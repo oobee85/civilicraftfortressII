@@ -37,7 +37,7 @@ public class Game {
 		currentMode = BuildMode.NOMODE;
 		
 		world = new Tile[(int) worldSize.getX()][(int) worldSize.getY()];
-		genTerrain();
+		genTerrain(0.5);
 
 	}
 
@@ -61,7 +61,7 @@ public class Game {
 		return rand / tries;
 	}
 
-	private void genTerrain() {
+	private void genTerrain(double percentageGrass) {
 		System.out.println("gen terr");
 		LinkedList<double[][]> noises = new LinkedList<>();
 
@@ -104,13 +104,52 @@ public class Game {
 				}
 			}
 		}
-
+		
+		// make twenty bins to count how many tiles have which value from terrain gen
+		int[] bins = new int[20];
+		double minValue = smoothed[0][0];
+		double maxValue = smoothed[0][0];
+		for (int i = 0; i < x; i++) {
+			for (int j = 0; j < y; j++) {
+				minValue = smoothed[i][j] < minValue ? smoothed[i][j] : minValue;
+				maxValue = smoothed[i][j] > maxValue ? smoothed[i][j] : maxValue;
+				
+				// This is the same as:
+//				if(smoothed[i][j] > maxValue) {
+//					maxValue = smoothed[i][j];
+//				}
+//				else {
+//					maxValue = maxValue;
+//				}
+			}
+		}
+		// if values range from: 0 to 1
+		// bin 0: 0-0.05
+		// bin 1: 0.05-0.1
+		// ..
+		// bin 19: 0.95-1
+		for (int i = 0; i < x; i++) {
+			for (int j = 0; j < y; j++) {
+				int bin = (int) ((bins.length-1) * (smoothed[i][j] - minValue) / (maxValue - minValue));
+				bins[bin]++;
+			}
+		}
+		int totalNumTiles = x*y;
+		int numGrassTilesSoFar = 0;
+		double cutoffThreshold = 0;
+		for(int bin = 0; bin < bins.length; bin++) {
+			numGrassTilesSoFar += bins[bin];
+			if(numGrassTilesSoFar >= totalNumTiles * percentageGrass) {
+				cutoffThreshold = (double)bin / bins.length * (maxValue - minValue) + minValue;
+				break;
+			}
+		}
 		for (int i = 0; i < x; i++) {
 			for (int j = 0; j < y; j++) {
 
 				Position p = new Position(i, j);
 				Terrain t;
-				if (smoothed[i][j] > 0.55) {
+				if (smoothed[i][j] > cutoffThreshold) {
 					t = Terrain.DIRT;
 				} else {
 					t = Terrain.GRASS;
