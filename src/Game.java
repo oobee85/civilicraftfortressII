@@ -161,7 +161,31 @@ public class Game {
 			}
 		}
 		makeRoad();
+		makeVolcano();
 
+	}
+	
+	private void makeVolcano() {
+		int x = (int) (Math.random() * world.length);
+		int y = (int) (Math.random() * world.length);
+		
+		double magmaRadius = 2.5;
+		double mountainRadius = 6;
+		for(int i = 0; i < world.length; i++) {
+			for(int j = 0; j < world[i].length; j++) {
+				int dx = i - x;
+				int dy = j - y;
+				double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
+				Position p = new Position(i, j);
+				if(distanceFromCenter < magmaRadius) {
+					world[i][j] = new Tile(null, p, Terrain.MAGMA);
+				}
+				else if(distanceFromCenter < mountainRadius) {
+					world[i][j] = new Tile(null, p, Terrain.DIRT);
+				}
+			}
+		}
+		
 	}
 
 	private void makeRoad() {

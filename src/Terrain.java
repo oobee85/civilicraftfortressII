@@ -8,7 +8,8 @@ import javax.imageio.ImageIO;
 
 public enum Terrain {
 	    GRASS (5, "Images/grass.jpg"),
-	    DIRT  (4, "Images/dirt.jpg")
+	    DIRT  (4, "Images/dirt.jpg"),
+	    MAGMA  (1, "Images/magma.png")
 		;
 	    private final int moveSpeed;   
 	    
