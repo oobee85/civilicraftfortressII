@@ -7,23 +7,33 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 
 public enum Terrain {
-	    GRASS (5, "Images/grass.jpg"),
-	    DIRT  (4, "Images/dirt.jpg"),
-	    MAGMA  (1, "Images/magma.png")
+	    GRASS (5, new String[] {"Images/grass.jpg", "Images/grass512.png"}),
+	    DIRT  (4, new String[] {"Images/dirt.jpg", "Images/dirt512.png"}),
+	    MAGMA  (1, new String[] {"Images/magma32.png", "Images/magma128.png", "Images/magma512.png"})
 		;
 	    private final int moveSpeed;   
 	    
-	    private final BufferedImage image;
+	    private final BufferedImage[] mipmaps;
+	    private final int[] mipmapSizes;
 	    
 	    
-	    Terrain(int speed, String s) {
+	    Terrain(int speed, String[] s) {
 	        this.moveSpeed = speed;
-	        this.image = Utils.loadImage(50, 50, s);
+	        mipmaps = new BufferedImage[s.length];
+	        mipmapSizes = new int[s.length];
+	        for(int i = 0; i < s.length; i++) {
+	        	mipmaps[i] = Utils.loadImage(s[i]);
+	        	mipmapSizes[i] = mipmaps[i].getWidth();
+	        }
 	    }
 	    
-	    public BufferedImage getImage() {
-	    	
-	    	return image;
+	    public BufferedImage getImage(int size) {
+	    	for(int i = 0; i < mipmapSizes.length; i++) {
+	    		if(mipmapSizes[i] > size) {
+	    			return mipmaps[i];
+	    		}
+	    	}
+	    	return mipmaps[mipmaps.length-1];
 	    }
 	    
 	    private int moveSpeed() {
