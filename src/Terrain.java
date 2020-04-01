@@ -7,9 +7,9 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 
 public enum Terrain {
-	    GRASS (5, new String[] {"Images/grass.jpg", "Images/grass512.png"}),
-	    DIRT  (4, new String[] {"Images/dirt16.png", "Images/dirt.jpg", "Images/dirt512.png"}),
-	    MAGMA  (1, new String[] {"Images/lava16.png", "Images/lavaanim.gif"})
+	    GRASS (5, new String[] {"Images/grass/grass16.jpg", "Images/grass/grass128.jpg", "Images/grass/grass512.png"}),
+	    DIRT  (4, new String[] {"Images/dirt/dirt16.png", "Images/dirt/dirt128.jpg", "Images/dirt/dirt512.png"}),
+	    MAGMA  (1, new String[] {"Images/lava/lava16.png", "Images/lava/lavaanim.gif", "Images/lava/magma512.png"})
 	    ;
 	
 	    private final int moveSpeed;   
