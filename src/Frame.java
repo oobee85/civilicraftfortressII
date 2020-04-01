@@ -289,7 +289,7 @@ public class Frame extends JPanel{
 		frame.repaint();
 		System.err.println(gamepanel.getWidth());
 		gamepanel.requestFocus();
-		
+		gameInstance.setViewSize(gamepanel.getWidth(), gamepanel.getHeight());
 	
 	}
 	

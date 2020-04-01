@@ -28,6 +28,7 @@ public enum Terrain {
 	    }
 	    
 	    public BufferedImage getImage(int size) {
+	    	// Get the first mipmap that is larger than the tile size
 	    	for(int i = 0; i < mipmapSizes.length; i++) {
 	    		if(mipmapSizes[i] > size) {
 	    			return mipmaps[i];

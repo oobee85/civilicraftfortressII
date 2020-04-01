@@ -20,6 +20,9 @@ public class Game {
 	private BuildMode currentMode;
 	private int rotate = 0;
 	
+	private int panelWidth;
+	private int panelHeight;
+	
 	public enum BuildMode{
 		NOMODE,
 		ROAD,
@@ -39,6 +42,11 @@ public class Game {
 		world = new Tile[(int) worldSize.getX()][(int) worldSize.getY()];
 		genTerrain(0.5);
 
+	}
+	
+	public void setViewSize(int width, int height) {
+		panelWidth = width;
+		panelHeight = height;
 	}
 
 	private void grid(Graphics g) {
@@ -206,15 +214,21 @@ public class Game {
 	}
 
 	public void draw(Graphics g) {
-
-		for (int i = 0; i < x; i++) {
-			for (int j = 0; j < y; j++) {
+		
+		// Try to only draw stuff that is visible on the screen
+		int lowerX = Math.max(0, viewOffset.divide(tileSize).getIntX());
+		int lowerY = Math.max(0, viewOffset.divide(tileSize).getIntY());
+		int upperX = Math.min(x, lowerX + panelWidth/tileSize);
+		int upperY = Math.min(y, lowerY + panelHeight/tileSize);
+		
+		for (int i = lowerX; i < upperX; i++) {
+			for (int j = lowerY; j < upperY; j++) {
 				Tile t = world[i][j];
 				t.draw(g);
 			}
 		}
-		for (int i = 0; i < x; i++) {
-			for (int j = 0; j < y; j++) {
+		for (int i = lowerX; i < upperX; i++) {
+			for (int j = lowerY; j < upperY; j++) {
 				Tile t = world[i][j];
 				
 				if(currentMode == BuildMode.WALL) {
