@@ -18,7 +18,7 @@ public enum Buildings {
 	    
 	    Buildings(int hp, String s) {
 	        this.health = hp;
-	        this.image = Utils.loadImage(50, 50, s);
+	        this.image = Utils.loadImage(s);
 	    }
 	    
 	    public BufferedImage getImage() {

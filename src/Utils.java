@@ -11,11 +11,11 @@ public final class Utils {
 	public static final HashMap<String, BufferedImage> roadImages;
 	static {
 		roadImages = new HashMap<>();
-		roadImages.put("top_down", loadImage(50, 50, "Images/road.png"));
-		roadImages.put("left_right", loadImage(50, 50, "Images/road_left_right.png"));
+		roadImages.put("top_down", loadImage("Images/road.png"));
+		roadImages.put("left_right", loadImage("Images/road_left_right.png"));
 	}
 
-    public static final BufferedImage getDefaultSkin(int width, int height) {
+    public static final BufferedImage getDefaultSkin() {
         BufferedImage temp = new BufferedImage(50,50,BufferedImage.TYPE_3BYTE_BGR);
         Graphics g = temp.getGraphics();
         g.drawLine(0, 0, 50, 50);
@@ -23,8 +23,8 @@ public final class Utils {
         return temp;
     }
     
-    public static final BufferedImage loadImage(int width, int height, String filename) {
-        BufferedImage temp = Utils.getDefaultSkin(50, 50);
+    public static final BufferedImage loadImage(String filename) {
+        BufferedImage temp = Utils.getDefaultSkin();
         try {
         	URL a = Utils.class.getResource(filename);
         	if(a!=null) {

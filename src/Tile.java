@@ -61,7 +61,7 @@ public class Tile {
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
 
-		g.drawImage(terr.getImage(), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
+		g.drawImage(terr.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
 	}
 	
 	private void applyHighlight(Graphics g, String bm) {

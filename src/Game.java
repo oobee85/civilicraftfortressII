@@ -22,6 +22,9 @@ public class Game {
 	private int rotate = 0;
 
 	
+	private int panelWidth;
+	private int panelHeight;
+	
 	public enum BuildMode{
 		NOMODE,
 		ROAD,
@@ -40,8 +43,13 @@ public class Game {
 		currentMode = BuildMode.NOMODE;
 		
 		world = new Tile[(int) worldSize.getX()][(int) worldSize.getY()];
-		genTerrain();
+		genTerrain(0.5);
 
+	}
+	
+	public void setViewSize(int width, int height) {
+		panelWidth = width;
+		panelHeight = height;
 	}
 
 	private void grid(Graphics g) {
@@ -64,7 +72,7 @@ public class Game {
 		return rand / tries;
 	}
 
-	private void genTerrain() {
+	private void genTerrain(double percentageGrass) {
 		System.out.println("gen terr");
 		LinkedList<double[][]> noises = new LinkedList<>();
 
@@ -107,13 +115,52 @@ public class Game {
 				}
 			}
 		}
-
+		
+		// make twenty bins to count how many tiles have which value from terrain gen
+		int[] bins = new int[20];
+		double minValue = smoothed[0][0];
+		double maxValue = smoothed[0][0];
+		for (int i = 0; i < x; i++) {
+			for (int j = 0; j < y; j++) {
+				minValue = smoothed[i][j] < minValue ? smoothed[i][j] : minValue;
+				maxValue = smoothed[i][j] > maxValue ? smoothed[i][j] : maxValue;
+				
+				// This is the same as:
+//				if(smoothed[i][j] > maxValue) {
+//					maxValue = smoothed[i][j];
+//				}
+//				else {
+//					maxValue = maxValue;
+//				}
+			}
+		}
+		// if values range from: 0 to 1
+		// bin 0: 0-0.05
+		// bin 1: 0.05-0.1
+		// ..
+		// bin 19: 0.95-1
+		for (int i = 0; i < x; i++) {
+			for (int j = 0; j < y; j++) {
+				int bin = (int) ((bins.length-1) * (smoothed[i][j] - minValue) / (maxValue - minValue));
+				bins[bin]++;
+			}
+		}
+		int totalNumTiles = x*y;
+		int numGrassTilesSoFar = 0;
+		double cutoffThreshold = 0;
+		for(int bin = 0; bin < bins.length; bin++) {
+			numGrassTilesSoFar += bins[bin];
+			if(numGrassTilesSoFar >= totalNumTiles * percentageGrass) {
+				cutoffThreshold = (double)bin / bins.length * (maxValue - minValue) + minValue;
+				break;
+			}
+		}
 		for (int i = 0; i < x; i++) {
 			for (int j = 0; j < y; j++) {
 
 				Position p = new Position(i, j);
 				Terrain t;
-				if (smoothed[i][j] > 0.55) {
+				if (smoothed[i][j] > cutoffThreshold) {
 					t = Terrain.DIRT;
 				} else {
 					t = Terrain.GRASS;
@@ -125,7 +172,31 @@ public class Game {
 			}
 		}
 		makeRoad();
+		makeVolcano();
 
+	}
+	
+	private void makeVolcano() {
+		int x = (int) (Math.random() * world.length);
+		int y = (int) (Math.random() * world.length);
+		
+		double magmaRadius = 2.5;
+		double mountainRadius = 6;
+		for(int i = 0; i < world.length; i++) {
+			for(int j = 0; j < world[i].length; j++) {
+				int dx = i - x;
+				int dy = j - y;
+				double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
+				Position p = new Position(i, j);
+				if(distanceFromCenter < magmaRadius) {
+					world[i][j] = new Tile(null, p, Terrain.MAGMA);
+				}
+				else if(distanceFromCenter < mountainRadius) {
+					world[i][j] = new Tile(null, p, Terrain.DIRT);
+				}
+			}
+		}
+		
 	}
 
 	private void makeRoad() {
@@ -146,15 +217,21 @@ public class Game {
 	}
 
 	public void draw(Graphics g) {
-
-		for (int i = 0; i < x; i++) {
-			for (int j = 0; j < y; j++) {
+		
+		// Try to only draw stuff that is visible on the screen
+		int lowerX = Math.max(0, viewOffset.divide(tileSize).getIntX());
+		int lowerY = Math.max(0, viewOffset.divide(tileSize).getIntY());
+		int upperX = Math.min(x, lowerX + panelWidth/tileSize);
+		int upperY = Math.min(y, lowerY + panelHeight/tileSize);
+		
+		for (int i = lowerX; i < upperX; i++) {
+			for (int j = lowerY; j < upperY; j++) {
 				Tile t = world[i][j];
 				t.draw(g);
 			}
 		}
-		for (int i = 0; i < x; i++) {
-			for (int j = 0; j < y; j++) {
+		for (int i = lowerX; i < upperX; i++) {
+			for (int j = lowerY; j < upperY; j++) {
 				Tile t = world[i][j];
 				
 				if(currentMode == BuildMode.WALL) {
