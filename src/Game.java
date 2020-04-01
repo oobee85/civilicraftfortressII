@@ -43,7 +43,7 @@ public class Game {
 		currentMode = BuildMode.NOMODE;
 		
 		world = new Tile[(int) worldSize.getX()][(int) worldSize.getY()];
-		genTerrain(0.5);
+		genTerrain(0.8);
 
 	}
 	
