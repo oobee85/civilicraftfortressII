@@ -183,6 +183,7 @@ public class Frame extends JPanel{
 			
 			@Override
 			public void mouseMoved(MouseEvent e) {
+				
 				mx = e.getX();
 				my = e.getY();
 				gameInstance.mouseOver(mx, my);
@@ -190,8 +191,8 @@ public class Frame extends JPanel{
 			
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				
-				
+//				System.out.println("mouse drag");
+				dragged = true;
 				if(SwingUtilities.isRightMouseButton(e)) {
 					int mrx = e.getX();
 					int mry = e.getY();
@@ -200,11 +201,15 @@ public class Frame extends JPanel{
 					gameInstance.shiftView(dx, dy);
 					mx = mrx;
 					my = mry;
+					
 					gameInstance.mouseOver(mx, my);
 				}else if(SwingUtilities.isLeftMouseButton(e)) {
-					mx = e.getX();
-					my = e.getY();
-					gameInstance.mouseOver(mx, my);
+					int mx2 = e.getX();
+					int my2 = e.getY();
+					
+					gameInstance.mouseOver(mx2, my2);
+					gameInstance.selectBox(mx,my, mx2, my2);
+					
 				}
 					
 				
@@ -217,18 +222,23 @@ public class Frame extends JPanel{
 			
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				
-				if(e.getButton()== MouseEvent.BUTTON1) {
+//				System.out.println("mouse release");
+				if(e.getButton()== MouseEvent.BUTTON1 && dragged ==false) {
+					
 					System.out.println("click");
-						gameInstance.mouseClick(mx, my);
-						
+					gameInstance.mouseClick(mx, my);
+					
 				}
+				dragged = false;
 				
-				
+				gameInstance.resetHoveredArea();
 			}
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+//				System.out.println("mousepressed");
+				mx = e.getX();
+				my = e.getY();
 				
 			}
 
@@ -260,11 +270,11 @@ public class Frame extends JPanel{
 			public void keyPressed(KeyEvent e) {
 				
 				//esc closes game
-				if(e.getKeyCode()==27) {
+				if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {
 					exitGame();
 				}
 				//r rotates
-				if (e.getKeyCode()==82) {
+				if (e.getKeyCode()==KeyEvent.VK_R) {
 					gameInstance.rotateBlock();
 				}
 				

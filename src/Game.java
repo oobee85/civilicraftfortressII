@@ -17,8 +17,10 @@ public class Game {
 	private int money;
 	private Position viewOffset;
 	private Position hoveredTile;
+	private Area hoveredArea;
 	private BuildMode currentMode;
 	private int rotate = 0;
+
 	
 	private int panelWidth;
 	private int panelHeight;
@@ -36,6 +38,7 @@ public class Game {
 		y = wSize.y;
 		money = 100;
 		hoveredTile = new Position(-1,-1);
+		hoveredArea = new Area(0,0,0,0);
 		viewOffset = new Position(0, 0);
 		currentMode = BuildMode.NOMODE;
 		
@@ -240,9 +243,14 @@ public class Game {
 				if(i==hoveredTile.getIntX() && j==hoveredTile.getIntY()) {
 					t.highlight(g);
 				}
+				if(hoveredArea.contains(i, j)) {
+					t.highlight(g);
+				}
+				
 			}
 		}
-
+		
+		
 		grid(g);
 	}
 
@@ -259,6 +267,12 @@ public class Game {
 		Position tile = getTileAtPixel(new Position(mx, my));
 //		System.out.println("Mouse is on tile " + tile);
 		hoveredTile = tile;
+	}
+	public void selectBox(int x1, int y1, int x2, int y2) {
+		Position p1 = getTileAtPixel(new Position(x1,y1));
+		Position p2 = getTileAtPixel(new Position(x2,y2));
+		hoveredArea = new Area(p1.getIntX(),p1.getIntY(), p2.getIntX(), p2.getIntY());
+		
 	}
 	public void mouseClick(int mx, int my) {
 		Position tile = getTileAtPixel(new Position(mx, my));
@@ -330,6 +344,9 @@ public class Game {
 	public BuildMode getMode() {
 		return currentMode;
 		
+	}
+	public void resetHoveredArea() {
+		hoveredArea = new Area(0,0,0,0);
 	}
 
 	protected void drawGame(Graphics g) {
