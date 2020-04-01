@@ -219,10 +219,10 @@ public class Game {
 	public void draw(Graphics g) {
 		
 		// Try to only draw stuff that is visible on the screen
-		int lowerX = Math.max(0, viewOffset.divide(tileSize).getIntX() - 1);
-		int lowerY = Math.max(0, viewOffset.divide(tileSize).getIntY() - 1);
-		int upperX = Math.min(x, lowerX + panelWidth/tileSize + 1);
-		int upperY = Math.min(y, lowerY + panelHeight/tileSize + 1);
+		int lowerX = Math.max(0, viewOffset.divide(tileSize).getIntX() - 2);
+		int lowerY = Math.max(0, viewOffset.divide(tileSize).getIntY() - 2);
+		int upperX = Math.min(x, lowerX + panelWidth/tileSize + 4);
+		int upperY = Math.min(y, lowerY + panelHeight/tileSize + 4);
 		
 		for (int i = lowerX; i < upperX; i++) {
 			for (int j = lowerY; j < upperY; j++) {
