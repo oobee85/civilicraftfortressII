@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 
@@ -13,7 +14,7 @@ public enum Buildings {
 		;
 	
 	    private final int health;   
-	    private final BufferedImage image;
+	    private final Image image;
 	    
 	    
 	    Buildings(int hp, String s) {
@@ -21,7 +22,7 @@ public enum Buildings {
 	        this.image = Utils.loadImage(s);
 	    }
 	    
-	    public BufferedImage getImage() {
+	    public Image getImage() {
 	    	
 	    	return image;
 	    }
