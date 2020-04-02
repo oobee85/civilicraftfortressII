@@ -180,19 +180,19 @@ public class Game {
 		int x = (int) (Math.random() * world.length);
 		int y = (int) (Math.random() * world.length);
 		
-		double magmaRadius = 2.5;
-		double mountainRadius = 6;
+		double lavaRadius = 2.5;
+		double mountainRadius = 10;
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world[i].length; j++) {
 				int dx = i - x;
 				int dy = j - y;
 				double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
 				Position p = new Position(i, j);
-				if(distanceFromCenter < magmaRadius) {
-					world[i][j] = new Tile(null, p, Terrain.MAGMA);
+				if(distanceFromCenter < lavaRadius) {
+					world[i][j] = new Tile(null, p, Terrain.LAVA);
 				}
 				else if(distanceFromCenter < mountainRadius) {
-					world[i][j] = new Tile(null, p, Terrain.DIRT);
+					world[i][j] = new Tile(null, p, Terrain.VOLCANO);
 				}
 			}
 		}
@@ -203,17 +203,50 @@ public class Game {
 		int topTile = (int) (Math.random() * world.length);
 		int botTile = (int) (Math.random() * world.length);
 		
+//		topTile = 10;
+//		botTile = world.length/6;
+		
 		Position start = new Position(topTile, 0);
 		Position end = new Position(botTile, world.length-1);
 		
+		Position prevRoad = new Position(0,0);
 		for(double t = 0; t < 1; t += 0.1 / world.length) {
 			Position current = start.multiply(t).add(end.multiply(1-t));
-			world[current.getIntX()][current.getIntY()].setHasRoad(true,rotate);
+			
+			turnRoads(current,prevRoad);
+			prevRoad = current;
+			
 		}
 		
 		double castleDistance = getRandomNormal(5);
 		Position halfway = start.multiply(castleDistance).add(end.multiply(1-castleDistance));
 		world[halfway.getIntX()][halfway.getIntY()].setStructure(new Structure());
+	}
+	
+	private void turnRoads(Position current, Position prev) {
+		
+		//makes turns   bot left -> top right
+		if(current.getIntX()-1 == prev.getIntX() && current.getIntY() == prev.getIntY()) {
+			world[current.getIntX()-1][current.getIntY()].setHasRoad(true, "left_down");
+			world[current.getIntX()][current.getIntY()].setHasRoad(true, "right_up");
+		}else if(current.getIntX()-1 == prev.getIntX() && current.getIntY()+1 == prev.getIntY()) {
+			world[current.getIntX()-1][current.getIntY()].setHasRoad(true, "left_down");
+			world[current.getIntX()][current.getIntY()].setHasRoad(true, "right_up");
+		}
+		
+		
+		//makes turns bot right -> top left
+		if(current.getIntX()+1 == prev.getIntX() && current.getIntY() == prev.getIntY()) {
+			world[current.getIntX()+1][current.getIntY()].setHasRoad(true, "right_down");
+			world[current.getIntX()][current.getIntY()].setHasRoad(true, "left_up");
+		}else if(current.getIntX()+1 == prev.getIntX() && current.getIntY()+1 == prev.getIntY()) {
+			world[current.getIntX()+1][current.getIntY()].setHasRoad(true, "right_down");
+			world[current.getIntX()][current.getIntY()].setHasRoad(true, "left_up");
+		}
+		
+		if(world[current.getIntX()][current.getIntY()].getHasRoad() == false) {
+			world[current.getIntX()][current.getIntY()].setHasRoad(true, "top_down");
+		}
 	}
 
 	public void draw(Graphics g) {
@@ -303,6 +336,7 @@ public class Game {
 			Position focalPoint = tile.multiply(tileSize).subtract(viewOffset);
 			viewOffset.x -= mx - focalPoint.x;
 			viewOffset.y -= my - focalPoint.y;
+			System.out.println("Tilesize: "+tileSize);
 		}
 	}
 

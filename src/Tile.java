@@ -20,6 +20,7 @@ public class Tile {
 	private int rotate;
 	private String corner;
 	private boolean isHighlight;
+	private String roadCorner;
 
 	public Tile(Unit u, Position point, Terrain t) {
 		unit = u;
@@ -36,10 +37,9 @@ public class Tile {
 		}
 	}
 
-	public void setHasRoad(boolean r, int i) {
-		
+	public void setHasRoad(boolean r, String s) {
 			this.hasRoad = r;
-			rotate = i;
+			roadCorner = s;
 	}
 	
 	public void setHasWall(boolean w, int i) {
@@ -116,6 +116,10 @@ public class Tile {
 			
 		}
 	}
+	private void drawRoad(Graphics g) {
+		
+		
+	}
 
 	public void drawEntities(Graphics g, String bm) {
 		int extra = 0;
@@ -123,7 +127,8 @@ public class Tile {
 			extra = minEntitySize - Game.tileSize;
 		}
 		if (hasRoad == true) {
-			g.drawImage(Utils.roadImages.get("top_down"), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
+			
+			g.drawImage(Utils.roadImages.get(roadCorner), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
 		}
 		
 		applyHighlight(g, bm);
@@ -141,7 +146,9 @@ public class Tile {
 	public boolean getHasWall() {
 		return hasWall;
 	}
-
+	public boolean getHasRoad() {
+		return hasRoad;
+	}
 	public void highlight(Graphics g) {
 		isHighlight = true;
 		

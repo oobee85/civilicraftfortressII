@@ -12,8 +12,14 @@ public final class Utils {
 	public static final HashMap<String, Image> roadImages;
 	static {
 		roadImages = new HashMap<>();
-		roadImages.put("top_down", loadImage("Images/road.png"));
-		roadImages.put("left_right", loadImage("Images/road_left_right.png"));
+		roadImages.put("top_down", loadImage("Images/road/road_up.png"));
+		roadImages.put("left_right", loadImage("Images/road/road_left_right.png"));
+		
+		roadImages.put("left_down", loadImage("Images/road/road_left_down.png"));
+		roadImages.put("left_up", loadImage("Images/road/road_left_up.png"));
+		roadImages.put("right_down", loadImage("Images/road/road_right_down.png"));
+		roadImages.put("right_up", loadImage("Images/road/road_right_up.png"));
+		
 	}
 
     public static final Image getDefaultSkin() {

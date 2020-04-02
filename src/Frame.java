@@ -144,11 +144,15 @@ public class Frame extends JPanel{
 		JLabel stone = new JLabel(); 
 		stone.setText("Stone = "+gameInstance.getMoney());
 		
+		JLabel tSize = new JLabel(); 
+		stone.setText("TileSize = "+gameInstance.tileSize);
+		
 		makeRoad.setFocusable(false);
 		makeWall.setFocusable(false);
 		
 		gui.add(money);
 		gui.add(stone);
+		gui.add(tSize);
 		gui.add(makeRoad);
 		gui.add(makeWall);
 		
