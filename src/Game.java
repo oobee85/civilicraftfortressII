@@ -23,6 +23,8 @@ public class Game {
 	private double snowEdgeRatio = 0.5;
 	private double rockEdgeRatio = 0.7;
 	private double oreRarity = 0.01;
+	private double bushRarity = 0.005;
+	private double waterPlantRarity = 0.05;
 	
 	private int panelWidth;
 	private int panelHeight;
@@ -66,6 +68,10 @@ public class Game {
 			rand += Math.random();
 		}
 		return rand / tries;
+	}
+	private void genResources() {
+		genOres();
+		genPlants();
 	}
 
 	
@@ -173,29 +179,57 @@ public class Game {
 		makeVolcano();
 		makeLake();
 		makeRoad();
-		genOres();
+		genResources();
+	}
+	
+	private void genPlants() {
+		for(int i = 0; i < world.length; i++) {
+			for(int j = 0; j < world.length; j++) {
+				
+				//generates land plants
+				if(world[i][j].checkTerrain(Terrain.GRASS) && Math.random() < bushRarity) {
+					double o = Math.random();
+					if(o < Plant.BERRY.getRarity()) {
+						world[i][j].setHasPlant(Plant.BERRY);
+					}
+					
+				}
+				//generates water plants
+				if(world[i][j].checkTerrain(Terrain.WATER) && Math.random() < waterPlantRarity) {
+					double o = Math.random();
+					if(o < Plant.CATTAIL.getRarity()) {
+						world[i][j].setHasPlant(Plant.CATTAIL);
+					}
+					
+				}
+				
+				
+			}
+		}
+		
+		
 	}
 	
 	private void genOres() {
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world.length; j++) {
 				
+				//ore generation on rock
 				if(world[i][j].checkTerrain(Terrain.ROCK) && Math.random() < oreRarity) {
-					
 					double o = Math.random();
 					if(o < Ore.ORE_GOLD.getRarity()) {
 						world[i][j].setHasOre(Ore.ORE_GOLD);
 					}else if(o < Ore.ORE_SILVER.getRarity()) {
 						world[i][j].setHasOre(Ore.ORE_SILVER);
-					}else if(o < Ore.ORE_IRON.getRarity()) {
-						world[i][j].setHasOre(Ore.ORE_IRON);
 					}else if(o < Ore.ORE_COPPER.getRarity()) {
 						world[i][j].setHasOre(Ore.ORE_COPPER);
+					}else if(o < Ore.ORE_IRON.getRarity()) {
+						world[i][j].setHasOre(Ore.ORE_IRON);
 					}
-					
 				}
 				
-				if(world[i][j].checkTerrain(Terrain.VOLCANO) && Math.random() < oreRarity +0.1) {
+				//ore generation on volcano
+				if(world[i][j].checkTerrain(Terrain.VOLCANO) && Math.random() < oreRarity +0.2) {
 					double o = Math.random();
 					if(o < Ore.ORE_GOLD.getRarity()) {
 						world[i][j].setHasOre(Ore.ORE_GOLD);
@@ -210,12 +244,12 @@ public class Game {
 			}
 		}
 		
+		
 	}
 	
 	private void makeVolcano() {
 		int x = (int) (Math.random() * world.length);
 		int y = (int) (Math.random() * world.length);
-		
 		
 		double lavaRadius = 2.5;
 		double volcanoRadius = 9;
@@ -333,10 +367,23 @@ public class Game {
 			prevRoad = current;
 			
 		}
+		makeCastle(start, end);
 		
+		
+	}
+	private void makeCastle(Position start, Position end) {
 		double castleDistance = getRandomNormal(5);
 		Position halfway = start.multiply(castleDistance).add(end.multiply(1-castleDistance));
+		
 		world[halfway.getIntX()][halfway.getIntY()].setStructure(new Structure());
+		
+		
+	}
+	private boolean canBuildCastle(Position halfway) {
+		if(world[halfway.getIntX()][halfway.getIntY()].canBuild() == false) {
+			return false;
+		}
+		return true;
 	}
 	
 	private void turnRoads(Position current, Position prev) {

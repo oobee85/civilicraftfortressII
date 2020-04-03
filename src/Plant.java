@@ -1,11 +1,10 @@
 import java.awt.Image;
 
-public enum Ore {
+public enum Plant {
 	
-	ORE_IRON ( 100, new String[] {"Images/ore/ore_iron16.png", "Images/ore/ore_iron128.png"} , 1.0),
-	ORE_COPPER ( 100, new String[] {"Images/ore/ore_copper16.png", "Images/ore/ore_copper128.png"} , 0.6),
-	ORE_GOLD ( 100, new String[] {"Images/ore/ore_gold16.png", "Images/ore/ore_gold128.png"} , 0.1),
-	ORE_SILVER ( 100, new String[] {"Images/ore/ore_silver16.png", "Images/ore/ore_silver128.png"} , 0.3),
+	BERRY ( 100, new String[] {"Images/plants/berry16.png", "Images/plants/berry128.png"} , 1.0),
+	BERRY_DEPLETED ( 0, new String[] {"Images/plants/berry_depleted16.png", "Images/plants/berry_depleted128.png"} , 0.2),
+	CATTAIL ( 100, new String[] {"Images/plants/cattail32.png"} , 1.0),
 	;
 	
 	
@@ -14,7 +13,7 @@ public enum Ore {
     private int yield;
     private double rarity;
     
-	Ore(int y, String[] s, double r){
+	Plant(int y, String[] s, double r){
 		yield = y;
 		rarity = r;
 		

@@ -22,6 +22,7 @@ public class Tile {
 	private boolean isHighlight;
 	private String roadCorner;
 	private Ore ore;
+	private Plant plant;
 	
 	public Tile(Unit u, Position point, Terrain t) {
 		unit = u;
@@ -44,6 +45,9 @@ public class Tile {
 	}
 	public void setHasOre(Ore o) {
 		ore = o;
+	}
+	public void setHasPlant(Plant p) {
+		plant = p;
 	}
 	
 	public void setHasWall(boolean w, int i) {
@@ -68,12 +72,14 @@ public class Tile {
 		g.drawImage(terr.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
 	}
 	private void drawOre(Graphics g) {
-		
 		if(ore != null) {
 			g.drawImage(ore.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
 		}
-		
-		
+	}
+	private void drawPlant(Graphics g) {
+		if(plant != null) {
+			g.drawImage(plant.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
+		}
 	}
 	
 	private void applyHighlight(Graphics g, String bm) {
@@ -127,7 +133,7 @@ public class Tile {
 		if (structure != null) {
 			g.drawImage(structure.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
 		}
-		
+		drawPlant(g);
 		drawOre(g);
 		isHighlight = false;
 	}
