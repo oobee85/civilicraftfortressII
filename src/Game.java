@@ -174,10 +174,9 @@ public class Game {
 
 			}
 		}
-		
+		makeLake();
 		makeMountain();
 		makeVolcano();
-		makeLake();
 		makeRoad();
 		genResources();
 	}
@@ -379,12 +378,6 @@ public class Game {
 		
 		
 	}
-	private boolean canBuildCastle(Position halfway) {
-		if(world[halfway.getIntX()][halfway.getIntY()].canBuild() == false) {
-			return false;
-		}
-		return true;
-	}
 	
 	private void turnRoads(Position current, Position prev) {
 		if(world[current.getIntX()][current.getIntY()].canBuild()==true) {
@@ -470,6 +463,15 @@ public class Game {
 		Position p1 = getTileAtPixel(new Position(x1,y1));
 		Position p2 = getTileAtPixel(new Position(x2,y2));
 		hoveredArea = new Area(p1.getIntX(),p1.getIntY(), p2.getIntX(), p2.getIntY());
+		selectResources();
+	}
+	
+	private void selectResources() {
+		for (int i = 0; i < hoveredArea.getIntX2()-hoveredArea.getIntX1(); i++) {
+			for (int j = 0; j < hoveredArea.getIntY2()-hoveredArea.getIntY1(); j++) {
+				world[hoveredArea.getIntX1()+i][hoveredArea.getIntY1()+j].setHighlight(true);;
+			}
+		}
 		
 	}
 	public void mouseClick(int mx, int my) {

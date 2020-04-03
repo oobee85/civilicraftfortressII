@@ -3,8 +3,9 @@ import java.awt.image.BufferedImage;
 
 
 public enum Buildings {
-	 WALL (5, "Images/wall.png"),
-	 
+	 	WALL_BRICK (5, "Images/wall_brick.png"),
+	 	WALL_WOOD (5, "Images/wall_brick.png")
+	 	
 		;
 	
 	    private final int health;   
