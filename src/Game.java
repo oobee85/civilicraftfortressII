@@ -171,31 +171,78 @@ public class Game {
 
 			}
 		}
-		makeRoad();
+		
+		makeMountain();
 		makeVolcano();
-
+		makeRoad();
 	}
 	
 	private void makeVolcano() {
 		int x = (int) (Math.random() * world.length);
 		int y = (int) (Math.random() * world.length);
 		
+		
 		double lavaRadius = 2.5;
-		double mountainRadius = 10;
+		double volcanoRadius = 9;
+		double mountainRadius = 20;
+		
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world[i].length; j++) {
 				int dx = i - x;
 				int dy = j - y;
 				double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
 				Position p = new Position(i, j);
+				
 				if(distanceFromCenter < lavaRadius) {
 					world[i][j] = new Tile(null, p, Terrain.LAVA);
 				}
-				else if(distanceFromCenter < mountainRadius) {
+				else if(distanceFromCenter < volcanoRadius) {
 					world[i][j] = new Tile(null, p, Terrain.VOLCANO);
+				}else if(distanceFromCenter <mountainRadius) {
+					if(world[i][j].checkTerrain(Terrain.ROCK_SNOW) == false) {
+						world[i][j] = new Tile(null, p, Terrain.ROCK);
+					}
+					
 				}
 			}
 		}
+		
+		
+	}
+	
+	private void makeMountain() {
+		
+		int x0 = (int) (Math.random() * world.length);
+		int y0 = (int) (Math.random() * world.length);
+		
+		double mountLength = Math.random()*80;;
+		double mountHeight = Math.random()*80;
+		double snowMountLength = mountLength/4;
+		double snowMountHeight = mountHeight/4;
+		
+		for(int i = 0; i < world.length; i++) {
+			for(int j = 0; j < world[i].length; j++) {
+				int dx = i - x0;
+				int dy = j - y0;
+				double mountain = (dx*dx)/(mountLength*mountLength) + (dy*dy)/(mountHeight*mountHeight);
+				double snowMountain = (dx*dx)/(snowMountLength*snowMountLength) + (dy*dy)/(snowMountHeight*snowMountHeight);
+				
+				Position p = new Position(i, j);
+				if (snowMountain <1 ) {
+					world[i][j] = new Tile(null, p, Terrain.ROCK_SNOW);
+				}else if(mountain < 1) {
+					world[i][j] = new Tile(null, p, Terrain.ROCK);
+				}
+				
+				
+				
+				
+			}
+		}
+		
+		
+	}
+	private void mountainDirection() {
 		
 	}
 
@@ -314,9 +361,13 @@ public class Game {
 		if(currentMode == BuildMode.ROAD) {
 			
 			world[tile.getIntX()][tile.getIntY()].buildRoad(true);
-		}else if(currentMode == BuildMode.WALL) {
+		} 
+		if(currentMode == BuildMode.WALL) {
 			
-			world[tile.getIntX()][tile.getIntY()].setHasWall(true,rotate);
+			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
+				world[tile.getIntX()][tile.getIntY()].setHasWall(true,rotate);
+			}
+			
 			
 		}
 		
@@ -336,7 +387,7 @@ public class Game {
 			Position focalPoint = tile.multiply(tileSize).subtract(viewOffset);
 			viewOffset.x -= mx - focalPoint.x;
 			viewOffset.y -= my - focalPoint.y;
-			System.out.println("Tilesize: "+tileSize);
+//			System.out.println("Tilesize: "+tileSize);
 		}
 	}
 

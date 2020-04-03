@@ -65,7 +65,13 @@ public class Tile {
 	}
 	
 	private void applyHighlight(Graphics g, String bm) {
+
+		
 		Graphics2D g2d = (Graphics2D)g;
+		
+		
+		
+		
 		
 		if(isHighlight == true && hasWall == false && bm != null && bm.equals("wall") ) {
 			AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F);
@@ -76,6 +82,13 @@ public class Tile {
 		    g2d.setComposite(ac2);
 		    drawWall(g,false);
 		}
+		
+//		if(terr.isBuildable(terr)==false) {
+//			Color c = new Color(255, 0, 0, 4); // Red with alpha = 0.5 
+//			g2d.setColor(c);
+//			g.setColor(c);
+//			g.fillRect(100,100,100,100); 
+//		}
 		
 	}
 	
@@ -148,6 +161,15 @@ public class Tile {
 	}
 	public boolean getHasRoad() {
 		return hasRoad;
+	}
+	public boolean canBuild() {
+		return terr.isBuildable(terr);
+	}
+	public boolean checkTerrain(Terrain t) {
+		if(terr == t) {
+			return true;
+		}
+		return false;
 	}
 	public void highlight(Graphics g) {
 		isHighlight = true;
