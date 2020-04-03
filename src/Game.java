@@ -24,10 +24,11 @@ public class Game {
 	private double oreRarity = 0.01;
 	private double bushRarity = 0.005;
 	private double waterPlantRarity = 0.05;
-	private double forestDensity = 0.5;
+	private double forestDensity = 0.3;
 	
 	private int panelWidth;
 	private int panelHeight;
+	private int fastModeTileSize = 10;
 	
 
 	public Game(int w, int h, Point wSize) {
@@ -385,9 +386,10 @@ public class Game {
 		int x0 = (int) (Math.random() * world.length);
 		int y0 = (int) (Math.random() * world.length);
 		
-		double forestLength = Math.random()*100+10;
-		double forestHeight = Math.random()*100+10;
-		
+		double forestLength = Math.random()*70+1;
+		double forestHeight = Math.random()*70+1;
+		double forestLengthEdge = forestLength+30;
+		double forestHeightEdge = forestHeight+30;
 		
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world[i].length; j++) {
@@ -395,23 +397,23 @@ public class Game {
 				int dy = j - y0;
 				
 				double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
-
-				Position p = new Position(i, j);
-				if(forest < 1 && Math.random()<forestDensity) {
-					
-					if(world[i][j].canBuild()==true && world[i][j].canPlant()==true) {
-						int t = (int) (Math.random()+1.5);
-						world[i][j].setHasForest(t);
+				double forestEdge = (dx*dx)/(forestLengthEdge*forestLengthEdge) + (dy*dy)/(forestHeightEdge*forestHeightEdge);
+				
+					if(world[i][j].canPlant()==true) {
+						
+						if(forestEdge < 1 && Math.random()<forestDensity-0.2) {
+							int t = (int) (Math.random()+0.5);
+							world[i][j].setHasForest(true, t);
+						}else if (forest < 1 && Math.random() < forestDensity) {
+							int t = (int) (Math.random()+0.5);
+							world[i][j].setHasForest(true, t);
+						}
+						
 					}
 					
-					
-				}
-				
-				
-				
-				
 			}
 		}
+		
 	}
 	
 	private void makeMountain() {
@@ -531,7 +533,7 @@ public class Game {
 		int upperX = Math.min(world.length, lowerX + panelWidth/tileSize + 4);
 		int upperY = Math.min(world[0].length, lowerY + panelHeight/tileSize + 4);
 		
-		if(Game.tileSize < 12) {
+		if(Game.tileSize < fastModeTileSize) {
 			if(showHeightMap) {
 				g.drawImage(heightMapImage, 0, 0, Game.tileSize*world.length, Game.tileSize*world[0].length, null);
 			}

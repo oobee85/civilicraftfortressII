@@ -8,8 +8,8 @@ public enum Terrain {
 	    ROCK (3, new String[] {"Images/mountain/rock16.png", "Images/mountain/rock128.png"}),
 	    SNOW (1, new String[] {"Images/mountain/snow16.png", "Images/mountain/snow128.png"}),
 	    WATER (0, new String[] {"Images/water/water16.png", "Images/water/water128.png", "Images/water/water512.png"}),
-	    FOREST1 (5, new String[] {"Images/forest/tree1.png"}),
-	    FOREST2 (5, new String[] {"Images/forest/tree2.png"})
+	    FOREST0 (5, new String[] {"Images/forest/tree0.png"}),
+	    FOREST1 (5, new String[] {"Images/forest/tree1.png"})
 	    ;
 	
 	    private final int moveSpeed;   
