@@ -49,6 +49,9 @@ public class Tile {
 	public void setHasPlant(Plant p) {
 		plant = p;
 	}
+	public void setHighlight(boolean b) {
+		isHighlight = b;
+	}
 	
 	public void setHasWall(boolean w, int i) {
 		if(hasWall == w) {
@@ -117,7 +120,7 @@ public class Tile {
 		}
 
 		if (highlight==true || hasWall == true) {
-			g.drawImage(Buildings.WALL.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
+			g.drawImage(Buildings.WALL_BRICK.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
 			
 		}
 	}
@@ -136,10 +139,17 @@ public class Tile {
 		
 		
 		if (structure != null) {
-			g.drawImage(structure.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
+			g.drawImage(structure.getImage(), p.getIntX() * Game.tileSize - extra / 1,p.getIntY() * Game.tileSize - extra / 1, Game.tileSize + extra, Game.tileSize + extra, null);
 		}
-		drawPlant(g);
-		drawOre(g);
+		
+		if(hasWall == false) {
+			drawPlant(g);
+			drawOre(g);
+		}
+		
+		if(plant != null && hasWall == true) {
+			plant = null;
+		}
 		isHighlight = false;
 	}
 
