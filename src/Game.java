@@ -11,6 +11,7 @@ public class Game {
 	private int turn;
 	private Point worldSize;
 	public Tile[][] world;
+	private double[][] heightMap;
 	int x;
 	int y;
 	protected static int tileSize = 10;
@@ -118,15 +119,14 @@ public class Game {
 				}
 			}
 		}
+		heightMap = smoothed;
 		
-		// make twenty bins to count how many tiles have which value from terrain gen
-		int[] bins = new int[20];
-		double minValue = smoothed[0][0];
-		double maxValue = smoothed[0][0];
+		double minValue = heightMap[0][0];
+		double maxValue = heightMap[0][0];
 		for (int i = 0; i < x; i++) {
 			for (int j = 0; j < y; j++) {
-				minValue = smoothed[i][j] < minValue ? smoothed[i][j] : minValue;
-				maxValue = smoothed[i][j] > maxValue ? smoothed[i][j] : maxValue;
+				minValue = heightMap[i][j] < minValue ? heightMap[i][j] : minValue;
+				maxValue = heightMap[i][j] > maxValue ? heightMap[i][j] : maxValue;
 				
 				// This is the same as:
 //				if(smoothed[i][j] > maxValue) {
@@ -137,14 +137,24 @@ public class Game {
 //				}
 			}
 		}
-		// if values range from: 0 to 1
-		// bin 0: 0-0.05
-		// bin 1: 0.05-0.1
-		// ..
-		// bin 19: 0.95-1
+		System.out.println("Min Terrain Gen Value: " + minValue + ", Max value: " + maxValue);
+		// Normalize the heightMap to be between 0 and 1
 		for (int i = 0; i < x; i++) {
 			for (int j = 0; j < y; j++) {
-				int bin = (int) ((bins.length-1) * (smoothed[i][j] - minValue) / (maxValue - minValue));
+				heightMap[i][j] = (heightMap[i][j] - minValue) / (maxValue - minValue);
+			}
+		}
+
+		// make ten bins to count how many tiles have which value from terrain gen
+		int[] bins = new int[10];
+		// if values range from: 0 to 1
+		// bin 0: 0-0.1
+		// bin 1: 0.1-0.2
+		// ..
+		// bin 9: 0.9-1
+		for (int i = 0; i < x; i++) {
+			for (int j = 0; j < y; j++) {
+				int bin = (int) ((bins.length-1) * heightMap[i][j]);
 				bins[bin]++;
 			}
 		}
@@ -154,13 +164,12 @@ public class Game {
 		for(int bin = 0; bin < bins.length; bin++) {
 			numGrassTilesSoFar += bins[bin];
 			if(numGrassTilesSoFar >= totalNumTiles * percentageGrass) {
-				cutoffThreshold = (double)bin / bins.length * (maxValue - minValue) + minValue;
+				cutoffThreshold = (double)bin / bins.length;
 				break;
 			}
 		}
 		for (int i = 0; i < x; i++) {
 			for (int j = 0; j < y; j++) {
-
 				Position p = new Position(i, j);
 				Terrain t;
 				if (smoothed[i][j] > cutoffThreshold) {
