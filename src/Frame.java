@@ -126,12 +126,22 @@ public class Frame extends JPanel{
 		makeRoad.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.ROAD);
 		});
-		
 		JButton makeWall = new JButton("Make Wall");
 		makeWall.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.WALL);
 		});
-		
+		JButton buildMine = new JButton("Build Mine");
+		buildMine.addActionListener(e -> {
+			gameInstance.setBuildMode(BuildMode.MINE);
+		});
+		JButton buildBarracks = new JButton("Build Barracks");
+		buildBarracks.addActionListener(e -> {
+			gameInstance.setBuildMode(BuildMode.BARRACKS);
+		});
+		JButton buildIrrigation = new JButton("Irrigate");
+		buildIrrigation.addActionListener(e -> {
+			gameInstance.setBuildMode(BuildMode.IRRIGATE);
+		});
 		JLabel money = new JLabel(); 
 		money.setText("Gold = "+gameInstance.getMoney());
 		JLabel stone = new JLabel(); 
@@ -142,6 +152,9 @@ public class Frame extends JPanel{
 		
 		makeRoad.setFocusable(false);
 		makeWall.setFocusable(false);
+		buildMine.setFocusable(false);
+		buildBarracks.setFocusable(false);
+		buildIrrigation.setFocusable(false);
 		
 		JToggleButton showHeightMap = new JToggleButton("Show Height Map");
 		showHeightMap.addActionListener(e -> {
@@ -149,11 +162,15 @@ public class Frame extends JPanel{
 			gameInstance.setShowHeightMap(showHeightMap.isSelected());
 		});
 		
+		gui.setPreferredSize(new Dimension(400,1080));
 		gui.add(money);
 		gui.add(stone);
 		gui.add(tSize);
 		gui.add(makeRoad);
 		gui.add(makeWall);
+		gui.add(buildMine);
+		gui.add(buildBarracks);
+		gui.add(buildIrrigation);
 		gui.add(showHeightMap);
 		
 		money.setFont(new Font("Verdana",1,20));

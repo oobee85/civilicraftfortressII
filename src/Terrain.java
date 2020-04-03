@@ -5,10 +5,10 @@ public enum Terrain {
 	    DIRT  (8, new String[] {"Images/dirt/dirt16.png", "Images/dirt/dirt128.png", "Images/dirt/dirt512.png"}),
 	    LAVA  (0, new String[] {"Images/lava/lava16.png", "Images/lava/lavaanim32.gif", "Images/lava/lava128.gif", "Images/lava/lava512.png"}),
 	    VOLCANO (1, new String[] {"Images/lava/volcano16.png", "Images/lava/volcano128.png", "Images/lava/magma512.png"}),
-	    ROCK (2, new String[] {"Images/mountain/rock16.png", "Images/mountain/rock128.png"}),
-	    ROCK_SNOW (1, new String[] {"Images/mountain/rock_snow16.png", "Images/mountain/rock_snow128.png"}),
-	    WATER (0, new String[] {"Images/water/water16.png", "Images/water/water128.png", "Images/water/water512.png"})
-	    
+	    ROCK (3, new String[] {"Images/mountain/rock16.png", "Images/mountain/rock128.png"}),
+	    SNOW (1, new String[] {"Images/mountain/snow16.png", "Images/mountain/snow128.png"}),
+	    WATER (0, new String[] {"Images/water/water16.png", "Images/water/water128.png", "Images/water/water512.png"}),
+	    FOREST (5, new String[] {"Images/forest/forest0.png"})
 	    ;
 	
 	    private final int moveSpeed;   
@@ -42,13 +42,12 @@ public enum Terrain {
 	    }
 	    
 	    public boolean isBuildable(Terrain t) {
-	    	if(t==Terrain.VOLCANO || t==Terrain.LAVA || t==Terrain.ROCK_SNOW || t==Terrain.WATER) {
+	    	if(t==Terrain.VOLCANO || t==Terrain.LAVA || t==Terrain.SNOW || t==Terrain.WATER) {
 	    		return false;
 	    	}
 	    	return true;
 	    	
 	    }
-
 	  
 	    
 	}

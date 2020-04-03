@@ -2,7 +2,12 @@
 public enum BuildMode {
 	NOMODE,
 	ROAD,
-	WALL;
+	WALL,
+	MINE,
+	BARRACKS,
+	IRRIGATE
+	
+	;
 	
 	
 	BuildMode(){

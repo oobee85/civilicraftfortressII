@@ -13,6 +13,10 @@ public class Tile {
 	private Structure structure;
 	private boolean hasRoad;
 	private boolean hasWall;
+	private boolean hasMine;
+	private boolean hasIrrigation;
+	private boolean hasForest;
+	
 	private Unit unit;
 	private Position p;
 	private Terrain terr;
@@ -52,14 +56,36 @@ public class Tile {
 	public void setHighlight(boolean b) {
 		isHighlight = b;
 	}
-	
-	public void setHasWall(boolean w, int i) {
+	public void setHasMine(boolean b) {
+		if(hasMine == b) {
+			this.hasMine = false;
+		}else {
+			this.hasMine = b;
+		}
+		
+	}
+	public void setHasForest(boolean b) {
+		if(hasForest == b) {
+			this.hasForest = false;
+		}else {
+			this.hasForest = b;
+		}
+		
+	}
+	public void setHasIrrigation(boolean b) {
+		if(hasIrrigation == b) {
+			this.hasIrrigation = false;
+		}else {
+			this.hasIrrigation = b;
+		}
+		
+	}
+	public void setHasWall(boolean w) {
 		if(hasWall == w) {
 			this.hasWall = false;
 		}else {
 			this.hasWall = w;
 		}
-		rotate = i;
 		
 	}
 
@@ -88,7 +114,12 @@ public class Tile {
 		if(plant != null) {
 			g.drawImage(plant.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
 		}
+		if(hasForest == true) {
+//			g.drawImage(terr.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
+			g.drawImage(Terrain.FOREST.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null); 
+		}
 	}
+	
 	
 	private void applyHighlight(Graphics g, String bm) {
 
@@ -130,11 +161,26 @@ public class Tile {
 		if (Game.tileSize < minEntitySize) {
 			extra = minEntitySize - Game.tileSize;
 		}
-		if (hasRoad == true) {
-			
-			g.drawImage(Utils.roadImages.get(roadCorner), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
+		
+		if(hasWall == false) {
+			drawPlant(g);
+			drawOre(g);
 		}
 		
+		//kills the plant if its built on
+		if(plant != null && hasWall == true) {
+			plant = null;
+		}
+		
+		if (hasRoad == true) {
+			g.drawImage(Utils.roadImages.get(roadCorner), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
+		}
+		if (hasMine == true) {
+			g.drawImage(Buildings.MINE.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
+		}
+		if (hasIrrigation == true) {
+			g.drawImage(Buildings.IRRIGATION.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
+		}
 		applyHighlight(g, bm);
 		
 		
@@ -142,14 +188,7 @@ public class Tile {
 			g.drawImage(structure.getImage(), p.getIntX() * Game.tileSize - extra / 1,p.getIntY() * Game.tileSize - extra / 1, Game.tileSize + extra, Game.tileSize + extra, null);
 		}
 		
-		if(hasWall == false) {
-			drawPlant(g);
-			drawOre(g);
-		}
 		
-		if(plant != null && hasWall == true) {
-			plant = null;
-		}
 		isHighlight = false;
 	}
 

@@ -26,6 +26,7 @@ public class Game {
 	private double oreRarity = 0.01;
 	private double bushRarity = 0.005;
 	private double waterPlantRarity = 0.05;
+	private double forestDensity = 0.5;
 	
 	private int panelWidth;
 	private int panelHeight;
@@ -188,13 +189,16 @@ public class Game {
 
 			}
 		}
+		
 		makeMountain();
 		makeVolcano();
 		makeLake(800);
 		makeLake(100);
 		makeLake(100);
+		makeForest();
 		makeRoad();
 		genResources();
+		
 	}
 	
 	private void genPlants() {
@@ -289,7 +293,7 @@ public class Game {
 						world[i][j] = new Tile(null, p, Terrain.LAVA);
 					}else if(distanceFromCenter < volcanoRadius) {
 						world[i][j] = new Tile(null, p, Terrain.VOLCANO);
-					}else if(distanceFromCenter < mountainRadius && world[i][j].checkTerrain(Terrain.ROCK_SNOW) == false) {
+					}else if(distanceFromCenter < mountainRadius && world[i][j].checkTerrain(Terrain.SNOW) == false) {
 						world[i][j] = new Tile(null, p, Terrain.ROCK);
 					}else if(distanceFromCenter < mountainEdgeRadius && Math.random()<rockEdgeRatio) {
 						world[i][j] = new Tile(null, p, Terrain.ROCK);
@@ -336,6 +340,41 @@ public class Game {
 			}
 		}
 	}
+	private void makeForest() {
+		
+		int x0 = (int) (Math.random() * world.length);
+		int y0 = (int) (Math.random() * world.length);
+		
+		double forestLength = Math.random()*100+10;
+		double forestHeight = Math.random()*100+10;
+		
+		
+		for(int i = 0; i < world.length; i++) {
+			for(int j = 0; j < world[i].length; j++) {
+				int dx = i - x0;
+				int dy = j - y0;
+				double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
+				
+
+				double ratio = Math.sqrt(dx*dx/forestLength/forestLength + dy*dy/forestHeight/forestHeight);
+				//double ratio = dist / Math.max(mountLength, mountHeight);
+				Position p = new Position(i, j);
+				
+				if(forest < 1 && Math.random()<forestDensity) {
+					if(world[i][j].canBuild()==true) {
+						world[i][j].setHasForest(true);
+						heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
+					}
+					
+					
+				}
+				
+				
+				
+				
+			}
+		}
+	}
 	
 	private void makeMountain() {
 		
@@ -366,10 +405,10 @@ public class Game {
 				//double ratio = dist / Math.max(mountLength, mountHeight);
 				Position p = new Position(i, j);
 				if(snowMountainEdge < 1 && Math.random()<snowEdgeRatio) {
-					world[i][j] = new Tile(null, p, Terrain.ROCK_SNOW);
+					world[i][j] = new Tile(null, p, Terrain.SNOW);
 					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}else if (snowMountain < 1 ) {
-					world[i][j] = new Tile(null, p, Terrain.ROCK_SNOW);
+					world[i][j] = new Tile(null, p, Terrain.SNOW);
 					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}else if(mountainEdge < 1 && Math.random()<rockEdgeRatio) {
 					world[i][j] = new Tile(null, p, Terrain.ROCK);
@@ -507,7 +546,7 @@ public class Game {
 	public void selectBox(int x1, int y1, int x2, int y2) {
 		Position p1 = getTileAtPixel(new Position(x1,y1));
 		Position p2 = getTileAtPixel(new Position(x2,y2));
-		hoveredArea = new Area(p1.getIntX(),p1.getIntY(), p2.getIntX(), p2.getIntY());
+		hoveredArea = new Area(p1.getIntX(),p1.getIntY(), p2.getIntX()+1, p2.getIntY()+1);
 		selectResources();
 	}
 	
@@ -530,10 +569,18 @@ public class Game {
 		if(currentMode == BuildMode.WALL) {
 			
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
-				world[tile.getIntX()][tile.getIntY()].setHasWall(true,rotate);
+				world[tile.getIntX()][tile.getIntY()].setHasWall(true);
 			}
-			
-			
+		}
+		if(currentMode == BuildMode.MINE) {
+			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
+				world[tile.getIntX()][tile.getIntY()].setHasMine(true);
+			}
+		}
+		if(currentMode == BuildMode.IRRIGATE) {
+			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
+				world[tile.getIntX()][tile.getIntY()].setHasIrrigation(true);
+			}
 		}
 		
 	}
