@@ -279,13 +279,16 @@ public class Game {
 				
 				if(distanceFromCenter < lavaRadius) {
 					world[i][j] = new Tile(null, p, Terrain.LAVA);
+					heightMap[i][j] = 0.94;
 				}else if(distanceFromCenter < volcanoRadius) {
 					world[i][j] = new Tile(null, p, Terrain.VOLCANO);
+					heightMap[i][j] = 0.96;
 				}else if(distanceFromCenter < mountainRadius && world[i][j].checkTerrain(Terrain.ROCK_SNOW) == false) {
 					world[i][j] = new Tile(null, p, Terrain.ROCK);
-						
+					heightMap[i][j] = 0.95;
 				}else if(distanceFromCenter < mountainEdgeRadius && Math.random()<rockEdgeRatio) {
 					world[i][j] = new Tile(null, p, Terrain.ROCK);
+					heightMap[i][j] = 0.95;
 				}
 				
 			}
@@ -355,12 +358,16 @@ public class Game {
 				Position p = new Position(i, j);
 				if(snowMountainEdge < 1 && Math.random()<snowEdgeRatio) {
 					world[i][j] = new Tile(null, p, Terrain.ROCK_SNOW);
+					heightMap[i][j] = 1;
 				}else if (snowMountain < 1 ) {
 					world[i][j] = new Tile(null, p, Terrain.ROCK_SNOW);
+					heightMap[i][j] = 1;
 				}else if(mountainEdge < 1 && Math.random()<rockEdgeRatio) {
 					world[i][j] = new Tile(null, p, Terrain.ROCK);
+					heightMap[i][j] = 0.95;
 				}else if(mountain < 1) {
 					world[i][j] = new Tile(null, p, Terrain.ROCK);
+					heightMap[i][j] = 0.95;
 				}
 				
 				
