@@ -361,12 +361,8 @@ public class Game {
 				int dy = j - y0;
 				
 				double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
-				
 
-				double ratio = Math.sqrt(dx*dx/forestLength/forestLength + dy*dy/forestHeight/forestHeight);
-				//double ratio = dist / Math.max(mountLength, mountHeight);
 				Position p = new Position(i, j);
-				
 				if(forest < 1 && Math.random()<forestDensity) {
 					
 					if(world[i][j].canBuild()==true && world[i][j].canPlant()==true) {
@@ -460,8 +456,7 @@ public class Game {
 	private void makeCastle(Position start, Position end) {
 		double castleDistance = getRandomNormal(5);
 		Position halfway = start.multiply(castleDistance).add(end.multiply(1-castleDistance));
-		
-		world[halfway.getIntX()][halfway.getIntY()].setStructure(new Structure());
+		world[halfway.getIntX()][halfway.getIntY()].setStructure(Structure.CASTLE);
 		
 		
 	}
@@ -571,8 +566,10 @@ public class Game {
 		System.out.println(currentMode);
 		
 		if(currentMode == BuildMode.ROAD) {
-			
 			world[tile.getIntX()][tile.getIntY()].buildRoad(true);
+		} 
+		if(currentMode == BuildMode.BARRACKS) {
+			world[tile.getIntX()][tile.getIntY()].setStructure(Structure.BARRACKS);
 		} 
 		if(currentMode == BuildMode.WALL) {
 			

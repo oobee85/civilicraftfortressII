@@ -10,23 +10,26 @@ import java.util.ArrayList;
 
 
 public class Tile {
-	private Structure structure;
 	private boolean hasRoad;
 	private boolean hasWall;
 	private boolean hasMine;
 	private boolean hasIrrigation;
 	private int hasForest;
+	private boolean isHighlight;
 	
 	private Unit unit;
 	private Position p;
-	private Terrain terr;
+	
 	int minEntitySize = 20;
 	private int rotate;
 	private String corner;
-	private boolean isHighlight;
+	
 	private String roadCorner;
+	
 	private Ore ore;
 	private Plant plant;
+	private Terrain terr;
+	private Structure structure;
 	
 	public Tile(Unit u, Position point, Terrain t) {
 		unit = u;
