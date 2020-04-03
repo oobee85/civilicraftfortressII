@@ -99,33 +99,7 @@ public class Tile {
 		}
 
 		if (highlight==true || hasWall == true) {
-			
-			if (corner != null && corner.equals("wctr")) {
-				g.drawImage(Buildings.WALLCTR.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
-			
-			} else
-			if (corner != null && corner.equals("wctl")) {
-				g.drawImage(Buildings.WALLCTL.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
-			
-			} else
-			if (corner != null && corner.equals("wcbr")) {
-				g.drawImage(Buildings.WALLCBR.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
-			
-			} else
-			if (corner != null && corner.equals("wcbl")) {
-				g.drawImage(Buildings.WALLCBL.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
-			
-			} else
-			
-				if (rotate == 0) {
-					g.drawImage(Buildings.WALLT.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra,null);
-				} else if (rotate == 1) {
-					g.drawImage(Buildings.WALLR.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra,null);
-				} else if (rotate == 2) {
-					g.drawImage(Buildings.WALLB.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra,null);
-				} else if (rotate == 3) {
-					g.drawImage(Buildings.WALLL.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra,null);
-				}
+			g.drawImage(Buildings.WALL.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
 			
 		}
 	}
