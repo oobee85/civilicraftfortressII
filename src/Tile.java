@@ -68,12 +68,17 @@ public class Tile {
 	}
 
 	public void draw(Graphics g) {
-//		System.out.println("filling tile");
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
-
-		g.drawImage(terr.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
+		g.drawImage(terr.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 	}
+	
+	public void drawHeightMap(Graphics g, double height) {
+		int r = Math.max(Math.min((int)(255*height), 255), 0);
+		g.setColor(new Color(r, 0, 255-r));
+		g.fillRect(p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
+	}
+	
 	private void drawOre(Graphics g) {
 		if(ore != null) {
 			g.drawImage(ore.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);

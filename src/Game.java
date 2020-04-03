@@ -3,14 +3,14 @@ import java.awt.Graphics;
 import java.awt.List;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.*;
 
 public class Game {
 	private int ticks;
 	private int turn;
 	private Point worldSize;
 	public Tile[][] world;
+	private double[][] heightMap;
 	int x;
 	int y;
 	protected static int tileSize = 10;
@@ -19,6 +19,7 @@ public class Game {
 	private Position hoveredTile;
 	private Area hoveredArea;
 	private BuildMode currentMode;
+	private boolean showHeightMap;
 	private int rotate = 0;
 	private double snowEdgeRatio = 0.5;
 	private double rockEdgeRatio = 0.7;
@@ -39,9 +40,10 @@ public class Game {
 		hoveredArea = new Area(0,0,0,0);
 		viewOffset = new Position(0, 0);
 		currentMode = BuildMode.NOMODE;
+		showHeightMap = false;
 		
 		world = new Tile[(int) worldSize.getX()][(int) worldSize.getY()];
-		genTerrain(0.8);
+		genTerrain(0.75, 6);
 
 	}
 	
@@ -75,7 +77,7 @@ public class Game {
 	}
 
 	
-	private void genTerrain(double percentageGrass) {
+	private void genTerrain(double percentageGrass, int smoothingRadius) {
 		System.out.println("gen terr");
 		LinkedList<double[][]> noises = new LinkedList<>();
 
@@ -97,36 +99,39 @@ public class Game {
 				double multiplier = 1;
 				for (double[][] noise : noises) {
 					divider /= 2;
-					multiplier /= 2;
+					multiplier /= 1.4;
 					rand += multiplier * noise[i / divider][j / divider];
 				}
 				combinedNoise[i][j] = rand;
 			}
 		}
 
-		// TODO make smoothing filter bigger so it looks more smooth.
 		double[][] smoothed = new double[x][y];
 		// apply smoothing filter
 		for (int i = 0; i < x; i++) {
 			for (int j = 0; j < y; j++) {
-				if (i == 0 || j == 0 || i == x - 1 || j == y - 1) {
-					smoothed[i][j] = combinedNoise[i][j];
-				} else {
-					double sum = combinedNoise[i][j] + combinedNoise[i + 1][j] + combinedNoise[i][j + 1]
-							+ combinedNoise[i][j - 1] + combinedNoise[i - 1][j];
-					smoothed[i][j] = sum / 5;
+				int mini = Math.max(0, i-smoothingRadius);
+				int maxi = Math.min(x-1, i+smoothingRadius);
+				int minj = Math.max(0, j-smoothingRadius);
+				int maxj = Math.min(y-1, j+smoothingRadius);
+				int count = 0;
+				for(int ii = mini; ii <= maxi; ii++) {
+					for(int jj = minj; jj < maxj; jj++) {
+						smoothed[i][j] += combinedNoise[ii][jj];
+						count++;
+					}
 				}
+				smoothed[i][j] /= count;
 			}
 		}
+		heightMap = smoothed;
 		
-		// make twenty bins to count how many tiles have which value from terrain gen
-		int[] bins = new int[20];
-		double minValue = smoothed[0][0];
-		double maxValue = smoothed[0][0];
+		double minValue = heightMap[0][0];
+		double maxValue = heightMap[0][0];
 		for (int i = 0; i < x; i++) {
 			for (int j = 0; j < y; j++) {
-				minValue = smoothed[i][j] < minValue ? smoothed[i][j] : minValue;
-				maxValue = smoothed[i][j] > maxValue ? smoothed[i][j] : maxValue;
+				minValue = heightMap[i][j] < minValue ? heightMap[i][j] : minValue;
+				maxValue = heightMap[i][j] > maxValue ? heightMap[i][j] : maxValue;
 				
 				// This is the same as:
 //				if(smoothed[i][j] > maxValue) {
@@ -137,14 +142,24 @@ public class Game {
 //				}
 			}
 		}
-		// if values range from: 0 to 1
-		// bin 0: 0-0.05
-		// bin 1: 0.05-0.1
-		// ..
-		// bin 19: 0.95-1
+		System.out.println("Min Terrain Gen Value: " + minValue + ", Max value: " + maxValue);
+		// Normalize the heightMap to be between 0 and 1
 		for (int i = 0; i < x; i++) {
 			for (int j = 0; j < y; j++) {
-				int bin = (int) ((bins.length-1) * (smoothed[i][j] - minValue) / (maxValue - minValue));
+				heightMap[i][j] = (heightMap[i][j] - minValue) / (maxValue - minValue);
+			}
+		}
+
+		// make ten bins to count how many tiles have which value from terrain gen
+		int[] bins = new int[10];
+		// if values range from: 0 to 1
+		// bin 0: 0-0.1
+		// bin 1: 0.1-0.2
+		// ..
+		// bin 9: 0.9-1
+		for (int i = 0; i < x; i++) {
+			for (int j = 0; j < y; j++) {
+				int bin = (int) ((bins.length-1) * heightMap[i][j]);
 				bins[bin]++;
 			}
 		}
@@ -154,13 +169,12 @@ public class Game {
 		for(int bin = 0; bin < bins.length; bin++) {
 			numGrassTilesSoFar += bins[bin];
 			if(numGrassTilesSoFar >= totalNumTiles * percentageGrass) {
-				cutoffThreshold = (double)bin / bins.length * (maxValue - minValue) + minValue;
+				cutoffThreshold = (double)bin / bins.length;
 				break;
 			}
 		}
 		for (int i = 0; i < x; i++) {
 			for (int j = 0; j < y; j++) {
-
 				Position p = new Position(i, j);
 				Terrain t;
 				if (smoothed[i][j] > cutoffThreshold) {
@@ -174,9 +188,11 @@ public class Game {
 
 			}
 		}
-		makeLake();
 		makeMountain();
 		makeVolcano();
+		makeLake(800);
+		makeLake(100);
+		makeLake(100);
 		makeRoad();
 		genResources();
 	}
@@ -261,16 +277,23 @@ public class Game {
 				int dy = j - y;
 				double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
 				Position p = new Position(i, j);
-				
-				if(distanceFromCenter < lavaRadius) {
-					world[i][j] = new Tile(null, p, Terrain.LAVA);
-				}else if(distanceFromCenter < volcanoRadius) {
-					world[i][j] = new Tile(null, p, Terrain.VOLCANO);
-				}else if(distanceFromCenter < mountainRadius && world[i][j].checkTerrain(Terrain.ROCK_SNOW) == false) {
-					world[i][j] = new Tile(null, p, Terrain.ROCK);
-						
-				}else if(distanceFromCenter < mountainEdgeRadius && Math.random()<rockEdgeRatio) {
-					world[i][j] = new Tile(null, p, Terrain.ROCK);
+				if(distanceFromCenter < mountainEdgeRadius) {
+					
+					double height = 1 - (volcanoRadius - distanceFromCenter)/volcanoRadius/2;
+					if(distanceFromCenter > volcanoRadius) {
+						height = 1 - (distanceFromCenter - volcanoRadius)/mountainEdgeRadius;
+					}
+					heightMap[i][j] = Math.max(height, heightMap[i][j]);
+					
+					if(distanceFromCenter < lavaRadius) {
+						world[i][j] = new Tile(null, p, Terrain.LAVA);
+					}else if(distanceFromCenter < volcanoRadius) {
+						world[i][j] = new Tile(null, p, Terrain.VOLCANO);
+					}else if(distanceFromCenter < mountainRadius && world[i][j].checkTerrain(Terrain.ROCK_SNOW) == false) {
+						world[i][j] = new Tile(null, p, Terrain.ROCK);
+					}else if(distanceFromCenter < mountainEdgeRadius && Math.random()<rockEdgeRatio) {
+						world[i][j] = new Tile(null, p, Terrain.ROCK);
+					}
 				}
 				
 			}
@@ -278,29 +301,40 @@ public class Game {
 		
 		
 	}
-	private void makeLake() {
-		int x = (int) (Math.random() * world.length);
-		int y = (int) (Math.random() * world.length);
+	private void makeLake(int volume) {
 		
-		double lakeRadius = 20;
-		double lakeEdgeRadius = 21;
-		
-		for(int i = 0; i < world.length; i++) {
-			for(int j = 0; j < world[i].length; j++) {
-				int dx = i - x;
-				int dy = j - y;
-				double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
-				Position p = new Position(i, j);
-				
-				if(distanceFromCenter < lakeRadius) {
-					world[i][j] = new Tile(null, p, Terrain.WATER);
-				}else if(distanceFromCenter < lakeEdgeRadius && Math.random()<.3) {
-					world[i][j] = new Tile(null, p, Terrain.WATER);
-				}
-				
+		// Fill tiles until volume reached
+		PriorityQueue<Position> queue = new PriorityQueue<Position>((p1, p2) -> {
+			return heightMap[p1.getIntX()][p1.getIntY()] - heightMap[p2.getIntX()][p2.getIntY()] > 0 ? 1 : -1;
+		});
+		boolean[][] visited = new boolean[world.length][world[0].length];
+		queue.add(new Position((int) (Math.random() * world.length), (int) (Math.random() * world.length)));
+		while(!queue.isEmpty() && volume > 0) {
+			Position next = queue.poll();
+			int i = next.getIntX();
+			int j = next.getIntY();
+			if(!world[i][j].checkTerrain(Terrain.WATER)) {
+				world[i][j] = new Tile(null, next, Terrain.WATER);
+				volume--;
+			}
+			// Add adjacent tiles to the queue
+			if(i > 0 && !visited[i-1][j]) {
+				queue.add(new Position(i-1, j));
+				visited[i-1][j] = true;
+			}
+			if(j > 0 && !visited[i][j-1]) {
+				queue.add(new Position(i, j-1));
+				visited[i][j-1] = true;
+			}
+			if(i + 1 < world.length && !visited[i+1][j]) {
+				queue.add(new Position(i+1, j));
+				visited[i+1][j] = true;
+			}
+			if(j + 1 < world[0].length && !visited[i][j+1]) {
+				queue.add(new Position(i, j+1));
+				visited[i][j+1] = true;
 			}
 		}
-		
 	}
 	
 	private void makeMountain() {
@@ -327,16 +361,22 @@ public class Game {
 				
 				double snowMountain = (dx*dx)/(snowMountLength*snowMountLength) + (dy*dy)/(snowMountHeight*snowMountHeight);
 				double snowMountainEdge = (dx*dx)/(snowMountLengthEdge*snowMountLengthEdge) + (dy*dy)/(snowMountHeightEdge*snowMountHeightEdge);
-				
+
+				double ratio = Math.sqrt(dx*dx/mountLength/mountLength + dy*dy/mountHeight/mountHeight);
+				//double ratio = dist / Math.max(mountLength, mountHeight);
 				Position p = new Position(i, j);
 				if(snowMountainEdge < 1 && Math.random()<snowEdgeRatio) {
 					world[i][j] = new Tile(null, p, Terrain.ROCK_SNOW);
+					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}else if (snowMountain < 1 ) {
 					world[i][j] = new Tile(null, p, Terrain.ROCK_SNOW);
+					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}else if(mountainEdge < 1 && Math.random()<rockEdgeRatio) {
 					world[i][j] = new Tile(null, p, Terrain.ROCK);
+					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}else if(mountain < 1) {
 					world[i][j] = new Tile(null, p, Terrain.ROCK);
+					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}
 				
 				
@@ -418,7 +458,12 @@ public class Game {
 		for (int i = lowerX; i < upperX; i++) {
 			for (int j = lowerY; j < upperY; j++) {
 				Tile t = world[i][j];
-				t.draw(g);
+				if(showHeightMap) {
+					t.drawHeightMap(g, heightMap[i][j]);
+				}
+				else {
+					t.draw(g);
+				}
 			}
 		}
 		for (int i = lowerX; i < upperX; i++) {
@@ -563,6 +608,10 @@ public class Game {
 		draw(g);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
 		Toolkit.getDefaultToolkit().sync();
+	}
+	
+	public void setShowHeightMap(boolean show) {
+		this.showHeightMap = show;
 	}
 	
 
