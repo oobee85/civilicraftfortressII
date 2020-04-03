@@ -71,7 +71,7 @@ public class Tile {
 	}
 	
 	public void drawHeightMap(Graphics g, double height) {
-		int r = (int)(255*height);
+		int r = Math.max(Math.min((int)(255*height), 255), 0);
 		g.setColor(new Color(r, 0, 255-r));
 		g.fillRect(p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
 	}
