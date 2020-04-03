@@ -7,15 +7,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+import java.awt.event.*;
 
 import javax.swing.*;
 
@@ -34,6 +26,8 @@ public class Frame extends JPanel{
 	public JPanel gui;
 	private boolean dragged = false;
 	
+	private Thread gameLoopThread;
+	
 	public Frame(int w, int h, int ws) {
 	
 		frame = new JFrame("Civilization");
@@ -45,7 +39,6 @@ public class Frame extends JPanel{
 		WIDTH = w;
 		HEIGHT = h;
 		
-		gamepanel = new JPanel();
 		gameInstance = new Game(w, h, worldSize);
 		
 		gui = new JPanel();
@@ -57,13 +50,10 @@ public class Frame extends JPanel{
 				try {
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					menu();
-					
 				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
 				}
 			}
 		});
-	
-		
 	}
 	
 	private void menu() {
@@ -108,21 +98,17 @@ public class Frame extends JPanel{
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
 				gameInstance.drawGame(g);
-
-				
 			}
 		};
+		gamepanel.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				gameInstance.setViewSize(gamepanel.getWidth(), gamepanel.getHeight());
+	        }
+		});
 		
 		
 		JButton makeRoad = new JButton("Make Road");
-//		makeRoad.addActionListener(new ActionListener() {
-//			
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//
-//				
-//			}
-//		});
 		makeRoad.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.ROAD);
 		});
@@ -320,8 +306,19 @@ public class Frame extends JPanel{
 		frame.repaint();
 		System.err.println(gamepanel.getWidth());
 		gamepanel.requestFocus();
-		gameInstance.setViewSize(gamepanel.getWidth(), gamepanel.getHeight());
-	
+		
+		
+		gameLoopThread = new Thread(() -> {
+			try {
+				while(true) {
+					gameInstance.gameTick();
+					Thread.sleep(100);
+				}
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+		});
+		gameLoopThread.start();
 	}
 	
 	

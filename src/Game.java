@@ -45,7 +45,13 @@ public class Game {
 		
 		world = new Tile[(int) worldSize.getX()][(int) worldSize.getY()];
 		genTerrain(0.75, 6);
+	}
 
+	public void gameTick() {
+		// Do all the game events like unit movement, time passing, building things, growing, etc
+		// happens once every 100ms
+		
+		
 	}
 	
 	public void setViewSize(int width, int height) {
