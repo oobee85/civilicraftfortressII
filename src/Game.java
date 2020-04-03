@@ -1,8 +1,6 @@
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.List;
-import java.awt.Point;
-import java.awt.Toolkit;
+import java.awt.image.*;
 import java.util.*;
 
 public class Game {
@@ -11,8 +9,8 @@ public class Game {
 	private Point worldSize;
 	public Tile[][] world;
 	private double[][] heightMap;
-	int x;
-	int y;
+	private BufferedImage terrainImage;
+	private BufferedImage heightMapImage;
 	protected static int tileSize = 10;
 	private int money;
 	private Position viewOffset;
@@ -34,8 +32,6 @@ public class Game {
 
 	public Game(int w, int h, Point wSize) {
 		worldSize = wSize;
-		x = wSize.x;
-		y = wSize.y;
 		money = 100;
 		hoveredTile = new Position(-1,-1);
 		hoveredArea = new Area(0,0,0,0);
@@ -62,8 +58,8 @@ public class Game {
 	private void grid(Graphics g) {
 //		System.out.println("Drawing Grid");
 		g.setColor(Color.BLUE);
-		for (int i = 0; i <= x; i++) {
-			for (int j = 0; j <= y; j++) {
+		for (int i = 0; i <= world.length; i++) {
+			for (int j = 0; j <= world[0].length; j++) {
 //				g.drawLine(i * tileSize, 0, i * tileSize, j * tileSize);
 //				g.drawLine(0, j * tileSize, i * tileSize, j * tileSize);
 			}
@@ -88,7 +84,7 @@ public class Game {
 		System.out.println("gen terr");
 		LinkedList<double[][]> noises = new LinkedList<>();
 
-		for (int octave = 2; octave <= x; octave *= 2) {
+		for (int octave = 2; octave <= world.length; octave *= 2) {
 			double[][] noise1 = new double[octave][octave];
 			for (int i = 0; i < noise1.length; i++) {
 				for (int j = 0; j < noise1[0].length; j++) {
@@ -98,9 +94,9 @@ public class Game {
 			noises.add(noise1);
 		}
 
-		double[][] combinedNoise = new double[x][y];
-		for (int i = 0; i < x; i++) {
-			for (int j = 0; j < y; j++) {
+		double[][] combinedNoise = new double[world.length][world[0].length];
+		for (int i = 0; i < world.length; i++) {
+			for (int j = 0; j < world[0].length; j++) {
 				double rand = 0;
 				int divider = world.length;
 				double multiplier = 1;
@@ -113,14 +109,14 @@ public class Game {
 			}
 		}
 
-		double[][] smoothed = new double[x][y];
+		double[][] smoothed = new double[world.length][world[0].length];
 		// apply smoothing filter
-		for (int i = 0; i < x; i++) {
-			for (int j = 0; j < y; j++) {
+		for (int i = 0; i < world.length; i++) {
+			for (int j = 0; j < world[0].length; j++) {
 				int mini = Math.max(0, i-smoothingRadius);
-				int maxi = Math.min(x-1, i+smoothingRadius);
+				int maxi = Math.min(world.length-1, i+smoothingRadius);
 				int minj = Math.max(0, j-smoothingRadius);
-				int maxj = Math.min(y-1, j+smoothingRadius);
+				int maxj = Math.min(world[0].length-1, j+smoothingRadius);
 				int count = 0;
 				for(int ii = mini; ii <= maxi; ii++) {
 					for(int jj = minj; jj < maxj; jj++) {
@@ -135,8 +131,8 @@ public class Game {
 		
 		double minValue = heightMap[0][0];
 		double maxValue = heightMap[0][0];
-		for (int i = 0; i < x; i++) {
-			for (int j = 0; j < y; j++) {
+		for (int i = 0; i < world.length; i++) {
+			for (int j = 0; j < world[0].length; j++) {
 				minValue = heightMap[i][j] < minValue ? heightMap[i][j] : minValue;
 				maxValue = heightMap[i][j] > maxValue ? heightMap[i][j] : maxValue;
 				
@@ -151,8 +147,8 @@ public class Game {
 		}
 		System.out.println("Min Terrain Gen Value: " + minValue + ", Max value: " + maxValue);
 		// Normalize the heightMap to be between 0 and 1
-		for (int i = 0; i < x; i++) {
-			for (int j = 0; j < y; j++) {
+		for (int i = 0; i < world.length; i++) {
+			for (int j = 0; j < world[0].length; j++) {
 				heightMap[i][j] = (heightMap[i][j] - minValue) / (maxValue - minValue);
 			}
 		}
@@ -164,13 +160,13 @@ public class Game {
 		// bin 1: 0.1-0.2
 		// ..
 		// bin 9: 0.9-1
-		for (int i = 0; i < x; i++) {
-			for (int j = 0; j < y; j++) {
+		for (int i = 0; i < world.length; i++) {
+			for (int j = 0; j < world[0].length; j++) {
 				int bin = (int) ((bins.length-1) * heightMap[i][j]);
 				bins[bin]++;
 			}
 		}
-		int totalNumTiles = x*y;
+		int totalNumTiles = world.length*world[0].length;
 		int numGrassTilesSoFar = 0;
 		double cutoffThreshold = 0;
 		for(int bin = 0; bin < bins.length; bin++) {
@@ -180,8 +176,8 @@ public class Game {
 				break;
 			}
 		}
-		for (int i = 0; i < x; i++) {
-			for (int j = 0; j < y; j++) {
+		for (int i = 0; i < world.length; i++) {
+			for (int j = 0; j < world[0].length; j++) {
 				Position p = new Position(i, j);
 				Terrain t;
 				if (smoothed[i][j] > cutoffThreshold) {
@@ -205,6 +201,44 @@ public class Game {
 		makeRoad();
 		genResources();
 		
+		createTerrainImage();
+	}
+	
+	private void createTerrainImage() {
+		HashMap<Terrain, Color> terrainColors = new HashMap<>();
+		for(Terrain t : Terrain.values()) {
+			BufferedImage image = Utils.toBufferedImage(t.getImage(0));
+			int sumr = 0;
+			int sumg = 0;
+			int sumb = 0;
+			for(int i = 0; i < image.getWidth(); i++) {
+				for(int j = 0; j < image.getHeight(); j++) {
+					Color c = new Color(image.getRGB(i, j));
+					sumr += c.getRed();
+					sumg += c.getGreen();
+					sumb += c.getBlue();
+				}
+			}
+			int totalNumPixels = image.getWidth()*image.getHeight();
+			Color average = new Color(sumr/totalNumPixels, sumg/totalNumPixels, sumb/totalNumPixels);
+			terrainColors.put(t, average);
+		}
+		
+		terrainImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
+		for(int i = 0; i < world.length; i++) {
+			for(int j = 0; j < world[0].length; j++) {
+				terrainImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
+			}
+		}
+		
+		heightMapImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
+		for(int i = 0; i < world.length; i++) {
+			for(int j = 0; j < world[0].length; j++) {
+				int r = Math.max(Math.min((int)(255*heightMap[i][j]), 255), 0);
+				Color c = new Color(r, 0, 255-r);
+				heightMapImage.setRGB(i, j, c.getRGB());
+			}
+		}
 	}
 	
 	private void genPlants() {
@@ -494,20 +528,31 @@ public class Game {
 		// Try to only draw stuff that is visible on the screen
 		int lowerX = Math.max(0, viewOffset.divide(tileSize).getIntX() - 2);
 		int lowerY = Math.max(0, viewOffset.divide(tileSize).getIntY() - 2);
-		int upperX = Math.min(x, lowerX + panelWidth/tileSize + 4);
-		int upperY = Math.min(y, lowerY + panelHeight/tileSize + 4);
+		int upperX = Math.min(world.length, lowerX + panelWidth/tileSize + 4);
+		int upperY = Math.min(world[0].length, lowerY + panelHeight/tileSize + 4);
 		
-		for (int i = lowerX; i < upperX; i++) {
-			for (int j = lowerY; j < upperY; j++) {
-				Tile t = world[i][j];
-				if(showHeightMap) {
-					t.drawHeightMap(g, heightMap[i][j]);
-				}
-				else {
-					t.draw(g);
+		if(Game.tileSize < 12) {
+			if(showHeightMap) {
+				g.drawImage(heightMapImage, 0, 0, Game.tileSize*world.length, Game.tileSize*world[0].length, null);
+			}
+			else {
+				g.drawImage(terrainImage, 0, 0, Game.tileSize*world.length, Game.tileSize*world[0].length, null);
+			}
+		}
+		else {
+			for (int i = lowerX; i < upperX; i++) {
+				for (int j = lowerY; j < upperY; j++) {
+					Tile t = world[i][j];
+					if(showHeightMap) {
+						t.drawHeightMap(g, heightMap[i][j]);
+					}
+					else {
+						t.draw(g);
+					}
 				}
 			}
 		}
+		
 		for (int i = lowerX; i < upperX; i++) {
 			for (int j = lowerY; j < upperY; j++) {
 				Tile t = world[i][j];

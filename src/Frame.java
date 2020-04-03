@@ -304,7 +304,6 @@ public class Frame extends JPanel{
 		frame.add(gamepanel, BorderLayout.CENTER); 
 		gamepanel.setSize(frame.getSize());
 		frame.repaint();
-		System.err.println(gamepanel.getWidth());
 		gamepanel.requestFocus();
 		
 		
