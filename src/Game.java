@@ -3,8 +3,7 @@ import java.awt.Graphics;
 import java.awt.List;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.*;
 
 public class Game {
 	private int ticks;
@@ -192,7 +191,7 @@ public class Game {
 		
 		makeMountain();
 		makeVolcano();
-		makeLake();
+		makeLake(1000);
 		makeRoad();
 		genResources();
 	}
@@ -294,30 +293,38 @@ public class Game {
 		
 		
 	}
-	private void makeLake() {
+	private void makeLake(int volume) {
 		
-		int x = (int) (Math.random() * world.length);
-		int y = (int) (Math.random() * world.length);
-		
-		double lakeRadius = 20;
-		double lakeEdgeRadius = 21;
-		
-		for(int i = 0; i < world.length; i++) {
-			for(int j = 0; j < world[i].length; j++) {
-				int dx = i - x;
-				int dy = j - y;
-				double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
-				Position p = new Position(i, j);
-				
-				if(distanceFromCenter < lakeRadius) {
-					world[i][j] = new Tile(null, p, Terrain.WATER);
-				}else if(distanceFromCenter < lakeEdgeRadius && Math.random()<.3) {
-					world[i][j] = new Tile(null, p, Terrain.WATER);
-				}
-				
+		// Fill tiles until volume reached
+		PriorityQueue<Position> queue = new PriorityQueue<Position>((p1, p2) -> {
+			return heightMap[p1.getIntX()][p1.getIntY()] - heightMap[p2.getIntX()][p2.getIntY()] > 0 ? 1 : -1;
+		});
+		boolean[][] visited = new boolean[world.length][world[0].length];
+		queue.add(new Position((int) (Math.random() * world.length), (int) (Math.random() * world.length)));
+		while(!queue.isEmpty() && volume > 0) {
+			Position next = queue.poll();
+			int i = next.getIntX();
+			int j = next.getIntY();
+			world[i][j] = new Tile(null, next, Terrain.WATER);
+			volume--;
+			// Add adjacent tiles to the queue
+			if(i > 0 && !visited[i-1][j]) {
+				queue.add(new Position(i-1, j));
+				visited[i-1][j] = true;
+			}
+			if(j > 0 && !visited[i][j-1]) {
+				queue.add(new Position(i, j-1));
+				visited[i][j-1] = true;
+			}
+			if(i + 1 < world.length && !visited[i+1][j]) {
+				queue.add(new Position(i+1, j));
+				visited[i+1][j] = true;
+			}
+			if(j + 1 < world[0].length && !visited[i][j+1]) {
+				queue.add(new Position(i, j+1));
+				visited[i][j+1] = true;
 			}
 		}
-		
 	}
 	
 	private void makeMountain() {
