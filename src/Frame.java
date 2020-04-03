@@ -131,12 +131,12 @@ public class Frame extends JPanel{
 //			}
 //		});
 		makeRoad.addActionListener(e -> {
-			gameInstance.setBuildMode(Game.BuildMode.ROAD);
+			gameInstance.setBuildMode(BuildMode.ROAD);
 		});
 		
 		JButton makeWall = new JButton("Make Wall");
 		makeWall.addActionListener(e -> {
-			gameInstance.setBuildMode(Game.BuildMode.WALL);
+			gameInstance.setBuildMode(BuildMode.WALL);
 		});
 		
 		JLabel money = new JLabel(); 

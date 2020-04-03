@@ -22,16 +22,11 @@ public class Game {
 	private int rotate = 0;
 	private double snowEdgeRatio = 0.5;
 	private double rockEdgeRatio = 0.7;
+	private double oreRarity = 0.01;
 	
 	private int panelWidth;
 	private int panelHeight;
 	
-	public enum BuildMode{
-		NOMODE,
-		ROAD,
-		WALL;
-		
-	};
 
 	public Game(int w, int h, Point wSize) {
 		worldSize = wSize;
@@ -178,6 +173,42 @@ public class Game {
 		makeVolcano();
 		makeLake();
 		makeRoad();
+		genOres();
+	}
+	
+	private void genOres() {
+		for(int i = 0; i < world.length; i++) {
+			for(int j = 0; j < world.length; j++) {
+				
+				if(world[i][j].checkTerrain(Terrain.ROCK) && Math.random() < oreRarity) {
+					
+					double o = Math.random();
+					if(o < Ore.ORE_GOLD.getRarity()) {
+						world[i][j].setHasOre(Ore.ORE_GOLD);
+					}else if(o < Ore.ORE_SILVER.getRarity()) {
+						world[i][j].setHasOre(Ore.ORE_SILVER);
+					}else if(o < Ore.ORE_IRON.getRarity()) {
+						world[i][j].setHasOre(Ore.ORE_IRON);
+					}else if(o < Ore.ORE_COPPER.getRarity()) {
+						world[i][j].setHasOre(Ore.ORE_COPPER);
+					}
+					
+				}
+				
+				if(world[i][j].checkTerrain(Terrain.VOLCANO) && Math.random() < oreRarity +0.1) {
+					double o = Math.random();
+					if(o < Ore.ORE_GOLD.getRarity()) {
+						world[i][j].setHasOre(Ore.ORE_GOLD);
+					}else if(o < Ore.ORE_SILVER.getRarity()) {
+						world[i][j].setHasOre(Ore.ORE_SILVER);
+					}else if(o < Ore.ORE_COPPER.getRarity()) {
+						world[i][j].setHasOre(Ore.ORE_COPPER);
+					}
+				}
+				
+				
+			}
+		}
 		
 	}
 	
@@ -203,7 +234,7 @@ public class Game {
 				}else if(distanceFromCenter < volcanoRadius) {
 					world[i][j] = new Tile(null, p, Terrain.VOLCANO);
 				}else if(distanceFromCenter < mountainRadius && world[i][j].checkTerrain(Terrain.ROCK_SNOW) == false) {
-						world[i][j] = new Tile(null, p, Terrain.ROCK);
+					world[i][j] = new Tile(null, p, Terrain.ROCK);
 						
 				}else if(distanceFromCenter < mountainEdgeRadius && Math.random()<rockEdgeRatio) {
 					world[i][j] = new Tile(null, p, Terrain.ROCK);

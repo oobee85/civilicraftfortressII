@@ -1,10 +1,4 @@
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-
-import javax.imageio.ImageIO;
 
 public enum Terrain {
 	    GRASS (10, new String[] {"Images/grass/grass16.png", "Images/grass/grass128.png", "Images/grass/grass512.png"}),

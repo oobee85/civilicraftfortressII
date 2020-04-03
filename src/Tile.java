@@ -21,7 +21,8 @@ public class Tile {
 	private String corner;
 	private boolean isHighlight;
 	private String roadCorner;
-
+	private Ore ore;
+	
 	public Tile(Unit u, Position point, Terrain t) {
 		unit = u;
 		p = point;
@@ -40,6 +41,9 @@ public class Tile {
 	public void setHasRoad(boolean r, String s) {
 			this.hasRoad = r;
 			roadCorner = s;
+	}
+	public void setHasOre(Ore o) {
+		ore = o;
 	}
 	
 	public void setHasWall(boolean w, int i) {
@@ -63,15 +67,18 @@ public class Tile {
 
 		g.drawImage(terr.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
 	}
+	private void drawOre(Graphics g) {
+		
+		if(ore != null) {
+			g.drawImage(ore.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
+		}
+		
+		
+	}
 	
 	private void applyHighlight(Graphics g, String bm) {
 
-		
 		Graphics2D g2d = (Graphics2D)g;
-		
-		
-		
-		
 		
 		if(isHighlight == true && hasWall == false && bm != null && bm.equals("wall") ) {
 			AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F);
@@ -103,10 +110,6 @@ public class Tile {
 			
 		}
 	}
-	private void drawRoad(Graphics g) {
-		
-		
-	}
 
 	public void drawEntities(Graphics g, String bm) {
 		int extra = 0;
@@ -121,12 +124,11 @@ public class Tile {
 		applyHighlight(g, bm);
 		
 		
-		
-		
 		if (structure != null) {
 			g.drawImage(structure.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
 		}
 		
+		drawOre(g);
 		isHighlight = false;
 	}
 
@@ -135,6 +137,9 @@ public class Tile {
 	}
 	public boolean getHasRoad() {
 		return hasRoad;
+	}
+	public Ore getOre() {
+		return ore;
 	}
 	public boolean canBuild() {
 		return terr.isBuildable(terr);
