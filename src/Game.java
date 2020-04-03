@@ -20,7 +20,8 @@ public class Game {
 	private Area hoveredArea;
 	private BuildMode currentMode;
 	private int rotate = 0;
-
+	private double snowEdgeRatio = 0.5;
+	private double rockEdgeRatio = 0.7;
 	
 	private int panelWidth;
 	private int panelHeight;
@@ -72,6 +73,7 @@ public class Game {
 		return rand / tries;
 	}
 
+	
 	private void genTerrain(double percentageGrass) {
 		System.out.println("gen terr");
 		LinkedList<double[][]> noises = new LinkedList<>();
@@ -185,6 +187,7 @@ public class Game {
 		double lavaRadius = 2.5;
 		double volcanoRadius = 9;
 		double mountainRadius = 20;
+		double mountainEdgeRadius = 23;
 		
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world[i].length; j++) {
@@ -195,15 +198,15 @@ public class Game {
 				
 				if(distanceFromCenter < lavaRadius) {
 					world[i][j] = new Tile(null, p, Terrain.LAVA);
-				}
-				else if(distanceFromCenter < volcanoRadius) {
+				}else if(distanceFromCenter < volcanoRadius) {
 					world[i][j] = new Tile(null, p, Terrain.VOLCANO);
-				}else if(distanceFromCenter <mountainRadius) {
-					if(world[i][j].checkTerrain(Terrain.ROCK_SNOW) == false) {
+				}else if(distanceFromCenter < mountainRadius && world[i][j].checkTerrain(Terrain.ROCK_SNOW) == false) {
 						world[i][j] = new Tile(null, p, Terrain.ROCK);
-					}
-					
+						
+				}else if(distanceFromCenter < mountainEdgeRadius && Math.random()<rockEdgeRatio) {
+					world[i][j] = new Tile(null, p, Terrain.ROCK);
 				}
+				
 			}
 		}
 		
@@ -215,21 +218,33 @@ public class Game {
 		int x0 = (int) (Math.random() * world.length);
 		int y0 = (int) (Math.random() * world.length);
 		
-		double mountLength = Math.random()*80;;
+		double mountLength = Math.random()*80;
 		double mountHeight = Math.random()*80;
+		double mountLengthEdge = mountLength+3;
+		double mountHeightEdge = mountHeight+3;
+		
 		double snowMountLength = mountLength/4;
 		double snowMountHeight = mountHeight/4;
+		double snowMountLengthEdge = mountLength/3;
+		double snowMountHeightEdge = mountHeight/3;
 		
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world[i].length; j++) {
 				int dx = i - x0;
 				int dy = j - y0;
 				double mountain = (dx*dx)/(mountLength*mountLength) + (dy*dy)/(mountHeight*mountHeight);
+				double mountainEdge = (dx*dx)/(mountLengthEdge*mountLengthEdge) + (dy*dy)/(mountHeightEdge*mountHeightEdge);
+				
 				double snowMountain = (dx*dx)/(snowMountLength*snowMountLength) + (dy*dy)/(snowMountHeight*snowMountHeight);
+				double snowMountainEdge = (dx*dx)/(snowMountLengthEdge*snowMountLengthEdge) + (dy*dy)/(snowMountHeightEdge*snowMountHeightEdge);
 				
 				Position p = new Position(i, j);
-				if (snowMountain <1 ) {
+				if(snowMountainEdge < 1 && Math.random()<snowEdgeRatio) {
 					world[i][j] = new Tile(null, p, Terrain.ROCK_SNOW);
+				}else if (snowMountain < 1 ) {
+					world[i][j] = new Tile(null, p, Terrain.ROCK_SNOW);
+				}else if(mountainEdge < 1 && Math.random()<rockEdgeRatio) {
+					world[i][j] = new Tile(null, p, Terrain.ROCK);
 				}else if(mountain < 1) {
 					world[i][j] = new Tile(null, p, Terrain.ROCK);
 				}
@@ -425,6 +440,9 @@ public class Game {
 		}
 		
 	}
+	public int getTileSize() {
+		return tileSize;
+	}
 	
 	public BuildMode getMode() {
 		return currentMode;
@@ -441,5 +459,6 @@ public class Game {
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
 		Toolkit.getDefaultToolkit().sync();
 	}
+	
 
 }
