@@ -204,11 +204,11 @@ public class Tile {
 	public boolean canBuild() {
 		return terr.isBuildable(terr);
 	}
+	public Terrain getTerrain() {
+		return terr;
+	}
 	public boolean checkTerrain(Terrain t) {
-		if(terr == t) {
-			return true;
-		}
-		return false;
+		return terr == t;
 	}
 	public void highlight(Graphics g) {
 		isHighlight = true;
