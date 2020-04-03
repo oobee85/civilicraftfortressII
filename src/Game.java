@@ -701,7 +701,15 @@ public class Game {
 	public void resetHoveredArea() {
 		hoveredArea = new Area(0,0,0,0);
 	}
-
+	
+	protected void drawMinimap(Graphics g, int x, int y, int w, int h) {
+		if(showHeightMap) {
+			g.drawImage(heightMapImage, x, y, w, h, null);
+		}
+		else {
+			g.drawImage(terrainImage, x, y, w, h, null);
+		}
+	}
 	protected void drawGame(Graphics g) {
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
 
