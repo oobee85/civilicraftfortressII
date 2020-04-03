@@ -393,6 +393,7 @@ public class Game {
 			for(int j = 0; j < world[i].length; j++) {
 				int dx = i - x0;
 				int dy = j - y0;
+				
 				double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
 				
 
@@ -401,9 +402,10 @@ public class Game {
 				Position p = new Position(i, j);
 				
 				if(forest < 1 && Math.random()<forestDensity) {
-					if(world[i][j].canBuild()==true) {
-						world[i][j].setHasForest(true);
-						heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
+					
+					if(world[i][j].canBuild()==true && world[i][j].canPlant()==true) {
+						int t = (int) (Math.random()+1.5);
+						world[i][j].setHasForest(t);
 					}
 					
 					

@@ -8,7 +8,8 @@ public enum Terrain {
 	    ROCK (3, new String[] {"Images/mountain/rock16.png", "Images/mountain/rock128.png"}),
 	    SNOW (1, new String[] {"Images/mountain/snow16.png", "Images/mountain/snow128.png"}),
 	    WATER (0, new String[] {"Images/water/water16.png", "Images/water/water128.png", "Images/water/water512.png"}),
-	    FOREST (5, new String[] {"Images/forest/forest0.png"})
+	    FOREST1 (5, new String[] {"Images/forest/tree1.png"}),
+	    FOREST2 (5, new String[] {"Images/forest/tree2.png"})
 	    ;
 	
 	    private final int moveSpeed;   
@@ -48,7 +49,13 @@ public enum Terrain {
 	    	return true;
 	    	
 	    }
-	  
+	    public boolean isPlantable(Terrain t) {
+	    	if(t==Terrain.VOLCANO || t==Terrain.LAVA || t==Terrain.SNOW || t==Terrain.WATER || t==Terrain.ROCK) {
+	    		return false;
+	    	}
+	    	return true;
+	    	
+	    }
 	    
 	}
 	
