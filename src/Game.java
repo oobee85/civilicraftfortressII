@@ -20,6 +20,7 @@ public class Game {
 	private Position hoveredTile;
 	private Area hoveredArea;
 	private BuildMode currentMode;
+	private boolean showHeightMap;
 	private int rotate = 0;
 	private double snowEdgeRatio = 0.5;
 	private double rockEdgeRatio = 0.7;
@@ -40,9 +41,10 @@ public class Game {
 		hoveredArea = new Area(0,0,0,0);
 		viewOffset = new Position(0, 0);
 		currentMode = BuildMode.NOMODE;
+		showHeightMap = false;
 		
 		world = new Tile[(int) worldSize.getX()][(int) worldSize.getY()];
-		genTerrain(0.8);
+		genTerrain(0.75, 6);
 
 	}
 	
@@ -76,7 +78,7 @@ public class Game {
 	}
 
 	
-	private void genTerrain(double percentageGrass) {
+	private void genTerrain(double percentageGrass, int smoothingRadius) {
 		System.out.println("gen terr");
 		LinkedList<double[][]> noises = new LinkedList<>();
 
@@ -98,25 +100,29 @@ public class Game {
 				double multiplier = 1;
 				for (double[][] noise : noises) {
 					divider /= 2;
-					multiplier /= 2;
+					multiplier /= 1.4;
 					rand += multiplier * noise[i / divider][j / divider];
 				}
 				combinedNoise[i][j] = rand;
 			}
 		}
 
-		// TODO make smoothing filter bigger so it looks more smooth.
 		double[][] smoothed = new double[x][y];
 		// apply smoothing filter
 		for (int i = 0; i < x; i++) {
 			for (int j = 0; j < y; j++) {
-				if (i == 0 || j == 0 || i == x - 1 || j == y - 1) {
-					smoothed[i][j] = combinedNoise[i][j];
-				} else {
-					double sum = combinedNoise[i][j] + combinedNoise[i + 1][j] + combinedNoise[i][j + 1]
-							+ combinedNoise[i][j - 1] + combinedNoise[i - 1][j];
-					smoothed[i][j] = sum / 5;
+				int mini = Math.max(0, i-smoothingRadius);
+				int maxi = Math.min(x-1, i+smoothingRadius);
+				int minj = Math.max(0, j-smoothingRadius);
+				int maxj = Math.min(y-1, j+smoothingRadius);
+				int count = 0;
+				for(int ii = mini; ii <= maxi; ii++) {
+					for(int jj = minj; jj < maxj; jj++) {
+						smoothed[i][j] += combinedNoise[ii][jj];
+						count++;
+					}
 				}
+				smoothed[i][j] /= count;
 			}
 		}
 		heightMap = smoothed;
@@ -289,6 +295,7 @@ public class Game {
 		
 	}
 	private void makeLake() {
+		
 		int x = (int) (Math.random() * world.length);
 		int y = (int) (Math.random() * world.length);
 		
@@ -434,7 +441,12 @@ public class Game {
 		for (int i = lowerX; i < upperX; i++) {
 			for (int j = lowerY; j < upperY; j++) {
 				Tile t = world[i][j];
-				t.draw(g);
+				if(showHeightMap) {
+					t.drawHeightMap(g, heightMap[i][j]);
+				}
+				else {
+					t.draw(g);
+				}
 			}
 		}
 		for (int i = lowerX; i < upperX; i++) {
@@ -570,6 +582,10 @@ public class Game {
 		draw(g);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
 		Toolkit.getDefaultToolkit().sync();
+	}
+	
+	public void setShowHeightMap(boolean show) {
+		this.showHeightMap = show;
 	}
 	
 

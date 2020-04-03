@@ -17,14 +17,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
 
 
 public class Frame extends JPanel{
@@ -150,11 +143,18 @@ public class Frame extends JPanel{
 		makeRoad.setFocusable(false);
 		makeWall.setFocusable(false);
 		
+		JToggleButton showHeightMap = new JToggleButton("Show Height Map");
+		showHeightMap.addActionListener(e -> {
+			showHeightMap.setText(showHeightMap.isSelected() ? "Hide Height Map" : "Show Height Map");
+			gameInstance.setShowHeightMap(showHeightMap.isSelected());
+		});
+		
 		gui.add(money);
 		gui.add(stone);
 		gui.add(tSize);
 		gui.add(makeRoad);
 		gui.add(makeWall);
+		gui.add(showHeightMap);
 		
 		money.setFont(new Font("Verdana",1,20));
 		money.setHorizontalAlignment(JLabel.CENTER);
