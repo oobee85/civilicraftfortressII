@@ -15,7 +15,7 @@ public class Tile {
 	private boolean hasWall;
 	private boolean hasMine;
 	private boolean hasIrrigation;
-	private boolean hasForest;
+	private int hasForest;
 	
 	private Unit unit;
 	private Position p;
@@ -64,12 +64,8 @@ public class Tile {
 		}
 		
 	}
-	public void setHasForest(boolean b) {
-		if(hasForest == b) {
-			this.hasForest = false;
-		}else {
-			this.hasForest = b;
-		}
+	public void setHasForest(int t) {
+			this.hasForest = t;
 		
 	}
 	public void setHasIrrigation(boolean b) {
@@ -114,10 +110,13 @@ public class Tile {
 		if(plant != null) {
 			g.drawImage(plant.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
 		}
-		if(hasForest == true) {
-//			g.drawImage(terr.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
-			g.drawImage(Terrain.FOREST.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null); 
+		if(hasForest != 0 && hasForest == 1) {
+			g.drawImage(Terrain.FOREST1.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null); 
 		}
+		if(hasForest != 0 && hasForest == 2) {
+			g.drawImage(Terrain.FOREST2.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null); 
+		}
+		
 	}
 	
 	
@@ -203,6 +202,9 @@ public class Tile {
 	}
 	public boolean canBuild() {
 		return terr.isBuildable(terr);
+	}
+	public boolean canPlant() {
+		return terr.isPlantable(terr);
 	}
 	public boolean checkTerrain(Terrain t) {
 		if(terr == t) {
