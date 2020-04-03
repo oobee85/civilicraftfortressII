@@ -17,6 +17,7 @@ public class Frame extends JPanel{
 	public JPanel panel;
 	public JFrame frame;
 	public JPanel gamepanel;
+	public JPanel minimapPanel;
 	private int WIDTH;
 	private int HEIGHT;
 	public Game gameInstance;
@@ -106,6 +107,16 @@ public class Frame extends JPanel{
 				gameInstance.setViewSize(gamepanel.getWidth(), gamepanel.getHeight());
 	        }
 		});
+		int MINIMAPBORDERWIDTH = 50;
+		minimapPanel = new JPanel() {
+			@Override
+			public void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				g.setColor(Color.gray);
+				g.fillRect(0, 0, getWidth(), getHeight());
+				gameInstance.drawMinimap(g, MINIMAPBORDERWIDTH, MINIMAPBORDERWIDTH, minimapPanel.getWidth() - 2*MINIMAPBORDERWIDTH,  minimapPanel.getHeight() - 2*MINIMAPBORDERWIDTH);
+			}
+		};
 		
 		
 		JButton makeRoad = new JButton("Make Road");
@@ -147,18 +158,7 @@ public class Frame extends JPanel{
 			showHeightMap.setText(showHeightMap.isSelected() ? "Hide Height Map" : "Show Height Map");
 			gameInstance.setShowHeightMap(showHeightMap.isSelected());
 		});
-		
-		gui.setPreferredSize(new Dimension(400,1080));
-		gui.add(money);
-		gui.add(stone);
-		gui.add(tSize);
-		gui.add(makeRoad);
-		gui.add(makeWall);
-		gui.add(buildMine);
-		gui.add(buildBarracks);
-		gui.add(buildIrrigation);
-		gui.add(showHeightMap);
-		
+
 		money.setFont(new Font("Verdana",1,20));
 		money.setHorizontalAlignment(JLabel.CENTER);
 		stone.setHorizontalAlignment(JLabel.CENTER);
@@ -171,10 +171,31 @@ public class Frame extends JPanel{
 			}
 		});
 		exit.setPreferredSize(new Dimension(100,50));
-		gamepanel.add(exit);
+
+		
+		gui.setPreferredSize(new Dimension(400,1080));
+		gui.add(money);
+		gui.add(stone);
+		gui.add(tSize);
+		gui.add(makeRoad);
+		gui.add(makeWall);
+		gui.add(buildMine);
+		gui.add(buildBarracks);
+		gui.add(buildIrrigation);
+		gui.add(showHeightMap);
+		gui.add(exit);
+
+		int GUIWIDTH = 400;
+		JPanel guiSplitter = new JPanel();
+		guiSplitter.setLayout(new BorderLayout());
+		guiSplitter.setPreferredSize(new Dimension(GUIWIDTH,1080));
+		guiSplitter.add(gui,BorderLayout.CENTER);
+		
+		minimapPanel.setPreferredSize(new Dimension(GUIWIDTH,GUIWIDTH));
+		guiSplitter.add(minimapPanel,BorderLayout.SOUTH);
 		
 		frame.add(gamepanel,BorderLayout.CENTER);
-		frame.add(gui,BorderLayout.EAST);
+		frame.add(guiSplitter,BorderLayout.EAST);
 		frame.pack();
 		frame.setVisible(true);
 		frame.requestFocusInWindow();
@@ -293,9 +314,7 @@ public class Frame extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gameInstance.updateGame();
-				gamepanel.repaint();
-			
-				gui.repaint();
+				frame.repaint();
 			}
 		});
 		timmy.start();
