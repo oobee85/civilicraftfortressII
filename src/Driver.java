@@ -26,13 +26,31 @@ public class Driver {
 //		
 //	}
 	
+	public static void rotateAndScaleImage(String filename, String outputFile) {
+		double angle = 45;
+		double xscale = 1;
+		double yscale = 2;
+		try {
+			BufferedImage image = ImageIO.read(new File(filename));
+			// make image that is twice as big
+			BufferedImage rotated = new BufferedImage(image.getWidth() + image.getHeight(), image.getHeight() + image.getWidth(), BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g = rotated.createGraphics();
+			g.setColor(Color.gray);
+			g.fillRect(0, 0, rotated.getWidth(), rotated.getHeight());
+			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+			g.translate(400, 0);
+			g.rotate(angle * 2 * Math.PI / 360);
+			g.scale(xscale, yscale);
+			g.drawImage(image, 0, 0, null);
+			g.dispose();
+			ImageIO.write(rotated, "png", new File(outputFile));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static void main(String[] run) {
-		
-		//new Driver();
-		
-		
-		
-		
+		//rotateAndScaleImage("irrigation.png", "rotated.png");
 		
 		new Frame(Toolkit.getDefaultToolkit().getScreenSize().width * 3/4, Toolkit.getDefaultToolkit().getScreenSize().height * 3/4, worldSize);
 	}
