@@ -152,7 +152,7 @@ public class Frame extends JPanel{
 		int BUILDING_ICON_SIZE = 25;
 		Insets zeroMargin = new Insets(0,0,0,0);
 		
-		JButton makeRoad = new JButton("Make Road");
+		JButton makeRoad = new JButton("Make Road", Utils.resizeImageIcon(Utils.loadImageIcon("images/road_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		makeRoad.setMargin(zeroMargin);
 		makeRoad.setPreferredSize(BUILDING_BUTTON_SIZE);
 		makeRoad.addActionListener(e -> {

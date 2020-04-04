@@ -225,7 +225,7 @@ public class Game {
 				minimapImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
 				terrainImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
 				if(world[i][j].getHasForest()==true) {
-					Color c = new Color(86,96,81);
+					Color c = new Color(75,110,75);
 					minimapImage.setRGB(i,j,c.getRGB());
 				}
 			}
