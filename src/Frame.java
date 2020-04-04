@@ -1,18 +1,13 @@
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.KeyboardFocusManager;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
 
 
 public class Frame extends JPanel{
+	public static final Color BACKGROUND_COLOR = new Color(200, 200, 200);
+	int GUIWIDTH = 400;
+	
 	private Timer timmy;
 	public JPanel panel;
 	public JFrame frame;
@@ -29,21 +24,21 @@ public class Frame extends JPanel{
 	
 	private Thread gameLoopThread;
 	
-	public Frame(int w, int h, int ws) {
+	public Frame(int ws) {
 	
 		frame = new JFrame("Civilization");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height * 8/9;
+		WIDTH = HEIGHT + GUIWIDTH;
+		frame.setSize(WIDTH, HEIGHT);
+		frame.setLocationRelativeTo(null);
+		
 		worldSize.x = ws;
 		worldSize.y = ws;
 		
-		WIDTH = w;
-		HEIGHT = h;
+		gameInstance = new Game(WIDTH, HEIGHT, worldSize);
 		
-		gameInstance = new Game(w, h, worldSize);
-		
-		gui = new JPanel();
-		gui.add(new JLabel("asdf"));
 		
 		EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -98,6 +93,8 @@ public class Frame extends JPanel{
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
+				g.setColor(BACKGROUND_COLOR);
+				g.fillRect(0, 0, getWidth(), getHeight());
 				gameInstance.drawGame(g);
 			}
 		};
@@ -112,12 +109,23 @@ public class Frame extends JPanel{
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				g.setColor(Color.gray);
+				g.setColor(BACKGROUND_COLOR);
 				g.fillRect(0, 0, getWidth(), getHeight());
+				g.setColor(Color.black);
+				g.drawRect(0, 0, getWidth(), getHeight());
 				gameInstance.drawMinimap(g, MINIMAPBORDERWIDTH, MINIMAPBORDERWIDTH, minimapPanel.getWidth() - 2*MINIMAPBORDERWIDTH,  minimapPanel.getHeight() - 2*MINIMAPBORDERWIDTH);
 			}
 		};
-		
+
+		gui = new JPanel() {
+			@Override
+			public void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				g.setColor(Color.black);
+				g.drawRect(0, 0, getWidth(), getHeight());
+			}
+		};
+		gui.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));
 		
 		JButton makeRoad = new JButton("Make Road");
 		makeRoad.addActionListener(e -> {
@@ -172,8 +180,7 @@ public class Frame extends JPanel{
 		});
 		exit.setPreferredSize(new Dimension(100,50));
 
-		
-		gui.setPreferredSize(new Dimension(400,1080));
+
 		gui.add(money);
 		gui.add(stone);
 		gui.add(tSize);
@@ -185,10 +192,9 @@ public class Frame extends JPanel{
 		gui.add(showHeightMap);
 		gui.add(exit);
 
-		int GUIWIDTH = 400;
 		JPanel guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());
-		guiSplitter.setPreferredSize(new Dimension(GUIWIDTH,1080));
+		guiSplitter.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));
 		guiSplitter.add(gui,BorderLayout.CENTER);
 		
 		minimapPanel.setPreferredSize(new Dimension(GUIWIDTH,GUIWIDTH));
@@ -205,6 +211,7 @@ public class Frame extends JPanel{
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				//+1 is in -1 is out
 				gameInstance.zoomView(e.getWheelRotation(),mx,my);
+				stone.setText("TileSize = " + gameInstance.getTileSize());
 			}
 		});
 		gamepanel.addMouseMotionListener(new MouseMotionListener() {

@@ -26,8 +26,8 @@ public class Game {
 	private double waterPlantRarity = 0.05;
 	private double forestDensity = 0.3;
 	
-	private int panelWidth;
-	private int panelHeight;
+	private volatile int panelWidth;
+	private volatile int panelHeight;
 	private int fastModeTileSize = 10;
 	
 
@@ -708,6 +708,14 @@ public class Game {
 		else {
 			g.drawImage(terrainImage, x, y, w, h, null);
 		}
+		Position offsetTile = getTileAtPixel(viewOffset);
+		int boxx = (int) (offsetTile.x * w / world.length / 2);
+		int boxy = (int) (offsetTile.y * h / world[0].length / 2);
+		int boxw = (int) (panelWidth/Game.tileSize * w / world.length);
+		int boxh = (int) (panelHeight/Game.tileSize * h / world[0].length);
+//		System.out.println(boxx);
+		g.setColor(Color.yellow);
+		g.drawRect(x + boxx, y + boxy, boxw, boxh);
 	}
 	protected void drawGame(Graphics g) {
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());

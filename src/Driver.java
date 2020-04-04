@@ -52,7 +52,7 @@ public class Driver {
 	public static void main(String[] run) {
 		//rotateAndScaleImage("irrigation.png", "rotated.png");
 		
-		new Frame(Toolkit.getDefaultToolkit().getScreenSize().width * 3/4, Toolkit.getDefaultToolkit().getScreenSize().height * 3/4, worldSize);
+		new Frame(worldSize);
 	}
 
 
