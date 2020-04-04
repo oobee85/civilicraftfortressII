@@ -587,6 +587,9 @@ public class Game {
 		Position tile = pixel.add(viewOffset).divide(tileSize);
 		return tile;
 	}
+	public Position getPixelForTile(Position tile) {
+		return tile.multiply(tileSize).subtract(viewOffset);
+	}
 
 	public void mouseOver(int mx, int my) {
 		Position tile = getTileAtPixel(new Position(mx, my));
@@ -661,6 +664,11 @@ public class Game {
 		viewOffset.y += dy;
 //		System.out.println(viewOffset.x + "curview" + viewOffset.y);
 	}
+	public void moveViewTo(double ratiox, double ratioy) {
+		Position tile = new Position(ratiox*world.length, ratioy*world[0].length);
+		Position pixel = tile.multiply(tileSize).subtract(new Position(panelWidth/2, panelHeight/2));
+		viewOffset = pixel;
+	}
 
 	public void updateGame() {
 		ticks++;
@@ -719,7 +727,6 @@ public class Game {
 	}
 	protected void drawGame(Graphics g) {
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
-
 		draw(g);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
 		Toolkit.getDefaultToolkit().sync();
