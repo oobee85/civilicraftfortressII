@@ -13,10 +13,11 @@ public class Frame extends JPanel{
 	public JFrame frame;
 	public JPanel gamepanel;
 	public JPanel minimapPanel;
+	private JComboBox<MapType> mapType;
+	private JTextField mapSize;
 	private int WIDTH;
 	private int HEIGHT;
 	public Game gameInstance;
-	private Point worldSize = new Point();
 	private int mx;
 	private int my;
 	public JPanel gui;
@@ -24,7 +25,7 @@ public class Frame extends JPanel{
 	
 	private Thread gameLoopThread;
 	
-	public Frame(int ws) {
+	public Frame() {
 	
 		frame = new JFrame("Civilization");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -35,10 +36,7 @@ public class Frame extends JPanel{
 		frame.setSize(WIDTH, HEIGHT);
 		frame.setLocationRelativeTo(null);
 		
-		worldSize.x = ws;
-		worldSize.y = ws;
-		
-		gameInstance = new Game(WIDTH, HEIGHT, worldSize);
+		gameInstance = new Game();
 		
 		
 		EventQueue.invokeLater(new Runnable() {
@@ -59,11 +57,28 @@ public class Frame extends JPanel{
 		start.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				runGame();
+				try {
+					String sizeString = mapSize.getText();
+					int size = Integer.parseInt(sizeString);
+					gameInstance.generateWorld((MapType) mapType.getSelectedItem(), size);
+					runGame();
+				}
+				catch(NumberFormatException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 		start.setPreferredSize(new Dimension(100,50));
 		panel.add(start);
+		
+		mapType = new JComboBox<>(MapType.values());
+		mapType.setPreferredSize(new Dimension(100,50));
+		panel.add(mapType);
+		
+		mapSize = new JTextField("256", 10);
+		mapSize.setPreferredSize(new Dimension(100,50));
+		panel.add(mapSize);
+		
 
 		
 		

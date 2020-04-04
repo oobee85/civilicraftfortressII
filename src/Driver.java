@@ -5,7 +5,6 @@ import java.io.*;
 import javax.imageio.*;
 
 public class Driver {
-	private static int worldSize = 256;
 //	
 //	public Driver() {
 //		Image lava = Utils.loadImage("Images/lava_flow.png");
@@ -52,7 +51,7 @@ public class Driver {
 	public static void main(String[] run) {
 		//rotateAndScaleImage("irrigation.png", "rotated.png");
 		
-		new Frame(worldSize);
+		new Frame();
 	}
 
 

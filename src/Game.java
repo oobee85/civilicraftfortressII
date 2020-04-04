@@ -33,23 +33,24 @@ public class Game {
 	private int fastModeTileSize = 10;
 	
 
-	public Game(int w, int h, Point wSize) {
-		worldSize = wSize;
+	public Game() {
 		money = 100;
 		hoveredTile = new Position(-1,-1);
 		hoveredArea = new Area(0,0,0,0);
 		viewOffset = new Position(0, 0);
 		currentMode = BuildMode.NOMODE;
 		showHeightMap = false;
-		
-		world = new Tile[(int) worldSize.getX()][(int) worldSize.getY()];
-		genTerrain(0.75, 8);
 	}
 
 	public void gameTick() {
 		// Do all the game events like unit movement, time passing, building things, growing, etc
 		// happens once every 100ms
 		ticks++;
+		
+		if(Math.random() < 0.001) {
+			makeLake(100);
+			createTerrainImage();
+		}
 		
 	}
 	
@@ -70,8 +71,35 @@ public class Game {
 		genPlants();
 	}
 
+	public void generateWorld(MapType mapType, int size) {
+		worldSize = new Point(size, size);
+		world = new Tile[(int) worldSize.getX()][(int) worldSize.getY()];
+		int smoothingRadius = (int) (Math.sqrt(size)/2);
+		
+		if(mapType == MapType.PANGEA) {
+			generateHeightMap(0.5, smoothingRadius, 0.05);
+		}
+		else if(mapType == MapType.CONTINENTS) {
+			generateHeightMap(0.6, smoothingRadius, 0.35);
+		}
+		else if(mapType == MapType.ARCHIPELAGO) {
+			generateHeightMap(0.75, smoothingRadius, 0.60);
+		}
+		int numTiles = size*size;
+		makeLake(numTiles * 2/100);
+		makeLake(numTiles * 1/100);
+		makeLake(numTiles * 1/200);
+		makeLake(numTiles * 1/400);
+
+		
+		makeRoad();
+		makeForest();
+		genResources();
+		
+		createTerrainImage();
+	}
 	
-	private void genTerrain(double percentageGrass, int smoothingRadius) {
+	private void generateHeightMap(double dirtLevel, int smoothingRadius, double waterLevel) {
 		System.out.println("gen terr");
 		LinkedList<double[][]> noises = new LinkedList<>();
 
@@ -138,28 +166,28 @@ public class Game {
 		
 		
 		// make ten bins to count how many tiles have which value from terrain gen
-		int[] bins = new int[10];
-		// if values range from: 0 to 1
-		// bin 0: 0-0.1
-		// bin 1: 0.1-0.2
-		// ..
-		// bin 9: 0.9-1
-		for (int i = 0; i < world.length; i++) {
-			for (int j = 0; j < world[0].length; j++) {
-				int bin = (int) ((bins.length-1) * heightMap[i][j]);
-				bins[bin]++;
-			}
-		}
-		int totalNumTiles = world.length*world[0].length;
-		int numGrassTilesSoFar = 0;
-		double cutoffThreshold = 0;
-		for(int bin = 0; bin < bins.length; bin++) {
-			numGrassTilesSoFar += bins[bin];
-			if(numGrassTilesSoFar >= totalNumTiles * percentageGrass) {
-				cutoffThreshold = (double)bin / bins.length;
-				break;
-			}
-		}
+//		int[] bins = new int[10];
+//		// if values range from: 0 to 1
+//		// bin 0: 0-0.1
+//		// bin 1: 0.1-0.2
+//		// ..
+//		// bin 9: 0.9-1
+//		for (int i = 0; i < world.length; i++) {
+//			for (int j = 0; j < world[0].length; j++) {
+//				int bin = (int) ((bins.length-1) * heightMap[i][j]);
+//				bins[bin]++;
+//			}
+//		}
+//		int totalNumTiles = world.length*world[0].length;
+//		int numGrassTilesSoFar = 0;
+//		double cutoffThreshold = 0;
+//		for(int bin = 0; bin < bins.length; bin++) {
+//			numGrassTilesSoFar += bins[bin];
+//			if(numGrassTilesSoFar >= totalNumTiles * percentageGrass) {
+//				cutoffThreshold = (double)bin / bins.length;
+//				break;
+//			}
+//		}
 		for (int i = 0; i < world.length; i++) {
 			for (int j = 0; j < world[0].length; j++) {
 				if(world[i][j].getTerrain() == Terrain.DIRT) {
@@ -171,10 +199,10 @@ public class Game {
 					else if (heightMap[i][j] > 0.85) {
 						t = Terrain.ROCK;
 					}
-					else if (heightMap[i][j] > cutoffThreshold) {
+					else if (heightMap[i][j] > dirtLevel) {
 						t = Terrain.DIRT;
 					}
-					else if (heightMap[i][j] > 0.1) {
+					else if (heightMap[i][j] > waterLevel) {
 						t = Terrain.GRASS;
 					}
 					else {
@@ -185,17 +213,6 @@ public class Game {
 				}
 			}
 		}
-		
-		makeLake(1000);
-		makeLake(100);
-		makeLake(100);
-		makeLake(100);
-		makeLake(100);
-		makeRoad();
-		makeForest();
-		genResources();
-		
-		createTerrainImage();
 	}
 	
 	private void createTerrainImage() {
