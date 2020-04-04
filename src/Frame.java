@@ -104,6 +104,9 @@ public class Frame extends JPanel{
 	
 	private void runGame() {
 		System.err.println("Starting Game");
+		frame.remove(panel);
+		
+		
 		
 		gamepanel = new JPanel() {
 			@Override
@@ -392,8 +395,6 @@ public class Frame extends JPanel{
 		});
 		timmy.start();
 
-		frame.remove(panel);
-		frame.add(gamepanel, BorderLayout.CENTER); 
 		gamepanel.setSize(frame.getSize());
 		frame.repaint();
 		gamepanel.requestFocus();
