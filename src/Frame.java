@@ -203,6 +203,24 @@ public class Frame extends JPanel{
 		buildIrrigation.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.IRRIGATE);
 		});
+		JButton buildWorker = new JButton("Build Worker", Utils.resizeImageIcon(Unit.WORKER.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		buildWorker.setMargin(zeroMargin);
+		buildWorker.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildWorker.addActionListener(e -> {
+			
+		});
+		JButton buildWarrior = new JButton("Build Warrior", Utils.resizeImageIcon(Unit.WARRIOR.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		buildWarrior.setMargin(zeroMargin);
+		buildWarrior.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildWarrior.addActionListener(e -> {
+			
+		});
+		JButton buildSpearman = new JButton("Build Spearman", Utils.resizeImageIcon(Unit.SPEARMAN.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		buildSpearman.setMargin(zeroMargin);
+		buildSpearman.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildSpearman.addActionListener(e -> {
+			
+		});
 		JLabel money = new JLabel(Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE)); 
 		//money.setFont(new Font("Verdana",1,20));
 		money.setText("Gold = "+gameInstance.getMoney());
@@ -255,6 +273,9 @@ public class Frame extends JPanel{
 		gui.add(buildMine);
 		gui.add(buildBarracks);
 		gui.add(buildIrrigation);
+		gui.add(buildWorker);
+		gui.add(buildWarrior);
+		gui.add(buildSpearman);
 		gui.add(showHeightMap);
 		gui.add(exit);
 
