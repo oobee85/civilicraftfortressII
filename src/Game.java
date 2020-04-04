@@ -517,27 +517,43 @@ public class Game {
 	
 	private void turnRoads(Position current, Position prev) {
 		if(world[current.getIntX()][current.getIntY()].canBuild()==true) {
+			
 			// makes turns bot left -> top right
-			if (current.getIntX() - 1 == prev.getIntX() && current.getIntY() == prev.getIntY()) {
-				world[current.getIntX() - 1][current.getIntY()].setHasRoad(true, "left_down");
-				world[current.getIntX()][current.getIntY()].setHasRoad(true, "right_up");
-			} else if (current.getIntX() - 1 == prev.getIntX() && current.getIntY() + 1 == prev.getIntY()) {
-				world[current.getIntX() - 1][current.getIntY()].setHasRoad(true, "left_down");
-				world[current.getIntX()][current.getIntY()].setHasRoad(true, "right_up");
+			if(world[current.getIntX()-1][current.getIntY()].canBuild()==true) {
+				if (current.getIntX() - 1 == prev.getIntX() && current.getIntY() == prev.getIntY()) {
+					world[current.getIntX()-1][current.getIntY()].setHasRoad(true, "left_down");
+					world[current.getIntX()][current.getIntY()].setHasRoad(true, "right_up");
+				} else if (current.getIntX() - 1 == prev.getIntX() && current.getIntY() + 1 == prev.getIntY()) {
+					world[current.getIntX()-1][current.getIntY()].setHasRoad(true, "left_down");
+					world[current.getIntX()][current.getIntY()].setHasRoad(true, "right_up");
+				}	
 			}
+			
 
 			// makes turns bot right -> top left
-			if (current.getIntX() + 1 == prev.getIntX() && current.getIntY() == prev.getIntY()) {
-				world[current.getIntX() + 1][current.getIntY()].setHasRoad(true, "right_down");
-				world[current.getIntX()][current.getIntY()].setHasRoad(true, "left_up");
-			} else if (current.getIntX() + 1 == prev.getIntX() && current.getIntY() + 1 == prev.getIntY()) {
-				world[current.getIntX() + 1][current.getIntY()].setHasRoad(true, "right_down");
-				world[current.getIntX()][current.getIntY()].setHasRoad(true, "left_up");
+			if(world[current.getIntX()+1][current.getIntY()].canBuild()==true) {
+				if (current.getIntX() + 1 == prev.getIntX() && current.getIntY() == prev.getIntY()) {
+					world[current.getIntX() + 1][current.getIntY()].setHasRoad(true, "right_down");
+					world[current.getIntX()][current.getIntY()].setHasRoad(true, "left_up");
+				} else if (current.getIntX() + 1 == prev.getIntX() && current.getIntY() + 1 == prev.getIntY()) {
+					world[current.getIntX() + 1][current.getIntY()].setHasRoad(true, "right_down");
+					world[current.getIntX()][current.getIntY()].setHasRoad(true, "left_up");
+				}
 			}
+			
 
 			if (world[current.getIntX()][current.getIntY()].getHasRoad() == false) {
 				world[current.getIntX()][current.getIntY()].setHasRoad(true, "top_down");
 			}
+			
+			
+//			Tile t =  world[current.getIntX()][current.getIntY()];
+//			if(
+////					world[current.getIntX()][current.getIntY()].getHasRoad() == true && 
+//					t.getTerrain().isBridgeable(t.getTerrain()) == true) {
+//				System.out.println("bridging");
+//				world[current.getIntX()][current.getIntY()].setHasBuilding(Buildings.BRIDGE);
+//			}
 
 		}
 

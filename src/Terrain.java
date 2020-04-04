@@ -56,6 +56,13 @@ public enum Terrain {
 	    	return true;
 	    	
 	    }
+	    public boolean isBridgeable(Terrain t) {
+	    	if(t==Terrain.WATER) {
+	    		return true;
+	    	}
+	    	return false;
+	    	
+	    }
 	    
 	}
 	

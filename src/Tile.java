@@ -18,6 +18,7 @@ public class Tile {
 	private int forestType;
 	private boolean isHighlight;
 	private boolean hasOre;
+	private boolean hasBuilding;
 	
 	private Unit unit;
 	private Position p;
@@ -32,6 +33,7 @@ public class Tile {
 	private Plant plant;
 	private Terrain terr;
 	private Structure structure;
+	private Buildings building;
 	
 	public Tile(Unit u, Position point, Terrain t) {
 		unit = u;
@@ -40,17 +42,21 @@ public class Tile {
 		isHighlight = false;
 		
 	}
-	public void buildRoad(boolean r) {
-		if(hasRoad == r) {
+	public void setHasBuilding(Buildings b) {
+		this.hasBuilding = true;
+		building = b;
+	}
+	public void buildRoad(boolean b) {
+		if(hasRoad == b) {
 			this.hasRoad = false;
 		}else {
-			this.hasRoad = r;
+			this.hasRoad = b;
 		}
 	}
 
-	public void setHasRoad(boolean r, String s) {
-			this.hasRoad = r;
-			roadCorner = s;
+	public void setHasRoad(boolean b, String s) {
+		this.hasRoad = b;
+		roadCorner = s;
 	}
 	public void setHasOre(Ore o) {
 		hasOre = true;
@@ -182,6 +188,9 @@ public class Tile {
 		
 		if (hasRoad == true) {
 			g.drawImage(Utils.roadImages.get(roadCorner), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
+		}
+		if(hasBuilding == true) {
+			g.drawImage(building.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
 		}
 		if (hasMine == true) {
 			g.drawImage(Buildings.MINE.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
