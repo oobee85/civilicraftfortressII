@@ -194,11 +194,10 @@ public class Game {
 		makeForest();
 		genResources();
 		
-		createTerrainImage(false);
-		createTerrainImage(true);
+		createTerrainImage();
 	}
 	
-	private void createTerrainImage(boolean mapImage) {
+	private void createTerrainImage() {
 		HashMap<Terrain, Color> terrainColors = new HashMap<>();
 		for(Terrain t : Terrain.values()) {
 			BufferedImage image = Utils.toBufferedImage(t.getImage(0));
@@ -217,31 +216,18 @@ public class Game {
 			Color average = new Color(sumr/totalNumPixels, sumg/totalNumPixels, sumb/totalNumPixels);
 			terrainColors.put(t, average);
 		}
-		if(mapImage == false) {
-			terrainImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
-		}
-		if(mapImage == true) {
-			minimapImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
-		}
+		terrainImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
+		minimapImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
 		
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world[0].length; j++) {
 				
-				if(mapImage == true) {
-					minimapImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
-				}
-				if(mapImage == true && world[i][j].getHasForest()==true) {
+				minimapImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
+				terrainImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
+				if(world[i][j].getHasForest()==true) {
 					Color c = new Color(86,96,81);
 					minimapImage.setRGB(i,j,c.getRGB());
 				}
-				
-				
-				if(mapImage == false) {
-					terrainImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
-				}
-			
-				
-				
 			}
 		}
 		
