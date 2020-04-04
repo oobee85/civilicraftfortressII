@@ -2,9 +2,9 @@ import java.awt.Image;
 
 public enum Plant {
 	
-	BERRY ( 100, new String[] {"Images/plants/berry16.png", "Images/plants/berry128.png"} , 1.0),
-	BERRY_DEPLETED ( 0, new String[] {"Images/plants/berry_depleted16.png", "Images/plants/berry_depleted128.png"} , 0.2),
-	CATTAIL ( 100, new String[] {"Images/plants/cattail32.png"} , 1.0),
+	BERRY ( 100, new String[] {"resources/Images/plants/berry16.png", "resources/Images/plants/berry128.png"} , 1.0),
+	BERRY_DEPLETED ( 0, new String[] {"resources/Images/plants/berry_depleted16.png", "resources/Images/plants/berry_depleted128.png"} , 0.2),
+	CATTAIL ( 100, new String[] {"resources/Images/plants/cattail32.png"} , 1.0),
 	;
 	
 	

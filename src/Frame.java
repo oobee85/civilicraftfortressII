@@ -28,6 +28,7 @@ public class Frame extends JPanel{
 	
 		frame = new JFrame("Civilization");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setIconImage(Utils.loadImage("resources/Images/logo.png"));
 		
 		HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height * 8/9;
 		WIDTH = HEIGHT + GUIWIDTH;
@@ -184,7 +185,7 @@ public class Frame extends JPanel{
 		buildIrrigation.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.IRRIGATE);
 		});
-		JLabel money = new JLabel(Utils.resizeImageIcon(Utils.loadImageIcon("images/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE)); 
+		JLabel money = new JLabel(Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE)); 
 		//money.setFont(new Font("Verdana",1,20));
 		money.setText("Gold = "+gameInstance.getMoney());
 		money.setPreferredSize(BUILDING_BUTTON_SIZE);

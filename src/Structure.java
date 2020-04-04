@@ -5,8 +5,8 @@ import javax.swing.*;
 
 public enum Structure {
 	
-	CASTLE (500, "Images/buildings/castle256.png"),
-	BARRACKS (100, "Images/buildings/barracks256.png")
+	CASTLE (500, "resources/Images/buildings/castle256.png"),
+	BARRACKS (100, "resources/Images/buildings/barracks256.png")
 	;
 	
     private final int health;   

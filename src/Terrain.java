@@ -1,15 +1,15 @@
 import java.awt.*;
 
 public enum Terrain {
-	    GRASS (10, new String[] {"Images/grass/grass16.png", "Images/grass/grass128.png", "Images/grass/grass512.png"}),
-	    DIRT  (8, new String[] {"Images/dirt/dirt16.png", "Images/dirt/dirt128.png", "Images/dirt/dirt512.png"}),
-	    LAVA  (0, new String[] {"Images/lava/lava16.png", "Images/lava/lavaanim32.gif", "Images/lava/lava128.gif", "Images/lava/lava512.png"}),
-	    VOLCANO (1, new String[] {"Images/lava/volcano16.png", "Images/lava/volcano128.png", "Images/lava/magma512.png"}),
-	    ROCK (3, new String[] {"Images/mountain/rock16.png", "Images/mountain/rock128.png"}),
-	    SNOW (1, new String[] {"Images/mountain/snow16.png", "Images/mountain/snow128.png"}),
-	    WATER (0, new String[] {"Images/water/water16.png", "Images/water/water128.png", "Images/water/water512.png"}),
-	    FOREST0 (5, new String[] {"Images/forest/tree0.png"}),
-	    FOREST1 (5, new String[] {"Images/forest/tree1.png"})
+	    GRASS (10, new String[] {"resources/Images/grass/grass16.png", "resources/Images/grass/grass128.png", "resources/Images/grass/grass512.png"}),
+	    DIRT  (8, new String[] {"resources/Images/dirt/dirt16.png", "resources/Images/dirt/dirt128.png", "resources/Images/dirt/dirt512.png"}),
+	    LAVA  (0, new String[] {"resources/Images/lava/lava16.png", "resources/Images/lava/lavaanim32.gif", "resources/Images/lava/lava128.gif", "resources/Images/lava/lava512.png"}),
+	    VOLCANO (1, new String[] {"resources/Images/lava/volcano16.png", "resources/Images/lava/volcano128.png", "resources/Images/lava/magma512.png"}),
+	    ROCK (3, new String[] {"resources/Images/mountain/rock16.png", "resources/Images/mountain/rock128.png"}),
+	    SNOW (1, new String[] {"resources/Images/mountain/snow16.png", "resources/Images/mountain/snow128.png"}),
+	    WATER (0, new String[] {"resources/Images/water/water16.png", "resources/Images/water/water128.png", "resources/Images/water/water512.png"}),
+	    FOREST0 (5, new String[] {"resources/Images/forest/tree0.png"}),
+	    FOREST1 (5, new String[] {"resources/Images/forest/tree1.png"})
 	    ;
 	
 	    private final int moveSpeed;   

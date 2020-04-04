@@ -43,7 +43,7 @@ public class Game {
 		showHeightMap = false;
 		
 		world = new Tile[(int) worldSize.getX()][(int) worldSize.getY()];
-		genTerrain(0.75, 6);
+		genTerrain(0.75, 8);
 	}
 
 	public void gameTick() {
@@ -99,26 +99,8 @@ public class Game {
 				combinedNoise[i][j] = rand;
 			}
 		}
-
-		double[][] smoothed = new double[world.length][world[0].length];
-		// apply smoothing filter
-		for (int i = 0; i < world.length; i++) {
-			for (int j = 0; j < world[0].length; j++) {
-				int mini = Math.max(0, i-smoothingRadius);
-				int maxi = Math.min(world.length-1, i+smoothingRadius);
-				int minj = Math.max(0, j-smoothingRadius);
-				int maxj = Math.min(world[0].length-1, j+smoothingRadius);
-				int count = 0;
-				for(int ii = mini; ii <= maxi; ii++) {
-					for(int jj = minj; jj < maxj; jj++) {
-						smoothed[i][j] += combinedNoise[ii][jj];
-						count++;
-					}
-				}
-				smoothed[i][j] /= count;
-			}
-		}
-		heightMap = smoothed;
+		
+		heightMap = Utils.smoothingFilter(combinedNoise, smoothingRadius, 100);
 		
 		double minValue = heightMap[0][0];
 		double maxValue = heightMap[0][0];
@@ -143,7 +125,18 @@ public class Game {
 				heightMap[i][j] = (heightMap[i][j] - minValue) / (maxValue - minValue);
 			}
 		}
-
+		for (int i = 0; i < world.length; i++) {
+			for (int j = 0; j < world[0].length; j++) {
+				Position p = new Position(i, j);
+				world[i][j] = new Tile(null, p, Terrain.DIRT);
+			}
+		}
+		
+		makeMountain();
+		makeVolcano();
+		heightMap = Utils.smoothingFilter(heightMap, 3, 9);
+		
+		
 		// make ten bins to count how many tiles have which value from terrain gen
 		int[] bins = new int[10];
 		// if values range from: 0 to 1
@@ -169,22 +162,30 @@ public class Game {
 		}
 		for (int i = 0; i < world.length; i++) {
 			for (int j = 0; j < world[0].length; j++) {
-				Position p = new Position(i, j);
-				Terrain t;
-				if (smoothed[i][j] > cutoffThreshold) {
-					t = Terrain.DIRT;
-				} else {
-					t = Terrain.GRASS;
+				if(world[i][j].getTerrain() == Terrain.DIRT) {
+					Position p = new Position(i, j);
+					Terrain t;
+					if (heightMap[i][j] > 0.95) {
+						t = Terrain.SNOW;
+					}
+					else if (heightMap[i][j] > 0.85) {
+						t = Terrain.ROCK;
+					}
+					else if (heightMap[i][j] > cutoffThreshold) {
+						t = Terrain.DIRT;
+					}
+					else if (heightMap[i][j] > 0.1) {
+						t = Terrain.GRASS;
+					}
+					else {
+						t = Terrain.WATER;
+					}
+					Tile tile = new Tile(null, p, t);
+					world[i][j] = tile;
 				}
-
-				Tile tile = new Tile(null, p, t);
-				world[i][j] = tile;
-
 			}
 		}
 		
-		makeMountain();
-		makeVolcano();
 		makeLake(1000);
 		makeLake(100);
 		makeLake(100);
@@ -325,7 +326,7 @@ public class Game {
 					
 					double height = 1 - (volcanoRadius - distanceFromCenter)/volcanoRadius/2;
 					if(distanceFromCenter > volcanoRadius) {
-						height = 1 - (distanceFromCenter - volcanoRadius)/mountainEdgeRadius;
+						height = 1 - (distanceFromCenter - volcanoRadius)/mountainEdgeRadius*2;
 					}
 					heightMap[i][j] = Math.max(height, heightMap[i][j]);
 					

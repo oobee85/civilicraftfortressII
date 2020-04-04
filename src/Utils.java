@@ -12,13 +12,13 @@ public final class Utils {
 	public static final HashMap<String, Image> roadImages;
 	static {
 		roadImages = new HashMap<>();
-		roadImages.put("top_down", loadImage("Images/road/road_up.png"));
-		roadImages.put("left_right", loadImage("Images/road/road_left_right.png"));
+		roadImages.put("top_down", loadImage("resources/Images/road/road_up.png"));
+		roadImages.put("left_right", loadImage("resources/Images/road/road_left_right.png"));
 		
-		roadImages.put("left_down", loadImage("Images/road/road_left_down.png"));
-		roadImages.put("left_up", loadImage("Images/road/road_left_up.png"));
-		roadImages.put("right_down", loadImage("Images/road/road_right_down.png"));
-		roadImages.put("right_up", loadImage("Images/road/road_right_up.png"));
+		roadImages.put("left_down", loadImage("resources/Images/road/road_left_down.png"));
+		roadImages.put("left_up", loadImage("resources/Images/road/road_left_up.png"));
+		roadImages.put("right_down", loadImage("resources/Images/road/road_right_down.png"));
+		roadImages.put("right_up", loadImage("resources/Images/road/road_right_up.png"));
 
 	}
 
@@ -31,9 +31,12 @@ public final class Utils {
 	}
 
 	public static final ImageIcon loadImageIcon(String filename) {
-		URL a = Utils.class.getResource(filename);
+		URL a = Utils.class.getClassLoader().getResource(filename);
 		if (a != null) {
 			return new ImageIcon(a);
+		}
+		else {
+			System.err.println("FAILED TO LOAD FILE " + filename);
 		}
 		return null;
 	}
@@ -76,5 +79,30 @@ public final class Utils {
 
 		// Return the buffered image
 		return bimage;
+	}
+
+	public static double[][] smoothingFilter(double[][] data, double radius, double c) {
+		double[][] smoothed = new double[data.length][data[0].length];
+		// apply smoothing filter
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				int mini = (int) Math.max(0, i-radius);
+				int maxi = (int) Math.min(data.length-1, i+radius);
+				int minj = (int) Math.max(0, j-radius);
+				int maxj = (int) Math.min(data[0].length-1, j+radius);
+				double count = 0;
+				for(int ii = mini; ii <= maxi; ii++) {
+					for(int jj = minj; jj < maxj; jj++) {
+						double distance = Math.sqrt((ii-i)*(ii-i) + (jj-j)*(jj-j));
+						double gaussian = Math.exp(-distance*distance / c);
+						smoothed[i][j] += gaussian * data[ii][jj];
+						//smoothed[i][j] += data[ii][jj];
+						count += gaussian;
+					}
+				}
+				smoothed[i][j] /= count;
+			}
+		}
+		return smoothed;
 	}
 }
