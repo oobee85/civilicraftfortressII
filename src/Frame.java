@@ -13,7 +13,7 @@ public class Frame extends JPanel{
 	private JFrame frame;
 	private JPanel gamepanel;
 	private JPanel minimapPanel;
-	private JComponent cityView;
+	private JPanel cityView;
 	private JComboBox<MapType> mapType;
 	private JTextField mapSize;
 	private int WIDTH;
@@ -280,9 +280,6 @@ public class Frame extends JPanel{
 		gui.add(buildMine);
 		gui.add(buildBarracks);
 		gui.add(buildIrrigation);
-		gui.add(buildWorker);
-		gui.add(buildWarrior);
-		gui.add(buildSpearman);
 		gui.add(showHeightMap);
 		gui.add(exit);
 
@@ -295,11 +292,22 @@ public class Frame extends JPanel{
 		guiSplitter.add(minimapPanel,BorderLayout.SOUTH);
 		
 		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/background.png");
-		cityView = new JComponent() {
+		cityView = new JPanel() {
 		    protected void paintComponent(Graphics g) {
 	            g.drawImage(cityOverlay, 0, 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
+		    	super.paintComponent(g);
 		    }
 		};
+		cityView.setOpaque(false);
+		cityView.setLayout(null);
+		
+		cityView.add(buildWorker);
+		int numButtons = 0;
+		buildWorker.setBounds((++numButtons)*10 + (numButtons-1)*BUILDING_BUTTON_SIZE.width, 10, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		cityView.add(buildWarrior);
+		buildWarrior.setBounds((++numButtons)*10 + (numButtons-1)*BUILDING_BUTTON_SIZE.width, 10, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		cityView.add(buildSpearman);
+		buildSpearman.setBounds((++numButtons)*10 + (numButtons-1)*BUILDING_BUTTON_SIZE.width, 10, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 		
 		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
 		frame.getContentPane().add(guiSplitter,BorderLayout.EAST);
