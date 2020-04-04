@@ -172,7 +172,7 @@ public class Frame extends JPanel{
 		stone.setText("Stone = "+gameInstance.getMoney());
 		
 		JLabel tSize = new JLabel(); 
-		stone.setText("TileSize = "+gameInstance.getTileSize());
+		tSize.setText("TileSize = "+gameInstance.getTileSize());
 		
 		makeRoad.setFocusable(false);
 		makeWall.setFocusable(false);
@@ -230,7 +230,7 @@ public class Frame extends JPanel{
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				//+1 is in -1 is out
 				gameInstance.zoomView(e.getWheelRotation(),mx,my);
-				stone.setText("TileSize = " + gameInstance.getTileSize());
+				tSize.setText("TileSize = " + gameInstance.getTileSize());
 			}
 		});
 		gamepanel.addMouseMotionListener(new MouseMotionListener() {

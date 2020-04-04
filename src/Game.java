@@ -10,7 +10,9 @@ public class Game {
 	public Tile[][] world;
 	private double[][] heightMap;
 	private BufferedImage terrainImage;
+	private BufferedImage minimapImage;
 	private BufferedImage heightMapImage;
+	
 	protected static int tileSize = 10;
 	private int money;
 	private Position viewOffset;
@@ -192,10 +194,11 @@ public class Game {
 		makeForest();
 		genResources();
 		
-		createTerrainImage();
+		createTerrainImage(false);
+		createTerrainImage(true);
 	}
 	
-	private void createTerrainImage() {
+	private void createTerrainImage(boolean mapImage) {
 		HashMap<Terrain, Color> terrainColors = new HashMap<>();
 		for(Terrain t : Terrain.values()) {
 			BufferedImage image = Utils.toBufferedImage(t.getImage(0));
@@ -214,11 +217,30 @@ public class Game {
 			Color average = new Color(sumr/totalNumPixels, sumg/totalNumPixels, sumb/totalNumPixels);
 			terrainColors.put(t, average);
 		}
+		if(mapImage == false) {
+			terrainImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
+		}
+		if(mapImage == true) {
+			minimapImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
+		}
 		
-		terrainImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world[0].length; j++) {
-				terrainImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
+				
+				if(mapImage == true) {
+					minimapImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
+				}
+				if(mapImage == true && world[i][j].getHasForest()==true) {
+					Color c = new Color(86,96,81);
+					minimapImage.setRGB(i,j,c.getRGB());
+				}
+				
+				
+				if(mapImage == false) {
+					terrainImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
+				}
+			
+				
 				
 			}
 		}
@@ -604,24 +626,31 @@ public class Game {
 		System.out.println(currentMode);
 		
 		if(currentMode == BuildMode.ROAD) {
-			world[tile.getIntX()][tile.getIntY()].buildRoad(true);
-		} 
-		if(currentMode == BuildMode.BARRACKS) {
-			world[tile.getIntX()][tile.getIntY()].setStructure(Structure.BARRACKS);
-		} 
-		if(currentMode == BuildMode.WALL) {
+			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
+				world[tile.getIntX()][tile.getIntY()].buildRoad(true);
+			}
+		}
 			
+		if(currentMode == BuildMode.BARRACKS) {
+			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
+				world[tile.getIntX()][tile.getIntY()].setStructure(Structure.BARRACKS);
+			}
+		} 
+		
+		if(currentMode == BuildMode.WALL) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
 				world[tile.getIntX()][tile.getIntY()].setHasWall(true);
 			}
 		}
+		
 		if(currentMode == BuildMode.MINE) {
-			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
+			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true || world[tile.getIntX()][tile.getIntY()].getHasOre() == true) {
 				world[tile.getIntX()][tile.getIntY()].setHasMine(true);
 			}
 		}
+		
 		if(currentMode == BuildMode.IRRIGATE) {
-			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
+			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true && world[tile.getIntX()][tile.getIntY()].canPlant() == true) {
 				world[tile.getIntX()][tile.getIntY()].setHasIrrigation(true);
 			}
 		}
@@ -698,7 +727,7 @@ public class Game {
 			g.drawImage(heightMapImage, x, y, w, h, null);
 		}
 		else {
-			g.drawImage(terrainImage, x, y, w, h, null);
+			g.drawImage(minimapImage, x, y, w, h, null);
 		}
 		Position offsetTile = getTileAtPixel(viewOffset);
 		int boxx = (int) (offsetTile.x * w / world.length / 2);

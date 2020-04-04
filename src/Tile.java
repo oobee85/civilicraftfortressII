@@ -17,6 +17,7 @@ public class Tile {
 	private boolean hasForest;
 	private int forestType;
 	private boolean isHighlight;
+	private boolean hasOre;
 	
 	private Unit unit;
 	private Position p;
@@ -52,6 +53,7 @@ public class Tile {
 			roadCorner = s;
 	}
 	public void setHasOre(Ore o) {
+		hasOre = true;
 		ore = o;
 	}
 	public void setHasPlant(Plant p) {
@@ -200,6 +202,9 @@ public class Tile {
 
 	public boolean getHasWall() {
 		return hasWall;
+	}
+	public boolean getHasOre() {
+		return hasOre;
 	}
 	public boolean getHasRoad() {
 		return hasRoad;
