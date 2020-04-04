@@ -56,18 +56,6 @@ public class Game {
 		panelHeight = height;
 	}
 
-	private void grid(Graphics g) {
-//		System.out.println("Drawing Grid");
-		g.setColor(Color.BLUE);
-		for (int i = 0; i <= world.length; i++) {
-			for (int j = 0; j <= world[0].length; j++) {
-//				g.drawLine(i * tileSize, 0, i * tileSize, j * tileSize);
-//				g.drawLine(0, j * tileSize, i * tileSize, j * tileSize);
-			}
-		}
-		g.setColor(Color.BLACK);
-	}
-
 	private double getRandomNormal(int tries) {
 		double rand = 0;
 		for (int i = 0; i < tries; i++) {
@@ -574,9 +562,6 @@ public class Game {
 				
 			}
 		}
-		
-		
-		grid(g);
 	}
 
 	public static void printPoint(Point p) {
