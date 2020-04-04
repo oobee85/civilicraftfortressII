@@ -19,6 +19,7 @@ public class Tile {
 	private boolean isHighlight;
 	private boolean hasOre;
 	private boolean hasBuilding;
+	private boolean isTerritory = false;
 	
 	private Unit unit;
 	private Position p;
@@ -57,6 +58,9 @@ public class Tile {
 	public void setHasRoad(boolean b, String s) {
 		this.hasRoad = b;
 		roadCorner = s;
+	}
+	public void setTerritory(boolean b) {
+		this.isTerritory = b;
 	}
 	public void setHasOre(Ore o) {
 		hasOre = true;
@@ -204,7 +208,9 @@ public class Tile {
 		if (structure != null) {
 			g.drawImage(structure.getImage(), p.getIntX() * Game.tileSize - extra / 1,p.getIntY() * Game.tileSize - extra / 1, Game.tileSize + extra, Game.tileSize + extra, null);
 		}
-		
+		if(isTerritory == true) {
+			g.drawImage(Buildings.IRRIGATION.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
+		}
 		
 		isHighlight = false;
 	}
