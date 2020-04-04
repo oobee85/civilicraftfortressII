@@ -26,8 +26,8 @@ public class Game {
 	private double waterPlantRarity = 0.05;
 	private double forestDensity = 0.3;
 	
-	private int panelWidth;
-	private int panelHeight;
+	private volatile int panelWidth;
+	private volatile int panelHeight;
 	private int fastModeTileSize = 10;
 	
 
@@ -47,25 +47,13 @@ public class Game {
 	public void gameTick() {
 		// Do all the game events like unit movement, time passing, building things, growing, etc
 		// happens once every 100ms
-		
+		ticks++;
 		
 	}
 	
 	public void setViewSize(int width, int height) {
 		panelWidth = width;
 		panelHeight = height;
-	}
-
-	private void grid(Graphics g) {
-//		System.out.println("Drawing Grid");
-		g.setColor(Color.BLUE);
-		for (int i = 0; i <= world.length; i++) {
-			for (int j = 0; j <= world[0].length; j++) {
-//				g.drawLine(i * tileSize, 0, i * tileSize, j * tileSize);
-//				g.drawLine(0, j * tileSize, i * tileSize, j * tileSize);
-			}
-		}
-		g.setColor(Color.BLACK);
 	}
 
 	private double getRandomNormal(int tries) {
@@ -577,9 +565,6 @@ public class Game {
 				
 			}
 		}
-		
-		
-		grid(g);
 	}
 
 	public static void printPoint(Point p) {
@@ -589,6 +574,9 @@ public class Game {
 	public Position getTileAtPixel(Position pixel) {
 		Position tile = pixel.add(viewOffset).divide(tileSize);
 		return tile;
+	}
+	public Position getPixelForTile(Position tile) {
+		return tile.multiply(tileSize).subtract(viewOffset);
 	}
 
 	public void mouseOver(int mx, int my) {
@@ -664,11 +652,12 @@ public class Game {
 		viewOffset.y += dy;
 //		System.out.println(viewOffset.x + "curview" + viewOffset.y);
 	}
-
-	public void updateGame() {
-		ticks++;
-
+	public void moveViewTo(double ratiox, double ratioy) {
+		Position tile = new Position(ratiox*world.length, ratioy*world[0].length);
+		Position pixel = tile.multiply(tileSize).subtract(new Position(panelWidth/2, panelHeight/2));
+		viewOffset = pixel;
 	}
+
 
 	public int getMoney() {
 		return money;
@@ -711,10 +700,17 @@ public class Game {
 		else {
 			g.drawImage(terrainImage, x, y, w, h, null);
 		}
+		Position offsetTile = getTileAtPixel(viewOffset);
+		int boxx = (int) (offsetTile.x * w / world.length / 2);
+		int boxy = (int) (offsetTile.y * h / world[0].length / 2);
+		int boxw = (int) (panelWidth/Game.tileSize * w / world.length);
+		int boxh = (int) (panelHeight/Game.tileSize * h / world[0].length);
+//		System.out.println(boxx);
+		g.setColor(Color.yellow);
+		g.drawRect(x + boxx, y + boxy, boxw, boxh);
 	}
 	protected void drawGame(Graphics g) {
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
-
 		draw(g);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
 		Toolkit.getDefaultToolkit().sync();
