@@ -147,18 +147,20 @@ public class Tile {
 			AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F);
 		    g2d.setComposite(ac);
 		    drawWall(g, true);
+		    if(terr.isBuildable(terr)==false) {
+				Color c = new Color(255, 0, 0, 100); // Red with alpha = 0.5 
+				g2d.setColor(c);
+				g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
+				System.out.println("highlight");
+				
+			}
 		}else {
 			AlphaComposite ac2 = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
 		    g2d.setComposite(ac2);
 		    drawWall(g,false);
 		}
 		
-//		if(terr.isBuildable(terr)==false) {
-//			Color c = new Color(255, 0, 0, 4); // Red with alpha = 0.5 
-//			g2d.setColor(c);
-//			g.setColor(c);
-//			g.fillRect(100,100,100,100); 
-//		}
+		
 		
 	}
 	
@@ -202,7 +204,6 @@ public class Tile {
 		if (hasIrrigation == true) {
 			g.drawImage(Buildings.IRRIGATION.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
 		}
-		applyHighlight(g, bm);
 		
 		
 		if (structure != null) {
@@ -212,6 +213,7 @@ public class Tile {
 			g.drawImage(Buildings.IRRIGATION.getImage(), p.getIntX() * Game.tileSize - extra / 2,p.getIntY() * Game.tileSize - extra / 2, Game.tileSize + extra, Game.tileSize + extra, null);
 		}
 		
+		applyHighlight(g, bm);
 		isHighlight = false;
 	}
 

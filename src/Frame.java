@@ -291,7 +291,7 @@ public class Frame extends JPanel{
 		minimapPanel.setPreferredSize(new Dimension(GUIWIDTH,GUIWIDTH));
 		guiSplitter.add(minimapPanel,BorderLayout.SOUTH);
 		
-		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/background.png");
+		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
 		cityView = new JPanel() {
 		    protected void paintComponent(Graphics g) {
 	            g.drawImage(cityOverlay, 0, 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
@@ -300,14 +300,19 @@ public class Frame extends JPanel{
 		};
 		cityView.setOpaque(false);
 		cityView.setLayout(null);
+//		x: 761
+//		y: 180
 		
+//		x: 941
+//		y: 605
 		cityView.add(buildWorker);
 		int numButtons = 0;
-		buildWorker.setBounds((++numButtons)*10 + (numButtons-1)*BUILDING_BUTTON_SIZE.width, 10, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+//		buildWorker.setBounds((++numButtons)*10 + (numButtons-1)*BUILDING_BUTTON_SIZE.width, 10, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		buildWorker.setBounds(765,  185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons , BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 		cityView.add(buildWarrior);
-		buildWarrior.setBounds((++numButtons)*10 + (numButtons-1)*BUILDING_BUTTON_SIZE.width, 10, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		buildWarrior.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 		cityView.add(buildSpearman);
-		buildSpearman.setBounds((++numButtons)*10 + (numButtons-1)*BUILDING_BUTTON_SIZE.width, 10, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		buildSpearman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 		
 		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
 		frame.getContentPane().add(guiSplitter,BorderLayout.EAST);
