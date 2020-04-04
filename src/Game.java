@@ -599,7 +599,10 @@ public class Game {
 					t.drawEntities(g, bm);
 				}
 				t.drawEntities(g, null);
-				
+				if(t.isStructure(Structure.CASTLE) == true) {
+					Position p = new Position(i,j);
+					updateTerritory(p);
+				}
 				if(i==hoveredTile.getIntX() && j==hoveredTile.getIntY()) {
 					t.highlight(g);
 				}
@@ -609,6 +612,18 @@ public class Game {
 				
 			}
 		}
+	}
+	private void updateTerritory(Position p) {
+		int c = world[p.getIntX()][p.getIntY()].getStructure().getCulture();
+		if(c >= 10) {
+			for (int i=-1; i < 2; i++) {
+				for (int j=-1; j < 2; j++) {
+					world[p.getIntX()+i][p.getIntY()+j].setTerritory(true);
+					
+				}
+			}
+		}
+		
 	}
 
 	public static void printPoint(Point p) {
