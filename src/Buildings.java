@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import javax.swing.*;
+
 
 public enum Buildings {
 	 	WALL_BRICK (100, "Images/buildings/wall_brick.png"),
@@ -10,16 +12,19 @@ public enum Buildings {
 		;
 	
 	    private final int health;   
-	    private final Image image;
+	    private final ImageIcon imageicon;
 	    
 	    
 	    Buildings(int hp, String s) {
 	        this.health = hp;
-	        this.image = Utils.loadImage(s);
+	        this.imageicon = Utils.loadImageIcon(s);
 	    }
 	    
 	    public Image getImage() {
-	    	return image;
+	    	return imageicon.getImage();
+	    }
+	    public ImageIcon getImageIcon() {
+	    	return imageicon;
 	    }
 	    
 	    private int getHealth() {

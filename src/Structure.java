@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import javax.swing.*;
+
 public enum Structure {
 	
 	CASTLE (500, "Images/buildings/castle256.png"),
@@ -8,15 +10,18 @@ public enum Structure {
 	;
 	
     private final int health;   
-    private final Image image;
+    private final ImageIcon imageicon;
     
     Structure(int hp, String s) {
         this.health = hp;
-        this.image = Utils.loadImage(s);
+        this.imageicon = Utils.loadImageIcon(s);
     }
     
     public Image getImage() {
-    	return image;
+    	return imageicon.getImage();
+    }
+    public ImageIcon getImageIcon() {
+    	return imageicon;
     }
     
     private int getHealth() {
