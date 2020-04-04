@@ -96,6 +96,8 @@ public class Frame extends JPanel{
 				g.setColor(BACKGROUND_COLOR);
 				g.fillRect(0, 0, getWidth(), getHeight());
 				gameInstance.drawGame(g);
+				g.setColor(Color.black);
+				g.drawRect(-1, 0, getWidth()+1, getHeight());
 			}
 		};
 		gamepanel.addComponentListener(new ComponentAdapter() {
@@ -146,49 +148,75 @@ public class Frame extends JPanel{
 		};
 		gui.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));
 		
+		Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
+		int BUILDING_ICON_SIZE = 25;
+		Insets zeroMargin = new Insets(0,0,0,0);
+		
 		JButton makeRoad = new JButton("Make Road");
+		makeRoad.setMargin(zeroMargin);
+		makeRoad.setPreferredSize(BUILDING_BUTTON_SIZE);
 		makeRoad.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.ROAD);
 		});
-		JButton makeWall = new JButton("Make Wall");
+		JButton makeWall = new JButton("Make Wall", Utils.resizeImageIcon(Buildings.WALL_BRICK.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		makeWall.setMargin(zeroMargin);
+		makeWall.setPreferredSize(BUILDING_BUTTON_SIZE);
 		makeWall.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.WALL);
 		});
-		JButton buildMine = new JButton("Build Mine");
+		
+		JButton buildMine = new JButton("Build Mine", Utils.resizeImageIcon(Buildings.MINE.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		buildMine.setMargin(zeroMargin);
+		buildMine.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildMine.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.MINE);
 		});
-		JButton buildBarracks = new JButton("Build Barracks");
+		
+		JButton buildBarracks = new JButton("Build Barracks", Utils.resizeImageIcon(Structure.BARRACKS.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		buildBarracks.setMargin(zeroMargin);
+		buildBarracks.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildBarracks.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.BARRACKS);
 		});
-		JButton buildIrrigation = new JButton("Irrigate");
+		JButton buildIrrigation = new JButton("Irrigate", Utils.resizeImageIcon(Buildings.IRRIGATION.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		buildIrrigation.setMargin(zeroMargin);
+		buildIrrigation.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildIrrigation.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.IRRIGATE);
 		});
-		JLabel money = new JLabel(); 
+		JLabel money = new JLabel(Utils.resizeImageIcon(Utils.loadImageIcon("images/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE)); 
+		//money.setFont(new Font("Verdana",1,20));
 		money.setText("Gold = "+gameInstance.getMoney());
+		money.setPreferredSize(BUILDING_BUTTON_SIZE);
+		money.setBorder(BorderFactory.createLineBorder(Color.gray));
+		money.setHorizontalAlignment(JLabel.CENTER);
+		
 		JLabel stone = new JLabel(); 
 		stone.setText("Stone = "+gameInstance.getMoney());
+		stone.setPreferredSize(BUILDING_BUTTON_SIZE);
+		stone.setBorder(BorderFactory.createLineBorder(Color.gray));
+		stone.setHorizontalAlignment(JLabel.CENTER);
 		
 		JLabel tSize = new JLabel(); 
-		stone.setText("TileSize = "+gameInstance.getTileSize());
+		tSize.setText("TileSize = "+gameInstance.getTileSize());
+		tSize.setPreferredSize(BUILDING_BUTTON_SIZE);
+		tSize.setBorder(BorderFactory.createLineBorder(Color.gray));
+		tSize.setHorizontalAlignment(JLabel.CENTER);
+
+		JToggleButton showHeightMap = new JToggleButton("Show Height Map");
+		showHeightMap.setPreferredSize(BUILDING_BUTTON_SIZE);
+		showHeightMap.addActionListener(e -> {
+			showHeightMap.setText(showHeightMap.isSelected() ? "Hide Height Map" : "Show Height Map");
+			gameInstance.setShowHeightMap(showHeightMap.isSelected());
+		});
 		
 		makeRoad.setFocusable(false);
 		makeWall.setFocusable(false);
 		buildMine.setFocusable(false);
 		buildBarracks.setFocusable(false);
 		buildIrrigation.setFocusable(false);
-		
-		JToggleButton showHeightMap = new JToggleButton("Show Height Map");
-		showHeightMap.addActionListener(e -> {
-			showHeightMap.setText(showHeightMap.isSelected() ? "Hide Height Map" : "Show Height Map");
-			gameInstance.setShowHeightMap(showHeightMap.isSelected());
-		});
+		showHeightMap.setFocusable(false);
 
-		money.setFont(new Font("Verdana",1,20));
-		money.setHorizontalAlignment(JLabel.CENTER);
-		stone.setHorizontalAlignment(JLabel.CENTER);
 		
 		JButton exit = new JButton("Exit");
 		exit.addActionListener(new ActionListener() {
@@ -197,7 +225,7 @@ public class Frame extends JPanel{
 				exitGame();
 			}
 		});
-		exit.setPreferredSize(new Dimension(100,50));
+		exit.setPreferredSize(BUILDING_BUTTON_SIZE);
 
 
 		gui.add(money);
@@ -225,12 +253,11 @@ public class Frame extends JPanel{
 		frame.setVisible(true);
 		frame.requestFocusInWindow();
 		gamepanel.addMouseWheelListener(new MouseWheelListener() {
-			
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				//+1 is in -1 is out
 				gameInstance.zoomView(e.getWheelRotation(),mx,my);
-				stone.setText("TileSize = " + gameInstance.getTileSize());
+				tSize.setText("TileSize = " + gameInstance.getTileSize());
 			}
 		});
 		gamepanel.addMouseMotionListener(new MouseMotionListener() {

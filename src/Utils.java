@@ -30,14 +30,28 @@ public final class Utils {
 		return temp;
 	}
 
-	public static final Image loadImage(String filename) {
-		Image temp = Utils.getDefaultSkin();
+	public static final ImageIcon loadImageIcon(String filename) {
 		URL a = Utils.class.getResource(filename);
 		if (a != null) {
-			temp = new ImageIcon(a).getImage();
+			return new ImageIcon(a);
 		}
-
-		return temp;
+		return null;
+	}
+	
+	public static final Image loadImage(String filename) {
+		ImageIcon icon = loadImageIcon(filename);
+		if(icon != null) {
+			return icon.getImage();
+		}
+		else {
+			return Utils.getDefaultSkin();
+		}
+	}
+	
+	public static final ImageIcon resizeImageIcon(ImageIcon icon, int width, int height) {
+		Image image = icon.getImage(); // transform it 
+		Image newimg = image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+		return new ImageIcon(newimg);  // transform it back
 	}
 
 	/**
