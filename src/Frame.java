@@ -336,10 +336,9 @@ public class Frame extends JPanel{
 			}
 		});
 	
-		timmy = new Timer(10, new ActionListener() {
+		timmy = new Timer(30, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.updateGame();
 				frame.repaint();
 			}
 		});

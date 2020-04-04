@@ -47,7 +47,7 @@ public class Game {
 	public void gameTick() {
 		// Do all the game events like unit movement, time passing, building things, growing, etc
 		// happens once every 100ms
-		
+		ticks++;
 		
 	}
 	
@@ -670,10 +670,6 @@ public class Game {
 		viewOffset = pixel;
 	}
 
-	public void updateGame() {
-		ticks++;
-
-	}
 
 	public int getMoney() {
 		return money;
