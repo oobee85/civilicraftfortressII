@@ -21,6 +21,7 @@ public class Game {
 	private BuildMode currentMode;
 	private boolean showHeightMap;
 	private int rotate = 0;
+	private boolean inCity = false;
 	private double snowEdgeRatio = 0.5;
 	private double rockEdgeRatio = 0.7;
 	private double oreRarity = 0.01;
@@ -591,6 +592,11 @@ public class Game {
 				
 			}
 		}
+		if(inCity == true) {
+//			System.out.println("drawing incity");
+			g.drawImage(Utils.loadImage("resources/Images/interfaces/background.png"), 0+viewOffset.getIntX(), 0+viewOffset.getIntY(), 944, 925, null);
+		}
+		
 	}
 
 	public static void printPoint(Point p) {
@@ -656,6 +662,18 @@ public class Game {
 		if(currentMode == BuildMode.IRRIGATE) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true && world[tile.getIntX()][tile.getIntY()].canPlant() == true) {
 				world[tile.getIntX()][tile.getIntY()].setHasIrrigation(true);
+			}
+		}
+		
+	}
+	
+	public void doubleClick(int mx, int my) {
+		System.out.println("double click");
+		if(world[mx/tileSize][my/tileSize].isStructure((world[mx/tileSize][my/tileSize].getStructure())) ) {
+			if(inCity == true) {
+				inCity = false;
+			}else {
+				inCity = true;
 			}
 		}
 		

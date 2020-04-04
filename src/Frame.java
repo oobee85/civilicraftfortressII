@@ -168,7 +168,7 @@ public class Frame extends JPanel{
 		int BUILDING_ICON_SIZE = 25;
 		Insets zeroMargin = new Insets(0,0,0,0);
 		
-		JButton makeRoad = new JButton("Make Road", Utils.resizeImageIcon(Utils.loadImageIcon("resources/images/road_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton makeRoad = new JButton("Make Road", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/road_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		makeRoad.setMargin(zeroMargin);
 		makeRoad.setPreferredSize(BUILDING_BUTTON_SIZE);
 		makeRoad.addActionListener(e -> {
@@ -200,7 +200,7 @@ public class Frame extends JPanel{
 		buildIrrigation.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.IRRIGATE);
 		});
-		JLabel money = new JLabel(Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE)); 
+		JLabel money = new JLabel(Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE)); 
 		//money.setFont(new Font("Verdana",1,20));
 		money.setText("Gold = "+gameInstance.getMoney());
 		money.setPreferredSize(BUILDING_BUTTON_SIZE);
@@ -349,6 +349,11 @@ public class Frame extends JPanel{
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount()==2) {
+//					System.out.println("x: "+e.getX());
+//					System.out.println("y: "+e.getY());
+					gameInstance.doubleClick(mx, my);
+				}
 			}
 		});
 		

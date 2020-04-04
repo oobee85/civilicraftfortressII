@@ -215,6 +215,15 @@ public class Tile {
 	public Ore getOre() {
 		return ore;
 	}
+	public Structure getStructure() {
+		return structure;
+	}
+	public boolean isStructure(Structure s) {
+		if(structure == s) {
+			return true;
+		}
+		return false;
+	}
 	public boolean canBuild() {
 		return terr.isBuildable(terr);
 	}
