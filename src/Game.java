@@ -183,11 +183,13 @@ public class Game {
 		
 		makeMountain();
 		makeVolcano();
-		makeLake(800);
+		makeLake(1000);
 		makeLake(100);
 		makeLake(100);
-		makeForest();
+		makeLake(100);
+		makeLake(100);
 		makeRoad();
+		makeForest();
 		genResources();
 		
 		createTerrainImage();
@@ -217,6 +219,7 @@ public class Game {
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world[0].length; j++) {
 				terrainImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
+				
 			}
 		}
 		
@@ -235,7 +238,7 @@ public class Game {
 			for(int j = 0; j < world.length; j++) {
 				
 				//generates land plants
-				if(world[i][j].checkTerrain(Terrain.GRASS) && Math.random() < bushRarity) {
+				if(world[i][j].checkTerrain(Terrain.GRASS) && world[i][j].getHasRoad()==false && Math.random() < bushRarity) {
 					double o = Math.random();
 					if(o < Plant.BERRY.getRarity()) {
 						world[i][j].setHasPlant(Plant.BERRY);
@@ -387,7 +390,7 @@ public class Game {
 				double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
 				double forestEdge = (dx*dx)/(forestLengthEdge*forestLengthEdge) + (dy*dy)/(forestHeightEdge*forestHeightEdge);
 				
-					if(world[i][j].canPlant()==true) {
+					if(world[i][j].canPlant()==true && world[i][j].getHasRoad() == false) {
 						
 						if(forestEdge < 1 && Math.random()<forestDensity-0.2) {
 							int t = (int) (Math.random()+0.5);

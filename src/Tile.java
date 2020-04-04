@@ -204,6 +204,9 @@ public class Tile {
 	public boolean getHasRoad() {
 		return hasRoad;
 	}
+	public boolean getHasForest() {
+		return hasForest;
+	}
 	public Ore getOre() {
 		return ore;
 	}
