@@ -684,8 +684,8 @@ public class Game {
 	}
 	
 	public void doubleClick(int mx, int my) {
-		System.out.println("double click");
-		if(world[mx/tileSize][my/tileSize].isStructure((world[mx/tileSize][my/tileSize].getStructure())) ) {
+		Position tile = getTileAtPixel(new Position(mx, my));
+		if(world[tile.getIntX()][tile.getIntY()].isStructure(Structure.CASTLE) == true ) {
 			if(inCity == true) {
 				inCity = false;
 			}else {
