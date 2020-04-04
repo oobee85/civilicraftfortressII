@@ -21,7 +21,6 @@ public class Game {
 	private BuildMode currentMode;
 	private boolean showHeightMap;
 	private int rotate = 0;
-	private boolean inCity = false;
 	private double snowEdgeRatio = 0.5;
 	private double rockEdgeRatio = 0.7;
 	private double oreRarity = 0.01;
@@ -33,8 +32,10 @@ public class Game {
 	private volatile int panelHeight;
 	private int fastModeTileSize = 10;
 	
+	private GUIController guiController;
 
-	public Game() {
+	public Game(GUIController guiController) {
+		this.guiController = guiController;
 		money = 100;
 		hoveredTile = new Position(-1,-1);
 		hoveredArea = new Area(0,0,0,0);
@@ -608,11 +609,6 @@ public class Game {
 				
 			}
 		}
-		if(inCity == true) {
-//			System.out.println("drawing incity");
-			g.drawImage(Utils.loadImage("resources/Images/interfaces/background.png"), 0+viewOffset.getIntX(), 0+viewOffset.getIntY(), 944, 925, null);
-		}
-		
 	}
 
 	public static void printPoint(Point p) {
@@ -686,11 +682,7 @@ public class Game {
 	public void doubleClick(int mx, int my) {
 		Position tile = getTileAtPixel(new Position(mx, my));
 		if(world[tile.getIntX()][tile.getIntY()].isStructure(Structure.CASTLE) == true ) {
-			if(inCity == true) {
-				inCity = false;
-			}else {
-				inCity = true;
-			}
+			guiController.toggleCityView();
 		}
 		
 	}

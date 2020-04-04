@@ -9,18 +9,19 @@ public class Frame extends JPanel{
 	int GUIWIDTH = 400;
 	
 	private Timer timmy;
-	public JPanel panel;
-	public JFrame frame;
-	public JPanel gamepanel;
-	public JPanel minimapPanel;
+	private JPanel panel;
+	private JFrame frame;
+	private JPanel gamepanel;
+	private JPanel minimapPanel;
+	private JComponent cityView;
 	private JComboBox<MapType> mapType;
 	private JTextField mapSize;
 	private int WIDTH;
 	private int HEIGHT;
-	public Game gameInstance;
+	private Game gameInstance;
 	private int mx;
 	private int my;
-	public JPanel gui;
+	private JPanel gui;
 	private boolean dragged = false;
 	
 	private Thread gameLoopThread;
@@ -36,7 +37,13 @@ public class Frame extends JPanel{
 		frame.setSize(WIDTH, HEIGHT);
 		frame.setLocationRelativeTo(null);
 		
-		gameInstance = new Game();
+		gameInstance = new Game(new GUIController() {
+			
+			@Override
+			public void toggleCityView() {
+				cityView.setVisible(!cityView.isVisible());
+			}
+		});
 		
 		
 		EventQueue.invokeLater(new Runnable() {
@@ -75,7 +82,7 @@ public class Frame extends JPanel{
 		mapType.setPreferredSize(new Dimension(100,50));
 		panel.add(mapType);
 		
-		mapSize = new JTextField("256", 10);
+		mapSize = new JTextField("64", 10);
 		mapSize.setPreferredSize(new Dimension(100,50));
 		panel.add(mapSize);
 		
@@ -266,11 +273,19 @@ public class Frame extends JPanel{
 		minimapPanel.setPreferredSize(new Dimension(GUIWIDTH,GUIWIDTH));
 		guiSplitter.add(minimapPanel,BorderLayout.SOUTH);
 		
-		frame.add(gamepanel,BorderLayout.CENTER);
-		frame.add(guiSplitter,BorderLayout.EAST);
+		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/background.png");
+		cityView = new JComponent() {
+		    protected void paintComponent(Graphics g) {
+	            g.drawImage(cityOverlay, 0, 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
+		    }
+		};
+		
+		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
+		frame.getContentPane().add(guiSplitter,BorderLayout.EAST);
+		frame.setGlassPane(cityView);
 		frame.pack();
 		frame.setVisible(true);
-		frame.requestFocusInWindow();
+		gamepanel.requestFocusInWindow();
 		gamepanel.addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -395,10 +410,8 @@ public class Frame extends JPanel{
 		});
 		timmy.start();
 
-		gamepanel.setSize(frame.getSize());
 		frame.repaint();
 		gamepanel.requestFocus();
-		
 		
 		gameLoopThread = new Thread(() -> {
 			try {
@@ -412,10 +425,6 @@ public class Frame extends JPanel{
 		});
 		gameLoopThread.start();
 	}
-	
-	
-
-	
 	
 	public void exitGame() {
 		System.exit(0);
