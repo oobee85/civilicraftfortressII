@@ -202,8 +202,15 @@ public class Tile {
 	}
 	private void drawTerritory(Graphics g) {
 		if(isTerritory == true) {
-			g.drawImage(Buildings.IRRIGATION.getImage(), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			Utils.setTransparent(g);
+			Color c = new Color(0, 0, 255, 150); 
+	    	g.setColor(c);
+	    	g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
+			
+//	    	g.drawImage(Buildings.IRRIGATION.getImage(), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			Utils.resetTransparent(g);
 		}
+		
 	}
 	private void drawRoad(Graphics g) {
 		if (hasRoad == true) {
