@@ -422,10 +422,10 @@ public class Game {
 						
 						if(forestEdge < 1 && Math.random()<forestDensity-0.2) {
 							int t = (int) (Math.random()+1+0.5);
-							world[i][j].setHasForest(t);
+							world[i][j].setForestType(t);
 						}else if (forest < 1 && Math.random() < forestDensity) {
 							int t = (int) (Math.random()+1+0.5);
-							world[i][j].setHasForest(t);
+							world[i][j].setForestType(t);
 						}
 						
 					}

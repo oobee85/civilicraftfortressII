@@ -65,23 +65,37 @@ public class Tile {
 		plant = p;
 	}
 	public void setHighlight(boolean b) {
-		isHighlight = b;
+		if(isHighlight == b) {
+			isHighlight = false;
+		}else {
+			isHighlight = b;
+		}
+		
 	}
-	public void setHasForest(int t) {
-			setForestType(t);
-	}
-	private void setForestType(int t) {
+	public void setForestType(int t) {
 		forestType = t;
 	}
 	
 	public void setBuilding(Building b) {
-		this.building = b;
-		hasBuilding = true;
+		if(this.building == b) {
+			this.building = null;
+			hasBuilding = false;
+		}else {
+			this.building = b;
+			hasBuilding = true;
+		}
 	}
 	
 	public void setStructure(Structure s) {
-		this.structure = s;
-		hasStructure = true;
+		if(this.structure == s) {
+			this.structure = null;
+			hasStructure = false;
+		}else {
+			this.structure = s;
+			hasStructure = true;
+		}
+		
+		
 	}
 
 	public void draw(Graphics g, BuildMode bm) {
