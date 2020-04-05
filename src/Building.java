@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 
-public enum Buildings {
+public enum Building {
 	 	WALL_BRICK (100, "resources/Images/buildings/wall_brick.png"),
 	 	WALL_WOOD (50, "resources/Images/buildings/wall_brick.png"),
 	 	MINE (10, "resources/Images/buildings/mine256.png"),
@@ -16,7 +16,7 @@ public enum Buildings {
 	    private final ImageIcon imageicon;
 	    
 	    
-	    Buildings(int hp, String s) {
+	    Building(int hp, String s) {
 	        this.health = hp;
 	        this.imageicon = Utils.loadImageIcon(s);
 	    }
@@ -27,8 +27,8 @@ public enum Buildings {
 	    public ImageIcon getImageIcon() {
 	    	return imageicon;
 	    }
-	    public BuildMode getToBuildMode(Buildings b) {
-	    	if(b == Buildings.WALL_BRICK) {
+	    public BuildMode getToBuildMode(Building b) {
+	    	if(b == Building.WALL_BRICK) {
 	    		return BuildMode.WALL;
 	    	}
 	    	return null;

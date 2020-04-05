@@ -244,7 +244,7 @@ public class Game {
 				
 				minimapImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
 				terrainImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
-				if(world[i][j].getHasForest()!=0) {
+				if(world[i][j].getForestType()!=0) {
 					Color c = new Color(75,110,75);
 					minimapImage.setRGB(i,j,c.getRGB());
 				}
@@ -672,19 +672,19 @@ public class Game {
 		
 		if(currentMode == BuildMode.WALL) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
-				world[tile.getIntX()][tile.getIntY()].setBuilding(Buildings.WALL_BRICK);
+				world[tile.getIntX()][tile.getIntY()].setBuilding(Building.WALL_BRICK);
 			}
 		}
 		
 		if(currentMode == BuildMode.MINE) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true || world[tile.getIntX()][tile.getIntY()].getHasOre() == true) {
-				world[tile.getIntX()][tile.getIntY()].setBuilding(Buildings.MINE);
+				world[tile.getIntX()][tile.getIntY()].setBuilding(Building.MINE);
 			}
 		}
 		
 		if(currentMode == BuildMode.IRRIGATE) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true && world[tile.getIntX()][tile.getIntY()].canPlant() == true) {
-				world[tile.getIntX()][tile.getIntY()].setBuilding(Buildings.IRRIGATION);
+				world[tile.getIntX()][tile.getIntY()].setBuilding(Building.IRRIGATION);
 			}
 		}
 		

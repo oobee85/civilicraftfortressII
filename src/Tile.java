@@ -29,7 +29,7 @@ public class Tile {
 	private Plant plant;
 	private Terrain terr;
 	private Structure structure;
-	private Buildings building;
+	private Building building;
 	
 	public Tile(Unit u, Position point, Terrain t) {
 		unit = u;
@@ -38,7 +38,7 @@ public class Tile {
 		isHighlight = false;
 		
 	}
-	public void setHasBuilding(Buildings b) {
+	public void setHasBuilding(Building b) {
 		this.hasBuilding = true;
 		building = b;
 	}
@@ -74,7 +74,7 @@ public class Tile {
 		forestType = t;
 	}
 	
-	public void setBuilding(Buildings b) {
+	public void setBuilding(Building b) {
 		this.building = b;
 		hasBuilding = true;
 	}
@@ -167,13 +167,13 @@ public class Tile {
 		}
 		
 		if(bm == BuildMode.WALL && isHighlight == true) {
-			g.drawImage(Buildings.WALL_BRICK.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(Building.WALL_BRICK.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		if(bm == BuildMode.MINE && isHighlight == true) {
-			g.drawImage(Buildings.MINE.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(Building.MINE.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		if(bm == BuildMode.IRRIGATE && isHighlight == true) {
-			g.drawImage(Buildings.IRRIGATION.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(Building.IRRIGATION.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 	}
 	private void drawStructure(Graphics g, BuildMode bm) {
@@ -220,7 +220,7 @@ public class Tile {
 	public boolean getHasRoad() {
 		return hasRoad;
 	}
-	public int getHasForest() {
+	public int getForestType() {
 		return forestType;
 	}
 	public Ore getOre() {
