@@ -27,6 +27,12 @@ public enum Buildings {
 	    public ImageIcon getImageIcon() {
 	    	return imageicon;
 	    }
+	    public BuildMode getToBuildMode(Buildings b) {
+	    	if(b == Buildings.WALL_BRICK) {
+	    		return BuildMode.WALL;
+	    	}
+	    	return null;
+	    }
 	    
 	    private int getHealth() {
 	    	return health; 

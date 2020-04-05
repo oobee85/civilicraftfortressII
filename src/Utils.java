@@ -80,6 +80,17 @@ public final class Utils {
 		// Return the buffered image
 		return bimage;
 	}
+	public static void resetTransparent(Graphics g) {
+		Graphics2D g2d = (Graphics2D)g;
+		AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
+	    g2d.setComposite(ac);
+	}
+	public static void setTransparent(Graphics g) {
+		Graphics2D g2d = (Graphics2D)g;
+		AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F);
+	    g2d.setComposite(ac);
+	}
+	
 
 	public static double[][] smoothingFilter(double[][] data, double radius, double c) {
 		double[][] smoothed = new double[data.length][data[0].length];

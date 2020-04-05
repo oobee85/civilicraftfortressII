@@ -594,7 +594,7 @@ public class Game {
 			for (int j = lowerY; j < upperY; j++) {
 				Tile t = world[i][j];
 				
-				t.draw(g, currentMode);
+			
 				if(t.isStructure(Structure.CASTLE) == true) {
 					Position p = new Position(i,j);
 					updateTerritory(p);
@@ -605,7 +605,7 @@ public class Game {
 				if(hoveredArea.contains(i, j)) {
 					t.highlight(g);
 				}
-				
+				t.draw(g, currentMode);
 			}
 		}
 	}
@@ -672,19 +672,19 @@ public class Game {
 		
 		if(currentMode == BuildMode.WALL) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
-				world[tile.getIntX()][tile.getIntY()].setHasWall(true);
+				world[tile.getIntX()][tile.getIntY()].setBuilding(Buildings.WALL_BRICK);
 			}
 		}
 		
 		if(currentMode == BuildMode.MINE) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true || world[tile.getIntX()][tile.getIntY()].getHasOre() == true) {
-				world[tile.getIntX()][tile.getIntY()].setHasMine(true);
+				world[tile.getIntX()][tile.getIntY()].setBuilding(Buildings.MINE);
 			}
 		}
 		
 		if(currentMode == BuildMode.IRRIGATE) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true && world[tile.getIntX()][tile.getIntY()].canPlant() == true) {
-				world[tile.getIntX()][tile.getIntY()].setHasIrrigation(true);
+				world[tile.getIntX()][tile.getIntY()].setBuilding(Buildings.IRRIGATION);
 			}
 		}
 		
