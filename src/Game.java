@@ -244,7 +244,7 @@ public class Game {
 				
 				minimapImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
 				terrainImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
-				if(world[i][j].getHasForest()==true) {
+				if(world[i][j].getHasForest()!=0) {
 					Color c = new Color(75,110,75);
 					minimapImage.setRGB(i,j,c.getRGB());
 				}
@@ -421,11 +421,11 @@ public class Game {
 					if(world[i][j].canPlant()==true && world[i][j].getHasRoad() == false) {
 						
 						if(forestEdge < 1 && Math.random()<forestDensity-0.2) {
-							int t = (int) (Math.random()+0.5);
-							world[i][j].setHasForest(true, t);
+							int t = (int) (Math.random()+1+0.5);
+							world[i][j].setHasForest(t);
 						}else if (forest < 1 && Math.random() < forestDensity) {
-							int t = (int) (Math.random()+0.5);
-							world[i][j].setHasForest(true, t);
+							int t = (int) (Math.random()+1+0.5);
+							world[i][j].setHasForest(t);
 						}
 						
 					}

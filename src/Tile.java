@@ -11,23 +11,17 @@ import java.util.ArrayList;
 
 public class Tile {
 	private boolean hasRoad;
-	private boolean hasWall;
-	private boolean hasMine;
-	private boolean hasIrrigation;
-	private boolean hasForest;
-	private int forestType;
 	private boolean isHighlight;
 	private boolean hasOre;
 	private boolean hasBuilding;
 	private boolean hasStructure;
 	private boolean isTerritory = false;
+	private int forestType = 0;
 	
 	private Unit unit;
 	private Position p;
 	
 	int minEntitySize = 20;
-	private int rotate;
-	private String corner;
 	
 	private String roadCorner;
 	
@@ -73,8 +67,7 @@ public class Tile {
 	public void setHighlight(boolean b) {
 		isHighlight = b;
 	}
-	public void setHasForest(boolean b, int t) {
-			this.hasForest = b;
+	public void setHasForest(int t) {
 			setForestType(t);
 	}
 	private void setForestType(int t) {
@@ -153,14 +146,14 @@ public class Tile {
 			g.drawImage(plant.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
 		}
 		//kills the plant if its built on
-		if(plant != null && hasWall == true) {
+		if(plant != null && building != null) {
 			plant = null;
 		}
-		if(hasForest == true && forestType == 0) {
-			g.drawImage(Terrain.FOREST0.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null); 
-		}
-		if(hasForest == true && forestType == 1) {
+		if(forestType == 1) {
 			g.drawImage(Terrain.FOREST1.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null); 
+		}
+		if(forestType == 2) {
+			g.drawImage(Terrain.FOREST2.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null); 
 		}
 		
 	}
@@ -221,17 +214,14 @@ public class Tile {
 
 	
 
-	public boolean getHasWall() {
-		return hasWall;
-	}
 	public boolean getHasOre() {
 		return hasOre;
 	}
 	public boolean getHasRoad() {
 		return hasRoad;
 	}
-	public boolean getHasForest() {
-		return hasForest;
+	public int getHasForest() {
+		return forestType;
 	}
 	public Ore getOre() {
 		return ore;
