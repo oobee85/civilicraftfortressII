@@ -584,7 +584,7 @@ public class Game {
 						t.drawHeightMap(g, heightMap[i][j]);
 					}
 					else {
-						t.draw(g);
+						t.draw(g, currentMode);
 					}
 				}
 			}
@@ -594,11 +594,7 @@ public class Game {
 			for (int j = lowerY; j < upperY; j++) {
 				Tile t = world[i][j];
 				
-				if(currentMode == BuildMode.WALL) {
-					String bm = "wall";
-					t.drawEntities(g, bm);
-				}
-				t.drawEntities(g, null);
+				t.draw(g, currentMode);
 				if(t.isStructure(Structure.CASTLE) == true) {
 					Position p = new Position(i,j);
 					updateTerritory(p);
@@ -653,7 +649,7 @@ public class Game {
 	private void selectResources() {
 		for (int i = 0; i < hoveredArea.getIntX2()-hoveredArea.getIntX1(); i++) {
 			for (int j = 0; j < hoveredArea.getIntY2()-hoveredArea.getIntY1(); j++) {
-				world[hoveredArea.getIntX1()+i][hoveredArea.getIntY1()+j].setHighlight(true);;
+//				world[hoveredArea.getIntX1()+i][hoveredArea.getIntY1()+j].setHighlight(true);;
 			}
 		}
 		
