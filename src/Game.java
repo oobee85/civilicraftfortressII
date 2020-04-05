@@ -649,7 +649,8 @@ public class Game {
 	private void selectResources() {
 		for (int i = 0; i < hoveredArea.getIntX2()-hoveredArea.getIntX1(); i++) {
 			for (int j = 0; j < hoveredArea.getIntY2()-hoveredArea.getIntY1(); j++) {
-//				world[hoveredArea.getIntX1()+i][hoveredArea.getIntY1()+j].setHighlight(true);;
+				world[hoveredArea.getIntX1()+i][hoveredArea.getIntY1()+j].setHighlight(true);
+				System.out.println("hovered area");
 			}
 		}
 		

@@ -93,7 +93,6 @@ public class Tile {
 		drawEntities(g, bm);
 //		g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
 		isHighlight = false;
-//		Utils.resetTransparent(g);
 	}
 	
 	public void drawEntities(Graphics g, BuildMode bm) {
@@ -104,10 +103,20 @@ public class Tile {
 		drawRoad(g);
 		drawBuilding(g, bm);
 		drawStructure(g, bm);
+		drawHighlightedArea(g);
 		
 		
 	}
 	
+	private void drawHighlightedArea(Graphics g) {
+		if(isHighlight == true) {
+			g.setColor(new Color(0, 0, 0, 64));
+			g.drawRect(p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
+			g.drawRect(p.getIntX() * Game.tileSize + 1, p.getIntY() * Game.tileSize + 1, Game.tileSize - 1,
+					Game.tileSize - 1);
+		}
+		
+	}
 	private void applyHighlight(Graphics g, BuildMode bm) {
 		
 		if(isHighlight == true && bm != BuildMode.NOMODE) {
@@ -200,7 +209,6 @@ public class Tile {
 	    	g.setColor(c);
 	    	g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
 			
-//	    	g.drawImage(Buildings.IRRIGATION.getImage(), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 			Utils.resetTransparent(g);
 		}
 		
@@ -250,16 +258,6 @@ public class Tile {
 	public void highlight(Graphics g) {
 		isHighlight = true;
 		
-		g.setColor(new Color(0, 0, 0, 64));
-		g.drawRect(p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
-		g.drawRect(p.getIntX() * Game.tileSize + 1, p.getIntY() * Game.tileSize + 1, Game.tileSize - 1,
-				Game.tileSize - 1);
-		
-		
-	    
-//		g.setColor(new Color(255,0,0,128));
-//		g.fillRect(p.x*Game.tileSize, p.y*Game.tileSize, Game.tileSize, Game.tileSize);
-
 	}
 
 }
