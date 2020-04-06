@@ -735,6 +735,12 @@ public class Game {
 			}
 		}
 		
+		
+	}
+	public void buildUnit(Unit u) {
+		Point po = new Point(structureLoc.get(0).getIntX(), structureLoc.get(0).getIntY());
+		world[po.x][po.y].setUnit(u);
+		
 	}
 	
 	public void doubleClick(int mx, int my) {
