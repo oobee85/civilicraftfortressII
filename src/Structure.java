@@ -40,8 +40,8 @@ public enum Structure {
     }
     public void updateCulture() {
     	culture += cultureRate;
-    	System.out.println("culture: "+culture);
-    	System.out.println("cultureRate: "+cultureRate);
+//    	System.out.println("culture: "+culture);
+//    	System.out.println("cultureRate: "+cultureRate);
     }
     
 }

@@ -53,7 +53,6 @@ public class Game {
 		
 		if(ticks%10 == 0) {
 			updateTerritory();
-			System.out.println("updating territory");
 		}
 		
 		if(Math.random() < 0.001) {
@@ -618,7 +617,7 @@ public class Game {
 	}
 	private void updateTerritory() {
 		for (int i = 0; i < structureLoc.size(); i++) {
-			System.out.println("structureloc" +i);
+//			System.out.println("structureloc" +i);
 			world[structureLoc.get(i).getIntX()][structureLoc.get(i).getIntY()].getStructure().updateCulture();
 		}
 	}
@@ -696,7 +695,7 @@ public class Game {
 		for (int i = 0; i < hoveredArea.getIntX2()-hoveredArea.getIntX1(); i++) {
 			for (int j = 0; j < hoveredArea.getIntY2()-hoveredArea.getIntY1(); j++) {
 				world[hoveredArea.getIntX1()+i][hoveredArea.getIntY1()+j].setHighlight(true);
-				System.out.println("hovered area");
+//				System.out.println("hovered area");
 			}
 		}
 		
@@ -741,9 +740,12 @@ public class Game {
 	public void doubleClick(int mx, int my) {
 		Position tile = getTileAtPixel(new Position(mx, my));
 		if(world[tile.getIntX()][tile.getIntY()].isStructure(Structure.CASTLE) == true ) {
-			guiController.toggleCityView();
+			exitCity();
 		}
 		
+	}
+	public void exitCity() {
+		guiController.toggleCityView();
 	}
 	
 	public void zoomView(int scroll, int mx, int my) {

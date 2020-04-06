@@ -228,6 +228,12 @@ public class Frame extends JPanel{
 		buildSpearman.addActionListener(e -> {
 			
 		});
+		JButton exitCity = new JButton("Exit City", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		exitCity.setMargin(zeroMargin);
+		exitCity.setPreferredSize(BUILDING_BUTTON_SIZE);
+		exitCity.addActionListener(e -> {
+			gameInstance.exitCity();
+		});
 		JLabel money = new JLabel(Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE)); 
 		//money.setFont(new Font("Verdana",1,20));
 		money.setText("Gold = "+gameInstance.getMoney());
@@ -259,6 +265,7 @@ public class Frame extends JPanel{
 		buildMine.setFocusable(false);
 		buildBarracks.setFocusable(false);
 		buildIrrigation.setFocusable(false);
+		exitCity.setFocusable(false);
 		showHeightMap.setFocusable(false);
 
 		
@@ -282,6 +289,7 @@ public class Frame extends JPanel{
 		gui.add(buildIrrigation);
 		gui.add(showHeightMap);
 		gui.add(exit);
+		
 
 		JPanel guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());
@@ -300,19 +308,15 @@ public class Frame extends JPanel{
 		};
 		cityView.setOpaque(false);
 		cityView.setLayout(null);
-//		x: 761
-//		y: 180
-		
-//		x: 941
-//		y: 605
-		cityView.add(buildWorker);
 		int numButtons = 0;
-//		buildWorker.setBounds((++numButtons)*10 + (numButtons-1)*BUILDING_BUTTON_SIZE.width, 10, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		cityView.add(buildWorker);
 		buildWorker.setBounds(765,  185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons , BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 		cityView.add(buildWarrior);
 		buildWarrior.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 		cityView.add(buildSpearman);
 		buildSpearman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		cityView.add(exitCity);
+		exitCity.setBounds(838, 22 , 36, 44);
 		
 		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
 		frame.getContentPane().add(guiSplitter,BorderLayout.EAST);
