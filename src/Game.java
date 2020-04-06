@@ -164,7 +164,7 @@ public class Game {
 		for (int i = 0; i < world.length; i++) {
 			for (int j = 0; j < world[0].length; j++) {
 				Position p = new Position(i, j);
-				world[i][j] = new Tile(null, p, Terrain.DIRT);
+				world[i][j] = new Tile(p, Terrain.DIRT);
 			}
 		}
 		
@@ -216,7 +216,7 @@ public class Game {
 					else {
 						t = Terrain.WATER;
 					}
-					Tile tile = new Tile(null, p, t);
+					Tile tile = new Tile(p, t);
 					world[i][j] = tile;
 				}
 			}
@@ -356,13 +356,13 @@ public class Game {
 					heightMap[i][j] = Math.max(height, heightMap[i][j]);
 					
 					if(distanceFromCenter < lavaRadius) {
-						world[i][j] = new Tile(null, p, Terrain.LAVA);
+						world[i][j] = new Tile(p, Terrain.LAVA);
 					}else if(distanceFromCenter < volcanoRadius) {
-						world[i][j] = new Tile(null, p, Terrain.VOLCANO);
+						world[i][j] = new Tile(p, Terrain.VOLCANO);
 					}else if(distanceFromCenter < mountainRadius && world[i][j].checkTerrain(Terrain.SNOW) == false) {
-						world[i][j] = new Tile(null, p, Terrain.ROCK);
+						world[i][j] = new Tile(p, Terrain.ROCK);
 					}else if(distanceFromCenter < mountainEdgeRadius && Math.random()<rockEdgeRatio) {
-						world[i][j] = new Tile(null, p, Terrain.ROCK);
+						world[i][j] = new Tile(p, Terrain.ROCK);
 					}
 				}
 				
@@ -384,7 +384,7 @@ public class Game {
 			int i = next.getIntX();
 			int j = next.getIntY();
 			if(!world[i][j].checkTerrain(Terrain.WATER)) {
-				world[i][j] = new Tile(null, next, Terrain.WATER);
+				world[i][j] = new Tile(next, Terrain.WATER);
 				volume--;
 			}
 			// Add adjacent tiles to the queue
@@ -470,16 +470,16 @@ public class Game {
 				//double ratio = dist / Math.max(mountLength, mountHeight);
 				Position p = new Position(i, j);
 				if(snowMountainEdge < 1 && Math.random()<snowEdgeRatio) {
-					world[i][j] = new Tile(null, p, Terrain.SNOW);
+					world[i][j] = new Tile(p, Terrain.SNOW);
 					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}else if (snowMountain < 1 ) {
-					world[i][j] = new Tile(null, p, Terrain.SNOW);
+					world[i][j] = new Tile(p, Terrain.SNOW);
 					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}else if(mountainEdge < 1 && Math.random()<rockEdgeRatio) {
-					world[i][j] = new Tile(null, p, Terrain.ROCK);
+					world[i][j] = new Tile(p, Terrain.ROCK);
 					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}else if(mountain < 1) {
-					world[i][j] = new Tile(null, p, Terrain.ROCK);
+					world[i][j] = new Tile(p, Terrain.ROCK);
 					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}
 				

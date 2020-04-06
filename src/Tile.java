@@ -15,12 +15,13 @@ public class Tile {
 	private boolean hasOre;
 	private boolean hasBuilding;
 	private boolean hasStructure;
+	private boolean hasUnit;
 	private boolean isTerritory = false;
 	private int forestType = 0;
 	
-	private Unit unit;
-	private Position p;
 	
+	private Position p;
+	private ArrayList<Unit> units = new ArrayList<Unit>();
 	int minEntitySize = 20;
 	
 	private String roadCorner;
@@ -31,8 +32,7 @@ public class Tile {
 	private Structure structure;
 	private Building building;
 	
-	public Tile(Unit u, Position point, Terrain t) {
-		unit = u;
+	public Tile(Position point, Terrain t) {
 		p = point;
 		terr = t;
 		isHighlight = false;
@@ -97,6 +97,11 @@ public class Tile {
 		
 		
 	}
+	public void setUnit(Unit u) {
+		units.add(u);
+		
+		
+	}
 
 	public void draw(Graphics g, BuildMode bm) {
 //		g.setColor(Color.PINK);
@@ -117,6 +122,7 @@ public class Tile {
 		drawRoad(g);
 		drawBuilding(g, bm);
 		drawStructure(g, bm);
+		drawUnit(g);
 		drawHighlightedArea(g);
 		
 		
@@ -216,6 +222,14 @@ public class Tile {
 		}
 		
 	}
+	private void drawUnit(Graphics g) {
+		if(units != null) {
+			for (int i = 0; i < units.size(); i++) {
+				g.drawImage(units.get(i).getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			}
+			
+		}
+	}
 	private void drawTerritory(Graphics g) {
 		if(isTerritory == true) {
 			Utils.setTransparent(g);
@@ -239,6 +253,9 @@ public class Tile {
 	public boolean getHasOre() {
 		return hasOre;
 	}
+	public boolean getHasUnit() {
+		return hasUnit;
+	}
 	public boolean getHasRoad() {
 		return hasRoad;
 	}
@@ -250,6 +267,9 @@ public class Tile {
 	}
 	public Ore getOre() {
 		return ore;
+	}
+	public ArrayList<Unit> getUnit() {
+		return units;
 	}
 	public Structure getStructure() {
 		return structure;
