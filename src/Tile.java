@@ -242,6 +242,9 @@ public class Tile {
 	public boolean getHasRoad() {
 		return hasRoad;
 	}
+	public boolean getHasStructure() {
+		return hasStructure;
+	}
 	public int getForestType() {
 		return forestType;
 	}
@@ -250,6 +253,9 @@ public class Tile {
 	}
 	public Structure getStructure() {
 		return structure;
+	}
+	public boolean getIsTerritory() {
+		return isTerritory;
 	}
 	public boolean isStructure(Structure s) {
 		if(structure == s) {

@@ -12,6 +12,7 @@ public class Game {
 	private BufferedImage terrainImage;
 	private BufferedImage minimapImage;
 	private BufferedImage heightMapImage;
+	ArrayList<Position> structureLoc = new ArrayList<Position>();
 	
 	protected static int tileSize = 10;
 	private int money;
@@ -27,6 +28,7 @@ public class Game {
 	private double bushRarity = 0.005;
 	private double waterPlantRarity = 0.05;
 	private double forestDensity = 0.3;
+	private int cultureDifBetweenExpanding = 100;
 	
 	private volatile int panelWidth;
 	private volatile int panelHeight;
@@ -48,6 +50,11 @@ public class Game {
 		// Do all the game events like unit movement, time passing, building things, growing, etc
 		// happens once every 100ms
 		ticks++;
+		
+		if(ticks%10 == 0) {
+			updateTerritory();
+			System.out.println("updating territory");
+		}
 		
 		if(Math.random() < 0.001) {
 			makeLake(100);
@@ -512,7 +519,7 @@ public class Game {
 		double castleDistance = getRandomNormal(5);
 		Position halfway = start.multiply(castleDistance).add(end.multiply(1-castleDistance));
 		world[halfway.getIntX()][halfway.getIntY()].setStructure(Structure.CASTLE);
-		
+		structureLoc.add(halfway);
 		
 	}
 	
@@ -595,9 +602,9 @@ public class Game {
 				Tile t = world[i][j];
 				
 			
-				if(t.isStructure(Structure.CASTLE) == true) {
+				if(t.getHasStructure() == true) {
 					Position p = new Position(i,j);
-					updateTerritory(p);
+					setTerritory(p);
 				}
 				if(i==hoveredTile.getIntX() && j==hoveredTile.getIntY()) {
 					t.highlight(g);
@@ -609,18 +616,57 @@ public class Game {
 			}
 		}
 	}
-	private void updateTerritory(Position p) {
+	private void updateTerritory() {
+		for (int i = 0; i < structureLoc.size(); i++) {
+			System.out.println("structureloc" +i);
+			world[structureLoc.get(i).getIntX()][structureLoc.get(i).getIntY()].getStructure().updateCulture();
+		}
+	}
+	private void setTerritory(Position p) {
 		int c = world[p.getIntX()][p.getIntY()].getStructure().getCulture();
-		if(c >= 10) {
-			for (int i=-1; i < 2; i++) {
-				for (int j=-1; j < 2; j++) {
-					world[p.getIntX()+i][p.getIntY()+j].setTerritory(true);
-					
-				}
-			}
+		int x = 0;
+		while(!(c <= x) ) {
+			x+=cultureDifBetweenExpanding;
+			expandTerritory(x/cultureDifBetweenExpanding, p);	
 		}
 		
+		
 	}
+	private void expandTerritory(int r, Position p) {
+			
+			for (int i=0-r; i < r; i++) {
+				for (int j=0-r; j < r; j++) {
+					
+					double distanceFromCenter = Math.sqrt(i*i + j*j);
+					if(distanceFromCenter < r) {
+						if(r == 3) {
+							if(i==1-r && j==1-r) {
+								continue;	
+							}	
+							if(i==-1+r && j==1-r) {
+								continue;	
+							}
+							if(i==1-r && j==-1+r) {
+								continue;	
+							}
+							if(i==-1+r && j==-1+r) {
+								continue;	
+							}
+						}
+						
+						world[p.getIntX()+i][p.getIntY()+j].setTerritory(true);
+										
+				}
+
+			}
+		}
+
+			
+	}
+
+	
+
+	
 
 	public static void printPoint(Point p) {
 		System.out.println("Point: (" + p.x + ", " + p.y + ")");
@@ -668,6 +714,7 @@ public class Game {
 		if(currentMode == BuildMode.BARRACKS) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
 				world[tile.getIntX()][tile.getIntY()].setStructure(Structure.BARRACKS);
+				structureLoc.add(tile);
 			}
 		} 
 		
