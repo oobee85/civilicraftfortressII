@@ -316,7 +316,7 @@ public class Frame extends JPanel{
 		cityView.add(buildSpearman);
 		buildSpearman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 		cityView.add(exitCity);
-		exitCity.setBounds(838, 22 , 36, 44);
+		exitCity.setBounds(790, 22 , BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 		
 		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
 		frame.getContentPane().add(guiSplitter,BorderLayout.EAST);
