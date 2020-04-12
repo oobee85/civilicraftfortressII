@@ -10,7 +10,7 @@ public enum Structure {
 	;
 	
     private final int health;   
-    private final ImageIcon imageicon;
+	private MipMap mipmap;
     private int culture;
     private int cultureRate;
     
@@ -18,15 +18,15 @@ public enum Structure {
         this.health = hp;
         this.culture = c;
         this.cultureRate = cr;
-        this.imageicon = Utils.loadImageIcon(s);
+        this.mipmap = new MipMap(s);
         
     }
     
     public Image getImage() {
-    	return imageicon.getImage();
+    	return mipmap.getImage(0);
     }
     public ImageIcon getImageIcon() {
-    	return imageicon;
+    	return mipmap.getImageIcon(0);
     }
     
     public int getHealth() {

@@ -13,19 +13,19 @@ public enum Building {
 		;
 	
 	    private final int health;   
-	    private final ImageIcon imageicon;
+	    private MipMap mipmap;
 	    
 	    
 	    Building(int hp, String s) {
 	        this.health = hp;
-	        this.imageicon = Utils.loadImageIcon(s);
+	        mipmap = new MipMap(s);
 	    }
 	    
 	    public Image getImage() {
-	    	return imageicon.getImage();
+	    	return mipmap.getImage(0);
 	    }
 	    public ImageIcon getImageIcon() {
-	    	return imageicon;
+	    	return mipmap.getImageIcon(0);
 	    }
 	    public BuildMode getToBuildMode(Building b) {
 	    	if(b == Building.WALL_BRICK) {

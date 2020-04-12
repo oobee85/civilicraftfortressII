@@ -7,32 +7,19 @@ public enum Plant {
 	CATTAIL ( 100, new String[] {"resources/Images/plants/cattail32.png"} , 1.0),
 	;
 	
-	
-	private final Image[] mipmaps;
-    private final int[] mipmapSizes;
     private int yield;
     private double rarity;
+    private MipMap mipmap;
     
 	Plant(int y, String[] s, double r){
 		yield = y;
 		rarity = r;
 		
-		mipmaps = new Image[s.length];
-        mipmapSizes = new int[s.length];
-        for(int i = 0; i < s.length; i++) {
-        	mipmaps[i] = Utils.loadImage(s[i]);
-        	mipmapSizes[i] = mipmaps[i].getWidth(null);
-        }
+		mipmap = new MipMap(s);
 	}
 	
 	public Image getImage(int size) {
-    	// Get the first mipmap that is larger than the tile size
-    	for(int i = 0; i < mipmapSizes.length; i++) {
-    		if(mipmapSizes[i] > size) {
-    			return mipmaps[i];
-    		}
-    	}
-    	return mipmaps[mipmaps.length-1];
+		return mipmap.getImage(size);
     }
 	
 	public int getYield() {
