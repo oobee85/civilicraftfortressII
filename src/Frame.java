@@ -376,10 +376,13 @@ public class Frame extends JPanel{
 			@Override
 			public void mouseReleased(MouseEvent e) {
 //				System.out.println("mouse release");
-				if(e.getButton()== MouseEvent.BUTTON1 && dragged ==false) {
+				if(e.getButton() == MouseEvent.BUTTON1 && dragged == false) {
 					
 					System.out.println("click");
 					gameInstance.mouseClick(mx, my);
+				}
+				if(e.getClickCount()==2 && e.getButton() == MouseEvent.BUTTON1) {
+					gameInstance.selectUnit(mx, my);
 					
 				}
 				dragged = false;
@@ -392,6 +395,7 @@ public class Frame extends JPanel{
 //				System.out.println("mousepressed");
 				mx = e.getX();
 				my = e.getY();
+				
 				
 			}
 
