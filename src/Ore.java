@@ -2,15 +2,14 @@ import java.awt.Image;
 
 public enum Ore {
 	
-	ORE_IRON ( 100, new String[] {"resources/Images/ore/ore_iron16.png", "resources/Images/ore/ore_iron128.png"} , 1.0),
-	ORE_COPPER ( 100, new String[] {"resources/Images/ore/ore_copper16.png", "resources/Images/ore/ore_copper128.png"} , 0.6),
-	ORE_GOLD ( 100, new String[] {"resources/Images/ore/ore_gold16.png", "resources/Images/ore/ore_gold128.png"} , 0.1),
-	ORE_SILVER ( 100, new String[] {"resources/Images/ore/ore_silver16.png", "resources/Images/ore/ore_silver128.png"} , 0.3),
+	ORE_IRON ( 100, new String[] {"resources/Images/ore/iron/ore_iron16.png", "resources/Images/ore/iron/ore_iron128.png"}, 1.0),
+	ORE_COPPER ( 100, new String[] {"resources/Images/ore/copper/ore_copper16.png", "resources/Images/ore/copper/ore_copper128.png"} , 0.6),
+	ORE_GOLD ( 100, new String[] {"resources/Images/ore/gold/ore_gold16.png", "resources/Images/ore/gold/ore_gold128.png"} , 0.1),
+	ORE_SILVER ( 100, new String[] {"resources/Images/ore/silver/ore_silver16.png", "resources/Images/ore/silver/ore_silver128.png"} , 0.3),
 	;
 	
 	
-	private final Image[] mipmaps;
-    private final int[] mipmapSizes;
+	private MipMap mipmap;
     private int yield;
     private double rarity;
     
@@ -18,22 +17,11 @@ public enum Ore {
 		yield = y;
 		rarity = r;
 		
-		mipmaps = new Image[s.length];
-        mipmapSizes = new int[s.length];
-        for(int i = 0; i < s.length; i++) {
-        	mipmaps[i] = Utils.loadImage(s[i]);
-        	mipmapSizes[i] = mipmaps[i].getWidth(null);
-        }
+		mipmap = new MipMap(s);
 	}
 	
 	public Image getImage(int size) {
-    	// Get the first mipmap that is larger than the tile size
-    	for(int i = 0; i < mipmapSizes.length; i++) {
-    		if(mipmapSizes[i] > size) {
-    			return mipmaps[i];
-    		}
-    	}
-    	return mipmaps[mipmaps.length-1];
+		return mipmap.getImage(size);
     }
 	
 	public int getYield() {

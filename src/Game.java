@@ -447,8 +447,11 @@ public class Game {
 		int x0 = (int) (Math.random() * world.length);
 		int y0 = (int) (Math.random() * world.length);
 		
-		double mountLength = Math.random()*80;
-		double mountHeight = Math.random()*80;
+		
+		int mountainSize = 80 * world.length / 256;
+		
+		double mountLength = (0.1 + 0.9 * Math.random() ) *mountainSize;
+		double mountHeight = (0.1 + 0.9 * Math.random() )*mountainSize;
 		double mountLengthEdge = mountLength+3;
 		double mountHeightEdge = mountHeight+3;
 		

@@ -7,15 +7,13 @@ public enum Unit {
  	WARRIOR ( "resources/Images/units/warrior.png", new CombatStats(10,10,10,10) ),
  	SPEARMAN ( "resources/Images/units/spearman.png", new CombatStats(10,10,20,10) ),
 	;
-
-    private final ImageIcon imageicon;
+	
+	private MipMap mipmap;
     private CombatStats combatStats;
-    
-    
     
     Unit( String s, CombatStats cs) {
     	combatStats = cs;
-        this.imageicon = Utils.loadImageIcon(s);
+    	mipmap = new MipMap(s);
     }
     
     public CombatStats getCombatStats() {
@@ -23,10 +21,10 @@ public enum Unit {
     }
     
     public Image getImage() {
-    	return imageicon.getImage();
+    	return mipmap.getImage(0);
     }
     public ImageIcon getImageIcon() {
-    	return imageicon;
+    	return mipmap.getImageIcon(0);
     }
     
 }
