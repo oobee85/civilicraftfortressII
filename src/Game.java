@@ -667,23 +667,25 @@ public class Game {
 			
 	}
 
-	private void moveUnit() {
-		
-	}
-	
-	public void selectUnit(int mx, int my) {
-		Position tile = getTileAtPixel(new Position(mx, my));
-		
+	public void rightClick(int mx, int my) {
+		Position tile = getTileAtPixel(new Position(mx,my));
 		if(currentMode == BuildMode.NOMODE) {
 			if(world[tile.getIntX()][tile.getIntY()].getHasUnit() == true) {
 				selectedUnit = true;
-				
+				System.out.println("selected unit");
 			}
 		}
-		
-			
+//		if(selectedUnit == false) {
+//			if(world[p1.getIntX()][p1.getIntY()] != null) {
+//				Unit temp = world[p1.getIntX()][p1.getIntY()].getUnit();
+//				world[p1.getIntX()][p1.getIntY()].setUnit(null);
+//				world[p2.getIntX()][p2.getIntY()].setUnit(temp);
+//			}
+//			
+//		}
 		
 	}
+	
 	
 
 	public static void printPoint(Point p) {
@@ -707,20 +709,10 @@ public class Game {
 		Position p1 = getTileAtPixel(new Position(x1,y1));
 		Position p2 = getTileAtPixel(new Position(x2,y2));
 		
-		if(selectedUnit == false) {
-			if(world[p1.getIntX()][p1.getIntY()] != null) {
-				Unit temp = world[p1.getIntX()][p1.getIntY()].getUnit();
-				world[p1.getIntX()][p1.getIntY()].setUnit(null);
-				world[p2.getIntX()][p2.getIntY()].setUnit(temp);
-			}
 			
+		hoveredArea = new Area(p1.getIntX(),p1.getIntY(), p2.getIntX()+1, p2.getIntY()+1);
 			
-		}else {
-			
-			hoveredArea = new Area(p1.getIntX(),p1.getIntY(), p2.getIntX()+1, p2.getIntY()+1);
-			
-			selectTile();
-		}
+		selectTile();
 		
 	}
 	
@@ -788,7 +780,9 @@ public class Game {
 	public void exitCity() {
 		guiController.toggleCityView();
 	}
-	
+	public void exitTile() {
+		guiController.toggleTileView();
+	}
 	public void zoomView(int scroll, int mx, int my) {
 		int newTileSize;
 		if(scroll > 0) {

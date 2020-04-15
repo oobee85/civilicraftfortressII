@@ -14,6 +14,7 @@ public class Frame extends JPanel{
 	private JPanel gamepanel;
 	private JPanel minimapPanel;
 	private JPanel cityView;
+	private JPanel tileView;
 	private JComboBox<MapType> mapType;
 	private JTextField mapSize;
 	private int WIDTH;
@@ -43,8 +44,12 @@ public class Frame extends JPanel{
 			public void toggleCityView() {
 				cityView.setVisible(!cityView.isVisible());
 			}
+			@Override
+			public void toggleTileView() {
+				tileView.setVisible(!tileView.isVisible());
+			}
 		});
-		
+			
 		
 		EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -381,10 +386,12 @@ public class Frame extends JPanel{
 					System.out.println("click");
 					gameInstance.mouseClick(mx, my);
 				}
-				if(e.getClickCount()==2 && e.getButton() == MouseEvent.BUTTON1) {
-					gameInstance.selectUnit(mx, my);
+				if(e.getButton() == MouseEvent.BUTTON2 && dragged == false) {
 					
+					System.out.println("right click");
+					gameInstance.rightClick(mx, my);
 				}
+				
 				dragged = false;
 				
 				gameInstance.resetHoveredArea();
