@@ -6,6 +6,8 @@ public enum Ore {
 	ORE_COPPER ( 100, new String[] {"resources/Images/ore/copper/ore_copper16.png", "resources/Images/ore/copper/ore_copper128.png"} , 0.6),
 	ORE_GOLD ( 100, new String[] {"resources/Images/ore/gold/ore_gold16.png", "resources/Images/ore/gold/ore_gold128.png"} , 0.1),
 	ORE_SILVER ( 100, new String[] {"resources/Images/ore/silver/ore_silver16.png", "resources/Images/ore/silver/ore_silver128.png"} , 0.3),
+	ORE_RUNE ( 100, new String[] {"resources/Images/ore/runite/ore_rune16.png", "resources/Images/ore/runite/ore_rune128.png"} , 0.3),
+	ORE_ADAMANT ( 100, new String[] {"resources/Images/ore/adamantite/ore_adamant16.png", "resources/Images/ore/adamantite/ore_adamant128.png"} , 0.3),
 	;
 	
 	

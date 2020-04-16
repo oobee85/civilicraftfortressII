@@ -13,6 +13,7 @@ public class Game {
 	private BufferedImage minimapImage;
 	private BufferedImage heightMapImage;
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
+	ArrayList<Unit> selectUnits = new ArrayList<Unit>();
 	
 	protected static int tileSize = 10;
 	public boolean selectedUnit = false;
@@ -56,7 +57,7 @@ public class Game {
 			updateTerritory();
 		}
 		
-		if(Math.random() < 0.001) {
+		if(Math.random() < 0.0001) {
 			makeLake(100);
 			createTerrainImage();
 		}
@@ -78,6 +79,7 @@ public class Game {
 	private void genResources() {
 		genOres();
 		genPlants();
+		makeForest();
 	}
 
 	public void generateWorld(MapType mapType, int size) {
@@ -102,7 +104,6 @@ public class Game {
 
 		
 		makeRoad();
-		makeForest();
 		genResources();
 		
 		createTerrainImage();
@@ -269,6 +270,8 @@ public class Game {
 	}
 	
 	private void genPlants() {
+		
+		
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world.length; j++) {
 				
@@ -441,7 +444,6 @@ public class Game {
 		}
 		
 	}
-	
 	private void makeMountain() {
 		
 		int x0 = (int) (Math.random() * world.length);
@@ -720,7 +722,9 @@ public class Game {
 		for (int i = 0; i < hoveredArea.getIntX2()-hoveredArea.getIntX1(); i++) {
 			for (int j = 0; j < hoveredArea.getIntY2()-hoveredArea.getIntY1(); j++) {
 				world[hoveredArea.getIntX1()+i][hoveredArea.getIntY1()+j].setHighlight(true);
-//				System.out.println("hovered area");
+				if(world[hoveredArea.getIntX1()+i][hoveredArea.getIntY1()+j].getUnit() != null) {
+					selectUnits.add(world[hoveredArea.getIntX1()+i][hoveredArea.getIntY1()+j].getUnit());
+				}
 			}
 		}
 		
@@ -764,9 +768,11 @@ public class Game {
 		
 		
 	}
-	public void buildUnit(Unit u) {
+	public void buildUnit(UnitType u) {
 		Point po = new Point(structureLoc.get(0).getIntX(), structureLoc.get(0).getIntY());
-		world[po.x][po.y].setUnit(u);
+		Position p = new Position(structureLoc.get(0).getIntX(), structureLoc.get(0).getIntY());
+		Unit unit = new Unit(u , p);
+		world[po.x][po.y].setUnit(unit);
 		
 	}
 	

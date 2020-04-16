@@ -124,6 +124,7 @@ public class Tile {
 		drawBuilding(g, bm);
 		drawStructure(g, bm);
 		drawHighlightedArea(g);
+		drawUnit(g);
 		
 		
 	}
@@ -152,7 +153,11 @@ public class Tile {
 		    	g.setColor(c);
 				g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
 		    }
-		    
+		    if(unit != null) {
+		    	Color c = new Color(0, 255, 0, 100); 
+		    	g.setColor(c);
+				g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
+		    }
 		}else {
 			Utils.resetTransparent(g);
 		}
@@ -160,7 +165,12 @@ public class Tile {
 		
 	}
 	
-	
+	private void drawUnit(Graphics g) {
+		if(unit != null) {
+			g.drawImage(unit.getImage(), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+		}
+		
+	}
 	private void drawTerrain(Graphics g) {
 		g.drawImage(terr.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 	}
