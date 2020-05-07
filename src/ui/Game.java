@@ -1,7 +1,13 @@
+package ui;
 import java.awt.*;
 import java.awt.List;
 import java.awt.image.*;
 import java.util.*;
+
+import game.*;
+import ui.*;
+import utils.*;
+import world.*;
 
 public class Game {
 	private int ticks;
@@ -15,7 +21,7 @@ public class Game {
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
 	ArrayList<Unit> selectUnits = new ArrayList<Unit>();
 	
-	protected static int tileSize = 10;
+	public static int tileSize = 10;
 	public boolean selectedUnit = false;
 	private int money;
 	private Position viewOffset;

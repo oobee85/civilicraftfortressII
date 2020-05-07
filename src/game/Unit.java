@@ -1,4 +1,8 @@
+package game;
 import java.awt.Image;
+
+import game.*;
+import utils.*;
 
 public class Unit {
 	

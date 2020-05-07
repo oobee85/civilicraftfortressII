@@ -1,3 +1,4 @@
+package world;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -5,6 +6,11 @@ import java.awt.Graphics2D;
 import java.awt.List;
 import java.awt.Point;
 import java.util.ArrayList;
+
+import game.*;
+import liquid.*;
+import ui.*;
+import utils.*;
 
 
 
@@ -33,11 +39,17 @@ public class Tile {
 	private Building building;
 	private Unit unit;
 	
+	
+	private double liquidAmount;
+	private LiquidType liquidType;
+	
 	public Tile(Position point, Terrain t) {
 		p = point;
 		terr = t;
 		isHighlight = false;
 		
+		liquidType = LiquidType.WATER;
+		liquidAmount = 0;
 	}
 	public void setHasBuilding(Building b) {
 		this.hasBuilding = true;

@@ -1,4 +1,7 @@
+package world;
 import java.awt.*;
+
+import utils.*;
 
 public enum Terrain {
 		GRASS (10, new String[] {"resources/Images/grass/grass16.png", "resources/Images/grass/grass128.png", "resources/Images/grass/grass512.png"}),

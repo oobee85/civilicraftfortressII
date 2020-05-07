@@ -1,7 +1,13 @@
+package ui;
 import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+
+import game.*;
+import ui.*;
+import utils.*;
+import world.*;
 
 
 public class Frame extends JPanel{

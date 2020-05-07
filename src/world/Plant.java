@@ -1,4 +1,7 @@
+package world;
 import java.awt.Image;
+
+import utils.*;
 
 public enum Plant {
 	

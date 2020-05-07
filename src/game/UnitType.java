@@ -1,6 +1,9 @@
+package game;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
+
+import utils.*;
 public enum UnitType {
 	WORKER ( "resources/Images/units/worker.png", new CombatStats(1,0,0,10)),
  	WARRIOR ( "resources/Images/units/warrior.png", new CombatStats(10,10,10,10)),

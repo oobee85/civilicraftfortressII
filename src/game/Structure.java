@@ -1,7 +1,10 @@
+package game;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 import javax.swing.*;
+
+import utils.*;
 
 public enum Structure {
 	
