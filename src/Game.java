@@ -589,6 +589,18 @@ public class Game {
 			for (int i = lowerX; i < upperX; i++) {
 				for (int j = lowerY; j < upperY; j++) {
 					Tile t = world[i][j];
+					
+					if(t.getHasStructure() == true) {
+						Position p = new Position(i,j);
+						setTerritory(p);
+					}
+					if(i==hoveredTile.getIntX() && j==hoveredTile.getIntY()) {
+						t.highlight(g);
+					}
+					if(hoveredArea.contains(i, j)) {
+						t.highlight(g);
+					}
+					
 					if(showHeightMap) {
 						t.drawHeightMap(g, heightMap[i][j]);
 					}
@@ -599,24 +611,6 @@ public class Game {
 			}
 		}
 		
-		for (int i = lowerX; i < upperX; i++) {
-			for (int j = lowerY; j < upperY; j++) {
-				Tile t = world[i][j];
-				
-			
-				if(t.getHasStructure() == true) {
-					Position p = new Position(i,j);
-					setTerritory(p);
-				}
-				if(i==hoveredTile.getIntX() && j==hoveredTile.getIntY()) {
-					t.highlight(g);
-				}
-				if(hoveredArea.contains(i, j)) {
-					t.highlight(g);
-				}
-				t.draw(g, currentMode);
-			}
-		}
 	}
 	private void updateTerritory() {
 		for (int i = 0; i < structureLoc.size(); i++) {
