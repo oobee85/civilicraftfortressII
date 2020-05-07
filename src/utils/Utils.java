@@ -81,17 +81,55 @@ public final class Utils {
 		// Return the buffered image
 		return bimage;
 	}
-	public static void resetTransparent(Graphics g) {
-		Graphics2D g2d = (Graphics2D)g;
-		AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
-	    g2d.setComposite(ac);
-	}
-	public static void setTransparent(Graphics g) {
-		Graphics2D g2d = (Graphics2D)g;
-		AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F);
-	    g2d.setComposite(ac);
+	
+	/**
+	 * @param alpha 1 alpha is opaque, 0 alpha is completely transparent
+	 * @param g
+	 */
+	public static void setTransparency(Graphics g, float alpha) {
+	    ((Graphics2D)g).setComposite(java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
 	}
 	
+	/**
+	 * result is top*alpha + bottom*(1-alpha)
+	 * @param top
+	 * @param bottom
+	 * @param alpha
+	 */
+	public static Color blendColors(Color top, Color bottom, float alpha) {
+		return new Color(snap((int) (top.getRed()*alpha + bottom.getRed()*(1-alpha))), 
+				snap((int) (top.getGreen()*alpha + bottom.getGreen()*(1-alpha))),
+				snap((int) (top.getBlue()*alpha + bottom.getBlue()*(1-alpha))));
+	}
+	private static int snap(int color) {
+		return Math.min(Math.max(color, 0), 255);
+	}
+	
+	public static float getAlphaOfLiquid(double amount) {
+		// 1 units of fluid is opaque, linearly becoming transparent at 0 units of fluid.
+		float alpha = (float)Math.max(Math.min(amount*8, 1), 0);
+		return alpha;
+		//return 1 - (1 - alpha) * (1 - alpha);
+	}
+	
+
+	public static void normalize(double[][] data) {
+		double minValue = data[0][0];
+		double maxValue = data[0][0];
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				minValue = data[i][j] < minValue ? data[i][j] : minValue;
+				maxValue = data[i][j] > maxValue ? data[i][j] : maxValue;
+			}
+		}
+		System.out.println("Min Terrain Gen Value: " + minValue + ", Max value: " + maxValue);
+		// Normalize the heightMap to be between 0 and 1
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				data[i][j] = (data[i][j] - minValue) / (maxValue - minValue);
+			}
+		}
+	}
 
 	public static double[][] smoothingFilter(double[][] data, double radius, double c) {
 		double[][] smoothed = new double[data.length][data[0].length];

@@ -5,6 +5,7 @@ import java.awt.image.*;
 import java.util.*;
 
 import game.*;
+import liquid.*;
 import ui.*;
 import utils.*;
 import world.*;
@@ -53,8 +54,9 @@ public class Game {
 		currentMode = BuildMode.NOMODE;
 		showHeightMap = false;
 	}
-
+	
 	public void gameTick() {
+		boolean changedTerrain = false;
 		// Do all the game events like unit movement, time passing, building things, growing, etc
 		// happens once every 100ms
 		ticks++;
@@ -62,12 +64,35 @@ public class Game {
 		if(ticks%10 == 0) {
 			updateTerritory();
 		}
+//		if(Math.random() < 0.01) {
+//			for(int x = 0; x < world.length; x++) {
+//				for(int y = 0; y < world[0].length; y++) {
+//					world[x][y].liquidAmount *= 0.5;
+//				}
+//			}
+//			makeLake(100);
+//			changedTerrain = true;
+//		}
 		
-		if(Math.random() < 0.0001) {
-			makeLake(100);
+		
+		// rain event
+		if(Math.random() < 0.005) {
+			for(int x = 0; x < world.length; x++) {
+				for(int y = 0; y < world[0].length; y++) {
+					world[x][y].liquidAmount += 0.005;
+				}
+			}
+		}
+		if(ticks%1 == 0) {
+			world[mountx][mounty].liquidAmount += 0.004;
+			world[volcanox][volcanoy].liquidType = LiquidType.LAVA;
+			world[volcanox][volcanoy].liquidAmount += 0.002;
+			Liquid.propogate(world, heightMap);
+			changedTerrain = true;
+		}
+		if(changedTerrain) {
 			createTerrainImage();
 		}
-		
 	}
 	
 	public void setViewSize(int width, int height) {
@@ -94,13 +119,16 @@ public class Game {
 		int smoothingRadius = (int) (Math.sqrt(size)/2);
 		
 		if(mapType == MapType.PANGEA) {
-			generateHeightMap(0.5, smoothingRadius, 0.05);
+//			generateHeightMap(0.5, smoothingRadius, 0.05);
+			generateHeightMap(0.5, smoothingRadius, 0);
 		}
 		else if(mapType == MapType.CONTINENTS) {
-			generateHeightMap(0.6, smoothingRadius, 0.35);
+//			generateHeightMap(0.6, smoothingRadius, 0.35);
+			generateHeightMap(0.6, smoothingRadius, 0);
 		}
 		else if(mapType == MapType.ARCHIPELAGO) {
-			generateHeightMap(0.75, smoothingRadius, 0.60);
+//			generateHeightMap(0.75, smoothingRadius, 0.60);
+			generateHeightMap(0.75, smoothingRadius, 0);
 		}
 		int numTiles = size*size;
 		makeLake(numTiles * 2/100);
@@ -112,6 +140,15 @@ public class Game {
 		makeRoad();
 		genResources();
 		
+		createTerrainImage();
+	}
+	
+	public void flipTable() {
+		for(int x = 0; x < heightMap.length; x++) {
+			for(int y = 0; y < heightMap[0].length; y++) {
+				heightMap[x][y] = 1 - heightMap[x][y];
+			}
+		}
 		createTerrainImage();
 	}
 	
@@ -145,30 +182,8 @@ public class Game {
 		}
 		
 		heightMap = Utils.smoothingFilter(combinedNoise, smoothingRadius, 100);
+		Utils.normalize(heightMap);
 		
-		double minValue = heightMap[0][0];
-		double maxValue = heightMap[0][0];
-		for (int i = 0; i < world.length; i++) {
-			for (int j = 0; j < world[0].length; j++) {
-				minValue = heightMap[i][j] < minValue ? heightMap[i][j] : minValue;
-				maxValue = heightMap[i][j] > maxValue ? heightMap[i][j] : maxValue;
-				
-				// This is the same as:
-//				if(smoothed[i][j] > maxValue) {
-//					maxValue = smoothed[i][j];
-//				}
-//				else {
-//					maxValue = maxValue;
-//				}
-			}
-		}
-		System.out.println("Min Terrain Gen Value: " + minValue + ", Max value: " + maxValue);
-		// Normalize the heightMap to be between 0 and 1
-		for (int i = 0; i < world.length; i++) {
-			for (int j = 0; j < world[0].length; j++) {
-				heightMap[i][j] = (heightMap[i][j] - minValue) / (maxValue - minValue);
-			}
-		}
 		for (int i = 0; i < world.length; i++) {
 			for (int j = 0; j < world[0].length; j++) {
 				Position p = new Position(i, j);
@@ -250,22 +265,32 @@ public class Game {
 			Color average = new Color(sumr/totalNumPixels, sumg/totalNumPixels, sumb/totalNumPixels);
 			terrainColors.put(t, average);
 		}
-		terrainImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
-		minimapImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
-		
+		BufferedImage terrainImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
+		BufferedImage minimapImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
+
+		Graphics minimapGraphics = minimapImage.getGraphics();
+		Graphics terrainGraphics = terrainImage.getGraphics();
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world[0].length; j++) {
-				
 				minimapImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
 				terrainImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
 				if(world[i][j].getForestType()!=0) {
 					Color c = new Color(75,110,75);
 					minimapImage.setRGB(i,j,c.getRGB());
 				}
+				if(world[i][j].liquidAmount > 0) {
+					float alpha = Utils.getAlphaOfLiquid(world[i][j].liquidAmount);
+					Color newColor = Utils.blendColors(world[i][j].liquidType.getColor(), new Color(minimapImage.getRGB(i, j)), alpha);
+					minimapImage.setRGB(i, j, newColor.getRGB());
+					newColor = Utils.blendColors(world[i][j].liquidType.getColor(), new Color(terrainImage.getRGB(i, j)), alpha);
+					terrainImage.setRGB(i, j, newColor.getRGB());
+				}
 			}
 		}
+		minimapGraphics.dispose();
+		terrainGraphics.dispose();
 		
-		heightMapImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
+		BufferedImage heightMapImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world[0].length; j++) {
 				int r = Math.max(Math.min((int)(255*heightMap[i][j]), 255), 0);
@@ -273,6 +298,9 @@ public class Game {
 				heightMapImage.setRGB(i, j, c.getRGB());
 			}
 		}
+		this.terrainImage = terrainImage;
+		this.minimapImage = minimapImage;
+		this.heightMapImage = heightMapImage;
 	}
 	
 	private void genPlants() {
@@ -342,9 +370,13 @@ public class Game {
 		
 	}
 	
+	int volcanox;
+	int volcanoy;
 	private void makeVolcano() {
 		int x = (int) (Math.random() * world.length);
 		int y = (int) (Math.random() * world.length);
+		volcanox = x;
+		volcanoy = y;
 		
 		double lavaRadius = 2.5;
 		double volcanoRadius = 9;
@@ -367,6 +399,8 @@ public class Game {
 					
 					if(distanceFromCenter < lavaRadius) {
 						world[i][j] = new Tile(p, Terrain.LAVA);
+						world[i][j].liquidType = LiquidType.LAVA;
+						world[i][j].liquidAmount = 5;
 					}else if(distanceFromCenter < volcanoRadius) {
 						world[i][j] = new Tile(p, Terrain.VOLCANO);
 					}else if(distanceFromCenter < mountainRadius && world[i][j].checkTerrain(Terrain.SNOW) == false) {
@@ -393,27 +427,28 @@ public class Game {
 			Position next = queue.poll();
 			int i = next.getIntX();
 			int j = next.getIntY();
-			if(!world[i][j].checkTerrain(Terrain.WATER)) {
-				world[i][j] = new Tile(next, Terrain.WATER);
-				volume--;
-			}
-			// Add adjacent tiles to the queue
-			if(i > 0 && !visited[i-1][j]) {
-				queue.add(new Position(i-1, j));
-				visited[i-1][j] = true;
-			}
-			if(j > 0 && !visited[i][j-1]) {
-				queue.add(new Position(i, j-1));
-				visited[i][j-1] = true;
-			}
-			if(i + 1 < world.length && !visited[i+1][j]) {
-				queue.add(new Position(i+1, j));
-				visited[i+1][j] = true;
-			}
-			if(j + 1 < world[0].length && !visited[i][j+1]) {
-				queue.add(new Position(i, j+1));
-				visited[i][j+1] = true;
-			}
+			world[i][j].liquidAmount += volume/5;
+//			if(!world[i][j].checkTerrain(Terrain.WATER)) {
+//				world[i][j] = new Tile(next, Terrain.WATER);
+//				volume--;
+//			}
+//			// Add adjacent tiles to the queue
+//			if(i > 0 && !visited[i-1][j]) {
+//				queue.add(new Position(i-1, j));
+//				visited[i-1][j] = true;
+//			}
+//			if(j > 0 && !visited[i][j-1]) {
+//				queue.add(new Position(i, j-1));
+//				visited[i][j-1] = true;
+//			}
+//			if(i + 1 < world.length && !visited[i+1][j]) {
+//				queue.add(new Position(i+1, j));
+//				visited[i+1][j] = true;
+//			}
+//			if(j + 1 < world[0].length && !visited[i][j+1]) {
+//				queue.add(new Position(i, j+1));
+//				visited[i][j+1] = true;
+//			}
 		}
 	}
 	private void makeForest() {
@@ -450,11 +485,14 @@ public class Game {
 		}
 		
 	}
+	int mountx;
+	int mounty;
 	private void makeMountain() {
 		
 		int x0 = (int) (Math.random() * world.length);
 		int y0 = (int) (Math.random() * world.length);
-		
+		mountx = x0;
+		mounty = y0;
 		
 		int mountainSize = 80 * world.length / 256;
 		
@@ -535,6 +573,9 @@ public class Game {
 	}
 	
 	private void turnRoads(Position current, Position prev) {
+		if(current.getIntX()-1 < 0 || current.getIntX()+1 >= world.length) {
+			return;
+		}
 		if(world[current.getIntX()][current.getIntY()].canBuild()==true) {
 			
 			// makes turns bot left -> top right
@@ -658,8 +699,9 @@ public class Game {
 								continue;	
 							}
 						}
-						
-						world[p.getIntX()+i][p.getIntY()+j].setTerritory(true);
+						if(p.getIntX()+i >= 0 && p.getIntX()+i < world.length && p.getIntY()+j >= 0 && p.getIntY()+j < world[0].length) {
+							world[p.getIntX()+i][p.getIntY()+j].setTerritory(true);
+						}
 										
 				}
 

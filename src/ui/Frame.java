@@ -71,7 +71,7 @@ public class Frame extends JPanel{
 	
 	private void menu() {
 		panel = new JPanel();
-		JButton start = new JButton("startGame");
+		JButton start = new JButton("Start Game");
 		start.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -93,7 +93,7 @@ public class Frame extends JPanel{
 		mapType.setPreferredSize(new Dimension(100,50));
 		panel.add(mapType);
 		
-		mapSize = new JTextField("64", 10);
+		mapSize = new JTextField("128", 10);
 		mapSize.setPreferredSize(new Dimension(100,50));
 		panel.add(mapSize);
 		
@@ -281,6 +281,16 @@ public class Frame extends JPanel{
 		showHeightMap.setFocusable(false);
 
 		
+		JButton flipTable = new JButton("Flip Table");
+		flipTable.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.flipTable();
+			}
+		});
+		flipTable.setPreferredSize(BUILDING_BUTTON_SIZE);
+		
+		
 		JButton exit = new JButton("Exit");
 		exit.addActionListener(new ActionListener() {
 			@Override
@@ -300,6 +310,7 @@ public class Frame extends JPanel{
 		gui.add(buildBarracks);
 		gui.add(buildIrrigation);
 		gui.add(showHeightMap);
+		gui.add(flipTable);
 		gui.add(exit);
 		
 
