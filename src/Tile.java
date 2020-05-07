@@ -18,10 +18,10 @@ public class Tile {
 	private boolean hasUnit;
 	private boolean isTerritory = false;
 	private int forestType = 0;
-	
+	private boolean isSelected = false;
 	
 	private Position p;
-	private ArrayList<Unit> units = new ArrayList<Unit>();
+//	private ArrayList<Unit> units = new ArrayList<Unit>();
 	int minEntitySize = 20;
 	
 	private String roadCorner;
@@ -31,6 +31,7 @@ public class Tile {
 	private Terrain terr;
 	private Structure structure;
 	private Building building;
+	private Unit unit;
 	
 	public Tile(Position point, Terrain t) {
 		p = point;
@@ -98,8 +99,8 @@ public class Tile {
 		
 	}
 	public void setUnit(Unit u) {
-		units.add(u);
-		
+//		units.add(u);
+		unit = u;
 		
 	}
 
@@ -122,8 +123,8 @@ public class Tile {
 		drawRoad(g);
 		drawBuilding(g, bm);
 		drawStructure(g, bm);
-		drawUnit(g);
 		drawHighlightedArea(g);
+		drawUnit(g);
 		
 		
 	}
@@ -147,7 +148,16 @@ public class Tile {
 		    	g.setColor(c);
 				g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
 		    }
-		    
+		    if(bm == BuildMode.IRRIGATE && terr.isPlantable(terr) == false) {
+		    	Color c = new Color(255, 0, 0, 100); // Red with alpha = 0.5 
+		    	g.setColor(c);
+				g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
+		    }
+		    if(unit != null) {
+		    	Color c = new Color(0, 255, 0, 100); 
+		    	g.setColor(c);
+				g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
+		    }
 		}else {
 			Utils.resetTransparent(g);
 		}
@@ -155,6 +165,12 @@ public class Tile {
 		
 	}
 	
+	private void drawUnit(Graphics g) {
+		if(unit != null) {
+			g.drawImage(unit.getImage(), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+		}
+		
+	}
 	private void drawTerrain(Graphics g) {
 		g.drawImage(terr.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 	}
@@ -222,14 +238,6 @@ public class Tile {
 		}
 		
 	}
-	private void drawUnit(Graphics g) {
-		if(units != null) {
-			for (int i = 0; i < units.size(); i++) {
-				g.drawImage(units.get(i).getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
-			}
-			
-		}
-	}
 	private void drawTerritory(Graphics g) {
 		if(isTerritory == true) {
 			Utils.setTransparent(g);
@@ -268,11 +276,14 @@ public class Tile {
 	public Ore getOre() {
 		return ore;
 	}
-	public ArrayList<Unit> getUnit() {
-		return units;
+	public Unit getUnit() {
+		return unit;
 	}
 	public Structure getStructure() {
 		return structure;
+	}
+	public boolean getIsSelected() {
+		return isSelected;
 	}
 	public boolean getIsTerritory() {
 		return isTerritory;

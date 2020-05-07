@@ -13,8 +13,10 @@ public class Game {
 	private BufferedImage minimapImage;
 	private BufferedImage heightMapImage;
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
+	ArrayList<Unit> selectUnits = new ArrayList<Unit>();
 	
 	protected static int tileSize = 10;
+	public boolean selectedUnit = false;
 	private int money;
 	private Position viewOffset;
 	private Position hoveredTile;
@@ -55,7 +57,7 @@ public class Game {
 			updateTerritory();
 		}
 		
-		if(Math.random() < 0.001) {
+		if(Math.random() < 0.0001) {
 			makeLake(100);
 			createTerrainImage();
 		}
@@ -77,6 +79,7 @@ public class Game {
 	private void genResources() {
 		genOres();
 		genPlants();
+		makeForest();
 	}
 
 	public void generateWorld(MapType mapType, int size) {
@@ -101,7 +104,6 @@ public class Game {
 
 		
 		makeRoad();
-		makeForest();
 		genResources();
 		
 		createTerrainImage();
@@ -268,6 +270,8 @@ public class Game {
 	}
 	
 	private void genPlants() {
+		
+		
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world.length; j++) {
 				
@@ -440,7 +444,6 @@ public class Game {
 		}
 		
 	}
-	
 	private void makeMountain() {
 		
 		int x0 = (int) (Math.random() * world.length);
@@ -660,8 +663,25 @@ public class Game {
 			
 	}
 
+	public void rightClick(int mx, int my) {
+		Position tile = getTileAtPixel(new Position(mx,my));
+		if(currentMode == BuildMode.NOMODE) {
+			if(world[tile.getIntX()][tile.getIntY()].getHasUnit() == true) {
+				selectedUnit = true;
+				System.out.println("selected unit");
+			}
+		}
+//		if(selectedUnit == false) {
+//			if(world[p1.getIntX()][p1.getIntY()] != null) {
+//				Unit temp = world[p1.getIntX()][p1.getIntY()].getUnit();
+//				world[p1.getIntX()][p1.getIntY()].setUnit(null);
+//				world[p2.getIntX()][p2.getIntY()].setUnit(temp);
+//			}
+//			
+//		}
+		
+	}
 	
-
 	
 
 	public static void printPoint(Point p) {
@@ -684,15 +704,21 @@ public class Game {
 	public void selectBox(int x1, int y1, int x2, int y2) {
 		Position p1 = getTileAtPixel(new Position(x1,y1));
 		Position p2 = getTileAtPixel(new Position(x2,y2));
+		
+			
 		hoveredArea = new Area(p1.getIntX(),p1.getIntY(), p2.getIntX()+1, p2.getIntY()+1);
-		selectResources();
+			
+		selectTile();
+		
 	}
 	
-	private void selectResources() {
+	private void selectTile() {
 		for (int i = 0; i < hoveredArea.getIntX2()-hoveredArea.getIntX1(); i++) {
 			for (int j = 0; j < hoveredArea.getIntY2()-hoveredArea.getIntY1(); j++) {
 				world[hoveredArea.getIntX1()+i][hoveredArea.getIntY1()+j].setHighlight(true);
-//				System.out.println("hovered area");
+				if(world[hoveredArea.getIntX1()+i][hoveredArea.getIntY1()+j].getUnit() != null) {
+					selectUnits.add(world[hoveredArea.getIntX1()+i][hoveredArea.getIntY1()+j].getUnit());
+				}
 			}
 		}
 		
@@ -700,6 +726,8 @@ public class Game {
 	public void mouseClick(int mx, int my) {
 		Position tile = getTileAtPixel(new Position(mx, my));
 		System.out.println(currentMode);
+		
+		
 		
 		if(currentMode == BuildMode.ROAD) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
@@ -734,9 +762,11 @@ public class Game {
 		
 		
 	}
-	public void buildUnit(Unit u) {
+	public void buildUnit(UnitType u) {
 		Point po = new Point(structureLoc.get(0).getIntX(), structureLoc.get(0).getIntY());
-		world[po.x][po.y].setUnit(u);
+		Position p = new Position(structureLoc.get(0).getIntX(), structureLoc.get(0).getIntY());
+		Unit unit = new Unit(u , p);
+		world[po.x][po.y].setUnit(unit);
 		
 	}
 	
@@ -750,7 +780,9 @@ public class Game {
 	public void exitCity() {
 		guiController.toggleCityView();
 	}
-	
+	public void exitTile() {
+		guiController.toggleTileView();
+	}
 	public void zoomView(int scroll, int mx, int my) {
 		int newTileSize;
 		if(scroll > 0) {

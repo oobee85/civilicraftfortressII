@@ -14,6 +14,7 @@ public class Frame extends JPanel{
 	private JPanel gamepanel;
 	private JPanel minimapPanel;
 	private JPanel cityView;
+	private JPanel tileView;
 	private JComboBox<MapType> mapType;
 	private JTextField mapSize;
 	private int WIDTH;
@@ -43,8 +44,12 @@ public class Frame extends JPanel{
 			public void toggleCityView() {
 				cityView.setVisible(!cityView.isVisible());
 			}
+			@Override
+			public void toggleTileView() {
+				tileView.setVisible(!tileView.isVisible());
+			}
 		});
-		
+			
 		
 		EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -211,23 +216,23 @@ public class Frame extends JPanel{
 		buildIrrigation.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.IRRIGATE);
 		});
-		JButton buildWorker = new JButton("Build Worker", Utils.resizeImageIcon(Unit.WORKER.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildWorker = new JButton("Build Worker", Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildWorker.setMargin(zeroMargin);
 		buildWorker.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildWorker.addActionListener(e -> {
-			gameInstance.buildUnit(Unit.WORKER);
+			gameInstance.buildUnit(UnitType.WORKER);
 		});
-		JButton buildWarrior = new JButton("Build Warrior", Utils.resizeImageIcon(Unit.WARRIOR.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildWarrior = new JButton("Build Warrior", Utils.resizeImageIcon(UnitType.WARRIOR.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildWarrior.setMargin(zeroMargin);
 		buildWarrior.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildWarrior.addActionListener(e -> {
-			gameInstance.buildUnit(Unit.WARRIOR);
+			gameInstance.buildUnit(UnitType.WARRIOR);
 		});
-		JButton buildSpearman = new JButton("Build Spearman", Utils.resizeImageIcon(Unit.SPEARMAN.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildSpearman = new JButton("Build Spearman", Utils.resizeImageIcon(UnitType.SPEARMAN.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildSpearman.setMargin(zeroMargin);
 		buildSpearman.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildSpearman.addActionListener(e -> {
-			gameInstance.buildUnit(Unit.SPEARMAN);
+			gameInstance.buildUnit(UnitType.SPEARMAN);
 		});
 		JButton exitCity = new JButton("Exit City", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		exitCity.setMargin(zeroMargin);
@@ -377,12 +382,17 @@ public class Frame extends JPanel{
 			@Override
 			public void mouseReleased(MouseEvent e) {
 //				System.out.println("mouse release");
-				if(e.getButton()== MouseEvent.BUTTON1 && dragged ==false) {
+				if(e.getButton() == MouseEvent.BUTTON1 && dragged == false) {
 					
 					System.out.println("click");
 					gameInstance.mouseClick(mx, my);
-					
 				}
+				if(e.getButton() == MouseEvent.BUTTON2 && dragged == false) {
+					
+					System.out.println("right click");
+					gameInstance.rightClick(mx, my);
+				}
+				
 				dragged = false;
 				
 				gameInstance.resetHoveredArea();
@@ -393,6 +403,7 @@ public class Frame extends JPanel{
 //				System.out.println("mousepressed");
 				mx = e.getX();
 				my = e.getY();
+				
 				
 			}
 
