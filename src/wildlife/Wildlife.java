@@ -35,15 +35,15 @@ public class Wildlife {
 				dead.add(animal);
 				continue;
 			}
-			if(Math.random() < 0.01) {
+			animal.loseEnergy();
+			if(animal.wantsToEat()) {
 				if(animal.getTile().getPlant() != null) {
 					animal.getTile().getPlant().takeDamage(1);
+					animal.eat();
 				}
 				else if(animal.getTile().checkTerrain(Terrain.GRASS)) {
 					animal.getTile().setTerrain(Terrain.DIRT);
-				}
-				else {
-					animal.takeDamage(1);
+					animal.eat();
 				}
 			}
 			if(Math.random() < animal.getMoveChance()) {
