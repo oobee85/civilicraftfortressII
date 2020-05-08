@@ -7,14 +7,13 @@ public class CombatStats {
 	private int defence;
 	private int speed;
 	
-	CombatStats(int hp, int a, int d, int s){
-		this.health = hp;
-		this.attack = a;
-		this.defence = d;
-		this.speed = s;
-		
+	public CombatStats(int health, int attack, int defence, int speed) {
+		super();
+		this.health = health;
+		this.attack = attack;
+		this.defence = defence;
+		this.speed = speed;
 	}
-	
 	public int getHealth() {
 		return health;
 	}
