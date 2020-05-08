@@ -695,7 +695,7 @@ public class Game {
 				}
 			}
 			for(Animal animal : Wildlife.getAnimals()) {
-				g.drawImage(UnitType.DEER.getImage(), animal.getTile().getLocation().getIntX() * Game.tileSize, animal.getTile().getLocation().getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				g.drawImage(animal.getType().getImage(), animal.getTile().getLocation().getIntX() * Game.tileSize, animal.getTile().getLocation().getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 			}
 		}
 		

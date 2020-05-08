@@ -70,6 +70,13 @@ public class Liquid {
 						world[x][y].setTerrain(Terrain.ROCK);
 					}
 				}
+				if(world[x][y].liquidType == LiquidType.WATER) {
+					if(world[x][y].checkTerrain(Terrain.DIRT)) {
+						if(Math.random() < world[x][y].liquidAmount*0.04) {
+							world[x][y].setTerrain(Terrain.GRASS);
+						}
+					}
+				}
 			}
 		}
 		//Utils.normalize(heightMap);
