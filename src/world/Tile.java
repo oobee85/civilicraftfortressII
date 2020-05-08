@@ -300,12 +300,16 @@ public class Tile {
 	public Structure getStructure() {
 		return structure;
 	}
+	public Plant getPlant() {
+		return plant;
+	}
 	public boolean getIsSelected() {
 		return isSelected;
 	}
 	public boolean getIsTerritory() {
 		return isTerritory;
 	}
+	
 	public boolean isStructure(Structure s) {
 		if(structure == s) {
 			return true;

@@ -1,37 +1,41 @@
 package world;
+
 import java.awt.Image;
 
-import utils.*;
+import utils.Position;
 
-public enum Plant {
+public class Plant {
+
+	private Position position;
+	private PlantType plantType;
+	private int currentYield;
+	private int health;
 	
-	BERRY ( 100, new String[] {"resources/Images/plants/berry16.png", "resources/Images/plants/berry128.png"} , 1.0),
-	BERRY_DEPLETED ( 0, new String[] {"resources/Images/plants/berry_depleted16.png", "resources/Images/plants/berry_depleted128.png"} , 0.2),
-	CATTAIL ( 100, new String[] {"resources/Images/plants/cattail32.png"} , 1.0),
-	;
-	
-    private int yield;
-    private double rarity;
-    private MipMap mipmap;
-    
-	Plant(int y, String[] s, double r){
-		yield = y;
-		rarity = r;
+	public Plant(PlantType pt, Position pos) {
+		position = pos;
+		plantType = pt;
+		health = pt.getHealth();
 		
-		mipmap = new MipMap(s);
+	}
+	public void takeDamage(double damage) {
+		health -= damage;
+	}
+	public boolean isDead() {
+		return health < 0;
 	}
 	
-	public Image getImage(int size) {
-		return mipmap.getImage(size);
-    }
-	
+	public int getHealth() {
+		return health;
+	}
+	public Position getPos() {
+		return position;
+	}
 	public int getYield() {
-		return yield;
+		return currentYield;
 	}
-	public double getRarity() {
-		return rarity;
+	public Image getImage(int size) {
+		return plantType.getImage(size);
 	}
-	
 	
 	
 }
