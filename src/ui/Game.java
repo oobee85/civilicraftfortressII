@@ -117,8 +117,11 @@ public class Game {
 			Tile tile = plant.getTile();
 			
 			if(tile.liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD) {
-				double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
-				plant.takeDamage(damageTaken);
+				if(!plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
+					double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
+					plant.takeDamage(damageTaken);
+				}
+				
 			}
 			
 		}	
@@ -190,7 +193,7 @@ public class Game {
 	public void flipTable() {
 		for(int x = 0; x < heightMap.length; x++) {
 			for(int y = 0; y < heightMap[0].length; y++) {
-				heightMap[x][y] = 1 - heightMap[x][y];
+				heightMap[x][y] = Math.max(Math.min(1-heightMap[x][y], 1), 0);
 			}
 		}
 		createTerrainImage();
@@ -325,7 +328,23 @@ public class Game {
 					minimapImage.setRGB(i, j, newColor.getRGB());
 					newColor = Utils.blendColors(world[i][j].liquidType.getColor(), new Color(terrainImage.getRGB(i, j)), alpha);
 					terrainImage.setRGB(i, j, newColor.getRGB());
+//				if(world[i][j].liquidType == LiquidType.WATER) {
+//					minimapImage.setRGB(i, j, Color.red.getRGB());
+//					terrainImage.setRGB(i, j, Color.red.getRGB());
+//				}
+					
+					
 				}
+				
+//				else if(world[i][j].liquidAmount < 0){
+//					minimapImage.setRGB(i, j, Color.red.getRGB());
+//					terrainImage.setRGB(i, j, Color.red.getRGB());
+//				}
+//				else {
+//					minimapImage.setRGB(i, j, Color.green.getRGB());
+//					terrainImage.setRGB(i, j, Color.green.getRGB());
+//				}
+				
 			}
 		}
 		minimapGraphics.dispose();
