@@ -3,17 +3,22 @@ package liquid;
 import java.awt.*;
 
 public enum LiquidType {
-	WATER(0.3, Color.blue, 0.01),
-	LAVA(0.05, Color.orange, 0.01);
+	WATER(0.2, Color.blue, 0.015, 100),
+	LAVA(0.05, Color.orange, 0.01, 1000);
 	
 	double viscosity;
 	Color color;
 	double surfaceTension;
+	double damage;
 
-	LiquidType(double viscosity, Color color, double surfaceTension) {
+	LiquidType(double viscosity, Color color, double surfaceTension, double damage) {
 		this.viscosity = viscosity;
 		this.color = color;
 		this.surfaceTension = surfaceTension;
+		this.damage = damage;
+	}
+	public double getDamage() {
+		return damage;
 	}
 	
 	public Color getColor() {

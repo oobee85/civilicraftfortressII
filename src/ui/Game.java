@@ -65,7 +65,7 @@ public class Game {
 		
 		if(ticks%10 == 0) {
 			updateTerritory();
-			updatePlants();
+			updatePlantDamage();
 		}
 //		if(Math.random() < 0.01) {
 //			for(int x = 0; x < world.length; x++) {
@@ -97,14 +97,22 @@ public class Game {
 			createTerrainImage();
 		}
 	}
-	public void updatePlants() {
+	public void updatePlantDamage() {
+		
 		for(int i = 0; i < plantsLand.size(); i ++) {
 			Position p = plantsLand.get(i).getPos();
 			if(world[p.getIntX()][p.getIntY()].liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD) {
-				world[p.getIntX()][p.getIntY()].setHasPlant(null);
-				plantsLand.remove(i);
+				double damageTaken = world[p.getIntX()][p.getIntY()].liquidAmount * world[p.getIntX()][p.getIntY()].liquidType.getDamage();
+				world[p.getIntX()][p.getIntY()].getPlant().takeDamage(damageTaken);
+//				System.out.println(damageTaken);
+				if(world[p.getIntX()][p.getIntY()].getPlant().isDead() == true) {
+					world[p.getIntX()][p.getIntY()].setHasPlant(null);
+					plantsLand.remove(i);
+				}
+				
 			}
 		}
+		
 		
 	}
 	
