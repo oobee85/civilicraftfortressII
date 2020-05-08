@@ -1,53 +1,46 @@
 package game;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 
-import javax.swing.*;
+import java.awt.Image;
 
-import utils.*;
+import javax.swing.ImageIcon;
 
-public enum Structure {
+import utils.Position;
+
+public class Structure {
+
+	private StructureType structureType;
+	private Position position;
+	private int health;
+	private int culture;
 	
-	CASTLE (500, "resources/Images/buildings/castle256.png", 80, 5),
-	BARRACKS (100, "resources/Images/buildings/barracks256.png", 0, 1)
-	;
+	public Structure(StructureType structureType, Position pos) {
+		this.structureType = structureType;
+		this.position = position;
+		this.health = structureType.getHealth();
+	}
 	
-    private final int health;   
-	private MipMap mipmap;
-    private int culture;
-    private int cultureRate;
-    
-    Structure(int hp, String s, int c, int cr) {
-        this.health = hp;
-        this.culture = c;
-        this.cultureRate = cr;
-        this.mipmap = new MipMap(s);
-        
-    }
-    
-    public Image getImage() {
-    	return mipmap.getImage(0);
-    }
-    public ImageIcon getImageIcon() {
-    	return mipmap.getImageIcon(0);
-    }
-    
-    public int getHealth() {
-    	return health; 
-    }
-    public int getCulture() {
-    	return culture; 
-    }
-    public int getCultureRate() {
-    	return cultureRate;
-    }
-    public void updateCulture() {
-    	culture += cultureRate;
-//    	System.out.println("culture: "+culture);
-//    	System.out.println("cultureRate: "+cultureRate);
-    }
-    
+	
+	 public void updateCulture() {
+	    	culture += structureType.cultureRate;
+//	    	System.out.println("culture: "+culture);
+//	    	System.out.println("cultureRate: "+cultureRate);
+	    }
+	 public int getCulture() {
+		 return culture; 
+	 }
+	 public Image getImage(int size) {
+		return structureType.getImage(size);
+	}
+
+	public ImageIcon getImageIcon() {
+		return structureType.getImageIcon(0);
+	}
+	public StructureType getStructureType() {
+		return structureType;
+	}
+
+	public int getHealth() {
+		return health;
+	}
+
 }
-
-
-

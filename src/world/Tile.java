@@ -36,7 +36,7 @@ public class Tile {
 	private Plant plant;
 	private Terrain terr;
 	private Structure structure;
-	private BuildingType building;
+	private Building building;
 	private Unit unit;
 	
 	
@@ -51,7 +51,7 @@ public class Tile {
 		liquidType = LiquidType.WATER;
 		liquidAmount = 0;
 	}
-	public void setHasBuilding(BuildingType b) {
+	public void setHasBuilding(Building b) {
 		this.hasBuilding = true;
 		building = b;
 	}
@@ -89,7 +89,7 @@ public class Tile {
 		forestType = t;
 	}
 	
-	public void setBuilding(BuildingType b) {
+	public void setBuilding(Building b) {
 		if(this.building == b) {
 			this.building = null;
 			hasBuilding = false;
@@ -226,17 +226,17 @@ public class Tile {
 	private void drawBuilding(Graphics g, BuildMode bm) {
 		if(hasBuilding == true) {
 			Utils.setTransparency(g, 1);
-			g.drawImage(building.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(building.getImage(0),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		
 		if(bm == BuildMode.WALL && isHighlight == true) {
-			g.drawImage(BuildingType.WALL_BRICK.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(BuildingType.WALL_BRICK.getImage(0),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		if(bm == BuildMode.MINE && isHighlight == true) {
-			g.drawImage(BuildingType.MINE.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(BuildingType.MINE.getImage(0),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		if(bm == BuildMode.IRRIGATE && isHighlight == true) {
-			g.drawImage(BuildingType.IRRIGATION.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(BuildingType.IRRIGATION.getImage(0),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 	}
 	private void drawStructure(Graphics g, BuildMode bm) {
@@ -246,13 +246,13 @@ public class Tile {
 		}
 		if(hasStructure == true) {
 			Utils.setTransparency(g, 1);
-			g.drawImage(structure.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(structure.getImage(0),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}else if (structure != null) {
-			g.drawImage(structure.getImage(), p.getIntX() * Game.tileSize - extra / 1,p.getIntY() * Game.tileSize - extra / 1, Game.tileSize + extra, Game.tileSize + extra, null);
+			g.drawImage(structure.getImage(0), p.getIntX() * Game.tileSize - extra / 1,p.getIntY() * Game.tileSize - extra / 1, Game.tileSize + extra, Game.tileSize + extra, null);
 		}
 		
 		if(bm == BuildMode.BARRACKS && isHighlight == true) {
-			g.drawImage(Structure.BARRACKS.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(StructureType.BARRACKS.getImage(0),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		
 	}
@@ -310,8 +310,8 @@ public class Tile {
 		return isTerritory;
 	}
 	
-	public boolean isStructure(Structure s) {
-		if(structure == s) {
+	public boolean isStructure(StructureType s) {
+		if(structure.getStructureType() == s) {
 			return true;
 		}
 		return false;

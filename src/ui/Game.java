@@ -601,7 +601,8 @@ public class Game {
 	private void makeCastle(Position start, Position end) {
 		double castleDistance = getRandomNormal(5);
 		Position halfway = start.multiply(castleDistance).add(end.multiply(1-castleDistance));
-		world[halfway.getIntX()][halfway.getIntY()].setStructure(Structure.CASTLE);
+		Structure struct = new Structure(StructureType.CASTLE, halfway);
+		world[halfway.getIntX()][halfway.getIntY()].setStructure(struct);
 		structureLoc.add(halfway);
 		
 	}
@@ -826,26 +827,30 @@ public class Game {
 			
 		if(currentMode == BuildMode.BARRACKS) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
-				world[tile.getIntX()][tile.getIntY()].setStructure(Structure.BARRACKS);
+				Structure struct = new Structure(StructureType.BARRACKS, tile);
+				world[tile.getIntX()][tile.getIntY()].setStructure(struct);
 				structureLoc.add(tile);
 			}
 		} 
 		
 		if(currentMode == BuildMode.WALL) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
-				world[tile.getIntX()][tile.getIntY()].setBuilding(BuildingType.WALL_BRICK);
+				Building building = new Building(BuildingType.WALL_BRICK, tile);
+				world[tile.getIntX()][tile.getIntY()].setBuilding(building);
 			}
 		}
 		
 		if(currentMode == BuildMode.MINE) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true || world[tile.getIntX()][tile.getIntY()].getHasOre() == true) {
-				world[tile.getIntX()][tile.getIntY()].setBuilding(BuildingType.MINE);
+				Building building = new Building(BuildingType.MINE, tile);
+				world[tile.getIntX()][tile.getIntY()].setBuilding(building);
 			}
 		}
 		
 		if(currentMode == BuildMode.IRRIGATE) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true && world[tile.getIntX()][tile.getIntY()].canPlant() == true) {
-				world[tile.getIntX()][tile.getIntY()].setBuilding(BuildingType.IRRIGATION);
+				Building building = new Building(BuildingType.IRRIGATION, tile);
+				world[tile.getIntX()][tile.getIntY()].setBuilding(building);
 			}
 		}
 		
@@ -861,7 +866,7 @@ public class Game {
 	
 	public void doubleClick(int mx, int my) {
 		Position tile = getTileAtPixel(new Position(mx, my));
-		if(world[tile.getIntX()][tile.getIntY()].isStructure(Structure.CASTLE) == true ) {
+		if(world[tile.getIntX()][tile.getIntY()].isStructure(StructureType.CASTLE) == true ) {
 			exitCity();
 		}
 		

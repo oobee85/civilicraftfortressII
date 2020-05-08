@@ -196,27 +196,27 @@ public class Frame extends JPanel{
 		makeRoad.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.ROAD);
 		});
-		JButton makeWall = new JButton("Make Wall", Utils.resizeImageIcon(BuildingType.WALL_BRICK.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton makeWall = new JButton("Make Wall", Utils.resizeImageIcon(BuildingType.WALL_BRICK.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		makeWall.setMargin(zeroMargin);
 		makeWall.setPreferredSize(BUILDING_BUTTON_SIZE);
 		makeWall.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.WALL);
 		});
 		
-		JButton buildMine = new JButton("Build Mine", Utils.resizeImageIcon(BuildingType.MINE.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildMine = new JButton("Build Mine", Utils.resizeImageIcon(BuildingType.MINE.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildMine.setMargin(zeroMargin);
 		buildMine.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildMine.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.MINE);
 		});
 		
-		JButton buildBarracks = new JButton("Build Barracks", Utils.resizeImageIcon(Structure.BARRACKS.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildBarracks = new JButton("Build Barracks", Utils.resizeImageIcon(StructureType.BARRACKS.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildBarracks.setMargin(zeroMargin);
 		buildBarracks.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildBarracks.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.BARRACKS);
 		});
-		JButton buildIrrigation = new JButton("Irrigate", Utils.resizeImageIcon(BuildingType.IRRIGATION.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildIrrigation = new JButton("Irrigate", Utils.resizeImageIcon(BuildingType.IRRIGATION.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildIrrigation.setMargin(zeroMargin);
 		buildIrrigation.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildIrrigation.addActionListener(e -> {
