@@ -24,6 +24,8 @@ public class Game {
 	ArrayList<Unit> selectUnits = new ArrayList<Unit>();
 	LinkedList<Plant> plantsLand = new LinkedList<Plant>();
 	ArrayList<Plant> plantsWater = new ArrayList<Plant>();
+	LinkedList<Building> buildings = new LinkedList<Building>();
+	LinkedList<Structure> structures = new LinkedList<Structure>();
 	
 	public static int tileSize = 10;
 	public boolean selectedUnit = false;
@@ -139,6 +141,33 @@ public class Game {
 		}
 		plantsLand = plantsLandNew;
 		
+		
+	}
+
+	public void buildingDamage() {
+		LinkedList<Building> buildingsNew = new LinkedList<Building>();
+
+		for (Building building : buildingsNew) {
+
+			Tile tile = building.getTile();
+
+			if (tile.liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD) {
+				double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
+				building.takeDamage(damageTaken);
+
+			}
+		}	
+		
+		for (Building building : buildings) {
+
+			Tile tile = building.getTile();
+			if (building.isDead() == true) {
+				tile.setBuilding(null);
+			} else {
+				buildingsNew.add(building);
+			}
+		}
+		buildings = buildingsNew;
 		
 	}
 	
@@ -635,10 +664,11 @@ public class Game {
 		double castleDistance = getRandomNormal(5);
 		Position halfway = start.multiply(castleDistance).add(end.multiply(1-castleDistance));
 		Tile tile = world[halfway.getIntX()][halfway.getIntY()];
-		Structure struct = new Structure(StructureType.CASTLE, halfway);
+//		Structure struct = new Structure(StructureType.CASTLE, halfway);
 		if(tile.canBuild() == true) {
-			world[halfway.getIntX()][halfway.getIntY()].setStructure(struct);
-			structureLoc.add(halfway);
+			buildStructure(StructureType.CASTLE, tile);
+//			world[halfway.getIntX()][halfway.getIntY()].setStructure(struct);
+//			structureLoc.add(halfway);
 		}else {
 			makeCastle(start, end);
 		}
@@ -790,9 +820,8 @@ public class Game {
 		
 	}
 	private void updateTerritory() {
-		for (int i = 0; i < structureLoc.size(); i++) {
-//			System.out.println("structureloc" +i);
-			world[structureLoc.get(i).getIntX()][structureLoc.get(i).getIntY()].getStructure().updateCulture();
+		for(Structure structure : structures) {
+			structure.updateCulture();
 		}
 	}
 	private void setTerritory(Position p) {
@@ -889,47 +918,52 @@ public class Game {
 		
 	}
 	public void mouseClick(int mx, int my) {
-		Position tile = getTileAtPixel(new Position(mx, my));
+		Position pos = getTileAtPixel(new Position(mx, my));
 		System.out.println(currentMode);
-		
+		Tile tile = world[pos.getIntX()][pos.getIntY()];
 		
 		
 		if(currentMode == BuildMode.ROAD) {
-			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
-				world[tile.getIntX()][tile.getIntY()].setRoad(true, null);
+			if(tile.canBuild() == true) {
+				tile.setRoad(true, null);
 			}
 		}
 			
 		if(currentMode == BuildMode.BARRACKS) {
-			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
-				Structure struct = new Structure(StructureType.BARRACKS, tile);
-				world[tile.getIntX()][tile.getIntY()].setStructure(struct);
-				structureLoc.add(tile);
+			if(tile.canBuild() == true) {
+				buildStructure(StructureType.BARRACKS, tile);
 			}
 		} 
 		
 		if(currentMode == BuildMode.WALL) {
-			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
-				Building building = new Building(BuildingType.WALL_BRICK, tile);
-				world[tile.getIntX()][tile.getIntY()].setBuilding(building);
+			if(tile.canBuild() == true) {
+				buildBuilding(BuildingType.WALL_BRICK, tile);
 			}
 		}
 		
 		if(currentMode == BuildMode.MINE) {
-			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true || world[tile.getIntX()][tile.getIntY()].getHasOre() == true) {
-				Building building = new Building(BuildingType.MINE, tile);
-				world[tile.getIntX()][tile.getIntY()].setBuilding(building);
+			if(tile.canBuild() == true || tile.getHasOre() == true) {
+				buildBuilding(BuildingType.MINE, tile);
 			}
 		}
 		
 		if(currentMode == BuildMode.IRRIGATE) {
-			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true && world[tile.getIntX()][tile.getIntY()].canPlant() == true) {
-				Building building = new Building(BuildingType.IRRIGATION, tile);
-				world[tile.getIntX()][tile.getIntY()].setBuilding(building);
+			if(tile.canBuild() == true && tile.canPlant() == true) {
+				buildBuilding(BuildingType.IRRIGATION, tile);
 			}
 		}
 		
 		
+	}
+	private void buildBuilding(BuildingType bt, Tile t) {
+		Building building = new Building(bt, t);
+		t.setBuilding(building);
+		buildings.add(building);
+	}
+	private void buildStructure(StructureType st, Tile t) {
+		Structure structure = new Structure(st, t);
+		t.setStructure(structure);
+		structures.add(structure);
 	}
 	public void buildUnit(UnitType u) {
 		Point po = new Point(structureLoc.get(0).getIntX(), structureLoc.get(0).getIntY());

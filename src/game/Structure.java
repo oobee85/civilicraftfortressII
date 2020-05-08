@@ -5,17 +5,18 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 
 import utils.Position;
+import world.Tile;
 
 public class Structure {
 
 	private StructureType structureType;
-	private Position position;
+	private Tile tile;
 	private int health;
 	private int culture;
 	
-	public Structure(StructureType structureType, Position pos) {
+	public Structure(StructureType structureType, Tile tile) {
 		this.structureType = structureType;
-		this.position = position;
+		this.tile = tile;
 		this.health = structureType.getHealth();
 	}
 	
@@ -38,7 +39,10 @@ public class Structure {
 	public StructureType getStructureType() {
 		return structureType;
 	}
-
+	
+	public Tile getTile() {
+		return tile;
+	}
 	public int getHealth() {
 		return health;
 	}

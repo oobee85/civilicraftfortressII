@@ -5,16 +5,17 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 
 import utils.Position;
+import world.Tile;
 
 public class Building {
 	
 	private BuildingType buildingType;
-	private Position position;
+	private Tile tile;
 	private int health;
 	
-	public Building(BuildingType buildingType, Position pos) {
+	public Building(BuildingType buildingType, Tile tile) {
 		this.buildingType = buildingType;
-		this.position = pos;
+		this.tile = tile;
 		health = buildingType.getHealth();
 	}
 	
@@ -27,8 +28,8 @@ public class Building {
 	public boolean isDead() {
 		return health < 0;
 	}
-	public Position getPos() {
-		return position;
+	public Tile getTile() {
+		return tile;
 	}
 	public Image getImage(int size) {
 		return buildingType.getImage(size);
