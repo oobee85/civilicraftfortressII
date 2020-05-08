@@ -39,7 +39,7 @@ public enum BuildingType {
 	    	return null;
 	    }
 	    
-	    private int getHealth() {
+	    public int getHealth() {
 	    	return health; 
 	    }
 

@@ -16,7 +16,7 @@ public class Wildlife {
 	public static void generateWildLife(Tile[][] world) {
 		for(int x = 0; x < world.length; x++) {
 			for(int y = 0; y < world[0].length; y++) {
-				if(world[x][y].checkTerrain(Terrain.GRASS) && Math.random() < 0.01) {
+				if(world[x][y].checkTerrain(Terrain.GRASS) && Math.random() < 0.1) {
 					Animal animal = new Animal();
 					animal.setTile(world[x][y]);
 					animals.add(animal);
@@ -47,7 +47,9 @@ public class Wildlife {
 				dead.add(animal);
 				continue;
 			}
-			animal.getTile().setHasPlant(null);
+			if(animal.getTile().getPlant() != null) {
+				animal.getTile().getPlant().takeDamage(1);
+			}
 			if(animal.getTile().checkTerrain(Terrain.GRASS)) {
 				animal.getTile().setTerrain(Terrain.DIRT);
 			}

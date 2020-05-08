@@ -106,16 +106,17 @@ public class Game {
 		
 		for(int i = 0; i < plantsLand.size(); i ++) {
 			Position p = plantsLand.get(i).getPos();
+			
 			if(world[p.getIntX()][p.getIntY()].liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD) {
 				double damageTaken = world[p.getIntX()][p.getIntY()].liquidAmount * world[p.getIntX()][p.getIntY()].liquidType.getDamage();
 				world[p.getIntX()][p.getIntY()].getPlant().takeDamage(damageTaken);
-//				System.out.println(damageTaken);
-				if(world[p.getIntX()][p.getIntY()].getPlant().isDead() == true) {
-					world[p.getIntX()][p.getIntY()].setHasPlant(null);
-					plantsLand.remove(i);
-				}
-				
 			}
+			
+			if(world[p.getIntX()][p.getIntY()].getPlant().isDead() == true) {
+				world[p.getIntX()][p.getIntY()].setHasPlant(null);
+				plantsLand.remove(i);
+			}
+			
 		}
 		
 		
@@ -693,7 +694,7 @@ public class Game {
 				}
 			}
 			for(Animal animal : Wildlife.getAnimals()) {
-				g.drawImage(UnitType.SPEARMAN.getImage(), animal.getTile().getLocation().getIntX() * Game.tileSize, animal.getTile().getLocation().getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				g.drawImage(UnitType.DEER.getImage(), animal.getTile().getLocation().getIntX() * Game.tileSize, animal.getTile().getLocation().getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 			}
 		}
 		
