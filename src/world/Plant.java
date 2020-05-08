@@ -36,6 +36,8 @@ public class Plant {
 	public Image getImage(int size) {
 		return plantType.getImage(size);
 	}
-	
+	public boolean isAquatic() {
+		return plantType.isAquatic();
+	}
 	
 }
