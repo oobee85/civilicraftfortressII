@@ -769,6 +769,16 @@ public class Game {
 						g.drawString(String.format("HP=%." + numDigits + "f", animal.getHealth()), x, y + (row++)*fontsize);
 						g.drawString(String.format("EN=%." + numDigits + "f", animal.getEnergy()), x, y + (row++)*fontsize);
 					}
+					for(Plant plant : plantsLand) {
+						Tile tile = plant.getTile();
+						int x = tile.getLocation().getIntX() * Game.tileSize + 2;
+						int y = tile.getLocation().getIntY() * Game.tileSize + fontsize/2 + 2 * fontsize;
+						int row = 1;
+						g.setColor(Color.black);
+						g.fillRect(x, y + 2, stringWidth, 1*fontsize);
+						g.setColor(Color.green);
+						g.drawString(String.format("HP=%." + numDigits + "f", plant.getHealth()), x, y + (row++)*fontsize);
+					}
 				}
 			}
 		}

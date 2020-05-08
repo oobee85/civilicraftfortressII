@@ -279,7 +279,7 @@ public class Frame extends JPanel{
 		buildIrrigation.setFocusable(false);
 		exitCity.setFocusable(false);
 		showHeightMap.setFocusable(false);
-
+		
 		
 		JButton flipTable = new JButton("Flip Table");
 		flipTable.addActionListener(new ActionListener() {
@@ -333,7 +333,9 @@ public class Frame extends JPanel{
 		gui.add(debug);
 		gui.add(exit);
 		
-
+		makeItRain.setFocusable(false);
+		flipTable.setFocusable(false);
+		
 		JPanel guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());
 		guiSplitter.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));

@@ -17,10 +17,10 @@ public enum PlantType {
 	
     private double rarity;
     private MipMap mipmap;
-    private int health;
+    private double health;
     private boolean aquatic;
     
-	PlantType( String[] s, double rare, int health, boolean aquatic){
+	PlantType( String[] s, double rare, double health, boolean aquatic){
 		rarity = rare;
 		this.health = health;
 		this.aquatic = aquatic;
@@ -31,7 +31,7 @@ public enum PlantType {
 	public Image getImage(int size) {
 		return mipmap.getImage(size);
     }
-	public int getHealth() {
+	public double getHealth() {
 		return health;
 	}
 	public double getRarity() {

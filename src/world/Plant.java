@@ -9,7 +9,7 @@ public class Plant {
 	private Tile tile;
 	private PlantType plantType;
 	private int currentYield;
-	private int health;
+	private double health;
 	
 	public Plant(PlantType pt, Tile t) {
 		tile = t;
@@ -24,7 +24,7 @@ public class Plant {
 		return health < 0;
 	}
 	
-	public int getHealth() {
+	public double getHealth() {
 		return health;
 	}
 	public Tile getTile() {
