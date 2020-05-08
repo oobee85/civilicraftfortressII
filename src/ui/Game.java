@@ -47,6 +47,8 @@ public class Game {
 	private int fastModeTileSize = 10;
 	
 	private GUIController guiController;
+	
+	public static boolean DEBUG_DRAW = false;
 
 	public Game(GUIController guiController) {
 		this.guiController = guiController;
@@ -724,10 +726,50 @@ public class Game {
 					else {
 						t.draw(g, currentMode);
 					}
+					
 				}
 			}
 			for(Animal animal : Wildlife.getAnimals()) {
 				g.drawImage(animal.getType().getImage(), animal.getTile().getLocation().getIntX() * Game.tileSize, animal.getTile().getLocation().getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			}
+			if(DEBUG_DRAW) {
+				if(Game.tileSize >= 36) {
+					int numDigits = 2;
+					int fontsize = Game.tileSize/4;
+					fontsize = Math.min(fontsize, 13);
+					Font font = new Font("Consolas", Font.PLAIN, fontsize);
+					g.setFont(font);
+					int stringWidth = g.getFontMetrics().stringWidth(String.format("??=%." + numDigits + "f", 0.0));
+					for (int i = lowerX; i < upperX; i++) {
+						for (int j = lowerY; j < upperY; j++) {
+							Tile tile = world[i][j];
+
+							int x = i * Game.tileSize + 2;
+							int y = j * Game.tileSize + fontsize/2;
+							int row = 1;
+							
+							g.setColor(Color.black);
+							g.fillRect(x, y + 2, stringWidth, 2*fontsize);
+							g.setColor(Color.green);
+							
+							g.drawString(String.format("L=%." + numDigits + "f", tile.liquidAmount), x, y + (row++)*fontsize);
+							g.drawString(String.format("H=%." + numDigits + "f", heightMap[i][j]), x, y + (row++)*fontsize);
+						}
+					}
+					for(Animal animal : Wildlife.getAnimals()) {
+						Tile tile = animal.getTile();
+						int x = tile.getLocation().getIntX() * Game.tileSize + 2;
+						int y = tile.getLocation().getIntY() * Game.tileSize + fontsize/2 + 2 * fontsize;
+						int row = 1;
+						
+						g.setColor(Color.black);
+						g.fillRect(x, y + 2, stringWidth, 2*fontsize);
+						g.setColor(Color.green);
+						
+						g.drawString(String.format("HP=%." + numDigits + "f", animal.getHealth()), x, y + (row++)*fontsize);
+						g.drawString(String.format("EN=%." + numDigits + "f", animal.getEnergy()), x, y + (row++)*fontsize);
+					}
+				}
 			}
 		}
 		
