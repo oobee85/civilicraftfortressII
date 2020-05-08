@@ -108,7 +108,7 @@ public final class Utils {
 	public static float getAlphaOfLiquid(double amount) {
 		// 1 units of fluid is opaque, linearly becoming transparent at 0 units of fluid.
 		float alpha = (float)Math.max(Math.min(amount*8, 1), 0);
-		return alpha;
+		return alpha * alpha;
 		//return 1 - (1 - alpha) * (1 - alpha);
 	}
 	

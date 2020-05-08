@@ -21,6 +21,8 @@ public class Game {
 	private BufferedImage heightMapImage;
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
 	ArrayList<Unit> selectUnits = new ArrayList<Unit>();
+	ArrayList<Plant> plantsLand = new ArrayList<Plant>();
+	ArrayList<Plant> plantsWater = new ArrayList<Plant>();
 	
 	public static int tileSize = 10;
 	public boolean selectedUnit = false;
@@ -63,6 +65,7 @@ public class Game {
 		
 		if(ticks%10 == 0) {
 			updateTerritory();
+			updatePlants();
 		}
 //		if(Math.random() < 0.01) {
 //			for(int x = 0; x < world.length; x++) {
@@ -93,6 +96,12 @@ public class Game {
 		if(changedTerrain) {
 			createTerrainImage();
 		}
+	}
+	public void updatePlants() {
+		for(int i = 0; i < plantsLand.size(); i ++) {
+//			if()
+		}
+		
 	}
 	
 	public void setViewSize(int width, int height) {
@@ -305,23 +314,28 @@ public class Game {
 	
 	private void genPlants() {
 		
-		
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world.length; j++) {
 				
 				//generates land plants
 				if(world[i][j].checkTerrain(Terrain.GRASS) && world[i][j].getHasRoad()==false && Math.random() < bushRarity) {
 					double o = Math.random();
-					if(o < Plant.BERRY.getRarity()) {
-						world[i][j].setHasPlant(Plant.BERRY);
+					if(o < PlantType.BERRY.getRarity()) {
+						Position po = new Position((int)i ,(int)j);
+						Plant p = new Plant(PlantType.BERRY, po );
+						world[i][j].setHasPlant(p);
+						plantsLand.add(world[i][j].getPlant());
 					}
 					
 				}
 				//generates water plants
 				if(world[i][j].checkTerrain(Terrain.WATER) && Math.random() < waterPlantRarity) {
 					double o = Math.random();
-					if(o < Plant.CATTAIL.getRarity()) {
-						world[i][j].setHasPlant(Plant.CATTAIL);
+					if(o < PlantType.CATTAIL.getRarity()) {
+						Position po = new Position((int)i ,(int)j);
+						Plant p = new Plant(PlantType.CATTAIL, po );
+						world[i][j].setHasPlant(p);
+						plantsWater.add(world[i][j].getPlant());
 					}
 					
 				}
@@ -667,6 +681,10 @@ public class Game {
 //			System.out.println("structureloc" +i);
 			world[structureLoc.get(i).getIntX()][structureLoc.get(i).getIntY()].getStructure().updateCulture();
 		}
+	}
+	private void updatePlant() {
+		
+		
 	}
 	private void setTerritory(Position p) {
 		int c = world[p.getIntX()][p.getIntY()].getStructure().getCulture();
