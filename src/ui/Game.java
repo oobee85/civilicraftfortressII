@@ -534,9 +534,8 @@ public class Game {
 				double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
 				double forestEdge = (dx*dx)/(forestLengthEdge*forestLengthEdge) + (dy*dy)/(forestHeightEdge*forestHeightEdge);
 				
-					if(world[i][j].canPlant()==true && world[i][j].getHasRoad() == false) {
-						
-						
+				Tile tile = world[i][j];
+					if(tile.canPlant()==true && tile.getHasRoad() == false) {
 						
 						
 						if((forestEdge < 1 && Math.random()<forestDensity-0.2) 
@@ -635,9 +634,15 @@ public class Game {
 	private void makeCastle(Position start, Position end) {
 		double castleDistance = getRandomNormal(5);
 		Position halfway = start.multiply(castleDistance).add(end.multiply(1-castleDistance));
+		Tile tile = world[halfway.getIntX()][halfway.getIntY()];
 		Structure struct = new Structure(StructureType.CASTLE, halfway);
-		world[halfway.getIntX()][halfway.getIntY()].setStructure(struct);
-		structureLoc.add(halfway);
+		if(tile.canBuild() == true) {
+			world[halfway.getIntX()][halfway.getIntY()].setStructure(struct);
+			structureLoc.add(halfway);
+		}else {
+			makeCastle(start, end);
+		}
+		
 		
 	}
 	
@@ -650,11 +655,11 @@ public class Game {
 			// makes turns bot left -> top right
 			if(world[current.getIntX()-1][current.getIntY()].canBuild()==true) {
 				if (current.getIntX() - 1 == prev.getIntX() && current.getIntY() == prev.getIntY()) {
-					world[current.getIntX()-1][current.getIntY()].setHasRoad(true, "left_down");
-					world[current.getIntX()][current.getIntY()].setHasRoad(true, "right_up");
+					world[current.getIntX()-1][current.getIntY()].setRoad(true, "left_down");
+					world[current.getIntX()][current.getIntY()].setRoad(true, "right_up");
 				} else if (current.getIntX() - 1 == prev.getIntX() && current.getIntY() + 1 == prev.getIntY()) {
-					world[current.getIntX()-1][current.getIntY()].setHasRoad(true, "left_down");
-					world[current.getIntX()][current.getIntY()].setHasRoad(true, "right_up");
+					world[current.getIntX()-1][current.getIntY()].setRoad(true, "left_down");
+					world[current.getIntX()][current.getIntY()].setRoad(true, "right_up");
 				}	
 			}
 			
@@ -662,17 +667,17 @@ public class Game {
 			// makes turns bot right -> top left
 			if(world[current.getIntX()+1][current.getIntY()].canBuild()==true) {
 				if (current.getIntX() + 1 == prev.getIntX() && current.getIntY() == prev.getIntY()) {
-					world[current.getIntX() + 1][current.getIntY()].setHasRoad(true, "right_down");
-					world[current.getIntX()][current.getIntY()].setHasRoad(true, "left_up");
+					world[current.getIntX() + 1][current.getIntY()].setRoad(true, "right_down");
+					world[current.getIntX()][current.getIntY()].setRoad(true, "left_up");
 				} else if (current.getIntX() + 1 == prev.getIntX() && current.getIntY() + 1 == prev.getIntY()) {
-					world[current.getIntX() + 1][current.getIntY()].setHasRoad(true, "right_down");
-					world[current.getIntX()][current.getIntY()].setHasRoad(true, "left_up");
+					world[current.getIntX() + 1][current.getIntY()].setRoad(true, "right_down");
+					world[current.getIntX()][current.getIntY()].setRoad(true, "left_up");
 				}
 			}
 			
 
 			if (world[current.getIntX()][current.getIntY()].getHasRoad() == false) {
-				world[current.getIntX()][current.getIntY()].setHasRoad(true, "top_down");
+				world[current.getIntX()][current.getIntY()].setRoad(true, "top_down");
 			}
 			
 			
@@ -790,10 +795,6 @@ public class Game {
 			world[structureLoc.get(i).getIntX()][structureLoc.get(i).getIntY()].getStructure().updateCulture();
 		}
 	}
-	private void updatePlant() {
-		
-		
-	}
 	private void setTerritory(Position p) {
 		int c = world[p.getIntX()][p.getIntY()].getStructure().getCulture();
 		int x = 0;
@@ -905,7 +906,7 @@ public class Game {
 		
 		if(currentMode == BuildMode.ROAD) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
-				world[tile.getIntX()][tile.getIntY()].buildRoad(true);
+				world[tile.getIntX()][tile.getIntY()].setRoad(true, null);
 			}
 		}
 			

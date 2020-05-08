@@ -18,10 +18,10 @@ import utils.*;
 public class Tile {
 	private boolean hasRoad;
 	private boolean isHighlight;
-	private boolean hasOre;
-	private boolean hasBuilding;
-	private boolean hasStructure;
-	private boolean hasUnit;
+//	private boolean hasOre;
+//	private boolean hasBuilding;
+//	private boolean hasStructure;
+//	private boolean hasUnit;
 	private boolean isTerritory = false;
 	private boolean isSelected = false;
 	
@@ -50,27 +50,26 @@ public class Tile {
 		liquidType = LiquidType.WATER;
 		liquidAmount = 0;
 	}
-	public void setHasBuilding(Building b) {
-		this.hasBuilding = true;
-		building = b;
-	}
-	public void buildRoad(boolean b) {
-		if(hasRoad == b) {
-			this.hasRoad = false;
-		}else {
-			this.hasRoad = b;
-		}
-	}
+//	public void buildRoad(boolean b) {
+//		if(hasRoad == b) {
+//			this.hasRoad = false;
+//		}else {
+//			this.hasRoad = b;
+//		}
+//	}
 
-	public void setHasRoad(boolean b, String s) {
+	
+	public void setRoad(boolean b, String s) {
 		this.hasRoad = b;
-		roadCorner = s;
+		if(s != null) {
+			roadCorner = s;
+		}
+		
 	}
 	public void setTerritory(boolean b) {
 		this.isTerritory = b;
 	}
 	public void setHasOre(Ore o) {
-		hasOre = true;
 		ore = o;
 	}
 	public void setHasPlant(Plant p) {
@@ -88,20 +87,16 @@ public class Tile {
 	public void setBuilding(Building b) {
 		if(this.building == b) {
 			this.building = null;
-			hasBuilding = false;
 		}else {
 			this.building = b;
-			hasBuilding = true;
 		}
 	}
 	
 	public void setStructure(Structure s) {
 		if(this.structure == s) {
 			this.structure = null;
-			hasStructure = false;
 		}else {
 			this.structure = s;
-			hasStructure = true;
 		}
 		
 		
@@ -124,7 +119,7 @@ public class Tile {
 	}
 	
 	public void drawEntities(Graphics g, BuildMode bm) {
-		
+	
 		drawTerritory(g);
 		drawPlant(g);
 		drawOre(g);
@@ -151,7 +146,7 @@ public class Tile {
 		
 		if(isHighlight == true && bm != BuildMode.NOMODE) {
 			Utils.setTransparency(g, 0.5f);
-		    if(terr.isBuildable(terr)==false) {
+		    if(canBuild() ==false) {
 		    	//draws red rectangle over image
 		    	Color c = new Color(255, 0, 0, 100); // Red with alpha = 0.5 
 		    	g.setColor(c);
@@ -218,7 +213,7 @@ public class Tile {
 	
 	
 	private void drawBuilding(Graphics g, BuildMode bm) {
-		if(hasBuilding == true) {
+		if(building != null) {
 			Utils.setTransparency(g, 1);
 			g.drawImage(building.getImage(0),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
@@ -238,7 +233,7 @@ public class Tile {
 		if (Game.tileSize < minEntitySize) {
 			extra = minEntitySize - Game.tileSize;
 		}
-		if(hasStructure == true) {
+		if(structure != null) {
 			Utils.setTransparency(g, 1);
 			g.drawImage(structure.getImage(0),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}else if (structure != null) {
@@ -271,16 +266,19 @@ public class Tile {
 	
 
 	public boolean getHasOre() {
-		return hasOre;
+		return ore != null;
 	}
 	public boolean getHasUnit() {
-		return hasUnit;
+		return unit != null;
 	}
 	public boolean getHasRoad() {
 		return hasRoad;
 	}
 	public boolean getHasStructure() {
-		return hasStructure;
+		return structure != null;
+	}
+	public boolean getHasBuilding() {
+		return building != null;
 	}
 	public Ore getOre() {
 		return ore;
@@ -291,8 +289,14 @@ public class Tile {
 	public Structure getStructure() {
 		return structure;
 	}
+	public Building getBuilding() {
+		return building;
+	}
 	public Plant getPlant() {
 		return plant;
+	}
+	public Terrain getTerrain() {
+		return terr;
 	}
 	public boolean getIsSelected() {
 		return isSelected;
@@ -313,9 +317,7 @@ public class Tile {
 	public boolean canPlant() {
 		return terr.isPlantable(terr);
 	}
-	public Terrain getTerrain() {
-		return terr;
-	}
+	
 	public void setTerrain(Terrain t) {
 		terr = t;
 	}
