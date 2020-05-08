@@ -7,21 +7,14 @@ import world.*;
 
 public class Liquid {
 	
-	private static final double MINIMUM_LIQUID_THRESHOLD = 0.00001;
+	public static final double MINIMUM_LIQUID_THRESHOLD = 0.00001;
 	
-	private static final double FRICTION_RATIO = 2;
+	private static final double FRICTION_RATIO = 0.1;
 	
 	private static double[][] liquidAmountsTemp;
 	private static LiquidType[][] liquidTypesTemp;
 
 	
-	private static class Loc {
-		int x, y;
-		public Loc(int x, int y) {
-			this.x = x;
-			this.y = y;
-		}
-	}
 	
 	// idea: create constant arraylist of positions, initialize it once, then every time simply use a random permutation to access all elements randomly.
 	
@@ -32,10 +25,10 @@ public class Liquid {
 		if(liquidTypesTemp == null || liquidTypesTemp.length != world.length || liquidTypesTemp[0].length != world[0].length) {
 			liquidTypesTemp = new LiquidType[world.length][world[0].length];
 		}
-		LinkedList<Loc> tiles = new LinkedList<>();
+		LinkedList<TileLoc> tiles = new LinkedList<>();
 		for(int x = 0; x < world.length; x++) {
 			for(int y = 0; y < world.length; y++) {
-				tiles.add(new Loc(x, y));
+				tiles.add(new TileLoc(x, y));
 			}
 		}
 		
@@ -58,7 +51,7 @@ public class Liquid {
 		
 		Collections.shuffle(tiles); 
 		while(!tiles.isEmpty() ) {
-			Loc pos = tiles.remove();
+			TileLoc pos = tiles.remove();
 			int x = pos.x;
 			int y = pos.y;
 			propogate(x, y, world, heightMap);
@@ -66,7 +59,7 @@ public class Liquid {
 		
 		for(int x = 0; x < world.length; x++) {
 			for(int y = 0; y < world.length; y++) {
-				world[x][y].liquidAmount = Math.max(liquidAmountsTemp[x][y] * 0.999 - 0.0001, 0);
+				world[x][y].liquidAmount = Math.max(liquidAmountsTemp[x][y] * 0.9999 - 0.00001, 0);
 				
 				world[x][y].liquidType = liquidTypesTemp[x][y];
 				if(world[x][y].liquidType == LiquidType.LAVA && world[x][y].liquidAmount > world[x][y].liquidType.surfaceTension*2) {
@@ -87,18 +80,20 @@ public class Liquid {
 		int minY = Math.max(0, y-1);
 		int maxY = Math.min(world[0].length-1, y + 1);
 
-		LinkedList<Loc> tiles = new LinkedList<>();
+		LinkedList<TileLoc> tiles = new LinkedList<>();
 		for(int i = minX; i <= maxX; i++) {
 			for(int j = minY; j <= maxY; j++) {
-				if(i != x || j != y) {
-					tiles.add(new Loc(i, j));
+				if(i == x || j == y) {
+					if(i != x || j != y) {
+						tiles.add(new TileLoc(i, j));
+					}
 				}
 			}
 		}
 		Collections.shuffle(tiles); 
 		
 		while(!tiles.isEmpty()) {
-			Loc other = tiles.remove();
+			TileLoc other = tiles.remove();
 			// Interaction between liquids happens here
 			
 			double myh = heightMap[x][y];
@@ -123,9 +118,9 @@ public class Liquid {
 					}
 					if(myh < oh) {
 						double deltah = oh - myh;
-						double changeh = deltah/2 * change;
-						heightMap[x][y] += changeh * FRICTION_RATIO;
-						heightMap[other.x][other.y] -= changeh * FRICTION_RATIO;
+						double changeh = deltah/2 * Math.min(change* FRICTION_RATIO, 1);
+						heightMap[x][y] += changeh;
+						heightMap[other.x][other.y] -= changeh;
 					}
 					liquidAmountsTemp[x][y] += change;
 					liquidTypesTemp[x][y] = otype;

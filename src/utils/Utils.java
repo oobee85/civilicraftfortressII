@@ -3,10 +3,14 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.*;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import liquid.Liquid.*;
+import world.*;
 
 public final class Utils {
 	
@@ -108,7 +112,7 @@ public final class Utils {
 	public static float getAlphaOfLiquid(double amount) {
 		// 1 units of fluid is opaque, linearly becoming transparent at 0 units of fluid.
 		float alpha = (float)Math.max(Math.min(amount*8, 1), 0);
-		return alpha;
+		return alpha*alpha;
 		//return 1 - (1 - alpha) * (1 - alpha);
 	}
 	
@@ -154,5 +158,27 @@ public final class Utils {
 			}
 		}
 		return smoothed;
+	}
+	
+	public static List<Tile> getNeighbors(Tile tile, Tile[][] world) {
+		int x = tile.getLocation().getIntX();
+		int y = tile.getLocation().getIntY();
+		int minX = Math.max(0, tile.getLocation().getIntX() - 1);
+		int maxX = Math.min(world.length-1, tile.getLocation().getIntX() + 1);
+		int minY = Math.max(0, tile.getLocation().getIntY()-1);
+		int maxY = Math.min(world[0].length-1, tile.getLocation().getIntY() + 1);
+
+		LinkedList<Tile> tiles = new LinkedList<>();
+		for(int i = minX; i <= maxX; i++) {
+			for(int j = minY; j <= maxY; j++) {
+				if(i == x || j == y) {
+					if(i != x || j != y) {
+						tiles.add(world[i][j]);
+					}
+				}
+			}
+		}
+		Collections.shuffle(tiles); 
+		return tiles;
 	}
 }

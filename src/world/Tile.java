@@ -331,5 +331,8 @@ public class Tile {
 		isHighlight = true;
 		
 	}
+	public Position getLocation() {
+		return p;
+	}
 
 }

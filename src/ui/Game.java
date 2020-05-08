@@ -8,6 +8,7 @@ import game.*;
 import liquid.*;
 import ui.*;
 import utils.*;
+import wildlife.*;
 import world.*;
 
 public class Game {
@@ -79,17 +80,21 @@ public class Game {
 		if(Math.random() < 0.005) {
 			for(int x = 0; x < world.length; x++) {
 				for(int y = 0; y < world[0].length; y++) {
-					world[x][y].liquidAmount += 0.005;
+					if(world[x][y].liquidType == LiquidType.WATER) {
+						world[x][y].liquidAmount += 0.005;
+					}
 				}
 			}
 		}
 		if(ticks%1 == 0) {
-			world[mountx][mounty].liquidAmount += 0.004;
+			world[mountx][mounty].liquidAmount += 0.008;
 			world[volcanox][volcanoy].liquidType = LiquidType.LAVA;
 			world[volcanox][volcanoy].liquidAmount += 0.002;
 			Liquid.propogate(world, heightMap);
 			changedTerrain = true;
 		}
+		
+		Wildlife.tick(world);
 		if(changedTerrain) {
 			createTerrainImage();
 		}
@@ -141,6 +146,8 @@ public class Game {
 		genResources();
 		
 		createTerrainImage();
+		
+		Wildlife.generateWildLife(world);
 	}
 	
 	public void flipTable() {
@@ -658,6 +665,9 @@ public class Game {
 						t.draw(g, currentMode);
 					}
 				}
+			}
+			for(Animal animal : Wildlife.getAnimals()) {
+				g.drawImage(UnitType.SPEARMAN.getImage(), animal.getTile().getLocation().getIntX() * Game.tileSize, animal.getTile().getLocation().getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 			}
 		}
 		
