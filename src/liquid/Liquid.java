@@ -7,7 +7,7 @@ import world.*;
 
 public class Liquid {
 	
-	private static final double MINIMUM_LIQUID_THRESHOLD = 0.00001;
+	public static final double MINIMUM_LIQUID_THRESHOLD = 0.00001;
 	
 	private static final double FRICTION_RATIO = 2;
 	

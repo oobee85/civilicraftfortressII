@@ -99,7 +99,11 @@ public class Game {
 	}
 	public void updatePlants() {
 		for(int i = 0; i < plantsLand.size(); i ++) {
-//			if()
+			Position p = plantsLand.get(i).getPos();
+			if(world[p.getIntX()][p.getIntY()].liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD) {
+				world[p.getIntX()][p.getIntY()].setHasPlant(null);
+				plantsLand.remove(i);
+			}
 		}
 		
 	}
