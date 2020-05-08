@@ -8,7 +8,6 @@ public class CombatStats {
 	private int speed;
 	
 	public CombatStats(int health, int attack, int defence, int speed) {
-		super();
 		this.health = health;
 		this.attack = attack;
 		this.defence = defence;
