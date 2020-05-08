@@ -834,10 +834,9 @@ public class Game {
 
 			}
 		}
-
 			
 	}
-
+	
 	public void rightClick(int mx, int my) {
 		Position tile = getTileAtPixel(new Position(mx,my));
 		if(currentMode == BuildMode.NOMODE) {
@@ -846,17 +845,8 @@ public class Game {
 				System.out.println("selected unit");
 			}
 		}
-//		if(selectedUnit == false) {
-//			if(world[p1.getIntX()][p1.getIntY()] != null) {
-//				Unit temp = world[p1.getIntX()][p1.getIntY()].getUnit();
-//				world[p1.getIntX()][p1.getIntY()].setUnit(null);
-//				world[p2.getIntX()][p2.getIntY()].setUnit(temp);
-//			}
-//			
-//		}
 		
 	}
-	
 	
 
 	public static void printPoint(Point p) {
