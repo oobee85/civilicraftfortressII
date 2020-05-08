@@ -3,7 +3,7 @@ package liquid;
 import java.awt.*;
 
 public enum LiquidType {
-	WATER(0.2, Color.blue, 0.015, 100),
+	WATER(0.1, Color.blue, 0.015, 100),
 	LAVA(0.05, Color.orange, 0.01, 1000);
 	
 	double viscosity;
