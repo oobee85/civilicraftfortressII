@@ -9,7 +9,7 @@ import ui.*;
 import utils.*;
 
 
-public enum Building {
+public enum BuildingType {
 	 	WALL_BRICK (100, "resources/Images/buildings/wall_brick.png"),
 	 	WALL_WOOD (50, "resources/Images/buildings/wall_brick.png"),
 	 	MINE (10, "resources/Images/buildings/mine256.png"),
@@ -21,7 +21,7 @@ public enum Building {
 	    private MipMap mipmap;
 	    
 	    
-	    Building(int hp, String s) {
+	    BuildingType(int hp, String s) {
 	        this.health = hp;
 	        mipmap = new MipMap(s);
 	    }
@@ -32,8 +32,8 @@ public enum Building {
 	    public ImageIcon getImageIcon() {
 	    	return mipmap.getImageIcon(0);
 	    }
-	    public BuildMode getToBuildMode(Building b) {
-	    	if(b == Building.WALL_BRICK) {
+	    public BuildMode getToBuildMode(BuildingType b) {
+	    	if(b == BuildingType.WALL_BRICK) {
 	    		return BuildMode.WALL;
 	    	}
 	    	return null;

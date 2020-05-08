@@ -832,19 +832,19 @@ public class Game {
 		
 		if(currentMode == BuildMode.WALL) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true) {
-				world[tile.getIntX()][tile.getIntY()].setBuilding(Building.WALL_BRICK);
+				world[tile.getIntX()][tile.getIntY()].setBuilding(BuildingType.WALL_BRICK);
 			}
 		}
 		
 		if(currentMode == BuildMode.MINE) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true || world[tile.getIntX()][tile.getIntY()].getHasOre() == true) {
-				world[tile.getIntX()][tile.getIntY()].setBuilding(Building.MINE);
+				world[tile.getIntX()][tile.getIntY()].setBuilding(BuildingType.MINE);
 			}
 		}
 		
 		if(currentMode == BuildMode.IRRIGATE) {
 			if(world[tile.getIntX()][tile.getIntY()].canBuild() == true && world[tile.getIntX()][tile.getIntY()].canPlant() == true) {
-				world[tile.getIntX()][tile.getIntY()].setBuilding(Building.IRRIGATION);
+				world[tile.getIntX()][tile.getIntY()].setBuilding(BuildingType.IRRIGATION);
 			}
 		}
 		
