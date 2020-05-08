@@ -63,7 +63,7 @@ public class Liquid {
 				
 				world[x][y].liquidType = liquidTypesTemp[x][y];
 				if(world[x][y].liquidType == LiquidType.LAVA && world[x][y].liquidAmount > world[x][y].liquidType.surfaceTension*2) {
-					if(world[x][y].checkTerrain(Terrain.GRASS) || world[x][y].checkTerrain(Terrain.FOREST1) || world[x][y].checkTerrain(Terrain.FOREST2)) {
+					if(world[x][y].checkTerrain(Terrain.GRASS) ) {
 						world[x][y].setTerrain(Terrain.DIRT);
 					}
 					if(world[x][y].checkTerrain(Terrain.SNOW)) {

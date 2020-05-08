@@ -23,7 +23,6 @@ public class Tile {
 	private boolean hasStructure;
 	private boolean hasUnit;
 	private boolean isTerritory = false;
-	private int forestType = 0;
 	private boolean isSelected = false;
 	
 	private Position p;
@@ -85,9 +84,6 @@ public class Tile {
 		}
 		
 	}
-	public void setForestType(int t) {
-		forestType = t;
-	}
 	
 	public void setBuilding(Building b) {
 		if(this.building == b) {
@@ -133,6 +129,7 @@ public class Tile {
 		drawPlant(g);
 		drawOre(g);
 		drawRoad(g);
+		drawWater(g);
 		drawBuilding(g, bm);
 		drawStructure(g, bm);
 		drawHighlightedArea(g);
@@ -186,6 +183,9 @@ public class Tile {
 	private void drawTerrain(Graphics g) {
 		g.drawImage(terr.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		
+	}
+	
+	private void drawWater(Graphics g) {
 		float alpha = Utils.getAlphaOfLiquid(liquidAmount);
 		Utils.setTransparency(g, alpha);
 		g.setColor(liquidType.getColor());
@@ -211,12 +211,6 @@ public class Tile {
 		//kills the plant if its built on
 		if(plant != null && building != null) {
 			plant = null;
-		}
-		if(forestType == 1) {
-			g.drawImage(Terrain.FOREST1.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null); 
-		}
-		if(forestType == 2) {
-			g.drawImage(Terrain.FOREST2.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null); 
 		}
 		
 	}
@@ -287,9 +281,6 @@ public class Tile {
 	}
 	public boolean getHasStructure() {
 		return hasStructure;
-	}
-	public int getForestType() {
-		return forestType;
 	}
 	public Ore getOre() {
 		return ore;

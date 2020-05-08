@@ -290,6 +290,14 @@ public class Frame extends JPanel{
 		});
 		flipTable.setPreferredSize(BUILDING_BUTTON_SIZE);
 		
+		JButton makeItRain = new JButton("rain");
+		makeItRain.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.rain();
+			}
+		});
+		makeItRain.setPreferredSize(BUILDING_BUTTON_SIZE);
 		
 		JButton exit = new JButton("Exit");
 		exit.addActionListener(new ActionListener() {
@@ -311,6 +319,7 @@ public class Frame extends JPanel{
 		gui.add(buildIrrigation);
 		gui.add(showHeightMap);
 		gui.add(flipTable);
+		gui.add(makeItRain);
 		gui.add(exit);
 		
 
