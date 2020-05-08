@@ -11,8 +11,6 @@ public enum Terrain {
 		ROCK (3, new String[] {"resources/Images/mountain/rock16.png", "resources/Images/mountain/rock128.png", "resources/Images/mountain/rock512.png"}),
 		SNOW (1, new String[] {"resources/Images/mountain/snow16.png", "resources/Images/mountain/snow128.png", "resources/Images/mountain/snow512.png"}),
 		WATER (0, new String[] {"resources/Images/water/water16.png", "resources/Images/water/water128.png", "resources/Images/water/water512.png"}),
-		FOREST1 (5, new String[] {"resources/Images/forest/tree1.png"}),
-		FOREST2 (5, new String[] {"resources/Images/forest/tree2.png"})
 		;
 
 	private final int moveSpeed;

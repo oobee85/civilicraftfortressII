@@ -6,13 +6,13 @@ import utils.Position;
 
 public class Plant {
 
-	private Position position;
+	private Tile tile;
 	private PlantType plantType;
 	private int currentYield;
 	private int health;
 	
-	public Plant(PlantType pt, Position pos) {
-		position = pos;
+	public Plant(PlantType pt, Tile t) {
+		tile = t;
 		plantType = pt;
 		health = pt.getHealth();
 		
@@ -27,8 +27,8 @@ public class Plant {
 	public int getHealth() {
 		return health;
 	}
-	public Position getPos() {
-		return position;
+	public Tile getTile() {
+		return tile;
 	}
 	public int getYield() {
 		return currentYield;
