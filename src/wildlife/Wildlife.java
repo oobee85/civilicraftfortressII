@@ -40,7 +40,7 @@ public class Wildlife {
 			animal.loseEnergy();
 			if(animal.wantsToEat()) {
 				if(animal.getTile().getPlant() != null) {
-//					animal.getTile().getPlant().takeDamage(1);
+					animal.getTile().getPlant().takeDamage(0.1);
 					animal.eat();
 				}
 				else if(animal.getTile().checkTerrain(Terrain.GRASS)) {
@@ -75,7 +75,6 @@ public class Wildlife {
 					Animal newanimal = new Animal(animal.getType());
 					newanimal.setTile(animal.getTile());
 					newAnimals.add(newanimal);
-					System.out.println("NEW DEER!");
 				}
 				else {
 					trying.put(animal.getTile(), animal);

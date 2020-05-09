@@ -12,7 +12,7 @@ public class Thing implements HasImage {
 	
 	private double maxHealth;
 	private double health;
-	private int timeLastDamageTaken = Integer.MIN_VALUE;
+	private int timeLastDamageTaken = -1000;
 	private Tile tile;
 	
 	private HasImage hasImage;

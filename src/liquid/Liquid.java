@@ -13,6 +13,7 @@ public class Liquid {
 	
 	private static double[][] liquidAmountsTemp;
 	private static LiquidType[][] liquidTypesTemp;
+	private static LinkedList<TileLoc> tiles;
 
 	
 	
@@ -25,36 +26,39 @@ public class Liquid {
 		if(liquidTypesTemp == null || liquidTypesTemp.length != world.length || liquidTypesTemp[0].length != world[0].length) {
 			liquidTypesTemp = new LiquidType[world.length][world[0].length];
 		}
-		LinkedList<TileLoc> tiles = new LinkedList<>();
-		for(int x = 0; x < world.length; x++) {
-			for(int y = 0; y < world.length; y++) {
-				tiles.add(new TileLoc(x, y));
+		if(tiles == null) {
+			tiles = new LinkedList<>();
+			for(int x = 0; x < world.length; x++) {
+				for(int y = 0; y < world.length; y++) {
+					tiles.add(new TileLoc(x, y));
+				}
 			}
 		}
 		
 //		double[] totals = new double[LiquidType.values().length];
-		for(int x = 0; x < world.length; x++) {
-			for(int y = 0; y < world.length; y++) {
+//		for(int x = 0; x < world.length; x++) {
+//			for(int y = 0; y < world.length; y++) {
 //				for(int i = 0; i < totals.length; i++) {
 //					if(world[x][y].liquidType == LiquidType.values()[i]) {
 //						totals[i] += world[x][y].liquidAmount;
 //					}
 //				}
-				
-				liquidAmountsTemp[x][y] = world[x][y].liquidAmount;
-				liquidTypesTemp[x][y] = world[x][y].liquidType;
-			}
-		}
+//			}
+//		}
 //		for(int i = 0; i < totals.length; i++) {
 //			System.out.println("Total " + LiquidType.values()[i].name() + ": " + totals[i]);
 //		}
 		
+		for(int x = 0; x < world.length; x++) {
+			for(int y = 0; y < world.length; y++) {
+				liquidAmountsTemp[x][y] = world[x][y].liquidAmount;
+				liquidTypesTemp[x][y] = world[x][y].liquidType;
+			}
+		}
+		
 		Collections.shuffle(tiles); 
-		while(!tiles.isEmpty() ) {
-			TileLoc pos = tiles.remove();
-			int x = pos.x;
-			int y = pos.y;
-			propogate(x, y, world, heightMap);
+		for(TileLoc pos : tiles) {
+			propogate(pos.x, pos.y, world, heightMap);
 		}
 		
 		for(int x = 0; x < world.length; x++) {
