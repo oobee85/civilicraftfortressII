@@ -132,18 +132,17 @@ public class Tile {
 		drawStructure(g, bm);
 		drawHighlightedArea(g);
 		drawUnit(g);
-		if(Game.tileSize > 30) {
-			if(plant != null) {
-				drawHealthBar(g, plant);
-			}
-			if(building != null) {
-				drawHealthBar(g, building);
-			}
-			if(structure != null) {
-				drawHealthBar(g, structure);
-			}
+
+		if (plant != null) {
+			drawHealthBar(g, plant);
 		}
-		
+		if (building != null) {
+			drawHealthBar(g, building);
+		}
+		if (structure != null) {
+			drawHealthBar(g, structure);
+		}
+
 	}
 	
 	private void drawHighlightedArea(Graphics g) {
@@ -235,18 +234,22 @@ public class Tile {
 	}
 	
 	public void drawHealthBar(Graphics g, Thing thing) {
+		if (Game.tileSize > 30) {
+			if ((isHighlight == true || (currentTick - thing.getTimeLastDamageTaken()) < 20)) {
+				g.setColor(Color.BLACK);
+				g.fillRect(position.getIntX() * Game.tileSize + 1, position.getIntY() * Game.tileSize + 1,
+						Game.tileSize - 1, Game.tileSize / 4 - 1);
+				g.setColor(Color.RED);
+				g.fillRect(position.getIntX() * Game.tileSize + 3, position.getIntY() * Game.tileSize + 3,
+						Game.tileSize - 5, Game.tileSize / 4 - 5);
 
-		if (( isHighlight == true || (currentTick - thing.getTimeLastDamageTaken()) <20 ) ) {
-			g.setColor(Color.BLACK);
-			g.fillRect(position.getIntX() * Game.tileSize + 1, position.getIntY() * Game.tileSize + 1, Game.tileSize - 1, Game.tileSize / 4 - 1);
-			g.setColor(Color.RED);
-			g.fillRect(position.getIntX() * Game.tileSize + 3, position.getIntY() * Game.tileSize + 3, Game.tileSize - 5, Game.tileSize / 4 - 5);
-
-			double healthOverMaxHealth = thing.getHealth() / thing.getMaxHealth();
-			int maxWidth = Game.tileSize - 5;
-			int width = (int) (healthOverMaxHealth * maxWidth);
-			g.setColor(Color.GREEN);
-			g.fillRect(position.getIntX() * Game.tileSize + 3, position.getIntY() * Game.tileSize + 3, width, Game.tileSize / 4 - 5);
+				double healthOverMaxHealth = thing.getHealth() / thing.getMaxHealth();
+				int maxWidth = Game.tileSize - 5;
+				int width = (int) (healthOverMaxHealth * maxWidth);
+				g.setColor(Color.GREEN);
+				g.fillRect(position.getIntX() * Game.tileSize + 3, position.getIntY() * Game.tileSize + 3, width,
+						Game.tileSize / 4 - 5);
+			}
 		}
 	}
 	

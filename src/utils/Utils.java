@@ -134,7 +134,13 @@ public final class Utils {
 			}
 		}
 	}
-
+	/**
+	 * 
+	 * @param data
+	 * @param radius
+	 * @param c	lower = sharper, higher = smoother
+	 * @return
+	 */
 	public static double[][] smoothingFilter(double[][] data, double radius, double c) {
 		double[][] smoothed = new double[data.length][data[0].length];
 		// apply smoothing filter
