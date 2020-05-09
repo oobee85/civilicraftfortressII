@@ -96,7 +96,7 @@ public class Game {
 		if(ticks%1 == 0) {
 			world[mountx][mounty].liquidAmount += 0.008;
 			world[volcanox][volcanoy].liquidType = LiquidType.LAVA;
-			world[volcanox][volcanoy].liquidAmount += 1;
+			world[volcanox][volcanoy].liquidAmount += .1;
 			Liquid.propogate(world, heightMap);
 			changedTerrain = true;
 		}
@@ -586,7 +586,7 @@ public class Game {
 					if(distanceFromCenter < lavaRadius) {
 						world[i][j] = new Tile(p, Terrain.LAVA);
 						world[i][j].liquidType = LiquidType.LAVA;
-						world[i][j].liquidAmount = 10;
+						world[i][j].liquidAmount = 1;
 					}else if(distanceFromCenter < volcanoRadius) {
 						world[i][j] = new Tile(p, Terrain.VOLCANO);
 					}else if(distanceFromCenter < mountainRadius && world[i][j].checkTerrain(Terrain.SNOW) == false) {
