@@ -14,7 +14,6 @@ import world.*;
 public class Game {
 	public static final int NUM_DEBUG_DIGITS = 3;
 	public static int ticks;
-	private int turn;
 	private BufferedImage terrainImage;
 	private BufferedImage minimapImage;
 	private BufferedImage heightMapImage;
@@ -41,7 +40,7 @@ public class Game {
 	
 	public static boolean DEBUG_DRAW = false;
 	
-	public World world2;
+	public World world;
 
 	public Game(GUIController guiController) {
 		this.guiController = guiController;
@@ -75,25 +74,25 @@ public class Game {
 		
 		
 		if(ticks == 1) {
-			world2.rain();
+			world.rain();
 		}
 		// rain event
 		if(Math.random() < 0.001) {
-			world2.rain();
+			world.rain();
 		}
 		if(Math.random() < 0.01) {
-			world2.grow();
+			world.grow();
 		}
 		if(ticks%1 == 0) {
-			world2[world2.mountain].liquidAmount += 0.008;
-			world2[world2.volcano].liquidType = LiquidType.LAVA;
-			world2[world2.volcano].liquidAmount += .1;
-			Liquid.propogate(world2);
+			world[world.mountain].liquidAmount += 0.008;
+			world[world.volcano].liquidType = LiquidType.LAVA;
+			world[world.volcano].liquidAmount += .1;
+			Liquid.propogate(world);
 			changedTerrain = true;
 		}
 		
-		Wildlife.tick(world2);
-		world2.updatePlantDamage();
+		Wildlife.tick(world);
+		world.updatePlantDamage();
 		updateBuildingDamage();
 		updateStructureDamage();
 		if(changedTerrain) {
@@ -102,14 +101,14 @@ public class Game {
 	}
 	
 	public void generateWorld(MapType mapType, int size) {
-		world2 = new World();
-		world2.generateWorld(mapType, size);
+		world = new World();
+		world.generateWorld(mapType, size);
 		makeRoad();
 		updateTerrainImages();
 	}
 	
 	public void updateTerrainImages() {
-		BufferedImage[] images = world2.createTerrainImage();
+		BufferedImage[] images = world.createTerrainImage();
 		this.terrainImage = images[0];
 		this.minimapImage = images[1];
 		this.heightMapImage = images[2];
@@ -172,9 +171,9 @@ public class Game {
 
 	
 	public void flipTable() {
-		for(int x = 0; x < world2.heightMap.length; x++) {
-			for(int y = 0; y < world2.heightMap[0].length; y++) {
-				world2.heightMap[x][y] = Math.max(Math.min(1-world2.heightMap[x][y], 1), 0);
+		for(int x = 0; x < world.heightMap.length; x++) {
+			for(int y = 0; y < world.heightMap[0].length; y++) {
+				world.heightMap[x][y] = Math.max(Math.min(1-world.heightMap[x][y], 1), 0);
 			}
 		}
 		updateTerrainImages();
@@ -182,17 +181,17 @@ public class Game {
 	
 
 	private void makeRoad() {
-		int topTile = (int) (Math.random() * world2.getWidth());
-		int botTile = (int) (Math.random() * world2.getWidth());
+		int topTile = (int) (Math.random() * world.getWidth());
+		int botTile = (int) (Math.random() * world.getWidth());
 		
 //		topTile = 10;
 //		botTile = world2.getWidth()/6;
 		
 		Position start = new Position(topTile, 0);
-		Position end = new Position(botTile, world2.getHeight()-1);
+		Position end = new Position(botTile, world.getHeight()-1);
 		
 		TileLoc prevRoad = new TileLoc(0,0);
-		for(double t = 0; t < 1; t += 0.1 / world2.getHeight()) {
+		for(double t = 0; t < 1; t += 0.1 / world.getHeight()) {
 			Position current = start.multiply(t).add(end.multiply(1-t));
 			TileLoc curLoc = new TileLoc(current.getIntX(), current.getIntY());
 			turnRoads(curLoc,prevRoad);
@@ -207,7 +206,7 @@ public class Game {
 		double castleDistance = Utils.getRandomNormal(5);
 		Position halfway = start.multiply(castleDistance).add(end.multiply(1-castleDistance));
 		TileLoc loc = new TileLoc(halfway.getIntX(), halfway.getIntY());
-		Tile tile = world2[loc];
+		Tile tile = world[loc];
 //		Structure struct = new Structure(StructureType.CASTLE, halfway);
 		if(tile.canBuild() == true) {
 			buildStructure(StructureType.CASTLE, tile);
@@ -221,39 +220,39 @@ public class Game {
 	}
 	
 	private void turnRoads(TileLoc current, TileLoc prev) {
-		if(current.x-1 < 0 || current.x+1 >= world2.getWidth()) {
+		if(current.x-1 < 0 || current.x+1 >= world.getWidth()) {
 			return;
 		}
-		if(world2[current].canBuild()==true) {
+		if(world[current].canBuild()==true) {
 			
 			// makes turns bot left -> top right
 			TileLoc left = new TileLoc(current.x-1, current.y);
-			if(world2[left].canBuild()==true) {
+			if(world[left].canBuild()==true) {
 				if (left.x == prev.x && current.y == prev.y) {
-					world2[left].setRoad(true, "left_down");
-					world2[current].setRoad(true, "right_up");
+					world[left].setRoad(true, "left_down");
+					world[current].setRoad(true, "right_up");
 				} else if (left.x == prev.x && current.x + 1 == prev.y) {
-					world2[left].setRoad(true, "left_down");
-					world2[current].setRoad(true, "right_up");
+					world[left].setRoad(true, "left_down");
+					world[current].setRoad(true, "right_up");
 				}	
 			}
 			
 
 			// makes turns bot right -> top left
 			TileLoc right = new TileLoc(current.x+1, current.y);
-			if(world2[right].canBuild()==true) {
+			if(world[right].canBuild()==true) {
 				if (right.x == prev.x && current.y == prev.y) {
-					world2[right].setRoad(true, "right_down");
-					world2[current].setRoad(true, "left_up");
+					world[right].setRoad(true, "right_down");
+					world[current].setRoad(true, "left_up");
 				} else if (right.x == prev.x && current.y + 1 == prev.y) {
-					world2[right].setRoad(true, "right_down");
-					world2[current].setRoad(true, "left_up");
+					world[right].setRoad(true, "right_down");
+					world[current].setRoad(true, "left_up");
 				}
 			}
 			
 
-			if (world2[current].getHasRoad() == false) {
-				world2[current].setRoad(true, "top_down");
+			if (world[current].getHasRoad() == false) {
+				world[current].setRoad(true, "top_down");
 			}
 			
 			
@@ -274,21 +273,21 @@ public class Game {
 		// Try to only draw stuff that is visible on the screen
 		int lowerX = Math.max(0, viewOffset.divide(tileSize).getIntX() - 2);
 		int lowerY = Math.max(0, viewOffset.divide(tileSize).getIntY() - 2);
-		int upperX = Math.min(world2.getWidth(), lowerX + panelWidth/tileSize + 4);
-		int upperY = Math.min(world2.getHeight(), lowerY + panelHeight/tileSize + 4);
+		int upperX = Math.min(world.getWidth(), lowerX + panelWidth/tileSize + 4);
+		int upperY = Math.min(world.getHeight(), lowerY + panelHeight/tileSize + 4);
 		
 		if(Game.tileSize < fastModeTileSize) {
 			if(showHeightMap) {
-				g.drawImage(heightMapImage, 0, 0, Game.tileSize*world2.getWidth(), Game.tileSize*world2.getHeight(), null);
+				g.drawImage(heightMapImage, 0, 0, Game.tileSize*world.getWidth(), Game.tileSize*world.getHeight(), null);
 			}
 			else {
-				g.drawImage(terrainImage, 0, 0, Game.tileSize*world2.getWidth(), Game.tileSize*world2.getHeight(), null);
+				g.drawImage(terrainImage, 0, 0, Game.tileSize*world.getWidth(), Game.tileSize*world.getHeight(), null);
 			}
 		}
 		else {
 			for (int i = lowerX; i < upperX; i++) {
 				for (int j = lowerY; j < upperY; j++) {
-					Tile t = world2[new TileLoc(i, j)];
+					Tile t = world[new TileLoc(i, j)];
 					
 					if(t.getHasStructure() == true) {
 						setTerritory(new TileLoc(i,j));
@@ -301,7 +300,7 @@ public class Game {
 					}
 					
 					if(showHeightMap) {
-						t.drawHeightMap(g, world2.heightMap[i][j]);
+						t.drawHeightMap(g, world.heightMap[i][j]);
 					}
 					else {
 						t.setRecentTick(ticks);
@@ -316,7 +315,7 @@ public class Game {
 			}
 			if(DEBUG_DRAW) {
 				if(Game.tileSize >= 36) {
-					int[][] rows = new int[world2.getWidth()][world2.getHeight()];
+					int[][] rows = new int[world.getWidth()][world.getHeight()];
 					int fontsize = Game.tileSize/4;
 					fontsize = Math.min(fontsize, 13);
 					Font font = new Font("Consolas", Font.PLAIN, fontsize);
@@ -325,28 +324,28 @@ public class Game {
 					for (int i = lowerX; i < upperX; i++) {
 						for (int j = lowerY; j < upperY; j++) {
 							TileLoc loc = new TileLoc(i, j);
-							Tile tile = world2[loc];
+							Tile tile = world[loc];
 							int x = i * Game.tileSize + 2;
 							int y = j * Game.tileSize + fontsize/2;
 							
 							g.setColor(Color.black);
 							g.fillRect(x, y + 2, stringWidth, 2*fontsize);
 							g.setColor(Color.green);
-							String liquidString = "" + world2[loc].liquidType.name().charAt(0);
-							if(world2[loc].liquidType != LiquidType.DRY) {
+							String liquidString = "" + world[loc].liquidType.name().charAt(0);
+							if(world[loc].liquidType != LiquidType.DRY) {
 								liquidString += String.format("=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount);
 							}
 							g.drawString(liquidString, x, y + (++rows[i][j])*fontsize);
-							g.drawString(String.format("H=%." + NUM_DEBUG_DIGITS + "f", world2.heightMap[i][j]), x, y + (++rows[i][j])*fontsize);
+							g.drawString(String.format("H=%." + NUM_DEBUG_DIGITS + "f", world.heightMap[i][j]), x, y + (++rows[i][j])*fontsize);
 						}
 					}
 					for(Animal animal : Wildlife.getAnimals()) {
 						animal.getTile().drawDebugStrings(g, animal.getDebugStrings(), rows, fontsize, stringWidth);
 					}
-					for(Plant plant : world2.plantsLand) {
+					for(Plant plant : world.plantsLand) {
 						plant.getTile().drawDebugStrings(g, plant.getDebugStrings(), rows, fontsize, stringWidth);
 					}
-					for(Plant plant : world2.plantsAquatic) {
+					for(Plant plant : world.plantsAquatic) {
 						plant.getTile().drawDebugStrings(g, plant.getDebugStrings(), rows, fontsize, stringWidth);
 					}
 					for(Building building : buildings) {
@@ -366,7 +365,7 @@ public class Game {
 		}
 	}
 	private void setTerritory(TileLoc p) {
-		int culture = world2[p].getStructure().getCulture();
+		int culture = world[p].getStructure().getCulture();
 		double area = culture * Structure.CULTURE_AREA_MULTIPLIER;
 		double radius = Math.sqrt(area);
 		expandTerritory(radius, p);	
@@ -377,8 +376,8 @@ public class Game {
 			for (int j=0-r; j <= r; j++) {
 				double distanceFromCenter = Math.sqrt(i*i + j*j);
 				if(distanceFromCenter < radius) {
-					if(p.x+i >= 0 && p.x+i < world2.getWidth() && p.y+j >= 0 && p.y+j < world2.getHeight()) {
-						world2[new TileLoc(p.x+i, p.y+j)].setTerritory(true);
+					if(p.x+i >= 0 && p.x+i < world.getWidth() && p.y+j >= 0 && p.y+j < world.getHeight()) {
+						world[new TileLoc(p.x+i, p.y+j)].setTerritory(true);
 					}
 				}
 			}
@@ -389,7 +388,7 @@ public class Game {
 		Position tilepos = getTileAtPixel(new Position(mx,my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
 		if(currentMode == BuildMode.NOMODE) {
-			if(world2[loc].getHasUnit() == true) {
+			if(world[loc].getHasUnit() == true) {
 				selectedUnit = true;
 				System.out.println("selected unit");
 			}
@@ -430,9 +429,9 @@ public class Game {
 		for (int i = 0; i < hoveredArea.getIntX2()-hoveredArea.getIntX1(); i++) {
 			for (int j = 0; j < hoveredArea.getIntY2()-hoveredArea.getIntY1(); j++) {
 				TileLoc loc = new TileLoc(hoveredArea.getIntX1()+i, hoveredArea.getIntY1()+j);
-				world2[loc].setHighlight(true);
-				if(world2[loc].getUnit() != null) {
-					selectUnits.add(world2[loc].getUnit());
+				world[loc].setHighlight(true);
+				if(world[loc].getUnit() != null) {
+					selectUnits.add(world[loc].getUnit());
 				}
 			}
 		}
@@ -442,7 +441,7 @@ public class Game {
 		Position pos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
 		System.out.println(currentMode);
-		Tile tile = world2[loc];
+		Tile tile = world[loc];
 		
 		if(currentMode == BuildMode.ROAD) {
 			if(tile.canBuild() == true) {
@@ -496,7 +495,7 @@ public class Game {
 	public void doubleClick(int mx, int my) {
 		Position tilepos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
-		if(world2[loc].isStructure(StructureType.CASTLE) == true ) {
+		if(world[loc].isStructure(StructureType.CASTLE) == true ) {
 			exitCity();
 		}
 	}
@@ -531,7 +530,7 @@ public class Game {
 //		System.out.println(viewOffset.x + "curview" + viewOffset.y);
 	}
 	public void moveViewTo(double ratiox, double ratioy) {
-		Position tile = new Position(ratiox*world2.getWidth(), ratioy*world2.getHeight());
+		Position tile = new Position(ratiox*world.getWidth(), ratioy*world.getHeight());
 		Position pixel = tile.multiply(tileSize).subtract(new Position(panelWidth/2, panelHeight/2));
 		viewOffset = pixel;
 	}
@@ -579,10 +578,10 @@ public class Game {
 			g.drawImage(minimapImage, x, y, w, h, null);
 		}
 		Position offsetTile = getTileAtPixel(viewOffset);
-		int boxx = (int) (offsetTile.x * w / world2.getWidth() / 2);
-		int boxy = (int) (offsetTile.y * h / world2.getHeight() / 2);
-		int boxw = (int) (panelWidth/Game.tileSize * w / world2.getWidth());
-		int boxh = (int) (panelHeight/Game.tileSize * h / world2.getHeight());
+		int boxx = (int) (offsetTile.x * w / world.getWidth() / 2);
+		int boxy = (int) (offsetTile.y * h / world.getHeight() / 2);
+		int boxw = (int) (panelWidth/Game.tileSize * w / world.getWidth());
+		int boxh = (int) (panelHeight/Game.tileSize * h / world.getHeight());
 //		System.out.println(boxx);
 		g.setColor(Color.yellow);
 		g.drawRect(x + boxx, y + boxy, boxw, boxh);
