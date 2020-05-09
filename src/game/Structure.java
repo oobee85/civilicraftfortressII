@@ -13,6 +13,7 @@ public class Structure {
 	private Tile tile;
 	private double health;
 	private int culture;
+	private int timeLastDamageTaken;
 	
 	public Structure(StructureType structureType, Tile tile) {
 		this.structureType = structureType;
@@ -51,6 +52,9 @@ public class Structure {
 	}
 	public boolean isDead() {
 		return health < 0;
+	}
+	public int getTimeLastDamageTaken() {
+		return timeLastDamageTaken;
 	}
 
 }

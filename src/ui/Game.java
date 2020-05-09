@@ -452,37 +452,50 @@ public class Game {
 	}
 	
 	private void genOres() {
-		for(int i = 0; i < world.length; i++) {
-			for(int j = 0; j < world.length; j++) {
-				
-				//ore generation on rock
-				if(world[i][j].checkTerrain(Terrain.ROCK) && Math.random() < oreRarity) {
-					double o = Math.random();
-					if(o < Ore.ORE_GOLD.getRarity()) {
-						world[i][j].setHasOre(Ore.ORE_GOLD);
-					}else if(o < Ore.ORE_SILVER.getRarity()) {
-						world[i][j].setHasOre(Ore.ORE_SILVER);
-					}else if(o < Ore.ORE_COPPER.getRarity()) {
-						world[i][j].setHasOre(Ore.ORE_COPPER);
-					}else if(o < Ore.ORE_IRON.getRarity()) {
-						world[i][j].setHasOre(Ore.ORE_IRON);
+		int numOres = (int)(world.length * world.length *oreRarity); //163
+
+		while (numOres > 0) {
+			for (int i = 0; i < world.length; i++) {
+				for (int j = 0; j < world.length; j++) {
+
+					Tile tile = world[i][j];
+//					System.out.println(numOres+" numores");
+					if (tile.canOre() == true && Math.random() < oreRarity) {
+
+						if(tile.canSupportRareOre() == false) {
+							if (Math.random() < Ore.ORE_IRON.getRarity()) {
+								tile.setHasOre(Ore.ORE_IRON);
+								numOres--;
+							} else if (Math.random() < Ore.ORE_COPPER.getRarity()) {
+								tile.setHasOre(Ore.ORE_COPPER);
+								numOres--;
+							} else if (Math.random() < Ore.ORE_SILVER.getRarity()) {
+								tile.setHasOre(Ore.ORE_SILVER);
+								numOres--;
+							}
+						}
+						
+						if(tile.canSupportRareOre() == true) {
+							if (Math.random() < Ore.ORE_GOLD.getRarity()) {
+								tile.setHasOre(Ore.ORE_GOLD);
+								numOres--;
+							}else if (Math.random() < Ore.ORE_ADAMANT.getRarity()) {
+								tile.setHasOre(Ore.ORE_ADAMANT);
+								numOres--;
+							} else if (Math.random() < Ore.ORE_RUNE.getRarity()) {
+								tile.setHasOre(Ore.ORE_RUNE);
+								numOres--;
+							}
+						}
+						
 					}
-				}
-				
-				//ore generation on volcano
-				if(world[i][j].checkTerrain(Terrain.VOLCANO) && Math.random() < oreRarity +0.2) {
-					double o = Math.random();
-					if(o < Ore.ORE_GOLD.getRarity()) {
-						world[i][j].setHasOre(Ore.ORE_GOLD);
-					}else if(o < Ore.ORE_SILVER.getRarity()) {
-						world[i][j].setHasOre(Ore.ORE_SILVER);
-					}else if(o < Ore.ORE_COPPER.getRarity()) {
-						world[i][j].setHasOre(Ore.ORE_COPPER);
+					if(numOres <= 0) {
+						break;
 					}
+					
 				}
-				
-				
 			}
+			
 		}
 		
 		

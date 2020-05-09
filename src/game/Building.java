@@ -12,6 +12,7 @@ public class Building {
 	private BuildingType buildingType;
 	private Tile tile;
 	private double health;
+	private int timeLastDamageTaken = 0;
 	
 	public Building(BuildingType buildingType, Tile tile) {
 		this.buildingType = buildingType;
@@ -36,6 +37,9 @@ public class Building {
 	} 
 	public BuildingType getBuildingType() {
 		return buildingType;
+	}
+	public int getTimeLastDamageTaken() {
+		return timeLastDamageTaken;
 	}
 	
 }

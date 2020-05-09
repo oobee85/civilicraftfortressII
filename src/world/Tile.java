@@ -114,11 +114,11 @@ public class Tile {
 	}
 	
 	public void drawEntities(Graphics g, BuildMode bm) {
-	
-		drawTerritory(g);
-		drawPlant(g);
+		
 		drawOre(g);
+		drawTerritory(g);
 		drawRoad(g);
+		drawPlant(g);
 		drawWater(g);
 		drawBuilding(g, bm);
 		drawStructure(g, bm);
@@ -365,9 +365,14 @@ public class Tile {
 	public boolean canPlant() {
 		return terr.isPlantable(terr);
 	}
-	
+	public boolean canOre() {
+		return terr.isOreable(terr);
+	}
 	public void setTerrain(Terrain t) {
 		terr = t;
+	}
+	public boolean canSupportRareOre() {
+		return terr.canSupportRare(terr);
 	}
 	public void setRecentTick(int t) {
 		currentTick = t;
@@ -375,6 +380,7 @@ public class Tile {
 	public boolean checkTerrain(Terrain t) {
 		return terr == t;
 	}
+	
 	public void highlight(Graphics g) {
 		isHighlight = true;
 		

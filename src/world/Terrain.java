@@ -37,12 +37,25 @@ public enum Terrain {
 
 	}
 
+	public boolean isOreable(Terrain t) {
+		if (t == Terrain.VOLCANO || t == Terrain.SNOW || t == Terrain.ROCK) {
+			return true;
+		}
+		return false;
+
+	}
 	public boolean isPlantable(Terrain t) {
 		if (t == Terrain.VOLCANO || t == Terrain.LAVA || t == Terrain.SNOW || t == Terrain.WATER || t == Terrain.ROCK) {
 			return false;
 		}
 		return true;
 
+	}
+	public boolean canSupportRare(Terrain t) {
+		if (t == Terrain.VOLCANO || t == Terrain.SNOW ) {
+			return true;
+		}
+		return false;
 	}
 
 	public boolean isBridgeable(Terrain t) {

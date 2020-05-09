@@ -11,8 +11,8 @@ public enum PlantType {
 	BERRY ( new String[] {"resources/Images/plants/berry16.png", "resources/Images/plants/berry128.png"} , 1.0, 5, false),
 	BERRY_DEPLETED ( new String[] {"resources/Images/plants/berry_depleted16.png", "resources/Images/plants/berry_depleted128.png"} , 0.2, 5, false),
 	CATTAIL ( new String[] {"resources/Images/plants/cattail32.png"} , 1.0, 5, true),
-	FOREST1 ( new String[] {"resources/Images/forest/tree1.png"}, 1, 50, false),
-//	FOREST2 ( new String[] {"resources/Images/forest/tree2.png"}, 1, 50)
+	FOREST1 ( new String[] {"resources/Images/plants/tree1.png"}, 1, 50, false),
+//	FOREST2 ( new String[] {"resources/Images/plants/tree2.png"}, 1, 50)
 	;
 	
     private double rarity;
