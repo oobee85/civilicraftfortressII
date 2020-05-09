@@ -173,12 +173,12 @@ public final class Utils {
 		return tiles;
 	}
 	public static List<Tile> getNeighbors(Tile tile, Tile[][] world) {
-		int x = tile.getLocation().getIntX();
-		int y = tile.getLocation().getIntY();
-		int minX = Math.max(0, tile.getLocation().getIntX() - 1);
-		int maxX = Math.min(world.length-1, tile.getLocation().getIntX() + 1);
-		int minY = Math.max(0, tile.getLocation().getIntY()-1);
-		int maxY = Math.min(world[0].length-1, tile.getLocation().getIntY() + 1);
+		int x = tile.getLocation().x;
+		int y = tile.getLocation().y;
+		int minX = Math.max(0, tile.getLocation().x - 1);
+		int maxX = Math.min(world.length-1, tile.getLocation().x + 1);
+		int minY = Math.max(0, tile.getLocation().y-1);
+		int maxY = Math.min(world[0].length-1, tile.getLocation().y + 1);
 
 		LinkedList<Tile> tiles = new LinkedList<>();
 		for(int i = minX; i <= maxX; i++) {

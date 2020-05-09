@@ -336,8 +336,7 @@ public class Game {
 		
 		for (int i = 0; i < world.length; i++) {
 			for (int j = 0; j < world[0].length; j++) {
-				Position p = new Position(i, j);
-				world[i][j] = new Tile(p, Terrain.DIRT);
+				world[i][j] = new Tile(new TileLoc(i, j), Terrain.DIRT);
 			}
 		}
 		
@@ -372,7 +371,6 @@ public class Game {
 		for (int i = 0; i < world.length; i++) {
 			for (int j = 0; j < world[0].length; j++) {
 				if(world[i][j].getTerrain() == Terrain.DIRT) {
-					Position p = new Position(i, j);
 					Terrain t;
 					if (heightMap[i][j] > 0.95) {
 						t = Terrain.SNOW;
@@ -389,8 +387,7 @@ public class Game {
 					else {
 						t = Terrain.WATER;
 					}
-					Tile tile = new Tile(p, t);
-					world[i][j] = tile;
+					world[i][j] = new Tile(new TileLoc(i, j), t);
 				}
 			}
 		}
@@ -574,7 +571,7 @@ public class Game {
 				int dx = i - x;
 				int dy = j - y;
 				double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
-				Position p = new Position(i, j);
+				TileLoc p = new TileLoc(i, j);
 				if(distanceFromCenter < mountainEdgeRadius) {
 					
 					double height = 1 - (lavaRadius - distanceFromCenter)/lavaRadius/2;
@@ -706,7 +703,7 @@ public class Game {
 
 				double ratio = Math.sqrt(dx*dx/mountLength/mountLength + dy*dy/mountHeight/mountHeight);
 				//double ratio = dist / Math.max(mountLength, mountHeight);
-				Position p = new Position(i, j);
+				TileLoc p = new TileLoc(i, j);
 				if(snowMountainEdge < 1 && Math.random()<snowEdgeRatio) {
 					world[i][j] = new Tile(p, Terrain.SNOW);
 					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
@@ -858,7 +855,7 @@ public class Game {
 				}
 			}
 			for(Animal animal : Wildlife.getAnimals()) {
-				g.drawImage(animal.getImage(0), animal.getTile().getLocation().getIntX() * Game.tileSize, animal.getTile().getLocation().getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				g.drawImage(animal.getImage(0), animal.getTile().getLocation().x * Game.tileSize, animal.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 				animal.getTile().drawHealthBar(g, animal);
 			}
 			if(DEBUG_DRAW) {
