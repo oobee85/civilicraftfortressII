@@ -1,9 +1,11 @@
 package game;
 
 import java.awt.*;
+import java.util.List;
 
 import javax.swing.*;
 
+import ui.*;
 import utils.*;
 import world.*;
 
@@ -41,5 +43,12 @@ public class Structure extends Thing {
 	
 	public Tile getTile() {
 		return tile;
+	}
+	
+	@Override
+	public List<String> getDebugStrings() {
+		List<String> strings = super.getDebugStrings();
+		strings.add(String.format("CT=%." + Game.NUM_DEBUG_DIGITS + "f", getCulture()*1.0));
+		return strings;
 	}
 }

@@ -3,7 +3,7 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.List;
+import java.util.List;
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -251,6 +251,19 @@ public class Tile {
 						Game.tileSize / 4 - 5);
 			}
 		}
+	}
+	public void drawDebugStrings(Graphics g, List<String> strings, int[][] rows, int fontsize, int stringWidth) {
+		int x = getLocation().getIntX() * Game.tileSize + 2;
+		int y = getLocation().getIntY() * Game.tileSize + fontsize/2;
+		int row = rows[getLocation().getIntX()][getLocation().getIntY()];
+		
+		g.setColor(Color.black);
+		g.fillRect(x, y + 2 + row*fontsize, stringWidth, strings.size()*fontsize);
+		g.setColor(Color.green);
+		for(String s : strings) {
+			g.drawString(s, x, y + (++row)*fontsize);
+		}
+		rows[getLocation().getIntX()][getLocation().getIntY()] = row;
 	}
 	
 	private void drawBuilding(Graphics g, BuildMode bm) {

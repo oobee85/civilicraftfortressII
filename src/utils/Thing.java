@@ -1,6 +1,6 @@
 package utils;
-
-import java.awt.*;
+import java.util.List;
+import java.util.*;
 
 import ui.*;
 
@@ -30,6 +30,10 @@ public class Thing {
 	}
 	public int getTimeLastDamageTaken() {
 		return timeLastDamageTaken;
+	}
+	
+	public List<String> getDebugStrings() {
+		return new LinkedList<String>(Arrays.asList(String.format("HP=%." + Game.NUM_DEBUG_DIGITS + "f", getHealth())));
 	}
 
 }

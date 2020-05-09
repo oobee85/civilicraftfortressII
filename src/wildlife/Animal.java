@@ -1,5 +1,8 @@
 package wildlife;
 
+import java.util.*;
+
+import ui.*;
 import utils.*;
 import world.*;
 
@@ -16,6 +19,13 @@ public class Animal extends Thing {
 		this.type = type;
 		energy = MAX_ENERGY;
 		drive = 0;
+	}
+	
+	@Override
+	public List<String> getDebugStrings() {
+		List<String> strings = super.getDebugStrings();
+		strings.add(String.format("EN=%." + Game.NUM_DEBUG_DIGITS + "f", getEnergy()));
+		return strings;
 	}
 	
 	public double computeDanger(Tile tile) {

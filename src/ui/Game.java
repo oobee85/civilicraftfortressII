@@ -1,6 +1,6 @@
 package ui;
 import java.awt.*;
-import java.awt.List;
+import java.util.List;
 import java.awt.image.*;
 import java.util.*;
 
@@ -12,6 +12,7 @@ import wildlife.*;
 import world.*;
 
 public class Game {
+	public static final int NUM_DEBUG_DIGITS = 3;
 	public static int ticks;
 	private int turn;
 	private Point worldSize;
@@ -862,71 +863,37 @@ public class Game {
 			}
 			if(DEBUG_DRAW) {
 				if(Game.tileSize >= 36) {
-					int numDigits = 2;
+					int[][] rows = new int[world.length][world[0].length];
 					int fontsize = Game.tileSize/4;
 					fontsize = Math.min(fontsize, 13);
 					Font font = new Font("Consolas", Font.PLAIN, fontsize);
 					g.setFont(font);
-					int stringWidth = g.getFontMetrics().stringWidth(String.format("??=%." + numDigits + "f", 0.0));
+					int stringWidth = g.getFontMetrics().stringWidth(String.format("??=%." + NUM_DEBUG_DIGITS + "f", 0.0));
 					for (int i = lowerX; i < upperX; i++) {
 						for (int j = lowerY; j < upperY; j++) {
 							Tile tile = world[i][j];
-
 							int x = i * Game.tileSize + 2;
 							int y = j * Game.tileSize + fontsize/2;
-							int row = 1;
 							
 							g.setColor(Color.black);
 							g.fillRect(x, y + 2, stringWidth, 2*fontsize);
 							g.setColor(Color.green);
 							
-							g.drawString(String.format("L=%." + numDigits + "f", tile.liquidAmount), x, y + (row++)*fontsize);
-							g.drawString(String.format("H=%." + numDigits + "f", heightMap[i][j]), x, y + (row++)*fontsize);
+							g.drawString(String.format("L=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount), x, y + (++rows[i][j])*fontsize);
+							g.drawString(String.format("H=%." + NUM_DEBUG_DIGITS + "f", heightMap[i][j]), x, y + (++rows[i][j])*fontsize);
 						}
 					}
 					for(Animal animal : Wildlife.getAnimals()) {
-						Tile tile = animal.getTile();
-						int x = tile.getLocation().getIntX() * Game.tileSize + 2;
-						int y = tile.getLocation().getIntY() * Game.tileSize + fontsize/2 + 2 * fontsize;
-						int row = 1;
-						
-						g.setColor(Color.black);
-						g.fillRect(x, y + 2, stringWidth, 2*fontsize);
-						g.setColor(Color.green);
-						
-						g.drawString(String.format("HP=%." + numDigits + "f", animal.getHealth()), x, y + (row++)*fontsize);
-						g.drawString(String.format("EN=%." + numDigits + "f", animal.getEnergy()), x, y + (row++)*fontsize);
+						animal.getTile().drawDebugStrings(g, animal.getDebugStrings(), rows, fontsize, stringWidth);
 					}
 					for(Plant plant : plantsLand) {
-						Tile tile = plant.getTile();
-						int x = tile.getLocation().getIntX() * Game.tileSize + 2;
-						int y = tile.getLocation().getIntY() * Game.tileSize + fontsize/2 + 2 * fontsize;
-						int row = 1;
-						g.setColor(Color.black);
-						g.fillRect(x, y + 2, stringWidth, 1*fontsize);
-						g.setColor(Color.green);
-						g.drawString(String.format("HP=%." + numDigits + "f", plant.getHealth()), x, y + (row++)*fontsize);
+						plant.getTile().drawDebugStrings(g, plant.getDebugStrings(), rows, fontsize, stringWidth);
 					}
 					for(Building building : buildings) {
-						Tile tile = building.getTile();
-						int x = tile.getLocation().getIntX() * Game.tileSize + 2;
-						int y = tile.getLocation().getIntY() * Game.tileSize + fontsize/2 + 2 * fontsize;
-						int row = 1;
-						g.setColor(Color.black);
-						g.fillRect(x, y + 2, stringWidth, 1*fontsize);
-						g.setColor(Color.green);
-						g.drawString(String.format("HP=%." + numDigits + "f", building.getHealth()), x, y + (row++)*fontsize);
+						building.getTile().drawDebugStrings(g, building.getDebugStrings(), rows, fontsize, stringWidth);
 					}
 					for(Structure structure : structures) {
-						Tile tile = structure.getTile();
-						int x = tile.getLocation().getIntX() * Game.tileSize + 2;
-						int y = tile.getLocation().getIntY() * Game.tileSize + fontsize/2 + 2 * fontsize;
-						int row = 1;
-						g.setColor(Color.black);
-						g.fillRect(x, y + 2, stringWidth, 2*fontsize);
-						g.setColor(Color.green);
-						g.drawString(String.format("HP=%." + numDigits + "f", structure.getHealth()), x, y + (row++)*fontsize);
-						g.drawString(String.format("CT=%." + numDigits + "f", structure.getCulture()*1.0), x, y + (row++)*fontsize);
+						structure.getTile().drawDebugStrings(g, structure.getDebugStrings(), rows, fontsize, stringWidth);
 					}
 				}
 			}
