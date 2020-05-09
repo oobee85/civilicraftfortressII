@@ -175,7 +175,7 @@ public class Game {
 
 		for (Structure structure : structures) {
 			Tile tile = structure.getTile();
-			if (tile.liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD) {
+			if (tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
 				structure.takeDamage(damageTaken);
 
