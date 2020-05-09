@@ -166,26 +166,26 @@ public final class Utils {
 		return smoothed;
 	}
 
-	public static List<Tile> getNeighborsIncludingCurrent(Tile tile, Tile[][] world) {
+	public static List<Tile> getNeighborsIncludingCurrent(Tile tile, World world) {
 		List<Tile> tiles = getNeighbors(tile, world);
 		tiles.add(tile);
 		Collections.shuffle(tiles); 
 		return tiles;
 	}
-	public static List<Tile> getNeighbors(Tile tile, Tile[][] world) {
+	public static List<Tile> getNeighbors(Tile tile, World world) {
 		int x = tile.getLocation().x;
 		int y = tile.getLocation().y;
 		int minX = Math.max(0, tile.getLocation().x - 1);
-		int maxX = Math.min(world.length-1, tile.getLocation().x + 1);
+		int maxX = Math.min(world.getWidth()-1, tile.getLocation().x + 1);
 		int minY = Math.max(0, tile.getLocation().y-1);
-		int maxY = Math.min(world[0].length-1, tile.getLocation().y + 1);
+		int maxY = Math.min(world.getHeight()-1, tile.getLocation().y + 1);
 
 		LinkedList<Tile> tiles = new LinkedList<>();
 		for(int i = minX; i <= maxX; i++) {
 			for(int j = minY; j <= maxY; j++) {
 				if(i == x || j == y) {
 					if(i != x || j != y) {
-						tiles.add(world[i][j]);
+						tiles.add(world[new TileLoc(i, j)]);
 					}
 				}
 			}

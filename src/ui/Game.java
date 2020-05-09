@@ -95,14 +95,14 @@ public class Game {
 			grow();
 		}
 		if(ticks%1 == 0) {
-			world[mountain.x][mountain.y].liquidAmount += 0.008;
-			world[volcano.x][volcano.y].liquidType = LiquidType.LAVA;
-			world[volcano.x][volcano.y].liquidAmount += .1;
+			world2[mountain].liquidAmount += 0.008;
+			world2[volcano].liquidType = LiquidType.LAVA;
+			world2[volcano].liquidAmount += .1;
 			Liquid.propogate(world2);
 			changedTerrain = true;
 		}
 		
-		Wildlife.tick(world);
+		Wildlife.tick(world2);
 		updatePlantDamage();
 		updateBuildingDamage();
 		updateStructureDamage();
@@ -307,7 +307,7 @@ public class Game {
 		genPlants();
 		makeForest();
 		createTerrainImage();
-		Wildlife.generateWildLife(world);
+		Wildlife.generateWildLife(world2);
 	}
 	
 	public void flipTable() {

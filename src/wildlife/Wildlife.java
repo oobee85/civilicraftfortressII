@@ -14,13 +14,14 @@ public class Wildlife {
 
 	private static LinkedList<Animal> dead = new LinkedList<>();
 	
-	public static void generateWildLife(Tile[][] world) {
-		for(int x = 0; x < world.length; x++) {
-			for(int y = 0; y < world[0].length; y++) {
+	public static void generateWildLife(World world) {
+		for(int x = 0; x < world.getWidth(); x++) {
+			for(int y = 0; y < world.getHeight(); y++) {
 				if(Math.random() < 0.04) {
-					if(world[x][y].checkTerrain(Terrain.GRASS) || world[x][y].checkTerrain(Terrain.DIRT)) {
+					TileLoc loc = new TileLoc(x, y);
+					if(world[loc].checkTerrain(Terrain.GRASS) || world[loc].checkTerrain(Terrain.DIRT)) {
 						Animal animal = new Animal(AnimalType.DEER);
-						animal.setTile(world[x][y]);
+						animal.setTile(world[loc]);
 						animals.add(animal);
 					}
 				}
@@ -28,7 +29,7 @@ public class Wildlife {
 		}
 	}
 	
-	public static void tick(Tile[][] world) {
+	public static void tick(World world) {
 		ConcurrentLinkedQueue<Animal> newAnimals = new ConcurrentLinkedQueue<>();
 		HashMap<Tile, Animal> trying = new HashMap<>();
 		for(Animal animal : animals) {
