@@ -10,17 +10,12 @@ import world.Tile;
 public class Building extends Thing {
 	
 	private BuildingType buildingType;
-	private Tile tile;
 	
 	public Building(BuildingType buildingType, Tile tile) {
-		super(buildingType.getHealth());
+		super(buildingType.getHealth(), tile);
 		this.buildingType = buildingType;
-		this.tile = tile;
 	}
 	
-	public Tile getTile() {
-		return tile;
-	}
 	public Image getImage(int size) {
 		return buildingType.getImage(size);
 	} 

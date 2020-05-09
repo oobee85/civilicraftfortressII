@@ -3,16 +3,22 @@ import java.util.List;
 import java.util.*;
 
 import ui.*;
+import world.*;
 
 public class Thing {
 	
 	private double maxHealth;
 	private double health;
-	private int timeLastDamageTaken = 0;
+	private int timeLastDamageTaken = Integer.MIN_VALUE;
+	private Tile tile;
 	
 	public Thing(double maxHealth) {
 		health = maxHealth;
 		this.maxHealth = maxHealth;
+	}
+	public Thing(double maxHealth, Tile tile) {
+		this(maxHealth);
+		this.tile = tile;
 	}
 
 	public boolean isDead() {
@@ -30,6 +36,13 @@ public class Thing {
 	}
 	public int getTimeLastDamageTaken() {
 		return timeLastDamageTaken;
+	}
+	public void setTile(Tile tile) {
+		this.tile = tile;
+	}
+	
+	public Tile getTile() {
+		return tile;
 	}
 	
 	public List<String> getDebugStrings() {

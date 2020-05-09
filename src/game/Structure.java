@@ -12,15 +12,12 @@ import world.*;
 public class Structure extends Thing {
 
 	private StructureType structureType;
-	private Tile tile;
 	private int culture;
 	
 	public Structure(StructureType structureType, Tile tile) {
-		super(structureType.getHealth());
+		super(structureType.getHealth(), tile);
 		this.structureType = structureType;
-		this.tile = tile;
 	}
-	
 	
 	 public void updateCulture() {
 	    	culture += structureType.cultureRate;
@@ -39,10 +36,6 @@ public class Structure extends Thing {
 	}
 	public StructureType getStructureType() {
 		return structureType;
-	}
-	
-	public Tile getTile() {
-		return tile;
 	}
 	
 	@Override

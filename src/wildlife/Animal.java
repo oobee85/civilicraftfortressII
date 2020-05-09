@@ -8,7 +8,6 @@ import world.*;
 
 public class Animal extends Thing {
 	public static final int MAX_ENERGY = 100;
-	private Tile tile;
 	private AnimalType type;
 	
 	private double energy;
@@ -70,13 +69,6 @@ public class Animal extends Thing {
 		return super.isDead() || energy <= 0;
 	}
 	
-	public void setTile(Tile tile) {
-		this.tile = tile;
-	}
-	
-	public Tile getTile() {
-		return tile;
-	}
 	public AnimalType getType() {
 		return type;
 	}
