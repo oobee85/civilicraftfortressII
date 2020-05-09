@@ -133,9 +133,15 @@ public class Tile {
 		drawHighlightedArea(g);
 		drawUnit(g);
 		if(Game.tileSize > 30) {
-			drawHealthBarPlants(g);
-			drawHealthBarBuilding(g);
-			drawHealthBarStructure(g);
+			if(plant != null) {
+				drawHealthBar(g, plant);
+			}
+			if(building != null) {
+				drawHealthBar(g, building);
+			}
+			if(structure != null) {
+				drawHealthBar(g, structure);
+			}
 		}
 		
 	}
@@ -227,57 +233,22 @@ public class Tile {
 			plant = null;
 		}
 	}
-
-	private void drawHealthBarBuilding(Graphics g) {
-
-		if (building != null) {
-			g.setColor(Color.BLACK);
-			g.fillRect(position.getIntX() * Game.tileSize + 1, position.getIntY() * Game.tileSize + 1, Game.tileSize - 1, Game.tileSize / 4 - 1);
-			g.setColor(Color.RED);
-			g.fillRect(position.getIntX() * Game.tileSize + 3, position.getIntY() * Game.tileSize + 3, Game.tileSize - 5, Game.tileSize / 4 - 5);
-
-			double healthOverMaxHealth = building.getHealth() / building.getBuildingType().getHealth();
-			int maxWidth = Game.tileSize - 5;
-			int width = (int) (healthOverMaxHealth * maxWidth);
-			g.setColor(Color.GREEN);
-			g.fillRect(position.getIntX() * Game.tileSize + 3, position.getIntY() * Game.tileSize + 3, width, Game.tileSize / 4 - 5);
-		}
-
-	}
-	private void drawHealthBarStructure(Graphics g) {
-
-		if (structure != null) {
-			g.setColor(Color.BLACK);
-			g.fillRect(position.getIntX() * Game.tileSize + 1, position.getIntY() * Game.tileSize + 1, Game.tileSize - 1, Game.tileSize / 4 - 1);
-			g.setColor(Color.RED);
-			g.fillRect(position.getIntX() * Game.tileSize + 3, position.getIntY() * Game.tileSize + 3, Game.tileSize - 5, Game.tileSize / 4 - 5);
-
-			double healthOverMaxHealth = structure.getHealth() / structure.getStructureType().getHealth();
-			int maxWidth = Game.tileSize - 5;
-			int width = (int) (healthOverMaxHealth * maxWidth);
-			g.setColor(Color.GREEN);
-			g.fillRect(position.getIntX() * Game.tileSize + 3, position.getIntY() * Game.tileSize + 3, width, Game.tileSize / 4 - 5);
-		}
-
-	}
-	private void drawHealthBarPlants(Graphics g) {
-		
-		
-		if(plant != null &&( isHighlight == true || (currentTick - plant.getTimeLastDamageTaken()) <20 ) ) {
-			g.setColor(Color.BLACK);
-			g.fillRect(position.getIntX() * Game.tileSize+1, position.getIntY() * Game.tileSize+1, Game.tileSize-1, Game.tileSize/4 -1);
-			g.setColor(Color.RED);
-			g.fillRect(position.getIntX() * Game.tileSize+3, position.getIntY() * Game.tileSize+3, Game.tileSize-5, Game.tileSize/4 -5);
-			
-			double healthOverMaxHealth = plant.getHealth()/plant.getPlantType().getHealth();
-			int maxWidth = Game.tileSize-5;
-			int width = (int)(healthOverMaxHealth * maxWidth);
-			g.setColor(Color.GREEN);
-			g.fillRect(position.getIntX() * Game.tileSize+3, position.getIntY() * Game.tileSize+3, width, Game.tileSize/4 -5);
-		}
-		
-	}
 	
+	public void drawHealthBar(Graphics g, Thing thing) {
+
+		if (( isHighlight == true || (currentTick - thing.getTimeLastDamageTaken()) <20 ) ) {
+			g.setColor(Color.BLACK);
+			g.fillRect(position.getIntX() * Game.tileSize + 1, position.getIntY() * Game.tileSize + 1, Game.tileSize - 1, Game.tileSize / 4 - 1);
+			g.setColor(Color.RED);
+			g.fillRect(position.getIntX() * Game.tileSize + 3, position.getIntY() * Game.tileSize + 3, Game.tileSize - 5, Game.tileSize / 4 - 5);
+
+			double healthOverMaxHealth = thing.getHealth() / thing.getMaxHealth();
+			int maxWidth = Game.tileSize - 5;
+			int width = (int) (healthOverMaxHealth * maxWidth);
+			g.setColor(Color.GREEN);
+			g.fillRect(position.getIntX() * Game.tileSize + 3, position.getIntY() * Game.tileSize + 3, width, Game.tileSize / 4 - 5);
+		}
+	}
 	
 	private void drawBuilding(Graphics g, BuildMode bm) {
 		if(building != null) {

@@ -1,24 +1,22 @@
 package game;
 
-import java.awt.Image;
+import java.awt.*;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
-import utils.Position;
-import world.Tile;
+import utils.*;
+import world.*;
 
-public class Structure {
+public class Structure extends Thing {
 
 	private StructureType structureType;
 	private Tile tile;
-	private double health;
 	private int culture;
-	private int timeLastDamageTaken;
 	
 	public Structure(StructureType structureType, Tile tile) {
+		super(structureType.getHealth());
 		this.structureType = structureType;
 		this.tile = tile;
-		this.health = structureType.getHealth();
 	}
 	
 	
@@ -44,17 +42,4 @@ public class Structure {
 	public Tile getTile() {
 		return tile;
 	}
-	public double getHealth() {
-		return health;
-	}
-	public void takeDamage(double damage) {
-		health -= damage;
-	}
-	public boolean isDead() {
-		return health < 0;
-	}
-	public int getTimeLastDamageTaken() {
-		return timeLastDamageTaken;
-	}
-
 }

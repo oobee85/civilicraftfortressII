@@ -3,6 +3,7 @@ package wildlife;
 import java.util.*;
 import java.util.concurrent.*;
 
+import game.*;
 import liquid.*;
 import utils.*;
 import world.*;
@@ -49,16 +50,22 @@ public class Wildlife {
 			}
 			if(Math.random() < animal.getMoveChance()) {
 				List<Tile> neighbors = Utils.getNeighborsIncludingCurrent(animal.getTile(), world);
-				Tile best = neighbors.remove(0);
-				double bestDanger = animal.computeDanger(best);
+				Tile best = null;
+				double bestDanger = Double.MAX_VALUE;
 				for(Tile t : neighbors) {
+					// deer cant move onto walls
+					if(t.getHasBuilding() && t.getBuilding().getBuildingType() == BuildingType.WALL_BRICK) {
+						continue;
+					}
 					double danger = animal.computeDanger(t);
 					if(danger < bestDanger) {
 						best = t;
 						bestDanger = danger;
 					}
 				}
-				animal.setTile(best);
+				if(best != null) {
+					animal.setTile(best);
+				}
 			}
 			else if(Math.random() < animal.getDrive()) {
 				if(trying.containsKey(animal.getTile())) {

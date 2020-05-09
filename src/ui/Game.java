@@ -12,7 +12,7 @@ import wildlife.*;
 import world.*;
 
 public class Game {
-	private int ticks;
+	public static int ticks;
 	private int turn;
 	private Point worldSize;
 	public Tile[][] world;
@@ -149,7 +149,7 @@ public class Game {
 			if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(!plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
 					double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
-					plant.takeDamage(damageTaken, ticks);
+					plant.takeDamage(damageTaken);
 				}
 				
 			}
@@ -176,7 +176,7 @@ public class Game {
 				if (plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
 					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
 					double damageTaken = difInLiquids * tile.liquidType.getDamage();
-					plant.takeDamage(damageTaken, ticks);
+					plant.takeDamage(damageTaken);
 				}
 
 			}
@@ -201,7 +201,7 @@ public class Game {
 
 		for (Building building : buildings) {
 			Tile tile = building.getTile();
-			if (tile.liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD) {
+			if (tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
 				building.takeDamage(damageTaken);
 
@@ -859,6 +859,7 @@ public class Game {
 			}
 			for(Animal animal : Wildlife.getAnimals()) {
 				g.drawImage(animal.getType().getImage(), animal.getTile().getLocation().getIntX() * Game.tileSize, animal.getTile().getLocation().getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				animal.getTile().drawHealthBar(g, animal);
 			}
 			if(DEBUG_DRAW) {
 				if(Game.tileSize >= 36) {
