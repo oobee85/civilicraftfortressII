@@ -23,7 +23,7 @@ public class Game {
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
 	ArrayList<Unit> selectUnits = new ArrayList<Unit>();
 	LinkedList<Plant> plantsLand = new LinkedList<Plant>();
-	ArrayList<Plant> plantsWater = new ArrayList<Plant>();
+	LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
 	LinkedList<Building> buildings = new LinkedList<Building>();
 	LinkedList<Structure> structures = new LinkedList<Structure>();
 	
@@ -83,11 +83,16 @@ public class Game {
 //		}
 		
 		
+		if(ticks == 1) {
+			rain();
+		}
 		// rain event
 		if(Math.random() < 0.001) {
-//			rain();
+			rain();
 		}
-		
+		if(Math.random() < 0.01) {
+			grow();
+		}
 		if(ticks%1 == 0) {
 			world[mountx][mounty].liquidAmount += 0.008;
 			world[volcanox][volcanoy].liquidType = LiquidType.LAVA;
@@ -104,8 +109,27 @@ public class Game {
 			createTerrainImage();
 		}
 	}
+	public void grow() {
+		System.out.println("growing plants");
+		for(int i = 0; i < world.length; i++) {
+			for(int j = 0; j < world.length; j++) {
+				Tile tile = world[i][j];
+				
+				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD 
+						&& Math.random()< 0.01) {
+					Plant plant = new Plant(PlantType.CATTAIL, tile);
+					tile.setHasPlant(plant);
+					plantsAquatic.add(plant);
+				}
+				
+				
+			}
+		}
+		
+	}
 	
 	public void rain() {
+		System.out.println("raining");
 		for(int x = 0; x < world.length; x++) {
 			for(int y = 0; y < world[0].length; y++) {
 				if(world[x][y].liquidType == LiquidType.WATER) {
@@ -142,8 +166,34 @@ public class Game {
 			}
 		}
 		plantsLand = plantsLandNew;
-		
-		
+
+		LinkedList<Plant> plantsAquaticNew = new LinkedList<Plant>();
+
+		for (Plant plant : plantsAquatic) {
+			Tile tile = plant.getTile();
+
+			if (tile.liquidAmount < Liquid.MINIMUM_LIQUID_THRESHOLD) {
+				if (plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
+					double difInLiquids = Liquid.MINIMUM_LIQUID_THRESHOLD - tile.liquidAmount;
+					double damageTaken = difInLiquids * tile.liquidType.getDamage();
+					plant.takeDamage(damageTaken, ticks);
+				}
+
+			}
+
+		}
+
+		for (Plant plant : plantsAquatic) {
+
+			Tile tile = plant.getTile();
+			if (plant.isDead() == true) {
+				tile.setHasPlant(null);
+			} else {
+				plantsAquaticNew.add(plant);
+			}
+		}
+		plantsAquatic = plantsAquaticNew;
+
 	}
 
 	public void updateBuildingDamage() {
@@ -239,9 +289,7 @@ public class Game {
 		
 		makeRoad();
 		genResources();
-		
 		createTerrainImage();
-		
 		Wildlife.generateWildLife(world);
 	}
 	
@@ -439,7 +487,7 @@ public class Game {
 					if(o < PlantType.CATTAIL.getRarity()) {
 						Plant p = new Plant(PlantType.CATTAIL, world[i][j] );
 						world[i][j].setHasPlant(p);
-						plantsWater.add(world[i][j].getPlant());
+						plantsAquatic.add(world[i][j].getPlant());
 					}
 					
 				}
@@ -485,10 +533,14 @@ public class Game {
 							}else if (Math.random() < Ore.ORE_ADAMANT.getRarity()) {
 								tile.setHasOre(Ore.ORE_ADAMANT);
 								numOres--;
-							} else if (Math.random() < Ore.ORE_RUNE.getRarity()) {
+							}else if (Math.random() < Ore.ORE_RUNE.getRarity()) {
 								tile.setHasOre(Ore.ORE_RUNE);
 								numOres--;
+							}else if (Math.random() < Ore.ORE_TITANIUM.getRarity()) {
+								tile.setHasOre(Ore.ORE_TITANIUM);
+								numOres--;
 							}
+							
 						}
 						
 					}
