@@ -172,9 +172,9 @@ public class Game {
 		for (Plant plant : plantsAquatic) {
 			Tile tile = plant.getTile();
 
-			if (tile.liquidAmount < Liquid.MINIMUM_LIQUID_THRESHOLD) {
+			if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 				if (plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
-					double difInLiquids = Liquid.MINIMUM_LIQUID_THRESHOLD - tile.liquidAmount;
+					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
 					double damageTaken = difInLiquids * tile.liquidType.getDamage();
 					plant.takeDamage(damageTaken, ticks);
 				}
