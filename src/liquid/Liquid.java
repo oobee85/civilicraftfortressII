@@ -147,11 +147,16 @@ public class Liquid {
 							combined = myv;
 							extra = change - combined;
 						}
+						
+//						if(heightMap[x][y] + combined > 1) {
+//							combined = 1 - heightMap[x][y];
+//							extra = change - combined;
+//						}
+//						heightMap[x][y] += combined;
+						
 						if(heightMap[x][y] + combined > 1) {
-							combined = 1 - heightMap[x][y];
-							extra = change - combined;
+							heightMap[x][y] = 1;
 						}
-						heightMap[x][y] += combined;
 						
 						if(extra == 0) {
 							liquidAmountsTemp[x][y] -= combined;
