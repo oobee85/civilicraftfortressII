@@ -17,10 +17,12 @@ public class Wildlife {
 	public static void generateWildLife(Tile[][] world) {
 		for(int x = 0; x < world.length; x++) {
 			for(int y = 0; y < world[0].length; y++) {
-				if(world[x][y].checkTerrain(Terrain.GRASS) && Math.random() < 0.1) {
-					Animal animal = new Animal(AnimalType.DEER);
-					animal.setTile(world[x][y]);
-					animals.add(animal);
+				if(Math.random() < 0.04) {
+					if(world[x][y].checkTerrain(Terrain.GRASS) || world[x][y].checkTerrain(Terrain.DIRT)) {
+						Animal animal = new Animal(AnimalType.DEER);
+						animal.setTile(world[x][y]);
+						animals.add(animal);
+					}
 				}
 			}
 		}

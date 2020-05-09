@@ -64,8 +64,13 @@ public class Liquid {
 		for(int x = 0; x < world.length; x++) {
 			for(int y = 0; y < world.length; y++) {
 				world[x][y].liquidAmount = Math.max(liquidAmountsTemp[x][y] * 0.9999 - 0.00001, 0);
+				if(world[x][y].liquidAmount == 0) {
+					world[x][y].liquidType = LiquidType.DRY;
+				}
+				else {
+					world[x][y].liquidType = liquidTypesTemp[x][y];
+				}
 				
-				world[x][y].liquidType = liquidTypesTemp[x][y];
 				if(world[x][y].liquidType == LiquidType.LAVA && world[x][y].liquidAmount > world[x][y].liquidType.surfaceTension*2) {
 					if(world[x][y].checkTerrain(Terrain.GRASS) ) {
 						world[x][y].setTerrain(Terrain.DIRT);
@@ -123,7 +128,7 @@ public class Liquid {
 					change = ov;
 				}
 				
-				if(otype == mytype) {
+				if(otype == mytype || mytype == LiquidType.DRY) {
 					if(myv < MINIMUM_LIQUID_THRESHOLD && change < otype.surfaceTension) { 
 						change = 0;
 					}

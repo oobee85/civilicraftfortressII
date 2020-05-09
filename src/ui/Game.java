@@ -133,7 +133,8 @@ public class Game {
 		System.out.println("raining");
 		for(int x = 0; x < world.length; x++) {
 			for(int y = 0; y < world[0].length; y++) {
-				if(world[x][y].liquidType == LiquidType.WATER) {
+				if(world[x][y].liquidType == LiquidType.WATER || world[x][y].liquidType == LiquidType.DRY) {
+					world[x][y].liquidType = LiquidType.WATER;
 					world[x][y].liquidAmount += 0.005;
 				}
 			}
