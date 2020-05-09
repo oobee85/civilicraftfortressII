@@ -1,9 +1,10 @@
 package world;
+
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.List;
+import java.util.List;
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -12,23 +13,15 @@ import liquid.*;
 import ui.*;
 import utils.*;
 
-
-
-
 public class Tile {
 	private boolean hasRoad;
 	private boolean isHighlight;
-	private boolean hasOre;
-	private boolean hasBuilding;
-	private boolean hasStructure;
-	private boolean hasUnit;
 	private boolean isTerritory = false;
-	private int forestType = 0;
 	private boolean isSelected = false;
 	
-	private Position p;
-//	private ArrayList<Unit> units = new ArrayList<Unit>();
+	private TileLoc location;
 	int minEntitySize = 20;
+	private int currentTick = 0;
 	
 	private String roadCorner;
 	
@@ -40,38 +33,29 @@ public class Tile {
 	private Unit unit;
 	
 	
-	private double liquidAmount;
-	private LiquidType liquidType;
+	public double liquidAmount;
+	public LiquidType liquidType;
 	
-	public Tile(Position point, Terrain t) {
-		p = point;
+	public Tile(TileLoc location, Terrain t) {
+		this.location = location;
 		terr = t;
 		isHighlight = false;
 		
 		liquidType = LiquidType.WATER;
 		liquidAmount = 0;
 	}
-	public void setHasBuilding(Building b) {
-		this.hasBuilding = true;
-		building = b;
-	}
-	public void buildRoad(boolean b) {
-		if(hasRoad == b) {
-			this.hasRoad = false;
-		}else {
-			this.hasRoad = b;
-		}
-	}
-
-	public void setHasRoad(boolean b, String s) {
+	
+	public void setRoad(boolean b, String s) {
 		this.hasRoad = b;
-		roadCorner = s;
+		if(s != null) {
+			roadCorner = s;
+		}
+		
 	}
 	public void setTerritory(boolean b) {
 		this.isTerritory = b;
 	}
 	public void setHasOre(Ore o) {
-		hasOre = true;
 		ore = o;
 	}
 	public void setHasPlant(Plant p) {
@@ -85,33 +69,32 @@ public class Tile {
 		}
 		
 	}
-	public void setForestType(int t) {
-		forestType = t;
-	}
 	
 	public void setBuilding(Building b) {
-		if(this.building == b) {
-			this.building = null;
-			hasBuilding = false;
-		}else {
-			this.building = b;
-			hasBuilding = true;
+		if(b != null) {
+			if (building != null && building.getBuildingType() == b.getBuildingType()) {
+				this.building = null;
+			} else if (structure == null) {
+				this.building = b;
+			}
 		}
+		building = b;
+			
 	}
 	
 	public void setStructure(Structure s) {
-		if(this.structure == s) {
-			this.structure = null;
-			hasStructure = false;
-		}else {
-			this.structure = s;
-			hasStructure = true;
+		if(s != null) {
+			if (structure != null && structure.getStructureType() == s.getStructureType()) {
+				this.structure = null;
+			} else if (building == null) {
+				this.structure = s;
+			}	
 		}
+		structure = s;
 		
 		
 	}
 	public void setUnit(Unit u) {
-//		units.add(u);
 		unit = u;
 		
 	}
@@ -129,23 +112,34 @@ public class Tile {
 	
 	public void drawEntities(Graphics g, BuildMode bm) {
 		
-		drawTerritory(g);
-		drawPlant(g);
 		drawOre(g);
+		drawTerritory(g);
 		drawRoad(g);
+		drawPlantLand(g);
+		drawWater(g);
+		drawPlantAquatic(g);
 		drawBuilding(g, bm);
 		drawStructure(g, bm);
 		drawHighlightedArea(g);
 		drawUnit(g);
-		
-		
+
+		if (plant != null) {
+			drawHealthBar(g, plant);
+		}
+		if (building != null) {
+			drawHealthBar(g, building);
+		}
+		if (structure != null) {
+			drawHealthBar(g, structure);
+		}
+
 	}
 	
 	private void drawHighlightedArea(Graphics g) {
 		if(isHighlight == true) {
 			g.setColor(new Color(0, 0, 0, 64));
-			g.drawRect(p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
-			g.drawRect(p.getIntX() * Game.tileSize + 1, p.getIntY() * Game.tileSize + 1, Game.tileSize - 1,
+			g.drawRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize);
+			g.drawRect(location.x * Game.tileSize + 1, location.y * Game.tileSize + 1, Game.tileSize - 1,
 					Game.tileSize - 1);
 		}
 		
@@ -153,25 +147,25 @@ public class Tile {
 	private void applyHighlight(Graphics g, BuildMode bm) {
 		
 		if(isHighlight == true && bm != BuildMode.NOMODE) {
-			Utils.setTransparent(g);
-		    if(terr.isBuildable(terr)==false) {
+			Utils.setTransparency(g, 0.5f);
+		    if(canBuild() ==false) {
 		    	//draws red rectangle over image
 		    	Color c = new Color(255, 0, 0, 100); // Red with alpha = 0.5 
 		    	g.setColor(c);
-				g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
+				g.fillRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize); 
 		    }
 		    if(bm == BuildMode.IRRIGATE && terr.isPlantable(terr) == false) {
 		    	Color c = new Color(255, 0, 0, 100); // Red with alpha = 0.5 
 		    	g.setColor(c);
-				g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
+				g.fillRect(location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize); 
 		    }
 		    if(unit != null) {
 		    	Color c = new Color(0, 255, 0, 100); 
 		    	g.setColor(c);
-				g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
+				g.fillRect(location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize); 
 		    }
 		}else {
-			Utils.resetTransparent(g);
+			Utils.setTransparency(g, 1);
 		}
 		
 		
@@ -179,58 +173,103 @@ public class Tile {
 	
 	private void drawUnit(Graphics g) {
 		if(unit != null) {
-			g.drawImage(unit.getImage(), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(unit.getImage(), location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		
 	}
 	private void drawTerrain(Graphics g) {
-		g.drawImage(terr.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+		g.drawImage(terr.getImage(Game.tileSize), location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+		
+	}
+	
+	private void drawWater(Graphics g) {
+		float alpha = Utils.getAlphaOfLiquid(liquidAmount);
+		Utils.setTransparency(g, alpha);
+		g.setColor(liquidType.getColor());
+		g.fillRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize);
+		Utils.setTransparency(g, 1);
 	}
 	
 	public void drawHeightMap(Graphics g, double height) {
 		int r = Math.max(Math.min((int)(255*height), 255), 0);
 		g.setColor(new Color(r, 0, 255-r));
-		g.fillRect(p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
+		g.fillRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize);
 	}
 	
 	private void drawOre(Graphics g) {
 		if(ore != null) {
-			g.drawImage(ore.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
+			g.drawImage(ore.getImage(Game.tileSize), location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize,Game.tileSize, null);
 		}
 	}
-	private void drawPlant(Graphics g) {
-		if(plant != null) {
-			g.drawImage(plant.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
+	private void drawPlantLand(Graphics g) {
+		if(plant != null && plant.isAquatic() == false) {
+			g.drawImage(plant.getImage(Game.tileSize), location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize,Game.tileSize, null);
 		}
 		//kills the plant if its built on
 		if(plant != null && building != null) {
 			plant = null;
 		}
-		if(forestType == 1) {
-			g.drawImage(Terrain.FOREST1.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null); 
-		}
-		if(forestType == 2) {
-			g.drawImage(Terrain.FOREST2.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null); 
-		}
 		
 	}
+
+	private void drawPlantAquatic(Graphics g) {
+		if (plant != null && plant.isAquatic() == true) {
+			g.drawImage(plant.getImage(Game.tileSize), location.x * Game.tileSize,
+					location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+		}
+		// kills the plant if its built on
+		if (plant != null && building != null) {
+			plant = null;
+		}
+	}
 	
-	
+	public void drawHealthBar(Graphics g, Thing thing) {
+		if (Game.tileSize > 30) {
+			if ((isHighlight == true || (currentTick - thing.getTimeLastDamageTaken()) < 20)) {
+				g.setColor(Color.BLACK);
+				g.fillRect(location.x * Game.tileSize + 1, location.y * Game.tileSize + 1,
+						Game.tileSize - 1, Game.tileSize / 4 - 1);
+				g.setColor(Color.RED);
+				g.fillRect(location.x * Game.tileSize + 3, location.y * Game.tileSize + 3,
+						Game.tileSize - 5, Game.tileSize / 4 - 5);
+
+				double healthOverMaxHealth = thing.getHealth() / thing.getMaxHealth();
+				int maxWidth = Game.tileSize - 5;
+				int width = (int) (healthOverMaxHealth * maxWidth);
+				g.setColor(Color.GREEN);
+				g.fillRect(location.x * Game.tileSize + 3, location.y * Game.tileSize + 3, width,
+						Game.tileSize / 4 - 5);
+			}
+		}
+	}
+	public void drawDebugStrings(Graphics g, List<String> strings, int[][] rows, int fontsize, int stringWidth) {
+		int x = location.x * Game.tileSize + 2;
+		int y = location.y * Game.tileSize + fontsize/2;
+		int row = rows[location.x][location.y];
+		
+		g.setColor(Color.black);
+		g.fillRect(x, y + 2 + row*fontsize, stringWidth, strings.size()*fontsize);
+		g.setColor(Color.green);
+		for(String s : strings) {
+			g.drawString(s, x, y + (++row)*fontsize);
+		}
+		rows[location.x][location.y] = row;
+	}
 	
 	private void drawBuilding(Graphics g, BuildMode bm) {
-		if(hasBuilding == true) {
-			Utils.resetTransparent(g);
-			g.drawImage(building.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+		if(building != null) {
+			Utils.setTransparency(g, 1);
+			g.drawImage(building.getImage(0), location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		
 		if(bm == BuildMode.WALL && isHighlight == true) {
-			g.drawImage(Building.WALL_BRICK.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(BuildingType.WALL_BRICK.getImage(0), location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		if(bm == BuildMode.MINE && isHighlight == true) {
-			g.drawImage(Building.MINE.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(BuildingType.MINE.getImage(0), location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		if(bm == BuildMode.IRRIGATE && isHighlight == true) {
-			g.drawImage(Building.IRRIGATION.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(BuildingType.IRRIGATION.getImage(0), location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 	}
 	private void drawStructure(Graphics g, BuildMode bm) {
@@ -238,32 +277,32 @@ public class Tile {
 		if (Game.tileSize < minEntitySize) {
 			extra = minEntitySize - Game.tileSize;
 		}
-		if(hasStructure == true) {
-			Utils.resetTransparent(g);
-			g.drawImage(structure.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+		if(structure != null) {
+			Utils.setTransparency(g, 1);
+			g.drawImage(structure.getImage(0), location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}else if (structure != null) {
-			g.drawImage(structure.getImage(), p.getIntX() * Game.tileSize - extra / 1,p.getIntY() * Game.tileSize - extra / 1, Game.tileSize + extra, Game.tileSize + extra, null);
+			g.drawImage(structure.getImage(0), location.x * Game.tileSize - extra / 1,location.y * Game.tileSize - extra / 1, Game.tileSize + extra, Game.tileSize + extra, null);
 		}
 		
 		if(bm == BuildMode.BARRACKS && isHighlight == true) {
-			g.drawImage(Structure.BARRACKS.getImage(),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(StructureType.BARRACKS.getImage(0), location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		
 	}
 	private void drawTerritory(Graphics g) {
 		if(isTerritory == true) {
-			Utils.setTransparent(g);
+			Utils.setTransparency(g, 0.5f);
 			Color c = new Color(0, 0, 255, 150); 
 	    	g.setColor(c);
-	    	g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
+	    	g.fillRect( location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize); 
 			
-			Utils.resetTransparent(g);
+			Utils.setTransparency(g, 1);
 		}
 		
 	}
 	private void drawRoad(Graphics g) {
 		if (hasRoad == true) {
-			g.drawImage(Utils.roadImages.get(roadCorner), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(Utils.roadImages.get(roadCorner), location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 	}
 	
@@ -271,19 +310,19 @@ public class Tile {
 	
 
 	public boolean getHasOre() {
-		return hasOre;
+		return ore != null;
 	}
 	public boolean getHasUnit() {
-		return hasUnit;
+		return unit != null;
 	}
 	public boolean getHasRoad() {
 		return hasRoad;
 	}
 	public boolean getHasStructure() {
-		return hasStructure;
+		return structure != null;
 	}
-	public int getForestType() {
-		return forestType;
+	public boolean getHasBuilding() {
+		return building != null;
 	}
 	public Ore getOre() {
 		return ore;
@@ -294,14 +333,24 @@ public class Tile {
 	public Structure getStructure() {
 		return structure;
 	}
+	public Building getBuilding() {
+		return building;
+	}
+	public Plant getPlant() {
+		return plant;
+	}
+	public Terrain getTerrain() {
+		return terr;
+	}
 	public boolean getIsSelected() {
 		return isSelected;
 	}
 	public boolean getIsTerritory() {
 		return isTerritory;
 	}
-	public boolean isStructure(Structure s) {
-		if(structure == s) {
+	
+	public boolean isStructure(StructureType s) {
+		if(structure.getStructureType() == s) {
 			return true;
 		}
 		return false;
@@ -312,15 +361,28 @@ public class Tile {
 	public boolean canPlant() {
 		return terr.isPlantable(terr);
 	}
-	public Terrain getTerrain() {
-		return terr;
+	public boolean canOre() {
+		return terr.isOreable(terr);
+	}
+	public void setTerrain(Terrain t) {
+		terr = t;
+	}
+	public boolean canSupportRareOre() {
+		return terr.canSupportRare(terr);
+	}
+	public void setRecentTick(int t) {
+		currentTick = t;
 	}
 	public boolean checkTerrain(Terrain t) {
 		return terr == t;
 	}
+	
 	public void highlight(Graphics g) {
 		isHighlight = true;
 		
+	}
+	public TileLoc getLocation() {
+		return location;
 	}
 
 }

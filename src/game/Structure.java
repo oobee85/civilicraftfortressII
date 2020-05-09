@@ -1,53 +1,38 @@
 package game;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 
-import javax.swing.*;
-
+import java.util.List;
+import ui.*;
 import utils.*;
+import world.*;
 
-public enum Structure {
+public class Structure extends Thing {
 	
-	CASTLE (500, "resources/Images/buildings/castle256.png", 80, 5),
-	BARRACKS (100, "resources/Images/buildings/barracks256.png", 0, 1)
-	;
-	
-    private final int health;   
-	private MipMap mipmap;
-    private int culture;
-    private int cultureRate;
-    
-    Structure(int hp, String s, int c, int cr) {
-        this.health = hp;
-        this.culture = c;
-        this.cultureRate = cr;
-        this.mipmap = new MipMap(s);
-        
-    }
-    
-    public Image getImage() {
-    	return mipmap.getImage(0);
-    }
-    public ImageIcon getImageIcon() {
-    	return mipmap.getImageIcon(0);
-    }
-    
-    public int getHealth() {
-    	return health; 
-    }
-    public int getCulture() {
-    	return culture; 
-    }
-    public int getCultureRate() {
-    	return cultureRate;
-    }
-    public void updateCulture() {
-    	culture += cultureRate;
-//    	System.out.println("culture: "+culture);
-//    	System.out.println("cultureRate: "+cultureRate);
-    }
-    
+	public static final double CULTURE_AREA_MULTIPLIER = 0.1;
+
+	private StructureType structureType;
+	private int culture;
+
+	public Structure(StructureType structureType, Tile tile) {
+		super(structureType.getHealth(), structureType, tile);
+		this.structureType = structureType;
+	}
+
+	public void updateCulture() {
+		culture += structureType.cultureRate;
+	}
+
+	public int getCulture() {
+		return culture;
+	}
+
+	public StructureType getStructureType() {
+		return structureType;
+	}
+
+	@Override
+	public List<String> getDebugStrings() {
+		List<String> strings = super.getDebugStrings();
+		strings.add(String.format("CT=%." + Game.NUM_DEBUG_DIGITS + "f", getCulture() * 1.0));
+		return strings;
+	}
 }
-
-
-

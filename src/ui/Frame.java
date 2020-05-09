@@ -71,7 +71,7 @@ public class Frame extends JPanel{
 	
 	private void menu() {
 		panel = new JPanel();
-		JButton start = new JButton("startGame");
+		JButton start = new JButton("Start Game");
 		start.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -93,7 +93,7 @@ public class Frame extends JPanel{
 		mapType.setPreferredSize(new Dimension(100,50));
 		panel.add(mapType);
 		
-		mapSize = new JTextField("64", 10);
+		mapSize = new JTextField("128", 10);
 		mapSize.setPreferredSize(new Dimension(100,50));
 		panel.add(mapSize);
 		
@@ -196,27 +196,27 @@ public class Frame extends JPanel{
 		makeRoad.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.ROAD);
 		});
-		JButton makeWall = new JButton("Make Wall", Utils.resizeImageIcon(Building.WALL_BRICK.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton makeWall = new JButton("Make Wall", Utils.resizeImageIcon(BuildingType.WALL_BRICK.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		makeWall.setMargin(zeroMargin);
 		makeWall.setPreferredSize(BUILDING_BUTTON_SIZE);
 		makeWall.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.WALL);
 		});
 		
-		JButton buildMine = new JButton("Build Mine", Utils.resizeImageIcon(Building.MINE.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildMine = new JButton("Build Mine", Utils.resizeImageIcon(BuildingType.MINE.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildMine.setMargin(zeroMargin);
 		buildMine.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildMine.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.MINE);
 		});
 		
-		JButton buildBarracks = new JButton("Build Barracks", Utils.resizeImageIcon(Structure.BARRACKS.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildBarracks = new JButton("Build Barracks", Utils.resizeImageIcon(StructureType.BARRACKS.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildBarracks.setMargin(zeroMargin);
 		buildBarracks.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildBarracks.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.BARRACKS);
 		});
-		JButton buildIrrigation = new JButton("Irrigate", Utils.resizeImageIcon(Building.IRRIGATION.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildIrrigation = new JButton("Irrigate", Utils.resizeImageIcon(BuildingType.IRRIGATION.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildIrrigation.setMargin(zeroMargin);
 		buildIrrigation.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildIrrigation.addActionListener(e -> {
@@ -240,12 +240,12 @@ public class Frame extends JPanel{
 		buildSpearman.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.SPEARMAN);
 		});
-		JButton exitCity = new JButton("Exit City", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		exitCity.setMargin(zeroMargin);
-		exitCity.setPreferredSize(BUILDING_BUTTON_SIZE);
-		exitCity.addActionListener(e -> {
-			gameInstance.exitCity();
-		});
+//		JButton exitCity = new JButton("Exit City", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+//		exitCity.setMargin(zeroMargin);
+//		exitCity.setPreferredSize(BUILDING_BUTTON_SIZE);
+//		exitCity.addActionListener(e -> {
+//			gameInstance.exitCity();
+//		});
 		JLabel money = new JLabel(Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE)); 
 		//money.setFont(new Font("Verdana",1,20));
 		money.setText("Gold = "+gameInstance.getMoney());
@@ -277,9 +277,38 @@ public class Frame extends JPanel{
 		buildMine.setFocusable(false);
 		buildBarracks.setFocusable(false);
 		buildIrrigation.setFocusable(false);
-		exitCity.setFocusable(false);
+//		exitCity.setFocusable(false);
 		showHeightMap.setFocusable(false);
+		
+		
+		JButton flipTable = new JButton("Flip Table");
+		flipTable.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.flipTable();
+			}
+		});
+		flipTable.setPreferredSize(BUILDING_BUTTON_SIZE);
+		
+		JButton makeItRain = new JButton("rain");
+		makeItRain.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.world.rain();
+				gameInstance.world.grow();
+			}
+		});
+		makeItRain.setPreferredSize(BUILDING_BUTTON_SIZE);
 
+		JToggleButton debug = new JToggleButton(Game.DEBUG_DRAW ? "Stop Debug" : "Debug");
+		debug.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				Game.DEBUG_DRAW = debug.isSelected();
+				debug.setText(Game.DEBUG_DRAW ? "Stop Debug" : "Debug");
+			}
+		});
+		debug.setPreferredSize(BUILDING_BUTTON_SIZE);
 		
 		JButton exit = new JButton("Exit");
 		exit.addActionListener(new ActionListener() {
@@ -300,9 +329,14 @@ public class Frame extends JPanel{
 		gui.add(buildBarracks);
 		gui.add(buildIrrigation);
 		gui.add(showHeightMap);
+		gui.add(flipTable);
+		gui.add(makeItRain);
+		gui.add(debug);
 		gui.add(exit);
 		
-
+		makeItRain.setFocusable(false);
+		flipTable.setFocusable(false);
+		
 		JPanel guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());
 		guiSplitter.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));
@@ -327,8 +361,8 @@ public class Frame extends JPanel{
 		buildWarrior.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 		cityView.add(buildSpearman);
 		buildSpearman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
-		cityView.add(exitCity);
-		exitCity.setBounds(790, 22 , BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+//		cityView.add(exitCity);
+//		exitCity.setBounds(790, 22 , BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 		
 		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
 		frame.getContentPane().add(guiSplitter,BorderLayout.EAST);

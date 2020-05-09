@@ -3,24 +3,25 @@ import java.awt.Image;
 
 import game.*;
 import utils.*;
+import world.Tile;
 
 public class Unit {
 	
 	
-	Position pos;
+	Tile tile;
 	UnitType unitType;
 	
-	public Unit(UnitType ut, Position p) {
+	public Unit(UnitType ut, Tile tile) {
 		this.unitType = ut;
-		pos = p;
+		this.tile = tile;
 	}
 	
 	
-	public void changePosion(Position p) {
-		pos = p;
+	public void changePosion(Tile t) {
+		tile = t;
 	}
-	public Position getPosition() {
-		return pos;
+	public Tile getTile() {
+		return tile;
 	}
 	public Image getImage() {
 		return unitType.getImage();

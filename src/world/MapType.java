@@ -1,14 +1,16 @@
 package world;
 
 public enum MapType {
-	PANGEA("Pangea"), 
-	CONTINENTS("Continents"), 
-	ARCHIPELAGO("Archipelago")
+	PANGEA("Pangea", 0.5), 
+	CONTINENTS("Continents", 0.6), 
+	ARCHIPELAGO("Archipelago", 0.75)
 	;
 	
 	String name;
-	private MapType(String name) {
+	public double dirtLevel;
+	private MapType(String name, double dirtLevel) {
 		this.name = name;
+		this.dirtLevel = dirtLevel;
 	}
 	
 	@Override

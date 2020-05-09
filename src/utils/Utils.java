@@ -3,10 +3,14 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.*;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import liquid.Liquid.*;
+import world.*;
 
 public final class Utils {
 	
@@ -81,18 +85,62 @@ public final class Utils {
 		// Return the buffered image
 		return bimage;
 	}
-	public static void resetTransparent(Graphics g) {
-		Graphics2D g2d = (Graphics2D)g;
-		AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
-	    g2d.setComposite(ac);
+	
+	/**
+	 * @param alpha 1 alpha is opaque, 0 alpha is completely transparent
+	 * @param g
+	 */
+	public static void setTransparency(Graphics g, float alpha) {
+	    ((Graphics2D)g).setComposite(java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
 	}
-	public static void setTransparent(Graphics g) {
-		Graphics2D g2d = (Graphics2D)g;
-		AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F);
-	    g2d.setComposite(ac);
+	
+	/**
+	 * result is top*alpha + bottom*(1-alpha)
+	 * @param top
+	 * @param bottom
+	 * @param alpha
+	 */
+	public static Color blendColors(Color top, Color bottom, float alpha) {
+		return new Color(snap((int) (top.getRed()*alpha + bottom.getRed()*(1-alpha))), 
+				snap((int) (top.getGreen()*alpha + bottom.getGreen()*(1-alpha))),
+				snap((int) (top.getBlue()*alpha + bottom.getBlue()*(1-alpha))));
+	}
+	private static int snap(int color) {
+		return Math.min(Math.max(color, 0), 255);
+	}
+	
+	public static float getAlphaOfLiquid(double amount) {
+		// 1 units of fluid is opaque, linearly becoming transparent at 0 units of fluid.
+		float alpha = (float)Math.max(Math.min(amount*12 - 0.2, 1), 0);
+		return alpha*alpha;
+		//return 1 - (1 - alpha) * (1 - alpha);
 	}
 	
 
+	public static void normalize(double[][] data) {
+		double minValue = data[0][0];
+		double maxValue = data[0][0];
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				minValue = data[i][j] < minValue ? data[i][j] : minValue;
+				maxValue = data[i][j] > maxValue ? data[i][j] : maxValue;
+			}
+		}
+		System.out.println("Min Terrain Gen Value: " + minValue + ", Max value: " + maxValue);
+		// Normalize the heightMap to be between 0 and 1
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				data[i][j] = (data[i][j] - minValue) / (maxValue - minValue);
+			}
+		}
+	}
+	/**
+	 * 
+	 * @param data
+	 * @param radius
+	 * @param c	lower = sharper, higher = smoother
+	 * @return
+	 */
 	public static double[][] smoothingFilter(double[][] data, double radius, double c) {
 		double[][] smoothed = new double[data.length][data[0].length];
 		// apply smoothing filter
@@ -116,5 +164,40 @@ public final class Utils {
 			}
 		}
 		return smoothed;
+	}
+
+	public static List<Tile> getNeighborsIncludingCurrent(Tile tile, World world) {
+		List<Tile> tiles = getNeighbors(tile, world);
+		tiles.add(tile);
+		Collections.shuffle(tiles); 
+		return tiles;
+	}
+	public static List<Tile> getNeighbors(Tile tile, World world) {
+		int x = tile.getLocation().x;
+		int y = tile.getLocation().y;
+		int minX = Math.max(0, tile.getLocation().x - 1);
+		int maxX = Math.min(world.getWidth()-1, tile.getLocation().x + 1);
+		int minY = Math.max(0, tile.getLocation().y-1);
+		int maxY = Math.min(world.getHeight()-1, tile.getLocation().y + 1);
+
+		LinkedList<Tile> tiles = new LinkedList<>();
+		for(int i = minX; i <= maxX; i++) {
+			for(int j = minY; j <= maxY; j++) {
+				if(i == x || j == y) {
+					if(i != x || j != y) {
+						tiles.add(world[new TileLoc(i, j)]);
+					}
+				}
+			}
+		}
+		Collections.shuffle(tiles); 
+		return tiles;
+	}
+	public static double getRandomNormal(int tries) {
+		double rand = 0;
+		for (int i = 0; i < tries; i++) {
+			rand += Math.random();
+		}
+		return rand / tries;
 	}
 }
