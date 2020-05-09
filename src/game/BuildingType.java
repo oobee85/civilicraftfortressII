@@ -1,15 +1,10 @@
 package game;
+
 import java.awt.*;
-import java.awt.image.BufferedImage;
-
 import javax.swing.*;
-
-import game.*;
-import ui.*;
 import utils.*;
 
-
-public enum BuildingType {
+public enum BuildingType implements HasImage {
 	 	WALL_BRICK (1000, "resources/Images/buildings/wall_brick.png"),
 	 	WALL_WOOD (100, "resources/Images/buildings/wall_brick.png"),
 	 	MINE (100, "resources/Images/buildings/mine256.png"),
@@ -26,9 +21,11 @@ public enum BuildingType {
 	        mipmap = new MipMap(s);
 	    }
 	    
+	    @Override
 	    public Image getImage(int size) {
 	    	return mipmap.getImage(size);
 	    }
+	    @Override
 	    public ImageIcon getImageIcon(int size) {
 	    	return mipmap.getImageIcon(size);
 	    }

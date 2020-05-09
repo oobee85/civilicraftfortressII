@@ -858,7 +858,7 @@ public class Game {
 				}
 			}
 			for(Animal animal : Wildlife.getAnimals()) {
-				g.drawImage(animal.getType().getImage(), animal.getTile().getLocation().getIntX() * Game.tileSize, animal.getTile().getLocation().getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				g.drawImage(animal.getImage(0), animal.getTile().getLocation().getIntX() * Game.tileSize, animal.getTile().getLocation().getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 				animal.getTile().drawHealthBar(g, animal);
 			}
 			if(DEBUG_DRAW) {

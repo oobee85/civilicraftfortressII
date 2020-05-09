@@ -14,7 +14,7 @@ public class Animal extends Thing {
 	private double drive;
 	
 	public Animal(AnimalType type) {
-		super(type.getCombatStats().getHealth());
+		super(type.getCombatStats().getHealth(), type);
 		this.type = type;
 		energy = MAX_ENERGY;
 		drive = 0;

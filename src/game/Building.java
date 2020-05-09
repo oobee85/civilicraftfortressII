@@ -12,13 +12,10 @@ public class Building extends Thing {
 	private BuildingType buildingType;
 	
 	public Building(BuildingType buildingType, Tile tile) {
-		super(buildingType.getHealth(), tile);
+		super(buildingType.getHealth(), buildingType, tile);
 		this.buildingType = buildingType;
 	}
 	
-	public Image getImage(int size) {
-		return buildingType.getImage(size);
-	} 
 	public BuildingType getBuildingType() {
 		return buildingType;
 	}

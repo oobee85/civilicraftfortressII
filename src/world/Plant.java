@@ -1,7 +1,5 @@
 package world;
 
-import java.awt.Image;
-
 import utils.*;
 
 public class Plant extends Thing {
@@ -10,15 +8,12 @@ public class Plant extends Thing {
 	private int currentYield;
 	
 	public Plant(PlantType pt, Tile t) {
-		super(pt.getHealth(), t);
+		super(pt.getHealth(), pt, t);
 		plantType = pt;
 	}
 	
 	public int getYield() {
 		return currentYield;
-	}
-	public Image getImage(int size) {
-		return plantType.getImage(size);
 	}
 	public boolean isAquatic() {
 		return plantType.isAquatic();

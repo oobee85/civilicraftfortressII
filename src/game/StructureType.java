@@ -6,7 +6,7 @@ import javax.swing.*;
 
 import utils.*;
 
-public enum StructureType {
+public enum StructureType implements HasImage {
 	
 	CASTLE (5000, "resources/Images/buildings/castle256.png", 80, 5),
 	BARRACKS (1000, "resources/Images/buildings/barracks256.png", 0, 1)
@@ -25,9 +25,11 @@ public enum StructureType {
         
     }
     
+    @Override
     public Image getImage(int size) {
     	return mipmap.getImage(size);
     }
+    @Override
     public ImageIcon getImageIcon(int size) {
     	return mipmap.getImageIcon(size);
     }
