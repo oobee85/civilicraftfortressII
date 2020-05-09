@@ -9,7 +9,7 @@ public class Liquid {
 	
 	public static final double MINIMUM_LIQUID_THRESHOLD = 0.001;
 	
-	private static final double FRICTION_RATIO = 0.1;
+	private static final double FRICTION_RATIO = 0.99;
 	
 	private static double[][] liquidAmountsTemp;
 	private static LiquidType[][] liquidTypesTemp;

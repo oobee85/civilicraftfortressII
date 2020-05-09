@@ -303,7 +303,6 @@ public class Game {
 	}
 	
 	private void generateHeightMap(double dirtLevel, int smoothingRadius, double waterLevel) {
-		System.out.println("gen terr");
 		LinkedList<double[][]> noises = new LinkedList<>();
 
 		for (int octave = 2; octave <= world.length; octave *= 2) {
@@ -343,7 +342,7 @@ public class Game {
 		
 		makeMountain();
 		makeVolcano();
-		heightMap = Utils.smoothingFilter(heightMap, 3, 9);
+		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		
 		
 		// make ten bins to count how many tiles have which value from terrain gen
@@ -564,8 +563,8 @@ public class Game {
 		volcanox = x;
 		volcanoy = y;
 		
-		double lavaRadius = 2.5;
-		double volcanoRadius = 9;
+		double lavaRadius = 5;
+		double volcanoRadius = 10;
 		double mountainRadius = 20;
 		double mountainEdgeRadius = 23;
 		
@@ -577,16 +576,16 @@ public class Game {
 				Position p = new Position(i, j);
 				if(distanceFromCenter < mountainEdgeRadius) {
 					
-					double height = 1 - (volcanoRadius - distanceFromCenter)/volcanoRadius/2;
-					if(distanceFromCenter > volcanoRadius) {
-						height = 1 - (distanceFromCenter - volcanoRadius)/mountainEdgeRadius*2;
+					double height = 1 - (lavaRadius - distanceFromCenter)/lavaRadius/2;
+					if(distanceFromCenter > lavaRadius) {
+						height = 1 - (distanceFromCenter - lavaRadius)/mountainEdgeRadius*2;
 					}
 					heightMap[i][j] = Math.max(height, heightMap[i][j]);
 					
 					if(distanceFromCenter < lavaRadius) {
 						world[i][j] = new Tile(p, Terrain.LAVA);
 						world[i][j].liquidType = LiquidType.LAVA;
-						world[i][j].liquidAmount = 1;
+						world[i][j].liquidAmount = 0.2;
 					}else if(distanceFromCenter < volcanoRadius) {
 						world[i][j] = new Tile(p, Terrain.VOLCANO);
 					}else if(distanceFromCenter < mountainRadius && world[i][j].checkTerrain(Terrain.SNOW) == false) {
@@ -638,10 +637,10 @@ public class Game {
 		}
 	}
 	private void makeForest() {
-		
+
 		int x0 = (int) (Math.random() * world.length);
 		int y0 = (int) (Math.random() * world.length);
-		
+
 		double forestLength = Math.random()*70+1;
 		double forestHeight = Math.random()*70+1;
 		double forestLengthEdge = forestLength+30;
@@ -1081,10 +1080,9 @@ public class Game {
 		structures.add(structure);
 	}
 	public void buildUnit(UnitType u) {
-		Point po = new Point(structureLoc.get(0).getIntX(), structureLoc.get(0).getIntY());
-		Position p = new Position(structureLoc.get(0).getIntX(), structureLoc.get(0).getIntY());
-		Unit unit = new Unit(u , p);
-		world[po.x][po.y].setUnit(unit);
+		Tile t = structures.get(0).getTile();
+		Unit unit = new Unit(u , t);
+		t.setUnit(unit);
 		
 	}
 	
