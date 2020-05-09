@@ -295,6 +295,7 @@ public class Frame extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gameInstance.rain();
+				gameInstance.grow();
 			}
 		});
 		makeItRain.setPreferredSize(BUILDING_BUTTON_SIZE);

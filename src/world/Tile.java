@@ -125,8 +125,9 @@ public class Tile {
 		drawOre(g);
 		drawTerritory(g);
 		drawRoad(g);
-		drawPlant(g);
+		drawPlantLand(g);
 		drawWater(g);
+		drawPlantAquatic(g);
 		drawBuilding(g, bm);
 		drawStructure(g, bm);
 		drawHighlightedArea(g);
@@ -205,8 +206,8 @@ public class Tile {
 			g.drawImage(ore.getImage(Game.tileSize), position.getIntX() * Game.tileSize, position.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
 		}
 	}
-	private void drawPlant(Graphics g) {
-		if(plant != null) {
+	private void drawPlantLand(Graphics g) {
+		if(plant != null && plant.isAquatic() == false) {
 			g.drawImage(plant.getImage(Game.tileSize), position.getIntX() * Game.tileSize, position.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
 		}
 		//kills the plant if its built on
@@ -214,6 +215,17 @@ public class Tile {
 			plant = null;
 		}
 		
+	}
+
+	private void drawPlantAquatic(Graphics g) {
+		if (plant != null && plant.isAquatic() == true) {
+			g.drawImage(plant.getImage(Game.tileSize), position.getIntX() * Game.tileSize,
+					position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+		}
+		// kills the plant if its built on
+		if (plant != null && building != null) {
+			plant = null;
+		}
 	}
 
 	private void drawHealthBarBuilding(Graphics g) {

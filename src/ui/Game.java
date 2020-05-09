@@ -23,7 +23,7 @@ public class Game {
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
 	ArrayList<Unit> selectUnits = new ArrayList<Unit>();
 	LinkedList<Plant> plantsLand = new LinkedList<Plant>();
-	ArrayList<Plant> plantsWater = new ArrayList<Plant>();
+	LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
 	LinkedList<Building> buildings = new LinkedList<Building>();
 	LinkedList<Structure> structures = new LinkedList<Structure>();
 	
@@ -85,9 +85,11 @@ public class Game {
 		
 		// rain event
 		if(Math.random() < 0.001) {
-//			rain();
+			rain();
 		}
-		
+		if(Math.random() < 0.001) {
+			grow();
+		}
 		if(ticks%1 == 0) {
 			world[mountx][mounty].liquidAmount += 0.008;
 			world[volcanox][volcanoy].liquidType = LiquidType.LAVA;
@@ -103,6 +105,23 @@ public class Game {
 		if(changedTerrain) {
 			createTerrainImage();
 		}
+	}
+	public void grow() {
+		for(int i = 0; i < world.length; i++) {
+			for(int j = 0; j < world.length; j++) {
+				Tile tile = world[i][j];
+				
+				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD 
+						&& Math.random()< 0.1) {
+					Plant plant = new Plant(PlantType.CATTAIL, tile);
+					tile.setHasPlant(plant);
+					plantsAquatic.add(plant);
+				}
+				
+				
+			}
+		}
+		
 	}
 	
 	public void rain() {
@@ -142,8 +161,34 @@ public class Game {
 			}
 		}
 		plantsLand = plantsLandNew;
-		
-		
+
+		LinkedList<Plant> plantsAquaticNew = new LinkedList<Plant>();
+
+		for (Plant plant : plantsAquatic) {
+			Tile tile = plant.getTile();
+
+			if (tile.liquidAmount < Liquid.MINIMUM_LIQUID_THRESHOLD) {
+				if (plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
+					double difInLiquids = Liquid.MINIMUM_LIQUID_THRESHOLD - tile.liquidAmount;
+					double damageTaken = difInLiquids * tile.liquidType.getDamage();
+					plant.takeDamage(damageTaken, ticks);
+				}
+
+			}
+
+		}
+
+		for (Plant plant : plantsAquatic) {
+
+			Tile tile = plant.getTile();
+			if (plant.isDead() == true) {
+				tile.setHasPlant(null);
+			} else {
+				plantsAquaticNew.add(plant);
+			}
+		}
+		plantsAquatic = plantsAquaticNew;
+
 	}
 
 	public void updateBuildingDamage() {
@@ -439,7 +484,7 @@ public class Game {
 					if(o < PlantType.CATTAIL.getRarity()) {
 						Plant p = new Plant(PlantType.CATTAIL, world[i][j] );
 						world[i][j].setHasPlant(p);
-						plantsWater.add(world[i][j].getPlant());
+						plantsAquatic.add(world[i][j].getPlant());
 					}
 					
 				}
