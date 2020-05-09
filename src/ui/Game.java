@@ -15,8 +15,6 @@ public class Game {
 	public static final int NUM_DEBUG_DIGITS = 3;
 	public static int ticks;
 	private int turn;
-	public Tile[][] world;
-	private double[][] heightMap;
 	private BufferedImage terrainImage;
 	private BufferedImage minimapImage;
 	private BufferedImage heightMapImage;
@@ -51,6 +49,9 @@ public class Game {
 	
 	private TileLoc mountain;
 	private TileLoc volcano;
+	public Tile[][] world;
+	public double[][] heightMap;
+	private World world2;
 
 	public Game(GUIController guiController) {
 		this.guiController = guiController;
@@ -97,7 +98,7 @@ public class Game {
 			world[mountain.x][mountain.y].liquidAmount += 0.008;
 			world[volcano.x][volcano.y].liquidType = LiquidType.LAVA;
 			world[volcano.x][volcano.y].liquidAmount += .1;
-			Liquid.propogate(world, heightMap);
+			Liquid.propogate(world2);
 			changedTerrain = true;
 		}
 		
@@ -257,6 +258,7 @@ public class Game {
 		world = new Tile[width][height];
 		int smoothingRadius = (int) (Math.sqrt((width + height)/2)/2);
 		heightMap = Generation.generateHeightMap(smoothingRadius, width, height);
+		world2 = new World(world, heightMap);
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
 				world[i][j] = new Tile(new TileLoc(i, j), Terrain.DIRT);
@@ -297,7 +299,7 @@ public class Game {
 		Generation.makeLake(numTiles * 1.0/400, world, heightMap);
 		Generation.makeLake(numTiles * 1.0/800, world, heightMap);
 		for(int i = 0; i < 100; i++) {
-			Liquid.propogate(world, heightMap);
+			Liquid.propogate(world2);
 		}
 		
 		makeRoad();

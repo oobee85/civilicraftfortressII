@@ -19,17 +19,17 @@ public class Liquid {
 	
 	// idea: create constant arraylist of positions, initialize it once, then every time simply use a random permutation to access all elements randomly.
 	
-	public static void propogate(Tile[][] world, double[][] heightMap) {
-		if(liquidAmountsTemp == null || liquidAmountsTemp.length != world.length || liquidAmountsTemp[0].length != world[0].length) {
-			liquidAmountsTemp = new double[world.length][world[0].length];
+	public static void propogate(World world) {
+		if(liquidAmountsTemp == null || liquidAmountsTemp.length != world.getWidth() || liquidAmountsTemp[0].length != world.getHeight()) {
+			liquidAmountsTemp = new double[world.getWidth()][world.getHeight()];
 		}
-		if(liquidTypesTemp == null || liquidTypesTemp.length != world.length || liquidTypesTemp[0].length != world[0].length) {
-			liquidTypesTemp = new LiquidType[world.length][world[0].length];
+		if(liquidTypesTemp == null || liquidTypesTemp.length != world.getWidth() || liquidTypesTemp[0].length != world.getHeight()) {
+			liquidTypesTemp = new LiquidType[world.getWidth()][world.getHeight()];
 		}
 		if(tiles == null) {
 			tiles = new LinkedList<>();
-			for(int x = 0; x < world.length; x++) {
-				for(int y = 0; y < world.length; y++) {
+			for(int x = 0; x < world.getWidth(); x++) {
+				for(int y = 0; y < world.getHeight(); y++) {
 					tiles.add(new TileLoc(x, y));
 				}
 			}
@@ -49,40 +49,41 @@ public class Liquid {
 //			System.out.println("Total " + LiquidType.values()[i].name() + ": " + totals[i]);
 //		}
 		
-		for(int x = 0; x < world.length; x++) {
-			for(int y = 0; y < world.length; y++) {
-				liquidAmountsTemp[x][y] = world[x][y].liquidAmount;
-				liquidTypesTemp[x][y] = world[x][y].liquidType;
+		for(int x = 0; x < world.getWidth(); x++) {
+			for(int y = 0; y < world.getHeight(); y++) {
+				liquidAmountsTemp[x][y] = world[new TileLoc(x, y)].liquidAmount;
+				liquidTypesTemp[x][y] = world[new TileLoc(x, y)].liquidType;
 			}
 		}
 		
 		Collections.shuffle(tiles); 
 		for(TileLoc pos : tiles) {
-			propogate(pos.x, pos.y, world, heightMap);
+			propogate(pos.x, pos.y, world);
 		}
 		
-		for(int x = 0; x < world.length; x++) {
-			for(int y = 0; y < world.length; y++) {
-				world[x][y].liquidAmount = Math.max(liquidAmountsTemp[x][y] * 0.9999 - 0.00001, 0);
-				if(world[x][y].liquidAmount == 0) {
-					world[x][y].liquidType = LiquidType.DRY;
+		for(int x = 0; x < world.getWidth(); x++) {
+			for(int y = 0; y < world.getHeight(); y++) {
+				Tile tile = world[new TileLoc(x, y)];
+				tile.liquidAmount = Math.max(liquidAmountsTemp[x][y] * 0.9999 - 0.00001, 0);
+				if(tile.liquidAmount == 0) {
+					tile.liquidType = LiquidType.DRY;
 				}
 				else {
-					world[x][y].liquidType = liquidTypesTemp[x][y];
+					tile.liquidType = liquidTypesTemp[x][y];
 				}
 				
-				if(world[x][y].liquidType == LiquidType.LAVA && world[x][y].liquidAmount > world[x][y].liquidType.surfaceTension*2) {
-					if(world[x][y].checkTerrain(Terrain.GRASS) ) {
-						world[x][y].setTerrain(Terrain.DIRT);
+				if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount > tile.liquidType.surfaceTension*2) {
+					if(tile.checkTerrain(Terrain.GRASS) ) {
+						tile.setTerrain(Terrain.DIRT);
 					}
-					if(world[x][y].checkTerrain(Terrain.SNOW)) {
-						world[x][y].setTerrain(Terrain.ROCK);
+					if(tile.checkTerrain(Terrain.SNOW)) {
+						tile.setTerrain(Terrain.ROCK);
 					}
 				}
-				if(world[x][y].liquidType == LiquidType.WATER) {
-					if(world[x][y].checkTerrain(Terrain.DIRT)) {
-						if(Math.random() < world[x][y].liquidAmount*0.04) {
-							world[x][y].setTerrain(Terrain.GRASS);
+				if(tile.liquidType == LiquidType.WATER) {
+					if(tile.checkTerrain(Terrain.DIRT)) {
+						if(Math.random() < tile.liquidAmount*0.04) {
+							tile.setTerrain(Terrain.GRASS);
 						}
 					}
 				}
@@ -90,11 +91,11 @@ public class Liquid {
 		}
 		//Utils.normalize(heightMap);
 	}
-	private static void propogate(int x, int y, Tile[][] world, double[][] heightMap) {
+	private static void propogate(int x, int y, World world) {
 		int minX = Math.max(0, x - 1);
-		int maxX = Math.min(world.length-1, x + 1);
+		int maxX = Math.min(world.getWidth()-1, x + 1);
 		int minY = Math.max(0, y-1);
-		int maxY = Math.min(world[0].length-1, y + 1);
+		int maxY = Math.min(world.getHeight()-1, y + 1);
 
 		LinkedList<TileLoc> tiles = new LinkedList<>();
 		for(int i = minX; i <= maxX; i++) {
@@ -112,12 +113,12 @@ public class Liquid {
 			TileLoc other = tiles.remove();
 			// Interaction between liquids happens here
 			
-			double myh = heightMap[x][y];
+			double myh = world.heightMap[x][y];
 			double myv = liquidAmountsTemp[x][y];
 			LiquidType mytype = liquidTypesTemp[x][y];
 			
-			double oh = heightMap[other.x][other.y];
-			double ov = world[other.x][other.y].liquidAmount;
+			double oh = world.heightMap[other.x][other.y];
+			double ov = world[other].liquidAmount;
 			LiquidType otype = liquidTypesTemp[other.x][other.y];
 			
 			if(myh + myv < oh + ov) {
@@ -135,14 +136,14 @@ public class Liquid {
 					if(myh < oh) {
 						double deltah = oh - myh;
 						double changeh = deltah/2 * Math.min(change* FRICTION_RATIO, 1);
-						heightMap[x][y] += changeh;
-						heightMap[other.x][other.y] -= changeh;
+						world.heightMap[x][y] += changeh;
+						world.heightMap[other.x][other.y] -= changeh;
 					}
 					liquidAmountsTemp[x][y] += change;
 					liquidTypesTemp[x][y] = otype;
 					
 					liquidAmountsTemp[other.x][other.y] -= change;
-					world[other.x][other.y].liquidAmount -= change;
+					world[other].liquidAmount -= change;
 				}
 				else {
 					if(otype == LiquidType.WATER && mytype == LiquidType.LAVA ||
@@ -163,13 +164,13 @@ public class Liquid {
 //						}
 //						heightMap[x][y] += combined;
 						
-						if(heightMap[x][y] + combined > 1) {
-							heightMap[x][y] = 1;
+						if(world.heightMap[x][y] + combined > 1) {
+							world.heightMap[x][y] = 1;
 						}
 						
 						if(extra == 0) {
 							liquidAmountsTemp[x][y] -= combined;
-							world[x][y].liquidAmount -= combined;
+							world[new TileLoc(x, y)].liquidAmount -= combined;
 						}
 						else {
 							liquidAmountsTemp[x][y] = extra;
@@ -177,7 +178,7 @@ public class Liquid {
 						}
 						
 						liquidAmountsTemp[other.x][other.y] -= change;
-						world[other.x][other.y].liquidAmount -= change;
+						world[other].liquidAmount -= change;
 					}
 				}
 			}
