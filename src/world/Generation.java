@@ -229,18 +229,18 @@ public class Generation {
 		}
 	}
 
-	public static void makeLake(double volume, Tile[][] world, double[][] heightMap) {
+	public static void makeLake(double volume, World world) {
 		// Fill tiles until volume reached
 		PriorityQueue<TileLoc> queue = new PriorityQueue<TileLoc>((p1, p2) -> {
-			return (heightMap[p1.x][p1.y] + world[p1.x][p1.y].liquidAmount) - (heightMap[p2.x][p2.y] + world[p2.x][p2.y].liquidAmount) > 0 ? 1 : -1;
+			return (world.heightMap[p1.x][p1.y] + world[p1].liquidAmount) - (world.heightMap[p2.x][p2.y] + world[p2].liquidAmount) > 0 ? 1 : -1;
 		});
-		boolean[][] visited = new boolean[world.length][world[0].length];
-		queue.add(new TileLoc((int) (Math.random() * world.length), (int) (Math.random() * world[0].length)));
+		boolean[][] visited = new boolean[world.getWidth()][world.getHeight()];
+		queue.add(new TileLoc((int) (Math.random() * world.getWidth()), (int) (Math.random() * world.getHeight())));
 		while(!queue.isEmpty() && volume > 0) {
 			TileLoc next = queue.poll();
 			int i = next.x;
 			int j = next.y;
-			world[i][j].liquidAmount += 0.02;
+			world[next].liquidAmount += 0.02;
 			volume -= 0.02;
 			// Add adjacent tiles to the queue
 			if(i > 0 && !visited[i-1][j]) {
@@ -251,11 +251,11 @@ public class Generation {
 				queue.add(new TileLoc(i, j-1));
 				visited[i][j-1] = true;
 			}
-			if(i + 1 < world.length && !visited[i+1][j]) {
+			if(i + 1 < world.getWidth() && !visited[i+1][j]) {
 				queue.add(new TileLoc(i+1, j));
 				visited[i+1][j] = true;
 			}
-			if(j + 1 < world[0].length && !visited[i][j+1]) {
+			if(j + 1 < world.getHeight() && !visited[i][j+1]) {
 				queue.add(new TileLoc(i, j+1));
 				visited[i][j+1] = true;
 			}
