@@ -193,4 +193,11 @@ public final class Utils {
 		Collections.shuffle(tiles); 
 		return tiles;
 	}
+	public static double getRandomNormal(int tries) {
+		double rand = 0;
+		for (int i = 0; i < tries; i++) {
+			rand += Math.random();
+		}
+		return rand / tries;
+	}
 }

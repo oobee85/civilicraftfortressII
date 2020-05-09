@@ -6,6 +6,8 @@ import utils.*;
 import world.*;
 
 public class Structure extends Thing {
+	
+	public static final double CULTURE_AREA_MULTIPLIER = 0.1;
 
 	private StructureType structureType;
 	private int culture;
