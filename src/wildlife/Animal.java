@@ -1,19 +1,19 @@
 package wildlife;
 
+import utils.*;
 import world.*;
 
-public class Animal {
+public class Animal extends Thing {
 	public static final int MAX_ENERGY = 100;
 	private Tile tile;
 	private AnimalType type;
 	
-	private double health;
 	private double energy;
 	private double drive;
 	
 	public Animal(AnimalType type) {
+		super(type.getCombatStats().getHealth());
 		this.type = type;
-		health = type.getCombatStats().getHealth();
 		energy = MAX_ENERGY;
 		drive = 0;
 	}
@@ -32,16 +32,16 @@ public class Animal {
 	}
 	public void eat() {
 		energy += 1;
-		drive += 0.02;
+		drive += 0.01;
 	}
 	public void loseEnergy() {
 		energy -= 0.01;
-		if(health < type.getCombatStats().getHealth()) {
+		if(getHealth() < type.getCombatStats().getHealth()) {
 			energy -= 0.02;
-			health += 0.1;
+			takeDamage(-0.1);
 		}
 		if(energy < MAX_ENERGY/10) {
-			health -= 0.01;
+			takeDamage(0.01);
 		}
 	}
 	
@@ -49,15 +49,15 @@ public class Animal {
 		drive = 0;
 	}
 	
+	public boolean wantsToReproduce() {
+		return Math.random() < drive - 0.1;
+	}
 	public double getDrive() {
 		return drive;
 	}
 	
-	public void takeDamage(double damage) {
-		health -= damage;
-	}
 	public boolean isDead() {
-		return health <= 0 || energy <= 0;
+		return super.isDead() || energy <= 0;
 	}
 	
 	public void setTile(Tile tile) {
@@ -72,13 +72,10 @@ public class Animal {
 	}
 	
 	public double getMoveChance() {
-		return 0.02 + 0.1*(1 - energy/MAX_ENERGY) + 0.1*(1 - health/type.getCombatStats().getHealth());
+		return 0.02 + 0.1*(1 - energy/MAX_ENERGY) + 0.1*(1 - getHealth()/type.getCombatStats().getHealth());
 	}
 	
 	public double getEnergy() {
 		return energy;
-	}
-	public double getHealth() {
-		return health;
 	}
 }
