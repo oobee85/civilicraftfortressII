@@ -186,7 +186,7 @@ public class Game {
 
 			Tile tile = structure.getTile();
 			if (structure.isDead() == true) {
-				tile.setBuilding(null);
+				tile.setStructure(null);
 			} else {
 				structuresNew.add(structure);
 			}

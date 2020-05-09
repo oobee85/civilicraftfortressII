@@ -81,19 +81,26 @@ public class Tile {
 	}
 	
 	public void setBuilding(Building b) {
-		if(building != null && building.getBuildingType() == b.getBuildingType()) {
-			this.building = null;
-		}else if(structure == null){
-			this.building = b;
+		if(b != null) {
+			if (building != null && building.getBuildingType() == b.getBuildingType()) {
+				this.building = null;
+			} else if (structure == null) {
+				this.building = b;
+			}
 		}
+		building = b;
+			
 	}
 	
 	public void setStructure(Structure s) {
-		if(structure != null && structure.getStructureType() == s.getStructureType()) {
-			this.structure = null;
-		}else if(building == null){
-			this.structure = s;
+		if(s != null) {
+			if (structure != null && structure.getStructureType() == s.getStructureType()) {
+				this.structure = null;
+			} else if (building == null) {
+				this.structure = s;
+			}	
 		}
+		structure = s;
 		
 		
 	}
