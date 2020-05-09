@@ -17,11 +17,11 @@ public enum BuildingType {
 	 	BRIDGE (500, "resources/Images/buildings/bridge.png")
 		;
 	
-	    private final int health;   
+	    private final double health;   
 	    private MipMap mipmap;
 	    
 	    
-	    BuildingType(int hp, String s) {
+	    BuildingType(double hp, String s) {
 	        this.health = hp;
 	        mipmap = new MipMap(s);
 	    }
@@ -33,7 +33,7 @@ public enum BuildingType {
 	    	return mipmap.getImageIcon(size);
 	    }
 	    
-	    public int getHealth() {
+	    public double getHealth() {
 	    	return health; 
 	    }
 

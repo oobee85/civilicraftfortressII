@@ -12,12 +12,12 @@ public enum StructureType {
 	BARRACKS (1000, "resources/Images/buildings/barracks256.png", 0, 1)
 	;
 	
-    private final int health;   
+    private final double health;   
 	private MipMap mipmap;
     private int culture;
     public int cultureRate;
     
-    StructureType(int hp, String s, int culture, int cultureRate) {
+    StructureType(double hp, String s, int culture, int cultureRate) {
         this.health = hp;
         this.culture = culture;
         this.cultureRate = cultureRate;
@@ -32,7 +32,7 @@ public enum StructureType {
     	return mipmap.getImageIcon(size);
     }
     
-    public int getHealth() {
+    public double getHealth() {
     	return health; 
     }
     public int getCulture() {

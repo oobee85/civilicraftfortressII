@@ -17,7 +17,7 @@ public enum PlantType {
 	
     private double rarity;
     private MipMap mipmap;
-    private double health;
+    private double health;	
     private boolean aquatic;
     
 	PlantType( String[] s, double rare, double health, boolean aquatic){

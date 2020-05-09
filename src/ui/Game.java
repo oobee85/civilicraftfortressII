@@ -98,6 +98,8 @@ public class Game {
 		
 		Wildlife.tick(world);
 		updatePlantDamage();
+		updateBuildingDamage();
+		updateStructureDamage();
 		if(changedTerrain) {
 			createTerrainImage();
 		}
@@ -144,13 +146,11 @@ public class Game {
 		
 	}
 
-	public void buildingDamage() {
+	public void updateBuildingDamage() {
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
 
-		for (Building building : buildingsNew) {
-
+		for (Building building : buildings) {
 			Tile tile = building.getTile();
-
 			if (tile.liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD) {
 				double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
 				building.takeDamage(damageTaken);
@@ -168,6 +168,30 @@ public class Game {
 			}
 		}
 		buildings = buildingsNew;
+		
+	}
+	public void updateStructureDamage() {
+		LinkedList<Structure> structuresNew = new LinkedList<Structure>();
+
+		for (Structure structure : structures) {
+			Tile tile = structure.getTile();
+			if (tile.liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD) {
+				double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
+				structure.takeDamage(damageTaken);
+
+			}
+		}	
+		
+		for (Structure structure : structures) {
+
+			Tile tile = structure.getTile();
+			if (structure.isDead() == true) {
+				tile.setBuilding(null);
+			} else {
+				structuresNew.add(structure);
+			}
+		}
+		structures = structuresNew;
 		
 	}
 	
@@ -722,7 +746,7 @@ public class Game {
 		}
 
 	}
-
+	
 	public void draw(Graphics g) {
 		
 		// Try to only draw stuff that is visible on the screen
@@ -813,6 +837,27 @@ public class Game {
 						g.fillRect(x, y + 2, stringWidth, 1*fontsize);
 						g.setColor(Color.green);
 						g.drawString(String.format("HP=%." + numDigits + "f", plant.getHealth()), x, y + (row++)*fontsize);
+					}
+					for(Building building : buildings) {
+						Tile tile = building.getTile();
+						int x = tile.getLocation().getIntX() * Game.tileSize + 2;
+						int y = tile.getLocation().getIntY() * Game.tileSize + fontsize/2 + 2 * fontsize;
+						int row = 1;
+						g.setColor(Color.black);
+						g.fillRect(x, y + 2, stringWidth, 1*fontsize);
+						g.setColor(Color.green);
+						g.drawString(String.format("HP=%." + numDigits + "f", building.getHealth()), x, y + (row++)*fontsize);
+					}
+					for(Structure structure : structures) {
+						Tile tile = structure.getTile();
+						int x = tile.getLocation().getIntX() * Game.tileSize + 2;
+						int y = tile.getLocation().getIntY() * Game.tileSize + fontsize/2 + 2 * fontsize;
+						int row = 1;
+						g.setColor(Color.black);
+						g.fillRect(x, y + 2, stringWidth, 2*fontsize);
+						g.setColor(Color.green);
+						g.drawString(String.format("HP=%." + numDigits + "f", structure.getHealth()), x, y + (row++)*fontsize);
+						g.drawString(String.format("CT=%." + numDigits + "f", structure.getCulture()*1.0), x, y + (row++)*fontsize);
 					}
 				}
 			}

@@ -18,15 +18,10 @@ import utils.*;
 public class Tile {
 	private boolean hasRoad;
 	private boolean isHighlight;
-//	private boolean hasOre;
-//	private boolean hasBuilding;
-//	private boolean hasStructure;
-//	private boolean hasUnit;
 	private boolean isTerritory = false;
 	private boolean isSelected = false;
 	
-	private Position p;
-//	private ArrayList<Unit> units = new ArrayList<Unit>();
+	private Position position;
 	int minEntitySize = 20;
 	
 	private String roadCorner;
@@ -43,7 +38,7 @@ public class Tile {
 	public LiquidType liquidType;
 	
 	public Tile(Position point, Terrain t) {
-		p = point;
+		position = point;
 		terr = t;
 		isHighlight = false;
 		
@@ -85,24 +80,23 @@ public class Tile {
 	}
 	
 	public void setBuilding(Building b) {
-		if(this.building == b) {
+		if(building != null && building.getBuildingType() == b.getBuildingType()) {
 			this.building = null;
-		}else {
+		}else if(structure == null){
 			this.building = b;
 		}
 	}
 	
 	public void setStructure(Structure s) {
-		if(this.structure == s) {
+		if(structure != null && structure.getStructureType() == s.getStructureType()) {
 			this.structure = null;
-		}else {
+		}else if(building == null){
 			this.structure = s;
 		}
 		
 		
 	}
 	public void setUnit(Unit u) {
-//		units.add(u);
 		unit = u;
 		
 	}
@@ -129,15 +123,19 @@ public class Tile {
 		drawStructure(g, bm);
 		drawHighlightedArea(g);
 		drawUnit(g);
-		
+		if(Game.tileSize > 40) {
+			drawHealthBarPlants(g);
+			drawHealthBarBuilding(g);
+			drawHealthBarStructure(g);
+		}
 		
 	}
 	
 	private void drawHighlightedArea(Graphics g) {
 		if(isHighlight == true) {
 			g.setColor(new Color(0, 0, 0, 64));
-			g.drawRect(p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
-			g.drawRect(p.getIntX() * Game.tileSize + 1, p.getIntY() * Game.tileSize + 1, Game.tileSize - 1,
+			g.drawRect(position.getIntX() * Game.tileSize, position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
+			g.drawRect(position.getIntX() * Game.tileSize + 1, position.getIntY() * Game.tileSize + 1, Game.tileSize - 1,
 					Game.tileSize - 1);
 		}
 		
@@ -150,17 +148,17 @@ public class Tile {
 		    	//draws red rectangle over image
 		    	Color c = new Color(255, 0, 0, 100); // Red with alpha = 0.5 
 		    	g.setColor(c);
-				g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
+				g.fillRect(position.getIntX() * Game.tileSize,position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
 		    }
 		    if(bm == BuildMode.IRRIGATE && terr.isPlantable(terr) == false) {
 		    	Color c = new Color(255, 0, 0, 100); // Red with alpha = 0.5 
 		    	g.setColor(c);
-				g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
+				g.fillRect(position.getIntX() * Game.tileSize,position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
 		    }
 		    if(unit != null) {
 		    	Color c = new Color(0, 255, 0, 100); 
 		    	g.setColor(c);
-				g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
+				g.fillRect(position.getIntX() * Game.tileSize,position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
 		    }
 		}else {
 			Utils.setTransparency(g, 1);
@@ -171,12 +169,12 @@ public class Tile {
 	
 	private void drawUnit(Graphics g) {
 		if(unit != null) {
-			g.drawImage(unit.getImage(), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(unit.getImage(), position.getIntX() * Game.tileSize, position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		
 	}
 	private void drawTerrain(Graphics g) {
-		g.drawImage(terr.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+		g.drawImage(terr.getImage(Game.tileSize), position.getIntX() * Game.tileSize, position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		
 	}
 	
@@ -184,24 +182,24 @@ public class Tile {
 		float alpha = Utils.getAlphaOfLiquid(liquidAmount);
 		Utils.setTransparency(g, alpha);
 		g.setColor(liquidType.getColor());
-		g.fillRect(p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
+		g.fillRect(position.getIntX() * Game.tileSize, position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
 		Utils.setTransparency(g, 1);
 	}
 	
 	public void drawHeightMap(Graphics g, double height) {
 		int r = Math.max(Math.min((int)(255*height), 255), 0);
 		g.setColor(new Color(r, 0, 255-r));
-		g.fillRect(p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
+		g.fillRect(position.getIntX() * Game.tileSize, position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
 	}
 	
 	private void drawOre(Graphics g) {
 		if(ore != null) {
-			g.drawImage(ore.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
+			g.drawImage(ore.getImage(Game.tileSize), position.getIntX() * Game.tileSize, position.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
 		}
 	}
 	private void drawPlant(Graphics g) {
 		if(plant != null) {
-			g.drawImage(plant.getImage(Game.tileSize), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
+			g.drawImage(plant.getImage(Game.tileSize), position.getIntX() * Game.tileSize, position.getIntY() * Game.tileSize, Game.tileSize,Game.tileSize, null);
 		}
 		//kills the plant if its built on
 		if(plant != null && building != null) {
@@ -209,23 +207,71 @@ public class Tile {
 		}
 		
 	}
-	
+
+	private void drawHealthBarBuilding(Graphics g) {
+
+		if (building != null) {
+			g.setColor(Color.BLACK);
+			g.fillRect(position.getIntX() * Game.tileSize + 1, position.getIntY() * Game.tileSize + 1, Game.tileSize - 1, Game.tileSize / 4 - 1);
+			g.setColor(Color.RED);
+			g.fillRect(position.getIntX() * Game.tileSize + 3, position.getIntY() * Game.tileSize + 3, Game.tileSize - 5, Game.tileSize / 4 - 5);
+
+			double healthOverMaxHealth = building.getHealth() / building.getBuildingType().getHealth();
+			int maxWidth = Game.tileSize - 5;
+			int width = (int) (healthOverMaxHealth * maxWidth);
+			g.setColor(Color.GREEN);
+			g.fillRect(position.getIntX() * Game.tileSize + 3, position.getIntY() * Game.tileSize + 3, width, Game.tileSize / 4 - 5);
+		}
+
+	}
+	private void drawHealthBarStructure(Graphics g) {
+
+		if (structure != null) {
+			g.setColor(Color.BLACK);
+			g.fillRect(position.getIntX() * Game.tileSize + 1, position.getIntY() * Game.tileSize + 1, Game.tileSize - 1, Game.tileSize / 4 - 1);
+			g.setColor(Color.RED);
+			g.fillRect(position.getIntX() * Game.tileSize + 3, position.getIntY() * Game.tileSize + 3, Game.tileSize - 5, Game.tileSize / 4 - 5);
+
+			double healthOverMaxHealth = structure.getHealth() / structure.getStructureType().getHealth();
+			int maxWidth = Game.tileSize - 5;
+			int width = (int) (healthOverMaxHealth * maxWidth);
+			g.setColor(Color.GREEN);
+			g.fillRect(position.getIntX() * Game.tileSize + 3, position.getIntY() * Game.tileSize + 3, width, Game.tileSize / 4 - 5);
+		}
+
+	}
+	private void drawHealthBarPlants(Graphics g) {
+		
+		if(plant != null && isHighlight == true) {
+			g.setColor(Color.BLACK);
+			g.fillRect(position.getIntX() * Game.tileSize+1, position.getIntY() * Game.tileSize+1, Game.tileSize-1, Game.tileSize/4 -1);
+			g.setColor(Color.RED);
+			g.fillRect(position.getIntX() * Game.tileSize+3, position.getIntY() * Game.tileSize+3, Game.tileSize-5, Game.tileSize/4 -5);
+			
+			double healthOverMaxHealth = plant.getHealth()/plant.getPlantType().getHealth();
+			int maxWidth = Game.tileSize-5;
+			int width = (int)(healthOverMaxHealth * maxWidth);
+			g.setColor(Color.GREEN);
+			g.fillRect(position.getIntX() * Game.tileSize+3, position.getIntY() * Game.tileSize+3, width, Game.tileSize/4 -5);
+		}
+		
+	}
 	
 	
 	private void drawBuilding(Graphics g, BuildMode bm) {
 		if(building != null) {
 			Utils.setTransparency(g, 1);
-			g.drawImage(building.getImage(0),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(building.getImage(0),position.getIntX() * Game.tileSize,position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		
 		if(bm == BuildMode.WALL && isHighlight == true) {
-			g.drawImage(BuildingType.WALL_BRICK.getImage(0),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(BuildingType.WALL_BRICK.getImage(0),position.getIntX() * Game.tileSize,position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		if(bm == BuildMode.MINE && isHighlight == true) {
-			g.drawImage(BuildingType.MINE.getImage(0),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(BuildingType.MINE.getImage(0),position.getIntX() * Game.tileSize,position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		if(bm == BuildMode.IRRIGATE && isHighlight == true) {
-			g.drawImage(BuildingType.IRRIGATION.getImage(0),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(BuildingType.IRRIGATION.getImage(0),position.getIntX() * Game.tileSize,position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 	}
 	private void drawStructure(Graphics g, BuildMode bm) {
@@ -235,13 +281,13 @@ public class Tile {
 		}
 		if(structure != null) {
 			Utils.setTransparency(g, 1);
-			g.drawImage(structure.getImage(0),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(structure.getImage(0),position.getIntX() * Game.tileSize,position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}else if (structure != null) {
-			g.drawImage(structure.getImage(0), p.getIntX() * Game.tileSize - extra / 1,p.getIntY() * Game.tileSize - extra / 1, Game.tileSize + extra, Game.tileSize + extra, null);
+			g.drawImage(structure.getImage(0), position.getIntX() * Game.tileSize - extra / 1,position.getIntY() * Game.tileSize - extra / 1, Game.tileSize + extra, Game.tileSize + extra, null);
 		}
 		
 		if(bm == BuildMode.BARRACKS && isHighlight == true) {
-			g.drawImage(StructureType.BARRACKS.getImage(0),p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(StructureType.BARRACKS.getImage(0),position.getIntX() * Game.tileSize,position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		
 	}
@@ -250,7 +296,7 @@ public class Tile {
 			Utils.setTransparency(g, 0.5f);
 			Color c = new Color(0, 0, 255, 150); 
 	    	g.setColor(c);
-	    	g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
+	    	g.fillRect(position.getIntX() * Game.tileSize,position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize); 
 			
 			Utils.setTransparency(g, 1);
 		}
@@ -258,7 +304,7 @@ public class Tile {
 	}
 	private void drawRoad(Graphics g) {
 		if (hasRoad == true) {
-			g.drawImage(Utils.roadImages.get(roadCorner), p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(Utils.roadImages.get(roadCorner), position.getIntX() * Game.tileSize, position.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 	}
 	
@@ -329,7 +375,7 @@ public class Tile {
 		
 	}
 	public Position getLocation() {
-		return p;
+		return position;
 	}
 
 }

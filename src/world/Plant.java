@@ -39,5 +39,8 @@ public class Plant {
 	public boolean isAquatic() {
 		return plantType.isAquatic();
 	}
+	public PlantType getPlantType() {
+		return plantType;
+	}
 	
 }

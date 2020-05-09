@@ -11,7 +11,7 @@ public class Building {
 	
 	private BuildingType buildingType;
 	private Tile tile;
-	private int health;
+	private double health;
 	
 	public Building(BuildingType buildingType, Tile tile) {
 		this.buildingType = buildingType;
@@ -19,7 +19,7 @@ public class Building {
 		health = buildingType.getHealth();
 	}
 	
-	public int getHealth() {
+	public double getHealth() {
     	return health; 
     }
 	public void takeDamage(double damage) {
@@ -34,6 +34,8 @@ public class Building {
 	public Image getImage(int size) {
 		return buildingType.getImage(size);
 	} 
-	
+	public BuildingType getBuildingType() {
+		return buildingType;
+	}
 	
 }

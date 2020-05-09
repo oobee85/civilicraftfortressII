@@ -11,7 +11,7 @@ public class Structure {
 
 	private StructureType structureType;
 	private Tile tile;
-	private int health;
+	private double health;
 	private int culture;
 	
 	public Structure(StructureType structureType, Tile tile) {
@@ -43,8 +43,14 @@ public class Structure {
 	public Tile getTile() {
 		return tile;
 	}
-	public int getHealth() {
+	public double getHealth() {
 		return health;
+	}
+	public void takeDamage(double damage) {
+		health -= damage;
+	}
+	public boolean isDead() {
+		return health < 0;
 	}
 
 }
