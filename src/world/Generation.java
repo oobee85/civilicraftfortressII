@@ -9,6 +9,7 @@ public class Generation {
 	
 	private static final double snowEdgeRatio = 0.5;
 	private static final double rockEdgeRatio = 0.7;
+	private static final double oreRarity = 0.01;
 	
 	public static double[][] generateHeightMap(int smoothingRadius, int width, int height) {
 		LinkedList<double[][]> noises = new LinkedList<>();
@@ -134,5 +135,130 @@ public class Generation {
 			}
 		}
 		return new TileLoc(x, y);
+	}
+
+	public static void genOres(Tile[][] world) {
+		int numOres = (int)(world.length * world.length *oreRarity); //163
+
+		while (numOres > 0) {
+			for (int i = 0; i < world.length; i++) {
+				for (int j = 0; j < world.length; j++) {
+
+					Tile tile = world[i][j];
+//					System.out.println(numOres+" numores");
+					if (tile.canOre() == true && Math.random() < oreRarity) {
+
+						if(tile.canSupportRareOre() == false) {
+							if (Math.random() < Ore.ORE_IRON.getRarity()) {
+								tile.setHasOre(Ore.ORE_IRON);
+								numOres--;
+							}else if (Math.random() < Ore.ORE_COPPER.getRarity()) {
+								tile.setHasOre(Ore.ORE_COPPER);
+								numOres--;
+							}else if (Math.random() < Ore.ORE_SILVER.getRarity()) {
+								tile.setHasOre(Ore.ORE_SILVER);
+								numOres--;
+							}else if (Math.random() < Ore.ORE_MITHRIL.getRarity()) {
+								tile.setHasOre(Ore.ORE_MITHRIL);
+								numOres--;
+							}
+						}
+						
+						if(tile.canSupportRareOre() == true) {
+							if (Math.random() < Ore.ORE_GOLD.getRarity()) {
+								tile.setHasOre(Ore.ORE_GOLD);
+								numOres--;
+							}else if (Math.random() < Ore.ORE_ADAMANT.getRarity()) {
+								tile.setHasOre(Ore.ORE_ADAMANT);
+								numOres--;
+							}else if (Math.random() < Ore.ORE_RUNE.getRarity()) {
+								tile.setHasOre(Ore.ORE_RUNE);
+								numOres--;
+							}else if (Math.random() < Ore.ORE_TITANIUM.getRarity()) {
+								tile.setHasOre(Ore.ORE_TITANIUM);
+								numOres--;
+							}
+							
+						}
+						
+					}
+					if(numOres <= 0) {
+						break;
+					}
+					
+				}
+			}
+			
+		}
+	}
+
+	private void oldMakeLake(int volume, Tile[][] world, double[][] heightMap) {
+		
+		// Fill tiles until volume reached
+		PriorityQueue<TileLoc> queue = new PriorityQueue<TileLoc>((p1, p2) -> {
+			return heightMap[p1.x][p1.y] - heightMap[p2.x][p2.y] > 0 ? 1 : -1;
+		});
+		boolean[][] visited = new boolean[world.length][world[0].length];
+		queue.add(new TileLoc((int) (Math.random() * world.length), (int) (Math.random() * world[0].length)));
+		while(!queue.isEmpty() && volume > 0) {
+			TileLoc next = queue.poll();
+			int i = next.x;
+			int j = next.y;
+//			world[i][j].liquidAmount += volume/5;
+			if(!world[i][j].checkTerrain(Terrain.WATER)) {
+				world[i][j] = new Tile(next, Terrain.WATER);
+				volume--;
+			}
+			// Add adjacent tiles to the queue
+			if(i > 0 && !visited[i-1][j]) {
+				queue.add(new TileLoc(i-1, j));
+				visited[i-1][j] = true;
+			}
+			if(j > 0 && !visited[i][j-1]) {
+				queue.add(new TileLoc(i, j-1));
+				visited[i][j-1] = true;
+			}
+			if(i + 1 < world.length && !visited[i+1][j]) {
+				queue.add(new TileLoc(i+1, j));
+				visited[i+1][j] = true;
+			}
+			if(j + 1 < world[0].length && !visited[i][j+1]) {
+				queue.add(new TileLoc(i, j+1));
+				visited[i][j+1] = true;
+			}
+		}
+	}
+
+	public static void makeLake(double volume, Tile[][] world, double[][] heightMap) {
+		// Fill tiles until volume reached
+		PriorityQueue<TileLoc> queue = new PriorityQueue<TileLoc>((p1, p2) -> {
+			return (heightMap[p1.x][p1.y] + world[p1.x][p1.y].liquidAmount) - (heightMap[p2.x][p2.y] + world[p2.x][p2.y].liquidAmount) > 0 ? 1 : -1;
+		});
+		boolean[][] visited = new boolean[world.length][world[0].length];
+		queue.add(new TileLoc((int) (Math.random() * world.length), (int) (Math.random() * world[0].length)));
+		while(!queue.isEmpty() && volume > 0) {
+			TileLoc next = queue.poll();
+			int i = next.x;
+			int j = next.y;
+			world[i][j].liquidAmount += 0.02;
+			volume -= 0.02;
+			// Add adjacent tiles to the queue
+			if(i > 0 && !visited[i-1][j]) {
+				queue.add(new TileLoc(i-1, j));
+				visited[i-1][j] = true;
+			}
+			if(j > 0 && !visited[i][j-1]) {
+				queue.add(new TileLoc(i, j-1));
+				visited[i][j-1] = true;
+			}
+			if(i + 1 < world.length && !visited[i+1][j]) {
+				queue.add(new TileLoc(i+1, j));
+				visited[i+1][j] = true;
+			}
+			if(j + 1 < world[0].length && !visited[i][j+1]) {
+				queue.add(new TileLoc(i, j+1));
+				visited[i][j+1] = true;
+			}
+		}
 	}
 }

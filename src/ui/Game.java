@@ -36,7 +36,6 @@ public class Game {
 	private BuildMode currentMode;
 	private boolean showHeightMap;
 	private int rotate = 0;
-	private double oreRarity = 0.01;
 	private double bushRarity = 0.005;
 	private double waterPlantRarity = 0.05;
 	private double forestDensity = 0.3;
@@ -292,15 +291,17 @@ public class Game {
 			}
 		}
 		
-		int numTiles = size*size;
-//		makeLake(numTiles * 2/100);
-//		makeLake(numTiles * 1/100);
-//		makeLake(numTiles * 1/200);
-//		makeLake(numTiles * 1/400);
-
+		int numTiles = width*height;
+		Generation.makeLake(numTiles * 1.0/100, world, heightMap);
+		Generation.makeLake(numTiles * 1.0/200, world, heightMap);
+		Generation.makeLake(numTiles * 1.0/400, world, heightMap);
+		Generation.makeLake(numTiles * 1.0/800, world, heightMap);
+		for(int i = 0; i < 100; i++) {
+			Liquid.propogate(world, heightMap);
+		}
 		
 		makeRoad();
-		genOres();
+		Generation.genOres(world);
 		genPlants();
 		makeForest();
 		createTerrainImage();
@@ -420,98 +421,7 @@ public class Game {
 		
 		
 	}
-	
-	private void genOres() {
-		int numOres = (int)(world.length * world.length *oreRarity); //163
 
-		while (numOres > 0) {
-			for (int i = 0; i < world.length; i++) {
-				for (int j = 0; j < world.length; j++) {
-
-					Tile tile = world[i][j];
-//					System.out.println(numOres+" numores");
-					if (tile.canOre() == true && Math.random() < oreRarity) {
-
-						if(tile.canSupportRareOre() == false) {
-							if (Math.random() < Ore.ORE_IRON.getRarity()) {
-								tile.setHasOre(Ore.ORE_IRON);
-								numOres--;
-							}else if (Math.random() < Ore.ORE_COPPER.getRarity()) {
-								tile.setHasOre(Ore.ORE_COPPER);
-								numOres--;
-							}else if (Math.random() < Ore.ORE_SILVER.getRarity()) {
-								tile.setHasOre(Ore.ORE_SILVER);
-								numOres--;
-							}else if (Math.random() < Ore.ORE_MITHRIL.getRarity()) {
-								tile.setHasOre(Ore.ORE_MITHRIL);
-								numOres--;
-							}
-						}
-						
-						if(tile.canSupportRareOre() == true) {
-							if (Math.random() < Ore.ORE_GOLD.getRarity()) {
-								tile.setHasOre(Ore.ORE_GOLD);
-								numOres--;
-							}else if (Math.random() < Ore.ORE_ADAMANT.getRarity()) {
-								tile.setHasOre(Ore.ORE_ADAMANT);
-								numOres--;
-							}else if (Math.random() < Ore.ORE_RUNE.getRarity()) {
-								tile.setHasOre(Ore.ORE_RUNE);
-								numOres--;
-							}else if (Math.random() < Ore.ORE_TITANIUM.getRarity()) {
-								tile.setHasOre(Ore.ORE_TITANIUM);
-								numOres--;
-							}
-							
-						}
-						
-					}
-					if(numOres <= 0) {
-						break;
-					}
-					
-				}
-			}
-			
-		}
-	}
-	
-	private void makeLake(int volume) {
-		
-		// Fill tiles until volume reached
-		PriorityQueue<Position> queue = new PriorityQueue<Position>((p1, p2) -> {
-			return heightMap[p1.getIntX()][p1.getIntY()] - heightMap[p2.getIntX()][p2.getIntY()] > 0 ? 1 : -1;
-		});
-		boolean[][] visited = new boolean[world.length][world[0].length];
-		queue.add(new Position((int) (Math.random() * world.length), (int) (Math.random() * world.length)));
-		while(!queue.isEmpty() && volume > 0) {
-			Position next = queue.poll();
-			int i = next.getIntX();
-			int j = next.getIntY();
-			world[i][j].liquidAmount += volume/5;
-//			if(!world[i][j].checkTerrain(Terrain.WATER)) {
-//				world[i][j] = new Tile(next, Terrain.WATER);
-//				volume--;
-//			}
-//			// Add adjacent tiles to the queue
-//			if(i > 0 && !visited[i-1][j]) {
-//				queue.add(new Position(i-1, j));
-//				visited[i-1][j] = true;
-//			}
-//			if(j > 0 && !visited[i][j-1]) {
-//				queue.add(new Position(i, j-1));
-//				visited[i][j-1] = true;
-//			}
-//			if(i + 1 < world.length && !visited[i+1][j]) {
-//				queue.add(new Position(i+1, j));
-//				visited[i+1][j] = true;
-//			}
-//			if(j + 1 < world[0].length && !visited[i][j+1]) {
-//				queue.add(new Position(i, j+1));
-//				visited[i][j+1] = true;
-//			}
-		}
-	}
 	private void makeForest() {
 
 		int x0 = (int) (Math.random() * world.length);
