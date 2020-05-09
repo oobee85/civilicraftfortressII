@@ -56,7 +56,7 @@ public class World {
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world.length; j++) {
 				Tile tile = world[i][j];
-				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD 
+				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount() 
 						&& Math.random()< 0.01) {
 					Plant plant = new Plant(PlantType.CATTAIL, tile);
 					tile.setHasPlant(plant);
