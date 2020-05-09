@@ -466,11 +466,14 @@ public class Game {
 							if (Math.random() < Ore.ORE_IRON.getRarity()) {
 								tile.setHasOre(Ore.ORE_IRON);
 								numOres--;
-							} else if (Math.random() < Ore.ORE_COPPER.getRarity()) {
+							}else if (Math.random() < Ore.ORE_COPPER.getRarity()) {
 								tile.setHasOre(Ore.ORE_COPPER);
 								numOres--;
-							} else if (Math.random() < Ore.ORE_SILVER.getRarity()) {
+							}else if (Math.random() < Ore.ORE_SILVER.getRarity()) {
 								tile.setHasOre(Ore.ORE_SILVER);
+								numOres--;
+							}else if (Math.random() < Ore.ORE_MITHRIL.getRarity()) {
+								tile.setHasOre(Ore.ORE_MITHRIL);
 								numOres--;
 							}
 						}
