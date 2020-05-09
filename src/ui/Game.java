@@ -1080,10 +1080,9 @@ public class Game {
 		structures.add(structure);
 	}
 	public void buildUnit(UnitType u) {
-		Point po = new Point(structureLoc.get(0).getIntX(), structureLoc.get(0).getIntY());
-		Position p = new Position(structureLoc.get(0).getIntX(), structureLoc.get(0).getIntY());
-		Unit unit = new Unit(u , p);
-		world[po.x][po.y].setUnit(unit);
+		Tile t = structures.get(0).getTile();
+		Unit unit = new Unit(u , t);
+		t.setUnit(unit);
 		
 	}
 	
