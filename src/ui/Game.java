@@ -68,7 +68,7 @@ public class Game {
 		// happens once every 100ms
 		ticks++;
 		
-		if(ticks%10 == 0) {
+		if(ticks%200 == 0) {
 			updateTerritory();
 			
 		}
@@ -122,7 +122,7 @@ public class Game {
 			
 			Tile tile = plant.getTile();
 			
-			if(tile.liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD) {
+			if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(!plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
 					double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
 					plant.takeDamage(damageTaken, ticks);
