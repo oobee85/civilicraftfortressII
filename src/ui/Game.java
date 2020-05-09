@@ -329,14 +329,17 @@ public class Game {
 							int y = j * Game.tileSize + fontsize/2;
 							
 							g.setColor(Color.black);
-							g.fillRect(x, y + 2, stringWidth, 2*fontsize);
-							g.setColor(Color.green);
-							String liquidString = "" + world[loc].liquidType.name().charAt(0);
-							if(world[loc].liquidType != LiquidType.DRY) {
-								liquidString += String.format("=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount);
+							int numrows = 2;
+							if(world[loc].liquidType == LiquidType.DRY) {
+								numrows = 1;
 							}
-							g.drawString(liquidString, x, y + (++rows[i][j])*fontsize);
+							g.fillRect(x, y + 2, stringWidth, numrows*fontsize);
+							g.setColor(Color.green);
 							g.drawString(String.format("H=%." + NUM_DEBUG_DIGITS + "f", world.heightMap[i][j]), x, y + (++rows[i][j])*fontsize);
+							
+							if(world[loc].liquidType != LiquidType.DRY) {
+								g.drawString(String.format(world[loc].liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount), x, y + (++rows[i][j])*fontsize);
+							}
 						}
 					}
 					for(Animal animal : Wildlife.getAnimals()) {
