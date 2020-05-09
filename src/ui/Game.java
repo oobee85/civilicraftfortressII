@@ -83,11 +83,14 @@ public class Game {
 //		}
 		
 		
+		if(ticks == 1) {
+			rain();
+		}
 		// rain event
 		if(Math.random() < 0.001) {
 			rain();
 		}
-		if(Math.random() < 0.001) {
+		if(Math.random() < 0.01) {
 			grow();
 		}
 		if(ticks%1 == 0) {
@@ -107,12 +110,13 @@ public class Game {
 		}
 	}
 	public void grow() {
+		System.out.println("growing plants");
 		for(int i = 0; i < world.length; i++) {
 			for(int j = 0; j < world.length; j++) {
 				Tile tile = world[i][j];
 				
 				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD 
-						&& Math.random()< 0.1) {
+						&& Math.random()< 0.01) {
 					Plant plant = new Plant(PlantType.CATTAIL, tile);
 					tile.setHasPlant(plant);
 					plantsAquatic.add(plant);
@@ -125,6 +129,7 @@ public class Game {
 	}
 	
 	public void rain() {
+		System.out.println("raining");
 		for(int x = 0; x < world.length; x++) {
 			for(int y = 0; y < world[0].length; y++) {
 				if(world[x][y].liquidType == LiquidType.WATER) {
@@ -284,9 +289,7 @@ public class Game {
 		
 		makeRoad();
 		genResources();
-		
 		createTerrainImage();
-		
 		Wildlife.generateWildLife(world);
 	}
 	
@@ -530,10 +533,14 @@ public class Game {
 							}else if (Math.random() < Ore.ORE_ADAMANT.getRarity()) {
 								tile.setHasOre(Ore.ORE_ADAMANT);
 								numOres--;
-							} else if (Math.random() < Ore.ORE_RUNE.getRarity()) {
+							}else if (Math.random() < Ore.ORE_RUNE.getRarity()) {
 								tile.setHasOre(Ore.ORE_RUNE);
 								numOres--;
+							}else if (Math.random() < Ore.ORE_TITANIUM.getRarity()) {
+								tile.setHasOre(Ore.ORE_TITANIUM);
+								numOres--;
 							}
+							
 						}
 						
 					}

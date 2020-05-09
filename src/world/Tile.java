@@ -132,7 +132,7 @@ public class Tile {
 		drawStructure(g, bm);
 		drawHighlightedArea(g);
 		drawUnit(g);
-		if(Game.tileSize > 40) {
+		if(Game.tileSize > 30) {
 			drawHealthBarPlants(g);
 			drawHealthBarBuilding(g);
 			drawHealthBarStructure(g);

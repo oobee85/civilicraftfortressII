@@ -12,6 +12,7 @@ public enum Ore {
 	ORE_GOLD ( 100, new String[] {"resources/Images/ore/gold/ore_gold16.png", "resources/Images/ore/gold/ore_gold128.png"} , 0.1, true),
 	ORE_RUNE ( 100, new String[] {"resources/Images/ore/runite/ore_rune16.png", "resources/Images/ore/runite/ore_rune128.png"} , 0.1, true),
 	ORE_ADAMANT ( 100, new String[] {"resources/Images/ore/adamantite/ore_adamant16.png", "resources/Images/ore/adamantite/ore_adamant128.png"} , 0.2, true),
+	ORE_TITANIUM ( 100, new String[] {"resources/Images/ore/titanium/ore_titanium16.png", "resources/Images/ore/titanium/ore_titanium128.png"} , 0.05, true)
 	;
 	
 	
