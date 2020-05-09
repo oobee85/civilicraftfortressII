@@ -38,7 +38,7 @@ public class Wildlife {
 			animal.loseEnergy();
 			if(animal.wantsToEat()) {
 				if(animal.getTile().getPlant() != null) {
-					animal.getTile().getPlant().takeDamage(1);
+//					animal.getTile().getPlant().takeDamage(1);
 					animal.eat();
 				}
 				else if(animal.getTile().checkTerrain(Terrain.GRASS)) {

@@ -23,6 +23,7 @@ public class Tile {
 	
 	private Position position;
 	int minEntitySize = 20;
+	private int currentTick = 0;
 	
 	private String roadCorner;
 	
@@ -242,7 +243,8 @@ public class Tile {
 	}
 	private void drawHealthBarPlants(Graphics g) {
 		
-		if(plant != null && isHighlight == true) {
+		
+		if(plant != null &&( isHighlight == true || (currentTick - plant.getTimeLastDamageTaken()) <20 ) ) {
 			g.setColor(Color.BLACK);
 			g.fillRect(position.getIntX() * Game.tileSize+1, position.getIntY() * Game.tileSize+1, Game.tileSize-1, Game.tileSize/4 -1);
 			g.setColor(Color.RED);
@@ -366,6 +368,9 @@ public class Tile {
 	
 	public void setTerrain(Terrain t) {
 		terr = t;
+	}
+	public void setRecentTick(int t) {
+		currentTick = t;
 	}
 	public boolean checkTerrain(Terrain t) {
 		return terr == t;

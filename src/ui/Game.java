@@ -125,7 +125,7 @@ public class Game {
 			if(tile.liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD) {
 				if(!plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
 					double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
-					plant.takeDamage(damageTaken);
+					plant.takeDamage(damageTaken, ticks);
 				}
 				
 			}
@@ -783,6 +783,7 @@ public class Game {
 						t.drawHeightMap(g, heightMap[i][j]);
 					}
 					else {
+						t.setRecentTick(ticks);
 						t.draw(g, currentMode);
 					}
 					

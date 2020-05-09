@@ -10,6 +10,7 @@ public class Plant {
 	private PlantType plantType;
 	private int currentYield;
 	private double health;
+	private int timeLastDamageTaken = 0;
 	
 	public Plant(PlantType pt, Tile t) {
 		tile = t;
@@ -17,8 +18,9 @@ public class Plant {
 		health = pt.getHealth();
 		
 	}
-	public void takeDamage(double damage) {
+	public void takeDamage(double damage, int tick) {
 		health -= damage;
+		timeLastDamageTaken = tick;
 	}
 	public boolean isDead() {
 		return health < 0;
@@ -41,6 +43,9 @@ public class Plant {
 	}
 	public PlantType getPlantType() {
 		return plantType;
+	}
+	public int getTimeLastDamageTaken() {
+		return timeLastDamageTaken;
 	}
 	
 }
