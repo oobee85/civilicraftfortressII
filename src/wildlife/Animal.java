@@ -32,7 +32,7 @@ public class Animal extends Thing {
 	}
 	public void eat() {
 		energy += 1;
-		drive += 0.02;
+		drive += 0.01;
 	}
 	public void loseEnergy() {
 		energy -= 0.01;
@@ -49,6 +49,9 @@ public class Animal extends Thing {
 		drive = 0;
 	}
 	
+	public boolean wantsToReproduce() {
+		return Math.random() < drive - 0.1;
+	}
 	public double getDrive() {
 		return drive;
 	}

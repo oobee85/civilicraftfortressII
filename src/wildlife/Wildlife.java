@@ -67,7 +67,7 @@ public class Wildlife {
 					animal.setTile(best);
 				}
 			}
-			else if(Math.random() < animal.getDrive()) {
+			else if(animal.wantsToReproduce()) {
 				if(trying.containsKey(animal.getTile())) {
 					Animal other = trying.remove(animal.getTile());
 					animal.reproduced();
