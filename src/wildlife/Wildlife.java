@@ -27,8 +27,9 @@ public class Wildlife {
 	
 	public static void tick(Tile[][] world) {
 		ConcurrentLinkedQueue<Animal> newAnimals = new ConcurrentLinkedQueue<>();
+		HashMap<Tile, Animal> trying = new HashMap<>();
 		for(Animal animal : animals) {
-			if(animal.getTile().liquidAmount > Liquid.MINIMUM_LIQUID_THRESHOLD) {
+			if(animal.getTile().liquidAmount > animal.getTile().liquidType.getMinimumDamageAmount()) {
 				animal.takeDamage(animal.getTile().liquidAmount * animal.getTile().liquidType.getDamage());
 			}
 			if(animal.isDead()) {
@@ -47,12 +48,35 @@ public class Wildlife {
 				}
 			}
 			if(Math.random() < animal.getMoveChance()) {
-				List<Tile> neighbors = Utils.getNeighbors(animal.getTile(), world);
-				Tile next = neighbors.get(0);
-				animal.setTile(next);
+				List<Tile> neighbors = Utils.getNeighborsIncludingCurrent(animal.getTile(), world);
+				Tile best = neighbors.remove(0);
+				double bestDanger = animal.computeDanger(best);
+				for(Tile t : neighbors) {
+					double danger = animal.computeDanger(t);
+					if(danger < bestDanger) {
+						best = t;
+						bestDanger = danger;
+					}
+				}
+				animal.setTile(best);
+			}
+			else if(Math.random() < animal.getDrive()) {
+				if(trying.containsKey(animal.getTile())) {
+					Animal other = trying.remove(animal.getTile());
+					animal.reproduced();
+					other.reproduced();
+					Animal newanimal = new Animal(animal.getType());
+					newanimal.setTile(animal.getTile());
+					newAnimals.add(newanimal);
+					System.out.println("NEW DEER!");
+				}
+				else {
+					trying.put(animal.getTile(), animal);
+				}
 			}
 			newAnimals.add(animal);
 		}
+		
 		animals = newAnimals;
 	}
 	

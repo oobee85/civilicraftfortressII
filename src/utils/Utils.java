@@ -159,7 +159,13 @@ public final class Utils {
 		}
 		return smoothed;
 	}
-	
+
+	public static List<Tile> getNeighborsIncludingCurrent(Tile tile, Tile[][] world) {
+		List<Tile> tiles = getNeighbors(tile, world);
+		tiles.add(tile);
+		Collections.shuffle(tiles); 
+		return tiles;
+	}
 	public static List<Tile> getNeighbors(Tile tile, Tile[][] world) {
 		int x = tile.getLocation().getIntX();
 		int y = tile.getLocation().getIntY();
