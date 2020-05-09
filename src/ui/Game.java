@@ -252,28 +252,11 @@ public class Game {
 		panelHeight = height;
 	}
 
-	private void genResources() {
-		genOres();
-		genPlants();
-		makeForest();
-	}
-
 	public void generateWorld(MapType mapType, int size) {
 		int width = size;
 		int height = size;
 		world = new Tile[width][height];
 		int smoothingRadius = (int) (Math.sqrt((width + height)/2)/2);
-		double dirtLevel = 0;
-		double waterLevel = 0;
-		if(mapType == MapType.PANGEA) {
-			dirtLevel = 0.5;
-		}
-		else if(mapType == MapType.CONTINENTS) {
-			dirtLevel = 0.6;
-		}
-		else if(mapType == MapType.ARCHIPELAGO) {
-			dirtLevel = 0.75;
-		}
 		heightMap = Generation.generateHeightMap(smoothingRadius, width, height);
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
@@ -295,10 +278,10 @@ public class Game {
 					else if (heightMap[i][j] > 0.85) {
 						t = Terrain.ROCK;
 					}
-					else if (heightMap[i][j] > dirtLevel) {
+					else if (heightMap[i][j] > mapType.dirtLevel) {
 						t = Terrain.DIRT;
 					}
-					else if (heightMap[i][j] > waterLevel) {
+					else if (heightMap[i][j] > 0) {
 						t = Terrain.GRASS;
 					}
 					else {
@@ -317,7 +300,9 @@ public class Game {
 
 		
 		makeRoad();
-		genResources();
+		genOres();
+		genPlants();
+		makeForest();
 		createTerrainImage();
 		Wildlife.generateWildLife(world);
 	}
