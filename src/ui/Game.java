@@ -317,8 +317,6 @@ public class Game {
 		createTerrainImage();
 	}
 	
-	
-	
 	private void createTerrainImage() {
 		HashMap<Terrain, Color> terrainColors = new HashMap<>();
 		for(Terrain t : Terrain.values()) {
@@ -354,23 +352,7 @@ public class Game {
 					minimapImage.setRGB(i, j, newColor.getRGB());
 					newColor = Utils.blendColors(world[i][j].liquidType.getColor(), new Color(terrainImage.getRGB(i, j)), alpha);
 					terrainImage.setRGB(i, j, newColor.getRGB());
-//				if(world[i][j].liquidType == LiquidType.WATER) {
-//					minimapImage.setRGB(i, j, Color.red.getRGB());
-//					terrainImage.setRGB(i, j, Color.red.getRGB());
-//				}
-					
-					
 				}
-				
-//				else if(world[i][j].liquidAmount < 0){
-//					minimapImage.setRGB(i, j, Color.red.getRGB());
-//					terrainImage.setRGB(i, j, Color.red.getRGB());
-//				}
-//				else {
-//					minimapImage.setRGB(i, j, Color.green.getRGB());
-//					terrainImage.setRGB(i, j, Color.green.getRGB());
-//				}
-				
 			}
 		}
 		minimapGraphics.dispose();
