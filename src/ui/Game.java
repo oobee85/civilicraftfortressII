@@ -590,8 +590,11 @@ public class Game {
 							g.setColor(Color.black);
 							g.fillRect(x, y + 2, stringWidth, 2*fontsize);
 							g.setColor(Color.green);
-							
-							g.drawString(String.format("L=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount), x, y + (++rows[i][j])*fontsize);
+							String liquidString = "" + world[i][j].liquidType.name().charAt(0);
+							if(world[i][j].liquidType != LiquidType.DRY) {
+								liquidString += String.format("=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount);
+							}
+							g.drawString(liquidString, x, y + (++rows[i][j])*fontsize);
 							g.drawString(String.format("H=%." + NUM_DEBUG_DIGITS + "f", heightMap[i][j]), x, y + (++rows[i][j])*fontsize);
 						}
 					}
