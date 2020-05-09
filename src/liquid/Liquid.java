@@ -7,7 +7,7 @@ import world.*;
 
 public class Liquid {
 	
-	public static final double MINIMUM_LIQUID_THRESHOLD = 0.01;
+	public static final double MINIMUM_LIQUID_THRESHOLD = 0.001;
 	
 	private static final double FRICTION_RATIO = 0.1;
 	
@@ -138,6 +138,9 @@ public class Liquid {
 				else {
 					if(otype == LiquidType.WATER && mytype == LiquidType.LAVA ||
 							otype == LiquidType.LAVA && mytype == LiquidType.WATER) {
+						if(change < otype.surfaceTension) { 
+							change = 0;
+						}
 						double combined = change;
 						double extra = 0;
 						if(myv - change < 0) {
