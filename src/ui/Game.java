@@ -19,6 +19,7 @@ public class Game {
 	private BufferedImage heightMapImage;
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
 	ArrayList<Unit> selectUnits = new ArrayList<Unit>();
+	HashMap<ResourceType, Resource> resources = new HashMap<ResourceType, Resource>();
 	LinkedList<Building> buildings = new LinkedList<Building>();
 	LinkedList<Structure> structures = new LinkedList<Structure>();
 	
@@ -43,7 +44,7 @@ public class Game {
 	public static boolean DEBUG_DRAW = false;
 	
 	public World world;
-
+	
 	public Game(GUIController guiController) {
 		this.guiController = guiController;
 		money = 100;
@@ -52,6 +53,12 @@ public class Game {
 		viewOffset = new Position(0, 0);
 		currentMode = BuildMode.NOMODE;
 		showHeightMap = false;
+		
+		for(ResourceType resourceType : ResourceType.values()) {
+			Resource resource = new Resource(0, resourceType);
+			resources.put(resourceType, resource);
+		}
+		
 	}
 	
 	public void gameTick() {
@@ -94,11 +101,20 @@ public class Game {
 		
 		Wildlife.tick(world);
 		world.updatePlantDamage();
+		if(ticks%5 == 0) {
+			updateBuildingAction();
+		}
+		
 		updateBuildingDamage();
 		updateStructureDamage();
+		
+		guiController.updateGUI();
 		if(changedTerrain) {
 			updateTerrainImages();
 		}
+		
+		
+		
 	}
 	
 	public void generateWorld(MapType mapType, int size) {
@@ -113,6 +129,16 @@ public class Game {
 		this.terrainImage = images[0];
 		this.minimapImage = images[1];
 		this.heightMapImage = images[2];
+	}
+
+	public void updateBuildingAction() {
+		
+		for(Building building : buildings) {
+			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getHasOre() == true) {
+				resources.get(building.getTile().getOre().getResourceType()).addAmount(1);
+			}
+		}
+		
 	}
 	
 
@@ -509,6 +535,7 @@ public class Game {
 	public void exitTile() {
 		guiController.toggleTileView();
 	}
+	
 	public void zoomView(int scroll, int mx, int my) {
 		int newTileSize;
 		if(scroll > 0) {
@@ -543,8 +570,8 @@ public class Game {
 	public int getMoney() {
 		return money;
 	}
-	public int getResourceAmount() {
-		return ironOre;
+	public int getResourceAmount(ResourceType resourceType) {
+		return resources.get(resourceType).getAmount();
 	}
 	public void setBuildMode(BuildMode b) {
 		if(currentMode == b) {

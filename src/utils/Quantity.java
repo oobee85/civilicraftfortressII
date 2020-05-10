@@ -21,4 +21,10 @@ public class Quantity implements HasImage{
 	public ImageIcon getImageIcon(int size) {
 		return hasImage.getImageIcon(size);
 	}
+	public int getAmount() {
+		return amount;
+	}
+	public void addAmount(int i) {
+		amount += i;
+	}
 }

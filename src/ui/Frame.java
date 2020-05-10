@@ -21,7 +21,9 @@ public class Frame extends JPanel{
 	private JPanel minimapPanel;
 	private JPanel cityView;
 	private JPanel tileView;
+	JLabel ironOre; 
 	private JComboBox<MapType> mapType;
+	private JLabel[] resourceIndicators = new JLabel[ResourceType.values().length];
 	private JTextField mapSize;
 	private int WIDTH;
 	private int HEIGHT;
@@ -53,6 +55,14 @@ public class Frame extends JPanel{
 			@Override
 			public void toggleTileView() {
 				tileView.setVisible(!tileView.isVisible());
+			}
+			@Override
+			public void updateGUI() {
+				for(int i = 0; i < ResourceType.values().length; i++) {
+					resourceIndicators[i].setText(ResourceType.values()[i]+" = "+gameInstance.getResourceAmount(ResourceType.values()[i]) );
+				}
+					
+				
 			}
 		});
 			
@@ -253,11 +263,13 @@ public class Frame extends JPanel{
 		money.setBorder(BorderFactory.createLineBorder(Color.gray));
 		money.setHorizontalAlignment(JLabel.CENTER);
 		
-		JLabel stone = new JLabel(); 
-		stone.setText("Stone = "+gameInstance.getMoney());
-		stone.setPreferredSize(BUILDING_BUTTON_SIZE);
-		stone.setBorder(BorderFactory.createLineBorder(Color.gray));
-		stone.setHorizontalAlignment(JLabel.CENTER);
+		
+		for(int i = 0; i < ResourceType.values().length; i++) {
+			resourceIndicators[i] = new JLabel();
+			resourceIndicators[i].setPreferredSize(BUILDING_BUTTON_SIZE);
+			resourceIndicators[i].setBorder(BorderFactory.createLineBorder(Color.gray));
+			resourceIndicators[i].setHorizontalAlignment(JLabel.CENTER);
+		}
 		
 		JLabel tSize = new JLabel(); 
 		tSize.setText("TileSize = "+gameInstance.getTileSize());
@@ -320,9 +332,11 @@ public class Frame extends JPanel{
 		});
 		exit.setPreferredSize(BUILDING_BUTTON_SIZE);
 
-
+		
+		for(JLabel label : resourceIndicators) {
+			gui.add(label);
+		}
 		gui.add(money);
-		gui.add(stone);
 		gui.add(tSize);
 		gui.add(makeRoad);
 		gui.add(makeWall);

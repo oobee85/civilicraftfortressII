@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
 
+import game.Resource;
+import game.ResourceType;
 import liquid.*;
 import utils.*;
 import wildlife.*;
@@ -18,6 +20,7 @@ public class World {
 	
 	public LinkedList<Plant> plantsLand = new LinkedList<Plant>();
 	public LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
+
 	private double bushRarity = 0.005;
 	private double waterPlantRarity = 0.05;
 	private double forestDensity = 0.3;
@@ -26,6 +29,9 @@ public class World {
 	
 	public World() {
 		tileList = new LinkedList<>();
+		
+		
+		
 	}
 	
 	
@@ -76,7 +82,9 @@ public class World {
 			}
 		}
 	}
-
+	
+	
+	
 	public void updatePlantDamage() {
 		LinkedList<Plant> plantsLandNew = new LinkedList<Plant>();
 		
