@@ -8,8 +8,8 @@ import utils.*;
 
 public enum LiquidType implements HasImage {
 		DRY(new String[] {"resources/Images/lava/lavaanim32.gif"}, 0, 1000, 5, 0.08),
-		WATER(new String[] {"resources/Images/water/water16.png", "resources/Images/water/water128.png", "resources/Images/water/water512.png"}, 0.2, 0.0005, 5, 0.08),
-		LAVA(new String[] {"resources/Images/lava/lavaanim32.gif", "resources/Images/lava/lava512.png"}, 0.1, 0.005, 100, 0.001)
+		WATER(new String[] {"resources/Images/water/water16.png", "resources/Images/water/water128.png", "resources/Images/water/water512.png", "resources/Images/water/water1024.jpg"}, 0.2, 0.0005, 5, 0.08),
+		LAVA(new String[] {"resources/Images/lava/lava16.png", "resources/Images/lava/lavaanim32.gif"}, 0.1, 0.005, 100, 0.001)
 		;
 	
 	double viscosity;
