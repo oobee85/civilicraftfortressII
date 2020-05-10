@@ -599,6 +599,4 @@ public class Game {
 	public void setShowHeightMap(boolean show) {
 		this.showHeightMap = show;
 	}
-	
-
 }

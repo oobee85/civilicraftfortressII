@@ -9,7 +9,6 @@ public class Generation {
 	
 	private static final double snowEdgeRatio = 0.5;
 	private static final double rockEdgeRatio = 0.7;
-	private static final double oreRarity = 0.01;
 	
 	public static double[][] generateHeightMap(int smoothingRadius, int width, int height) {
 		LinkedList<double[][]> noises = new LinkedList<>();
