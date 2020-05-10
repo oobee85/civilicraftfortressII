@@ -25,6 +25,8 @@ public class Game {
 	public static int tileSize = 10;
 	public boolean selectedUnit = false;
 	private int money;
+	private int ironOre;
+	private int copperOre;
 	private Position viewOffset;
 	private Position hoveredTile;
 	private Area hoveredArea;
@@ -541,6 +543,9 @@ public class Game {
 
 	public int getMoney() {
 		return money;
+	}
+	public int getResourceAmount() {
+		return ironOre;
 	}
 	public void setBuildMode(BuildMode b) {
 		if(currentMode == b) {

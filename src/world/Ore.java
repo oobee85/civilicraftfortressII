@@ -5,14 +5,14 @@ import utils.*;
 
 public enum Ore {
 	
-	IRON ( 100, new String[] {"resources/Images/ore/iron/ore_iron16.png", "resources/Images/ore/iron/ore_iron128.png"}, 0.005, false),
-	COPPER ( 100, new String[] {"resources/Images/ore/copper/ore_copper16.png", "resources/Images/ore/copper/ore_copper128.png"} , 0.01, false),
-	SILVER ( 100, new String[] {"resources/Images/ore/silver/ore_silver16.png", "resources/Images/ore/silver/ore_silver128.png"} , 0.005, false),
-	MITHRIL ( 100, new String[] {"resources/Images/ore/mithril/ore_mithril16.png", "resources/Images/ore/mithril/ore_mithril128.png"} , 0.001, false),
-	GOLD ( 100, new String[] {"resources/Images/ore/gold/ore_gold16.png", "resources/Images/ore/gold/ore_gold128.png"} , 0.001, true),
-	RUNE ( 100, new String[] {"resources/Images/ore/runite/ore_rune16.png", "resources/Images/ore/runite/ore_rune128.png"} , 0.001, true),
-	ADAMANT ( 100, new String[] {"resources/Images/ore/adamantite/ore_adamant16.png", "resources/Images/ore/adamantite/ore_adamant128.png"} , 0.002, true),
-	TITANIUM ( 100, new String[] {"resources/Images/ore/titanium/ore_titanium16.png", "resources/Images/ore/titanium/ore_titanium128.png"} , 0.0005, true)
+	IRON ( 100, new String[] {"resources/Images/ore/iron/ore_iron16.png", "resources/Images/ore/iron/ore_iron128.png"}, 0.001, false),
+	COPPER ( 100, new String[] {"resources/Images/ore/copper/ore_copper16.png", "resources/Images/ore/copper/ore_copper128.png"} , 0.002, false),
+	SILVER ( 100, new String[] {"resources/Images/ore/silver/ore_silver16.png", "resources/Images/ore/silver/ore_silver128.png"} , 0.001, false),
+	MITHRIL ( 100, new String[] {"resources/Images/ore/mithril/ore_mithril16.png", "resources/Images/ore/mithril/ore_mithril128.png"} , 0.0005, false),
+	GOLD ( 100, new String[] {"resources/Images/ore/gold/ore_gold16.png", "resources/Images/ore/gold/ore_gold128.png"} , 0.0005, true),
+	RUNE ( 100, new String[] {"resources/Images/ore/runite/ore_rune16.png", "resources/Images/ore/runite/ore_rune128.png"} , 0.000125, true),
+	ADAMANT ( 100, new String[] {"resources/Images/ore/adamantite/ore_adamant16.png", "resources/Images/ore/adamantite/ore_adamant128.png"} , 0.00025, true),
+	TITANIUM ( 100, new String[] {"resources/Images/ore/titanium/ore_titanium16.png", "resources/Images/ore/titanium/ore_titanium128.png"} , 0.0000625, true)
 	;
 	
 	
