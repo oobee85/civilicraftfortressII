@@ -9,7 +9,8 @@ import utils.*;
 import wildlife.*;
 
 public class World {
-	public Tile[][] world;
+	private LinkedList<Tile> tileList;
+	public Tile[][] tiles;
 	public double[][] heightMap;
 	
 	private int width;
@@ -25,6 +26,7 @@ public class World {
 	public TileLoc volcano;
 	
 	public World() {
+		tileList = new LinkedList<>();
 	}
 	
 	
@@ -35,17 +37,22 @@ public class World {
 		return height;
 	}
 	
+	public LinkedList<Tile> getTiles() {
+		Collections.shuffle(tileList);
+		return tileList;
+	}
+	
 	public Tile get(TileLoc loc) {
-		return world[loc.x][loc.y];
+		return tiles[loc.x][loc.y];
 	}
 
 	public void rain() {
 		System.out.println("raining");
-		for(int x = 0; x < world.length; x++) {
-			for(int y = 0; y < world[0].length; y++) {
-				if(world[x][y].liquidType == LiquidType.WATER || world[x][y].liquidType == LiquidType.DRY) {
-					world[x][y].liquidType = LiquidType.WATER;
-					world[x][y].liquidAmount += 0.005;
+		for(int x = 0; x < tiles.length; x++) {
+			for(int y = 0; y < tiles[0].length; y++) {
+				if(tiles[x][y].liquidType == LiquidType.WATER || tiles[x][y].liquidType == LiquidType.DRY) {
+					tiles[x][y].liquidType = LiquidType.WATER;
+					tiles[x][y].liquidAmount += 0.005;
 				}
 			}
 		}
@@ -53,9 +60,9 @@ public class World {
 	
 	public void grow() {
 		System.out.println("growing plants");
-		for(int i = 0; i < world.length; i++) {
-			for(int j = 0; j < world.length; j++) {
-				Tile tile = world[i][j];
+		for(int i = 0; i < tiles.length; i++) {
+			for(int j = 0; j < tiles.length; j++) {
+				Tile tile = tiles[i][j];
 				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount() 
 						&& Math.random()< 0.01) {
 					Plant plant = new Plant(PlantType.CATTAIL, tile);
@@ -127,26 +134,26 @@ public class World {
 
 	public void genPlants() {
 		
-		for(int i = 0; i < world.length; i++) {
-			for(int j = 0; j < world.length; j++) {
+		for(int i = 0; i < tiles.length; i++) {
+			for(int j = 0; j < tiles.length; j++) {
 				
 				//generates land plants
-				if(world[i][j].checkTerrain(Terrain.GRASS) && world[i][j].getHasRoad()==false && Math.random() < bushRarity) {
+				if(tiles[i][j].checkTerrain(Terrain.GRASS) && tiles[i][j].getHasRoad()==false && Math.random() < bushRarity) {
 					double o = Math.random();
 					if(o < PlantType.BERRY.getRarity()) {
-						Plant p = new Plant(PlantType.BERRY, world[i][j] );
-						world[i][j].setHasPlant(p);
-						plantsLand.add(world[i][j].getPlant());
+						Plant p = new Plant(PlantType.BERRY, tiles[i][j] );
+						tiles[i][j].setHasPlant(p);
+						plantsLand.add(tiles[i][j].getPlant());
 					}
 					
 				}
 				//generates water plants
-				if(world[i][j].checkTerrain(Terrain.WATER) && Math.random() < waterPlantRarity) {
+				if(tiles[i][j].checkTerrain(Terrain.WATER) && Math.random() < waterPlantRarity) {
 					double o = Math.random();
 					if(o < PlantType.CATTAIL.getRarity()) {
-						Plant p = new Plant(PlantType.CATTAIL, world[i][j] );
-						world[i][j].setHasPlant(p);
-						plantsAquatic.add(world[i][j].getPlant());
+						Plant p = new Plant(PlantType.CATTAIL, tiles[i][j] );
+						tiles[i][j].setHasPlant(p);
+						plantsAquatic.add(tiles[i][j].getPlant());
 					}
 					
 				}
@@ -161,31 +168,31 @@ public class World {
 
 	public void makeForest() {
 
-		int x0 = (int) (Math.random() * world.length);
-		int y0 = (int) (Math.random() * world.length);
+		int x0 = (int) (Math.random() * tiles.length);
+		int y0 = (int) (Math.random() * tiles.length);
 
 		double forestLength = Math.random()*70+1;
 		double forestHeight = Math.random()*70+1;
 		double forestLengthEdge = forestLength+30;
 		double forestHeightEdge = forestHeight+30;
 		
-		for(int i = 0; i < world.length; i++) {
-			for(int j = 0; j < world[i].length; j++) {
+		for(int i = 0; i < tiles.length; i++) {
+			for(int j = 0; j < tiles[i].length; j++) {
 				int dx = i - x0;
 				int dy = j - y0;
 				
 				double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
 				double forestEdge = (dx*dx)/(forestLengthEdge*forestLengthEdge) + (dy*dy)/(forestHeightEdge*forestHeightEdge);
 				
-				Tile tile = world[i][j];
+				Tile tile = tiles[i][j];
 					if(tile.canPlant()==true && tile.getHasRoad() == false) {
 						
 						
 						if((forestEdge < 1 && Math.random()<forestDensity-0.2) 
 								|| (forest < 1 && Math.random() < forestDensity)) {
 							
-							Plant plant = new Plant(PlantType.FOREST1, world[i][j]);
-							world[i][j].setHasPlant(plant);
+							Plant plant = new Plant(PlantType.FOREST1, tiles[i][j]);
+							tiles[i][j].setHasPlant(plant);
 							plantsLand.add(plant);
 							
 						}	
@@ -199,22 +206,23 @@ public class World {
 	public void generateWorld(MapType mapType, int size) {
 		width = size;
 		height = size;
-		world = new Tile[width][height];
+		tiles = new Tile[width][height];
 		int smoothingRadius = (int) (Math.sqrt((width + height)/2)/2);
 		heightMap = Generation.generateHeightMap(smoothingRadius, width, height);
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				world[i][j] = new Tile(new TileLoc(i, j), Terrain.DIRT);
+				tiles[i][j] = Tile.makeTile(new TileLoc(i, j), Terrain.DIRT);
+				tileList.add(tiles[i][j]);
 			}
 		}
 		
-		mountain = Generation.makeMountain(world, heightMap);
-		volcano = Generation.makeVolcano(world, heightMap);
+		mountain = Generation.makeMountain(tiles, heightMap);
+		volcano = Generation.makeVolcano(tiles, heightMap);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				if(world[i][j].getTerrain() == Terrain.DIRT) {
+				if(tiles[i][j].getTerrain() == Terrain.DIRT) {
 					Terrain t;
 					if (heightMap[i][j] > 0.95) {
 						t = Terrain.SNOW;
@@ -231,7 +239,7 @@ public class World {
 					else {
 						t = Terrain.WATER;
 					}
-					world[i][j] = new Tile(new TileLoc(i, j), t);
+					tiles[i][j].setTerrain(t);
 				}
 			}
 		}
@@ -246,7 +254,7 @@ public class World {
 			Liquid.propogate(this);
 		}
 
-		Generation.genOres(world);
+		Generation.genOres(this);
 		this.genPlants();
 		this.makeForest();
 		Wildlife.generateWildLife(this);
@@ -271,21 +279,21 @@ public class World {
 			Color average = new Color(sumr/totalNumPixels, sumg/totalNumPixels, sumb/totalNumPixels);
 			terrainColors.put(t, average);
 		}
-		BufferedImage terrainImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
-		BufferedImage minimapImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
+		BufferedImage terrainImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_3BYTE_BGR);
+		BufferedImage minimapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_3BYTE_BGR);
 
 		Graphics minimapGraphics = minimapImage.getGraphics();
 		Graphics terrainGraphics = terrainImage.getGraphics();
-		for(int i = 0; i < world.length; i++) {
-			for(int j = 0; j < world[0].length; j++) {
-				minimapImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
-				terrainImage.setRGB(i, j, terrainColors.get(world[i][j].getTerrain()).getRGB());
+		for(int i = 0; i < tiles.length; i++) {
+			for(int j = 0; j < tiles[0].length; j++) {
+				minimapImage.setRGB(i, j, terrainColors.get(tiles[i][j].getTerrain()).getRGB());
+				terrainImage.setRGB(i, j, terrainColors.get(tiles[i][j].getTerrain()).getRGB());
 				
-				if(world[i][j].liquidAmount > 0) {
-					float alpha = Utils.getAlphaOfLiquid(world[i][j].liquidAmount);
-					Color newColor = Utils.blendColors(world[i][j].liquidType.getColor(), new Color(minimapImage.getRGB(i, j)), alpha);
+				if(tiles[i][j].liquidAmount > 0) {
+					float alpha = Utils.getAlphaOfLiquid(tiles[i][j].liquidAmount);
+					Color newColor = Utils.blendColors(tiles[i][j].liquidType.getColor(), new Color(minimapImage.getRGB(i, j)), alpha);
 					minimapImage.setRGB(i, j, newColor.getRGB());
-					newColor = Utils.blendColors(world[i][j].liquidType.getColor(), new Color(terrainImage.getRGB(i, j)), alpha);
+					newColor = Utils.blendColors(tiles[i][j].liquidType.getColor(), new Color(terrainImage.getRGB(i, j)), alpha);
 					terrainImage.setRGB(i, j, newColor.getRGB());
 				}
 			}
@@ -293,9 +301,9 @@ public class World {
 		minimapGraphics.dispose();
 		terrainGraphics.dispose();
 		
-		BufferedImage heightMapImage = new BufferedImage(world.length, world[0].length, BufferedImage.TYPE_3BYTE_BGR);
-		for(int i = 0; i < world.length; i++) {
-			for(int j = 0; j < world[0].length; j++) {
+		BufferedImage heightMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_3BYTE_BGR);
+		for(int i = 0; i < tiles.length; i++) {
+			for(int j = 0; j < tiles[0].length; j++) {
 				int r = Math.max(Math.min((int)(255*heightMap[i][j]), 255), 0);
 				Color c = new Color(r, 0, 255-r);
 				heightMapImage.setRGB(i, j, c.getRGB());

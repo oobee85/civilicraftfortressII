@@ -75,16 +75,16 @@ public class Generation {
 				//double ratio = dist / Math.max(mountLength, mountHeight);
 				TileLoc p = new TileLoc(i, j);
 				if(snowMountainEdge < 1 && Math.random()<snowEdgeRatio) {
-					world[i][j] = new Tile(p, Terrain.SNOW);
+					world[i][j].setTerrain(Terrain.SNOW);
 					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}else if (snowMountain < 1 ) {
-					world[i][j] = new Tile(p, Terrain.SNOW);
+					world[i][j].setTerrain(Terrain.SNOW);
 					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}else if(mountainEdge < 1 && Math.random()<rockEdgeRatio) {
-					world[i][j] = new Tile(p, Terrain.ROCK);
+					world[i][j].setTerrain(Terrain.ROCK);
 					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}else if(mountain < 1) {
-					world[i][j] = new Tile(p, Terrain.ROCK);
+					world[i][j].setTerrain(Terrain.ROCK);
 					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}
 				
@@ -120,15 +120,15 @@ public class Generation {
 					heightMap[i][j] = Math.max(height, heightMap[i][j]);
 					
 					if(distanceFromCenter < lavaRadius) {
-						world[i][j] = new Tile(p, Terrain.LAVA);
+						world[i][j].setTerrain(Terrain.LAVA);
 						world[i][j].liquidType = LiquidType.LAVA;
 						world[i][j].liquidAmount = 0.2;
 					}else if(distanceFromCenter < volcanoRadius) {
-						world[i][j] = new Tile(p, Terrain.VOLCANO);
+						world[i][j].setTerrain(Terrain.VOLCANO);
 					}else if(distanceFromCenter < mountainRadius && world[i][j].checkTerrain(Terrain.SNOW) == false) {
-						world[i][j] = new Tile(p, Terrain.ROCK);
+						world[i][j].setTerrain(Terrain.ROCK);
 					}else if(distanceFromCenter < mountainEdgeRadius && Math.random()<rockEdgeRatio) {
-						world[i][j] = new Tile(p, Terrain.ROCK);
+						world[i][j].setTerrain(Terrain.ROCK);
 					}
 				}
 				
@@ -137,58 +137,22 @@ public class Generation {
 		return new TileLoc(x, y);
 	}
 
-	public static void genOres(Tile[][] world) {
-		int numOres = (int)(world.length * world.length *oreRarity); //163
-
-		while (numOres > 0) {
-			for (int i = 0; i < world.length; i++) {
-				for (int j = 0; j < world.length; j++) {
-
-					Tile tile = world[i][j];
-//					System.out.println(numOres+" numores");
-					if (tile.canOre() == true && Math.random() < oreRarity) {
-
-						if(tile.canSupportRareOre() == false) {
-							if (Math.random() < Ore.ORE_IRON.getRarity()) {
-								tile.setHasOre(Ore.ORE_IRON);
-								numOres--;
-							}else if (Math.random() < Ore.ORE_COPPER.getRarity()) {
-								tile.setHasOre(Ore.ORE_COPPER);
-								numOres--;
-							}else if (Math.random() < Ore.ORE_SILVER.getRarity()) {
-								tile.setHasOre(Ore.ORE_SILVER);
-								numOres--;
-							}else if (Math.random() < Ore.ORE_MITHRIL.getRarity()) {
-								tile.setHasOre(Ore.ORE_MITHRIL);
-								numOres--;
-							}
-						}
-						
-						if(tile.canSupportRareOre() == true) {
-							if (Math.random() < Ore.ORE_GOLD.getRarity()) {
-								tile.setHasOre(Ore.ORE_GOLD);
-								numOres--;
-							}else if (Math.random() < Ore.ORE_ADAMANT.getRarity()) {
-								tile.setHasOre(Ore.ORE_ADAMANT);
-								numOres--;
-							}else if (Math.random() < Ore.ORE_RUNE.getRarity()) {
-								tile.setHasOre(Ore.ORE_RUNE);
-								numOres--;
-							}else if (Math.random() < Ore.ORE_TITANIUM.getRarity()) {
-								tile.setHasOre(Ore.ORE_TITANIUM);
-								numOres--;
-							}
-							
-						}
-						
+	public static void genOres(World world) {
+		for(Ore ore : Ore.values()) {
+			int numOres = (int)(world.getWidth() * world.getHeight() * ore.getRarity()); //163
+			System.out.println("Tiles of " + ore.name() + ": " + numOres);
+			for(Tile tile : world.getTiles()) {
+				if(tile.canOre() && !tile.getHasOre()) {
+					// if ore is rare the tile must be able to support rare ore
+					if(!ore.isRare() || tile.canSupportRareOre()) {
+						tile.setHasOre(ore);
+						numOres--;
 					}
-					if(numOres <= 0) {
-						break;
-					}
-					
+				}
+				if(numOres <= 0) {
+					break;
 				}
 			}
-			
 		}
 	}
 
@@ -206,7 +170,7 @@ public class Generation {
 			int j = next.y;
 //			world[i][j].liquidAmount += volume/5;
 			if(!world[i][j].checkTerrain(Terrain.WATER)) {
-				world[i][j] = new Tile(next, Terrain.WATER);
+				world[i][j].setTerrain(Terrain.WATER);
 				volume--;
 			}
 			// Add adjacent tiles to the queue
