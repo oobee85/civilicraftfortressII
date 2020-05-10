@@ -31,7 +31,19 @@ public class Unit extends Thing{
 		return targetTile;
 	}
 	public void setTargetTile(Tile t) {
-		targetTile = t;
+		if(!t.equals(getTile()) ) {
+			targetTile = t;
+		}
+		
+	}
+	
+	@Override
+	public void setTile(Tile tile) {
+		super.setTile(tile);
+		if(targetTile == getTile() ) {
+			targetTile = null;
+		}
+		
 	}
 	
 }

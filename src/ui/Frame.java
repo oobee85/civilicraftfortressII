@@ -441,12 +441,11 @@ public class Frame extends JPanel{
 //				System.out.println("mouse release");
 				if(e.getButton() == MouseEvent.BUTTON1 && dragged == false) {
 					
-					System.out.println("click");
 					gameInstance.mouseClick(mx, my);
+					
 				}
 				if(e.getButton() == MouseEvent.BUTTON2 && dragged == false) {
 					
-					System.out.println("right click");
 					gameInstance.rightClick(mx, my);
 				}
 				
@@ -461,7 +460,6 @@ public class Frame extends JPanel{
 				mx = e.getX();
 				my = e.getY();
 				
-				gameInstance.setDestination(mx, my);
 				
 			}
 
@@ -480,7 +478,6 @@ public class Frame extends JPanel{
 //					System.out.println("y: "+e.getY());
 					gameInstance.doubleClick(mx, my);
 				}
-				
 				
 				
 			}

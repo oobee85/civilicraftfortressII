@@ -184,7 +184,9 @@ public class Tile {
 		
 		if(unit != null && unit.getIsSelected() == true) {
 			g.setColor(Color.pink);
+			Utils.setTransparency(g, 0.5f);
 			g.fillRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize);
+			Utils.setTransparency(g, 1f);
 		}
 		if(unit != null) {
 			g.drawImage(unit.getImage(0), location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
@@ -370,13 +372,6 @@ public class Tile {
 	}
 	public boolean getIsTerritory() {
 		return isTerritory;
-	}
-	
-	public boolean isStructure(StructureType s) {
-		if(structure.getStructureType() == s) {
-			return true;
-		}
-		return false;
 	}
 	public boolean canBuild() {
 		return terr.isBuildable(terr);

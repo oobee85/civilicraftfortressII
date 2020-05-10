@@ -539,6 +539,10 @@ public class Game {
 			}
 		}
 		if(currentMode == BuildMode.NOMODE && tile.getHasUnit() == true) {
+			if(selectedUnit != null) {
+//				selectedUnit.selectUnit(false);
+//				selectedUnit = null;
+			}
 			if(tile.getUnit().getIsSelected() == false) {
 				selectedUnit = tile.getUnit();
 				tile.getUnit().selectUnit(true);
@@ -547,15 +551,21 @@ public class Game {
 				tile.getUnit().selectUnit(false);
 			}
 			
+			
 		}
+		setDestination(mx, my);
 		
 	}
+	
 	public void setDestination(int mx, int my) {
-		Position pos = new Position(mx *1.0, my*1.0);
+		
+		Position pos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
 		Tile destination = world[loc];
-		selectedUnit.setTargetTile(destination);
-		System.out.println("setting destination");
+		
+		if(selectedUnit != null && destination != null ) {
+			selectedUnit.setTargetTile(destination);
+		}
 		
 	}
 	
@@ -578,8 +588,9 @@ public class Game {
 					}
 				
 			}
-			System.out.println("moving unit");
 			bestTile.setUnit(unit);
+			unit.setTile(bestTile);
+			
 			currentTile.setUnit(null);
 			
 		}
@@ -613,7 +624,7 @@ public class Game {
 	public void doubleClick(int mx, int my) {
 		Position tilepos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
-		if(world[loc].isStructure(StructureType.CASTLE) == true ) {
+		if(world[loc].getStructure() != null && world[loc].getStructure().getStructureType() == StructureType.CASTLE) {
 			exitCity();
 		}
 	}
