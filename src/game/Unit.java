@@ -5,23 +5,19 @@ import game.*;
 import utils.*;
 import world.Tile;
 
-public class Unit {
+public class Unit extends Thing{
 	
 	
-	Tile tile;
-	UnitType unitType;
+	private UnitType unitType;
 	
-	public Unit(UnitType ut, Tile tile) {
-		this.unitType = ut;
-		this.tile = tile;
+	public Unit(UnitType unitType, Tile tile) {
+		super(unitType.getHealth(), unitType, tile);
+		this.unitType = unitType;
 	}
 	
 	
-	public void changePosion(Tile t) {
-		tile = t;
-	}
 	public Tile getTile() {
-		return tile;
+		return super.getTile();
 	}
 	public Image getImage() {
 		return unitType.getImage();

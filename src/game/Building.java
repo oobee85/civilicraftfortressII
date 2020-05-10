@@ -1,9 +1,5 @@
 package game;
 
-import java.awt.Image;
-
-import javax.swing.ImageIcon;
-
 import utils.*;
 import world.Tile;
 

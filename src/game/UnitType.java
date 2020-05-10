@@ -4,7 +4,7 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 
 import utils.*;
-public enum UnitType {
+public enum UnitType implements HasImage{
 	WORKER ( "resources/Images/units/worker.png", new CombatStats(30,0,0,10)),
  	WARRIOR ( "resources/Images/units/warrior.png", new CombatStats(30,10,10,10)),
  	SPEARMAN ( "resources/Images/units/spearman.png", new CombatStats(30,10,20,10)),
@@ -19,9 +19,6 @@ public enum UnitType {
     	mipmap = new MipMap(s);
     }
     
-    public CombatStats getCombatStats() {
-    	return combatStats;
-    }
     
     public Image getImage() {
     	return mipmap.getImage(0);
@@ -29,5 +26,25 @@ public enum UnitType {
     public ImageIcon getImageIcon() {
     	return mipmap.getImageIcon(0);
     }
-    
+
+	public double getHealth() {
+		return combatStats.getHealth();
+	}
+	public double getAttack() {
+		return combatStats.getAttack();
+	}
+	public double getDefence() {
+		return combatStats.getDefence();
+	}
+
+	@Override
+	public Image getImage(int size) {
+		return mipmap.getImage(size);
+	}
+
+	@Override
+	public ImageIcon getImageIcon(int size) {
+		return mipmap.getImageIcon(size);
+	}
+
 }
