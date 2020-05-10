@@ -28,6 +28,12 @@ public class Animal extends Thing {
 		return strings;
 	}
 	
+	public void climb(double height) {
+		if(height > 0) {
+			energy -= height;
+		}
+	}
+	
 	public double computeTileDamage(Tile tile, double height) {
 		double damage = 0;
 		if(getType().isAquatic()) {

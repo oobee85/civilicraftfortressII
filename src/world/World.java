@@ -306,9 +306,9 @@ public class World {
 				
 				if(tiles[i][j].liquidAmount > 0) {
 					float alpha = Utils.getAlphaOfLiquid(tiles[i][j].liquidAmount);
-					Color newColor = Utils.blendColors(tiles[i][j].liquidType.getColor(Game.tileSize), new Color(minimapImage.getRGB(i, j)), alpha);
+					Color newColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), new Color(minimapImage.getRGB(i, j)), alpha);
 					minimapImage.setRGB(i, j, newColor.getRGB());
-					newColor = Utils.blendColors(tiles[i][j].liquidType.getColor(Game.tileSize), new Color(terrainImage.getRGB(i, j)), alpha);
+					newColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), new Color(terrainImage.getRGB(i, j)), alpha);
 					terrainImage.setRGB(i, j, newColor.getRGB());
 				}
 			}

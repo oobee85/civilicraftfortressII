@@ -24,7 +24,7 @@ public enum LiquidType implements HasImage {
 		this.surfaceTension = surfaceTension;
 		this.damage = damage;
 		this.minimumDamageAmount = minimumDamageAmount;
-        this.mipmap = new MipMap(s);
+		this.mipmap = new MipMap(s);
 	}
 	public double getDamage() {
 		return damage;

@@ -71,7 +71,10 @@ public class Wildlife {
 					}
 				}
 				if(best != null) {
+					double heightIncrease = world.getHeight(best.getLocation()) - world.getHeight(animal.getTile().getLocation());
+					animal.climb(heightIncrease);
 					animal.setTile(best);
+					
 				}
 			}
 			else if(animal.wantsToReproduce()) {
