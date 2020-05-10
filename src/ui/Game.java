@@ -137,6 +137,9 @@ public class Game {
 			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getHasOre() == true) {
 				resources.get(building.getTile().getOre().getResourceType()).addAmount(1);
 			}
+			if(building.getBuildingType() == BuildingType.IRRIGATION && building.getTile().canPlant() == true) {
+				resources.get(ResourceType.WHEAT).addAmount(1);
+			}
 		}
 		
 	}

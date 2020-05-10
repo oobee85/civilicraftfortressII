@@ -27,11 +27,12 @@ public class Driver {
 //	}
 	
 	public static void rotateAndScaleImage(String filename, String outputFile) {
-		double angle = 45;
-		double xscale = 1;
-		double yscale = 2;
+		double angle = 0;
+		
 		try {
 			BufferedImage image = ImageIO.read(new File(filename));
+			double xscale = 16.0/image.getWidth();
+			double yscale = 16.0/image.getHeight();
 			// make image that is twice as big
 			BufferedImage rotated = new BufferedImage(image.getWidth() + image.getHeight(), image.getHeight() + image.getWidth(), BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g = rotated.createGraphics();
@@ -50,7 +51,7 @@ public class Driver {
 	}
 	
 	public static void main(String[] run) {
-		//rotateAndScaleImage("irrigation.png", "rotated.png");
+//		rotateAndScaleImage("fish2.png", "rotated.png");
 		
 		new Frame();
 	}

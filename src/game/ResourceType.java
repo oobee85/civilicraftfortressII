@@ -16,7 +16,8 @@ public enum ResourceType implements HasImage{
 	SILVER_ORE ( "resources/Images/resourceicons/silver_ore.png"),
 	ADAMANTITE_ORE ( "resources/Images/resourceicons/adamantite_ore.png"),
 	RUNITE_ORE ( "resources/Images/resourceicons/runite_ore.png"),
-	TITANIUM_ORE ( "resources/Images/resourceicons/titanium_ore.png")
+	TITANIUM_ORE ( "resources/Images/resourceicons/titanium_ore.png"),
+	WHEAT ( "resources/Images/resourceicons/wheat.png")
 	;
 	
 	private MipMap mipmap;
@@ -27,16 +28,17 @@ public enum ResourceType implements HasImage{
 		 name = this.name().toLowerCase().replace('_', ' ');
 	}
 
-	 @Override
-	    public Image getImage(int size) {
-	    	return mipmap.getImage(size);
-	    }
-	    @Override
-	    public ImageIcon getImageIcon(int size) {
-	    	return mipmap.getImageIcon(size);
-	    }
-	
-	 @Override
+	@Override
+	public Image getImage(int size) {
+		return mipmap.getImage(size);
+	}
+
+	@Override
+	public ImageIcon getImageIcon(int size) {
+		return mipmap.getImageIcon(size);
+	}
+
+	@Override
 	public String toString() {
 		return name;
 	}
