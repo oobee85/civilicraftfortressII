@@ -14,6 +14,9 @@ import wildlife.*;
 public class World {
 	
 	public static final double SNOW_LEVEL = 0.75;
+	public static final int DAY_DURATION = 500;
+	public static final int NIGHT_DURATION = 250;
+	public static final int TRANSITION_PERIOD = 100;
 	
 	private LinkedList<Tile> tileList;
 	public Tile[][] tiles;
@@ -33,9 +36,6 @@ public class World {
 	
 	public World() {
 		tileList = new LinkedList<>();
-		
-		
-		
 	}
 	
 	
