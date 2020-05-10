@@ -11,28 +11,32 @@ public enum BuildingType implements HasImage {
 	 	IRRIGATION (50, "resources/Images/buildings/irrigation.png"),
 	 	BRIDGE (500, "resources/Images/buildings/bridge.png")
 		;
-	
-	    private final double health;   
-	    private MipMap mipmap;
-	    
-	    
-	    BuildingType(double hp, String s) {
-	        this.health = hp;
-	        mipmap = new MipMap(s);
-	    }
-	    
-	    @Override
-	    public Image getImage(int size) {
-	    	return mipmap.getImage(size);
-	    }
-	    @Override
-	    public ImageIcon getImageIcon(int size) {
-	    	return mipmap.getImageIcon(size);
-	    }
-	    
-	    public double getHealth() {
-	    	return health; 
-	    }
 
+	private final double health;
+	private MipMap mipmap;
+
+	BuildingType(double hp, String s) {
+		this.health = hp;
+		mipmap = new MipMap(s);
+	}
+
+	@Override
+	public Image getImage(int size) {
+		return mipmap.getImage(size);
+	}
+
+	@Override
+	public ImageIcon getImageIcon(int size) {
+		return mipmap.getImageIcon(size);
+	}
+
+	@Override
+	public Color getColor(int size) {
+		return mipmap.getColor(size);
+	}
+
+	public double getHealth() {
+		return health;
+	}
 
 }

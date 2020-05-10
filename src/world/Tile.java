@@ -189,14 +189,16 @@ public class Tile {
 	private void drawWater(Graphics g) {
 		if(liquidType != LiquidType.DRY) {
 			float alpha = Utils.getAlphaOfLiquid(liquidAmount);
-			int size = (int) Math.max(Game.tileSize*alpha, 1);
-			g.setColor(liquidType.getColor());
-			g.fillRect(location.x * Game.tileSize + Game.tileSize/2 - size/2, location.y * Game.tileSize + Game.tileSize/2 - size/2, size, size);
-			// transparency liquids
+//			 transparency liquids
 			Utils.setTransparency(g, alpha);
-			g.setColor(liquidType.getColor());
+			g.setColor(liquidType.getColor(Game.tileSize));
 			g.fillRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize);
 			Utils.setTransparency(g, 1);
+			
+			int size = (int) Math.min(Math.max(Game.tileSize*liquidAmount / 0.2, 1), Game.tileSize);
+			g.setColor(liquidType.getColor(Game.tileSize));
+			g.fillRect(location.x * Game.tileSize + Game.tileSize/2 - size/2, location.y * Game.tileSize + Game.tileSize/2 - size/2, size, size);
+			g.drawImage(liquidType.getImage(Game.tileSize), location.x * Game.tileSize + Game.tileSize/2 - size/2, location.y * Game.tileSize + Game.tileSize/2 - size/2, size, size, null);
 		}
 	}
 	

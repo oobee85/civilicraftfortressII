@@ -19,7 +19,7 @@ public class Wildlife {
 			for(int y = 0; y < world.getHeight(); y++) {
 				if(Math.random() < 0.04) {
 					TileLoc loc = new TileLoc(x, y);
-					if(world[loc].checkTerrain(Terrain.GRASS) || world[loc].checkTerrain(Terrain.DIRT)) {
+					if(world[loc].checkTerrain(Terrain.GRASS) || world[loc].checkTerrain(Terrain.DIRT) || world[loc].checkTerrain(Terrain.SNOW)) {
 						Animal animal = new Animal(AnimalType.DEER);
 						animal.setTile(world[loc]);
 						animals.add(animal);
@@ -38,7 +38,7 @@ public class Wildlife {
 		ConcurrentLinkedQueue<Animal> newAnimals = new ConcurrentLinkedQueue<>();
 		HashMap<Tile, Animal> trying = new HashMap<>();
 		for(Animal animal : animals) {
-			double liquidDamage = animal.computeTileDamage(animal.getTile());
+			double liquidDamage = animal.computeTileDamage(animal.getTile(), world.getHeight(animal.getTile().getLocation()));
 			animal.takeDamage(liquidDamage);
 			if(animal.isDead()) {
 				dead.add(animal);
@@ -64,7 +64,7 @@ public class Wildlife {
 					if(t.getHasBuilding() && t.getBuilding().getBuildingType() == BuildingType.WALL_BRICK) {
 						continue;
 					}
-					double danger = animal.computeDanger(t);
+					double danger = animal.computeDanger(t, world.getHeight(t.getLocation()));
 					if(danger < bestDanger) {
 						best = t;
 						bestDanger = danger;

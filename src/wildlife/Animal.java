@@ -28,7 +28,7 @@ public class Animal extends Thing {
 		return strings;
 	}
 	
-	public double computeTileDamage(Tile tile) {
+	public double computeTileDamage(Tile tile, double height) {
 		double damage = 0;
 		if(getType().isAquatic()) {
 			if(tile.liquidAmount < LiquidType.DRY.getMinimumDamageAmount()) {
@@ -41,14 +41,14 @@ public class Animal extends Thing {
 			}
 		}
 		if(tile.checkTerrain(Terrain.SNOW)) {
-			damage += 0.01;
+			damage += 0.1 *(height - World.SNOW_LEVEL) / (1 - World.SNOW_LEVEL);
 		}
 		return damage;
 	}
 	
-	public double computeDanger(Tile tile) {
+	public double computeDanger(Tile tile, double height) {
 		double danger = 0;
-		danger += computeTileDamage(tile);
+		danger += computeTileDamage(tile, height);
 		return danger;
 	}
 	

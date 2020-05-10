@@ -38,4 +38,9 @@ public enum AnimalType implements HasImage{
 	public ImageIcon getImageIcon(int size) {
 		return mipmap.getImageIcon(size);
 	}
+	
+	@Override
+	public Color getColor(int size) {
+		return mipmap.getColor(size);
+	}
 }

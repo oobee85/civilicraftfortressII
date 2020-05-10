@@ -1,6 +1,7 @@
 package world;
 
-import java.awt.Image;
+import java.awt.*;
+
 import javax.swing.*;
 import utils.*;
 
@@ -34,6 +35,10 @@ public enum PlantType implements HasImage {
     public ImageIcon getImageIcon(int size) {
     	return mipmap.getImageIcon(size);
     }
+	@Override
+	public Color getColor(int size) {
+		return mipmap.getColor(size);
+	}
     
 	public double getHealth() {
 		return health;
