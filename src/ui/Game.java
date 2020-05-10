@@ -208,26 +208,90 @@ public class Game {
 	
 
 	private void makeRoad() {
-		int topTile = (int) (Math.random() * world.getWidth());
-		int botTile = (int) (Math.random() * world.getWidth());
-		
-//		topTile = 10;
-//		botTile = world2.getWidth()/6;
-		
-		Position start = new Position(topTile, 0);
-		Position end = new Position(botTile, world.getHeight()-1);
-		
-		TileLoc prevRoad = new TileLoc(0,0);
-		for(double t = 0; t < 1; t += 0.1 / world.getHeight()) {
-			Position current = start.multiply(t).add(end.multiply(1-t));
-			TileLoc curLoc = new TileLoc(current.getIntX(), current.getIntY());
-			turnRoads(curLoc,prevRoad);
-			prevRoad = curLoc;
-			
+		double highest = -1000;
+		Tile highestTile = null;
+		double lowest = +1000;
+		Tile lowestTile = null;
+		for(Tile tile: world.getTiles()) {
+			if(world.getHeight(tile.getLocation()) > highest) {
+				highestTile = tile;
+				highest = world.getHeight(tile.getLocation());
+			}
+			if(world.getHeight(tile.getLocation()) < lowest) {
+				lowestTile = tile;
+				lowest = world.getHeight(tile.getLocation());
+			}
 		}
-		makeCastle(start, end);
+		
+		TileLoc startTile = new TileLoc((int) (Math.random() * world.getWidth()), (int) (Math.random() * world.getHeight()));
+		startTile = highestTile.getLocation();
+		TileLoc targetTile = lowestTile.getLocation();
 		
 		
+		TileLoc current = startTile;
+		TileLoc previous = null;
+		TileLoc previous2 = null;
+		while(true) {
+//			world[current].setRoad(true, "left_down");
+			
+			List<Tile> neighbors = Utils.getNeighbors(world[current], world);
+			TileLoc best = null;
+			double bestValue = Double.MAX_VALUE;
+			for(Tile tile : neighbors) {
+				double delta = world.getHeight(tile.getLocation()) - world.getHeight(current);
+				double distance = tile.getLocation().distanceTo(targetTile);
+				double value = delta*100 + distance;
+				if(!tile.getHasRoad() && !tile.getLocation().equals(previous) && !tile.getLocation().equals(previous2) && value < bestValue) {
+					bestValue = value;
+					best = tile.getLocation();
+				}
+			}
+			if(best == null) {
+				break;
+			}
+			current = best;
+			
+			if(previous != null  && previous2 != null) {
+				boolean[] directions = new boolean[4];
+				String s = "";
+				if(previous2.y == previous.y + 1) {
+					directions[2] = true;
+				}
+				if(previous2.x == previous.x + 1) {
+					directions[1] = true;
+				}
+				if(previous2.y == previous.y - 1) {
+					directions[0] = true;
+				}
+				if(previous2.x == previous.x - 1) {
+					directions[3] = true;
+				}
+				if(current.y == previous.y + 1) {
+					directions[2] = true;
+				}
+				if(current.x == previous.x + 1) {
+					directions[1] = true;
+				}
+				if(current.y == previous.y - 1) {
+					directions[0] = true;
+				}
+				if(current.x == previous.x - 1) {
+					directions[3] = true;
+				}
+				for(int direction = 0; direction < directions.length; direction++) {
+					if(directions[direction]) {
+						s += Utils.DIRECTION_STRINGS[direction];
+					}
+				}
+				System.out.println(current + s);
+				world[previous].setRoad(true, s);
+			}
+			if(previous == targetTile) {
+				break;
+			}
+			previous2 = previous;
+			previous = current;
+		}
 	}
 	private void makeCastle(Position start, Position end) {
 		double castleDistance = Utils.getRandomNormal(5);

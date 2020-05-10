@@ -50,6 +50,9 @@ public class World {
 	public Tile get(TileLoc loc) {
 		return tiles[loc.x][loc.y];
 	}
+	public double getHeight(TileLoc loc) {
+		return heightMap[loc.x][loc.y];
+	}
 
 	public void rain() {
 		System.out.println("raining");

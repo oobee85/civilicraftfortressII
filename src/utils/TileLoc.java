@@ -13,10 +13,16 @@ public class TileLoc {
 	public TileLoc add(TileLoc other) {
 		return new TileLoc(x + other.x, y + other.y);
 	}
-	public static void main(String[] args ) {
-		TileLoc a = new TileLoc(1, 2);
-		TileLoc b = new TileLoc(3, 4);
-		TileLoc c = a + b;
-		System.out.println(a + " + " + b + " = " + c);
+	@Override
+	public boolean equals(Object other) {
+		if(other instanceof TileLoc) {
+			return x == ((TileLoc)other).x && y == ((TileLoc)other).y;
+		}
+		return false;
+	}
+	
+	public double distanceTo(TileLoc other) {
+//		return Math.abs(this.x - other.x) + Math.abs(this.y - other.y);
+		return Math.sqrt((this.x - other.x)*(this.x - other.x) + (this.y - other.y)*(this.y - other.y));
 	}
 }

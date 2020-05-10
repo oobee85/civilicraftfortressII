@@ -90,7 +90,7 @@ public class Animal extends Thing {
 	}
 	
 	public double getMoveChance() {
-		return 0.02 + 0.1*(1 - energy/MAX_ENERGY) + 0.4*(1 - getHealth()/type.getCombatStats().getHealth());
+		return getType().getCombatStats().getSpeed()*0.001 + 0.1*(1 - energy/MAX_ENERGY) + 0.4*(1 - getHealth()/type.getCombatStats().getHealth());
 	}
 	
 	public double getEnergy() {
