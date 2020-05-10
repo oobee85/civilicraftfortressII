@@ -60,6 +60,7 @@ public class Frame extends JPanel{
 			public void updateGUI() {
 				for(int i = 0; i < ResourceType.values().length; i++) {
 					resourceIndicators[i].setText(ResourceType.values()[i]+" = "+gameInstance.getResourceAmount(ResourceType.values()[i]) );
+					
 				}
 					
 				
@@ -265,10 +266,11 @@ public class Frame extends JPanel{
 		
 		
 		for(int i = 0; i < ResourceType.values().length; i++) {
-			resourceIndicators[i] = new JLabel();
+			resourceIndicators[i] = new JLabel(Utils.resizeImageIcon(ResourceType.values()[i].getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE) );
 			resourceIndicators[i].setPreferredSize(BUILDING_BUTTON_SIZE);
 			resourceIndicators[i].setBorder(BorderFactory.createLineBorder(Color.gray));
-			resourceIndicators[i].setHorizontalAlignment(JLabel.CENTER);
+			resourceIndicators[i].setHorizontalAlignment(JLabel.LEFT);
+			
 		}
 		
 		JLabel tSize = new JLabel(); 
@@ -422,7 +424,7 @@ public class Frame extends JPanel{
 					int my2 = e.getY();
 					
 					gameInstance.mouseOver(mx2, my2);
-					gameInstance.selectBox(mx,my, mx2, my2);
+//					gameInstance.selectBox(mx,my, mx2, my2);
 					
 				}
 					
@@ -450,7 +452,7 @@ public class Frame extends JPanel{
 				
 				dragged = false;
 				
-				gameInstance.resetHoveredArea();
+//				gameInstance.resetHoveredArea();
 			}
 
 			@Override
@@ -458,7 +460,6 @@ public class Frame extends JPanel{
 //				System.out.println("mousepressed");
 				mx = e.getX();
 				my = e.getY();
-				
 				
 			}
 

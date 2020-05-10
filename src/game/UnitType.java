@@ -2,8 +2,8 @@ package game;
 import java.awt.*;
 
 import javax.swing.ImageIcon;
-
 import utils.*;
+
 public enum UnitType implements HasImage{
 	WORKER ( "resources/Images/units/worker.png", new CombatStats(30,0,0,10)),
  	WARRIOR ( "resources/Images/units/warrior.png", new CombatStats(30,10,10,10)),

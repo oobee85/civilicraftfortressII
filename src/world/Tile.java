@@ -81,8 +81,10 @@ public class Tile {
 			} else if (structure == null) {
 				this.building = b;
 			}
+		}else {
+			building = b;
 		}
-		building = b;
+		
 			
 	}
 	
@@ -90,11 +92,14 @@ public class Tile {
 		if(s != null) {
 			if (structure != null && structure.getStructureType() == s.getStructureType()) {
 				this.structure = null;
-			} else if (building == null) {
+				
+			}else if (building == null) {
 				this.structure = s;
 			}	
+		}else {
+			structure = s;
 		}
-		structure = s;
+		
 		
 		
 	}

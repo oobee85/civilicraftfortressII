@@ -49,7 +49,7 @@ public class Game {
 		this.guiController = guiController;
 		money = 100;
 		hoveredTile = new Position(-1,-1);
-		hoveredArea = new Area(0,0,0,0);
+//		hoveredArea = new Area(0,0,0,0);
 		viewOffset = new Position(0, 0);
 		currentMode = BuildMode.NOMODE;
 		showHeightMap = false;
@@ -136,6 +136,9 @@ public class Game {
 		for(Building building : buildings) {
 			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getHasOre() == true) {
 				resources.get(building.getTile().getOre().getResourceType()).addAmount(1);
+			}
+			if(building.getBuildingType() == BuildingType.IRRIGATION && building.getTile().canPlant() == true) {
+				resources.get(ResourceType.WHEAT).addAmount(1);
 			}
 		}
 		
@@ -386,9 +389,9 @@ public class Game {
 					if(i==hoveredTile.getIntX() && j==hoveredTile.getIntY()) {
 						t.highlight(g);
 					}
-					if(hoveredArea.contains(i, j)) {
-						t.highlight(g);
-					}
+//					if(hoveredArea.contains(i, j)) {
+//						t.highlight(g);
+//					}
 					
 					if(showHeightMap) {
 						t.drawHeightMap(g, world.heightMap[i][j]);
@@ -508,29 +511,30 @@ public class Game {
 //		System.out.println("Mouse is on tile " + tile);
 		hoveredTile = tile;
 	}
-	public void selectBox(int x1, int y1, int x2, int y2) {
-		Position p1 = getTileAtPixel(new Position(x1,y1));
-		Position p2 = getTileAtPixel(new Position(x2,y2));
-		
-			
-		hoveredArea = new Area(p1.getIntX(),p1.getIntY(), p2.getIntX()+1, p2.getIntY()+1);
-			
-		selectTile();
-		
-	}
+//	public void selectBox(int x1, int y1, int x2, int y2) {
+//		Position p1 = getTileAtPixel(new Position(x1,y1));
+//		Position p2 = getTileAtPixel(new Position(x2,y2));
+//		
+//			
+//		hoveredArea = new Area(p1.getIntX(),p1.getIntY(), p2.getIntX()+1, p2.getIntY()+1);
+//			
+//		selectTile();
+//		
+//	}
 	
-	private void selectTile() {
-		for (int i = 0; i < hoveredArea.getIntX2()-hoveredArea.getIntX1(); i++) {
-			for (int j = 0; j < hoveredArea.getIntY2()-hoveredArea.getIntY1(); j++) {
-				TileLoc loc = new TileLoc(hoveredArea.getIntX1()+i, hoveredArea.getIntY1()+j);
-				world[loc].setHighlight(true);
-				if(world[loc].getUnit() != null) {
-					selectUnits.add(world[loc].getUnit());
-				}
-			}
-		}
-		
-	}
+//	private void selectTile() {
+//		for (int i = 0; i < hoveredArea.getIntX2()-hoveredArea.getIntX1(); i++) {
+//			for (int j = 0; j < hoveredArea.getIntY2()-hoveredArea.getIntY1(); j++) {
+//				TileLoc loc = new TileLoc(hoveredArea.getIntX1()+i, hoveredArea.getIntY1()+j);
+//				world[loc].setHighlight(true);
+//				if(world[loc].getUnit() != null) {
+//					selectUnits.add(world[loc].getUnit());
+//				}
+//			}
+//		}
+//		
+//	}
+	
 	public void mouseClick(int mx, int my) {
 		Position pos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
@@ -664,9 +668,9 @@ public class Game {
 		return currentMode;
 		
 	}
-	public void resetHoveredArea() {
-		hoveredArea = new Area(0,0,0,0);
-	}
+//	public void resetHoveredArea() {
+//		hoveredArea = new Area(0,0,0,0);
+//	}
 	
 	protected void drawMinimap(Graphics g, int x, int y, int w, int h) {
 		if(showHeightMap) {
