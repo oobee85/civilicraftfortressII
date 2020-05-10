@@ -181,9 +181,15 @@ public class Tile {
 	}
 	
 	private void drawUnit(Graphics g) {
-		if(unit != null) {
-			g.drawImage(unit.getImage(), location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+		
+		if(unit != null && unit.getIsSelected() == true) {
+			g.setColor(Color.pink);
+			g.fillRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize);
 		}
+		if(unit != null) {
+			g.drawImage(unit.getImage(0), location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+		}
+		
 		
 	}
 	private void drawTerrain(Graphics g) {

@@ -461,6 +461,8 @@ public class Frame extends JPanel{
 				mx = e.getX();
 				my = e.getY();
 				
+				gameInstance.setDestination(mx, my);
+				
 			}
 
 			@Override
@@ -478,6 +480,9 @@ public class Frame extends JPanel{
 //					System.out.println("y: "+e.getY());
 					gameInstance.doubleClick(mx, my);
 				}
+				
+				
+				
 			}
 		});
 		
@@ -495,15 +500,10 @@ public class Frame extends JPanel{
 			@Override
 			public void keyPressed(KeyEvent e) {
 				
-				//esc closes game
+				//esc removes buildmode
 				if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {
-					exitGame();
+					gameInstance.setBuildMode(BuildMode.NOMODE);
 				}
-				//r rotates
-				if (e.getKeyCode()==KeyEvent.VK_R) {
-					gameInstance.rotateBlock();
-				}
-				
 				
 			}
 		});
