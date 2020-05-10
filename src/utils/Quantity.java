@@ -1,10 +1,10 @@
 package utils;
 
-import java.awt.Image;
+import java.awt.*;
 
 import javax.swing.ImageIcon;
 
-public class Quantity implements HasImage{
+public class Quantity implements HasImage {
 
 	private HasImage hasImage;
 	private int amount;
@@ -20,6 +20,10 @@ public class Quantity implements HasImage{
 	@Override
 	public ImageIcon getImageIcon(int size) {
 		return hasImage.getImageIcon(size);
+	}
+	@Override
+	public Color getColor(int size) {
+		return hasImage.getColor(size);
 	}
 	public int getAmount() {
 		return amount;

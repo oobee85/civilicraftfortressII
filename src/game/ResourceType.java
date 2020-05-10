@@ -1,6 +1,6 @@
 package game;
 
-import java.awt.Image;
+import java.awt.*;
 
 import javax.swing.ImageIcon;
 
@@ -39,6 +39,11 @@ public enum ResourceType implements HasImage{
 	}
 
 	@Override
+	public Color getColor(int size) {
+		return mipmap.getColor(size);
+	}
+	
+	 @Override
 	public String toString() {
 		return name;
 	}

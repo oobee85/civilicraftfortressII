@@ -93,6 +93,22 @@ public final class Utils {
 		return bimage;
 	}
 	
+	public static Color getAverageColor(BufferedImage image) {
+		int sumr = 0;
+		int sumg = 0;
+		int sumb = 0;
+		for(int i = 0; i < image.getWidth(); i++) {
+			for(int j = 0; j < image.getHeight(); j++) {
+				Color c = new Color(image.getRGB(i, j));
+				sumr += c.getRed();
+				sumg += c.getGreen();
+				sumb += c.getBlue();
+			}
+		}
+		int totalNumPixels = image.getWidth()*image.getHeight();
+		return new Color(sumr/totalNumPixels, sumg/totalNumPixels, sumb/totalNumPixels);
+	}
+	
 	/**
 	 * @param alpha 1 alpha is opaque, 0 alpha is completely transparent
 	 * @param g

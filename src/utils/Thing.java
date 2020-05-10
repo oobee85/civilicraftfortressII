@@ -61,6 +61,10 @@ public class Thing implements HasImage {
 	public ImageIcon getImageIcon(int size) {
 		return hasImage.getImageIcon(size);
 	}
+	@Override
+	public Color getColor(int size) {
+		return hasImage.getColor(size);
+	}
 	
 	public List<String> getDebugStrings() {
 		return new LinkedList<String>(Arrays.asList(String.format("HP=%." + Game.NUM_DEBUG_DIGITS + "f", getHealth())));

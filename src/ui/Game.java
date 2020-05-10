@@ -695,6 +695,28 @@ public class Game {
 		g.drawRect(x + boxx, y + boxy, boxw, boxh);
 	}
 	protected void drawGame(Graphics g) {
+		
+		int currentDayOffset = ticks%(World.DAY_DURATION + World.NIGHT_DURATION);
+		double ratio = 1;
+		if(currentDayOffset < World.TRANSITION_PERIOD) {
+			ratio = 0.5 + 0.5*currentDayOffset/World.TRANSITION_PERIOD;
+		}
+		else if(currentDayOffset < World.DAY_DURATION - World.TRANSITION_PERIOD) {
+			ratio = 1;
+		}
+		else if(currentDayOffset < World.DAY_DURATION + World.TRANSITION_PERIOD) {
+			ratio = 0.5 - 0.5*(currentDayOffset - World.DAY_DURATION)/World.TRANSITION_PERIOD;
+		}
+		else if(currentDayOffset < World.DAY_DURATION + World.NIGHT_DURATION - World.TRANSITION_PERIOD) {
+			ratio = 0;
+		}
+		else {
+			ratio = 0.5 - 0.5*(World.DAY_DURATION + World.NIGHT_DURATION - currentDayOffset)/World.TRANSITION_PERIOD;
+		}
+		int c = (int)(ratio * 255);
+		g.setColor(new Color(c, c, c));
+		g.fillRect(0, 0, panelWidth, panelHeight);
+		
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
 		draw(g);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());

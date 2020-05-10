@@ -7,10 +7,17 @@ import java.util.*;
 import game.Resource;
 import game.ResourceType;
 import liquid.*;
+import ui.*;
 import utils.*;
 import wildlife.*;
 
 public class World {
+	
+	public static final double SNOW_LEVEL = 0.75;
+	public static final int DAY_DURATION = 500;
+	public static final int NIGHT_DURATION = 250;
+	public static final int TRANSITION_PERIOD = 100;
+	
 	private LinkedList<Tile> tileList;
 	public Tile[][] tiles;
 	public double[][] heightMap;
@@ -29,9 +36,6 @@ public class World {
 	
 	public World() {
 		tileList = new LinkedList<>();
-		
-		
-		
 	}
 	
 	
@@ -48,6 +52,9 @@ public class World {
 	}
 	
 	public Tile get(TileLoc loc) {
+		if(loc.x < 0 || loc.x >= tiles.length || loc.y < 0 || loc.y >= tiles[0].length) {
+			return null;
+		}
 		return tiles[loc.x][loc.y];
 	}
 	public double getHeight(TileLoc loc) {
@@ -56,12 +63,10 @@ public class World {
 
 	public void rain() {
 		System.out.println("raining");
-		for(int x = 0; x < tiles.length; x++) {
-			for(int y = 0; y < tiles[0].length; y++) {
-				if(tiles[x][y].liquidType == LiquidType.WATER || tiles[x][y].liquidType == LiquidType.DRY) {
-					tiles[x][y].liquidType = LiquidType.WATER;
-					tiles[x][y].liquidAmount += 0.005;
-				}
+		for(Tile tile : getTiles()) {
+			if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.DRY) {
+				tile.liquidType = LiquidType.WATER;
+				tile.liquidAmount += 0.005;
 			}
 		}
 	}
@@ -237,7 +242,7 @@ public class World {
 			for (int j = 0; j < height; j++) {
 				if(tiles[i][j].getTerrain() == Terrain.DIRT) {
 					Terrain t;
-					if (heightMap[i][j] > 0.75) {
+					if (heightMap[i][j] > SNOW_LEVEL) {
 						t = Terrain.SNOW;
 					}
 					else if (heightMap[i][j] > 0.6) {
@@ -304,9 +309,9 @@ public class World {
 				
 				if(tiles[i][j].liquidAmount > 0) {
 					float alpha = Utils.getAlphaOfLiquid(tiles[i][j].liquidAmount);
-					Color newColor = Utils.blendColors(tiles[i][j].liquidType.getColor(), new Color(minimapImage.getRGB(i, j)), alpha);
+					Color newColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), new Color(minimapImage.getRGB(i, j)), alpha);
 					minimapImage.setRGB(i, j, newColor.getRGB());
-					newColor = Utils.blendColors(tiles[i][j].liquidType.getColor(), new Color(terrainImage.getRGB(i, j)), alpha);
+					newColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), new Color(terrainImage.getRGB(i, j)), alpha);
 					terrainImage.setRGB(i, j, newColor.getRGB());
 				}
 			}

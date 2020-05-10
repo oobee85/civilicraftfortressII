@@ -1,5 +1,6 @@
 package utils;
 import java.awt.*;
+import java.awt.image.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -8,11 +9,14 @@ import java.util.List;
 import javax.swing.*;
 
 import utils.*;
+import world.*;
 
 public class MipMap {
 
 	private final ImageIcon[] mipmaps;
 	private final int[] mipmapSizes;
+	
+	private final Color[] avgColors;
 
 
 	public MipMap(String[] paths) {
@@ -20,10 +24,12 @@ public class MipMap {
 		
 		mipmaps = new ImageIcon[numFiles];
 		mipmapSizes = new int[numFiles];
+		avgColors = new Color[numFiles];
 		int index = 0;
 		for (String s : paths) {
 			mipmaps[index] = Utils.loadImageIcon(s);
 			mipmapSizes[index] = mipmaps[index].getIconWidth();
+			avgColors[index] = Utils.getAverageColor(Utils.toBufferedImage(mipmaps[index].getImage()));
 			index++;
 		}
 	}
@@ -50,5 +56,15 @@ public class MipMap {
 			}
 		}
 		return mipmaps[mipmaps.length - 1];
+	}
+	
+	public Color getColor(int size) {
+		// Get the first mipmap that is larger than the tile size
+		for (int i = 0; i < mipmapSizes.length; i++) {
+			if (mipmapSizes[i] > size) {
+				return avgColors[i];
+			}
+		}
+		return avgColors[avgColors.length - 1];
 	}
 }
