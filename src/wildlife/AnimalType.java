@@ -9,7 +9,7 @@ import utils.*;
 
 public enum AnimalType implements HasImage{
 	DEER("resources/Images/units/deer.png", new CombatStats(20, 1, 1, 10), false),
-	FISH("resources/Images/units/fish.png", new CombatStats(5, 1, 1, 10), true)
+	FISH("resources/Images/units/fish.png", new CombatStats(5, 1, 1, 100), true)
 	;
 
 	private MipMap mipmap;
