@@ -238,9 +238,9 @@ public class Game {
 			TileLoc best = null;
 			double bestValue = Double.MAX_VALUE;
 			for(Tile tile : neighbors) {
-				double delta = world.getHeight(tile.getLocation()) - world.getHeight(current);
+				double delta = Math.abs(world.getHeight(tile.getLocation()) - world.getHeight(current));
 				double distance = tile.getLocation().distanceTo(targetTile);
-				double value = delta*100 + distance;
+				double value = delta*20 + distance;
 				if(!tile.getHasRoad() && !tile.getLocation().equals(previous) && !tile.getLocation().equals(previous2) && value < bestValue) {
 					bestValue = value;
 					best = tile.getLocation();

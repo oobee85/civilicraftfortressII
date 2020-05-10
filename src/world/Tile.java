@@ -187,11 +187,17 @@ public class Tile {
 	}
 	
 	private void drawWater(Graphics g) {
-		float alpha = Utils.getAlphaOfLiquid(liquidAmount);
-		Utils.setTransparency(g, alpha);
-		g.setColor(liquidType.getColor());
-		g.fillRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize);
-		Utils.setTransparency(g, 1);
+		if(liquidType != LiquidType.DRY) {
+			float alpha = Utils.getAlphaOfLiquid(liquidAmount);
+			int size = (int) Math.max(Game.tileSize*alpha, 1);
+			g.setColor(liquidType.getColor());
+			g.fillRect(location.x * Game.tileSize + Game.tileSize/2 - size/2, location.y * Game.tileSize + Game.tileSize/2 - size/2, size, size);
+			// transparency liquids
+			Utils.setTransparency(g, alpha);
+			g.setColor(liquidType.getColor());
+			g.fillRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize);
+			Utils.setTransparency(g, 1);
+		}
 	}
 	
 	public void drawHeightMap(Graphics g, double height) {
