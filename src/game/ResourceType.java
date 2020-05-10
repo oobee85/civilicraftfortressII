@@ -9,14 +9,14 @@ import utils.MipMap;
 
 public enum ResourceType implements HasImage{
 	
-	COPPER_ORE ( "resources/Images/buildings/wall_brick.png"),
-	IRON_ORE ( "resources/Images/buildings/wall_brick.png"),
-	MITHRIL_ORE ( "resources/Images/buildings/wall_brick.png"),
-	GOLD_ORE ( "resources/Images/buildings/wall_brick.png"),
-	SILVER_ORE ( "resources/Images/buildings/wall_brick.png"),
-	ADAMANTITE_ORE ( "resources/Images/buildings/wall_brick.png"),
-	RUNITE_ORE ( "resources/Images/buildings/wall_brick.png"),
-	TITANIUM_ORE ( "resources/Images/buildings/wall_brick.png")
+	COPPER_ORE ( "resources/Images/resourceicons/copper_ore.png"),
+	IRON_ORE ( "resources/Images/resourceicons/iron_ore.png"),
+	MITHRIL_ORE ( "resources/Images/resourceicons/mithril_ore.png"),
+	GOLD_ORE ( "resources/Images/resourceicons/gold_ore.png"),
+	SILVER_ORE ( "resources/Images/resourceicons/silver_ore.png"),
+	ADAMANTITE_ORE ( "resources/Images/resourceicons/adamantite_ore.png"),
+	RUNITE_ORE ( "resources/Images/resourceicons/runite_ore.png"),
+	TITANIUM_ORE ( "resources/Images/resourceicons/titanium_ore.png")
 	;
 	
 	private MipMap mipmap;
