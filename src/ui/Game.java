@@ -673,6 +673,7 @@ public class Game {
 //	}
 	
 	protected void drawMinimap(Graphics g, int x, int y, int w, int h) {
+		
 		if(showHeightMap) {
 			g.drawImage(heightMapImage, x, y, w, h, null);
 		}
@@ -690,6 +691,12 @@ public class Game {
 	}
 	protected void drawGame(Graphics g) {
 		
+		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
+		draw(g);
+		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
+		Toolkit.getDefaultToolkit().sync();
+	}
+	public Color getBackgroundColor() {
 		int currentDayOffset = ticks%(World.DAY_DURATION + World.NIGHT_DURATION);
 		double ratio = 1;
 		if(currentDayOffset < World.TRANSITION_PERIOD) {
@@ -708,13 +715,7 @@ public class Game {
 			ratio = 0.5 - 0.5*(World.DAY_DURATION + World.NIGHT_DURATION - currentDayOffset)/World.TRANSITION_PERIOD;
 		}
 		int c = (int)(ratio * 255);
-		g.setColor(new Color(c, c, c));
-		g.fillRect(0, 0, panelWidth, panelHeight);
-		
-		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
-		draw(g);
-		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
-		Toolkit.getDefaultToolkit().sync();
+		return new Color(c, c, c);
 	}
 	
 	public void setShowHeightMap(boolean show) {

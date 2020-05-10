@@ -142,7 +142,7 @@ public class Frame extends JPanel{
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
 		        ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				g.setColor(BACKGROUND_COLOR);
+				g.setColor(gameInstance.getBackgroundColor());
 				g.fillRect(0, 0, getWidth(), getHeight());
 				gameInstance.drawGame(g);
 				g.setColor(Color.black);
@@ -160,7 +160,7 @@ public class Frame extends JPanel{
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				g.setColor(BACKGROUND_COLOR);
+				g.setColor(gameInstance.getBackgroundColor());
 				g.fillRect(0, 0, getWidth(), getHeight());
 				g.setColor(Color.black);
 				g.drawRect(0, 0, getWidth(), getHeight());
