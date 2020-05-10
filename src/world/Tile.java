@@ -36,13 +36,17 @@ public class Tile {
 	public double liquidAmount;
 	public LiquidType liquidType;
 	
-	public Tile(TileLoc location, Terrain t) {
+	private Tile(TileLoc location, Terrain t) {
 		this.location = location;
 		terr = t;
 		isHighlight = false;
 		
 		liquidType = LiquidType.WATER;
 		liquidAmount = 0;
+	}
+	
+	public static Tile makeTile(TileLoc location, Terrain t) {
+		return new Tile(location, t);
 	}
 	
 	public void setRoad(boolean b, String s) {
