@@ -424,7 +424,7 @@ public class Frame extends JPanel{
 					int my2 = e.getY();
 					
 					gameInstance.mouseOver(mx2, my2);
-					gameInstance.selectBox(mx,my, mx2, my2);
+//					gameInstance.selectBox(mx,my, mx2, my2);
 					
 				}
 					
@@ -452,7 +452,7 @@ public class Frame extends JPanel{
 				
 				dragged = false;
 				
-				gameInstance.resetHoveredArea();
+//				gameInstance.resetHoveredArea();
 			}
 
 			@Override
@@ -460,7 +460,6 @@ public class Frame extends JPanel{
 //				System.out.println("mousepressed");
 				mx = e.getX();
 				my = e.getY();
-				
 				
 			}
 
