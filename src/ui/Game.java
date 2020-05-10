@@ -22,7 +22,7 @@ public class Game {
 	HashMap<ResourceType, Resource> resources = new HashMap<ResourceType, Resource>();
 	LinkedList<Building> buildings = new LinkedList<Building>();
 	LinkedList<Structure> structures = new LinkedList<Structure>();
-	LinkedList<Unit> units = new LinkedList<Unit>();
+	
 	
 	public static int tileSize = 10;
 //	public boolean selectedUnit = false;
@@ -98,6 +98,7 @@ public class Game {
 		
 		Wildlife.tick(world);
 		world.updatePlantDamage();
+		world.updateUnitDamage();
 		if(ticks%5 == 0) {
 			updateBuildingAction();
 			
@@ -583,7 +584,7 @@ public class Game {
 	
 	private void moveUnits() {
 		
-		for(Unit unit : units) {
+		for(Unit unit : world.units) {
 			if(unit.getTargetTile() == null) {
 				continue;
 			}
@@ -635,7 +636,7 @@ public class Game {
 		Tile tile = structures.get(0).getTile();
 		Unit unit = new Unit(u , tile);
 		tile.setUnit(unit);
-		units.add(unit);
+		world.units.add(unit);
 		
 	}
 	
