@@ -38,7 +38,7 @@ public class Wildlife {
 		ConcurrentLinkedQueue<Animal> newAnimals = new ConcurrentLinkedQueue<>();
 		HashMap<Tile, Animal> trying = new HashMap<>();
 		for(Animal animal : animals) {
-			double liquidDamage = animal.computeLiquidDamage(animal.getTile());
+			double liquidDamage = animal.computeTileDamage(animal.getTile());
 			animal.takeDamage(liquidDamage);
 			if(animal.isDead()) {
 				dead.add(animal);

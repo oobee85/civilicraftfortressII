@@ -84,7 +84,6 @@ public class Game {
 			world.grow();
 		}
 		if(ticks%1 == 0) {
-			world[world.mountain].liquidAmount += 0.008;
 			world[world.volcano].liquidType = LiquidType.LAVA;
 			world[world.volcano].liquidAmount += .1;
 			Liquid.propogate(world);

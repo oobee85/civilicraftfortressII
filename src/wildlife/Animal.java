@@ -28,23 +28,27 @@ public class Animal extends Thing {
 		return strings;
 	}
 	
-	public double computeLiquidDamage(Tile tile) {
+	public double computeTileDamage(Tile tile) {
+		double damage = 0;
 		if(getType().isAquatic()) {
 			if(tile.liquidAmount < LiquidType.DRY.getMinimumDamageAmount()) {
-				return (LiquidType.DRY.getMinimumDamageAmount() - tile.liquidAmount) * LiquidType.DRY.getDamage();
+				damage += (LiquidType.DRY.getMinimumDamageAmount() - tile.liquidAmount) * LiquidType.DRY.getDamage();
 			}
 		}
 		else {
 			if(getTile().liquidAmount > getTile().liquidType.getMinimumDamageAmount()) {
-				return tile.liquidAmount * tile.liquidType.getDamage();
+				damage += tile.liquidAmount * tile.liquidType.getDamage();
 			}
 		}
-		return 0;
+		if(tile.checkTerrain(Terrain.SNOW)) {
+			damage += 0.01;
+		}
+		return damage;
 	}
 	
 	public double computeDanger(Tile tile) {
 		double danger = 0;
-		danger += computeLiquidDamage(tile);
+		danger += computeTileDamage(tile);
 		return danger;
 	}
 	

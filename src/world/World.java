@@ -22,7 +22,6 @@ public class World {
 	private double waterPlantRarity = 0.05;
 	private double forestDensity = 0.3;
 
-	public TileLoc mountain;
 	public TileLoc volcano;
 	
 	public World() {
@@ -216,7 +215,7 @@ public class World {
 			}
 		}
 		
-		mountain = Generation.makeMountain(tiles, heightMap);
+//		mountain = Generation.makeMountain(tiles, heightMap);
 		volcano = Generation.makeVolcano(tiles, heightMap);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		
@@ -224,13 +223,13 @@ public class World {
 			for (int j = 0; j < height; j++) {
 				if(tiles[i][j].getTerrain() == Terrain.DIRT) {
 					Terrain t;
-					if (heightMap[i][j] > 0.95) {
+					if (heightMap[i][j] > 0.75) {
 						t = Terrain.SNOW;
 					}
-					else if (heightMap[i][j] > 0.85) {
+					else if (heightMap[i][j] > 0.6) {
 						t = Terrain.ROCK;
 					}
-					else if (heightMap[i][j] > mapType.dirtLevel) {
+					else if (heightMap[i][j] > 0.4) {
 						t = Terrain.DIRT;
 					}
 					else if (heightMap[i][j] > 0) {
