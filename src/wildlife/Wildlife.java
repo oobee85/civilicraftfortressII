@@ -24,6 +24,11 @@ public class Wildlife {
 						animal.setTile(world[loc]);
 						animals.add(animal);
 					}
+					if(world[loc].liquidAmount > world[loc].liquidType.getMinimumDamageAmount()) {
+						Animal animal = new Animal(AnimalType.FISH);
+						animal.setTile(world[loc]);
+						animals.add(animal);
+					}
 				}
 			}
 		}
@@ -33,9 +38,8 @@ public class Wildlife {
 		ConcurrentLinkedQueue<Animal> newAnimals = new ConcurrentLinkedQueue<>();
 		HashMap<Tile, Animal> trying = new HashMap<>();
 		for(Animal animal : animals) {
-			if(animal.getTile().liquidAmount > animal.getTile().liquidType.getMinimumDamageAmount()) {
-				animal.takeDamage(animal.getTile().liquidAmount * animal.getTile().liquidType.getDamage());
-			}
+			double liquidDamage = animal.computeTileDamage(animal.getTile());
+			animal.takeDamage(liquidDamage);
 			if(animal.isDead()) {
 				dead.add(animal);
 				continue;

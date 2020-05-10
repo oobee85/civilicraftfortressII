@@ -281,16 +281,17 @@ public class Frame extends JPanel{
 		showHeightMap.setFocusable(false);
 		
 		
-		JButton flipTable = new JButton("Flip Table");
+		JToggleButton flipTable = new JToggleButton("Flip Table");
 		flipTable.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gameInstance.flipTable();
+				flipTable.setText(flipTable.isSelected() ? "Unflip Table" : "Flip Table");
 			}
 		});
 		flipTable.setPreferredSize(BUILDING_BUTTON_SIZE);
 		
-		JButton makeItRain = new JButton("rain");
+		JButton makeItRain = new JButton("Rain");
 		makeItRain.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {

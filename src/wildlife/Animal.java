@@ -2,6 +2,7 @@ package wildlife;
 
 import java.util.*;
 
+import liquid.*;
 import ui.*;
 import utils.*;
 import world.*;
@@ -27,12 +28,27 @@ public class Animal extends Thing {
 		return strings;
 	}
 	
+	public double computeTileDamage(Tile tile) {
+		double damage = 0;
+		if(getType().isAquatic()) {
+			if(tile.liquidAmount < LiquidType.DRY.getMinimumDamageAmount()) {
+				damage += (LiquidType.DRY.getMinimumDamageAmount() - tile.liquidAmount) * LiquidType.DRY.getDamage();
+			}
+		}
+		else {
+			if(getTile().liquidAmount > getTile().liquidType.getMinimumDamageAmount()) {
+				damage += tile.liquidAmount * tile.liquidType.getDamage();
+			}
+		}
+		if(tile.checkTerrain(Terrain.SNOW)) {
+			damage += 0.01;
+		}
+		return damage;
+	}
+	
 	public double computeDanger(Tile tile) {
 		double danger = 0;
-		// 3/4 of liquid damage amount starts being considered dangerous
-		if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()*0.75) {
-			danger += tile.liquidAmount * tile.liquidType.getDamage();
-		}
+		danger += computeTileDamage(tile);
 		return danger;
 	}
 	
@@ -74,7 +90,7 @@ public class Animal extends Thing {
 	}
 	
 	public double getMoveChance() {
-		return 0.02 + 0.1*(1 - energy/MAX_ENERGY) + 0.1*(1 - getHealth()/type.getCombatStats().getHealth());
+		return 0.02 + 0.1*(1 - energy/MAX_ENERGY) + 0.4*(1 - getHealth()/type.getCombatStats().getHealth());
 	}
 	
 	public double getEnergy() {

@@ -40,6 +40,11 @@ public class Generation {
 		
 		double[][] heightMap = Utils.smoothingFilter(combinedNoise, smoothingRadius, 100);
 		Utils.normalize(heightMap);
+//		for (int i = 0; i < width; i++) {
+//			for (int j = 0; j < height; j++) {
+//				heightMap[i][j] *= heightMap[i][j];
+//			}
+//		}
 		return heightMap;
 	}
 	

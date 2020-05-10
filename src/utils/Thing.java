@@ -32,7 +32,9 @@ public class Thing implements HasImage {
 	}
 	public void takeDamage(double damage) {
 		health -= damage;
-		timeLastDamageTaken = Game.ticks;
+		if(damage != 0) {
+			timeLastDamageTaken = Game.ticks;
+		}
 	}
 	public double getHealth() {
 		return health;
