@@ -353,6 +353,8 @@ public class Frame extends JPanel{
 		
 		makeItRain.setFocusable(false);
 		flipTable.setFocusable(false);
+		debug.setFocusable(false);
+		exit.setFocusable(false);
 		
 		JPanel guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());
@@ -500,6 +502,7 @@ public class Frame extends JPanel{
 				//esc removes buildmode
 				if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {
 					gameInstance.setBuildMode(BuildMode.NOMODE);
+					gameInstance.deselectUnit();
 				}
 				
 			}

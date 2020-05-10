@@ -100,9 +100,9 @@ public class Game {
 		world.updatePlantDamage();
 		if(ticks%5 == 0) {
 			updateBuildingAction();
-			moveUnits();
+			
 		}
-		
+		moveUnits();
 		updateBuildingDamage();
 		updateStructureDamage();
 		
@@ -539,21 +539,33 @@ public class Game {
 			}
 		}
 		if(currentMode == BuildMode.NOMODE && tile.getHasUnit() == true) {
-			if(selectedUnit != null) {
-//				selectedUnit.selectUnit(false);
-//				selectedUnit = null;
-			}
+			if(selectedUnit != null && !selectedUnit.equals(tile.getUnit()) ) {
+				selectedUnit.selectUnit(false);
+				selectedUnit = tile.getUnit();
+				selectedUnit.selectUnit(true);
+			}else
 			if(tile.getUnit().getIsSelected() == false) {
 				selectedUnit = tile.getUnit();
-				tile.getUnit().selectUnit(true);
+				selectedUnit.selectUnit(true);
+//				tile.getUnit().selectUnit(true);
 			}else {
-				selectedUnit = null;
-				tile.getUnit().selectUnit(false);
+				deselectUnit();
 			}
 			
 			
 		}
-		setDestination(mx, my);
+		if(currentMode == BuildMode.NOMODE) {
+			setDestination(mx, my);
+		}
+		
+		
+	}
+	public void deselectUnit() {
+		System.out.println("deselecting unit");
+		if(selectedUnit != null) {
+			selectedUnit.selectUnit(false);
+			selectedUnit = null;
+		}
 		
 	}
 	
