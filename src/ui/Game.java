@@ -299,7 +299,7 @@ public class Game {
 	private void makeCastle() {
 		
 		for(Tile tile :world.getTiles()) {
-			if(tile.canBuild() == true && tile.getHasRoad() == true) {
+			if(tile.getHasRoad() == true && tile.canBuild() == true && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 				buildStructure(StructureType.CASTLE, tile);
 				break;
 			}
@@ -615,15 +615,21 @@ public class Game {
 		
 	}
 	
-	private void buildBuilding(BuildingType bt, Tile t) {
-		Building building = new Building(bt, t);
-		t.setBuilding(building);
-		buildings.add(building);
+	private void buildBuilding(BuildingType bt, Tile tile) {
+		if(tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+			Building building = new Building(bt, tile);
+			tile.setBuilding(building);
+			buildings.add(building);
+		}
+		
 	}
-	private void buildStructure(StructureType st, Tile t) {
-		Structure structure = new Structure(st, t);
-		t.setStructure(structure);
-		structures.add(structure);
+	private void buildStructure(StructureType st, Tile tile) {
+		if(tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+			Structure structure = new Structure(st, tile);
+			tile.setStructure(structure);
+			structures.add(structure);
+		}
+		
 	}
 	public void buildUnit(UnitType u) {
 		Tile tile = structures.get(0).getTile();

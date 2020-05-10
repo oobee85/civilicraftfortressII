@@ -273,6 +273,16 @@ public class Tile {
 				g.setColor(Color.GREEN);
 				g.fillRect(location.x * Game.tileSize + 3, location.y * Game.tileSize + 3, Game.tileSize / 4 - 5,
 						height);
+				
+				//trying to make bars across the hp bar to show how many health
+//				g.setColor(Color.BLACK);
+//				for(int i = 1; i < unit.getMaxHealth()%25; i++) {
+//					System.out.println(unit.getMaxHealth()%25);
+//					g.fillRect(location.x * Game.tileSize + 3, location.y * Game.tileSize + 3, Game.tileSize / 4 - 5,
+//							Game.tileSize/i - 5);
+//				}
+				
+				
 			} else if ((isHighlight == true || (currentTick - thing.getTimeLastDamageTaken()) < 20)) {
 				g.setColor(Color.BLACK);
 
