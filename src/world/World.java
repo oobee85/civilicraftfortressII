@@ -52,6 +52,9 @@ public class World {
 	}
 	
 	public Tile get(TileLoc loc) {
+		if(loc.x < 0 || loc.x >= tiles.length || loc.y < 0 || loc.y >= tiles[0].length) {
+			return null;
+		}
 		return tiles[loc.x][loc.y];
 	}
 	public double getHeight(TileLoc loc) {
