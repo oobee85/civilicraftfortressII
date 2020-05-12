@@ -524,7 +524,7 @@ public class Game {
 		
 		if(currentMode == BuildMode.WALL) {
 			if(tile.canBuild() == true) {
-				buildBuilding(BuildingType.WALL_BRICK, tile);
+				buildBuilding(BuildingType.WALL_STONE, tile);
 			}
 		}
 		

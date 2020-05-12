@@ -5,8 +5,11 @@ import javax.swing.*;
 import utils.*;
 
 public enum BuildingType implements HasImage {
-	 	WALL_BRICK (1000, "resources/Images/buildings/wall_brick.png"),
-	 	WALL_WOOD (100, "resources/Images/buildings/wall_brick.png"),
+	 	
+	 	WALL_WOOD (100, "resources/Images/buildings/wall_wood.png"),
+	 	WALL_STONE (1000, "resources/Images/buildings/wall_stone.png"),
+	 	WALL_BRICK (100, "resources/Images/buildings/wall_brick.png"),
+	 	
 	 	MINE (100, "resources/Images/buildings/mine256.png"),
 	 	IRRIGATION (50, "resources/Images/buildings/irrigation.png"),
 	 	BRIDGE (500, "resources/Images/buildings/bridge.png")

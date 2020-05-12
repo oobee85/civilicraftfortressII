@@ -68,7 +68,7 @@ public class Wildlife {
 				double bestDanger = Double.MAX_VALUE;
 				for(Tile t : neighbors) {
 					// deer cant move onto walls
-					if(!animal.getType().isFlying() && t.getHasBuilding() && t.getBuilding().getBuildingType() == BuildingType.WALL_BRICK) {
+					if(!animal.getType().isFlying() && t.getHasBuilding() && t.getBuilding().getBuildingType() == BuildingType.WALL_STONE) {
 						continue;
 					}
 					double danger = animal.computeDanger(t, world.getHeight(t.getLocation()));

@@ -12,6 +12,7 @@ import game.*;
 import liquid.*;
 import ui.*;
 import utils.*;
+import wildlife.Animal;
 
 public class Tile {
 	private boolean hasRoad;
@@ -31,6 +32,7 @@ public class Tile {
 	private Structure structure;
 	private Building building;
 	private Unit unit;
+	private Animal animal;
 	
 	
 	public double liquidAmount;
@@ -323,7 +325,7 @@ public class Tile {
 		}
 		
 		if(bm == BuildMode.WALL && isHighlight == true) {
-			g.drawImage(BuildingType.WALL_BRICK.getImage(0), location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(BuildingType.WALL_STONE.getImage(0), location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		if(bm == BuildMode.MINE && isHighlight == true) {
 			g.drawImage(BuildingType.MINE.getImage(0), location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);

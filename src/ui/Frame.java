@@ -207,7 +207,7 @@ public class Frame extends JPanel{
 		makeRoad.addActionListener(e -> {
 			gameInstance.setBuildMode(BuildMode.ROAD);
 		});
-		JButton makeWall = new JButton("Make Wall", Utils.resizeImageIcon(BuildingType.WALL_BRICK.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton makeWall = new JButton("Make Wall", Utils.resizeImageIcon(BuildingType.WALL_STONE.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		makeWall.setMargin(zeroMargin);
 		makeWall.setPreferredSize(BUILDING_BUTTON_SIZE);
 		makeWall.addActionListener(e -> {
@@ -355,6 +355,9 @@ public class Frame extends JPanel{
 		flipTable.setFocusable(false);
 		debug.setFocusable(false);
 		exit.setFocusable(false);
+		buildWorker.setFocusable(false);
+		buildWarrior.setFocusable(false);
+		buildSpearman.setFocusable(false);
 		
 		JPanel guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());
