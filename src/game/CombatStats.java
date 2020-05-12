@@ -7,6 +7,15 @@ public class CombatStats {
 	private int defence;
 	private int speed;
 	
+	
+
+	
+	/**
+	 * @param health
+	 * @param attack
+	 * @param defence
+	 * @param speed
+	**/
 	public CombatStats(int health, int attack, int defence, int speed) {
 		this.health = health;
 		this.attack = attack;
