@@ -45,6 +45,7 @@ public class Thing implements HasImage {
 	public int getTimeLastDamageTaken() {
 		return timeLastDamageTaken;
 	}
+	
 	public void setTile(Tile tile) {
 		this.tile = tile;
 	}

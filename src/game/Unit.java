@@ -9,6 +9,8 @@ public class Unit extends Thing{
 	
 	
 	private UnitType unitType;
+	private boolean isSelected;
+	private Tile targetTile;
 	
 	public Unit(UnitType unitType, Tile tile) {
 		super(unitType.getHealth(), unitType, tile);
@@ -16,10 +18,32 @@ public class Unit extends Thing{
 	}
 	
 	
-	public Tile getTile() {
-		return super.getTile();
+	public void selectUnit(boolean select) {
+		isSelected = select;
 	}
-	public Image getImage() {
-		return unitType.getImage();
+	public boolean getIsSelected() {
+		return isSelected;
 	}
+	public UnitType getUnitType() {
+		return unitType;
+	}
+	public Tile getTargetTile() {
+		return targetTile;
+	}
+	public void setTargetTile(Tile t) {
+		if(!t.equals(getTile()) ) {
+			targetTile = t;
+		}
+		
+	}
+	
+	@Override
+	public void setTile(Tile tile) {
+		super.setTile(tile);
+		if(targetTile == getTile() ) {
+			targetTile = null;
+		}
+		
+	}
+	
 }

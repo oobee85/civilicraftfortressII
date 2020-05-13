@@ -12,6 +12,7 @@ import game.*;
 import liquid.*;
 import ui.*;
 import utils.*;
+import wildlife.Animal;
 
 public class Tile {
 	private boolean hasRoad;
@@ -31,6 +32,7 @@ public class Tile {
 	private Structure structure;
 	private Building building;
 	private Unit unit;
+	private Animal animal;
 	
 	
 	public double liquidAmount;
@@ -141,6 +143,9 @@ public class Tile {
 		if (structure != null) {
 			drawHealthBar(g, structure);
 		}
+		if(unit != null) {
+			drawHealthBar(g, unit);
+;		}
 
 	}
 	
@@ -181,9 +186,22 @@ public class Tile {
 	}
 	
 	private void drawUnit(Graphics g) {
-		if(unit != null) {
-			g.drawImage(unit.getImage(), location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+		
+		if(unit != null && unit.getIsSelected() == true) {
+			g.setColor(Color.pink);
+			Utils.setTransparency(g, 0.8f);
+//			g.fillRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize);
+			for(int i = 0; i < 10; i++) {
+				g.drawOval(location.x * Game.tileSize+i, location.y * Game.tileSize+i, Game.tileSize-2*i-1, Game.tileSize-2*i-1);
+			}
+			
+			
+			Utils.setTransparency(g, 1f);
 		}
+		if(unit != null) {
+			g.drawImage(unit.getImage(0), location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+		}
+		
 		
 	}
 	private void drawTerrain(Graphics g) {
@@ -241,14 +259,40 @@ public class Tile {
 	}
 	
 	public void drawHealthBar(Graphics g, Thing thing) {
+		
 		if (Game.tileSize > 30) {
-			if ((isHighlight == true || (currentTick - thing.getTimeLastDamageTaken()) < 20)) {
+			if (thing == unit) {
 				g.setColor(Color.BLACK);
-				g.fillRect(location.x * Game.tileSize + 1, location.y * Game.tileSize + 1,
-						Game.tileSize - 1, Game.tileSize / 4 - 1);
+				g.fillRect(location.x * Game.tileSize + 1, location.y * Game.tileSize + 1, Game.tileSize / 4 - 1,
+						Game.tileSize - 1);
 				g.setColor(Color.RED);
-				g.fillRect(location.x * Game.tileSize + 3, location.y * Game.tileSize + 3,
-						Game.tileSize - 5, Game.tileSize / 4 - 5);
+				g.fillRect(location.x * Game.tileSize + 3, location.y * Game.tileSize + 3, Game.tileSize / 4 - 5,
+						Game.tileSize - 5);
+
+				double healthOverMaxHealth = thing.getHealth() / thing.getMaxHealth();
+				int maxHeight = Game.tileSize - 5;
+				int height = (int) (healthOverMaxHealth * maxHeight);
+				g.setColor(Color.GREEN);
+				g.fillRect(location.x * Game.tileSize + 3, location.y * Game.tileSize + 3, Game.tileSize / 4 - 5,
+						height);
+				
+				//trying to make bars across the hp bar to show how many health
+//				g.setColor(Color.BLACK);
+//				for(int i = 1; i < unit.getMaxHealth()%25; i++) {
+//					System.out.println(unit.getMaxHealth()%25);
+//					g.fillRect(location.x * Game.tileSize + 3, location.y * Game.tileSize + 3, Game.tileSize / 4 - 5,
+//							Game.tileSize/i - 5);
+//				}
+				
+				
+			} else if ((isHighlight == true || (currentTick - thing.getTimeLastDamageTaken()) < 20)) {
+				g.setColor(Color.BLACK);
+
+				g.fillRect(location.x * Game.tileSize + 1, location.y * Game.tileSize + 1, Game.tileSize - 1,
+						Game.tileSize / 4 - 1);
+				g.setColor(Color.RED);
+				g.fillRect(location.x * Game.tileSize + 3, location.y * Game.tileSize + 3, Game.tileSize - 5,
+						Game.tileSize / 4 - 5);
 
 				double healthOverMaxHealth = thing.getHealth() / thing.getMaxHealth();
 				int maxWidth = Game.tileSize - 5;
@@ -256,6 +300,7 @@ public class Tile {
 				g.setColor(Color.GREEN);
 				g.fillRect(location.x * Game.tileSize + 3, location.y * Game.tileSize + 3, width,
 						Game.tileSize / 4 - 5);
+
 			}
 		}
 	}
@@ -280,7 +325,7 @@ public class Tile {
 		}
 		
 		if(bm == BuildMode.WALL && isHighlight == true) {
-			g.drawImage(BuildingType.WALL_BRICK.getImage(0), location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			g.drawImage(BuildingType.WALL_STONE.getImage(0), location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 		}
 		if(bm == BuildMode.MINE && isHighlight == true) {
 			g.drawImage(BuildingType.MINE.getImage(0), location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize, null);
@@ -308,9 +353,8 @@ public class Tile {
 	}
 	private void drawTerritory(Graphics g) {
 		if(isTerritory == true) {
+			g.setColor(Color.pink);
 			Utils.setTransparency(g, 0.5f);
-			Color c = new Color(0, 0, 255, 150); 
-	    	g.setColor(c);
 	    	g.fillRect( location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize); 
 			
 			Utils.setTransparency(g, 1);
@@ -364,13 +408,6 @@ public class Tile {
 	}
 	public boolean getIsTerritory() {
 		return isTerritory;
-	}
-	
-	public boolean isStructure(StructureType s) {
-		if(structure.getStructureType() == s) {
-			return true;
-		}
-		return false;
 	}
 	public boolean canBuild() {
 		return terr.isBuildable(terr);

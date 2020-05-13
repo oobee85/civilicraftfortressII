@@ -17,8 +17,8 @@ public class Wildlife {
 	public static void generateWildLife(World world) {
 		for(int x = 0; x < world.getWidth(); x++) {
 			for(int y = 0; y < world.getHeight(); y++) {
+				TileLoc loc = new TileLoc(x, y);
 				if(Math.random() < 0.04) {
-					TileLoc loc = new TileLoc(x, y);
 					if(world[loc].checkTerrain(Terrain.GRASS) || world[loc].checkTerrain(Terrain.DIRT) || world[loc].checkTerrain(Terrain.SNOW)) {
 						Animal animal = new Animal(AnimalType.DEER);
 						animal.setTile(world[loc]);
@@ -30,6 +30,12 @@ public class Wildlife {
 						animals.add(animal);
 					}
 				}
+				
+				if(world[loc].getTerrain() == Terrain.VOLCANO && Math.random() < 0.01) {
+					Animal animal = new Animal(AnimalType.DRAGON);
+					animal.setTile(world[loc]);
+					animals.add(animal);
+				}
 			}
 		}
 	}
@@ -39,7 +45,9 @@ public class Wildlife {
 		HashMap<Tile, Animal> trying = new HashMap<>();
 		for(Animal animal : animals) {
 			double liquidDamage = animal.computeTileDamage(animal.getTile(), world.getHeight(animal.getTile().getLocation()));
-			animal.takeDamage(liquidDamage);
+			if(animal.getType().isFlying() != true) {
+				animal.takeDamage(liquidDamage);
+			}
 			if(animal.isDead()) {
 				dead.add(animal);
 				continue;
@@ -49,8 +57,7 @@ public class Wildlife {
 				if(animal.getTile().getPlant() != null) {
 					animal.getTile().getPlant().takeDamage(0.1);
 					animal.eat();
-				}
-				else if(animal.getTile().checkTerrain(Terrain.GRASS)) {
+				}else if(animal.getTile().checkTerrain(Terrain.GRASS)) {
 					animal.getTile().setTerrain(Terrain.DIRT);
 					animal.eat();
 				}
@@ -61,7 +68,7 @@ public class Wildlife {
 				double bestDanger = Double.MAX_VALUE;
 				for(Tile t : neighbors) {
 					// deer cant move onto walls
-					if(t.getHasBuilding() && t.getBuilding().getBuildingType() == BuildingType.WALL_BRICK) {
+					if(!animal.getType().isFlying() && t.getHasBuilding() && t.getBuilding().getBuildingType() == BuildingType.WALL_STONE) {
 						continue;
 					}
 					double danger = animal.computeDanger(t, world.getHeight(t.getLocation()));

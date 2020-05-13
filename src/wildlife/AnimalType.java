@@ -8,22 +8,33 @@ import game.*;
 import utils.*;
 
 public enum AnimalType implements HasImage{
-	DEER("resources/Images/units/deer.png", new CombatStats(20, 1, 1, 10), false),
-	FISH("resources/Images/units/fish2.png", new CombatStats(5, 1, 1, 100), true)
+	DEER("resources/Images/units/deer.png", new CombatStats(20, 1, 1, 10), false, false, false),
+	FISH("resources/Images/units/fish2.png", new CombatStats(5, 1, 1, 100), true, false, false),
+	DRAGON("resources/Images/units/dragon.png", new CombatStats(100, 100, 1000, 100), false, true, true),
 	;
 
 	private MipMap mipmap;
 	private CombatStats combatStats;
 	private boolean isAquatic;
+	private boolean isFlying;
+	private boolean isHostile;
 	
-	AnimalType(String s, CombatStats cs, boolean isAquatic) {
+	AnimalType(String s, CombatStats cs, boolean isAquatic, boolean isFlying, boolean isHostile) {
 		mipmap = new MipMap(s);
 		combatStats = cs;
 		this.isAquatic = isAquatic;
+		this.isFlying = isFlying;
+		this.isHostile = isHostile;
 	}
 	
 	public boolean isAquatic() {
 		return isAquatic;
+	}
+	public boolean isFlying() {
+		return isFlying;
+	}
+	public boolean isHostile() {
+		return isHostile;
 	}
 	public CombatStats getCombatStats() {
 		return combatStats;

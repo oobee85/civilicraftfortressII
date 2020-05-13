@@ -6,6 +6,7 @@ import java.util.*;
 
 import game.Resource;
 import game.ResourceType;
+import game.Unit;
 import liquid.*;
 import ui.*;
 import utils.*;
@@ -27,6 +28,7 @@ public class World {
 	
 	public LinkedList<Plant> plantsLand = new LinkedList<Plant>();
 	public LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
+	public LinkedList<Unit> units = new LinkedList<Unit>();
 
 	private double bushRarity = 0.005;
 	private double waterPlantRarity = 0.05;
@@ -96,6 +98,33 @@ public class World {
 	}
 	
 	
+	public void updateUnitDamage() {
+		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
+
+		for (Unit unit : units) {
+
+			Tile tile = unit.getTile();
+
+			if (tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+					double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
+					unit.takeDamage(damageTaken);
+				}
+
+			}
+
+		
+
+		for (Unit unit : units) {
+
+			Tile tile = unit.getTile();
+			if (unit.isDead() == true) {
+				tile.setUnit(null);
+			} else {
+				unitsNew.add(unit);
+			}
+		}
+		units = unitsNew;
+	}
 	
 	public void updatePlantDamage() {
 		LinkedList<Plant> plantsLandNew = new LinkedList<Plant>();

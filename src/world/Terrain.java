@@ -52,7 +52,7 @@ public enum Terrain {
 
 	}
 	public boolean canSupportRare(Terrain t) {
-		if (t == Terrain.VOLCANO || t == Terrain.SNOW ) {
+		if (t == Terrain.VOLCANO) {
 			return true;
 		}
 		return false;
