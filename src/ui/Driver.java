@@ -5,6 +5,8 @@ import java.io.*;
 
 import javax.imageio.*;
 
+import utils.*;
+
 public class Driver {
 //	
 //	public Driver() {
@@ -25,6 +27,20 @@ public class Driver {
 //		}
 //		
 //	}
+	
+	public static void resizeImage(String filename, String outputFile, int width, int height) {
+		try {
+			BufferedImage image = ImageIO.read(new File(filename));
+			BufferedImage target = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g = target.createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+			g.drawImage(image, 0, 0, width, height, null);
+			g.dispose();
+			ImageIO.write(target, "png", new File(outputFile));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	public static void rotateAndScaleImage(String filename, String outputFile) {
 		double angle = 0;
@@ -50,9 +66,18 @@ public class Driver {
 		}
 	}
 	
+	
+	
 	public static void main(String[] run) {
 //		rotateAndScaleImage("fish2.png", "rotated.png");
-		
+//		resizeImage("roadtile.png", "newroadtile.png", 16, 16);
+//		ImageCreation.createRoadImages("roadtile.png");
+//		for(Direction[] arr : ImageCreation.getAllDirectionCombinations()) {
+//			for(Direction d : arr) {
+//				System.out.print(d + ", ");
+//			}
+//			System.out.println();
+//		}
 		new Frame();
 	}
 

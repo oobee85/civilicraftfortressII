@@ -18,20 +18,13 @@ public final class Utils {
 	public static final String[] DIRECTION_STRINGS = new String[] {"north", "east", "south", "west"};
 	static {
 		roadImages = new HashMap<>();
-		for(int i = 0; i < DIRECTION_STRINGS.length-1; i++) {
-			for(int j = i + 1; j < DIRECTION_STRINGS.length; j++) {
-				String s = DIRECTION_STRINGS[i] + DIRECTION_STRINGS[j];
-				roadImages.put(s, loadImage("resources/Images/road/road_" + s + ".png"));
+		for(Direction[] arr : ImageCreation.getAllDirectionCombinations()) {
+			String s = "";
+			for(Direction d: arr) {
+				s += d;
 			}
+			roadImages.put(s, loadImage("resources/Images/road/road_" + s + ".png"));
 		}
-//		roadImages.put("top_down", loadImage("resources/Images/road/road_up.png"));
-//		roadImages.put("left_right", loadImage("resources/Images/road/road_left_right.png"));
-//		
-//		roadImages.put("left_down", loadImage("resources/Images/road/road_left_down.png"));
-//		roadImages.put("left_up", loadImage("resources/Images/road/road_left_up.png"));
-//		roadImages.put("right_down", loadImage("resources/Images/road/road_right_down.png"));
-//		roadImages.put("right_up", loadImage("resources/Images/road/road_right_up.png"));
-
 	}
 
 	public static final Image getDefaultSkin() {

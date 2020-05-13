@@ -119,7 +119,7 @@ public class Generation {
 					
 					double height = 1 - (lavaRadius - distanceFromCenter)/lavaRadius/2;
 					if(distanceFromCenter > lavaRadius) {
-						height = 1 - (distanceFromCenter - lavaRadius)/mountainEdgeRadius*2;
+						height = 1 - (distanceFromCenter - lavaRadius)/mountainEdgeRadius;
 					}
 					heightMap[i][j] = Math.max(height, heightMap[i][j]);
 					

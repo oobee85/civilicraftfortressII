@@ -40,7 +40,6 @@ public class World {
 		tileList = new LinkedList<>();
 	}
 	
-	
 	public int getWidth() {
 		return width;
 	}
@@ -63,6 +62,11 @@ public class World {
 		return heightMap[loc.x][loc.y];
 	}
 
+	public void drought() {
+		for(Tile tile : getTiles()) {
+			tile.liquidAmount = 0;
+		}
+	}
 	public void rain() {
 		System.out.println("raining");
 		for(Tile tile : getTiles()) {
