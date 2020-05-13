@@ -90,8 +90,10 @@ public class Game {
 			world.grow();
 		}
 		if(ticks%1 == 0) {
-			world[world.volcano].liquidType = LiquidType.LAVA;
-			world[world.volcano].liquidAmount += .1;
+			if(world.volcano != null) {
+				world[world.volcano].liquidType = LiquidType.LAVA;
+				world[world.volcano].liquidAmount += .1;
+			}
 			Liquid.propogate(world);
 			changedTerrain = true;
 		}
@@ -208,60 +210,115 @@ public class Game {
 		updateTerrainImages();
 	}
 	
-
-	private void makeRoad() {
-		double highest = -1000;
-		Tile highestTile = null;
-		double lowest = +1000;
-		Tile lowestTile = null;
-		for(Tile tile: world.getTiles()) {
-			if(world.getHeight(tile.getLocation()) > highest) {
-				highestTile = tile;
-				highest = world.getHeight(tile.getLocation());
+	private double computeCost(Tile current, Tile two, Tile target) {
+		double distanceCosts = 1 + (two.getLocation().distanceTo(target.getLocation()) - current.getLocation().distanceTo(target.getLocation()));
+		if(!two.getHasRoad()) {
+			double deltaHeight = 10000 * Math.abs(world.getHeight(current.getLocation()) - world.getHeight(two.getLocation()));
+			distanceCosts += two.getTerrain().getRoadCost()
+							+ deltaHeight * deltaHeight
+							+ two.liquidAmount*two.liquidType.getDamage();
+		}
+		return distanceCosts;
+	}
+	
+	private class Path {
+		double cost;
+		LinkedList<Tile> tiles = new LinkedList<>();
+		public Path() {
+			cost = 0;
+		}
+		public void addTile(Tile tile, double addedCost) {
+			tiles.add(tile);
+			cost += addedCost;
+		}
+		public Tile getHead() {
+			return tiles.getLast();
+		}
+		public boolean visited(Tile tile) {
+			return tiles.contains(tile);
+		}
+		public Path clone() {
+			Path p = new Path();
+			for(Tile t : tiles) {
+				p.addTile(t, 0);
 			}
-			if(world.getHeight(tile.getLocation()) < lowest) {
-				lowestTile = tile;
-				lowest = world.getHeight(tile.getLocation());
+			p.cost = cost;
+			return p;
+		}
+		public double getCost() {
+			return cost;
+		}
+		public LinkedList<Tile> getTiles() {
+			return tiles;
+		}
+		@Override
+		public String toString() {
+			String s = "";
+			for(Tile t : tiles) {
+				s += t.getLocation() + ", ";
+			}
+			return s;
+		}
+	}
+	
+	private void makeRoadBetween(Tile start, Tile target) {
+
+		PriorityQueue<Path> search = new PriorityQueue<>((x, y) ->  { 
+			if(y.getCost() < x.getCost()) {
+				return 1;
+			}
+			else if(y.getCost() > x.getCost()) {
+				return -1;
+			}
+			else {
+				return 0;
+			}
+		});
+		
+		Path startingPath = new Path();
+		startingPath.addTile(start, 0);
+		search.add(startingPath);
+		
+		Path selectedPath = null;
+		HashMap<Tile, Double> visited = new HashMap<>();
+		visited.put(startingPath.getHead(), startingPath.getCost());
+		
+		while(!search.isEmpty()) {
+			Path currentPath = search.remove();
+			Tile currentTile = currentPath.getHead();
+//			System.out.println(search.size());
+//			System.out.println("Current path: " + currentPath);
+			if(currentTile == target) {
+				selectedPath = currentPath;
+				break;
+			}
+			List<Tile> neighbors = Utils.getNeighbors(currentTile, world);
+			for(Tile neighbor : neighbors) {
+//				System.out.println("Neighbor: " + neighbor.getLocation());
+				double cost = computeCost(currentTile, neighbor, target);
+				Path p = currentPath.clone();
+				p.addTile(neighbor, cost);
+				if(visited.containsKey(neighbor)) {
+					if(p.getCost() > visited[currentTile]) {
+						// Already visited this tile at a lower cost
+						continue;
+					}
+				}
+				visited.put(neighbor, p.getCost());
+				search.add(p);
 			}
 		}
 		
-		TileLoc startTile = new TileLoc((int) (Math.random() * world.getWidth()), (int) (Math.random() * world.getHeight()));
-		startTile = highestTile.getLocation();
-		TileLoc targetTile = lowestTile.getLocation();
+		for(Tile t : selectedPath.getTiles()) {
+			System.out.println(t.getLocation());
+		}
 		
 		
-		TileLoc current = startTile;
+		TileLoc current = null;
 		TileLoc previous = null;
 		TileLoc previous2 = null;
-		while(true) {
-//			world[current].setRoad(true, "left_down");
-			
-			List<Tile> neighbors = Utils.getNeighbors(world[current], world);
-			TileLoc best = null;
-			double bestValue = Double.MAX_VALUE;
-			for(Tile tile : neighbors) {
-				double delta = world.getHeight(tile.getLocation()) - world.getHeight(current);
-				if(Math.abs(delta) < 0.004) {
-					delta = -Math.abs(delta);
-				}
-				if(delta > 0) {
-					delta = delta * delta * 4000;
-				}
-				else {
-					delta = delta * delta * 2000;
-				}
-				double distance = tile.getLocation().distanceTo(targetTile);
-				double value = delta + distance;
-				if(!tile.getHasRoad() && !tile.getLocation().equals(previous) && !tile.getLocation().equals(previous2) && value < bestValue) {
-					bestValue = value;
-					best = tile.getLocation();
-				}
-			}
-			if(best == null) {
-				break;
-			}
-			current = best;
-			
+		
+		for(Tile t : selectedPath.getTiles()) {
 			if(previous != null  && previous2 != null) {
 				boolean[] directions = new boolean[4];
 				String s = "";
@@ -294,15 +351,60 @@ public class Game {
 						s += Utils.DIRECTION_STRINGS[direction];
 					}
 				}
-				System.out.println(current + s);
+//				System.out.println(current + s);
 				world[previous].setRoad(true, s);
-			}
-			if(previous == targetTile) {
-				break;
 			}
 			previous2 = previous;
 			previous = current;
+			current = t.getLocation();
 		}
+	}
+
+	private void makeRoad() {
+		
+//		int numDestinations = 2;
+//		List<Tile> destinations = new LinkedList<>();
+//		for(Tile tile : world.getTiles()) {
+//			if(!tile.checkTerrain(Terrain.LAVA) && !tile.checkTerrain(Terrain.VOLCANO)) {
+//				destinations.add(tile);
+//				if(destinations.size() >= numDestinations) {
+//					break;
+//				}
+//			}
+//		}
+		
+		double highest = -1000;
+		Tile highestTile = null;
+		double lowest = +1000;
+		Tile lowestTile = null;
+		for(Tile tile: world.getTiles()) {
+			if(world.getHeight(tile.getLocation()) > highest) {
+				highestTile = tile;
+				highest = world.getHeight(tile.getLocation());
+			}
+			if(world.getHeight(tile.getLocation()) < lowest) {
+				lowestTile = tile;
+				lowest = world.getHeight(tile.getLocation());
+			}
+		}
+		
+		makeRoadBetween(highestTile, lowestTile);
+		
+		
+		double furthestDistance = 0;
+		Tile furthestTile = null;
+		for(Tile tile : world.getTiles()) {
+			double dist = tile.getLocation().distanceTo(highestTile.getLocation()) + tile.getLocation().distanceTo(lowestTile.getLocation());
+			if(dist > furthestDistance) {
+				furthestDistance = dist;
+				furthestTile = tile;
+			}
+		}
+
+		makeRoadBetween(furthestTile, lowestTile);
+		makeRoadBetween(highestTile, furthestTile);
+		
+		
 		makeCastle();
 		
 	}

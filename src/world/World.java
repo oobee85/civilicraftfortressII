@@ -268,7 +268,7 @@ public class World {
 		}
 		
 //		mountain = Generation.makeMountain(tiles, heightMap);
-		volcano = Generation.makeVolcano(tiles, heightMap);
+//		volcano = Generation.makeVolcano(tiles, heightMap);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		
 		for (int i = 0; i < width; i++) {
