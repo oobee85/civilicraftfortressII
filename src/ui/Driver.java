@@ -72,12 +72,6 @@ public class Driver {
 //		rotateAndScaleImage("fish2.png", "rotated.png");
 //		resizeImage("roadtile.png", "newroadtile.png", 16, 16);
 //		ImageCreation.createRoadImages("roadtile.png");
-//		for(Direction[] arr : ImageCreation.getAllDirectionCombinations()) {
-//			for(Direction d : arr) {
-//				System.out.print(d + ", ");
-//			}
-//			System.out.println();
-//		}
 		new Frame();
 	}
 
