@@ -47,7 +47,12 @@ public class Animal extends Thing {
 			}
 		}
 		if(tile.checkTerrain(Terrain.SNOW)) {
-			damage += 0.1 *(height - World.SNOW_LEVEL) / (1 - World.SNOW_LEVEL);
+			if(height > World.SNOW_LEVEL) {
+				damage += 0.1 *(height - World.SNOW_LEVEL) / (1 - World.SNOW_LEVEL);
+			}
+			else {
+				damage += 0.01;
+			}
 		}
 		return damage;
 	}

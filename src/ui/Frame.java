@@ -314,6 +314,15 @@ public class Frame extends JPanel{
 			}
 		});
 		makeItRain.setPreferredSize(BUILDING_BUTTON_SIZE);
+		
+		JButton makeItDry = new JButton("Drought");
+		makeItDry.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.world.drought();
+			}
+		});
+		makeItDry.setPreferredSize(BUILDING_BUTTON_SIZE);
 
 		JToggleButton debug = new JToggleButton(Game.DEBUG_DRAW ? "Stop Debug" : "Debug");
 		debug.addActionListener(new ActionListener() {
@@ -348,6 +357,7 @@ public class Frame extends JPanel{
 		gui.add(showHeightMap);
 		gui.add(flipTable);
 		gui.add(makeItRain);
+		gui.add(makeItDry);
 		gui.add(debug);
 		gui.add(exit);
 		
