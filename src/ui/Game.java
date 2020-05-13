@@ -211,12 +211,12 @@ public class Game {
 	}
 	
 	private double computeCost(Tile current, Tile two, Tile target) {
-		double distanceCosts = 1 + (two.getLocation().distanceTo(target.getLocation()) - current.getLocation().distanceTo(target.getLocation()));
+		double distanceCosts = 1;
 		if(!two.getHasRoad()) {
 			double deltaHeight = 10000 * Math.abs(world.getHeight(current.getLocation()) - world.getHeight(two.getLocation()));
 			distanceCosts += two.getTerrain().getRoadCost()
 							+ deltaHeight * deltaHeight
-							+ 1000*two.liquidAmount*two.liquidType.getDamage();
+							+ 1000000*two.liquidAmount*two.liquidType.getDamage();
 		}
 		return distanceCosts;
 	}
@@ -233,9 +233,6 @@ public class Game {
 		}
 		public Tile getHead() {
 			return tiles.getLast();
-		}
-		public boolean visited(Tile tile) {
-			return tiles.contains(tile);
 		}
 		public Path clone() {
 			Path p = new Path();

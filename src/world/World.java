@@ -301,6 +301,7 @@ public class World {
 		Generation.makeLake(numTiles * 1.0/200, this);
 		Generation.makeLake(numTiles * 1.0/400, this);
 		Generation.makeLake(numTiles * 1.0/800, this);
+		System.out.println("Simulating water for 100 iterations");
 		for(int i = 0; i < 100; i++) {
 			Liquid.propogate(this);
 		}
