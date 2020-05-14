@@ -22,6 +22,7 @@ public class Tile {
 	private boolean isSelected = false;
 	
 	private TileLoc location;
+	private double height;
 	int minEntitySize = 20;
 	private int currentTick = 0;
 	
@@ -450,6 +451,16 @@ public class Tile {
 	}
 	public TileLoc getLocation() {
 		return location;
+	}
+	
+	public void setHeight(double newheight) {
+		height = newheight;
+		if(height > 1) {
+			height = 1;
+		}
+	}
+	public double getHeight() {
+		return height;
 	}
 
 }

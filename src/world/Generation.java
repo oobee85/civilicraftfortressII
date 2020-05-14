@@ -145,7 +145,7 @@ public class Generation {
 		for(Ore ore : Ore.values()) {
 			int numOres = (int)(world.getWidth() * world.getHeight() * ore.getRarity()); //163
 			System.out.println("Tiles of " + ore.name() + ": " + numOres);
-			for(Tile tile : world.getTiles()) {
+			for(Tile tile : world.getTilesRandomly()) {
 				if(tile.canOre() && !tile.getHasOre()) {
 					// if ore is rare the tile must be able to support rare ore
 					if(!ore.isRare() || tile.canSupportRareOre()) {
@@ -200,7 +200,7 @@ public class Generation {
 	public static void makeLake(double volume, World world) {
 		// Fill tiles until volume reached
 		PriorityQueue<TileLoc> queue = new PriorityQueue<TileLoc>((p1, p2) -> {
-			return (world.heightMap[p1.x][p1.y] + world[p1].liquidAmount) - (world.heightMap[p2.x][p2.y] + world[p2].liquidAmount) > 0 ? 1 : -1;
+			return (world[p1].getHeight() + world[p1].liquidAmount) - (world[p2].getHeight() + world[p2].liquidAmount) > 0 ? 1 : -1;
 		});
 		boolean[][] visited = new boolean[world.getWidth()][world.getHeight()];
 		queue.add(new TileLoc((int) (Math.random() * world.getWidth()), (int) (Math.random() * world.getHeight())));
