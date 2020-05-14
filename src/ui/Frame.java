@@ -21,7 +21,7 @@ public class Frame extends JPanel{
 	private JPanel minimapPanel;
 	private JPanel cityView;
 	private JPanel tileView;
-	JLabel ironOre; 
+	private JPanel workerView;
 	private JComboBox<MapType> mapType;
 	private JLabel[] resourceIndicators = new JLabel[ResourceType.values().length];
 	private JTextField mapSize;
@@ -57,9 +57,14 @@ public class Frame extends JPanel{
 				tileView.setVisible(!tileView.isVisible());
 			}
 			@Override
+			public void toggleWorkerView() {
+				workerView.setVisible(!workerView.isVisible());
+			}
+			@Override
 			public void updateGUI() {
 				for(int i = 0; i < ResourceType.values().length; i++) {
 					resourceIndicators[i].setText(ResourceType.values()[i]+" = "+gameInstance.getResourceAmount(ResourceType.values()[i]) );
+					
 					
 				}
 					
@@ -374,6 +379,18 @@ public class Frame extends JPanel{
 		    	super.paintComponent(g);
 		    }
 		};
+		Image workerOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
+		workerView = new JPanel() {
+		    protected void paintComponent(Graphics g) {
+	            g.drawImage(workerOverlay, gamepanel.getHeight(), 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
+		    	super.paintComponent(g);
+		    	System.out.println("workeroverLay");
+		    }
+		};
+		frame.setGlassPane(workerView);
+		workerView.setOpaque(false);
+		workerView.setLayout(null);
+		
 		cityView.setOpaque(false);
 		cityView.setLayout(null);
 		int numButtons = 0;

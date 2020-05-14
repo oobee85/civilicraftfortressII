@@ -653,6 +653,9 @@ public class Game {
 	public void exitTile() {
 		guiController.toggleTileView();
 	}
+	public void exitWorkerView() {
+		guiController.toggleWorkerView();
+	}
 	
 	public void zoomView(int scroll, int mx, int my) {
 		int newTileSize;
@@ -755,5 +758,8 @@ public class Game {
 	
 	public void setShowHeightMap(boolean show) {
 		this.showHeightMap = show;
+	}
+	public UnitType getSelectedUnit() {
+		return selectedUnit.getUnitType();
 	}
 }
