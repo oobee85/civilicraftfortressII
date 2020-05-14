@@ -92,7 +92,7 @@ public class Game {
 		if(ticks%1 == 0) {
 			if(world.volcano != null) {
 				world[world.volcano].liquidType = LiquidType.LAVA;
-				world[world.volcano].liquidAmount += .1;
+				world[world.volcano].liquidAmount += .05;
 			}
 			Liquid.propogate(world);
 			changedTerrain = true;
@@ -103,7 +103,7 @@ public class Game {
 		world.updateUnitDamage();
 		if(ticks%5 == 0) {
 			updateBuildingAction();
-			
+			changedTerrain = true;
 		}
 		moveUnits();
 		updateBuildingDamage();
@@ -113,9 +113,6 @@ public class Game {
 		if(changedTerrain) {
 			updateTerrainImages();
 		}
-		
-		
-		
 	}
 	
 	public void generateWorld(MapType mapType, int size) {

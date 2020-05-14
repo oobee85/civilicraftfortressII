@@ -227,17 +227,20 @@ public class World {
 		int smoothingRadius = (int) (Math.sqrt((width + height)/2)/2);
 		double[][] heightMap = Generation.generateHeightMap(smoothingRadius, width, height);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
-		
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				tiles[i][j] = Tile.makeTile(new TileLoc(i, j), Terrain.DIRT, heightMap[i][j]);
+				tiles[i][j] = Tile.makeTile(new TileLoc(i, j), Terrain.DIRT);
 				tileList.add(tiles[i][j]);
 				tileListRandom.add(tiles[i][j]);
 			}
 		}
+		volcano = Generation.makeVolcano(tiles, heightMap);
+		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		
-//		mountain = Generation.makeMountain(tiles, heightMap);
-//		volcano = Generation.makeVolcano(tiles, heightMap);
+		for(Tile tile : getTiles()) {
+			tile.setHeight(heightMap[tile.getLocation().x][tile.getLocation().y]);
+		}
+
 		
 		for(Tile tile : getTiles()) {
 			if(tile.getTerrain() == Terrain.DIRT) {

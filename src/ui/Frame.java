@@ -60,10 +60,8 @@ public class Frame extends JPanel{
 			public void updateGUI() {
 				for(int i = 0; i < ResourceType.values().length; i++) {
 					resourceIndicators[i].setText(ResourceType.values()[i]+" = "+gameInstance.getResourceAmount(ResourceType.values()[i]) );
-					
 				}
-					
-				
+				frame.repaint();
 			}
 		});
 			

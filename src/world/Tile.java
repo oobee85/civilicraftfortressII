@@ -40,9 +40,8 @@ public class Tile {
 	public double liquidAmount;
 	public LiquidType liquidType;
 	
-	private Tile(TileLoc location, Terrain t, double height) {
+	private Tile(TileLoc location, Terrain t) {
 		this.location = location;
-		this.height = height;
 		terr = t;
 		isHighlight = false;
 		
@@ -50,8 +49,8 @@ public class Tile {
 		liquidAmount = 0;
 	}
 	
-	public static Tile makeTile(TileLoc location, Terrain t, double height) {
-		return new Tile(location, t, height);
+	public static Tile makeTile(TileLoc location, Terrain t) {
+		return new Tile(location, t);
 	}
 	
 	public void setRoad(boolean b, String s) {
