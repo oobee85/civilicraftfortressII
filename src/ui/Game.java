@@ -650,25 +650,28 @@ public class Game {
 	private void moveUnits() {
 		
 		for(Unit unit : world.units) {
+			unit.tick();
 			if(unit.getTargetTile() == null) {
 				continue;
 			}
-			Tile currentTile = unit.getTile();
-			double bestDistance = Integer.MAX_VALUE;
-			Tile bestTile = currentTile;
-			
-			for(Tile tile : Utils.getNeighbors(currentTile, world)) {
-				if(tile.getHasUnit()) {
-					continue;
-				}
-				double distance = tile.getLocation().distanceTo(unit.getTargetTile().getLocation() );
-				if(distance < bestDistance) {
-					bestDistance = distance;
-					bestTile = tile;
-				}
+			if(unit.readyToMove()) {
+				Tile currentTile = unit.getTile();
+				double bestDistance = Integer.MAX_VALUE;
+				Tile bestTile = currentTile;
 				
+				for(Tile tile : Utils.getNeighbors(currentTile, world)) {
+					if(tile.getHasUnit()) {
+						continue;
+					}
+					double distance = tile.getLocation().distanceTo(unit.getTargetTile().getLocation() );
+					if(distance < bestDistance) {
+						bestDistance = distance;
+						bestTile = tile;
+					}
+					
+				}
+				unit.moveTo(bestTile);
 			}
-			unit.moveTo(bestTile);
 		}
 	}
 	
