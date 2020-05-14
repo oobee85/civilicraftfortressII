@@ -16,7 +16,7 @@ public class World {
 	
 	public static final double SNOW_LEVEL = 0.75;
 	public static final int DAY_DURATION = 500;
-	public static final int NIGHT_DURATION = 250;
+	public static final int NIGHT_DURATION = 350;
 	public static final int TRANSITION_PERIOD = 100;
 	
 	private LinkedList<Tile> tileList;
@@ -313,6 +313,7 @@ public class World {
 	}
 
 	public BufferedImage[] createTerrainImage() {
+		double brighnessModifier = getDaylight();
 		HashMap<Terrain, Color> terrainColors = new HashMap<>();
 		for(Terrain t : Terrain.values()) {
 			BufferedImage image = Utils.toBufferedImage(t.getImage(0));
@@ -338,16 +339,39 @@ public class World {
 		Graphics terrainGraphics = terrainImage.getGraphics();
 		for(int i = 0; i < tiles.length; i++) {
 			for(int j = 0; j < tiles[0].length; j++) {
-				minimapImage.setRGB(i, j, terrainColors.get(tiles[i][j].getTerrain()).getRGB());
-				terrainImage.setRGB(i, j, terrainColors.get(tiles[i][j].getTerrain()).getRGB());
+				Color minimapColor = terrainColors.get(tiles[i][j].getTerrain());
+				Color terrainColor = terrainColors.get(tiles[i][j].getTerrain());
+				if(tiles[i][j].getOre() != null) {
+					terrainColor = tiles[i][j].getOre().getColor(0);
+					minimapColor = tiles[i][j].getOre().getColor(0);
+				}
+				if(tiles[i][j].getPlant() != null) {
+					terrainColor = tiles[i][j].getPlant().getColor(0);
+					minimapColor = tiles[i][j].getPlant().getColor(0);
+				}
+				if(tiles[i][j].getHasRoad()) {
+					terrainColor = Utils.roadColor;
+					minimapColor = Utils.roadColor;
+				}
+				if(tiles[i][j].getHasStructure()) {
+					terrainColor = tiles[i][j].getStructure().getColor(0);
+					minimapColor = tiles[i][j].getStructure().getColor(0);
+				}
+				if(tiles[i][j].getIsTerritory()) {
+					minimapColor = Utils.blendColors(Tile.TERRITORY_COLOR, minimapColor, 0.5);
+					terrainColor = Utils.blendColors(Tile.TERRITORY_COLOR, terrainColor, 0.5);
+				}
 				
 				if(tiles[i][j].liquidAmount > 0) {
-					float alpha = Utils.getAlphaOfLiquid(tiles[i][j].liquidAmount);
-					Color newColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), new Color(minimapImage.getRGB(i, j)), alpha);
-					minimapImage.setRGB(i, j, newColor.getRGB());
-					newColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), new Color(terrainImage.getRGB(i, j)), alpha);
-					terrainImage.setRGB(i, j, newColor.getRGB());
+					double alpha = Utils.getAlphaOfLiquid(tiles[i][j].liquidAmount);
+					minimapColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), minimapColor, alpha);
+					terrainColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), terrainColor, alpha);
 				}
+				double tilebrightness = tiles[i][j].getBrightness();
+				minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);
+				terrainColor = Utils.blendColors(terrainColor, Color.black, brighnessModifier + tilebrightness);
+				minimapImage.setRGB(i, j, minimapColor.getRGB());
+				terrainImage.setRGB(i, j, terrainColor.getRGB());
 			}
 		}
 		minimapGraphics.dispose();
@@ -362,6 +386,27 @@ public class World {
 			}
 		}
 		return new BufferedImage[] { terrainImage, minimapImage, heightMapImage};
+	}
+	
+	public double getDaylight() {
+		int currentDayOffset = (Game.ticks + TRANSITION_PERIOD)%(DAY_DURATION + NIGHT_DURATION);
+		double ratio = 1;
+		if(currentDayOffset < TRANSITION_PERIOD) {
+			ratio = 0.5 + 0.5*currentDayOffset/TRANSITION_PERIOD;
+		}
+		else if(currentDayOffset < DAY_DURATION - TRANSITION_PERIOD) {
+			ratio = 1;
+		}
+		else if(currentDayOffset < DAY_DURATION + TRANSITION_PERIOD) {
+			ratio = 0.5 - 0.5*(currentDayOffset - DAY_DURATION)/TRANSITION_PERIOD;
+		}
+		else if(currentDayOffset < DAY_DURATION + NIGHT_DURATION - TRANSITION_PERIOD) {
+			ratio = 0;
+		}
+		else {
+			ratio = 0.5 - 0.5*(DAY_DURATION + NIGHT_DURATION - currentDayOffset)/TRANSITION_PERIOD;
+		}
+		return ratio;
 	}
 	
 }

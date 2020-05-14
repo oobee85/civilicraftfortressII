@@ -513,8 +513,15 @@ public class Game {
 					}
 				}
 			}
+			for (int i = lowerX; i < upperX; i++) {
+				for (int j = lowerY; j < upperY; j++) {
+					double brightness = world.getDaylight() + world[new TileLoc(i, j)].getBrightness();
+					brightness = Math.max(Math.min(brightness, 1), 0);
+					g.setColor(new Color(0, 0, 0, (int)(255 * (1 - brightness))));
+					g.fillRect(i * Game.tileSize, j * Game.tileSize, Game.tileSize, Game.tileSize);
+				}
+			}
 		}
-		
 	}
 	private void updateTerritory() {
 		for(Structure structure : structures) {
@@ -795,24 +802,9 @@ public class Game {
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
 		Toolkit.getDefaultToolkit().sync();
 	}
+	
 	public Color getBackgroundColor() {
-		int currentDayOffset = ticks%(World.DAY_DURATION + World.NIGHT_DURATION);
-		double ratio = 1;
-		if(currentDayOffset < World.TRANSITION_PERIOD) {
-			ratio = 0.5 + 0.5*currentDayOffset/World.TRANSITION_PERIOD;
-		}
-		else if(currentDayOffset < World.DAY_DURATION - World.TRANSITION_PERIOD) {
-			ratio = 1;
-		}
-		else if(currentDayOffset < World.DAY_DURATION + World.TRANSITION_PERIOD) {
-			ratio = 0.5 - 0.5*(currentDayOffset - World.DAY_DURATION)/World.TRANSITION_PERIOD;
-		}
-		else if(currentDayOffset < World.DAY_DURATION + World.NIGHT_DURATION - World.TRANSITION_PERIOD) {
-			ratio = 0;
-		}
-		else {
-			ratio = 0.5 - 0.5*(World.DAY_DURATION + World.NIGHT_DURATION - currentDayOffset)/World.TRANSITION_PERIOD;
-		}
+		double ratio = world.getDaylight();
 		int c = (int)(ratio * 255);
 		return new Color(c, c, c);
 	}
