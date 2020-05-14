@@ -345,28 +345,28 @@ public class World {
 					terrainColor = tiles[i][j].getOre().getColor(0);
 					minimapColor = tiles[i][j].getOre().getColor(0);
 				}
-				if(tiles[i][j].getPlant() != null) {
-					terrainColor = tiles[i][j].getPlant().getColor(0);
-					minimapColor = tiles[i][j].getPlant().getColor(0);
-				}
 				if(tiles[i][j].getHasRoad()) {
 					terrainColor = Utils.roadColor;
 					minimapColor = Utils.roadColor;
+				}
+				if(tiles[i][j].liquidAmount > 0) {
+					double alpha = Utils.getAlphaOfLiquid(tiles[i][j].liquidAmount);
+					minimapColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), minimapColor, alpha);
+					terrainColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), terrainColor, alpha);
+				}
+				if(tiles[i][j].getPlant() != null) {
+					terrainColor = tiles[i][j].getPlant().getColor(0);
+					minimapColor = tiles[i][j].getPlant().getColor(0);
 				}
 				if(tiles[i][j].getHasStructure()) {
 					terrainColor = tiles[i][j].getStructure().getColor(0);
 					minimapColor = tiles[i][j].getStructure().getColor(0);
 				}
 				if(tiles[i][j].getIsTerritory()) {
-					minimapColor = Utils.blendColors(Tile.TERRITORY_COLOR, minimapColor, 0.5);
-					terrainColor = Utils.blendColors(Tile.TERRITORY_COLOR, terrainColor, 0.5);
+					minimapColor = Utils.blendColors(Tile.TERRITORY_COLOR, minimapColor, 0.3);
+					terrainColor = Utils.blendColors(Tile.TERRITORY_COLOR, terrainColor, 0.3);
 				}
 				
-				if(tiles[i][j].liquidAmount > 0) {
-					double alpha = Utils.getAlphaOfLiquid(tiles[i][j].liquidAmount);
-					minimapColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), minimapColor, alpha);
-					terrainColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), terrainColor, alpha);
-				}
 				double tilebrightness = tiles[i][j].getBrightness();
 				minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);
 				terrainColor = Utils.blendColors(terrainColor, Color.black, brighnessModifier + tilebrightness);
