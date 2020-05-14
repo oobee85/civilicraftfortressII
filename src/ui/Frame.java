@@ -147,7 +147,9 @@ public class Frame extends JPanel{
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
 		        ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				g.setColor(BACKGROUND_COLOR);
+		        ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+		        ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+				g.setColor(gameInstance.getBackgroundColor());
 				g.fillRect(0, 0, getWidth(), getHeight());
 				gameInstance.drawGame(g);
 				g.setColor(Color.black);
@@ -165,7 +167,7 @@ public class Frame extends JPanel{
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				g.setColor(BACKGROUND_COLOR);
+				g.setColor(gameInstance.getBackgroundColor());
 				g.fillRect(0, 0, getWidth(), getHeight());
 				g.setColor(Color.black);
 				g.drawRect(0, 0, getWidth(), getHeight());
@@ -319,6 +321,15 @@ public class Frame extends JPanel{
 			}
 		});
 		makeItRain.setPreferredSize(BUILDING_BUTTON_SIZE);
+		
+		JButton makeItDry = new JButton("Drought");
+		makeItDry.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.world.drought();
+			}
+		});
+		makeItDry.setPreferredSize(BUILDING_BUTTON_SIZE);
 
 		JToggleButton debug = new JToggleButton(Game.DEBUG_DRAW ? "Stop Debug" : "Debug");
 		debug.addActionListener(new ActionListener() {
@@ -353,6 +364,7 @@ public class Frame extends JPanel{
 		gui.add(showHeightMap);
 		gui.add(flipTable);
 		gui.add(makeItRain);
+		gui.add(makeItDry);
 		gui.add(debug);
 		gui.add(exit);
 		

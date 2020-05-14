@@ -14,24 +14,21 @@ import world.*;
 
 public final class Utils {
 	
+	public static Color roadColor;
 	public static final HashMap<String, Image> roadImages;
 	public static final String[] DIRECTION_STRINGS = new String[] {"north", "east", "south", "west"};
 	static {
 		roadImages = new HashMap<>();
-		for(int i = 0; i < DIRECTION_STRINGS.length-1; i++) {
-			for(int j = i + 1; j < DIRECTION_STRINGS.length; j++) {
-				String s = DIRECTION_STRINGS[i] + DIRECTION_STRINGS[j];
-				roadImages.put(s, loadImage("resources/Images/road/road_" + s + ".png"));
+		for(Direction[] arr : ImageCreation.getAllDirectionCombinations()) {
+			String s = "";
+			for(Direction d: arr) {
+				s += d;
+			}
+			roadImages.put(s, loadImage("resources/Images/road/road_" + s + ".png"));
+			if(roadColor == null) {
+				roadColor = getAverageColor(Utils.toBufferedImage(roadImages.get(s)));
 			}
 		}
-//		roadImages.put("top_down", loadImage("resources/Images/road/road_up.png"));
-//		roadImages.put("left_right", loadImage("resources/Images/road/road_left_right.png"));
-//		
-//		roadImages.put("left_down", loadImage("resources/Images/road/road_left_down.png"));
-//		roadImages.put("left_up", loadImage("resources/Images/road/road_left_up.png"));
-//		roadImages.put("right_down", loadImage("resources/Images/road/road_right_down.png"));
-//		roadImages.put("right_up", loadImage("resources/Images/road/road_right_up.png"));
-
 	}
 
 	public static final Image getDefaultSkin() {
@@ -94,27 +91,29 @@ public final class Utils {
 	}
 	
 	public static Color getAverageColor(BufferedImage image) {
-		int sumr = 0;
-		int sumg = 0;
-		int sumb = 0;
+		float sumr = 0;
+		float sumg = 0;
+		float sumb = 0;
+		float total = 0;
 		for(int i = 0; i < image.getWidth(); i++) {
 			for(int j = 0; j < image.getHeight(); j++) {
-				Color c = new Color(image.getRGB(i, j));
-				sumr += c.getRed();
-				sumg += c.getGreen();
-				sumb += c.getBlue();
+				Color c = new Color(image.getRGB(i, j), true);
+				float alpha = c.getAlpha()/255f;
+				sumr += c.getRed()*alpha/255f;
+				sumg += c.getGreen()*alpha/255f;
+				sumb += c.getBlue()*alpha/255f;
+				total += alpha;
 			}
 		}
-		int totalNumPixels = image.getWidth()*image.getHeight();
-		return new Color(sumr/totalNumPixels, sumg/totalNumPixels, sumb/totalNumPixels);
+		return new Color(sumr/total, sumg/total, sumb/total);
 	}
 	
 	/**
 	 * @param alpha 1 alpha is opaque, 0 alpha is completely transparent
 	 * @param g
 	 */
-	public static void setTransparency(Graphics g, float alpha) {
-	    ((Graphics2D)g).setComposite(java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+	public static void setTransparency(Graphics g, double alpha) {
+	    ((Graphics2D)g).setComposite(java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)alpha));
 	}
 	
 	/**
@@ -123,7 +122,8 @@ public final class Utils {
 	 * @param bottom
 	 * @param alpha
 	 */
-	public static Color blendColors(Color top, Color bottom, float alpha) {
+	public static Color blendColors(Color top, Color bottom, double alpha) {
+		alpha = Math.max(Math.min(alpha, 1), 0);
 		return new Color(snap((int) (top.getRed()*alpha + bottom.getRed()*(1-alpha))), 
 				snap((int) (top.getGreen()*alpha + bottom.getGreen()*(1-alpha))),
 				snap((int) (top.getBlue()*alpha + bottom.getBlue()*(1-alpha))));
@@ -132,9 +132,9 @@ public final class Utils {
 		return Math.min(Math.max(color, 0), 255);
 	}
 	
-	public static float getAlphaOfLiquid(double amount) {
+	public static double getAlphaOfLiquid(double amount) {
 		// 1 units of fluid is opaque, linearly becoming transparent at 0 units of fluid.
-		float alpha = (float)Math.max(Math.min(amount*12 - 0.2, 1), 0);
+		double alpha = Math.max(Math.min(amount*12 - 0.2, 1), 0);
 		return alpha*alpha;
 		//return 1 - (1 - alpha) * (1 - alpha);
 	}

@@ -90,8 +90,10 @@ public class Game {
 			world.grow();
 		}
 		if(ticks%1 == 0) {
-			world[world.volcano].liquidType = LiquidType.LAVA;
-			world[world.volcano].liquidAmount += .1;
+			if(world.volcano != null) {
+				world[world.volcano].liquidType = LiquidType.LAVA;
+				world[world.volcano].liquidAmount += .1;
+			}
 			Liquid.propogate(world);
 			changedTerrain = true;
 		}
@@ -119,7 +121,7 @@ public class Game {
 	public void generateWorld(MapType mapType, int size) {
 		world = new World();
 		world.generateWorld(mapType, size);
-		makeRoad();
+		makeRoads();
 		updateTerrainImages();
 	}
 	
@@ -208,8 +210,113 @@ public class Game {
 		updateTerrainImages();
 	}
 	
+	private double computeCost(Tile current, Tile two, Tile target) {
+		double distanceCosts = 1;
+		if(!two.getHasRoad()) {
+			double deltaHeight = 10000 * Math.abs(world.getHeight(current.getLocation()) - world.getHeight(two.getLocation()));
+			distanceCosts += two.getTerrain().getRoadCost()
+							+ deltaHeight * deltaHeight
+							+ 1000000*two.liquidAmount*two.liquidType.getDamage();
+		}
+		return distanceCosts;
+	}
+	
+	private class Path {
+		double cost;
+		LinkedList<Tile> tiles = new LinkedList<>();
+		public Path() {
+			cost = 0;
+		}
+		public void addTile(Tile tile, double addedCost) {
+			tiles.add(tile);
+			cost += addedCost;
+		}
+		public Tile getHead() {
+			return tiles.getLast();
+		}
+		public Path clone() {
+			Path p = new Path();
+			for(Tile t : tiles) {
+				p.addTile(t, 0);
+			}
+			p.cost = cost;
+			return p;
+		}
+		public double getCost() {
+			return cost;
+		}
+		public LinkedList<Tile> getTiles() {
+			return tiles;
+		}
+		@Override
+		public String toString() {
+			String s = "";
+			for(Tile t : tiles) {
+				s += t.getLocation() + ", ";
+			}
+			return s;
+		}
+	}
+	
+	private void makeRoadBetween(Tile start, Tile target) {
+		PriorityQueue<Path> search = new PriorityQueue<>((x, y) ->  { 
+			if(y.getCost() < x.getCost()) {
+				return 1;
+			}
+			else if(y.getCost() > x.getCost()) {
+				return -1;
+			}
+			else {
+				return 0;
+			}
+		});
+		
+		Path startingPath = new Path();
+		startingPath.addTile(start, 0);
+		search.add(startingPath);
+		
+		double bestCost = Double.MAX_VALUE;
+		Path selectedPath = null;
+		HashMap<Tile, Double> visited = new HashMap<>();
+		visited.put(startingPath.getHead(), startingPath.getCost());
+		
+		int iterations = 0;
+		while(!search.isEmpty()) {
+			iterations++;
+			Path currentPath = search.remove();
+			Tile currentTile = currentPath.getHead();
+			if(currentTile == target && currentPath.getCost() < bestCost) {
+				selectedPath = currentPath;
+				bestCost = currentPath.getCost();
+				continue;
+			}
+			if(currentPath.getCost() > bestCost) {
+				// if current cost is already more than the best cost
+				continue;
+			}
+			List<Tile> neighbors = Utils.getNeighbors(currentTile, world);
+			for(Tile neighbor : neighbors) {
+				double cost = computeCost(currentTile, neighbor, target);
+				Path p = currentPath.clone();
+				p.addTile(neighbor, cost);
+				if(visited.containsKey(neighbor)) {
+					if(p.getCost() > visited[currentTile]) {
+						// Already visited this tile at a lower cost
+						continue;
+					}
+				}
+				visited.put(neighbor, p.getCost());
+				search.add(p);
+			}
+		}
+		System.out.println("road iterations: " + iterations);
+		
+		for(Tile t : selectedPath.getTiles()) {
+			t.setRoad(true, "asdf");
+		}
+	}
 
-	private void makeRoad() {
+	private void makeRoads() {
 		double highest = -1000;
 		Tile highestTile = null;
 		double lowest = +1000;
@@ -224,140 +331,96 @@ public class Game {
 				lowest = world.getHeight(tile.getLocation());
 			}
 		}
+
+		makeRoadBetween(world[new TileLoc(world.getWidth()-1, 0)], world[new TileLoc(0, world.getHeight()-1)]);
+		makeRoadBetween(world[new TileLoc(0, 0)], world[new TileLoc(world.getWidth()-1, world.getHeight()-1)]);
+		makeRoadBetween(highestTile, lowestTile);
+		turnRoads();
 		
-		TileLoc startTile = new TileLoc((int) (Math.random() * world.getWidth()), (int) (Math.random() * world.getHeight()));
-		startTile = highestTile.getLocation();
-		TileLoc targetTile = lowestTile.getLocation();
-		
-		
-		TileLoc current = startTile;
-		TileLoc previous = null;
-		TileLoc previous2 = null;
-		while(true) {
-//			world[current].setRoad(true, "left_down");
-			
-			List<Tile> neighbors = Utils.getNeighbors(world[current], world);
-			TileLoc best = null;
-			double bestValue = Double.MAX_VALUE;
-			for(Tile tile : neighbors) {
-				double delta = Math.abs(world.getHeight(tile.getLocation()) - world.getHeight(current));
-				double distance = tile.getLocation().distanceTo(targetTile);
-				double value = delta*20 + distance;
-				if(!tile.getHasRoad() && !tile.getLocation().equals(previous) && !tile.getLocation().equals(previous2) && value < bestValue) {
-					bestValue = value;
-					best = tile.getLocation();
-				}
-			}
-			if(best == null) {
-				break;
-			}
-			current = best;
-			
-			if(previous != null  && previous2 != null) {
-				boolean[] directions = new boolean[4];
-				String s = "";
-				if(previous2.y == previous.y + 1) {
-					directions[2] = true;
-				}
-				if(previous2.x == previous.x + 1) {
-					directions[1] = true;
-				}
-				if(previous2.y == previous.y - 1) {
-					directions[0] = true;
-				}
-				if(previous2.x == previous.x - 1) {
-					directions[3] = true;
-				}
-				if(current.y == previous.y + 1) {
-					directions[2] = true;
-				}
-				if(current.x == previous.x + 1) {
-					directions[1] = true;
-				}
-				if(current.y == previous.y - 1) {
-					directions[0] = true;
-				}
-				if(current.x == previous.x - 1) {
-					directions[3] = true;
-				}
-				for(int direction = 0; direction < directions.length; direction++) {
-					if(directions[direction]) {
-						s += Utils.DIRECTION_STRINGS[direction];
-					}
-				}
-				System.out.println(current + s);
-				world[previous].setRoad(true, s);
-			}
-			if(previous == targetTile) {
-				break;
-			}
-			previous2 = previous;
-			previous = current;
-		}
 		makeCastle();
-		
+	}
+	private void turnRoads() {
+		for(Tile tile : world.getTiles()) {
+			if(!tile.getHasRoad())
+				continue;
+			
+			Set<Direction> directions = new HashSet<>();
+			TileLoc loc = tile.getLocation();
+			List<Tile> neighbors = Utils.getNeighbors(tile, world);
+			for(Tile t : neighbors) {
+				if(!t.getHasRoad())
+					continue;
+				Direction d = Direction.getDirection(loc, t.getLocation());
+				if(d != null)
+					directions.add(d);
+			}
+			String s = "";
+			for(Direction d : Direction.values()) {
+				if(directions.contains(d)) {
+					s += d;
+				}
+			}
+			world[loc].setRoad(true, s);
+		}
 	}
 	private void makeCastle() {
-		
 		for(Tile tile :world.getTiles()) {
 			if(tile.getHasRoad() == true && tile.canBuild() == true && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 				buildStructure(StructureType.CASTLE, tile);
 				break;
 			}
 		}
-		
-		
-		
 	}
 	
-	private void turnRoads(TileLoc current, TileLoc prev) {
-		if(current.x-1 < 0 || current.x+1 >= world.getWidth()) {
-			return;
-		}
-		if(world[current].canBuild()==true) {
-			
-			// makes turns bot left -> top right
-			TileLoc left = new TileLoc(current.x-1, current.y);
-			if(world[left].canBuild()==true) {
-				if (left.x == prev.x && current.y == prev.y) {
-					world[left].setRoad(true, "left_down");
-					world[current].setRoad(true, "right_up");
-				} else if (left.x == prev.x && current.x + 1 == prev.y) {
-					world[left].setRoad(true, "left_down");
-					world[current].setRoad(true, "right_up");
-				}	
-			}
-			
-
-			// makes turns bot right -> top left
-			TileLoc right = new TileLoc(current.x+1, current.y);
-			if(world[right].canBuild()==true) {
-				if (right.x == prev.x && current.y == prev.y) {
-					world[right].setRoad(true, "right_down");
-					world[current].setRoad(true, "left_up");
-				} else if (right.x == prev.x && current.y + 1 == prev.y) {
-					world[right].setRoad(true, "right_down");
-					world[current].setRoad(true, "left_up");
-				}
-			}
-			
-
-			if (world[current].getHasRoad() == false) {
-				world[current].setRoad(true, "top_down");
-			}
-			
-			
-//			Tile t =  world[current.getIntX()][current.getIntY()];
-//			if(
-////					world[current.getIntX()][current.getIntY()].getHasRoad() == true && 
-//					t.getTerrain().isBridgeable(t.getTerrain()) == true) {
-//				System.out.println("bridging");
-//				world[current.getIntX()][current.getIntY()].setHasBuilding(Buildings.BRIDGE);
+	
+//	private void turnRoads(TileLoc current, TileLoc prev) {
+//		if(current.x-1 < 0 || current.x+1 >= world.getWidth()) {
+//			return;
+//		}
+//		if(world[current].canBuild()==true) {
+//			
+//			// makes turns bot left -> top right
+//			TileLoc left = new TileLoc(current.x-1, current.y);
+//			if(world[left].canBuild()==true) {
+//				if (left.x == prev.x && current.y == prev.y) {
+//					world[left].setRoad(true, "left_down");
+//					world[current].setRoad(true, "right_up");
+//				} else if (left.x == prev.x && current.x + 1 == prev.y) {
+//					world[left].setRoad(true, "left_down");
+//					world[current].setRoad(true, "right_up");
+//				}	
 //			}
-
-		}
-
-	}
+//			
+//
+//			// makes turns bot right -> top left
+//			TileLoc right = new TileLoc(current.x+1, current.y);
+//			if(world[right].canBuild()==true) {
+//				if (right.x == prev.x && current.y == prev.y) {
+//					world[right].setRoad(true, "right_down");
+//					world[current].setRoad(true, "left_up");
+//				} else if (right.x == prev.x && current.y + 1 == prev.y) {
+//					world[right].setRoad(true, "right_down");
+//					world[current].setRoad(true, "left_up");
+//				}
+//			}
+//			
+//
+//			if (world[current].getHasRoad() == false) {
+//				world[current].setRoad(true, "top_down");
+//			}
+//			
+//			
+////			Tile t =  world[current.getIntX()][current.getIntY()];
+////			if(
+//////					world[current.getIntX()][current.getIntY()].getHasRoad() == true && 
+////					t.getTerrain().isBridgeable(t.getTerrain()) == true) {
+////				System.out.println("bridging");
+////				world[current.getIntX()][current.getIntY()].setHasBuilding(Buildings.BRIDGE);
+////			}
+//
+//		}
+//
+//	}
 	
 	public void draw(Graphics g) {
 		
@@ -450,8 +513,15 @@ public class Game {
 					}
 				}
 			}
+			for (int i = lowerX; i < upperX; i++) {
+				for (int j = lowerY; j < upperY; j++) {
+					double brightness = world.getDaylight() + world[new TileLoc(i, j)].getBrightness();
+					brightness = Math.max(Math.min(brightness, 1), 0);
+					g.setColor(new Color(0, 0, 0, (int)(255 * (1 - brightness))));
+					g.fillRect(i * Game.tileSize, j * Game.tileSize, Game.tileSize, Game.tileSize);
+				}
+			}
 		}
-		
 	}
 	private void updateTerritory() {
 		for(Structure structure : structures) {
@@ -712,6 +782,7 @@ public class Game {
 	}
 	
 	protected void drawMinimap(Graphics g, int x, int y, int w, int h) {
+		
 		if(showHeightMap) {
 			g.drawImage(heightMapImage, x, y, w, h, null);
 		}
@@ -729,31 +800,16 @@ public class Game {
 	}
 	protected void drawGame(Graphics g) {
 		
-		int currentDayOffset = ticks%(World.DAY_DURATION + World.NIGHT_DURATION);
-		double ratio = 1;
-		if(currentDayOffset < World.TRANSITION_PERIOD) {
-			ratio = 0.5 + 0.5*currentDayOffset/World.TRANSITION_PERIOD;
-		}
-		else if(currentDayOffset < World.DAY_DURATION - World.TRANSITION_PERIOD) {
-			ratio = 1;
-		}
-		else if(currentDayOffset < World.DAY_DURATION + World.TRANSITION_PERIOD) {
-			ratio = 0.5 - 0.5*(currentDayOffset - World.DAY_DURATION)/World.TRANSITION_PERIOD;
-		}
-		else if(currentDayOffset < World.DAY_DURATION + World.NIGHT_DURATION - World.TRANSITION_PERIOD) {
-			ratio = 0;
-		}
-		else {
-			ratio = 0.5 - 0.5*(World.DAY_DURATION + World.NIGHT_DURATION - currentDayOffset)/World.TRANSITION_PERIOD;
-		}
-		int c = (int)(ratio * 255);
-		g.setColor(new Color(c, c, c));
-		g.fillRect(0, 0, panelWidth, panelHeight);
-		
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
 		draw(g);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
 		Toolkit.getDefaultToolkit().sync();
+	}
+	
+	public Color getBackgroundColor() {
+		double ratio = world.getDaylight();
+		int c = (int)(ratio * 255);
+		return new Color(c, c, c);
 	}
 	
 	public void setShowHeightMap(boolean show) {

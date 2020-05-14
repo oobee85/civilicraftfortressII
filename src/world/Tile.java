@@ -15,6 +15,7 @@ import utils.*;
 import wildlife.Animal;
 
 public class Tile {
+	public static final Color TERRITORY_COLOR = Color.pink;
 	private boolean hasRoad;
 	private boolean isHighlight;
 	private boolean isTerritory = false;
@@ -73,7 +74,20 @@ public class Tile {
 		}else {
 			isHighlight = b;
 		}
+	}
+	
+	public double getBrightness() {
+		double brightness = 0;
+		if(this.getHasStructure() || this.getHasBuilding() || this.getHasUnit()) {
+			brightness += 1;
+		}
 		
+		if(this.isTerritory) {
+			brightness += 0.8;
+		}
+		brightness += getTerrain().getBrightness();
+		brightness += liquidAmount * liquidType.getBrightness();
+		return brightness;
 	}
 	
 	public void setBuilding(Building b) {
@@ -211,7 +225,7 @@ public class Tile {
 	
 	private void drawWater(Graphics g) {
 		if(liquidType != LiquidType.DRY) {
-			float alpha = Utils.getAlphaOfLiquid(liquidAmount);
+			double alpha = Utils.getAlphaOfLiquid(liquidAmount);
 //			 transparency liquids
 			Utils.setTransparency(g, alpha);
 			g.setColor(liquidType.getColor(Game.tileSize));
@@ -353,10 +367,9 @@ public class Tile {
 	}
 	private void drawTerritory(Graphics g) {
 		if(isTerritory == true) {
-			g.setColor(Color.pink);
+			g.setColor(TERRITORY_COLOR);
 			Utils.setTransparency(g, 0.5f);
 	    	g.fillRect( location.x * Game.tileSize,location.y * Game.tileSize, Game.tileSize, Game.tileSize); 
-			
 			Utils.setTransparency(g, 1);
 		}
 		

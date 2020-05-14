@@ -1,10 +1,12 @@
 package world;
-import java.awt.Image;
+import java.awt.*;
+
+import javax.swing.*;
 
 import game.ResourceType;
 import utils.*;
 
-public enum Ore {
+public enum Ore implements HasImage {
 	GOLD ( 100, new String[] {"resources/Images/ore/gold/ore_gold16.png", "resources/Images/ore/gold/ore_gold128.png"} , 0.0005, true, ResourceType.GOLD_ORE),
 	COPPER ( 100, new String[] {"resources/Images/ore/copper/ore_copper16.png", "resources/Images/ore/copper/ore_copper128.png"} , 0.002, false, ResourceType.COPPER_ORE),
 	IRON ( 100, new String[] {"resources/Images/ore/iron/ore_iron16.png", "resources/Images/ore/iron/ore_iron128.png"}, 0.001, false, ResourceType.IRON_ORE),
@@ -30,9 +32,6 @@ public enum Ore {
 		this.resourceType = resourceType;
 	}
 	
-	public Image getImage(int size) {
-		return mipmap.getImage(size);
-    }
 	
 	public int getYield() {
 		return yield;
@@ -46,7 +45,18 @@ public enum Ore {
 	public ResourceType getResourceType() {
 		return resourceType;
 	}
-	
-	
-	
+
+	@Override
+	public Image getImage(int size) {
+		return mipmap.getImage(size);
+	}
+
+	@Override
+	public ImageIcon getImageIcon(int size) {
+		return mipmap.getImageIcon(size);
+	}
+	@Override
+	public Color getColor(int size) {
+		return mipmap.getColor(size);
+	}
 }
