@@ -237,19 +237,19 @@ public class Frame extends JPanel{
 		buildWorker.setMargin(zeroMargin);
 		buildWorker.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildWorker.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.WORKER);
+			gameInstance.buildUnit(UnitType.WORKER, gameInstance.structures[0].getTile());
 		});
 		JButton buildWarrior = new JButton("Build Warrior", Utils.resizeImageIcon(UnitType.WARRIOR.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildWarrior.setMargin(zeroMargin);
 		buildWarrior.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildWarrior.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.WARRIOR);
+			gameInstance.buildUnit(UnitType.WARRIOR, gameInstance.structures[0].getTile());
 		});
 		JButton buildSpearman = new JButton("Build Spearman", Utils.resizeImageIcon(UnitType.SPEARMAN.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildSpearman.setMargin(zeroMargin);
 		buildSpearman.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildSpearman.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.SPEARMAN);
+			gameInstance.buildUnit(UnitType.SPEARMAN, gameInstance.structures[0].getTile());
 		});
 //		JButton exitCity = new JButton("Exit City", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 //		exitCity.setMargin(zeroMargin);

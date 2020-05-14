@@ -424,7 +424,7 @@ public class Tile {
 		return isTerritory;
 	}
 	public boolean canBuild() {
-		return terr.isBuildable(terr);
+		return terr.isBuildable(terr) && liquidAmount < liquidType.getMinimumDamageAmount();
 	}
 	public boolean canPlant() {
 		return terr.isPlantable(terr);
