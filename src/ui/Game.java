@@ -205,13 +205,13 @@ public class Game {
 		updateTerrainImages();
 	}
 	
-	private double computeCost(Tile current, Tile two, Tile target) {
+	private double computeCost(Tile current, Tile next, Tile target) {
 		double distanceCosts = 1;
-		if(!two.getHasRoad()) {
-			double deltaHeight = 10000 * Math.abs(world.getHeight(current.getLocation()) - world.getHeight(two.getLocation()));
-			distanceCosts += two.getTerrain().getRoadCost()
+		if(!next.getHasRoad()) {
+			double deltaHeight = 10000 * Math.abs(current.getHeight() - next.getHeight());
+			distanceCosts += next.getTerrain().getRoadCost()
 							+ deltaHeight * deltaHeight
-							+ 1000000*two.liquidAmount*two.liquidType.getDamage();
+							+ 1000000*next.liquidAmount*next.liquidType.getDamage();
 		}
 		return distanceCosts;
 	}
@@ -317,13 +317,13 @@ public class Game {
 		double lowest = +1000;
 		Tile lowestTile = null;
 		for(Tile tile: world.getTiles()) {
-			if(world.getHeight(tile.getLocation()) > highest) {
+			if(tile.getHeight() > highest) {
 				highestTile = tile;
-				highest = world.getHeight(tile.getLocation());
+				highest = tile.getHeight();
 			}
-			if(world.getHeight(tile.getLocation()) < lowest) {
+			if(tile.getHeight() < lowest) {
 				lowestTile = tile;
-				lowest = world.getHeight(tile.getLocation());
+				lowest = tile.getHeight();
 			}
 		}
 

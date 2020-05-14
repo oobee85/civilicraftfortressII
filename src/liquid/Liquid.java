@@ -117,28 +117,15 @@ public class Liquid {
 		int maxX = Math.min(world.getWidth()-1, x + 1);
 		int minY = Math.max(0, y-1);
 		int maxY = Math.min(world.getHeight()-1, y + 1);
-
-		LinkedList<TileLoc> tiles = new LinkedList<>();
-		for(int i = minX; i <= maxX; i++) {
-			for(int j = minY; j <= maxY; j++) {
-				if(i == x || j == y) {
-					if(i != x || j != y) {
-						tiles.add(new TileLoc(i, j));
-					}
-				}
-			}
-		}
-		Collections.shuffle(tiles); 
 		
-		while(!tiles.isEmpty()) {
-			TileLoc other = tiles.remove();
-			// Interaction between liquids happens here
-			
-			double myh = world.getHeight(current);
+		List<Tile> neighbors = Utils.getNeighbors(tile, world);
+		for(Tile otherTile : neighbors) {
+			TileLoc other = otherTile.getLocation();
+			double myh = tile.getHeight();
 			double myv = liquidAmountsTemp[x][y];
 			LiquidType mytype = liquidTypesTemp[x][y];
 			
-			double oh = world.getHeight(other);
+			double oh = otherTile.getHeight();
 			double ov = world[other].liquidAmount;
 			LiquidType otype = liquidTypesTemp[other.x][other.y];
 			

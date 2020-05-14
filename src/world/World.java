@@ -21,7 +21,7 @@ public class World {
 	
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
-	public Tile[][] tiles;
+	private Tile[][] tiles;
 	
 	private int width;
 	private int height;
@@ -61,9 +61,6 @@ public class World {
 			return null;
 		}
 		return tiles[loc.x][loc.y];
-	}
-	public double getHeight(TileLoc loc) {
-		return this[loc].getHeight();
 	}
 
 	public void drought() {
