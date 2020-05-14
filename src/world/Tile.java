@@ -122,14 +122,8 @@ public class Tile {
 	}
 
 	public void draw(Graphics g, BuildMode bm) {
-//		g.setColor(Color.PINK);
-//		g.fillRect(p.getIntX() * Game.tileSize, p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
-		
 		drawTerrain(g);
-		applyHighlight(g, bm);
 		drawEntities(g, bm);
-//		g.fillRect(p.getIntX() * Game.tileSize,p.getIntY() * Game.tileSize, Game.tileSize, Game.tileSize);
-		isHighlight = false;
 	}
 	
 	public void drawEntities(Graphics g, BuildMode bm) {
@@ -140,9 +134,12 @@ public class Tile {
 		drawPlantLand(g);
 		drawWater(g);
 		drawPlantAquatic(g);
+		applyHighlight(g, bm);
 		drawBuilding(g, bm);
 		drawStructure(g, bm);
 		drawHighlightedArea(g);
+		isHighlight = false;
+		applyHighlight(g, bm);
 		drawUnit(g);
 
 		if (plant != null) {
@@ -163,9 +160,8 @@ public class Tile {
 	private void drawHighlightedArea(Graphics g) {
 		if(isHighlight == true) {
 			g.setColor(new Color(0, 0, 0, 64));
-			g.drawRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize);
-			g.drawRect(location.x * Game.tileSize + 1, location.y * Game.tileSize + 1, Game.tileSize - 1,
-					Game.tileSize - 1);
+			g.drawRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize-1, Game.tileSize-1);
+			g.drawRect(location.x * Game.tileSize + 1, location.y * Game.tileSize + 1, Game.tileSize - 2, Game.tileSize - 2);
 		}
 		
 	}
