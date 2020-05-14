@@ -1,11 +1,7 @@
 package world;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.util.List;
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 
 import game.*;
@@ -205,12 +201,12 @@ public class Tile {
 		if(unit != null && unit.getIsSelected() == true) {
 			g.setColor(Color.pink);
 			Utils.setTransparency(g, 0.8f);
-//			g.fillRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize);
-			for(int i = 0; i < 10; i++) {
-				g.drawOval(location.x * Game.tileSize+i, location.y * Game.tileSize+i, Game.tileSize-2*i-1, Game.tileSize-2*i-1);
-			}
-			
-			
+			Graphics2D g2d = (Graphics2D)g;
+			Stroke currentStroke = g2d.getStroke();
+			int strokeWidth = Game.tileSize /8;
+			g2d.setStroke(new BasicStroke(strokeWidth));
+			g.drawOval(location.x * Game.tileSize + strokeWidth/2, location.y * Game.tileSize + strokeWidth/2, Game.tileSize-1 - strokeWidth, Game.tileSize-1 - strokeWidth);
+			g2d.setStroke(currentStroke);
 			Utils.setTransparency(g, 1f);
 		}
 		if(unit != null) {
