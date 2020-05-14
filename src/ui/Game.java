@@ -211,12 +211,12 @@ public class Game {
 	}
 	
 	private double computeCost(Tile current, Tile two, Tile target) {
-		double distanceCosts = 1 + (two.getLocation().distanceTo(target.getLocation()) - current.getLocation().distanceTo(target.getLocation()));
+		double distanceCosts = 1;
 		if(!two.getHasRoad()) {
 			double deltaHeight = 10000 * Math.abs(world.getHeight(current.getLocation()) - world.getHeight(two.getLocation()));
 			distanceCosts += two.getTerrain().getRoadCost()
 							+ deltaHeight * deltaHeight
-							+ 1000*two.liquidAmount*two.liquidType.getDamage();
+							+ 1000000*two.liquidAmount*two.liquidType.getDamage();
 		}
 		return distanceCosts;
 	}
@@ -233,9 +233,6 @@ public class Game {
 		}
 		public Tile getHead() {
 			return tiles.getLast();
-		}
-		public boolean visited(Tile tile) {
-			return tiles.contains(tile);
 		}
 		public Path clone() {
 			Path p = new Path();
@@ -516,8 +513,15 @@ public class Game {
 					}
 				}
 			}
+			for (int i = lowerX; i < upperX; i++) {
+				for (int j = lowerY; j < upperY; j++) {
+					double brightness = world.getDaylight() + world[new TileLoc(i, j)].getBrightness();
+					brightness = Math.max(Math.min(brightness, 1), 0);
+					g.setColor(new Color(0, 0, 0, (int)(255 * (1 - brightness))));
+					g.fillRect(i * Game.tileSize, j * Game.tileSize, Game.tileSize, Game.tileSize);
+				}
+			}
 		}
-		
 	}
 	private void updateTerritory() {
 		for(Structure structure : structures) {
@@ -798,24 +802,9 @@ public class Game {
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
 		Toolkit.getDefaultToolkit().sync();
 	}
+	
 	public Color getBackgroundColor() {
-		int currentDayOffset = ticks%(World.DAY_DURATION + World.NIGHT_DURATION);
-		double ratio = 1;
-		if(currentDayOffset < World.TRANSITION_PERIOD) {
-			ratio = 0.5 + 0.5*currentDayOffset/World.TRANSITION_PERIOD;
-		}
-		else if(currentDayOffset < World.DAY_DURATION - World.TRANSITION_PERIOD) {
-			ratio = 1;
-		}
-		else if(currentDayOffset < World.DAY_DURATION + World.TRANSITION_PERIOD) {
-			ratio = 0.5 - 0.5*(currentDayOffset - World.DAY_DURATION)/World.TRANSITION_PERIOD;
-		}
-		else if(currentDayOffset < World.DAY_DURATION + World.NIGHT_DURATION - World.TRANSITION_PERIOD) {
-			ratio = 0;
-		}
-		else {
-			ratio = 0.5 - 0.5*(World.DAY_DURATION + World.NIGHT_DURATION - currentDayOffset)/World.TRANSITION_PERIOD;
-		}
+		double ratio = world.getDaylight();
 		int c = (int)(ratio * 255);
 		return new Color(c, c, c);
 	}
