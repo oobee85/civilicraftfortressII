@@ -11,6 +11,7 @@ public enum Terrain {
 		ROCK (2, 3, 0, new String[] {"resources/Images/mountain/rock16.png", "resources/Images/mountain/rock128.png", "resources/Images/mountain/rock512.png"}),
 		SNOW (4, 1, 0, new String[] {"resources/Images/mountain/snow16.png", "resources/Images/mountain/snow128.png", "resources/Images/mountain/snow512.png"}),
 		WATER (10000, 0, 0, new String[] {"resources/Images/water/water16.png", "resources/Images/water/water128.png", "resources/Images/water/water512.png"}),
+		SAND (2, 1, 0, new String[] {"resources/Images/sand.png"}),
 		;
 
 	private final int moveSpeed;

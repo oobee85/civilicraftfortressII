@@ -22,6 +22,7 @@ public class Tile {
 	private boolean isSelected = false;
 	
 	private TileLoc location;
+	private double height;
 	int minEntitySize = 20;
 	private int currentTick = 0;
 	
@@ -39,8 +40,9 @@ public class Tile {
 	public double liquidAmount;
 	public LiquidType liquidType;
 	
-	private Tile(TileLoc location, Terrain t) {
+	private Tile(TileLoc location, Terrain t, double height) {
 		this.location = location;
+		this.height = height;
 		terr = t;
 		isHighlight = false;
 		
@@ -48,8 +50,8 @@ public class Tile {
 		liquidAmount = 0;
 	}
 	
-	public static Tile makeTile(TileLoc location, Terrain t) {
-		return new Tile(location, t);
+	public static Tile makeTile(TileLoc location, Terrain t, double height) {
+		return new Tile(location, t, height);
 	}
 	
 	public void setRoad(boolean b, String s) {
@@ -450,6 +452,16 @@ public class Tile {
 	}
 	public TileLoc getLocation() {
 		return location;
+	}
+	
+	public void setHeight(double newheight) {
+		height = newheight;
+		if(height > 1) {
+			height = 1;
+		}
+	}
+	public double getHeight() {
+		return height;
 	}
 
 }

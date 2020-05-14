@@ -202,10 +202,8 @@ public class Game {
 
 	
 	public void flipTable() {
-		for(int x = 0; x < world.heightMap.length; x++) {
-			for(int y = 0; y < world.heightMap[0].length; y++) {
-				world.heightMap[x][y] = Math.max(Math.min(1-world.heightMap[x][y], 1), 0);
-			}
+		for(Tile tile : world.getTiles()) {
+			tile.setHeight(1 - tile.getHeight());
 		}
 		updateTerrainImages();
 	}
@@ -364,7 +362,7 @@ public class Game {
 		}
 	}
 	private void makeCastle() {
-		for(Tile tile :world.getTiles()) {
+		for(Tile tile :world.getTilesRandomly()) {
 			if(tile.getHasRoad() == true && tile.canBuild() == true && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 				buildStructure(StructureType.CASTLE, tile);
 				break;
@@ -454,7 +452,7 @@ public class Game {
 //					}
 					
 					if(showHeightMap) {
-						t.drawHeightMap(g, world.heightMap[i][j]);
+						t.drawHeightMap(g, world[new TileLoc(i, j)].getHeight());
 					}
 					else {
 						t.setRecentTick(ticks);
@@ -489,7 +487,7 @@ public class Game {
 							}
 							g.fillRect(x, y + 2, stringWidth, numrows*fontsize);
 							g.setColor(Color.green);
-							g.drawString(String.format("H=%." + NUM_DEBUG_DIGITS + "f", world.heightMap[i][j]), x, y + (++rows[i][j])*fontsize);
+							g.drawString(String.format("H=%." + NUM_DEBUG_DIGITS + "f", world[new TileLoc(i, j)].getHeight()), x, y + (++rows[i][j])*fontsize);
 							
 							if(world[loc].liquidType != LiquidType.DRY) {
 								g.drawString(String.format(world[loc].liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount), x, y + (++rows[i][j])*fontsize);
