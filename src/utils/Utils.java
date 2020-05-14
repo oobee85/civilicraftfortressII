@@ -1,15 +1,12 @@
 package utils;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import liquid.Liquid.*;
 import world.*;
 
 public final class Utils {

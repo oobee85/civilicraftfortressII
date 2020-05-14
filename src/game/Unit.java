@@ -36,6 +36,11 @@ public class Unit extends Thing{
 		}
 		
 	}
+	public void moveTo(Tile t) {
+		getTile().setUnit(null);
+		t.setUnit(this);
+		this.setTile(t);
+	}
 	
 	@Override
 	public void setTile(Tile tile) {

@@ -658,27 +658,18 @@ public class Game {
 			Tile bestTile = currentTile;
 			
 			for(Tile tile : Utils.getNeighbors(currentTile, world)) {
-				
-					double distance = tile.getLocation().distanceTo(unit.getTargetTile().getLocation() );
-					if(distance < bestDistance) {
-						bestDistance = distance;
-						bestTile = tile;
-					}
+				if(tile.getHasUnit()) {
+					continue;
+				}
+				double distance = tile.getLocation().distanceTo(unit.getTargetTile().getLocation() );
+				if(distance < bestDistance) {
+					bestDistance = distance;
+					bestTile = tile;
+				}
 				
 			}
-			bestTile.setUnit(unit);
-			unit.setTile(bestTile);
-			
-			currentTile.setUnit(null);
-			
+			unit.moveTo(bestTile);
 		}
-		
-		
-		
-		
-		
-		
-		
 	}
 	
 	private void buildBuilding(BuildingType bt, Tile tile) {
