@@ -477,6 +477,16 @@ public class Game {
 				g.drawImage(unit.getImage(0), unit.getTile().getLocation().x * Game.tileSize, unit.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 				drawHealthBar(g, unit);
 			}
+			if(!showHeightMap) {
+				for (int i = lowerX; i < upperX; i++) {
+					for (int j = lowerY; j < upperY; j++) {
+						double brightness = world.getDaylight() + world[new TileLoc(i, j)].getBrightness();
+						brightness = Math.max(Math.min(brightness, 1), 0);
+						g.setColor(new Color(0, 0, 0, (int)(255 * (1 - brightness))));
+						g.fillRect(i * Game.tileSize, j * Game.tileSize, Game.tileSize, Game.tileSize);
+					}
+				}
+			}
 			if(DEBUG_DRAW) {
 				if(Game.tileSize >= 36) {
 					int[][] rows = new int[world.getWidth()][world.getHeight()];
@@ -523,16 +533,6 @@ public class Game {
 					}
 				}
 			}
-			if(!showHeightMap) {
-				for (int i = lowerX; i < upperX; i++) {
-					for (int j = lowerY; j < upperY; j++) {
-						double brightness = world.getDaylight() + world[new TileLoc(i, j)].getBrightness();
-						brightness = Math.max(Math.min(brightness, 1), 0);
-						g.setColor(new Color(0, 0, 0, (int)(255 * (1 - brightness))));
-						g.fillRect(i * Game.tileSize, j * Game.tileSize, Game.tileSize, Game.tileSize);
-					}
-				}
-			}
 			g.setColor(new Color(0, 0, 0, 64));
 			g.drawRect(hoveredTile.x * Game.tileSize, hoveredTile.y * Game.tileSize, Game.tileSize-1, Game.tileSize-1);
 			g.drawRect(hoveredTile.x * Game.tileSize + 1, hoveredTile.y * Game.tileSize + 1, Game.tileSize - 3, Game.tileSize - 3);
@@ -566,7 +566,6 @@ public class Game {
 
 			g.setColor(Color.GREEN);
 			g.fillRect(x + 2, y + 2, greenBarWidth, greenBarHeight);
-			
 		}
 	}
 	private void updateTerritory() {
