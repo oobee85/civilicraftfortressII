@@ -77,31 +77,29 @@ public class Wildlife {
 				}
 			}
 			
-			
-			if(Math.random() < animal.getMoveChance()) {
-				if(animal.getPrey() != null) {
-					animal.imOnTheHunt(world);
+
+			if(animal.getPrey() != null) {
+				animal.imOnTheHunt(world);
+			}
+			else if(Math.random() < animal.getMoveChance()) {
+				List<Tile> neighbors = Utils.getNeighborsIncludingCurrent(animal.getTile(), world);
+				Tile best = null;
+				double bestDanger = Double.MAX_VALUE;
+				for(Tile t : neighbors) {
+					// deer cant move onto walls
+					if(!animal.getType().isFlying() && t.getHasBuilding() && t.getBuilding().getBuildingType() == BuildingType.WALL_STONE) {
+						continue;
+					}
+					double danger = animal.computeDanger(t, t.getHeight());
+					if(danger < bestDanger) {
+						best = t;
+						bestDanger = danger;
+					}
 				}
-				else {
-					List<Tile> neighbors = Utils.getNeighborsIncludingCurrent(animal.getTile(), world);
-					Tile best = null;
-					double bestDanger = Double.MAX_VALUE;
-					for(Tile t : neighbors) {
-						// deer cant move onto walls
-						if(!animal.getType().isFlying() && t.getHasBuilding() && t.getBuilding().getBuildingType() == BuildingType.WALL_STONE) {
-							continue;
-						}
-						double danger = animal.computeDanger(t, t.getHeight());
-						if(danger < bestDanger) {
-							best = t;
-							bestDanger = danger;
-						}
-					}
-					if(best != null) {
-						double heightIncrease = best.getHeight() - animal.getTile().getHeight();
-						animal.climb(heightIncrease);
-						animal.setTile(best);
-					}
+				if(best != null) {
+					double heightIncrease = best.getHeight() - animal.getTile().getHeight();
+					animal.climb(heightIncrease);
+					animal.setTile(best);
 				}
 			}
 			

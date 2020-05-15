@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.swing.*;
 
+import game.*;
 import ui.*;
 import world.*;
 
@@ -16,15 +17,21 @@ public class Thing implements HasImage {
 	private Tile tile;
 	
 	private HasImage hasImage;
+	private boolean sideHealthBar;
 	
 	public Thing(double maxHealth, HasImage hasImage) {
 		health = maxHealth;
 		this.maxHealth = maxHealth;
 		this.hasImage = hasImage;
+		sideHealthBar = hasImage instanceof UnitType;
 	}
 	public Thing(double maxHealth, HasImage hasImage, Tile tile) {
 		this(maxHealth, hasImage);
 		this.tile = tile;
+	}
+	
+	public boolean isSideHealthBar() {
+		return sideHealthBar;
 	}
 
 	public boolean isDead() {
