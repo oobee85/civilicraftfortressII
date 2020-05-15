@@ -20,8 +20,8 @@ public class World {
 	public static final int TRANSITION_PERIOD = 100;
 	
 	private LinkedList<Tile> tileList;
-	public Tile[][] tiles;
-	public double[][] heightMap;
+	private LinkedList<Tile> tileListRandom;
+	private Tile[][] tiles;
 	
 	private int width;
 	private int height;
@@ -38,6 +38,7 @@ public class World {
 	
 	public World() {
 		tileList = new LinkedList<>();
+		tileListRandom = new LinkedList<>();
 	}
 	
 	public int getWidth() {
@@ -48,8 +49,11 @@ public class World {
 	}
 	
 	public LinkedList<Tile> getTiles() {
-		Collections.shuffle(tileList);
 		return tileList;
+	}
+	public LinkedList<Tile> getTilesRandomly() {
+		Collections.shuffle(tileListRandom);
+		return tileListRandom;
 	}
 	
 	public Tile get(TileLoc loc) {
@@ -57,9 +61,6 @@ public class World {
 			return null;
 		}
 		return tiles[loc.x][loc.y];
-	}
-	public double getHeight(TileLoc loc) {
-		return heightMap[loc.x][loc.y];
 	}
 
 	public void drought() {
@@ -78,23 +79,38 @@ public class World {
 	}
 	
 	public void grow() {
-		System.out.println("growing plants");
-		for(int i = 0; i < tiles.length; i++) {
-			for(int j = 0; j < tiles.length; j++) {
-				Tile tile = tiles[i][j];
-				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount() 
-						&& Math.random()< 0.01) {
+		System.out.println("Growing plants. Currently " + plantsLand.size() + " land plants and " + plantsAquatic.size() + " aquatic plants.");
+		LinkedList<Plant> newAquatic = new LinkedList<>();
+		LinkedList<Plant> newLand = new LinkedList<>();
+		for(Tile tile : getTiles()) {
+			if(tile.getPlant() != null)
+				continue;
+			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+				if(Math.random() < 0.01) {
 					Plant plant = new Plant(PlantType.CATTAIL, tile);
-					if(tile.getPlant() == null) {
-						tile.setHasPlant(plant);
-						plantsAquatic.add(plant);
-					}
-					
+					tile.setHasPlant(plant);
+					newAquatic.add(plant);
 				}
-				
-				
+			}
+			else if(tile.canPlant() && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+				if(Math.random() < 0.00001) {
+					tile.setHasPlant(new Plant(PlantType.FOREST1, tile));
+					newLand.add(tile.getPlant());
+				}
+				else if(Math.random() < 0.0001) {
+					tile.setHasPlant(new Plant(PlantType.BERRY, tile));
+					newLand.add(tile.getPlant());
+				}
 			}
 		}
+		for(Plant p : plantsAquatic) {
+			newAquatic.add(p);
+		}
+		for(Plant p : plantsLand) {
+			newLand.add(p);
+		}
+		plantsAquatic = newAquatic;
+		plantsLand = newLand;
 	}
 	
 	
@@ -102,21 +118,11 @@ public class World {
 		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
 
 		for (Unit unit : units) {
-
 			Tile tile = unit.getTile();
-
 			if (tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-					double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
-					unit.takeDamage(damageTaken);
-				}
-
+				double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
+				unit.takeDamage(damageTaken);
 			}
-
-		
-
-		for (Unit unit : units) {
-
-			Tile tile = unit.getTile();
 			if (unit.isDead() == true) {
 				tile.setUnit(null);
 			} else {
@@ -128,51 +134,32 @@ public class World {
 	
 	public void updatePlantDamage() {
 		LinkedList<Plant> plantsLandNew = new LinkedList<Plant>();
-		
 		for(Plant plant : plantsLand) {
-			
 			Tile tile = plant.getTile();
-			
 			if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(!plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
 					double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
 					plant.takeDamage(damageTaken);
 				}
-				
 			}
-			
-		}	
-		
-		for(Plant plant : plantsLand) {
-			
-			Tile tile = plant.getTile();
 			if(plant.isDead() == true) {
 				tile.setHasPlant(null);
 			}else {
 				plantsLandNew.add(plant);
 			}
-		}
+		}	
 		plantsLand = plantsLandNew;
 
 		LinkedList<Plant> plantsAquaticNew = new LinkedList<Plant>();
-
 		for (Plant plant : plantsAquatic) {
 			Tile tile = plant.getTile();
-
 			if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 				if (plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
 					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
 					double damageTaken = difInLiquids * tile.liquidType.getDamage();
 					plant.takeDamage(damageTaken);
 				}
-
 			}
-
-		}
-
-		for (Plant plant : plantsAquatic) {
-
-			Tile tile = plant.getTile();
 			if (plant.isDead() == true) {
 				tile.setHasPlant(null);
 			} else {
@@ -180,78 +167,54 @@ public class World {
 			}
 		}
 		plantsAquatic = plantsAquaticNew;
-
 	}
 
 	public void genPlants() {
-		
-		for(int i = 0; i < tiles.length; i++) {
-			for(int j = 0; j < tiles.length; j++) {
-				
-				//generates land plants
-				if(tiles[i][j].checkTerrain(Terrain.GRASS) && tiles[i][j].getHasRoad()==false && Math.random() < bushRarity) {
-					double o = Math.random();
-					if(o < PlantType.BERRY.getRarity()) {
-						Plant p = new Plant(PlantType.BERRY, tiles[i][j] );
-						tiles[i][j].setHasPlant(p);
-						plantsLand.add(tiles[i][j].getPlant());
-					}
-					
+		for(Tile tile : getTiles()) {
+			//generates land plants
+			if(tile.checkTerrain(Terrain.GRASS) && tile.getHasRoad()==false && Math.random() < bushRarity) {
+				double o = Math.random();
+				if(o < PlantType.BERRY.getRarity()) {
+					Plant p = new Plant(PlantType.BERRY, tile);
+					tile.setHasPlant(p);
+					plantsLand.add(tile.getPlant());
 				}
-				//generates water plants
-				if(tiles[i][j].checkTerrain(Terrain.WATER) && Math.random() < waterPlantRarity) {
-					double o = Math.random();
-					if(o < PlantType.CATTAIL.getRarity()) {
-						Plant p = new Plant(PlantType.CATTAIL, tiles[i][j] );
-						tiles[i][j].setHasPlant(p);
-						plantsAquatic.add(tiles[i][j].getPlant());
-					}
-					
+			}
+			//generates water plants
+			if(tile.checkTerrain(Terrain.WATER) && Math.random() < waterPlantRarity) {
+				double o = Math.random();
+				if(o < PlantType.CATTAIL.getRarity()) {
+					Plant p = new Plant(PlantType.CATTAIL, tile);
+					tile.setHasPlant(p);
+					plantsAquatic.add(tile.getPlant());
 				}
-				
-				
 			}
 		}
-		
-		
 	}
 
 
 	public void makeForest() {
-
 		int x0 = (int) (Math.random() * tiles.length);
 		int y0 = (int) (Math.random() * tiles.length);
-
 		double forestLength = Math.random()*70+1;
 		double forestHeight = Math.random()*70+1;
 		double forestLengthEdge = forestLength+30;
 		double forestHeightEdge = forestHeight+30;
-		
-		for(int i = 0; i < tiles.length; i++) {
-			for(int j = 0; j < tiles[i].length; j++) {
-				int dx = i - x0;
-				int dy = j - y0;
-				
-				double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
-				double forestEdge = (dx*dx)/(forestLengthEdge*forestLengthEdge) + (dy*dy)/(forestHeightEdge*forestHeightEdge);
-				
-				Tile tile = tiles[i][j];
-					if(tile.canPlant()==true && tile.getHasRoad() == false) {
-						
-						
-						if((forestEdge < 1 && Math.random()<forestDensity-0.2) 
-								|| (forest < 1 && Math.random() < forestDensity)) {
-							
-							Plant plant = new Plant(PlantType.FOREST1, tiles[i][j]);
-							tiles[i][j].setHasPlant(plant);
-							plantsLand.add(plant);
-							
-						}	
-					}
-					
+		for(Tile tile : getTiles()) {
+			int dx = tile.getLocation().x - x0;
+			int dy = tile.getLocation().y - y0;
+			double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
+			double forestEdge = (dx*dx)/(forestLengthEdge*forestLengthEdge) + (dy*dy)/(forestHeightEdge*forestHeightEdge);
+			
+			if(tile.canPlant()==true && tile.getHasRoad() == false) {
+				if((forestEdge < 1 && Math.random()<forestDensity-0.2) 
+						|| (forest < 1 && Math.random() < forestDensity)) {
+					Plant plant = new Plant(PlantType.FOREST1, tile);
+					tile.setHasPlant(plant);
+					plantsLand.add(plant);
+				}	
 			}
 		}
-		
 	}
 	
 	public void generateWorld(MapType mapType, int size) {
@@ -259,39 +222,42 @@ public class World {
 		height = size;
 		tiles = new Tile[width][height];
 		int smoothingRadius = (int) (Math.sqrt((width + height)/2)/2);
-		heightMap = Generation.generateHeightMap(smoothingRadius, width, height);
+		double[][] heightMap = Generation.generateHeightMap(smoothingRadius, width, height);
+		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
 				tiles[i][j] = Tile.makeTile(new TileLoc(i, j), Terrain.DIRT);
 				tileList.add(tiles[i][j]);
+				tileListRandom.add(tiles[i][j]);
 			}
 		}
-		
-//		mountain = Generation.makeMountain(tiles, heightMap);
 		volcano = Generation.makeVolcano(tiles, heightMap);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
-				if(tiles[i][j].getTerrain() == Terrain.DIRT) {
-					Terrain t;
-					if (heightMap[i][j] > SNOW_LEVEL) {
-						t = Terrain.SNOW;
-					}
-					else if (heightMap[i][j] > 0.6) {
-						t = Terrain.ROCK;
-					}
-					else if (heightMap[i][j] > 0.4) {
-						t = Terrain.DIRT;
-					}
-					else if (heightMap[i][j] > 0) {
-						t = Terrain.GRASS;
-					}
-					else {
-						t = Terrain.WATER;
-					}
-					tiles[i][j].setTerrain(t);
+		for(Tile tile : getTiles()) {
+			tile.setHeight(heightMap[tile.getLocation().x][tile.getLocation().y]);
+		}
+
+		
+		for(Tile tile : getTiles()) {
+			if(tile.getTerrain() == Terrain.DIRT) {
+				Terrain t;
+				if (tile.getHeight() > SNOW_LEVEL) {
+					t = Terrain.SNOW;
 				}
+				else if (tile.getHeight() > 0.6) {
+					t = Terrain.ROCK;
+				}
+				else if (tile.getHeight() > 0.4) {
+					t = Terrain.DIRT;
+				}
+				else if (tile.getHeight() > 0) {
+					t = Terrain.GRASS;
+				}
+				else {
+					t = Terrain.WATER;
+				}
+				tile.setTerrain(t);
 			}
 		}
 		
@@ -378,12 +344,10 @@ public class World {
 		terrainGraphics.dispose();
 		
 		BufferedImage heightMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_3BYTE_BGR);
-		for(int i = 0; i < tiles.length; i++) {
-			for(int j = 0; j < tiles[0].length; j++) {
-				int r = Math.max(Math.min((int)(255*heightMap[i][j]), 255), 0);
-				Color c = new Color(r, 0, 255-r);
-				heightMapImage.setRGB(i, j, c.getRGB());
-			}
+		for(Tile tile : getTiles() ) {
+			int r = Math.max(Math.min((int)(255*tile.getHeight()), 255), 0);
+			Color c = new Color(r, 0, 255-r);
+			heightMapImage.setRGB(tile.getLocation().x, tile.getLocation().y, c.getRGB());
 		}
 		return new BufferedImage[] { terrainImage, minimapImage, heightMapImage};
 	}

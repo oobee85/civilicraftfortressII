@@ -44,7 +44,7 @@ public class Wildlife {
 		ConcurrentLinkedQueue<Animal> newAnimals = new ConcurrentLinkedQueue<>();
 		HashMap<Tile, Animal> trying = new HashMap<>();
 		for(Animal animal : animals) {
-			double liquidDamage = animal.computeTileDamage(animal.getTile(), world.getHeight(animal.getTile().getLocation()));
+			double liquidDamage = animal.computeTileDamage(animal.getTile(), animal.getTile().getHeight());
 			if(animal.getType().isFlying() != true) {
 				animal.takeDamage(liquidDamage);
 			}
@@ -71,14 +71,14 @@ public class Wildlife {
 					if(!animal.getType().isFlying() && t.getHasBuilding() && t.getBuilding().getBuildingType() == BuildingType.WALL_STONE) {
 						continue;
 					}
-					double danger = animal.computeDanger(t, world.getHeight(t.getLocation()));
+					double danger = animal.computeDanger(t, t.getHeight());
 					if(danger < bestDanger) {
 						best = t;
 						bestDanger = danger;
 					}
 				}
 				if(best != null) {
-					double heightIncrease = world.getHeight(best.getLocation()) - world.getHeight(animal.getTile().getLocation());
+					double heightIncrease = best.getHeight() - animal.getTile().getHeight();
 					animal.climb(heightIncrease);
 					animal.setTile(best);
 					

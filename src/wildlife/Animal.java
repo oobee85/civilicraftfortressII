@@ -71,13 +71,13 @@ public class Animal extends Thing {
 		drive += 0.01;
 	}
 	public void loseEnergy() {
-		energy -= 0.01;
+		energy -= 0.02;
 		if(getHealth() < type.getCombatStats().getHealth()) {
-			energy -= 0.02;
+			energy -= 0.04;
 			takeDamage(-0.1);
 		}
-		if(energy < MAX_ENERGY/10) {
-			takeDamage(0.01);
+		if(energy < MAX_ENERGY/20) {
+			takeDamage(0.05);
 		}
 	}
 	

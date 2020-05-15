@@ -92,7 +92,7 @@ public class Game {
 		if(ticks%1 == 0) {
 			if(world.volcano != null) {
 				world[world.volcano].liquidType = LiquidType.LAVA;
-				world[world.volcano].liquidAmount += .1;
+				world[world.volcano].liquidAmount += .05;
 			}
 			Liquid.propogate(world);
 			changedTerrain = true;
@@ -103,7 +103,7 @@ public class Game {
 		world.updateUnitDamage();
 		if(ticks%5 == 0) {
 			updateBuildingAction();
-			
+			changedTerrain = true;
 		}
 		moveUnits();
 		updateBuildingDamage();
@@ -113,9 +113,6 @@ public class Game {
 		if(changedTerrain) {
 			updateTerrainImages();
 		}
-		
-		
-		
 	}
 	
 	public void generateWorld(MapType mapType, int size) {
@@ -202,21 +199,19 @@ public class Game {
 
 	
 	public void flipTable() {
-		for(int x = 0; x < world.heightMap.length; x++) {
-			for(int y = 0; y < world.heightMap[0].length; y++) {
-				world.heightMap[x][y] = Math.max(Math.min(1-world.heightMap[x][y], 1), 0);
-			}
+		for(Tile tile : world.getTiles()) {
+			tile.setHeight(1 - tile.getHeight());
 		}
 		updateTerrainImages();
 	}
 	
-	private double computeCost(Tile current, Tile two, Tile target) {
+	private double computeCost(Tile current, Tile next, Tile target) {
 		double distanceCosts = 1;
-		if(!two.getHasRoad()) {
-			double deltaHeight = 10000 * Math.abs(world.getHeight(current.getLocation()) - world.getHeight(two.getLocation()));
-			distanceCosts += two.getTerrain().getRoadCost()
+		if(!next.getHasRoad()) {
+			double deltaHeight = 10000 * Math.abs(current.getHeight() - next.getHeight());
+			distanceCosts += next.getTerrain().getRoadCost()
 							+ deltaHeight * deltaHeight
-							+ 1000000*two.liquidAmount*two.liquidType.getDamage();
+							+ 1000000*next.liquidAmount*next.liquidType.getDamage();
 		}
 		return distanceCosts;
 	}
@@ -322,13 +317,13 @@ public class Game {
 		double lowest = +1000;
 		Tile lowestTile = null;
 		for(Tile tile: world.getTiles()) {
-			if(world.getHeight(tile.getLocation()) > highest) {
+			if(tile.getHeight() > highest) {
 				highestTile = tile;
-				highest = world.getHeight(tile.getLocation());
+				highest = tile.getHeight();
 			}
-			if(world.getHeight(tile.getLocation()) < lowest) {
+			if(tile.getHeight() < lowest) {
 				lowestTile = tile;
-				lowest = world.getHeight(tile.getLocation());
+				lowest = tile.getHeight();
 			}
 		}
 
@@ -364,8 +359,9 @@ public class Game {
 		}
 	}
 	private void makeCastle() {
-		for(Tile tile :world.getTiles()) {
-			if(tile.getHasRoad() == true && tile.canBuild() == true && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+		for(Tile tile :world.getTilesRandomly()) {
+			if(tile.getHasRoad() == true && tile.canBuild() == true) {
+				buildUnit(UnitType.WORKER, tile);
 				buildStructure(StructureType.CASTLE, tile);
 				break;
 			}
@@ -454,7 +450,7 @@ public class Game {
 //					}
 					
 					if(showHeightMap) {
-						t.drawHeightMap(g, world.heightMap[i][j]);
+						t.drawHeightMap(g, world[new TileLoc(i, j)].getHeight());
 					}
 					else {
 						t.setRecentTick(ticks);
@@ -489,7 +485,7 @@ public class Game {
 							}
 							g.fillRect(x, y + 2, stringWidth, numrows*fontsize);
 							g.setColor(Color.green);
-							g.drawString(String.format("H=%." + NUM_DEBUG_DIGITS + "f", world.heightMap[i][j]), x, y + (++rows[i][j])*fontsize);
+							g.drawString(String.format("H=%." + NUM_DEBUG_DIGITS + "f", world[new TileLoc(i, j)].getHeight()), x, y + (++rows[i][j])*fontsize);
 							
 							if(world[loc].liquidType != LiquidType.DRY) {
 								g.drawString(String.format(world[loc].liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount), x, y + (++rows[i][j])*fontsize);
@@ -655,39 +651,33 @@ public class Game {
 	private void moveUnits() {
 		
 		for(Unit unit : world.units) {
+			unit.tick();
 			if(unit.getTargetTile() == null) {
 				continue;
 			}
-			Tile currentTile = unit.getTile();
-			double bestDistance = Integer.MAX_VALUE;
-			Tile bestTile = currentTile;
-			
-			for(Tile tile : Utils.getNeighbors(currentTile, world)) {
+			if(unit.readyToMove()) {
+				Tile currentTile = unit.getTile();
+				double bestDistance = Integer.MAX_VALUE;
+				Tile bestTile = currentTile;
 				
+				for(Tile tile : Utils.getNeighbors(currentTile, world)) {
+					if(tile.getHasUnit()) {
+						continue;
+					}
 					double distance = tile.getLocation().distanceTo(unit.getTargetTile().getLocation() );
 					if(distance < bestDistance) {
 						bestDistance = distance;
 						bestTile = tile;
 					}
-				
+					
+				}
+				unit.moveTo(bestTile);
 			}
-			bestTile.setUnit(unit);
-			unit.setTile(bestTile);
-			
-			currentTile.setUnit(null);
-			
 		}
-		
-		
-		
-		
-		
-		
-		
 	}
 	
 	private void buildBuilding(BuildingType bt, Tile tile) {
-		if(tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+		if(tile.getHasUnit() && tile.getUnit().getUnitType() == UnitType.WORKER) {
 			Building building = new Building(bt, tile);
 			tile.setBuilding(building);
 			buildings.add(building);
@@ -695,15 +685,14 @@ public class Game {
 		
 	}
 	private void buildStructure(StructureType st, Tile tile) {
-		if(tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+		if(tile.getHasUnit() && tile.getUnit().getUnitType() == UnitType.WORKER) {
 			Structure structure = new Structure(st, tile);
 			tile.setStructure(structure);
 			structures.add(structure);
 		}
 		
 	}
-	public void buildUnit(UnitType u) {
-		Tile tile = structures.get(0).getTile();
+	public void buildUnit(UnitType u, Tile tile) {
 		Unit unit = new Unit(u , tile);
 		tile.setUnit(unit);
 		world.units.add(unit);
