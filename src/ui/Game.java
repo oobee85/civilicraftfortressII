@@ -636,16 +636,23 @@ public class Game {
 	}
 	public void toggleUnitSelectOnTile(Tile tile) {
 		if(selectedUnit == tile.getUnit()) {
+			workerView();
 			deselectUnit();
-			guiController.toggleWorkerView();
 			return;
 		}
 		else if(selectedUnit != null) {
+			workerView();
 			deselectUnit();
 		}
 		selectedUnit = tile.getUnit();
 		selectedUnit.setIsSelected(true);
-		guiController.toggleWorkerView();
+		workerView();
+		
+	}
+	private void workerView() {
+		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
+			guiController.toggleWorkerView();
+		}
 	}
 	public void deselectUnit() {
 		System.out.println("deselecting unit");

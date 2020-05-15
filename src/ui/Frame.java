@@ -265,6 +265,25 @@ public class Frame extends JPanel{
 		buildSpearman.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.SPEARMAN, gameInstance.structures[0].getTile());
 		});
+		JButton buildArcher = new JButton("Build Archer", Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		buildArcher.setMargin(zeroMargin);
+		buildArcher.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildArcher.addActionListener(e -> {
+			gameInstance.buildUnit(UnitType.ARCHER, gameInstance.structures[0].getTile());
+		});
+		JButton buildSwordsman = new JButton("Build swordsman", Utils.resizeImageIcon(UnitType.SWORDSMAN.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		buildSwordsman.setMargin(zeroMargin);
+		buildSwordsman.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildSwordsman.addActionListener(e -> {
+			gameInstance.buildUnit(UnitType.SWORDSMAN, gameInstance.structures[0].getTile());
+		});
+		JButton buildHorseman = new JButton("Build horseman", Utils.resizeImageIcon(UnitType.HORSEMAN.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		buildHorseman.setMargin(zeroMargin);
+		buildHorseman.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildHorseman.addActionListener(e -> {
+			gameInstance.buildUnit(UnitType.HORSEMAN, gameInstance.structures[0].getTile());
+		});
+		
 //		JButton exitCity = new JButton("Exit City", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 //		exitCity.setMargin(zeroMargin);
 //		exitCity.setPreferredSize(BUILDING_BUTTON_SIZE);
@@ -380,7 +399,9 @@ public class Frame extends JPanel{
 		buildWorker.setFocusable(false);
 		buildWarrior.setFocusable(false);
 		buildSpearman.setFocusable(false);
-	
+		buildArcher.setFocusable(false);
+		buildHorseman.setFocusable(false);
+		buildSwordsman.setFocusable(false);
 		
 		JPanel guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());
@@ -403,12 +424,23 @@ public class Frame extends JPanel{
 		int numButtons = 0;
 		cityView.add(buildWorker);
 		buildWorker.setBounds(765,  185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons , BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		
 		cityView.add(buildWarrior);
 		buildWarrior.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		
 		cityView.add(buildSpearman);
 		buildSpearman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
-//		cityView.add(exitCity);
-//		exitCity.setBounds(790, 22 , BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		
+		cityView.add(buildArcher);
+		buildArcher.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		
+		cityView.add(buildSwordsman);
+		buildSwordsman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		
+		cityView.add(buildHorseman);
+		buildHorseman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+
+		
 		
 		
 		
@@ -416,9 +448,9 @@ public class Frame extends JPanel{
 		workerView = new JPanel() {
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				g.drawRect(1, 1, getWidth()-2, getHeight()-2);
+//				g.drawRect(1, 1, getWidth()-2, getHeight()-2);
 //				g.drawImage(workerOverlay, 0, 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
-				System.out.println("workeroverLay");
+//				System.out.println("workeroverLay");
 			}
 		};
 		

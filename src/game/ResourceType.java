@@ -17,7 +17,9 @@ public enum ResourceType implements HasImage{
 	ADAMANTITE_ORE ( "resources/Images/resourceicons/adamantite_ore.png"),
 	RUNITE_ORE ( "resources/Images/resourceicons/runite_ore.png"),
 	TITANIUM_ORE ( "resources/Images/resourceicons/titanium_ore.png"),
-	WHEAT ( "resources/Images/resourceicons/wheat.png")
+	WHEAT ( "resources/Images/resourceicons/wheat.png"),
+	HORSE ( "resources/Images/resourceicons/horse.png")
+	
 	;
 	
 	private MipMap mipmap;

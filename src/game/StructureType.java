@@ -8,7 +8,7 @@ import utils.*;
 
 public enum StructureType implements HasImage {
 	
-	CASTLE (5000, "resources/Images/buildings/castle256.png", 80, 5),
+	CASTLE (5000, "resources/Images/buildings/castle256.png", 80, 50),
 	BARRACKS (1000, "resources/Images/buildings/barracks256.png", 0, 1)
 	;
 	

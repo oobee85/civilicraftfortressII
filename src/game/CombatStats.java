@@ -4,7 +4,6 @@ public class CombatStats {
 
 	private int health;
 	private int attack;
-	private int defence;
 	private int speed;
 	
 	
@@ -13,13 +12,11 @@ public class CombatStats {
 	/**
 	 * @param health
 	 * @param attack
-	 * @param defence
 	 * @param speed
 	**/
-	public CombatStats(int health, int attack, int defence, int speed) {
+	public CombatStats(int health, int attack, int speed) {
 		this.health = health;
 		this.attack = attack;
-		this.defence = defence;
 		this.speed = speed;
 	}
 	public int getHealth() {
@@ -27,9 +24,6 @@ public class CombatStats {
 	}
 	public int getAttack() {
 		return attack;
-	}
-	public int getDefence() {
-		return defence;
 	}
 	public int getSpeed() {
 		return speed;
