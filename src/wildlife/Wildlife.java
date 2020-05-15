@@ -53,15 +53,30 @@ public class Wildlife {
 				continue;
 			}
 			animal.loseEnergy();
+			animal.loseEnergy();
+			animal.loseEnergy();
+			animal.loseEnergy();
+			animal.loseEnergy();
+			animal.loseEnergy();
 			if(animal.wantsToEat()) {
-				if(animal.getTile().getPlant() != null) {
+				if(!animal.getType().isHostile() && animal.getTile().getPlant() != null) {
 					animal.getTile().getPlant().takeDamage(0.1);
 					animal.eat();
 				}else if(animal.getTile().checkTerrain(Terrain.GRASS)) {
 					animal.getTile().setTerrain(Terrain.DIRT);
 					animal.eat();
 				}
+				
+				if(animal.getType().isHostile() == true) {
+					int pickAnimal = (int) (animals.size()*Math.random());
+					Animal iveGotYouInMySights = animals.peek();
+					
+//					System.out.println(pickAnimal + ", " +animals.size());
+					
+				}
 			}
+			
+			
 			if(Math.random() < animal.getMoveChance()) {
 				List<Tile> neighbors = Utils.getNeighborsIncludingCurrent(animal.getTile(), world);
 				Tile best = null;
