@@ -50,15 +50,27 @@ public class Frame extends JPanel{
 			
 			@Override
 			public void toggleCityView() {
+				System.out.println("toggle city view");
+				if(workerView.isVisible()) {
+					workerView.setVisible(false);
+				}
+				frame.setGlassPane(cityView);
 				cityView.setVisible(!cityView.isVisible());
+				frame.repaint();
+			}
+			@Override
+			public void toggleWorkerView() {
+				System.out.println("toggle worker view");
+				if(cityView.isVisible()) {
+					cityView.setVisible(false);
+				}
+				frame.setGlassPane(workerView);
+				workerView.setVisible(!workerView.isVisible());
+				frame.repaint();
 			}
 			@Override
 			public void toggleTileView() {
 				tileView.setVisible(!tileView.isVisible());
-			}
-			@Override
-			public void toggleWorkerView() {
-				workerView.setVisible(!workerView.isVisible());
 			}
 			@Override
 			public void updateGUI() {
@@ -109,8 +121,6 @@ public class Frame extends JPanel{
 		mapSize = new JTextField("128", 10);
 		mapSize.setPreferredSize(new Dimension(100,50));
 		panel.add(mapSize);
-		
-
 		
 		
 		JButton exit = new JButton("exit");
@@ -383,23 +393,12 @@ public class Frame extends JPanel{
 		
 		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
 		cityView = new JPanel() {
-		    protected void paintComponent(Graphics g) {
-	            g.drawImage(cityOverlay, 0, 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
-		    	super.paintComponent(g);
-		    }
+			protected void paintComponent(Graphics g) {
+				g.drawImage(cityOverlay, 0, 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
+				super.paintComponent(g);
+			}
 		};
-		Image workerOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
-		workerView = new JPanel() {
-		    protected void paintComponent(Graphics g) {
-	            g.drawImage(workerOverlay, gamepanel.getHeight(), 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
-		    	super.paintComponent(g);
-		    	System.out.println("workeroverLay");
-		    }
-		};
-		frame.setGlassPane(workerView);
-		workerView.setOpaque(false);
-		workerView.setLayout(null);
-		
+		cityView.setVisible(false);
 		cityView.setOpaque(false);
 		cityView.setLayout(null);
 		int numButtons = 0;
@@ -412,9 +411,33 @@ public class Frame extends JPanel{
 //		cityView.add(exitCity);
 //		exitCity.setBounds(790, 22 , BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 		
+		
+		
+//		Image workerOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
+		workerView = new JPanel() {
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				g.drawRect(1, 1, getWidth()-2, getHeight()-2);
+//				g.drawImage(workerOverlay, 0, 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
+				System.out.println("workeroverLay");
+			}
+		};
+		
+		
+//		frame.setGlassPane(workerView);
+		workerView.setVisible(false);
+		workerView.setOpaque(false);
+		workerView.setLayout(null);
+		
+		JButton test = new JButton("Asdf");
+		test.setOpaque(false);
+		test.setBounds(400, frame.getHeight()-150, 100, 50);
+		workerView.add(test);
+		
 		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
 		frame.getContentPane().add(guiSplitter,BorderLayout.EAST);
-		frame.setGlassPane(cityView);
+//		frame.setGlassPane(cityView);
+		frame.setGlassPane(workerView);
 		frame.pack();
 		frame.setVisible(true);
 		gamepanel.requestFocusInWindow();

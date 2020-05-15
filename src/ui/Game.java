@@ -368,56 +368,6 @@ public class Game {
 		}
 	}
 	
-	
-//	private void turnRoads(TileLoc current, TileLoc prev) {
-//		if(current.x-1 < 0 || current.x+1 >= world.getWidth()) {
-//			return;
-//		}
-//		if(world[current].canBuild()==true) {
-//			
-//			// makes turns bot left -> top right
-//			TileLoc left = new TileLoc(current.x-1, current.y);
-//			if(world[left].canBuild()==true) {
-//				if (left.x == prev.x && current.y == prev.y) {
-//					world[left].setRoad(true, "left_down");
-//					world[current].setRoad(true, "right_up");
-//				} else if (left.x == prev.x && current.x + 1 == prev.y) {
-//					world[left].setRoad(true, "left_down");
-//					world[current].setRoad(true, "right_up");
-//				}	
-//			}
-//			
-//
-//			// makes turns bot right -> top left
-//			TileLoc right = new TileLoc(current.x+1, current.y);
-//			if(world[right].canBuild()==true) {
-//				if (right.x == prev.x && current.y == prev.y) {
-//					world[right].setRoad(true, "right_down");
-//					world[current].setRoad(true, "left_up");
-//				} else if (right.x == prev.x && current.y + 1 == prev.y) {
-//					world[right].setRoad(true, "right_down");
-//					world[current].setRoad(true, "left_up");
-//				}
-//			}
-//			
-//
-//			if (world[current].getHasRoad() == false) {
-//				world[current].setRoad(true, "top_down");
-//			}
-//			
-//			
-////			Tile t =  world[current.getIntX()][current.getIntY()];
-////			if(
-//////					world[current.getIntX()][current.getIntY()].getHasRoad() == true && 
-////					t.getTerrain().isBridgeable(t.getTerrain()) == true) {
-////				System.out.println("bridging");
-////				world[current.getIntX()][current.getIntY()].setHasBuilding(Buildings.BRIDGE);
-////			}
-//
-//		}
-//
-//	}
-	
 	public void draw(Graphics g) {
 		
 		// Try to only draw stuff that is visible on the screen
@@ -606,34 +556,31 @@ public class Game {
 			}
 		}
 		if(currentMode == BuildMode.NOMODE && tile.getHasUnit() == true) {
-			if(selectedUnit != null && !selectedUnit.equals(tile.getUnit()) ) {
-				selectedUnit.selectUnit(false);
-				selectedUnit = tile.getUnit();
-				selectedUnit.selectUnit(true);
-			}else
-			if(tile.getUnit().getIsSelected() == false) {
-				selectedUnit = tile.getUnit();
-				selectedUnit.selectUnit(true);
-//				tile.getUnit().selectUnit(true);
-			}else {
-				deselectUnit();
-			}
-			
-			
+			toggleUnitSelectOnTile(tile);
 		}
 		if(currentMode == BuildMode.NOMODE) {
 			setDestination(mx, my);
 		}
-		
-		
+	}
+	public void toggleUnitSelectOnTile(Tile tile) {
+		if(selectedUnit == tile.getUnit()) {
+			deselectUnit();
+			guiController.toggleWorkerView();
+			return;
+		}
+		else if(selectedUnit != null) {
+			deselectUnit();
+		}
+		selectedUnit = tile.getUnit();
+		selectedUnit.setIsSelected(true);
+		guiController.toggleWorkerView();
 	}
 	public void deselectUnit() {
 		System.out.println("deselecting unit");
 		if(selectedUnit != null) {
-			selectedUnit.selectUnit(false);
+			selectedUnit.setIsSelected(false);
 			selectedUnit = null;
 		}
-		
 	}
 	
 	public void setDestination(int mx, int my) {

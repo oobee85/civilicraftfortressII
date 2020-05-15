@@ -20,7 +20,7 @@ public class Unit extends Thing{
 	}
 	
 	
-	public void selectUnit(boolean select) {
+	public void setIsSelected(boolean select) {
 		isSelected = select;
 	}
 	public boolean getIsSelected() {
