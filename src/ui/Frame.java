@@ -21,7 +21,7 @@ public class Frame extends JPanel{
 	private JPanel minimapPanel;
 	private JPanel cityView;
 	private JPanel tileView;
-	JLabel ironOre; 
+	private JPanel workerView;
 	private JComboBox<MapType> mapType;
 	private JLabel[] resourceIndicators = new JLabel[ResourceType.values().length];
 	private JTextField mapSize;
@@ -50,7 +50,23 @@ public class Frame extends JPanel{
 			
 			@Override
 			public void toggleCityView() {
+				System.out.println("toggle city view");
+				if(workerView.isVisible()) {
+					workerView.setVisible(false);
+				}
+				frame.setGlassPane(cityView);
 				cityView.setVisible(!cityView.isVisible());
+				frame.repaint();
+			}
+			@Override
+			public void toggleWorkerView() {
+				System.out.println("toggle worker view");
+				if(cityView.isVisible()) {
+					cityView.setVisible(false);
+				}
+				frame.setGlassPane(workerView);
+				workerView.setVisible(!workerView.isVisible());
+				frame.repaint();
 			}
 			@Override
 			public void toggleTileView() {
@@ -60,10 +76,8 @@ public class Frame extends JPanel{
 			public void updateGUI() {
 				for(int i = 0; i < ResourceType.values().length; i++) {
 					resourceIndicators[i].setText(ResourceType.values()[i]+" = "+gameInstance.getResourceAmount(ResourceType.values()[i]) );
-					
 				}
-					
-				
+				frame.repaint();
 			}
 		});
 			
@@ -108,8 +122,6 @@ public class Frame extends JPanel{
 		mapSize.setPreferredSize(new Dimension(100,50));
 		panel.add(mapSize);
 		
-
-		
 		
 		JButton exit = new JButton("exit");
 		exit.addActionListener(new ActionListener() {
@@ -142,6 +154,8 @@ public class Frame extends JPanel{
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
 		        ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		        ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+		        ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 				g.setColor(gameInstance.getBackgroundColor());
 				g.fillRect(0, 0, getWidth(), getHeight());
 				gameInstance.drawGame(g);
@@ -237,19 +251,19 @@ public class Frame extends JPanel{
 		buildWorker.setMargin(zeroMargin);
 		buildWorker.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildWorker.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.WORKER);
+			gameInstance.buildUnit(UnitType.WORKER, gameInstance.structures[0].getTile());
 		});
 		JButton buildWarrior = new JButton("Build Warrior", Utils.resizeImageIcon(UnitType.WARRIOR.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildWarrior.setMargin(zeroMargin);
 		buildWarrior.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildWarrior.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.WARRIOR);
+			gameInstance.buildUnit(UnitType.WARRIOR, gameInstance.structures[0].getTile());
 		});
 		JButton buildSpearman = new JButton("Build Spearman", Utils.resizeImageIcon(UnitType.SPEARMAN.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildSpearman.setMargin(zeroMargin);
 		buildSpearman.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildSpearman.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.SPEARMAN);
+			gameInstance.buildUnit(UnitType.SPEARMAN, gameInstance.structures[0].getTile());
 		});
 //		JButton exitCity = new JButton("Exit City", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 //		exitCity.setMargin(zeroMargin);
@@ -379,11 +393,12 @@ public class Frame extends JPanel{
 		
 		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
 		cityView = new JPanel() {
-		    protected void paintComponent(Graphics g) {
-	            g.drawImage(cityOverlay, 0, 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
-		    	super.paintComponent(g);
-		    }
+			protected void paintComponent(Graphics g) {
+				g.drawImage(cityOverlay, 0, 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
+				super.paintComponent(g);
+			}
 		};
+		cityView.setVisible(false);
 		cityView.setOpaque(false);
 		cityView.setLayout(null);
 		int numButtons = 0;
@@ -396,9 +411,33 @@ public class Frame extends JPanel{
 //		cityView.add(exitCity);
 //		exitCity.setBounds(790, 22 , BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 		
+		
+		
+//		Image workerOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
+		workerView = new JPanel() {
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				g.drawRect(1, 1, getWidth()-2, getHeight()-2);
+//				g.drawImage(workerOverlay, 0, 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
+				System.out.println("workeroverLay");
+			}
+		};
+		
+		
+//		frame.setGlassPane(workerView);
+		workerView.setVisible(false);
+		workerView.setOpaque(false);
+		workerView.setLayout(null);
+		
+		JButton test = new JButton("Asdf");
+		test.setOpaque(false);
+		test.setBounds(400, frame.getHeight()-150, 100, 50);
+		workerView.add(test);
+		
 		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
 		frame.getContentPane().add(guiSplitter,BorderLayout.EAST);
-		frame.setGlassPane(cityView);
+//		frame.setGlassPane(cityView);
+		frame.setGlassPane(workerView);
 		frame.pack();
 		frame.setVisible(true);
 		gamepanel.requestFocusInWindow();

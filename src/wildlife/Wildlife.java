@@ -10,7 +10,8 @@ import world.*;
 
 public class Wildlife {
 	
-	private static ConcurrentLinkedQueue<Animal> animals = new ConcurrentLinkedQueue<>();
+//	private static ConcurrentLinkedQueue<Animal> animals = new ConcurrentLinkedQueue<>();
+	private static LinkedList<Animal> animals = new LinkedList<>();
 
 	private static LinkedList<Animal> dead = new LinkedList<>();
 	
@@ -39,12 +40,14 @@ public class Wildlife {
 			}
 		}
 	}
+
+	
 	
 	public static void tick(World world) {
-		ConcurrentLinkedQueue<Animal> newAnimals = new ConcurrentLinkedQueue<>();
+		LinkedList<Animal> newAnimals = new LinkedList<>();
 		HashMap<Tile, Animal> trying = new HashMap<>();
 		for(Animal animal : animals) {
-			double liquidDamage = animal.computeTileDamage(animal.getTile(), world.getHeight(animal.getTile().getLocation()));
+			double liquidDamage = animal.computeTileDamage(animal.getTile(), animal.getTile().getHeight());
 			if(animal.getType().isFlying() != true) {
 				animal.takeDamage(liquidDamage);
 			}
@@ -54,15 +57,31 @@ public class Wildlife {
 			}
 			animal.loseEnergy();
 			if(animal.wantsToEat()) {
-				if(animal.getTile().getPlant() != null) {
-					animal.getTile().getPlant().takeDamage(0.1);
-					animal.eat();
-				}else if(animal.getTile().checkTerrain(Terrain.GRASS)) {
-					animal.getTile().setTerrain(Terrain.DIRT);
-					animal.eat();
+				if(animal.getType().isHostile() == true) {
+					int pickAnimal = (int) (animals.size()*Math.random());
+					Animal iveGotYouInMySights = animals.get(pickAnimal);
+					if(iveGotYouInMySights != animal) {
+						animal.setPrey(iveGotYouInMySights);
+					}
+//					animal.setTargetTile(iveGotYouInMySights.getTile());
+//					System.out.println(pickAnimal + ", " +animals.size());
+				}
+				else {
+					if(!animal.getType().isHostile() && animal.getTile().getPlant() != null) {
+						animal.getTile().getPlant().takeDamage(0.1);
+						animal.eat();
+					}else if(animal.getTile().checkTerrain(Terrain.GRASS)) {
+						animal.getTile().setTerrain(Terrain.DIRT);
+						animal.eat();
+					}
 				}
 			}
-			if(Math.random() < animal.getMoveChance()) {
+			
+
+			if(animal.getPrey() != null) {
+				animal.imOnTheHunt(world);
+			}
+			else if(Math.random() < animal.getMoveChance()) {
 				List<Tile> neighbors = Utils.getNeighborsIncludingCurrent(animal.getTile(), world);
 				Tile best = null;
 				double bestDanger = Double.MAX_VALUE;
@@ -71,19 +90,19 @@ public class Wildlife {
 					if(!animal.getType().isFlying() && t.getHasBuilding() && t.getBuilding().getBuildingType() == BuildingType.WALL_STONE) {
 						continue;
 					}
-					double danger = animal.computeDanger(t, world.getHeight(t.getLocation()));
+					double danger = animal.computeDanger(t, t.getHeight());
 					if(danger < bestDanger) {
 						best = t;
 						bestDanger = danger;
 					}
 				}
 				if(best != null) {
-					double heightIncrease = world.getHeight(best.getLocation()) - world.getHeight(animal.getTile().getLocation());
+					double heightIncrease = best.getHeight() - animal.getTile().getHeight();
 					animal.climb(heightIncrease);
 					animal.setTile(best);
-					
 				}
 			}
+			
 			else if(animal.wantsToReproduce()) {
 				if(trying.containsKey(animal.getTile())) {
 					Animal other = trying.remove(animal.getTile());
@@ -102,8 +121,33 @@ public class Wildlife {
 		
 		animals = newAnimals;
 	}
+//	
+//	private static void moveToLocation(Animal animal, World world) {
+//		if(animal.getTargetTile() != null) {
+//			Tile currentTile = animal.getTile();
+//			double bestDistance = Integer.MAX_VALUE;
+//			Tile bestTile = currentTile;
+//	
+//			for (Tile tile : Utils.getNeighbors(currentTile, world)) {
+////				if (tile.getHasUnit()) {
+////					tile.getUnit().takeDamage(animal.getType().getCombatStats().getAttack());
+////					break;
+////				}
+////				if (tile.getHasAnimal()) {
+////					tile.getAnimal().takeDamage(animal.getType().getCombatStats().getAttack());
+////					break;
+////				}
+//				double distance = tile.getLocation().distanceTo(animal.getTargetTile().getLocation());
+//				if (distance < bestDistance) {
+//					bestDistance = distance;
+//					bestTile = tile;
+//				}
+//			}
+//			animal.moveTo(bestTile);
+//		}
+//	}
 	
-	public static ConcurrentLinkedQueue<Animal> getAnimals() {
+	public static LinkedList<Animal> getAnimals() {
 		return animals;
 	}
 }

@@ -11,6 +11,7 @@ public class Animal extends Thing {
 	public static final int MAX_ENERGY = 100;
 	private AnimalType type;
 	
+	private Animal prey;
 	private double energy;
 	private double drive;
 	
@@ -36,14 +37,19 @@ public class Animal extends Thing {
 	
 	public double computeTileDamage(Tile tile, double height) {
 		double damage = 0;
-		if(getType().isAquatic()) {
-			if(tile.liquidAmount < LiquidType.DRY.getMinimumDamageAmount()) {
-				damage += (LiquidType.DRY.getMinimumDamageAmount() - tile.liquidAmount) * LiquidType.DRY.getDamage();
-			}
+		if(getType().isFlying()) {
+			
 		}
 		else {
-			if(getTile().liquidAmount > getTile().liquidType.getMinimumDamageAmount()) {
-				damage += tile.liquidAmount * tile.liquidType.getDamage();
+			if(getType().isAquatic()) {
+				if(tile.liquidAmount < LiquidType.DRY.getMinimumDamageAmount()) {
+					damage += (LiquidType.DRY.getMinimumDamageAmount() - tile.liquidAmount) * LiquidType.DRY.getDamage();
+				}
+			}
+			else {
+				if(getTile().liquidAmount > getTile().liquidType.getMinimumDamageAmount()) {
+					damage += tile.liquidAmount * tile.liquidType.getDamage();
+				}
 			}
 		}
 		if(tile.checkTerrain(Terrain.SNOW)) {
@@ -55,6 +61,19 @@ public class Animal extends Thing {
 			}
 		}
 		return damage;
+	}
+	
+	public void moveTo(Tile t) {
+		double penalty = t.getTerrain().moveSpeed();
+		if(this.getType().isFlying()) {
+			penalty = 0;
+		}
+		if(getTile().getHasRoad() && t.getHasRoad()) {
+			penalty = penalty/2;
+		}
+		getTile().setUnit(null);
+		t.setAnimal(this);
+		this.setTile(t);
 	}
 	
 	public double computeDanger(Tile tile, double height) {
@@ -71,13 +90,13 @@ public class Animal extends Thing {
 		drive += 0.01;
 	}
 	public void loseEnergy() {
-		energy -= 0.01;
+		energy -= 0.02;
 		if(getHealth() < type.getCombatStats().getHealth()) {
-			energy -= 0.02;
+			energy -= 0.04;
 			takeDamage(-0.1);
 		}
-		if(energy < MAX_ENERGY/10) {
-			takeDamage(0.01);
+		if(energy < MAX_ENERGY/20) {
+			takeDamage(0.05);
 		}
 	}
 	
@@ -98,6 +117,35 @@ public class Animal extends Thing {
 	
 	public AnimalType getType() {
 		return type;
+	}
+	public Animal getPrey() {
+		return prey;
+	}
+	public void setPrey(Animal t) {
+		prey = t;
+	}
+	
+	public void imOnTheHunt(World world) {
+		if(prey != null) {
+			Tile currentTile = getTile();
+			double bestDistance = Integer.MAX_VALUE;
+			Tile bestTile = currentTile;
+			for (Tile tile : Utils.getNeighbors(currentTile, world)) {
+				double distance = tile.getLocation().distanceTo(prey.getTile().getLocation());
+				if (distance < bestDistance) {
+					bestDistance = distance;
+					bestTile = tile;
+				}
+			}
+			this.moveTo(bestTile);
+			if(prey.getTile() == getTile()) {
+				prey.takeDamage(this.getType().getCombatStats().getAttack());
+				eat();
+				if(prey.isDead()) {
+					prey = null;
+				}
+			}
+		}
 	}
 	
 	public double getMoveChance() {

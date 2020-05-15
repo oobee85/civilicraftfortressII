@@ -12,13 +12,15 @@ public class Unit extends Thing{
 	private boolean isSelected;
 	private Tile targetTile;
 	
+	private double timeToMove;
+	
 	public Unit(UnitType unitType, Tile tile) {
 		super(unitType.getHealth(), unitType, tile);
 		this.unitType = unitType;
 	}
 	
 	
-	public void selectUnit(boolean select) {
+	public void setIsSelected(boolean select) {
 		isSelected = select;
 	}
 	public boolean getIsSelected() {
@@ -34,7 +36,25 @@ public class Unit extends Thing{
 		if(!t.equals(getTile()) ) {
 			targetTile = t;
 		}
-		
+	}
+	public void moveTo(Tile t) {
+		double penalty = t.getTerrain().moveSpeed();
+		if(getTile().getHasRoad() && t.getHasRoad()) {
+			penalty = penalty/2;
+		}
+		timeToMove += penalty;
+		getTile().setUnit(null);
+		t.setUnit(this);
+		this.setTile(t);
+	}
+	
+	public void tick() {
+		if(timeToMove > 0) {
+			timeToMove -= 1;
+		}
+	}
+	public boolean readyToMove() {
+		return timeToMove <= 0;
 	}
 	
 	@Override

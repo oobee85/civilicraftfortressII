@@ -28,7 +28,7 @@ public class Game {
 //	public boolean selectedUnit = false;
 	private int money;
 	private Position viewOffset;
-	private Position hoveredTile;
+	private TileLoc hoveredTile;
 	private BuildMode currentMode;
 	private boolean showHeightMap;
 	
@@ -45,7 +45,7 @@ public class Game {
 	public Game(GUIController guiController) {
 		this.guiController = guiController;
 		money = 100;
-		hoveredTile = new Position(-1,-1);
+		hoveredTile = new TileLoc(-1,-1);
 //		hoveredArea = new Area(0,0,0,0);
 		viewOffset = new Position(0, 0);
 		currentMode = BuildMode.NOMODE;
@@ -90,8 +90,10 @@ public class Game {
 			world.grow();
 		}
 		if(ticks%1 == 0) {
-			world[world.volcano].liquidType = LiquidType.LAVA;
-			world[world.volcano].liquidAmount += .1;
+			if(world.volcano != null) {
+				world[world.volcano].liquidType = LiquidType.LAVA;
+				world[world.volcano].liquidAmount += .05;
+			}
 			Liquid.propogate(world);
 			changedTerrain = true;
 		}
@@ -101,7 +103,7 @@ public class Game {
 		world.updateUnitDamage();
 		if(ticks%5 == 0) {
 			updateBuildingAction();
-			
+			changedTerrain = true;
 		}
 		moveUnits();
 		updateBuildingDamage();
@@ -111,15 +113,12 @@ public class Game {
 		if(changedTerrain) {
 			updateTerrainImages();
 		}
-		
-		
-		
 	}
 	
 	public void generateWorld(MapType mapType, int size) {
 		world = new World();
 		world.generateWorld(mapType, size);
-		makeRoad();
+		makeRoads();
 		updateTerrainImages();
 	}
 	
@@ -200,172 +199,173 @@ public class Game {
 
 	
 	public void flipTable() {
-		for(int x = 0; x < world.heightMap.length; x++) {
-			for(int y = 0; y < world.heightMap[0].length; y++) {
-				world.heightMap[x][y] = Math.max(Math.min(1-world.heightMap[x][y], 1), 0);
-			}
+		for(Tile tile : world.getTiles()) {
+			tile.setHeight(1 - tile.getHeight());
 		}
 		updateTerrainImages();
 	}
 	
+	private double computeCost(Tile current, Tile next, Tile target) {
+		double distanceCosts = 1;
+		if(!next.getHasRoad()) {
+			double deltaHeight = 10000 * Math.abs(current.getHeight() - next.getHeight());
+			distanceCosts += next.getTerrain().getRoadCost()
+							+ deltaHeight * deltaHeight
+							+ 1000000*next.liquidAmount*next.liquidType.getDamage();
+		}
+		return distanceCosts;
+	}
+	
+	private class Path {
+		double cost;
+		LinkedList<Tile> tiles = new LinkedList<>();
+		public Path() {
+			cost = 0;
+		}
+		public void addTile(Tile tile, double addedCost) {
+			tiles.add(tile);
+			cost += addedCost;
+		}
+		public Tile getHead() {
+			return tiles.getLast();
+		}
+		public Path clone() {
+			Path p = new Path();
+			for(Tile t : tiles) {
+				p.addTile(t, 0);
+			}
+			p.cost = cost;
+			return p;
+		}
+		public double getCost() {
+			return cost;
+		}
+		public LinkedList<Tile> getTiles() {
+			return tiles;
+		}
+		@Override
+		public String toString() {
+			String s = "";
+			for(Tile t : tiles) {
+				s += t.getLocation() + ", ";
+			}
+			return s;
+		}
+	}
+	
+	private void makeRoadBetween(Tile start, Tile target) {
+		PriorityQueue<Path> search = new PriorityQueue<>((x, y) ->  { 
+			if(y.getCost() < x.getCost()) {
+				return 1;
+			}
+			else if(y.getCost() > x.getCost()) {
+				return -1;
+			}
+			else {
+				return 0;
+			}
+		});
+		
+		Path startingPath = new Path();
+		startingPath.addTile(start, 0);
+		search.add(startingPath);
+		
+		double bestCost = Double.MAX_VALUE;
+		Path selectedPath = null;
+		HashMap<Tile, Double> visited = new HashMap<>();
+		visited.put(startingPath.getHead(), startingPath.getCost());
+		
+		int iterations = 0;
+		while(!search.isEmpty()) {
+			iterations++;
+			Path currentPath = search.remove();
+			Tile currentTile = currentPath.getHead();
+			if(currentTile == target && currentPath.getCost() < bestCost) {
+				selectedPath = currentPath;
+				bestCost = currentPath.getCost();
+				continue;
+			}
+			if(currentPath.getCost() > bestCost) {
+				// if current cost is already more than the best cost
+				continue;
+			}
+			List<Tile> neighbors = Utils.getNeighbors(currentTile, world);
+			for(Tile neighbor : neighbors) {
+				double cost = computeCost(currentTile, neighbor, target);
+				Path p = currentPath.clone();
+				p.addTile(neighbor, cost);
+				if(visited.containsKey(neighbor)) {
+					if(p.getCost() > visited[currentTile]) {
+						// Already visited this tile at a lower cost
+						continue;
+					}
+				}
+				visited.put(neighbor, p.getCost());
+				search.add(p);
+			}
+		}
+		System.out.println("road iterations: " + iterations);
+		
+		for(Tile t : selectedPath.getTiles()) {
+			t.setRoad(true, "asdf");
+		}
+	}
 
-	private void makeRoad() {
+	private void makeRoads() {
 		double highest = -1000;
 		Tile highestTile = null;
 		double lowest = +1000;
 		Tile lowestTile = null;
 		for(Tile tile: world.getTiles()) {
-			if(world.getHeight(tile.getLocation()) > highest) {
+			if(tile.getHeight() > highest) {
 				highestTile = tile;
-				highest = world.getHeight(tile.getLocation());
+				highest = tile.getHeight();
 			}
-			if(world.getHeight(tile.getLocation()) < lowest) {
+			if(tile.getHeight() < lowest) {
 				lowestTile = tile;
-				lowest = world.getHeight(tile.getLocation());
+				lowest = tile.getHeight();
 			}
 		}
+
+		makeRoadBetween(world[new TileLoc(world.getWidth()-1, 0)], world[new TileLoc(0, world.getHeight()-1)]);
+		makeRoadBetween(world[new TileLoc(0, 0)], world[new TileLoc(world.getWidth()-1, world.getHeight()-1)]);
+		makeRoadBetween(highestTile, lowestTile);
+		turnRoads();
 		
-		TileLoc startTile = new TileLoc((int) (Math.random() * world.getWidth()), (int) (Math.random() * world.getHeight()));
-		startTile = highestTile.getLocation();
-		TileLoc targetTile = lowestTile.getLocation();
-		
-		
-		TileLoc current = startTile;
-		TileLoc previous = null;
-		TileLoc previous2 = null;
-		while(true) {
-//			world[current].setRoad(true, "left_down");
-			
-			List<Tile> neighbors = Utils.getNeighbors(world[current], world);
-			TileLoc best = null;
-			double bestValue = Double.MAX_VALUE;
-			for(Tile tile : neighbors) {
-				double delta = world.getHeight(tile.getLocation()) - world.getHeight(current);
-				if(Math.abs(delta) < 0.004) {
-					delta = -Math.abs(delta);
-				}
-				if(delta > 0) {
-					delta = delta * delta * 4000;
-				}
-				else {
-					delta = delta * delta * 2000;
-				}
-				double distance = tile.getLocation().distanceTo(targetTile);
-				double value = delta + distance;
-				if(!tile.getHasRoad() && !tile.getLocation().equals(previous) && !tile.getLocation().equals(previous2) && value < bestValue) {
-					bestValue = value;
-					best = tile.getLocation();
-				}
-			}
-			if(best == null) {
-				break;
-			}
-			current = best;
-			
-			if(previous != null  && previous2 != null) {
-				boolean[] directions = new boolean[4];
-				String s = "";
-				if(previous2.y == previous.y + 1) {
-					directions[2] = true;
-				}
-				if(previous2.x == previous.x + 1) {
-					directions[1] = true;
-				}
-				if(previous2.y == previous.y - 1) {
-					directions[0] = true;
-				}
-				if(previous2.x == previous.x - 1) {
-					directions[3] = true;
-				}
-				if(current.y == previous.y + 1) {
-					directions[2] = true;
-				}
-				if(current.x == previous.x + 1) {
-					directions[1] = true;
-				}
-				if(current.y == previous.y - 1) {
-					directions[0] = true;
-				}
-				if(current.x == previous.x - 1) {
-					directions[3] = true;
-				}
-				for(int direction = 0; direction < directions.length; direction++) {
-					if(directions[direction]) {
-						s += Utils.DIRECTION_STRINGS[direction];
-					}
-				}
-				System.out.println(current + s);
-				world[previous].setRoad(true, s);
-			}
-			if(previous == targetTile) {
-				break;
-			}
-			previous2 = previous;
-			previous = current;
-		}
 		makeCastle();
-		
+	}
+	private void turnRoads() {
+		for(Tile tile : world.getTiles()) {
+			if(!tile.getHasRoad())
+				continue;
+			
+			Set<Direction> directions = new HashSet<>();
+			TileLoc loc = tile.getLocation();
+			List<Tile> neighbors = Utils.getNeighbors(tile, world);
+			for(Tile t : neighbors) {
+				if(!t.getHasRoad())
+					continue;
+				Direction d = Direction.getDirection(loc, t.getLocation());
+				if(d != null)
+					directions.add(d);
+			}
+			String s = "";
+			for(Direction d : Direction.values()) {
+				if(directions.contains(d)) {
+					s += d;
+				}
+			}
+			world[loc].setRoad(true, s);
+		}
 	}
 	private void makeCastle() {
-		
-		for(Tile tile :world.getTiles()) {
-			if(tile.getHasRoad() == true && tile.canBuild() == true && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+		for(Tile tile :world.getTilesRandomly()) {
+			if(tile.getHasRoad() == true && tile.canBuild() == true) {
+				buildUnit(UnitType.WORKER, tile);
 				buildStructure(StructureType.CASTLE, tile);
 				break;
 			}
 		}
-		
-		
-		
-	}
-	
-	private void turnRoads(TileLoc current, TileLoc prev) {
-		if(current.x-1 < 0 || current.x+1 >= world.getWidth()) {
-			return;
-		}
-		if(world[current].canBuild()==true) {
-			
-			// makes turns bot left -> top right
-			TileLoc left = new TileLoc(current.x-1, current.y);
-			if(world[left].canBuild()==true) {
-				if (left.x == prev.x && current.y == prev.y) {
-					world[left].setRoad(true, "left_down");
-					world[current].setRoad(true, "right_up");
-				} else if (left.x == prev.x && current.x + 1 == prev.y) {
-					world[left].setRoad(true, "left_down");
-					world[current].setRoad(true, "right_up");
-				}	
-			}
-			
-
-			// makes turns bot right -> top left
-			TileLoc right = new TileLoc(current.x+1, current.y);
-			if(world[right].canBuild()==true) {
-				if (right.x == prev.x && current.y == prev.y) {
-					world[right].setRoad(true, "right_down");
-					world[current].setRoad(true, "left_up");
-				} else if (right.x == prev.x && current.y + 1 == prev.y) {
-					world[right].setRoad(true, "right_down");
-					world[current].setRoad(true, "left_up");
-				}
-			}
-			
-
-			if (world[current].getHasRoad() == false) {
-				world[current].setRoad(true, "top_down");
-			}
-			
-			
-//			Tile t =  world[current.getIntX()][current.getIntY()];
-//			if(
-////					world[current.getIntX()][current.getIntY()].getHasRoad() == true && 
-//					t.getTerrain().isBridgeable(t.getTerrain()) == true) {
-//				System.out.println("bridging");
-//				world[current.getIntX()][current.getIntY()].setHasBuilding(Buildings.BRIDGE);
-//			}
-
-		}
-
 	}
 	
 	public void draw(Graphics g) {
@@ -385,33 +385,107 @@ public class Game {
 			}
 		}
 		else {
+			double highest = 0;
+			double lowest = 1;
+			if(showHeightMap) {
+				for (int i = lowerX; i < upperX; i++) {
+					for (int j = lowerY; j < upperY; j++) {
+						highest = Math.max(highest, world[new TileLoc(i, j)].getHeight());
+						lowest = Math.min(lowest, world[new TileLoc(i, j)].getHeight());
+					}
+				}
+			}
 			for (int i = lowerX; i < upperX; i++) {
 				for (int j = lowerY; j < upperY; j++) {
 					Tile t = world[new TileLoc(i, j)];
+					int x = t.getLocation().x * Game.tileSize;
+					int y = t.getLocation().y * Game.tileSize;
+					int w = Game.tileSize;
+					int h = Game.tileSize;
 					
 					if(t.getHasStructure() == true) {
 						setTerritory(new TileLoc(i,j));
 					}
-					if(i==hoveredTile.getIntX() && j==hoveredTile.getIntY()) {
-						t.highlight(g);
-					}
-//					if(hoveredArea.contains(i, j)) {
-//						t.highlight(g);
-//					}
 					
 					if(showHeightMap) {
-						t.drawHeightMap(g, world.heightMap[i][j]);
+						t.drawHeightMap(g, (world[new TileLoc(i, j)].getHeight() - lowest) / (highest - lowest));
 					}
 					else {
-						t.setRecentTick(ticks);
-						t.draw(g, currentMode);
+						g.drawImage(t.getTerrain().getImage(Game.tileSize), x, y, w, h, null);
+//						t.drawEntities(g, currentMode);
+						
+						if(t.getHasOre()) {
+							g.drawImage(t.getOre().getImage(Game.tileSize), x, y, w, h, null);
+						}
+						if(t.getIsTerritory()) {
+							g.setColor(Tile.TERRITORY_COLOR);
+							Utils.setTransparency(g, 0.5f);
+							g.fillRect(x, y, w, h); 
+							Utils.setTransparency(g, 1);
+						}
+						if (t.getHasRoad() == true) {
+							g.drawImage(t.getRoadImage(), x, y, w, h, null);
+						}
+						if(t.liquidType != LiquidType.DRY) {
+							double alpha = Utils.getAlphaOfLiquid(t.liquidAmount);
+//							 transparency liquids
+							Utils.setTransparency(g, alpha);
+							g.setColor(t.liquidType.getColor(Game.tileSize));
+							g.fillRect(x, y, w, h);
+							Utils.setTransparency(g, 1);
+							
+							int size = (int) Math.min(Math.max(Game.tileSize*t.liquidAmount / 0.2, 1), Game.tileSize);
+							g.setColor(t.liquidType.getColor(Game.tileSize));
+							g.fillRect(x + Game.tileSize/2 - size/2, y + Game.tileSize/2 - size/2, size, size);
+							g.drawImage(t.liquidType.getImage(Game.tileSize), x + Game.tileSize/2 - size/2, y + Game.tileSize/2 - size/2, size, size, null);
+						}
 					}
-					
 				}
+			}
+			for(Plant p : world.plantsLand) {
+				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				drawHealthBar(g, p);
+			}
+			for(Plant p : world.plantsAquatic) {
+				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				drawHealthBar(g, p);
+			}
+			for(Building b : this.buildings) {
+				g.drawImage(b.getImage(0), b.getTile().getLocation().x * Game.tileSize, b.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				drawHealthBar(g, b);
+			}
+			for(Structure s : this.structures) {
+				g.drawImage(s.getImage(0), s.getTile().getLocation().x * Game.tileSize, s.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				drawHealthBar(g, s);
 			}
 			for(Animal animal : Wildlife.getAnimals()) {
 				g.drawImage(animal.getImage(0), animal.getTile().getLocation().x * Game.tileSize, animal.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
-				animal.getTile().drawHealthBar(g, animal);
+				drawHealthBar(g, animal);
+			}
+			for(Unit unit : world.units) {
+				if(unit.getIsSelected()) {
+					g.setColor(Color.pink);
+					Utils.setTransparency(g, 0.8f);
+					Graphics2D g2d = (Graphics2D)g;
+					Stroke currentStroke = g2d.getStroke();
+					int strokeWidth = Game.tileSize /8;
+					g2d.setStroke(new BasicStroke(strokeWidth));
+					g.drawOval(unit.getTile().getLocation().x * Game.tileSize + strokeWidth/2, unit.getTile().getLocation().y * Game.tileSize + strokeWidth/2, Game.tileSize-1 - strokeWidth, Game.tileSize-1 - strokeWidth);
+					g2d.setStroke(currentStroke);
+					Utils.setTransparency(g, 1f);
+				}
+				g.drawImage(unit.getImage(0), unit.getTile().getLocation().x * Game.tileSize, unit.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				drawHealthBar(g, unit);
+			}
+			if(!showHeightMap) {
+				for (int i = lowerX; i < upperX; i++) {
+					for (int j = lowerY; j < upperY; j++) {
+						double brightness = world.getDaylight() + world[new TileLoc(i, j)].getBrightness();
+						brightness = Math.max(Math.min(brightness, 1), 0);
+						g.setColor(new Color(0, 0, 0, (int)(255 * (1 - brightness))));
+						g.fillRect(i * Game.tileSize, j * Game.tileSize, Game.tileSize, Game.tileSize);
+					}
+				}
 			}
 			if(DEBUG_DRAW) {
 				if(Game.tileSize >= 36) {
@@ -435,7 +509,7 @@ public class Game {
 							}
 							g.fillRect(x, y + 2, stringWidth, numrows*fontsize);
 							g.setColor(Color.green);
-							g.drawString(String.format("H=%." + NUM_DEBUG_DIGITS + "f", world.heightMap[i][j]), x, y + (++rows[i][j])*fontsize);
+							g.drawString(String.format("H=%." + NUM_DEBUG_DIGITS + "f", world[new TileLoc(i, j)].getHeight()), x, y + (++rows[i][j])*fontsize);
 							
 							if(world[loc].liquidType != LiquidType.DRY) {
 								g.drawString(String.format(world[loc].liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount), x, y + (++rows[i][j])*fontsize);
@@ -459,8 +533,40 @@ public class Game {
 					}
 				}
 			}
+			g.setColor(new Color(0, 0, 0, 64));
+			g.drawRect(hoveredTile.x * Game.tileSize, hoveredTile.y * Game.tileSize, Game.tileSize-1, Game.tileSize-1);
+			g.drawRect(hoveredTile.x * Game.tileSize + 1, hoveredTile.y * Game.tileSize + 1, Game.tileSize - 3, Game.tileSize - 3);
 		}
-		
+	}
+
+	public void drawHealthBar(Graphics g, Thing thing) {
+		if( Game.tileSize <= 30) {
+			return;
+		}
+		if(Game.ticks - thing.getTimeLastDamageTaken() < 20 || thing.getTile().getLocation().equals(hoveredTile)) {
+			int x = thing.getTile().getLocation().x * Game.tileSize + 1;
+			int y = thing.getTile().getLocation().y * Game.tileSize + 1;
+			int w = Game.tileSize - 1;
+			int h = Game.tileSize / 4 - 1;
+			int greenBarWidth = (int) (thing.getHealth() / thing.getMaxHealth() * (w - 4));
+			int greenBarHeight = h - 4;
+			if (thing.isSideHealthBar()) {
+				int temp = w;
+				w = h;
+				h = temp;
+				temp = greenBarWidth;
+				greenBarWidth =greenBarHeight;
+				greenBarHeight = temp;
+			}
+			g.setColor(Color.BLACK);
+			g.fillRect(x, y, w, h);
+			
+			g.setColor(Color.RED);
+			g.fillRect(x + 2, y + 2, w - 4, h - 4);
+
+			g.setColor(Color.GREEN);
+			g.fillRect(x + 2, y + 2, greenBarWidth, greenBarHeight);
+		}
 	}
 	private void updateTerritory() {
 		for(Structure structure : structures) {
@@ -510,7 +616,7 @@ public class Game {
 	public void mouseOver(int mx, int my) {
 		Position tile = getTileAtPixel(new Position(mx, my));
 //		System.out.println("Mouse is on tile " + tile);
-		hoveredTile = tile;
+		hoveredTile = new TileLoc(tile.getIntX(), tile.getIntY());
 	}
 	
 	public void mouseClick(int mx, int my) {
@@ -549,34 +655,31 @@ public class Game {
 			}
 		}
 		if(currentMode == BuildMode.NOMODE && tile.getHasUnit() == true) {
-			if(selectedUnit != null && !selectedUnit.equals(tile.getUnit()) ) {
-				selectedUnit.selectUnit(false);
-				selectedUnit = tile.getUnit();
-				selectedUnit.selectUnit(true);
-			}else
-			if(tile.getUnit().getIsSelected() == false) {
-				selectedUnit = tile.getUnit();
-				selectedUnit.selectUnit(true);
-//				tile.getUnit().selectUnit(true);
-			}else {
-				deselectUnit();
-			}
-			
-			
+			toggleUnitSelectOnTile(tile);
 		}
 		if(currentMode == BuildMode.NOMODE) {
 			setDestination(mx, my);
 		}
-		
-		
+	}
+	public void toggleUnitSelectOnTile(Tile tile) {
+		if(selectedUnit == tile.getUnit()) {
+			deselectUnit();
+			guiController.toggleWorkerView();
+			return;
+		}
+		else if(selectedUnit != null) {
+			deselectUnit();
+		}
+		selectedUnit = tile.getUnit();
+		selectedUnit.setIsSelected(true);
+		guiController.toggleWorkerView();
 	}
 	public void deselectUnit() {
 		System.out.println("deselecting unit");
 		if(selectedUnit != null) {
-			selectedUnit.selectUnit(false);
+			selectedUnit.setIsSelected(false);
 			selectedUnit = null;
 		}
-		
 	}
 	
 	public void setDestination(int mx, int my) {
@@ -594,39 +697,33 @@ public class Game {
 	private void moveUnits() {
 		
 		for(Unit unit : world.units) {
+			unit.tick();
 			if(unit.getTargetTile() == null) {
 				continue;
 			}
-			Tile currentTile = unit.getTile();
-			double bestDistance = Integer.MAX_VALUE;
-			Tile bestTile = currentTile;
-			
-			for(Tile tile : Utils.getNeighbors(currentTile, world)) {
+			if(unit.readyToMove()) {
+				Tile currentTile = unit.getTile();
+				double bestDistance = Integer.MAX_VALUE;
+				Tile bestTile = currentTile;
 				
+				for(Tile tile : Utils.getNeighbors(currentTile, world)) {
+					if(tile.getHasUnit()) {
+						continue;
+					}
 					double distance = tile.getLocation().distanceTo(unit.getTargetTile().getLocation() );
 					if(distance < bestDistance) {
 						bestDistance = distance;
 						bestTile = tile;
 					}
-				
+					
+				}
+				unit.moveTo(bestTile);
 			}
-			bestTile.setUnit(unit);
-			unit.setTile(bestTile);
-			
-			currentTile.setUnit(null);
-			
 		}
-		
-		
-		
-		
-		
-		
-		
 	}
 	
 	private void buildBuilding(BuildingType bt, Tile tile) {
-		if(tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+		if(tile.getHasUnit() && tile.getUnit().getUnitType() == UnitType.WORKER) {
 			Building building = new Building(bt, tile);
 			tile.setBuilding(building);
 			buildings.add(building);
@@ -634,15 +731,14 @@ public class Game {
 		
 	}
 	private void buildStructure(StructureType st, Tile tile) {
-		if(tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+		if(tile.getHasUnit() && tile.getUnit().getUnitType() == UnitType.WORKER) {
 			Structure structure = new Structure(st, tile);
 			tile.setStructure(structure);
 			structures.add(structure);
 		}
 		
 	}
-	public void buildUnit(UnitType u) {
-		Tile tile = structures.get(0).getTile();
+	public void buildUnit(UnitType u, Tile tile) {
 		Unit unit = new Unit(u , tile);
 		tile.setUnit(unit);
 		world.units.add(unit);
@@ -661,6 +757,9 @@ public class Game {
 	}
 	public void exitTile() {
 		guiController.toggleTileView();
+	}
+	public void exitWorkerView() {
+		guiController.toggleWorkerView();
 	}
 	
 	public void zoomView(int scroll, int mx, int my) {
@@ -741,29 +840,17 @@ public class Game {
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
 		Toolkit.getDefaultToolkit().sync();
 	}
+	
 	public Color getBackgroundColor() {
-		int currentDayOffset = ticks%(World.DAY_DURATION + World.NIGHT_DURATION);
-		double ratio = 1;
-		if(currentDayOffset < World.TRANSITION_PERIOD) {
-			ratio = 0.5 + 0.5*currentDayOffset/World.TRANSITION_PERIOD;
-		}
-		else if(currentDayOffset < World.DAY_DURATION - World.TRANSITION_PERIOD) {
-			ratio = 1;
-		}
-		else if(currentDayOffset < World.DAY_DURATION + World.TRANSITION_PERIOD) {
-			ratio = 0.5 - 0.5*(currentDayOffset - World.DAY_DURATION)/World.TRANSITION_PERIOD;
-		}
-		else if(currentDayOffset < World.DAY_DURATION + World.NIGHT_DURATION - World.TRANSITION_PERIOD) {
-			ratio = 0;
-		}
-		else {
-			ratio = 0.5 - 0.5*(World.DAY_DURATION + World.NIGHT_DURATION - currentDayOffset)/World.TRANSITION_PERIOD;
-		}
+		double ratio = world.getDaylight();
 		int c = (int)(ratio * 255);
 		return new Color(c, c, c);
 	}
 	
 	public void setShowHeightMap(boolean show) {
 		this.showHeightMap = show;
+	}
+	public UnitType getSelectedUnit() {
+		return selectedUnit.getUnitType();
 	}
 }
