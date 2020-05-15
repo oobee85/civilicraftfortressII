@@ -11,6 +11,7 @@ public class Animal extends Thing {
 	public static final int MAX_ENERGY = 100;
 	private AnimalType type;
 	
+	private Tile targetTile;
 	private double energy;
 	private double drive;
 	
@@ -57,6 +58,16 @@ public class Animal extends Thing {
 		return damage;
 	}
 	
+	public void moveTo(Tile t) {
+		double penalty = t.getTerrain().moveSpeed();
+		if(!this.getType().isFlying() && getTile().getHasRoad() && t.getHasRoad()) {
+			penalty = penalty/2;
+		}
+		getTile().setUnit(null);
+		t.setAnimal(this);
+		this.setTile(t);
+	}
+	
 	public double computeDanger(Tile tile, double height) {
 		double danger = 0;
 		danger += computeTileDamage(tile, height);
@@ -98,6 +109,14 @@ public class Animal extends Thing {
 	
 	public AnimalType getType() {
 		return type;
+	}
+	public Tile getTargetTile() {
+		return targetTile;
+	}
+	public void setTargetTile(Tile t) {
+		if(!t.equals(getTile()) ) {
+			targetTile = t;
+		}
 	}
 	
 	public double getMoveChance() {

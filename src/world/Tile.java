@@ -118,7 +118,9 @@ public class Tile {
 	}
 	public void setUnit(Unit u) {
 		unit = u;
-		
+	}
+	public void setAnimal(Animal a) {
+		animal = a;
 	}
 
 	public void draw(Graphics g, BuildMode bm) {
@@ -391,11 +393,17 @@ public class Tile {
 	public boolean getHasBuilding() {
 		return building != null;
 	}
+	public boolean getHasAnimal() {
+		return animal != null;
+	}
 	public Ore getOre() {
 		return ore;
 	}
 	public Unit getUnit() {
 		return unit;
+	}
+	public Animal getAnimal() {
+		return animal;
 	}
 	public Structure getStructure() {
 		return structure;

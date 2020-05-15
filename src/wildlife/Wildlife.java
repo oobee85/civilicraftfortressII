@@ -39,6 +39,8 @@ public class Wildlife {
 			}
 		}
 	}
+
+	
 	
 	public static void tick(World world) {
 		ConcurrentLinkedQueue<Animal> newAnimals = new ConcurrentLinkedQueue<>();
@@ -70,9 +72,9 @@ public class Wildlife {
 				if(animal.getType().isHostile() == true) {
 					int pickAnimal = (int) (animals.size()*Math.random());
 					Animal iveGotYouInMySights = animals.peek();
-					
+					animal.setTargetTile(iveGotYouInMySights.getTile());
 //					System.out.println(pickAnimal + ", " +animals.size());
-					
+					moveToLocation(animal, world);
 				}
 			}
 			
@@ -96,9 +98,11 @@ public class Wildlife {
 					double heightIncrease = best.getHeight() - animal.getTile().getHeight();
 					animal.climb(heightIncrease);
 					animal.setTile(best);
-					
 				}
+				
+				
 			}
+			
 			else if(animal.wantsToReproduce()) {
 				if(trying.containsKey(animal.getTile())) {
 					Animal other = trying.remove(animal.getTile());
@@ -116,6 +120,27 @@ public class Wildlife {
 		}
 		
 		animals = newAnimals;
+	}
+	
+	private static void moveToLocation(Animal animal, World world) {
+		Tile currentTile = animal.getTile();
+		double bestDistance = Integer.MAX_VALUE;
+		Tile bestTile = currentTile;
+
+		for (Tile tile : Utils.getNeighbors(currentTile, world)) {
+			if (tile.getHasUnit() || tile.getHasAnimal()) {
+				tile.getAnimal().takeDamage(animal.getType().getCombatStats().getAttack());
+//				tile.setAnimal(null);
+				continue;
+			}
+			double distance = tile.getLocation().distanceTo(animal.getTargetTile().getLocation());
+			if (distance < bestDistance) {
+				bestDistance = distance;
+				bestTile = tile;
+			}
+
+		}
+		animal.moveTo(bestTile);
 	}
 	
 	public static ConcurrentLinkedQueue<Animal> getAnimals() {
