@@ -11,7 +11,7 @@ public class Animal extends Thing {
 	public static final int MAX_ENERGY = 100;
 	private AnimalType type;
 	
-	private Tile targetTile;
+	private Animal prey;
 	private double energy;
 	private double drive;
 	
@@ -37,14 +37,19 @@ public class Animal extends Thing {
 	
 	public double computeTileDamage(Tile tile, double height) {
 		double damage = 0;
-		if(getType().isAquatic()) {
-			if(tile.liquidAmount < LiquidType.DRY.getMinimumDamageAmount()) {
-				damage += (LiquidType.DRY.getMinimumDamageAmount() - tile.liquidAmount) * LiquidType.DRY.getDamage();
-			}
+		if(getType().isFlying()) {
+			
 		}
 		else {
-			if(getTile().liquidAmount > getTile().liquidType.getMinimumDamageAmount()) {
-				damage += tile.liquidAmount * tile.liquidType.getDamage();
+			if(getType().isAquatic()) {
+				if(tile.liquidAmount < LiquidType.DRY.getMinimumDamageAmount()) {
+					damage += (LiquidType.DRY.getMinimumDamageAmount() - tile.liquidAmount) * LiquidType.DRY.getDamage();
+				}
+			}
+			else {
+				if(getTile().liquidAmount > getTile().liquidType.getMinimumDamageAmount()) {
+					damage += tile.liquidAmount * tile.liquidType.getDamage();
+				}
 			}
 		}
 		if(tile.checkTerrain(Terrain.SNOW)) {
@@ -60,7 +65,10 @@ public class Animal extends Thing {
 	
 	public void moveTo(Tile t) {
 		double penalty = t.getTerrain().moveSpeed();
-		if(!this.getType().isFlying() && getTile().getHasRoad() && t.getHasRoad()) {
+		if(this.getType().isFlying()) {
+			penalty = 0;
+		}
+		if(getTile().getHasRoad() && t.getHasRoad()) {
 			penalty = penalty/2;
 		}
 		getTile().setUnit(null);
@@ -110,12 +118,33 @@ public class Animal extends Thing {
 	public AnimalType getType() {
 		return type;
 	}
-	public Tile getTargetTile() {
-		return targetTile;
+	public Animal getPrey() {
+		return prey;
 	}
-	public void setTargetTile(Tile t) {
-		if(!t.equals(getTile()) ) {
-			targetTile = t;
+	public void setPrey(Animal t) {
+		prey = t;
+	}
+	
+	public void imOnTheHunt(World world) {
+		if(prey != null) {
+			Tile currentTile = getTile();
+			double bestDistance = Integer.MAX_VALUE;
+			Tile bestTile = currentTile;
+			for (Tile tile : Utils.getNeighbors(currentTile, world)) {
+				double distance = tile.getLocation().distanceTo(prey.getTile().getLocation());
+				if (distance < bestDistance) {
+					bestDistance = distance;
+					bestTile = tile;
+				}
+			}
+			this.moveTo(bestTile);
+			if(prey.getTile() == getTile()) {
+				prey.takeDamage(this.getType().getCombatStats().getAttack());
+				eat();
+				if(prey.isDead()) {
+					prey = null;
+				}
+			}
 		}
 	}
 	
