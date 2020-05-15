@@ -362,7 +362,10 @@ public class Game {
 		for(Tile tile :world.getTilesRandomly()) {
 			if(tile.getHasRoad() == true && tile.canBuild() == true) {
 				buildUnit(UnitType.WORKER, tile);
-				buildStructure(StructureType.CASTLE, tile);
+				Structure s = new Structure(StructureType.CASTLE, tile);
+				tile.setStructure(s);
+				structures.add(s);
+				
 				break;
 			}
 		}
@@ -624,36 +627,6 @@ public class Game {
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
 		System.out.println(currentMode);
 		Tile tile = world[loc];
-		
-		if(currentMode == BuildMode.ROAD) {
-			if(tile.canBuild() == true) {
-				tile.setRoad(true, null);
-			}
-		}
-			
-		if(currentMode == BuildMode.BARRACKS) {
-			if(tile.canBuild() == true) {
-				buildStructure(StructureType.BARRACKS, tile);
-			}
-		} 
-		
-		if(currentMode == BuildMode.WALL) {
-			if(tile.canBuild() == true) {
-				buildBuilding(BuildingType.WALL_STONE, tile);
-			}
-		}
-		
-		if(currentMode == BuildMode.MINE) {
-			if(tile.canBuild() == true || tile.getHasOre() == true) {
-				buildBuilding(BuildingType.MINE, tile);
-			}
-		}
-		
-		if(currentMode == BuildMode.IRRIGATE) {
-			if(tile.canBuild() == true && tile.canPlant() == true) {
-				buildBuilding(BuildingType.IRRIGATION, tile);
-			}
-		}
 		if(currentMode == BuildMode.NOMODE && tile.getHasUnit() == true) {
 			toggleUnitSelectOnTile(tile);
 		}
@@ -722,18 +695,26 @@ public class Game {
 		}
 	}
 	
-	private void buildBuilding(BuildingType bt, Tile tile) {
-		if(tile.getHasUnit() && tile.getUnit().getUnitType() == UnitType.WORKER) {
-			Building building = new Building(bt, tile);
-			tile.setBuilding(building);
+	public void buildBuilding(BuildingType bt) {
+		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
+			Building building = new Building(bt, selectedUnit.getTile());
+			selectedUnit.getTile().setBuilding(building);
 			buildings.add(building);
 		}
 		
 	}
-	private void buildStructure(StructureType st, Tile tile) {
-		if(tile.getHasUnit() && tile.getUnit().getUnitType() == UnitType.WORKER) {
-			Structure structure = new Structure(st, tile);
-			tile.setStructure(structure);
+//	public void buildRoad() {
+//		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
+//			Building building = new Building(bt, selectedUnit.getTile());
+//			selectedUnit.getTile().setBuilding(building);
+//			buildings.add(building);
+//		}
+//		
+//	}
+	public void buildStructure(StructureType st) {
+		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
+			Structure structure = new Structure(st, selectedUnit.getTile());
+			selectedUnit.getTile().setStructure(structure);
 			structures.add(structure);
 		}
 		
@@ -798,14 +779,6 @@ public class Game {
 	}
 	public int getResourceAmount(ResourceType resourceType) {
 		return resources.get(resourceType).getAmount();
-	}
-	public void setBuildMode(BuildMode b) {
-		if(currentMode == b) {
-			currentMode = BuildMode.NOMODE;
-		}else {
-			currentMode = b;
-		}
-		
 	}
 	public int getTileSize() {
 		return tileSize;

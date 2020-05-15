@@ -219,33 +219,33 @@ public class Frame extends JPanel{
 		makeRoad.setMargin(zeroMargin);
 		makeRoad.setPreferredSize(BUILDING_BUTTON_SIZE);
 		makeRoad.addActionListener(e -> {
-			gameInstance.setBuildMode(BuildMode.ROAD);
+//			gameInstance.setBuildMode(BuildMode.ROAD);
 		});
 		JButton makeWall = new JButton("Make Wall", Utils.resizeImageIcon(BuildingType.WALL_STONE.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		makeWall.setMargin(zeroMargin);
 		makeWall.setPreferredSize(BUILDING_BUTTON_SIZE);
 		makeWall.addActionListener(e -> {
-			gameInstance.setBuildMode(BuildMode.WALL);
+			gameInstance.buildBuilding(BuildingType.WALL_STONE);
 		});
 		
 		JButton buildMine = new JButton("Build Mine", Utils.resizeImageIcon(BuildingType.MINE.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildMine.setMargin(zeroMargin);
 		buildMine.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildMine.addActionListener(e -> {
-			gameInstance.setBuildMode(BuildMode.MINE);
+			gameInstance.buildBuilding(BuildingType.MINE);
 		});
 		
 		JButton buildBarracks = new JButton("Build Barracks", Utils.resizeImageIcon(StructureType.BARRACKS.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildBarracks.setMargin(zeroMargin);
 		buildBarracks.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildBarracks.addActionListener(e -> {
-			gameInstance.setBuildMode(BuildMode.BARRACKS);
+			gameInstance.buildStructure(StructureType.BARRACKS);
 		});
 		JButton buildIrrigation = new JButton("Irrigate", Utils.resizeImageIcon(BuildingType.IRRIGATION.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildIrrigation.setMargin(zeroMargin);
 		buildIrrigation.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildIrrigation.addActionListener(e -> {
-			gameInstance.setBuildMode(BuildMode.IRRIGATE);
+			gameInstance.buildBuilding(BuildingType.IRRIGATION);
 		});
 		JButton buildWorker = new JButton("Build Worker", Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildWorker.setMargin(zeroMargin);
@@ -363,11 +363,7 @@ public class Frame extends JPanel{
 		}
 		gui.add(money);
 		gui.add(tSize);
-		gui.add(makeRoad);
-		gui.add(makeWall);
-		gui.add(buildMine);
-		gui.add(buildBarracks);
-		gui.add(buildIrrigation);
+		
 		gui.add(showHeightMap);
 		gui.add(flipTable);
 		gui.add(makeItRain);
@@ -377,11 +373,14 @@ public class Frame extends JPanel{
 		
 		makeItRain.setFocusable(false);
 		flipTable.setFocusable(false);
+		makeItDry.setFocusable(false);
+		
 		debug.setFocusable(false);
 		exit.setFocusable(false);
 		buildWorker.setFocusable(false);
 		buildWarrior.setFocusable(false);
 		buildSpearman.setFocusable(false);
+	
 		
 		JPanel guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());
@@ -429,10 +428,21 @@ public class Frame extends JPanel{
 		workerView.setOpaque(false);
 		workerView.setLayout(null);
 		
-		JButton test = new JButton("Asdf");
-		test.setOpaque(false);
-		test.setBounds(400, frame.getHeight()-150, 100, 50);
-		workerView.add(test);
+		makeRoad.setOpaque(false);
+		makeRoad.setBounds(400, frame.getHeight()-150, 100, 50);
+		makeWall.setOpaque(false);
+		makeWall.setBounds(500, frame.getHeight()-150, 100, 50);
+		buildMine.setOpaque(false);
+		buildMine.setBounds(600, frame.getHeight()-150, 100, 50);
+		buildBarracks.setOpaque(false);
+		buildBarracks.setBounds(200, frame.getHeight()-150, 100, 50);
+		buildIrrigation.setOpaque(false);
+		buildIrrigation.setBounds(300, frame.getHeight()-150, 100, 50);
+		workerView.add(makeRoad);
+		workerView.add(makeWall);
+		workerView.add(buildMine);
+		workerView.add(buildBarracks);
+		workerView.add(buildIrrigation);
 		
 		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
 		frame.getContentPane().add(guiSplitter,BorderLayout.EAST);
@@ -553,7 +563,6 @@ public class Frame extends JPanel{
 				
 				//esc removes buildmode
 				if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {
-					gameInstance.setBuildMode(BuildMode.NOMODE);
 					gameInstance.deselectUnit();
 				}
 				
