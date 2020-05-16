@@ -608,7 +608,8 @@ public class Game {
 	public void rightClick(int mx, int my) {
 		Position tilepos = getTileAtPixel(new Position(mx,my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
-
+		
+		guiController.openRightClickMenu(mx, my, world[loc]);
 		
 	}
 	
