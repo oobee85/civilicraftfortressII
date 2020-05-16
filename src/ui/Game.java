@@ -334,28 +334,37 @@ public class Game {
 		
 		makeCastle();
 	}
+	private void turnRoad(Tile tile) {
+		if(tile.getRoadType() == null) {
+			return;
+		}
+		Set<Direction> directions = new HashSet<>();
+		TileLoc loc = tile.getLocation();
+		List<Tile> neighbors = Utils.getNeighbors(tile, world);
+		for(Tile t : neighbors) {
+			if(t.getRoadType() == null)
+				continue;
+			Direction d = Direction.getDirection(loc, t.getLocation());
+			if(d != null)
+				directions.add(d);
+		}
+		String s = "";
+		for(Direction d : Direction.values()) {
+			if(directions.contains(d)) {
+				s += d;
+			}
+		}
+		if(s.equals("")) {
+			for(Direction d : Direction.values()) {
+				s += d;
+			}
+		}
+		world[loc].setRoad(RoadType.ROAD_STONE, s);
+	}
 	private void turnRoads() {
 		for(Tile tile : world.getTiles()) {
-			if(tile.getRoadType() == null)
-				continue;
-			
-			Set<Direction> directions = new HashSet<>();
-			TileLoc loc = tile.getLocation();
-			List<Tile> neighbors = Utils.getNeighbors(tile, world);
-			for(Tile t : neighbors) {
-				if(t.getRoadType() == null)
-					continue;
-				Direction d = Direction.getDirection(loc, t.getLocation());
-				if(d != null)
-					directions.add(d);
-			}
-			String s = "";
-			for(Direction d : Direction.values()) {
-				if(directions.contains(d)) {
-					s += d;
-				}
-			}
-			world[loc].setRoad(RoadType.ROAD_STONE, s);
+			if(tile.getRoadType() != null)
+				turnRoad(tile);
 		}
 	}
 	private void makeCastle() {
@@ -722,9 +731,10 @@ public class Game {
 	}
 	public void buildRoad(RoadType rt) {
 		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
-			String s = "";
-			s += Direction.NORTH;
-			selectedUnit.getTile().setRoad(rt, s);
+			selectedUnit.getTile().setRoad(rt, Direction.NORTH.toString());
+			for(Tile tile : Utils.getNeighborsIncludingCurrent(selectedUnit.getTile(), world)) {
+				turnRoad(tile);
+			}
 		}
 		
 	}

@@ -460,21 +460,27 @@ public class Frame extends JPanel{
 		workerView.setOpaque(false);
 		workerView.setLayout(null);
 		
-		makeRoad.setOpaque(false);
-		makeRoad.setBounds(400, frame.getHeight()-150, 50, 50);
-		makeWall.setOpaque(false);
-		makeWall.setBounds(450, frame.getHeight()-150, 50, 50);
-		buildMine.setOpaque(false);
-		buildMine.setBounds(500, frame.getHeight()-150, 50, 50);
-		buildBarracks.setOpaque(false);
-		buildBarracks.setBounds(300, frame.getHeight()-150, 50, 50);
-		buildIrrigation.setOpaque(false);
-		buildIrrigation.setBounds(350, frame.getHeight()-150, 50, 50);
 		workerView.add(makeRoad);
 		workerView.add(makeWall);
 		workerView.add(buildMine);
 		workerView.add(buildBarracks);
 		workerView.add(buildIrrigation);
+		
+		makeRoad.setOpaque(false);
+		makeRoad.setBounds(400, frame.getHeight()-150, 50, 50);
+		makeRoad.setContentAreaFilled(false);
+		makeWall.setOpaque(false);
+		makeWall.setBounds(450, frame.getHeight()-150, 50, 50);
+		makeWall.setContentAreaFilled(false);
+		buildMine.setOpaque(false);
+		buildMine.setBounds(500, frame.getHeight()-150, 50, 50);
+		buildMine.setContentAreaFilled(false);
+		buildBarracks.setOpaque(false);
+		buildBarracks.setContentAreaFilled(false);
+		buildBarracks.setBounds(300, frame.getHeight()-150, 50, 50);
+		buildIrrigation.setOpaque(false);
+		buildIrrigation.setBounds(350, frame.getHeight()-150, 50, 50);
+		buildIrrigation.setContentAreaFilled(false);
 		
 		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
 		frame.getContentPane().add(guiSplitter,BorderLayout.EAST);
