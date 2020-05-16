@@ -79,6 +79,22 @@ public class Frame extends JPanel{
 				}
 				frame.repaint();
 			}
+			@Override
+			public void openRightClickMenu(int mx, int my, Tile tile) {
+				System.out.println("trying to open right click menu");
+				JPopupMenu popup = new JPopupMenu();
+				popup.add(new JLabel(tile.getTerrain().toString()));
+				if(tile.getPlant() != null) {
+					popup.add(new JLabel(tile.getPlant().getImageIcon(0)));
+				}
+				if(tile.getHasAnimal()) {
+					popup.add(new JLabel(tile.getAnimal().getImageIcon(0)));
+				}
+				if(tile.getHasUnit()) {
+					popup.add(new JLabel(tile.getUnit().getImageIcon(0)));
+				}
+				popup.show(frame,  mx, my);
+			}
 		});
 			
 		
@@ -123,16 +139,16 @@ public class Frame extends JPanel{
 		panel.add(mapSize);
 		
 		
-		JButton exit = new JButton("exit");
-		exit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				exitGame();
-			}
-		});
-
-		exit.setPreferredSize(new Dimension(100,50));
-		panel.add(exit);
+//		JButton exit = new JButton("exit");
+//		exit.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				exitGame();
+//			}
+//		});
+//
+//		exit.setPreferredSize(new Dimension(100,50));
+//		panel.add(exit);
 		
 		panel.setBackground(Color.WHITE);
 		panel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -460,21 +476,27 @@ public class Frame extends JPanel{
 		workerView.setOpaque(false);
 		workerView.setLayout(null);
 		
-		makeRoad.setOpaque(false);
-		makeRoad.setBounds(400, frame.getHeight()-150, 50, 50);
-		makeWall.setOpaque(false);
-		makeWall.setBounds(450, frame.getHeight()-150, 50, 50);
-		buildMine.setOpaque(false);
-		buildMine.setBounds(500, frame.getHeight()-150, 50, 50);
-		buildBarracks.setOpaque(false);
-		buildBarracks.setBounds(300, frame.getHeight()-150, 50, 50);
-		buildIrrigation.setOpaque(false);
-		buildIrrigation.setBounds(350, frame.getHeight()-150, 50, 50);
 		workerView.add(makeRoad);
 		workerView.add(makeWall);
 		workerView.add(buildMine);
 		workerView.add(buildBarracks);
 		workerView.add(buildIrrigation);
+		
+		makeRoad.setOpaque(false);
+		makeRoad.setBounds(400, frame.getHeight()-150, 50, 50);
+		makeRoad.setContentAreaFilled(false);
+		makeWall.setOpaque(false);
+		makeWall.setBounds(450, frame.getHeight()-150, 50, 50);
+		makeWall.setContentAreaFilled(false);
+		buildMine.setOpaque(false);
+		buildMine.setBounds(500, frame.getHeight()-150, 50, 50);
+		buildMine.setContentAreaFilled(false);
+		buildBarracks.setOpaque(false);
+		buildBarracks.setContentAreaFilled(false);
+		buildBarracks.setBounds(300, frame.getHeight()-150, 50, 50);
+		buildIrrigation.setOpaque(false);
+		buildIrrigation.setBounds(350, frame.getHeight()-150, 50, 50);
+		buildIrrigation.setContentAreaFilled(false);
 		
 		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
 		frame.getContentPane().add(guiSplitter,BorderLayout.EAST);
@@ -540,7 +562,7 @@ public class Frame extends JPanel{
 					gameInstance.mouseClick(mx, my);
 					
 				}
-				if(e.getButton() == MouseEvent.BUTTON2 && dragged == false) {
+				if(e.getButton() == MouseEvent.BUTTON3 && dragged == false) {
 					
 					gameInstance.rightClick(mx, my);
 				}
