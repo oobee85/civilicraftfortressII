@@ -86,7 +86,7 @@ public class World {
 			if(tile.getPlant() != null)
 				continue;
 			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				if(Math.random() < 0.001) {
+				if(Math.random() < 0.01) {
 					Plant plant = new Plant(PlantType.CATTAIL, tile);
 					tile.setHasPlant(plant);
 					newAquatic.add(plant);

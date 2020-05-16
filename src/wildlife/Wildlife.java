@@ -19,28 +19,35 @@ public class Wildlife {
 		for(int x = 0; x < world.getWidth(); x++) {
 			for(int y = 0; y < world.getHeight(); y++) {
 				TileLoc loc = new TileLoc(x, y);
-				if(Math.random() < 0.04) {
-					if(world[loc].checkTerrain(Terrain.GRASS) || world[loc].checkTerrain(Terrain.DIRT) || world[loc].checkTerrain(Terrain.SNOW)) {
-						Animal animal = new Animal(AnimalType.DEER);
-						animal.setTile(world[loc]);
-						animals.add(animal);
+				
+				if(Math.random() < 0.01) {
+					if(world[loc].checkTerrain(Terrain.GRASS) || world[loc].checkTerrain(Terrain.DIRT)) {
+						makeAnimal(AnimalType.DEER, world, loc);
 					}
+					
 					if(world[loc].liquidAmount > world[loc].liquidType.getMinimumDamageAmount()) {
-						Animal animal = new Animal(AnimalType.FISH);
-						animal.setTile(world[loc]);
-						animals.add(animal);
+						makeAnimal(AnimalType.FISH, world, loc);
 					}
 				}
 				
+				if(Math.random() < 0.01) {
+					if(world[loc].checkTerrain(Terrain.GRASS)) {
+						makeAnimal(AnimalType.HORSE, world, loc);
+					}
+				}
+				
+				
 				if(world[loc].getTerrain() == Terrain.VOLCANO && Math.random() < 0.01) {
-					Animal animal = new Animal(AnimalType.DRAGON);
-					animal.setTile(world[loc]);
-					animals.add(animal);
+					makeAnimal(AnimalType.DRAGON, world, loc);
 				}
 			}
 		}
 	}
-
+	private static void makeAnimal(AnimalType animalType, World world, TileLoc loc) {
+		Animal animal = new Animal(animalType);
+		animal.setTile(world[loc]);
+		animals.add(animal);
+	}
 	
 	
 	public static void tick(World world) {
