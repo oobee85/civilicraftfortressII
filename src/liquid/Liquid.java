@@ -78,7 +78,7 @@ public class Liquid {
 					}
 				}
 			}
-			if(tile.checkTerrain(Terrain.DIRT)) {
+			if(tile.checkTerrain(Terrain.DIRT) || tile.checkTerrain(Terrain.BURNEDGROUND)) {
 				boolean adjacentGrass = false;
 				boolean adjacentWater = false;
 				for(Tile neighbor : Utils.getNeighbors(tile, world)) {
