@@ -13,7 +13,6 @@ import wildlife.Animal;
 
 public class Tile {
 	public static final Color TERRITORY_COLOR = Color.pink;
-	private boolean hasRoad;
 	private boolean isTerritory = false;
 	private boolean isSelected = false;
 	
@@ -24,6 +23,7 @@ public class Tile {
 	private String roadCorner;
 	
 	private ResourceType resourceType;
+	private RoadType roadType;
 	private Plant plant;
 	private Terrain terr;
 	private Structure structure;
@@ -47,12 +47,11 @@ public class Tile {
 		return new Tile(location, t);
 	}
 	
-	public void setRoad(boolean b, String s) {
-		this.hasRoad = b;
+	public void setRoad(RoadType r, String s) {
+		this.roadType = r;
 		if(s != null) {
 			roadCorner = s;
 		}
-		
 	}
 	public void setTerritory(boolean b) {
 		this.isTerritory = b;
@@ -142,8 +141,8 @@ public class Tile {
 	public boolean getHasUnit() {
 		return unit != null;
 	}
-	public boolean getHasRoad() {
-		return hasRoad;
+	public RoadType getRoadType() {
+		return roadType;
 	}
 	public Image getRoadImage() {
 		return Utils.roadImages.get(roadCorner);

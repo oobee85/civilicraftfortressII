@@ -207,7 +207,7 @@ public class Game {
 	
 	private double computeCost(Tile current, Tile next, Tile target) {
 		double distanceCosts = 1;
-		if(!next.getHasRoad()) {
+		if(next.getRoadType() == null) {
 			double deltaHeight = 10000 * Math.abs(current.getHeight() - next.getHeight());
 			distanceCosts += next.getTerrain().getRoadCost()
 							+ deltaHeight * deltaHeight
@@ -307,7 +307,7 @@ public class Game {
 		System.out.println("road iterations: " + iterations);
 		
 		for(Tile t : selectedPath.getTiles()) {
-			t.setRoad(true, "asdf");
+			t.setRoad(RoadType.ROAD_STONE, "asdf");
 		}
 	}
 
@@ -336,14 +336,14 @@ public class Game {
 	}
 	private void turnRoads() {
 		for(Tile tile : world.getTiles()) {
-			if(!tile.getHasRoad())
+			if(tile.getRoadType() == null)
 				continue;
 			
 			Set<Direction> directions = new HashSet<>();
 			TileLoc loc = tile.getLocation();
 			List<Tile> neighbors = Utils.getNeighbors(tile, world);
 			for(Tile t : neighbors) {
-				if(!t.getHasRoad())
+				if(t.getRoadType() == null)
 					continue;
 				Direction d = Direction.getDirection(loc, t.getLocation());
 				if(d != null)
@@ -355,12 +355,12 @@ public class Game {
 					s += d;
 				}
 			}
-			world[loc].setRoad(true, s);
+			world[loc].setRoad(RoadType.ROAD_STONE, s);
 		}
 	}
 	private void makeCastle() {
 		for(Tile tile :world.getTilesRandomly()) {
-			if(tile.getHasRoad() == true && tile.canBuild() == true) {
+			if(tile.getRoadType() != null && tile.canBuild() == true && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 				buildUnit(UnitType.WORKER, tile);
 				Structure s = new Structure(StructureType.CASTLE, tile);
 				tile.setStructure(s);
@@ -426,7 +426,7 @@ public class Game {
 							g.fillRect(x, y, w, h); 
 							Utils.setTransparency(g, 1);
 						}
-						if (t.getHasRoad() == true) {
+						if (t.getRoadType() != null) {
 							g.drawImage(t.getRoadImage(), x, y, w, h, null);
 						}
 						if(t.liquidType != LiquidType.DRY) {
@@ -704,9 +704,16 @@ public class Game {
 	
 	public void buildBuilding(BuildingType bt) {
 		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
-			Building building = new Building(bt, selectedUnit.getTile());
-			selectedUnit.getTile().setBuilding(building);
-			buildings.add(building);
+			if(selectedUnit.getTile().getHasBuilding() == false && selectedUnit.getTile().getHasStructure() == false) {
+				if (bt == BuildingType.IRRIGATION && selectedUnit.getTile().canPlant() == false) {
+					return;
+				}
+				Building building = new Building(bt, selectedUnit.getTile());
+				selectedUnit.getTile().setBuilding(building);
+				buildings.add(building);
+
+			}
+			
 		}
 		
 	}
@@ -720,9 +727,12 @@ public class Game {
 //	}
 	public void buildStructure(StructureType st) {
 		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
-			Structure structure = new Structure(st, selectedUnit.getTile());
-			selectedUnit.getTile().setStructure(structure);
-			structures.add(structure);
+			if(selectedUnit.getTile().getHasBuilding() == false && selectedUnit.getTile().getHasStructure() == false) {
+				Structure structure = new Structure(st, selectedUnit.getTile());
+				selectedUnit.getTile().setStructure(structure);
+				structures.add(structure);
+			}
+			
 		}
 		
 	}

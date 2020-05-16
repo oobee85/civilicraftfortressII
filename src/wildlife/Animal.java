@@ -68,8 +68,8 @@ public class Animal extends Thing {
 		if(this.getType().isFlying()) {
 			penalty = 0;
 		}
-		if(getTile().getHasRoad() && t.getHasRoad()) {
-			penalty = penalty/2;
+		if(getTile().getRoadType() != null && t.getRoadType() != null) {
+			penalty = penalty/getTile().getRoadType().getSpeed();
 		}
 		getTile().setUnit(null);
 		t.setAnimal(this);

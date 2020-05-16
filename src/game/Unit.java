@@ -39,8 +39,8 @@ public class Unit extends Thing{
 	}
 	public void moveTo(Tile t) {
 		double penalty = t.getTerrain().moveSpeed();
-		if(getTile().getHasRoad() && t.getHasRoad()) {
-			penalty = penalty/2;
+		if(getTile().getRoadType() != null && t.getRoadType() != null) {
+			penalty = penalty/getTile().getRoadType().getSpeed();
 		}
 		timeToMove += penalty;
 		getTile().setUnit(null);
