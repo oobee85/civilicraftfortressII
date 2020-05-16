@@ -300,7 +300,7 @@ public class Frame extends JPanel{
 			gameInstance.buildUnit(UnitType.HORSEMAN, gameInstance.structures[0].getTile());
 		});
 		
-		JButton exitCity = new JButton("Exit City", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton exitCity = new JButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		exitCity.setMargin(zeroMargin);
 		exitCity.setPreferredSize(BUILDING_BUTTON_SIZE);
 		exitCity.addActionListener(e -> {
@@ -458,8 +458,8 @@ public class Frame extends JPanel{
 		buildHorseman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 
 		cityView.add(exitCity);
-		exitCity.setBounds(765, 10, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
-		
+		exitCity.setBounds(740, 20, 100, 100);
+		exitCity.setContentAreaFilled(false);
 		
 		
 //		Image workerOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");

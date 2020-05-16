@@ -145,7 +145,10 @@ public class Animal extends Thing {
 			this.moveTo(bestTile);
 			if(prey.getTile() == getTile()) {
 				prey.takeDamage(this.getType().getCombatStats().getAttack());
-				eat();
+				for(int i = 0; i < this.getType().getCombatStats().getAttack()/5; i++) {
+					eat();
+				}
+				
 				if(prey.isDead()) {
 					prey = null;
 				}
