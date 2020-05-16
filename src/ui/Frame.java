@@ -305,12 +305,13 @@ public class Frame extends JPanel{
 			gameInstance.buildUnit(UnitType.HORSEMAN, gameInstance.structures[0].getTile());
 		});
 		
-//		JButton exitCity = new JButton("Exit City", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-//		exitCity.setMargin(zeroMargin);
-//		exitCity.setPreferredSize(BUILDING_BUTTON_SIZE);
-//		exitCity.addActionListener(e -> {
-//			gameInstance.exitCity();
-//		});
+		JButton exitCity = new JButton("Exit City", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		exitCity.setMargin(zeroMargin);
+		exitCity.setPreferredSize(BUILDING_BUTTON_SIZE);
+		exitCity.addActionListener(e -> {
+			gameInstance.exitCity();
+		});
+		
 		JLabel money = new JLabel(Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE)); 
 		//money.setFont(new Font("Verdana",1,20));
 		money.setText("Gold = "+gameInstance.getMoney());
@@ -345,7 +346,7 @@ public class Frame extends JPanel{
 		buildMine.setFocusable(false);
 		buildBarracks.setFocusable(false);
 		buildIrrigation.setFocusable(false);
-//		exitCity.setFocusable(false);
+		exitCity.setFocusable(false);
 		showHeightMap.setFocusable(false);
 		
 		
@@ -461,7 +462,8 @@ public class Frame extends JPanel{
 		cityView.add(buildHorseman);
 		buildHorseman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 
-		
+		cityView.add(exitCity);
+		exitCity.setBounds(765, 10, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 		
 		
 		
