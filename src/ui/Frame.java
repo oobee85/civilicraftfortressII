@@ -215,33 +215,33 @@ public class Frame extends JPanel{
 		int BUILDING_ICON_SIZE = 25;
 		Insets zeroMargin = new Insets(0,0,0,0);
 		
-		JButton makeRoad = new JButton("Make Road", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/road_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton makeRoad = new JButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildroad.png"), BUILDING_ICON_SIZE*2, BUILDING_ICON_SIZE*2));
 		makeRoad.setMargin(zeroMargin);
 		makeRoad.setPreferredSize(BUILDING_BUTTON_SIZE);
 		makeRoad.addActionListener(e -> {
-//			gameInstance.setBuildMode(BuildMode.ROAD);
+			gameInstance.buildRoad(RoadType.ROAD_STONE);
 		});
-		JButton makeWall = new JButton("Make Wall", Utils.resizeImageIcon(BuildingType.WALL_STONE.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton makeWall = new JButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), BUILDING_ICON_SIZE*2, BUILDING_ICON_SIZE*2));
 		makeWall.setMargin(zeroMargin);
 		makeWall.setPreferredSize(BUILDING_BUTTON_SIZE);
 		makeWall.addActionListener(e -> {
 			gameInstance.buildBuilding(BuildingType.WALL_STONE);
 		});
 		
-		JButton buildMine = new JButton("Build Mine", Utils.resizeImageIcon(BuildingType.MINE.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildMine = new JButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildmine.png"), BUILDING_ICON_SIZE*2, BUILDING_ICON_SIZE*2));
 		buildMine.setMargin(zeroMargin);
 		buildMine.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildMine.addActionListener(e -> {
 			gameInstance.buildBuilding(BuildingType.MINE);
 		});
 		
-		JButton buildBarracks = new JButton("Build Barracks", Utils.resizeImageIcon(StructureType.BARRACKS.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildBarracks = new JButton("", Utils.resizeImageIcon(StructureType.BARRACKS.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildBarracks.setMargin(zeroMargin);
 		buildBarracks.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildBarracks.addActionListener(e -> {
 			gameInstance.buildStructure(StructureType.BARRACKS);
 		});
-		JButton buildIrrigation = new JButton("Irrigate", Utils.resizeImageIcon(BuildingType.IRRIGATION.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildIrrigation = new JButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildirrigation.png"), BUILDING_ICON_SIZE*2, BUILDING_ICON_SIZE*2));
 		buildIrrigation.setMargin(zeroMargin);
 		buildIrrigation.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildIrrigation.addActionListener(e -> {
@@ -461,15 +461,15 @@ public class Frame extends JPanel{
 		workerView.setLayout(null);
 		
 		makeRoad.setOpaque(false);
-		makeRoad.setBounds(400, frame.getHeight()-150, 100, 50);
+		makeRoad.setBounds(400, frame.getHeight()-150, 50, 50);
 		makeWall.setOpaque(false);
-		makeWall.setBounds(500, frame.getHeight()-150, 100, 50);
+		makeWall.setBounds(450, frame.getHeight()-150, 50, 50);
 		buildMine.setOpaque(false);
-		buildMine.setBounds(600, frame.getHeight()-150, 100, 50);
+		buildMine.setBounds(500, frame.getHeight()-150, 50, 50);
 		buildBarracks.setOpaque(false);
-		buildBarracks.setBounds(200, frame.getHeight()-150, 100, 50);
+		buildBarracks.setBounds(300, frame.getHeight()-150, 50, 50);
 		buildIrrigation.setOpaque(false);
-		buildIrrigation.setBounds(300, frame.getHeight()-150, 100, 50);
+		buildIrrigation.setBounds(350, frame.getHeight()-150, 50, 50);
 		workerView.add(makeRoad);
 		workerView.add(makeWall);
 		workerView.add(buildMine);

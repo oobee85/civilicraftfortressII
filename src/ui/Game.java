@@ -720,14 +720,14 @@ public class Game {
 		}
 		
 	}
-//	public void buildRoad() {
-//		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
-//			Building building = new Building(bt, selectedUnit.getTile());
-//			selectedUnit.getTile().setBuilding(building);
-//			buildings.add(building);
-//		}
-//		
-//	}
+	public void buildRoad(RoadType rt) {
+		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
+			String s = "";
+			s += Direction.NORTH;
+			selectedUnit.getTile().setRoad(rt, s);
+		}
+		
+	}
 	public void buildStructure(StructureType st) {
 		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
 			if(selectedUnit.getTile().getHasBuilding() == false && selectedUnit.getTile().getHasStructure() == false) {
