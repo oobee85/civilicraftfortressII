@@ -690,6 +690,9 @@ public class Game {
 					if(tile.getHasUnit()) {
 						continue;
 					}
+					if(tile.getHasBuilding() == true && tile.getBuilding().getBuildingType().canMoveThrough() == false) {
+						continue;
+					}
 					double distance = tile.getLocation().distanceTo(unit.getTargetTile().getLocation() );
 					if(distance < bestDistance) {
 						bestDistance = distance;
