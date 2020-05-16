@@ -23,7 +23,7 @@ public class Frame extends JPanel{
 	private JPanel tileView;
 	private JPanel workerView;
 	private JComboBox<MapType> mapType;
-	private JLabel[] resourceIndicators = new JLabel[ResourceType.values().length];
+	private JLabel[] resourceIndicators = new JLabel[ItemType.values().length];
 	private JTextField mapSize;
 	private int WIDTH;
 	private int HEIGHT;
@@ -74,8 +74,8 @@ public class Frame extends JPanel{
 			}
 			@Override
 			public void updateGUI() {
-				for(int i = 0; i < ResourceType.values().length; i++) {
-					resourceIndicators[i].setText(ResourceType.values()[i]+" = "+gameInstance.getResourceAmount(ResourceType.values()[i]) );
+				for(int i = 0; i < ItemType.values().length; i++) {
+					resourceIndicators[i].setText(ItemType.values()[i]+" = "+gameInstance.getResourceAmount(ItemType.values()[i]) );
 				}
 				frame.repaint();
 			}
@@ -298,8 +298,8 @@ public class Frame extends JPanel{
 		money.setHorizontalAlignment(JLabel.CENTER);
 		
 		
-		for(int i = 0; i < ResourceType.values().length; i++) {
-			resourceIndicators[i] = new JLabel(Utils.resizeImageIcon(ResourceType.values()[i].getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE) );
+		for(int i = 0; i < ItemType.values().length; i++) {
+			resourceIndicators[i] = new JLabel(Utils.resizeImageIcon(ItemType.values()[i].getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE) );
 			resourceIndicators[i].setPreferredSize(BUILDING_BUTTON_SIZE);
 			resourceIndicators[i].setBorder(BorderFactory.createLineBorder(Color.gray));
 			resourceIndicators[i].setHorizontalAlignment(JLabel.LEFT);

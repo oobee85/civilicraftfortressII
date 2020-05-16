@@ -23,7 +23,7 @@ public class Tile {
 	
 	private String roadCorner;
 	
-	private Ore ore;
+	private ResourceType resourceType;
 	private Plant plant;
 	private Terrain terr;
 	private Structure structure;
@@ -57,8 +57,8 @@ public class Tile {
 	public void setTerritory(boolean b) {
 		this.isTerritory = b;
 	}
-	public void setHasOre(Ore o) {
-		ore = o;
+	public void setResource(ResourceType o) {
+		resourceType = o;
 	}
 	public void setHasPlant(Plant p) {
 		plant = p;
@@ -136,8 +136,8 @@ public class Tile {
 		rows[location.x][location.y] = row;
 	}
 
-	public boolean getHasOre() {
-		return ore != null;
+	public boolean getHasResource() {
+		return resourceType != null;
 	}
 	public boolean getHasUnit() {
 		return unit != null;
@@ -157,8 +157,8 @@ public class Tile {
 	public boolean getHasAnimal() {
 		return animal != null;
 	}
-	public Ore getOre() {
-		return ore;
+	public ResourceType getResourceType() {
+		return resourceType;
 	}
 	public Unit getUnit() {
 		return unit;

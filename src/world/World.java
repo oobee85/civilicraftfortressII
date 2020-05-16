@@ -4,8 +4,8 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
 
-import game.Resource;
-import game.ResourceType;
+import game.Item;
+import game.ItemType;
 import game.Unit;
 import liquid.*;
 import ui.*;
@@ -272,7 +272,7 @@ public class World {
 			Liquid.propogate(this);
 		}
 
-		Generation.genOres(this);
+		Generation.genResources(this);
 		this.genPlants();
 		this.makeForest();
 		Wildlife.generateWildLife(this);
@@ -307,9 +307,9 @@ public class World {
 			for(int j = 0; j < tiles[0].length; j++) {
 				Color minimapColor = terrainColors.get(tiles[i][j].getTerrain());
 				Color terrainColor = terrainColors.get(tiles[i][j].getTerrain());
-				if(tiles[i][j].getOre() != null) {
-					terrainColor = tiles[i][j].getOre().getColor(0);
-					minimapColor = tiles[i][j].getOre().getColor(0);
+				if(tiles[i][j].getResourceType() != null) {
+					terrainColor = tiles[i][j].getResourceType().getColor(0);
+					minimapColor = tiles[i][j].getResourceType().getColor(0);
 				}
 				if(tiles[i][j].getHasRoad()) {
 					terrainColor = Utils.roadColor;

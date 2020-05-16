@@ -19,7 +19,7 @@ public class Game {
 	private BufferedImage heightMapImage;
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
 	private Unit selectedUnit;
-	HashMap<ResourceType, Resource> resources = new HashMap<ResourceType, Resource>();
+	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
 	LinkedList<Building> buildings = new LinkedList<Building>();
 	LinkedList<Structure> structures = new LinkedList<Structure>();
 	
@@ -51,8 +51,8 @@ public class Game {
 		currentMode = BuildMode.NOMODE;
 		showHeightMap = false;
 		
-		for(ResourceType resourceType : ResourceType.values()) {
-			Resource resource = new Resource(0, resourceType);
+		for(ItemType resourceType : ItemType.values()) {
+			Item resource = new Item(0, resourceType);
 			resources.put(resourceType, resource);
 		}
 		
@@ -132,11 +132,11 @@ public class Game {
 	public void updateBuildingAction() {
 		
 		for(Building building : buildings) {
-			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getHasOre() == true) {
-				resources.get(building.getTile().getOre().getResourceType()).addAmount(1);
+			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getHasResource() == true) {
+				resources.get(building.getTile().getResourceType().getResourceType()).addAmount(1);
 			}
 			if(building.getBuildingType() == BuildingType.IRRIGATION && building.getTile().canPlant() == true) {
-				resources.get(ResourceType.WHEAT).addAmount(1);
+				resources.get(ItemType.WHEAT).addAmount(1);
 			}
 		}
 		
@@ -417,8 +417,8 @@ public class Game {
 						g.drawImage(t.getTerrain().getImage(Game.tileSize), x, y, w, h, null);
 //						t.drawEntities(g, currentMode);
 						
-						if(t.getHasOre()) {
-							g.drawImage(t.getOre().getImage(Game.tileSize), x, y, w, h, null);
+						if(t.getHasResource()) {
+							g.drawImage(t.getResourceType().getImage(Game.tileSize), x, y, w, h, null);
 						}
 						if(t.getIsTerritory()) {
 							g.setColor(Tile.TERRITORY_COLOR);
@@ -784,7 +784,7 @@ public class Game {
 	public int getMoney() {
 		return money;
 	}
-	public int getResourceAmount(ResourceType resourceType) {
+	public int getResourceAmount(ItemType resourceType) {
 		return resources.get(resourceType).getAmount();
 	}
 	public int getTileSize() {

@@ -141,19 +141,24 @@ public class Generation {
 		return new TileLoc(x, y);
 	}
 
-	public static void genOres(World world) {
-		for(Ore ore : Ore.values()) {
-			int numOres = (int)(world.getWidth() * world.getHeight() * ore.getRarity()); //163
-			System.out.println("Tiles of " + ore.name() + ": " + numOres);
+	public static void genResources(World world) {
+		for(ResourceType resource : ResourceType.values()) {
+			int numResource = (int)(world.getWidth() * world.getHeight() * resource.getRarity()); //163
+			System.out.println("Tiles of " + resource.name() + ": " + numResource);
+			
 			for(Tile tile : world.getTilesRandomly()) {
-				if(tile.canOre() && !tile.getHasOre()) {
+				if(resource.isOre() && tile.canOre() && !tile.getHasResource()) {
 					// if ore is rare the tile must be able to support rare ore
-					if(!ore.isRare() || tile.canSupportRareOre()) {
-						tile.setHasOre(ore);
-						numOres--;
+					if(!resource.isRare() || tile.canSupportRareOre()) {
+						tile.setResource(resource);
+						numResource--;
 					}
+				}else if(!resource.isOre() && !tile.canOre()) {
+					
+					tile.setResource(resource);
+					numResource--;
 				}
-				if(numOres <= 0) {
+				if(numResource <= 0) {
 					break;
 				}
 			}
