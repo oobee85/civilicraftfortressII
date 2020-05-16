@@ -84,17 +84,17 @@ public class Frame extends JPanel{
 				System.out.println("trying to open right click menu");
 				JPanel rightClickPanel = new JPanel();
 				rightClickPanel.setBackground(Color.white);
-				rightClickPanel.setPreferredSize(new Dimension(200, 200));
+				rightClickPanel.setPreferredSize(new Dimension(150, 100));
 				rightClickPanel.setLayout(new BoxLayout(rightClickPanel, BoxLayout.Y_AXIS));
 				rightClickPanel.add(new JLabel(tile.getTerrain().toString()));
 				if(tile.getPlant() != null) {
-					rightClickPanel.add(new JLabel(tile.getPlant().getImageIcon(0)));
+					rightClickPanel.add(new JLabel(tile.getPlant().getPlantType().toString()));
 				}
 				if(tile.getHasAnimal()) {
-					rightClickPanel.add(new JLabel(tile.getAnimal().getImageIcon(0)));
+					rightClickPanel.add(new JLabel(tile.getAnimal().getType().toString()));
 				}
 				if(tile.getHasUnit()) {
-					rightClickPanel.add(new JLabel(tile.getUnit().getImageIcon(0)));
+					rightClickPanel.add(new JLabel(tile.getUnit().getUnitType().toString()));
 				}
 				JPopupMenu popup = new JPopupMenu();
 				popup.add(rightClickPanel);

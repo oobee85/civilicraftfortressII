@@ -63,8 +63,6 @@ public class Wildlife {
 				continue;
 			}
 			animal.loseEnergy();
-			animal.loseEnergy();
-			animal.loseEnergy();
 			if(animal.wantsToEat()) {
 				if(animal.getType().isHostile() == true && animal.getPrey() == null) {
 					int pickAnimal = (int) (animals.size()*Math.random());
