@@ -82,17 +82,22 @@ public class Frame extends JPanel{
 			@Override
 			public void openRightClickMenu(int mx, int my, Tile tile) {
 				System.out.println("trying to open right click menu");
-				JPopupMenu popup = new JPopupMenu();
-				popup.add(new JLabel(tile.getTerrain().toString()));
+				JPanel rightClickPanel = new JPanel();
+				rightClickPanel.setBackground(Color.white);
+				rightClickPanel.setPreferredSize(new Dimension(200, 200));
+				rightClickPanel.setLayout(new BoxLayout(rightClickPanel, BoxLayout.Y_AXIS));
+				rightClickPanel.add(new JLabel(tile.getTerrain().toString()));
 				if(tile.getPlant() != null) {
-					popup.add(new JLabel(tile.getPlant().getImageIcon(0)));
+					rightClickPanel.add(new JLabel(tile.getPlant().getImageIcon(0)));
 				}
 				if(tile.getHasAnimal()) {
-					popup.add(new JLabel(tile.getAnimal().getImageIcon(0)));
+					rightClickPanel.add(new JLabel(tile.getAnimal().getImageIcon(0)));
 				}
 				if(tile.getHasUnit()) {
-					popup.add(new JLabel(tile.getUnit().getImageIcon(0)));
+					rightClickPanel.add(new JLabel(tile.getUnit().getImageIcon(0)));
 				}
+				JPopupMenu popup = new JPopupMenu();
+				popup.add(rightClickPanel);
 				popup.show(frame,  mx, my);
 			}
 		});
