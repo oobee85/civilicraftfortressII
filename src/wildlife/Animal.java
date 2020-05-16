@@ -71,9 +71,14 @@ public class Animal extends Thing {
 		if(getTile().getRoadType() != null && t.getRoadType() != null) {
 			penalty = penalty/getTile().getRoadType().getSpeed();
 		}
+		if(type == AnimalType.DRAGON && t.canPlant() == true) {
+			t.setTerrain(Terrain.BURNEDGROUND);
+		}
 		getTile().setUnit(null);
 		t.setAnimal(this);
 		this.setTile(t);
+		
+		
 	}
 	
 	public double computeDanger(Tile tile, double height) {

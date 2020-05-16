@@ -12,6 +12,7 @@ public enum Terrain {
 		SNOW (4, 6, 0, new String[] {"resources/Images/mountain/snow16.png", "resources/Images/mountain/snow128.png", "resources/Images/mountain/snow512.png"}),
 		WATER (10000, 12, 0, new String[] {"resources/Images/water/water16.png", "resources/Images/water/water128.png", "resources/Images/water/water512.png"}),
 		SAND (2, 6, 0, new String[] {"resources/Images/sand.png"}),
+		BURNEDGROUND (4, 8, 0.08, new String[] {"resources/Images/burnedground.png"}),
 		;
 
 	private final double movePenalty;
