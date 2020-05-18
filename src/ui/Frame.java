@@ -476,8 +476,8 @@ public class Frame extends JPanel{
 		gui.add(buttonPanel, BorderLayout.CENTER);
 		
 		JTabbedPane tabbedPane = new JTabbedPane();
-		tabbedPane.addTab("Resources", null, resourcePanel, "Does nothing");
-		tabbedPane.addTab("Buttons", null, buttonPanel, "Does nothing");
+		tabbedPane.addTab(null, Utils.resizeImageIcon(ItemType.ADAMANTITE_ORE.getImageIcon(0), 20, 20), resourcePanel, "Does nothing");
+		tabbedPane.addTab("Debug Buttons", null, buttonPanel, "Does nothing");
 		
 		JPanel guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());
