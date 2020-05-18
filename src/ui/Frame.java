@@ -79,27 +79,62 @@ public class Frame extends JPanel{
 				}
 				frame.repaint();
 			}
+			
 			@Override
 			public void openRightClickMenu(int mx, int my, Tile tile) {
 				System.out.println("trying to open right click menu");
-				JPanel rightClickPanel = new JPanel();
-				rightClickPanel.setBackground(Color.white);
-				rightClickPanel.setPreferredSize(new Dimension(150, 100));
-				rightClickPanel.setLayout(new BoxLayout(rightClickPanel, BoxLayout.Y_AXIS));
-				rightClickPanel.add(new JLabel(tile.getTerrain().toString()));
+				JPanel rightClickPanel = new JPanel() {
+					@Override
+					public void paintComponent(Graphics g){
+						
+						Graphics2D g2d = (Graphics2D) g; 
+			            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1)); 
+						g.drawImage(Utils.toBufferedImage(Utils.loadImage("resources/Images/interfaces/tileinfo.png")),0 ,0, null );
+						super.paintComponent(g);
+						
+					}
+				};
+				rightClickPanel.setBackground(Color.red);
+				rightClickPanel.setPreferredSize(new Dimension(193, 173));
+				rightClickPanel.setLayout(null);
+				rightClickPanel.setOpaque(false);
+				
+				
+				JLabel terr = new JLabel(tile.getTerrain().toString());
+				rightClickPanel.add(terr);
+				terr.setBounds(20, 65, 100, 100);
 				if(tile.getPlant() != null) {
-					rightClickPanel.add(new JLabel(tile.getPlant().getPlantType().toString()));
+					JLabel t = new JLabel(tile.getPlant().getPlantType().toString());
+					rightClickPanel.add(t);
+					t.setBounds(20, 75, 100, 100);
 				}
 				if(tile.getHasAnimal()) {
-					rightClickPanel.add(new JLabel(tile.getAnimal().getType().toString()));
+					JLabel a = new JLabel(tile.getAnimal().getType().toString());
+					rightClickPanel.add(a);
+					a.setBounds(20, 85, 100, 100);
 				}
 				if(tile.getHasUnit()) {
-					rightClickPanel.add(new JLabel(tile.getUnit().getUnitType().toString()));
+					JLabel u = new JLabel(tile.getUnit().getUnitType().toString());
+					rightClickPanel.add(u);
+					u.setBounds(20, 95, 100, 100);
 				}
-				JPopupMenu popup = new JPopupMenu();
+				
+				
+				JPopupMenu popup = new JPopupMenu() {
+					@Override
+					public void paintComponent(Graphics g) { 
+		                Graphics2D g2d = (Graphics2D) g.create(); 
+		                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0)); 
+		                super.paintComponent(g2d); 
+		                g2d.dispose(); 
+		        }
+				};
 				popup.setLayout(new BorderLayout());
-				popup.add(rightClickPanel, BorderLayout.CENTER);
-				popup.show(frame,  mx, my);
+				popup.add(rightClickPanel);
+				popup.setOpaque(false);
+				popup.setBorderPainted(false);
+				popup.show(gamepanel, mx-100, my-50);
+				
 			}
 		});
 			
