@@ -3,9 +3,9 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.border.*;
 
 import game.*;
-import ui.*;
 import utils.*;
 import world.*;
 
@@ -75,7 +75,7 @@ public class Frame extends JPanel{
 			@Override
 			public void updateGUI() {
 				for(int i = 0; i < ItemType.values().length; i++) {
-					resourceIndicators[i].setText(ItemType.values()[i]+" = "+gameInstance.getResourceAmount(ItemType.values()[i]) );
+					resourceIndicators[i].setText("" + gameInstance.getResourceAmount(ItemType.values()[i]) + " " + ItemType.values()[i]);
 				}
 				frame.repaint();
 			}
@@ -263,13 +263,15 @@ public class Frame extends JPanel{
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
 				g.setColor(Color.black);
-				g.drawRect(0, 0, getWidth(), getHeight());
+				g.fillRect(0, 0, getWidth()-1, getHeight()-1);
 			}
 		};
-		gui.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));
+//		gui.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));
 		
 		Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
+		Dimension RESOURCE_BUTTON_SIZE = new Dimension(200, 35);
 		int BUILDING_ICON_SIZE = 25;
+		int RESOURCE_ICON_SIZE = 35;
 		Insets zeroMargin = new Insets(0,0,0,0);
 		
 		JButton makeRoad = new JButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildroad.png"), BUILDING_ICON_SIZE*2, BUILDING_ICON_SIZE*2));
@@ -357,14 +359,15 @@ public class Frame extends JPanel{
 		
 		
 		for(int i = 0; i < ItemType.values().length; i++) {
-			resourceIndicators[i] = new JLabel(Utils.resizeImageIcon(ItemType.values()[i].getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE) );
-			resourceIndicators[i].setPreferredSize(BUILDING_BUTTON_SIZE);
+			resourceIndicators[i] = new JLabel(Utils.resizeImageIcon(ItemType.values()[i].getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE), SwingConstants.LEFT );
+			resourceIndicators[i].setToolTipText("" + ItemType.values()[i]);
+			resourceIndicators[i].setPreferredSize(RESOURCE_BUTTON_SIZE);
 			resourceIndicators[i].setBorder(BorderFactory.createLineBorder(Color.gray));
-			resourceIndicators[i].setHorizontalAlignment(JLabel.LEFT);
-			
+			resourceIndicators[i].setFocusable(false);
+			resourceIndicators[i].setFont(new Font("Comic Sans MS", Font.PLAIN, 16));
 		}
 		
-		JLabel tSize = new JLabel(); 
+		JLabel tSize = new JLabel();
 		tSize.setText("TileSize = "+gameInstance.getTileSize());
 		tSize.setPreferredSize(BUILDING_BUTTON_SIZE);
 		tSize.setBorder(BorderFactory.createLineBorder(Color.gray));
@@ -435,18 +438,24 @@ public class Frame extends JPanel{
 		exit.setPreferredSize(BUILDING_BUTTON_SIZE);
 
 		
+		JPanel resourcePanel = new JPanel();
+		int RESOURCE_PANEL_WIDTH = 100;
+		resourcePanel.setPreferredSize(new Dimension(RESOURCE_PANEL_WIDTH, 1000));
+//		resourcePanel.setLayout(new BoxLayout(resourcePanel, BoxLayout.Y_AXIS));
 		for(JLabel label : resourceIndicators) {
-			gui.add(label);
+			resourcePanel.add(label);
 		}
-		gui.add(money);
-		gui.add(tSize);
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setPreferredSize(new Dimension(GUIWIDTH-RESOURCE_PANEL_WIDTH, 1000));
+		buttonPanel.add(money);
+		buttonPanel.add(tSize);
 		
-		gui.add(showHeightMap);
-		gui.add(flipTable);
-		gui.add(makeItRain);
-		gui.add(makeItDry);
-		gui.add(debug);
-		gui.add(exit);
+		buttonPanel.add(showHeightMap);
+		buttonPanel.add(flipTable);
+		buttonPanel.add(makeItRain);
+		buttonPanel.add(makeItDry);
+		buttonPanel.add(debug);
+		buttonPanel.add(exit);
 		
 		makeItRain.setFocusable(false);
 		flipTable.setFocusable(false);
@@ -461,13 +470,23 @@ public class Frame extends JPanel{
 		buildHorseman.setFocusable(false);
 		buildSwordsman.setFocusable(false);
 		
+		gui.setLayout(new BorderLayout());
+		gui.setBorder(new LineBorder(Color.black));
+		gui.add(resourcePanel, BorderLayout.WEST);
+		gui.add(buttonPanel, BorderLayout.CENTER);
+		
+		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane.addTab("Resources", null, resourcePanel, "Does nothing");
+		tabbedPane.addTab("Buttons", null, buttonPanel, "Does nothing");
+		
 		JPanel guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());
 		guiSplitter.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));
-		guiSplitter.add(gui,BorderLayout.CENTER);
+		guiSplitter.add(tabbedPane,BorderLayout.CENTER);
+//		guiSplitter.add(resourcePanel,BorderLayout.WEST);
 		
 		minimapPanel.setPreferredSize(new Dimension(GUIWIDTH,GUIWIDTH));
-		guiSplitter.add(minimapPanel,BorderLayout.SOUTH);
+		guiSplitter.add(minimapPanel,BorderLayout.NORTH);
 		
 		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
 		cityView = new JPanel() {
