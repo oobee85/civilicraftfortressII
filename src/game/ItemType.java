@@ -11,9 +11,9 @@ public enum ItemType implements HasImage{
 	
 	COPPER_ORE ( "resources/Images/itemicons/copper_ore.png"),
 	IRON_ORE ( "resources/Images/itemicons/iron_ore.png"),
+	SILVER_ORE ( "resources/Images/itemicons/silver_ore.png"),
 	MITHRIL_ORE ( "resources/Images/itemicons/mithril_ore.png"),
 	GOLD_ORE ( "resources/Images/itemicons/gold_ore.png"),
-	SILVER_ORE ( "resources/Images/itemicons/silver_ore.png"),
 	ADAMANTITE_ORE ( "resources/Images/itemicons/adamantite_ore.png"),
 	RUNITE_ORE ( "resources/Images/itemicons/runite_ore.png"),
 	TITANIUM_ORE ( "resources/Images/itemicons/titanium_ore.png"),
