@@ -40,6 +40,9 @@ public class Wildlife {
 				if(world[loc].getTerrain() == Terrain.VOLCANO && Math.random() < 0.01) {
 					makeAnimal(AnimalType.DRAGON, world, loc);
 				}
+				if(world[loc].getTerrain() == Terrain.SNOW && Math.random() < 0.01) {
+					makeAnimal(AnimalType.WOLF, world, loc);
+				}
 			}
 		}
 	}

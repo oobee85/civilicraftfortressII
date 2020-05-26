@@ -108,10 +108,11 @@ public class Frame extends JPanel{
 					rightClickPanel.add(t);
 					t.setBounds(20, 75, 100, 100);
 				}
-				if(tile.getHasAnimal()) {
+				if(tile.getAnimal() != null) {
 					JLabel a = new JLabel(tile.getAnimal().getType().toString());
 					rightClickPanel.add(a);
 					a.setBounds(20, 85, 100, 100);
+					System.out.println("has animal");
 				}
 				if(tile.getHasUnit()) {
 					JLabel u = new JLabel(tile.getUnit().getUnitType().toString());

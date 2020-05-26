@@ -75,6 +75,8 @@ public class Animal extends Thing {
 			t.setTerrain(Terrain.BURNEDGROUND);
 		}
 		getTile().setUnit(null);
+		
+//		this.getTile().setAnimal(null);
 		t.setAnimal(this);
 		this.setTile(t);
 		
