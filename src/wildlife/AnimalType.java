@@ -8,11 +8,11 @@ import game.*;
 import utils.*;
 
 public enum AnimalType implements HasImage{
-	DEER("resources/Images/units/deer.png", new CombatStats(100, 5, 10), false, false, false),
-	HORSE("resources/Images/units/horse.png", new CombatStats(100, 5, 10), false, false, false),
-	FISH("resources/Images/units/fish2.png", new CombatStats(10, 1, 100), true, false, false),
-	DRAGON("resources/Images/units/dragon.png", new CombatStats(1000, 50, 100), false, true, true),
-	WOLF("resources/Images/units/wolf.png", new CombatStats(50, 15, 10), false, false, true),
+	DEER("resources/Images/units/deer.png", new CombatStats(100, 5, 10, 5), false, false, false),
+	HORSE("resources/Images/units/horse.png", new CombatStats(100, 5, 10, 5), false, false, false),
+	FISH("resources/Images/units/fish2.png", new CombatStats(10, 1, 100, 1), true, false, false),
+	DRAGON("resources/Images/units/dragon.png", new CombatStats(1000, 50, 100, 50), false, true, true),
+	WOLF("resources/Images/units/wolf.png", new CombatStats(50, 15, 10, 10), false, false, true),
 	;
 
 	private MipMap mipmap;

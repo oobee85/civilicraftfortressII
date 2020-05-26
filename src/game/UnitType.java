@@ -5,12 +5,12 @@ import javax.swing.ImageIcon;
 import utils.*;
 
 public enum UnitType implements HasImage {
-	WORKER ( "resources/Images/units/worker.png", new CombatStats(100, 0, 10)),
- 	WARRIOR ( "resources/Images/units/warrior.png", new CombatStats(100, 10, 10)),
- 	SPEARMAN ( "resources/Images/units/spearman.png", new CombatStats(200, 10, 10)),
- 	ARCHER ( "resources/Images/units/archer.png", new CombatStats(50, 20, 10)),
- 	SWORDSMAN ( "resources/Images/units/swordsman.png", new CombatStats(100, 20, 10)),
- 	HORSEMAN ( "resources/Images/units/horseman.png", new CombatStats(100, 10, 20)),
+	WORKER ( "resources/Images/units/worker.png", new CombatStats(100, 0, 10, 1)),
+ 	WARRIOR ( "resources/Images/units/warrior.png", new CombatStats(100, 10, 10, 1)),
+ 	SPEARMAN ( "resources/Images/units/spearman.png", new CombatStats(200, 10, 10, 1)),
+ 	ARCHER ( "resources/Images/units/archer.png", new CombatStats(50, 20, 10, 1)),
+ 	SWORDSMAN ( "resources/Images/units/swordsman.png", new CombatStats(100, 20, 10, 1)),
+ 	HORSEMAN ( "resources/Images/units/horseman.png", new CombatStats(100, 10, 20, 1)),
  	;
 	
 	private MipMap mipmap;
