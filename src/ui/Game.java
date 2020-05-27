@@ -14,6 +14,7 @@ import world.*;
 public class Game {
 	public static final int NUM_DEBUG_DIGITS = 3;
 	public static int ticks;
+	private int skipUntilTick;
 	private BufferedImage terrainImage;
 	private BufferedImage minimapImage;
 	private BufferedImage heightMapImage;
@@ -23,9 +24,7 @@ public class Game {
 	LinkedList<Building> buildings = new LinkedList<Building>();
 	LinkedList<Structure> structures = new LinkedList<Structure>();
 	
-	
 	public static int tileSize = 10;
-//	public boolean selectedUnit = false;
 	private int money;
 	private Position viewOffset;
 	private TileLoc hoveredTile;
@@ -853,5 +852,13 @@ public class Game {
 			return selectedUnit.getUnitType();
 		}
 		return null;
+	}
+	
+	public void fastForwardToDay() {
+		skipUntilTick = ticks + world.ticksUntilDay();
+	}
+	
+	public boolean shouldFastForward() {
+		return ticks < skipUntilTick;
 	}
 }
