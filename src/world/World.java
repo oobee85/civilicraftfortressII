@@ -124,7 +124,7 @@ public class World {
 				unit.takeDamage(damageTaken);
 			}
 			if (unit.isDead() == true) {
-				tile.setUnit(null);
+				tile.removeUnit(unit);
 			} else {
 				unitsNew.add(unit);
 			}

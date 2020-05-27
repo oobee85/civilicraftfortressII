@@ -637,7 +637,7 @@ public class Game {
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
 		System.out.println(currentMode);
 		Tile tile = world[loc];
-		if(currentMode == BuildMode.NOMODE && tile.getHasUnit() == true) {
+		if(currentMode == BuildMode.NOMODE && tile.hasPlayerControlledUnit() == true) {
 			toggleUnitSelectOnTile(tile);
 		}
 		if(currentMode == BuildMode.NOMODE) {
@@ -645,27 +645,25 @@ public class Game {
 		}
 	}
 	public void toggleUnitSelectOnTile(Tile tile) {
-		if(selectedUnit == tile.getUnit()) {
-			workerView();
-			deselectUnit();
-			return;
+		if(tile.hasPlayerControlledUnit()) {
+			if(tile.getPlayerControlledUnit() == selectedUnit) {
+				deselectUnit();
+			}
+			else {
+				deselectUnit();
+				selectedUnit = tile.getPlayerControlledUnit();
+				selectedUnit.setIsSelected(true);
+			}
 		}
-		else if(selectedUnit != null) {
-			workerView();
-			deselectUnit();
-		}
-		selectedUnit = tile.getUnit();
-		selectedUnit.setIsSelected(true);
-		workerView();
 		
-	}
-	private void workerView() {
 		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
-			guiController.toggleWorkerView();
+			guiController.setWorkerView(true);
+		}
+		else {
+			guiController.setWorkerView(false);
 		}
 	}
 	public void deselectUnit() {
-		System.out.println("deselecting unit");
 		if(selectedUnit != null) {
 			selectedUnit.setIsSelected(false);
 			selectedUnit = null;
@@ -697,10 +695,7 @@ public class Game {
 				Tile bestTile = currentTile;
 				
 				for(Tile tile : Utils.getNeighbors(currentTile, world)) {
-					if(tile.getHasUnit()) {
-						continue;
-					}
-					if(tile.getHasBuilding() == true && tile.getBuilding().getBuildingType().canMoveThrough() == false) {
+					if(tile.isBlocked(unit)) {
 						continue;
 					}
 					double distance = tile.getLocation().distanceTo(unit.getTargetTile().getLocation() );
@@ -713,6 +708,7 @@ public class Game {
 				unit.moveTo(bestTile);
 			}
 		}
+		
 	}
 	
 	public void buildBuilding(BuildingType bt) {
@@ -751,10 +747,11 @@ public class Game {
 		
 	}
 	public void buildUnit(UnitType u, Tile tile) {
-		Unit unit = new Unit(u , tile);
-		tile.setUnit(unit);
-		world.units.add(unit);
-		
+		Unit unit = new Unit(u , tile, true);
+		if(!tile.isBlocked(unit)) {
+			tile.addUnit(unit);
+			world.units.add(unit);
+		}
 	}
 	
 	public void doubleClick(int mx, int my) {
@@ -769,9 +766,6 @@ public class Game {
 	}
 	public void exitTile() {
 		guiController.toggleTileView();
-	}
-	public void exitWorkerView() {
-		guiController.toggleWorkerView();
 	}
 	
 	public void zoomView(int scroll, int mx, int my) {

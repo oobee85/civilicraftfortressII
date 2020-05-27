@@ -59,13 +59,17 @@ public class Frame extends JPanel{
 				frame.repaint();
 			}
 			@Override
-			public void toggleWorkerView() {
-				System.out.println("toggle worker view");
-				if(cityView.isVisible()) {
-					cityView.setVisible(false);
+			public void setWorkerView(boolean visible) {
+				if(visible) {
+					if(cityView.isVisible()) {
+						cityView.setVisible(false);
+					}
+					frame.setGlassPane(workerView);
+					workerView.setVisible(true);
 				}
-				frame.setGlassPane(workerView);
-				workerView.setVisible(!workerView.isVisible());
+				else {
+					workerView.setVisible(false);
+				}
 				frame.repaint();
 			}
 			@Override
@@ -102,33 +106,27 @@ public class Frame extends JPanel{
 				
 				JLabel terr = new JLabel(tile.getTerrain().toString());
 				rightClickPanel.add(terr);
-				terr.setBounds(20, 65, 100, 100);
+				int y = 55;
+				terr.setBounds(20, y += 10, 100, 100);
 				if(tile.getPlant() != null) {
 					JLabel t = new JLabel(tile.getPlant().getPlantType().toString());
 					rightClickPanel.add(t);
-					t.setBounds(20, 75, 100, 100);
+					t.setBounds(20, y += 10, 100, 100);
 				}
-				if(tile.getAnimal() != null) {
-					JLabel a = new JLabel(tile.getAnimal().getType().toString());
+				for(Unit u : tile.getUnits()) {
+					JLabel a = new JLabel(u.getUnitType().toString());
 					rightClickPanel.add(a);
-					a.setBounds(20, 85, 100, 100);
-					System.out.println("has animal");
+					a.setBounds(20, y += 10, 100, 100);
 				}
-				if(tile.getHasUnit()) {
-					JLabel u = new JLabel(tile.getUnit().getUnitType().toString());
-					rightClickPanel.add(u);
-					u.setBounds(20, 95, 100, 100);
-				}
-				
 				
 				JPopupMenu popup = new JPopupMenu() {
 					@Override
-					public void paintComponent(Graphics g) { 
-		                Graphics2D g2d = (Graphics2D) g.create(); 
-		                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0)); 
-		                super.paintComponent(g2d); 
-		                g2d.dispose(); 
-		        }
+					public void paintComponent(Graphics g) {
+						Graphics2D g2d = (Graphics2D) g.create();
+						g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0));
+						super.paintComponent(g2d);
+						g2d.dispose();
+					}
 				};
 				popup.setLayout(new BorderLayout());
 				popup.add(rightClickPanel);
@@ -313,37 +311,37 @@ public class Frame extends JPanel{
 		buildIrrigation.addActionListener(e -> {
 			gameInstance.buildBuilding(BuildingType.IRRIGATION);
 		});
-		JButton buildWorker = new JButton("Build Worker", Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildWorker = new JButton("Build Worker", Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildWorker.setMargin(zeroMargin);
 		buildWorker.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildWorker.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.WORKER, gameInstance.structures[0].getTile());
 		});
-		JButton buildWarrior = new JButton("Build Warrior", Utils.resizeImageIcon(UnitType.WARRIOR.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildWarrior = new JButton("Build Warrior", Utils.resizeImageIcon(UnitType.WARRIOR.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildWarrior.setMargin(zeroMargin);
 		buildWarrior.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildWarrior.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.WARRIOR, gameInstance.structures[0].getTile());
 		});
-		JButton buildSpearman = new JButton("Build Spearman", Utils.resizeImageIcon(UnitType.SPEARMAN.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildSpearman = new JButton("Build Spearman", Utils.resizeImageIcon(UnitType.SPEARMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildSpearman.setMargin(zeroMargin);
 		buildSpearman.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildSpearman.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.SPEARMAN, gameInstance.structures[0].getTile());
 		});
-		JButton buildArcher = new JButton("Build Archer", Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildArcher = new JButton("Build Archer", Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildArcher.setMargin(zeroMargin);
 		buildArcher.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildArcher.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.ARCHER, gameInstance.structures[0].getTile());
 		});
-		JButton buildSwordsman = new JButton("Build swordsman", Utils.resizeImageIcon(UnitType.SWORDSMAN.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildSwordsman = new JButton("Build swordsman", Utils.resizeImageIcon(UnitType.SWORDSMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildSwordsman.setMargin(zeroMargin);
 		buildSwordsman.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildSwordsman.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.SWORDSMAN, gameInstance.structures[0].getTile());
 		});
-		JButton buildHorseman = new JButton("Build horseman", Utils.resizeImageIcon(UnitType.HORSEMAN.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildHorseman = new JButton("Build horseman", Utils.resizeImageIcon(UnitType.HORSEMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildHorseman.setMargin(zeroMargin);
 		buildHorseman.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildHorseman.addActionListener(e -> {

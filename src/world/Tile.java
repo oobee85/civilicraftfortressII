@@ -1,15 +1,13 @@
 package world;
 
-import java.util.List;
 import java.awt.*;
-import java.awt.image.*;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.List;
 
 import game.*;
 import liquid.*;
 import ui.*;
 import utils.*;
-import wildlife.Animal;
 
 public class Tile {
 	public static final Color TERRITORY_COLOR = Color.pink;
@@ -28,8 +26,8 @@ public class Tile {
 	private Terrain terr;
 	private Structure structure;
 	private Building building;
-	private Unit unit;
-	private Animal animal;
+	
+	private List<Unit> units;
 	
 	
 	public double liquidAmount;
@@ -41,6 +39,7 @@ public class Tile {
 		
 		liquidType = LiquidType.WATER;
 		liquidAmount = 0;
+		units = new LinkedList<Unit>();
 	}
 	
 	public static Tile makeTile(TileLoc location, Terrain t) {
@@ -63,9 +62,30 @@ public class Tile {
 		plant = p;
 	}
 	
+	public boolean hasPlayerControlledUnit() {
+		for(Unit u : units) {
+			if(u.isPlayerControlled()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public Unit getPlayerControlledUnit() {
+		for(Unit u : units) {
+			if(u.isPlayerControlled()) {
+				return u;
+			}
+		}
+		return null;
+	}
+	
+	public List<Unit> getUnits() {
+		return units;
+	}
+	
 	public double getBrightness() {
 		double brightness = 0;
-		if(this.getHasStructure() || this.getHasBuilding() || this.getHasUnit()) {
+		if(this.getHasStructure() || this.getHasBuilding() || this.hasPlayerControlledUnit()) {
 			brightness += 1;
 		}
 		
@@ -106,13 +126,11 @@ public class Tile {
 		
 		
 	}
-	public void setUnit(Unit u) {
-		unit = u;
+	public void addUnit(Unit u) {
+		units.add(u);
 	}
-	public void setAnimal(Animal a) {
-		animal = a;
-	}
-	public void drawEntities(Graphics g, BuildMode bm) {
+	public void removeUnit(Unit u) {
+		units.remove(u);
 	}
 	
 	public void drawHeightMap(Graphics g, double height) {
@@ -138,9 +156,20 @@ public class Tile {
 	public boolean getHasResource() {
 		return resourceType != null;
 	}
-	public boolean getHasUnit() {
-		return unit != null;
+	
+	public boolean isBlocked(Unit u) {
+		if(u.isPlayerControlled() && this.hasPlayerControlledUnit()) {
+			return true;
+		}
+		if(u.getUnitType().isFlying()) {
+			return false;
+		}
+		return getHasBuilding() == true && getBuilding().getBuildingType().canMoveThrough() == false;
 	}
+	
+//	public boolean getHasUnit() {
+//		return units.isEmpty();
+//	}
 	public RoadType getRoadType() {
 		return roadType;
 	}
@@ -153,17 +182,8 @@ public class Tile {
 	public boolean getHasBuilding() {
 		return building != null;
 	}
-	public boolean getHasAnimal() {
-		return animal != null;
-	}
 	public ResourceType getResourceType() {
 		return resourceType;
-	}
-	public Unit getUnit() {
-		return unit;
-	}
-	public Animal getAnimal() {
-		return animal;
 	}
 	public Structure getStructure() {
 		return structure;

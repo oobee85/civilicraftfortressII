@@ -2,21 +2,22 @@ package wildlife;
 
 import java.util.*;
 
+import game.*;
 import liquid.*;
 import ui.*;
 import utils.*;
 import world.*;
 
-public class Animal extends Thing {
+public class Animal extends Unit {
 	public static final int MAX_ENERGY = 100;
-	private AnimalType type;
+	private UnitType type;
 	
 	private Animal prey;
 	private double energy;
 	private double drive;
 	
-	public Animal(AnimalType type) {
-		super(type.getCombatStats().getHealth(), type);
+	public Animal(UnitType type, Tile tile, boolean isPlayerControlled) {
+		super(type, tile, isPlayerControlled);
 		this.type = type;
 		energy = MAX_ENERGY;
 		drive = 0;
@@ -63,26 +64,6 @@ public class Animal extends Thing {
 		return damage;
 	}
 	
-	public void moveTo(Tile t) {
-		double penalty = t.getTerrain().moveSpeed();
-		if(this.getType().isFlying()) {
-			penalty = 0;
-		}
-		if(getTile().getRoadType() != null && t.getRoadType() != null) {
-			penalty = penalty/getTile().getRoadType().getSpeed();
-		}
-		if(type == AnimalType.DRAGON && t.canPlant() == true) {
-			t.setTerrain(Terrain.BURNEDGROUND);
-		}
-		getTile().setUnit(null);
-		
-//		this.getTile().setAnimal(null);
-		t.setAnimal(this);
-		this.setTile(t);
-		
-		
-	}
-	
 	public double computeDanger(Tile tile, double height) {
 		double danger = 0;
 		danger += computeTileDamage(tile, height);
@@ -122,7 +103,7 @@ public class Animal extends Thing {
 		return super.isDead() || energy <= 0;
 	}
 	
-	public AnimalType getType() {
+	public UnitType getType() {
 		return type;
 	}
 	public Animal getPrey() {
@@ -132,6 +113,9 @@ public class Animal extends Thing {
 		prey = t;
 	}
 	
+	/**
+	 * Moves toward the target and tries to eat it.
+	 */
 	public void imOnTheHunt(World world) {
 		if(prey != null) {
 			Tile currentTile = getTile();
@@ -144,7 +128,9 @@ public class Animal extends Thing {
 					bestTile = tile;
 				}
 			}
-			this.moveTo(bestTile);
+			if(this.readyToMove()) {
+				this.moveTo(bestTile);
+			}
 			if(prey.getTile() == getTile()) {
 				prey.takeDamage(this.getType().getCombatStats().getAttack());
 				for(int i = 0; i < this.getType().getCombatStats().getAttack()/5; i++) {
