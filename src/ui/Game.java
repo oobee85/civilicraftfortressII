@@ -667,6 +667,7 @@ public class Game {
 		if(selectedUnit != null) {
 			selectedUnit.setIsSelected(false);
 			selectedUnit = null;
+			guiController.setWorkerView(false);
 		}
 	}
 	

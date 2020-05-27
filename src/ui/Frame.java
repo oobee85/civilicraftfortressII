@@ -476,6 +476,7 @@ public class Frame extends JPanel{
 		makeItRain.setFocusable(false);
 		flipTable.setFocusable(false);
 		makeItDry.setFocusable(false);
+		makeItDay.setFocusable(false);
 		
 		debug.setFocusable(false);
 		exit.setFocusable(false);
