@@ -3,9 +3,9 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.border.*;
 
 import game.*;
-import ui.*;
 import utils.*;
 import world.*;
 
@@ -23,7 +23,7 @@ public class Frame extends JPanel{
 	private JPanel tileView;
 	private JPanel workerView;
 	private JComboBox<MapType> mapType;
-	private JLabel[] resourceIndicators = new JLabel[ResourceType.values().length];
+	private JLabel[] resourceIndicators = new JLabel[ItemType.values().length];
 	private JTextField mapSize;
 	private int WIDTH;
 	private int HEIGHT;
@@ -51,33 +51,91 @@ public class Frame extends JPanel{
 			@Override
 			public void toggleCityView() {
 				System.out.println("toggle city view");
-				if(workerView.isVisible()) {
-					workerView.setVisible(false);
-				}
+//				if(workerView.isVisible()) {
+//					workerView.setVisible(false);
+//				}
 				frame.setGlassPane(cityView);
 				cityView.setVisible(!cityView.isVisible());
 				frame.repaint();
 			}
 			@Override
-			public void toggleWorkerView() {
-				System.out.println("toggle worker view");
-				if(cityView.isVisible()) {
-					cityView.setVisible(false);
-				}
-				frame.setGlassPane(workerView);
-				workerView.setVisible(!workerView.isVisible());
-				frame.repaint();
+			public void setWorkerView(boolean visible) {
+//				if(visible) {
+//					if(cityView.isVisible()) {
+//						cityView.setVisible(false);
+//					}
+//					frame.setGlassPane(workerView);
+//					workerView.setVisible(true);
+//				}
+//				else {
+//					workerView.setVisible(false);
+//				}
+//				frame.repaint();
 			}
+			
 			@Override
 			public void toggleTileView() {
 				tileView.setVisible(!tileView.isVisible());
 			}
+			
 			@Override
 			public void updateGUI() {
-				for(int i = 0; i < ResourceType.values().length; i++) {
-					resourceIndicators[i].setText(ResourceType.values()[i]+" = "+gameInstance.getResourceAmount(ResourceType.values()[i]) );
+				for(int i = 0; i < ItemType.values().length; i++) {
+					resourceIndicators[i].setText("" + gameInstance.getResourceAmount(ItemType.values()[i]) + " " + ItemType.values()[i]);
 				}
 				frame.repaint();
+			}
+			
+			@Override
+			public void openRightClickMenu(int mx, int my, Tile tile) {
+				System.out.println("trying to open right click menu");
+				JPanel rightClickPanel = new JPanel() {
+					@Override
+					public void paintComponent(Graphics g){
+						
+						Graphics2D g2d = (Graphics2D) g; 
+			            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1)); 
+						g.drawImage(Utils.toBufferedImage(Utils.loadImage("resources/Images/interfaces/tileinfo.png")),0 ,0, null );
+						super.paintComponent(g);
+						
+					}
+				};
+				rightClickPanel.setBackground(Color.red);
+				rightClickPanel.setPreferredSize(new Dimension(193, 173));
+				rightClickPanel.setLayout(null);
+				rightClickPanel.setOpaque(false);
+				
+				
+				JLabel terr = new JLabel(tile.getTerrain().toString());
+				rightClickPanel.add(terr);
+				int y = 55;
+				terr.setBounds(20, y += 10, 100, 100);
+				if(tile.getPlant() != null) {
+					JLabel t = new JLabel(tile.getPlant().getPlantType().toString());
+					rightClickPanel.add(t);
+					t.setBounds(20, y += 10, 100, 100);
+				}
+				for(Unit u : tile.getUnits()) {
+					JLabel a = new JLabel(u.getUnitType().toString());
+					rightClickPanel.add(a);
+					a.setBounds(20, y += 10, 100, 100);
+				}
+				
+				JPopupMenu popup = new JPopupMenu() {
+					@Override
+					public void paintComponent(Graphics g) {
+						Graphics2D g2d = (Graphics2D) g.create();
+						g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0));
+						super.paintComponent(g2d);
+						g2d.dispose();
+					}
+				};
+				popup.setLayout(new BorderLayout());
+				popup.add(rightClickPanel);
+				popup.setOpaque(false);
+				popup.setBorderPainted(false);
+				popup.show(gamepanel, mx-100, my-50);
+				
 			}
 		});
 			
@@ -123,16 +181,16 @@ public class Frame extends JPanel{
 		panel.add(mapSize);
 		
 		
-		JButton exit = new JButton("exit");
-		exit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				exitGame();
-			}
-		});
-
-		exit.setPreferredSize(new Dimension(100,50));
-		panel.add(exit);
+//		JButton exit = new JButton("exit");
+//		exit.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				exitGame();
+//			}
+//		});
+//
+//		exit.setPreferredSize(new Dimension(100,50));
+//		panel.add(exit);
 		
 		panel.setBackground(Color.WHITE);
 		panel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -206,71 +264,121 @@ public class Frame extends JPanel{
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
 				g.setColor(Color.black);
-				g.drawRect(0, 0, getWidth(), getHeight());
+				g.fillRect(0, 0, getWidth()-1, getHeight()-1);
 			}
 		};
-		gui.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));
+//		gui.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));
 		
 		Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
+		Dimension RESOURCE_BUTTON_SIZE = new Dimension(200, 35);
 		int BUILDING_ICON_SIZE = 25;
+		int RESOURCE_ICON_SIZE = 35;
 		Insets zeroMargin = new Insets(0,0,0,0);
+		Font buttonFont = new Font("Comic Sans MS", Font.PLAIN, 16);
+		Border massiveBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		
-		JButton makeRoad = new JButton("Make Road", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/road_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton makeRoad = new JButton("Road", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildroad.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		makeRoad.setMargin(zeroMargin);
 		makeRoad.setPreferredSize(BUILDING_BUTTON_SIZE);
+		makeRoad.setFont(buttonFont);
+		makeRoad.setHorizontalAlignment(SwingConstants.LEFT);
+		makeRoad.setBorder(massiveBorder);
 		makeRoad.addActionListener(e -> {
-			gameInstance.setBuildMode(BuildMode.ROAD);
+			gameInstance.buildRoad(RoadType.ROAD_STONE);
 		});
-		JButton makeWall = new JButton("Make Wall", Utils.resizeImageIcon(BuildingType.WALL_STONE.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		
+		JButton makeWall = new JButton("Wall", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		makeWall.setMargin(zeroMargin);
 		makeWall.setPreferredSize(BUILDING_BUTTON_SIZE);
+		makeWall.setFont(buttonFont);
+		makeWall.setHorizontalAlignment(SwingConstants.LEFT);
+		makeWall.setBorder(massiveBorder);
 		makeWall.addActionListener(e -> {
-			gameInstance.setBuildMode(BuildMode.WALL);
+			gameInstance.buildBuilding(BuildingType.WALL_STONE);
 		});
 		
-		JButton buildMine = new JButton("Build Mine", Utils.resizeImageIcon(BuildingType.MINE.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildMine = new JButton("Mine", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildmine.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildMine.setMargin(zeroMargin);
 		buildMine.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildMine.setFont(buttonFont);
+		buildMine.setHorizontalAlignment(SwingConstants.LEFT);
+		buildMine.setBorder(massiveBorder);
 		buildMine.addActionListener(e -> {
-			gameInstance.setBuildMode(BuildMode.MINE);
+			gameInstance.buildBuilding(BuildingType.MINE);
 		});
 		
-		JButton buildBarracks = new JButton("Build Barracks", Utils.resizeImageIcon(StructureType.BARRACKS.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildBarracks = new JButton("Barracks", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildbarracks.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildBarracks.setMargin(zeroMargin);
 		buildBarracks.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildBarracks.setFont(buttonFont);
+		buildBarracks.setHorizontalAlignment(SwingConstants.LEFT);
+		buildBarracks.setBorder(massiveBorder);
 		buildBarracks.addActionListener(e -> {
-			gameInstance.setBuildMode(BuildMode.BARRACKS);
+			gameInstance.buildStructure(StructureType.BARRACKS);
 		});
-		JButton buildIrrigation = new JButton("Irrigate", Utils.resizeImageIcon(BuildingType.IRRIGATION.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildFarm = new JButton("Farm", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildfarm.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		buildFarm.setMargin(zeroMargin);
+		buildFarm.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildFarm.setFont(buttonFont);
+		buildFarm.setHorizontalAlignment(SwingConstants.LEFT);
+		buildFarm.setBorder(massiveBorder);
+		buildFarm.addActionListener(e -> {
+			gameInstance.buildStructure(StructureType.FARM);
+		});
+		JButton buildIrrigation = new JButton("Irrigate", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildirrigation.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildIrrigation.setMargin(zeroMargin);
 		buildIrrigation.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildIrrigation.setFont(buttonFont);
+		buildIrrigation.setHorizontalAlignment(SwingConstants.LEFT);
+		buildIrrigation.setBorder(massiveBorder);
 		buildIrrigation.addActionListener(e -> {
-			gameInstance.setBuildMode(BuildMode.IRRIGATE);
+			gameInstance.buildBuilding(BuildingType.IRRIGATION);
 		});
-		JButton buildWorker = new JButton("Build Worker", Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		
+		JButton buildWorker = new JButton("Build Worker", Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildWorker.setMargin(zeroMargin);
 		buildWorker.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildWorker.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.WORKER, gameInstance.structures[0].getTile());
 		});
-		JButton buildWarrior = new JButton("Build Warrior", Utils.resizeImageIcon(UnitType.WARRIOR.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildWarrior = new JButton("Build Warrior", Utils.resizeImageIcon(UnitType.WARRIOR.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildWarrior.setMargin(zeroMargin);
 		buildWarrior.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildWarrior.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.WARRIOR, gameInstance.structures[0].getTile());
 		});
-		JButton buildSpearman = new JButton("Build Spearman", Utils.resizeImageIcon(UnitType.SPEARMAN.getImageIcon(), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		JButton buildSpearman = new JButton("Build Spearman", Utils.resizeImageIcon(UnitType.SPEARMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildSpearman.setMargin(zeroMargin);
 		buildSpearman.setPreferredSize(BUILDING_BUTTON_SIZE);
 		buildSpearman.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.SPEARMAN, gameInstance.structures[0].getTile());
 		});
-//		JButton exitCity = new JButton("Exit City", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-//		exitCity.setMargin(zeroMargin);
-//		exitCity.setPreferredSize(BUILDING_BUTTON_SIZE);
-//		exitCity.addActionListener(e -> {
-//			gameInstance.exitCity();
-//		});
+		JButton buildArcher = new JButton("Build Archer", Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		buildArcher.setMargin(zeroMargin);
+		buildArcher.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildArcher.addActionListener(e -> {
+			gameInstance.buildUnit(UnitType.ARCHER, gameInstance.structures[0].getTile());
+		});
+		JButton buildSwordsman = new JButton("Build swordsman", Utils.resizeImageIcon(UnitType.SWORDSMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		buildSwordsman.setMargin(zeroMargin);
+		buildSwordsman.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildSwordsman.addActionListener(e -> {
+			gameInstance.buildUnit(UnitType.SWORDSMAN, gameInstance.structures[0].getTile());
+		});
+		JButton buildHorseman = new JButton("Build horseman", Utils.resizeImageIcon(UnitType.HORSEMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		buildHorseman.setMargin(zeroMargin);
+		buildHorseman.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildHorseman.addActionListener(e -> {
+			gameInstance.buildUnit(UnitType.HORSEMAN, gameInstance.structures[0].getTile());
+		});
+		
+		JButton exitCity = new JButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		exitCity.setMargin(zeroMargin);
+		exitCity.setPreferredSize(BUILDING_BUTTON_SIZE);
+		exitCity.addActionListener(e -> {
+			gameInstance.exitCity();
+		});
+		
 		JLabel money = new JLabel(Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE)); 
 		//money.setFont(new Font("Verdana",1,20));
 		money.setText("Gold = "+gameInstance.getMoney());
@@ -279,15 +387,16 @@ public class Frame extends JPanel{
 		money.setHorizontalAlignment(JLabel.CENTER);
 		
 		
-		for(int i = 0; i < ResourceType.values().length; i++) {
-			resourceIndicators[i] = new JLabel(Utils.resizeImageIcon(ResourceType.values()[i].getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE) );
-			resourceIndicators[i].setPreferredSize(BUILDING_BUTTON_SIZE);
+		for(int i = 0; i < ItemType.values().length; i++) {
+			resourceIndicators[i] = new JLabel(Utils.resizeImageIcon(ItemType.values()[i].getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE), SwingConstants.LEFT );
+			resourceIndicators[i].setToolTipText("" + ItemType.values()[i]);
+			resourceIndicators[i].setPreferredSize(RESOURCE_BUTTON_SIZE);
 			resourceIndicators[i].setBorder(BorderFactory.createLineBorder(Color.gray));
-			resourceIndicators[i].setHorizontalAlignment(JLabel.LEFT);
-			
+			resourceIndicators[i].setFocusable(false);
+			resourceIndicators[i].setFont(new Font("Comic Sans MS", Font.PLAIN, 16));
 		}
 		
-		JLabel tSize = new JLabel(); 
+		JLabel tSize = new JLabel();
 		tSize.setText("TileSize = "+gameInstance.getTileSize());
 		tSize.setPreferredSize(BUILDING_BUTTON_SIZE);
 		tSize.setBorder(BorderFactory.createLineBorder(Color.gray));
@@ -305,7 +414,8 @@ public class Frame extends JPanel{
 		buildMine.setFocusable(false);
 		buildBarracks.setFocusable(false);
 		buildIrrigation.setFocusable(false);
-//		exitCity.setFocusable(false);
+		buildFarm.setFocusable(false);
+		exitCity.setFocusable(false);
 		showHeightMap.setFocusable(false);
 		
 		
@@ -337,6 +447,15 @@ public class Frame extends JPanel{
 			}
 		});
 		makeItDry.setPreferredSize(BUILDING_BUTTON_SIZE);
+		
+		JButton makeItDay = new JButton("Day");
+		makeItDay.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.fastForwardToDay();
+			}
+		});
+		makeItDay.setPreferredSize(BUILDING_BUTTON_SIZE);
 
 		JToggleButton debug = new JToggleButton(Game.DEBUG_DRAW ? "Stop Debug" : "Debug");
 		debug.addActionListener(new ActionListener() {
@@ -358,38 +477,43 @@ public class Frame extends JPanel{
 		exit.setPreferredSize(BUILDING_BUTTON_SIZE);
 
 		
+		JPanel resourcePanel = new JPanel();
+		int RESOURCE_PANEL_WIDTH = 100;
+		resourcePanel.setPreferredSize(new Dimension(RESOURCE_PANEL_WIDTH, 1000));
+//		resourcePanel.setLayout(new BoxLayout(resourcePanel, BoxLayout.Y_AXIS));
 		for(JLabel label : resourceIndicators) {
-			gui.add(label);
+			resourcePanel.add(label);
 		}
-		gui.add(money);
-		gui.add(tSize);
-		gui.add(makeRoad);
-		gui.add(makeWall);
-		gui.add(buildMine);
-		gui.add(buildBarracks);
-		gui.add(buildIrrigation);
-		gui.add(showHeightMap);
-		gui.add(flipTable);
-		gui.add(makeItRain);
-		gui.add(makeItDry);
-		gui.add(debug);
-		gui.add(exit);
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setPreferredSize(new Dimension(GUIWIDTH-RESOURCE_PANEL_WIDTH, 1000));
+		buttonPanel.add(money);
+		buttonPanel.add(tSize);
+		
+		buttonPanel.add(showHeightMap);
+		buttonPanel.add(flipTable);
+		buttonPanel.add(makeItRain);
+		buttonPanel.add(makeItDry);
+		buttonPanel.add(makeItDay);
+		buttonPanel.add(debug);
+		buttonPanel.add(exit);
 		
 		makeItRain.setFocusable(false);
 		flipTable.setFocusable(false);
+		makeItDry.setFocusable(false);
+		makeItDay.setFocusable(false);
+		
 		debug.setFocusable(false);
 		exit.setFocusable(false);
 		buildWorker.setFocusable(false);
 		buildWarrior.setFocusable(false);
 		buildSpearman.setFocusable(false);
+		buildArcher.setFocusable(false);
+		buildHorseman.setFocusable(false);
+		buildSwordsman.setFocusable(false);
 		
-		JPanel guiSplitter = new JPanel();
-		guiSplitter.setLayout(new BorderLayout());
-		guiSplitter.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));
-		guiSplitter.add(gui,BorderLayout.CENTER);
+		gui.setLayout(new BorderLayout());
+		gui.setBorder(new LineBorder(Color.black));
 		
-		minimapPanel.setPreferredSize(new Dimension(GUIWIDTH,GUIWIDTH));
-		guiSplitter.add(minimapPanel,BorderLayout.SOUTH);
 		
 		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
 		cityView = new JPanel() {
@@ -404,40 +528,65 @@ public class Frame extends JPanel{
 		int numButtons = 0;
 		cityView.add(buildWorker);
 		buildWorker.setBounds(765,  185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons , BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		
 		cityView.add(buildWarrior);
 		buildWarrior.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		
 		cityView.add(buildSpearman);
 		buildSpearman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
-//		cityView.add(exitCity);
-//		exitCity.setBounds(790, 22 , BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 		
+		cityView.add(buildArcher);
+		buildArcher.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		
+		cityView.add(buildSwordsman);
+		buildSwordsman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		
+		cityView.add(buildHorseman);
+		buildHorseman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+
+		cityView.add(exitCity);
+		exitCity.setBounds(740, 20, 100, 100);
+		exitCity.setContentAreaFilled(false);
 		
 		
 //		Image workerOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
-		workerView = new JPanel() {
-			protected void paintComponent(Graphics g) {
-				super.paintComponent(g);
-				g.drawRect(1, 1, getWidth()-2, getHeight()-2);
-//				g.drawImage(workerOverlay, 0, 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
-				System.out.println("workeroverLay");
-			}
-		};
+		workerView = new JPanel();
+		
 		
 		
 //		frame.setGlassPane(workerView);
-		workerView.setVisible(false);
-		workerView.setOpaque(false);
-		workerView.setLayout(null);
+//		workerView.setVisible(false);
+//		workerView.setOpaque(false);
+//		workerView.setLayout(null);
 		
-		JButton test = new JButton("Asdf");
-		test.setOpaque(false);
-		test.setBounds(400, frame.getHeight()-150, 100, 50);
-		workerView.add(test);
+		workerView.add(makeRoad);
+		workerView.add(makeWall);
+		workerView.add(buildMine);
+		workerView.add(buildBarracks);
+		workerView.add(buildIrrigation);
+		workerView.add(buildFarm);
+
+		
+		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane.addTab(null, Utils.resizeImageIcon(ItemType.ADAMANTITE_ORE.getImageIcon(0), 20, 20), resourcePanel, "Does nothing");
+		tabbedPane.addTab("Build Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), 20, 20), workerView, "Does nothing");
+		tabbedPane.addTab("Debug Buttons", null, buttonPanel, "Does nothing");
+		
+		
+		JPanel guiSplitter = new JPanel();
+		guiSplitter.setLayout(new BorderLayout());
+		guiSplitter.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));
+		guiSplitter.add(tabbedPane,BorderLayout.CENTER);
+//		guiSplitter.add(resourcePanel,BorderLayout.WEST);
+		
+		minimapPanel.setPreferredSize(new Dimension(GUIWIDTH,GUIWIDTH));
+		guiSplitter.add(minimapPanel,BorderLayout.NORTH);
+		
 		
 		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
 		frame.getContentPane().add(guiSplitter,BorderLayout.EAST);
 //		frame.setGlassPane(cityView);
-		frame.setGlassPane(workerView);
+//		frame.setGlassPane(workerView);
 		frame.pack();
 		frame.setVisible(true);
 		gamepanel.requestFocusInWindow();
@@ -498,7 +647,7 @@ public class Frame extends JPanel{
 					gameInstance.mouseClick(mx, my);
 					
 				}
-				if(e.getButton() == MouseEvent.BUTTON2 && dragged == false) {
+				if(e.getButton() == MouseEvent.BUTTON3 && dragged == false) {
 					
 					gameInstance.rightClick(mx, my);
 				}
@@ -553,8 +702,22 @@ public class Frame extends JPanel{
 				
 				//esc removes buildmode
 				if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {
-					gameInstance.setBuildMode(BuildMode.NOMODE);
 					gameInstance.deselectUnit();
+				}
+				if(e.getKeyCode()==KeyEvent.VK_R) {
+					if(gameInstance.getSelectedUnit() != null) {
+						gameInstance.buildRoad(RoadType.ROAD_STONE);
+					}
+				}
+				if(e.getKeyCode()==KeyEvent.VK_M) {
+					if(gameInstance.getSelectedUnit() != null) {
+						gameInstance.buildBuilding(BuildingType.MINE);
+					}
+				}
+				if(e.getKeyCode()==KeyEvent.VK_I) {
+					if(gameInstance.getSelectedUnit() != null) {
+						gameInstance.buildBuilding(BuildingType.IRRIGATION);
+					}
 				}
 				
 			}
@@ -575,7 +738,8 @@ public class Frame extends JPanel{
 			try {
 				while(true) {
 					gameInstance.gameTick();
-					Thread.sleep(100);
+					if(!gameInstance.shouldFastForward())
+						Thread.sleep(100);
 				}
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();

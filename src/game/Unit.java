@@ -1,11 +1,9 @@
 package game;
-import java.awt.Image;
 
-import game.*;
 import utils.*;
-import world.Tile;
+import world.*;
 
-public class Unit extends Thing{
+public class Unit extends Thing {
 	
 	
 	private UnitType unitType;
@@ -14,11 +12,16 @@ public class Unit extends Thing{
 	
 	private double timeToMove;
 	
-	public Unit(UnitType unitType, Tile tile) {
-		super(unitType.getHealth(), unitType, tile);
-		this.unitType = unitType;
-	}
+	private boolean isPlayerControlled;
 	
+	public Unit(UnitType unitType, Tile tile, boolean isPlayerControlled) {
+		super(unitType.getCombatStats().getHealth(), unitType, tile);
+		this.unitType = unitType;
+		this.isPlayerControlled = isPlayerControlled;
+	}
+	public boolean isPlayerControlled() {
+		return isPlayerControlled;
+	}
 	
 	public void setIsSelected(boolean select) {
 		isSelected = select;
@@ -39,13 +42,20 @@ public class Unit extends Thing{
 	}
 	public void moveTo(Tile t) {
 		double penalty = t.getTerrain().moveSpeed();
-		if(getTile().getHasRoad() && t.getHasRoad()) {
-			penalty = penalty/2;
+		if(this.getUnitType().isFlying()) {
+			penalty = 0;
+		}
+		if(getTile().getRoadType() != null && t.getRoadType() != null) {
+			penalty = penalty/getTile().getRoadType().getSpeed();
 		}
 		timeToMove += penalty;
-		getTile().setUnit(null);
-		t.setUnit(this);
+		getTile().removeUnit(this);
+		t.addUnit(this);
 		this.setTile(t);
+
+		if(this.getUnitType() == UnitType.DRAGON && t.canPlant() == true) {
+			t.setTerrain(Terrain.BURNEDGROUND);
+		}
 	}
 	
 	public void tick() {

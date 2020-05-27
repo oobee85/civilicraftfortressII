@@ -1,19 +1,17 @@
 package world;
 
-import java.util.List;
 import java.awt.*;
-import java.awt.image.*;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.*;
 
 import game.*;
 import liquid.*;
 import ui.*;
 import utils.*;
-import wildlife.Animal;
 
 public class Tile {
 	public static final Color TERRITORY_COLOR = Color.pink;
-	private boolean hasRoad;
 	private boolean isTerritory = false;
 	private boolean isSelected = false;
 	
@@ -23,13 +21,14 @@ public class Tile {
 	
 	private String roadCorner;
 	
-	private Ore ore;
+	private ResourceType resourceType;
+	private RoadType roadType;
 	private Plant plant;
 	private Terrain terr;
 	private Structure structure;
 	private Building building;
-	private Unit unit;
-	private Animal animal;
+	
+	private ConcurrentLinkedQueue<Unit> units;
 	
 	
 	public double liquidAmount;
@@ -41,32 +40,53 @@ public class Tile {
 		
 		liquidType = LiquidType.WATER;
 		liquidAmount = 0;
+		units = new ConcurrentLinkedQueue<Unit>();
 	}
 	
 	public static Tile makeTile(TileLoc location, Terrain t) {
 		return new Tile(location, t);
 	}
 	
-	public void setRoad(boolean b, String s) {
-		this.hasRoad = b;
+	public void setRoad(RoadType r, String s) {
+		this.roadType = r;
 		if(s != null) {
 			roadCorner = s;
 		}
-		
 	}
 	public void setTerritory(boolean b) {
 		this.isTerritory = b;
 	}
-	public void setHasOre(Ore o) {
-		ore = o;
+	public void setResource(ResourceType o) {
+		resourceType = o;
 	}
 	public void setHasPlant(Plant p) {
 		plant = p;
 	}
 	
+	public boolean hasPlayerControlledUnit() {
+		for(Unit u : units) {
+			if(u.isPlayerControlled()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public Unit getPlayerControlledUnit() {
+		for(Unit u : units) {
+			if(u.isPlayerControlled()) {
+				return u;
+			}
+		}
+		return null;
+	}
+	
+	public ConcurrentLinkedQueue<Unit> getUnits() {
+		return units;
+	}
+	
 	public double getBrightness() {
 		double brightness = 0;
-		if(this.getHasStructure() || this.getHasBuilding() || this.getHasUnit()) {
+		if(this.getHasStructure() || this.getHasBuilding() || this.hasPlayerControlledUnit()) {
 			brightness += 1;
 		}
 		
@@ -107,13 +127,11 @@ public class Tile {
 		
 		
 	}
-	public void setUnit(Unit u) {
-		unit = u;
+	public void addUnit(Unit u) {
+		units.add(u);
 	}
-	public void setAnimal(Animal a) {
-		animal = a;
-	}
-	public void drawEntities(Graphics g, BuildMode bm) {
+	public void removeUnit(Unit u) {
+		units.remove(u);
 	}
 	
 	public void drawHeightMap(Graphics g, double height) {
@@ -136,14 +154,25 @@ public class Tile {
 		rows[location.x][location.y] = row;
 	}
 
-	public boolean getHasOre() {
-		return ore != null;
+	public boolean getHasResource() {
+		return resourceType != null;
 	}
-	public boolean getHasUnit() {
-		return unit != null;
+	
+	public boolean isBlocked(Unit u) {
+		if(u.isPlayerControlled() && this.hasPlayerControlledUnit()) {
+			return true;
+		}
+		if(u.getUnitType().isFlying()) {
+			return false;
+		}
+		return getHasBuilding() == true && getBuilding().getBuildingType().canMoveThrough() == false;
 	}
-	public boolean getHasRoad() {
-		return hasRoad;
+	
+//	public boolean getHasUnit() {
+//		return units.isEmpty();
+//	}
+	public RoadType getRoadType() {
+		return roadType;
 	}
 	public Image getRoadImage() {
 		return Utils.roadImages.get(roadCorner);
@@ -154,17 +183,8 @@ public class Tile {
 	public boolean getHasBuilding() {
 		return building != null;
 	}
-	public boolean getHasAnimal() {
-		return animal != null;
-	}
-	public Ore getOre() {
-		return ore;
-	}
-	public Unit getUnit() {
-		return unit;
-	}
-	public Animal getAnimal() {
-		return animal;
+	public ResourceType getResourceType() {
+		return resourceType;
 	}
 	public Structure getStructure() {
 		return structure;
