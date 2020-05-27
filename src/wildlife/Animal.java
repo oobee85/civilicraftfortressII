@@ -93,7 +93,7 @@ public class Animal extends Unit {
 	}
 	
 	public boolean wantsToReproduce() {
-		return Math.random() < drive - 0.1;
+		return Math.random() < drive - 0.2;
 	}
 	public double getDrive() {
 		return drive;
