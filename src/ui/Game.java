@@ -45,7 +45,6 @@ public class Game {
 		this.guiController = guiController;
 		money = 100;
 		hoveredTile = new TileLoc(-1,-1);
-//		hoveredArea = new Area(0,0,0,0);
 		viewOffset = new Position(0, 0);
 		currentMode = BuildMode.NOMODE;
 		showHeightMap = false;
@@ -65,7 +64,7 @@ public class Game {
 		
 		if(ticks%20 == 0) {
 			updateTerritory();
-			
+			changedTerrain = true;
 		}
 //		if(Math.random() < 0.01) {
 //			for(int x = 0; x < world2.getWidth(); x++) {
