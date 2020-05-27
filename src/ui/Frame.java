@@ -134,6 +134,33 @@ public class Frame extends JPanel{
 			}
 		});
 	}
+
+	Insets zeroMargin = new Insets(0,0,0,0);
+	Font buttonFont = new Font("Comic Sans MS", Font.PLAIN, 16);
+	Border massiveBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(5, 5, 5, 5));
+	
+	private JButton setupButton(String text, Icon icon, Dimension size) {
+		JButton b = new JButton(text, icon);
+		b.setMargin(zeroMargin);
+		b.setFont(buttonFont);
+		b.setHorizontalAlignment(SwingConstants.LEFT);
+		b.setBorder(massiveBorder);
+		b.setFocusable(false);
+		if(size != null)
+			b.setPreferredSize(size);
+		return b;
+	}
+	private JLabel setupLabel(String text, Icon icon, Dimension size) {
+		JLabel b = new JLabel(icon);
+		b.setText(text);
+		b.setFont(buttonFont);
+		b.setHorizontalAlignment(SwingConstants.LEFT);
+		b.setBorder(massiveBorder);
+		b.setFocusable(false);
+		if(size != null)
+			b.setPreferredSize(size);
+		return b;
+	}
 	
 	private void menu() {
 		panel = new JPanel();
@@ -187,8 +214,6 @@ public class Frame extends JPanel{
 	private void runGame() {
 		System.err.println("Starting Game");
 		frame.remove(panel);
-		
-		
 		
 		gamepanel = new JPanel() {
 			@Override
@@ -256,46 +281,23 @@ public class Frame extends JPanel{
 		Dimension RESOURCE_BUTTON_SIZE = new Dimension(200, 35);
 		int BUILDING_ICON_SIZE = 25;
 		int RESOURCE_ICON_SIZE = 35;
-		Insets zeroMargin = new Insets(0,0,0,0);
-		Font buttonFont = new Font("Comic Sans MS", Font.PLAIN, 16);
-		Border massiveBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		
-		JButton makeRoad = new JButton("Road", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildroad.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		makeRoad.setMargin(zeroMargin);
-		makeRoad.setPreferredSize(BUILDING_BUTTON_SIZE);
-		makeRoad.setFont(buttonFont);
-		makeRoad.setHorizontalAlignment(SwingConstants.LEFT);
-		makeRoad.setBorder(massiveBorder);
+		JButton makeRoad = setupButton("Road", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildroad.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		makeRoad.addActionListener(e -> {
 			gameInstance.buildRoad(RoadType.ROAD_STONE);
 		});
 		
-		JButton makeWall = new JButton("Wall", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		makeWall.setMargin(zeroMargin);
-		makeWall.setPreferredSize(BUILDING_BUTTON_SIZE);
-		makeWall.setFont(buttonFont);
-		makeWall.setHorizontalAlignment(SwingConstants.LEFT);
-		makeWall.setBorder(massiveBorder);
+		JButton makeWall = setupButton("Wall", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		makeWall.addActionListener(e -> {
 			gameInstance.buildBuilding(BuildingType.WALL_STONE);
 		});
 		
-		JButton buildMine = new JButton("Mine", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildmine.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		buildMine.setMargin(zeroMargin);
-		buildMine.setPreferredSize(BUILDING_BUTTON_SIZE);
-		buildMine.setFont(buttonFont);
-		buildMine.setHorizontalAlignment(SwingConstants.LEFT);
-		buildMine.setBorder(massiveBorder);
+		JButton buildMine = setupButton("Mine", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildmine.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildMine.addActionListener(e -> {
 			gameInstance.buildBuilding(BuildingType.MINE);
 		});
 		
-		JButton buildBarracks = new JButton("Barracks", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildbarracks.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		buildBarracks.setMargin(zeroMargin);
-		buildBarracks.setPreferredSize(BUILDING_BUTTON_SIZE);
-		buildBarracks.setFont(buttonFont);
-		buildBarracks.setHorizontalAlignment(SwingConstants.LEFT);
-		buildBarracks.setBorder(massiveBorder);
+		JButton buildBarracks = setupButton("Barracks", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildbarracks.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildBarracks.addActionListener(e -> {
 			gameInstance.buildStructure(StructureType.BARRACKS);
 		});
@@ -308,24 +310,18 @@ public class Frame extends JPanel{
 		buildSawmill.addActionListener(e -> {
 			gameInstance.buildBuilding(BuildingType.SAWMILL);
 		});
-		JButton buildFarm = new JButton("Farm", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildfarm.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		buildFarm.setMargin(zeroMargin);
-		buildFarm.setPreferredSize(BUILDING_BUTTON_SIZE);
-		buildFarm.setFont(buttonFont);
-		buildFarm.setHorizontalAlignment(SwingConstants.LEFT);
-		buildFarm.setBorder(massiveBorder);
+		
+		JButton buildFarm = setupButton("Farm", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildfarm.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildFarm.addActionListener(e -> {
 			gameInstance.buildStructure(StructureType.FARM);
 		});
-		JButton buildIrrigation = new JButton("Irrigate", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildirrigation.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		buildIrrigation.setMargin(zeroMargin);
-		buildIrrigation.setPreferredSize(BUILDING_BUTTON_SIZE);
-		buildIrrigation.setFont(buttonFont);
-		buildIrrigation.setHorizontalAlignment(SwingConstants.LEFT);
-		buildIrrigation.setBorder(massiveBorder);
+		
+		JButton buildIrrigation = setupButton("Irrigate", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildirrigation.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildIrrigation.addActionListener(e -> {
 			gameInstance.buildBuilding(BuildingType.IRRIGATION);
 		});
+		
+		
 		
 		JButton buildWorker = new JButton("Build Worker", Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildWorker.setMargin(zeroMargin);
@@ -371,17 +367,11 @@ public class Frame extends JPanel{
 			gameInstance.exitCity();
 		});
 		
-		JLabel money = new JLabel(Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE)); 
-		//money.setFont(new Font("Verdana",1,20));
-		money.setText("Gold = "+gameInstance.getMoney());
-		money.setPreferredSize(BUILDING_BUTTON_SIZE);
-		money.setBorder(BorderFactory.createLineBorder(Color.gray));
-		money.setHorizontalAlignment(JLabel.CENTER);
-		
+		JLabel money = setupLabel("Gold = " + gameInstance.getMoney(), Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		
 		for(int i = 0; i < ItemType.values().length; i++) {
+			resourceIndicators[i] = setupLabel()
 			resourceIndicators[i] = new JLabel(Utils.resizeImageIcon(ItemType.values()[i].getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE), SwingConstants.LEFT );
-			resourceIndicators[i].setToolTipText("" + ItemType.values()[i]);
 			resourceIndicators[i].setPreferredSize(RESOURCE_BUTTON_SIZE);
 			resourceIndicators[i].setBorder(BorderFactory.createLineBorder(Color.gray));
 			resourceIndicators[i].setFocusable(false);
