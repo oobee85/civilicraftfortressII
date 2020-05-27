@@ -25,6 +25,7 @@ public class Frame extends JPanel{
 	private JPanel techView;
 	private JComboBox<MapType> mapType;
 	private JLabel[] resourceIndicators = new JLabel[ItemType.values().length];
+	private JButton[] researchButtons = new JButton[ResearchType.values().length];
 	private JTextField mapSize;
 	private int WIDTH;
 	private int HEIGHT;
@@ -511,7 +512,7 @@ public class Frame extends JPanel{
 		
 		
 //		Image workerOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
-		workerView = new JPanel();
+		
 		
 		
 		
@@ -519,6 +520,7 @@ public class Frame extends JPanel{
 //		workerView.setVisible(false);
 //		workerView.setOpaque(false);
 //		workerView.setLayout(null);
+		workerView = new JPanel();
 		
 		workerView.add(makeRoad);
 		workerView.add(makeWall);
@@ -527,11 +529,19 @@ public class Frame extends JPanel{
 		workerView.add(buildIrrigation);
 		workerView.add(buildFarm);
 		workerView.add(buildSawmill);
-
+		
+		
+		techView = new JPanel();
+		
+		for(int i = 0; i < ResearchType.values().length; i++) {
+			researchButtons[i] = setupButton(ResearchType.values()[i].toString(), null, RESOURCE_BUTTON_SIZE);
+			techView.add(researchButtons[i]);
+		}
 		
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.addTab(null, Utils.resizeImageIcon(ItemType.ADAMANTITE_ORE.getImageIcon(0), 20, 20), resourcePanel, "Does nothing");
 		tabbedPane.addTab("Build Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), 20, 20), workerView, "Does nothing");
+		tabbedPane.addTab("Tech Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), 20, 20), techView, "Does nothing");
 		tabbedPane.addTab("Debug Buttons", null, buttonPanel, "Does nothing");
 		
 		
