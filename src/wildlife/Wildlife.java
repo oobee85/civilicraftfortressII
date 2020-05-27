@@ -103,8 +103,9 @@ public class Wildlife {
 				animal.imOnTheHunt(world);
 			}
 			else if(Math.random() < animal.getMoveChance() && animal.readyToMove()) {
+				
 				if(animal.getTile().getStructure() != null && animal.getTile().getStructure().getStructureType() == StructureType.FARM) {
-					System.out.println("stuck inside farm");
+				//stuck inside farm
 				}
 				else {
 					List<Tile> neighbors = Utils.getNeighborsIncludingCurrent(animal.getTile(), world);

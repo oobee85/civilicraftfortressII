@@ -133,8 +133,14 @@ public class Game {
 			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getHasResource() == true) {
 				resources.get(building.getTile().getResourceType().getResourceType()).addAmount(1);
 			}
+			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getTerrain() == Terrain.ROCK) {
+				resources.get(ItemType.ROCK).addAmount(1);
+			}
 			if(building.getBuildingType() == BuildingType.IRRIGATION && building.getTile().canPlant() == true) {
 				resources.get(ItemType.WHEAT).addAmount(1);
+			}
+			if(building.getBuildingType() == BuildingType.SAWMILL) {
+				resources.get(ItemType.WOOD).addAmount(1);
 			}
 		}
 		
@@ -654,18 +660,11 @@ public class Game {
 			}
 		}
 		
-		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
-			guiController.setWorkerView(true);
-		}
-		else {
-			guiController.setWorkerView(false);
-		}
 	}
 	public void deselectUnit() {
 		if(selectedUnit != null) {
 			selectedUnit.setIsSelected(false);
 			selectedUnit = null;
-			guiController.setWorkerView(false);
 		}
 	}
 	
