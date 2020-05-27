@@ -13,20 +13,20 @@ public enum ResearchType {
 	WHEEL (100, "resources/Images/buildings/wall_wood.png", null),
 	WOODCUTTING (100, "resources/Images/buildings/wall_wood.png", null),
 	
-	IRON_WORKING (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.WARRIOR_CODE, ResearchType.BRONZE_WORKING}),
-	FARMING (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.BRONZE_WORKING}),
-	MASONRY (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.WHEEL, ResearchType.WOODCUTTING}),
-	MYSTICISM (100, "resources/Images/buildings/wall_wood.png",  new ResearchType[] {ResearchType.WOODCUTTING}),
-	MATHEMATICS (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.WRITING, ResearchType.WHEEL}),
+	IRON_WORKING (200, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.WARRIOR_CODE, ResearchType.BRONZE_WORKING}),
+	FARMING (200, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.BRONZE_WORKING}),
+	MASONRY (200, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.WHEEL, ResearchType.WOODCUTTING}),
+	MYSTICISM (200, "resources/Images/buildings/wall_wood.png",  new ResearchType[] {ResearchType.WOODCUTTING}),
+	MATHEMATICS (200, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.WRITING, ResearchType.WHEEL}),
 	
-	ARMORING (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.IRON_WORKING}),
-	HORSEBACK_RIDING (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.FARMING}),
-	CURRENCY (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.FARMING, ResearchType.MATHEMATICS}),
-	CONSTRUCTION (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.MASONRY, ResearchType.MATHEMATICS}),
+	ARMORING (300, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.IRON_WORKING}),
+	HORSEBACK_RIDING (300, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.FARMING}),
+	CURRENCY (300, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.FARMING, ResearchType.MATHEMATICS}),
+	CONSTRUCTION (300, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.MASONRY, ResearchType.MATHEMATICS}),
 	
-	CHIVALRY (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.ARMORING, ResearchType.HORSEBACK_RIDING}),
-	CODE_OF_LAWS (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.CURRENCY}),
-	MONARCHY (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.CONSTRUCTION, ResearchType.MYSTICISM}),
+	CHIVALRY (400, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.ARMORING, ResearchType.HORSEBACK_RIDING}),
+	CODE_OF_LAWS (400, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.CURRENCY}),
+	MONARCHY (400, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.CONSTRUCTION, ResearchType.MYSTICISM}),
 	;
 	
 	private ResearchType[] children;
