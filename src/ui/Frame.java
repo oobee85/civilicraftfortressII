@@ -14,6 +14,20 @@ public class Frame extends JPanel{
 	public static final Color BACKGROUND_COLOR = new Color(200, 200, 200);
 	int GUIWIDTH = 400;
 	
+	public static final Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
+
+	Insets zeroMargin = new Insets(0,0,0,0);
+	
+//	private static final String fontName = "Comic Sans MS";
+//	private static final String fontName = "Chiller";
+	private static final String fontName = "TW Cen MT";
+	
+	Font buttonFont = new Font(fontName, Font.PLAIN, 16);
+	Font buttonFontSmall = new Font(fontName, Font.PLAIN, 14);
+	
+	Border massiveBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(5, 5, 5, 5));
+	
+	
 	private Timer timmy;
 	private JPanel panel;
 	private JFrame frame;
@@ -31,7 +45,6 @@ public class Frame extends JPanel{
 	private Game gameInstance;
 	private int mx;
 	private int my;
-	private JPanel gui;
 	private boolean dragged = false;
 	
 	private Thread gameLoopThread;
@@ -48,7 +61,6 @@ public class Frame extends JPanel{
 		frame.setLocationRelativeTo(null);
 		
 		gameInstance = new Game(new GUIController() {
-			
 			@Override
 			public void toggleCityView() {
 				System.out.println("toggle city view");
@@ -134,32 +146,35 @@ public class Frame extends JPanel{
 			}
 		});
 	}
-
-	Insets zeroMargin = new Insets(0,0,0,0);
-	Font buttonFont = new Font("Comic Sans MS", Font.PLAIN, 16);
-	Border massiveBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(5, 5, 5, 5));
 	
 	private JButton setupButton(String text, Icon icon, Dimension size) {
 		JButton b = new JButton(text, icon);
 		b.setMargin(zeroMargin);
-		b.setFont(buttonFont);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
-		b.setBorder(massiveBorder);
-		b.setFocusable(false);
-		if(size != null)
-			b.setPreferredSize(size);
+		setComponentAttributes(b, size);
+		return b;
+	}
+	private JToggleButton setupToggleButton(String text, Icon icon, Dimension size) {
+		JToggleButton b = new JToggleButton(text, icon);
+		b.setMargin(zeroMargin);
+		b.setHorizontalAlignment(SwingConstants.LEFT);
+		setComponentAttributes(b, size);
 		return b;
 	}
 	private JLabel setupLabel(String text, Icon icon, Dimension size) {
 		JLabel b = new JLabel(icon);
 		b.setText(text);
-		b.setFont(buttonFont);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
-		b.setBorder(massiveBorder);
-		b.setFocusable(false);
-		if(size != null)
-			b.setPreferredSize(size);
+		setComponentAttributes(b, size);
 		return b;
+	}
+	
+	private void setComponentAttributes(JComponent c, Dimension size) {
+		c.setFont(buttonFont);
+		c.setBorder(massiveBorder);
+		c.setFocusable(false);
+		if(size != null)
+			c.setPreferredSize(size);
 	}
 	
 	private void menu() {
@@ -169,8 +184,7 @@ public class Frame extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					String sizeString = mapSize.getText();
-					int size = Integer.parseInt(sizeString);
+					int size = Integer.parseInt(mapSize.getText());
 					gameInstance.generateWorld((MapType) mapType.getSelectedItem(), size);
 					runGame();
 				}
@@ -179,15 +193,15 @@ public class Frame extends JPanel{
 				}
 			}
 		});
-		start.setPreferredSize(new Dimension(100,50));
+		setComponentAttributes(start, BUILDING_BUTTON_SIZE);
 		panel.add(start);
 		
 		mapType = new JComboBox<>(MapType.values());
-		mapType.setPreferredSize(new Dimension(100,50));
+		setComponentAttributes(mapType, BUILDING_BUTTON_SIZE);
 		panel.add(mapType);
 		
 		mapSize = new JTextField("128", 10);
-		mapSize.setPreferredSize(new Dimension(100,50));
+		setComponentAttributes(mapSize, BUILDING_BUTTON_SIZE);
 		panel.add(mapSize);
 		
 		
@@ -266,18 +280,7 @@ public class Frame extends JPanel{
 				frame.repaint();
 			}
 		});
-
-		gui = new JPanel() {
-			@Override
-			public void paintComponent(Graphics g) {
-				super.paintComponent(g);
-				g.setColor(Color.black);
-				g.fillRect(0, 0, getWidth()-1, getHeight()-1);
-			}
-		};
-//		gui.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));
 		
-		Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
 		Dimension RESOURCE_BUTTON_SIZE = new Dimension(200, 35);
 		int BUILDING_ICON_SIZE = 25;
 		int RESOURCE_ICON_SIZE = 35;
@@ -317,48 +320,33 @@ public class Frame extends JPanel{
 		});
 		
 		
-		
-		JButton buildWorker = new JButton("Build Worker", Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		buildWorker.setMargin(zeroMargin);
-		buildWorker.setPreferredSize(BUILDING_BUTTON_SIZE);
+		JButton buildWorker = setupButton("Build Worker", Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildWorker.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.WORKER, gameInstance.structures[0].getTile());
 		});
-		JButton buildWarrior = new JButton("Build Warrior", Utils.resizeImageIcon(UnitType.WARRIOR.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		buildWarrior.setMargin(zeroMargin);
-		buildWarrior.setPreferredSize(BUILDING_BUTTON_SIZE);
+		JButton buildWarrior = setupButton("Build Warrior", Utils.resizeImageIcon(UnitType.WARRIOR.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildWarrior.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.WARRIOR, gameInstance.structures[0].getTile());
 		});
-		JButton buildSpearman = new JButton("Build Spearman", Utils.resizeImageIcon(UnitType.SPEARMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		buildSpearman.setMargin(zeroMargin);
-		buildSpearman.setPreferredSize(BUILDING_BUTTON_SIZE);
+		JButton buildSpearman = setupButton("Build Spearman", Utils.resizeImageIcon(UnitType.SPEARMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildSpearman.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.SPEARMAN, gameInstance.structures[0].getTile());
 		});
-		JButton buildArcher = new JButton("Build Archer", Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		buildArcher.setMargin(zeroMargin);
-		buildArcher.setPreferredSize(BUILDING_BUTTON_SIZE);
+		JButton buildArcher = setupButton("Build Archer", Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildArcher.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.ARCHER, gameInstance.structures[0].getTile());
 		});
-		JButton buildSwordsman = new JButton("Build swordsman", Utils.resizeImageIcon(UnitType.SWORDSMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		buildSwordsman.setMargin(zeroMargin);
-		buildSwordsman.setPreferredSize(BUILDING_BUTTON_SIZE);
+		JButton buildSwordsman = setupButton("Build swordsman", Utils.resizeImageIcon(UnitType.SWORDSMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildSwordsman.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.SWORDSMAN, gameInstance.structures[0].getTile());
 		});
-		JButton buildHorseman = new JButton("Build horseman", Utils.resizeImageIcon(UnitType.HORSEMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		buildHorseman.setMargin(zeroMargin);
-		buildHorseman.setPreferredSize(BUILDING_BUTTON_SIZE);
+		JButton buildHorseman = setupButton("Build horseman", Utils.resizeImageIcon(UnitType.HORSEMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildHorseman.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.HORSEMAN, gameInstance.structures[0].getTile());
 		});
 		
-		JButton exitCity = new JButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		exitCity.setMargin(zeroMargin);
-		exitCity.setPreferredSize(BUILDING_BUTTON_SIZE);
-		exitCity.setFocusable(false);
+		JButton exitCity = setupButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+		exitCity.setBorder(null);
 		exitCity.addActionListener(e -> {
 			gameInstance.exitCity();
 		});
@@ -371,16 +359,13 @@ public class Frame extends JPanel{
 		
 		JLabel tSize = setupLabel("TileSize = "+gameInstance.getTileSize(), null, BUILDING_BUTTON_SIZE);
 
-		JToggleButton showHeightMap = new JToggleButton("Show Height Map");
-		showHeightMap.setPreferredSize(BUILDING_BUTTON_SIZE);
+		JToggleButton showHeightMap = setupToggleButton("Show Height Map", null, BUILDING_BUTTON_SIZE);
 		showHeightMap.addActionListener(e -> {
 			showHeightMap.setText(showHeightMap.isSelected() ? "Hide Height Map" : "Show Height Map");
 			gameInstance.setShowHeightMap(showHeightMap.isSelected());
 		});
-		showHeightMap.setFocusable(false);
-		
-		
-		JToggleButton flipTable = new JToggleButton("Flip Table");
+
+		JToggleButton flipTable = setupToggleButton("Flip Table", null, BUILDING_BUTTON_SIZE);
 		flipTable.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -388,9 +373,8 @@ public class Frame extends JPanel{
 				flipTable.setText(flipTable.isSelected() ? "Unflip Table" : "Flip Table");
 			}
 		});
-		flipTable.setPreferredSize(BUILDING_BUTTON_SIZE);
 		
-		JButton makeItRain = new JButton("Rain");
+		JButton makeItRain = setupButton("Rain", null, BUILDING_BUTTON_SIZE);
 		makeItRain.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -398,27 +382,24 @@ public class Frame extends JPanel{
 				gameInstance.world.grow();
 			}
 		});
-		makeItRain.setPreferredSize(BUILDING_BUTTON_SIZE);
 		
-		JButton makeItDry = new JButton("Drought");
+		JButton makeItDry = setupButton("Drought", null, BUILDING_BUTTON_SIZE);
 		makeItDry.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gameInstance.world.drought();
 			}
 		});
-		makeItDry.setPreferredSize(BUILDING_BUTTON_SIZE);
 		
-		JButton makeItDay = new JButton("Day");
+		JButton makeItDay = setupButton("Day", null, BUILDING_BUTTON_SIZE);
 		makeItDay.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gameInstance.fastForwardToDay();
 			}
 		});
-		makeItDay.setPreferredSize(BUILDING_BUTTON_SIZE);
 
-		JToggleButton debug = new JToggleButton(Game.DEBUG_DRAW ? "Stop Debug" : "Debug");
+		JToggleButton debug = setupToggleButton(Game.DEBUG_DRAW ? "Stop Debug" : "Debug", null, BUILDING_BUTTON_SIZE);
 		debug.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -426,17 +407,14 @@ public class Frame extends JPanel{
 				debug.setText(Game.DEBUG_DRAW ? "Stop Debug" : "Debug");
 			}
 		});
-		debug.setPreferredSize(BUILDING_BUTTON_SIZE);
 		
-		JButton exit = new JButton("Exit");
+		JButton exit = setupButton("Exit", null, BUILDING_BUTTON_SIZE);
 		exit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				exitGame();
 			}
 		});
-		exit.setPreferredSize(BUILDING_BUTTON_SIZE);
-
 		
 		JPanel resourcePanel = new JPanel();
 		int RESOURCE_PANEL_WIDTH = 100;
@@ -458,23 +436,12 @@ public class Frame extends JPanel{
 		buttonPanel.add(debug);
 		buttonPanel.add(exit);
 		
-		makeItRain.setFocusable(false);
-		flipTable.setFocusable(false);
-		makeItDry.setFocusable(false);
-		makeItDay.setFocusable(false);
-		
-		debug.setFocusable(false);
-		exit.setFocusable(false);
 		buildWorker.setFocusable(false);
 		buildWarrior.setFocusable(false);
 		buildSpearman.setFocusable(false);
 		buildArcher.setFocusable(false);
 		buildHorseman.setFocusable(false);
 		buildSwordsman.setFocusable(false);
-		
-		gui.setLayout(new BorderLayout());
-		gui.setBorder(new LineBorder(Color.black));
-		
 		
 		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
 		cityView = new JPanel() {
@@ -506,19 +473,11 @@ public class Frame extends JPanel{
 		buildHorseman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
 
 		cityView.add(exitCity);
-		exitCity.setBounds(740, 20, 100, 100);
+		exitCity.setBounds(790, 20, 100, 100);
 		exitCity.setContentAreaFilled(false);
 		
 		
-//		Image workerOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
 		workerView = new JPanel();
-		
-		
-		
-//		frame.setGlassPane(workerView);
-//		workerView.setVisible(false);
-//		workerView.setOpaque(false);
-//		workerView.setLayout(null);
 		
 		workerView.add(makeRoad);
 		workerView.add(makeWall);
@@ -530,9 +489,11 @@ public class Frame extends JPanel{
 
 		
 		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane.setFont(buttonFontSmall);
 		tabbedPane.addTab(null, Utils.resizeImageIcon(ItemType.ADAMANTITE_ORE.getImageIcon(0), 20, 20), resourcePanel, "Does nothing");
-		tabbedPane.addTab("Build Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), 20, 20), workerView, "Does nothing");
+		tabbedPane.addTab("Building", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), 20, 20), workerView, "Does nothing");
 		tabbedPane.addTab("Debug Buttons", null, buttonPanel, "Does nothing");
+//		tabbedPane.setEnabledAt(1, false);
 		
 		
 		JPanel guiSplitter = new JPanel();
