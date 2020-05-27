@@ -9,7 +9,7 @@ import utils.HasImage;
 import utils.MipMap;
 
 public enum RoadType implements HasImage{
-	ROAD_STONE (2, "resources/Images/buildings/castle256.png"),
+	ROAD_STONE (4, "resources/Images/buildings/castle256.png"),
 	;
 	
 	private final double speed;

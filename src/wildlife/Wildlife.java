@@ -26,7 +26,7 @@ public class Wildlife {
 				}
 				
 				if(Math.random() < 0.01) {
-					if(world[loc].checkTerrain(Terrain.GRASS)) {
+					if(world[loc].checkTerrain(Terrain.DIRT)) {
 						makeAnimal(UnitType.HORSE, world, loc);
 					}
 				}
@@ -41,7 +41,11 @@ public class Wildlife {
 						makeAnimal(UnitType.SHEEP, world, loc);
 					}
 				}
-				
+				if(Math.random() < 0.01) {
+					if(world[loc].checkTerrain(Terrain.GRASS)) {
+						makeAnimal(UnitType.COW, world, loc);
+					}
+				}
 				
 				if(world[loc].getTerrain() == Terrain.VOLCANO && Math.random() < 0.01) {
 					makeAnimal(UnitType.DRAGON, world, loc);
