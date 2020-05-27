@@ -855,6 +855,9 @@ public class Game {
 		this.showHeightMap = show;
 	}
 	public UnitType getSelectedUnit() {
-		return selectedUnit.getUnitType();
+		if(selectedUnit != null) {
+			return selectedUnit.getUnitType();
+		}
+		return null;
 	}
 }

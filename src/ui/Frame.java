@@ -682,6 +682,21 @@ public class Frame extends JPanel{
 				if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {
 					gameInstance.deselectUnit();
 				}
+				if(e.getKeyCode()==KeyEvent.VK_R) {
+					if(gameInstance.getSelectedUnit() != null) {
+						gameInstance.buildRoad(RoadType.ROAD_STONE);
+					}
+				}
+				if(e.getKeyCode()==KeyEvent.VK_M) {
+					if(gameInstance.getSelectedUnit() != null) {
+						gameInstance.buildBuilding(BuildingType.MINE);
+					}
+				}
+				if(e.getKeyCode()==KeyEvent.VK_I) {
+					if(gameInstance.getSelectedUnit() != null) {
+						gameInstance.buildBuilding(BuildingType.IRRIGATION);
+					}
+				}
 				
 			}
 		});
