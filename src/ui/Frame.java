@@ -512,14 +512,10 @@ public class Frame extends JPanel{
 		tabbedPane.setFocusable(false);
 		tabbedPane.setFont(buttonFontSmall);
 		tabbedPane.addTab(null, Utils.resizeImageIcon(ItemType.ADAMANTITE_ORE.getImageIcon(0), 20, 20), resourcePanel, "Does nothing");
-<<<<<<< HEAD
 		tabbedPane.addTab("Tech Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), 20, 20), techView, "Does nothing");
 		tabbedPane.addTab("Build Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), 20, 20), workerView, "Does nothing");
 		tabbedPane.addTab("Debug Buttons", null, buttonPanel, "Does nothing");
-=======
-		tabbedPane.addTab("Building", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), 20, 20), workerView, "Does nothing");
 		tabbedPane.addTab(null, Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), 20, 20), buttonPanel, "Does nothing");
->>>>>>> origin/master
 //		tabbedPane.setEnabledAt(1, false);
 		
 		
