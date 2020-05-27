@@ -9,6 +9,7 @@ import world.*;
 public class Wildlife {
 	
 	private static LinkedList<Animal> animals = new LinkedList<>();
+	private static LinkedList<Animal> dead = new LinkedList<>();
 
 	public static void generateWildLife(World world) {
 		for(int x = 0; x < world.getWidth(); x++) {
@@ -74,6 +75,7 @@ public class Wildlife {
 				animal.takeDamage(liquidDamage);
 			}
 			if(animal.isDead()) {
+				dead.add(animal);
 				continue;
 			}
 			animal.loseEnergy();
@@ -144,7 +146,10 @@ public class Wildlife {
 			}
 			newAnimals.add(animal);
 		}
-		
+
+		for(Animal a : dead) {
+			a.getTile().removeUnit(a);
+		}
 		animals = newAnimals;
 	}
 	
