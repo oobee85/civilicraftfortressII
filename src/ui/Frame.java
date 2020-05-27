@@ -22,7 +22,7 @@ public class Frame extends JPanel{
 //	private static final String fontName = "Chiller";
 	private static final String fontName = "TW Cen MT";
 	
-	Font buttonFont = new Font(fontName, Font.PLAIN, 16);
+	Font buttonFont = new Font(fontName, Font.PLAIN, 17);
 	Font buttonFontSmall = new Font(fontName, Font.PLAIN, 14);
 	
 	Border massiveBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -148,14 +148,14 @@ public class Frame extends JPanel{
 	}
 	
 	private JButton setupButton(String text, Icon icon, Dimension size) {
-		JButton b = new JButton(text, icon);
+		JButton b = new KButton(text, icon);
 		b.setMargin(zeroMargin);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
 		setComponentAttributes(b, size);
 		return b;
 	}
 	private JToggleButton setupToggleButton(String text, Icon icon, Dimension size) {
-		JToggleButton b = new JToggleButton(text, icon);
+		JToggleButton b = new KToggleButton(text, icon);
 		b.setMargin(zeroMargin);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
 		setComponentAttributes(b, size);
@@ -179,7 +179,7 @@ public class Frame extends JPanel{
 	
 	private void menu() {
 		panel = new JPanel();
-		JButton start = new JButton("Start Game");
+		JButton start = setupButton("Start Game", null, BUILDING_BUTTON_SIZE);
 		start.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -193,7 +193,6 @@ public class Frame extends JPanel{
 				}
 			}
 		});
-		setComponentAttributes(start, BUILDING_BUTTON_SIZE);
 		panel.add(start);
 		
 		mapType = new JComboBox<>(MapType.values());
