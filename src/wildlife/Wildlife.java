@@ -109,26 +109,25 @@ public class Wildlife {
 				
 				double bestDanger = Double.MAX_VALUE;
 				if(animal.getTile().getStructure() != null && animal.getTile().getStructure().getStructureType() == StructureType.FARM) {
-					best = animal.getTile();
-					bestDanger = 0;
 					System.out.println("stuck inside farm");
-					continue;
 				}
-				for(Tile t : neighbors) {
-					// deer cant move onto walls
-					if(!animal.getType().isFlying() && t.getHasBuilding() && t.getBuilding().getBuildingType() == BuildingType.WALL_STONE) {
-						continue;
+				else {
+					for(Tile t : neighbors) {
+						// deer cant move onto walls
+						if(!animal.getType().isFlying() && t.getHasBuilding() && t.getBuilding().getBuildingType() == BuildingType.WALL_STONE) {
+							continue;
+						}
+						double danger = animal.computeDanger(t, t.getHeight());
+						if(danger < bestDanger) {
+							best = t;
+							bestDanger = danger;
+						}
 					}
-					double danger = animal.computeDanger(t, t.getHeight());
-					if(danger < bestDanger) {
-						best = t;
-						bestDanger = danger;
+					if(best != null) {
+						double heightIncrease = best.getHeight() - animal.getTile().getHeight();
+						animal.climb(heightIncrease);
+						animal.setTile(best);
 					}
-				}
-				if(best != null) {
-					double heightIncrease = best.getHeight() - animal.getTile().getHeight();
-					animal.climb(heightIncrease);
-					animal.setTile(best);
 				}
 			}
 			
