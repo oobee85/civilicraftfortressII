@@ -144,6 +144,10 @@ public class Wildlife {
 					trying.put(animal.getTile(), animal);
 				}
 			}
+			if(animal.isDead()) {
+				dead.add(animal);
+				continue;
+			}
 			newAnimals.add(animal);
 		}
 
