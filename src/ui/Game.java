@@ -745,10 +745,17 @@ public class Game {
 		
 	}
 	public void buildUnit(UnitType u, Tile tile) {
+		if(u == UnitType.SWORDSMAN && resources[ItemType.IRON_ORE].getAmount() < 10) {
+			return;
+		}
 		Unit unit = new Unit(u , tile, true);
 		if(!tile.isBlocked(unit)) {
 			tile.addUnit(unit);
 			world.units.add(unit);
+			if(u == UnitType.SWORDSMAN) {
+				resources[ItemType.IRON_ORE].addAmount(-10);
+				guiController.updateGUI();
+			}
 		}
 	}
 	

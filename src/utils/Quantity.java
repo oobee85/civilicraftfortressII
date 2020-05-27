@@ -7,7 +7,7 @@ import javax.swing.ImageIcon;
 public class Quantity implements HasImage {
 
 	private HasImage hasImage;
-	private int amount;
+	private volatile int amount;
 	
 	public Quantity(int amount) {
 		this.amount = amount;

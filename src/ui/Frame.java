@@ -15,6 +15,7 @@ public class Frame extends JPanel{
 	int GUIWIDTH = 400;
 	
 	public static final Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
+	public static final Dimension BUILD_UNIT_BUTTON_SIZE = new Dimension(170, 35);
 
 	Insets zeroMargin = new Insets(0,0,0,0);
 	
@@ -320,33 +321,46 @@ public class Frame extends JPanel{
 		});
 		
 		
-		JButton buildWorker = setupButton("Build Worker", Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+		JButton buildWorker = setupButton("Build Worker", 
+				Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
+				null);
 		buildWorker.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.WORKER, gameInstance.structures[0].getTile());
 		});
-		JButton buildWarrior = setupButton("Build Warrior", Utils.resizeImageIcon(UnitType.WARRIOR.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+		JButton buildWarrior = setupButton("Build Warrior", 
+				Utils.resizeImageIcon(UnitType.WARRIOR.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
+				null);
 		buildWarrior.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.WARRIOR, gameInstance.structures[0].getTile());
 		});
-		JButton buildSpearman = setupButton("Build Spearman", Utils.resizeImageIcon(UnitType.SPEARMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+		JButton buildSpearman = setupButton("Build Spearman", 
+				Utils.resizeImageIcon(UnitType.SPEARMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
+				null);
 		buildSpearman.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.SPEARMAN, gameInstance.structures[0].getTile());
 		});
-		JButton buildArcher = setupButton("Build Archer", Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+		JButton buildArcher = setupButton("Build Archer", 
+				Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
+				null);
 		buildArcher.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.ARCHER, gameInstance.structures[0].getTile());
 		});
-		JButton buildSwordsman = setupButton("Build swordsman", Utils.resizeImageIcon(UnitType.SWORDSMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+		JButton buildSwordsman = setupButton("Build Swordsman", 
+				Utils.resizeImageIcon(UnitType.SWORDSMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
+				null);
 		buildSwordsman.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.SWORDSMAN, gameInstance.structures[0].getTile());
 		});
-		JButton buildHorseman = setupButton("Build horseman", Utils.resizeImageIcon(UnitType.HORSEMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+		JButton buildHorseman = setupButton("Build Horseman", 
+				Utils.resizeImageIcon(UnitType.HORSEMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
+				null);
 		buildHorseman.addActionListener(e -> {
 			gameInstance.buildUnit(UnitType.HORSEMAN, gameInstance.structures[0].getTile());
 		});
 		
 		JButton exitCity = setupButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		exitCity.setBorder(null);
+		exitCity.setContentAreaFilled(false);
 		exitCity.addActionListener(e -> {
 			gameInstance.exitCity();
 		});
@@ -455,26 +469,25 @@ public class Frame extends JPanel{
 		cityView.setLayout(null);
 		int numButtons = 0;
 		cityView.add(buildWorker);
-		buildWorker.setBounds(765,  185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons , BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		buildWorker.setBounds(765,  185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons , BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
 		
 		cityView.add(buildWarrior);
-		buildWarrior.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		buildWarrior.setBounds(765, 185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
 		
 		cityView.add(buildSpearman);
-		buildSpearman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		buildSpearman.setBounds(765, 185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
 		
 		cityView.add(buildArcher);
-		buildArcher.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		buildArcher.setBounds(765, 185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
 		
 		cityView.add(buildSwordsman);
-		buildSwordsman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		buildSwordsman.setBounds(765, 185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
 		
 		cityView.add(buildHorseman);
-		buildHorseman.setBounds(765, 185 + (BUILDING_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILDING_BUTTON_SIZE.width, BUILDING_BUTTON_SIZE.height);
+		buildHorseman.setBounds(765, 185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
 
 		cityView.add(exitCity);
-		exitCity.setBounds(790, 20, 100, 100);
-		exitCity.setContentAreaFilled(false);
+		exitCity.setBounds(790, 20, BUILDING_ICON_SIZE, BUILDING_ICON_SIZE);
 		
 		
 		workerView = new JPanel();
@@ -496,11 +509,17 @@ public class Frame extends JPanel{
 		}
 		
 		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane.setFocusable(false);
 		tabbedPane.setFont(buttonFontSmall);
 		tabbedPane.addTab(null, Utils.resizeImageIcon(ItemType.ADAMANTITE_ORE.getImageIcon(0), 20, 20), resourcePanel, "Does nothing");
+<<<<<<< HEAD
 		tabbedPane.addTab("Tech Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), 20, 20), techView, "Does nothing");
 		tabbedPane.addTab("Build Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), 20, 20), workerView, "Does nothing");
 		tabbedPane.addTab("Debug Buttons", null, buttonPanel, "Does nothing");
+=======
+		tabbedPane.addTab("Building", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), 20, 20), workerView, "Does nothing");
+		tabbedPane.addTab(null, Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), 20, 20), buttonPanel, "Does nothing");
+>>>>>>> origin/master
 //		tabbedPane.setEnabledAt(1, false);
 		
 		
