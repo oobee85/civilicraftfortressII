@@ -301,12 +301,7 @@ public class Frame extends JPanel{
 		buildBarracks.addActionListener(e -> {
 			gameInstance.buildStructure(StructureType.BARRACKS);
 		});
-		JButton buildSawmill = new JButton("Sawmill", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/sawmill2.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
-		buildSawmill.setMargin(zeroMargin);
-		buildSawmill.setPreferredSize(BUILDING_BUTTON_SIZE);
-		buildSawmill.setFont(buttonFont);
-		buildSawmill.setHorizontalAlignment(SwingConstants.LEFT);
-		buildSawmill.setBorder(massiveBorder);
+		JButton buildSawmill = setupButton("Sawmill", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/sawmill2.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildSawmill.addActionListener(e -> {
 			gameInstance.buildBuilding(BuildingType.SAWMILL);
 		});
@@ -363,6 +358,7 @@ public class Frame extends JPanel{
 		JButton exitCity = new JButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		exitCity.setMargin(zeroMargin);
 		exitCity.setPreferredSize(BUILDING_BUTTON_SIZE);
+		exitCity.setFocusable(false);
 		exitCity.addActionListener(e -> {
 			gameInstance.exitCity();
 		});
@@ -370,19 +366,10 @@ public class Frame extends JPanel{
 		JLabel money = setupLabel("Gold = " + gameInstance.getMoney(), Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		
 		for(int i = 0; i < ItemType.values().length; i++) {
-			resourceIndicators[i] = setupLabel()
-			resourceIndicators[i] = new JLabel(Utils.resizeImageIcon(ItemType.values()[i].getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE), SwingConstants.LEFT );
-			resourceIndicators[i].setPreferredSize(RESOURCE_BUTTON_SIZE);
-			resourceIndicators[i].setBorder(BorderFactory.createLineBorder(Color.gray));
-			resourceIndicators[i].setFocusable(false);
-			resourceIndicators[i].setFont(new Font("Comic Sans MS", Font.PLAIN, 16));
+			resourceIndicators[i] = setupLabel("", Utils.resizeImageIcon(ItemType.values()[i].getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE), RESOURCE_BUTTON_SIZE);
 		}
 		
-		JLabel tSize = new JLabel();
-		tSize.setText("TileSize = "+gameInstance.getTileSize());
-		tSize.setPreferredSize(BUILDING_BUTTON_SIZE);
-		tSize.setBorder(BorderFactory.createLineBorder(Color.gray));
-		tSize.setHorizontalAlignment(JLabel.CENTER);
+		JLabel tSize = setupLabel("TileSize = "+gameInstance.getTileSize(), null, BUILDING_BUTTON_SIZE);
 
 		JToggleButton showHeightMap = new JToggleButton("Show Height Map");
 		showHeightMap.setPreferredSize(BUILDING_BUTTON_SIZE);
@@ -390,15 +377,6 @@ public class Frame extends JPanel{
 			showHeightMap.setText(showHeightMap.isSelected() ? "Hide Height Map" : "Show Height Map");
 			gameInstance.setShowHeightMap(showHeightMap.isSelected());
 		});
-		
-		makeRoad.setFocusable(false);
-		makeWall.setFocusable(false);
-		buildMine.setFocusable(false);
-		buildBarracks.setFocusable(false);
-		buildIrrigation.setFocusable(false);
-		buildFarm.setFocusable(false);
-		buildSawmill.setFocusable(false);
-		exitCity.setFocusable(false);
 		showHeightMap.setFocusable(false);
 		
 		
