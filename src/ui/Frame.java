@@ -428,7 +428,7 @@ public class Frame extends JPanel{
 		makeItDay.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.world.makeItDay();
+				gameInstance.fastForwardToDay();
 			}
 		});
 		makeItDay.setPreferredSize(BUILDING_BUTTON_SIZE);
@@ -736,7 +736,8 @@ public class Frame extends JPanel{
 			try {
 				while(true) {
 					gameInstance.gameTick();
-					Thread.sleep(100);
+					if(!gameInstance.shouldFastForward())
+						Thread.sleep(100);
 				}
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();

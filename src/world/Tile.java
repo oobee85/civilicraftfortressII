@@ -3,6 +3,7 @@ package world;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.*;
 
 import game.*;
 import liquid.*;
@@ -27,7 +28,7 @@ public class Tile {
 	private Structure structure;
 	private Building building;
 	
-	private List<Unit> units;
+	private ConcurrentLinkedQueue<Unit> units;
 	
 	
 	public double liquidAmount;
@@ -39,7 +40,7 @@ public class Tile {
 		
 		liquidType = LiquidType.WATER;
 		liquidAmount = 0;
-		units = new LinkedList<Unit>();
+		units = new ConcurrentLinkedQueue<Unit>();
 	}
 	
 	public static Tile makeTile(TileLoc location, Terrain t) {
@@ -79,7 +80,7 @@ public class Tile {
 		return null;
 	}
 	
-	public List<Unit> getUnits() {
+	public ConcurrentLinkedQueue<Unit> getUnits() {
 		return units;
 	}
 	

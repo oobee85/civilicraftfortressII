@@ -4,9 +4,7 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
 
-import game.Item;
-import game.ItemType;
-import game.Unit;
+import game.*;
 import liquid.*;
 import ui.*;
 import utils.*;
@@ -67,9 +65,6 @@ public class World {
 		for(Tile tile : getTiles()) {
 			tile.liquidAmount = 0;
 		}
-	}
-	public void makeItDay() {
-		Game.ticks = 0;
 	}
 	public void rain() {
 		System.out.println("raining");
@@ -353,6 +348,15 @@ public class World {
 			heightMapImage.setRGB(tile.getLocation().x, tile.getLocation().y, c.getRGB());
 		}
 		return new BufferedImage[] { terrainImage, minimapImage, heightMapImage};
+	}
+
+	public int ticksUntilDay() {
+		int currentDayOffset = Game.ticks%(DAY_DURATION + NIGHT_DURATION);
+		int skipAmount = (DAY_DURATION + NIGHT_DURATION - TRANSITION_PERIOD) - currentDayOffset;
+		if(skipAmount < 0) {
+			skipAmount += DAY_DURATION + NIGHT_DURATION;
+		}
+		return skipAmount;
 	}
 	
 	public double getDaylight() {
