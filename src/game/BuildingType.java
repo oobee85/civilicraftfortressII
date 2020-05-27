@@ -13,6 +13,7 @@ public enum BuildingType implements HasImage {
 	 	MINE (200, "resources/Images/buildings/mine256.png", true),
 	 	IRRIGATION (100, "resources/Images/buildings/irrigation.png", true),
 	 	WINDMILL (200, "resources/Images/buildings/ancientwindmill.png", true),
+		SAWMILL (200, "resources/Images/buildings/sawmill2.png", true),
 	 	BRIDGE (500, "resources/Images/buildings/bridge.png", true)
 		;
 

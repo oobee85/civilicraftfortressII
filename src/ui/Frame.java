@@ -22,6 +22,7 @@ public class Frame extends JPanel{
 	private JPanel cityView;
 	private JPanel tileView;
 	private JPanel workerView;
+	private JPanel techView;
 	private JComboBox<MapType> mapType;
 	private JLabel[] resourceIndicators = new JLabel[ItemType.values().length];
 	private JTextField mapSize;
@@ -51,28 +52,10 @@ public class Frame extends JPanel{
 			@Override
 			public void toggleCityView() {
 				System.out.println("toggle city view");
-//				if(workerView.isVisible()) {
-//					workerView.setVisible(false);
-//				}
 				frame.setGlassPane(cityView);
 				cityView.setVisible(!cityView.isVisible());
 				frame.repaint();
 			}
-			@Override
-			public void setWorkerView(boolean visible) {
-//				if(visible) {
-//					if(cityView.isVisible()) {
-//						cityView.setVisible(false);
-//					}
-//					frame.setGlassPane(workerView);
-//					workerView.setVisible(true);
-//				}
-//				else {
-//					workerView.setVisible(false);
-//				}
-//				frame.repaint();
-			}
-			
 			@Override
 			public void toggleTileView() {
 				tileView.setVisible(!tileView.isVisible());
@@ -316,6 +299,15 @@ public class Frame extends JPanel{
 		buildBarracks.addActionListener(e -> {
 			gameInstance.buildStructure(StructureType.BARRACKS);
 		});
+		JButton buildSawmill = new JButton("Sawmill", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/sawmill2.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
+		buildSawmill.setMargin(zeroMargin);
+		buildSawmill.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildSawmill.setFont(buttonFont);
+		buildSawmill.setHorizontalAlignment(SwingConstants.LEFT);
+		buildSawmill.setBorder(massiveBorder);
+		buildSawmill.addActionListener(e -> {
+			gameInstance.buildBuilding(BuildingType.SAWMILL);
+		});
 		JButton buildFarm = new JButton("Farm", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildfarm.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE));
 		buildFarm.setMargin(zeroMargin);
 		buildFarm.setPreferredSize(BUILDING_BUTTON_SIZE);
@@ -415,6 +407,7 @@ public class Frame extends JPanel{
 		buildBarracks.setFocusable(false);
 		buildIrrigation.setFocusable(false);
 		buildFarm.setFocusable(false);
+		buildSawmill.setFocusable(false);
 		exitCity.setFocusable(false);
 		showHeightMap.setFocusable(false);
 		
@@ -565,6 +558,7 @@ public class Frame extends JPanel{
 		workerView.add(buildBarracks);
 		workerView.add(buildIrrigation);
 		workerView.add(buildFarm);
+		workerView.add(buildSawmill);
 
 		
 		JTabbedPane tabbedPane = new JTabbedPane();

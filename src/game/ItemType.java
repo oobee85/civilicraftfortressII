@@ -18,8 +18,9 @@ public enum ItemType implements HasImage{
 	RUNITE_ORE ( "resources/Images/itemicons/runite_ore.png"),
 	TITANIUM_ORE ( "resources/Images/itemicons/titanium_ore.png"),
 	WHEAT ( "resources/Images/itemicons/wheat.png"),
-	HORSE ( "resources/Images/units/horse.png")
-	
+	HORSE ( "resources/Images/units/horse.png"),
+	WOOD ( "resources/Images/itemicons/wood.png"),
+	ROCK ( "resources/Images/itemicons/rock.png")
 	;
 	
 	private MipMap mipmap;
