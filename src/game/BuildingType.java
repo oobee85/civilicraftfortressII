@@ -6,16 +6,16 @@ import utils.*;
 
 public enum BuildingType implements HasImage {
 	 	
-	 	WALL_WOOD (100, "resources/Images/buildings/wall_wood.png", false),
+	 	WALL_WOOD (250, "resources/Images/buildings/wall_wood.png", false),
 	 	WALL_STONE (1000, "resources/Images/buildings/wall_stone.png", false),
 	 	WALL_BRICK (5000, "resources/Images/buildings/wall_brick.png", false),
 	 	
-	 	MINE (200, "resources/Images/buildings/mine256.png", true),
+	 	MINE (500, "resources/Images/buildings/mine256.png", true),
 	 	IRRIGATION (100, "resources/Images/buildings/irrigation.png", true),
-	 	WINDMILL (200, "resources/Images/buildings/ancientwindmill.png", true),
-		SAWMILL (200, "resources/Images/buildings/sawmill2.png", true),
+	 	WINDMILL (1000, "resources/Images/buildings/ancientwindmill.png", true),
+		SAWMILL (1000, "resources/Images/buildings/sawmill.png", true),
 	 	BRIDGE (500, "resources/Images/buildings/bridge.png", true),
-	 	FARM (100, "resources/Images/buildings/farm.png", true)
+	 	FARM (500, "resources/Images/buildings/farm.png", true)
 		;
 
 	private final double health;

@@ -306,10 +306,19 @@ public class Frame extends JPanel{
 		makeRoad.addActionListener(e -> {
 			gameInstance.buildRoad(RoadType.ROAD_STONE);
 		});
+		JButton makeWoodWall = setupButton("Wood Wall", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/wall_wood.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+		makeWoodWall.addActionListener(e -> {
+			gameInstance.buildBuilding(BuildingType.WALL_WOOD);
+		});
 		
-		JButton makeWall = setupButton("Wall", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
-		makeWall.addActionListener(e -> {
+		JButton makeStoneWall = setupButton("Stone Wall", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/wall_stone.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+		makeStoneWall.addActionListener(e -> {
 			gameInstance.buildBuilding(BuildingType.WALL_STONE);
+		});
+		
+		JButton makeBrickWall = setupButton("Brick Wall", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/wall_brick.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+		makeBrickWall.addActionListener(e -> {
+			gameInstance.buildBuilding(BuildingType.WALL_BRICK);
 		});
 		
 		JButton buildMine = setupButton("Mine", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildmine.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
@@ -321,7 +330,7 @@ public class Frame extends JPanel{
 		buildBarracks.addActionListener(e -> {
 			gameInstance.buildStructure(StructureType.BARRACKS);
 		});
-		JButton buildSawmill = setupButton("Sawmill", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/sawmill2.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+		JButton buildSawmill = setupButton("Sawmill", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/sawmill.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildSawmill.addActionListener(e -> {
 			gameInstance.buildBuilding(BuildingType.SAWMILL);
 		});
@@ -513,7 +522,9 @@ public class Frame extends JPanel{
 		workerView = new JPanel();
 		
 		workerView.add(makeRoad);
-		workerView.add(makeWall);
+		workerView.add(makeWoodWall);
+		workerView.add(makeStoneWall);
+		workerView.add(makeBrickWall);
 		workerView.add(buildMine);
 		workerView.add(buildBarracks);
 		workerView.add(buildIrrigation);
