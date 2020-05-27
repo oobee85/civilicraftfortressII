@@ -301,6 +301,12 @@ public class Frame extends JPanel{
 		buildBarracks.addActionListener(e -> {
 			gameInstance.buildStructure(StructureType.BARRACKS);
 		});
+		JButton buildFarm = new JButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildfarm.png"), BUILDING_ICON_SIZE*2, BUILDING_ICON_SIZE*2));
+		buildFarm.setMargin(zeroMargin);
+		buildFarm.setPreferredSize(BUILDING_BUTTON_SIZE);
+		buildFarm.addActionListener(e -> {
+			gameInstance.buildStructure(StructureType.FARM);
+		});
 		JButton buildIrrigation = new JButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildirrigation.png"), BUILDING_ICON_SIZE*2, BUILDING_ICON_SIZE*2));
 		buildIrrigation.setMargin(zeroMargin);
 		buildIrrigation.setPreferredSize(BUILDING_BUTTON_SIZE);
@@ -386,6 +392,7 @@ public class Frame extends JPanel{
 		buildMine.setFocusable(false);
 		buildBarracks.setFocusable(false);
 		buildIrrigation.setFocusable(false);
+		buildFarm.setFocusable(false);
 		exitCity.setFocusable(false);
 		showHeightMap.setFocusable(false);
 		
@@ -544,6 +551,7 @@ public class Frame extends JPanel{
 		workerView.add(buildMine);
 		workerView.add(buildBarracks);
 		workerView.add(buildIrrigation);
+		workerView.add(buildFarm);
 		
 		makeRoad.setOpaque(false);
 		makeRoad.setBounds(400, frame.getHeight()-150, 50, 50);
@@ -560,6 +568,9 @@ public class Frame extends JPanel{
 		buildIrrigation.setOpaque(false);
 		buildIrrigation.setBounds(350, frame.getHeight()-150, 50, 50);
 		buildIrrigation.setContentAreaFilled(false);
+		buildFarm.setOpaque(false);
+		buildFarm.setBounds(550, frame.getHeight()-150, 50, 50);
+		buildFarm.setContentAreaFilled(false);
 		
 		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
 		frame.getContentPane().add(guiSplitter,BorderLayout.EAST);

@@ -36,6 +36,17 @@ public class Wildlife {
 					}
 				}
 				
+				if(Math.random() < 0.01) {
+					if(world[loc].checkTerrain(Terrain.GRASS)) {
+						makeAnimal(AnimalType.PIG, world, loc);
+					}
+				}
+				if(Math.random() < 0.01) {
+					if(world[loc].checkTerrain(Terrain.GRASS)) {
+						makeAnimal(AnimalType.SHEEP, world, loc);
+					}
+				}
+				
 				
 				if(world[loc].getTerrain() == Terrain.VOLCANO && Math.random() < 0.01) {
 					makeAnimal(AnimalType.DRAGON, world, loc);
@@ -92,9 +103,17 @@ public class Wildlife {
 				animal.imOnTheHunt(world);
 			}
 			else if(Math.random() < animal.getMoveChance()) {
+				
 				List<Tile> neighbors = Utils.getNeighborsIncludingCurrent(animal.getTile(), world);
 				Tile best = null;
+				
 				double bestDanger = Double.MAX_VALUE;
+				if(animal.getTile().getStructure() != null && animal.getTile().getStructure().getStructureType() == StructureType.FARM) {
+					best = animal.getTile();
+					bestDanger = 0;
+					System.out.println("stuck inside farm");
+					continue;
+				}
 				for(Tile t : neighbors) {
 					// deer cant move onto walls
 					if(!animal.getType().isFlying() && t.getHasBuilding() && t.getBuilding().getBuildingType() == BuildingType.WALL_STONE) {
