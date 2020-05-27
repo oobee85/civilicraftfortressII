@@ -348,7 +348,10 @@ public class Frame extends JPanel{
 		buildWindmill.addActionListener(e -> {
 			gameInstance.buildBuilding(BuildingType.WINDMILL);
 		});
-		
+		JButton buildGranary = setupButton("Granary", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/granary.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+		buildGranary.addActionListener(e -> {
+			gameInstance.buildBuilding(BuildingType.GRANARY);
+		});
 		
 		JButton buildWorker = setupButton("Build Worker", 
 				Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
@@ -531,6 +534,7 @@ public class Frame extends JPanel{
 		workerView.add(buildFarm);
 		workerView.add(buildSawmill);
 		workerView.add(buildWindmill);
+		workerView.add(buildGranary);
 		
 		techView = new JPanel();
 		

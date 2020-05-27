@@ -6,7 +6,6 @@ import utils.MipMap;
 
 public enum ResearchType {
 	
-	
 	WARRIOR_CODE (100, "resources/Images/buildings/wall_wood.png", null),
 	BRONZE_WORKING (100, "resources/Images/buildings/wall_wood.png", null),
 	WRITING (100, "resources/Images/buildings/wall_wood.png", null),

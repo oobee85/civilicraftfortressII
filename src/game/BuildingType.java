@@ -15,8 +15,9 @@ public enum BuildingType implements HasImage {
 	 	WINDMILL (1000, "resources/Images/buildings/ancientwindmill.png", true),
 		SAWMILL (1000, "resources/Images/buildings/sawmill.png", true),
 	 	BRIDGE (500, "resources/Images/buildings/bridge.png", true),
-	 	FARM (500, "resources/Images/buildings/farm.png", true)
-		;
+	 	FARM (500, "resources/Images/buildings/farm.png", true),
+	 	GRANARY (500, "resources/Images/buildings/granary.png", true),
+	 	;
 
 	private final double health;
 	private MipMap mipmap;
