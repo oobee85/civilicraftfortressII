@@ -71,6 +71,7 @@ public class Tile {
 		}
 		return false;
 	}
+	
 	public Unit getPlayerControlledUnit() {
 		for(Unit u : units) {
 			if(u.isPlayerControlled()) {
@@ -82,6 +83,15 @@ public class Tile {
 	
 	public ConcurrentLinkedQueue<Unit> getUnits() {
 		return units;
+	}
+	
+	public boolean hasUnit(UnitType unit) {
+		for(Unit u : units) {
+			if(u.getUnitType() == unit ) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public double getBrightness() {

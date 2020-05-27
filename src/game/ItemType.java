@@ -46,7 +46,7 @@ public enum ItemType implements HasImage{
 		return mipmap.getColor(size);
 	}
 	
-	 @Override
+	@Override
 	public String toString() {
 		return name;
 	}

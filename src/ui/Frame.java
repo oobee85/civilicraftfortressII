@@ -105,8 +105,24 @@ public class Frame extends JPanel{
 				
 				JLabel terr = new JLabel(tile.getTerrain().toString());
 				rightClickPanel.add(terr);
+				
+			
+				
+				
 				int y = 55;
 				terr.setBounds(20, y += 10, 100, 100);
+				
+				if(tile.getBuilding() != null) {
+					JLabel building = new JLabel(tile.getBuilding().toString());
+					rightClickPanel.add(building);
+					building.setBounds(20, y += 10, 100, 100);
+				}
+				if(tile.getStructure() != null) {
+					JLabel structure = new JLabel(tile.getStructure().toString());
+					rightClickPanel.add(structure);
+					structure.setBounds(20, y += 10, 100, 100);
+				}
+				
 				if(tile.getPlant() != null) {
 					JLabel t = new JLabel(tile.getPlant().getPlantType().toString());
 					rightClickPanel.add(t);
@@ -312,7 +328,7 @@ public class Frame extends JPanel{
 		
 		JButton buildFarm = setupButton("Farm", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildfarm.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildFarm.addActionListener(e -> {
-			gameInstance.buildStructure(StructureType.FARM);
+			gameInstance.buildBuilding(BuildingType.FARM);
 		});
 		
 		JButton buildIrrigation = setupButton("Irrigate", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildirrigation.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);

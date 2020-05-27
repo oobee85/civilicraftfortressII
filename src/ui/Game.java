@@ -49,9 +49,12 @@ public class Game {
 		currentMode = BuildMode.NOMODE;
 		showHeightMap = false;
 		
-		for(ItemType resourceType : ItemType.values()) {
-			Item resource = new Item(0, resourceType);
-			resources.put(resourceType, resource);
+		for(ItemType itemType : ItemType.values()) {
+			Item item = new Item(0, itemType);
+			if(itemType == ItemType.WOOD || itemType == ItemType.ROCK || itemType == ItemType.WHEAT) {
+				item = new Item(100, itemType);
+			}
+			resources.put(itemType, item);
 		}
 		
 	}
@@ -141,6 +144,9 @@ public class Game {
 			}
 			if(building.getBuildingType() == BuildingType.SAWMILL) {
 				resources.get(ItemType.WOOD).addAmount(1);
+			}
+			if(building.getBuildingType() == BuildingType.FARM && building.getTile().hasUnit(UnitType.HORSE)) {
+				resources.get(ItemType.HORSE).addAmount(1);
 			}
 		}
 		
@@ -373,7 +379,8 @@ public class Game {
 	}
 	private void makeCastle() {
 		for(Tile tile :world.getTilesRandomly()) {
-			if(tile.getRoadType() != null && tile.canBuild() == true && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+			if(tile.getRoadType() != null && tile.canBuild() == true && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() && 
+					tile.getTerrain() != Terrain.ROCK) {
 				buildUnit(UnitType.WORKER, tile);
 				Structure s = new Structure(StructureType.CASTLE, tile);
 				tile.setStructure(s);

@@ -14,13 +14,15 @@ public enum BuildingType implements HasImage {
 	 	IRRIGATION (100, "resources/Images/buildings/irrigation.png", true),
 	 	WINDMILL (200, "resources/Images/buildings/ancientwindmill.png", true),
 		SAWMILL (200, "resources/Images/buildings/sawmill2.png", true),
-	 	BRIDGE (500, "resources/Images/buildings/bridge.png", true)
+	 	BRIDGE (500, "resources/Images/buildings/bridge.png", true),
+	 	FARM (100, "resources/Images/buildings/farm.png", true)
 		;
 
 	private final double health;
 	private MipMap mipmap;
 	private boolean canMoveThrough;
-
+	private String name;
+	
 	BuildingType(double hp, String s, boolean canMoveThrough) {
 		this.health = hp;
 		mipmap = new MipMap(s);
@@ -42,11 +44,17 @@ public enum BuildingType implements HasImage {
 		return mipmap.getColor(size);
 	}
 
+	@Override
+	public String toString() {
+		return name;
+	}
+	
 	public double getHealth() {
 		return health;
 	}
 	public boolean canMoveThrough() {
 		return canMoveThrough;
 	}
+	
 
 }

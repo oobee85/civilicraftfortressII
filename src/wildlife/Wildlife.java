@@ -106,7 +106,7 @@ public class Wildlife {
 			}
 			else if(Math.random() < animal.getMoveChance() && animal.readyToMove()) {
 				
-				if(animal.getTile().getStructure() != null && animal.getTile().getStructure().getStructureType() == StructureType.FARM) {
+				if(animal.getTile().getBuilding() != null && animal.getTile().getBuilding().getBuildingType() == BuildingType.FARM) {
 				//stuck inside farm
 				}
 				else {
