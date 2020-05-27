@@ -423,6 +423,15 @@ public class Frame extends JPanel{
 			}
 		});
 		makeItDry.setPreferredSize(BUILDING_BUTTON_SIZE);
+		
+		JButton makeItDay = new JButton("Day");
+		makeItDay.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.world.makeItDay();
+			}
+		});
+		makeItDay.setPreferredSize(BUILDING_BUTTON_SIZE);
 
 		JToggleButton debug = new JToggleButton(Game.DEBUG_DRAW ? "Stop Debug" : "Debug");
 		debug.addActionListener(new ActionListener() {
@@ -460,6 +469,7 @@ public class Frame extends JPanel{
 		buttonPanel.add(flipTable);
 		buttonPanel.add(makeItRain);
 		buttonPanel.add(makeItDry);
+		buttonPanel.add(makeItDay);
 		buttonPanel.add(debug);
 		buttonPanel.add(exit);
 		

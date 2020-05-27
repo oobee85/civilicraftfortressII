@@ -68,6 +68,9 @@ public class World {
 			tile.liquidAmount = 0;
 		}
 	}
+	public void makeItDay() {
+		Game.ticks = 0;
+	}
 	public void rain() {
 		System.out.println("raining");
 		for(Tile tile : getTiles()) {
