@@ -56,6 +56,9 @@ public class Game {
 			}
 			resources.put(itemType, item);
 		}
+		resources[ItemType.IRON_ORE].addAmount(200);
+		resources[ItemType.COPPER_ORE].addAmount(200);
+		resources[ItemType.HORSE].addAmount(200);
 		
 	}
 	
@@ -751,21 +754,35 @@ public class Game {
 		}
 		
 	}
+
 	public void buildUnit(UnitType u, Tile tile) {
-		if(u == UnitType.SWORDSMAN && resources[ItemType.IRON_ORE].getAmount() < 10) {
-			return;
-		}
-		Unit unit = new Unit(u , tile, true);
-		if(!tile.isBlocked(unit)) {
-			tile.addUnit(unit);
-			world.units.add(unit);
-			if(u == UnitType.SWORDSMAN) {
-				resources[ItemType.IRON_ORE].addAmount(-10);
-				guiController.updateGUI();
+
+		for (Map.Entry mapElement : u.getCost().entrySet()) {
+			ItemType key = (ItemType) mapElement.getKey();
+			Integer value = (Integer) mapElement.getValue();
+			
+			if (resources[key].getAmount() < value) {
+				return;
 			}
 		}
+		
+		Unit unit = new Unit(u, tile, true);
+		if (tile.isBlocked(unit)) {
+			return;
+		}
+		
+		for (Map.Entry mapElement : u.getCost().entrySet()) {
+			ItemType key = (ItemType) mapElement.getKey();
+			Integer value = (Integer) mapElement.getValue();
+			
+			resources[key].addAmount(-value);
+		}
+
+		tile.addUnit(unit);
+		world.units.add(unit);
+
 	}
-	
+
 	public void doubleClick(int mx, int my) {
 		Position tilepos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
