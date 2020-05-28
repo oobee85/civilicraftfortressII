@@ -109,6 +109,12 @@ public class Frame extends JPanel{
 				int fontSize = terr.getFont().getSize();
 				rightClickPanel.add(terr);
 				terr.setBounds(20, y += fontSize, 100, 100);
+
+				if(tile.getHasResource()) {
+					JLabel label = setupMiniLabel(tile.getResourceType().toString(), null, null);
+					rightClickPanel.add(label);
+					label.setBounds(20, y += fontSize, 100, 100);
+				}
 				
 				if(tile.getBuilding() != null) {
 					JLabel building = setupMiniLabel(tile.getBuilding().toString(), null, null);
@@ -310,6 +316,7 @@ public class Frame extends JPanel{
 		});
 		
 		Dimension RESOURCE_BUTTON_SIZE = new Dimension(200, 35);
+		Dimension RESEARCH_BUTTON_SIZE = new Dimension(125, 35);
 		int BUILDING_ICON_SIZE = 25;
 		int RESOURCE_ICON_SIZE = 35;
 		
@@ -550,7 +557,7 @@ public class Frame extends JPanel{
 		techView = new JPanel();
 		
 		for(int i = 0; i < ResearchType.values().length; i++) {
-			researchButtons[i] = setupButton(ResearchType.values()[i].toString(), null, RESOURCE_BUTTON_SIZE);
+			researchButtons[i] = setupButton(ResearchType.values()[i].toString(), null, RESEARCH_BUTTON_SIZE);
 			techView.add(researchButtons[i]);
 		}
 		
