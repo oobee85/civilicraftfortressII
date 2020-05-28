@@ -44,24 +44,31 @@ public class KButton extends JButton {
 
 	@Override
 	public void paintComponent(Graphics g) {
-		if(pressed) {
+		if(pressed && isEnabled()) {
 			g.setColor(KUIConstants.SELECTED_COLOR);
 		}
-		else if(hovered) {
+		else if(hovered && isEnabled()) {
 			g.setColor(KUIConstants.HOVERED_COLOR);
 		}
-		else {
+		else if(isEnabled()) {
 			g.setColor(KUIConstants.NORMAL_COLOR);
+		}
+		else {
+			g.setColor(KUIConstants.HOVERED_COLOR);
 		}
 		g.fillRect(0, 0, getWidth(), getHeight());
 
-		if(pressed) {
+		if(pressed && isEnabled()) {
 			this.setForeground(KUIConstants.SELECTED_TEXT_COLOR);
 			this.setBorderPainted(false);
 		}
-		else {
+		else if(isEnabled()) {
 			this.setForeground(KUIConstants.NORMAL_TEXT_COLOR);
 			this.setBorderPainted(true);
+		}
+		else {
+			this.setForeground(KUIConstants.DISABLED_TEXT_COLOR);
+			this.setBorderPainted(false);
 		}
 		super.paintComponent(g);
 	}

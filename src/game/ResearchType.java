@@ -6,11 +6,11 @@ import utils.*;
 
 public enum ResearchType {
 	
-	WARRIOR_CODE (100, "resources/Images/buildings/wall_wood.png", null),
-	BRONZE_WORKING (100, "resources/Images/buildings/wall_wood.png", null),
-	WRITING (100, "resources/Images/buildings/wall_wood.png", null),
-	WHEEL (100, "resources/Images/buildings/wall_wood.png", null),
-	WOODCUTTING (100, "resources/Images/buildings/wall_wood.png", null),
+	WARRIOR_CODE (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {}),
+	BRONZE_WORKING (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {}),
+	WRITING (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {}),
+	WHEEL (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {}),
+	WOODCUTTING (100, "resources/Images/buildings/wall_wood.png", new ResearchType[] {}),
 	
 	IRON_WORKING (200, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.WARRIOR_CODE, ResearchType.BRONZE_WORKING}),
 	FARMING (200, "resources/Images/buildings/wall_wood.png", new ResearchType[] {ResearchType.BRONZE_WORKING}),

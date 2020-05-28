@@ -62,8 +62,7 @@ public class Frame extends JPanel{
 		WIDTH = HEIGHT + GUIWIDTH;
 		frame.setSize(WIDTH, HEIGHT);
 		frame.setLocationRelativeTo(null);
-		
-		gameInstance = new Game(new GUIController() {
+		GUIController guiController = new GUIController() {
 			@Override
 			public void toggleCityView() {
 				System.out.println("toggle city view");
@@ -80,6 +79,17 @@ public class Frame extends JPanel{
 			public void updateGUI() {
 				for(int i = 0; i < ItemType.values().length; i++) {
 					resourceIndicators[i].setText("" + gameInstance.getResourceAmount(ItemType.values()[i]) + " " + ItemType.values()[i]);
+				}
+				for(int i = 0; i < ResearchType.values().length; i++) {
+					Research r = gameInstance.researches.get(ResearchType.values()[i]);
+					boolean unlocked = r.isUnlocked();
+					boolean requirements = r.areRequirementsMet();
+					if(unlocked || !requirements) {
+						researchButtons[i].setEnabled(false);
+					}
+					else {
+						researchButtons[i].setEnabled(true);
+					}
 				}
 				frame.repaint();
 			}
@@ -158,7 +168,8 @@ public class Frame extends JPanel{
 				popup.show(gamepanel, mx-100, my-50);
 				
 			}
-		});
+		};
+		gameInstance = new Game(guiController);
 			
 		
 		EventQueue.invokeLater(new Runnable() {
@@ -557,7 +568,12 @@ public class Frame extends JPanel{
 		techView = new JPanel();
 		
 		for(int i = 0; i < ResearchType.values().length; i++) {
-			researchButtons[i] = setupButton(ResearchType.values()[i].toString(), null, RESEARCH_BUTTON_SIZE);
+			final ResearchType type = ResearchType.values()[i];
+			researchButtons[i] = setupButton(type.toString(), null, RESEARCH_BUTTON_SIZE);
+			researchButtons[i].setEnabled(false);
+			researchButtons[i].addActionListener(e -> {
+				gameInstance.setResearchTarget(type);
+			});
 			techView.add(researchButtons[i]);
 		}
 		

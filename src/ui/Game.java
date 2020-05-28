@@ -20,9 +20,13 @@ public class Game {
 	private BufferedImage heightMapImage;
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
 	private Unit selectedUnit;
-	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
 	LinkedList<Building> buildings = new LinkedList<Building>();
 	LinkedList<Structure> structures = new LinkedList<Structure>();
+	
+	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
+	HashMap<ResearchType, Research> researches = new HashMap<>();
+	
+	private Research researchTarget;
 	
 	public static int tileSize = 10;
 	private int money;
@@ -56,6 +60,15 @@ public class Game {
 			}
 			resources.put(itemType, item);
 		}
+		for(ResearchType researchType : ResearchType.values()) {
+			Research res = new Research(researchType);
+			researches.put(researchType, res);
+		}
+		for(Research research : researches.values()) {
+			for(ResearchType requiredType : research.getType().getChildren()) {
+				research.addRequirement(researches[requiredType]);
+			}
+		}
 		
 	}
 	
@@ -67,18 +80,9 @@ public class Game {
 		
 		if(ticks%20 == 0) {
 			updateTerritory();
+			doResearch();
 			changedTerrain = true;
 		}
-//		if(Math.random() < 0.01) {
-//			for(int x = 0; x < world2.getWidth(); x++) {
-//				for(int y = 0; y < world2.getHeight(); y++) {
-//					world[x][y].liquidAmount *= 0.5;
-//				}
-//			}
-//			makeLake(100);
-//			changedTerrain = true;
-//		}
-		
 		
 		if(ticks == 1) {
 			world.rain();
@@ -90,14 +94,12 @@ public class Game {
 		if(Math.random() < 0.01) {
 			world.grow();
 		}
-		if(ticks%1 == 0) {
-			if(world.volcano != null) {
-				world[world.volcano].liquidType = LiquidType.LAVA;
-				world[world.volcano].liquidAmount += .05;
-			}
-			Liquid.propogate(world);
-			changedTerrain = true;
+		if(world.volcano != null) {
+			world[world.volcano].liquidType = LiquidType.LAVA;
+			world[world.volcano].liquidAmount += .05;
 		}
+		Liquid.propogate(world);
+		changedTerrain = true;
 		
 		Wildlife.tick(world);
 		world.updatePlantDamage();
@@ -594,6 +596,19 @@ public class Game {
 	private void updateTerritory() {
 		for(Structure structure : structures) {
 			structure.updateCulture();
+		}
+	}
+	private void doResearch() {
+		if(researchTarget != null) {
+			researchTarget.spendResearch(10);
+			if(researchTarget.isUnlocked()) {
+				guiController.updateGUI();
+			}
+		}
+	}
+	public void setResearchTarget(ResearchType type) {
+		if(researches[type].areRequirementsMet()) {
+			researchTarget = researches[type];
 		}
 	}
 	private void setTerritory(TileLoc p) {
