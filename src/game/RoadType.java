@@ -5,11 +5,10 @@ import java.awt.Image;
 
 import javax.swing.ImageIcon;
 
-import utils.HasImage;
-import utils.MipMap;
+import utils.*;
 
 public enum RoadType implements HasImage{
-	ROAD_STONE (4, "resources/Images/buildings/castle256.png"),
+	STONE_ROAD (4, "resources/Images/buildings/castle256.png"),
 	;
 	
 	private final double speed;
@@ -40,6 +39,11 @@ public enum RoadType implements HasImage{
 
 	public double getSpeed() {
 		return speed;
+	}
+
+	@Override
+	public String toString() {
+		return Utils.getName(this);
 	}
 
 }

@@ -19,6 +19,8 @@ public class Thing implements HasImage {
 	private HasImage hasImage;
 	private boolean sideHealthBar;
 	
+	private String name;
+	
 	public Thing(double maxHealth, HasImage hasImage) {
 		health = maxHealth;
 		this.maxHealth = maxHealth;

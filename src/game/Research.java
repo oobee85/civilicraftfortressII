@@ -1,7 +1,5 @@
 package game;
 
-import java.util.ArrayList;
-
 public class Research {
 
 	private int researchPointsSpent;
@@ -20,6 +18,11 @@ public class Research {
 		if(researchPointsSpent >= type.getRequirdPoints()) {
 			isUnlocked = true;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return type;
 	}
 	
 }

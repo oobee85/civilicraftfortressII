@@ -54,7 +54,7 @@ public class Unit extends Thing {
 		this.setTile(t);
 
 		if(this.getUnitType() == UnitType.DRAGON && t.canPlant() == true) {
-			t.setTerrain(Terrain.BURNEDGROUND);
+			t.setTerrain(Terrain.BURNED_GROUND);
 		}
 	}
 	
@@ -75,5 +75,9 @@ public class Unit extends Thing {
 		}
 		
 	}
-	
+
+	@Override
+	public String toString() {
+		return unitType;
+	}
 }

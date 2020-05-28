@@ -22,7 +22,6 @@ public enum BuildingType implements HasImage {
 	private final double health;
 	private MipMap mipmap;
 	private boolean canMoveThrough;
-	private String name;
 	
 	BuildingType(double hp, String s, boolean canMoveThrough) {
 		this.health = hp;
@@ -39,6 +38,13 @@ public enum BuildingType implements HasImage {
 	public ImageIcon getImageIcon(int size) {
 		return mipmap.getImageIcon(size);
 	}
+	
+	public double getHealth() {
+		return health;
+	}
+	public boolean canMoveThrough() {
+		return canMoveThrough;
+	}
 
 	@Override
 	public Color getColor(int size) {
@@ -47,15 +53,6 @@ public enum BuildingType implements HasImage {
 
 	@Override
 	public String toString() {
-		return name;
+		return Utils.getName(this);
 	}
-	
-	public double getHealth() {
-		return health;
-	}
-	public boolean canMoveThrough() {
-		return canMoveThrough;
-	}
-	
-
 }

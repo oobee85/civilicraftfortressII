@@ -12,42 +12,45 @@ public enum StructureType implements HasImage {
 	BARRACKS (1000, "resources/Images/buildings/barracks256.png", 0, 1)
 	
 	;
-	
-    private final double health;   
+
+	private final double health;
 	private MipMap mipmap;
-    private int culture;
-    public int cultureRate;
-    
-    StructureType(double hp, String s, int culture, int cultureRate) {
-        this.health = hp;
-        this.culture = culture;
-        this.cultureRate = cultureRate;
-        this.mipmap = new MipMap(s);
-        
-    }
-    
-    @Override
-    public Image getImage(int size) {
-    	return mipmap.getImage(size);
-    }
-    @Override
-    public ImageIcon getImageIcon(int size) {
-    	return mipmap.getImageIcon(size);
-    }
+	private int culture;
+	public int cultureRate;
+
+	StructureType(double hp, String s, int culture, int cultureRate) {
+		this.health = hp;
+		this.culture = culture;
+		this.cultureRate = cultureRate;
+		this.mipmap = new MipMap(s);
+
+	}
+
+	@Override
+	public Image getImage(int size) {
+		return mipmap.getImage(size);
+	}
+
+	@Override
+	public ImageIcon getImageIcon(int size) {
+		return mipmap.getImageIcon(size);
+	}
+
 	@Override
 	public Color getColor(int size) {
 		return mipmap.getColor(size);
 	}
-    
-    public double getHealth() {
-    	return health; 
-    }
-    public int getCulture() {
-    	return culture; 
-    }
-    
-    
+
+	public double getHealth() {
+		return health;
+	}
+
+	public int getCulture() {
+		return culture;
+	}
+
+	@Override
+	public String toString() {
+		return Utils.getName(this);
+	}
 }
-
-
-

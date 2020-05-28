@@ -2,7 +2,7 @@ package game;
 
 import java.util.ArrayList;
 
-import utils.MipMap;
+import utils.*;
 
 public enum ResearchType {
 	
@@ -30,14 +30,12 @@ public enum ResearchType {
 	
 	private ResearchType[] children;
 	private MipMap mipmap;
-	private String name;
 	private int requiredRP;
 	
 	ResearchType(int researchPoints, String s, ResearchType[] rt){
 		children = rt;
 		mipmap = new MipMap(s);
 		this.requiredRP = researchPoints;
-		name = this.name().toLowerCase().replace('_', ' ');
 	}
 	public int getRequirdPoints() {
 		return requiredRP;
@@ -48,7 +46,7 @@ public enum ResearchType {
 
 	@Override
 	public String toString() {
-		return name;
+		return Utils.getName(this);
 	}
 	
 	

@@ -35,4 +35,9 @@ public class Structure extends Thing {
 		strings.add(String.format("CT=%." + Game.NUM_DEBUG_DIGITS + "f", getCulture() * 1.0));
 		return strings;
 	}
+	
+	@Override
+	public String toString() {
+		return structureType;
+	}
 }

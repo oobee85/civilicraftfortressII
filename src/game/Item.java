@@ -1,6 +1,6 @@
 package game;
 
-import utils.Quantity;
+import utils.*;
 
 public class Item extends Quantity{
 
@@ -12,6 +12,11 @@ public class Item extends Quantity{
 	}
 	
 	public ItemType getResourceType() {
+		return resourceType;
+	}
+	
+	@Override
+	public String toString() {
 		return resourceType;
 	}
 	

@@ -53,4 +53,9 @@ public enum LiquidType implements HasImage {
 	public Color getColor(int size) {
 		return mipmap.getColor(size);
 	}
+
+	@Override
+	public String toString() {
+		return Utils.getName(this);
+	}
 }

@@ -25,6 +25,7 @@ public class Frame extends JPanel{
 	
 	Font buttonFont = new Font(fontName, Font.PLAIN, 17);
 	Font buttonFontSmall = new Font(fontName, Font.PLAIN, 14);
+	Font buttonFontMini = new Font(fontName, Font.PLAIN, 13);
 	
 	Border massiveBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(5, 5, 5, 5));
 	
@@ -91,7 +92,7 @@ public class Frame extends JPanel{
 					public void paintComponent(Graphics g){
 						
 						Graphics2D g2d = (Graphics2D) g; 
-			            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1)); 
+						g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1)); 
 						g.drawImage(Utils.toBufferedImage(Utils.loadImage("resources/Images/interfaces/tileinfo.png")),0 ,0, null );
 						super.paintComponent(g);
 						
@@ -101,37 +102,38 @@ public class Frame extends JPanel{
 				rightClickPanel.setPreferredSize(new Dimension(193, 173));
 				rightClickPanel.setLayout(null);
 				rightClickPanel.setOpaque(false);
+
+				int y = 48;
 				
-				
-				JLabel terr = new JLabel(tile.getTerrain().toString());
+				JLabel terr = setupMiniLabel(tile.getTerrain().toString(), null, null);
+				int fontSize = terr.getFont().getSize();
 				rightClickPanel.add(terr);
-				
-			
-				
-				
-				int y = 55;
-				terr.setBounds(20, y += 10, 100, 100);
+				terr.setBounds(20, y += fontSize, 100, 100);
 				
 				if(tile.getBuilding() != null) {
-					JLabel building = new JLabel(tile.getBuilding().toString());
+					JLabel building = setupMiniLabel(tile.getBuilding().toString(), null, null);
 					rightClickPanel.add(building);
-					building.setBounds(20, y += 10, 100, 100);
+					building.setBounds(20, y += fontSize, 100, 100);
 				}
 				if(tile.getStructure() != null) {
-					JLabel structure = new JLabel(tile.getStructure().toString());
+					JLabel structure = setupMiniLabel(tile.getStructure().toString(), null, null);
 					rightClickPanel.add(structure);
-					structure.setBounds(20, y += 10, 100, 100);
+					structure.setBounds(20, y += fontSize, 100, 100);
 				}
-				
+				if(tile.getRoadType() != null) {
+					JLabel structure = setupMiniLabel(tile.getRoadType().toString(), null, null);
+					rightClickPanel.add(structure);
+					structure.setBounds(20, y += fontSize, 100, 100);
+				}
 				if(tile.getPlant() != null) {
-					JLabel t = new JLabel(tile.getPlant().getPlantType().toString());
+					JLabel t = setupMiniLabel(tile.getPlant().getPlantType().toString(), null, null);
 					rightClickPanel.add(t);
-					t.setBounds(20, y += 10, 100, 100);
+					t.setBounds(20, y += fontSize, 100, 100);
 				}
 				for(Unit u : tile.getUnits()) {
-					JLabel a = new JLabel(u.getUnitType().toString());
+					JLabel a = setupMiniLabel(u.getUnitType().toString(), null, null);
 					rightClickPanel.add(a);
-					a.setBounds(20, y += 10, 100, 100);
+					a.setBounds(20, y += fontSize, 100, 100);
 				}
 				
 				JPopupMenu popup = new JPopupMenu() {
@@ -184,6 +186,15 @@ public class Frame extends JPanel{
 		b.setText(text);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
 		setComponentAttributes(b, size);
+		return b;
+	}
+	private JLabel setupMiniLabel(String text, Icon icon, Dimension size) {
+		JLabel b = new JLabel(icon);
+		b.setText(text);
+		b.setHorizontalAlignment(SwingConstants.LEFT);
+		setComponentAttributes(b, size);
+		b.setBorder(null);
+		b.setFont(buttonFontMini);
 		return b;
 	}
 	
@@ -304,7 +315,7 @@ public class Frame extends JPanel{
 		
 		JButton makeRoad = setupButton("Road", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildroad.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		makeRoad.addActionListener(e -> {
-			gameInstance.buildRoad(RoadType.ROAD_STONE);
+			gameInstance.buildRoad(RoadType.STONE_ROAD);
 		});
 		JButton makeWoodWall = setupButton("Wood Wall", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/wall_wood.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		makeWoodWall.addActionListener(e -> {
@@ -687,7 +698,7 @@ public class Frame extends JPanel{
 				}
 				if(e.getKeyCode()==KeyEvent.VK_R) {
 					if(gameInstance.getSelectedUnit() != null) {
-						gameInstance.buildRoad(RoadType.ROAD_STONE);
+						gameInstance.buildRoad(RoadType.STONE_ROAD);
 					}
 				}
 				if(e.getKeyCode()==KeyEvent.VK_M) {

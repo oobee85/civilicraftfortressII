@@ -4,10 +4,9 @@ import java.awt.*;
 
 import javax.swing.ImageIcon;
 
-import utils.HasImage;
-import utils.MipMap;
+import utils.*;
 
-public enum ItemType implements HasImage{
+public enum ItemType implements HasImage {
 	
 	COPPER_ORE ( "resources/Images/itemicons/copper_ore.png"),
 	IRON_ORE ( "resources/Images/itemicons/iron_ore.png"),
@@ -24,11 +23,9 @@ public enum ItemType implements HasImage{
 	;
 	
 	private MipMap mipmap;
-	private String name;
 	
 	ItemType(String s) {
 		 this.mipmap = new MipMap(s);
-		 name = this.name().toLowerCase().replace('_', ' ');
 	}
 
 	@Override
@@ -48,6 +45,6 @@ public enum ItemType implements HasImage{
 	
 	@Override
 	public String toString() {
-		return name;
+		return Utils.getName(this);
 	}
 }

@@ -16,4 +16,9 @@ public class Building extends Thing {
 		return buildingType;
 	}
 	
+	@Override
+	public String toString() {
+		return buildingType;
+	}
+	
 }

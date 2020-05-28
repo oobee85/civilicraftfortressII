@@ -21,4 +21,9 @@ public class Plant extends Thing {
 	public PlantType getPlantType() {
 		return plantType;
 	}
+
+	@Override
+	public String toString() {
+		return plantType;
+	}
 }

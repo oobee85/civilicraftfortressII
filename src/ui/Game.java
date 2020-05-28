@@ -317,7 +317,7 @@ public class Game {
 		System.out.println("road iterations: " + iterations);
 		
 		for(Tile t : selectedPath.getTiles()) {
-			t.setRoad(RoadType.ROAD_STONE, "asdf");
+			t.setRoad(RoadType.STONE_ROAD, "asdf");
 		}
 	}
 
@@ -369,7 +369,7 @@ public class Game {
 				s += d;
 			}
 		}
-		world[loc].setRoad(RoadType.ROAD_STONE, s);
+		world[loc].setRoad(RoadType.STONE_ROAD, s);
 	}
 	private void turnRoads() {
 		for(Tile tile : world.getTiles()) {

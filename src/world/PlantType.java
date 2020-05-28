@@ -49,4 +49,9 @@ public enum PlantType implements HasImage {
 	public boolean isAquatic() {
 		return aquatic;
 	}
+
+	@Override
+	public String toString() {
+		return Utils.getName(this);
+	}
 }
