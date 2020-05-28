@@ -1,26 +1,31 @@
 package game;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Image;
+import java.util.HashMap;
 
 import javax.swing.ImageIcon;
-import utils.*;
+
+import utils.HasImage;
+import utils.MipMap;
+import utils.Utils;
 
 public enum UnitType implements HasImage {
-	WORKER        ( "resources/Images/units/worker.png", new CombatStats(100, 0, 10, 1), false, false, false),
- 	WARRIOR      ( "resources/Images/units/warrior.png", new CombatStats(100, 10, 10, 1), false, false, false),
- 	SPEARMAN    ( "resources/Images/units/spearman.png", new CombatStats(200, 10, 10, 1), false, false, false),
- 	ARCHER        ( "resources/Images/units/archer.png", new CombatStats(50, 20, 10, 2), false, false, false),
- 	SWORDSMAN  ( "resources/Images/units/swordsman.png", new CombatStats(200, 20, 10, 1), false, false, false),
- 	HORSEMAN    ( "resources/Images/units/horseman.png", new CombatStats(100, 10, 20, 2), false, false, false),
+	WORKER         ( "resources/Images/units/worker.png", new CombatStats(100, 0, 10, 1), false, false, false, new HashMap<ItemType, Integer>() { {put(ItemType.WHEAT,50);  }} ),
+ 	WARRIOR      ( "resources/Images/units/warrior.png", new CombatStats(100, 10, 10, 1), false, false, false, new HashMap<ItemType, Integer>() { {put(ItemType.WHEAT,50); put(ItemType.COPPER_ORE,10); }} ),
+ 	SPEARMAN    ( "resources/Images/units/spearman.png", new CombatStats(200, 10, 10, 1), false, false, false, new HashMap<ItemType, Integer>() { {put(ItemType.WHEAT,50); put(ItemType.COPPER_ORE,20);}} ),
+ 	ARCHER         ( "resources/Images/units/archer.png", new CombatStats(50, 20, 10, 2), false, false, false, new HashMap<ItemType, Integer>() { {put(ItemType.WHEAT,50); }}),
+ 	SWORDSMAN  ( "resources/Images/units/swordsman.png", new CombatStats(200, 20, 10, 1), false, false, false, new HashMap<ItemType, Integer>() { {put(ItemType.WHEAT,50); put(ItemType.IRON_ORE,10);}}),
+ 	HORSEMAN    ( "resources/Images/units/horseman.png", new CombatStats(100, 10, 20, 2), false, false, false, new HashMap<ItemType, Integer>() { {put(ItemType.WHEAT,50); put(ItemType.COPPER_ORE,10); put(ItemType.HORSE,10);}}),
 
-	DEER   ("resources/Images/units/deer.png", new CombatStats(100, 5, 10, 5), false, false, false),
-	HORSE ("resources/Images/units/horse.png", new CombatStats(100, 5, 10, 5), false, false, false),
-	PIG     ("resources/Images/units/pig.png", new CombatStats(100, 5, 10, 5), false, false, false),
-	SHEEP ("resources/Images/units/sheep.png", new CombatStats(100, 5, 10, 5), false, false, false),
-	FISH  ("resources/Images/units/fish2.png", new CombatStats(10, 1, 100, 1), true, false, false),
-	COW     ("resources/Images/units/cow.png", new CombatStats(200, 10, 10, 1), false, false, false),
+	DEER    ("resources/Images/units/deer.png", new CombatStats(100, 5, 10, 5), false, false, false, null),
+	HORSE  ("resources/Images/units/horse.png", new CombatStats(100, 5, 10, 5), false, false, false, null),
+	PIG      ("resources/Images/units/pig.png", new CombatStats(100, 5, 10, 5), false, false, false, null),
+	SHEEP  ("resources/Images/units/sheep.png", new CombatStats(100, 5, 10, 5), false, false, false, null),
+	FISH    ("resources/Images/units/fish2.png", new CombatStats(10, 1, 100, 1), true, false, false, null),
+	COW     ("resources/Images/units/cow.png", new CombatStats(200, 10, 10, 1), false, false, false, null),
 	
-	DRAGON  ("resources/Images/units/dragon.png", new CombatStats(1000, 50, 100, 50), false, true, true),
-	WOLF      ("resources/Images/units/wolf.png", new CombatStats(100, 10, 10, 10), false, false, true),
+	DRAGON  ("resources/Images/units/dragon.png", new CombatStats(1000, 50, 100, 50), false, true, true, null),
+	WOLF       ("resources/Images/units/wolf.png", new CombatStats(100, 10, 10, 10), false, false, true, null),
 	;
 	
 	private MipMap mipmap;
@@ -28,13 +33,15 @@ public enum UnitType implements HasImage {
 	private boolean isAquatic;
 	private boolean isFlying;
 	private boolean isHostile;
+	private HashMap <ItemType, Integer> cost;
     
-    UnitType( String s, CombatStats cs, boolean isAquatic, boolean isFlying, boolean isHostile) {
+    UnitType( String s, CombatStats cs, boolean isAquatic, boolean isFlying, boolean isHostile, HashMap<ItemType, Integer> resourcesNeeded) {
     	mipmap = new MipMap(s);
     	combatStats = cs;
 		this.isAquatic = isAquatic;
 		this.isFlying = isFlying;
 		this.isHostile = isHostile;
+		this.cost = resourcesNeeded;
     }
     
 	public CombatStats getCombatStats() {
@@ -49,6 +56,9 @@ public enum UnitType implements HasImage {
 	}
 	public boolean isHostile() {
 		return isHostile;
+	}
+	public HashMap<ItemType, Integer> getCost(){
+		return cost;
 	}
 
 	@Override
