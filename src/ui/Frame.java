@@ -13,6 +13,7 @@ import world.*;
 public class Frame extends JPanel{
 	public static final Color BACKGROUND_COLOR = new Color(200, 200, 200);
 	int GUIWIDTH = 400;
+	int MINIMAPBORDERWIDTH = 50;
 	
 	public static final Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
 	public static final Dimension BUILD_UNIT_BUTTON_SIZE = new Dimension(170, 35);
@@ -30,8 +31,10 @@ public class Frame extends JPanel{
 	Border massiveBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(5, 5, 5, 5));
 	
 	
-	private Timer timmy;
-	private JPanel panel;
+	private ImageIcon BUILDING_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), 20, 20);
+	
+	private Timer repaintingThread;
+	private JPanel mainMenuPanel;
 	private JFrame frame;
 	private JPanel gamepanel;
 	private JPanel minimapPanel;
@@ -39,6 +42,8 @@ public class Frame extends JPanel{
 	private JPanel tileView;
 	private JPanel buildingMenu;
 	private JPanel techView;
+	private JLabel tileSize;
+	private JTabbedPane tabbedPane;
 	private JComboBox<MapType> mapType;
 	private JLabel[] resourceIndicators = new JLabel[ItemType.values().length];
 	private JButton[] researchButtons = new JButton[ResearchType.values().length];
@@ -51,6 +56,11 @@ public class Frame extends JPanel{
 	private int mx;
 	private int my;
 	private boolean dragged = false;
+	
+	private int RESOURCE_TAB;
+	private int BUILDING_TAB;
+	private int TECH_TAB;
+	private int DEBUG_TAB;
 	
 	private Thread gameLoopThread;
 	
@@ -70,6 +80,17 @@ public class Frame extends JPanel{
 				System.out.println("toggle city view");
 				frame.setGlassPane(cityView);
 				cityView.setVisible(!cityView.isVisible());
+				frame.repaint();
+			}
+			@Override
+			public void selectedWorker(boolean selected) {
+				if(selected) {
+					addBuildingTab();
+					tabbedPane.setSelectedIndex(BUILDING_TAB);
+				}
+				else {
+					removeBuildingTab();
+				}
 				frame.repaint();
 			}
 			@Override
@@ -261,7 +282,7 @@ public class Frame extends JPanel{
 	}
 	
 	private void menu() {
-		panel = new JPanel();
+		mainMenuPanel = new JPanel();
 		JButton start = setupButton("Start Game", null, BUILDING_BUTTON_SIZE);
 		start.addActionListener(new ActionListener() {
 			@Override
@@ -276,15 +297,15 @@ public class Frame extends JPanel{
 				}
 			}
 		});
-		panel.add(start);
+		mainMenuPanel.add(start);
 		
 		mapType = new JComboBox<>(MapType.values());
 		setComponentAttributes(mapType, BUILDING_BUTTON_SIZE);
-		panel.add(mapType);
+		mainMenuPanel.add(mapType);
 		
 		mapSize = new JTextField("128", 10);
 		setComponentAttributes(mapSize, BUILDING_BUTTON_SIZE);
-		panel.add(mapSize);
+		mainMenuPanel.add(mapSize);
 		
 		
 //		JButton exit = new JButton("exit");
@@ -298,19 +319,16 @@ public class Frame extends JPanel{
 //		exit.setPreferredSize(new Dimension(100,50));
 //		panel.add(exit);
 		
-		panel.setBackground(Color.WHITE);
-		panel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-		frame.add(panel);
+		mainMenuPanel.setBackground(Color.WHITE);
+		mainMenuPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+		frame.add(mainMenuPanel);
 		frame.pack();
 		frame.setVisible(true);
 		frame.requestFocusInWindow();
 		frame.setPreferredSize(new Dimension(WIDTH,HEIGHT));
 	}
 	
-	private void runGame() {
-		System.err.println("Starting Game");
-		frame.remove(panel);
-		
+	private void setupGamePanel() {
 		gamepanel = new JPanel() {
 			@Override
 			public void paintComponent(Graphics g) {
@@ -331,7 +349,101 @@ public class Frame extends JPanel{
 				gameInstance.setViewSize(gamepanel.getWidth(), gamepanel.getHeight());
 			}
 		});
-		int MINIMAPBORDERWIDTH = 50;
+		gamepanel.addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				//+1 is in -1 is out
+				gameInstance.zoomView(e.getWheelRotation(),mx,my);
+				tileSize.setText("TileSize = " + gameInstance.getTileSize());
+			}
+		});
+		gamepanel.addMouseMotionListener(new MouseMotionListener() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				mx = e.getX();
+				my = e.getY();
+				gameInstance.mouseOver(mx, my);
+			}
+			@Override
+			public void mouseDragged(MouseEvent e) {
+//				System.out.println("mouse drag");
+				dragged = true;
+				if(SwingUtilities.isRightMouseButton(e)) {
+					int mrx = e.getX();
+					int mry = e.getY();
+					int dx = mx-mrx;
+					int dy = my-mry;
+					gameInstance.shiftView(dx, dy);
+					mx = mrx;
+					my = mry;
+					
+					gameInstance.mouseOver(mx, my);
+				} else if(SwingUtilities.isLeftMouseButton(e)) {
+					int mx2 = e.getX();
+					int my2 = e.getY();
+					gameInstance.mouseOver(mx2, my2);
+				}
+			}
+		});
+		
+		gamepanel.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if(e.getButton() == MouseEvent.BUTTON1 && dragged == false) {
+					gameInstance.mouseClick(mx, my);
+				}
+				if(e.getButton() == MouseEvent.BUTTON3 && dragged == false) {
+					gameInstance.rightClick(mx, my);
+				}
+				dragged = false;
+			}
+			@Override
+			public void mousePressed(MouseEvent e) {
+				mx = e.getX();
+				my = e.getY();
+			}
+			@Override
+			public void mouseExited(MouseEvent e) { }
+			@Override
+			public void mouseEntered(MouseEvent e) { }
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount()==2) {
+					gameInstance.doubleClick(mx, my);
+				}
+			}
+		});
+		
+		gamepanel.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) { }
+			@Override
+			public void keyReleased(KeyEvent e) { }
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {
+					gameInstance.deselectUnit();
+				}
+				if(e.getKeyCode()==KeyEvent.VK_R) {
+					if(gameInstance.getSelectedUnit() != null) {
+						gameInstance.buildRoad(RoadType.STONE_ROAD);
+					}
+				}
+				if(e.getKeyCode()==KeyEvent.VK_M) {
+					if(gameInstance.getSelectedUnit() != null) {
+						gameInstance.buildBuilding(BuildingType.MINE);
+					}
+				}
+				if(e.getKeyCode()==KeyEvent.VK_I) {
+					if(gameInstance.getSelectedUnit() != null) {
+						gameInstance.buildBuilding(BuildingType.IRRIGATION);
+					}
+				}
+			}
+		});
+	}
+	
+	private void setupMinimapPanel() {
 		minimapPanel = new JPanel() {
 			@Override
 			public void paintComponent(Graphics g) {
@@ -362,6 +474,18 @@ public class Frame extends JPanel{
 				frame.repaint();
 			}
 		});
+	}
+	
+	private void addBuildingTab() {
+		tabbedPane.insertTab("Build Stuff", BUILDING_TAB_ICON, buildingMenu, "Does nothing", BUILDING_TAB);
+	}
+	private void removeBuildingTab() {
+		tabbedPane.removeTabAt(BUILDING_TAB);
+	}
+	
+	private void runGame() {
+		System.err.println("Starting Game");
+		frame.remove(mainMenuPanel);
 		
 		Dimension RESOURCE_BUTTON_SIZE = new Dimension(200, 35);
 		Dimension RESEARCH_BUTTON_SIZE = new Dimension(125, 35);
@@ -429,7 +553,7 @@ public class Frame extends JPanel{
 			resourceIndicators[i] = setupLabel("", Utils.resizeImageIcon(ItemType.values()[i].getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE), RESOURCE_BUTTON_SIZE);
 		}
 		
-		JLabel tSize = setupLabel("TileSize = "+gameInstance.getTileSize(), null, BUILDING_BUTTON_SIZE);
+		tileSize = setupLabel("TileSize = "+gameInstance.getTileSize(), null, BUILDING_BUTTON_SIZE);
 
 		JToggleButton showHeightMap = setupToggleButton("Show Height Map", null, BUILDING_BUTTON_SIZE);
 		showHeightMap.addActionListener(e -> {
@@ -498,7 +622,7 @@ public class Frame extends JPanel{
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setPreferredSize(new Dimension(GUIWIDTH-RESOURCE_PANEL_WIDTH, 1000));
 		buttonPanel.add(money);
-		buttonPanel.add(tSize);
+		buttonPanel.add(tileSize);
 		
 		buttonPanel.add(showHeightMap);
 		buttonPanel.add(flipTable);
@@ -520,24 +644,32 @@ public class Frame extends JPanel{
 			});
 			techView.add(researchButtons[i]);
 		}
+
+		setupGamePanel();
+		setupMinimapPanel();
 		
-		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane = new JTabbedPane();
 		tabbedPane.setFocusable(false);
 		tabbedPane.setFont(buttonFontSmall);
-		tabbedPane.addTab(null, Utils.resizeImageIcon(ItemType.ADAMANTITE_ORE.getImageIcon(0), 20, 20), resourcePanel, "Does nothing");
-		tabbedPane.addTab("Tech Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), 20, 20), techView, "Does nothing");
-		tabbedPane.addTab("Build Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), 20, 20), buildingMenu, "Does nothing");
-		tabbedPane.addTab("Debug Buttons", null, buttonPanel, "Does nothing");
-		tabbedPane.addTab(null, Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), 20, 20), buttonPanel, "Does nothing");
-//		tabbedPane.setEnabledAt(1, false);
 		
+		RESOURCE_TAB = tabbedPane.getTabCount();
+		tabbedPane.addTab(null, Utils.resizeImageIcon(ItemType.ADAMANTITE_ORE.getImageIcon(0), 20, 20), resourcePanel, "Does nothing");
+		TECH_TAB = tabbedPane.getTabCount();
+		tabbedPane.addTab("Tech Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), 20, 20), techView, "Does nothing");
+		BUILDING_TAB = tabbedPane.getTabCount();
+		addBuildingTab();
+		DEBUG_TAB = tabbedPane.getTabCount();
+		tabbedPane.addTab(null, Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), 20, 20), buttonPanel, "Does nothing");
+
+		// remove building tab after setting all of the tabs up
+		removeBuildingTab();
 		
 		JPanel guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());
 		guiSplitter.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));
 		guiSplitter.add(tabbedPane,BorderLayout.CENTER);
 //		guiSplitter.add(resourcePanel,BorderLayout.WEST);
-		
+
 		minimapPanel.setPreferredSize(new Dimension(GUIWIDTH,GUIWIDTH));
 		guiSplitter.add(minimapPanel,BorderLayout.NORTH);
 		
@@ -549,146 +681,14 @@ public class Frame extends JPanel{
 		frame.pack();
 		frame.setVisible(true);
 		gamepanel.requestFocusInWindow();
-		gamepanel.addMouseWheelListener(new MouseWheelListener() {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				//+1 is in -1 is out
-				gameInstance.zoomView(e.getWheelRotation(),mx,my);
-				tSize.setText("TileSize = " + gameInstance.getTileSize());
-			}
-		});
-		gamepanel.addMouseMotionListener(new MouseMotionListener() {
-			
-			@Override
-			public void mouseMoved(MouseEvent e) {
-				
-				mx = e.getX();
-				my = e.getY();
-				gameInstance.mouseOver(mx, my);
-			}
-			
-			@Override
-			public void mouseDragged(MouseEvent e) {
-//				System.out.println("mouse drag");
-				dragged = true;
-				if(SwingUtilities.isRightMouseButton(e)) {
-					int mrx = e.getX();
-					int mry = e.getY();
-					int dx = mx-mrx;
-					int dy = my-mry;
-					gameInstance.shiftView(dx, dy);
-					mx = mrx;
-					my = mry;
-					
-					gameInstance.mouseOver(mx, my);
-				}else if(SwingUtilities.isLeftMouseButton(e)) {
-					int mx2 = e.getX();
-					int my2 = e.getY();
-					
-					gameInstance.mouseOver(mx2, my2);
-//					gameInstance.selectBox(mx,my, mx2, my2);
-					
-				}
-					
-				
-				
-			}
-		});
-		
-		
-		gamepanel.addMouseListener(new MouseListener() {
-			
-			@Override
-			public void mouseReleased(MouseEvent e) {
-//				System.out.println("mouse release");
-				if(e.getButton() == MouseEvent.BUTTON1 && dragged == false) {
-					
-					gameInstance.mouseClick(mx, my);
-					
-				}
-				if(e.getButton() == MouseEvent.BUTTON3 && dragged == false) {
-					
-					gameInstance.rightClick(mx, my);
-				}
-				
-				dragged = false;
-				
-//				gameInstance.resetHoveredArea();
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-//				System.out.println("mousepressed");
-				mx = e.getX();
-				my = e.getY();
-				
-				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-			}
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(e.getClickCount()==2) {
-//					System.out.println("x: "+e.getX());
-//					System.out.println("y: "+e.getY());
-					gameInstance.doubleClick(mx, my);
-				}
-				
-				
-			}
-		});
-		
-		gamepanel.addKeyListener(new KeyListener() {
-			
-			@Override
-			public void keyTyped(KeyEvent e) {
-				
-			}
-			
-			@Override
-			public void keyReleased(KeyEvent e) {
-			}
-			
-			@Override
-			public void keyPressed(KeyEvent e) {
-				
-				//esc removes buildmode
-				if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {
-					gameInstance.deselectUnit();
-				}
-				if(e.getKeyCode()==KeyEvent.VK_R) {
-					if(gameInstance.getSelectedUnit() != null) {
-						gameInstance.buildRoad(RoadType.STONE_ROAD);
-					}
-				}
-				if(e.getKeyCode()==KeyEvent.VK_M) {
-					if(gameInstance.getSelectedUnit() != null) {
-						gameInstance.buildBuilding(BuildingType.MINE);
-					}
-				}
-				if(e.getKeyCode()==KeyEvent.VK_I) {
-					if(gameInstance.getSelectedUnit() != null) {
-						gameInstance.buildBuilding(BuildingType.IRRIGATION);
-					}
-				}
-				
-			}
-		});
 	
-		timmy = new Timer(30, new ActionListener() {
+		repaintingThread = new Timer(30, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				frame.repaint();
 			}
 		});
-		timmy.start();
+		repaintingThread.start();
 
 		frame.repaint();
 		gamepanel.requestFocus();

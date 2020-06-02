@@ -31,7 +31,7 @@ public class Game {
 	
 	private Research researchTarget;
 	
-	public static int tileSize = 20;
+	public static int tileSize = 25;
 	private int money;
 	private Position viewOffset;
 	private TileLoc hoveredTile;
@@ -388,16 +388,17 @@ public class Game {
 		}
 	}
 	private void makeCastle() {
-		for(Tile tile :world.getTilesRandomly()) {
-			if(tile.getRoadType() != null && tile.canBuild() == true && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() && 
-					tile.getTerrain() != Terrain.ROCK) {
+		for (Tile tile : world.getTilesRandomly()) {
+			if (tile.getRoadType() != null && tile.canBuild() == true
+					&& tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()
+					&& tile.getTerrain() != Terrain.ROCK) {
 				buildUnit(UnitType.WORKER, tile);
 				Building s = new Building(BuildingType.CASTLE, tile);
 				tile.setBuilding(s);
 				buildings.add(s);
 				System.out.println("building castle" + tile.getLocation());
-				viewOffset.x += (tile.getLocation().x - panelWidth/2)*tileSize;
-				viewOffset.y += (tile.getLocation().y - panelHeight/2)*tileSize;
+				viewOffset.x += (tile.getLocation().x - 20) * tileSize;
+				viewOffset.y += (tile.getLocation().y - 20) * tileSize;
 				break;
 			}
 		}
@@ -674,20 +675,26 @@ public class Game {
 		}
 	}
 	public void toggleUnitSelectOnTile(Tile tile) {
-		if(tile.hasPlayerControlledUnit()) {
-			if(tile.getPlayerControlledUnit() == selectedUnit) {
+		if (tile.hasPlayerControlledUnit()) {
+			if (tile.getPlayerControlledUnit() == selectedUnit) {
 				deselectUnit();
-			}
-			else {
+			} else {
 				deselectUnit();
 				selectedUnit = tile.getPlayerControlledUnit();
 				selectedUnit.setIsSelected(true);
+				if (selectedUnit.getUnitType() == UnitType.WORKER) {
+					guiController.selectedWorker(true);
+				}
 			}
 		}
-		
+
 	}
+
 	public void deselectUnit() {
-		if(selectedUnit != null) {
+		if (selectedUnit != null) {
+			if (selectedUnit.getUnitType() == UnitType.WORKER) {
+				guiController.selectedWorker(false);
+			}
 			selectedUnit.setIsSelected(false);
 			selectedUnit = null;
 		}
