@@ -37,11 +37,12 @@ public class Frame extends JPanel{
 	private JPanel minimapPanel;
 	private JPanel cityView;
 	private JPanel tileView;
-	private JPanel workerView;
+	private JPanel buildingMenu;
 	private JPanel techView;
 	private JComboBox<MapType> mapType;
 	private JLabel[] resourceIndicators = new JLabel[ItemType.values().length];
 	private JButton[] researchButtons = new JButton[ResearchType.values().length];
+	private JButton[] buildingButtons = new JButton[BuildingType.values().length];
 	private JTextField mapSize;
 	private int WIDTH;
 	private int HEIGHT;
@@ -83,12 +84,25 @@ public class Frame extends JPanel{
 				for(int i = 0; i < ResearchType.values().length; i++) {
 					Research r = gameInstance.researches.get(ResearchType.values()[i]);
 					boolean unlocked = r.isUnlocked();
-					boolean requirements = r.areRequirementsMet();
+					boolean requirements = r.getRequirement().areRequirementsMet();
 					if(unlocked || !requirements) {
 						researchButtons[i].setEnabled(false);
 					}
 					else {
 						researchButtons[i].setEnabled(true);
+					}
+				}
+				for(int i = 0; i < BuildingType.values().length; i++) {
+					BuildingType type = BuildingType.values()[i];
+					JButton button = buildingButtons[i];
+					ResearchRequirement req = gameInstance.buildingResearchRequirements[type];
+					if(req.areRequirementsMet()) {
+						button.setEnabled(true);
+						button.setVisible(true);
+					}
+					else {
+						button.setEnabled(false);
+						button.setVisible(false);
 					}
 				}
 				frame.repaint();
@@ -287,7 +301,7 @@ public class Frame extends JPanel{
 			@Override
 			public void componentResized(ComponentEvent e) {
 				gameInstance.setViewSize(gamepanel.getWidth(), gamepanel.getHeight());
-	        }
+			}
 		});
 		int MINIMAPBORDERWIDTH = 50;
 		minimapPanel = new JPanel() {
@@ -325,57 +339,24 @@ public class Frame extends JPanel{
 		Dimension RESEARCH_BUTTON_SIZE = new Dimension(125, 35);
 		int BUILDING_ICON_SIZE = 25;
 		int RESOURCE_ICON_SIZE = 35;
+
+		buildingMenu = new JPanel();
 		
 		JButton makeRoad = setupButton("Road", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildroad.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		makeRoad.addActionListener(e -> {
 			gameInstance.buildRoad(RoadType.STONE_ROAD);
 		});
-		JButton makeWoodWall = setupButton("Wood Wall", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/wall_wood.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
-		makeWoodWall.addActionListener(e -> {
-			gameInstance.buildBuilding(BuildingType.WALL_WOOD);
-		});
+		buildingMenu.add(makeRoad);
 		
-		JButton makeStoneWall = setupButton("Stone Wall", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/wall_stone.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
-		makeStoneWall.addActionListener(e -> {
-			gameInstance.buildBuilding(BuildingType.WALL_STONE);
-		});
-		
-		JButton makeBrickWall = setupButton("Brick Wall", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/wall_brick.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
-		makeBrickWall.addActionListener(e -> {
-			gameInstance.buildBuilding(BuildingType.WALL_BRICK);
-		});
-		
-		JButton buildMine = setupButton("Mine", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildmine.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
-		buildMine.addActionListener(e -> {
-			gameInstance.buildBuilding(BuildingType.MINE);
-		});
-		
-		JButton buildBarracks = setupButton("Barracks", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildbarracks.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
-		buildBarracks.addActionListener(e -> {
-			gameInstance.buildBuilding(BuildingType.BARRACKS);
-		});
-		JButton buildSawmill = setupButton("Sawmill", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/sawmill.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
-		buildSawmill.addActionListener(e -> {
-			gameInstance.buildBuilding(BuildingType.SAWMILL);
-		});
-		
-		JButton buildFarm = setupButton("Farm", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildfarm.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
-		buildFarm.addActionListener(e -> {
-			gameInstance.buildBuilding(BuildingType.FARM);
-		});
-		
-		JButton buildIrrigation = setupButton("Irrigate", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildirrigation.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
-		buildIrrigation.addActionListener(e -> {
-			gameInstance.buildBuilding(BuildingType.IRRIGATION);
-		});
-		JButton buildWindmill = setupButton("Windmill", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/ancientwindmill.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
-		buildWindmill.addActionListener(e -> {
-			gameInstance.buildBuilding(BuildingType.WINDMILL);
-		});
-		JButton buildGranary = setupButton("Granary", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/granary.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
-		buildGranary.addActionListener(e -> {
-			gameInstance.buildBuilding(BuildingType.GRANARY);
-		});
+		for(int i = 0; i < BuildingType.values().length; i++) {
+			BuildingType type = BuildingType.values()[i];
+			JButton button = setupButton(type.toString(), Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+			button.addActionListener(e -> {
+				gameInstance.buildBuilding(type);
+			});
+			buildingButtons[i] = button;
+			buildingMenu.add(button);
+		}
 		
 		JButton buildWorker = setupButton("Build Worker", 
 				Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
@@ -546,20 +527,6 @@ public class Frame extends JPanel{
 		exitCity.setBounds(790, 20, BUILDING_ICON_SIZE, BUILDING_ICON_SIZE);
 		
 		
-		workerView = new JPanel();
-		
-		workerView.add(makeRoad);
-		workerView.add(makeWoodWall);
-		workerView.add(makeStoneWall);
-		workerView.add(makeBrickWall);
-		workerView.add(buildMine);
-		workerView.add(buildBarracks);
-		workerView.add(buildIrrigation);
-		workerView.add(buildFarm);
-		workerView.add(buildSawmill);
-		workerView.add(buildWindmill);
-		workerView.add(buildGranary);
-		
 		techView = new JPanel();
 		
 		for(int i = 0; i < ResearchType.values().length; i++) {
@@ -577,7 +544,7 @@ public class Frame extends JPanel{
 		tabbedPane.setFont(buttonFontSmall);
 		tabbedPane.addTab(null, Utils.resizeImageIcon(ItemType.ADAMANTITE_ORE.getImageIcon(0), 20, 20), resourcePanel, "Does nothing");
 		tabbedPane.addTab("Tech Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), 20, 20), techView, "Does nothing");
-		tabbedPane.addTab("Build Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), 20, 20), workerView, "Does nothing");
+		tabbedPane.addTab("Build Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), 20, 20), buildingMenu, "Does nothing");
 		tabbedPane.addTab("Debug Buttons", null, buttonPanel, "Does nothing");
 		tabbedPane.addTab(null, Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), 20, 20), buttonPanel, "Does nothing");
 //		tabbedPane.setEnabledAt(1, false);

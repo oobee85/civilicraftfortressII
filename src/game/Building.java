@@ -8,16 +8,15 @@ import world.Tile;
 
 public class Building extends Thing {
 	
-	private boolean isUnlocked = false;
 	private BuildingType buildingType;
-	private ResearchType requirement;
 	private int culture;
 	public static double CULTURE_AREA_MULTIPLIER = 0.1;
+
+	private ResearchRequirement req = new ResearchRequirement();
 	
 	public Building(BuildingType buildingType, Tile tile) {
 		super(buildingType.getHealth(), buildingType, tile);
 		this.buildingType = buildingType;
-		this.requirement = buildingType.getResearchRequirement();
 	}
 	
 	public void updateCulture() {
@@ -29,8 +28,9 @@ public class Building extends Thing {
 	public BuildingType getBuildingType() {
 		return buildingType;
 	}
-	public boolean isUnlocked() {
-		return isUnlocked;
+	
+	public ResearchRequirement getRequirement() {
+		return req;
 	}
 	@Override
 	public List<String> getDebugStrings() {

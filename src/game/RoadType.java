@@ -7,7 +7,7 @@ import javax.swing.ImageIcon;
 
 import utils.*;
 
-public enum RoadType implements HasImage{
+public enum RoadType implements HasImage {
 	STONE_ROAD (4, "resources/Images/buildings/castle256.png"),
 	;
 	

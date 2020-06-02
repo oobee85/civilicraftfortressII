@@ -1,34 +1,23 @@
 package game;
 
-import java.util.*;
-
 public class Research {
 
 	private int researchPointsSpent;
 	private boolean isUnlocked = false;
 	private ResearchType type;
 	
-	private LinkedList<Research> requirements;
+	private ResearchRequirement req = new ResearchRequirement();
 	
 	public Research(ResearchType researchType) {
 		this.type = researchType;
-		requirements = new LinkedList<>();
 	}
 	
 	public ResearchType getType() {
 		return type;
 	}
 	
-	public void addRequirement(Research r) {
-		requirements.add(r);
-	}
-	
-	public boolean areRequirementsMet() {
-		for(Research r : requirements) {
-			if(!r.isUnlocked())
-				return false;
-		}
-		return true;
+	public ResearchRequirement getRequirement() {
+		return req;
 	}
 	
 	public boolean isUnlocked() {

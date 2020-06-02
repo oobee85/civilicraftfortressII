@@ -1,6 +1,7 @@
 package ui;
 import java.awt.*;
 import java.util.List;
+import java.util.Map.*;
 import java.awt.image.*;
 import java.util.*;
 
@@ -25,9 +26,11 @@ public class Game {
 	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
 	HashMap<ResearchType, Research> researches = new HashMap<>();
 	
+	HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements= new HashMap<>();
+	
 	private Research researchTarget;
 	
-	public static int tileSize = 10;
+	public static int tileSize = 20;
 	private int money;
 	private Position viewOffset;
 	private TileLoc hoveredTile;
@@ -65,8 +68,21 @@ public class Game {
 		}
 		for(Research research : researches.values()) {
 			for(ResearchType requiredType : research.getType().getChildren()) {
-				research.addRequirement(researches[requiredType]);
+				research.getRequirement().addRequirement(researches[requiredType]);
 			}
+		}
+		for(BuildingType type : BuildingType.values()) {
+			// make a new researchrequirement object
+			ResearchRequirement req = new ResearchRequirement();
+			// only add requirement if it isnt null
+			if(type.getResearchRequirement() != null) {
+				// get the research that type requires
+				Research typesRequirement = researches[type.getResearchRequirement()];
+				// add the required research to the req
+				req.addRequirement(typesRequirement);
+			}
+			// put it in the hashmap
+			buildingResearchRequirements.put(type, req);
 		}
 		resources[ItemType.IRON_ORE].addAmount(200);
 		resources[ItemType.COPPER_ORE].addAmount(200);
@@ -365,6 +381,8 @@ public class Game {
 				tile.setBuilding(s);
 				buildings.add(s);
 				System.out.println("building castle" + tile.getLocation());
+				viewOffset.x += (tile.getLocation().x - panelWidth/2)*tileSize;
+				viewOffset.y += (tile.getLocation().y - panelHeight/2)*tileSize;
 				break;
 			}
 		}
@@ -570,14 +588,14 @@ public class Game {
 	}
 	private void doResearch() {
 		if(researchTarget != null) {
-			researchTarget.spendResearch(10);
+			researchTarget.spendResearch(1000);
 			if(researchTarget.isUnlocked()) {
 				guiController.updateGUI();
 			}
 		}
 	}
 	public void setResearchTarget(ResearchType type) {
-		if(researches[type].areRequirementsMet()) {
+		if(researches[type].getRequirement().areRequirementsMet()) {
 			researchTarget = researches[type];
 		}
 	}
