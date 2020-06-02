@@ -25,7 +25,6 @@ public class Tile {
 	private RoadType roadType;
 	private Plant plant;
 	private Terrain terr;
-	private Structure structure;
 	private Building building;
 	
 	private ConcurrentLinkedQueue<Unit> units;
@@ -96,7 +95,7 @@ public class Tile {
 	
 	public double getBrightness() {
 		double brightness = 0;
-		if(this.getHasStructure() || this.getHasBuilding() || this.hasPlayerControlledUnit()) {
+		if(this.getHasBuilding() || this.hasPlayerControlledUnit()) {
 			brightness += 1;
 		}
 		
@@ -109,34 +108,17 @@ public class Tile {
 	}
 	
 	public void setBuilding(Building b) {
+		if (building != null) {
+			return;
+		}
 		if(b != null) {
-			if (building != null && building.getBuildingType() == b.getBuildingType()) {
-				this.building = null;
-			} else if (structure == null) {
-				this.building = b;
-			}
-		}else {
 			building = b;
 		}
 		
 			
 	}
 	
-	public void setStructure(Structure s) {
-		if(s != null) {
-			if (structure != null && structure.getStructureType() == s.getStructureType()) {
-				this.structure = null;
-				
-			}else if (building == null) {
-				this.structure = s;
-			}	
-		}else {
-			structure = s;
-		}
 		
-		
-		
-	}
 	public void addUnit(Unit u) {
 		units.add(u);
 	}
@@ -187,17 +169,11 @@ public class Tile {
 	public Image getRoadImage() {
 		return Utils.roadImages.get(roadCorner);
 	}
-	public boolean getHasStructure() {
-		return structure != null;
-	}
 	public boolean getHasBuilding() {
 		return building != null;
 	}
 	public ResourceType getResourceType() {
 		return resourceType;
-	}
-	public Structure getStructure() {
-		return structure;
 	}
 	public Building getBuilding() {
 		return building;

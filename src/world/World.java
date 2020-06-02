@@ -322,9 +322,9 @@ public class World {
 					terrainColor = tiles[i][j].getPlant().getColor(0);
 					minimapColor = tiles[i][j].getPlant().getColor(0);
 				}
-				if(tiles[i][j].getHasStructure()) {
-					terrainColor = tiles[i][j].getStructure().getColor(0);
-					minimapColor = tiles[i][j].getStructure().getColor(0);
+				if(tiles[i][j].getHasBuilding()) {
+					terrainColor = tiles[i][j].getBuilding().getColor(0);
+					minimapColor = tiles[i][j].getBuilding().getColor(0);
 				}
 				if(tiles[i][j].getIsTerritory()) {
 					minimapColor = Utils.blendColors(Tile.TERRITORY_COLOR, minimapColor, 0.3);

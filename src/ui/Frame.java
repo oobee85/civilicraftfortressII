@@ -131,11 +131,6 @@ public class Frame extends JPanel{
 					rightClickPanel.add(building);
 					building.setBounds(20, y += fontSize, 100, 100);
 				}
-				if(tile.getStructure() != null) {
-					JLabel structure = setupMiniLabel(tile.getStructure().toString(), null, null);
-					rightClickPanel.add(structure);
-					structure.setBounds(20, y += fontSize, 100, 100);
-				}
 				if(tile.getRoadType() != null) {
 					JLabel structure = setupMiniLabel(tile.getRoadType().toString(), null, null);
 					rightClickPanel.add(structure);
@@ -357,7 +352,7 @@ public class Frame extends JPanel{
 		
 		JButton buildBarracks = setupButton("Barracks", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildbarracks.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildBarracks.addActionListener(e -> {
-			gameInstance.buildStructure(StructureType.BARRACKS);
+			gameInstance.buildBuilding(BuildingType.BARRACKS);
 		});
 		JButton buildSawmill = setupButton("Sawmill", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/sawmill.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		buildSawmill.addActionListener(e -> {
@@ -386,37 +381,37 @@ public class Frame extends JPanel{
 				Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
 				null);
 		buildWorker.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.WORKER, gameInstance.structures[0].getTile());
+			gameInstance.buildUnit(UnitType.WORKER, gameInstance.buildings[0].getTile());
 		});
 		JButton buildWarrior = setupButton("Build Warrior", 
 				Utils.resizeImageIcon(UnitType.WARRIOR.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
 				null);
 		buildWarrior.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.WARRIOR, gameInstance.structures[0].getTile());
+			gameInstance.buildUnit(UnitType.WARRIOR, gameInstance.buildings[0].getTile());
 		});
 		JButton buildSpearman = setupButton("Build Spearman", 
 				Utils.resizeImageIcon(UnitType.SPEARMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
 				null);
 		buildSpearman.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.SPEARMAN, gameInstance.structures[0].getTile());
+			gameInstance.buildUnit(UnitType.SPEARMAN, gameInstance.buildings[0].getTile());
 		});
 		JButton buildArcher = setupButton("Build Archer", 
 				Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
 				null);
 		buildArcher.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.ARCHER, gameInstance.structures[0].getTile());
+			gameInstance.buildUnit(UnitType.ARCHER, gameInstance.buildings[0].getTile());
 		});
 		JButton buildSwordsman = setupButton("Build Swordsman", 
 				Utils.resizeImageIcon(UnitType.SWORDSMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
 				null);
 		buildSwordsman.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.SWORDSMAN, gameInstance.structures[0].getTile());
+			gameInstance.buildUnit(UnitType.SWORDSMAN, gameInstance.buildings[0].getTile());
 		});
 		JButton buildHorseman = setupButton("Build Horseman", 
 				Utils.resizeImageIcon(UnitType.HORSEMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
 				null);
 		buildHorseman.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.HORSEMAN, gameInstance.structures[0].getTile());
+			gameInstance.buildUnit(UnitType.HORSEMAN, gameInstance.buildings[0].getTile());
 		});
 		
 		JButton exitCity = setupButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);

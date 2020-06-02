@@ -21,7 +21,6 @@ public class Game {
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
 	private Unit selectedUnit;
 	LinkedList<Building> buildings = new LinkedList<Building>();
-	LinkedList<Structure> structures = new LinkedList<Structure>();
 	
 	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
 	HashMap<ResearchType, Research> researches = new HashMap<>();
@@ -113,7 +112,6 @@ public class Game {
 		}
 		moveUnits();
 		updateBuildingDamage();
-		updateStructureDamage();
 		
 		guiController.updateGUI();
 		if(changedTerrain) {
@@ -182,31 +180,6 @@ public class Game {
 		buildings = buildingsNew;
 		
 	}
-	public void updateStructureDamage() {
-		LinkedList<Structure> structuresNew = new LinkedList<Structure>();
-
-		for (Structure structure : structures) {
-			Tile tile = structure.getTile();
-			if (tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
-				structure.takeDamage(damageTaken);
-
-			}
-		}	
-		
-		for (Structure structure : structures) {
-
-			Tile tile = structure.getTile();
-			if (structure.isDead() == true) {
-				tile.setStructure(null);
-			} else {
-				structuresNew.add(structure);
-			}
-		}
-		structures = structuresNew;
-		
-	}
-	
 	public void setViewSize(int width, int height) {
 		panelWidth = width;
 		panelHeight = height;
@@ -387,10 +360,10 @@ public class Game {
 			if(tile.getRoadType() != null && tile.canBuild() == true && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() && 
 					tile.getTerrain() != Terrain.ROCK) {
 				buildUnit(UnitType.WORKER, tile);
-				Structure s = new Structure(StructureType.CASTLE, tile);
-				tile.setStructure(s);
-				structures.add(s);
-				
+				Building s = new Building(BuildingType.CASTLE, tile);
+				tile.setBuilding(s);
+				buildings.add(s);
+				System.out.println("building castle" + tile.getLocation());
 				break;
 			}
 		}
@@ -431,7 +404,7 @@ public class Game {
 					int w = Game.tileSize;
 					int h = Game.tileSize;
 					
-					if(t.getHasStructure() == true) {
+					if(t.getHasBuilding() == true) {
 						setTerritory(new TileLoc(i,j));
 					}
 					
@@ -481,10 +454,6 @@ public class Game {
 			for(Building b : this.buildings) {
 				g.drawImage(b.getImage(0), b.getTile().getLocation().x * Game.tileSize, b.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 				drawHealthBar(g, b);
-			}
-			for(Structure s : this.structures) {
-				g.drawImage(s.getImage(0), s.getTile().getLocation().x * Game.tileSize, s.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
-				drawHealthBar(g, s);
 			}
 			for(Animal animal : Wildlife.getAnimals()) {
 				g.drawImage(animal.getImage(0), animal.getTile().getLocation().x * Game.tileSize, animal.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
@@ -556,9 +525,6 @@ public class Game {
 					for(Building building : buildings) {
 						building.getTile().drawDebugStrings(g, building.getDebugStrings(), rows, fontsize, stringWidth);
 					}
-					for(Structure structure : structures) {
-						structure.getTile().drawDebugStrings(g, structure.getDebugStrings(), rows, fontsize, stringWidth);
-					}
 				}
 			}
 			g.setColor(new Color(0, 0, 0, 64));
@@ -597,8 +563,8 @@ public class Game {
 		}
 	}
 	private void updateTerritory() {
-		for(Structure structure : structures) {
-			structure.updateCulture();
+		for(Building building : buildings) {
+			building.updateCulture();
 		}
 	}
 	private void doResearch() {
@@ -615,8 +581,8 @@ public class Game {
 		}
 	}
 	private void setTerritory(TileLoc p) {
-		int culture = world[p].getStructure().getCulture();
-		double area = culture * Structure.CULTURE_AREA_MULTIPLIER;
+		int culture = world[p].getBuilding().getCulture();
+		double area = culture * Building.CULTURE_AREA_MULTIPLIER;
 		double radius = Math.sqrt(area);
 		expandTerritory(radius, p);	
 	}
@@ -736,7 +702,7 @@ public class Game {
 	
 	public void buildBuilding(BuildingType bt) {
 		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
-			if(selectedUnit.getTile().getHasBuilding() == false && selectedUnit.getTile().getHasStructure() == false) {
+			if(selectedUnit.getTile().getHasBuilding() == false) {
 				if (bt == BuildingType.IRRIGATION && selectedUnit.getTile().canPlant() == false) {
 					return;
 				}
@@ -755,17 +721,6 @@ public class Game {
 			for(Tile tile : Utils.getNeighborsIncludingCurrent(selectedUnit.getTile(), world)) {
 				turnRoad(tile);
 			}
-		}
-		
-	}
-	public void buildStructure(StructureType st) {
-		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
-			if(selectedUnit.getTile().getHasBuilding() == false && selectedUnit.getTile().getHasStructure() == false) {
-				Structure structure = new Structure(st, selectedUnit.getTile());
-				selectedUnit.getTile().setStructure(structure);
-				structures.add(structure);
-			}
-			
 		}
 		
 	}
@@ -801,7 +756,7 @@ public class Game {
 	public void doubleClick(int mx, int my) {
 		Position tilepos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
-		if(world[loc].getStructure() != null && world[loc].getStructure().getStructureType() == StructureType.CASTLE) {
+		if(world[loc].getBuilding() != null && world[loc].getBuilding().getBuildingType() == BuildingType.CASTLE) {
 			exitCity();
 		}
 	}
