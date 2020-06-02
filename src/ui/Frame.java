@@ -112,10 +112,6 @@ public class Frame extends JPanel{
 						button.setEnabled(true);
 						button.setVisible(true);
 					}
-					else if(req.areSecondLayerRequirementsMet()) {
-						button.setEnabled(false);
-						button.setVisible(true);
-					}
 					else {
 						button.setEnabled(false);
 						button.setVisible(false);
@@ -130,10 +126,6 @@ public class Frame extends JPanel{
 					ResearchRequirement req = gameInstance.unitResearchRequirements[type];
 					if(req.areRequirementsMet()) {
 						button.setEnabled(true);
-						button.setVisible(true);
-					}
-					else if(req.areSecondLayerRequirementsMet()) {
-						button.setEnabled(false);
 						button.setVisible(true);
 					}
 					else {
