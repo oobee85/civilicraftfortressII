@@ -124,7 +124,7 @@ public class Generation {
 					heightMap[i][j] = Math.max(height, heightMap[i][j]);
 					
 					if(distanceFromCenter < lavaRadius) {
-						world[i][j].setTerrain(Terrain.LAVA);
+						world[i][j].setTerrain(Terrain.VOLCANO);
 						world[i][j].liquidType = LiquidType.LAVA;
 						world[i][j].liquidAmount = 0.2;
 					}else if(distanceFromCenter < volcanoRadius) {
@@ -178,10 +178,10 @@ public class Generation {
 			int i = next.x;
 			int j = next.y;
 //			world[i][j].liquidAmount += volume/5;
-			if(!world[i][j].checkTerrain(Terrain.WATER)) {
-				world[i][j].setTerrain(Terrain.WATER);
-				volume--;
-			}
+//			if(!world[i][j].checkTerrain(Terrain.WATER)) {
+//				world[i][j].setTerrain(Terrain.WATER);
+//				volume--;
+//			}
 			// Add adjacent tiles to the queue
 			if(i > 0 && !visited[i-1][j]) {
 				queue.add(new TileLoc(i-1, j));

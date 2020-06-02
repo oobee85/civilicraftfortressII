@@ -75,6 +75,59 @@ public class World {
 			}
 		}
 	}
+	public void updateTerrainChange(World world) {
+		for(Tile tile : getTiles()) {
+			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+				
+				if(tile.checkTerrain(Terrain.DIRT) || tile.checkTerrain(Terrain.GRASS)) {
+					double chance = 0.001 * tile.liquidAmount * tile.liquidType.getDamage();
+					if(Math.random() < chance) {
+						tile.setTerrain(Terrain.SAND);
+					}
+				}
+			}else if(tile.checkTerrain(Terrain.SAND) && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()){
+				double chance = 0.001 * tile.liquidType.getDamage();
+				if(Math.random() < chance) {
+					tile.setTerrain(Terrain.GRASS);
+				}
+			}
+			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA) {
+				double chance = 0.01;
+				if(Math.random() < chance) {
+					tile.setTerrain(Terrain.DIRT);
+				}
+			}
+			if(tile.checkTerrain(Terrain.DIRT)) {
+				boolean adjacentGrass = false;
+				boolean adjacentWater = false;
+				for(Tile neighbor : Utils.getNeighbors(tile, world)) {
+					if(neighbor.checkTerrain(Terrain.GRASS)) {
+						adjacentGrass = true;
+					}
+					if(neighbor.liquidType == LiquidType.WATER) {
+						adjacentWater = true;
+					}
+				}
+				double threshold = 0;
+				if(tile.liquidType == LiquidType.WATER) {
+					threshold += 0.001;
+				}
+				if(adjacentGrass) {
+					threshold += 0.005;
+				}
+				if(adjacentWater) {
+					threshold += 0.005;
+				}
+				if(adjacentGrass && adjacentWater) {
+					threshold += 0.05;
+				}
+				if(Math.random() < tile.liquidAmount*threshold) {
+					tile.setTerrain(Terrain.GRASS);
+				}
+			}
+		}
+		
+	}
 	
 	public void grow() {
 		System.out.println(plantsLand.size() + " land plants and " + plantsAquatic.size() + " aquatic plants.");
@@ -178,8 +231,9 @@ public class World {
 					plantsLand.add(tile.getPlant());
 				}
 			}
+			//tile.liquidType.WATER &&
 			//generates water plants
-			if(tile.checkTerrain(Terrain.WATER) && Math.random() < waterPlantRarity) {
+			if( Math.random() < waterPlantRarity) {
 				double o = Math.random();
 				if(o < PlantType.CATTAIL.getRarity()) {
 					Plant p = new Plant(PlantType.CATTAIL, tile);
@@ -249,12 +303,12 @@ public class World {
 				else if (tile.getHeight() > 0.4) {
 					t = Terrain.DIRT;
 				}
-				else if (tile.getHeight() > 0) {
+				else {
 					t = Terrain.GRASS;
 				}
-				else {
-					t = Terrain.WATER;
-				}
+//				else {
+//					t = Terrain.WATER;
+//				}
 				tile.setTerrain(t);
 			}
 		}

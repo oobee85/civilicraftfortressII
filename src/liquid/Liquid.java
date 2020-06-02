@@ -63,47 +63,11 @@ public class Liquid {
 			}
 			
 			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount > tile.liquidType.surfaceTension*2) {
-				if(tile.checkTerrain(Terrain.GRASS) ) {
-					tile.setTerrain(Terrain.DIRT);
+				if(tile.checkTerrain(Terrain.GRASS) || tile.checkTerrain(Terrain.DIRT)) {
+					tile.setTerrain(Terrain.BURNED_GROUND);
 				}
 				if(tile.checkTerrain(Terrain.SNOW)) {
 					tile.setTerrain(Terrain.ROCK);
-				}
-			}
-			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				if(tile.checkTerrain(Terrain.DIRT) || tile.checkTerrain(Terrain.GRASS)) {
-					double chance = 0.001 * tile.liquidAmount * tile.liquidType.getDamage();
-					if(Math.random() < chance) {
-						tile.setTerrain(Terrain.SAND);
-					}
-				}
-			}
-			if(tile.checkTerrain(Terrain.DIRT) || tile.checkTerrain(Terrain.BURNED_GROUND)) {
-				boolean adjacentGrass = false;
-				boolean adjacentWater = false;
-				for(Tile neighbor : Utils.getNeighbors(tile, world)) {
-					if(neighbor.checkTerrain(Terrain.GRASS)) {
-						adjacentGrass = true;
-					}
-					if(neighbor.liquidType == LiquidType.WATER) {
-						adjacentWater = true;
-					}
-				}
-				double threshold = 0;
-				if(tile.liquidType == LiquidType.WATER) {
-					threshold += 0.001;
-				}
-				if(adjacentGrass) {
-					threshold += 0.005;
-				}
-				if(adjacentWater) {
-					threshold += 0.001;
-				}
-				if(adjacentGrass && adjacentWater) {
-					threshold += 0.01;
-				}
-				if(Math.random() < tile.liquidAmount*threshold) {
-					tile.setTerrain(Terrain.GRASS);
 				}
 			}
 		}

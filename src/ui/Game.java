@@ -106,6 +106,7 @@ public class Game {
 		Wildlife.tick(world);
 		world.updatePlantDamage();
 		world.updateUnitDamage();
+		world.updateTerrainChange(world);
 		if(ticks%5 == 0) {
 			updateBuildingAction();
 			changedTerrain = true;
