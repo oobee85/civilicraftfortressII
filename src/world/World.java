@@ -77,7 +77,7 @@ public class World {
 	}
 	
 	public void grow() {
-		System.out.println("Growing plants. Currently " + plantsLand.size() + " land plants and " + plantsAquatic.size() + " aquatic plants.");
+		System.out.println(plantsLand.size() + " land plants and " + plantsAquatic.size() + " aquatic plants.");
 		LinkedList<Plant> newAquatic = new LinkedList<>();
 		LinkedList<Plant> newLand = new LinkedList<>();
 		for(Tile tile : getTiles()) {

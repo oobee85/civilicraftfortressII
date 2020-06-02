@@ -86,14 +86,12 @@ public class Wildlife {
 					if(iveGotYouInMySights != animal) {
 						animal.setPrey(iveGotYouInMySights);
 					}
-//					animal.setTargetTile(iveGotYouInMySights.getTile());
-//					System.out.println(pickAnimal + ", " +animals.size());
 				}
 				else {
 					if(!animal.getType().isHostile() && animal.getTile().getPlant() != null) {
 						animal.getTile().getPlant().takeDamage(0.1);
 						animal.eat();
-					}else if(animal.getTile().checkTerrain(Terrain.GRASS)) {
+					}else if(!animal.getType().isHostile() && animal.getTile().checkTerrain(Terrain.GRASS)) {
 						animal.getTile().setTerrain(Terrain.DIRT);
 						animal.eat();
 					}
