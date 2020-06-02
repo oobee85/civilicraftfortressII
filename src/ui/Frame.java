@@ -43,6 +43,7 @@ public class Frame extends JPanel{
 	private JLabel[] resourceIndicators = new JLabel[ItemType.values().length];
 	private JButton[] researchButtons = new JButton[ResearchType.values().length];
 	private JButton[] buildingButtons = new JButton[BuildingType.values().length];
+	private JButton[] unitButtons = new JButton[UnitType.values().length];
 	private JTextField mapSize;
 	private int WIDTH;
 	private int HEIGHT;
@@ -84,12 +85,23 @@ public class Frame extends JPanel{
 				for(int i = 0; i < ResearchType.values().length; i++) {
 					Research r = gameInstance.researches.get(ResearchType.values()[i]);
 					boolean unlocked = r.isUnlocked();
-					boolean requirements = r.getRequirement().areRequirementsMet();
-					if(unlocked || !requirements) {
-						researchButtons[i].setEnabled(false);
+					ResearchRequirement req = r.getRequirement();
+					JButton button = researchButtons[i];
+					if(unlocked) {
+						button.setEnabled(false);
+						button.setVisible(true);
+					}
+					else if(req.areRequirementsMet()) {
+						button.setEnabled(true);
+						button.setVisible(true);
+					}
+					else if(req.areSecondLayerRequirementsMet()) {
+						button.setEnabled(false);
+						button.setVisible(true);
 					}
 					else {
-						researchButtons[i].setEnabled(true);
+						button.setEnabled(false);
+						button.setVisible(false);
 					}
 				}
 				for(int i = 0; i < BuildingType.values().length; i++) {
@@ -98,6 +110,30 @@ public class Frame extends JPanel{
 					ResearchRequirement req = gameInstance.buildingResearchRequirements[type];
 					if(req.areRequirementsMet()) {
 						button.setEnabled(true);
+						button.setVisible(true);
+					}
+					else if(req.areSecondLayerRequirementsMet()) {
+						button.setEnabled(false);
+						button.setVisible(true);
+					}
+					else {
+						button.setEnabled(false);
+						button.setVisible(false);
+					}
+				}
+				for(int i = 0; i < UnitType.values().length; i++) {
+					JButton button = unitButtons[i];
+					if(button == null) {
+						continue;
+					}
+					UnitType type = UnitType.values()[i];
+					ResearchRequirement req = gameInstance.unitResearchRequirements[type];
+					if(req.areRequirementsMet()) {
+						button.setEnabled(true);
+						button.setVisible(true);
+					}
+					else if(req.areSecondLayerRequirementsMet()) {
+						button.setEnabled(false);
 						button.setVisible(true);
 					}
 					else {
@@ -358,42 +394,33 @@ public class Frame extends JPanel{
 			buildingMenu.add(button);
 		}
 		
-		JButton buildWorker = setupButton("Build Worker", 
-				Utils.resizeImageIcon(UnitType.WORKER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
-				null);
-		buildWorker.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.WORKER, gameInstance.buildings[0].getTile());
-		});
-		JButton buildWarrior = setupButton("Build Warrior", 
-				Utils.resizeImageIcon(UnitType.WARRIOR.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
-				null);
-		buildWarrior.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.WARRIOR, gameInstance.buildings[0].getTile());
-		});
-		JButton buildSpearman = setupButton("Build Spearman", 
-				Utils.resizeImageIcon(UnitType.SPEARMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
-				null);
-		buildSpearman.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.SPEARMAN, gameInstance.buildings[0].getTile());
-		});
-		JButton buildArcher = setupButton("Build Archer", 
-				Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
-				null);
-		buildArcher.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.ARCHER, gameInstance.buildings[0].getTile());
-		});
-		JButton buildSwordsman = setupButton("Build Swordsman", 
-				Utils.resizeImageIcon(UnitType.SWORDSMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
-				null);
-		buildSwordsman.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.SWORDSMAN, gameInstance.buildings[0].getTile());
-		});
-		JButton buildHorseman = setupButton("Build Horseman", 
-				Utils.resizeImageIcon(UnitType.HORSEMAN.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
-				null);
-		buildHorseman.addActionListener(e -> {
-			gameInstance.buildUnit(UnitType.HORSEMAN, gameInstance.buildings[0].getTile());
-		});
+		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
+		cityView = new JPanel() {
+			protected void paintComponent(Graphics g) {
+				g.drawImage(cityOverlay, 0, 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
+				super.paintComponent(g);
+			}
+		};
+		cityView.setVisible(false);
+		cityView.setOpaque(false);
+		cityView.setLayout(null);
+		
+		int numButtons = 0;
+		for(int i = 0; i < UnitType.values().length; i++) {
+			UnitType type = UnitType.values()[i];
+			if(type.getCost() == null) {
+				continue;
+			}
+			JButton button = setupButton("Build " + type.toString(), 
+					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
+					null);
+			button.addActionListener(e -> {
+				gameInstance.buildUnit(type, gameInstance.buildings[0].getTile());
+			});
+			cityView.add(button);
+			button.setBounds(765, 185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
+			unitButtons[i] = button;
+		}
 		
 		JButton exitCity = setupButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		exitCity.setBorder(null);
@@ -401,6 +428,8 @@ public class Frame extends JPanel{
 		exitCity.addActionListener(e -> {
 			gameInstance.exitCity();
 		});
+		cityView.add(exitCity);
+		exitCity.setBounds(790, 20, BUILDING_ICON_SIZE, BUILDING_ICON_SIZE);
 		
 		JLabel money = setupLabel("Gold = " + gameInstance.getMoney(), Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		
@@ -486,45 +515,6 @@ public class Frame extends JPanel{
 		buttonPanel.add(makeItDay);
 		buttonPanel.add(debug);
 		buttonPanel.add(exit);
-		
-		buildWorker.setFocusable(false);
-		buildWarrior.setFocusable(false);
-		buildSpearman.setFocusable(false);
-		buildArcher.setFocusable(false);
-		buildHorseman.setFocusable(false);
-		buildSwordsman.setFocusable(false);
-		
-		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
-		cityView = new JPanel() {
-			protected void paintComponent(Graphics g) {
-				g.drawImage(cityOverlay, 0, 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
-				super.paintComponent(g);
-			}
-		};
-		cityView.setVisible(false);
-		cityView.setOpaque(false);
-		cityView.setLayout(null);
-		int numButtons = 0;
-		cityView.add(buildWorker);
-		buildWorker.setBounds(765,  185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons , BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
-		
-		cityView.add(buildWarrior);
-		buildWarrior.setBounds(765, 185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
-		
-		cityView.add(buildSpearman);
-		buildSpearman.setBounds(765, 185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
-		
-		cityView.add(buildArcher);
-		buildArcher.setBounds(765, 185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
-		
-		cityView.add(buildSwordsman);
-		buildSwordsman.setBounds(765, 185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
-		
-		cityView.add(buildHorseman);
-		buildHorseman.setBounds(765, 185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
-
-		cityView.add(exitCity);
-		exitCity.setBounds(790, 20, BUILDING_ICON_SIZE, BUILDING_ICON_SIZE);
 		
 		
 		techView = new JPanel();

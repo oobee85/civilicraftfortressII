@@ -26,7 +26,8 @@ public class Game {
 	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
 	HashMap<ResearchType, Research> researches = new HashMap<>();
 	
-	HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements= new HashMap<>();
+	HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
+	HashMap<UnitType, ResearchRequirement> unitResearchRequirements = new HashMap<>();
 	
 	private Research researchTarget;
 	
@@ -84,6 +85,20 @@ public class Game {
 			// put it in the hashmap
 			buildingResearchRequirements.put(type, req);
 		}
+		for(UnitType type : UnitType.values()) {
+			// make a new researchrequirement object
+			ResearchRequirement req = new ResearchRequirement();
+			// only add requirement if it isnt null
+			if(type.getResearchRequirement() != null) {
+				// get the research that type requires
+				Research typesRequirement = researches[type.getResearchRequirement()];
+				// add the required research to the req
+				req.addRequirement(typesRequirement);
+			}
+			// put it in the hashmap
+			unitResearchRequirements.put(type, req);
+		}
+		
 		resources[ItemType.IRON_ORE].addAmount(200);
 		resources[ItemType.COPPER_ORE].addAmount(200);
 		resources[ItemType.HORSE].addAmount(200);

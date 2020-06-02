@@ -19,4 +19,12 @@ public class ResearchRequirement {
 		}
 		return true;
 	}
+	public boolean areSecondLayerRequirementsMet() {
+		for(Research r : requirements) {
+			if(!r.getRequirement().areRequirementsMet()) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
