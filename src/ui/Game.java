@@ -616,7 +616,7 @@ public class Game {
 		}
 	}
 	private void setTerritory(TileLoc p) {
-		int culture = world[p].getBuilding().getCulture();
+		double culture = world[p].getBuilding().getCulture();
 		double area = culture * Building.CULTURE_AREA_MULTIPLIER;
 		double radius = Math.sqrt(area);
 		expandTerritory(radius, p);	

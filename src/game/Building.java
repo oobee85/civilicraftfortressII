@@ -9,7 +9,7 @@ import world.Tile;
 public class Building extends Thing {
 	
 	private BuildingType buildingType;
-	private int culture;
+	private double culture;
 	public static double CULTURE_AREA_MULTIPLIER = 0.1;
 
 	private ResearchRequirement req = new ResearchRequirement();
@@ -22,7 +22,7 @@ public class Building extends Thing {
 	public void updateCulture() {
 		culture += buildingType.cultureRate;
 	}
-	public int getCulture() {
+	public double getCulture() {
 		return culture;
 	}
 	public BuildingType getBuildingType() {

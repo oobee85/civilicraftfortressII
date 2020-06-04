@@ -235,7 +235,7 @@ public class World {
 			//generates water plants
 			if( Math.random() < waterPlantRarity) {
 				double o = Math.random();
-				if(o < PlantType.CATTAIL.getRarity()) {
+				if(tile.liquidType == LiquidType.WATER && o < PlantType.CATTAIL.getRarity()) {
 					Plant p = new Plant(PlantType.CATTAIL, tile);
 					tile.setHasPlant(p);
 					plantsAquatic.add(tile.getPlant());
