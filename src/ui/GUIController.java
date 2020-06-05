@@ -3,7 +3,7 @@ package ui;
 import world.*;
 
 public interface GUIController {
-	public void toggleCityView();
+	public void selectedBuilding(boolean selected);
 	public void selectedWorker(boolean selected);
 	public void toggleTileView();
 	public void updateGUI();
