@@ -3,6 +3,7 @@ package world;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
+import java.util.List;
 
 import game.*;
 import liquid.*;
@@ -269,6 +270,30 @@ public class World {
 		}
 	}
 	
+	public List<Tile> getNeighbors(Tile tile) {
+		int x = tile.getLocation().x;
+		int y = tile.getLocation().y;
+		int minX = Math.max(0, tile.getLocation().x - 1);
+		int maxX = Math.min(this.getWidth()-1, tile.getLocation().x + 1);
+		int minY = Math.max(0, tile.getLocation().y-1);
+		int maxY = Math.min(this.getHeight()-1, tile.getLocation().y + 1);
+
+		LinkedList<Tile> tiles = new LinkedList<>();
+		for(int i = minX; i <= maxX; i++) {
+			for(int j = minY; j <= maxY; j++) {
+				if(i == x || j == y) {
+					if(i != x || j != y) {
+						if(this[new TileLoc(i, j)] != null) {
+							tiles.add(this[new TileLoc(i, j)]);
+						}
+					}
+				}
+			}
+		}
+		Collections.shuffle(tiles); 
+		return tiles;
+	}
+	
 	public void generateWorld(MapType mapType, int size) {
 		width = size;
 		height = size;
@@ -285,10 +310,10 @@ public class World {
 		}
 		
 		for(Tile tile : getTiles()) {
-			tile.setNeighbors(Utils.getNeighbors(tile, this));
+			tile.setNeighbors(getNeighbors(tile));
 		}
 		
-		volcano = Generation.makeVolcano(tiles, heightMap);
+		volcano = Generation.makeVolcano(this, heightMap);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		
 		for(Tile tile : getTiles()) {
@@ -360,42 +385,40 @@ public class World {
 
 		Graphics minimapGraphics = minimapImage.getGraphics();
 		Graphics terrainGraphics = terrainImage.getGraphics();
-		for(int i = 0; i < tiles.length; i++) {
-			for(int j = 0; j < tiles[0].length; j++) {
-				Color minimapColor = terrainColors.get(tiles[i][j].getTerrain());
-				Color terrainColor = terrainColors.get(tiles[i][j].getTerrain());
-				if(tiles[i][j].getResourceType() != null) {
-					terrainColor = tiles[i][j].getResourceType().getColor(0);
-					minimapColor = tiles[i][j].getResourceType().getColor(0);
-				}
-				if(tiles[i][j].getRoadType() != null) {
-					terrainColor = Utils.roadColor;
-					minimapColor = Utils.roadColor;
-				}
-				if(tiles[i][j].liquidAmount > 0) {
-					double alpha = Utils.getAlphaOfLiquid(tiles[i][j].liquidAmount);
-					minimapColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), minimapColor, alpha);
-					terrainColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), terrainColor, alpha);
-				}
-				if(tiles[i][j].getPlant() != null) {
-					terrainColor = tiles[i][j].getPlant().getColor(0);
-					minimapColor = tiles[i][j].getPlant().getColor(0);
-				}
-				if(tiles[i][j].getHasBuilding()) {
-					terrainColor = tiles[i][j].getBuilding().getColor(0);
-					minimapColor = tiles[i][j].getBuilding().getColor(0);
-				}
-				if(tiles[i][j].getIsTerritory()) {
-					minimapColor = Utils.blendColors(Tile.TERRITORY_COLOR, minimapColor, 0.3);
-					terrainColor = Utils.blendColors(Tile.TERRITORY_COLOR, terrainColor, 0.3);
-				}
-				
-				double tilebrightness = tiles[i][j].getBrightness();
-				minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);
-				terrainColor = Utils.blendColors(terrainColor, Color.black, brighnessModifier + tilebrightness);
-				minimapImage.setRGB(i, j, minimapColor.getRGB());
-				terrainImage.setRGB(i, j, terrainColor.getRGB());
+		for(Tile tile : this.getTiles()) {
+			Color minimapColor = terrainColors.get(tile.getTerrain());
+			Color terrainColor = terrainColors.get(tile.getTerrain());
+			if(tile.getResourceType() != null) {
+				terrainColor = tile.getResourceType().getColor(0);
+				minimapColor = tile.getResourceType().getColor(0);
 			}
+			if(tile.getRoadType() != null) {
+				terrainColor = Utils.roadColor;
+				minimapColor = Utils.roadColor;
+			}
+			if(tile.liquidAmount > 0) {
+				double alpha = Utils.getAlphaOfLiquid(tile.liquidAmount);
+				minimapColor = Utils.blendColors(tile.liquidType.getColor(0), minimapColor, alpha);
+				terrainColor = Utils.blendColors(tile.liquidType.getColor(0), terrainColor, alpha);
+			}
+			if(tile.getPlant() != null) {
+				terrainColor = tile.getPlant().getColor(0);
+				minimapColor = tile.getPlant().getColor(0);
+			}
+			if(tile.getHasBuilding()) {
+				terrainColor = tile.getBuilding().getColor(0);
+				minimapColor = tile.getBuilding().getColor(0);
+			}
+			if(tile.getIsTerritory()) {
+				minimapColor = Utils.blendColors(Tile.TERRITORY_COLOR, minimapColor, 0.3);
+				terrainColor = Utils.blendColors(Tile.TERRITORY_COLOR, terrainColor, 0.3);
+			}
+			
+			double tilebrightness = tile.getBrightness();
+			minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);
+			terrainColor = Utils.blendColors(terrainColor, Color.black, brighnessModifier + tilebrightness);
+			minimapImage.setRGB(tile.getLocation().x, tile.getLocation().y, minimapColor.getRGB());
+			terrainImage.setRGB(tile.getLocation().x, tile.getLocation().y, terrainColor.getRGB());
 		}
 		minimapGraphics.dispose();
 		terrainGraphics.dispose();

@@ -39,13 +39,16 @@ public class Liquid {
 //		for(int i = 0; i < totals.length; i++) {
 //			System.out.println("Total " + LiquidType.values()[i].name() + ": " + totals[i]);
 //		}
-		
-		for(int x = 0; x < world.getWidth(); x++) {
-			for(int y = 0; y < world.getHeight(); y++) {
-				liquidAmountsTemp[x][y] = world[new TileLoc(x, y)].liquidAmount;
-				liquidTypesTemp[x][y] = world[new TileLoc(x, y)].liquidType;
-			}
+		for(Tile tile : world.getTilesRandomly()) {
+			liquidAmountsTemp[tile.getLocation().x][tile.getLocation().y] = world[tile.getLocation()].liquidAmount;
+			liquidTypesTemp[tile.getLocation().x][tile.getLocation().y] = world[tile.getLocation()].liquidType;
 		}
+//		for(int x = 0; x < world.getWidth(); x++) {
+//			for(int y = 0; y < world.getHeight(); y++) {
+//				liquidAmountsTemp[x][y] = world[new TileLoc(x, y)].liquidAmount;
+//				liquidTypesTemp[x][y] = world[new TileLoc(x, y)].liquidType;
+//			}
+//		}
 		
 		for(Tile tile : world.getTiles()) {
 			propogate(tile, world);

@@ -153,6 +153,9 @@ public class Frame extends JPanel{
 			
 			@Override
 			public void openRightClickMenu(int mx, int my, Tile tile) {
+				if(tile == null) {
+					return;
+				}
 				System.out.println("trying to open right click menu");
 				JPanel rightClickPanel = new JPanel() {
 					@Override

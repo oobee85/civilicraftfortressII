@@ -332,8 +332,11 @@ public class Game {
 		}
 		System.out.println("road iterations: " + iterations);
 		
-		for(Tile t : selectedPath.getTiles()) {
-			t.setRoad(RoadType.STONE_ROAD, "asdf");
+		if(selectedPath != null) {
+			for(Tile t : selectedPath.getTiles()) {
+				if(t != null) 
+					t.setRoad(RoadType.STONE_ROAD, "asdf");
+			}
 		}
 	}
 
@@ -439,14 +442,19 @@ public class Game {
 			if(showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
-						highest = Math.max(highest, world[new TileLoc(i, j)].getHeight());
-						lowest = Math.min(lowest, world[new TileLoc(i, j)].getHeight());
+						Tile tile = world[new TileLoc(i, j)];
+						if(tile == null)
+							continue;
+						highest = Math.max(highest, tile.getHeight());
+						lowest = Math.min(lowest, tile.getHeight());
 					}
 				}
 			}
 			for (int i = lowerX; i < upperX; i++) {
 				for (int j = lowerY; j < upperY; j++) {
 					Tile t = world[new TileLoc(i, j)];
+					if(t == null)
+						continue;
 					int x = t.getLocation().x * Game.tileSize;
 					int y = t.getLocation().y * Game.tileSize;
 					int w = Game.tileSize;
@@ -541,7 +549,10 @@ public class Game {
 			if(!showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
-						double brightness = world.getDaylight() + world[new TileLoc(i, j)].getBrightness();
+						Tile tile = world[new TileLoc(i, j)];
+						if(tile == null)
+							continue;
+						double brightness = world.getDaylight() + tile.getBrightness();
 						brightness = Math.max(Math.min(brightness, 1), 0);
 						g.setColor(new Color(0, 0, 0, (int)(255 * (1 - brightness))));
 						g.fillRect(i * Game.tileSize, j * Game.tileSize, Game.tileSize, Game.tileSize);
