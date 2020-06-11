@@ -40,6 +40,9 @@ public class Building extends Thing {
 	public double getRemainingEffort() {
 		return remainingEffort;
 	}
+	public void setRemainingEffort(double effort) {
+		remainingEffort = effort;
+	}
 	public boolean isBuilt() {
 		return remainingEffort <= 0;
 	}

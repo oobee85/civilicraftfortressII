@@ -413,6 +413,7 @@ public class Game {
 				Building s = new Building(BuildingType.CASTLE, tile);
 				tile.setBuilding(s);
 				buildings.add(s);
+				s.setRemainingEffort(0);
 				viewOffset.x += (tile.getLocation().x - 20) * tileSize;
 				viewOffset.y += (tile.getLocation().y - 20) * tileSize;
 				break;
