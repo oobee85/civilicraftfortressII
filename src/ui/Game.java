@@ -13,6 +13,8 @@ import wildlife.*;
 import world.*;
 
 public class Game {
+	
+	private Image hitsplatImage = Utils.loadImage("resources/Images/interfaces/Red_hitsplat.png");
 	public static final int NUM_DEBUG_DIGITS = 3;
 	public static int ticks;
 	private int skipUntilTick;
@@ -573,7 +575,7 @@ public class Game {
 					int y = (int) ((unit.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.25);
 					int w = (int) (Game.tileSize*.5);
 					int hi = (int)(Game.tileSize*.5);
-					g.drawImage(Utils.loadImage("resources/Images/interfaces/Red_hitsplat.png"), x, y, w, hi, null);
+					g.drawImage(hitsplatImage, x, y, w, hi, null);
 					x += Game.tileSize*.25;
 					y += Game.tileSize*.25;
 					g.drawString(""+unit.getHitsplatDamage(), x, y);
