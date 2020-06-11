@@ -15,6 +15,8 @@ public class Thing implements HasImage {
 	private double health;
 	private int timeLastDamageTaken = -1000;
 	private Tile tile;
+	private Tile targetTile;
+	private boolean isSelected;
 	
 	private HasImage hasImage;
 	private boolean sideHealthBar;
@@ -61,14 +63,32 @@ public class Thing implements HasImage {
 		return timeLastDamageTaken;
 	}
 	
+	public void setIsSelected(boolean select) {
+		isSelected = select;
+	}
+	public boolean getIsSelected() {
+		return isSelected;
+	}
+	
 	public void setTile(Tile tile) {
 		this.tile = tile;
+		if(targetTile == getTile() ) {
+			targetTile = null;
+		}
 	}
 	
 	public Tile getTile() {
 		return tile;
 	}
 	
+	public Tile getTargetTile() {
+		return targetTile;
+	}
+	public void setTargetTile(Tile t) {
+		if(!t.equals(getTile()) ) {
+			targetTile = t;
+		}
+	}
 	@Override
 	public Image getImage(int size) {
 		return hasImage.getImage(size);

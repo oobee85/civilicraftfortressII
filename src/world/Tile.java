@@ -63,20 +63,25 @@ public class Tile {
 		plant = p;
 	}
 	
-	public boolean hasPlayerControlledUnit() {
-		for(Unit u : units) {
-			if(u.isPlayerControlled()) {
-				return true;
-			}
-		}
-		return false;
-	}
 	
 	public Unit getPlayerControlledUnit() {
 		for(Unit u : units) {
 			if(u.isPlayerControlled()) {
 				return u;
 			}
+		}
+		return null;
+	}
+	
+	
+	public Thing getPlayerControlledThing() {
+		for(Unit u : units) {
+			if(u.isPlayerControlled()) {
+				return u;
+			}
+		}
+		if(building != null) {
+			return building;
 		}
 		return null;
 	}
@@ -94,38 +99,25 @@ public class Tile {
 		return false;
 	}
 	
-	public double getBrightness() {
+	private double getBrightnessNonRecursive() {
 		double brightness = 0;
-		
-		boolean nearBuilding = this.getHasBuilding();
-		for(Tile tile : getNeighbors()) {
-			if(tile.getHasBuilding() ) {
-				nearBuilding = true;
-			}
-		}
-		
-		boolean nearUnit = this.hasPlayerControlledUnit();
-		for(Tile tile : getNeighbors()) {
-			if(tile.hasPlayerControlledUnit() ) {
-				nearUnit = true;
-			}
-		}
-		if(nearBuilding || nearUnit) {
+		if(this.getHasBuilding() || this.getPlayerControlledThing() != null) {
 			brightness += 1;
 		}
-		
-		boolean nearTerritory = this.isTerritory;
-		for(Tile tile : getNeighbors()) {
-			if(tile.isTerritory) {
-				nearTerritory = true;
-			}
-		}
-		if(nearTerritory) {
+		if(this.isTerritory) {
 			brightness += 0.4;
 		}
-		
 		brightness += getTerrain().getBrightness();
 		brightness += liquidAmount * liquidType.getBrightness();
+		return brightness;
+	}
+	
+	public double getBrightness() {
+		double brightness = 0;
+		brightness += this.getBrightnessNonRecursive();
+		for(Tile tile : getNeighbors()) {
+			brightness += tile.getBrightnessNonRecursive();
+		}
 		return brightness;
 	}
 	
@@ -136,11 +128,8 @@ public class Tile {
 		if(b != null) {
 			building = b;
 		}
-		
-			
 	}
 	
-		
 	public void addUnit(Unit u) {
 		units.add(u);
 	}
@@ -173,18 +162,13 @@ public class Tile {
 	}
 	
 	public boolean isBlocked(Unit u) {
-		if(u.isPlayerControlled() && this.hasPlayerControlledUnit()) {
-			return true;
-		}
+		
 		if(u.getUnitType().isFlying()) {
 			return false;
 		}
 		return getHasBuilding() == true && getBuilding().getBuildingType().canMoveThrough() == false;
 	}
 	
-//	public boolean getHasUnit() {
-//		return units.isEmpty();
-//	}
 	public RoadType getRoadType() {
 		return roadType;
 	}

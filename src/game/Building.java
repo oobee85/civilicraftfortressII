@@ -9,6 +9,8 @@ import world.Tile;
 public class Building extends Thing {
 	
 	private BuildingType buildingType;
+	private double remainingEffort;
+	
 	private double culture;
 	public static double CULTURE_AREA_MULTIPLIER = 0.1;
 
@@ -16,14 +18,27 @@ public class Building extends Thing {
 	
 	public Building(BuildingType buildingType, Tile tile) {
 		super(buildingType.getHealth(), buildingType, tile);
+		this.remainingEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
 	}
 	
 	public void updateCulture() {
-		culture += buildingType.cultureRate;
+		if(isBuilt()) {
+			culture += buildingType.cultureRate;
+		}
+		
 	}
 	public double getCulture() {
 		return culture;
+	}
+	public void expendEffort(double effort) {
+		remainingEffort -= effort;
+	}
+	public double getRemainingEffort() {
+		return remainingEffort;
+	}
+	public boolean isBuilt() {
+		return remainingEffort <= 0;
 	}
 	public BuildingType getBuildingType() {
 		return buildingType;
@@ -35,7 +50,10 @@ public class Building extends Thing {
 	@Override
 	public List<String> getDebugStrings() {
 		List<String> strings = super.getDebugStrings();
-		strings.add(String.format("CT=%." + Game.NUM_DEBUG_DIGITS + "f", getCulture() * 1.0));
+		strings.add(String.format("CT=%." + Game.NUM_DEBUG_DIGITS + "f", getCulture() ));
+		if(!isBuilt()) {
+			strings.add(String.format("work^2=%." + Game.NUM_DEBUG_DIGITS + "f", getRemainingEffort() ));
+		}
 		return strings;
 	}
 	

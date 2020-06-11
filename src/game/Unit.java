@@ -7,8 +7,8 @@ public class Unit extends Thing {
 	
 	
 	private UnitType unitType;
-	private boolean isSelected;
-	private Tile targetTile;
+
+	
 	
 	private double timeToMove;
 	
@@ -23,23 +23,11 @@ public class Unit extends Thing {
 		return isPlayerControlled;
 	}
 	
-	public void setIsSelected(boolean select) {
-		isSelected = select;
-	}
-	public boolean getIsSelected() {
-		return isSelected;
-	}
+	
 	public UnitType getUnitType() {
 		return unitType;
 	}
-	public Tile getTargetTile() {
-		return targetTile;
-	}
-	public void setTargetTile(Tile t) {
-		if(!t.equals(getTile()) ) {
-			targetTile = t;
-		}
-	}
+	
 	public void moveTo(Tile t) {
 		double penalty = t.getTerrain().moveSpeed();
 		if(this.getUnitType().isFlying()) {
@@ -59,22 +47,21 @@ public class Unit extends Thing {
 	}
 	
 	public void tick() {
+		Building building = this.getTile().getBuilding();
 		if(timeToMove > 0) {
 			timeToMove -= 1;
 		}
+		if(unitType == UnitType.WORKER && building != null) {
+			if(building.isBuilt() == false) {
+				building.expendEffort(1);
+			}
+		}
 	}
+	
 	public boolean readyToMove() {
 		return timeToMove <= 0;
 	}
 	
-	@Override
-	public void setTile(Tile tile) {
-		super.setTile(tile);
-		if(targetTile == getTile() ) {
-			targetTile = null;
-		}
-		
-	}
 
 	@Override
 	public String toString() {
