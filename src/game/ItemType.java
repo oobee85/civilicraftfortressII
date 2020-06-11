@@ -16,7 +16,7 @@ public enum ItemType implements HasImage {
 	ADAMANTITE_ORE ( "resources/Images/itemicons/adamantite_ore.png"),
 	RUNITE_ORE ( "resources/Images/itemicons/runite_ore.png"),
 	TITANIUM_ORE ( "resources/Images/itemicons/titanium_ore.png"),
-	WHEAT ( "resources/Images/itemicons/wheat.png"),
+	FOOD ( "resources/Images/itemicons/wheat.png"),
 	HORSE ( "resources/Images/units/horse.png"),
 	WOOD ( "resources/Images/itemicons/wood.png"),
 	ROCK ( "resources/Images/itemicons/rock.png")

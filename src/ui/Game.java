@@ -61,7 +61,7 @@ public class Game {
 		
 		for(ItemType itemType : ItemType.values()) {
 			Item item = new Item(0, itemType);
-			if(itemType == ItemType.WOOD || itemType == ItemType.ROCK || itemType == ItemType.WHEAT) {
+			if(itemType == ItemType.WOOD || itemType == ItemType.ROCK || itemType == ItemType.FOOD) {
 				item = new Item(100, itemType);
 			}
 			resources.put(itemType, item);
@@ -181,14 +181,23 @@ public class Game {
 				resources.get(ItemType.ROCK).addAmount(1);
 			}
 			if(building.getBuildingType() == BuildingType.IRRIGATION && building.getTile().canPlant() == true) {
-				resources.get(ItemType.WHEAT).addAmount(1);
+				resources.get(ItemType.FOOD).addAmount(1);
 			}
 			if(building.getBuildingType() == BuildingType.SAWMILL) {
 				resources.get(ItemType.WOOD).addAmount(1);
 			}
 			if(building.getBuildingType() == BuildingType.FARM && building.getTile().hasUnit(UnitType.HORSE)) {
 				resources.get(ItemType.HORSE).addAmount(1);
+				resources.get(ItemType.FOOD).addAmount(1);
 			}
+			
+			if(building.getTile().getPlant() != null) {
+				if(building.getBuildingType() == BuildingType.FARM && building.getTile().getPlant().getPlantType() == PlantType.BERRY) {
+					resources.get(ItemType.FOOD).addAmount(1);
+					building.getTile().getPlant().takeDamage(1);
+				}
+			}
+			
 		}
 		
 	}

@@ -31,7 +31,7 @@ public class Frame extends JPanel{
 	Border massiveBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(5, 5, 5, 5));
 	
 	
-	private ImageIcon BUILDING_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), 20, 20);
+	private ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.PNG"), 20, 20);
 	private ImageIcon CITY_TAB_ICON = Utils.resizeImageIcon(BuildingType.CASTLE.getImageIcon(0), 20, 20);
 	
 	private Timer repaintingThread;
@@ -41,7 +41,7 @@ public class Frame extends JPanel{
 	private JPanel minimapPanel;
 	private JPanel cityView;
 	private JPanel tileView;
-	private JPanel buildingMenu;
+	private JPanel workerMenu;
 	private JPanel techView;
 	private JLabel tileSize;
 	private JTabbedPane tabbedPane;
@@ -59,7 +59,7 @@ public class Frame extends JPanel{
 	private boolean dragged = false;
 	
 	private int RESOURCE_TAB;
-	private int BUILDING_TAB;
+	private int WORKER_TAB;
 	private int TECH_TAB;
 	private int DEBUG_TAB;
 	private int CITY_TAB;
@@ -475,12 +475,12 @@ public class Frame extends JPanel{
 	
 	private void manageBuildingTab(boolean enabled) {
 		
-		if(enabled == false && tabbedPane.getSelectedIndex() == BUILDING_TAB) {
+		if(enabled == false && tabbedPane.getSelectedIndex() == WORKER_TAB) {
 			tabbedPane.setSelectedIndex(0);
 		}else if (enabled == true){
-			tabbedPane.setSelectedIndex(BUILDING_TAB);
+			tabbedPane.setSelectedIndex(WORKER_TAB);
 		}
-		tabbedPane.setEnabledAt(BUILDING_TAB, enabled);
+		tabbedPane.setEnabledAt(WORKER_TAB, enabled);
 	}
 
 	private void manageCityTab(boolean enabled) {
@@ -501,13 +501,13 @@ public class Frame extends JPanel{
 		int BUILDING_ICON_SIZE = 25;
 		int RESOURCE_ICON_SIZE = 35;
 
-		buildingMenu = new JPanel();
+		workerMenu = new JPanel();
 		
 		JButton makeRoad = setupButton("Road", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildroad.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		makeRoad.addActionListener(e -> {
 			gameInstance.buildRoad(RoadType.STONE_ROAD);
 		});
-		buildingMenu.add(makeRoad);
+		workerMenu.add(makeRoad);
 		
 		for(int i = 0; i < BuildingType.values().length; i++) {
 			BuildingType type = BuildingType.values()[i];
@@ -516,7 +516,7 @@ public class Frame extends JPanel{
 				gameInstance.buildBuilding(type);
 			});
 			buildingButtons[i] = button;
-			buildingMenu.add(button);
+			workerMenu.add(button);
 		}
 		
 		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
@@ -650,11 +650,11 @@ public class Frame extends JPanel{
 		TECH_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab("Tech Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), 20, 20), techView, "Does nothing");
 		
-		BUILDING_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Build Stuff", BUILDING_TAB_ICON, buildingMenu, "Does nothing", BUILDING_TAB);
+		WORKER_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("Worker Tab", WORKER_TAB_ICON, workerMenu, "Does nothing", WORKER_TAB);
 		
 		CITY_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("City stuff", CITY_TAB_ICON, cityView, "Does nothing", CITY_TAB);
+		tabbedPane.insertTab("City", CITY_TAB_ICON, cityView, "Does nothing", CITY_TAB);
 		
 		DEBUG_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab(null, Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), 20, 20), buttonPanel, "Does nothing");
