@@ -20,8 +20,10 @@ public class Game {
 	private BufferedImage minimapImage;
 	private BufferedImage heightMapImage;
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
-	private Unit selectedUnit;
-	private Building selectedBuilding;
+//	private Unit selectedUnit;
+//	private Building selectedBuilding;
+	private Thing selectedThing;
+	
 	LinkedList<Building> buildings = new LinkedList<Building>();
 	
 	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
@@ -143,7 +145,7 @@ public class Game {
 			updateBuildingAction();
 			changedTerrain = true;
 		}
-		moveUnits();
+		unitTick();
 		updateBuildingDamage();
 		
 		guiController.updateGUI();
@@ -169,6 +171,9 @@ public class Game {
 	public void updateBuildingAction() {
 		
 		for(Building building : buildings) {
+			if(!building.isBuilt()) {
+				continue;
+			}
 			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getHasResource() == true) {
 				resources.get(building.getTile().getResourceType().getResourceType()).addAmount(1);
 			}
@@ -389,12 +394,16 @@ public class Game {
 		}
 	}
 	private void makeCastle() {
+		int borderPadCastle = 10;
 		for (Tile tile : world.getTilesRandomly()) {
 			if (tile.getRoadType() != null && tile.canBuild() == true
 					&& tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()
 					&& tile.getTerrain() != Terrain.ROCK) {
-				if(tile.getLocation().x - world.getWidth() <= 5 || tile.getLocation().y - world.getHeight() <= 5) {
-					System.out.println("too close to border"+ (tile.getLocation().x - world.getWidth()) );
+				if(Math.abs(tile.getLocation().x - world.getWidth()) <= borderPadCastle || tile.getLocation().x < borderPadCastle
+						|| Math.abs(tile.getLocation().y - world.getHeight()) <= borderPadCastle || tile.getLocation().y < borderPadCastle) {
+					System.out.println("dX"+ (tile.getLocation().x - world.getWidth()) );
+					System.out.println("dY"+ (tile.getLocation().y - world.getHeight()) );
+					System.out.println("location"+ (tile.getLocation()) );
 					continue;
 				}
 				buildUnit(UnitType.WORKER, tile);
@@ -491,7 +500,23 @@ public class Game {
 				drawHealthBar(g, p);
 			}
 			for(Building b : this.buildings) {
-				g.drawImage(b.getImage(0), b.getTile().getLocation().x * Game.tileSize, b.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				if(b.getIsSelected()) {
+					g.setColor(Color.pink);
+					Utils.setTransparency(g, 0.8f);
+					Graphics2D g2d = (Graphics2D)g;
+					Stroke currentStroke = g2d.getStroke();
+					int strokeWidth = Game.tileSize /8;
+					g2d.setStroke(new BasicStroke(strokeWidth));
+					g.drawOval(b.getTile().getLocation().x * Game.tileSize + strokeWidth/2, b.getTile().getLocation().y * Game.tileSize + strokeWidth/2, Game.tileSize-1 - strokeWidth, Game.tileSize-1 - strokeWidth);
+					g2d.setStroke(currentStroke);
+					Utils.setTransparency(g, 1f);
+				}
+				BufferedImage bI = Utils.toBufferedImage(b.getImage(0));
+				double percentDone = 1 - b.getRemainingEffort()/b.getBuildingType().getBuildingEffort();
+				int h =  Math.max(1, (int) (bI.getHeight() * percentDone));
+				int tileh = Math.max(1, (int) (Game.tileSize * percentDone));
+				bI = bI.getSubimage(0, bI.getHeight() - h, bI.getWidth(), h);
+				g.drawImage(bI, b.getTile().getLocation().x * Game.tileSize, b.getTile().getLocation().y * Game.tileSize - tileh + Game.tileSize, Game.tileSize, tileh , null);
 				drawHealthBar(g, b);
 			}
 			for(Animal animal : Wildlife.getAnimals()) {
@@ -671,7 +696,7 @@ public class Game {
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
 		System.out.println(currentMode);
 		Tile tile = world[loc];
-		if(currentMode == BuildMode.NOMODE && tile.hasPlayerControlledUnit() == true) {
+		if(currentMode == BuildMode.NOMODE) {
 			toggleUnitSelectOnTile(tile);
 		}
 		if(currentMode == BuildMode.NOMODE) {
@@ -679,28 +704,47 @@ public class Game {
 		}
 	}
 	public void toggleUnitSelectOnTile(Tile tile) {
-		if (tile.hasPlayerControlledUnit()) {
-			if (tile.getPlayerControlledUnit() == selectedUnit) {
-				deselectUnit();
-			} else {
-				deselectUnit();
-				selectedUnit = tile.getPlayerControlledUnit();
-				selectedUnit.setIsSelected(true);
-				if (selectedUnit.getUnitType() == UnitType.WORKER) {
+		Thing selectionCandidate = tile.getPlayerControlledThing();
+		if (selectionCandidate != null) {
+			
+			if (selectionCandidate == selectedThing) {
+				deselectThing();
+				//clicking on current selection
+			}else {
+				// clicking on new selection
+				deselectThing();
+				selectionCandidate.setIsSelected(true);
+				if (selectionCandidate instanceof Unit && ((Unit)selectionCandidate).getUnitType() == UnitType.WORKER) {
 					guiController.selectedWorker(true);
 				}
+				if (selectionCandidate instanceof Building && ((Building)selectionCandidate).getBuildingType() == BuildingType.CASTLE) {
+					guiController.selectedBuilding(true);
+				}
+				selectedThing = selectionCandidate;
 			}
 		}
+		
 
 	}
 
-	public void deselectUnit() {
-		if (selectedUnit != null) {
-			if (selectedUnit.getUnitType() == UnitType.WORKER) {
-				guiController.selectedWorker(false);
+	public void deselectThing() {
+		if (selectedThing != null) {
+			selectedThing.setIsSelected(false);
+			if (selectedThing instanceof Unit) {
+
+				Unit selectedUnit = (Unit) selectedThing;
+				if (selectedUnit.getUnitType() == UnitType.WORKER) {
+					guiController.selectedWorker(false);
+				}
+				
+				selectedThing = null;
 			}
-			selectedUnit.setIsSelected(false);
-			selectedUnit = null;
+			if (selectedThing instanceof Building) {
+				guiController.selectedBuilding(false);
+				selectedThing = null;
+			}
+		
+			
 		}
 	}
 	
@@ -710,13 +754,13 @@ public class Game {
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
 		Tile destination = world[loc];
 		
-		if(selectedUnit != null && destination != null ) {
-			selectedUnit.setTargetTile(destination);
+		if(selectedThing != null && destination != null ) {
+			selectedThing.setTargetTile(destination);
 		}
 		
 	}
 	
-	private void moveUnits() {
+	private void unitTick() {
 		
 		for(Unit unit : world.units) {
 			unit.tick();
@@ -746,13 +790,14 @@ public class Game {
 	}
 	
 	public void buildBuilding(BuildingType bt) {
-		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
-			if(selectedUnit.getTile().getHasBuilding() == false) {
-				if (bt == BuildingType.IRRIGATION && selectedUnit.getTile().canPlant() == false) {
+		
+		if(selectedThing != null && selectedThing instanceof Unit && ((Unit)selectedThing).getUnitType() == UnitType.WORKER) {
+			if(selectedThing.getTile().getHasBuilding() == false) {
+				if (bt == BuildingType.IRRIGATION && selectedThing.getTile().canPlant() == false) {
 					return;
 				}
-				Building building = new Building(bt, selectedUnit.getTile());
-				selectedUnit.getTile().setBuilding(building);
+				Building building = new Building(bt, selectedThing.getTile());
+				selectedThing.getTile().setBuilding(building);
 				buildings.add(building);
 
 			}
@@ -761,9 +806,9 @@ public class Game {
 		
 	}
 	public void buildRoad(RoadType rt) {
-		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
-			selectedUnit.getTile().setRoad(rt, Direction.NORTH.toString());
-			for(Tile tile : Utils.getNeighborsIncludingCurrent(selectedUnit.getTile(), world)) {
+		if(selectedThing != null && selectedThing instanceof Unit && ((Unit)selectedThing).getUnitType() == UnitType.WORKER) {
+			selectedThing.getTile().setRoad(rt, Direction.NORTH.toString());
+			for(Tile tile : Utils.getNeighborsIncludingCurrent(selectedThing.getTile(), world)) {
 				turnRoad(tile);
 			}
 		}
@@ -771,8 +816,9 @@ public class Game {
 	}
 
 	public void tryToBuildUnit(UnitType u) {
-		if(selectedBuilding != null) {
-			buildUnit(u, selectedBuilding.getTile());
+		
+		if(selectedThing != null && selectedThing instanceof Building && ((Building)selectedThing).getBuildingType() == BuildingType.CASTLE) {
+			buildUnit(u, selectedThing.getTile());
 		}
 	}
 	
@@ -806,22 +852,7 @@ public class Game {
 		Position tilepos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
 
-		if(world[loc].getBuilding() != null && world[loc].getBuilding().getBuildingType() == BuildingType.CASTLE) {
-			if(selectedBuilding == null) {
-				selectBuilding(world[loc].getBuilding());
-			}
-			else {
-				deselectBuilding();
-			}
-		}
-	}
-	public void selectBuilding(Building building) {
-		selectedBuilding = building;
-		guiController.selectedBuilding(true);
-	}
-	public void deselectBuilding() {
-		guiController.selectedBuilding(false);
-		selectedBuilding = null;
+		
 	}
 	public void exitTile() {
 		guiController.toggleTileView();
@@ -908,8 +939,9 @@ public class Game {
 		this.showHeightMap = show;
 	}
 	public UnitType getSelectedUnit() {
-		if(selectedUnit != null) {
-			return selectedUnit.getUnitType();
+		if(selectedThing != null && selectedThing instanceof Unit) {
+			
+			return ((Unit)selectedThing).getUnitType();
 		}
 		return null;
 	}

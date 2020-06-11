@@ -32,6 +32,7 @@ public class Frame extends JPanel{
 	
 	
 	private ImageIcon BUILDING_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildwall.png"), 20, 20);
+	private ImageIcon CITY_TAB_ICON = Utils.resizeImageIcon(BuildingType.CASTLE.getImageIcon(0), 20, 20);
 	
 	private Timer repaintingThread;
 	private JPanel mainMenuPanel;
@@ -61,6 +62,7 @@ public class Frame extends JPanel{
 	private int BUILDING_TAB;
 	private int TECH_TAB;
 	private int DEBUG_TAB;
+	private int CITY_TAB;
 	
 	private Thread gameLoopThread;
 	
@@ -77,24 +79,12 @@ public class Frame extends JPanel{
 		GUIController guiController = new GUIController() {
 			@Override
 			public void selectedBuilding(boolean selected) {
-				if(selected) {
-					frame.setGlassPane(cityView);
-					cityView.setVisible(true);
-				}
-				else {
-					cityView.setVisible(false);
-				}
+				manageCityTab(selected);
 				frame.repaint();
 			}
 			@Override
 			public void selectedWorker(boolean selected) {
-				if(selected) {
-					addBuildingTab();
-					tabbedPane.setSelectedIndex(BUILDING_TAB);
-				}
-				else {
-					removeBuildingTab();
-				}
+				manageBuildingTab(selected);
 				frame.repaint();
 			}
 			@Override
@@ -426,7 +416,7 @@ public class Frame extends JPanel{
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {
-					gameInstance.deselectUnit();
+					gameInstance.deselectThing();
 				}
 				if(e.getKeyCode()==KeyEvent.VK_R) {
 					if(gameInstance.getSelectedUnit() != null) {
@@ -480,11 +470,23 @@ public class Frame extends JPanel{
 		});
 	}
 	
-	private void addBuildingTab() {
-		tabbedPane.insertTab("Build Stuff", BUILDING_TAB_ICON, buildingMenu, "Does nothing", BUILDING_TAB);
+	private void manageBuildingTab(boolean enabled) {
+		
+		if(enabled == false && tabbedPane.getSelectedIndex() == BUILDING_TAB) {
+			tabbedPane.setSelectedIndex(0);
+		}else if (enabled == true){
+			tabbedPane.setSelectedIndex(BUILDING_TAB);
+		}
+		tabbedPane.setEnabledAt(BUILDING_TAB, enabled);
 	}
-	private void removeBuildingTab() {
-		tabbedPane.removeTabAt(BUILDING_TAB);
+
+	private void manageCityTab(boolean enabled) {
+		if(enabled == false && tabbedPane.getSelectedIndex() == CITY_TAB) {
+			tabbedPane.setSelectedIndex(0);
+		}else if (enabled == true){
+			tabbedPane.setSelectedIndex(CITY_TAB);
+		}
+		tabbedPane.setEnabledAt(CITY_TAB, enabled);
 	}
 	
 	private void runGame() {
@@ -515,15 +517,7 @@ public class Frame extends JPanel{
 		}
 		
 		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
-		cityView = new JPanel() {
-			protected void paintComponent(Graphics g) {
-				g.drawImage(cityOverlay, 0, 0, gamepanel.getWidth(), gamepanel.getHeight(), null);
-				super.paintComponent(g);
-			}
-		};
-		cityView.setVisible(false);
-		cityView.setOpaque(false);
-		cityView.setLayout(null);
+		cityView = new JPanel() {};
 		
 		int numButtons = 0;
 		for(int i = 0; i < UnitType.values().length; i++) {
@@ -538,18 +532,9 @@ public class Frame extends JPanel{
 				gameInstance.tryToBuildUnit(type);
 			});
 			cityView.add(button);
-			button.setBounds(765, 185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
 			unitButtons[i] = button;
 		}
 		
-		JButton exitCity = setupButton("", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/exitbutton.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
-		exitCity.setBorder(null);
-		exitCity.setContentAreaFilled(false);
-		exitCity.addActionListener(e -> {
-			gameInstance.deselectBuilding();
-		});
-		cityView.add(exitCity);
-		exitCity.setBounds(790, 20, BUILDING_ICON_SIZE, BUILDING_ICON_SIZE);
 		
 		JLabel money = setupLabel("Gold = " + gameInstance.getMoney(), Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		
@@ -658,15 +643,22 @@ public class Frame extends JPanel{
 		
 		RESOURCE_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab(null, Utils.resizeImageIcon(ItemType.ADAMANTITE_ORE.getImageIcon(0), 20, 20), resourcePanel, "Does nothing");
+		
 		TECH_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab("Tech Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), 20, 20), techView, "Does nothing");
+		
 		BUILDING_TAB = tabbedPane.getTabCount();
-		addBuildingTab();
+		tabbedPane.insertTab("Build Stuff", BUILDING_TAB_ICON, buildingMenu, "Does nothing", BUILDING_TAB);
+		
+		CITY_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("City stuff", CITY_TAB_ICON, cityView, "Does nothing", CITY_TAB);
+		
 		DEBUG_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab(null, Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), 20, 20), buttonPanel, "Does nothing");
 
 		// remove building tab after setting all of the tabs up
-		removeBuildingTab();
+		manageBuildingTab(false);
+		manageCityTab(false);
 		
 		JPanel guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());
