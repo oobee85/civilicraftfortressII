@@ -33,6 +33,9 @@ public class Building extends Thing {
 	}
 	public void expendEffort(double effort) {
 		remainingEffort -= effort;
+		if(remainingEffort < 0) {
+			remainingEffort = 0;
+		}
 	}
 	public double getRemainingEffort() {
 		return remainingEffort;

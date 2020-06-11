@@ -47,13 +47,27 @@ public class Unit extends Thing {
 	}
 	
 	public void tick() {
-		Building building = this.getTile().getBuilding();
 		if(timeToMove > 0) {
 			timeToMove -= 1;
 		}
-		if(unitType == UnitType.WORKER && building != null) {
-			if(building.isBuilt() == false) {
-				building.expendEffort(1);
+		if(unitType == UnitType.WORKER) {
+			Building tobuild = this.getTile().getBuilding();
+			if(tobuild != null && tobuild.isBuilt()) {
+				tobuild = null;
+			}
+			if(tobuild == null) {
+				for(Tile tile : this.getTile().getNeighbors()) {
+					tobuild = tile.getBuilding();
+					if(tobuild != null && tobuild.isBuilt()) {
+						tobuild = null;
+					}
+					if(tobuild != null) {
+						break;
+					}
+				}
+			}
+			if(tobuild != null) {
+				tobuild.expendEffort(1);
 			}
 		}
 	}

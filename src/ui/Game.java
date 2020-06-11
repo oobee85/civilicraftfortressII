@@ -761,7 +761,6 @@ public class Game {
 	}
 	
 	private void unitTick() {
-		
 		for(Unit unit : world.units) {
 			unit.tick();
 			if(unit.getTargetTile() == null) {
@@ -786,7 +785,6 @@ public class Game {
 				unit.moveTo(bestTile);
 			}
 		}
-		
 	}
 	
 	public void buildBuilding(BuildingType bt) {
