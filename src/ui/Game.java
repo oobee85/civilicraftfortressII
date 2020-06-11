@@ -714,9 +714,12 @@ public class Game {
 	public void rightClick(int mx, int my) {
 		Position tilepos = getTileAtPixel(new Position(mx,my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
-		
-		guiController.openRightClickMenu(mx, my, world[loc]);
-		
+		Tile tile = world[loc];
+		if(currentMode == BuildMode.NOMODE) {
+			toggleUnitSelectOnTile(tile);
+		}else {
+			guiController.openRightClickMenu(mx, my, world[loc]);
+		}
 	}
 	
 
@@ -743,9 +746,9 @@ public class Game {
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
 		System.out.println(currentMode);
 		Tile tile = world[loc];
-		if(currentMode == BuildMode.NOMODE) {
-			toggleUnitSelectOnTile(tile);
-		}
+//		if(currentMode == BuildMode.NOMODE) {
+//			toggleUnitSelectOnTile(tile);
+//		}
 		if(currentMode == BuildMode.NOMODE) {
 			setDestination(mx, my);
 		}

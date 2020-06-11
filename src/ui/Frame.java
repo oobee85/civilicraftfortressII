@@ -386,10 +386,10 @@ public class Frame extends JPanel{
 		gamepanel.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				if(e.getButton() == MouseEvent.BUTTON1) {
+				if(e.getButton() == MouseEvent.BUTTON3) {
 					gameInstance.mouseClick(mx, my);
 				}
-				if(e.getButton() == MouseEvent.BUTTON3 && dragged == false) {
+				if(e.getButton() == MouseEvent.BUTTON1 && dragged == false) {
 					gameInstance.rightClick(mx, my);
 				}
 				dragged = false;
