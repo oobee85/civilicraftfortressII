@@ -392,6 +392,10 @@ public class Game {
 			if (tile.getRoadType() != null && tile.canBuild() == true
 					&& tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()
 					&& tile.getTerrain() != Terrain.ROCK) {
+				if(tile.getLocation().x - world.getWidth() <= 5 || tile.getLocation().y - world.getHeight() <= 5) {
+					System.out.println("too close to border"+ (tile.getLocation().x - world.getWidth()) );
+					continue;
+				}
 				buildUnit(UnitType.WORKER, tile);
 				Building s = new Building(BuildingType.CASTLE, tile);
 				tile.setBuilding(s);
