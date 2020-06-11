@@ -29,9 +29,10 @@ public class Tile {
 	
 	private ConcurrentLinkedQueue<Unit> units;
 	
-	
 	public double liquidAmount;
 	public LiquidType liquidType;
+	
+	private List<Tile> neighborTiles = new LinkedList<Tile>();
 	
 	private Tile(TileLoc location, Terrain t) {
 		this.location = location;
@@ -95,13 +96,34 @@ public class Tile {
 	
 	public double getBrightness() {
 		double brightness = 0;
-		if(this.getHasBuilding() || this.hasPlayerControlledUnit()) {
+		
+		boolean nearBuilding = this.getHasBuilding();
+		for(Tile tile : getNeighbors()) {
+			if(tile.getHasBuilding() ) {
+				nearBuilding = true;
+			}
+		}
+		
+		boolean nearUnit = this.hasPlayerControlledUnit();
+		for(Tile tile : getNeighbors()) {
+			if(tile.hasPlayerControlledUnit() ) {
+				nearUnit = true;
+			}
+		}
+		if(nearBuilding || nearUnit) {
 			brightness += 1;
 		}
 		
-		if(this.isTerritory) {
-			brightness += 0.8;
+		boolean nearTerritory = this.isTerritory;
+		for(Tile tile : getNeighbors()) {
+			if(tile.isTerritory) {
+				nearTerritory = true;
+			}
 		}
+		if(nearTerritory) {
+			brightness += 0.4;
+		}
+		
 		brightness += getTerrain().getBrightness();
 		brightness += liquidAmount * liquidType.getBrightness();
 		return brightness;
@@ -222,5 +244,14 @@ public class Tile {
 	public double getHeight() {
 		return height;
 	}
-
+	
+	public void setNeighbors(List<Tile> tiles) {
+		neighborTiles.clear();
+		for(Tile t : tiles) {
+			neighborTiles.add(t);
+		}
+	}
+	public List<Tile> getNeighbors() {
+		return neighborTiles;
+	}
 }

@@ -283,6 +283,11 @@ public class World {
 				tileListRandom.add(tiles[i][j]);
 			}
 		}
+		
+		for(Tile tile : getTiles()) {
+			tile.setNeighbors(Utils.getNeighbors(tile, this));
+		}
+		
 		volcano = Generation.makeVolcano(tiles, heightMap);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		
