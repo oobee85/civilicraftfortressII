@@ -20,6 +20,7 @@ public class Thing implements HasImage {
 	
 	private HasImage hasImage;
 	private boolean sideHealthBar;
+	private LinkedList<Hitsplat> hitsplats = new LinkedList<Hitsplat>();
 	
 	private String name;
 	
@@ -48,6 +49,8 @@ public class Thing implements HasImage {
 		return health < 0;
 	}
 	public void takeDamage(double damage) {
+		Hitsplat hit = new Hitsplat(damage);
+		hitsplats.add(hit);
 		health -= damage;
 		if(damage != 0) {
 			timeLastDamageTaken = Game.ticks;
@@ -62,7 +65,25 @@ public class Thing implements HasImage {
 	public int getTimeLastDamageTaken() {
 		return timeLastDamageTaken;
 	}
-	
+	public void updateHitsplats() {
+		for(int i = 0; i < hitsplats.size(); i ++) {
+			hitsplats.get(i).updateDuration();
+			if(hitsplats.get(i).isDead() == true) {
+				hitsplats.remove(i);
+				i --;
+//				System.out.println("remove hitsplat");
+			}
+		}
+	}
+	public boolean hasHitsplat() {
+		return !hitsplats.isEmpty();
+	}
+	public double getHitsplatDamage() {
+		if(hitsplats.size() >= 1) {
+			return hitsplats.get(0).getDamage();
+		}
+		return 0;
+	}
 	public void setIsSelected(boolean select) {
 		isSelected = select;
 	}

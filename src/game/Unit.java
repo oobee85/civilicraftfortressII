@@ -1,5 +1,6 @@
 package game;
 
+
 import utils.*;
 import world.*;
 
@@ -7,12 +8,9 @@ public class Unit extends Thing {
 	
 	
 	private UnitType unitType;
-
-	
-	
 	private double timeToMove;
-	
 	private boolean isPlayerControlled;
+	
 	
 	public Unit(UnitType unitType, Tile tile, boolean isPlayerControlled) {
 		super(unitType.getCombatStats().getHealth(), unitType, tile);

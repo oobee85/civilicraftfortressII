@@ -132,14 +132,18 @@ public class Game {
 		}
 		if(world.volcano != null) {
 			world[world.volcano].liquidType = LiquidType.LAVA;
-			world[world.volcano].liquidAmount += .05;
+			world[world.volcano].liquidAmount += .01;
 		}
 		Liquid.propogate(world);
 		changedTerrain = true;
 		
 		Wildlife.tick(world);
-		world.updatePlantDamage();
-		world.updateUnitDamage();
+		
+		if(ticks%10 == 0) {
+			world.updatePlantDamage();
+			world.updateUnitDamage();
+		}
+		
 		world.updateTerrainChange(world);
 		if(ticks%5 == 0) {
 			updateBuildingAction();
@@ -562,6 +566,18 @@ public class Game {
 					Utils.setTransparency(g, 1f);
 				}
 				g.drawImage(unit.getImage(0), unit.getTile().getLocation().x * Game.tileSize, unit.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				
+				if(unit.hasHitsplat()) {
+					unit.updateHitsplats();
+					int x = (int) ((unit.getTile().getLocation().x * Game.tileSize) + Game.tileSize*.25);
+					int y = (int) ((unit.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.25);
+					int w = (int) (Game.tileSize*.5);
+					int hi = (int)(Game.tileSize*.5);
+					g.drawImage(Utils.loadImage("resources/Images/interfaces/Red_hitsplat.png"), x, y, w, hi, null);
+					x += Game.tileSize*.25;
+					y += Game.tileSize*.25;
+					g.drawString(""+unit.getHitsplatDamage(), x, y);
+				}
 				drawHealthBar(g, unit);
 			}
 			if(!showHeightMap) {
