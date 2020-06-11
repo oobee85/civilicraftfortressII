@@ -508,6 +508,7 @@ public class Game {
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 				drawHealthBar(g, p);
 			}
+			
 			for(Building b : this.buildings) {
 				if(b.getIsSelected()) {
 					g.setColor(Color.pink);
@@ -527,6 +528,13 @@ public class Game {
 				bI = bI.getSubimage(0, bI.getHeight() - h, bI.getWidth(), h);
 				g.drawImage(bI, b.getTile().getLocation().x * Game.tileSize, b.getTile().getLocation().y * Game.tileSize - tileh + Game.tileSize, Game.tileSize, tileh , null);
 				drawHealthBar(g, b);
+				if(b.isBuilt() == false) {
+					int x = (int) ((b.getTile().getLocation().x * Game.tileSize) + Game.tileSize*.25);
+					int y = (int) ((b.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.25);
+					int w = (int) (Game.tileSize*.75);
+					int hi = (int)(Game.tileSize*.75);
+					g.drawImage(Utils.loadImage("resources/Images/interfaces/building.PNG"), x, y, w, hi, null);
+				}
 			}
 			for(Animal animal : Wildlife.getAnimals()) {
 				g.drawImage(animal.getImage(0), animal.getTile().getLocation().x * Game.tileSize, animal.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
