@@ -21,6 +21,7 @@ public class Game {
 	private BufferedImage heightMapImage;
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
 	private Unit selectedUnit;
+	private Building selectedBuilding;
 	LinkedList<Building> buildings = new LinkedList<Building>();
 	
 	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
@@ -400,7 +401,6 @@ public class Game {
 				Building s = new Building(BuildingType.CASTLE, tile);
 				tile.setBuilding(s);
 				buildings.add(s);
-				System.out.println("building castle" + tile.getLocation());
 				viewOffset.x += (tile.getLocation().x - 20) * tileSize;
 				viewOffset.y += (tile.getLocation().y - 20) * tileSize;
 				break;
@@ -770,8 +770,13 @@ public class Game {
 		
 	}
 
-	public void buildUnit(UnitType u, Tile tile) {
-
+	public void tryToBuildUnit(UnitType u) {
+		if(selectedBuilding != null) {
+			buildUnit(u, selectedBuilding.getTile());
+		}
+	}
+	
+	private void buildUnit(UnitType u, Tile tile) {
 		for (Map.Entry mapElement : u.getCost().entrySet()) {
 			ItemType key = (ItemType) mapElement.getKey();
 			Integer value = (Integer) mapElement.getValue();
@@ -795,18 +800,28 @@ public class Game {
 
 		tile.addUnit(unit);
 		world.units.add(unit);
-
 	}
 
 	public void doubleClick(int mx, int my) {
 		Position tilepos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
+
 		if(world[loc].getBuilding() != null && world[loc].getBuilding().getBuildingType() == BuildingType.CASTLE) {
-			exitCity();
+			if(selectedBuilding == null) {
+				selectBuilding(world[loc].getBuilding());
+			}
+			else {
+				deselectBuilding();
+			}
 		}
 	}
-	public void exitCity() {
-		guiController.toggleCityView();
+	public void selectBuilding(Building building) {
+		selectedBuilding = building;
+		guiController.selectedBuilding(true);
+	}
+	public void deselectBuilding() {
+		guiController.selectedBuilding(false);
+		selectedBuilding = null;
 	}
 	public void exitTile() {
 		guiController.toggleTileView();

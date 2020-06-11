@@ -76,10 +76,14 @@ public class Frame extends JPanel{
 		frame.setLocationRelativeTo(null);
 		GUIController guiController = new GUIController() {
 			@Override
-			public void toggleCityView() {
-				System.out.println("toggle city view");
-				frame.setGlassPane(cityView);
-				cityView.setVisible(!cityView.isVisible());
+			public void selectedBuilding(boolean selected) {
+				if(selected) {
+					frame.setGlassPane(cityView);
+					cityView.setVisible(true);
+				}
+				else {
+					cityView.setVisible(false);
+				}
 				frame.repaint();
 			}
 			@Override
@@ -389,7 +393,7 @@ public class Frame extends JPanel{
 		gamepanel.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				if(e.getButton() == MouseEvent.BUTTON1 && dragged == false) {
+				if(e.getButton() == MouseEvent.BUTTON1) {
 					gameInstance.mouseClick(mx, my);
 				}
 				if(e.getButton() == MouseEvent.BUTTON3 && dragged == false) {
@@ -531,7 +535,7 @@ public class Frame extends JPanel{
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
 					null);
 			button.addActionListener(e -> {
-				gameInstance.buildUnit(type, gameInstance.buildings[0].getTile());
+				gameInstance.tryToBuildUnit(type);
 			});
 			cityView.add(button);
 			button.setBounds(765, 185 + (BUILD_UNIT_BUTTON_SIZE.height)*(++numButtons-1) +5*numButtons, BUILD_UNIT_BUTTON_SIZE.width, BUILD_UNIT_BUTTON_SIZE.height);
@@ -542,7 +546,7 @@ public class Frame extends JPanel{
 		exitCity.setBorder(null);
 		exitCity.setContentAreaFilled(false);
 		exitCity.addActionListener(e -> {
-			gameInstance.exitCity();
+			gameInstance.deselectBuilding();
 		});
 		cityView.add(exitCity);
 		exitCity.setBounds(790, 20, BUILDING_ICON_SIZE, BUILDING_ICON_SIZE);
