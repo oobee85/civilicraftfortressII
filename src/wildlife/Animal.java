@@ -9,16 +9,16 @@ import utils.*;
 import world.*;
 
 public class Animal extends Unit {
-	public static final int MAX_ENERGY = 100;
-	private UnitType type;
 	
-	private Animal prey;
+	public static final int MAX_ENERGY = 100;
+	
+	
+	private Unit prey;
 	private double energy;
 	private double drive;
 	
 	public Animal(UnitType type, Tile tile, boolean isPlayerControlled) {
 		super(type, tile, isPlayerControlled);
-		this.type = type;
 		energy = MAX_ENERGY;
 		drive = 0;
 	}
@@ -84,7 +84,7 @@ public class Animal extends Unit {
 	}
 	public void loseEnergy() {
 		energy -= 0.02;
-		if(getHealth() < type.getCombatStats().getHealth()) {
+		if(getHealth() < super.getType().getCombatStats().getHealth()) {
 			energy -= 0.04;
 			takeDamage(-0.1);
 		}
@@ -108,15 +108,11 @@ public class Animal extends Unit {
 		return super.isDead() || energy <= 0;
 	}
 	
-	public UnitType getType() {
-		return type;
-	}
-	public Animal getPrey() {
+	
+	public Unit getPrey() {
 		return prey;
 	}
-	public void setPrey(Animal t) {
-		prey = t;
-	}
+	
 	
 	/**
 	 * Moves toward the target and tries to eat it.
@@ -138,7 +134,7 @@ public class Animal extends Unit {
 			}
 			if(prey.getTile() == getTile()) {
 				prey.takeDamage(this.getType().getCombatStats().getAttack());
-				for(int i = 0; i < this.getType().getCombatStats().getAttack()/5; i++) {
+				for(int i = 0; i < prey.getType().getCombatStats().getHealth()/2; i++) {
 					eat();
 				}
 				
@@ -150,7 +146,7 @@ public class Animal extends Unit {
 	}
 	
 	public double getMoveChance() {
-		return getType().getCombatStats().getSpeed()*0.001 + 0.1*(1 - energy/MAX_ENERGY) + 0.4*(1 - getHealth()/type.getCombatStats().getHealth());
+		return getType().getCombatStats().getSpeed()*0.001 + 0.1*(1 - energy/MAX_ENERGY) + 0.4*(1 - getHealth()/super.getType().getCombatStats().getHealth());
 	}
 	
 	public double getEnergy() {

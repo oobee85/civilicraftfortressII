@@ -59,7 +59,6 @@ public class Game {
 		money = 100;
 		hoveredTile = new TileLoc(-1,-1);
 		viewOffset = new Position(0, 0);
-		currentMode = BuildMode.NOMODE;
 		showHeightMap = false;
 		
 		for(ItemType itemType : ItemType.values()) {
@@ -142,7 +141,7 @@ public class Game {
 		
 		
 		
-		if(ticks%10 == 0) {
+		if(ticks%5 == 0) {
 			world.updatePlantDamage();
 			world.updateUnitDamage();
 			updateBuildingDamage();
@@ -728,13 +727,22 @@ public class Game {
 		Position tilepos = getTileAtPixel(new Position(mx,my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
 		Tile tile = world[loc];
-		if(currentMode == BuildMode.NOMODE) {
-			toggleUnitSelectOnTile(tile);
-		}else {
-			guiController.openRightClickMenu(mx, my, world[loc]);
-		}
+		toggleUnitSelectOnTile(tile);
+		
+		
+//		guiController.openRightClickMenu(mx, my, world[loc]);
 	}
-	
+	public void toggleTargetEnemy(Tile tile) {
+		if(selectedThing instanceof Unit) {
+			Unit unit = (Unit) selectedThing;
+			Unit targetUnit = tile.getUnits().peek();
+			if(targetUnit != unit && targetUnit.isPlayerControlled() == false) {
+				unit.setTarget(targetUnit);
+			}
+			
+		}
+		
+	}
 
 	public static void printPoint(Point p) {
 		System.out.println("Point: (" + p.x + ", " + p.y + ")");
@@ -759,11 +767,9 @@ public class Game {
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
 		System.out.println(currentMode);
 		Tile tile = world[loc];
-//		if(currentMode == BuildMode.NOMODE) {
-//			toggleUnitSelectOnTile(tile);
-//		}
-		if(currentMode == BuildMode.NOMODE) {
-			setDestination(mx, my);
+		setDestination(mx, my);
+		if(tile.getUnits().isEmpty() == false) {
+			toggleTargetEnemy(tile);
 		}
 	}
 	public void toggleUnitSelectOnTile(Tile tile) {

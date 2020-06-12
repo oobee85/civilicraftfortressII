@@ -10,6 +10,7 @@ public class Unit extends Thing {
 	private UnitType unitType;
 	private double timeToMove;
 	private boolean isPlayerControlled;
+	private Unit target;
 	
 	
 	public Unit(UnitType unitType, Tile tile, boolean isPlayerControlled) {
@@ -21,6 +22,9 @@ public class Unit extends Thing {
 		return isPlayerControlled;
 	}
 	
+	public void setTarget(Unit t) {
+		target = t;
+	}
 	
 	public UnitType getUnitType() {
 		return unitType;
@@ -68,6 +72,30 @@ public class Unit extends Thing {
 				tobuild.expendEffort(1);
 			}
 		}
+		
+	}
+	public void dealDamage() {
+		damageTarget();
+	}
+	public void damageTarget() {
+		if(target == null) {
+			return;
+		}
+		for(Tile tile: this.getTile().getNeighbors()) {
+			if (target.getTile() == tile || target.getTile() == this.getTile()) {
+				target.takeDamage(this.getType().getCombatStats().getAttack());
+
+				if (target.isDead()) {
+					target = null;
+					return;
+				}
+			}
+		}
+		
+	}
+	
+	public UnitType getType() {
+		return unitType;
 	}
 	
 	public boolean readyToMove() {

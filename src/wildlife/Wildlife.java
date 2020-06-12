@@ -61,10 +61,6 @@ public class Wildlife {
 		world[loc].addUnit(animal);
 	}
 	
-	public static void updateAnimalDamage() {
-		
-	}
-	
 	
 	public static void tick(World world) {
 		LinkedList<Animal> newAnimals = new LinkedList<>();
@@ -88,12 +84,12 @@ public class Wildlife {
 					int pickAnimal = (int) (animals.size()*Math.random());
 					Animal iveGotYouInMySights = animals.get(pickAnimal);
 					if(iveGotYouInMySights != animal) {
-						animal.setPrey(iveGotYouInMySights);
+						animal.setTarget(iveGotYouInMySights);
 					}
 				}
 				else {
 					if(!animal.getType().isHostile() && animal.getTile().getPlant() != null) {
-						animal.getTile().getPlant().takeDamage(0.1);
+						animal.getTile().getPlant().takeDamage(1);
 						animal.eat();
 					}else if(!animal.getType().isHostile() && animal.getTile().checkTerrain(Terrain.GRASS)) {
 						animal.getTile().setTerrain(Terrain.DIRT);
