@@ -43,7 +43,6 @@ public class Game {
 	private int money;
 	private Position viewOffset;
 	private TileLoc hoveredTile;
-	private BuildMode currentMode;
 	private boolean showHeightMap;
 	
 	private volatile int panelWidth;
@@ -782,7 +781,6 @@ public class Game {
 	public void mouseClick(int mx, int my) {
 		Position pos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
-		System.out.println(currentMode);
 		Tile tile = world[loc];
 		setDestination(mx, my);
 		if(tile.getUnits().isEmpty() == false) {
@@ -983,10 +981,6 @@ public class Game {
 		return tileSize;
 	}
 	
-	public BuildMode getMode() {
-		return currentMode;
-		
-	}
 	
 	protected void drawMinimap(Graphics g, int x, int y, int w, int h) {
 		
