@@ -15,7 +15,9 @@ import world.*;
 public class Game {
 	
 	private Font damageFont = new Font("Comic Sans MS", Font.PLAIN, 14);
-	private Image hitsplatImage = Utils.loadImage("resources/Images/interfaces/Red_hitsplat.png");
+	private Image redHitsplatImage = Utils.loadImage("resources/Images/interfaces/redhitsplat.png");
+	private Image blueHitsplatImage = Utils.loadImage("resources/Images/interfaces/bluehitsplat.png");
+	private Image targetImage = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
 	public static final int NUM_DEBUG_DIGITS = 3;
 	public static int ticks;
 	private int skipUntilTick;
@@ -575,6 +577,7 @@ public class Game {
 					Utils.setTransparency(g, 1f);
 				}
 				g.drawImage(unit.getImage(0), unit.getTile().getLocation().x * Game.tileSize, unit.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				drawTarget(g, unit);
 				drawHitsplat(g, unit);
 				drawHealthBar(g, unit);
 			}
@@ -647,12 +650,26 @@ public class Game {
 			int y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.25);
 			int w = (int) (Game.tileSize*.5);
 			int hi = (int)(Game.tileSize*.5);
-			g.drawImage(hitsplatImage, x, y, w, hi, null);
+			if(thing.getHitsplatDamage() > 0) {
+				g.drawImage(redHitsplatImage, x, y, w, hi, null);
+			}else {
+				g.drawImage(blueHitsplatImage, x, y, w, hi, null);
+			}
 			x += Game.tileSize*.25;
 			y += Game.tileSize*.25;
 			g.setColor(Color.WHITE);
 			g.setFont(damageFont);
 			g.drawString(""+thing.getHitsplatDamage(), x-10, y+5);
+		}
+	}
+	public void drawTarget(Graphics g, Unit unit) {
+		if(unit.getTarget() != null) {
+			Unit target = unit.getTarget();
+			int x = (int) ((target.getTile().getLocation().x * Game.tileSize) );
+			int y = (int) ((target.getTile().getLocation().y * Game.tileSize) );
+			int w = (int) (Game.tileSize);
+			int hi = (int)(Game.tileSize);
+			g.drawImage(targetImage, x, y, w, hi, null);
 		}
 	}
 	
@@ -805,7 +822,7 @@ public class Game {
 				if (selectedUnit.getUnitType() == UnitType.WORKER) {
 					guiController.selectedWorker(false);
 				}
-				
+				selectedUnit.setTarget(null);
 				selectedThing = null;
 			}
 			if (selectedThing instanceof Building) {

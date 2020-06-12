@@ -93,7 +93,9 @@ public class Unit extends Thing {
 		}
 		
 	}
-	
+	public Unit getTarget() {
+		return target;
+	}
 	public UnitType getType() {
 		return unitType;
 	}
