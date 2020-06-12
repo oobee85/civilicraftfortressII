@@ -66,6 +66,9 @@ public class Thing implements HasImage {
 		return timeLastDamageTaken;
 	}
 	public void updateHitsplats() {
+		if(hitsplats.isEmpty()==true) {
+			return;
+		}
 		for(int i = 0; i < hitsplats.size(); i ++) {
 			hitsplats.get(i).updateDuration();
 			if(hitsplats.get(i).isDead() == true) {

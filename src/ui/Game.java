@@ -140,12 +140,13 @@ public class Game {
 		Liquid.propogate(world);
 		changedTerrain = true;
 		
-		Wildlife.tick(world);
+		
 		
 		if(ticks%10 == 0) {
 			world.updatePlantDamage();
 			world.updateUnitDamage();
 			updateBuildingDamage();
+			Wildlife.tick(world);
 		}
 		
 		world.updateTerrainChange(world);

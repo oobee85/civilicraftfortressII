@@ -61,6 +61,10 @@ public class Wildlife {
 		world[loc].addUnit(animal);
 	}
 	
+	public static void updateAnimalDamage() {
+		
+	}
+	
 	
 	public static void tick(World world) {
 		LinkedList<Animal> newAnimals = new LinkedList<>();
