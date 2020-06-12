@@ -61,11 +61,7 @@ public class Animal extends Unit {
 				damage += 0.01;
 			}
 		}
-	
-		if(damage != 0 ) {
-			int roundedDamage = (int) (damage +1);
-			return roundedDamage;
-		}
+		
 		return damage;
 	}
 	
@@ -86,7 +82,7 @@ public class Animal extends Unit {
 		energy -= 0.02;
 		if(getHealth() < super.getType().getCombatStats().getHealth()) {
 			energy -= 0.04;
-			takeDamage(-0.1);
+			heal(1);
 		}
 		if(energy < MAX_ENERGY/20) {
 			takeDamage(0.05);
@@ -146,7 +142,9 @@ public class Animal extends Unit {
 	}
 	
 	public double getMoveChance() {
-		return getType().getCombatStats().getSpeed()*0.001 + 0.1*(1 - energy/MAX_ENERGY) + 0.4*(1 - getHealth()/super.getType().getCombatStats().getHealth());
+		return getType().getCombatStats().getSpeed()*0.002 
+				+ 0.2*(1 - energy/MAX_ENERGY) 
+				+ 0.8*(1 - getHealth()/super.getType().getCombatStats().getHealth());
 	}
 	
 	public double getEnergy() {

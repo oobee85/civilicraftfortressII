@@ -49,10 +49,20 @@ public class Thing implements HasImage {
 		return health < 0;
 	}
 	public void takeDamage(double damage) {
-		Hitsplat hit = new Hitsplat(damage);
+		int roundedDamage = (int)Math.ceil(damage);
+		Hitsplat hit = new Hitsplat(roundedDamage);
 		hitsplats.add(hit);
-		health -= damage;
+		health -= roundedDamage;
 		if(damage != 0) {
+			timeLastDamageTaken = Game.ticks;
+		}
+	}
+	public void heal(double healing) {
+		int roundedHealing = (int)Math.ceil(healing);
+		Hitsplat hit = new Hitsplat(-roundedHealing);
+		hitsplats.add(hit);
+		health += roundedHealing;
+		if(roundedHealing != 0) {
 			timeLastDamageTaken = Game.ticks;
 		}
 	}
