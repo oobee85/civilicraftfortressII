@@ -61,6 +61,11 @@ public class Animal extends Unit {
 				damage += 0.01;
 			}
 		}
+	
+		if(damage != 0 ) {
+			int roundedDamage = (int) (damage +1);
+			return roundedDamage;
+		}
 		return damage;
 	}
 	

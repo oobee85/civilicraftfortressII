@@ -69,7 +69,10 @@ public class Wildlife {
 			animal.tick();
 			double liquidDamage = animal.computeTileDamage(animal.getTile(), animal.getTile().getHeight());
 			if(animal.getType().isFlying() != true) {
-				animal.takeDamage(liquidDamage);
+				if(liquidDamage >= 1) {
+					animal.takeDamage(liquidDamage);
+				}
+				
 			}
 			if(animal.isDead()) {
 				dead.add(animal);

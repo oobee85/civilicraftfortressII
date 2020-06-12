@@ -365,7 +365,7 @@ public class Frame extends JPanel{
 			public void mouseDragged(MouseEvent e) {
 //				System.out.println("mouse drag");
 				dragged = true;
-				if(SwingUtilities.isRightMouseButton(e)) {
+				if(SwingUtilities.isLeftMouseButton(e)) {
 					int mrx = e.getX();
 					int mry = e.getY();
 					int dx = mx-mrx;
@@ -375,7 +375,8 @@ public class Frame extends JPanel{
 					my = mry;
 					
 					gameInstance.mouseOver(mx, my);
-				} else if(SwingUtilities.isLeftMouseButton(e)) {
+				} 
+				else if(SwingUtilities.isRightMouseButton(e)) {
 					int mx2 = e.getX();
 					int my2 = e.getY();
 					gameInstance.mouseOver(mx2, my2);

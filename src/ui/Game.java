@@ -14,6 +14,7 @@ import world.*;
 
 public class Game {
 	
+	private Font damageFont = new Font("Comic Sans MS", Font.PLAIN, 14);
 	private Image hitsplatImage = Utils.loadImage("resources/Images/interfaces/Red_hitsplat.png");
 	public static final int NUM_DEBUG_DIGITS = 3;
 	public static int ticks;
@@ -144,6 +145,7 @@ public class Game {
 		if(ticks%10 == 0) {
 			world.updatePlantDamage();
 			world.updateUnitDamage();
+			updateBuildingDamage();
 		}
 		
 		world.updateTerrainChange(world);
@@ -152,7 +154,7 @@ public class Game {
 			changedTerrain = true;
 		}
 		unitTick();
-		updateBuildingDamage();
+		
 		
 		guiController.updateGUI();
 		if(changedTerrain) {
@@ -517,10 +519,12 @@ public class Game {
 			}
 			for(Plant p : world.plantsLand) {
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				drawHitsplat(g, p);
 				drawHealthBar(g, p);
 			}
 			for(Plant p : world.plantsAquatic) {
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				drawHitsplat(g, p);
 				drawHealthBar(g, p);
 			}
 			
@@ -542,6 +546,7 @@ public class Game {
 				int tileh = Math.max(1, (int) (Game.tileSize * percentDone));
 				bI = bI.getSubimage(0, bI.getHeight() - h, bI.getWidth(), h);
 				g.drawImage(bI, b.getTile().getLocation().x * Game.tileSize, b.getTile().getLocation().y * Game.tileSize - tileh + Game.tileSize, Game.tileSize, tileh , null);
+				drawHitsplat(g, b);
 				drawHealthBar(g, b);
 				if(b.isBuilt() == false) {
 					int x = (int) ((b.getTile().getLocation().x * Game.tileSize) + Game.tileSize*.25);
@@ -553,7 +558,9 @@ public class Game {
 			}
 			for(Animal animal : Wildlife.getAnimals()) {
 				g.drawImage(animal.getImage(0), animal.getTile().getLocation().x * Game.tileSize, animal.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				drawHitsplat(g, animal);
 				drawHealthBar(g, animal);
+		
 			}
 			for(Unit unit : world.units) {
 				if(unit.getIsSelected()) {
@@ -568,18 +575,7 @@ public class Game {
 					Utils.setTransparency(g, 1f);
 				}
 				g.drawImage(unit.getImage(0), unit.getTile().getLocation().x * Game.tileSize, unit.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
-				
-				if(unit.hasHitsplat()) {
-					unit.updateHitsplats();
-					int x = (int) ((unit.getTile().getLocation().x * Game.tileSize) + Game.tileSize*.25);
-					int y = (int) ((unit.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.25);
-					int w = (int) (Game.tileSize*.5);
-					int hi = (int)(Game.tileSize*.5);
-					g.drawImage(hitsplatImage, x, y, w, hi, null);
-					x += Game.tileSize*.25;
-					y += Game.tileSize*.25;
-					g.drawString(""+unit.getHitsplatDamage(), x, y);
-				}
+				drawHitsplat(g, unit);
 				drawHealthBar(g, unit);
 			}
 			if(!showHeightMap) {
@@ -644,6 +640,22 @@ public class Game {
 		}
 	}
 
+	public void drawHitsplat(Graphics g, Thing thing) {
+		if(thing.hasHitsplat()) {
+			thing.updateHitsplats();
+			int x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*.25);
+			int y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.25);
+			int w = (int) (Game.tileSize*.5);
+			int hi = (int)(Game.tileSize*.5);
+			g.drawImage(hitsplatImage, x, y, w, hi, null);
+			x += Game.tileSize*.25;
+			y += Game.tileSize*.25;
+			g.setColor(Color.WHITE);
+			g.setFont(damageFont);
+			g.drawString(""+thing.getHitsplatDamage(), x-10, y+5);
+		}
+	}
+	
 	public void drawHealthBar(Graphics g, Thing thing) {
 		if( Game.tileSize <= 30) {
 			return;

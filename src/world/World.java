@@ -173,7 +173,11 @@ public class World {
 			Tile tile = unit.getTile();
 			if (tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
-				unit.takeDamage(damageTaken);
+				int roundedDamage = (int) (damageTaken+1);
+				if(roundedDamage >= 1) {
+					unit.takeDamage(roundedDamage);
+				}
+				
 			}
 			if (unit.isDead() == true) {
 				tile.removeUnit(unit);
@@ -191,7 +195,10 @@ public class World {
 			if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(!plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
 					double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
-					plant.takeDamage(damageTaken);
+					int roundedDamage = (int) (damageTaken+1);
+					if(roundedDamage >= 1) {
+						plant.takeDamage(roundedDamage);
+					}
 				}
 			}
 			if(plant.isDead() == true) {
@@ -209,7 +216,10 @@ public class World {
 				if (plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
 					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
 					double damageTaken = difInLiquids * tile.liquidType.getDamage();
-					plant.takeDamage(damageTaken);
+					int roundedDamage = (int) (damageTaken+1);
+					if(roundedDamage >= 1) {
+						plant.takeDamage(roundedDamage);
+					}
 				}
 			}
 			if (plant.isDead() == true) {
