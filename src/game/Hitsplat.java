@@ -10,7 +10,7 @@ public class Hitsplat {
 	
 	public Hitsplat(double damage) {
 		currentDuration = Game.ticks;
-		maxDuration = currentDuration + 10;
+		maxDuration = currentDuration + 20;
 		this.damage = damage;
 		
 	}

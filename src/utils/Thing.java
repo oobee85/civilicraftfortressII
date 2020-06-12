@@ -97,6 +97,9 @@ public class Thing implements HasImage {
 		}
 		return 0;
 	}
+	public LinkedList<Hitsplat> getHitsplatList() {
+		return hitsplats;
+	}
 	public void setIsSelected(boolean select) {
 		isSelected = select;
 	}
