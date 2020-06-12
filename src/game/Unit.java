@@ -81,17 +81,14 @@ public class Unit extends Thing {
 		if(target == null) {
 			return;
 		}
-		for(Tile tile: this.getTile().getNeighbors()) {
-			if (target.getTile() == tile || target.getTile() == this.getTile()) {
-				target.takeDamage(this.getType().getCombatStats().getAttack());
+		if(this.getTile().getLocation().distanceTo(target.getTile().getLocation()) <= getType().getCombatStats().getVisionRadius()) {
+			target.takeDamage(this.getType().getCombatStats().getAttack());
 
-				if (target.isDead()) {
-					target = null;
-					return;
-				}
+			if (target.isDead()) {
+				target = null;
+				return;
 			}
 		}
-		
 	}
 	public Unit getTarget() {
 		return target;

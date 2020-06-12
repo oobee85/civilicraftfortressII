@@ -14,7 +14,7 @@ import world.*;
 
 public class Game {
 	
-	private Font damageFont = new Font("Comic Sans MS", Font.PLAIN, 14);
+	private Font damageFont = new Font("Comic Sans MS", Font.BOLD, 14);
 	private Image redHitsplatImage = Utils.loadImage("resources/Images/interfaces/redhitsplat.png");
 	private Image blueHitsplatImage = Utils.loadImage("resources/Images/interfaces/bluehitsplat.png");
 	private Image targetImage = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
@@ -645,29 +645,31 @@ public class Game {
 	public void drawHitsplat(Graphics g, Thing thing) {
 		if(thing.hasHitsplat()) {
 			thing.updateHitsplats();
-			int x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*.25);
-			int y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.25);
+			
+			int x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*.5);
+			int y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.5);
 			int w = (int) (Game.tileSize*.5);
 			int hi = (int)(Game.tileSize*.5);
 			if(thing.getHitsplatDamage() > 0) {
-				g.drawImage(redHitsplatImage, x, y, w, hi, null);
+				g.drawImage(redHitsplatImage, x - w/2, y - hi/2, w, hi, null);
 			}else {
-				g.drawImage(blueHitsplatImage, x, y, w, hi, null);
+				g.drawImage(blueHitsplatImage, x - w/2, y - hi/2, w, hi, null);
 			}
-			x += Game.tileSize*.25;
-			y += Game.tileSize*.25;
 			g.setColor(Color.WHITE);
-			g.setFont(damageFont);
-			g.drawString(""+thing.getHitsplatDamage(), x-10, y+5);
+			int fontSize = Game.tileSize/4;
+			g.setFont(new Font(damageFont.getFontName(), Font.BOLD, fontSize));
+			String text = String.format("%.0f", thing.getHitsplatDamage());
+			int width = g.getFontMetrics().stringWidth(text);
+			g.drawString(text, x-width/2, y+fontSize*4/10);
 		}
 	}
 	public void drawTarget(Graphics g, Unit unit) {
 		if(unit.getTarget() != null) {
 			Unit target = unit.getTarget();
-			int x = (int) ((target.getTile().getLocation().x * Game.tileSize) );
-			int y = (int) ((target.getTile().getLocation().y * Game.tileSize) );
-			int w = (int) (Game.tileSize);
-			int hi = (int)(Game.tileSize);
+			int x = (int) ((target.getTile().getLocation().x * Game.tileSize + Game.tileSize*1/10) );
+			int y = (int) ((target.getTile().getLocation().y * Game.tileSize + Game.tileSize*1/10) );
+			int w = (int) (Game.tileSize*8/10);
+			int hi = (int)(Game.tileSize*8/10);
 			g.drawImage(targetImage, x, y, w, hi, null);
 		}
 	}
