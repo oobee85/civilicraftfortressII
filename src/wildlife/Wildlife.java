@@ -80,7 +80,7 @@ public class Wildlife {
 			}
 			animal.loseEnergy();
 			if(animal.wantsToEat()) {
-				if(animal.getType().isHostile() == true && animal.getPrey() == null) {
+				if(animal.getType().isHostile() == true && animal.getTarget() == null) {
 					int pickAnimal = (int) (animals.size()*Math.random());
 					Animal iveGotYouInMySights = animals.get(pickAnimal);
 					if(iveGotYouInMySights != animal) {
@@ -99,7 +99,7 @@ public class Wildlife {
 			}
 			
 
-			if(animal.getPrey() != null) {
+			if(animal.getTarget() != null) {
 				animal.imOnTheHunt(world);
 			}
 			else if(Math.random() < animal.getMoveChance() && animal.readyToMove()) {

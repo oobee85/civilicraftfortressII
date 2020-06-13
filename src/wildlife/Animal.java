@@ -13,7 +13,6 @@ public class Animal extends Unit {
 	public static final int MAX_ENERGY = 100;
 	
 	
-	private Unit prey;
 	private double energy;
 	private double drive;
 	
@@ -105,21 +104,18 @@ public class Animal extends Unit {
 	}
 	
 	
-	public Unit getPrey() {
-		return prey;
-	}
 	
 	
 	/**
 	 * Moves toward the target and tries to eat it.
 	 */
 	public void imOnTheHunt(World world) {
-		if(prey != null) {
+		if(getTarget() != null) {
 			Tile currentTile = getTile();
 			double bestDistance = Integer.MAX_VALUE;
 			Tile bestTile = currentTile;
 			for (Tile tile : Utils.getNeighbors(currentTile, world)) {
-				double distance = tile.getLocation().distanceTo(prey.getTile().getLocation());
+				double distance = tile.getLocation().distanceTo(getTarget().getTile().getLocation());
 				if (distance < bestDistance) {
 					bestDistance = distance;
 					bestTile = tile;
@@ -128,16 +124,15 @@ public class Animal extends Unit {
 			if(this.readyToMove()) {
 				this.moveTo(bestTile);
 			}
-			if(prey.getTile() == getTile()) {
-				prey.takeDamage(this.getType().getCombatStats().getAttack());
-				for(int i = 0; i < prey.getType().getCombatStats().getHealth()/2; i++) {
-					eat();
-				}
-				
-				if(prey.isDead()) {
-					prey = null;
-				}
-			}
+			this.damageTarget();
+//				prey.takeDamage(this.getType().getCombatStats().getAttack());
+//				for(int i = 0; i < prey.getType().getCombatStats().getHealth()/2; i++) {
+//					eat();
+//				}
+//				
+//				if(prey.isDead()) {
+//					prey = null;
+//				}
 		}
 	}
 	

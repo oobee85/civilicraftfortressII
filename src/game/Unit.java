@@ -83,7 +83,8 @@ public class Unit extends Thing {
 		}
 		if(this.getTile().getLocation().distanceTo(target.getTile().getLocation()) <= getType().getCombatStats().getVisionRadius()) {
 			target.takeDamage(this.getType().getCombatStats().getAttack());
-
+			target.setTarget(this);
+			
 			if (target.isDead()) {
 				target = null;
 				return;
