@@ -171,7 +171,7 @@ public class World {
 
 		for (Unit unit : units) {
 			Tile tile = unit.getTile();
-			unit.dealDamage();
+			unit.damageTarget();
 			if (tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
 				int roundedDamage = (int) (damageTaken+1);

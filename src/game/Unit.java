@@ -9,6 +9,7 @@ public class Unit extends Thing {
 	
 	private UnitType unitType;
 	private double timeToMove;
+	private double timeToAttack;
 	private boolean isPlayerControlled;
 	private Unit target;
 	
@@ -17,6 +18,7 @@ public class Unit extends Thing {
 		super(unitType.getCombatStats().getHealth(), unitType, tile);
 		this.unitType = unitType;
 		this.isPlayerControlled = isPlayerControlled;
+		this.timeToAttack = unitType.getCombatStats().getAttackSpeed();
 	}
 	public boolean isPlayerControlled() {
 		return isPlayerControlled;
@@ -52,6 +54,10 @@ public class Unit extends Thing {
 		if(timeToMove > 0) {
 			timeToMove -= 1;
 		}
+		if(timeToAttack > 0) {
+			timeToAttack -= 1;
+//			System.out.println(timeToAttack);
+		}
 		if(unitType == UnitType.WORKER) {
 			Building tobuild = this.getTile().getBuilding();
 			if(tobuild != null && tobuild.isBuilt()) {
@@ -74,11 +80,8 @@ public class Unit extends Thing {
 		}
 		
 	}
-	public void dealDamage() {
-		damageTarget();
-	}
 	public void damageTarget() {
-		if(target == null) {
+		if(target == null || timeToAttack > 0) {
 			return;
 		}
 		if(this.getTile().getLocation().distanceTo(target.getTile().getLocation()) <= getType().getCombatStats().getVisionRadius()) {
@@ -100,6 +103,9 @@ public class Unit extends Thing {
 	
 	public boolean readyToMove() {
 		return timeToMove <= 0;
+	}
+	public boolean readyToAttack() {
+		return timeToAttack <= 0;
 	}
 	
 
