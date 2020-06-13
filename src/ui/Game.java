@@ -66,7 +66,7 @@ public class Game {
 		for(ItemType itemType : ItemType.values()) {
 			Item item = new Item(0, itemType);
 			if(itemType == ItemType.WOOD || itemType == ItemType.ROCK || itemType == ItemType.FOOD) {
-				item = new Item(100, itemType);
+				item = new Item(200, itemType);
 			}
 			resources.put(itemType, item);
 		}
@@ -141,11 +141,11 @@ public class Game {
 		Liquid.propogate(world);
 		changedTerrain = true;
 		
-		
+		world.updateUnitDamage();
 		
 		if(ticks%5 == 0) {
 			world.updatePlantDamage();
-			world.updateUnitDamage();
+			
 			updateBuildingDamage();
 			Wildlife.tick(world);
 		}
