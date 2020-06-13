@@ -75,6 +75,7 @@ public class Wildlife {
 				
 			}
 			if(animal.isDead()) {
+				animal.getTile().setResource(ResourceType.DEAD_ANIMAL);
 				dead.add(animal);
 				continue;
 			}

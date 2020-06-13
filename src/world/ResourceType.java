@@ -17,7 +17,9 @@ public enum ResourceType implements HasImage {
 	ADAMANTITE ( 100, new String[] {"resources/Images/resources/adamantite/ore_adamant16.png", "resources/Images/resources/adamantite/ore_adamant128.png"} , 0.00025, true, ItemType.ADAMANTITE_ORE, true),
 	
 	RUNITE ( 100, new String[] {"resources/Images/resources/runite/ore_rune16.png", "resources/Images/resources/runite/ore_rune128.png"} , 0.000125, true, ItemType.RUNITE_ORE, true),
-	TITANIUM ( 100, new String[] {"resources/Images/resources/titanium/ore_titanium16.png", "resources/Images/resources/titanium/ore_titanium128.png"} , 0.0000625, true, ItemType.TITANIUM_ORE, true)
+	TITANIUM ( 100, new String[] {"resources/Images/resources/titanium/ore_titanium16.png", "resources/Images/resources/titanium/ore_titanium128.png"} , 0.0000625, true, ItemType.TITANIUM_ORE, true),
+	
+	DEAD_ANIMAL(100, new String[] {"resources/Images/resources/dead_animal.png"} , 0, true, ItemType.FOOD, false),
 	;
 	
 	
@@ -25,15 +27,15 @@ public enum ResourceType implements HasImage {
     private int yield;
     private double rarity;
     private boolean isRare;
-    private ItemType resourceType;
+    private ItemType itemType;
     private boolean isOre;
     
-	ResourceType(int y, String[] s, double r, boolean rare, ItemType resourceType, boolean isOre){
+	ResourceType(int y, String[] s, double r, boolean rare, ItemType itemType, boolean isOre){
 		yield = y;
 		rarity = r;
 		isRare = rare;
 		mipmap = new MipMap(s);
-		this.resourceType = resourceType;
+		this.itemType = itemType;
 		this.isOre = isOre;
 	}
 	
@@ -51,7 +53,7 @@ public enum ResourceType implements HasImage {
 		return isOre;
 	}
 	public ItemType getResourceType() {
-		return resourceType;
+		return itemType;
 	}
 
 	@Override
