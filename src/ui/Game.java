@@ -879,7 +879,7 @@ public class Game {
 				if (selectedUnit.getUnitType() == UnitType.WORKER) {
 					guiController.selectedWorker(false);
 				}
-				selectedUnit.setTarget(null);
+				
 				selectedThing = null;
 			}
 			if (selectedThing instanceof Building) {
@@ -889,6 +889,14 @@ public class Game {
 		
 			
 		}
+	}
+	public void unitStop() {
+		if (selectedThing instanceof Unit) {
+			Unit selectedUnit = (Unit) selectedThing;
+			selectedUnit.setTarget(null);
+			selectedUnit.setTargetTile(null);
+		}
+
 	}
 	
 	public void setDestination(int mx, int my) {

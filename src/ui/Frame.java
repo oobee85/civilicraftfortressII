@@ -422,6 +422,9 @@ public class Frame extends JPanel{
 				if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {
 					gameInstance.deselectThing();
 				}
+				if(e.getKeyCode()==KeyEvent.VK_S) {
+					gameInstance.unitStop();
+				}
 				if(e.getKeyCode()==KeyEvent.VK_R) {
 					if(gameInstance.getSelectedUnit() != null) {
 						gameInstance.buildRoad(RoadType.STONE_ROAD);

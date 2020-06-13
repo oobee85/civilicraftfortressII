@@ -122,7 +122,7 @@ public class Thing implements HasImage {
 		return targetTile;
 	}
 	public void setTargetTile(Tile t) {
-		if(!t.equals(getTile()) ) {
+		if(t != getTile()) {
 			targetTile = t;
 		}
 	}
