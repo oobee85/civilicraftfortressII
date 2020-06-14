@@ -4,14 +4,16 @@ import ui.Game;
 
 public class Hitsplat {
 
-	double maxDuration;
-	double currentDuration = Game.ticks;
-	double damage;
+	private double maxDuration;
+	private double currentDuration = Game.ticks;
+	private	double damage;
+	private int square;
 	
-	public Hitsplat(double damage) {
+	public Hitsplat(double damage, int square) {
 		currentDuration = Game.ticks;
 		maxDuration = currentDuration + 4;
 		this.damage = damage;
+		this.square = square;
 		
 	}
 	public void updateDuration() {
@@ -29,6 +31,9 @@ public class Hitsplat {
 	}
 	public double getDamage() {
 		return damage;
+	}
+	public int getSquare() {
+		return square;
 	}
 	
 	

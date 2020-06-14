@@ -50,7 +50,8 @@ public class Thing implements HasImage {
 	}
 	public void takeDamage(double damage) {
 		int roundedDamage = (int)Math.ceil(damage);
-		Hitsplat hit = new Hitsplat(roundedDamage);
+		int square = (int) (Math.random() *4);
+		Hitsplat hit = new Hitsplat(roundedDamage, square);
 		hitsplats.add(hit);
 		health -= roundedDamage;
 		if(damage != 0) {
@@ -59,7 +60,8 @@ public class Thing implements HasImage {
 	}
 	public void heal(double healing) {
 		int roundedHealing = (int)Math.ceil(healing);
-		Hitsplat hit = new Hitsplat(-roundedHealing);
+		int square = (int) (Math.random() *4);
+		Hitsplat hit = new Hitsplat(-roundedHealing, square);
 		hitsplats.add(hit);
 		health += roundedHealing;
 		if(roundedHealing != 0) {

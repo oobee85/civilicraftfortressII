@@ -184,9 +184,10 @@ public class Game {
 			if(!building.isBuilt()) {
 				continue;
 			}
-			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getHasResource() == true) {
+			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResourceType().isOre() == true) {
 				resources.get(building.getTile().getResourceType().getResourceType()).addAmount(1);
 			}
+			
 			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getTerrain() == Terrain.ROCK) {
 				resources.get(ItemType.ROCK).addAmount(1);
 			}
@@ -649,8 +650,9 @@ public class Game {
 			thing.updateHitsplats();
 			LinkedList<Hitsplat> hitsplats = thing.getHitsplatList();
 			
-			for(int i = 0; i < hitsplats.size(); i ++) {
-
+			for(int m = 0; m < hitsplats.size(); m ++) {
+				
+				int i = hitsplats.get(m).getSquare();
 //				int x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*.25);
 //				int y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.25);
 				int w = (int) (Game.tileSize*.5);
