@@ -109,6 +109,9 @@ public class Game {
 		resources[ItemType.IRON_ORE].addAmount(200);
 		resources[ItemType.COPPER_ORE].addAmount(200);
 		resources[ItemType.HORSE].addAmount(200);
+		resources[ItemType.FOOD].addAmount(2000);
+		resources[ItemType.WOOD].addAmount(2000);
+		resources[ItemType.ROCK].addAmount(2000);
 		
 	}
 	
@@ -138,7 +141,7 @@ public class Game {
 			world[world.volcano].liquidType = LiquidType.LAVA;
 //			world[world.volcano].liquidAmount += .01;
 			if(Math.random() < 0.0001) {
-				world.eruptVolcano(world);
+				eruptVolcano();
 			}
 		}
 		
@@ -191,7 +194,7 @@ public class Game {
 			if(!building.isBuilt()) {
 				continue;
 			}
-			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResourceType().isOre() == true) {
+			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResourceType() != null && building.getTile().getResourceType().isOre() == true) {
 				resources.get(building.getTile().getResourceType().getResourceType()).addAmount(1);
 			}
 			
@@ -951,12 +954,33 @@ public class Game {
 		
 		if(selectedThing != null && selectedThing instanceof Unit && ((Unit)selectedThing).getUnitType() == UnitType.WORKER) {
 			if(selectedThing.getTile().getHasBuilding() == false) {
+				
+
+				for (Map.Entry mapElement : bt.getCost().entrySet()) {
+					ItemType key = (ItemType) mapElement.getKey();
+					Integer value = (Integer) mapElement.getValue();
+					
+					if (resources[key].getAmount() < value) {
+						return;
+					}
+				}
 				if (bt == BuildingType.IRRIGATION && selectedThing.getTile().canPlant() == false) {
 					return;
 				}
+				
+				for (Map.Entry mapElement : bt.getCost().entrySet()) {
+					ItemType key = (ItemType) mapElement.getKey();
+					Integer value = (Integer) mapElement.getValue();
+					
+					resources[key].addAmount(-value);
+				}
+				
+			
 				Building building = new Building(bt, selectedThing.getTile());
 				selectedThing.getTile().setBuilding(building);
 				buildings.add(building);
+				
+				
 
 			}
 			

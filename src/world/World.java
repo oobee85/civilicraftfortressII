@@ -78,6 +78,8 @@ public class World {
 	}
 	public void eruptVolcano(World world) {
 		System.out.println("eruption");
+//		world[volcano].liquidAmount += 200;
+		world[volcano].liquidType = LiquidType.WATER;
 		world[volcano].liquidAmount += 200;
 	}
 	public void updateTerrainChange(World world) {
