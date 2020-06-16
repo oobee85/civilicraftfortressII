@@ -73,6 +73,9 @@ public class Liquid {
 					tile.setTerrain(Terrain.ROCK);
 				}
 			}
+			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= 0.0001) {
+				tile.liquidAmount -= 0.0001;
+			}
 		}
 		//Utils.normalize(heightMap);
 	}

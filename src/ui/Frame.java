@@ -565,6 +565,13 @@ public class Frame extends JPanel{
 				flipTable.setText(flipTable.isSelected() ? "Unflip Table" : "Flip Table");
 			}
 		});
+		JButton eruptVolcano = setupButton("Erupt Volcano", null, BUILDING_BUTTON_SIZE);
+		eruptVolcano.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.eruptVolcano();
+			}
+		});
 		
 		JButton makeItRain = setupButton("Rain", null, BUILDING_BUTTON_SIZE);
 		makeItRain.addActionListener(new ActionListener() {
@@ -625,6 +632,7 @@ public class Frame extends JPanel{
 		buttonPanel.add(makeItRain);
 		buttonPanel.add(makeItDry);
 		buttonPanel.add(makeItDay);
+		buttonPanel.add(eruptVolcano);
 		buttonPanel.add(debug);
 		buttonPanel.add(exit);
 		

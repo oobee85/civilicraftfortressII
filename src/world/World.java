@@ -76,6 +76,10 @@ public class World {
 			}
 		}
 	}
+	public void eruptVolcano(World world) {
+		System.out.println("eruption");
+		world[volcano].liquidAmount += 200;
+	}
 	public void updateTerrainChange(World world) {
 		for(Tile tile : getTiles()) {
 			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {

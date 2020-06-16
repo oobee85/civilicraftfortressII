@@ -136,8 +136,12 @@ public class Game {
 		}
 		if(world.volcano != null) {
 			world[world.volcano].liquidType = LiquidType.LAVA;
-			world[world.volcano].liquidAmount += .01;
+//			world[world.volcano].liquidAmount += .01;
+			if(Math.random() < 0.0001) {
+				world.eruptVolcano(world);
+			}
 		}
+		
 		Liquid.propogate(world);
 		changedTerrain = true;
 		
@@ -162,6 +166,9 @@ public class Game {
 		if(changedTerrain) {
 			updateTerrainImages();
 		}
+	}
+	public void eruptVolcano() {
+		world.eruptVolcano(world);
 	}
 	
 	public void generateWorld(MapType mapType, int size) {
