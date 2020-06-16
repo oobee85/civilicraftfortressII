@@ -194,8 +194,12 @@ public class Game {
 			if(!building.isBuilt()) {
 				continue;
 			}
-			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResourceType() != null && building.getTile().getResourceType().isOre() == true) {
-				resources.get(building.getTile().getResourceType().getResourceType()).addAmount(1);
+			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResource() != null && building.getTile().getResource().getType().isOre() == true) {
+				resources.get(building.getTile().getResource().getType()).addAmount(1);
+				building.getTile().getResource().harvest(100);
+				if(building.getTile().getResource().getYield() <= 0) {
+					building.getTile().setResource(null);
+				}
 			}
 			
 			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getTerrain() == Terrain.ROCK) {
@@ -502,8 +506,8 @@ public class Game {
 						g.drawImage(t.getTerrain().getImage(Game.tileSize), x, y, w, h, null);
 //						t.drawEntities(g, currentMode);
 						
-						if(t.getHasResource()) {
-							g.drawImage(t.getResourceType().getImage(Game.tileSize), x, y, w, h, null);
+						if(t.getResource() != null) {
+							g.drawImage(t.getResource().getType().getImage(Game.tileSize), x, y, w, h, null);
 						}
 						if(t.getIsTerritory()) {
 							g.setColor(Tile.TERRITORY_COLOR);

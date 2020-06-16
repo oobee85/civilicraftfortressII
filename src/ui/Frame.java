@@ -180,8 +180,8 @@ public class Frame extends JPanel{
 				rightClickPanel.add(terr);
 				terr.setBounds(20, y += fontSize, 100, 100);
 
-				if(tile.getHasResource()) {
-					JLabel label = setupMiniLabel(tile.getResourceType().toString(), null, null);
+				if(tile.getResource() != null) {
+					JLabel label = setupMiniLabel(tile.getResource().getType().toString(), null, null);
 					rightClickPanel.add(label);
 					label.setBounds(20, y += fontSize, 100, 100);
 				}

@@ -24,14 +24,14 @@ public enum ResourceType implements HasImage {
 	
 	
 	private MipMap mipmap;
-    private int yield;
+    private double remainingEffort;
     private double rarity;
     private boolean isRare;
     private ItemType itemType;
     private boolean isOre;
     
-	ResourceType(int y, String[] s, double r, boolean rare, ItemType itemType, boolean isOre){
-		yield = y;
+	ResourceType(double y, String[] s, double r, boolean rare, ItemType itemType, boolean isOre){
+		remainingEffort = y;
 		rarity = r;
 		isRare = rare;
 		mipmap = new MipMap(s);
@@ -39,9 +39,15 @@ public enum ResourceType implements HasImage {
 		this.isOre = isOre;
 	}
 	
+	public void expendEffort(double effort) {
+		remainingEffort -= effort;
+		if(remainingEffort < 0) {
+			remainingEffort = 0;
+		}
+	}
 	
-	public int getYield() {
-		return yield;
+	public double getRemainingEffort() {
+		return remainingEffort;
 	}
 	public double getRarity() {
 		return rarity;

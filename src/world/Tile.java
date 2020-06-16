@@ -21,7 +21,8 @@ public class Tile {
 	
 	private String roadCorner;
 	
-	private ResourceType resourceType;
+	private Resource resource;
+//	private ResourceType resourceType;
 	private RoadType roadType;
 	private Plant plant;
 	private Terrain terr;
@@ -57,7 +58,10 @@ public class Tile {
 		this.isTerritory = b;
 	}
 	public void setResource(ResourceType o) {
-		resourceType = o;
+		resource = new Resource(o);
+	}
+	public Resource getResource() {
+		return resource;
 	}
 	public void setHasPlant(Plant p) {
 		plant = p;
@@ -157,9 +161,6 @@ public class Tile {
 		rows[location.x][location.y] = row;
 	}
 
-	public boolean getHasResource() {
-		return resourceType != null;
-	}
 	
 	public boolean isBlocked(Unit u) {
 		
@@ -177,9 +178,6 @@ public class Tile {
 	}
 	public boolean getHasBuilding() {
 		return building != null;
-	}
-	public ResourceType getResourceType() {
-		return resourceType;
 	}
 	public Building getBuilding() {
 		return building;

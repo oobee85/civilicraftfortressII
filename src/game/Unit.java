@@ -56,7 +56,6 @@ public class Unit extends Thing {
 		}
 		if(timeToAttack > 0) {
 			timeToAttack -= 1;
-//			System.out.println(timeToAttack);
 		}
 		if(unitType == UnitType.WORKER) {
 			Building tobuild = this.getTile().getBuilding();
@@ -76,6 +75,9 @@ public class Unit extends Thing {
 			}
 			if(tobuild != null) {
 				tobuild.expendEffort(1);
+			}
+			if(this.getTile().getResource() != null && this.getTile().getResource().getType() == ResourceType.DEAD_ANIMAL) {
+				this.getTile().getResource().getType().expendEffort(1);
 			}
 		}
 		

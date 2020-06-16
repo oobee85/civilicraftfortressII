@@ -78,9 +78,10 @@ public class World {
 	}
 	public void eruptVolcano(World world) {
 		System.out.println("eruption");
-//		world[volcano].liquidAmount += 200;
-		world[volcano].liquidType = LiquidType.WATER;
 		world[volcano].liquidAmount += 200;
+		
+//		world[volcano].liquidType = LiquidType.WATER;
+//		world[volcano].liquidAmount += 200;
 	}
 	public void updateTerrainChange(World world) {
 		for(Tile tile : getTiles()) {
@@ -406,9 +407,9 @@ public class World {
 		for(Tile tile : this.getTiles()) {
 			Color minimapColor = terrainColors.get(tile.getTerrain());
 			Color terrainColor = terrainColors.get(tile.getTerrain());
-			if(tile.getResourceType() != null) {
-				terrainColor = tile.getResourceType().getColor(0);
-				minimapColor = tile.getResourceType().getColor(0);
+			if(tile.getResource() != null) {
+				terrainColor = tile.getResource().getType().getColor(0);
+				minimapColor = tile.getResource().getType().getColor(0);
 			}
 			if(tile.getRoadType() != null) {
 				terrainColor = Utils.roadColor;

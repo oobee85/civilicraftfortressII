@@ -3,19 +3,19 @@ package world;
 public class Resource {
 
 	private ResourceType resourceType;
-	private int yieldLeft;
-	private int maxYield;
+	private double yieldLeft;
+	private double maxYield;
 	private Tile tile;
 	
 	public Resource(ResourceType resourceType) {
 		this.resourceType = resourceType;
-		this.maxYield = resourceType.getYield();
+		this.maxYield = resourceType.getRemainingEffort();
 		this.yieldLeft = maxYield;
 	}
 	public Tile getTile() {
 		return tile;
 	}
-	public int getYield() {
+	public double getYield() {
 		return yieldLeft;
 	}
 	public void harvest(int harvestAmount) {

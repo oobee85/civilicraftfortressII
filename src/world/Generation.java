@@ -146,7 +146,10 @@ public class Generation {
 			System.out.println("Tiles of " + resource.name() + ": " + numResource);
 			
 			for(Tile tile : world.getTilesRandomly()) {
-				if(resource.isOre() && tile.canOre() && !tile.getHasResource()) {
+				if(tile.getResource() != null) {
+					continue;
+				}
+				if(resource.isOre() && tile.canOre() ) {
 					// if ore is rare the tile must be able to support rare ore
 					if(!resource.isRare() || tile.canSupportRareOre()) {
 						tile.setResource(resource);
