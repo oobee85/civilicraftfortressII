@@ -194,8 +194,8 @@ public class Game {
 			if(!building.isBuilt()) {
 				continue;
 			}
-			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResource() != null && building.getTile().getResource().getType().isOre() == true) {
-				resources.get(building.getTile().getResource().getType()).addAmount(1);
+			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResource().getType() != null && building.getTile().getResource().getType().isOre() == true) {
+				resources.get(building.getTile().getResource().getResourceType()).addAmount(1);
 				building.getTile().getResource().harvest(100);
 				if(building.getTile().getResource().getYield() <= 0) {
 					building.getTile().setResource(null);

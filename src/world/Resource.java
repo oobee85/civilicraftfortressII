@@ -1,11 +1,14 @@
 package world;
 
+import game.ItemType;
+
 public class Resource {
 
 	private ResourceType resourceType;
 	private double yieldLeft;
 	private double maxYield;
 	private Tile tile;
+	private ItemType itemType;
 	
 	public Resource(ResourceType resourceType) {
 		this.resourceType = resourceType;
@@ -29,6 +32,10 @@ public class Resource {
 	}
 	public ResourceType getType() {
 		return resourceType;
+	}
+	
+	public ItemType getResourceType() {
+		return itemType;
 	}
 	
 	

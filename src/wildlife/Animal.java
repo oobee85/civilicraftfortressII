@@ -78,7 +78,7 @@ public class Animal extends Unit {
 		drive += 0.01;
 	}
 	public void loseEnergy() {
-		energy -= 0.02;
+		energy -= 0.05;
 		if(getHealth() < super.getType().getCombatStats().getHealth()) {
 			energy -= 0.04;
 			heal(1);
@@ -137,7 +137,7 @@ public class Animal extends Unit {
 	}
 	
 	public double getMoveChance() {
-		return getType().getCombatStats().getSpeed()*0.002 
+		return getType().getCombatStats().getSpeed()*0.02 
 				+ 0.2*(1 - energy/MAX_ENERGY) 
 				+ 0.8*(1 - getHealth()/super.getType().getCombatStats().getHealth());
 	}

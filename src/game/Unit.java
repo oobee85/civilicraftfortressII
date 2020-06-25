@@ -38,7 +38,7 @@ public class Unit extends Thing {
 			penalty = 0;
 		}
 		if(getTile().getRoadType() != null && t.getRoadType() != null) {
-			penalty = penalty/getTile().getRoadType().getSpeed();
+			penalty = (penalty/getTile().getRoadType().getSpeed())/2;
 		}
 		timeToMove += penalty;
 		getTile().removeUnit(this);
@@ -86,7 +86,8 @@ public class Unit extends Thing {
 		if(target == null || timeToAttack > 0) {
 			return;
 		}
-		if(this.getTile().getLocation().distanceTo(target.getTile().getLocation()) <= getType().getCombatStats().getVisionRadius()) {
+		if(this.getTile().getLocation().distanceTo(target.getTile().getLocation()) <= getType().getCombatStats().getVisionRadius() 
+				|| this.getTile() == target.getTile()) {
 			target.takeDamage(this.getType().getCombatStats().getAttack());
 			timeToAttack = unitType.getCombatStats().getAttackSpeed();
 			target.setTarget(this);
