@@ -42,6 +42,7 @@ public class Frame extends JPanel{
 	private JPanel cityView;
 	private JPanel tileView;
 	private JPanel workerMenu;
+	private JPanel spawnMenu;
 	private JPanel techView;
 	private JLabel tileSize;
 	private JTabbedPane tabbedPane;
@@ -63,6 +64,7 @@ public class Frame extends JPanel{
 	private int TECH_TAB;
 	private int DEBUG_TAB;
 	private int CITY_TAB;
+	private int SPAWN_TAB;
 	
 	private Thread gameLoopThread;
 	
@@ -85,6 +87,11 @@ public class Frame extends JPanel{
 			@Override
 			public void selectedWorker(boolean selected) {
 				manageBuildingTab(selected);
+				frame.repaint();
+			}
+			@Override
+			public void selectedSpawnUnit(boolean selected) {
+				manageSpawnTab(selected);
 				frame.repaint();
 			}
 			@Override
@@ -391,7 +398,7 @@ public class Frame extends JPanel{
 					gameInstance.mouseClick(mx, my);
 				}
 				if(e.getButton() == MouseEvent.BUTTON1 && dragged == false) {
-					gameInstance.rightClick(mx, my);
+					gameInstance.leftClick(mx, my);
 				}
 				dragged = false;
 			}
@@ -495,7 +502,17 @@ public class Frame extends JPanel{
 		}
 		tabbedPane.setEnabledAt(CITY_TAB, enabled);
 	}
-	
+
+	private void manageSpawnTab(boolean enabled) {
+
+		if (enabled == false && tabbedPane.getSelectedIndex() == SPAWN_TAB) {
+			tabbedPane.setSelectedIndex(0);
+		} else if (enabled == true) {
+			tabbedPane.setSelectedIndex(SPAWN_TAB);
+		}
+		tabbedPane.setEnabledAt(SPAWN_TAB, enabled);
+	}
+
 	private void runGame() {
 		System.err.println("Starting Game");
 		frame.remove(mainMenuPanel);
@@ -521,6 +538,17 @@ public class Frame extends JPanel{
 			});
 			buildingButtons[i] = button;
 			workerMenu.add(button);
+		}
+		
+		spawnMenu = new JPanel();
+		for(int i = 0; i < BuildingType.values().length; i++) {
+			UnitType type = UnitType.values()[i];
+			JButton button = setupButton(type.toString(), Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+			button.addActionListener(e -> {
+				gameInstance.setUnit(type);
+			});
+			unitButtons[i] = button;
+			spawnMenu.add(button);
 		}
 		
 		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
@@ -565,6 +593,13 @@ public class Frame extends JPanel{
 				flipTable.setText(flipTable.isSelected() ? "Unflip Table" : "Flip Table");
 			}
 		});
+		
+		JToggleButton spawnUnit = setupToggleButton("Enable Spawn Unit", null, BUILDING_BUTTON_SIZE);
+		spawnUnit.addActionListener(e -> {
+			spawnUnit.setText(spawnUnit.isSelected() ? "Disable Spawn Unit" : "Enable Spawn Unit");
+			gameInstance.spawnUnit(spawnUnit.isSelected());
+		});
+		
 		JButton eruptVolcano = setupButton("Erupt Volcano", null, BUILDING_BUTTON_SIZE);
 		eruptVolcano.addActionListener(new ActionListener() {
 			@Override
@@ -629,6 +664,7 @@ public class Frame extends JPanel{
 		
 		buttonPanel.add(showHeightMap);
 		buttonPanel.add(flipTable);
+		buttonPanel.add(spawnUnit);
 		buttonPanel.add(makeItRain);
 		buttonPanel.add(makeItDry);
 		buttonPanel.add(makeItDay);
@@ -668,12 +704,16 @@ public class Frame extends JPanel{
 		CITY_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("City", CITY_TAB_ICON, cityView, "Does nothing", CITY_TAB);
 		
+		SPAWN_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("Spawner", Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(0), 20, 20), spawnMenu, "Does nothing", SPAWN_TAB);
+		
 		DEBUG_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab(null, Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), 20, 20), buttonPanel, "Does nothing");
 
 		// remove building tab after setting all of the tabs up
 		manageBuildingTab(false);
 		manageCityTab(false);
+		manageSpawnTab(false);
 		
 		JPanel guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());

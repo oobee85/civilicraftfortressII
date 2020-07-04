@@ -29,6 +29,7 @@ public class Game {
 //	private Unit selectedUnit;
 //	private Building selectedBuilding;
 	private Thing selectedThing;
+	private UnitType selectedUnitToSpawn;
 	
 	LinkedList<Building> buildings = new LinkedList<Building>();
 	
@@ -194,7 +195,7 @@ public class Game {
 			if(!building.isBuilt()) {
 				continue;
 			}
-			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResource().getType() != null && building.getTile().getResource().getType().isOre() == true) {
+			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResource() != null && building.getTile().getResource().getType() != null && building.getTile().getResource().getType().isOre() == true) {
 				resources.get(building.getTile().getResource().getResourceType()).addAmount(1);
 				building.getTile().getResource().harvest(100);
 				if(building.getTile().getResource().getYield() <= 0) {
@@ -814,10 +815,21 @@ public class Game {
 		}
 	}
 	
-	public void rightClick(int mx, int my) {
+	public void leftClick(int mx, int my) {
 		Position tilepos = getTileAtPixel(new Position(mx,my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
 		Tile tile = world[loc];
+		
+		System.out.println("left click");
+		if(selectedUnitToSpawn != null) {
+			System.out.println("trying to spawn unit" + selectedUnitToSpawn.toString() + loc.toString());
+			Unit unit = new Unit(selectedUnitToSpawn, tile, true);
+			tile.addUnit(unit);
+			world.units.add(unit);
+			selectedUnitToSpawn = null;
+			return;
+		}
+		
 		toggleUnitSelectOnTile(tile);
 		
 		
@@ -906,6 +918,10 @@ public class Game {
 			
 		}
 	}
+	public void spawnUnit(boolean show) {
+		guiController.selectedSpawnUnit(show);
+	}
+	
 	public void unitStop() {
 		if (selectedThing instanceof Unit) {
 			Unit selectedUnit = (Unit) selectedThing;
@@ -991,6 +1007,11 @@ public class Game {
 		}
 		
 	}
+	public void setUnit(UnitType type) {
+		selectedUnitToSpawn = type;
+		
+	}
+	
 	public void buildRoad(RoadType rt) {
 		if(selectedThing != null && selectedThing instanceof Unit && ((Unit)selectedThing).getUnitType() == UnitType.WORKER) {
 			selectedThing.getTile().setRoad(rt, Direction.NORTH.toString());

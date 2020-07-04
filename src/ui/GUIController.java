@@ -8,4 +8,5 @@ public interface GUIController {
 	public void toggleTileView();
 	public void updateGUI();
 	public void openRightClickMenu(int mx, int my, Tile tile);
+	public void selectedSpawnUnit(boolean selected);
 }
