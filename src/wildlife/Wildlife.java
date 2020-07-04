@@ -82,8 +82,16 @@ public class Wildlife {
 			animal.loseEnergy();
 			if(animal.wantsToEat()) {
 				if(animal.getType().isHostile() == true && animal.getTarget() == null) {
-					int pickAnimal = (int) (animals.size()*Math.random());
-					Animal iveGotYouInMySights = animals.get(pickAnimal);
+					
+					Unit iveGotYouInMySights;
+					if(Math.random() > 0.5 && world.units.isEmpty() == false) {
+						int pickUnit = (int) (world.units.size()*Math.random());
+						iveGotYouInMySights = world.units.get(pickUnit);
+					}else {
+						int pickAnimal = (int) (animals.size()*Math.random());
+						iveGotYouInMySights = animals.get(pickAnimal);
+					}
+					
 					if(iveGotYouInMySights != animal) {
 						animal.setTarget(iveGotYouInMySights);
 					}

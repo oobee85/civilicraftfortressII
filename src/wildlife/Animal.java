@@ -74,11 +74,11 @@ public class Animal extends Unit {
 		return Math.random()*100 > energy + 10;
 	}
 	public void eat() {
-		energy += 1;
+		energy += 10;
 		drive += 0.01;
 	}
 	public void loseEnergy() {
-		energy -= 0.05;
+		energy -= 0.5;
 		if(getHealth() < super.getType().getCombatStats().getHealth()) {
 			energy -= 0.04;
 			heal(1);
