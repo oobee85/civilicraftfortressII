@@ -121,7 +121,7 @@ public class Animal extends Unit {
 					bestTile = tile;
 				}
 			}
-			if(this.readyToMove()) {
+			if(this.readyToMove() && bestTile != getTarget().getTile()) {
 				this.moveTo(bestTile);
 			}
 			this.damageTarget();
