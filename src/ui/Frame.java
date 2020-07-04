@@ -541,7 +541,7 @@ public class Frame extends JPanel{
 		}
 		
 		spawnMenu = new JPanel();
-		for(int i = 0; i < BuildingType.values().length; i++) {
+		for(int i = 0; i < UnitType.values().length; i++) {
 			UnitType type = UnitType.values()[i];
 			JButton button = setupButton(type.toString(), Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 			button.addActionListener(e -> {
