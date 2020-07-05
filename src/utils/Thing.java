@@ -74,6 +74,9 @@ public class Thing implements HasImage {
 	public double getMaxHealth() {
 		return maxHealth;
 	}
+	public void setHealth(double hp) {
+		health = hp;
+	}
 	public int getTimeLastDamageTaken() {
 		return timeLastDamageTaken;
 	}

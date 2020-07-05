@@ -243,7 +243,7 @@ public class World {
 	public void genPlants() {
 		for(Tile tile : getTiles()) {
 			//generates land plants
-			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoadType() == null && Math.random() < bushRarity) {
+			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoadType() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < bushRarity) {
 				double o = Math.random();
 				if(o < PlantType.BERRY.getRarity()) {
 					Plant p = new Plant(PlantType.BERRY, tile);
@@ -255,7 +255,7 @@ public class World {
 			//generates water plants
 			if( Math.random() < waterPlantRarity) {
 				double o = Math.random();
-				if(tile.liquidType == LiquidType.WATER && o < PlantType.CATTAIL.getRarity()) {
+				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()  && o < PlantType.CATTAIL.getRarity()) {
 					Plant p = new Plant(PlantType.CATTAIL, tile);
 					tile.setHasPlant(p);
 					plantsAquatic.add(tile.getPlant());
@@ -278,7 +278,7 @@ public class World {
 			double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
 			double forestEdge = (dx*dx)/(forestLengthEdge*forestLengthEdge) + (dy*dy)/(forestHeightEdge*forestHeightEdge);
 			
-			if(tile.canPlant()==true && tile.getRoadType() == null) {
+			if(tile.canPlant() == true && tile.getRoadType() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2) {
 				if((forestEdge < 1 && Math.random()<forestDensity-0.2) 
 						|| (forest < 1 && Math.random() < forestDensity)) {
 					Plant plant = new Plant(PlantType.FOREST1, tile);

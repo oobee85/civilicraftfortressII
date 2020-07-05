@@ -75,6 +75,7 @@ public class Unit extends Thing {
 			}
 			if(tobuild != null) {
 				tobuild.expendEffort(1);
+//				tobuild.setHealth(tobuild.getHealth() + 1);
 			}
 			if(this.getTile().getResource() != null && this.getTile().getResource().getType() == ResourceType.DEAD_ANIMAL) {
 				this.getTile().getResource().getType().expendEffort(1);

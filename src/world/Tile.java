@@ -131,6 +131,7 @@ public class Tile {
 		}
 		if(b != null) {
 			building = b;
+//			building.setHealth(1);
 		}
 	}
 	
