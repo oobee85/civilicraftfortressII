@@ -661,7 +661,15 @@ public class Frame extends JPanel{
 				gameInstance.fastForwardToDay();
 			}
 		});
-
+		
+		JButton researchEverything = setupButton("Research", null, BUILDING_BUTTON_SIZE);
+		researchEverything.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.researchEverything();
+			}
+		});
+		
 		JToggleButton debug = setupToggleButton(Game.DEBUG_DRAW ? "Stop Debug" : "Debug", null, BUILDING_BUTTON_SIZE);
 		debug.addActionListener(new ActionListener() {
 			@Override
@@ -697,6 +705,7 @@ public class Frame extends JPanel{
 		buttonPanel.add(makeItRain);
 		buttonPanel.add(makeItDry);
 		buttonPanel.add(makeItDay);
+		buttonPanel.add(researchEverything);
 		buttonPanel.add(eruptVolcano);
 		buttonPanel.add(debug);
 		buttonPanel.add(exit);

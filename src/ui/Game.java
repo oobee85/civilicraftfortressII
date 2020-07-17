@@ -1091,7 +1091,6 @@ public class Game {
 	}
 
 	public void shiftView(int dx, int dy) {
-
 		viewOffset.x += dx;
 		viewOffset.y += dy;
 //		System.out.println(viewOffset.x + "curview" + viewOffset.y);
@@ -1158,6 +1157,16 @@ public class Game {
 	
 	public void fastForwardToDay() {
 		skipUntilTick = ticks + world.ticksUntilDay();
+	}
+	
+	public void researchEverything() {
+		for(Research research : researches.values()) {
+			researchTarget = research;
+			researchTarget.spendResearch(100000);
+			if (researchTarget.isUnlocked()) {
+				guiController.updateGUI();
+			}
+		}
 	}
 	
 	public boolean shouldFastForward() {
