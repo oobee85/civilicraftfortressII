@@ -58,6 +58,9 @@ public enum ResourceType implements HasImage {
 	public boolean isOre() {
 		return isOre;
 	}
+	public ItemType getItemType() {
+		return itemType;
+	}
 
 
 	@Override

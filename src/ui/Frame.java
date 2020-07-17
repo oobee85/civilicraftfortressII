@@ -40,6 +40,7 @@ public class Frame extends JPanel{
 	private JPanel gamepanel;
 	private JPanel minimapPanel;
 	private JPanel cityView;
+	private JPanel militaryUnitView;
 	private JPanel tileView;
 	private JPanel workerMenu;
 	private JPanel spawnMenu;
@@ -64,6 +65,7 @@ public class Frame extends JPanel{
 	private int TECH_TAB;
 	private int DEBUG_TAB;
 	private int CITY_TAB;
+	private int MILITARY_TAB;
 	private int SPAWN_TAB;
 	
 	private Thread gameLoopThread;
@@ -80,8 +82,13 @@ public class Frame extends JPanel{
 		frame.setLocationRelativeTo(null);
 		GUIController guiController = new GUIController() {
 			@Override
-			public void selectedBuilding(boolean selected) {
-				manageCityTab(selected);
+			public void selectedBuilding(BuildingType bt, boolean selected) {
+				if(bt == BuildingType.BARRACKS) {
+					manageMilitaryUnitTab(selected);
+				}
+				if(bt == BuildingType.CASTLE) {
+					manageCityTab(selected);
+				}
 				frame.repaint();
 			}
 			@Override
@@ -502,6 +509,15 @@ public class Frame extends JPanel{
 		}
 		tabbedPane.setEnabledAt(CITY_TAB, enabled);
 	}
+	
+	private void manageMilitaryUnitTab(boolean enabled) {
+		if(enabled == false && tabbedPane.getSelectedIndex() == MILITARY_TAB) {
+			tabbedPane.setSelectedIndex(0);
+		}else if (enabled == true){
+			tabbedPane.setSelectedIndex(MILITARY_TAB);
+		}
+		tabbedPane.setEnabledAt(MILITARY_TAB, enabled);
+	}
 
 	private void manageSpawnTab(boolean enabled) {
 
@@ -551,24 +567,37 @@ public class Frame extends JPanel{
 			spawnMenu.add(button);
 		}
 		
-		Image cityOverlay = Utils.loadImage("resources/Images/interfaces/backgroundbuild.png");
 		cityView = new JPanel() {};
-		
-		int numButtons = 0;
-		for(int i = 0; i < UnitType.values().length; i++) {
+		for (int i = 0; i < UnitType.values().length; i++) {
 			UnitType type = UnitType.values()[i];
-			if(type.getCost() == null) {
+			if (type != UnitType.WORKER) {
 				continue;
 			}
-			JButton button = setupButton("Build " + type.toString(), 
-					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), 
-					null);
+			JButton button = setupButton("Build " + type.toString(),
+					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.addActionListener(e -> {
 				gameInstance.tryToBuildUnit(type);
 			});
-			cityView.add(button);
 			unitButtons[i] = button;
+			cityView.add(button);
 		}
+
+		militaryUnitView = new JPanel() {};
+		for (int i = 0; i < UnitType.values().length; i++) {
+			UnitType type = UnitType.values()[i];
+			if (type == UnitType.WORKER || type.getCost() == null) {
+				continue;
+			}
+
+			JButton button = setupButton("Build " + type.toString(),
+					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
+			button.addActionListener(e -> {
+				gameInstance.tryToBuildUnit(type);
+			});
+			unitButtons[i] = button;
+			militaryUnitView.add(button);
+		}
+
 		
 		
 		JLabel money = setupLabel("Gold = " + gameInstance.getMoney(), Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
@@ -703,6 +732,9 @@ public class Frame extends JPanel{
 		
 		CITY_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("City", CITY_TAB_ICON, cityView, "Does nothing", CITY_TAB);
+		
+		MILITARY_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("Military", CITY_TAB_ICON, militaryUnitView, "Does nothing", MILITARY_TAB);
 		
 		SPAWN_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("Spawner", Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(0), 20, 20), spawnMenu, "Does nothing", SPAWN_TAB);

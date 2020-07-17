@@ -55,10 +55,15 @@ public class Wildlife {
 		}
 	}
 	private static void makeAnimal(UnitType animalType, World world, TileLoc loc) {
+		
+		if(animalType.isAquatic() == false && world[loc].liquidAmount > world[loc].liquidType.getMinimumDamageAmount()/2 ) {
+			return;
+		}
 		Animal animal = new Animal(animalType, world[loc], false);
 		animal.setTile(world[loc]);
 		animals.add(animal);
 		world[loc].addUnit(animal);
+		
 	}
 	
 	
@@ -84,7 +89,7 @@ public class Wildlife {
 				if(animal.getType().isHostile() == true && animal.getTarget() == null) {
 					
 					Unit iveGotYouInMySights;
-					if(Math.random() > 0.5 && world.units.isEmpty() == false) {
+					if(Math.random() < 0.01 && world.units.isEmpty() == false) {
 						int pickUnit = (int) (world.units.size()*Math.random());
 						iveGotYouInMySights = world.units.get(pickUnit);
 					}else {

@@ -10,9 +10,9 @@ public enum BuildingType implements HasImage {
 	 	
 	 	WALL_WOOD (250, 100, "resources/Images/buildings/wall_wood.png", 0, false, 
 	 			ResearchType.WOODCUTTING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
-	 	WALL_STONE (1000, 100, "resources/Images/buildings/wall_stone.png", 0, false, 
+	 	WALL_STONE (1000, 200, "resources/Images/buildings/wall_stone.png", 0, false, 
 	 			ResearchType.MASONRY,  new HashMap<ItemType, Integer>() { {put(ItemType.ROCK,100);  }}),
-	 	WALL_BRICK (5000, 100, "resources/Images/buildings/wall_brick.png", 0, false, 
+	 	WALL_BRICK (5000, 500, "resources/Images/buildings/wall_brick.png", 0, false, 
 	 			ResearchType.MASONRY,  new HashMap<ItemType, Integer>() { {put(ItemType.ROCK,100);  }}),
 	 	BRIDGE (500, 100, "resources/Images/buildings/bridge.png", 0, true, 
 	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,50);  }}),
@@ -21,17 +21,17 @@ public enum BuildingType implements HasImage {
 	 	IRRIGATION (100, 100, "resources/Images/buildings/irrigation.png", 0, true, 
 	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,50);  }}),
 	 	
-	 	WINDMILL (1000, 100, "resources/Images/buildings/ancientwindmill.png", 0.05, true, 
+	 	WINDMILL (1000, 500, "resources/Images/buildings/ancientwindmill.png", 0.05, true, 
 	 			ResearchType.CONSTRUCTION,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
-		SAWMILL (1000, 100, "resources/Images/buildings/sawmill.png", 0.05, true, 
+		SAWMILL (1000, 500, "resources/Images/buildings/sawmill.png", 0.05, true, 
 				null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
-	 	FARM (500, 100, "resources/Images/buildings/farm.png", 0.05, true, 
+	 	FARM (500, 250, "resources/Images/buildings/farm.png", 0.05, true, 
 	 			ResearchType.FARMING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
-	 	GRANARY (500, 100, "resources/Images/buildings/granary.png", 0.05, true, 
+	 	GRANARY (500, 500, "resources/Images/buildings/granary.png", 0.05, true, 
 	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
-	 	CASTLE (5000, 100, "resources/Images/buildings/castle256.png", 1, true, 
+	 	CASTLE (5000, 1000, "resources/Images/buildings/castle256.png", 1, true, 
 	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000); put(ItemType.ROCK,1000);  }}),
-		BARRACKS (1000, 100, "resources/Images/buildings/barracks256.png", 0.1, true, 
+		BARRACKS (1000, 250, "resources/Images/buildings/barracks256.png", 0.1, true, 
 				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.ROCK,100);  }})
 	 	;
 

@@ -15,6 +15,9 @@ public class Plant extends Thing {
 	public int getYield() {
 		return currentYield;
 	}
+	public void harvest(int h) {
+		currentYield -= h;
+	}
 	public boolean isAquatic() {
 		return plantType.isAquatic();
 	}

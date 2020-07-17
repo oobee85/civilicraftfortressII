@@ -26,8 +26,6 @@ public class Game {
 	private BufferedImage minimapImage;
 	private BufferedImage heightMapImage;
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
-//	private Unit selectedUnit;
-//	private Building selectedBuilding;
 	private Thing selectedThing;
 	private UnitType selectedUnitToSpawn;
 	
@@ -195,8 +193,8 @@ public class Game {
 			if(!building.isBuilt()) {
 				continue;
 			}
-			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResource() != null && building.getTile().getResource().getType() != null && building.getTile().getResource().getType().isOre() == true) {
-				resources.get(building.getTile().getResource().getResourceType()).addAmount(1);
+			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResource() != null && building.getTile().getResource().getType().isOre() == true) {
+				resources.get(building.getTile().getResource().getType().getItemType()).addAmount(1);
 				building.getTile().getResource().harvest(100);
 				if(building.getTile().getResource().getYield() <= 0) {
 					building.getTile().setResource(null);
@@ -210,7 +208,14 @@ public class Game {
 				resources.get(ItemType.FOOD).addAmount(1);
 			}
 			if(building.getBuildingType() == BuildingType.SAWMILL) {
-				resources.get(ItemType.WOOD).addAmount(1);
+				for(Tile t : building.getTile().getNeighbors()) {
+					if(t.getPlant() != null && t.getPlant().getPlantType() == PlantType.FOREST1) {
+						t.getPlant().harvest(1);
+						t.getPlant().takeDamage(1);
+						resources.get(ItemType.WOOD).addAmount(1);
+					}
+				}
+				
 			}
 			if(building.getBuildingType() == BuildingType.FARM && building.getTile().hasUnit(UnitType.HORSE)) {
 				resources.get(ItemType.HORSE).addAmount(1);
@@ -695,9 +700,11 @@ public class Game {
 					g.drawImage(redHitsplatImage, x, y, w, hi, null);
 				}else if(thing.getHitsplatDamage() == 0){
 					g.drawImage(blueHitsplatImage, x, y, w, hi, null);
-				}else if(thing.getHitsplatDamage() < 0) {
-					g.drawImage(greenHitsplatImage, x, y, w, hi, null);
-					text = String.format("%.0f", thing.getHitsplatDamage() * -1);
+				}
+				else if(thing.getHitsplatDamage() < 0) {
+//					g.drawImage(greenHitsplatImage, x, y, w, hi, null);
+//					text = String.format("%.0f", thing.getHitsplatDamage() * -1);
+					return;
 				}
 				
 				int fontSize = Game.tileSize/4;
@@ -874,27 +881,27 @@ public class Game {
 			toggleTargetEnemy(tile);
 		}
 	}
+
 	public void toggleUnitSelectOnTile(Tile tile) {
 		Thing selectionCandidate = tile.getPlayerControlledThing();
-		if (selectionCandidate != null) {
-			
-			if (selectionCandidate == selectedThing) {
-				deselectThing();
-				//clicking on current selection
-			}else {
-				// clicking on new selection
-				deselectThing();
-				selectionCandidate.setIsSelected(true);
-				if (selectionCandidate instanceof Unit && ((Unit)selectionCandidate).getUnitType() == UnitType.WORKER) {
-					guiController.selectedWorker(true);
-				}
-				if (selectionCandidate instanceof Building && ((Building)selectionCandidate).getBuildingType() == BuildingType.CASTLE) {
-					guiController.selectedBuilding(true);
-				}
-				selectedThing = selectionCandidate;
-			}
+		if (selectionCandidate == null) {
+			return;
 		}
-		
+		if (selectionCandidate == selectedThing) {
+			deselectThing();
+			// clicking on current selection
+		} else {
+			// clicking on new selection
+			deselectThing();
+			selectionCandidate.setIsSelected(true);
+			if (selectionCandidate instanceof Unit && ((Unit) selectionCandidate).getUnitType() == UnitType.WORKER) {
+				guiController.selectedWorker(true);
+			}
+			if (selectionCandidate instanceof Building) {
+				guiController.selectedBuilding(((Building) selectionCandidate).getBuildingType(), true);
+			}
+			selectedThing = selectionCandidate;
+		}
 
 	}
 
@@ -911,7 +918,7 @@ public class Game {
 				selectedThing = null;
 			}
 			if (selectedThing instanceof Building) {
-				guiController.selectedBuilding(false);
+				guiController.selectedBuilding(((Building) selectedThing).getBuildingType(), false);
 				selectedThing = null;
 			}
 		

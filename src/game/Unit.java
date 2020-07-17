@@ -33,6 +33,9 @@ public class Unit extends Thing {
 	}
 	
 	public void moveTo(Tile t) {
+		if(t.canMove() == false) {
+			return;
+		}
 		double penalty = t.getTerrain().moveSpeed();
 		if(this.getUnitType().isFlying()) {
 			penalty = 0;
@@ -41,6 +44,8 @@ public class Unit extends Thing {
 			penalty = (penalty/getTile().getRoadType().getSpeed())/2;
 		}
 		timeToMove += penalty;
+		
+		
 		getTile().removeUnit(this);
 		t.addUnit(this);
 		this.setTile(t);
@@ -52,7 +57,7 @@ public class Unit extends Thing {
 	
 	public void tick() {
 		if(timeToMove > 0) {
-			timeToMove -= 1;
+			timeToMove -= 2;
 		}
 		if(timeToAttack > 0) {
 			timeToAttack -= 1;

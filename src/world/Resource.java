@@ -8,7 +8,7 @@ public class Resource {
 	private double yieldLeft;
 	private double maxYield;
 	private Tile tile;
-	private ItemType itemType;
+//	private ItemType itemType;
 	
 	public Resource(ResourceType resourceType) {
 		this.resourceType = resourceType;
@@ -34,9 +34,9 @@ public class Resource {
 		return resourceType;
 	}
 	
-	public ItemType getResourceType() {
-		return itemType;
-	}
+//	public ItemType getItemType() {
+//		return itemType;
+//	}
 	
 	
 }

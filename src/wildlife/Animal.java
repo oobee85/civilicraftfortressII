@@ -19,6 +19,9 @@ public class Animal extends Unit {
 	public Animal(UnitType type, Tile tile, boolean isPlayerControlled) {
 		super(type, tile, isPlayerControlled);
 		energy = MAX_ENERGY;
+		if(type.isHostile() == true) {
+			energy *= 10;
+		}
 		drive = 0;
 	}
 	
@@ -71,10 +74,11 @@ public class Animal extends Unit {
 	}
 	
 	public boolean wantsToEat() {
-		return Math.random()*100 > energy + 10;
+		return Math.random()*1000 > energy + 10;
+		
 	}
 	public void eat() {
-		energy += 10;
+		energy += 50;
 		drive += 0.01;
 	}
 	public void loseEnergy() {
