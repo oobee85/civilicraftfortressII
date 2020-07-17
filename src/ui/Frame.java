@@ -745,6 +745,7 @@ public class Frame extends JPanel{
 		// remove building tab after setting all of the tabs up
 		manageBuildingTab(false);
 		manageCityTab(false);
+		manageMilitaryUnitTab(false);
 		manageSpawnTab(false);
 		
 		JPanel guiSplitter = new JPanel();

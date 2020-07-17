@@ -1031,7 +1031,7 @@ public class Game {
 
 	public void tryToBuildUnit(UnitType u) {
 		
-		if(selectedThing != null && selectedThing instanceof Building && ((Building)selectedThing).getBuildingType() == BuildingType.CASTLE) {
+		if(selectedThing != null && selectedThing instanceof Building ) {
 			buildUnit(u, selectedThing.getTile());
 		}
 	}
