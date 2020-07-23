@@ -76,6 +76,9 @@ public class Liquid {
 			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= 0.0001) {
 				tile.liquidAmount -= 0.0001;
 			}
+			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount <= 0.001) {
+				tile.liquidAmount -= 0.0001;
+			}
 		}
 		//Utils.normalize(heightMap);
 	}

@@ -40,6 +40,7 @@ public class Frame extends JPanel{
 	private JPanel gamepanel;
 	private JPanel minimapPanel;
 	private JPanel cityView;
+	private JPanel craftView;
 	private JPanel militaryUnitView;
 	private JPanel tileView;
 	private JPanel workerMenu;
@@ -52,6 +53,7 @@ public class Frame extends JPanel{
 	private JButton[] researchButtons = new JButton[ResearchType.values().length];
 	private JButton[] buildingButtons = new JButton[BuildingType.values().length];
 	private JButton[] unitButtons = new JButton[UnitType.values().length];
+	private JButton[] craftButtons = new JButton[ItemType.values().length];
 	private JTextField mapSize;
 	private int WIDTH;
 	private int HEIGHT;
@@ -63,6 +65,7 @@ public class Frame extends JPanel{
 	private int RESOURCE_TAB;
 	private int WORKER_TAB;
 	private int TECH_TAB;
+	private int CRAFT_TAB;
 	private int DEBUG_TAB;
 	private int CITY_TAB;
 	private int MILITARY_TAB;
@@ -153,6 +156,22 @@ public class Frame extends JPanel{
 					}
 					UnitType type = UnitType.values()[i];
 					ResearchRequirement req = gameInstance.unitResearchRequirements[type];
+					if(req.areRequirementsMet()) {
+						button.setEnabled(true);
+						button.setVisible(true);
+					}
+					else {
+						button.setEnabled(false);
+						button.setVisible(false);
+					}
+				}
+				for(int i = 0; i < ItemType.values().length; i++) {
+					ItemType type = ItemType.values()[i];
+					if(type.getCost() == null) {
+						continue;
+					}
+					JButton button = craftButtons[i];
+					ResearchRequirement req = gameInstance.craftResearchRequirements[type];
 					if(req.areRequirementsMet()) {
 						button.setEnabled(true);
 						button.setVisible(true);
@@ -722,6 +741,20 @@ public class Frame extends JPanel{
 			});
 			techView.add(researchButtons[i]);
 		}
+		
+		craftView = new JPanel();
+		for (int i = 0; i < ItemType.values().length; i++) {
+			final ItemType type = ItemType.values()[i];
+			if(type.getCost() == null) {
+				continue;
+			}
+			craftButtons[i] = setupButton(type.toString(), null, RESEARCH_BUTTON_SIZE);
+			craftButtons[i].setEnabled(false);
+			craftButtons[i].addActionListener(e -> {
+				gameInstance.craftItem(type);
+			});
+			craftView.add(craftButtons[i]);
+		}
 
 		setupGamePanel();
 		setupMinimapPanel();
@@ -735,6 +768,9 @@ public class Frame extends JPanel{
 		
 		TECH_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab("Tech Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), 20, 20), techView, "Does nothing");
+		
+		CRAFT_TAB = tabbedPane.getTabCount();
+		tabbedPane.addTab("Craft Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), 20, 20), craftView, "Does nothing");
 		
 		WORKER_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("Worker Tab", WORKER_TAB_ICON, workerMenu, "Does nothing", WORKER_TAB);
@@ -769,8 +805,6 @@ public class Frame extends JPanel{
 		
 		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
 		frame.getContentPane().add(guiSplitter,BorderLayout.EAST);
-//		frame.setGlassPane(cityView);
-//		frame.setGlassPane(workerView);
 		frame.pack();
 		frame.setVisible(true);
 		gamepanel.requestFocusInWindow();

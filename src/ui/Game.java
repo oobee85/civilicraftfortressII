@@ -36,6 +36,7 @@ public class Game {
 	
 	HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
 	HashMap<UnitType, ResearchRequirement> unitResearchRequirements = new HashMap<>();
+	HashMap<ItemType, ResearchRequirement> craftResearchRequirements = new HashMap<>();
 	
 	private Research researchTarget;
 	
@@ -103,6 +104,19 @@ public class Game {
 			}
 			// put it in the hashmap
 			unitResearchRequirements.put(type, req);
+		}
+		for(ItemType type : ItemType.values()) {
+			// make a new researchrequirement object
+			ResearchRequirement req = new ResearchRequirement();
+			// only add requirement if it isnt null
+			if(type.getResearchRequirement() != null) {
+				// get the research that type requires
+				Research typesRequirement = researches[type.getResearchRequirement()];
+				// add the required research to the req
+				req.addRequirement(typesRequirement);
+			}
+			// put it in the hashmap
+			craftResearchRequirements.put(type, req);
 		}
 		
 		resources[ItemType.IRON_ORE].addAmount(200);
@@ -797,6 +811,29 @@ public class Game {
 			}
 		}
 	}
+	
+	public void craftItem(ItemType type) {
+		
+		for (Map.Entry mapElement : type.getCost().entrySet()) {
+			ItemType key = (ItemType) mapElement.getKey();
+			Integer value = (Integer) mapElement.getValue();
+
+			if (resources[key].getAmount() < value) {
+				return;
+			}
+		}
+
+		for (Map.Entry mapElement : type.getCost().entrySet()) {
+			ItemType key = (ItemType) mapElement.getKey();
+			Integer value = (Integer) mapElement.getValue();
+
+			resources[key].addAmount(-value);
+		}
+
+
+			
+	}
+	
 	public void setResearchTarget(ResearchType type) {
 		if(researches[type].getRequirement().areRequirementsMet()) {
 			researchTarget = researches[type];
@@ -982,7 +1019,7 @@ public class Game {
 		if(selectedThing != null && selectedThing instanceof Unit && ((Unit)selectedThing).getUnitType() == UnitType.WORKER) {
 			if(selectedThing.getTile().getHasBuilding() == false) {
 				
-
+				
 				for (Map.Entry mapElement : bt.getCost().entrySet()) {
 					ItemType key = (ItemType) mapElement.getKey();
 					Integer value = (Integer) mapElement.getValue();
