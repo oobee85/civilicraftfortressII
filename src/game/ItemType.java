@@ -22,10 +22,17 @@ public enum ItemType implements HasImage {
 	WOOD ( "resources/Images/itemicons/wood.png", null, null),
 	ROCK ( "resources/Images/itemicons/rock.png", null, null),
 	
-	COPPER_BAR ( "resources/Images/itemicons/copper_ore.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,10); }}),
-	BRONZE_BAR ( "resources/Images/itemicons/copper_ore.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,5); put(ItemType.SILVER_ORE, 5); }}),
-	IRON_BAR ( "resources/Images/itemicons/copper_ore.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.IRON_ORE,10);  }}),
-	MITHRIL_BAR ( "resources/Images/itemicons/copper_ore.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_ORE,10);  }}),
+	COPPER_BAR ( "resources/Images/itemicons/copper_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,10); }}),
+	IRON_BAR ( "resources/Images/itemicons/iron_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.IRON_ORE,10);  }}),
+	BRONZE_BAR ( "resources/Images/itemicons/bronze_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,5); put(ItemType.SILVER_ORE, 5); }}),
+	SILVER_BAR ( "resources/Images/itemicons/silver_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.SILVER_ORE,10); }}),
+	MITHRIL_BAR ( "resources/Images/itemicons/mithril_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_ORE,10);  }}),
+	GOLD_BAR ( "resources/Images/itemicons/gold_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.GOLD_ORE,10);  }}),
+	ADAMANTITE_BAR ( "resources/Images/itemicons/adamantite_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.ADAMANTITE_ORE,10);  }}),
+	RUNITE_BAR ( "resources/Images/itemicons/runite_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.RUNITE_ORE,10);  }}),
+	TITANIUM_BAR ( "resources/Images/itemicons/copper_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.TITANIUM_ORE,10);  }}),
+	
+	
 	;
 	
 	private MipMap mipmap;

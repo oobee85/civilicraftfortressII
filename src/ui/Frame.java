@@ -748,7 +748,7 @@ public class Frame extends JPanel{
 			if(type.getCost() == null) {
 				continue;
 			}
-			craftButtons[i] = setupButton(type.toString(), null, RESEARCH_BUTTON_SIZE);
+			craftButtons[i] = setupButton(type.toString(), Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 			craftButtons[i].setEnabled(false);
 			craftButtons[i].addActionListener(e -> {
 				gameInstance.craftItem(type);

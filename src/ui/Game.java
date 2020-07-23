@@ -828,6 +828,7 @@ public class Game {
 			Integer value = (Integer) mapElement.getValue();
 
 			resources[key].addAmount(-value);
+			resources[type].addAmount(1);
 		}
 
 
