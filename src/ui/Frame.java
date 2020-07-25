@@ -92,6 +92,9 @@ public class Frame extends JPanel{
 				if(bt == BuildingType.CASTLE) {
 					manageCityTab(selected);
 				}
+				if(bt == BuildingType.WORKSHOP) {
+					manageCraftTab(selected);
+				}
 				frame.repaint();
 			}
 			@Override
@@ -529,6 +532,15 @@ public class Frame extends JPanel{
 		tabbedPane.setEnabledAt(CITY_TAB, enabled);
 	}
 	
+	private void manageCraftTab(boolean enabled) {
+		if(enabled == false && tabbedPane.getSelectedIndex() == CRAFT_TAB) {
+			tabbedPane.setSelectedIndex(0);
+		}else if (enabled == true){
+			tabbedPane.setSelectedIndex(CRAFT_TAB);
+		}
+		tabbedPane.setEnabledAt(CRAFT_TAB, enabled);
+	}
+	
 	private void manageMilitaryUnitTab(boolean enabled) {
 		if(enabled == false && tabbedPane.getSelectedIndex() == MILITARY_TAB) {
 			tabbedPane.setSelectedIndex(0);
@@ -599,6 +611,20 @@ public class Frame extends JPanel{
 			});
 			unitButtons[i] = button;
 			cityView.add(button);
+		}
+		
+		craftView = new JPanel();
+		for (int i = 0; i < ItemType.values().length; i++) {
+			final ItemType type = ItemType.values()[i];
+			if(type.getCost() == null) {
+				continue;
+			}
+			craftButtons[i] = setupButton(type.toString(), Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+			craftButtons[i].setEnabled(false);
+			craftButtons[i].addActionListener(e -> {
+				gameInstance.craftItem(type);
+			});
+			craftView.add(craftButtons[i]);
 		}
 
 		militaryUnitView = new JPanel() {};
@@ -742,19 +768,7 @@ public class Frame extends JPanel{
 			techView.add(researchButtons[i]);
 		}
 		
-		craftView = new JPanel();
-		for (int i = 0; i < ItemType.values().length; i++) {
-			final ItemType type = ItemType.values()[i];
-			if(type.getCost() == null) {
-				continue;
-			}
-			craftButtons[i] = setupButton(type.toString(), Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
-			craftButtons[i].setEnabled(false);
-			craftButtons[i].addActionListener(e -> {
-				gameInstance.craftItem(type);
-			});
-			craftView.add(craftButtons[i]);
-		}
+		
 
 		setupGamePanel();
 		setupMinimapPanel();
@@ -770,7 +784,7 @@ public class Frame extends JPanel{
 		tabbedPane.addTab("Tech Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), 20, 20), techView, "Does nothing");
 		
 		CRAFT_TAB = tabbedPane.getTabCount();
-		tabbedPane.addTab("Craft Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), 20, 20), craftView, "Does nothing");
+		tabbedPane.insertTab("Craft Stuff", Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), 20, 20), craftView, "Does nothing", CRAFT_TAB);
 		
 		WORKER_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("Worker Tab", WORKER_TAB_ICON, workerMenu, "Does nothing", WORKER_TAB);
@@ -790,6 +804,7 @@ public class Frame extends JPanel{
 		// remove building tab after setting all of the tabs up
 		manageBuildingTab(false);
 		manageCityTab(false);
+		manageCraftTab(false);
 		manageMilitaryUnitTab(false);
 		manageSpawnTab(false);
 		

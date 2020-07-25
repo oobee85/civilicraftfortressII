@@ -144,7 +144,7 @@ public class Game {
 			world.rain();
 		}
 		// rain event
-		if(Math.random() < 0.001) {
+		if(Math.random() < 0.005) {
 			world.rain();
 		}
 		if(Math.random() < 0.01) {

@@ -12,8 +12,8 @@ import world.ResourceType;
 
 public enum UnitType implements HasImage {
 	WORKER           ( "resources/Images/units/worker.png", new CombatStats( 50,  1, 10, 1, 10), false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50);  }}, null ),
- 	WARRIOR          ( "resources/Images/units/warrior.png", new CombatStats(100, 10, 10, 1, 1), false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.COPPER_ORE,10); }}, null ),
- 	SPEARMAN       ( "resources/Images/units/spearman.png", new CombatStats(200, 10, 10, 1, 10), false, false, false, ResearchType.BRONZE_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.COPPER_ORE,20);}}, null ),
+ 	WARRIOR          ( "resources/Images/units/warrior.png", new CombatStats(100, 10, 10, 1, 1), false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.COPPER_BAR,5); }}, null ),
+ 	SPEARMAN       ( "resources/Images/units/spearman.png", new CombatStats(200, 10, 10, 1, 10), false, false, false, ResearchType.BRONZE_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.COPPER_BAR,5);}}, null ),
  	ARCHER            ( "resources/Images/units/archer.png", new CombatStats(50, 20, 10, 2, 10), false, false, false, ResearchType.WARRIOR_CODE, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); }}, null ),
  	SWORDSMAN     ( "resources/Images/units/swordsman.png", new CombatStats(200, 20, 10, 1, 10), false, false, false, ResearchType.IRON_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.IRON_ORE,20);}}, null ),
  	HORSEMAN       ( "resources/Images/units/horseman.png", new CombatStats(100, 10, 20, 1, 10), false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.COPPER_ORE,10); put(ItemType.HORSE,10);}}, null ),
