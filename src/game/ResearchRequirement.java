@@ -27,4 +27,8 @@ public class ResearchRequirement {
 		}
 		return true;
 	}
+	
+	public LinkedList<Research> getRequirements() {
+		return requirements;
+	}
 }

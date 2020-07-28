@@ -12,5 +12,13 @@ public class KUIConstants {
 	public static final Color SELECTED_TEXT_COLOR = Color.white;
 	public static final Color DISABLED_TEXT_COLOR = new Color(50, 50, 50);
 	
+
+
+//	private static final String fontName = "Comic Sans MS";
+//	private static final String fontName = "Chiller";
+	private static final String fontName = "TW Cen MT";
 	
+	public static final Font buttonFont = new Font(fontName, Font.PLAIN, 17);
+	public static final Font buttonFontSmall = new Font(fontName, Font.PLAIN, 14);
+	public static final Font buttonFontMini = new Font(fontName, Font.PLAIN, 13);
 }

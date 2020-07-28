@@ -37,7 +37,7 @@ public enum ResearchType {
 		mipmap = new MipMap(s);
 		this.requiredRP = researchPoints;
 	}
-	public int getRequirdPoints() {
+	public int getRequiredPoints() {
 		return requiredRP;
 	}
 	

@@ -805,7 +805,7 @@ public class Game {
 	}
 	private void doResearch() {
 		if(researchTarget != null) {
-			researchTarget.spendResearch(1000);
+			researchTarget.spendResearch(50);
 			if(researchTarget.isUnlocked()) {
 				guiController.updateGUI();
 			}

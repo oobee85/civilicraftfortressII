@@ -1,6 +1,7 @@
 package ui;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Map.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -19,14 +20,6 @@ public class Frame extends JPanel{
 	public static final Dimension BUILD_UNIT_BUTTON_SIZE = new Dimension(170, 35);
 
 	Insets zeroMargin = new Insets(0,0,0,0);
-	
-//	private static final String fontName = "Comic Sans MS";
-//	private static final String fontName = "Chiller";
-	private static final String fontName = "TW Cen MT";
-	
-	Font buttonFont = new Font(fontName, Font.PLAIN, 17);
-	Font buttonFontSmall = new Font(fontName, Font.PLAIN, 14);
-	Font buttonFontMini = new Font(fontName, Font.PLAIN, 13);
 	
 	Border massiveBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(5, 5, 5, 5));
 	
@@ -303,12 +296,12 @@ public class Frame extends JPanel{
 		b.setHorizontalAlignment(SwingConstants.LEFT);
 		setComponentAttributes(b, size);
 		b.setBorder(null);
-		b.setFont(buttonFontMini);
+		b.setFont(KUIConstants.buttonFontMini);
 		return b;
 	}
 	
 	private void setComponentAttributes(JComponent c, Dimension size) {
-		c.setFont(buttonFont);
+		c.setFont(KUIConstants.buttonFont);
 		c.setBorder(massiveBorder);
 		c.setFocusable(false);
 		if(size != null)
@@ -481,6 +474,15 @@ public class Frame extends JPanel{
 		});
 	}
 	
+	private void switchInfoPanel(JPanel newInfo) {
+		SwingUtilities.invokeLater(() -> {
+			infoPanel.removeAll();
+			newInfo.setOpaque(false);
+			infoPanel.add(newInfo, BorderLayout.CENTER);
+			infoPanel.validate();
+		});
+	}
+	
 	private void setupMinimapPanel() {
 		minimapPanel = new JPanel() {
 			@Override
@@ -605,10 +607,13 @@ public class Frame extends JPanel{
 			if (type != UnitType.WORKER) {
 				continue;
 			}
-			JButton button = setupButton("Build " + type.toString(),
+			KButton button = setupButton("Build " + type.toString(),
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.addActionListener(e -> {
 				gameInstance.tryToBuildUnit(type);
+			});
+			button.addRightClickActionListener(e -> {
+				switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
 			unitButtons[i] = button;
 			cityView.add(button);
@@ -635,10 +640,13 @@ public class Frame extends JPanel{
 				continue;
 			}
 
-			JButton button = setupButton("Build " + type.toString(),
+			KButton button = setupButton("Build " + type.toString(),
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.addActionListener(e -> {
 				gameInstance.tryToBuildUnit(type);
+			});
+			button.addRightClickActionListener(e -> {
+				switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
 			unitButtons[i] = button;
 			militaryUnitView.add(button);
@@ -761,11 +769,15 @@ public class Frame extends JPanel{
 		
 		for(int i = 0; i < ResearchType.values().length; i++) {
 			final ResearchType type = ResearchType.values()[i];
-			researchButtons[i] = setupButton(type.toString(), null, RESEARCH_BUTTON_SIZE);
-			researchButtons[i].setEnabled(false);
-			researchButtons[i].addActionListener(e -> {
+			KButton button = setupButton(type.toString(), null, RESEARCH_BUTTON_SIZE);
+			button.setEnabled(false);
+			button.addActionListener(e -> {
 				gameInstance.setResearchTarget(type);
 			});
+			button.addRightClickActionListener(e -> {
+				switchInfoPanel(new ResearchInfoPanel(gameInstance.researches[type]));
+			});
+			researchButtons[i] = button;
 			techView.add(researchButtons[i]);
 		}
 		
@@ -776,7 +788,7 @@ public class Frame extends JPanel{
 		
 		tabbedPane = new JTabbedPane();
 		tabbedPane.setFocusable(false);
-		tabbedPane.setFont(buttonFontSmall);
+		tabbedPane.setFont(KUIConstants.buttonFontSmall);
 		
 		RESOURCE_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab(null, Utils.resizeImageIcon(ItemType.ADAMANTITE_ORE.getImageIcon(0), 20, 20), resourcePanel, "Does nothing");
@@ -813,14 +825,18 @@ public class Frame extends JPanel{
 		guiSplitter.setLayout(new BorderLayout());
 		guiSplitter.setPreferredSize(new Dimension(GUIWIDTH,frame.getHeight()));
 		guiSplitter.add(tabbedPane,BorderLayout.CENTER);
+		tabbedPane.setBorder(BorderFactory.createLineBorder(Color.black, 1));
 //		guiSplitter.add(resourcePanel,BorderLayout.WEST);
 
 		minimapPanel.setPreferredSize(new Dimension(GUIWIDTH,GUIWIDTH));
 		guiSplitter.add(minimapPanel,BorderLayout.NORTH);
 		
 		infoPanel = new JPanel();
-		infoPanel.setBackground(Color.blue);
+		infoPanel.setLayout(new BorderLayout());
+		infoPanel.setBackground(gameInstance.getBackgroundColor());
 		infoPanel.setPreferredSize(new Dimension(GUIWIDTH,GUIWIDTH*2/3));
+		infoPanel.setBorder(BorderFactory.createLineBorder(Color.black, 1));
+		infoPanel.add(new JLabel("Try right clicking research buttons or build unit buttons."), BorderLayout.CENTER);
 		guiSplitter.add(infoPanel,BorderLayout.SOUTH);
 		
 		

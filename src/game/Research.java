@@ -20,6 +20,10 @@ public class Research {
 		return req;
 	}
 	
+	public int getPointsSpent() {
+		return researchPointsSpent;
+	}
+	
 	public boolean isUnlocked() {
 		return isUnlocked;
 	}
@@ -28,8 +32,9 @@ public class Research {
 		if(!isUnlocked()) {
 			researchPointsSpent += points;
 			System.out.println(researchPointsSpent);
-			if(researchPointsSpent >= type.getRequirdPoints()) {
+			if(researchPointsSpent >= type.getRequiredPoints()) {
 				isUnlocked = true;
+				researchPointsSpent = type.getRequiredPoints();
 			}
 		}
 	}

@@ -40,4 +40,9 @@ public class CombatStats {
 		return attackSpeed;
 	}
 	
+	@Override
+	public String toString() {
+		return String.format("health:%d, attack:%d, speed:%d, vision:%d, attack speed:%d", health, attack, speed, visionRadius, attackSpeed);
+	}
+	
 }

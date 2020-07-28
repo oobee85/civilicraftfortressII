@@ -12,6 +12,7 @@ public class KButton extends JButton {
 	
 	private boolean hovered;
 	private boolean pressed;
+	private boolean enabled = true;
 	
 	public KButton(String text, Icon icon) {
 		super(text, icon);
@@ -21,8 +22,10 @@ public class KButton extends JButton {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				pressed = false;
-				for(ActionListener l : rightClickListeners) {
-					l.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, text, System.currentTimeMillis(), 0));
+				if(e.getButton() == MouseEvent.BUTTON3) {
+					for(ActionListener l : rightClickListeners) {
+						l.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, text, System.currentTimeMillis(), 0));
+					}
 				}
 			}
 			
@@ -52,15 +55,21 @@ public class KButton extends JButton {
 		rightClickListeners.add(l);
 	}
 
+	// Note we are overriding setEnabled so that the parent class always thinks it is enabled to allow mouse interaction.
+	@Override
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
 	@Override
 	public void paintComponent(Graphics g) {
-		if(pressed && isEnabled()) {
+		if(pressed && enabled) {
 			g.setColor(KUIConstants.SELECTED_COLOR);
 		}
-		else if(hovered && isEnabled()) {
+		else if(hovered && enabled) {
 			g.setColor(KUIConstants.HOVERED_COLOR);
 		}
-		else if(isEnabled()) {
+		else if(enabled) {
 			g.setColor(KUIConstants.NORMAL_COLOR);
 		}
 		else {
@@ -68,11 +77,11 @@ public class KButton extends JButton {
 		}
 		g.fillRect(0, 0, getWidth(), getHeight());
 
-		if(pressed && isEnabled()) {
+		if(pressed && enabled) {
 			this.setForeground(KUIConstants.SELECTED_TEXT_COLOR);
 			this.setBorderPainted(false);
 		}
-		else if(isEnabled()) {
+		else if(enabled) {
 			this.setForeground(KUIConstants.NORMAL_TEXT_COLOR);
 			this.setBorderPainted(true);
 		}
