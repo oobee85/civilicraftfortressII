@@ -2,10 +2,13 @@ package ui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 import javax.swing.*;
 
 public class KButton extends JButton {
+	
+	private LinkedList<ActionListener> rightClickListeners = new LinkedList<>();
 	
 	private boolean hovered;
 	private boolean pressed;
@@ -18,6 +21,9 @@ public class KButton extends JButton {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				pressed = false;
+				for(ActionListener l : rightClickListeners) {
+					l.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_FIRST, text, System.currentTimeMillis(), 0));
+				}
 			}
 			
 			@Override
@@ -40,6 +46,10 @@ public class KButton extends JButton {
 				pressed = false;
 			}
 		});
+	}
+	
+	public void addRightClickActionListener(ActionListener l) {
+		rightClickListeners.add(l);
 	}
 
 	@Override

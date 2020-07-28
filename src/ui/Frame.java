@@ -39,6 +39,7 @@ public class Frame extends JPanel{
 	private JFrame frame;
 	private JPanel gamepanel;
 	private JPanel minimapPanel;
+	private JPanel infoPanel;
 	private JPanel cityView;
 	private JPanel craftView;
 	private JPanel militaryUnitView;
@@ -275,8 +276,8 @@ public class Frame extends JPanel{
 		});
 	}
 	
-	private JButton setupButton(String text, Icon icon, Dimension size) {
-		JButton b = new KButton(text, icon);
+	private KButton setupButton(String text, Icon icon, Dimension size) {
+		KButton b = new KButton(text, icon);
 		b.setMargin(zeroMargin);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
 		setComponentAttributes(b, size);
@@ -816,6 +817,11 @@ public class Frame extends JPanel{
 
 		minimapPanel.setPreferredSize(new Dimension(GUIWIDTH,GUIWIDTH));
 		guiSplitter.add(minimapPanel,BorderLayout.NORTH);
+		
+		infoPanel = new JPanel();
+		infoPanel.setBackground(Color.blue);
+		infoPanel.setPreferredSize(new Dimension(GUIWIDTH,GUIWIDTH*2/3));
+		guiSplitter.add(infoPanel,BorderLayout.SOUTH);
 		
 		
 		frame.getContentPane().add(gamepanel,BorderLayout.CENTER);
