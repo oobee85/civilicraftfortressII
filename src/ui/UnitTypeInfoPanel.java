@@ -27,8 +27,8 @@ public class UnitTypeInfoPanel extends JPanel {
 		int y = 25;
 		
 		g.setColor(Color.black);
-		g.setFont(KUIConstants.buttonFont);
-		int offset = 20;
+		g.setFont(KUIConstants.infoFont);
+		int offset = g.getFont().getSize();
 		
 		g.drawString("" + showing.toString(), x, y += offset);
 		if(showing.getResearchRequirement() != null) {

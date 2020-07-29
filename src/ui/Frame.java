@@ -109,7 +109,7 @@ public class Frame extends JPanel{
 			@Override
 			public void updateGUI() {
 				for(int i = 0; i < ItemType.values().length; i++) {
-					resourceIndicators[i].setText("" + gameInstance.getResourceAmount(ItemType.values()[i]) + " " + ItemType.values()[i]);
+					resourceIndicators[i].setText("" + gameInstance.getResourceAmount(ItemType.values()[i]));
 				}
 				for(int i = 0; i < ResearchType.values().length; i++) {
 					Research r = gameInstance.researches.get(ResearchType.values()[i]);
@@ -283,8 +283,8 @@ public class Frame extends JPanel{
 		setComponentAttributes(b, size);
 		return b;
 	}
-	private JLabel setupLabel(String text, Icon icon, Dimension size) {
-		JLabel b = new JLabel(icon);
+	private KLabel setupLabel(String text, Icon icon, Dimension size) {
+		KLabel b = new KLabel(icon);
 		b.setText(text);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
 		setComponentAttributes(b, size);
@@ -567,7 +567,7 @@ public class Frame extends JPanel{
 		System.err.println("Starting Game");
 		frame.remove(mainMenuPanel);
 		
-		Dimension RESOURCE_BUTTON_SIZE = new Dimension(200, 35);
+		Dimension RESOURCE_BUTTON_SIZE = new Dimension(125, 35);
 		Dimension RESEARCH_BUTTON_SIZE = new Dimension(125, 35);
 		int BUILDING_ICON_SIZE = 25;
 		int RESOURCE_ICON_SIZE = 35;
@@ -625,11 +625,15 @@ public class Frame extends JPanel{
 			if(type.getCost() == null) {
 				continue;
 			}
-			craftButtons[i] = setupButton(type.toString(), Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
-			craftButtons[i].setEnabled(false);
-			craftButtons[i].addActionListener(e -> {
+			KButton button = setupButton(type.toString(), Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+			button.setEnabled(false);
+			button.addActionListener(e -> {
 				gameInstance.craftItem(type);
 			});
+			button.addRightClickActionListener(e -> {
+				switchInfoPanel(new ItemTypeInfoPanel(type));
+			});
+			craftButtons[i] = button;
 			craftView.add(craftButtons[i]);
 		}
 
@@ -657,7 +661,12 @@ public class Frame extends JPanel{
 		JLabel money = setupLabel("Gold = " + gameInstance.getMoney(), Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		
 		for(int i = 0; i < ItemType.values().length; i++) {
-			resourceIndicators[i] = setupLabel("", Utils.resizeImageIcon(ItemType.values()[i].getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE), RESOURCE_BUTTON_SIZE);
+			ItemType type = ItemType.values()[i];
+			KLabel label = setupLabel("", Utils.resizeImageIcon(type.getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE), RESOURCE_BUTTON_SIZE);
+			label.addRightClickActionListener(e -> {
+				switchInfoPanel(new ItemTypeInfoPanel(type));
+			});
+			resourceIndicators[i] = label;
 		}
 		
 		tileSize = setupLabel("TileSize = "+gameInstance.getTileSize(), null, BUILDING_BUTTON_SIZE);

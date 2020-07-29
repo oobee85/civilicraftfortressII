@@ -26,8 +26,8 @@ public class ResearchInfoPanel extends JPanel {
 		int y = 50;
 		
 		g.setColor(Color.black);
-		g.setFont(KUIConstants.buttonFont);
-		int offset = 20;
+		g.setFont(KUIConstants.infoFont);
+		int offset = g.getFont().getSize();
 		
 		g.drawString(String.format("%s %d/%d", showing, showing.getPointsSpent(), showing.getType().getRequiredPoints()), x, y += offset);
 
