@@ -17,6 +17,7 @@ public class Frame extends JPanel{
 	int MINIMAPBORDERWIDTH = 50;
 	
 	public static final Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
+	public static final Dimension DEBUG_BUTTON_SIZE = new Dimension(130, 30);
 	public static final Dimension BUILD_UNIT_BUTTON_SIZE = new Dimension(170, 35);
 
 	Insets zeroMargin = new Insets(0,0,0,0);
@@ -658,7 +659,6 @@ public class Frame extends JPanel{
 
 		
 		
-		JLabel money = setupLabel("Gold = " + gameInstance.getMoney(), Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/coin_icon.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
 		
 		for(int i = 0; i < ItemType.values().length; i++) {
 			ItemType type = ItemType.values()[i];
@@ -669,15 +669,15 @@ public class Frame extends JPanel{
 			resourceIndicators[i] = label;
 		}
 		
-		tileSize = setupLabel("TileSize = "+gameInstance.getTileSize(), null, BUILDING_BUTTON_SIZE);
+		tileSize = setupLabel("TileSize = "+gameInstance.getTileSize(), null, DEBUG_BUTTON_SIZE);
 
-		JToggleButton showHeightMap = setupToggleButton("Show Height Map", null, BUILDING_BUTTON_SIZE);
+		JToggleButton showHeightMap = setupToggleButton("Show Height Map", null, DEBUG_BUTTON_SIZE);
 		showHeightMap.addActionListener(e -> {
 			showHeightMap.setText(showHeightMap.isSelected() ? "Hide Height Map" : "Show Height Map");
 			gameInstance.setShowHeightMap(showHeightMap.isSelected());
 		});
 
-		JToggleButton flipTable = setupToggleButton("Flip Table", null, BUILDING_BUTTON_SIZE);
+		JToggleButton flipTable = setupToggleButton("Flip Table", null, DEBUG_BUTTON_SIZE);
 		flipTable.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -686,13 +686,13 @@ public class Frame extends JPanel{
 			}
 		});
 		
-		JToggleButton spawnUnit = setupToggleButton("Enable Spawn Unit", null, BUILDING_BUTTON_SIZE);
+		JToggleButton spawnUnit = setupToggleButton("Enable Spawn Unit", null, DEBUG_BUTTON_SIZE);
 		spawnUnit.addActionListener(e -> {
 			spawnUnit.setText(spawnUnit.isSelected() ? "Disable Spawn Unit" : "Enable Spawn Unit");
 			gameInstance.spawnUnit(spawnUnit.isSelected());
 		});
 		
-		JButton eruptVolcano = setupButton("Erupt Volcano", null, BUILDING_BUTTON_SIZE);
+		JButton eruptVolcano = setupButton("Erupt Volcano", null, DEBUG_BUTTON_SIZE);
 		eruptVolcano.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -700,7 +700,7 @@ public class Frame extends JPanel{
 			}
 		});
 		
-		JButton makeItRain = setupButton("Rain", null, BUILDING_BUTTON_SIZE);
+		JButton makeItRain = setupButton("Rain", null, DEBUG_BUTTON_SIZE);
 		makeItRain.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -709,7 +709,7 @@ public class Frame extends JPanel{
 			}
 		});
 		
-		JButton makeItDry = setupButton("Drought", null, BUILDING_BUTTON_SIZE);
+		JButton makeItDry = setupButton("Drought", null, DEBUG_BUTTON_SIZE);
 		makeItDry.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -717,7 +717,7 @@ public class Frame extends JPanel{
 			}
 		});
 		
-		JButton makeItDay = setupButton("Day", null, BUILDING_BUTTON_SIZE);
+		JButton makeItDay = setupButton("Day", null, DEBUG_BUTTON_SIZE);
 		makeItDay.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -725,7 +725,7 @@ public class Frame extends JPanel{
 			}
 		});
 		
-		JButton researchEverything = setupButton("Research", null, BUILDING_BUTTON_SIZE);
+		JButton researchEverything = setupButton("Research", null, DEBUG_BUTTON_SIZE);
 		researchEverything.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -733,16 +733,16 @@ public class Frame extends JPanel{
 			}
 		});
 		
-		JToggleButton debug = setupToggleButton(Game.DEBUG_DRAW ? "Stop Debug" : "Debug", null, BUILDING_BUTTON_SIZE);
+		JToggleButton debug = setupToggleButton(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix", null, DEBUG_BUTTON_SIZE);
 		debug.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				Game.DEBUG_DRAW = debug.isSelected();
-				debug.setText(Game.DEBUG_DRAW ? "Stop Debug" : "Debug");
+				debug.setText(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix");
 			}
 		});
 		
-		JButton exit = setupButton("Exit", null, BUILDING_BUTTON_SIZE);
+		JButton exit = setupButton("Exit", null, DEBUG_BUTTON_SIZE);
 		exit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -759,7 +759,6 @@ public class Frame extends JPanel{
 		}
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setPreferredSize(new Dimension(GUIWIDTH-RESOURCE_PANEL_WIDTH, 1000));
-		buttonPanel.add(money);
 		buttonPanel.add(tileSize);
 		
 		buttonPanel.add(showHeightMap);

@@ -70,7 +70,7 @@ public class World {
 	public void rain() {
 		System.out.println("raining");
 		for(Tile tile : getTiles()) {
-			if(tile.getTerrain() != Terrain.SNOW) {
+			if(tile.getTerrain() != Terrain.SNOW || tile.getTerrain() != Terrain.ROCK) {
 				continue;
 			}
 			if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.DRY) {
