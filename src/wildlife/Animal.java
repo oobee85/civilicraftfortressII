@@ -77,8 +77,8 @@ public class Animal extends Unit {
 		return Math.random()*1000 > energy + 10;
 		
 	}
-	public void eat() {
-		energy += 50;
+	public void eat(int damage) {
+		energy += damage;
 		drive += 0.01;
 	}
 	public void loseEnergy() {
@@ -129,6 +129,7 @@ public class Animal extends Unit {
 				this.moveTo(bestTile);
 			}
 			this.damageTarget();
+			this.eat(this.getType().getCombatStats().getAttack());
 //				prey.takeDamage(this.getType().getCombatStats().getAttack());
 //				for(int i = 0; i < prey.getType().getCombatStats().getHealth()/2; i++) {
 //					eat();

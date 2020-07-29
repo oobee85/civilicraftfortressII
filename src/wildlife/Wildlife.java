@@ -103,11 +103,11 @@ public class Wildlife {
 				}
 				else {
 					if(!animal.getType().isHostile() && animal.getTile().getPlant() != null) {
-						animal.getTile().getPlant().takeDamage(1);
-						animal.eat();
+						animal.getTile().getPlant().takeDamage(animal.getType().getCombatStats().getAttack());
+						animal.eat(animal.getType().getCombatStats().getAttack());
 					}else if(!animal.getType().isHostile() && animal.getTile().checkTerrain(Terrain.GRASS)) {
 						animal.getTile().setTerrain(Terrain.DIRT);
-						animal.eat();
+						animal.eat(animal.getType().getCombatStats().getAttack());
 					}
 				}
 			}
