@@ -11,19 +11,21 @@ import utils.Utils;
 
 public enum GroundModifierType implements HasImage{
 
-	FIRE(new String[] { "resources/Images/ground_modifiers/fire.gif" }, 1000, 5),
+	FIRE(new String[] { "resources/Images/ground_modifiers/fire.gif" }, 1000, 5, 0.5),
 
 	;
 
 	double maxTime;
 	int damage;
+	double brightness;
 	
 	private MipMap mipmap;
 
-	GroundModifierType(String[] s, int maxTime, int damage) {
+	GroundModifierType(String[] s, int maxTime, int damage, double brightness) {
 		this.mipmap = new MipMap(s);
 		this.maxTime = maxTime;
 		this.damage = damage;
+		this.brightness = brightness;
 	}
 
 	public double getMaxTime() {
@@ -31,6 +33,9 @@ public enum GroundModifierType implements HasImage{
 	}
 	public int getDamage() {
 		return damage;
+	}
+	public double getBrightness() {
+		return brightness;
 	}
 
 	@Override
