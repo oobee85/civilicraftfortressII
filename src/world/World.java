@@ -160,6 +160,10 @@ public class World {
 					if(distanceFromCenter > radius/2) {
 						height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
 					}
+//					double height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
+//					if(distanceFromCenter > radius/2) {
+//						height = tile.getHeight()+0.2 - (radius/2 - distanceFromCenter)/radius/4;
+//					}
 					tile.setHeight(Math.max(height, tile.getHeight()));
 				}
 				
