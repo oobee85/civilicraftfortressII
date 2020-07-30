@@ -740,6 +740,13 @@ public class Frame extends JPanel{
 				gameInstance.meteorStrike();
 			}
 		});
+		JButton ogre = setupButton("Ogre", null, DEBUG_BUTTON_SIZE);
+		ogre.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.spawnOgre();
+			}
+		});
 		
 		JToggleButton debug = setupToggleButton(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix", null, DEBUG_BUTTON_SIZE);
 		debug.addActionListener(new ActionListener() {
@@ -779,6 +786,7 @@ public class Frame extends JPanel{
 		buttonPanel.add(researchEverything);
 		buttonPanel.add(eruptVolcano);
 		buttonPanel.add(meteor);
+		buttonPanel.add(ogre);
 		buttonPanel.add(debug);
 		buttonPanel.add(exit);
 		

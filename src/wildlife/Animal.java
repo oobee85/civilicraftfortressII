@@ -129,7 +129,7 @@ public class Animal extends Unit {
 				this.moveTo(bestTile);
 			}
 			this.damageTarget();
-			this.eat(this.getType().getCombatStats().getAttack());
+//			this.eat(this.getType().getCombatStats().getAttack());
 //				prey.takeDamage(this.getType().getCombatStats().getAttack());
 //				for(int i = 0; i < prey.getType().getCombatStats().getHealth()/2; i++) {
 //					eat();

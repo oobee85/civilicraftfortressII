@@ -16,10 +16,10 @@ public enum UnitType implements HasImage {
  	SPEARMAN       ( "resources/Images/units/spearman.png", new CombatStats(200, 10, 10, 1, 10), false, false, false, ResearchType.BRONZE_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.COPPER_BAR,5);}}, null ),
  	ARCHER            ( "resources/Images/units/archer.png", new CombatStats(50, 20, 10, 2, 10), false, false, false, ResearchType.WARRIOR_CODE, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); }}, null ),
  	SWORDSMAN     ( "resources/Images/units/swordsman.png", new CombatStats(200, 20, 10, 1, 10), false, false, false, ResearchType.IRON_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.IRON_ORE,20);}}, null ),
- 	HORSEMAN       ( "resources/Images/units/horseman.png", new CombatStats(100, 10, 20, 1, 10), false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.COPPER_ORE,10); put(ItemType.HORSE,10);}}, null ),
+ 	HORSEMAN       ( "resources/Images/units/horseman.png", new CombatStats(100, 10, 30, 1, 10), false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.COPPER_ORE,10); put(ItemType.HORSE,10);}}, null ),
  	KNIGHT           ( "resources/Images/units/knight.png", new CombatStats(200, 30, 20, 1, 10), false, false, false, ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.MITHRIL_ORE,10); put(ItemType.HORSE,20);}}, null ),
  	CHARIOT         ( "resources/Images/units/chariot.png", new CombatStats(200, 10, 20, 2, 10), false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.WOOD,10); put(ItemType.HORSE,10);}}, null ),
- 	HORSEARCHER ( "resources/Images/units/horsearcher.png", new CombatStats(100, 30, 40, 3, 10), false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.HORSE,10);}}, null ),
+ 	HORSEARCHER ( "resources/Images/units/horsearcher.png", new CombatStats(100, 30, 30, 3, 10), false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.HORSE,10);}}, null ),
  	
 	DEER    ("resources/Images/units/deer.png", new CombatStats(200, 5, 10, 1, 2), false, false, false, null, null, ResourceType.DEAD_ANIMAL),
 	HORSE  ("resources/Images/units/horse.png", new CombatStats(200, 5, 10, 1, 2), false, false, false, null, null, ResourceType.DEAD_ANIMAL),
@@ -29,7 +29,7 @@ public enum UnitType implements HasImage {
 	COW     ("resources/Images/units/cow.png", new CombatStats(200, 10, 10, 1, 2), false, false, false, null, null, ResourceType.DEAD_ANIMAL),
 	
 	DRAGON  ("resources/Images/units/dragon.png", new CombatStats(1000, 50, 100, 2, 5), false, true, true, null, null, ResourceType.DEAD_ANIMAL),
-	OGRE	("resources/Images/units/ogre.png", new CombatStats(1000, 100, 100, 2, 10), false, false, true, null, null, ResourceType.DEAD_ANIMAL),
+	OGRE	("resources/Images/units/ogre.png", new CombatStats(1000, 100, 50, 2, 10), false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	
 	WOLF        ("resources/Images/units/wolf.png", new CombatStats(200, 20, 10, 1, 5), false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	;

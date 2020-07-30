@@ -102,13 +102,31 @@ public class World {
 		}
 		GroundModifiers = GroundModifiersNew;
 	}
+	public void spawnOgre() {
+		
+		
+		LinkedList<Tile> tiles = this.getTilesRandomly();
+		Tile t = tiles.getFirst();
+		for(Tile tile : tiles) {
+			if(tile.getTerrain() == Terrain.ROCK) {
+				t = tile;
+				break;
+			}
+		}
+		System.out.println("Ogre at: "+t.getLocation().x+ ", "+ t.getLocation().y);
+		Animal ogre = new Animal(UnitType.OGRE, t, false);
+		t.addUnit(ogre);
+		Wildlife.addAnimal(ogre);
+		ogre.setTile(t);
+		
+		
+	}
 	public void meteorStrike() {
-		System.err.println("meteor strike");
 		Tile t = this.getTilesRandomly().getFirst();
 		
 		
 		int radius = (int) (Math.random()*20);
-		System.out.println("meteor at:"+t +", " );
+		System.out.println("meteor at: "+t.getLocation().x+ ", "+ t.getLocation().y);
 		
 		for(Tile tile : this.getTiles()) {
 			

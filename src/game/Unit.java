@@ -2,6 +2,7 @@ package game;
 
 
 import utils.*;
+import wildlife.Animal;
 import world.*;
 
 public class Unit extends Thing {

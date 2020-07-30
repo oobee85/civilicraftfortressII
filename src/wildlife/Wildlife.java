@@ -66,6 +66,9 @@ public class Wildlife {
 		
 	}
 	
+	public static void addAnimal(Animal a) {
+		animals.add(a);
+	}
 	
 	public static void tick(World world) {
 		LinkedList<Animal> newAnimals = new LinkedList<>();

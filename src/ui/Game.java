@@ -191,6 +191,9 @@ public class Game {
 	public void meteorStrike(){
 		world.meteorStrike();
 	}
+	public void spawnOgre() {
+		world.spawnOgre();
+	}
 	public void generateWorld(MapType mapType, int size) {
 		world = new World();
 		world.generateWorld(mapType, size);
