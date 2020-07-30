@@ -594,7 +594,7 @@ public class Frame extends JPanel{
 		spawnMenu = new JPanel();
 		for(int i = 0; i < UnitType.values().length; i++) {
 			UnitType type = UnitType.values()[i];
-			JButton button = setupButton(type.toString(), Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), BUILDING_BUTTON_SIZE);
+			JButton button = setupButton(type.toString(), Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), DEBUG_BUTTON_SIZE);
 			button.addActionListener(e -> {
 				gameInstance.setUnit(type);
 			});
@@ -733,6 +733,14 @@ public class Frame extends JPanel{
 			}
 		});
 		
+		JButton meteor = setupButton("Meteor", null, DEBUG_BUTTON_SIZE);
+		meteor.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.meteorStrike();
+			}
+		});
+		
 		JToggleButton debug = setupToggleButton(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix", null, DEBUG_BUTTON_SIZE);
 		debug.addActionListener(new ActionListener() {
 			@Override
@@ -741,6 +749,7 @@ public class Frame extends JPanel{
 				debug.setText(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix");
 			}
 		});
+		
 		
 		JButton exit = setupButton("Exit", null, DEBUG_BUTTON_SIZE);
 		exit.addActionListener(new ActionListener() {
@@ -769,6 +778,7 @@ public class Frame extends JPanel{
 		buttonPanel.add(makeItDay);
 		buttonPanel.add(researchEverything);
 		buttonPanel.add(eruptVolcano);
+		buttonPanel.add(meteor);
 		buttonPanel.add(debug);
 		buttonPanel.add(exit);
 		

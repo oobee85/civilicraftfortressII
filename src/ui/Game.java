@@ -31,6 +31,7 @@ public class Game {
 	
 	LinkedList<Building> buildings = new LinkedList<Building>();
 	
+	
 	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
 	HashMap<ResearchType, Research> researches = new HashMap<>();
 	
@@ -143,6 +144,7 @@ public class Game {
 		if(ticks == 1) {
 			world.rain();
 		}
+		world.tick();
 		// rain event
 		if(Math.random() < 0.005) {
 			world.rain();
@@ -184,9 +186,11 @@ public class Game {
 		}
 	}
 	public void eruptVolcano() {
-		world.eruptVolcano(world);
+		world.eruptVolcano();
 	}
-	
+	public void meteorStrike(){
+		world.meteorStrike();
+	}
 	public void generateWorld(MapType mapType, int size) {
 		world = new World();
 		world.generateWorld(mapType, size);
@@ -279,6 +283,10 @@ public class Game {
 		buildings = buildingsNew;
 		
 	}
+	
+	
+	
+	
 	public void setViewSize(int width, int height) {
 		panelWidth = width;
 		panelHeight = height;
@@ -558,6 +566,9 @@ public class Game {
 							g.fillRect(x + Game.tileSize/2 - size/2, y + Game.tileSize/2 - size/2, size, size);
 							g.drawImage(t.liquidType.getImage(Game.tileSize), x + Game.tileSize/2 - size/2, y + Game.tileSize/2 - size/2, size, size, null);
 						}
+						if(t.getModifier() != null) {
+							g.drawImage(t.getModifier().getType().getImage(Game.tileSize), x, y, w, h, null);
+						}
 					}
 				}
 			}
@@ -662,6 +673,9 @@ public class Game {
 							
 							if(world[loc].liquidType != LiquidType.DRY) {
 								g.drawString(String.format(world[loc].liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount), x, y + (++rows[i][j])*fontsize);
+							}
+							if(world[loc].getModifier() != null) {
+								g.drawString(world[loc].getModifier().timeLeft() + "", x, y + (++rows[i][j])*fontsize);
 							}
 						}
 					}

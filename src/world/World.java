@@ -28,7 +28,8 @@ public class World {
 	public LinkedList<Plant> plantsLand = new LinkedList<Plant>();
 	public LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
 	public LinkedList<Unit> units = new LinkedList<Unit>();
-
+	LinkedList<GroundModifier> GroundModifiers = new LinkedList<GroundModifier>();
+	
 	private double bushRarity = 0.005;
 	private double waterPlantRarity = 0.05;
 	private double forestDensity = 0.3;
@@ -79,12 +80,54 @@ public class World {
 			}
 		}
 	}
-	public void eruptVolcano(World world) {
+	public void eruptVolcano() {
 		System.out.println("eruption");
-		world[volcano].liquidAmount += 500;
+		this[volcano].liquidAmount += 500;
 		
 //		world[volcano].liquidType = LiquidType.WATER;
 //		world[volcano].liquidAmount += 200;
+	}
+	public void tick() {
+		updateGroundModifiers();
+	}
+	public void updateGroundModifiers() {
+		LinkedList<GroundModifier> GroundModifiersNew = new LinkedList<GroundModifier>();
+
+		for(GroundModifier modifier : GroundModifiers) {
+			if(modifier.updateTime() == false) {
+				GroundModifiersNew.add(modifier);
+			}else {
+				modifier.getTile().setModifier(null);
+			}
+		}
+		GroundModifiers = GroundModifiersNew;
+	}
+	public void meteorStrike() {
+		System.err.println("meteor strike");
+		Tile t = this.getTilesRandomly().getFirst();
+		
+		
+		int radius = (int) (Math.random()*20);
+		System.out.println("meteor at:"+t +", " );
+		
+		for(Tile tile : this.getTiles()) {
+			
+			int i =  tile.getLocation().x;
+			int j =  tile.getLocation().y;
+			int dx = i - t.getLocation().x;
+			int dy = j - t.getLocation().y;
+			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
+				
+				
+				if(distanceFromCenter < radius) {
+					tile.setTerrain(Terrain.BURNED_GROUND);
+					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, tile);
+					GroundModifiers.add(fire);
+					tile.setModifier(fire);
+				}
+		}
+		
+		
 	}
 	public void updateTerrainChange(World world) {
 		for(Tile tile : getTiles()) {

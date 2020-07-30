@@ -29,6 +29,8 @@ public enum UnitType implements HasImage {
 	COW     ("resources/Images/units/cow.png", new CombatStats(200, 10, 10, 1, 2), false, false, false, null, null, ResourceType.DEAD_ANIMAL),
 	
 	DRAGON  ("resources/Images/units/dragon.png", new CombatStats(1000, 50, 100, 2, 5), false, true, true, null, null, ResourceType.DEAD_ANIMAL),
+	OGRE	("resources/Images/units/ogre.png", new CombatStats(1000, 100, 100, 2, 10), false, false, true, null, null, ResourceType.DEAD_ANIMAL),
+	
 	WOLF        ("resources/Images/units/wolf.png", new CombatStats(200, 20, 10, 1, 5), false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	;
 	

@@ -27,21 +27,24 @@ public class Tile {
 	private Plant plant;
 	private Terrain terr;
 	private Building building;
-
+	private GroundModifier modifier;
+	
 	private ConcurrentLinkedQueue<Unit> units;
-
+	
 	public double liquidAmount;
 	public LiquidType liquidType;
-
+	
+	
 	private List<Tile> neighborTiles = new LinkedList<Tile>();
 
 	private Tile(TileLoc location, Terrain t) {
 		this.location = location;
 		terr = t;
-
+		
 		liquidType = LiquidType.WATER;
 		liquidAmount = 0;
 		units = new ConcurrentLinkedQueue<Unit>();
+		
 	}
 
 	public static Tile makeTile(TileLoc location, Terrain t) {
@@ -65,6 +68,9 @@ public class Tile {
 
 	public Resource getResource() {
 		return resource;
+	}
+	public GroundModifier getModifier() {
+		return modifier;
 	}
 
 	public void setHasPlant(Plant p) {
@@ -135,6 +141,9 @@ public class Tile {
 			building = b;
 //			building.setHealth(1);
 		}
+	}
+	public void setModifier(GroundModifier gm) {
+		modifier = gm;
 	}
 
 	public void addUnit(Unit u) {
