@@ -7,10 +7,10 @@ import utils.*;
 
 public enum PlantType implements HasImage {
 	
-	BERRY ( new String[] {"resources/Images/plants/berry16.png", "resources/Images/plants/berry128.png"} , 1.0, 5, false),
-	BERRY_DEPLETED ( new String[] {"resources/Images/plants/berry_depleted16.png", "resources/Images/plants/berry_depleted128.png"} , 0.2, 5, false),
-	CATTAIL ( new String[] {"resources/Images/plants/cattail32.png"} , 1.0, 5, true),
-	FOREST1 ( new String[] {"resources/Images/plants/tree1.png"}, 1, 50, false),
+	BERRY ( new String[] {"resources/Images/plants/berry16.png", "resources/Images/plants/berry128.png"} , 1.0, 50, false),
+	BERRY_DEPLETED ( new String[] {"resources/Images/plants/berry_depleted16.png", "resources/Images/plants/berry_depleted128.png"} , 0.2, 1, false),
+	CATTAIL ( new String[] {"resources/Images/plants/cattail32.png"} , 1.0, 50, true),
+	FOREST1 ( new String[] {"resources/Images/plants/tree1.png"}, 1, 100, false),
 //	FOREST2 ( new String[] {"resources/Images/plants/tree2.png"}, 1, 50)
 	;
 	
@@ -48,5 +48,10 @@ public enum PlantType implements HasImage {
 	}
 	public boolean isAquatic() {
 		return aquatic;
+	}
+
+	@Override
+	public String toString() {
+		return Utils.getName(this);
 	}
 }

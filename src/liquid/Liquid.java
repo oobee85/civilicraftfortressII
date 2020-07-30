@@ -39,13 +39,16 @@ public class Liquid {
 //		for(int i = 0; i < totals.length; i++) {
 //			System.out.println("Total " + LiquidType.values()[i].name() + ": " + totals[i]);
 //		}
-		
-		for(int x = 0; x < world.getWidth(); x++) {
-			for(int y = 0; y < world.getHeight(); y++) {
-				liquidAmountsTemp[x][y] = world[new TileLoc(x, y)].liquidAmount;
-				liquidTypesTemp[x][y] = world[new TileLoc(x, y)].liquidType;
-			}
+		for(Tile tile : world.getTilesRandomly()) {
+			liquidAmountsTemp[tile.getLocation().x][tile.getLocation().y] = world[tile.getLocation()].liquidAmount;
+			liquidTypesTemp[tile.getLocation().x][tile.getLocation().y] = world[tile.getLocation()].liquidType;
 		}
+//		for(int x = 0; x < world.getWidth(); x++) {
+//			for(int y = 0; y < world.getHeight(); y++) {
+//				liquidAmountsTemp[x][y] = world[new TileLoc(x, y)].liquidAmount;
+//				liquidTypesTemp[x][y] = world[new TileLoc(x, y)].liquidType;
+//			}
+//		}
 		
 		for(Tile tile : world.getTiles()) {
 			propogate(tile, world);
@@ -63,48 +66,18 @@ public class Liquid {
 			}
 			
 			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount > tile.liquidType.surfaceTension*2) {
-				if(tile.checkTerrain(Terrain.GRASS) ) {
-					tile.setTerrain(Terrain.DIRT);
+				if(tile.checkTerrain(Terrain.GRASS) || tile.checkTerrain(Terrain.DIRT)) {
+					tile.setTerrain(Terrain.BURNED_GROUND);
 				}
 				if(tile.checkTerrain(Terrain.SNOW)) {
 					tile.setTerrain(Terrain.ROCK);
 				}
 			}
-			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				if(tile.checkTerrain(Terrain.DIRT) || tile.checkTerrain(Terrain.GRASS)) {
-					double chance = 0.001 * tile.liquidAmount * tile.liquidType.getDamage();
-					if(Math.random() < chance) {
-						tile.setTerrain(Terrain.SAND);
-					}
-				}
+			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= 0.001) {
+				tile.liquidAmount -= 0.00001;
 			}
-			if(tile.checkTerrain(Terrain.DIRT) || tile.checkTerrain(Terrain.BURNEDGROUND)) {
-				boolean adjacentGrass = false;
-				boolean adjacentWater = false;
-				for(Tile neighbor : Utils.getNeighbors(tile, world)) {
-					if(neighbor.checkTerrain(Terrain.GRASS)) {
-						adjacentGrass = true;
-					}
-					if(neighbor.liquidType == LiquidType.WATER) {
-						adjacentWater = true;
-					}
-				}
-				double threshold = 0;
-				if(tile.liquidType == LiquidType.WATER) {
-					threshold += 0.001;
-				}
-				if(adjacentGrass) {
-					threshold += 0.005;
-				}
-				if(adjacentWater) {
-					threshold += 0.001;
-				}
-				if(adjacentGrass && adjacentWater) {
-					threshold += 0.01;
-				}
-				if(Math.random() < tile.liquidAmount*threshold) {
-					tile.setTerrain(Terrain.GRASS);
-				}
+			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount <= 0.001) {
+				tile.liquidAmount -= 0.00001;
 			}
 		}
 		//Utils.normalize(heightMap);

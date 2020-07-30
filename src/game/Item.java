@@ -1,18 +1,23 @@
 package game;
 
-import utils.Quantity;
+import utils.*;
 
-public class Item extends Quantity{
+public class Item extends Quantity {
 
-	private ItemType resourceType;
-	
-	public Item(int amount, ItemType resourceType) {
+	private ItemType itemType;
+
+	public Item(int amount, ItemType itemType) {
 		super(amount);
-		this.resourceType = resourceType;
+		this.itemType = itemType;
 	}
-	
+
 	public ItemType getResourceType() {
-		return resourceType;
+		return itemType;
 	}
-	
+
+	@Override
+	public String toString() {
+		return itemType;
+	}
+
 }

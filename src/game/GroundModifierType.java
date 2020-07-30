@@ -5,22 +5,29 @@ import java.awt.Image;
 
 import javax.swing.ImageIcon;
 
-import utils.*;
+import utils.HasImage;
+import utils.MipMap;
+import utils.Utils;
 
-public enum RoadType implements HasImage {
-	STONE_ROAD (4, "resources/Images/buildings/castle256.png"),
+public enum GroundModifierType implements HasImage{
+
+	FIRE(new String[] { "resources/Images/lava/lavaanim32.gif" }, 100),
+
 	;
-	
-	private final double speed;
-	private MipMap mipmap;
-	
-	// 	move penalty = penalty/speed
-	RoadType(double speed, String s) {
-		this.speed = speed;
-		mipmap = new MipMap(s);
 
-	}
+	int maxTime;
 	
+	
+	private MipMap mipmap;
+
+	GroundModifierType(String[] s, int maxTime) {
+		this.mipmap = new MipMap(s);
+		this.maxTime = maxTime;
+	}
+
+	public int getMaxTime() {
+		return maxTime;
+	}
 
 	@Override
 	public Image getImage(int size) {
@@ -31,19 +38,15 @@ public enum RoadType implements HasImage {
 	public ImageIcon getImageIcon(int size) {
 		return mipmap.getImageIcon(size);
 	}
-
 	@Override
 	public Color getColor(int size) {
 		return mipmap.getColor(size);
 	}
-
-	public double getSpeed() {
-		return speed;
-	}
-
+	
 	@Override
 	public String toString() {
 		return Utils.getName(this);
 	}
-
+	
+	
 }

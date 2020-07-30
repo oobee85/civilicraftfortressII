@@ -3,6 +3,7 @@ package world;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
+import java.util.List;
 
 import game.*;
 import liquid.*;
@@ -27,7 +28,8 @@ public class World {
 	public LinkedList<Plant> plantsLand = new LinkedList<Plant>();
 	public LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
 	public LinkedList<Unit> units = new LinkedList<Unit>();
-
+	LinkedList<GroundModifier> GroundModifiers = new LinkedList<GroundModifier>();
+	
 	private double bushRarity = 0.005;
 	private double waterPlantRarity = 0.05;
 	private double forestDensity = 0.3;
@@ -69,15 +71,120 @@ public class World {
 	public void rain() {
 		System.out.println("raining");
 		for(Tile tile : getTiles()) {
+			if(tile.getTerrain() != Terrain.SNOW || tile.getTerrain() != Terrain.ROCK) {
+				continue;
+			}
 			if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.DRY) {
 				tile.liquidType = LiquidType.WATER;
-				tile.liquidAmount += 0.005;
+				tile.liquidAmount += 0.01;
 			}
 		}
 	}
+	public void eruptVolcano() {
+		System.out.println("eruption");
+		this[volcano].liquidAmount += 500;
+		
+//		world[volcano].liquidType = LiquidType.WATER;
+//		world[volcano].liquidAmount += 200;
+	}
+	public void tick() {
+		updateGroundModifiers();
+	}
+	public void updateGroundModifiers() {
+		LinkedList<GroundModifier> GroundModifiersNew = new LinkedList<GroundModifier>();
+
+		for(GroundModifier modifier : GroundModifiers) {
+			if(modifier.updateTime() == false) {
+				GroundModifiersNew.add(modifier);
+			}else {
+				modifier.getTile().setModifier(null);
+			}
+		}
+		GroundModifiers = GroundModifiersNew;
+	}
+	public void meteorStrike() {
+		System.err.println("meteor strike");
+		Tile t = this.getTilesRandomly().getFirst();
+		
+		
+		int radius = (int) (Math.random()*20);
+		System.out.println("meteor at:"+t +", " );
+		
+		for(Tile tile : this.getTiles()) {
+			
+			int i =  tile.getLocation().x;
+			int j =  tile.getLocation().y;
+			int dx = i - t.getLocation().x;
+			int dy = j - t.getLocation().y;
+			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
+				
+				
+				if(distanceFromCenter < radius) {
+					tile.setTerrain(Terrain.BURNED_GROUND);
+					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, tile);
+					GroundModifiers.add(fire);
+					tile.setModifier(fire);
+				}
+		}
+		
+		
+	}
+	public void updateTerrainChange(World world) {
+		for(Tile tile : getTiles()) {
+			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+				
+				if(tile.checkTerrain(Terrain.DIRT) || tile.checkTerrain(Terrain.GRASS)) {
+					double chance = 0.001 * tile.liquidAmount * tile.liquidType.getDamage();
+					if(Math.random() < chance) {
+						tile.setTerrain(Terrain.SAND);
+					}
+				}
+			}else if(tile.checkTerrain(Terrain.SAND) && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()){
+				double chance = 0.001 * tile.liquidType.getDamage();
+				if(Math.random() < chance) {
+					tile.setTerrain(Terrain.GRASS);
+				}
+			}
+			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA) {
+				double chance = 0.01;
+				if(Math.random() < chance) {
+					tile.setTerrain(Terrain.DIRT);
+				}
+			}
+			if(tile.checkTerrain(Terrain.DIRT)) {
+				boolean adjacentGrass = false;
+				boolean adjacentWater = false;
+				for(Tile neighbor : Utils.getNeighbors(tile, world)) {
+					if(neighbor.checkTerrain(Terrain.GRASS)) {
+						adjacentGrass = true;
+					}
+					if(neighbor.liquidType == LiquidType.WATER) {
+						adjacentWater = true;
+					}
+				}
+				double threshold = 0;
+				if(tile.liquidType == LiquidType.WATER) {
+					threshold += 0.001;
+				}
+				if(adjacentGrass) {
+					threshold += 0.005;
+				}
+				if(adjacentWater) {
+					threshold += 0.005;
+				}
+				if(adjacentGrass && adjacentWater) {
+					threshold += 0.05;
+				}
+				if(Math.random() < tile.liquidAmount*threshold) {
+					tile.setTerrain(Terrain.GRASS);
+				}
+			}
+		}
+		
+	}
 	
 	public void grow() {
-		System.out.println("Growing plants. Currently " + plantsLand.size() + " land plants and " + plantsAquatic.size() + " aquatic plants.");
+		System.out.println(plantsLand.size() + " land plants and " + plantsAquatic.size() + " aquatic plants.");
 		LinkedList<Plant> newAquatic = new LinkedList<>();
 		LinkedList<Plant> newLand = new LinkedList<>();
 		for(Tile tile : getTiles()) {
@@ -117,15 +224,21 @@ public class World {
 
 		for (Unit unit : units) {
 			Tile tile = unit.getTile();
+			unit.damageTarget();
 			if (tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
-				unit.takeDamage(damageTaken);
+				int roundedDamage = (int) (damageTaken+1);
+				if(roundedDamage >= 1) {
+					unit.takeDamage(roundedDamage);
+				}
+				
 			}
 			if (unit.isDead() == true) {
 				tile.removeUnit(unit);
 			} else {
 				unitsNew.add(unit);
 			}
+			
 		}
 		units = unitsNew;
 	}
@@ -137,7 +250,10 @@ public class World {
 			if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(!plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
 					double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
-					plant.takeDamage(damageTaken);
+					int roundedDamage = (int) (damageTaken+1);
+					if(roundedDamage >= 1) {
+						plant.takeDamage(roundedDamage);
+					}
 				}
 			}
 			if(plant.isDead() == true) {
@@ -155,7 +271,10 @@ public class World {
 				if (plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
 					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
 					double damageTaken = difInLiquids * tile.liquidType.getDamage();
-					plant.takeDamage(damageTaken);
+					int roundedDamage = (int) (damageTaken+1);
+					if(roundedDamage >= 1) {
+						plant.takeDamage(roundedDamage);
+					}
 				}
 			}
 			if (plant.isDead() == true) {
@@ -170,7 +289,7 @@ public class World {
 	public void genPlants() {
 		for(Tile tile : getTiles()) {
 			//generates land plants
-			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoadType() == null && Math.random() < bushRarity) {
+			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoadType() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < bushRarity) {
 				double o = Math.random();
 				if(o < PlantType.BERRY.getRarity()) {
 					Plant p = new Plant(PlantType.BERRY, tile);
@@ -178,10 +297,11 @@ public class World {
 					plantsLand.add(tile.getPlant());
 				}
 			}
+			//tile.liquidType.WATER &&
 			//generates water plants
-			if(tile.checkTerrain(Terrain.WATER) && Math.random() < waterPlantRarity) {
+			if( Math.random() < waterPlantRarity) {
 				double o = Math.random();
-				if(o < PlantType.CATTAIL.getRarity()) {
+				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()  && o < PlantType.CATTAIL.getRarity()) {
 					Plant p = new Plant(PlantType.CATTAIL, tile);
 					tile.setHasPlant(p);
 					plantsAquatic.add(tile.getPlant());
@@ -204,7 +324,7 @@ public class World {
 			double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
 			double forestEdge = (dx*dx)/(forestLengthEdge*forestLengthEdge) + (dy*dy)/(forestHeightEdge*forestHeightEdge);
 			
-			if(tile.canPlant()==true && tile.getRoadType() == null) {
+			if(tile.canPlant() == true && tile.getRoadType() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2) {
 				if((forestEdge < 1 && Math.random()<forestDensity-0.2) 
 						|| (forest < 1 && Math.random() < forestDensity)) {
 					Plant plant = new Plant(PlantType.FOREST1, tile);
@@ -213,6 +333,30 @@ public class World {
 				}	
 			}
 		}
+	}
+	
+	public List<Tile> getNeighbors(Tile tile) {
+		int x = tile.getLocation().x;
+		int y = tile.getLocation().y;
+		int minX = Math.max(0, tile.getLocation().x - 1);
+		int maxX = Math.min(this.getWidth()-1, tile.getLocation().x + 1);
+		int minY = Math.max(0, tile.getLocation().y-1);
+		int maxY = Math.min(this.getHeight()-1, tile.getLocation().y + 1);
+
+		LinkedList<Tile> tiles = new LinkedList<>();
+		for(int i = minX; i <= maxX; i++) {
+			for(int j = minY; j <= maxY; j++) {
+				if(i == x || j == y) {
+					if(i != x || j != y) {
+						if(this[new TileLoc(i, j)] != null) {
+							tiles.add(this[new TileLoc(i, j)]);
+						}
+					}
+				}
+			}
+		}
+		Collections.shuffle(tiles); 
+		return tiles;
 	}
 	
 	public void generateWorld(MapType mapType, int size) {
@@ -229,7 +373,12 @@ public class World {
 				tileListRandom.add(tiles[i][j]);
 			}
 		}
-		volcano = Generation.makeVolcano(tiles, heightMap);
+		
+		for(Tile tile : getTiles()) {
+			tile.setNeighbors(getNeighbors(tile));
+		}
+		
+		volcano = Generation.makeVolcano(this, heightMap);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		
 		for(Tile tile : getTiles()) {
@@ -249,12 +398,12 @@ public class World {
 				else if (tile.getHeight() > 0.4) {
 					t = Terrain.DIRT;
 				}
-				else if (tile.getHeight() > 0) {
+				else {
 					t = Terrain.GRASS;
 				}
-				else {
-					t = Terrain.WATER;
-				}
+//				else {
+//					t = Terrain.WATER;
+//				}
 				tile.setTerrain(t);
 			}
 		}
@@ -301,42 +450,40 @@ public class World {
 
 		Graphics minimapGraphics = minimapImage.getGraphics();
 		Graphics terrainGraphics = terrainImage.getGraphics();
-		for(int i = 0; i < tiles.length; i++) {
-			for(int j = 0; j < tiles[0].length; j++) {
-				Color minimapColor = terrainColors.get(tiles[i][j].getTerrain());
-				Color terrainColor = terrainColors.get(tiles[i][j].getTerrain());
-				if(tiles[i][j].getResourceType() != null) {
-					terrainColor = tiles[i][j].getResourceType().getColor(0);
-					minimapColor = tiles[i][j].getResourceType().getColor(0);
-				}
-				if(tiles[i][j].getRoadType() != null) {
-					terrainColor = Utils.roadColor;
-					minimapColor = Utils.roadColor;
-				}
-				if(tiles[i][j].liquidAmount > 0) {
-					double alpha = Utils.getAlphaOfLiquid(tiles[i][j].liquidAmount);
-					minimapColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), minimapColor, alpha);
-					terrainColor = Utils.blendColors(tiles[i][j].liquidType.getColor(0), terrainColor, alpha);
-				}
-				if(tiles[i][j].getPlant() != null) {
-					terrainColor = tiles[i][j].getPlant().getColor(0);
-					minimapColor = tiles[i][j].getPlant().getColor(0);
-				}
-				if(tiles[i][j].getHasStructure()) {
-					terrainColor = tiles[i][j].getStructure().getColor(0);
-					minimapColor = tiles[i][j].getStructure().getColor(0);
-				}
-				if(tiles[i][j].getIsTerritory()) {
-					minimapColor = Utils.blendColors(Tile.TERRITORY_COLOR, minimapColor, 0.3);
-					terrainColor = Utils.blendColors(Tile.TERRITORY_COLOR, terrainColor, 0.3);
-				}
-				
-				double tilebrightness = tiles[i][j].getBrightness();
-				minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);
-				terrainColor = Utils.blendColors(terrainColor, Color.black, brighnessModifier + tilebrightness);
-				minimapImage.setRGB(i, j, minimapColor.getRGB());
-				terrainImage.setRGB(i, j, terrainColor.getRGB());
+		for(Tile tile : this.getTiles()) {
+			Color minimapColor = terrainColors.get(tile.getTerrain());
+			Color terrainColor = terrainColors.get(tile.getTerrain());
+			if(tile.getResource() != null) {
+				terrainColor = tile.getResource().getType().getColor(0);
+				minimapColor = tile.getResource().getType().getColor(0);
 			}
+			if(tile.getRoadType() != null) {
+				terrainColor = Utils.roadColor;
+				minimapColor = Utils.roadColor;
+			}
+			if(tile.liquidAmount > 0) {
+				double alpha = Utils.getAlphaOfLiquid(tile.liquidAmount);
+				minimapColor = Utils.blendColors(tile.liquidType.getColor(0), minimapColor, alpha);
+				terrainColor = Utils.blendColors(tile.liquidType.getColor(0), terrainColor, alpha);
+			}
+			if(tile.getPlant() != null) {
+				terrainColor = tile.getPlant().getColor(0);
+				minimapColor = tile.getPlant().getColor(0);
+			}
+			if(tile.getHasBuilding()) {
+				terrainColor = tile.getBuilding().getColor(0);
+				minimapColor = tile.getBuilding().getColor(0);
+			}
+			if(tile.getIsTerritory()) {
+				minimapColor = Utils.blendColors(Tile.TERRITORY_COLOR, minimapColor, 0.3);
+				terrainColor = Utils.blendColors(Tile.TERRITORY_COLOR, terrainColor, 0.3);
+			}
+			
+			double tilebrightness = tile.getBrightness();
+			minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);
+			terrainColor = Utils.blendColors(terrainColor, Color.black, brighnessModifier + tilebrightness);
+			minimapImage.setRGB(tile.getLocation().x, tile.getLocation().y, minimapColor.getRGB());
+			terrainImage.setRGB(tile.getLocation().x, tile.getLocation().y, terrainColor.getRGB());
 		}
 		minimapGraphics.dispose();
 		terrainGraphics.dispose();

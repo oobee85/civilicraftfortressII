@@ -100,42 +100,41 @@ public class Generation {
 		return new TileLoc(x0, y0);
 	}
 	
-	public static TileLoc makeVolcano(Tile[][] world, double[][] heightMap) {
-		int x = (int) (Math.random() * world.length);
-		int y = (int) (Math.random() * world.length);
+	public static TileLoc makeVolcano(World world, double[][] heightMap) {
+		int x = (int) (Math.random() * world.getWidth());
+		int y = (int) (Math.random() * world.getHeight());
 		
 		double lavaRadius = 5;
 		double volcanoRadius = 10;
 		double mountainRadius = 20;
 		double mountainEdgeRadius = 23;
 		
-		for(int i = 0; i < world.length; i++) {
-			for(int j = 0; j < world[i].length; j++) {
-				int dx = i - x;
-				int dy = j - y;
-				double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
-				TileLoc p = new TileLoc(i, j);
-				if(distanceFromCenter < mountainEdgeRadius) {
-					
-					double height = 1 - (lavaRadius - distanceFromCenter)/lavaRadius/2;
-					if(distanceFromCenter > lavaRadius) {
-						height = 1 - (distanceFromCenter - lavaRadius)/mountainEdgeRadius;
-					}
-					heightMap[i][j] = Math.max(height, heightMap[i][j]);
-					
-					if(distanceFromCenter < lavaRadius) {
-						world[i][j].setTerrain(Terrain.LAVA);
-						world[i][j].liquidType = LiquidType.LAVA;
-						world[i][j].liquidAmount = 0.2;
-					}else if(distanceFromCenter < volcanoRadius) {
-						world[i][j].setTerrain(Terrain.VOLCANO);
-					}else if(distanceFromCenter < mountainRadius && world[i][j].checkTerrain(Terrain.SNOW) == false) {
-						world[i][j].setTerrain(Terrain.ROCK);
-					}else if(distanceFromCenter < mountainEdgeRadius && Math.random()<rockEdgeRatio) {
-						world[i][j].setTerrain(Terrain.ROCK);
-					}
-				}
+		for(Tile tile : world.getTiles()) {
+			int i =  tile.getLocation().x;
+			int j =  tile.getLocation().y;
+			int dx = i - x;
+			int dy = j - y;
+			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
+			TileLoc p =  tile.getLocation();
+			if(distanceFromCenter < mountainEdgeRadius) {
 				
+				double height = 1 - (lavaRadius - distanceFromCenter)/lavaRadius/2;
+				if(distanceFromCenter > lavaRadius) {
+					height = 1 - (distanceFromCenter - lavaRadius)/mountainEdgeRadius;
+				}
+				heightMap[i][j] = Math.max(height, heightMap[i][j]);
+				
+				if(distanceFromCenter < lavaRadius) {
+					tile.setTerrain(Terrain.VOLCANO);
+					tile.liquidType = LiquidType.LAVA;
+					tile.liquidAmount = 0.2;
+				}else if(distanceFromCenter < volcanoRadius) {
+					tile.setTerrain(Terrain.VOLCANO);
+				}else if(distanceFromCenter < mountainRadius && tile.checkTerrain(Terrain.SNOW) == false) {
+					tile.setTerrain(Terrain.ROCK);
+				}else if(distanceFromCenter < mountainEdgeRadius && Math.random()<rockEdgeRatio) {
+					tile.setTerrain(Terrain.ROCK);
+				}
 			}
 		}
 		return new TileLoc(x, y);
@@ -147,7 +146,10 @@ public class Generation {
 			System.out.println("Tiles of " + resource.name() + ": " + numResource);
 			
 			for(Tile tile : world.getTilesRandomly()) {
-				if(resource.isOre() && tile.canOre() && !tile.getHasResource()) {
+				if(tile.getResource() != null) {
+					continue;
+				}
+				if(resource.isOre() && tile.canOre() ) {
 					// if ore is rare the tile must be able to support rare ore
 					if(!resource.isRare() || tile.canSupportRareOre()) {
 						tile.setResource(resource);
@@ -178,10 +180,10 @@ public class Generation {
 			int i = next.x;
 			int j = next.y;
 //			world[i][j].liquidAmount += volume/5;
-			if(!world[i][j].checkTerrain(Terrain.WATER)) {
-				world[i][j].setTerrain(Terrain.WATER);
-				volume--;
-			}
+//			if(!world[i][j].checkTerrain(Terrain.WATER)) {
+//				world[i][j].setTerrain(Terrain.WATER);
+//				volume--;
+//			}
 			// Add adjacent tiles to the queue
 			if(i > 0 && !visited[i-1][j]) {
 				queue.add(new TileLoc(i-1, j));
@@ -216,22 +218,28 @@ public class Generation {
 			world[next].liquidAmount += 0.02;
 			volume -= 0.02;
 			// Add adjacent tiles to the queue
-			if(i > 0 && !visited[i-1][j]) {
-				queue.add(new TileLoc(i-1, j));
-				visited[i-1][j] = true;
+			for(Tile t : world[next].getNeighbors()) {
+				if(!visited[t.getLocation().x][t.getLocation().y]) {
+					queue.add(t.getLocation());
+					visited[t.getLocation().x][t.getLocation().y] = true;
+				}
 			}
-			if(j > 0 && !visited[i][j-1]) {
-				queue.add(new TileLoc(i, j-1));
-				visited[i][j-1] = true;
-			}
-			if(i + 1 < world.getWidth() && !visited[i+1][j]) {
-				queue.add(new TileLoc(i+1, j));
-				visited[i+1][j] = true;
-			}
-			if(j + 1 < world.getHeight() && !visited[i][j+1]) {
-				queue.add(new TileLoc(i, j+1));
-				visited[i][j+1] = true;
-			}
+//			if(i > 0 && !visited[i-1][j]) {
+//				queue.add(new TileLoc(i-1, j));
+//				visited[i-1][j] = true;
+//			}
+//			if(j > 0 && !visited[i][j-1]) {
+//				queue.add(new TileLoc(i, j-1));
+//				visited[i][j-1] = true;
+//			}
+//			if(i + 1 < world.getWidth() && !visited[i+1][j]) {
+//				queue.add(new TileLoc(i+1, j));
+//				visited[i+1][j] = true;
+//			}
+//			if(j + 1 < world.getHeight() && !visited[i][j+1]) {
+//				queue.add(new TileLoc(i, j+1));
+//				visited[i][j+1] = true;
+//			}
 		}
 	}
 }

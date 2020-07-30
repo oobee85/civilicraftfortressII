@@ -10,9 +10,11 @@ public enum LiquidType implements HasImage {
 		DRY(new String[] {"resources/Images/lava/lavaanim32.gif"}, 
 				0, 1000, 5, 0.08, 0),
 		WATER(new String[] {"resources/Images/water/water16.png", "resources/Images/water/water128.png", "resources/Images/water/water512.png", "resources/Images/water/water1024.jpg"}, 
-				0.2, 0.0005, 5, 0.08, 0),
+				0.2, 0.0005, 10, 0.08, 0),
 		LAVA(new String[] {"resources/Images/lava/lava16.png", "resources/Images/lava/lavaanim32.gif"}, 
-				0.1, 0.005, 100, 0.001, 10)
+				0.1, 0.005, 100, 0.001, 10),
+		FOG(new String[] {"resources/Images/mountain/rock_snow128.png"}, 
+				0.5, 0.0005, 0, 1000, 0),
 		;
 	
 	double viscosity;
@@ -52,5 +54,10 @@ public enum LiquidType implements HasImage {
 	@Override
 	public Color getColor(int size) {
 		return mipmap.getColor(size);
+	}
+
+	@Override
+	public String toString() {
+		return Utils.getName(this);
 	}
 }

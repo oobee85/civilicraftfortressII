@@ -1,12 +1,14 @@
 package utils;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.net.URL;
+import java.awt.image.*;
+import java.net.*;
 import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
 
+import game.*;
+import liquid.*;
 import world.*;
 
 public final class Utils {
@@ -26,6 +28,39 @@ public final class Utils {
 				roadColor = getAverageColor(Utils.toBufferedImage(roadImages.get(s)));
 			}
 		}
+	}
+	
+	public static String getName(Object o) {
+		// TODO use map to record these so I can just lookup
+		String rawName = "";
+		if(o instanceof BuildingType) {
+			rawName = ((BuildingType)o).name();
+		}
+		else if(o instanceof ItemType) {
+			rawName = ((ItemType)o).name();
+		}
+		else if(o instanceof ResearchType) {
+			rawName = ((ResearchType)o).name();
+		}
+		else if(o instanceof RoadType) {
+			rawName = ((RoadType)o).name();
+		}
+		else if(o instanceof UnitType) {
+			rawName = ((UnitType)o).name();
+		}
+		else if(o instanceof LiquidType) {
+			rawName = ((LiquidType)o).name();
+		}
+		else if(o instanceof PlantType) {
+			rawName = ((PlantType)o).name();
+		}
+		else if(o instanceof ResourceType) {
+			rawName = ((ResourceType)o).name();
+		}
+		else if(o instanceof Terrain) {
+			rawName = ((Terrain)o).name();
+		}
+		return rawName.toLowerCase().replace('_', ' ');
 	}
 
 	public static final Image getDefaultSkin() {
@@ -193,25 +228,26 @@ public final class Utils {
 		return tiles;
 	}
 	public static List<Tile> getNeighbors(Tile tile, World world) {
-		int x = tile.getLocation().x;
-		int y = tile.getLocation().y;
-		int minX = Math.max(0, tile.getLocation().x - 1);
-		int maxX = Math.min(world.getWidth()-1, tile.getLocation().x + 1);
-		int minY = Math.max(0, tile.getLocation().y-1);
-		int maxY = Math.min(world.getHeight()-1, tile.getLocation().y + 1);
-
-		LinkedList<Tile> tiles = new LinkedList<>();
-		for(int i = minX; i <= maxX; i++) {
-			for(int j = minY; j <= maxY; j++) {
-				if(i == x || j == y) {
-					if(i != x || j != y) {
-						tiles.add(world[new TileLoc(i, j)]);
-					}
-				}
-			}
-		}
-		Collections.shuffle(tiles); 
-		return tiles;
+		return tile.getNeighbors();
+//		int x = tile.getLocation().x;
+//		int y = tile.getLocation().y;
+//		int minX = Math.max(0, tile.getLocation().x - 1);
+//		int maxX = Math.min(world.getWidth()-1, tile.getLocation().x + 1);
+//		int minY = Math.max(0, tile.getLocation().y-1);
+//		int maxY = Math.min(world.getHeight()-1, tile.getLocation().y + 1);
+//
+//		LinkedList<Tile> tiles = new LinkedList<>();
+//		for(int i = minX; i <= maxX; i++) {
+//			for(int j = minY; j <= maxY; j++) {
+//				if(i == x || j == y) {
+//					if(i != x || j != y) {
+//						tiles.add(world[new TileLoc(i, j)]);
+//					}
+//				}
+//			}
+//		}
+//		Collections.shuffle(tiles); 
+//		return tiles;
 	}
 	public static double getRandomNormal(int tries) {
 		double rand = 0;

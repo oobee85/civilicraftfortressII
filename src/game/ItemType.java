@@ -1,34 +1,56 @@
 package game;
 
 import java.awt.*;
+import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 
-import utils.HasImage;
-import utils.MipMap;
+import utils.*;
 
-public enum ItemType implements HasImage{
+public enum ItemType implements HasImage {
 	
-	COPPER_ORE ( "resources/Images/itemicons/copper_ore.png"),
-	IRON_ORE ( "resources/Images/itemicons/iron_ore.png"),
-	SILVER_ORE ( "resources/Images/itemicons/silver_ore.png"),
-	MITHRIL_ORE ( "resources/Images/itemicons/mithril_ore.png"),
-	GOLD_ORE ( "resources/Images/itemicons/gold_ore.png"),
-	ADAMANTITE_ORE ( "resources/Images/itemicons/adamantite_ore.png"),
-	RUNITE_ORE ( "resources/Images/itemicons/runite_ore.png"),
-	TITANIUM_ORE ( "resources/Images/itemicons/titanium_ore.png"),
-	WHEAT ( "resources/Images/itemicons/wheat.png"),
-	HORSE ( "resources/Images/units/horse.png"),
-	WOOD ( "resources/Images/itemicons/wood.png"),
-	ROCK ( "resources/Images/itemicons/rock.png")
+	COPPER_ORE ( "resources/Images/itemicons/copper_ore.png", null, null),
+	IRON_ORE ( "resources/Images/itemicons/iron_ore.png", ResearchType.IRON_WORKING, null),
+	SILVER_ORE ( "resources/Images/itemicons/silver_ore.png", null, null),
+	MITHRIL_ORE ( "resources/Images/itemicons/mithril_ore.png", null, null),
+	GOLD_ORE ( "resources/Images/itemicons/gold_ore.png", null, null),
+	ADAMANTITE_ORE ( "resources/Images/itemicons/adamantite_ore.png", null, null),
+	RUNITE_ORE ( "resources/Images/itemicons/runite_ore.png", null, null),
+	TITANIUM_ORE ( "resources/Images/itemicons/titanium_ore.png", null, null),
+	FOOD ( "resources/Images/itemicons/wheat.png", null, null),
+	HORSE ( "resources/Images/units/horse.png", ResearchType.HORSEBACK_RIDING, null),
+	WOOD ( "resources/Images/itemicons/wood.png", null, null),
+	ROCK ( "resources/Images/itemicons/rock.png", null, null),
+	
+	COPPER_BAR ( "resources/Images/itemicons/copper_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,10); }}),
+	IRON_BAR ( "resources/Images/itemicons/iron_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.IRON_ORE,10);  }}),
+	BRONZE_BAR ( "resources/Images/itemicons/bronze_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,5); put(ItemType.SILVER_ORE, 5); }}),
+	SILVER_BAR ( "resources/Images/itemicons/silver_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.SILVER_ORE,10); }}),
+	MITHRIL_BAR ( "resources/Images/itemicons/mithril_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_ORE,10);  }}),
+	GOLD_BAR ( "resources/Images/itemicons/gold_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.GOLD_ORE,10);  }}),
+	ADAMANTITE_BAR ( "resources/Images/itemicons/adamantite_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.ADAMANTITE_ORE,10);  }}),
+	RUNITE_BAR ( "resources/Images/itemicons/runite_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.RUNITE_ORE,10);  }}),
+	TITANIUM_BAR ( "resources/Images/itemicons/copper_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.TITANIUM_ORE,10);  }}),
+	
+	
 	;
 	
 	private MipMap mipmap;
-	private String name;
+	private ResearchType researchRequirement;
+	private HashMap <ItemType, Integer> cost;
 	
-	ItemType(String s) {
+	ItemType(String s, ResearchType researchNeeded, HashMap <ItemType, Integer> resourcesNeeded) {
 		 this.mipmap = new MipMap(s);
-		 name = this.name().toLowerCase().replace('_', ' ');
+		 researchRequirement = researchNeeded;
+		 cost = resourcesNeeded;
+	}
+	
+	public ResearchType getResearchRequirement() {
+		return researchRequirement;
+	}
+	
+	public HashMap<ItemType, Integer> getCost(){
+		return cost;
 	}
 
 	@Override
@@ -46,8 +68,8 @@ public enum ItemType implements HasImage{
 		return mipmap.getColor(size);
 	}
 	
-	 @Override
+	@Override
 	public String toString() {
-		return name;
+		return Utils.getName(this);
 	}
 }

@@ -1,6 +1,7 @@
 package ui;
 import java.awt.*;
 import java.util.List;
+import java.util.Map.*;
 import java.awt.image.*;
 import java.util.*;
 
@@ -12,6 +13,12 @@ import wildlife.*;
 import world.*;
 
 public class Game {
+	
+	private Font damageFont = new Font("Comic Sans MS", Font.BOLD, 14);
+	private Image redHitsplatImage = Utils.loadImage("resources/Images/interfaces/redhitsplat.png");
+	private Image blueHitsplatImage = Utils.loadImage("resources/Images/interfaces/bluehitsplat.png");
+	private Image greenHitsplatImage = Utils.loadImage("resources/Images/interfaces/greenhitsplat.png");
+	private Image targetImage = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
 	public static final int NUM_DEBUG_DIGITS = 3;
 	public static int ticks;
 	private int skipUntilTick;
@@ -19,16 +26,25 @@ public class Game {
 	private BufferedImage minimapImage;
 	private BufferedImage heightMapImage;
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
-	private Unit selectedUnit;
-	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
-	LinkedList<Building> buildings = new LinkedList<Building>();
-	LinkedList<Structure> structures = new LinkedList<Structure>();
+	private Thing selectedThing;
+	private UnitType selectedUnitToSpawn;
 	
-	public static int tileSize = 10;
+	LinkedList<Building> buildings = new LinkedList<Building>();
+	
+	
+	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
+	HashMap<ResearchType, Research> researches = new HashMap<>();
+	
+	HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
+	HashMap<UnitType, ResearchRequirement> unitResearchRequirements = new HashMap<>();
+	HashMap<ItemType, ResearchRequirement> craftResearchRequirements = new HashMap<>();
+	
+	private Research researchTarget;
+	
+	public static int tileSize = 25;
 	private int money;
 	private Position viewOffset;
 	private TileLoc hoveredTile;
-	private BuildMode currentMode;
 	private boolean showHeightMap;
 	
 	private volatile int panelWidth;
@@ -46,13 +62,70 @@ public class Game {
 		money = 100;
 		hoveredTile = new TileLoc(-1,-1);
 		viewOffset = new Position(0, 0);
-		currentMode = BuildMode.NOMODE;
 		showHeightMap = false;
 		
-		for(ItemType resourceType : ItemType.values()) {
-			Item resource = new Item(0, resourceType);
-			resources.put(resourceType, resource);
+		for(ItemType itemType : ItemType.values()) {
+			Item item = new Item(0, itemType);
+			if(itemType == ItemType.WOOD || itemType == ItemType.ROCK || itemType == ItemType.FOOD) {
+				item = new Item(200, itemType);
+			}
+			resources.put(itemType, item);
 		}
+		for(ResearchType researchType : ResearchType.values()) {
+			Research res = new Research(researchType);
+			researches.put(researchType, res);
+		}
+		for(Research research : researches.values()) {
+			for(ResearchType requiredType : research.getType().getChildren()) {
+				research.getRequirement().addRequirement(researches[requiredType]);
+			}
+		}
+		for(BuildingType type : BuildingType.values()) {
+			// make a new researchrequirement object
+			ResearchRequirement req = new ResearchRequirement();
+			// only add requirement if it isnt null
+			if(type.getResearchRequirement() != null) {
+				// get the research that type requires
+				Research typesRequirement = researches[type.getResearchRequirement()];
+				// add the required research to the req
+				req.addRequirement(typesRequirement);
+			}
+			// put it in the hashmap
+			buildingResearchRequirements.put(type, req);
+		}
+		for(UnitType type : UnitType.values()) {
+			// make a new researchrequirement object
+			ResearchRequirement req = new ResearchRequirement();
+			// only add requirement if it isnt null
+			if(type.getResearchRequirement() != null) {
+				// get the research that type requires
+				Research typesRequirement = researches[type.getResearchRequirement()];
+				// add the required research to the req
+				req.addRequirement(typesRequirement);
+			}
+			// put it in the hashmap
+			unitResearchRequirements.put(type, req);
+		}
+		for(ItemType type : ItemType.values()) {
+			// make a new researchrequirement object
+			ResearchRequirement req = new ResearchRequirement();
+			// only add requirement if it isnt null
+			if(type.getResearchRequirement() != null) {
+				// get the research that type requires
+				Research typesRequirement = researches[type.getResearchRequirement()];
+				// add the required research to the req
+				req.addRequirement(typesRequirement);
+			}
+			// put it in the hashmap
+			craftResearchRequirements.put(type, req);
+		}
+		
+		resources[ItemType.IRON_ORE].addAmount(200);
+		resources[ItemType.COPPER_ORE].addAmount(200);
+		resources[ItemType.HORSE].addAmount(200);
+		resources[ItemType.FOOD].addAmount(2000);
+		resources[ItemType.WOOD].addAmount(2000);
+		resources[ItemType.ROCK].addAmount(2000);
 		
 	}
 	
@@ -64,55 +137,60 @@ public class Game {
 		
 		if(ticks%20 == 0) {
 			updateTerritory();
+			doResearch();
 			changedTerrain = true;
 		}
-//		if(Math.random() < 0.01) {
-//			for(int x = 0; x < world2.getWidth(); x++) {
-//				for(int y = 0; y < world2.getHeight(); y++) {
-//					world[x][y].liquidAmount *= 0.5;
-//				}
-//			}
-//			makeLake(100);
-//			changedTerrain = true;
-//		}
-		
 		
 		if(ticks == 1) {
 			world.rain();
 		}
+		world.tick();
 		// rain event
-		if(Math.random() < 0.001) {
+		if(Math.random() < 0.005) {
 			world.rain();
 		}
 		if(Math.random() < 0.01) {
 			world.grow();
 		}
-		if(ticks%1 == 0) {
-			if(world.volcano != null) {
-				world[world.volcano].liquidType = LiquidType.LAVA;
-				world[world.volcano].liquidAmount += .05;
+		if(world.volcano != null) {
+			world[world.volcano].liquidType = LiquidType.LAVA;
+//			world[world.volcano].liquidAmount += .01;
+			if(Math.random() < 0.0001) {
+				eruptVolcano();
 			}
-			Liquid.propogate(world);
-			changedTerrain = true;
 		}
 		
-		Wildlife.tick(world);
-		world.updatePlantDamage();
+		Liquid.propogate(world);
+		changedTerrain = true;
+		
 		world.updateUnitDamage();
+		
+		if(ticks%5 == 0) {
+			world.updatePlantDamage();
+			
+			updateBuildingDamage();
+			Wildlife.tick(world);
+		}
+		
+		world.updateTerrainChange(world);
 		if(ticks%5 == 0) {
 			updateBuildingAction();
 			changedTerrain = true;
 		}
-		moveUnits();
-		updateBuildingDamage();
-		updateStructureDamage();
+		unitTick();
+		
 		
 		guiController.updateGUI();
 		if(changedTerrain) {
 			updateTerrainImages();
 		}
 	}
-	
+	public void eruptVolcano() {
+		world.eruptVolcano();
+	}
+	public void meteorStrike(){
+		world.meteorStrike();
+	}
 	public void generateWorld(MapType mapType, int size) {
 		world = new World();
 		world.generateWorld(mapType, size);
@@ -130,18 +208,52 @@ public class Game {
 	public void updateBuildingAction() {
 		
 		for(Building building : buildings) {
-			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getHasResource() == true) {
-				resources.get(building.getTile().getResourceType().getResourceType()).addAmount(1);
+			if(!building.isBuilt()) {
+				continue;
 			}
+			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResource() != null && building.getTile().getResource().getType().isOre() == true) {
+				resources.get(building.getTile().getResource().getType().getItemType()).addAmount(1);
+				building.getTile().getResource().harvest(1);
+				if(building.getTile().getResource().getYield() <= 0) {
+					building.getTile().setResource(null);
+				}
+			}
+			
 			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getTerrain() == Terrain.ROCK) {
 				resources.get(ItemType.ROCK).addAmount(1);
 			}
 			if(building.getBuildingType() == BuildingType.IRRIGATION && building.getTile().canPlant() == true) {
-				resources.get(ItemType.WHEAT).addAmount(1);
+				//irrigation produces extra food when placed on water
+				if(building.getTile().liquidType == LiquidType.WATER && building.getTile().liquidAmount > 0) {
+					int extraFood = (int) (building.getTile().liquidAmount * 100);
+					resources.get(ItemType.FOOD).addAmount(1 + extraFood);
+				}else {
+					resources.get(ItemType.FOOD).addAmount(1);
+				}
+				
 			}
 			if(building.getBuildingType() == BuildingType.SAWMILL) {
-				resources.get(ItemType.WOOD).addAmount(1);
+				for(Tile t : building.getTile().getNeighbors()) {
+					if(t.getPlant() != null && t.getPlant().getPlantType() == PlantType.FOREST1) {
+						t.getPlant().harvest(1);
+						t.getPlant().takeDamage(1);
+						resources.get(ItemType.WOOD).addAmount(1);
+					}
+				}
+				
 			}
+			if(building.getBuildingType() == BuildingType.FARM && building.getTile().hasUnit(UnitType.HORSE)) {
+				resources.get(ItemType.HORSE).addAmount(1);
+				resources.get(ItemType.FOOD).addAmount(1);
+			}
+			
+			if(building.getTile().getPlant() != null) {
+				if(building.getBuildingType() == BuildingType.FARM && building.getTile().getPlant().getPlantType() == PlantType.BERRY) {
+					resources.get(ItemType.FOOD).addAmount(1);
+					building.getTile().getPlant().takeDamage(1);
+				}
+			}
+			
 		}
 		
 	}
@@ -171,30 +283,9 @@ public class Game {
 		buildings = buildingsNew;
 		
 	}
-	public void updateStructureDamage() {
-		LinkedList<Structure> structuresNew = new LinkedList<Structure>();
-
-		for (Structure structure : structures) {
-			Tile tile = structure.getTile();
-			if (tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
-				structure.takeDamage(damageTaken);
-
-			}
-		}	
-		
-		for (Structure structure : structures) {
-
-			Tile tile = structure.getTile();
-			if (structure.isDead() == true) {
-				tile.setStructure(null);
-			} else {
-				structuresNew.add(structure);
-			}
-		}
-		structures = structuresNew;
-		
-	}
+	
+	
+	
 	
 	public void setViewSize(int width, int height) {
 		panelWidth = width;
@@ -310,8 +401,11 @@ public class Game {
 		}
 		System.out.println("road iterations: " + iterations);
 		
-		for(Tile t : selectedPath.getTiles()) {
-			t.setRoad(RoadType.ROAD_STONE, "asdf");
+		if(selectedPath != null) {
+			for(Tile t : selectedPath.getTiles()) {
+				if(t != null) 
+					t.setRoad(RoadType.STONE_ROAD, "asdf");
+			}
 		}
 	}
 
@@ -363,7 +457,7 @@ public class Game {
 				s += d;
 			}
 		}
-		world[loc].setRoad(RoadType.ROAD_STONE, s);
+		world[loc].setRoad(RoadType.STONE_ROAD, s);
 	}
 	private void turnRoads() {
 		for(Tile tile : world.getTiles()) {
@@ -372,13 +466,25 @@ public class Game {
 		}
 	}
 	private void makeCastle() {
-		for(Tile tile :world.getTilesRandomly()) {
-			if(tile.getRoadType() != null && tile.canBuild() == true && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+		int borderPadCastle = 10;
+		for (Tile tile : world.getTilesRandomly()) {
+			if (tile.getRoadType() != null && tile.canBuild() == true
+					&& tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()
+					&& tile.getTerrain() != Terrain.ROCK) {
+				if(Math.abs(tile.getLocation().x - world.getWidth()) <= borderPadCastle || tile.getLocation().x < borderPadCastle
+						|| Math.abs(tile.getLocation().y - world.getHeight()) <= borderPadCastle || tile.getLocation().y < borderPadCastle) {
+					System.out.println("dX"+ (tile.getLocation().x - world.getWidth()) );
+					System.out.println("dY"+ (tile.getLocation().y - world.getHeight()) );
+					System.out.println("location"+ (tile.getLocation()) );
+					continue;
+				}
 				buildUnit(UnitType.WORKER, tile);
-				Structure s = new Structure(StructureType.CASTLE, tile);
-				tile.setStructure(s);
-				structures.add(s);
-				
+				Building s = new Building(BuildingType.CASTLE, tile);
+				tile.setBuilding(s);
+				buildings.add(s);
+				s.setRemainingEffort(0);
+				viewOffset.x += (tile.getLocation().x - 20) * tileSize;
+				viewOffset.y += (tile.getLocation().y - 20) * tileSize;
 				break;
 			}
 		}
@@ -406,20 +512,25 @@ public class Game {
 			if(showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
-						highest = Math.max(highest, world[new TileLoc(i, j)].getHeight());
-						lowest = Math.min(lowest, world[new TileLoc(i, j)].getHeight());
+						Tile tile = world[new TileLoc(i, j)];
+						if(tile == null)
+							continue;
+						highest = Math.max(highest, tile.getHeight());
+						lowest = Math.min(lowest, tile.getHeight());
 					}
 				}
 			}
 			for (int i = lowerX; i < upperX; i++) {
 				for (int j = lowerY; j < upperY; j++) {
 					Tile t = world[new TileLoc(i, j)];
+					if(t == null)
+						continue;
 					int x = t.getLocation().x * Game.tileSize;
 					int y = t.getLocation().y * Game.tileSize;
 					int w = Game.tileSize;
 					int h = Game.tileSize;
 					
-					if(t.getHasStructure() == true) {
+					if(t.getHasBuilding() == true) {
 						setTerritory(new TileLoc(i,j));
 					}
 					
@@ -430,8 +541,8 @@ public class Game {
 						g.drawImage(t.getTerrain().getImage(Game.tileSize), x, y, w, h, null);
 //						t.drawEntities(g, currentMode);
 						
-						if(t.getHasResource()) {
-							g.drawImage(t.getResourceType().getImage(Game.tileSize), x, y, w, h, null);
+						if(t.getResource() != null) {
+							g.drawImage(t.getResource().getType().getImage(Game.tileSize), x, y, w, h, null);
 						}
 						if(t.getIsTerritory()) {
 							g.setColor(Tile.TERRITORY_COLOR);
@@ -455,28 +566,56 @@ public class Game {
 							g.fillRect(x + Game.tileSize/2 - size/2, y + Game.tileSize/2 - size/2, size, size);
 							g.drawImage(t.liquidType.getImage(Game.tileSize), x + Game.tileSize/2 - size/2, y + Game.tileSize/2 - size/2, size, size, null);
 						}
+						if(t.getModifier() != null) {
+							g.drawImage(t.getModifier().getType().getImage(Game.tileSize), x, y, w, h, null);
+						}
 					}
 				}
 			}
 			for(Plant p : world.plantsLand) {
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				drawHitsplat(g, p);
 				drawHealthBar(g, p);
 			}
 			for(Plant p : world.plantsAquatic) {
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				drawHitsplat(g, p);
 				drawHealthBar(g, p);
 			}
+			
 			for(Building b : this.buildings) {
-				g.drawImage(b.getImage(0), b.getTile().getLocation().x * Game.tileSize, b.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				if(b.getIsSelected()) {
+					g.setColor(Color.pink);
+					Utils.setTransparency(g, 0.8f);
+					Graphics2D g2d = (Graphics2D)g;
+					Stroke currentStroke = g2d.getStroke();
+					int strokeWidth = Game.tileSize /8;
+					g2d.setStroke(new BasicStroke(strokeWidth));
+					g.drawOval(b.getTile().getLocation().x * Game.tileSize + strokeWidth/2, b.getTile().getLocation().y * Game.tileSize + strokeWidth/2, Game.tileSize-1 - strokeWidth, Game.tileSize-1 - strokeWidth);
+					g2d.setStroke(currentStroke);
+					Utils.setTransparency(g, 1f);
+				}
+				BufferedImage bI = Utils.toBufferedImage(b.getImage(0));
+				double percentDone = 1 - b.getRemainingEffort()/b.getBuildingType().getBuildingEffort();
+				int h =  Math.max(1, (int) (bI.getHeight() * percentDone));
+				int tileh = Math.max(1, (int) (Game.tileSize * percentDone));
+				bI = bI.getSubimage(0, bI.getHeight() - h, bI.getWidth(), h);
+				g.drawImage(bI, b.getTile().getLocation().x * Game.tileSize, b.getTile().getLocation().y * Game.tileSize - tileh + Game.tileSize, Game.tileSize, tileh , null);
+				drawHitsplat(g, b);
 				drawHealthBar(g, b);
-			}
-			for(Structure s : this.structures) {
-				g.drawImage(s.getImage(0), s.getTile().getLocation().x * Game.tileSize, s.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
-				drawHealthBar(g, s);
+				if(b.isBuilt() == false) {
+					int x = (int) ((b.getTile().getLocation().x * Game.tileSize) + Game.tileSize*.25);
+					int y = (int) ((b.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.25);
+					int w = (int) (Game.tileSize*.75);
+					int hi = (int)(Game.tileSize*.75);
+					g.drawImage(Utils.loadImage("resources/Images/interfaces/building.PNG"), x, y, w, hi, null);
+				}
 			}
 			for(Animal animal : Wildlife.getAnimals()) {
 				g.drawImage(animal.getImage(0), animal.getTile().getLocation().x * Game.tileSize, animal.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				drawHitsplat(g, animal);
 				drawHealthBar(g, animal);
+		
 			}
 			for(Unit unit : world.units) {
 				if(unit.getIsSelected()) {
@@ -491,12 +630,17 @@ public class Game {
 					Utils.setTransparency(g, 1f);
 				}
 				g.drawImage(unit.getImage(0), unit.getTile().getLocation().x * Game.tileSize, unit.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				drawTarget(g, unit);
+				drawHitsplat(g, unit);
 				drawHealthBar(g, unit);
 			}
 			if(!showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
-						double brightness = world.getDaylight() + world[new TileLoc(i, j)].getBrightness();
+						Tile tile = world[new TileLoc(i, j)];
+						if(tile == null)
+							continue;
+						double brightness = world.getDaylight() + tile.getBrightness();
 						brightness = Math.max(Math.min(brightness, 1), 0);
 						g.setColor(new Color(0, 0, 0, (int)(255 * (1 - brightness))));
 						g.fillRect(i * Game.tileSize, j * Game.tileSize, Game.tileSize, Game.tileSize);
@@ -530,6 +674,9 @@ public class Game {
 							if(world[loc].liquidType != LiquidType.DRY) {
 								g.drawString(String.format(world[loc].liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount), x, y + (++rows[i][j])*fontsize);
 							}
+							if(world[loc].getModifier() != null) {
+								g.drawString(world[loc].getModifier().timeLeft() + "", x, y + (++rows[i][j])*fontsize);
+							}
 						}
 					}
 					for(Animal animal : Wildlife.getAnimals()) {
@@ -544,9 +691,6 @@ public class Game {
 					for(Building building : buildings) {
 						building.getTile().drawDebugStrings(g, building.getDebugStrings(), rows, fontsize, stringWidth);
 					}
-					for(Structure structure : structures) {
-						structure.getTile().drawDebugStrings(g, structure.getDebugStrings(), rows, fontsize, stringWidth);
-					}
 				}
 			}
 			g.setColor(new Color(0, 0, 0, 64));
@@ -555,6 +699,97 @@ public class Game {
 		}
 	}
 
+	public void drawHitsplat(Graphics g, Thing thing) {
+		
+		if(thing.getHitsplatList().isEmpty() == false) {
+			thing.updateHitsplats();
+			LinkedList<Hitsplat> hitsplats = thing.getHitsplatList();
+			
+			for(int m = 0; m < hitsplats.size(); m ++) {
+				
+				int i = hitsplats.get(m).getSquare();
+//				int x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*.25);
+//				int y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.25);
+				int w = (int) (Game.tileSize*.5);
+				int hi = (int) (Game.tileSize*.5);
+				
+				int x = (int) ((thing.getTile().getLocation().x * Game.tileSize) );
+				int y = (int) ((thing.getTile().getLocation().y * Game.tileSize) );
+				
+				if(i == 1) {
+					x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*0.5);
+					y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*0.5);
+				}
+				if(i == 2) {
+					x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*0.5);
+					y = (int) ((thing.getTile().getLocation().y * Game.tileSize) );
+				}
+				if( i == 3) {
+					x = (int) ((thing.getTile().getLocation().x * Game.tileSize) );
+					y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*0.5);
+				}
+				
+				String text = String.format("%.0f", thing.getHitsplatDamage());
+
+				if(thing.getHitsplatDamage() > 0) {
+					g.drawImage(redHitsplatImage, x, y, w, hi, null);
+				}else if(thing.getHitsplatDamage() == 0){
+					g.drawImage(blueHitsplatImage, x, y, w, hi, null);
+				}
+				else if(thing.getHitsplatDamage() < 0) {
+//					g.drawImage(greenHitsplatImage, x, y, w, hi, null);
+//					text = String.format("%.0f", thing.getHitsplatDamage() * -1);
+					return;
+				}
+				
+				int fontSize = Game.tileSize/4;
+				g.setFont(new Font(damageFont.getFontName(), Font.BOLD, fontSize));
+				int width = g.getFontMetrics().stringWidth(text);
+				g.setColor(Color.WHITE);
+//				g.drawString(text, x-width/2, y+fontSize*4/10);
+				
+				g.drawString(text, x+width, (int) (y+fontSize*1.5));
+			}
+		}
+		
+//		if(thing.hasHitsplat()) {
+//			thing.updateHitsplats();
+//			
+//			int x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*.5);
+//			int y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.5);
+//			int w = (int) (Game.tileSize*.5);
+//			int hi = (int) (Game.tileSize*.5);
+//			
+//			String text = String.format("%.0f", thing.getHitsplatDamage());
+//			
+//			if(thing.getHitsplatDamage() > 0) {
+//				g.drawImage(redHitsplatImage, x - w/2, y - hi/2, w, hi, null);
+//			}else if(thing.getHitsplatDamage() == 0){
+//				g.drawImage(blueHitsplatImage, x - w/2, y - hi/2, w, hi, null);
+//			}else if(thing.getHitsplatDamage() < 0) {
+//				g.drawImage(greenHitsplatImage, x - w/2, y - hi/2, w, hi, null);
+//				text = String.format("%.0f", thing.getHitsplatDamage() * -1);
+//			}
+//			
+//			int fontSize = Game.tileSize/4;
+//			g.setFont(new Font(damageFont.getFontName(), Font.BOLD, fontSize));
+//			int width = g.getFontMetrics().stringWidth(text);
+//			g.setColor(Color.WHITE);
+//			
+//			g.drawString(text, x-width/2, y+fontSize*4/10);
+//		}
+	}
+	public void drawTarget(Graphics g, Unit unit) {
+		if(unit.getTarget() != null) {
+			Unit target = unit.getTarget();
+			int x = (int) ((target.getTile().getLocation().x * Game.tileSize + Game.tileSize*1/10) );
+			int y = (int) ((target.getTile().getLocation().y * Game.tileSize + Game.tileSize*1/10) );
+			int w = (int) (Game.tileSize*8/10);
+			int hi = (int)(Game.tileSize*8/10);
+			g.drawImage(targetImage, x, y, w, hi, null);
+		}
+	}
+	
 	public void drawHealthBar(Graphics g, Thing thing) {
 		if( Game.tileSize <= 30) {
 			return;
@@ -585,13 +820,50 @@ public class Game {
 		}
 	}
 	private void updateTerritory() {
-		for(Structure structure : structures) {
-			structure.updateCulture();
+		for(Building building : buildings) {
+			building.updateCulture();
+		}
+	}
+	private void doResearch() {
+		if(researchTarget != null) {
+			researchTarget.spendResearch(50);
+			if(researchTarget.isUnlocked()) {
+				guiController.updateGUI();
+			}
+		}
+	}
+	
+	public void craftItem(ItemType type) {
+		
+		for (Map.Entry mapElement : type.getCost().entrySet()) {
+			ItemType key = (ItemType) mapElement.getKey();
+			Integer value = (Integer) mapElement.getValue();
+
+			if (resources[key].getAmount() < value) {
+				return;
+			}
+		}
+
+		for (Map.Entry mapElement : type.getCost().entrySet()) {
+			ItemType key = (ItemType) mapElement.getKey();
+			Integer value = (Integer) mapElement.getValue();
+
+			resources[key].addAmount(-value);
+			resources[type].addAmount(1);
+		}
+
+
+			
+	}
+	
+	public void setResearchTarget(ResearchType type) {
+		if(researches[type].getRequirement().areRequirementsMet()) {
+			researchTarget = researches[type];
 		}
 	}
 	private void setTerritory(TileLoc p) {
-		int culture = world[p].getStructure().getCulture();
-		double area = culture * Structure.CULTURE_AREA_MULTIPLIER;
+		double culture = world[p].getBuilding().getCulture();
+		double area = culture * Building.CULTURE_AREA_MULTIPLIER;
 		double radius = Math.sqrt(area);
 		expandTerritory(radius, p);	
 	}
@@ -609,14 +881,37 @@ public class Game {
 		}
 	}
 	
-	public void rightClick(int mx, int my) {
+	public void leftClick(int mx, int my) {
 		Position tilepos = getTileAtPixel(new Position(mx,my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
+		Tile tile = world[loc];
 		
-		guiController.openRightClickMenu(mx, my, world[loc]);
+		System.out.println("left click");
+		if(selectedUnitToSpawn != null) {
+			System.out.println("trying to spawn unit" + selectedUnitToSpawn.toString() + loc.toString());
+			Unit unit = new Unit(selectedUnitToSpawn, tile, true);
+			tile.addUnit(unit);
+			world.units.add(unit);
+			selectedUnitToSpawn = null;
+			return;
+		}
+		
+		toggleUnitSelectOnTile(tile);
+		
+		
+//		guiController.openRightClickMenu(mx, my, world[loc]);
+	}
+	public void toggleTargetEnemy(Tile tile) {
+		if(selectedThing instanceof Unit) {
+			Unit unit = (Unit) selectedThing;
+			Unit targetUnit = tile.getUnits().peek();
+			if(targetUnit != unit && targetUnit.isPlayerControlled() == false) {
+				unit.setTarget(targetUnit);
+			}
+			
+		}
 		
 	}
-	
 
 	public static void printPoint(Point p) {
 		System.out.println("Point: (" + p.x + ", " + p.y + ")");
@@ -639,33 +934,67 @@ public class Game {
 	public void mouseClick(int mx, int my) {
 		Position pos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
-		System.out.println(currentMode);
 		Tile tile = world[loc];
-		if(currentMode == BuildMode.NOMODE && tile.hasPlayerControlledUnit() == true) {
-			toggleUnitSelectOnTile(tile);
-		}
-		if(currentMode == BuildMode.NOMODE) {
-			setDestination(mx, my);
+		setDestination(mx, my);
+		if(tile.getUnits().isEmpty() == false) {
+			toggleTargetEnemy(tile);
 		}
 	}
+
 	public void toggleUnitSelectOnTile(Tile tile) {
-		if(tile.hasPlayerControlledUnit()) {
-			if(tile.getPlayerControlledUnit() == selectedUnit) {
-				deselectUnit();
-			}
-			else {
-				deselectUnit();
-				selectedUnit = tile.getPlayerControlledUnit();
-				selectedUnit.setIsSelected(true);
-			}
+		Thing selectionCandidate = tile.getPlayerControlledThing();
+		if (selectionCandidate == null) {
+			return;
 		}
-		
+		if (selectionCandidate == selectedThing) {
+			deselectThing();
+			// clicking on current selection
+		} else {
+			// clicking on new selection
+			deselectThing();
+			selectionCandidate.setIsSelected(true);
+			if (selectionCandidate instanceof Unit && ((Unit) selectionCandidate).getUnitType() == UnitType.WORKER) {
+				guiController.selectedWorker(true);
+			}
+			if (selectionCandidate instanceof Building) {
+				guiController.selectedBuilding(((Building) selectionCandidate).getBuildingType(), true);
+			}
+			selectedThing = selectionCandidate;
+		}
+
 	}
-	public void deselectUnit() {
-		if(selectedUnit != null) {
-			selectedUnit.setIsSelected(false);
-			selectedUnit = null;
+
+	public void deselectThing() {
+		if (selectedThing != null) {
+			selectedThing.setIsSelected(false);
+			if (selectedThing instanceof Unit) {
+
+				Unit selectedUnit = (Unit) selectedThing;
+				if (selectedUnit.getUnitType() == UnitType.WORKER) {
+					guiController.selectedWorker(false);
+				}
+				
+				selectedThing = null;
+			}
+			if (selectedThing instanceof Building) {
+				guiController.selectedBuilding(((Building) selectedThing).getBuildingType(), false);
+				selectedThing = null;
+			}
+		
+			
 		}
+	}
+	public void spawnUnit(boolean show) {
+		guiController.selectedSpawnUnit(show);
+	}
+	
+	public void unitStop() {
+		if (selectedThing instanceof Unit) {
+			Unit selectedUnit = (Unit) selectedThing;
+			selectedUnit.setTarget(null);
+			selectedUnit.setTargetTile(null);
+		}
+
 	}
 	
 	public void setDestination(int mx, int my) {
@@ -674,14 +1003,13 @@ public class Game {
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
 		Tile destination = world[loc];
 		
-		if(selectedUnit != null && destination != null ) {
-			selectedUnit.setTargetTile(destination);
+		if(selectedThing != null && destination != null ) {
+			selectedThing.setTargetTile(destination);
 		}
 		
 	}
 	
-	private void moveUnits() {
-		
+	private void unitTick() {
 		for(Unit unit : world.units) {
 			unit.tick();
 			if(unit.getTargetTile() == null) {
@@ -706,68 +1034,98 @@ public class Game {
 				unit.moveTo(bestTile);
 			}
 		}
-		
 	}
 	
 	public void buildBuilding(BuildingType bt) {
-		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
-			if(selectedUnit.getTile().getHasBuilding() == false && selectedUnit.getTile().getHasStructure() == false) {
-				if (bt == BuildingType.IRRIGATION && selectedUnit.getTile().canPlant() == false) {
+		
+		if(selectedThing != null && selectedThing instanceof Unit && ((Unit)selectedThing).getUnitType() == UnitType.WORKER) {
+			if(selectedThing.getTile().getHasBuilding() == false) {
+				
+				
+				for (Map.Entry mapElement : bt.getCost().entrySet()) {
+					ItemType key = (ItemType) mapElement.getKey();
+					Integer value = (Integer) mapElement.getValue();
+					
+					if (resources[key].getAmount() < value) {
+						return;
+					}
+				}
+				if (bt == BuildingType.IRRIGATION && selectedThing.getTile().canPlant() == false) {
 					return;
 				}
-				Building building = new Building(bt, selectedUnit.getTile());
-				selectedUnit.getTile().setBuilding(building);
+				
+				for (Map.Entry mapElement : bt.getCost().entrySet()) {
+					ItemType key = (ItemType) mapElement.getKey();
+					Integer value = (Integer) mapElement.getValue();
+					
+					resources[key].addAmount(-value);
+				}
+				
+			
+				Building building = new Building(bt, selectedThing.getTile());
+				selectedThing.getTile().setBuilding(building);
 				buildings.add(building);
+				
+				
 
 			}
 			
 		}
 		
 	}
+	public void setUnit(UnitType type) {
+		selectedUnitToSpawn = type;
+		
+	}
+	
 	public void buildRoad(RoadType rt) {
-		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
-			selectedUnit.getTile().setRoad(rt, Direction.NORTH.toString());
-			for(Tile tile : Utils.getNeighborsIncludingCurrent(selectedUnit.getTile(), world)) {
+		if(selectedThing != null && selectedThing instanceof Unit && ((Unit)selectedThing).getUnitType() == UnitType.WORKER) {
+			selectedThing.getTile().setRoad(rt, Direction.NORTH.toString());
+			for(Tile tile : Utils.getNeighborsIncludingCurrent(selectedThing.getTile(), world)) {
 				turnRoad(tile);
 			}
 		}
 		
 	}
-	public void buildStructure(StructureType st) {
-		if(selectedUnit != null && selectedUnit.getUnitType() == UnitType.WORKER) {
-			if(selectedUnit.getTile().getHasBuilding() == false && selectedUnit.getTile().getHasStructure() == false) {
-				Structure structure = new Structure(st, selectedUnit.getTile());
-				selectedUnit.getTile().setStructure(structure);
-				structures.add(structure);
-			}
-			
-		}
+
+	public void tryToBuildUnit(UnitType u) {
 		
-	}
-	public void buildUnit(UnitType u, Tile tile) {
-		if(u == UnitType.SWORDSMAN && resources[ItemType.IRON_ORE].getAmount() < 10) {
-			return;
-		}
-		Unit unit = new Unit(u , tile, true);
-		if(!tile.isBlocked(unit)) {
-			tile.addUnit(unit);
-			world.units.add(unit);
-			if(u == UnitType.SWORDSMAN) {
-				resources[ItemType.IRON_ORE].addAmount(-10);
-				guiController.updateGUI();
-			}
+		if(selectedThing != null && selectedThing instanceof Building ) {
+			buildUnit(u, selectedThing.getTile());
 		}
 	}
 	
+	private void buildUnit(UnitType u, Tile tile) {
+		for (Map.Entry mapElement : u.getCost().entrySet()) {
+			ItemType key = (ItemType) mapElement.getKey();
+			Integer value = (Integer) mapElement.getValue();
+			
+			if (resources[key].getAmount() < value) {
+				return;
+			}
+		}
+		
+		Unit unit = new Unit(u, tile, true);
+		if (tile.isBlocked(unit)) {
+			return;
+		}
+		
+		for (Map.Entry mapElement : u.getCost().entrySet()) {
+			ItemType key = (ItemType) mapElement.getKey();
+			Integer value = (Integer) mapElement.getValue();
+			
+			resources[key].addAmount(-value);
+		}
+
+		tile.addUnit(unit);
+		world.units.add(unit);
+	}
+
 	public void doubleClick(int mx, int my) {
 		Position tilepos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
-		if(world[loc].getStructure() != null && world[loc].getStructure().getStructureType() == StructureType.CASTLE) {
-			exitCity();
-		}
-	}
-	public void exitCity() {
-		guiController.toggleCityView();
+
+		
 	}
 	public void exitTile() {
 		guiController.toggleTileView();
@@ -792,7 +1150,6 @@ public class Game {
 	}
 
 	public void shiftView(int dx, int dy) {
-
 		viewOffset.x += dx;
 		viewOffset.y += dy;
 //		System.out.println(viewOffset.x + "curview" + viewOffset.y);
@@ -814,10 +1171,6 @@ public class Game {
 		return tileSize;
 	}
 	
-	public BuildMode getMode() {
-		return currentMode;
-		
-	}
 	
 	protected void drawMinimap(Graphics g, int x, int y, int w, int h) {
 		
@@ -854,14 +1207,25 @@ public class Game {
 		this.showHeightMap = show;
 	}
 	public UnitType getSelectedUnit() {
-		if(selectedUnit != null) {
-			return selectedUnit.getUnitType();
+		if(selectedThing != null && selectedThing instanceof Unit) {
+			
+			return ((Unit)selectedThing).getUnitType();
 		}
 		return null;
 	}
 	
 	public void fastForwardToDay() {
 		skipUntilTick = ticks + world.ticksUntilDay();
+	}
+	
+	public void researchEverything() {
+		for(Research research : researches.values()) {
+			researchTarget = research;
+			researchTarget.spendResearch(100000);
+			if (researchTarget.isUnlocked()) {
+				guiController.updateGUI();
+			}
+		}
 	}
 	
 	public boolean shouldFastForward() {

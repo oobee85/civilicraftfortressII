@@ -15,9 +15,14 @@ public class Thing implements HasImage {
 	private double health;
 	private int timeLastDamageTaken = -1000;
 	private Tile tile;
+	private Tile targetTile;
+	private boolean isSelected;
 	
 	private HasImage hasImage;
 	private boolean sideHealthBar;
+	private LinkedList<Hitsplat> hitsplats = new LinkedList<Hitsplat>();
+	
+	private String name;
 	
 	public Thing(double maxHealth, HasImage hasImage) {
 		health = maxHealth;
@@ -44,8 +49,22 @@ public class Thing implements HasImage {
 		return health < 0;
 	}
 	public void takeDamage(double damage) {
-		health -= damage;
+		int roundedDamage = (int)Math.ceil(damage);
+		int square = (int) (Math.random() *4);
+		Hitsplat hit = new Hitsplat(roundedDamage, square);
+		hitsplats.add(hit);
+		health -= roundedDamage;
 		if(damage != 0) {
+			timeLastDamageTaken = Game.ticks;
+		}
+	}
+	public void heal(double healing) {
+		int roundedHealing = (int)Math.ceil(healing);
+		int square = (int) (Math.random() *4);
+		Hitsplat hit = new Hitsplat(-roundedHealing, square);
+		hitsplats.add(hit);
+		health += roundedHealing;
+		if(roundedHealing != 0) {
 			timeLastDamageTaken = Game.ticks;
 		}
 	}
@@ -55,18 +74,63 @@ public class Thing implements HasImage {
 	public double getMaxHealth() {
 		return maxHealth;
 	}
+	public void setHealth(double hp) {
+		health = hp;
+	}
 	public int getTimeLastDamageTaken() {
 		return timeLastDamageTaken;
+	}
+	public void updateHitsplats() {
+		if(hitsplats.isEmpty()==true) {
+			return;
+		}
+		for(int i = 0; i < hitsplats.size(); i ++) {
+			hitsplats.get(i).updateDuration();
+			if(hitsplats.get(i).isDead() == true) {
+				hitsplats.remove(i);
+				i --;
+//				System.out.println("remove hitsplat");
+			}
+		}
+	}
+	public boolean hasHitsplat() {
+		return !hitsplats.isEmpty();
+	}
+	public double getHitsplatDamage() {
+		if(hitsplats.size() >= 1) {
+			return hitsplats.get(0).getDamage();
+		}
+		return 0;
+	}
+	public LinkedList<Hitsplat> getHitsplatList() {
+		return hitsplats;
+	}
+	public void setIsSelected(boolean select) {
+		isSelected = select;
+	}
+	public boolean getIsSelected() {
+		return isSelected;
 	}
 	
 	public void setTile(Tile tile) {
 		this.tile = tile;
+		if(targetTile == getTile() ) {
+			targetTile = null;
+		}
 	}
 	
 	public Tile getTile() {
 		return tile;
 	}
 	
+	public Tile getTargetTile() {
+		return targetTile;
+	}
+	public void setTargetTile(Tile t) {
+		if(t != getTile()) {
+			targetTile = t;
+		}
+	}
 	@Override
 	public Image getImage(int size) {
 		return hasImage.getImage(size);
