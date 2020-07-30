@@ -188,8 +188,13 @@ public class World {
 					tile.setTerrain(Terrain.GRASS);
 				}
 			}
-			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA) {
-				double chance = 0.01;
+			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA 
+//					&& (tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.FIRE)
+					) {
+//				if(tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.FIRE) {
+//					return;
+//				}
+				double chance = 0.05;
 				if(Math.random() < chance) {
 					tile.setTerrain(Terrain.DIRT);
 				}
@@ -230,7 +235,12 @@ public class World {
 		System.out.println(plantsLand.size() + " land plants and " + plantsAquatic.size() + " aquatic plants.");
 		LinkedList<Plant> newAquatic = new LinkedList<>();
 		LinkedList<Plant> newLand = new LinkedList<>();
+		
 		for(Tile tile : getTiles()) {
+			
+			if(tile.canPlant() == false) {
+				continue;
+			}
 			
 			if(tile.getPlant() != null && tile.getPlant().getPlantType() == PlantType.FOREST1 && tile.canPlant()) {
 				for(Tile t : tile.getNeighbors()) {
