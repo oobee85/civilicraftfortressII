@@ -231,8 +231,19 @@ public class World {
 		LinkedList<Plant> newAquatic = new LinkedList<>();
 		LinkedList<Plant> newLand = new LinkedList<>();
 		for(Tile tile : getTiles()) {
-			if(tile.getPlant() != null)
+			
+			if(tile.getPlant() != null && tile.getPlant().getPlantType() == PlantType.FOREST1 && tile.canPlant()) {
+				for(Tile t : tile.getNeighbors()) {
+					if(Math.random() < 0.05) {
+						t.setHasPlant(new Plant(PlantType.FOREST1, tile));
+						newLand.add(tile.getPlant());
+					}
+				}
+			}
+			
+			if(tile.getPlant() != null) {
 				continue;
+			}
 			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(Math.random() < 0.01) {
 					Plant plant = new Plant(PlantType.CATTAIL, tile);
@@ -240,16 +251,12 @@ public class World {
 					newAquatic.add(plant);
 				}
 			}
-			else if(tile.canPlant() && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
-				if(Math.random() < 0.00001) {
-					tile.setHasPlant(new Plant(PlantType.FOREST1, tile));
-					newLand.add(tile.getPlant());
-				}
-				else if(Math.random() < 0.0001) {
-					tile.setHasPlant(new Plant(PlantType.BERRY, tile));
-					newLand.add(tile.getPlant());
-				}
+			
+			if (Math.random() < 0.001) {
+				tile.setHasPlant(new Plant(PlantType.BERRY, tile));
+				newLand.add(tile.getPlant());
 			}
+
 		}
 		for(Plant p : plantsAquatic) {
 			newAquatic.add(p);
