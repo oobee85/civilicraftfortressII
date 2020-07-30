@@ -115,7 +115,6 @@ public class Generation {
 			int dx = i - x;
 			int dy = j - y;
 			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
-			TileLoc p =  tile.getLocation();
 			if(distanceFromCenter < mountainEdgeRadius) {
 				
 				double height = 1 - (lavaRadius - distanceFromCenter)/lavaRadius/2;

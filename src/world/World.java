@@ -125,7 +125,7 @@ public class World {
 		Tile t = this.getTilesRandomly().getFirst();
 		
 		
-		int radius = (int) (Math.random()*20);
+		int radius = (int) (Math.random()*20 + 5);
 		System.out.println("meteor at: "+t.getLocation().x+ ", "+ t.getLocation().y);
 		
 		for(Tile tile : this.getTiles()) {
@@ -138,11 +138,32 @@ public class World {
 				
 				
 				if(distanceFromCenter < radius) {
-					tile.setTerrain(Terrain.BURNED_GROUND);
+					if(tile.getTerrain() != Terrain.ROCK && tile.getTerrain() != Terrain.SNOW && tile.getTerrain() != Terrain.VOLCANO) {
+						tile.setTerrain(Terrain.BURNED_GROUND);
+					}
+					
+					tile.liquidAmount = 0;
 					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, tile);
 					GroundModifiers.add(fire);
 					tile.setModifier(fire);
+					if(tile.getHasBuilding() == true) {
+						tile.getBuilding().takeDamage(10000);
+					}
+					for(Unit unit : tile.getUnits()) {
+						unit.takeDamage(10000);
+					}
+					if(tile.getPlant() != null) {
+						tile.getPlant().takeDamage(10000);
+					}
+					
+					double height = tile.getHeight()+0.2 - (radius/2 - distanceFromCenter)/radius/4;
+					if(distanceFromCenter > radius/2) {
+						height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
+					}
+					tile.setHeight(Math.max(height, tile.getHeight()));
 				}
+				
+				
 		}
 		
 		

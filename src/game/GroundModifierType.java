@@ -11,7 +11,7 @@ import utils.Utils;
 
 public enum GroundModifierType implements HasImage{
 
-	FIRE(new String[] { "resources/Images/lava/lavaanim32.gif" }, 100),
+	FIRE(new String[] { "resources/Images/ground_modifiers/fire.gif" }, 100),
 
 	;
 
