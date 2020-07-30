@@ -219,7 +219,14 @@ public class Game {
 				resources.get(ItemType.ROCK).addAmount(1);
 			}
 			if(building.getBuildingType() == BuildingType.IRRIGATION && building.getTile().canPlant() == true) {
-				resources.get(ItemType.FOOD).addAmount(1);
+				//irrigation produces extra food when placed on water
+				if(building.getTile().liquidType == LiquidType.WATER && building.getTile().liquidAmount > 0) {
+					int extraFood = (int) (building.getTile().liquidAmount * 100);
+					resources.get(ItemType.FOOD).addAmount(1 + extraFood);
+				}else {
+					resources.get(ItemType.FOOD).addAmount(1);
+				}
+				
 			}
 			if(building.getBuildingType() == BuildingType.SAWMILL) {
 				for(Tile t : building.getTile().getNeighbors()) {
