@@ -60,6 +60,10 @@ public class Tile {
 	}
 
 	public void setResource(ResourceType o) {
+		if(o == null ) {
+			resource = null;
+			return;
+		}
 		resource = new Resource(o);
 	}
 
