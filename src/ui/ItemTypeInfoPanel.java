@@ -28,14 +28,15 @@ public class ItemTypeInfoPanel extends JPanel {
 			return;
 		}
 		
-		int x = 50;
-		int y = 50;
+		int x = 20;
+		int y = 20;
 		
 		int padding = 10;
 		g.drawImage(icon.getImage(), x, y, null);
 		g.setColor(Color.black);
 		g.drawRect(x - padding, y - padding, ICONSIZE + padding*2, ICONSIZE + padding*2);
 		
+		y -= padding;
 		
 		x += ICONSIZE + padding*2 + padding;
 		g.setColor(Color.black);

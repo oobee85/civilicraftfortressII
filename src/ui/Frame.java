@@ -843,7 +843,7 @@ public class Frame extends JPanel{
 		infoPanel = new JPanel();
 		infoPanel.setLayout(new BorderLayout());
 		infoPanel.setBackground(gameInstance.getBackgroundColor());
-		infoPanel.setPreferredSize(new Dimension(GUIWIDTH,GUIWIDTH*2/3));
+		infoPanel.setPreferredSize(new Dimension(GUIWIDTH,GUIWIDTH/3));
 		infoPanel.setBorder(BorderFactory.createLineBorder(Color.black, 1));
 		infoPanel.add(new JLabel("Try right clicking research buttons or build unit buttons."), BorderLayout.CENTER);
 		guiSplitter.add(infoPanel,BorderLayout.SOUTH);

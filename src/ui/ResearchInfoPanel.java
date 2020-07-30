@@ -22,8 +22,8 @@ public class ResearchInfoPanel extends JPanel {
 			return;
 		}
 		
-		int x = 50;
-		int y = 50;
+		int x = 20;
+		int y = 20;
 		
 		g.setColor(Color.black);
 		g.setFont(KUIConstants.infoFont);
