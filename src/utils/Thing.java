@@ -20,7 +20,8 @@ public class Thing implements HasImage {
 	
 	private HasImage hasImage;
 	private boolean sideHealthBar;
-	private LinkedList<Hitsplat> hitsplats = new LinkedList<Hitsplat>();
+//	private LinkedList<Hitsplat> hitsplats = new LinkedList<Hitsplat>();
+	private Hitsplat[] hitsplats = new Hitsplat[4];
 	
 	private String name;
 	
@@ -50,23 +51,31 @@ public class Thing implements HasImage {
 	}
 	public void takeDamage(double damage) {
 		int roundedDamage = (int)Math.ceil(damage);
-		int square = (int) (Math.random() *4);
-		Hitsplat hit = new Hitsplat(roundedDamage, square);
-		hitsplats.add(hit);
 		health -= roundedDamage;
 		if(damage != 0) {
 			timeLastDamageTaken = Game.ticks;
 		}
+		addHitsplat(roundedDamage);
 	}
 	public void heal(double healing) {
 		int roundedHealing = (int)Math.ceil(healing);
-		int square = (int) (Math.random() *4);
-		Hitsplat hit = new Hitsplat(-roundedHealing, square);
-		hitsplats.add(hit);
 		health += roundedHealing;
 		if(roundedHealing != 0) {
 			timeLastDamageTaken = Game.ticks;
 		}
+		addHitsplat(-roundedHealing);
+	}
+	private void addHitsplat(int damage) {
+		int oldest = 0;
+		for(int i = 0; i < hitsplats.length; i++) {
+			if(hitsplats[i] == null) {
+				oldest = i;
+				break;
+			}
+			oldest = hitsplats[i].getMaxDuration() < hitsplats[oldest].getMaxDuration() ? i : oldest;
+		}
+		Hitsplat hit = new Hitsplat(damage, oldest);
+		hitsplats[oldest] = hit;
 	}
 	public double getHealth() {
 		return health;
@@ -81,28 +90,32 @@ public class Thing implements HasImage {
 		return timeLastDamageTaken;
 	}
 	public void updateHitsplats() {
-		if(hitsplats.isEmpty()==true) {
-			return;
-		}
-		for(int i = 0; i < hitsplats.size(); i ++) {
-			hitsplats.get(i).updateDuration();
-			if(hitsplats.get(i).isDead() == true) {
-				hitsplats.remove(i);
-				i --;
-//				System.out.println("remove hitsplat");
+		for(int i = 0; i < hitsplats.length; i++) {
+			if(hitsplats[i] != null) {
+				hitsplats[i].updateDuration();
+				if(hitsplats[i].isDead() == true) {
+					hitsplats[i] = null;
+				}
 			}
 		}
 	}
 	public boolean hasHitsplat() {
-		return !hitsplats.isEmpty();
+		for(int i = 0; i < hitsplats.length; i++) {
+			if(hitsplats[i] != null) {
+				return true;
+			}
+		}
+		return false;
 	}
 	public double getHitsplatDamage() {
-		if(hitsplats.size() >= 1) {
-			return hitsplats.get(0).getDamage();
+		for(int i = 0; i < hitsplats.length; i++) {
+			if(hitsplats[i] != null) {
+				return hitsplats[i].getDamage();
+			}
 		}
 		return 0;
 	}
-	public LinkedList<Hitsplat> getHitsplatList() {
+	public Hitsplat[] getHitsplatList() {
 		return hitsplats;
 	}
 	public void setIsSelected(boolean select) {
