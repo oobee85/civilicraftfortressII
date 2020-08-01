@@ -71,7 +71,7 @@ public class World {
 	public void rain() {
 		System.out.println("raining");
 		for(Tile tile : getTiles()) {
-			if(tile.getTerrain() != Terrain.SNOW || tile.getTerrain() != Terrain.ROCK) {
+			if(tile.getTerrain() != Terrain.SNOW && tile.getTerrain() != Terrain.ROCK) {
 				continue;
 			}
 			if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.DRY) {
@@ -244,9 +244,9 @@ public class World {
 			
 			if(tile.getPlant() != null && tile.getPlant().getPlantType() == PlantType.FOREST1 && tile.canPlant()) {
 				for(Tile t : tile.getNeighbors()) {
-					if(Math.random() < 0.05) {
-						t.setHasPlant(new Plant(PlantType.FOREST1, tile));
-						newLand.add(tile.getPlant());
+					if(Math.random() < 0.05 && t.getPlant() == null && t != tile) {
+//						t.setHasPlant(new Plant(PlantType.FOREST1, tile));
+//						newLand.add(tile.getPlant());
 					}
 				}
 			}

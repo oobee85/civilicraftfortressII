@@ -28,8 +28,9 @@ public enum UnitType implements HasImage {
 	FISH   ("resources/Images/units/fish2.png", new CombatStats(10, 1, 100, 1, 2),  true, false, false, null, null, null),
 	COW     ("resources/Images/units/cow.png", new CombatStats(200, 10, 10, 1, 2), false, false, false, null, null, ResourceType.DEAD_ANIMAL),
 	
-	DRAGON  ("resources/Images/units/dragon.png", new CombatStats(1000, 50, 100, 2, 5), false, true, true, null, null, ResourceType.DEAD_ANIMAL),
-	OGRE	("resources/Images/units/ogre.png", new CombatStats(1000, 100, 50, 2, 10), false, false, true, null, null, ResourceType.DEAD_ANIMAL),
+	DRAGON   ("resources/Images/units/dragon.png", new CombatStats(1000, 50, 100, 2, 5), false, true, true, null, null, ResourceType.DEAD_ANIMAL),
+	OGRE	   ("resources/Images/units/ogre.png", new CombatStats(1000, 100, 50, 2, 10), false, false, true, null, null, ResourceType.DEAD_ANIMAL),
+	ENT			("resources/Images/units/ent.png", new CombatStats(500, 50, 50, 1, 10), false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	
 	WOLF        ("resources/Images/units/wolf.png", new CombatStats(200, 20, 10, 1, 5), false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	;
@@ -41,6 +42,16 @@ public enum UnitType implements HasImage {
 	private boolean isHostile;
 	private HashMap <ItemType, Integer> cost;
 	private ResearchType researchRequirement;
+	
+	/**
+	 * @param String
+	 * @param CombatStats
+	 * @param isAquatic
+	 * @param isFlying
+	 * @param isHostile 
+	 * @param researchNeeded
+	 * @param resourcesNeeded
+	**/
     
     UnitType( String s, CombatStats cs, boolean isAquatic, boolean isFlying, boolean isHostile, ResearchType researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, ResourceType resourceType) {
     	mipmap = new MipMap(s);
