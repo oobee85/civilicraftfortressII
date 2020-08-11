@@ -54,6 +54,9 @@ public class Unit extends Thing {
 		if(this.getUnitType() == UnitType.DRAGON && t.canPlant() == true) {
 			t.setTerrain(Terrain.BURNED_GROUND);
 		}
+		if(this.getUnitType() == UnitType.ENT && t.canPlant() == true) {
+			t.setTerrain(Terrain.GRASS);
+		}
 	}
 	
 	public void tick() {
