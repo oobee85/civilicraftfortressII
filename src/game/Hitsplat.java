@@ -4,8 +4,8 @@ import ui.Game;
 
 public class Hitsplat {
 
-	private double maxDuration;
-	private double currentDuration = Game.ticks;
+	private int maxDuration;
+	private int currentDuration = Game.ticks;
 	private	double damage;
 	private int square;
 	
@@ -20,6 +20,9 @@ public class Hitsplat {
 //		System.out.println("maxDur"+ maxDuration);
 //		System.out.println("curDur"+ currentDuration);
 		currentDuration = Game.ticks;
+	}
+	public int getMaxDuration() {
+		return maxDuration;
 	}
 	public boolean isDead() {
 		if(currentDuration >= maxDuration) {
