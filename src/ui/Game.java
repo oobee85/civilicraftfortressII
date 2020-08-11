@@ -577,13 +577,13 @@ public class Game {
 			}
 			for(Plant p : world.plantsLand) {
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
-				drawHitsplat(g, p);
 				drawHealthBar(g, p);
+				drawHitsplat(g, p);
 			}
 			for(Plant p : world.plantsAquatic) {
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
-				drawHitsplat(g, p);
 				drawHealthBar(g, p);
+				drawHitsplat(g, p);
 			}
 			
 			for(Building b : this.buildings) {
@@ -604,8 +604,8 @@ public class Game {
 				int tileh = Math.max(1, (int) (Game.tileSize * percentDone));
 				bI = bI.getSubimage(0, bI.getHeight() - h, bI.getWidth(), h);
 				g.drawImage(bI, b.getTile().getLocation().x * Game.tileSize, b.getTile().getLocation().y * Game.tileSize - tileh + Game.tileSize, Game.tileSize, tileh , null);
-				drawHitsplat(g, b);
 				drawHealthBar(g, b);
+				drawHitsplat(g, b);
 				if(b.isBuilt() == false) {
 					int x = (int) ((b.getTile().getLocation().x * Game.tileSize) + Game.tileSize*.25);
 					int y = (int) ((b.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.25);
@@ -616,8 +616,8 @@ public class Game {
 			}
 			for(Animal animal : Wildlife.getAnimals()) {
 				g.drawImage(animal.getImage(0), animal.getTile().getLocation().x * Game.tileSize, animal.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
-				drawHitsplat(g, animal);
 				drawHealthBar(g, animal);
+				drawHitsplat(g, animal);
 		
 			}
 			for(Unit unit : world.units) {
@@ -634,8 +634,8 @@ public class Game {
 				}
 				g.drawImage(unit.getImage(0), unit.getTile().getLocation().x * Game.tileSize, unit.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 				drawTarget(g, unit);
-				drawHitsplat(g, unit);
 				drawHealthBar(g, unit);
+				drawHitsplat(g, unit);
 			}
 			if(!showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
@@ -703,20 +703,19 @@ public class Game {
 	}
 
 	public void drawHitsplat(Graphics g, Thing thing) {
-		
+
+		int splatWidth = (int) (Game.tileSize*.5);
+		int splatHeight = (int) (Game.tileSize*.5);
 		
 		thing.updateHitsplats();
 		Hitsplat[] hitsplats = thing.getHitsplatList();
 		
-		for(int m = 0; m < hitsplats.length; m ++) {
+		for(int m = 0; m < hitsplats.length; m++) {
 			if(hitsplats[m] == null) {
 				continue;
 			}
+			double damage = hitsplats[m].getDamage();
 			int i = hitsplats[m].getSquare();
-//				int x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*.25);
-//				int y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.25);
-			int w = (int) (Game.tileSize*.5);
-			int hi = (int) (Game.tileSize*.5);
 			
 			int x = (int) ((thing.getTile().getLocation().x * Game.tileSize) );
 			int y = (int) ((thing.getTile().getLocation().y * Game.tileSize) );
@@ -734,17 +733,16 @@ public class Game {
 				y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*0.5);
 			}
 			
-			String text = String.format("%.0f", thing.getHitsplatDamage());
+			String text = String.format("%.0f", damage);
 
-			if(thing.getHitsplatDamage() > 0) {
-				g.drawImage(redHitsplatImage, x, y, w, hi, null);
-			}else if(thing.getHitsplatDamage() == 0){
-				g.drawImage(blueHitsplatImage, x, y, w, hi, null);
+			if(damage > 0) {
+				g.drawImage(redHitsplatImage, x, y, splatWidth, splatHeight, null);
+			}else if(damage == 0){
+				g.drawImage(blueHitsplatImage, x, y, splatWidth, splatHeight, null);
 			}
-			else if(thing.getHitsplatDamage() < 0) {
-//					g.drawImage(greenHitsplatImage, x, y, w, hi, null);
-//					text = String.format("%.0f", thing.getHitsplatDamage() * -1);
-				return;
+			else if(damage < 0) {
+				g.drawImage(greenHitsplatImage, x, y, splatWidth, splatHeight, null);
+				text = String.format("%.0f", thing.getHitsplatDamage() * -1);
 			}
 			
 			int fontSize = Game.tileSize/4;
