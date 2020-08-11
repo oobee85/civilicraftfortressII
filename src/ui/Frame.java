@@ -13,8 +13,8 @@ import world.*;
 
 public class Frame extends JPanel{
 	public static final Color BACKGROUND_COLOR = new Color(200, 200, 200);
-	int GUIWIDTH = 400;
-	int MINIMAPBORDERWIDTH = 50;
+	int GUIWIDTH = 350;
+	int MINIMAPBORDERWIDTH = 40;
 	
 	public static final Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
 	public static final Dimension DEBUG_BUTTON_SIZE = new Dimension(130, 30);
@@ -74,7 +74,9 @@ public class Frame extends JPanel{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setIconImage(Utils.loadImage("resources/Images/logo.png"));
 		
-		HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height * 8/9;
+		HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
+		HEIGHT = Math.min(HEIGHT, 1080);
+		HEIGHT = HEIGHT * 8/9;
 		WIDTH = HEIGHT + GUIWIDTH;
 		frame.setSize(WIDTH, HEIGHT);
 		frame.setLocationRelativeTo(null);
@@ -568,7 +570,7 @@ public class Frame extends JPanel{
 		System.err.println("Starting Game");
 		frame.remove(mainMenuPanel);
 		
-		Dimension RESOURCE_BUTTON_SIZE = new Dimension(125, 35);
+		Dimension RESOURCE_BUTTON_SIZE = new Dimension(100, 35);
 		Dimension RESEARCH_BUTTON_SIZE = new Dimension(125, 35);
 		int BUILDING_ICON_SIZE = 25;
 		int RESOURCE_ICON_SIZE = 35;

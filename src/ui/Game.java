@@ -704,55 +704,56 @@ public class Game {
 
 	public void drawHitsplat(Graphics g, Thing thing) {
 		
-		if(thing.getHitsplatList().isEmpty() == false) {
-			thing.updateHitsplats();
-			LinkedList<Hitsplat> hitsplats = thing.getHitsplatList();
-			
-			for(int m = 0; m < hitsplats.size(); m ++) {
-				
-				int i = hitsplats.get(m).getSquare();
+		
+		thing.updateHitsplats();
+		Hitsplat[] hitsplats = thing.getHitsplatList();
+		
+		for(int m = 0; m < hitsplats.length; m ++) {
+			if(hitsplats[m] == null) {
+				continue;
+			}
+			int i = hitsplats[m].getSquare();
 //				int x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*.25);
 //				int y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.25);
-				int w = (int) (Game.tileSize*.5);
-				int hi = (int) (Game.tileSize*.5);
-				
-				int x = (int) ((thing.getTile().getLocation().x * Game.tileSize) );
-				int y = (int) ((thing.getTile().getLocation().y * Game.tileSize) );
-				
-				if(i == 1) {
-					x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*0.5);
-					y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*0.5);
-				}
-				if(i == 2) {
-					x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*0.5);
-					y = (int) ((thing.getTile().getLocation().y * Game.tileSize) );
-				}
-				if( i == 3) {
-					x = (int) ((thing.getTile().getLocation().x * Game.tileSize) );
-					y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*0.5);
-				}
-				
-				String text = String.format("%.0f", thing.getHitsplatDamage());
+			int w = (int) (Game.tileSize*.5);
+			int hi = (int) (Game.tileSize*.5);
+			
+			int x = (int) ((thing.getTile().getLocation().x * Game.tileSize) );
+			int y = (int) ((thing.getTile().getLocation().y * Game.tileSize) );
+			
+			if(i == 1) {
+				x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*0.5);
+				y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*0.5);
+			}
+			if(i == 2) {
+				x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*0.5);
+				y = (int) ((thing.getTile().getLocation().y * Game.tileSize) );
+			}
+			if( i == 3) {
+				x = (int) ((thing.getTile().getLocation().x * Game.tileSize) );
+				y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*0.5);
+			}
+			
+			String text = String.format("%.0f", thing.getHitsplatDamage());
 
-				if(thing.getHitsplatDamage() > 0) {
-					g.drawImage(redHitsplatImage, x, y, w, hi, null);
-				}else if(thing.getHitsplatDamage() == 0){
-					g.drawImage(blueHitsplatImage, x, y, w, hi, null);
-				}
-				else if(thing.getHitsplatDamage() < 0) {
+			if(thing.getHitsplatDamage() > 0) {
+				g.drawImage(redHitsplatImage, x, y, w, hi, null);
+			}else if(thing.getHitsplatDamage() == 0){
+				g.drawImage(blueHitsplatImage, x, y, w, hi, null);
+			}
+			else if(thing.getHitsplatDamage() < 0) {
 //					g.drawImage(greenHitsplatImage, x, y, w, hi, null);
 //					text = String.format("%.0f", thing.getHitsplatDamage() * -1);
-					return;
-				}
-				
-				int fontSize = Game.tileSize/4;
-				g.setFont(new Font(damageFont.getFontName(), Font.BOLD, fontSize));
-				int width = g.getFontMetrics().stringWidth(text);
-				g.setColor(Color.WHITE);
-//				g.drawString(text, x-width/2, y+fontSize*4/10);
-				
-				g.drawString(text, x+width, (int) (y+fontSize*1.5));
+				return;
 			}
+			
+			int fontSize = Game.tileSize/4;
+			g.setFont(new Font(damageFont.getFontName(), Font.BOLD, fontSize));
+			int width = g.getFontMetrics().stringWidth(text);
+			g.setColor(Color.WHITE);
+//				g.drawString(text, x-width/2, y+fontSize*4/10);
+			
+			g.drawString(text, x+width, (int) (y+fontSize*1.5));
 		}
 		
 //		if(thing.hasHitsplat()) {
