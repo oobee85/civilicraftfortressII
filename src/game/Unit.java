@@ -122,6 +122,9 @@ public class Unit extends Thing {
 	public boolean readyToAttack() {
 		return timeToAttack <= 0;
 	}
+	public double getTimeToAttack() {
+		return timeToAttack;
+	}
 	
 
 	@Override

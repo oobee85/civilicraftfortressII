@@ -33,7 +33,12 @@ public enum ItemType implements HasImage {
 	RUNITE_BAR ( "resources/Images/itemicons/runite_bar.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.RUNITE_ORE,10);  }}),
 	TITANIUM_BAR ( "resources/Images/itemicons/copper_bar.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.TITANIUM_ORE,10);  }}),
 	
-	
+	BRONZE_SWORD ( "resources/Images/itemicons/bronze_sword.png", ResearchType.BRONZE_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.BRONZE_BAR,5);  }}),
+	IRON_SWORD ( "resources/Images/itemicons/iron_sword.png", ResearchType.IRON_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.IRON_BAR,5);  }}),
+	MITHRIL_SWORD ( "resources/Images/itemicons/mithril_sword.png", ResearchType.ARMORING, new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_BAR,5);  }}),
+	ADAMANT_SWORD ( "resources/Images/itemicons/adamant_sword.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.ADAMANTITE_BAR,5);  }}),
+	RUNE_SWORD ( "resources/Images/itemicons/rune_sword.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.RUNITE_BAR,5);  }}),
+	TITANIUM_SWORD ( "resources/Images/itemicons/titanium_sword.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.TITANIUM_BAR,5);  }}),
 	;
 	
 	private MipMap mipmap;

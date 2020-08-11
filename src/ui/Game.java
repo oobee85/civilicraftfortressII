@@ -690,6 +690,11 @@ public class Game {
 							}
 						}
 					}
+					for(Unit unit : world.units) {
+						unit.getTile().drawDebugStrings(g, unit.getDebugStrings(), rows, fontsize, stringWidth);
+						g.drawString("TTA: "+ unit.getTimeToAttack(), unit.getTile().getLocation().x, unit.getTile().getLocation().y);
+						System.out.println(""+unit.getTile().getLocation().x+ ", "+ unit.getTile().getLocation().y);
+					}
 					for(Animal animal : Wildlife.getAnimals()) {
 						animal.getTile().drawDebugStrings(g, animal.getDebugStrings(), rows, fontsize, stringWidth);
 					}
