@@ -238,10 +238,10 @@ public class Tile {
 			return true;
 		}
 		BuildingType bt = building.getBuildingType();
-		if(bt != BuildingType.WALL_WOOD || bt != BuildingType.WALL_STONE || bt != BuildingType.WALL_BRICK) {
-			return true;
+		if(bt == BuildingType.WALL_WOOD || bt == BuildingType.WALL_STONE || bt == BuildingType.WALL_BRICK) {
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 	public void setTerrain(Terrain t) {

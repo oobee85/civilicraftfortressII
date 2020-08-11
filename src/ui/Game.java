@@ -163,13 +163,10 @@ public class Game {
 		Liquid.propogate(world);
 		changedTerrain = true;
 		
-		world.updateUnitDamage();
 		
 		if(ticks%5 == 0) {
 			world.updatePlantDamage();
-			
 			updateBuildingDamage();
-			Wildlife.tick(world);
 		}
 		
 		world.updateTerrainChange(world);
@@ -177,7 +174,9 @@ public class Game {
 			updateBuildingAction();
 			changedTerrain = true;
 		}
+		Wildlife.tick(world);
 		unitTick();
+		world.updateUnitDamage();
 		
 		
 		guiController.updateGUI();
