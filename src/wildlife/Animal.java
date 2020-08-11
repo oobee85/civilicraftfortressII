@@ -78,13 +78,15 @@ public class Animal extends Unit {
 		
 	}
 	public void eat(int damage) {
+
 		energy += damage;
 		drive += 0.01;
+
 	}
 	public void loseEnergy() {
-		energy -= 0.5;
+		energy -= 0.005;
 		if(getHealth() < super.getType().getCombatStats().getHealth()) {
-			energy -= 0.04;
+			energy -= 1.0;
 			heal(1);
 		}
 		if(energy < MAX_ENERGY/20) {

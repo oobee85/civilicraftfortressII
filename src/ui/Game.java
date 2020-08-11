@@ -220,6 +220,7 @@ public class Game {
 			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResource() != null && building.getTile().getResource().getType().isOre() == true) {
 				resources.get(building.getTile().getResource().getType().getItemType()).addAmount(1);
 				building.getTile().getResource().harvest(1);
+				
 				if(building.getTile().getResource().getYield() <= 0) {
 					building.getTile().setResource(null);
 				}
