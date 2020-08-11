@@ -22,14 +22,13 @@ public class ResearchInfoPanel extends JPanel {
 			return;
 		}
 		
+		int progressBarHeight = 30;
 		int x = 20;
-		int y = 20;
+		int y = progressBarHeight;
 		
 		g.setColor(Color.black);
 		g.setFont(KUIConstants.infoFont);
 		int offset = g.getFont().getSize();
-		
-		g.drawString(String.format("%s %d/%d", showing, showing.getPointsSpent(), showing.getType().getRequiredPoints()), x, y += offset);
 
 		if(showing.getRequirement().getRequirements().size() > 0 ) {
 			g.drawString("Requirements:", x, y += offset);
@@ -41,12 +40,12 @@ public class ResearchInfoPanel extends JPanel {
 		
 		double completedRatio = 1.0 * showing.getPointsSpent() / showing.getType().getRequiredPoints();
 		g.setColor(Color.gray);
-		g.fillRect(0, 0, getWidth(), 30);
+		g.fillRect(0, 0, getWidth(), progressBarHeight);
 		g.setColor(Color.blue);
-		g.fillRect(0, 0, (int) (getWidth() * completedRatio), 30);
+		g.fillRect(0, 0, (int) (getWidth() * completedRatio), progressBarHeight);
 		g.setColor(Color.white);
-		String progress = String.format("%d/%d", showing.getPointsSpent(), showing.getType().getRequiredPoints());
+		String progress = String.format("%s %d/%d", showing, showing.getPointsSpent(), showing.getType().getRequiredPoints());
 		int w = g.getFontMetrics().stringWidth(progress);
-		g.drawString(progress, getWidth()/2 - w/2, 20);
+		g.drawString(progress, getWidth()/2 - w/2, progressBarHeight*2/3);
 	}
 }
