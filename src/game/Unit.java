@@ -38,12 +38,13 @@ public class Unit extends Thing {
 			return;
 		}
 		double penalty = t.getTerrain().moveSpeed();
+		if(getTile().getRoadType() != null && t.getRoadType() != null) {
+			penalty = penalty/getTile().getRoadType().getSpeed()/2;
+		}
 		if(this.getUnitType().isFlying()) {
 			penalty = 0;
 		}
-		if(getTile().getRoadType() != null && t.getRoadType() != null) {
-			penalty = (penalty/getTile().getRoadType().getSpeed())/2;
-		}
+		penalty += unitType.getCombatStats().getSpeed();
 		timeToMove += penalty;
 		
 		

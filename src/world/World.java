@@ -114,7 +114,7 @@ public class World {
 			}
 		}
 		System.out.println("Ogre at: "+t.getLocation().x+ ", "+ t.getLocation().y);
-		Animal ogre = new Animal(UnitType.OGRE, t, false);
+		Animal ogre = new Ogre(UnitType.OGRE, t, false);
 		t.addUnit(ogre);
 		Wildlife.addAnimal(ogre);
 		ogre.setTile(t);

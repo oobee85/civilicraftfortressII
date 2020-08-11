@@ -114,6 +114,16 @@ public class Wildlife {
 					}
 				}
 			}
+			if(animal instanceof Ogre) {
+				if(animal.getTarget() == null) {
+					for(Unit u : world.units) {
+						if(u.isPlayerControlled()) {
+							animal.setTarget(u);
+							break;
+						}
+					}
+				}
+			}
 			
 
 			if(animal.getTarget() != null) {
@@ -158,10 +168,6 @@ public class Wildlife {
 				else {
 					trying.put(animal.getTile(), animal);
 				}
-			}
-			if(animal.isDead()) {
-				dead.add(animal);
-				continue;
 			}
 			newAnimals.add(animal);
 		}

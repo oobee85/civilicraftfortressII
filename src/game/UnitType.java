@@ -12,7 +12,7 @@ import world.ResourceType;
 
 public enum UnitType implements HasImage {
 	WORKER           ( "resources/Images/units/worker.png", new CombatStats( 50,  1, 10, 1, 20), false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50);  }}, null ),
- 	WARRIOR          ( "resources/Images/units/warrior.png", new CombatStats(100, 10, 10, 1, 20), false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.COPPER_BAR,5); }}, null ),
+ 	WARRIOR          ( "resources/Images/units/warrior.png", new CombatStats(100, 10, 1, 1, 20), false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.COPPER_BAR,5); }}, null ),
  	SPEARMAN       ( "resources/Images/units/spearman.png", new CombatStats(200, 10, 10, 1, 20), false, false, false, ResearchType.BRONZE_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.COPPER_BAR,5);}}, null ),
  	ARCHER            ( "resources/Images/units/archer.png", new CombatStats(50, 20, 10, 2, 20), false, false, false, ResearchType.WARRIOR_CODE, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); }}, null ),
  	SWORDSMAN     ( "resources/Images/units/swordsman.png", new CombatStats(200, 20, 10, 1, 20), false, false, false, ResearchType.IRON_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.IRON_ORE,20);}}, null ),
@@ -28,8 +28,8 @@ public enum UnitType implements HasImage {
 	FISH   ("resources/Images/units/fish2.png", new CombatStats(10, 1, 100, 1, 20),  true, false, false, null, null, null),
 	COW     ("resources/Images/units/cow.png", new CombatStats(200, 10, 10, 1, 20), false, false, false, null, null, ResourceType.DEAD_ANIMAL),
 	
-	DRAGON   ("resources/Images/units/dragon.png", new CombatStats(1000, 50, 100, 2, 20), false, true, true, null, null, ResourceType.DEAD_ANIMAL),
-	OGRE	   ("resources/Images/units/ogre.png", new CombatStats(1000, 100, 50, 2, 20), false, false, true, null, null, ResourceType.DEAD_ANIMAL),
+	DRAGON   ("resources/Images/units/dragon.png", new CombatStats(1000, 50, 1, 2, 20), false, true, true, null, null, ResourceType.DEAD_ANIMAL),
+	OGRE	   ("resources/Images/units/ogre.png", new CombatStats(1000, 100, 0, 2, 20), false, true, true, null, null, ResourceType.DEAD_ANIMAL),
 	ENT			("resources/Images/units/ent.png", new CombatStats(500, 50, 50, 1, 20), false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	
 	WOLF        ("resources/Images/units/wolf.png", new CombatStats(200, 20, 10, 1, 20), false, false, true, null, null, ResourceType.DEAD_ANIMAL),

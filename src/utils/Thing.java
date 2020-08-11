@@ -47,7 +47,7 @@ public class Thing implements HasImage {
 	}
 
 	public boolean isDead() {
-		return health < 0;
+		return health <= 0;
 	}
 	public void takeDamage(double damage) {
 		int roundedDamage = (int)Math.ceil(damage);
