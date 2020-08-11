@@ -76,7 +76,7 @@ public class World {
 			}
 			if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.DRY) {
 				tile.liquidType = LiquidType.WATER;
-				tile.liquidAmount += 0.01;
+				tile.liquidAmount += 0.001;
 			}
 		}
 	}
@@ -236,7 +236,7 @@ public class World {
 		LinkedList<Plant> newAquatic = new LinkedList<>();
 		LinkedList<Plant> newLand = new LinkedList<>();
 		
-		for(Tile tile : getTiles()) {
+		for(Tile tile : getTilesRandomly()) {
 			
 			if(tile.canPlant() == false) {
 				continue;
@@ -244,9 +244,9 @@ public class World {
 			
 			if(tile.getPlant() != null && tile.getPlant().getPlantType() == PlantType.FOREST1 && tile.canPlant()) {
 				for(Tile t : tile.getNeighbors()) {
-					if(Math.random() < 0.05 && t.getPlant() == null && t != tile) {
-//						t.setHasPlant(new Plant(PlantType.FOREST1, tile));
-//						newLand.add(tile.getPlant());
+					if(Math.random() < 0.01 && t.getPlant() == null && t != tile && t.canPlant()) {
+						t.setHasPlant(new Plant(PlantType.FOREST1, t));
+						newLand.add(t.getPlant());
 					}
 				}
 			}

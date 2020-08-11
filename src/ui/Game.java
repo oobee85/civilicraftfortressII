@@ -28,6 +28,7 @@ public class Game {
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
 	private Thing selectedThing;
 	private UnitType selectedUnitToSpawn;
+	private int numCutTrees = 0;
 	
 	LinkedList<Building> buildings = new LinkedList<Building>();
 	
@@ -144,6 +145,9 @@ public class Game {
 		if(ticks == 1) {
 			world.rain();
 		}
+		if(numCutTrees %10 == 9) {
+			//TODO spawn ent
+		}
 		world.tick();
 		// rain event
 		if(Math.random() < 0.005) {
@@ -240,6 +244,10 @@ public class Game {
 						t.getPlant().harvest(1);
 						t.getPlant().takeDamage(1);
 						resources.get(ItemType.WOOD).addAmount(1);
+						if(t.getPlant().isDead() ) {
+							numCutTrees ++;
+						}
+						
 					}
 				}
 				
