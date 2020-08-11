@@ -116,12 +116,17 @@ public class Animal extends Unit {
 	public void imOnTheHunt(World world) {
 		if(getTarget() != null) {
 			Tile currentTile = getTile();
-			double bestDistance = Integer.MAX_VALUE;
+			double bestValue = Integer.MIN_VALUE;
 			Tile bestTile = currentTile;
 			for (Tile tile : Utils.getNeighbors(currentTile, world)) {
+				if(tile.isBlocked(this)) {
+					continue;
+				}
+				double danger = this.computeDanger(tile, tile.getHeight());
 				double distance = tile.getLocation().distanceTo(getTarget().getTile().getLocation());
-				if (distance < bestDistance) {
-					bestDistance = distance;
+				double value = danger - distance;
+				if (value > bestValue) {
+					bestValue = value;
 					bestTile = tile;
 				}
 			}
