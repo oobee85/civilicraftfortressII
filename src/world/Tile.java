@@ -125,6 +125,9 @@ public class Tile {
 		}
 		brightness += getTerrain().getBrightness();
 		brightness += liquidAmount * liquidType.getBrightness();
+		if(modifier != null) {
+			brightness += getModifier().getType().getBrightness();
+		}
 		return brightness;
 	}
 

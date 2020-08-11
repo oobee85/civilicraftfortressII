@@ -10,6 +10,8 @@ public class Generation {
 	private static final double snowEdgeRatio = 0.5;
 	private static final double rockEdgeRatio = 0.7;
 	
+	public static final int OREMULTIPLIER = 16384;
+	
 	public static double[][] generateHeightMap(int smoothingRadius, int width, int height) {
 		LinkedList<double[][]> noises = new LinkedList<>();
 
@@ -115,7 +117,6 @@ public class Generation {
 			int dx = i - x;
 			int dy = j - y;
 			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
-			TileLoc p =  tile.getLocation();
 			if(distanceFromCenter < mountainEdgeRadius) {
 				
 				double height = 1 - (lavaRadius - distanceFromCenter)/lavaRadius/2;
@@ -142,29 +143,73 @@ public class Generation {
 
 	public static void genResources(World world) {
 		for(ResourceType resource : ResourceType.values()) {
-			int numResource = (int)(world.getWidth() * world.getHeight() * resource.getRarity()); //163
+			int numResource = (int)(world.getWidth() * world.getHeight() * resource.getRarity() / OREMULTIPLIER);
+			
 			System.out.println("Tiles of " + resource.name() + ": " + numResource);
 			
 			for(Tile tile : world.getTilesRandomly()) {
 				if(tile.getResource() != null) {
 					continue;
 				}
-				if(resource.isOre() && tile.canOre() ) {
-					// if ore is rare the tile must be able to support rare ore
-					if(!resource.isRare() || tile.canSupportRareOre()) {
-						tile.setResource(resource);
-						numResource--;
-					}
-				}else if(!resource.isOre() && !tile.canOre()) {
-					
-					tile.setResource(resource);
-					numResource--;
-				}
 				if(numResource <= 0) {
 					break;
 				}
+				if(resource.isOre() && tile.canOre() ) {
+					// if ore is rare the tile must be able to support rare ore
+					
+					if(!resource.isRare() || tile.canSupportRareOre()) {
+						makeOreVein(tile, resource);
+						numResource --;
+					}
+				}
+				
+				
 			}
 		}
+	}
+	private static void makeOreVein(Tile t, ResourceType resource) {
+		HashMap<Tile, Double> visited = new HashMap<>();
+		int oreSize = 10;
+		
+		PriorityQueue<Tile> search = new PriorityQueue<>((x, y) ->  { 
+			double distancex = visited.get(x);
+			double distancey = visited.get(y);
+			if(distancey < distancex) {
+				return 1;
+			}
+			else if(distancey > distancex) {
+				return -1;
+			}
+			else {
+				return 0;
+			}
+		});
+		visited.put(t, 0.0);
+		search.add(t);
+		
+		while(oreSize > 0) {
+			Tile potential = search.poll();
+			
+			for(Tile ti : potential.getNeighbors()) {
+				if(visited.containsKey(ti)) {
+					continue;
+				}
+				visited.put(ti, ti.getLocation().distanceTo(t.getLocation()) + Math.random()*10);
+				search.add(ti);
+			}
+			
+			if(resource.isOre() && potential.canOre() ) {
+				// if ore is rare the tile must be able to support rare ore
+				
+				if(!resource.isRare() || potential.canSupportRareOre()) {
+					potential.setResource(resource);
+					oreSize--;
+				}
+			}
+		}
+		
+		
+		
 	}
 
 	private void oldMakeLake(int volume, Tile[][] world, double[][] heightMap) {

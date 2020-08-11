@@ -71,7 +71,7 @@ public class World {
 	public void rain() {
 		System.out.println("raining");
 		for(Tile tile : getTiles()) {
-			if(tile.getTerrain() != Terrain.SNOW || tile.getTerrain() != Terrain.ROCK) {
+			if(tile.getTerrain() != Terrain.SNOW && tile.getTerrain() != Terrain.ROCK) {
 				continue;
 			}
 			if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.DRY) {
@@ -102,13 +102,31 @@ public class World {
 		}
 		GroundModifiers = GroundModifiersNew;
 	}
+	public void spawnOgre() {
+		
+		
+		LinkedList<Tile> tiles = this.getTilesRandomly();
+		Tile t = tiles.getFirst();
+		for(Tile tile : tiles) {
+			if(tile.getTerrain() == Terrain.ROCK) {
+				t = tile;
+				break;
+			}
+		}
+		System.out.println("Ogre at: "+t.getLocation().x+ ", "+ t.getLocation().y);
+		Animal ogre = new Animal(UnitType.OGRE, t, false);
+		t.addUnit(ogre);
+		Wildlife.addAnimal(ogre);
+		ogre.setTile(t);
+		
+		
+	}
 	public void meteorStrike() {
-		System.err.println("meteor strike");
 		Tile t = this.getTilesRandomly().getFirst();
 		
 		
-		int radius = (int) (Math.random()*20);
-		System.out.println("meteor at:"+t +", " );
+		int radius = (int) (Math.random()*20 + 5);
+		System.out.println("meteor at: "+t.getLocation().x+ ", "+ t.getLocation().y);
 		
 		for(Tile tile : this.getTiles()) {
 			
@@ -120,11 +138,36 @@ public class World {
 				
 				
 				if(distanceFromCenter < radius) {
-					tile.setTerrain(Terrain.BURNED_GROUND);
+					if(tile.getTerrain() != Terrain.ROCK && tile.getTerrain() != Terrain.SNOW && tile.getTerrain() != Terrain.VOLCANO) {
+						tile.setTerrain(Terrain.BURNED_GROUND);
+					}
+					
+					tile.liquidAmount = 0;
 					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, tile);
 					GroundModifiers.add(fire);
 					tile.setModifier(fire);
+					if(tile.getHasBuilding() == true) {
+						tile.getBuilding().takeDamage(10000);
+					}
+					for(Unit unit : tile.getUnits()) {
+						unit.takeDamage(10000);
+					}
+					if(tile.getPlant() != null) {
+						tile.getPlant().takeDamage(10000);
+					}
+					
+					double height = tile.getHeight()+0.2 - (radius/2 - distanceFromCenter)/radius/4;
+					if(distanceFromCenter > radius/2) {
+						height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
+					}
+//					double height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
+//					if(distanceFromCenter > radius/2) {
+//						height = tile.getHeight()+0.2 - (radius/2 - distanceFromCenter)/radius/4;
+//					}
+					tile.setHeight(Math.max(height, tile.getHeight()));
 				}
+				
+				
 		}
 		
 		
@@ -145,8 +188,13 @@ public class World {
 					tile.setTerrain(Terrain.GRASS);
 				}
 			}
-			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA) {
-				double chance = 0.01;
+			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA 
+//					&& (tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.FIRE)
+					) {
+//				if(tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.FIRE) {
+//					return;
+//				}
+				double chance = 0.05;
 				if(Math.random() < chance) {
 					tile.setTerrain(Terrain.DIRT);
 				}
@@ -187,9 +235,25 @@ public class World {
 		System.out.println(plantsLand.size() + " land plants and " + plantsAquatic.size() + " aquatic plants.");
 		LinkedList<Plant> newAquatic = new LinkedList<>();
 		LinkedList<Plant> newLand = new LinkedList<>();
+		
 		for(Tile tile : getTiles()) {
-			if(tile.getPlant() != null)
+			
+			if(tile.canPlant() == false) {
 				continue;
+			}
+			
+			if(tile.getPlant() != null && tile.getPlant().getPlantType() == PlantType.FOREST1 && tile.canPlant()) {
+				for(Tile t : tile.getNeighbors()) {
+					if(Math.random() < 0.05 && t.getPlant() == null && t != tile) {
+//						t.setHasPlant(new Plant(PlantType.FOREST1, tile));
+//						newLand.add(tile.getPlant());
+					}
+				}
+			}
+			
+			if(tile.getPlant() != null) {
+				continue;
+			}
 			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(Math.random() < 0.01) {
 					Plant plant = new Plant(PlantType.CATTAIL, tile);
@@ -197,16 +261,12 @@ public class World {
 					newAquatic.add(plant);
 				}
 			}
-			else if(tile.canPlant() && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
-				if(Math.random() < 0.00001) {
-					tile.setHasPlant(new Plant(PlantType.FOREST1, tile));
-					newLand.add(tile.getPlant());
-				}
-				else if(Math.random() < 0.0001) {
-					tile.setHasPlant(new Plant(PlantType.BERRY, tile));
-					newLand.add(tile.getPlant());
-				}
+			
+			if (Math.random() < 0.001) {
+				tile.setHasPlant(new Plant(PlantType.BERRY, tile));
+				newLand.add(tile.getPlant());
 			}
+
 		}
 		for(Plant p : plantsAquatic) {
 			newAquatic.add(p);
@@ -248,7 +308,7 @@ public class World {
 		for(Plant plant : plantsLand) {
 			Tile tile = plant.getTile();
 			if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				if(!plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
+				if(plant.isAquatic() == false || tile.liquidType != LiquidType.WATER) {
 					double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
 					int roundedDamage = (int) (damageTaken+1);
 					if(roundedDamage >= 1) {

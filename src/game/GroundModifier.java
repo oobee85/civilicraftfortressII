@@ -7,12 +7,14 @@ public class GroundModifier {
 	
 	private GroundModifierType type;
 	private int timeAlive;
+	private int maxTime;
 	private Tile tile;
 	
 	public GroundModifier(GroundModifierType type, Tile tile) {
 		this.type = type;
 		timeAlive = 0;
 		this.tile = tile;
+		maxTime = (int) (Math.random()*type.getMaxTime());
 	}
 	
 	public GroundModifierType getType() {
@@ -20,11 +22,11 @@ public class GroundModifier {
 	}
 	
 	public int timeLeft() {
-		return type.getMaxTime() - timeAlive;
+		return maxTime - timeAlive;
 	}
 	public boolean updateTime() {
 		timeAlive ++;
-		return timeAlive >= type.getMaxTime();
+		return timeAlive >= maxTime;
 	}
 	public Tile getTile() {
 		return tile;

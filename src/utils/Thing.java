@@ -63,7 +63,9 @@ public class Thing implements HasImage {
 		if(roundedHealing != 0) {
 			timeLastDamageTaken = Game.ticks;
 		}
-		addHitsplat(-roundedHealing);
+		if(roundedHealing > 2) {
+			addHitsplat(-roundedHealing);
+		}
 	}
 	private void addHitsplat(int damage) {
 		int oldest = 0;
@@ -91,11 +93,11 @@ public class Thing implements HasImage {
 	}
 	public void updateHitsplats() {
 		for(int i = 0; i < hitsplats.length; i++) {
-			if(hitsplats[i] != null) {
-				hitsplats[i].updateDuration();
-				if(hitsplats[i].isDead() == true) {
-					hitsplats[i] = null;
-				}
+			if(hitsplats[i] == null) {
+				continue;
+			}
+			if(hitsplats[i].isDead() == true) {
+				hitsplats[i] = null;
 			}
 		}
 	}
