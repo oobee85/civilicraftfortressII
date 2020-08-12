@@ -35,6 +35,10 @@ public enum BuildingType implements HasImage {
 				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.ROCK,100);  }}),
 		WORKSHOP (1000, 250, "resources/Images/buildings/workshop.png", 0.1, true, 
 				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.ROCK,500);  }}),
+		BLACKSMITH (1000, 250, "resources/Images/buildings/blacksmith.png", 0.1, true, 
+				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.ROCK,500);  }}),
+		RESEARCHLAB (1000, 250, "resources/Images/buildings/research.png", 0.1, true, 
+				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.ROCK,500);  }}),
 	 	
 		;
 

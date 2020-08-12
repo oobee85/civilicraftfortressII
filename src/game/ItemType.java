@@ -9,45 +9,47 @@ import utils.*;
 
 public enum ItemType implements HasImage {
 	
-	COPPER_ORE ( "resources/Images/itemicons/copper_ore.png", null, null),
-	IRON_ORE ( "resources/Images/itemicons/iron_ore.png", ResearchType.IRON_WORKING, null),
-	SILVER_ORE ( "resources/Images/itemicons/silver_ore.png", null, null),
-	MITHRIL_ORE ( "resources/Images/itemicons/mithril_ore.png", ResearchType.ARMORING, null),
-	GOLD_ORE ( "resources/Images/itemicons/gold_ore.png", ResearchType.CURRENCY, null),
-	ADAMANTITE_ORE ( "resources/Images/itemicons/adamantite_ore.png", ResearchType.CHIVALRY, null),
-	RUNITE_ORE ( "resources/Images/itemicons/runite_ore.png", ResearchType.CHIVALRY, null),
-	TITANIUM_ORE ( "resources/Images/itemicons/titanium_ore.png", ResearchType.CHIVALRY, null),
+	COPPER_ORE ( "resources/Images/itemicons/copper_ore.png", null, null, null),
+	IRON_ORE ( "resources/Images/itemicons/iron_ore.png", ResearchType.IRON_WORKING, null, null),
+	SILVER_ORE ( "resources/Images/itemicons/silver_ore.png", null, null, null),
+	MITHRIL_ORE ( "resources/Images/itemicons/mithril_ore.png", ResearchType.ARMORING, null, null),
+	GOLD_ORE ( "resources/Images/itemicons/gold_ore.png", ResearchType.CURRENCY, null, null),
+	ADAMANTITE_ORE ( "resources/Images/itemicons/adamantite_ore.png", ResearchType.CHIVALRY, null, null),
+	RUNITE_ORE ( "resources/Images/itemicons/runite_ore.png", ResearchType.CHIVALRY, null, null),
+	TITANIUM_ORE ( "resources/Images/itemicons/titanium_ore.png", ResearchType.CHIVALRY, null, null),
 	
-	FOOD ( "resources/Images/itemicons/wheat.png", null, null),
-	HORSE ( "resources/Images/units/horse.png", ResearchType.HORSEBACK_RIDING, null),
-	WOOD ( "resources/Images/itemicons/wood.png", null, null),
-	ROCK ( "resources/Images/itemicons/rock.png", null, null),
+	FOOD ( "resources/Images/itemicons/wheat.png", null, null, null),
+	HORSE ( "resources/Images/units/horse.png", ResearchType.HORSEBACK_RIDING, null, null),
+	WOOD ( "resources/Images/itemicons/wood.png", null, null, null),
+	ROCK ( "resources/Images/itemicons/rock.png", null, null, null),
 	
-	COPPER_BAR ( "resources/Images/itemicons/copper_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,10); }}),
-	IRON_BAR ( "resources/Images/itemicons/iron_bar.png", ResearchType.IRON_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.IRON_ORE,10);  }}),
-	BRONZE_BAR ( "resources/Images/itemicons/bronze_bar.png", ResearchType.BRONZE_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,5); put(ItemType.SILVER_ORE, 5); }}),
-	SILVER_BAR ( "resources/Images/itemicons/silver_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.SILVER_ORE,10); }}),
-	MITHRIL_BAR ( "resources/Images/itemicons/mithril_bar.png", ResearchType.ARMORING, new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_ORE,10);  }}),
-	GOLD_BAR ( "resources/Images/itemicons/gold_bar.png", ResearchType.CURRENCY, new HashMap<ItemType, Integer>() { {put(ItemType.GOLD_ORE,10);  }}),
-	ADAMANTITE_BAR ( "resources/Images/itemicons/adamantite_bar.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.ADAMANTITE_ORE,10);  }}),
-	RUNITE_BAR ( "resources/Images/itemicons/runite_bar.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.RUNITE_ORE,10);  }}),
-	TITANIUM_BAR ( "resources/Images/itemicons/copper_bar.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.TITANIUM_ORE,10);  }}),
+	COPPER_BAR ( "resources/Images/itemicons/copper_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,10); }}, BuildingType.BLACKSMITH),
+	IRON_BAR ( "resources/Images/itemicons/iron_bar.png", ResearchType.IRON_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.IRON_ORE,10);  }}, BuildingType.BLACKSMITH),
+	BRONZE_BAR ( "resources/Images/itemicons/bronze_bar.png", ResearchType.BRONZE_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,5); put(ItemType.SILVER_ORE, 5); }}, BuildingType.BLACKSMITH),
+	SILVER_BAR ( "resources/Images/itemicons/silver_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.SILVER_ORE,10); }}, BuildingType.BLACKSMITH),
+	MITHRIL_BAR ( "resources/Images/itemicons/mithril_bar.png", ResearchType.ARMORING, new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_ORE,10);  }}, BuildingType.BLACKSMITH),
+	GOLD_BAR ( "resources/Images/itemicons/gold_bar.png", ResearchType.CURRENCY, new HashMap<ItemType, Integer>() { {put(ItemType.GOLD_ORE,10);  }}, BuildingType.BLACKSMITH),
+	ADAMANTITE_BAR ( "resources/Images/itemicons/adamantite_bar.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.ADAMANTITE_ORE,10);  }}, BuildingType.BLACKSMITH),
+	RUNITE_BAR ( "resources/Images/itemicons/runite_bar.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.RUNITE_ORE,10);  }}, BuildingType.BLACKSMITH),
+	TITANIUM_BAR ( "resources/Images/itemicons/copper_bar.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.TITANIUM_ORE,10);  }}, BuildingType.BLACKSMITH),
 	
-	BRONZE_SWORD ( "resources/Images/itemicons/bronze_sword.png", ResearchType.BRONZE_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.BRONZE_BAR,5);  }}),
-	IRON_SWORD ( "resources/Images/itemicons/iron_sword.png", ResearchType.IRON_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.IRON_BAR,5);  }}),
-	MITHRIL_SWORD ( "resources/Images/itemicons/mithril_sword.png", ResearchType.ARMORING, new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_BAR,5);  }}),
-	ADAMANT_SWORD ( "resources/Images/itemicons/adamant_sword.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.ADAMANTITE_BAR,5);  }}),
-	RUNE_SWORD ( "resources/Images/itemicons/rune_sword.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.RUNITE_BAR,5);  }}),
-	TITANIUM_SWORD ( "resources/Images/itemicons/titanium_sword.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.TITANIUM_BAR,5);  }}),
+	BRONZE_SWORD ( "resources/Images/itemicons/bronze_sword.png", ResearchType.BRONZE_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.BRONZE_BAR,5); put(ItemType.WOOD, 10); }}, BuildingType.BLACKSMITH),
+	IRON_SWORD ( "resources/Images/itemicons/iron_sword.png", ResearchType.IRON_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.IRON_BAR,5); put(ItemType.WOOD, 10); }}, BuildingType.BLACKSMITH),
+	MITHRIL_SWORD ( "resources/Images/itemicons/mithril_sword.png", ResearchType.ARMORING, new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_BAR,5); put(ItemType.WOOD, 10); }}, BuildingType.BLACKSMITH),
+	ADAMANT_SWORD ( "resources/Images/itemicons/adamant_sword.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.ADAMANTITE_BAR,5); put(ItemType.WOOD, 10); }}, BuildingType.BLACKSMITH),
+	RUNE_SWORD ( "resources/Images/itemicons/rune_sword.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.RUNITE_BAR,5); put(ItemType.WOOD, 10); }}, BuildingType.BLACKSMITH),
+	TITANIUM_SWORD ( "resources/Images/itemicons/titanium_sword.png", ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.TITANIUM_BAR,5); put(ItemType.WOOD, 10); }}, BuildingType.BLACKSMITH),
 	;
 	
 	private MipMap mipmap;
 	private ResearchType researchRequirement;
 	private HashMap <ItemType, Integer> cost;
+	private BuildingType buildingNeeded;
 	
-	ItemType(String s, ResearchType researchNeeded, HashMap <ItemType, Integer> resourcesNeeded) {
+	ItemType(String s, ResearchType researchNeeded, HashMap <ItemType, Integer> resourcesNeeded, BuildingType buildingNeeded) {
 		 this.mipmap = new MipMap(s);
 		 researchRequirement = researchNeeded;
+		 this.buildingNeeded = buildingNeeded;
 		 cost = resourcesNeeded;
 	}
 	

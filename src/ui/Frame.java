@@ -89,7 +89,7 @@ public class Frame extends JPanel{
 				if(bt == BuildingType.CASTLE) {
 					manageCityTab(selected);
 				}
-				if(bt == BuildingType.WORKSHOP) {
+				if(bt == BuildingType.WORKSHOP || bt == BuildingType.BLACKSMITH) {
 					manageCraftTab(selected);
 				}
 				frame.repaint();
