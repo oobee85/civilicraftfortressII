@@ -143,15 +143,15 @@ public class Generation {
 
 	public static void genResources(World world) {
 		for(ResourceType resource : ResourceType.values()) {
-			int numResource = (int)(world.getWidth() * world.getHeight() * resource.getRarity() / OREMULTIPLIER);
+			int numVeins = (int)(world.getWidth() * world.getHeight() * resource.getRarity() / OREMULTIPLIER);
 			
-			System.out.println("Tiles of " + resource.name() + ": " + numResource);
+			System.out.println("Tiles of " + resource.name() + ": " + numVeins);
 			
 			for(Tile tile : world.getTilesRandomly()) {
 				if(tile.getResource() != null) {
 					continue;
 				}
-				if(numResource <= 0) {
+				if(numVeins <= 0) {
 					break;
 				}
 				if(resource.isOre() && tile.canOre() ) {
@@ -159,7 +159,7 @@ public class Generation {
 					
 					if(!resource.isRare() || tile.canSupportRareOre()) {
 						makeOreVein(tile, resource);
-						numResource --;
+						numVeins --;
 					}
 				}
 				
@@ -198,7 +198,7 @@ public class Generation {
 				search.add(ti);
 			}
 			
-			if(resource.isOre() && potential.canOre() ) {
+			if(resource.isOre() && potential.canOre()  && potential.getResource() == null) {
 				// if ore is rare the tile must be able to support rare ore
 				
 				if(!resource.isRare() || potential.canSupportRareOre()) {
