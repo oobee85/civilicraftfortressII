@@ -102,9 +102,8 @@ public class World {
 		}
 		GroundModifiers = GroundModifiersNew;
 	}
+	
 	public void spawnOgre() {
-		
-		
 		LinkedList<Tile> tiles = this.getTilesRandomly();
 		Tile t = tiles.getFirst();
 		for(Tile tile : tiles) {
@@ -118,12 +117,27 @@ public class World {
 		t.addUnit(ogre);
 		Wildlife.addAnimal(ogre);
 		ogre.setTile(t);
-		
-		
 	}
+
+	public void spawnEnt() {
+		LinkedList<Tile> tiles = this.getTilesRandomly();
+		Tile t = tiles.getFirst();
+		for (Tile tile : tiles) {
+			if (tile.getTerrain() == Terrain.GRASS) {
+				t = tile;
+				break;
+			}
+		}
+		System.out.println("Ent at: " + t.getLocation().x + ", " + t.getLocation().y);
+		Animal ent = new Ent(UnitType.ENT, t, false);
+		t.addUnit(ent);
+		Wildlife.addAnimal(ent);
+		ent.setTile(t);
+	}
+	
+	
 	public void meteorStrike() {
 		Tile t = this.getTilesRandomly().getFirst();
-		
 		
 		int radius = (int) (Math.random()*20 + 5);
 		System.out.println("meteor at: "+t.getLocation().x+ ", "+ t.getLocation().y);

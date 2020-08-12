@@ -129,6 +129,17 @@ public class Wildlife {
 				}
 			}
 			
+			if(animal instanceof Ent) {
+				if(animal.getTarget() == null) {
+					for(Unit u : world.units) {
+						if(u.isPlayerControlled()) {
+							animal.setTarget(u);
+							break;
+						}
+					}
+				}
+			}
+			
 
 			if(animal.getTarget() != null) {
 				animal.imOnTheHunt(world);

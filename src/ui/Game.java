@@ -28,7 +28,8 @@ public class Game {
 	ArrayList<Position> structureLoc = new ArrayList<Position>();
 	private Thing selectedThing;
 	private UnitType selectedUnitToSpawn;
-	private int numCutTrees = 0;
+	private int numCutTrees = 10;
+	private int buildingsUntilOgre = 10;
 	
 	LinkedList<Building> buildings = new LinkedList<Building>();
 	
@@ -145,8 +146,13 @@ public class Game {
 		if(ticks == 1) {
 			world.rain();
 		}
-		if(numCutTrees %10 == 9) {
-			//TODO spawn ent
+		if(numCutTrees % 10 == 9) {
+			spawnEnt();
+			numCutTrees += numCutTrees;
+		}
+		if(buildingsUntilOgre == buildings.size()) {
+			spawnOgre();
+			buildingsUntilOgre += buildingsUntilOgre;
 		}
 		world.tick();
 		// rain event
@@ -196,6 +202,9 @@ public class Game {
 	}
 	public void spawnOgre() {
 		world.spawnOgre();
+	}
+	public void spawnEnt() {
+		world.spawnEnt();
 	}
 	public void generateWorld(MapType mapType, int size) {
 		world = new World();
