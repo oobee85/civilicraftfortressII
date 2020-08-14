@@ -13,7 +13,6 @@ import wildlife.*;
 import world.*;
 
 public class Game {
-	
 	private Font damageFont = new Font("Comic Sans MS", Font.BOLD, 14);
 	private Image redHitsplatImage = Utils.loadImage("resources/Images/interfaces/redhitsplat.png");
 	private Image blueHitsplatImage = Utils.loadImage("resources/Images/interfaces/bluehitsplat.png");
@@ -54,7 +53,8 @@ public class Game {
 	private int fastModeTileSize = 10;
 	
 	private GUIController guiController;
-	
+
+	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
 	public static boolean DEBUG_DRAW = false;
 	
 	public World world;
@@ -746,7 +746,7 @@ public class Game {
 			}
 			else if(damage < 0) {
 				g.drawImage(greenHitsplatImage, x, y, splatWidth, splatHeight, null);
-				text = String.format("%.0f", thing.getHitsplatDamage() * -1);
+				text = String.format("%.0f", -thing.getHitsplatDamage());
 			}
 			
 			int fontSize = Game.tileSize/4;
@@ -755,7 +755,7 @@ public class Game {
 			g.setColor(Color.WHITE);
 //				g.drawString(text, x-width/2, y+fontSize*4/10);
 			
-			g.drawString(text, x+width, (int) (y+fontSize*1.5));
+			g.drawString(text, x + splatWidth/2 - width/2, (int) (y+fontSize*1.5));
 		}
 		
 //		if(thing.hasHitsplat()) {
@@ -1016,28 +1016,13 @@ public class Game {
 	}
 	
 	private void unitTick() {
-		for(Unit unit : world.units) {
+		for (Unit unit : world.units) {
 			unit.tick();
-			if(unit.getTargetTile() == null) {
+			if (unit.getTargetTile() == null) {
 				continue;
 			}
-			if(unit.readyToMove()) {
-				Tile currentTile = unit.getTile();
-				double bestDistance = Integer.MAX_VALUE;
-				Tile bestTile = currentTile;
-				
-				for(Tile tile : Utils.getNeighbors(currentTile, world)) {
-					if(tile.isBlocked(unit)) {
-						continue;
-					}
-					double distance = tile.getLocation().distanceTo(unit.getTargetTile().getLocation() );
-					if(distance < bestDistance) {
-						bestDistance = distance;
-						bestTile = tile;
-					}
-					
-				}
-				unit.moveTo(bestTile);
+			if (unit.readyToMove()) {
+				unit.moveTowardsTargetTile();
 			}
 		}
 	}

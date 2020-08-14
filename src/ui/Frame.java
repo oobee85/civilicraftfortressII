@@ -335,8 +335,8 @@ public class Frame extends JPanel{
 		
 		mapSize = new JTextField("128", 10);
 		setComponentAttributes(mapSize, BUILDING_BUTTON_SIZE);
+		mapSize.setFocusable(true);
 		mainMenuPanel.add(mapSize);
-		
 		
 //		JButton exit = new JButton("exit");
 //		exit.addActionListener(new ActionListener() {
@@ -758,6 +758,14 @@ public class Frame extends JPanel{
 				debug.setText(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix");
 			}
 		});
+		JToggleButton reverseAStar = setupToggleButton(Game.USE_BIDIRECTIONAL_A_STAR ? "Bidir A*" : "A*", null, DEBUG_BUTTON_SIZE);
+		reverseAStar.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				Game.USE_BIDIRECTIONAL_A_STAR = reverseAStar.isSelected();
+				reverseAStar.setText(Game.USE_BIDIRECTIONAL_A_STAR ? "Bidir A*" : "A*");
+			}
+		});
 		
 		
 		JButton exit = setupButton("Exit", null, DEBUG_BUTTON_SIZE);
@@ -790,6 +798,7 @@ public class Frame extends JPanel{
 		buttonPanel.add(meteor);
 		buttonPanel.add(ogre);
 		buttonPanel.add(debug);
+		buttonPanel.add(reverseAStar);
 		buttonPanel.add(exit);
 		
 		

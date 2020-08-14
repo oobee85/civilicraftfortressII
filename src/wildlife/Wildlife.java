@@ -75,7 +75,7 @@ public class Wildlife {
 		HashMap<Tile, Animal> trying = new HashMap<>();
 		for(Animal animal : animals) {
 			animal.tick();
-			double liquidDamage = animal.computeTileDamage(animal.getTile(), animal.getTile().getHeight());
+			double liquidDamage = animal.getTile().computeTileDamage(animal);
 			if(animal.getType().isFlying() != true) {
 				if(liquidDamage >= 1) {
 					animal.takeDamage(liquidDamage);
@@ -159,7 +159,7 @@ public class Wildlife {
 						if(t.isBlocked(animal)) {
 							continue;
 						}
-						double danger = animal.computeDanger(t, t.getHeight());
+						double danger = animal.computeDanger(t);
 						if(danger < bestDanger) {
 							best = t;
 							bestDanger = danger;
