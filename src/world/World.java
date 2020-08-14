@@ -92,15 +92,16 @@ public class World {
 	}
 	public void updateGroundModifiers() {
 		LinkedList<GroundModifier> GroundModifiersNew = new LinkedList<GroundModifier>();
-
-		for(GroundModifier modifier : GroundModifiers) {
-			if(modifier.updateTime() == false) {
-				GroundModifiersNew.add(modifier);
-			}else {
-				modifier.getTile().setModifier(null);
+		synchronized(GroundModifiers) {
+			for(GroundModifier modifier : GroundModifiers) {
+				if(modifier.updateTime() == false) {
+					GroundModifiersNew.add(modifier);
+				}else {
+					modifier.getTile().setModifier(null);
+				}
 			}
+			GroundModifiers = GroundModifiersNew;
 		}
-		GroundModifiers = GroundModifiersNew;
 	}
 	
 	public void spawnOgre() {
@@ -158,7 +159,9 @@ public class World {
 					
 					tile.liquidAmount = 0;
 					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, tile);
-					GroundModifiers.add(fire);
+					synchronized(GroundModifiers) {
+						GroundModifiers.add(fire);
+					}
 					tile.setModifier(fire);
 					if(tile.getHasBuilding() == true) {
 						tile.getBuilding().takeDamage(10000);
@@ -299,13 +302,9 @@ public class World {
 		for (Unit unit : units) {
 			Tile tile = unit.getTile();
 			unit.damageTarget();
-			if (tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
-				int roundedDamage = (int) (damageTaken+1);
-				if(roundedDamage >= 1) {
-					unit.takeDamage(roundedDamage);
-				}
-				
+			int tileDamage = tile.computeTileDamage(unit);
+			if(tileDamage != 0) {
+				unit.takeDamage(tileDamage);
 			}
 			if (unit.isDead() == true) {
 				tile.removeUnit(unit);

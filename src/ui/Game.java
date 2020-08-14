@@ -746,7 +746,7 @@ public class Game {
 			}
 			else if(damage < 0) {
 				g.drawImage(greenHitsplatImage, x, y, splatWidth, splatHeight, null);
-				text = String.format("%.0f", thing.getHitsplatDamage() * -1);
+				text = String.format("%.0f", -thing.getHitsplatDamage());
 			}
 			
 			int fontSize = Game.tileSize/4;
@@ -755,7 +755,7 @@ public class Game {
 			g.setColor(Color.WHITE);
 //				g.drawString(text, x-width/2, y+fontSize*4/10);
 			
-			g.drawString(text, x+width, (int) (y+fontSize*1.5));
+			g.drawString(text, x + splatWidth/2 - width/2, (int) (y+fontSize*1.5));
 		}
 		
 //		if(thing.hasHitsplat()) {
@@ -1015,178 +1015,6 @@ public class Game {
 		
 	}
 	
-	private class Node {
-		Tile tile;
-		Node previous;
-		double cost;
-		public Node(Tile tile, Node previous, double cost) {
-			this.tile = tile;
-			this.previous = previous;
-			this.cost = cost;
-		}
-	}
-	
-	static int count = 0;
-
-	private Tile chooseBestTile(Unit unit, Tile startingTile, Tile targetTile) {
-		if(startingTile == targetTile) {
-			return startingTile;
-		}
-		if(startingTile.getLocation().distanceTo(targetTile.getLocation()) == 1) {
-			return targetTile;
-		}
-		PriorityQueue<Node> search = new PriorityQueue<>((x, y) -> {
-			int speed = unit.getUnitType().getCombatStats().getSpeed();
-			// if speed is 0 then A* pathfinding will look through entire map
-			speed = speed <= 0 ? 1 : speed;
-			double xcost = x.cost + x.tile.getLocation().distanceTo(targetTile.getLocation())*speed;
-			double ycost = y.cost + y.tile.getLocation().distanceTo(targetTile.getLocation())*speed;
-			if (ycost < xcost) {
-				return 1;
-			} else if (ycost > xcost) {
-				return -1;
-			} else {
-				return 0;
-			}
-		});
-		PriorityQueue<Node> reverseSearch = new PriorityQueue<>((x, y) -> {
-			int speed = unit.getUnitType().getCombatStats().getSpeed();
-			// if speed is 0 then A* pathfinding will look through entire map
-			speed = speed <= 0 ? 1 : speed;
-			double xcost = x.cost + x.tile.getLocation().distanceTo(startingTile.getLocation())*speed;
-			double ycost = y.cost + y.tile.getLocation().distanceTo(startingTile.getLocation())*speed;
-			if (ycost < xcost) {
-				return 1;
-			} else if (ycost > xcost) {
-				return -1;
-			} else {
-				return 0;
-			}
-		});
-		HashMap<Tile, Node> visited = new HashMap<>();
-		HashMap<Tile, Node> reverseVisited = new HashMap<>();
-		
-		Node startingNode = new Node(startingTile, null, 0);
-		search.add(startingNode);
-		visited.put(startingNode.tile, startingNode);
-		
-		Node endingNode = new Node(targetTile, null, 0);
-		reverseSearch.add(endingNode);
-		reverseVisited.put(endingNode.tile, endingNode);
-		
-		Tile bestTile = startingTile;
-		Tile meetingPoint = startingTile;
-		double bestForwardCost = Double.MAX_VALUE;
-		double bestReverseCost = Double.MAX_VALUE;
-		
-		boolean forwardDone = false;
-		boolean reverseDone = !USE_BIDIRECTIONAL_A_STAR;
-		
-		
-		while (true) {
-			if(search.isEmpty() || reverseSearch.isEmpty()) {
-				break;
-			}
-			if(forwardDone && reverseDone) {
-				break;
-			}
-			if(!forwardDone) {
-				Node currentNode = search.remove();
-				if(currentNode.cost >= bestForwardCost) {
-					// If the next cheapest path is already worse than the best, nothing left to do.
-					forwardDone = true;
-					search.add(currentNode);
-				}
-				if(!forwardDone) {
-					Node[] results = asdf(unit, currentNode, targetTile, visited, reverseVisited, search, true);
-					if(results != null) {
-						if(currentNode.tile != meetingPoint) {
-							reverseDone = !USE_BIDIRECTIONAL_A_STAR;
-						}
-						bestForwardCost = results[0].cost;
-						bestTile = results[0].tile;
-						bestReverseCost = results[1].cost;
-					}
-				}
-			}
-			if(!reverseDone) {
-				Node currentNode = reverseSearch.remove();
-				if(currentNode.cost >= bestReverseCost) {
-					// If the next cheapest path is already worse than the best, nothing left to do.
-					reverseDone = true;
-					reverseSearch.add(currentNode);
-				}
-				if(!reverseDone) {
-					Node[] results = asdf(unit, currentNode, startingTile, reverseVisited, visited, reverseSearch, false);
-					if(results != null) {
-						if(currentNode.tile != meetingPoint) {
-							forwardDone = false;
-						}
-						bestForwardCost = results[0].cost;
-						bestTile = results[0].tile;
-						bestReverseCost = results[1].cost;
-					}
-				}
-			}
-		}
-		return bestTile;
-	}
-	private Node[] asdf(Unit unit, Node currentNode, Tile targetTile, HashMap<Tile, Node> visited, HashMap<Tile, Node> reverseVisited, PriorityQueue<Node> search, boolean forward) {
-		Tile currentTile = currentNode.tile;
-		if(reverseVisited.containsKey(currentTile)) {
-			if(forward) {
-				Node parent = currentNode;
-				Node child = parent.previous;
-				while(child != null && child.previous != null) {
-					parent = child;
-					child = parent.previous;
-				}
-				Tile bestTile = parent.tile;
-				return new Node[] {
-						new Node(bestTile, null, currentNode.cost),
-						new Node(bestTile, null, reverseVisited.get(currentTile).cost)
-					};
-			}
-			else {
-				Tile bestTile = currentNode.previous.tile;
-				if(reverseVisited.get(currentTile).tile != targetTile) {
-					Node parent = reverseVisited.get(currentTile);
-					Node child = parent.previous;
-					while(child != null && child.previous != null) {
-						parent = child;
-						child = parent.previous;
-					}
-					bestTile = parent.tile;
-				}
-				return new Node[] {
-					new Node(bestTile, null, reverseVisited.get(currentTile).cost),
-					new Node(bestTile, null, currentNode.cost)
-				};
-			}
-		}
-		
-		List<Tile> neighbors = Utils.getNeighbors(currentTile, world);
-		for (Tile neighbor : neighbors) {
-			if(!neighbor.canMove()) {
-				continue;
-			}
-			double cost = currentNode.cost;
-			if(forward) {
-				cost += unit.movePenaltyTo(currentTile, neighbor);
-			}
-			else {
-				cost += unit.movePenaltyTo(neighbor, currentTile);
-			}
-			// if tile not visited, or the cost can be improved
-			if(!visited.containsKey(neighbor) || cost < visited.get(neighbor).cost) {
-				Node newNode = new Node(neighbor, currentNode, cost);
-				visited.put(neighbor, newNode);
-				search.add(newNode);
-			}
-		}
-		return null;
-	}
-
 	private void unitTick() {
 		for (Unit unit : world.units) {
 			unit.tick();
@@ -1194,7 +1022,7 @@ public class Game {
 				continue;
 			}
 			if (unit.readyToMove()) {
-				unit.moveTo(chooseBestTile(unit, unit.getTile(), unit.getTargetTile()));
+				unit.moveTowardsTargetTile();
 			}
 		}
 	}

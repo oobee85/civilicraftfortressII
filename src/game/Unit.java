@@ -3,6 +3,8 @@ package game;
 
 import java.util.*;
 
+import liquid.*;
+import pathfinding.*;
 import ui.*;
 import utils.*;
 import wildlife.Animal;
@@ -36,6 +38,11 @@ public class Unit extends Thing {
 		return unitType;
 	}
 	
+	public int computeDanger(Tile tile) {
+		// currently only tile damage but at some point might check if enemies there
+		return tile.computeTileDamage(this);
+	}
+	
 	public double movePenaltyTo(Tile from, Tile to) {
 		double penalty = to.getTerrain().moveSpeed();
 		if(from.getRoadType() != null && to.getRoadType() != null) {
@@ -49,7 +56,7 @@ public class Unit extends Thing {
 	}
 	
 	public void moveTo(Tile t) {
-		if(t.canMove() == false) {
+		if(t.canMove(this) == false) {
 			return;
 		}
 		double penalty = movePenaltyTo(this.getTile(), t);
@@ -67,6 +74,20 @@ public class Unit extends Thing {
 		}
 	}
 	
+	public void moveTowardsTargetTile() {
+		if(this.getTargetTile() == null) {
+			return;
+		}
+		this.moveTo(Pathfinding.chooseBestTile(this, this.getTile(), this.getTargetTile()));
+	}
+
+	public void moveTowardsTarget() {
+		if(this.getTarget() == null) {
+			return;
+		}
+		this.moveTo(Pathfinding.chooseBestTile(this, this.getTile(), this.getTarget().getTile()));
+	}
+
 	public void tick() {
 		if(timeToMove > 0) {
 			timeToMove -= 2;

@@ -238,7 +238,10 @@ public class Tile {
 		return terr.isOreable(terr);
 	}
 
-	public boolean canMove() {
+	public boolean canMove(Unit u) {
+		if(u.getType().isFlying()) {
+			return true;
+		}
 		if (building == null) {
 			return true;
 		}
@@ -247,6 +250,35 @@ public class Tile {
 			return false;
 		}
 		return true;
+	}
+	
+	public int computeTileDamage(Unit unit) {
+		double damage = 0;
+		if(unit.getType().isFlying()) {
+			
+		}
+		else {
+			if(unit.getType().isAquatic()) {
+				if(liquidAmount < LiquidType.DRY.getMinimumDamageAmount()) {
+					damage += (LiquidType.DRY.getMinimumDamageAmount() - liquidAmount) * LiquidType.DRY.getDamage();
+				}
+			}
+			else {
+				if(liquidAmount > liquidType.getMinimumDamageAmount()) {
+					damage += liquidAmount * liquidType.getDamage();
+				}
+			}
+		}
+		if(checkTerrain(Terrain.SNOW)) {
+			if(getHeight() > World.SNOW_LEVEL) {
+				damage += 0.1 *(getHeight() - World.SNOW_LEVEL) / (1 - World.SNOW_LEVEL);
+			}
+			else {
+				damage += 0.01;
+			}
+		}
+		int roundedDamage = (int) (damage);
+		return roundedDamage;
 	}
 
 	public void setTerrain(Terrain t) {

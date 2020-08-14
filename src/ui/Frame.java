@@ -335,8 +335,8 @@ public class Frame extends JPanel{
 		
 		mapSize = new JTextField("128", 10);
 		setComponentAttributes(mapSize, BUILDING_BUTTON_SIZE);
+		mapSize.setFocusable(true);
 		mainMenuPanel.add(mapSize);
-		
 		
 //		JButton exit = new JButton("exit");
 //		exit.addActionListener(new ActionListener() {
