@@ -78,13 +78,11 @@ public class Animal extends Unit {
 		
 	}
 	public void eat(int damage) {
-
 		if(readyToAttack()) {
 			energy += damage;
 			drive += 0.01;
-			super.resetTimeToAttack();
+			resetTimeToAttack();
 		}
-		
 
 	}
 	public void loseEnergy() {
