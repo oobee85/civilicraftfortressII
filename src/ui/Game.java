@@ -56,6 +56,7 @@ public class Game {
 
 	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
 	public static boolean DEBUG_DRAW = false;
+	public static boolean DISABLE_NIGHT = false;
 	
 	public World world;
 	

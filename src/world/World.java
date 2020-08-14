@@ -580,6 +580,9 @@ public class World {
 	}
 	
 	public double getDaylight() {
+		if(Game.DISABLE_NIGHT) {
+			return 1;
+		}
 		int currentDayOffset = (Game.ticks + TRANSITION_PERIOD)%(DAY_DURATION + NIGHT_DURATION);
 		double ratio = 1;
 		if(currentDayOffset < TRANSITION_PERIOD) {

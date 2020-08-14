@@ -758,12 +758,12 @@ public class Frame extends JPanel{
 				debug.setText(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix");
 			}
 		});
-		JToggleButton reverseAStar = setupToggleButton(Game.USE_BIDIRECTIONAL_A_STAR ? "Bidir A*" : "A*", null, DEBUG_BUTTON_SIZE);
-		reverseAStar.addActionListener(new ActionListener() {
+		JToggleButton toggleNight = setupToggleButton(Game.DISABLE_NIGHT ? "Night Disabled" : "Night Enabled", null, DEBUG_BUTTON_SIZE);
+		toggleNight.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				Game.USE_BIDIRECTIONAL_A_STAR = reverseAStar.isSelected();
-				reverseAStar.setText(Game.USE_BIDIRECTIONAL_A_STAR ? "Bidir A*" : "A*");
+			public void actionPerformed(ActionEvent e) {
+				Game.DISABLE_NIGHT = toggleNight.isSelected();
+				toggleNight.setText(Game.DISABLE_NIGHT ? "Night Disabled" : "Night Enabled");
 			}
 		});
 		
@@ -798,7 +798,7 @@ public class Frame extends JPanel{
 		buttonPanel.add(meteor);
 		buttonPanel.add(ogre);
 		buttonPanel.add(debug);
-		buttonPanel.add(reverseAStar);
+		buttonPanel.add(toggleNight);
 		buttonPanel.add(exit);
 		
 		

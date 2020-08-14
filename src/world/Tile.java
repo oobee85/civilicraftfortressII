@@ -132,8 +132,7 @@ public class Tile {
 	}
 
 	public double getBrightness() {
-		double brightness = 0;
-		brightness += this.getBrightnessNonRecursive();
+		double brightness = this.getBrightnessNonRecursive();
 		for (Tile tile : getNeighbors()) {
 			brightness += tile.getBrightnessNonRecursive();
 		}
