@@ -335,8 +335,8 @@ public class Frame extends JPanel{
 		
 		mapSize = new JTextField("128", 10);
 		setComponentAttributes(mapSize, BUILDING_BUTTON_SIZE);
+		mapSize.setFocusable(true);
 		mainMenuPanel.add(mapSize);
-		
 		
 //		JButton exit = new JButton("exit");
 //		exit.addActionListener(new ActionListener() {
@@ -758,6 +758,14 @@ public class Frame extends JPanel{
 				debug.setText(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix");
 			}
 		});
+		JToggleButton toggleNight = setupToggleButton(Game.DISABLE_NIGHT ? "Night Disabled" : "Night Enabled", null, DEBUG_BUTTON_SIZE);
+		toggleNight.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Game.DISABLE_NIGHT = toggleNight.isSelected();
+				toggleNight.setText(Game.DISABLE_NIGHT ? "Night Disabled" : "Night Enabled");
+			}
+		});
 		
 		
 		JButton exit = setupButton("Exit", null, DEBUG_BUTTON_SIZE);
@@ -790,6 +798,7 @@ public class Frame extends JPanel{
 		buttonPanel.add(meteor);
 		buttonPanel.add(ogre);
 		buttonPanel.add(debug);
+		buttonPanel.add(toggleNight);
 		buttonPanel.add(exit);
 		
 		

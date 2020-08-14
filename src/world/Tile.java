@@ -132,8 +132,7 @@ public class Tile {
 	}
 
 	public double getBrightness() {
-		double brightness = 0;
-		brightness += this.getBrightnessNonRecursive();
+		double brightness = this.getBrightnessNonRecursive();
 		for (Tile tile : getNeighbors()) {
 			brightness += tile.getBrightnessNonRecursive();
 		}
@@ -167,22 +166,23 @@ public class Tile {
 		g.fillRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize);
 	}
 
-	public void drawDebugStrings(Graphics g, List<String> strings, int[][] rows, int fontsize, int stringWidth) {
+	public int drawDebugStrings(Graphics g, List<String> strings, int row, int fontsize) {
 		int x = location.x * Game.tileSize + 2;
 		int y = location.y * Game.tileSize + fontsize / 2;
-		int row = rows[location.x][location.y];
-		
-		g.setColor(Color.black);
-		g.fillRect(x, y + 2 + row * fontsize, Game.tileSize, Game.tileSize /2);
-		g.setColor(Color.green);
+		int maxWidth = 0;
 		for (String s : strings) {
-			g.drawString(s, x, y + (++row) * fontsize);
+			int stringWidth = g.getFontMetrics().stringWidth(s)+2;
+			maxWidth = maxWidth > stringWidth ? maxWidth : stringWidth;
 		}
-		for(Unit unit : units) {
-			g.drawString("TTA: "+ unit.getTimeToAttack(), x, y + (++row) * fontsize);
+		g.setColor(Color.black);
+		g.fillRect(x, y + 2 + row, maxWidth, fontsize * strings.size());
+		for (String s : strings) {
+			g.setColor(Color.green);
+			row += fontsize;
+			g.drawString(s, x, y + row);
 		}
-		
-		rows[location.x][location.y] = row;
+		row += 1;
+		return row;
 	}
 
 	public boolean isBlocked(Unit u) {
@@ -237,7 +237,10 @@ public class Tile {
 		return terr.isOreable(terr);
 	}
 
-	public boolean canMove() {
+	public boolean canMove(Unit u) {
+		if(u.getType().isFlying()) {
+			return true;
+		}
 		if (building == null) {
 			return true;
 		}
@@ -246,6 +249,35 @@ public class Tile {
 			return false;
 		}
 		return true;
+	}
+	
+	public int computeTileDamage(Unit unit) {
+		double damage = 0;
+		if(unit.getType().isFlying()) {
+			
+		}
+		else {
+			if(unit.getType().isAquatic()) {
+				if(liquidAmount < LiquidType.DRY.getMinimumDamageAmount()) {
+					damage += (LiquidType.DRY.getMinimumDamageAmount() - liquidAmount) * LiquidType.DRY.getDamage();
+				}
+			}
+			else {
+				if(liquidAmount > liquidType.getMinimumDamageAmount()) {
+					damage += liquidAmount * liquidType.getDamage();
+				}
+			}
+		}
+		if(checkTerrain(Terrain.SNOW)) {
+			if(getHeight() > World.SNOW_LEVEL) {
+				damage += 0.1 *(getHeight() - World.SNOW_LEVEL) / (1 - World.SNOW_LEVEL);
+			}
+			else {
+				damage += 0.01;
+			}
+		}
+		int roundedDamage = (int) (damage);
+		return roundedDamage;
 	}
 
 	public void setTerrain(Terrain t) {

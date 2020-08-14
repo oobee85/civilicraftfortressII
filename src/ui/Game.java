@@ -13,7 +13,6 @@ import wildlife.*;
 import world.*;
 
 public class Game {
-	
 	private Font damageFont = new Font("Comic Sans MS", Font.BOLD, 14);
 	private Image redHitsplatImage = Utils.loadImage("resources/Images/interfaces/redhitsplat.png");
 	private Image blueHitsplatImage = Utils.loadImage("resources/Images/interfaces/bluehitsplat.png");
@@ -54,8 +53,10 @@ public class Game {
 	private int fastModeTileSize = 10;
 	
 	private GUIController guiController;
-	
+
+	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
 	public static boolean DEBUG_DRAW = false;
+	public static boolean DISABLE_NIGHT = false;
 	
 	public World world;
 	
@@ -669,52 +670,34 @@ public class Game {
 			}
 			if(DEBUG_DRAW) {
 				if(Game.tileSize >= 36) {
-					int[][] rows = new int[world.getWidth()][world.getHeight()];
+					int[][] rows = new int[upperX - lowerX][upperY - lowerY];
 					int fontsize = Game.tileSize/4;
 					fontsize = Math.min(fontsize, 13);
 					Font font = new Font("Consolas", Font.PLAIN, fontsize);
 					g.setFont(font);
-					int stringWidth = g.getFontMetrics().stringWidth(String.format("??=%." + NUM_DEBUG_DIGITS + "f", 0.0));
 					for (int i = lowerX; i < upperX; i++) {
 						for (int j = lowerY; j < upperY; j++) {
-							TileLoc loc = new TileLoc(i, j);
-							Tile tile = world[loc];
-							int x = i * Game.tileSize + 2;
-							int y = j * Game.tileSize + fontsize/2;
-							
-							g.setColor(Color.black);
-							int numrows = 2;
-							if(world[loc].liquidType == LiquidType.DRY) {
-								numrows = 1;
+							Tile tile = world[new TileLoc(i, j)];
+							List<String> strings = new LinkedList<String>();
+							strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
+							if(tile.liquidType != LiquidType.DRY) {
+								strings.add(String.format(tile.liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount));
 							}
-							g.fillRect(x, y + 2, stringWidth, numrows*fontsize);
-							g.setColor(Color.green);
-							g.drawString(String.format("H=%." + NUM_DEBUG_DIGITS + "f", world[new TileLoc(i, j)].getHeight()), x, y + (++rows[i][j])*fontsize);
-							
-							if(world[loc].liquidType != LiquidType.DRY) {
-								g.drawString(String.format(world[loc].liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount), x, y + (++rows[i][j])*fontsize);
+							if(tile.getModifier() != null) {
+								strings.add(tile.getModifier().timeLeft() + "");
 							}
-							if(world[loc].getModifier() != null) {
-								g.drawString(world[loc].getModifier().timeLeft() + "", x, y + (++rows[i][j])*fontsize);
+							rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, strings, rows[i-lowerX][j-lowerY], fontsize);
+							
+							for(Unit unit : tile.getUnits()) {
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, unit.getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
+							}
+							if(tile.getPlant() != null) {
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getPlant().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
+							}
+							if(tile.getHasBuilding()) {
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getBuilding().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
 							}
 						}
-					}
-					for(Unit unit : world.units) {
-						unit.getTile().drawDebugStrings(g, unit.getDebugStrings(), rows, fontsize, stringWidth);
-						g.drawString("TTA: "+ unit.getTimeToAttack(), unit.getTile().getLocation().x, unit.getTile().getLocation().y);
-						System.out.println(""+unit.getTile().getLocation().x+ ", "+ unit.getTile().getLocation().y);
-					}
-					for(Animal animal : Wildlife.getAnimals()) {
-						animal.getTile().drawDebugStrings(g, animal.getDebugStrings(), rows, fontsize, stringWidth);
-					}
-					for(Plant plant : world.plantsLand) {
-						plant.getTile().drawDebugStrings(g, plant.getDebugStrings(), rows, fontsize, stringWidth);
-					}
-					for(Plant plant : world.plantsAquatic) {
-						plant.getTile().drawDebugStrings(g, plant.getDebugStrings(), rows, fontsize, stringWidth);
-					}
-					for(Building building : buildings) {
-						building.getTile().drawDebugStrings(g, building.getDebugStrings(), rows, fontsize, stringWidth);
 					}
 				}
 			}
@@ -764,7 +747,7 @@ public class Game {
 			}
 			else if(damage < 0) {
 				g.drawImage(greenHitsplatImage, x, y, splatWidth, splatHeight, null);
-				text = String.format("%.0f", thing.getHitsplatDamage() * -1);
+				text = String.format("%.0f", -thing.getHitsplatDamage());
 			}
 			
 			int fontSize = Game.tileSize/4;
@@ -773,7 +756,7 @@ public class Game {
 			g.setColor(Color.WHITE);
 //				g.drawString(text, x-width/2, y+fontSize*4/10);
 			
-			g.drawString(text, x+width, (int) (y+fontSize*1.5));
+			g.drawString(text, x + splatWidth/2 - width/2, (int) (y+fontSize*1.5));
 		}
 		
 //		if(thing.hasHitsplat()) {
@@ -1034,28 +1017,13 @@ public class Game {
 	}
 	
 	private void unitTick() {
-		for(Unit unit : world.units) {
+		for (Unit unit : world.units) {
 			unit.tick();
-			if(unit.getTargetTile() == null) {
+			if (unit.getTargetTile() == null) {
 				continue;
 			}
-			if(unit.readyToMove()) {
-				Tile currentTile = unit.getTile();
-				double bestDistance = Integer.MAX_VALUE;
-				Tile bestTile = currentTile;
-				
-				for(Tile tile : Utils.getNeighbors(currentTile, world)) {
-					if(tile.isBlocked(unit)) {
-						continue;
-					}
-					double distance = tile.getLocation().distanceTo(unit.getTargetTile().getLocation() );
-					if(distance < bestDistance) {
-						bestDistance = distance;
-						bestTile = tile;
-					}
-					
-				}
-				unit.moveTo(bestTile);
+			if (unit.readyToMove()) {
+				unit.moveTowardsTargetTile();
 			}
 		}
 	}

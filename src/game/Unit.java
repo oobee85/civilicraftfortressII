@@ -1,6 +1,11 @@
 package game;
 
 
+import java.util.*;
+
+import liquid.*;
+import pathfinding.*;
+import ui.*;
 import utils.*;
 import wildlife.Animal;
 import world.*;
@@ -33,20 +38,29 @@ public class Unit extends Thing {
 		return unitType;
 	}
 	
-	public void moveTo(Tile t) {
-		if(t.canMove() == false) {
-			return;
-		}
-		double penalty = t.getTerrain().moveSpeed();
-		if(getTile().getRoadType() != null && t.getRoadType() != null) {
-			penalty = penalty/getTile().getRoadType().getSpeed()/2;
+	public int computeDanger(Tile tile) {
+		// currently only tile damage but at some point might check if enemies there
+		return tile.computeTileDamage(this);
+	}
+	
+	public double movePenaltyTo(Tile from, Tile to) {
+		double penalty = to.getTerrain().moveSpeed();
+		if(from.getRoadType() != null && to.getRoadType() != null) {
+			penalty = penalty/from.getRoadType().getSpeed()/2;
 		}
 		if(this.getUnitType().isFlying()) {
 			penalty = 0;
 		}
 		penalty += unitType.getCombatStats().getSpeed();
+		return penalty;
+	}
+	
+	public void moveTo(Tile t) {
+		if(t.canMove(this) == false) {
+			return;
+		}
+		double penalty = movePenaltyTo(this.getTile(), t);
 		timeToMove += penalty;
-		
 		
 		getTile().removeUnit(this);
 		t.addUnit(this);
@@ -60,6 +74,20 @@ public class Unit extends Thing {
 		}
 	}
 	
+	public void moveTowardsTargetTile() {
+		if(this.getTargetTile() == null) {
+			return;
+		}
+		this.moveTo(Pathfinding.chooseBestTile(this, this.getTile(), this.getTargetTile()));
+	}
+
+	public void moveTowardsTarget() {
+		if(this.getTarget() == null) {
+			return;
+		}
+		this.moveTo(Pathfinding.chooseBestTile(this, this.getTile(), this.getTarget().getTile()));
+	}
+
 	public void tick() {
 		if(timeToMove > 0) {
 			timeToMove -= 2;
@@ -130,7 +158,12 @@ public class Unit extends Thing {
 		return timeToAttack;
 	}
 	
-
+	@Override
+	public List<String> getDebugStrings() {
+		List<String> strings = super.getDebugStrings();
+		strings.add(String.format("TTA=%.1f", getTimeToAttack()));
+		return strings;
+	}
 	@Override
 	public String toString() {
 		return unitType;

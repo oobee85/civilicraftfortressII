@@ -50,12 +50,11 @@ public class Thing implements HasImage {
 		return health <= 0;
 	}
 	public void takeDamage(double damage) {
-		int roundedDamage = (int)Math.ceil(damage);
-		health -= roundedDamage;
+		health -= damage;
 		if(damage != 0) {
 			timeLastDamageTaken = Game.ticks;
 		}
-		addHitsplat(roundedDamage);
+		addHitsplat((int)(Math.ceil(damage)));
 	}
 	public void heal(double healing) {
 		int roundedHealing = (int)Math.ceil(healing);
@@ -160,7 +159,9 @@ public class Thing implements HasImage {
 	}
 	
 	public List<String> getDebugStrings() {
-		return new LinkedList<String>(Arrays.asList(String.format("HP=%." + Game.NUM_DEBUG_DIGITS + "f", getHealth())));
+		return new LinkedList<String>(Arrays.asList(
+				String.format("HP=%.0f/%.0f", getHealth(), getMaxHealth())
+				));
 	}
 
 }

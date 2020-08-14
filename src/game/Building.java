@@ -56,9 +56,9 @@ public class Building extends Thing {
 	@Override
 	public List<String> getDebugStrings() {
 		List<String> strings = super.getDebugStrings();
-		strings.add(String.format("CT=%." + Game.NUM_DEBUG_DIGITS + "f", getCulture() ));
+		strings.add(String.format("CT=%.1f", getCulture() ));
 		if(!isBuilt()) {
-			strings.add(String.format("work^2=%." + Game.NUM_DEBUG_DIGITS + "f", getRemainingEffort() ));
+			strings.add(String.format("work^2=%.0f", getRemainingEffort() ));
 		}
 		return strings;
 	}
