@@ -42,13 +42,11 @@ public class Animal extends Unit {
 		return Math.random()*1000 > energy + 10;
 	}
 	public void eat(int damage) {
-
 		if(readyToAttack()) {
 			energy += damage;
 			drive += 0.01;
-			super.resetTimeToAttack();
+			resetTimeToAttack();
 		}
-		
 
 	}
 	public void loseEnergy() {
