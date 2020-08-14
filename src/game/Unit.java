@@ -36,20 +36,24 @@ public class Unit extends Thing {
 		return unitType;
 	}
 	
-	public void moveTo(Tile t) {
-		if(t.canMove() == false) {
-			return;
-		}
-		double penalty = t.getTerrain().moveSpeed();
-		if(getTile().getRoadType() != null && t.getRoadType() != null) {
-			penalty = penalty/getTile().getRoadType().getSpeed()/2;
+	public double movePenaltyTo(Tile from, Tile to) {
+		double penalty = to.getTerrain().moveSpeed();
+		if(from.getRoadType() != null && to.getRoadType() != null) {
+			penalty = penalty/from.getRoadType().getSpeed()/2;
 		}
 		if(this.getUnitType().isFlying()) {
 			penalty = 0;
 		}
 		penalty += unitType.getCombatStats().getSpeed();
+		return penalty;
+	}
+	
+	public void moveTo(Tile t) {
+		if(t.canMove() == false) {
+			return;
+		}
+		double penalty = movePenaltyTo(this.getTile(), t);
 		timeToMove += penalty;
-		
 		
 		getTile().removeUnit(this);
 		t.addUnit(this);

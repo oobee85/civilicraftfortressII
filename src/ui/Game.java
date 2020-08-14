@@ -1015,29 +1015,84 @@ public class Game {
 		
 	}
 	
+	private class Node {
+		Tile tile;
+		Node previous;
+		double cost;
+		public Node(Tile tile, Node previous, double cost) {
+			this.tile = tile;
+			this.previous = previous;
+			this.cost = cost;
+		}
+	}
+
+	private Tile chooseBestTile(Unit unit, Tile startingTile, Tile targetTile) {
+		PriorityQueue<Node> search = new PriorityQueue<>((x, y) -> {
+			double xcost = x.cost + x.tile.getLocation().distanceTo(targetTile.getLocation())*unit.getUnitType().getCombatStats().getSpeed();
+			double ycost = y.cost + y.tile.getLocation().distanceTo(targetTile.getLocation())*unit.getUnitType().getCombatStats().getSpeed();
+			if (ycost < xcost) {
+				return 1;
+			} else if (ycost > xcost) {
+				return -1;
+			} else {
+				return 0;
+			}
+		});
+		Node startingNode = new Node(startingTile, null, 0);
+		search.add(startingNode);
+		
+		HashMap<Tile, Double> visited = new HashMap<>();
+		visited.put(startingNode.tile, startingNode.cost);
+		
+		Tile bestTile = startingTile;
+		double bestCost = Double.MAX_VALUE;
+		
+		int iterations = 0;
+		while (!search.isEmpty()) {
+			iterations++;
+			Node currentNode = search.remove();
+			if(currentNode.cost >= bestCost) {
+				// If the next cheapest path is already worse than the best, nothing left to do.
+				break;
+			}
+			Tile currentTile = currentNode.tile;
+			if(currentTile == targetTile) {
+				bestCost = currentNode.cost;
+				Node parent = currentNode;
+				currentNode = parent.previous;
+				while(currentNode!= null && currentNode.previous != null) {
+					parent = currentNode;
+					currentNode = parent.previous;
+				}
+				bestTile = parent.tile;
+			}
+
+			List<Tile> neighbors = Utils.getNeighbors(currentTile, world);
+			for (Tile neighbor : neighbors) {
+				if (visited.containsKey(neighbor)) {
+					continue;
+				}
+				if(!neighbor.canMove()) {
+					visited.put(neighbor, -1.0);
+					continue;
+				}
+				double cost = currentNode.cost + unit.movePenaltyTo(currentTile, neighbor);
+				Node newNode = new Node(neighbor, currentNode, cost);
+				visited.put(neighbor, 0.0);
+				search.add(newNode);
+			}
+		}
+		return bestTile;
+	}
+
 	private void unitTick() {
-		for(Unit unit : world.units) {
+		for (Unit unit : world.units) {
 			unit.tick();
-			if(unit.getTargetTile() == null) {
+			if (unit.getTargetTile() == null) {
 				continue;
 			}
-			if(unit.readyToMove()) {
-				Tile currentTile = unit.getTile();
-				double bestDistance = Integer.MAX_VALUE;
-				Tile bestTile = currentTile;
-				
-				for(Tile tile : Utils.getNeighbors(currentTile, world)) {
-					if(tile.isBlocked(unit)) {
-						continue;
-					}
-					double distance = tile.getLocation().distanceTo(unit.getTargetTile().getLocation() );
-					if(distance < bestDistance) {
-						bestDistance = distance;
-						bestTile = tile;
-					}
-					
-				}
-				unit.moveTo(bestTile);
+			if (unit.readyToMove()) {
+				unit.moveTo(chooseBestTile(unit, unit.getTile(), unit.getTargetTile()));
 			}
 		}
 	}
