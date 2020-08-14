@@ -167,21 +167,23 @@ public class Tile {
 		g.fillRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize);
 	}
 
-	public void drawDebugStrings(Graphics g, List<String> strings, int[][] rows, int fontsize, int stringWidth) {
+	public int drawDebugStrings(Graphics g, List<String> strings, int row, int fontsize) {
 		int x = location.x * Game.tileSize + 2;
 		int y = location.y * Game.tileSize + fontsize / 2;
-		int row = rows[location.x][location.y];
-		
+		int maxWidth = 0;
 		for (String s : strings) {
-			int w = g.getFontMetrics().stringWidth(s)+2;
-			g.setColor(Color.black);
-			g.fillRect(x, y + 2 + row, w, fontsize);
+			int stringWidth = g.getFontMetrics().stringWidth(s)+2;
+			maxWidth = maxWidth > stringWidth ? maxWidth : stringWidth;
+		}
+		g.setColor(Color.black);
+		g.fillRect(x, y + 2 + row, maxWidth, fontsize * strings.size());
+		for (String s : strings) {
 			g.setColor(Color.green);
 			row += fontsize;
 			g.drawString(s, x, y + row);
 		}
 		row += 1;
-		rows[location.x][location.y] = row;
+		return row;
 	}
 
 	public boolean isBlocked(Unit u) {

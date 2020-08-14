@@ -669,12 +669,11 @@ public class Game {
 			}
 			if(DEBUG_DRAW) {
 				if(Game.tileSize >= 36) {
-					int[][] rows = new int[world.getWidth()][world.getHeight()];
+					int[][] rows = new int[upperX - lowerX][upperY - lowerY];
 					int fontsize = Game.tileSize/4;
 					fontsize = Math.min(fontsize, 13);
 					Font font = new Font("Consolas", Font.PLAIN, fontsize);
 					g.setFont(font);
-					int stringWidth = g.getFontMetrics().stringWidth(String.format("??=%." + NUM_DEBUG_DIGITS + "f", 0.0));
 					for (int i = lowerX; i < upperX; i++) {
 						for (int j = lowerY; j < upperY; j++) {
 							Tile tile = world[new TileLoc(i, j)];
@@ -686,23 +685,18 @@ public class Game {
 							if(tile.getModifier() != null) {
 								strings.add(tile.getModifier().timeLeft() + "");
 							}
-							tile.drawDebugStrings(g, strings, rows, fontsize, stringWidth);
+							rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, strings, rows[i-lowerX][j-lowerY], fontsize);
+							
+							for(Unit unit : tile.getUnits()) {
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, unit.getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
+							}
+							if(tile.getPlant() != null) {
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getPlant().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
+							}
+							if(tile.getHasBuilding()) {
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getBuilding().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
+							}
 						}
-					}
-					for(Unit unit : world.units) {
-						unit.getTile().drawDebugStrings(g, unit.getDebugStrings(), rows, fontsize, stringWidth);
-					}
-					for(Animal animal : Wildlife.getAnimals()) {
-						animal.getTile().drawDebugStrings(g, animal.getDebugStrings(), rows, fontsize, stringWidth);
-					}
-					for(Plant plant : world.plantsLand) {
-						plant.getTile().drawDebugStrings(g, plant.getDebugStrings(), rows, fontsize, stringWidth);
-					}
-					for(Plant plant : world.plantsAquatic) {
-						plant.getTile().drawDebugStrings(g, plant.getDebugStrings(), rows, fontsize, stringWidth);
-					}
-					for(Building building : buildings) {
-						building.getTile().drawDebugStrings(g, building.getDebugStrings(), rows, fontsize, stringWidth);
 					}
 				}
 			}

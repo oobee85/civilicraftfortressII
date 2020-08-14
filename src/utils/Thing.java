@@ -161,7 +161,7 @@ public class Thing implements HasImage {
 	
 	public List<String> getDebugStrings() {
 		return new LinkedList<String>(Arrays.asList(
-				String.format("HP=%.1f/%.1f", getHealth(), getMaxHealth())
+				String.format("HP=%.0f/%.0f", getHealth(), getMaxHealth())
 				));
 	}
 
