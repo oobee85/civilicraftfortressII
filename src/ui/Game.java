@@ -677,32 +677,20 @@ public class Game {
 					int stringWidth = g.getFontMetrics().stringWidth(String.format("??=%." + NUM_DEBUG_DIGITS + "f", 0.0));
 					for (int i = lowerX; i < upperX; i++) {
 						for (int j = lowerY; j < upperY; j++) {
-							TileLoc loc = new TileLoc(i, j);
-							Tile tile = world[loc];
-							int x = i * Game.tileSize + 2;
-							int y = j * Game.tileSize + fontsize/2;
-							
-							g.setColor(Color.black);
-							int numrows = 2;
-							if(world[loc].liquidType == LiquidType.DRY) {
-								numrows = 1;
+							Tile tile = world[new TileLoc(i, j)];
+							List<String> strings = new LinkedList<String>();
+							strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
+							if(tile.liquidType != LiquidType.DRY) {
+								strings.add(String.format(tile.liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount));
 							}
-							g.fillRect(x, y + 2, stringWidth, numrows*fontsize);
-							g.setColor(Color.green);
-							g.drawString(String.format("H=%." + NUM_DEBUG_DIGITS + "f", world[new TileLoc(i, j)].getHeight()), x, y + (++rows[i][j])*fontsize);
-							
-							if(world[loc].liquidType != LiquidType.DRY) {
-								g.drawString(String.format(world[loc].liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount), x, y + (++rows[i][j])*fontsize);
+							if(tile.getModifier() != null) {
+								strings.add(tile.getModifier().timeLeft() + "");
 							}
-							if(world[loc].getModifier() != null) {
-								g.drawString(world[loc].getModifier().timeLeft() + "", x, y + (++rows[i][j])*fontsize);
-							}
+							tile.drawDebugStrings(g, strings, rows, fontsize, stringWidth);
 						}
 					}
 					for(Unit unit : world.units) {
 						unit.getTile().drawDebugStrings(g, unit.getDebugStrings(), rows, fontsize, stringWidth);
-						g.drawString("TTA: "+ unit.getTimeToAttack(), unit.getTile().getLocation().x, unit.getTile().getLocation().y);
-						System.out.println(""+unit.getTile().getLocation().x+ ", "+ unit.getTile().getLocation().y);
 					}
 					for(Animal animal : Wildlife.getAnimals()) {
 						animal.getTile().drawDebugStrings(g, animal.getDebugStrings(), rows, fontsize, stringWidth);

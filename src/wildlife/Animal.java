@@ -28,7 +28,7 @@ public class Animal extends Unit {
 	@Override
 	public List<String> getDebugStrings() {
 		List<String> strings = super.getDebugStrings();
-		strings.add(String.format("EN=%." + Game.NUM_DEBUG_DIGITS + "f", getEnergy()));
+		strings.add(String.format("EN=%.1f", getEnergy()));
 		return strings;
 	}
 	

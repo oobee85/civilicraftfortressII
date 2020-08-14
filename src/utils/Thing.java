@@ -160,7 +160,9 @@ public class Thing implements HasImage {
 	}
 	
 	public List<String> getDebugStrings() {
-		return new LinkedList<String>(Arrays.asList(String.format("HP=%." + Game.NUM_DEBUG_DIGITS + "f", getHealth())));
+		return new LinkedList<String>(Arrays.asList(
+				String.format("HP=%.1f/%.1f", getHealth(), getMaxHealth())
+				));
 	}
 
 }

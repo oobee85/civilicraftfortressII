@@ -1,6 +1,9 @@
 package game;
 
 
+import java.util.*;
+
+import ui.*;
 import utils.*;
 import wildlife.Animal;
 import world.*;
@@ -130,7 +133,12 @@ public class Unit extends Thing {
 		return timeToAttack;
 	}
 	
-
+	@Override
+	public List<String> getDebugStrings() {
+		List<String> strings = super.getDebugStrings();
+		strings.add(String.format("TTA=%.1f", getTimeToAttack()));
+		return strings;
+	}
 	@Override
 	public String toString() {
 		return unitType;

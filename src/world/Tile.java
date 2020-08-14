@@ -172,16 +172,15 @@ public class Tile {
 		int y = location.y * Game.tileSize + fontsize / 2;
 		int row = rows[location.x][location.y];
 		
-		g.setColor(Color.black);
-		g.fillRect(x, y + 2 + row * fontsize, Game.tileSize, Game.tileSize /2);
-		g.setColor(Color.green);
 		for (String s : strings) {
-			g.drawString(s, x, y + (++row) * fontsize);
+			int w = g.getFontMetrics().stringWidth(s)+2;
+			g.setColor(Color.black);
+			g.fillRect(x, y + 2 + row, w, fontsize);
+			g.setColor(Color.green);
+			row += fontsize;
+			g.drawString(s, x, y + row);
 		}
-		for(Unit unit : units) {
-			g.drawString("TTA: "+ unit.getTimeToAttack(), x, y + (++row) * fontsize);
-		}
-		
+		row += 1;
 		rows[location.x][location.y] = row;
 	}
 
