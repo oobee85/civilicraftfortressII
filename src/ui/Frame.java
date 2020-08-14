@@ -139,7 +139,7 @@ public class Frame extends JPanel{
 				for(int i = 0; i < BuildingType.values().length; i++) {
 					BuildingType type = BuildingType.values()[i];
 					JButton button = buildingButtons[i];
-					ResearchRequirement req = gameInstance.buildingResearchRequirements[type];
+					ResearchRequirement req = gameInstance.buildingResearchRequirements.get(type);
 					if(req.areRequirementsMet()) {
 						button.setEnabled(true);
 						button.setVisible(true);
@@ -155,7 +155,7 @@ public class Frame extends JPanel{
 						continue;
 					}
 					UnitType type = UnitType.values()[i];
-					ResearchRequirement req = gameInstance.unitResearchRequirements[type];
+					ResearchRequirement req = gameInstance.unitResearchRequirements.get(type);
 					if(req.areRequirementsMet()) {
 						button.setEnabled(true);
 						button.setVisible(true);
@@ -171,7 +171,7 @@ public class Frame extends JPanel{
 						continue;
 					}
 					JButton button = craftButtons[i];
-					ResearchRequirement req = gameInstance.craftResearchRequirements[type];
+					ResearchRequirement req = gameInstance.craftResearchRequirements.get(type);
 					if(req.areRequirementsMet()) {
 						button.setEnabled(true);
 						button.setVisible(true);
@@ -812,7 +812,7 @@ public class Frame extends JPanel{
 				gameInstance.setResearchTarget(type);
 			});
 			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new ResearchInfoPanel(gameInstance.researches[type]));
+				switchInfoPanel(new ResearchInfoPanel(gameInstance.researches.get(type)));
 			});
 			researchButtons[i] = button;
 			techView.add(researchButtons[i]);

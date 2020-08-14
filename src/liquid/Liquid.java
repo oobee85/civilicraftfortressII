@@ -30,8 +30,8 @@ public class Liquid {
 //		for(int x = 0; x < world.length; x++) {
 //			for(int y = 0; y < world.length; y++) {
 //				for(int i = 0; i < totals.length; i++) {
-//					if(world[x][y].liquidType == LiquidType.values()[i]) {
-//						totals[i] += world[x][y].liquidAmount;
+//					if(world.get(x][y].liquidType == LiquidType.values()[i]) {
+//						totals[i] += world.get(x][y].liquidAmount;
 //					}
 //				}
 //			}
@@ -40,13 +40,13 @@ public class Liquid {
 //			System.out.println("Total " + LiquidType.values()[i].name() + ": " + totals[i]);
 //		}
 		for(Tile tile : world.getTilesRandomly()) {
-			liquidAmountsTemp[tile.getLocation().x][tile.getLocation().y] = world[tile.getLocation()].liquidAmount;
-			liquidTypesTemp[tile.getLocation().x][tile.getLocation().y] = world[tile.getLocation()].liquidType;
+			liquidAmountsTemp[tile.getLocation().x][tile.getLocation().y] = world.get(tile.getLocation()).liquidAmount;
+			liquidTypesTemp[tile.getLocation().x][tile.getLocation().y] = world.get(tile.getLocation()).liquidType;
 		}
 //		for(int x = 0; x < world.getWidth(); x++) {
 //			for(int y = 0; y < world.getHeight(); y++) {
-//				liquidAmountsTemp[x][y] = world[new TileLoc(x, y)].liquidAmount;
-//				liquidTypesTemp[x][y] = world[new TileLoc(x, y)].liquidType;
+//				liquidAmountsTemp[x][y] = world.get(new TileLoc(x, y)].liquidAmount;
+//				liquidTypesTemp[x][y] = world.get(new TileLoc(x, y)].liquidType;
 //			}
 //		}
 		
@@ -99,7 +99,7 @@ public class Liquid {
 			LiquidType mytype = liquidTypesTemp[x][y];
 			
 			double oh = otherTile.getHeight();
-			double ov = world[other].liquidAmount;
+			double ov = world.get(other).liquidAmount;
 			LiquidType otype = liquidTypesTemp[other.x][other.y];
 			
 			if(myh + myv < oh + ov) {
@@ -117,14 +117,14 @@ public class Liquid {
 					if(myh < oh) {
 						double deltah = oh - myh;
 						double changeh = deltah/2 * Math.min(change* FRICTION_RATIO, 1);
-						world[current].setHeight(world[current].getHeight() + changeh);
-						world[other].setHeight(world[other].getHeight() - changeh);
+						world.get(current).setHeight(world.get(current).getHeight() + changeh);
+						world.get(other).setHeight(world.get(other).getHeight() - changeh);
 					}
 					liquidAmountsTemp[x][y] += change;
 					liquidTypesTemp[x][y] = otype;
 					
 					liquidAmountsTemp[other.x][other.y] -= change;
-					world[other].liquidAmount -= change;
+					world.get(other).liquidAmount -= change;
 				}
 				else {
 					if(otype == LiquidType.WATER && mytype == LiquidType.LAVA ||
@@ -138,11 +138,11 @@ public class Liquid {
 							combined = myv;
 							extra = change - combined;
 						}
-						world[current].setHeight(world[current].getHeight() + combined);
+						world.get(current).setHeight(world.get(current).getHeight() + combined);
 						
 						if(extra == 0) {
 							liquidAmountsTemp[x][y] -= combined;
-							world[new TileLoc(x, y)].liquidAmount -= combined;
+							world.get(new TileLoc(x, y)).liquidAmount -= combined;
 						}
 						else {
 							liquidAmountsTemp[x][y] = extra;
@@ -150,7 +150,7 @@ public class Liquid {
 						}
 						
 						liquidAmountsTemp[other.x][other.y] -= change;
-						world[other].liquidAmount -= change;
+						world.get(other).liquidAmount -= change;
 					}
 				}
 			}

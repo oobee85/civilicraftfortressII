@@ -82,7 +82,7 @@ public class World {
 	}
 	public void eruptVolcano() {
 		System.out.println("eruption");
-		this[volcano].liquidAmount += 500;
+		this.get(volcano).liquidAmount += 500;
 		
 //		world[volcano].liquidType = LiquidType.WATER;
 //		world[volcano].liquidAmount += 200;
@@ -421,8 +421,8 @@ public class World {
 			for(int j = minY; j <= maxY; j++) {
 				if(i == x || j == y) {
 					if(i != x || j != y) {
-						if(this[new TileLoc(i, j)] != null) {
-							tiles.add(this[new TileLoc(i, j)]);
+						if(this.get(new TileLoc(i, j)) != null) {
+							tiles.add(this.get(new TileLoc(i, j)));
 						}
 					}
 				}

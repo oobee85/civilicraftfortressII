@@ -25,7 +25,7 @@ public class Item extends Quantity {
 
 	@Override
 	public String toString() {
-		return itemType;
+		return itemType.toString();
 	}
 
 }

@@ -15,54 +15,54 @@ public class Wildlife {
 		for(Tile tile : world.getTilesRandomly()) {
 			TileLoc loc = tile.getLocation();
 			if(Math.random() < 0.01) {
-				if(world[loc].checkTerrain(Terrain.GRASS) || world[loc].checkTerrain(Terrain.DIRT)) {
+				if(world.get(loc).checkTerrain(Terrain.GRASS) || world.get(loc).checkTerrain(Terrain.DIRT)) {
 					makeAnimal(UnitType.DEER, world, loc);
 				}
 				
-				if(world[loc].liquidAmount > world[loc].liquidType.getMinimumDamageAmount()) {
+				if(world.get(loc).liquidAmount > world.get(loc).liquidType.getMinimumDamageAmount()) {
 					makeAnimal(UnitType.FISH, world, loc);
 				}
 			}
 			
 			if(Math.random() < 0.01) {
-				if(world[loc].checkTerrain(Terrain.DIRT)) {
+				if(world.get(loc).checkTerrain(Terrain.DIRT)) {
 					makeAnimal(UnitType.HORSE, world, loc);
 				}
 			}
 			
 			if(Math.random() < 0.01) {
-				if(world[loc].checkTerrain(Terrain.GRASS)) {
+				if(world.get(loc).checkTerrain(Terrain.GRASS)) {
 					makeAnimal(UnitType.PIG, world, loc);
 				}
 			}
 			if(Math.random() < 0.01) {
-				if(world[loc].checkTerrain(Terrain.GRASS)) {
+				if(world.get(loc).checkTerrain(Terrain.GRASS)) {
 					makeAnimal(UnitType.SHEEP, world, loc);
 				}
 			}
 			if(Math.random() < 0.01) {
-				if(world[loc].checkTerrain(Terrain.GRASS)) {
+				if(world.get(loc).checkTerrain(Terrain.GRASS)) {
 					makeAnimal(UnitType.COW, world, loc);
 				}
 			}
 			
-			if(world[loc].getTerrain() == Terrain.VOLCANO && Math.random() < 0.01) {
+			if(world.get(loc).getTerrain() == Terrain.VOLCANO && Math.random() < 0.01) {
 				makeAnimal(UnitType.DRAGON, world, loc);
 			}
-			if(world[loc].getTerrain() == Terrain.SNOW && Math.random() < 0.005) {
+			if(world.get(loc).getTerrain() == Terrain.SNOW && Math.random() < 0.005) {
 				makeAnimal(UnitType.WOLF, world, loc);
 			}
 		}
 	}
 	private static void makeAnimal(UnitType animalType, World world, TileLoc loc) {
 		
-		if(animalType.isAquatic() == false && world[loc].liquidAmount > world[loc].liquidType.getMinimumDamageAmount()/2 ) {
+		if(animalType.isAquatic() == false && world.get(loc).liquidAmount > world.get(loc).liquidType.getMinimumDamageAmount()/2 ) {
 			return;
 		}
-		Animal animal = new Animal(animalType, world[loc], false);
-		animal.setTile(world[loc]);
+		Animal animal = new Animal(animalType, world.get(loc), false);
+		animal.setTile(world.get(loc));
 		animals.add(animal);
-		world[loc].addUnit(animal);
+		world.get(loc).addUnit(animal);
 		
 	}
 	
@@ -88,6 +88,7 @@ public class Wildlife {
 				continue;
 			}
 			animal.loseEnergy();
+			animal.tick();
 			if(animal.wantsToEat()) {
 				if(animal.getType().isHostile() == true && animal.getTarget() == null) {
 					

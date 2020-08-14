@@ -252,7 +252,7 @@ public class Generation {
 	public static void makeLake(double volume, World world) {
 		// Fill tiles until volume reached
 		PriorityQueue<TileLoc> queue = new PriorityQueue<TileLoc>((p1, p2) -> {
-			return (world[p1].getHeight() + world[p1].liquidAmount) - (world[p2].getHeight() + world[p2].liquidAmount) > 0 ? 1 : -1;
+			return (world.get(p1).getHeight() + world.get(p1).liquidAmount) - (world.get(p2).getHeight() + world.get(p2).liquidAmount) > 0 ? 1 : -1;
 		});
 		boolean[][] visited = new boolean[world.getWidth()][world.getHeight()];
 		queue.add(new TileLoc((int) (Math.random() * world.getWidth()), (int) (Math.random() * world.getHeight())));
@@ -260,10 +260,10 @@ public class Generation {
 			TileLoc next = queue.poll();
 			int i = next.x;
 			int j = next.y;
-			world[next].liquidAmount += 0.02;
+			world.get(next).liquidAmount += 0.02;
 			volume -= 0.02;
 			// Add adjacent tiles to the queue
-			for(Tile t : world[next].getNeighbors()) {
+			for(Tile t : world.get(next).getNeighbors()) {
 				if(!visited[t.getLocation().x][t.getLocation().y]) {
 					queue.add(t.getLocation());
 					visited[t.getLocation().x][t.getLocation().y] = true;

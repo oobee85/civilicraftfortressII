@@ -65,7 +65,7 @@ public class Building extends Thing {
 	
 	@Override
 	public String toString() {
-		return buildingType;
+		return buildingType.toString();
 	}
 	
 }

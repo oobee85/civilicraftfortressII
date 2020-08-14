@@ -80,7 +80,7 @@ public class Game {
 		}
 		for(Research research : researches.values()) {
 			for(ResearchType requiredType : research.getType().getChildren()) {
-				research.getRequirement().addRequirement(researches[requiredType]);
+				research.getRequirement().addRequirement(researches.get(requiredType));
 			}
 		}
 		for(BuildingType type : BuildingType.values()) {
@@ -89,7 +89,7 @@ public class Game {
 			// only add requirement if it isnt null
 			if(type.getResearchRequirement() != null) {
 				// get the research that type requires
-				Research typesRequirement = researches[type.getResearchRequirement()];
+				Research typesRequirement = researches.get(type.getResearchRequirement());
 				// add the required research to the req
 				req.addRequirement(typesRequirement);
 			}
@@ -102,7 +102,7 @@ public class Game {
 			// only add requirement if it isnt null
 			if(type.getResearchRequirement() != null) {
 				// get the research that type requires
-				Research typesRequirement = researches[type.getResearchRequirement()];
+				Research typesRequirement = researches.get(type.getResearchRequirement());
 				// add the required research to the req
 				req.addRequirement(typesRequirement);
 			}
@@ -115,7 +115,7 @@ public class Game {
 			// only add requirement if it isnt null
 			if(type.getResearchRequirement() != null) {
 				// get the research that type requires
-				Research typesRequirement = researches[type.getResearchRequirement()];
+				Research typesRequirement = researches.get(type.getResearchRequirement());
 				// add the required research to the req
 				req.addRequirement(typesRequirement);
 			}
@@ -123,12 +123,12 @@ public class Game {
 			craftResearchRequirements.put(type, req);
 		}
 		
-		resources[ItemType.IRON_ORE].addAmount(200);
-		resources[ItemType.COPPER_ORE].addAmount(200);
-		resources[ItemType.HORSE].addAmount(200);
-		resources[ItemType.FOOD].addAmount(2000);
-		resources[ItemType.WOOD].addAmount(2000);
-		resources[ItemType.ROCK].addAmount(2000);
+		resources.get(ItemType.IRON_ORE).addAmount(200);
+		resources.get(ItemType.COPPER_ORE).addAmount(200);
+		resources.get(ItemType.HORSE).addAmount(200);
+		resources.get(ItemType.FOOD).addAmount(2000);
+		resources.get(ItemType.WOOD).addAmount(2000);
+		resources.get(ItemType.ROCK).addAmount(2000);
 		
 	}
 	
@@ -164,8 +164,8 @@ public class Game {
 			world.grow();
 		}
 		if(world.volcano != null) {
-			world[world.volcano].liquidType = LiquidType.LAVA;
-//			world[world.volcano].liquidAmount += .01;
+			world.get(world.volcano).liquidType = LiquidType.LAVA;
+//			world.get(world.volcano].liquidAmount += .01;
 			if(Math.random() < 0.0001) {
 				eruptVolcano();
 			}
@@ -411,7 +411,7 @@ public class Game {
 				Path p = currentPath.clone();
 				p.addTile(neighbor, cost);
 				if(visited.containsKey(neighbor)) {
-					if(p.getCost() > visited[currentTile]) {
+					if(p.getCost() > visited.get(currentTile)) {
 						// Already visited this tile at a lower cost
 						continue;
 					}
@@ -446,8 +446,8 @@ public class Game {
 			}
 		}
 
-		makeRoadBetween(world[new TileLoc(world.getWidth()-1, 0)], world[new TileLoc(0, world.getHeight()-1)]);
-		makeRoadBetween(world[new TileLoc(0, 0)], world[new TileLoc(world.getWidth()-1, world.getHeight()-1)]);
+		makeRoadBetween(world.get(new TileLoc(world.getWidth()-1, 0)), world.get(new TileLoc(0, world.getHeight()-1)));
+		makeRoadBetween(world.get(new TileLoc(0, 0)), world.get(new TileLoc(world.getWidth()-1, world.getHeight()-1)));
 		makeRoadBetween(highestTile, lowestTile);
 		turnRoads();
 		
@@ -478,7 +478,7 @@ public class Game {
 				s += d;
 			}
 		}
-		world[loc].setRoad(RoadType.STONE_ROAD, s);
+		world.get(loc).setRoad(RoadType.STONE_ROAD, s);
 	}
 	private void turnRoads() {
 		for(Tile tile : world.getTiles()) {
@@ -533,7 +533,7 @@ public class Game {
 			if(showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
-						Tile tile = world[new TileLoc(i, j)];
+						Tile tile = world.get(new TileLoc(i, j));
 						if(tile == null)
 							continue;
 						highest = Math.max(highest, tile.getHeight());
@@ -543,7 +543,7 @@ public class Game {
 			}
 			for (int i = lowerX; i < upperX; i++) {
 				for (int j = lowerY; j < upperY; j++) {
-					Tile t = world[new TileLoc(i, j)];
+					Tile t = world.get(new TileLoc(i, j));
 					if(t == null)
 						continue;
 					int x = t.getLocation().x * Game.tileSize;
@@ -556,7 +556,7 @@ public class Game {
 					}
 					
 					if(showHeightMap) {
-						t.drawHeightMap(g, (world[new TileLoc(i, j)].getHeight() - lowest) / (highest - lowest));
+						t.drawHeightMap(g, (world.get(new TileLoc(i, j)).getHeight() - lowest) / (highest - lowest));
 					}
 					else {
 						g.drawImage(t.getTerrain().getImage(Game.tileSize), x, y, w, h, null);
@@ -658,7 +658,7 @@ public class Game {
 			if(!showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
-						Tile tile = world[new TileLoc(i, j)];
+						Tile tile = world.get(new TileLoc(i, j));
 						if(tile == null)
 							continue;
 						double brightness = world.getDaylight() + tile.getBrightness();
@@ -677,7 +677,7 @@ public class Game {
 					g.setFont(font);
 					for (int i = lowerX; i < upperX; i++) {
 						for (int j = lowerY; j < upperY; j++) {
-							Tile tile = world[new TileLoc(i, j)];
+							Tile tile = world.get(new TileLoc(i, j));
 							List<String> strings = new LinkedList<String>();
 							strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
 							if(tile.liquidType != LiquidType.DRY) {
@@ -846,7 +846,7 @@ public class Game {
 			ItemType key = (ItemType) mapElement.getKey();
 			Integer value = (Integer) mapElement.getValue();
 
-			if (resources[key].getAmount() < value) {
+			if (resources.get(key).getAmount() < value) {
 				return;
 			}
 		}
@@ -855,8 +855,8 @@ public class Game {
 			ItemType key = (ItemType) mapElement.getKey();
 			Integer value = (Integer) mapElement.getValue();
 
-			resources[key].addAmount(-value);
-			resources[type].addAmount(1);
+			resources.get(key).addAmount(-value);
+			resources.get(type).addAmount(1);
 		}
 
 
@@ -864,12 +864,12 @@ public class Game {
 	}
 	
 	public void setResearchTarget(ResearchType type) {
-		if(researches[type].getRequirement().areRequirementsMet()) {
-			researchTarget = researches[type];
+		if(researches.get(type).getRequirement().areRequirementsMet()) {
+			researchTarget = researches.get(type);
 		}
 	}
 	private void setTerritory(TileLoc p) {
-		double culture = world[p].getBuilding().getCulture();
+		double culture = world.get(p).getBuilding().getCulture();
 		double area = culture * Building.CULTURE_AREA_MULTIPLIER;
 		double radius = Math.sqrt(area);
 		expandTerritory(radius, p);	
@@ -881,7 +881,7 @@ public class Game {
 				double distanceFromCenter = Math.sqrt(i*i + j*j);
 				if(distanceFromCenter < radius) {
 					if(p.x+i >= 0 && p.x+i < world.getWidth() && p.y+j >= 0 && p.y+j < world.getHeight()) {
-						world[new TileLoc(p.x+i, p.y+j)].setTerritory(true);
+						world.get(new TileLoc(p.x+i, p.y+j)).setTerritory(true);
 					}
 				}
 			}
@@ -891,7 +891,7 @@ public class Game {
 	public void leftClick(int mx, int my) {
 		Position tilepos = getTileAtPixel(new Position(mx,my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
-		Tile tile = world[loc];
+		Tile tile = world.get(loc);
 		
 		System.out.println("left click");
 		if(selectedUnitToSpawn != null) {
@@ -906,7 +906,7 @@ public class Game {
 		toggleUnitSelectOnTile(tile);
 		
 		
-//		guiController.openRightClickMenu(mx, my, world[loc]);
+//		guiController.openRightClickMenu(mx, my, world.get(loc]);
 	}
 	public void toggleTargetEnemy(Tile tile) {
 		if(selectedThing instanceof Unit) {
@@ -941,7 +941,7 @@ public class Game {
 	public void mouseClick(int mx, int my) {
 		Position pos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
-		Tile tile = world[loc];
+		Tile tile = world.get(loc);
 		setDestination(mx, my);
 		if(tile.getUnits().isEmpty() == false) {
 			toggleTargetEnemy(tile);
@@ -1008,7 +1008,7 @@ public class Game {
 		
 		Position pos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
-		Tile destination = world[loc];
+		Tile destination = world.get(loc);
 		
 		if(selectedThing != null && destination != null ) {
 			selectedThing.setTargetTile(destination);
@@ -1038,7 +1038,7 @@ public class Game {
 					ItemType key = (ItemType) mapElement.getKey();
 					Integer value = (Integer) mapElement.getValue();
 					
-					if (resources[key].getAmount() < value) {
+					if (resources.get(key).getAmount() < value) {
 						return;
 					}
 				}
@@ -1050,7 +1050,7 @@ public class Game {
 					ItemType key = (ItemType) mapElement.getKey();
 					Integer value = (Integer) mapElement.getValue();
 					
-					resources[key].addAmount(-value);
+					resources.get(key).addAmount(-value);
 				}
 				
 			
@@ -1092,7 +1092,7 @@ public class Game {
 			ItemType key = (ItemType) mapElement.getKey();
 			Integer value = (Integer) mapElement.getValue();
 			
-			if (resources[key].getAmount() < value) {
+			if (resources.get(key).getAmount() < value) {
 				return;
 			}
 		}
@@ -1106,7 +1106,7 @@ public class Game {
 			ItemType key = (ItemType) mapElement.getKey();
 			Integer value = (Integer) mapElement.getValue();
 			
-			resources[key].addAmount(-value);
+			resources.get(key).addAmount(-value);
 		}
 
 		tile.addUnit(unit);

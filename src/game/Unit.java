@@ -56,6 +56,9 @@ public class Unit extends Thing {
 	}
 	
 	public void moveTo(Tile t) {
+		if(!readyToMove()) {
+			return;
+		}
 		if(t.canMove(this) == false) {
 			return;
 		}
@@ -166,6 +169,6 @@ public class Unit extends Thing {
 	}
 	@Override
 	public String toString() {
-		return unitType;
+		return unitType.toString();
 	}
 }
