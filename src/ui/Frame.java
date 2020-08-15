@@ -727,6 +727,15 @@ public class Frame extends JPanel{
 			}
 		});
 		
+		JToggleButton fastForward = setupToggleButton("Fast Forward", null, DEBUG_BUTTON_SIZE);
+		fastForward.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.toggleFastForward(fastForward.isSelected());
+				fastForward.setText(fastForward.isSelected() ? "Stop Fast Forward" : "Fast Forward");
+			}
+		});
+		
 		JButton researchEverything = setupButton("Research", null, DEBUG_BUTTON_SIZE);
 		researchEverything.addActionListener(new ActionListener() {
 			@Override
@@ -793,6 +802,7 @@ public class Frame extends JPanel{
 		buttonPanel.add(makeItRain);
 		buttonPanel.add(makeItDry);
 		buttonPanel.add(makeItDay);
+		buttonPanel.add(fastForward);
 		buttonPanel.add(researchEverything);
 		buttonPanel.add(eruptVolcano);
 		buttonPanel.add(meteor);
