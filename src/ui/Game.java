@@ -1216,6 +1216,14 @@ public class Game {
 	public void fastForwardToDay() {
 		skipUntilTick = ticks + world.ticksUntilDay();
 	}
+	public void toggleFastForward(boolean enabled) {
+		if(enabled) {
+			skipUntilTick = Integer.MAX_VALUE;
+		}
+		else {
+			skipUntilTick = ticks - 1;
+		}
+	}
 	
 	public void researchEverything() {
 		for(Research research : researches.values()) {
