@@ -35,7 +35,7 @@ public class Dragon extends Animal {
 			return;
 		}
 		Tile target = this.getTile();
-		target = t.getNeighbors().get((int) (Math.random()*4));
+		target = t.getNeighbors().get((int) (Math.random()*t.getNeighbors().size()));
 		this.moveTowards(target);
 	}
 	

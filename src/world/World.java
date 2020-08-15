@@ -125,6 +125,28 @@ public class World {
 		Wildlife.addAnimal(ogre);
 		ogre.setTile(t);
 	}
+	public void spawnWerewolf() {
+		LinkedList<Unit> wolves = new LinkedList<Unit>();
+		for(Animal animal : Wildlife.getAnimals()) {
+			if(animal.getType() == UnitType.WOLF) {
+				wolves.add(animal);
+			}
+		}
+		if(wolves.size() == 0) {
+			return;
+		}
+		Unit wolf = wolves.get((int)(Math.random()*wolves.size()));
+		Tile t = wolf.getTile();
+		
+		wolf.takeDamage(1000);
+		System.out.println("Werewolf at: "+t.getLocation().x+ ", "+ t.getLocation().y);
+		Animal werewolf = new Werewolf(t, false);
+		t.addUnit(werewolf);
+		Wildlife.addAnimal(werewolf);
+		werewolf.setTile(t);
+		
+	}
+	
 	public void spawnDragon() {
 		LinkedList<Tile> tiles = this.getTilesRandomly();
 		Tile t = tiles.getFirst();

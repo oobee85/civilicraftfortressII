@@ -150,6 +150,9 @@ public class Game {
 		if(ticks >= 100 && Math.random() < 0.001) {
 			spawnFlamelet();
 		}
+		if(ticks >= 100 && Math.random() < 0.0001 || ticks == 10) {
+			spawnWerewolf();
+		}
 		if(numCutTrees % 10 == 9) {
 			spawnEnt();
 			numCutTrees += numCutTrees;
@@ -213,6 +216,9 @@ public class Game {
 	}
 	public void spawnOgre() {
 		world.spawnOgre();
+	}
+	public void spawnWerewolf() {
+		world.spawnWerewolf();
 	}
 	public void spawnDragon() {
 		world.spawnDragon();
