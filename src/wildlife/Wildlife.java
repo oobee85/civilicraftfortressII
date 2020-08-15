@@ -93,18 +93,8 @@ public class Wildlife {
 			if(animal.wantsToEat()) {
 				animal.chooseWhatToEat(world.units, getAnimals());
 			}
-			if(animal.wantsToAttack()) {
+			if(animal.wantsToAttack() && animal.getTarget() == null) {
 				animal.chooseWhatToAttack(world.units, getAnimals(), world.buildings);
-			}
-			if(animal instanceof Ogre) {
-				if(animal.getTarget() == null) {
-					for(Unit u : world.units) {
-						if(u.isPlayerControlled()) {
-							animal.setTarget(u);
-							break;
-						}
-					}
-				}
 			}
 
 			animal.imOnTheHunt(world);

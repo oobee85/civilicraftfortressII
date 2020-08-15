@@ -147,7 +147,13 @@ public class World {
 		tile.addUnit(flamelet);
 		Wildlife.addAnimal(flamelet);
 		flamelet.setTile(tile);
-		
+	}
+	public void spawnWaterSpirit() {
+		Tile tile = this.getTilesRandomly().getFirst();
+		Animal spirit = new WaterSpirit(tile, false);
+		tile.addUnit(spirit);
+		Wildlife.addAnimal(spirit);
+		spirit.setTile(tile);
 	}
 	
 	public void meteorStrike() {

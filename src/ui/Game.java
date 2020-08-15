@@ -144,7 +144,10 @@ public class Game {
 		if(ticks == 1) {
 			world.rain();
 		}
-		if(ticks >= 100 && Math.random() < 0.01) {
+		if(ticks >= 10 && Math.random() < 0.0001) {
+			spawnWaterSpirit();
+		}
+		if(ticks >= 100 && Math.random() < 0.001) {
 			spawnFlamelet();
 		}
 		if(numCutTrees % 10 == 9) {
@@ -198,6 +201,10 @@ public class Game {
 	public void spawnFlamelet() {
 		world.spawnFlamelet();
 	}
+	public void spawnWaterSpirit() {
+		world.spawnWaterSpirit();
+	}
+	
 	public void eruptVolcano() {
 		world.eruptVolcano();
 	}
@@ -233,6 +240,8 @@ public class Game {
 			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResource() != null && building.getTile().getResource().getType().isOre() == true) {
 				resources.get(building.getTile().getResource().getType().getItemType()).addAmount(1);
 				building.getTile().getResource().harvest(1);
+				building.getTile().setHeight(building.getTile().getHeight() - 0.001);
+				
 				
 				if(building.getTile().getResource().getYield() <= 0) {
 					building.getTile().setResource(null);

@@ -26,11 +26,6 @@ public class Flamelet extends Animal {
 	}
 	
 	@Override
-	public void moveTo(Tile t) {
-		super.moveTo(t);
-	}
-	
-	@Override
 	public void tick() {
 		super.tick();
 		if(getTile().getModifier() != null) {

@@ -34,6 +34,7 @@ public enum UnitType implements HasImage {
 	
 	WOLF		("resources/Images/units/wolf.png",		new CombatStats(200, 20, 10, 1, 20), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	FLAMELET	("resources/Images/units/flamelet.png", new CombatStats(1, 0, 25, 0, 1000), 	false, false, false, null, null, null),
+	WATER_SPIRIT("resources/Images/units/waterspirit.png", new CombatStats(1, 0, 25, 0, 1000), 	false, false, false, null, null, null),
 	;
 	
 	private MipMap mipmap;
