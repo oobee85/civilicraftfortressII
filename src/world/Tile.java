@@ -9,6 +9,7 @@ import game.*;
 import liquid.*;
 import ui.*;
 import utils.*;
+import wildlife.*;
 
 public class Tile {
 	public static final Color TERRITORY_COLOR = Color.pink;
@@ -251,13 +252,24 @@ public class Tile {
 		return true;
 	}
 	
-	public int computeTileDamage(Unit unit) {
+	public int computeTileDamage(Thing thing) {
+		boolean flying = false;
+		boolean aquatic = false;
+		boolean fireResistant = false;
+		
+		if(thing instanceof Unit) {
+			Unit unit = (Unit)thing;
+			flying = unit.getType().isFlying();
+			aquatic = unit.getType().isAquatic();
+			fireResistant = unit.isFireResistant();
+		}
+		
 		double damage = 0;
-		if(unit.getType().isFlying()) {
+		if(flying) {
 			
 		}
 		else {
-			if(unit.getType().isAquatic()) {
+			if(aquatic) {
 				if(liquidAmount < LiquidType.DRY.getMinimumDamageAmount()) {
 					damage += (LiquidType.DRY.getMinimumDamageAmount() - liquidAmount) * LiquidType.DRY.getDamage();
 				}
@@ -265,6 +277,11 @@ public class Tile {
 			else {
 				if(liquidAmount > liquidType.getMinimumDamageAmount()) {
 					damage += liquidAmount * liquidType.getDamage();
+				}
+			}
+			if(modifier != null) {
+				if(modifier.getType() == GroundModifierType.FIRE && !fireResistant) {
+					damage += modifier.getType().getDamage();
 				}
 			}
 		}

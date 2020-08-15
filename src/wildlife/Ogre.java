@@ -1,12 +1,14 @@
 package wildlife;
 
+import java.util.*;
+
 import game.*;
 import world.*;
 
 public class Ogre extends Animal {
 
-	public Ogre(UnitType type, Tile tile, boolean isPlayerControlled) {
-		super(type, tile, isPlayerControlled);
+	public Ogre(Tile tile, boolean isPlayerControlled) {
+		super(UnitType.OGRE, tile, isPlayerControlled);
 	}
 
 	@Override
@@ -19,7 +21,23 @@ public class Ogre extends Animal {
 		return false;
 	}
 
+	@Override
+	public boolean wantsToAttack() {
+		return true;
+	}
 	
-	
-	
+	@Override
+	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
+		for(Unit u : units) {
+			if(u.isPlayerControlled()) {
+				setTarget(u);
+				return;
+			}
+		}
+		if(buildings.size() > 0) {
+			setTarget(buildings.get((int)(Math.random()*buildings.size())));
+			return;
+		}
+		return;
+	}
 }

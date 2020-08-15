@@ -42,6 +42,10 @@ public class Thing implements HasImage {
 		this.tile = tile;
 	}
 	
+	public boolean isFireResistant() {
+		return false;
+	}
+	
 	public boolean isSideHealthBar() {
 		return sideHealthBar;
 	}

@@ -746,7 +746,7 @@ public class Frame extends JPanel{
 		ogre.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.spawnEnt();
+				gameInstance.spawnOgre();
 			}
 		});
 		
