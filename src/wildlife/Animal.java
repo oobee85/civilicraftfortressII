@@ -17,13 +17,11 @@ public class Animal extends Unit {
 	private double drive;
 	
 	private Thing foodTarget;
+	private Tile resourceTarget;
 	
 	public Animal(UnitType type, Tile tile, boolean isPlayerControlled) {
 		super(type, tile, isPlayerControlled);
 		energy = MAX_ENERGY;
-		if(type.isHostile() == true) {
-			energy *= 10;
-		}
 		drive = 0;
 	}
 	
@@ -106,18 +104,38 @@ public class Animal extends Unit {
 	 * Moves toward the target and tries to eat it.
 	 */
 	public void imOnTheHunt(World world) {
+		if(resourceTarget != null) {
+			if(getTile() != resourceTarget) {
+				moveTowards(resourceTarget);
+			}
+			if(getTile() == resourceTarget) {
+				if(resourceTarget.getResource() == null || resourceTarget.getResource().getYield() <= 0 || resourceTarget.getResource().getType() != ResourceType.DEAD_ANIMAL) {
+					resourceTarget = null;
+				}
+				else {
+					resourceTarget.getResource().harvest(1);
+					eat(1);
+					if(resourceTarget.getResource().getYield() <= 0) {
+						resourceTarget.setResource(null);
+						resourceTarget = null;
+					}
+				}
+			}
+			return;
+		}
 		if(foodTarget != null) {
 			if(this.getTile().getLocation().distanceTo(foodTarget.getTile().getLocation()) > getType().getCombatStats().getVisionRadius()) {
-				this.moveTowards(foodTarget.getTile());
+				moveTowards(foodTarget.getTile());
 			}
 			double damageDealt = attack(foodTarget);
 			if(damageDealt > 0) {
 				eat(damageDealt);
-				if(foodTarget.isDead() || !wantsToEat() ) {
-					foodTarget = null;
-				}
-				return;
 			}
+			if(foodTarget.isDead()) {
+				resourceTarget = foodTarget.getTile();
+				foodTarget = null;
+			}
+			return;
 		}
 		if(getTarget() != null) {
 			if(this.getTile().getLocation().distanceTo(getTarget().getTile().getLocation()) > getType().getCombatStats().getVisionRadius()) {
