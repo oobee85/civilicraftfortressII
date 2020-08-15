@@ -27,6 +27,6 @@ public class Plant extends Thing {
 
 	@Override
 	public String toString() {
-		return plantType;
+		return plantType.toString();
 	}
 }

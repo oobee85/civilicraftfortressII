@@ -18,7 +18,7 @@ public enum RoadType implements HasImage {
 	RoadType(double speed, String s) {
 		this.speed = speed;
 		mipmap = new MipMap(s);
-
+		
 	}
 	
 
