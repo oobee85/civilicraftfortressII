@@ -30,9 +30,6 @@ public class Game {
 	private int numCutTrees = 10;
 	private int buildingsUntilOgre = 10;
 	
-	LinkedList<Building> buildings = new LinkedList<Building>();
-	
-	
 	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
 	HashMap<ResearchType, Research> researches = new HashMap<>();
 	
@@ -147,11 +144,14 @@ public class Game {
 		if(ticks == 1) {
 			world.rain();
 		}
+		if(ticks >= 100 && Math.random() < 0.01) {
+			spawnFlamelet();
+		}
 		if(numCutTrees % 10 == 9) {
 			spawnEnt();
 			numCutTrees += numCutTrees;
 		}
-		if(buildingsUntilOgre == buildings.size()) {
+		if(buildingsUntilOgre == world.buildings.size()) {
 			spawnOgre();
 			buildingsUntilOgre += buildingsUntilOgre;
 		}
@@ -195,6 +195,9 @@ public class Game {
 			updateTerrainImages();
 		}
 	}
+	public void spawnFlamelet() {
+		world.spawnFlamelet();
+	}
 	public void eruptVolcano() {
 		world.eruptVolcano();
 	}
@@ -223,7 +226,7 @@ public class Game {
 
 	public void updateBuildingAction() {
 		
-		for(Building building : buildings) {
+		for(Building building : world.buildings) {
 			if(!building.isBuilt()) {
 				continue;
 			}
@@ -282,27 +285,19 @@ public class Game {
 
 	public void updateBuildingDamage() {
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
-
-		for (Building building : buildings) {
+		for (Building building : world.buildings) {
 			Tile tile = building.getTile();
-			if (tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
-				building.takeDamage(damageTaken);
-
+			double damage = tile.computeTileDamage(building);
+			if(damage > 0 ) {
+				building.takeDamage(damage);
 			}
-		}	
-		
-		for (Building building : buildings) {
-
-			Tile tile = building.getTile();
 			if (building.isDead() == true) {
 				tile.setBuilding(null);
 			} else {
 				buildingsNew.add(building);
 			}
-		}
-		buildings = buildingsNew;
-		
+		}	
+		world.buildings = buildingsNew;
 	}
 	
 	
@@ -502,7 +497,7 @@ public class Game {
 				buildUnit(UnitType.WORKER, tile);
 				Building s = new Building(BuildingType.CASTLE, tile);
 				tile.setBuilding(s);
-				buildings.add(s);
+				world.buildings.add(s);
 				s.setRemainingEffort(0);
 				viewOffset.x += (tile.getLocation().x - 20) * tileSize;
 				viewOffset.y += (tile.getLocation().y - 20) * tileSize;
@@ -604,7 +599,7 @@ public class Game {
 				drawHitsplat(g, p);
 			}
 			
-			for(Building b : this.buildings) {
+			for(Building b : this.world.buildings) {
 				if(b.getIsSelected()) {
 					g.setColor(Color.pink);
 					Utils.setTransparency(g, 0.8f);
@@ -788,7 +783,7 @@ public class Game {
 	}
 	public void drawTarget(Graphics g, Unit unit) {
 		if(unit.getTarget() != null) {
-			Unit target = unit.getTarget();
+			Thing target = unit.getTarget();
 			int x = (int) ((target.getTile().getLocation().x * Game.tileSize + Game.tileSize*1/10) );
 			int y = (int) ((target.getTile().getLocation().y * Game.tileSize + Game.tileSize*1/10) );
 			int w = (int) (Game.tileSize*8/10);
@@ -827,7 +822,7 @@ public class Game {
 		}
 	}
 	private void updateTerritory() {
-		for(Building building : buildings) {
+		for(Building building : world.buildings) {
 			building.updateCulture();
 		}
 	}
@@ -1023,7 +1018,7 @@ public class Game {
 				continue;
 			}
 			if (unit.readyToMove()) {
-				unit.moveTowardsTargetTile();
+				unit.moveTowards(unit.getTargetTile());
 			}
 		}
 	}
@@ -1056,7 +1051,7 @@ public class Game {
 			
 				Building building = new Building(bt, selectedThing.getTile());
 				selectedThing.getTile().setBuilding(building);
-				buildings.add(building);
+				world.buildings.add(building);
 				
 				
 

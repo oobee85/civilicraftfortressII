@@ -17,7 +17,7 @@ public class Unit extends Thing {
 	private double timeToMove;
 	private double timeToAttack;
 	private boolean isPlayerControlled;
-	private Unit target;
+	private Thing target;
 	
 	
 	public Unit(UnitType unitType, Tile tile, boolean isPlayerControlled) {
@@ -30,7 +30,7 @@ public class Unit extends Thing {
 		return isPlayerControlled;
 	}
 	
-	public void setTarget(Unit t) {
+	public void setTarget(Thing t) {
 		target = t;
 	}
 	
@@ -77,18 +77,8 @@ public class Unit extends Thing {
 		}
 	}
 	
-	public void moveTowardsTargetTile() {
-		if(this.getTargetTile() == null) {
-			return;
-		}
-		this.moveTo(Pathfinding.chooseBestTile(this, this.getTile(), this.getTargetTile()));
-	}
-
-	public void moveTowardsTarget() {
-		if(this.getTarget() == null) {
-			return;
-		}
-		this.moveTo(Pathfinding.chooseBestTile(this, this.getTile(), this.getTarget().getTile()));
+	public void moveTowards(Tile tile) {
+		this.moveTo(Pathfinding.chooseBestTile(this, this.getTile(), tile));
 	}
 
 	public void tick() {
@@ -124,26 +114,33 @@ public class Unit extends Thing {
 		}
 		
 	}
-	public void damageTarget() {
-		if(target == null || timeToAttack > 0) {
-			return;
+	
+	/**
+	 * 
+	 * @return amount of damage dealt to target
+	 */
+	public double attack(Thing other) {
+		if(other == null || timeToAttack > 0) {
+			return 0;
 		}
-		if(this.getTile().getLocation().distanceTo(target.getTile().getLocation()) <= getType().getCombatStats().getVisionRadius() 
-				|| this.getTile() == target.getTile()) {
-			target.takeDamage(this.getType().getCombatStats().getAttack());
-			resetTimeToAttack();
-			target.setTarget(this);
-			
-			if (target.isDead()) {
-				target = null;
-				return;
-			}
+		if(this.getTile().getLocation().distanceTo(other.getTile().getLocation()) > getType().getCombatStats().getVisionRadius() 
+				&& this.getTile() != other.getTile()) {
+			//out of range
+			return 0;
 		}
+		double initialHP = other.getHealth();
+		other.takeDamage(this.getType().getCombatStats().getAttack());
+		double damageDealt = initialHP - (other.getHealth() < 0 ? 0 : other.getHealth());
+		resetTimeToAttack();
+		if(other instanceof Unit) {
+			((Unit)other).setTarget(this);
+		}
+		return damageDealt;
 	}
 	public void resetTimeToAttack() {
 		timeToAttack = unitType.getCombatStats().getAttackSpeed();
 	}
-	public Unit getTarget() {
+	public Thing getTarget() {
 		return target;
 	}
 	public UnitType getType() {

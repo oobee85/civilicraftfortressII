@@ -10,6 +10,7 @@ public class Wildlife {
 	
 	private static LinkedList<Animal> animals = new LinkedList<>();
 	private static LinkedList<Animal> dead = new LinkedList<>();
+	private static LinkedList<Animal> newAnimals = new LinkedList<>();
 
 	public static void generateWildLife(World world) {
 		for(Tile tile : world.getTilesRandomly()) {
@@ -61,17 +62,17 @@ public class Wildlife {
 		}
 		Animal animal = new Animal(animalType, world.get(loc), false);
 		animal.setTile(world.get(loc));
-		animals.add(animal);
+		newAnimals.add(animal);
 		world.get(loc).addUnit(animal);
 		
 	}
 	
 	public static void addAnimal(Animal a) {
-		animals.add(a);
+		newAnimals.add(a);
 	}
 	
 	public static void tick(World world) {
-		LinkedList<Animal> newAnimals = new LinkedList<>();
+		LinkedList<Animal> animalsCopy = new LinkedList<>();
 		HashMap<Tile, Animal> trying = new HashMap<>();
 		for(Animal animal : animals) {
 			animal.tick();
@@ -90,34 +91,10 @@ public class Wildlife {
 			animal.loseEnergy();
 			animal.tick();
 			if(animal.wantsToEat()) {
-				if(animal.getType().isHostile() == true && animal.getTarget() == null) {
-					
-					Unit iveGotYouInMySights;
-					if(Math.random() < 0.01 && world.units.isEmpty() == false) {
-						int pickUnit = (int) (world.units.size()*Math.random());
-						iveGotYouInMySights = world.units.get(pickUnit);
-					}else {
-						int pickAnimal = (int) (animals.size()*Math.random());
-						iveGotYouInMySights = animals.get(pickAnimal);
-					}
-					
-					if(iveGotYouInMySights != animal) {
-						animal.setTarget(iveGotYouInMySights);
-					}
-				}
-				else {
-					if(!animal.getType().isHostile() && animal.getTile().getPlant() != null) {
-						if(animal.readyToAttack()) {
-							animal.getTile().getPlant().takeDamage(animal.getType().getCombatStats().getAttack());
-							animal.eat(animal.getType().getCombatStats().getAttack());
-						}
-					}else if(!animal.getType().isHostile() && animal.getTile().checkTerrain(Terrain.GRASS)) {
-						if(animal.readyToAttack()) {
-							animal.getTile().setTerrain(Terrain.DIRT);
-							animal.eat(animal.getType().getCombatStats().getAttack());	
-						}
-					}
-				}
+				animal.chooseWhatToEat(world.units, getAnimals());
+			}
+			if(animal.wantsToAttack()) {
+				animal.chooseWhatToAttack(world.units, getAnimals(), world.buildings);
 			}
 			if(animal instanceof Ogre) {
 				if(animal.getTarget() == null) {
@@ -129,21 +106,10 @@ public class Wildlife {
 					}
 				}
 			}
-			
-			if(animal instanceof Ent) {
-				if(animal.getTarget() == null) {
-					for(Unit u : world.units) {
-						if(u.isPlayerControlled()) {
-							animal.setTarget(u);
-							break;
-						}
-					}
-				}
-			}
-			
 
+			animal.imOnTheHunt(world);
 			if(animal.getTarget() != null) {
-				animal.imOnTheHunt(world);
+				
 			}
 			else if(Math.random() < animal.getMoveChance() && animal.readyToMove()) {
 				
@@ -179,19 +145,21 @@ public class Wildlife {
 					other.reproduced();
 					Animal newanimal = new Animal(animal.getType(), animal.getTile(), false);
 					newanimal.setTile(animal.getTile());
-					newAnimals.add(newanimal);
+					animalsCopy.add(newanimal);
 				}
 				else {
 					trying.put(animal.getTile(), animal);
 				}
 			}
-			newAnimals.add(animal);
+			animalsCopy.add(animal);
 		}
 
 		for(Animal a : dead) {
 			a.getTile().removeUnit(a);
 		}
-		animals = newAnimals;
+		animalsCopy.addAll(newAnimals);
+		newAnimals.clear();
+		animals = animalsCopy;
 	}
 	
 	public static LinkedList<Animal> getAnimals() {

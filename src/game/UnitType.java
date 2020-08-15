@@ -21,18 +21,19 @@ public enum UnitType implements HasImage {
  	CHARIOT         ( "resources/Images/units/chariot.png", new CombatStats(200, 10, 10, 2, 20), false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.WOOD,10); put(ItemType.HORSE,10);}}, null ),
  	HORSEARCHER  ( "resources/Images/units/horsearcher.png", new CombatStats(100, 30, 5, 3, 20), false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.HORSE,10);}}, null ),
  	
-	DEER    ("resources/Images/units/deer.png", new CombatStats(200, 5, 10, 1, 20), false, false, false, null, null, ResourceType.DEAD_ANIMAL),
-	HORSE  ("resources/Images/units/horse.png", new CombatStats(200, 5, 10, 1, 20), false, false, false, null, null, ResourceType.DEAD_ANIMAL),
-	PIG      ("resources/Images/units/pig.png", new CombatStats(200, 5, 15, 1, 20), false, false, false, null, null, ResourceType.DEAD_ANIMAL),
-	SHEEP  ("resources/Images/units/sheep.png", new CombatStats(200, 5, 10, 1, 20), false, false, false, null, null, ResourceType.DEAD_ANIMAL),
-	FISH    ("resources/Images/units/fish2.png", new CombatStats( 10, 1, 5, 1, 20),  true, false, false, null, null, null),
-	COW     ("resources/Images/units/cow.png", new CombatStats(200, 10, 15, 1, 20), false, false, false, null, null, ResourceType.DEAD_ANIMAL),
+	DEER		("resources/Images/units/deer.png", 	new CombatStats(200, 5, 10, 1, 20), 	false, false, false, null, null, ResourceType.DEAD_ANIMAL),
+	HORSE		("resources/Images/units/horse.png",	new CombatStats(200, 5, 10, 1, 20), 	false, false, false, null, null, ResourceType.DEAD_ANIMAL),
+	PIG			("resources/Images/units/pig.png",		new CombatStats(200, 5, 15, 1, 20), 	false, false, false, null, null, ResourceType.DEAD_ANIMAL),
+	SHEEP		("resources/Images/units/sheep.png",	new CombatStats(200, 5, 10, 1, 20), 	false, false, false, null, null, ResourceType.DEAD_ANIMAL),
+	FISH		("resources/Images/units/fish2.png",	new CombatStats( 10, 1, 5, 1, 20),  	true, false, false, null, null, null),
+	COW			("resources/Images/units/cow.png",		new CombatStats(200, 10, 15, 1, 20), 	false, false, false, null, null, ResourceType.DEAD_ANIMAL),
 	
-	DRAGON  ("resources/Images/units/dragon.png", new CombatStats(1000, 50, 5, 2, 40), false, true, true, null, null, ResourceType.DEAD_ANIMAL),
-	OGRE	 ("resources/Images/units/ogre.png", new CombatStats(1000, 50, 10, 2, 40), false, false, true, null, null, ResourceType.DEAD_ANIMAL),
-	ENT	       ("resources/Images/units/ent.png", new CombatStats(500, 50, 30, 1, 40), false, false, true, null, null, ResourceType.DEAD_ANIMAL),
+	DRAGON		("resources/Images/units/dragon.png",	new CombatStats(1000, 50, 5, 2, 40), 	false, true, true, null, null, ResourceType.DEAD_ANIMAL),
+	OGRE		("resources/Images/units/ogre.png",		new CombatStats(1000, 50, 10, 2, 40), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL),
+	ENT			("resources/Images/units/ent.png",		new CombatStats(500, 50, 30, 1, 40), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	
-	WOLF        ("resources/Images/units/wolf.png", new CombatStats(200, 20, 10, 1, 20), false, false, true, null, null, ResourceType.DEAD_ANIMAL),
+	WOLF		("resources/Images/units/wolf.png",		new CombatStats(200, 20, 10, 1, 20), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL),
+	FLAMELET	("resources/Images/units/flamelet.png", new CombatStats(1, 0, 25, 0, 1000), 	false, false, false, null, null, null),
 	;
 	
 	private MipMap mipmap;

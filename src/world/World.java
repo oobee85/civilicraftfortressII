@@ -28,7 +28,9 @@ public class World {
 	public LinkedList<Plant> plantsLand = new LinkedList<Plant>();
 	public LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
 	public LinkedList<Unit> units = new LinkedList<Unit>();
-	LinkedList<GroundModifier> GroundModifiers = new LinkedList<GroundModifier>();
+	public LinkedList<Building> buildings = new LinkedList<Building>();
+	
+	public static LinkedList<GroundModifier> groundModifiers = new LinkedList<>();
 	
 	private double bushRarity = 0.005;
 	private double waterPlantRarity = 0.05;
@@ -92,15 +94,19 @@ public class World {
 	}
 	public void updateGroundModifiers() {
 		LinkedList<GroundModifier> GroundModifiersNew = new LinkedList<GroundModifier>();
-		synchronized(GroundModifiers) {
-			for(GroundModifier modifier : GroundModifiers) {
+		synchronized(groundModifiers) {
+			for(GroundModifier modifier : groundModifiers) {
+				Tile tile = modifier.getTile();
 				if(modifier.updateTime() == false) {
+					if(tile.getPlant() != null) {
+						tile.getPlant().takeDamage(modifier.getType().getDamage());
+					}
 					GroundModifiersNew.add(modifier);
 				}else {
-					modifier.getTile().setModifier(null);
+					tile.setModifier(null);
 				}
 			}
-			GroundModifiers = GroundModifiersNew;
+			groundModifiers = GroundModifiersNew;
 		}
 	}
 	
@@ -114,7 +120,7 @@ public class World {
 			}
 		}
 		System.out.println("Ogre at: "+t.getLocation().x+ ", "+ t.getLocation().y);
-		Animal ogre = new Ogre(UnitType.OGRE, t, false);
+		Animal ogre = new Ogre(t, false);
 		t.addUnit(ogre);
 		Wildlife.addAnimal(ogre);
 		ogre.setTile(t);
@@ -130,12 +136,19 @@ public class World {
 			}
 		}
 		System.out.println("Ent at: " + t.getLocation().x + ", " + t.getLocation().y);
-		Animal ent = new Ent(UnitType.ENT, t, false);
+		Animal ent = new Ent(t, false);
 		t.addUnit(ent);
 		Wildlife.addAnimal(ent);
 		ent.setTile(t);
 	}
-	
+	public void spawnFlamelet() {
+		Tile tile = this.getTilesRandomly().getFirst();
+		Animal flamelet = new Flamelet(tile, false);
+		tile.addUnit(flamelet);
+		Wildlife.addAnimal(flamelet);
+		flamelet.setTile(tile);
+		
+	}
 	
 	public void meteorStrike() {
 		Tile t = this.getTilesRandomly().getFirst();
@@ -158,9 +171,9 @@ public class World {
 					}
 					
 					tile.liquidAmount = 0;
-					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, tile);
-					synchronized(GroundModifiers) {
-						GroundModifiers.add(fire);
+					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, tile, 10 + (int)(Math.random()*990));
+					synchronized(groundModifiers) {
+						groundModifiers.add(fire);
 					}
 					tile.setModifier(fire);
 					if(tile.getHasBuilding() == true) {
@@ -301,7 +314,9 @@ public class World {
 
 		for (Unit unit : units) {
 			Tile tile = unit.getTile();
-			unit.damageTarget();
+			if(unit.getTarget() != null) {
+				unit.attack(unit.getTarget());
+			}
 			int tileDamage = tile.computeTileDamage(unit);
 			if(tileDamage != 0) {
 				unit.takeDamage(tileDamage);
