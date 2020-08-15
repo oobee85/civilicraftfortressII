@@ -6,11 +6,18 @@ import game.*;
 import world.Tile;
 
 public class Dragon extends Animal {
-
+	
+	private Tile nest;
+	
 	public Dragon(Tile tile, boolean isPlayerControlled) {
 		super(UnitType.DRAGON, tile, isPlayerControlled);
+		nest = tile;
 	}
-
+	
+	public Tile getNest() {
+		return nest;
+	}
+	
 	@Override
 	public boolean wantsToEat() {
 		return false;

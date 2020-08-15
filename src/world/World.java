@@ -125,6 +125,21 @@ public class World {
 		Wildlife.addAnimal(ogre);
 		ogre.setTile(t);
 	}
+	public void spawnLavaGolem() {
+		LinkedList<Tile> tiles = this.getTilesRandomly();
+		Tile t = tiles.getFirst();
+		for(Tile tile : tiles) {
+			if(tile.getTerrain() == Terrain.VOLCANO) {
+				t = tile;
+				break;
+			}
+		}
+		System.out.println("Lava Golem at: "+t.getLocation().x+ ", "+ t.getLocation().y);
+		Animal lavaGolem = new LavaGolem(t, false);
+		t.addUnit(lavaGolem);
+		Wildlife.addAnimal(lavaGolem);
+		lavaGolem.setTile(t);
+	}
 	public void spawnWerewolf() {
 		LinkedList<Unit> wolves = new LinkedList<Unit>();
 		for(Animal animal : Wildlife.getAnimals()) {

@@ -751,11 +751,17 @@ public class Frame extends JPanel{
 				gameInstance.meteorStrike();
 			}
 		});
-		JButton ogre = setupButton("Ogre", null, DEBUG_BUTTON_SIZE);
+		JButton ogre = setupButton("Unit Events", null, DEBUG_BUTTON_SIZE);
 		ogre.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gameInstance.spawnOgre();
+				gameInstance.spawnDragon();
+				gameInstance.spawnWerewolf();
+				gameInstance.spawnFlamelet();
+				gameInstance.spawnWaterSpirit();
+				gameInstance.spawnEnt();
+				gameInstance.spawnLavaGolem();
 			}
 		});
 		

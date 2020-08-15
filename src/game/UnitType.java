@@ -30,9 +30,10 @@ public enum UnitType implements HasImage {
 	COW			("resources/Images/units/cow.png",		new CombatStats(400, 10, 15, 1, 30), 	false, false, false, null, null, ResourceType.DEAD_ANIMAL),
 	
 	DRAGON		("resources/Images/units/dragon.png",	new CombatStats(1000, 100, 5, 2, 40), 	false, true, true, null, null, ResourceType.DEAD_ANIMAL),
-	OGRE		("resources/Images/units/ogre.png",		new CombatStats(1000, 50, 20, 2, 40), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL),
+	OGRE		("resources/Images/units/ogre.png",		new CombatStats(1000, 50, 20, 1, 40), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	ENT			("resources/Images/units/ent.png",		new CombatStats(500, 50, 30, 1, 80), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	WEREWOLF	("resources/Images/units/werewolf.png",	new CombatStats(200, 100, 5, 1, 20), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL),
+	LAVAGOLEM	("resources/Images/units/lavagolem.png",new CombatStats(1000, 25, 60, 1, 80), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	
 	WOLF		("resources/Images/units/wolf.png",		new CombatStats(200, 50, 10, 1, 20), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	

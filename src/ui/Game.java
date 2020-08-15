@@ -150,8 +150,11 @@ public class Game {
 		if(ticks >= 100 && Math.random() < 0.001) {
 			spawnFlamelet();
 		}
-		if(ticks >= 100 && Math.random() < 0.0001 || ticks == 10) {
+		if(ticks >= 1000 && Math.random() < 0.0001) {
 			spawnWerewolf();
+		}
+		if(ticks >= 1000 && Math.random() < 0.001) {
+			spawnLavaGolem();
 		}
 		if(numCutTrees % 10 == 9) {
 			spawnEnt();
@@ -207,7 +210,6 @@ public class Game {
 	public void spawnWaterSpirit() {
 		world.spawnWaterSpirit();
 	}
-	
 	public void eruptVolcano() {
 		world.eruptVolcano();
 	}
@@ -216,6 +218,9 @@ public class Game {
 	}
 	public void spawnOgre() {
 		world.spawnOgre();
+	}
+	public void spawnLavaGolem() {
+		world.spawnLavaGolem();
 	}
 	public void spawnWerewolf() {
 		world.spawnWerewolf();
