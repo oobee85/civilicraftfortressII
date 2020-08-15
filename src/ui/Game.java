@@ -214,6 +214,9 @@ public class Game {
 	public void spawnOgre() {
 		world.spawnOgre();
 	}
+	public void spawnDragon() {
+		world.spawnDragon();
+	}
 	public void spawnEnt() {
 		world.spawnEnt();
 	}

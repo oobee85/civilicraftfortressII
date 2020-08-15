@@ -48,7 +48,7 @@ public class Wildlife {
 			}
 			
 			if(world.get(loc).getTerrain() == Terrain.VOLCANO && Math.random() < 0.01) {
-				makeAnimal(UnitType.DRAGON, world, loc);
+				world.spawnDragon();
 			}
 			if(world.get(loc).getTerrain() == Terrain.SNOW && Math.random() < 0.005) {
 				makeAnimal(UnitType.WOLF, world, loc);

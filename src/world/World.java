@@ -125,6 +125,20 @@ public class World {
 		Wildlife.addAnimal(ogre);
 		ogre.setTile(t);
 	}
+	public void spawnDragon() {
+		LinkedList<Tile> tiles = this.getTilesRandomly();
+		Tile t = tiles.getFirst();
+		for(Tile tile : tiles) {
+			if(tile.getTerrain() == Terrain.VOLCANO) {
+				t = tile;
+				break;
+			}
+		}
+		Animal dragon = new Dragon(t, false);
+		t.addUnit(dragon);
+		Wildlife.addAnimal(dragon);
+		dragon.setTile(t);
+	}
 
 	public void spawnEnt() {
 		LinkedList<Tile> tiles = this.getTilesRandomly();
