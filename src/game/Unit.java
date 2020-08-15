@@ -8,6 +8,7 @@ import pathfinding.*;
 import ui.*;
 import utils.*;
 import wildlife.Animal;
+import wildlife.Dragon;
 import world.*;
 
 public class Unit extends Thing {

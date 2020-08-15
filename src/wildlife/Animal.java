@@ -142,6 +142,10 @@ public class Animal extends Unit {
 				this.moveTowards(getTarget().getTile());
 			}
 			attack(getTarget());
+			if(this instanceof Dragon) {
+				Dragon dragon = (Dragon) this;
+				dragon.moveAroundTarget();
+			}
 			if(getTarget().isDead()) {
 				setTarget(null);
 			}

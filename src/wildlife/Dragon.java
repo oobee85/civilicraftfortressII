@@ -26,10 +26,23 @@ public class Dragon extends Animal {
 		return true;
 	}
 	
+	public void moveAroundTarget() {
+		if(this.getTarget() == null) {
+			return;
+		}
+		Tile t = this.getTarget().getTile();
+		if(t == null) {
+			return;
+		}
+		Tile target = this.getTile();
+		target = t.getNeighbors().get((int) (Math.random()*4));
+		this.moveTowards(target);
+	}
+	
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
 		//chance to attack either wildlife or player
-		if(Math.random() > 0.1) {
+		if(Math.random() > 0.05) {
 			for (Animal a : animals) {
 				if (a != null) {
 					setTarget(animals.get((int) (Math.random() * animals.size())));
@@ -37,18 +50,25 @@ public class Dragon extends Animal {
 				}
 			}
 		} else {
-			for (Building b : buildings) {
-				if (buildings.size() > 0) {
-					setTarget(buildings.get((int) (Math.random() * buildings.size())));
-					return;
+			
+			//chance to attack building or unit
+			if(Math.random() > 0.4) {
+				for (Building b : buildings) {
+					if (buildings.size() > 0) {
+						setTarget(buildings.get((int) (Math.random() * buildings.size())));
+						return;
+					}
+				}
+			}else {
+				for (Unit u : units) {
+					if (u.isPlayerControlled()) {
+						setTarget(u);
+						return;
+					}
 				}
 			}
-			for (Unit u : units) {
-				if (u.isPlayerControlled()) {
-					setTarget(u);
-					return;
-				}
-			}
+			
+			
 		}
 		
 		return;
