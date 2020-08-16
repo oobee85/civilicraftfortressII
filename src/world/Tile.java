@@ -23,7 +23,6 @@ public class Tile {
 	private String roadCorner;
 
 	private Resource resource;
-//	private ResourceType resourceType;
 	private RoadType roadType;
 	private Plant plant;
 	private Terrain terr;

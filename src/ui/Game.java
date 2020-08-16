@@ -153,12 +153,14 @@ public class Game {
 		if(ticks >= 1000 && Math.random() < 0.0001) {
 			spawnWerewolf();
 		}
-		if(ticks >= 1000 && Math.random() < 0.001) {
+		if(ticks >= 1000 && Math.random() < 0.0001) {
 			spawnLavaGolem();
 		}
-		if(numCutTrees % 10 == 9) {
+		if(ticks >= 1000 && Math.random() < 0.00001) {
+			meteorStrike();
+		}
+		if(ticks >= 100 && Math.random() < (0.0001 * numCutTrees)) {
 			spawnEnt();
-			numCutTrees += numCutTrees;
 		}
 		if(buildingsUntilOgre == world.buildings.size()) {
 			spawnOgre();
@@ -204,6 +206,7 @@ public class Game {
 			updateTerrainImages();
 		}
 	}
+	
 	public void spawnFlamelet() {
 		world.spawnFlamelet();
 	}
