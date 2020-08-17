@@ -15,6 +15,8 @@ public class Frame extends JPanel {
 	public static final Color BACKGROUND_COLOR = new Color(200, 200, 200);
 	int GUIWIDTH = 350;
 	int MINIMAPBORDERWIDTH = 40;
+	
+	public static final long MILLISECONDS_PER_TICK = 100;
 
 	public static final Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
 	public static final Dimension DEBUG_BUTTON_SIZE = new Dimension(130, 30);
@@ -785,7 +787,7 @@ public class Frame extends JPanel {
 		ogre.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.spawnEverything();
+//				gameInstance.spawnEverything();
 				gameInstance.world.spawnOgre();
 				gameInstance.world.spawnDragon();
 				gameInstance.world.spawnWerewolf();
@@ -949,9 +951,13 @@ public class Frame extends JPanel {
 		gameLoopThread = new Thread(() -> {
 			try {
 				while (true) {
+					long start = System.currentTimeMillis();
 					gameInstance.gameTick();
-					if (!gameInstance.shouldFastForward())
-						Thread.sleep(100);
+					long elapsed = System.currentTimeMillis() - start;
+					long sleeptime = 100 - elapsed;
+					if(sleeptime > 0 && !gameInstance.shouldFastForward()) {
+						Thread.sleep(sleeptime);
+					}
 				}
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
