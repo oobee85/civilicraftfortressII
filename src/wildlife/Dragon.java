@@ -7,15 +7,15 @@ import world.Tile;
 
 public class Dragon extends Animal {
 	
-	private Tile nest;
+	private Tile home;
 	
 	public Dragon(Tile tile, boolean isPlayerControlled) {
 		super(UnitType.DRAGON, tile, isPlayerControlled);
-		nest = tile;
+		home = tile;
 	}
 	
-	public Tile getNest() {
-		return nest;
+	public Tile getHome() {
+		return home;
 	}
 	
 	@Override
@@ -49,7 +49,7 @@ public class Dragon extends Animal {
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
 		//chance to attack either wildlife or player
-		if(Math.random() > 0.05) {
+		if(Math.random() < 0.95) {
 			for (Animal a : animals) {
 				if (a != null) {
 					setTarget(animals.get((int) (Math.random() * animals.size())));
@@ -59,10 +59,13 @@ public class Dragon extends Animal {
 		} else {
 			
 			//chance to attack building or unit
-			if(Math.random() > 0.4) {
+			if(Math.random() < 0.4) {
 				for (Building b : buildings) {
 					if (buildings.size() > 0) {
-						setTarget(buildings.get((int) (Math.random() * buildings.size())));
+						Building targetBuilding = buildings.get((int) (Math.random() * buildings.size()));
+						if(targetBuilding.getBuildingType() != BuildingType.CASTLE) {
+							setTarget(targetBuilding);
+						}
 						return;
 					}
 				}
