@@ -19,6 +19,7 @@ public class KUIConstants {
 	private static final String fontName = "TW Cen MT";
 
 	public static final Font infoFont = new Font(fontName, Font.PLAIN, 22);
+	public static final Font infoFontSmall = new Font(fontName, Font.PLAIN, 20);
 	public static final Font buttonFont = new Font(fontName, Font.PLAIN, 17);
 	public static final Font buttonFontSmall = new Font(fontName, Font.PLAIN, 14);
 	public static final Font buttonFontMini = new Font(fontName, Font.PLAIN, 13);
