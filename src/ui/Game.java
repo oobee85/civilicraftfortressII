@@ -135,6 +135,10 @@ public class Game {
 		// happens once every 100ms
 		ticks++;
 		
+		if(selectedThing != null && !selectedThing.isPlayerControlled()) {
+			deselectThing();
+		}
+		
 		if(ticks%20 == 0) {
 			updateTerritory();
 			doResearch();
@@ -145,26 +149,29 @@ public class Game {
 			world.rain();
 		}
 		if(ticks >= 10 && Math.random() < 0.0001) {
-			spawnWaterSpirit();
+			world.spawnAnimal(UnitType.WATER_SPIRIT, world.getTilesRandomly().getFirst());
 		}
 		if(ticks >= 100 && Math.random() < 0.001) {
-			spawnFlamelet();
+			world.spawnAnimal(UnitType.FLAMELET, world.getTilesRandomly().getFirst());
 		}
 		if(ticks >= 1000 && Math.random() < 0.0001) {
-			spawnWerewolf();
+			world.spawnWerewolf();
 		}
 		if(ticks >= 1000 && Math.random() < 0.0001) {
-			spawnLavaGolem();
+			world.spawnLavaGolem();
+		}
+		if(ticks >= 2000 && Math.random() < 0.0001) {
+			world.spawnAnimal(UnitType.PARASITE, world.getTilesRandomly().getFirst());
+		}
+		if(ticks >= 100 && Math.random() < (0.0001 * numCutTrees)) {
+			world.spawnEnt();
+		}
+		if(buildingsUntilOgre == world.buildings.size()) {
+			world.spawnOgre();
+			buildingsUntilOgre += buildingsUntilOgre;
 		}
 		if(ticks >= 1000 && Math.random() < 0.00001) {
 			meteorStrike();
-		}
-		if(ticks >= 100 && Math.random() < (0.0001 * numCutTrees)) {
-			spawnEnt();
-		}
-		if(buildingsUntilOgre == world.buildings.size()) {
-			spawnOgre();
-			buildingsUntilOgre += buildingsUntilOgre;
 		}
 		world.tick();
 		// rain event
@@ -204,32 +211,17 @@ public class Game {
 		}
 	}
 	
-	public void spawnFlamelet() {
-		world.spawnFlamelet();
-	}
-	public void spawnWaterSpirit() {
-		world.spawnWaterSpirit();
-	}
 	public void eruptVolcano() {
 		world.eruptVolcano();
 	}
 	public void meteorStrike(){
 		world.meteorStrike();
 	}
-	public void spawnOgre() {
-		world.spawnOgre();
-	}
-	public void spawnLavaGolem() {
-		world.spawnLavaGolem();
-	}
-	public void spawnWerewolf() {
-		world.spawnWerewolf();
-	}
-	public void spawnDragon() {
-		world.spawnDragon();
-	}
-	public void spawnEnt() {
-		world.spawnEnt();
+	public void spawnEverything() {
+		List<Tile> tiles = world.getTilesRandomly();
+		for(UnitType type : UnitType.values()) {
+			world.spawnAnimal(type, tiles.remove(0));
+		}
 	}
 	public void generateWorld(MapType mapType, int size) {
 		world = new World();
@@ -526,7 +518,7 @@ public class Game {
 					System.out.println("location"+ (tile.getLocation()) );
 					continue;
 				}
-				summonUnit(tile, UnitType.WORKER);
+				summonUnit(tile, UnitType.WORKER, true);
 				Building s = new Building(BuildingType.CASTLE, tile);
 				tile.setBuilding(s);
 				world.buildings.add(s);
@@ -935,9 +927,9 @@ public class Game {
 		
 //		guiController.openRightClickMenu(mx, my, world.get(loc]);
 	}
-	private void summonUnit(Tile tile, UnitType type) {
+	private void summonUnit(Tile tile, UnitType type, boolean playerControlled) {
 		System.out.println("trying to spawn unit" + type.toString() +tile.getLocation());
-		Unit unit = new Unit(type, tile, true);
+		Unit unit = new Unit(type, tile, playerControlled);
 //		tile.addUnit(unit);
 		world.newUnits.add(unit);
 	}

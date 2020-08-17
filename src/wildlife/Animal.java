@@ -127,13 +127,15 @@ public class Animal extends Unit {
 			if(this.getTile().getLocation().distanceTo(foodTarget.getTile().getLocation()) > getType().getCombatStats().getVisionRadius()) {
 				moveTowards(foodTarget.getTile());
 			}
-			double damageDealt = attack(foodTarget);
-			if(damageDealt > 0) {
-				eat(damageDealt);
-			}
-			if(foodTarget.isDead()) {
-				resourceTarget = foodTarget.getTile();
-				foodTarget = null;
+			if(inRange(foodTarget)) {
+				double damageDealt = attack(foodTarget);
+				if(damageDealt > 0) {
+					eat(damageDealt);
+				}
+				if(foodTarget.isDead()) {
+					resourceTarget = foodTarget.getTile();
+					foodTarget = null;
+				}
 			}
 			return;
 		}
@@ -141,10 +143,12 @@ public class Animal extends Unit {
 			if(this.getTile().getLocation().distanceTo(getTarget().getTile().getLocation()) > getType().getCombatStats().getVisionRadius()) {
 				this.moveTowards(getTarget().getTile());
 			}
-			attack(getTarget());
-			if(this instanceof Dragon) {
-				Dragon dragon = (Dragon) this;
-				dragon.moveAroundTarget();
+			if(inRange(getTarget())) {
+				attack(getTarget());
+				if(this instanceof Dragon) {
+					Dragon dragon = (Dragon) this;
+					dragon.moveAroundTarget();
+				}
 			}
 			if(getTarget().isDead()) {
 				setTarget(null);

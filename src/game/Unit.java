@@ -17,15 +17,13 @@ public class Unit extends Thing {
 	private UnitType unitType;
 	private double timeToMove;
 	private double timeToAttack;
-	private boolean isPlayerControlled;
 	private Thing target;
 	private double remainingEffort;
 	
 	
 	public Unit(UnitType unitType, Tile tile, boolean isPlayerControlled) {
-		super(unitType.getCombatStats().getHealth(), unitType, tile);
+		super(unitType.getCombatStats().getHealth(), unitType, isPlayerControlled, tile);
 		this.unitType = unitType;
-		this.isPlayerControlled = isPlayerControlled;
 		this.timeToAttack = unitType.getCombatStats().getAttackSpeed();
 		this.remainingEffort = unitType.getCombatStats().getTicksToBuild();
 	}
@@ -43,9 +41,6 @@ public class Unit extends Thing {
 	}
 	public boolean isBuilt() {
 		return remainingEffort <= 0;
-	}
-	public boolean isPlayerControlled() {
-		return isPlayerControlled;
 	}
 	
 	public void setTarget(Thing t) {
@@ -133,17 +128,20 @@ public class Unit extends Thing {
 		
 	}
 	
+	public boolean inRange(Thing other) {
+		if(other == null) {
+			return false;
+		}
+		return !(this.getTile().getLocation().distanceTo(other.getTile().getLocation()) > getType().getCombatStats().getVisionRadius() 
+				&& this.getTile() != other.getTile());
+	}
+	
 	/**
-	 * 
+	 * this function does not check the attack range!
 	 * @return amount of damage dealt to target
 	 */
 	public double attack(Thing other) {
 		if(other == null || timeToAttack > 0) {
-			return 0;
-		}
-		if(this.getTile().getLocation().distanceTo(other.getTile().getLocation()) > getType().getCombatStats().getVisionRadius() 
-				&& this.getTile() != other.getTile()) {
-			//out of range
 			return 0;
 		}
 		double initialHP = other.getHealth();

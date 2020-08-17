@@ -10,7 +10,8 @@ import ui.*;
 import world.*;
 
 public class Thing implements HasImage {
-	
+
+	private boolean isPlayerControlled;
 	private double maxHealth;
 	private double health;
 	private int timeLastDamageTaken = -1000;
@@ -25,10 +26,11 @@ public class Thing implements HasImage {
 	
 	private String name;
 	
-	public Thing(double maxHealth, HasImage hasImage) {
+	public Thing(double maxHealth, HasImage hasImage, boolean isPlayerControlled) {
 		health = maxHealth;
 		this.maxHealth = maxHealth;
 		this.hasImage = hasImage;
+		this.isPlayerControlled = isPlayerControlled;
 		sideHealthBar = false;
 		if(hasImage instanceof UnitType) {
 			UnitType t = (UnitType)hasImage;
@@ -37,9 +39,17 @@ public class Thing implements HasImage {
 			}
 		}
 	}
-	public Thing(double maxHealth, HasImage hasImage, Tile tile) {
-		this(maxHealth, hasImage);
+	public Thing(double maxHealth, HasImage hasImage, boolean isPlayerControlled, Tile tile) {
+		this(maxHealth, hasImage, isPlayerControlled);
 		this.tile = tile;
+	}
+	
+	public boolean isPlayerControlled() {
+		return isPlayerControlled;
+	}
+	
+	public void setPlayerControlled(boolean pc) {
+		this.isPlayerControlled = pc;
 	}
 	
 	public boolean isFireResistant() {

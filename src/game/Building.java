@@ -17,7 +17,7 @@ public class Building extends Thing {
 	private ResearchRequirement req = new ResearchRequirement();
 	
 	public Building(BuildingType buildingType, Tile tile) {
-		super(buildingType.getHealth(), buildingType, tile);
+		super(buildingType.getHealth(), buildingType, true, tile);
 		this.remainingEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
 		

@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
 import java.util.List;
+import java.util.stream.*;
 
 import game.*;
 import liquid.*;
@@ -113,100 +114,55 @@ public class World {
 	}
 	
 	public void spawnOgre() {
-		LinkedList<Tile> tiles = this.getTilesRandomly();
-		Tile t = tiles.getFirst();
-		for(Tile tile : tiles) {
-			if(tile.getTerrain() == Terrain.ROCK) {
-				t = tile;
-				break;
-			}
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.ROCK ).findFirst();
+		if(tile.isPresent()) {
+			spawnAnimal(UnitType.OGRE, tile.get());
 		}
-		System.out.println("Ogre at: "+t.getLocation().x+ ", "+ t.getLocation().y);
-		Animal ogre = new Ogre(t, false);
-		t.addUnit(ogre);
-		Wildlife.addAnimal(ogre);
-		ogre.setTile(t);
 	}
-	public void spawnLavaGolem() {
-		LinkedList<Tile> tiles = this.getTilesRandomly();
-		Tile t = tiles.getFirst();
-		for(Tile tile : tiles) {
-			if(tile.getTerrain() == Terrain.VOLCANO) {
-				t = tile;
-				break;
-			}
-		}
-		System.out.println("Lava Golem at: "+t.getLocation().x+ ", "+ t.getLocation().y);
-		Animal lavaGolem = new LavaGolem(t, false);
-		t.addUnit(lavaGolem);
-		Wildlife.addAnimal(lavaGolem);
-		lavaGolem.setTile(t);
-	}
+	
 	public void spawnWerewolf() {
-		LinkedList<Unit> wolves = new LinkedList<Unit>();
-		for(Animal animal : Wildlife.getAnimals()) {
-			if(animal.getType() == UnitType.WOLF) {
-				wolves.add(animal);
-			}
-		}
+		List<Animal> wolves = Wildlife.getAnimals()
+				.stream()
+				.filter(e -> e.getType() == UnitType.WOLF)
+				.collect(Collectors.toList());
 		if(wolves.size() == 0) {
 			return;
 		}
 		Unit wolf = wolves.get((int)(Math.random()*wolves.size()));
 		Tile t = wolf.getTile();
 		
-		wolf.takeDamage(1000);
+		wolf.takeDamage(wolf.getHealth());
 		System.out.println("Werewolf at: "+t.getLocation().x+ ", "+ t.getLocation().y);
-		Animal werewolf = new Werewolf(t, false);
-		t.addUnit(werewolf);
-		Wildlife.addAnimal(werewolf);
-		werewolf.setTile(t);
-		
+		spawnAnimal(UnitType.WEREWOLF, t);
 	}
 	
-	public void spawnDragon() {
-		LinkedList<Tile> tiles = this.getTilesRandomly();
-		Tile t = tiles.getFirst();
-		for(Tile tile : tiles) {
-			if(tile.getTerrain() == Terrain.VOLCANO) {
-				t = tile;
-				break;
-			}
+	public void spawnLavaGolem() {
+		Optional<Tile> tile = getTilesRandomly()
+				.stream()
+				.filter(e -> e.getTerrain() == Terrain.VOLCANO )
+				.findFirst();
+		if(tile.isPresent()) {
+			spawnAnimal(UnitType.LAVAGOLEM, tile.get());
 		}
-		Animal dragon = new Dragon(t, false);
-		t.addUnit(dragon);
-		Wildlife.addAnimal(dragon);
-		dragon.setTile(t);
 	}
-
+	
 	public void spawnEnt() {
-		LinkedList<Tile> tiles = this.getTilesRandomly();
-		Tile t = tiles.getFirst();
-		for (Tile tile : tiles) {
-			if (tile.getTerrain() == Terrain.GRASS) {
-				t = tile;
-				break;
-			}
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.GRASS ).findFirst();
+		if(tile.isPresent()) {
+			spawnAnimal(UnitType.ENT, tile.get());
 		}
-		System.out.println("Ent at: " + t.getLocation().x + ", " + t.getLocation().y);
-		Animal ent = new Ent(t, false);
-		t.addUnit(ent);
-		Wildlife.addAnimal(ent);
-		ent.setTile(t);
 	}
-	public void spawnFlamelet() {
-		Tile tile = this.getTilesRandomly().getFirst();
-		Animal flamelet = new Flamelet(tile, false);
-		tile.addUnit(flamelet);
-		Wildlife.addAnimal(flamelet);
-		flamelet.setTile(tile);
+	public void spawnDragon() {
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.VOLCANO ).findFirst();
+		if(tile.isPresent()) {
+			spawnAnimal(UnitType.DRAGON, tile.get());
+		}
 	}
-	public void spawnWaterSpirit() {
-		Tile tile = this.getTilesRandomly().getFirst();
-		Animal spirit = new WaterSpirit(tile, false);
-		tile.addUnit(spirit);
-		Wildlife.addAnimal(spirit);
-		spirit.setTile(tile);
+	
+	public void spawnAnimal(UnitType type, Tile tile) {
+		Animal animal = AnimalFactory.makeAnimal(type, tile);
+		tile.addUnit(animal);
+		Wildlife.addAnimal(animal);
 	}
 	
 	public void meteorStrike() {
@@ -375,7 +331,7 @@ public class World {
 		
 		for (Unit unit : units) {
 			Tile tile = unit.getTile();
-			if(unit.getTarget() != null) {
+			if(unit.inRange(unit.getTarget())) {
 				unit.attack(unit.getTarget());
 			}
 			int tileDamage = tile.computeTileDamage(unit);

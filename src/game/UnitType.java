@@ -39,6 +39,7 @@ public enum UnitType implements HasImage {
 	
 	FLAMELET	    ("resources/Images/units/flamelet.png", new CombatStats(1, 0, 25, 0, 1000, 0), 	false, false, false, null, null, null),
 	WATER_SPIRIT ("resources/Images/units/waterspirit.png", new CombatStats(1, 0, 25, 0, 1000, 0), 	false, false, false, null, null, null),
+	PARASITE	 ("resources/Images/units/parasite.png", 	new CombatStats(1, 0, 0, 0, 1000, 0), 	false, false, false, null, null, null),
 	;
 	
 	private MipMap mipmap;
@@ -48,6 +49,7 @@ public enum UnitType implements HasImage {
 	private boolean isHostile;
 	private HashMap <ItemType, Integer> cost;
 	private ResearchType researchRequirement;
+	private ResourceType deadResource;
 	
 	/**
 	 * @param String
@@ -59,7 +61,7 @@ public enum UnitType implements HasImage {
 	 * @param resourcesNeeded
 	**/
     
-    UnitType( String s, CombatStats cs, boolean isAquatic, boolean isFlying, boolean isHostile, ResearchType researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, ResourceType resourceType) {
+    UnitType( String s, CombatStats cs, boolean isAquatic, boolean isFlying, boolean isHostile, ResearchType researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, ResourceType deadResource) {
     	mipmap = new MipMap(s);
     	combatStats = cs;
 		this.isAquatic = isAquatic;
@@ -67,6 +69,8 @@ public enum UnitType implements HasImage {
 		this.isHostile = isHostile;
 		this.cost = resourcesNeeded;
 		this.researchRequirement = researchNeeded;
+		this.deadResource = deadResource;
+		
     }
 	public ResearchType getResearchRequirement() {
 		return researchRequirement;
@@ -75,7 +79,9 @@ public enum UnitType implements HasImage {
 	public CombatStats getCombatStats() {
 		return combatStats;
 	}
-	
+	public ResourceType getDeadResource() {
+		return deadResource;
+	}
 	public boolean isAquatic() {
 		return isAquatic;
 	}

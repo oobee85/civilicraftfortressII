@@ -784,13 +784,15 @@ public class Frame extends JPanel {
 		ogre.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.spawnOgre();
-				gameInstance.spawnDragon();
-				gameInstance.spawnWerewolf();
-				gameInstance.spawnFlamelet();
-				gameInstance.spawnWaterSpirit();
-				gameInstance.spawnEnt();
-				gameInstance.spawnLavaGolem();
+				gameInstance.spawnEverything();
+				gameInstance.world.spawnOgre();
+				gameInstance.world.spawnDragon();
+				gameInstance.world.spawnWerewolf();
+				gameInstance.world.spawnAnimal(UnitType.FLAMELET, gameInstance.world.getTilesRandomly().getFirst());
+				gameInstance.world.spawnAnimal(UnitType.WATER_SPIRIT, gameInstance.world.getTilesRandomly().getFirst());
+				gameInstance.world.spawnAnimal(UnitType.PARASITE, gameInstance.world.getTilesRandomly().getFirst());
+				gameInstance.world.spawnEnt();
+				gameInstance.world.spawnLavaGolem();
 			}
 		});
 

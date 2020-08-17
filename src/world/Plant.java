@@ -8,7 +8,7 @@ public class Plant extends Thing {
 	private int currentYield;
 	
 	public Plant(PlantType pt, Tile t) {
-		super(pt.getHealth(), pt, t);
+		super(pt.getHealth(), pt, false, t);
 		plantType = pt;
 	}
 	
