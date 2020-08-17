@@ -29,17 +29,20 @@ public enum UnitType implements HasImage {
 	FISH		("resources/Images/units/fish2.png",	new CombatStats( 10, 1, 5, 1, 40, 0),  	true, false, false, null, null, null),
 	COW			("resources/Images/units/cow.png",		new CombatStats(200, 10, 30, 1, 40, 0), false, false, false, null, null, ResourceType.DEAD_ANIMAL),
 	
+	
 	DRAGON	   ("resources/Images/units/dragon.png",	new CombatStats(1000, 120, 5, 2, 40, 0), 	false, true, true, null, null, ResourceType.DEAD_ANIMAL),
 	OGRE	   ("resources/Images/units/ogre.png",		new CombatStats(1000, 40, 30, 1, 40, 0), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	ENT		   ("resources/Images/units/ent.png",		new CombatStats(500, 10, 50, 1, 100, 0), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	WEREWOLF   ("resources/Images/units/werewolf.png",	new CombatStats(200, 15, 10, 1, 5, 0), 		false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	LAVAGOLEM  ("resources/Images/units/lavagolem.png", new CombatStats(1000, 25, 50, 1, 100, 0), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL),
+	VAMPIRE    ("resources/Images/units/vampire.png", 	new CombatStats(200, 20, 20, 1, 40, 0), 	false, true, true, null, null, ResourceType.DEAD_ANIMAL),
 	
 	WOLF		("resources/Images/units/wolf.png",		new CombatStats(200, 40, 15, 1, 20, 0), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL),
 	
 	FLAMELET	    ("resources/Images/units/flamelet.png", new CombatStats(1, 0, 25, 0, 1000, 0), 	false, false, false, null, null, null),
 	WATER_SPIRIT ("resources/Images/units/waterspirit.png", new CombatStats(1, 0, 25, 0, 1000, 0), 	false, false, false, null, null, null),
 	PARASITE	 ("resources/Images/units/parasite.png", 	new CombatStats(1, 0, 0, 0, 1000, 0), 	false, false, false, null, null, null),
+	FIREFLY			("resources/Images/units/firefly.png",	new CombatStats(1, 0, 25, 1, 1000, 0), false, false, false, null, null, null),
 	;
 	
 	private MipMap mipmap;
