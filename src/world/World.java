@@ -30,6 +30,8 @@ public class World {
 	public LinkedList<Unit> units = new LinkedList<Unit>();
 	public LinkedList<Building> buildings = new LinkedList<Building>();
 	
+	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
+	
 	public static LinkedList<GroundModifier> groundModifiers = new LinkedList<>();
 	
 	private double bushRarity = 0.005;
@@ -367,8 +369,10 @@ public class World {
 	
 	
 	public void updateUnitDamage() {
+		
 		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
 
+		
 		for (Unit unit : units) {
 			Tile tile = unit.getTile();
 			if(unit.getTarget() != null) {
@@ -385,6 +389,11 @@ public class World {
 			}
 			
 		}
+		for(Unit unit : newUnits) {
+			unitsNew.add(unit);
+			unit.getTile().addUnit(unit);
+		}
+		newUnits.clear();
 		units = unitsNew;
 	}
 	

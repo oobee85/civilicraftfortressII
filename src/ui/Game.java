@@ -120,12 +120,12 @@ public class Game {
 			craftResearchRequirements.put(type, req);
 		}
 		
-		resources.get(ItemType.IRON_ORE).addAmount(200);
-		resources.get(ItemType.COPPER_ORE).addAmount(200);
-		resources.get(ItemType.HORSE).addAmount(200);
-		resources.get(ItemType.FOOD).addAmount(2000);
-		resources.get(ItemType.WOOD).addAmount(2000);
-		resources.get(ItemType.ROCK).addAmount(2000);
+//		resources.get(ItemType.IRON_ORE).addAmount(200);
+//		resources.get(ItemType.COPPER_ORE).addAmount(200);
+//		resources.get(ItemType.HORSE).addAmount(200);
+//		resources.get(ItemType.FOOD).addAmount(2000);
+//		resources.get(ItemType.WOOD).addAmount(2000);
+//		resources.get(ItemType.ROCK).addAmount(2000);
 		
 	}
 	
@@ -186,17 +186,14 @@ public class Game {
 		changedTerrain = true;
 		
 		
-		if(ticks%5 == 0) {
-			world.updatePlantDamage();
-			updateBuildingDamage();
-		}
+		world.updatePlantDamage();
 		
 		world.updateTerrainChange(world);
-		if(ticks%5 == 0) {
-			updateBuildingAction();
-			changedTerrain = true;
-		}
+		
+		changedTerrain = true;
+		
 		Wildlife.tick(world);
+		buildingTick();
 		unitTick();
 		world.updateUnitDamage();
 		
@@ -304,7 +301,16 @@ public class Game {
 				}
 			}
 			
+			// building builds units
+			if(building.getBuildingUnit() != null && building.getBuildingUnit().isBuilt() == true) {
+				Unit unit = building.getBuildingUnit();
+//				building.getTile().addUnit(unit);
+				world.newUnits.add(unit);
+				building.setBuildingUnit(null);
+			}
 		}
+		
+		
 		
 	}
 	
@@ -520,7 +526,7 @@ public class Game {
 					System.out.println("location"+ (tile.getLocation()) );
 					continue;
 				}
-				buildUnit(UnitType.WORKER, tile);
+				summonUnit(tile, UnitType.WORKER);
 				Building s = new Building(BuildingType.CASTLE, tile);
 				tile.setBuilding(s);
 				world.buildings.add(s);
@@ -929,6 +935,12 @@ public class Game {
 		
 //		guiController.openRightClickMenu(mx, my, world.get(loc]);
 	}
+	private void summonUnit(Tile tile, UnitType type) {
+		System.out.println("trying to spawn unit" + type.toString() +tile.getLocation());
+		Unit unit = new Unit(type, tile, true);
+//		tile.addUnit(unit);
+		world.newUnits.add(unit);
+	}
 	public void toggleTargetEnemy(Tile tile) {
 		if(selectedThing instanceof Unit) {
 			Unit unit = (Unit) selectedThing;
@@ -963,9 +975,11 @@ public class Game {
 		Position pos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
 		Tile tile = world.get(loc);
-		setDestination(mx, my);
+		
 		if(tile.getUnits().isEmpty() == false) {
 			toggleTargetEnemy(tile);
+		}else {
+			setDestination(mx, my);
 		}
 	}
 
@@ -1038,6 +1052,7 @@ public class Game {
 	}
 	
 	private void unitTick() {
+		
 		for (Unit unit : world.units) {
 			unit.tick();
 			if (unit.getTargetTile() == null) {
@@ -1047,6 +1062,16 @@ public class Game {
 				unit.moveTowards(unit.getTargetTile());
 			}
 		}
+		
+	}
+	
+	private void buildingTick() {
+		updateBuildingDamage();
+		updateBuildingAction();
+		for (Building building : world.buildings) {
+			building.tick();
+		}
+		
 	}
 	
 	public void buildBuilding(BuildingType bt) {
@@ -1129,9 +1154,9 @@ public class Game {
 			
 			resources.get(key).addAmount(-value);
 		}
-
-		tile.addUnit(unit);
-		world.units.add(unit);
+		tile.getBuilding().setBuildingUnit(unit);
+//		tile.addUnit(unit);
+//		world.units.add(unit);
 	}
 
 	public void doubleClick(int mx, int my) {

@@ -7,6 +7,7 @@ public class CombatStats {
 	private int speed;
 	private int visionRadius;
 	private int attackSpeed;
+	private int ticksToBuild;
 	
 
 	
@@ -16,13 +17,15 @@ public class CombatStats {
 	 * @param speed
 	 * @param visionRadius
 	 * @param attackSpeed
+	 * @param ticksToBuild
 	**/
-	public CombatStats(int health, int attack, int speed, int visionRange, int attackSpeed) {
+	public CombatStats(int health, int attack, int speed, int visionRange, int attackSpeed, int ticksToBuild) {
 		this.health = health;
 		this.attack = attack;
 		this.speed = speed;
 		this.visionRadius = visionRange;
 		this.attackSpeed = attackSpeed;
+		this.ticksToBuild = ticksToBuild;
 	}
 	public int getHealth() {
 		return health;
@@ -38,6 +41,9 @@ public class CombatStats {
 	}
 	public int getAttackSpeed() {
 		return attackSpeed;
+	}
+	public int getTicksToBuild() {
+		return ticksToBuild;
 	}
 	
 	@Override
