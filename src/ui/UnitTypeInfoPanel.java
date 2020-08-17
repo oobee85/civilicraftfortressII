@@ -23,24 +23,38 @@ public class UnitTypeInfoPanel extends JPanel {
 			return;
 		}
 		
-		int x = 25;
-		int y = 25;
+		g.drawImage(showing.getImage(20), 5, 5, 25, 25, null);
+		
+		int x = 35;
+		int y = 5;
 		
 		g.setColor(Color.black);
-		g.setFont(KUIConstants.infoFont);
 		int offset = g.getFont().getSize();
-		
+
+		g.setFont(KUIConstants.infoFont);
 		g.drawString("" + showing.toString(), x, y += offset);
+
+		g.setFont(KUIConstants.infoFontSmall);
+		offset = g.getFont().getSize();
 		if(showing.getResearchRequirement() != null) {
 			g.drawString("Research: " + showing.getResearchRequirement(), x, y += offset);
 		}
 		g.drawString("" + showing.getCombatStats(), x, y += offset);
 
+		int costx = x;
+		String coststr = "Cost: ";
 		if(showing.getCost() != null) {
-			g.drawString("Cost:", x, y += offset);
-			
+			boolean first = true;
 			for(Entry<ItemType, Integer> entry : showing.getCost().entrySet()) {
-				g.drawString(entry.getValue() + " " + entry.getKey().toString(), x + offset, y += offset);
+				String str = entry.getValue() + " " + entry.getKey().toString();
+				if(first) {
+					str = coststr + str;
+				}
+				g.drawString(str, costx, y += offset);
+				if(first) {
+					costx += g.getFontMetrics().stringWidth(coststr);
+					first = false;
+				}
 			}
 		}
 		
