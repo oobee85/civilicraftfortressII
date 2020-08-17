@@ -19,6 +19,7 @@ public class Unit extends Thing {
 	private double timeToAttack;
 	private boolean isPlayerControlled;
 	private Thing target;
+	private double remainingEffort;
 	
 	
 	public Unit(UnitType unitType, Tile tile, boolean isPlayerControlled) {
@@ -26,6 +27,22 @@ public class Unit extends Thing {
 		this.unitType = unitType;
 		this.isPlayerControlled = isPlayerControlled;
 		this.timeToAttack = unitType.getCombatStats().getAttackSpeed();
+		this.remainingEffort = unitType.getCombatStats().getTicksToBuild();
+	}
+	public void expendEffort(double effort) {
+		remainingEffort -= effort;
+		if(remainingEffort < 0) {
+			remainingEffort = 0;
+		}
+	}
+	public double getRemainingEffort() {
+		return remainingEffort;
+	}
+	public void setRemainingEffort(double effort) {
+		remainingEffort = effort;
+	}
+	public boolean isBuilt() {
+		return remainingEffort <= 0;
 	}
 	public boolean isPlayerControlled() {
 		return isPlayerControlled;
@@ -69,7 +86,7 @@ public class Unit extends Thing {
 		getTile().removeUnit(this);
 		t.addUnit(this);
 		this.setTile(t);
-
+		
 		if(this.getUnitType() == UnitType.DRAGON && t.canPlant() == true) {
 			t.setTerrain(Terrain.BURNED_GROUND);
 		}

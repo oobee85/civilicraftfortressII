@@ -10,7 +10,7 @@ public class Building extends Thing {
 	
 	private BuildingType buildingType;
 	private double remainingEffort;
-	
+	private Unit buildingUnit;
 	private double culture;
 	public static double CULTURE_AREA_MULTIPLIER = 0.1;
 
@@ -20,13 +20,28 @@ public class Building extends Thing {
 		super(buildingType.getHealth(), buildingType, tile);
 		this.remainingEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
+		
 	}
-	
+	public void tick() {
+		updateInProgressUnit();
+		
+	}
+	public void setBuildingUnit(Unit buildingUnit) {
+		this.buildingUnit = buildingUnit;
+	}
+	private void updateInProgressUnit() {
+		if (buildingUnit != null) {
+			buildingUnit.expendEffort(1);
+		}
+	}
 	public void updateCulture() {
 		if(isBuilt()) {
 			culture += buildingType.cultureRate;
 		}
 		
+	}
+	public Unit getBuildingUnit() {
+		return buildingUnit;
 	}
 	public double getCulture() {
 		return culture;
