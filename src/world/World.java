@@ -651,6 +651,10 @@ public class World {
 		return skipAmount;
 	}
 	
+	public boolean isNightTime() {
+		return getDaylight() < 0.2;
+	}
+	
 	public double getDaylight() {
 		if(Game.DISABLE_NIGHT) {
 			return 1;
