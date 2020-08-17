@@ -28,7 +28,7 @@ public class Game {
 	private Thing selectedThing;
 	private UnitType selectedUnitToSpawn;
 	private int numCutTrees = 10;
-	private int buildingsUntilOgre = 10;
+	private int buildingsUntilOgre = 8;
 	
 	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
 	HashMap<ResearchType, Research> researches = new HashMap<>();
@@ -163,7 +163,7 @@ public class Game {
 		if(ticks >= 2000 && Math.random() < 0.0001) {
 			world.spawnAnimal(UnitType.PARASITE, world.getTilesRandomly().getFirst());
 		}
-		if(ticks >= 100 && Math.random() < (0.0001 * numCutTrees)) {
+		if(ticks >= 100 && Math.random() < (0.00005 * numCutTrees/2)) {
 			world.spawnEnt();
 		}
 		if(buildingsUntilOgre == world.buildings.size()) {
@@ -175,7 +175,7 @@ public class Game {
 		}
 		world.tick();
 		// rain event
-		if(Math.random() < 0.005) {
+		if(Math.random() < 0.008) {
 			world.rain();
 		}
 		if(Math.random() < 0.01) {
@@ -260,7 +260,7 @@ public class Game {
 			if(building.getBuildingType() == BuildingType.IRRIGATION && building.getTile().canPlant() == true) {
 				//irrigation produces extra food when placed on water
 				if(building.getTile().liquidType == LiquidType.WATER && building.getTile().liquidAmount > 0) {
-					int extraFood = (int) (building.getTile().liquidAmount * 100);
+					int extraFood = (int) (building.getTile().liquidAmount * 10);
 					resources.get(ItemType.FOOD).addAmount(1 + extraFood);
 				}else {
 					resources.get(ItemType.FOOD).addAmount(1);
@@ -268,17 +268,25 @@ public class Game {
 				
 			}
 			if(building.getBuildingType() == BuildingType.SAWMILL) {
+				HashSet<Tile> tilesToCut = new HashSet<>();
+				tilesToCut.add(building.getTile());
 				for(Tile t : building.getTile().getNeighbors()) {
-					if(t.getPlant() != null && t.getPlant().getPlantType() == PlantType.FOREST1) {
-						t.getPlant().harvest(1);
-						t.getPlant().takeDamage(1);
+					for(Tile t2 : t.getNeighbors()) {
+						tilesToCut.add(t2);
+					}
+					tilesToCut.add(t);
+				}
+				for(Tile tile : tilesToCut) {
+					if(tile.getPlant() != null && tile.getPlant().getPlantType() == PlantType.FOREST1) {
+						tile.getPlant().harvest(1);
+						tile.getPlant().takeDamage(1);
 						resources.get(ItemType.WOOD).addAmount(1);
-						if(t.getPlant().isDead() ) {
+						if(tile.getPlant().isDead() ) {
 							numCutTrees ++;
 						}
-						
 					}
 				}
+				
 				
 			}
 			if(building.getBuildingType() == BuildingType.FARM && building.getTile().hasUnit(UnitType.HORSE)) {

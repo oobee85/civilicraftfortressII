@@ -23,7 +23,7 @@ public enum BuildingType implements HasImage {
 	 	
 	 	WINDMILL (1000, 500, "resources/Images/buildings/ancientwindmill.png", 0.05, true, 
 	 			ResearchType.CONSTRUCTION,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
-		SAWMILL (1000, 500, "resources/Images/buildings/sawmill.png", 0.05, true, 
+		SAWMILL (1000, 250, "resources/Images/buildings/sawmill.png", 0.05, true, 
 				null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
 	 	FARM (500, 250, "resources/Images/buildings/farm.png", 0.05, true, 
 	 			ResearchType.FARMING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
