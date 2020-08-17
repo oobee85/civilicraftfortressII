@@ -18,6 +18,7 @@ public class Frame extends JPanel {
 
 	public static final Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
 	public static final Dimension DEBUG_BUTTON_SIZE = new Dimension(130, 30);
+	public static final Dimension SPAWN_BUTTON_SIZE = new Dimension(100, 20);
 	public static final Dimension BUILD_UNIT_BUTTON_SIZE = new Dimension(170, 35);
 
 	Insets zeroMargin = new Insets(0, 0, 0, 0);
@@ -621,8 +622,8 @@ public class Frame extends JPanel {
 		for (int i = 0; i < UnitType.values().length; i++) {
 			UnitType type = UnitType.values()[i];
 			JButton button = setupButton(type.toString(),
-					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
-					DEBUG_BUTTON_SIZE);
+					Utils.resizeImageIcon(type.getImageIcon(0), (int)(BUILDING_ICON_SIZE/1.5), (int)(BUILDING_ICON_SIZE/1.5)),
+					SPAWN_BUTTON_SIZE);
 			button.addActionListener(e -> {
 				gameInstance.setUnit(type);
 			});
