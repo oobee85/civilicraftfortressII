@@ -20,7 +20,7 @@ public class UnitTypeInfoPanel extends InfoPanel {
 	UnitType showing;
 
 	public UnitTypeInfoPanel(UnitType showing) {
-		super(showing.toString(), showing.getImage(InfoPanel.IMAGE_SIZE));
+		super(showing.toString(), showing.getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
 	}
 	
@@ -70,7 +70,7 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		if(showing == null) {
 			return;
 		}
-		int x = InfoPanel.IMAGE_SIZE;
+		int x = getImageSize();
 		g.setColor(Color.black);
 		g.setFont(KUIConstants.infoFontSmaller);
 		int offset = g.getFont().getSize();

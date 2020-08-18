@@ -9,16 +9,26 @@ import utils.*;
 
 public class InfoPanel extends JPanel {
 	
-	public static final int IMAGE_SIZE = 100;
+	public static final int DEFAULT_IMAGE_SIZE = 100;
 	
+	private int imageSize = DEFAULT_IMAGE_SIZE;
 	private String name;
 	private Image image;
 	
 	protected int y;
 
+	public InfoPanel(String name, Image image, int imageSize) {
+		this(name, image);
+		this.imageSize = imageSize;
+	}
+	
 	public InfoPanel(String name, Image image) {
 		this.name = name;
 		this.image = image;
+	}
+	
+	protected int getImageSize() {
+		return imageSize;
 	}
 	
 	@Override
@@ -30,9 +40,9 @@ public class InfoPanel extends JPanel {
 		int x = 5;
 		if(image != null) {
 			Utils.setTransparency(g, 0.2);
-			g.drawImage(image, 1, 5, IMAGE_SIZE, IMAGE_SIZE, null);
+			g.drawImage(image, 1, 5, imageSize, imageSize, null);
 			Utils.setTransparency(g, 1);
-			x = IMAGE_SIZE + 1;
+			x = imageSize + 1;
 		}
 		if(name != null) {
 			int underlineoffset = 4;

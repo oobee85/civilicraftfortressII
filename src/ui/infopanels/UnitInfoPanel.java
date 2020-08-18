@@ -10,7 +10,7 @@ public class UnitInfoPanel extends InfoPanel {
 	Unit showing;
 
 	public UnitInfoPanel(Unit showing) {
-		super(showing.toString(), showing.getImage(InfoPanel.IMAGE_SIZE));
+		super(showing.toString(), showing.getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
 	}
 	

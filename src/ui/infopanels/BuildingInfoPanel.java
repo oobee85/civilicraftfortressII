@@ -10,7 +10,7 @@ public class BuildingInfoPanel extends InfoPanel {
 	Building showing;
 
 	public BuildingInfoPanel(Building showing) {
-		super(showing.toString(), showing.getImage(InfoPanel.IMAGE_SIZE));
+		super(showing.toString(), showing.getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
 	}
 	@Override
@@ -33,13 +33,13 @@ public class BuildingInfoPanel extends InfoPanel {
 		y += lineHeight;
 		
 		if(showing.getCulture() > 0 ) {
-			g.drawString("culture " + (int)showing.getCulture(), InfoPanel.IMAGE_SIZE, y);
+			g.drawString("culture " + (int)showing.getCulture(), getImageSize(), y);
 			y += lineHeight;
 		}
 		
 		
 		if(showing.getBuildingUnit() != null) {
-			int x = InfoPanel.IMAGE_SIZE;
+			int x = getImageSize();
 			int progressBarHeight = 30;
 			int buffer = 1;
 			int imageSize = progressBarHeight - 2*buffer;

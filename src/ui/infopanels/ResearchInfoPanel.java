@@ -10,7 +10,7 @@ public class ResearchInfoPanel extends InfoPanel {
 	Research showing;
 
 	public ResearchInfoPanel(Research showing) {
-		super(showing.toString(), null);
+		super(showing.toString(), showing.getType().getImage(70), 70);
 		this.showing = showing;
 	}
 	
@@ -22,9 +22,8 @@ public class ResearchInfoPanel extends InfoPanel {
 			return;
 		}
 		
-		int progressBarHeight = 30;
-		int x = 150;
-		int y = progressBarHeight;
+		int progressBarHeight = 25;
+		int x = getImageSize() + 5;
 		
 		g.setColor(Color.black);
 		g.setFont(KUIConstants.infoFont);
@@ -32,9 +31,7 @@ public class ResearchInfoPanel extends InfoPanel {
 		int xoffset = 15;
 
 		if(showing.getRequirement().getRequirements().size() > 0 ) {
-			y = 0;
-			g.drawString("Requires:", x, y += offset);
-			g.drawLine(x + xoffset - 10, y + 4, x + xoffset - 10, y + offset*showing.getRequirement().getRequirements().size() - offset/4);
+			g.drawLine(x + xoffset - 10, y, x + xoffset - 10, y + offset*showing.getRequirement().getRequirements().size() - offset/4);
 			
 			for(Research req : showing.getRequirement().getRequirements()) {
 				g.drawString(req.toString(), x + xoffset, y += offset);
