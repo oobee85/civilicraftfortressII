@@ -81,16 +81,17 @@ public class Frame extends JPanel {
 		frame.setLocationRelativeTo(null);
 		GUIController guiController = new GUIController() {
 			@Override
-			public void selectedBuilding(BuildingType bt, boolean selected) {
-				if (bt == BuildingType.BARRACKS) {
+			public void selectedBuilding(Building building, boolean selected) {
+				if (building.getBuildingType() == BuildingType.BARRACKS) {
 					manageMilitaryUnitTab(selected);
 				}
-				if (bt == BuildingType.CASTLE) {
+				if (building.getBuildingType() == BuildingType.CASTLE) {
 					manageCityTab(selected);
 				}
-				if (bt == BuildingType.WORKSHOP || bt == BuildingType.BLACKSMITH) {
+				if (building.getBuildingType() == BuildingType.WORKSHOP || building.getBuildingType() == BuildingType.BLACKSMITH) {
 					manageCraftTab(selected);
 				}
+				switchInfoPanel(new BuildingInfoPanel(building));
 				frame.repaint();
 			}
 
@@ -237,10 +238,8 @@ public class Frame extends JPanel {
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
 				((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				((Graphics2D) g).setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
-						RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-				((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-						RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+				((Graphics2D) g).setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+				((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 				g.setColor(gameInstance.getBackgroundColor());
 				g.fillRect(0, 0, getWidth(), getHeight());
 				gameInstance.drawGame(g);
@@ -411,7 +410,6 @@ public class Frame extends JPanel {
 	}
 
 	private void manageBuildingTab(boolean enabled) {
-
 		if (enabled == false && tabbedPane.getSelectedIndex() == WORKER_TAB) {
 			tabbedPane.setSelectedIndex(0);
 		} else if (enabled == true) {

@@ -23,6 +23,8 @@ public class KUIConstants {
 
 	public static final Font infoFont = new Font(fontName, Font.PLAIN, 22);
 	public static final Font infoFontSmall = new Font(fontName, Font.PLAIN, 20);
+	public static final Font infoFontTiny = new Font(fontName, Font.PLAIN, 14);
+	
 	public static final Font buttonFont = new Font(fontName, Font.PLAIN, 17);
 	public static final Font buttonFontSmall = new Font(fontName, Font.PLAIN, 14);
 	public static final Font buttonFontMini = new Font(fontName, Font.PLAIN, 13);
@@ -64,7 +66,6 @@ public class KUIConstants {
 		b.setFont(KUIConstants.buttonFontMini);
 		return b;
 	}
-
 
 	public static void setComponentAttributes(JComponent c, Dimension size) {
 		c.setFont(KUIConstants.buttonFont);

@@ -1,10 +1,9 @@
 package ui;
 
-import game.BuildingType;
-import world.*;
+import game.*;
 
 public interface GUIController {
-	public void selectedBuilding(BuildingType bt, boolean selected);
+	public void selectedBuilding(Building building, boolean selected);
 	public void selectedWorker(boolean selected);
 	public void toggleTileView();
 	public void updateGUI();

@@ -999,7 +999,7 @@ public class Game {
 				guiController.selectedWorker(true);
 			}
 			if (selectionCandidate instanceof Building) {
-				guiController.selectedBuilding(((Building) selectionCandidate).getBuildingType(), true);
+				guiController.selectedBuilding((Building) selectionCandidate, true);
 			}
 			selectedThing = selectionCandidate;
 		}
@@ -1019,7 +1019,7 @@ public class Game {
 				selectedThing = null;
 			}
 			if (selectedThing instanceof Building) {
-				guiController.selectedBuilding(((Building) selectedThing).getBuildingType(), false);
+				guiController.selectedBuilding((Building) selectedThing, false);
 				selectedThing = null;
 			}
 		

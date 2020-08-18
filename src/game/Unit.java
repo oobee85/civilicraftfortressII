@@ -18,7 +18,7 @@ public class Unit extends Thing {
 	private double timeToMove;
 	private double timeToAttack;
 	private Thing target;
-	private double remainingEffort;
+	private int remainingEffort;
 	
 	
 	public Unit(UnitType unitType, Tile tile, boolean isPlayerControlled) {
@@ -27,16 +27,16 @@ public class Unit extends Thing {
 		this.timeToAttack = unitType.getCombatStats().getAttackSpeed();
 		this.remainingEffort = unitType.getCombatStats().getTicksToBuild();
 	}
-	public void expendEffort(double effort) {
+	public void expendEffort(int effort) {
 		remainingEffort -= effort;
 		if(remainingEffort < 0) {
 			remainingEffort = 0;
 		}
 	}
-	public double getRemainingEffort() {
+	public int getRemainingEffort() {
 		return remainingEffort;
 	}
-	public void setRemainingEffort(double effort) {
+	public void setRemainingEffort(int effort) {
 		remainingEffort = effort;
 	}
 	public boolean isBuilt() {
