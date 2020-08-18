@@ -1,0 +1,75 @@
+
+// This is the old over-game right click menu code
+			@Override
+			public void openRightClickMenu(int mx, int my, Tile tile) {
+				if (tile == null) {
+					return;
+				}
+				System.out.println("trying to open right click menu");
+				JPanel rightClickPanel = new JPanel() {
+					@Override
+					public void paintComponent(Graphics g) {
+
+						Graphics2D g2d = (Graphics2D) g;
+						g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
+						g.drawImage(Utils.toBufferedImage(Utils.loadImage("resources/Images/interfaces/tileinfo.png")),
+								0, 0, null);
+						super.paintComponent(g);
+
+					}
+				};
+				rightClickPanel.setBackground(Color.red);
+				rightClickPanel.setPreferredSize(new Dimension(193, 173));
+				rightClickPanel.setLayout(null);
+				rightClickPanel.setOpaque(false);
+
+				int y = 48;
+
+				JLabel terr = setupMiniLabel(tile.getTerrain().toString(), null, null);
+				int fontSize = terr.getFont().getSize();
+				rightClickPanel.add(terr);
+				terr.setBounds(20, y += fontSize, 100, 100);
+
+				if (tile.getResource() != null) {
+					JLabel label = setupMiniLabel(tile.getResource().getType().toString(), null, null);
+					rightClickPanel.add(label);
+					label.setBounds(20, y += fontSize, 100, 100);
+				}
+
+				if (tile.getBuilding() != null) {
+					JLabel building = setupMiniLabel(tile.getBuilding().toString(), null, null);
+					rightClickPanel.add(building);
+					building.setBounds(20, y += fontSize, 100, 100);
+				}
+				if (tile.getRoadType() != null) {
+					JLabel structure = setupMiniLabel(tile.getRoadType().toString(), null, null);
+					rightClickPanel.add(structure);
+					structure.setBounds(20, y += fontSize, 100, 100);
+				}
+				if (tile.getPlant() != null) {
+					JLabel t = setupMiniLabel(tile.getPlant().getPlantType().toString(), null, null);
+					rightClickPanel.add(t);
+					t.setBounds(20, y += fontSize, 100, 100);
+				}
+				for (Unit u : tile.getUnits()) {
+					JLabel a = setupMiniLabel(u.getUnitType().toString(), null, null);
+					rightClickPanel.add(a);
+					a.setBounds(20, y += fontSize, 100, 100);
+				}
+
+				JPopupMenu popup = new JPopupMenu() {
+					@Override
+					public void paintComponent(Graphics g) {
+						Graphics2D g2d = (Graphics2D) g.create();
+						g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0));
+						super.paintComponent(g2d);
+						g2d.dispose();
+					}
+				};
+				popup.setLayout(new BorderLayout());
+				popup.add(rightClickPanel);
+				popup.setOpaque(false);
+				popup.setBorderPainted(false);
+				popup.show(gamepanel, mx - 100, my - 50);
+
+			}

@@ -23,13 +23,8 @@ public class Frame extends JPanel {
 	public static final Dimension SPAWN_BUTTON_SIZE = new Dimension(100, 20);
 	public static final Dimension BUILD_UNIT_BUTTON_SIZE = new Dimension(170, 35);
 
-	Insets zeroMargin = new Insets(0, 0, 0, 0);
 
-	Border massiveBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1),
-			BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-	private ImageIcon WORKER_TAB_ICON = Utils
-			.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.PNG"), 20, 20);
+	private ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.PNG"), 20, 20);
 	private ImageIcon CITY_TAB_ICON = Utils.resizeImageIcon(BuildingType.CASTLE.getImageIcon(0), 20, 20);
 
 	private Timer repaintingThread;
@@ -185,79 +180,6 @@ public class Frame extends JPanel {
 				frame.repaint();
 			}
 
-			@Override
-			public void openRightClickMenu(int mx, int my, Tile tile) {
-				if (tile == null) {
-					return;
-				}
-				System.out.println("trying to open right click menu");
-				JPanel rightClickPanel = new JPanel() {
-					@Override
-					public void paintComponent(Graphics g) {
-
-						Graphics2D g2d = (Graphics2D) g;
-						g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
-						g.drawImage(Utils.toBufferedImage(Utils.loadImage("resources/Images/interfaces/tileinfo.png")),
-								0, 0, null);
-						super.paintComponent(g);
-
-					}
-				};
-				rightClickPanel.setBackground(Color.red);
-				rightClickPanel.setPreferredSize(new Dimension(193, 173));
-				rightClickPanel.setLayout(null);
-				rightClickPanel.setOpaque(false);
-
-				int y = 48;
-
-				JLabel terr = setupMiniLabel(tile.getTerrain().toString(), null, null);
-				int fontSize = terr.getFont().getSize();
-				rightClickPanel.add(terr);
-				terr.setBounds(20, y += fontSize, 100, 100);
-
-				if (tile.getResource() != null) {
-					JLabel label = setupMiniLabel(tile.getResource().getType().toString(), null, null);
-					rightClickPanel.add(label);
-					label.setBounds(20, y += fontSize, 100, 100);
-				}
-
-				if (tile.getBuilding() != null) {
-					JLabel building = setupMiniLabel(tile.getBuilding().toString(), null, null);
-					rightClickPanel.add(building);
-					building.setBounds(20, y += fontSize, 100, 100);
-				}
-				if (tile.getRoadType() != null) {
-					JLabel structure = setupMiniLabel(tile.getRoadType().toString(), null, null);
-					rightClickPanel.add(structure);
-					structure.setBounds(20, y += fontSize, 100, 100);
-				}
-				if (tile.getPlant() != null) {
-					JLabel t = setupMiniLabel(tile.getPlant().getPlantType().toString(), null, null);
-					rightClickPanel.add(t);
-					t.setBounds(20, y += fontSize, 100, 100);
-				}
-				for (Unit u : tile.getUnits()) {
-					JLabel a = setupMiniLabel(u.getUnitType().toString(), null, null);
-					rightClickPanel.add(a);
-					a.setBounds(20, y += fontSize, 100, 100);
-				}
-
-				JPopupMenu popup = new JPopupMenu() {
-					@Override
-					public void paintComponent(Graphics g) {
-						Graphics2D g2d = (Graphics2D) g.create();
-						g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0));
-						super.paintComponent(g2d);
-						g2d.dispose();
-					}
-				};
-				popup.setLayout(new BorderLayout());
-				popup.add(rightClickPanel);
-				popup.setOpaque(false);
-				popup.setBorderPainted(false);
-				popup.show(gamepanel, mx - 100, my - 50);
-
-			}
 		};
 		gameInstance = new Game(guiController);
 
@@ -274,51 +196,9 @@ public class Frame extends JPanel {
 		});
 	}
 
-	private KButton setupButton(String text, Icon icon, Dimension size) {
-		KButton b = new KButton(text, icon);
-		b.setMargin(zeroMargin);
-		b.setHorizontalAlignment(SwingConstants.LEFT);
-		setComponentAttributes(b, size);
-		return b;
-	}
-
-	private JToggleButton setupToggleButton(String text, Icon icon, Dimension size) {
-		JToggleButton b = new KToggleButton(text, icon);
-		b.setMargin(zeroMargin);
-		b.setHorizontalAlignment(SwingConstants.LEFT);
-		setComponentAttributes(b, size);
-		return b;
-	}
-
-	private KLabel setupLabel(String text, Icon icon, Dimension size) {
-		KLabel b = new KLabel(icon);
-		b.setText(text);
-		b.setHorizontalAlignment(SwingConstants.LEFT);
-		setComponentAttributes(b, size);
-		return b;
-	}
-
-	private JLabel setupMiniLabel(String text, Icon icon, Dimension size) {
-		JLabel b = new JLabel(icon);
-		b.setText(text);
-		b.setHorizontalAlignment(SwingConstants.LEFT);
-		setComponentAttributes(b, size);
-		b.setBorder(null);
-		b.setFont(KUIConstants.buttonFontMini);
-		return b;
-	}
-
-	private void setComponentAttributes(JComponent c, Dimension size) {
-		c.setFont(KUIConstants.buttonFont);
-		c.setBorder(massiveBorder);
-		c.setFocusable(false);
-		if (size != null)
-			c.setPreferredSize(size);
-	}
-
 	private void menu() {
 		mainMenuPanel = new JPanel();
-		JButton start = setupButton("Start Game", null, BUILDING_BUTTON_SIZE);
+		JButton start = KUIConstants.setupButton("Start Game", null, BUILDING_BUTTON_SIZE);
 		start.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -334,24 +214,13 @@ public class Frame extends JPanel {
 		mainMenuPanel.add(start);
 
 		mapType = new JComboBox<>(MapType.values());
-		setComponentAttributes(mapType, BUILDING_BUTTON_SIZE);
+		KUIConstants.setComponentAttributes(mapType, BUILDING_BUTTON_SIZE);
 		mainMenuPanel.add(mapType);
 
 		mapSize = new JTextField("128", 10);
-		setComponentAttributes(mapSize, BUILDING_BUTTON_SIZE);
+		KUIConstants.setComponentAttributes(mapSize, BUILDING_BUTTON_SIZE);
 		mapSize.setFocusable(true);
 		mainMenuPanel.add(mapSize);
-
-//		JButton exit = new JButton("exit");
-//		exit.addActionListener(new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent arg0) {
-//				exitGame();
-//			}
-//		});
-//
-//		exit.setPreferredSize(new Dimension(100,50));
-//		panel.add(exit);
 
 		mainMenuPanel.setBackground(Color.WHITE);
 		mainMenuPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -599,7 +468,7 @@ public class Frame extends JPanel {
 
 		workerMenu = new JPanel();
 
-		JButton makeRoad = setupButton("Road",
+		JButton makeRoad = KUIConstants.setupButton("Road",
 				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildroad.png"),
 						BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
 				BUILDING_BUTTON_SIZE);
@@ -610,7 +479,7 @@ public class Frame extends JPanel {
 
 		for (int i = 0; i < BuildingType.values().length; i++) {
 			BuildingType type = BuildingType.values()[i];
-			JButton button = setupButton(type.toString(),
+			JButton button = KUIConstants.setupButton(type.toString(),
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
 					BUILDING_BUTTON_SIZE);
 			button.addActionListener(e -> {
@@ -623,7 +492,7 @@ public class Frame extends JPanel {
 		spawnMenu = new JPanel();
 		for (int i = 0; i < UnitType.values().length; i++) {
 			UnitType type = UnitType.values()[i];
-			JButton button = setupButton(type.toString(),
+			JButton button = KUIConstants.setupButton(type.toString(),
 					Utils.resizeImageIcon(type.getImageIcon(0), (int)(BUILDING_ICON_SIZE/1.5), (int)(BUILDING_ICON_SIZE/1.5)),
 					SPAWN_BUTTON_SIZE);
 			button.addActionListener(e -> {
@@ -640,7 +509,7 @@ public class Frame extends JPanel {
 			if (type != UnitType.WORKER) {
 				continue;
 			}
-			KButton button = setupButton("Build " + type.toString(),
+			KButton button = KUIConstants.setupButton("Build " + type.toString(),
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.addActionListener(e -> {
 				gameInstance.tryToBuildUnit(type);
@@ -658,7 +527,7 @@ public class Frame extends JPanel {
 			if (type.getCost() == null) {
 				continue;
 			}
-			KButton button = setupButton(type.toString(),
+			KButton button = KUIConstants.setupButton(type.toString(),
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
 					BUILDING_BUTTON_SIZE);
 			button.setEnabled(false);
@@ -680,7 +549,7 @@ public class Frame extends JPanel {
 				continue;
 			}
 
-			KButton button = setupButton("Build " + type.toString(),
+			KButton button = KUIConstants.setupButton("Build " + type.toString(),
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.addActionListener(e -> {
 				gameInstance.tryToBuildUnit(type);
@@ -694,7 +563,7 @@ public class Frame extends JPanel {
 
 		for (int i = 0; i < ItemType.values().length; i++) {
 			ItemType type = ItemType.values()[i];
-			KLabel label = setupLabel("",
+			KLabel label = KUIConstants.setupLabel("",
 					Utils.resizeImageIcon(type.getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE),
 					RESOURCE_BUTTON_SIZE);
 			label.addRightClickActionListener(e -> {
@@ -703,15 +572,15 @@ public class Frame extends JPanel {
 			resourceIndicators[i] = label;
 		}
 
-		tileSize = setupLabel("TileSize = " + gameInstance.getTileSize(), null, DEBUG_BUTTON_SIZE);
+		tileSize = KUIConstants.setupLabel("TileSize = " + gameInstance.getTileSize(), null, DEBUG_BUTTON_SIZE);
 
-		JToggleButton showHeightMap = setupToggleButton("Show Height Map", null, DEBUG_BUTTON_SIZE);
+		JToggleButton showHeightMap = KUIConstants.setupToggleButton("Show Height Map", null, DEBUG_BUTTON_SIZE);
 		showHeightMap.addActionListener(e -> {
 			showHeightMap.setText(showHeightMap.isSelected() ? "Hide Height Map" : "Show Height Map");
 			gameInstance.setShowHeightMap(showHeightMap.isSelected());
 		});
 
-		JToggleButton flipTable = setupToggleButton("Flip Table", null, DEBUG_BUTTON_SIZE);
+		JToggleButton flipTable = KUIConstants.setupToggleButton("Flip Table", null, DEBUG_BUTTON_SIZE);
 		flipTable.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -720,13 +589,13 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JToggleButton spawnUnit = setupToggleButton("Enable Spawn Unit", null, DEBUG_BUTTON_SIZE);
+		JToggleButton spawnUnit = KUIConstants.setupToggleButton("Enable Spawn Unit", null, DEBUG_BUTTON_SIZE);
 		spawnUnit.addActionListener(e -> {
 			spawnUnit.setText(spawnUnit.isSelected() ? "Disable Spawn Unit" : "Enable Spawn Unit");
 			gameInstance.spawnUnit(spawnUnit.isSelected());
 		});
 
-		JButton eruptVolcano = setupButton("Erupt Volcano", null, DEBUG_BUTTON_SIZE);
+		JButton eruptVolcano = KUIConstants.setupButton("Erupt Volcano", null, DEBUG_BUTTON_SIZE);
 		eruptVolcano.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -734,7 +603,7 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JButton makeItRain = setupButton("Rain", null, DEBUG_BUTTON_SIZE);
+		JButton makeItRain = KUIConstants.setupButton("Rain", null, DEBUG_BUTTON_SIZE);
 		makeItRain.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -743,7 +612,7 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JButton makeItDry = setupButton("Drought", null, DEBUG_BUTTON_SIZE);
+		JButton makeItDry = KUIConstants.setupButton("Drought", null, DEBUG_BUTTON_SIZE);
 		makeItDry.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -751,7 +620,7 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JButton makeItDay = setupButton("Day", null, DEBUG_BUTTON_SIZE);
+		JButton makeItDay = KUIConstants.setupButton("Day", null, DEBUG_BUTTON_SIZE);
 		makeItDay.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -759,7 +628,7 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JToggleButton fastForward = setupToggleButton("Fast Forward", null, DEBUG_BUTTON_SIZE);
+		JToggleButton fastForward = KUIConstants.setupToggleButton("Fast Forward", null, DEBUG_BUTTON_SIZE);
 		fastForward.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -768,7 +637,7 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JButton researchEverything = setupButton("Research", null, DEBUG_BUTTON_SIZE);
+		JButton researchEverything = KUIConstants.setupButton("Research", null, DEBUG_BUTTON_SIZE);
 		researchEverything.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -776,14 +645,14 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JButton meteor = setupButton("Meteor", null, DEBUG_BUTTON_SIZE);
+		JButton meteor = KUIConstants.setupButton("Meteor", null, DEBUG_BUTTON_SIZE);
 		meteor.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gameInstance.meteorStrike();
 			}
 		});
-		JButton ogre = setupButton("Unit Events", null, DEBUG_BUTTON_SIZE);
+		JButton ogre = KUIConstants.setupButton("Unit Events", null, DEBUG_BUTTON_SIZE);
 		ogre.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -799,7 +668,7 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JToggleButton debug = setupToggleButton(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix", null, DEBUG_BUTTON_SIZE);
+		JToggleButton debug = KUIConstants.setupToggleButton(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix", null, DEBUG_BUTTON_SIZE);
 		debug.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -807,7 +676,7 @@ public class Frame extends JPanel {
 				debug.setText(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix");
 			}
 		});
-		JToggleButton toggleNight = setupToggleButton(Game.DISABLE_NIGHT ? "Night Disabled" : "Night Enabled", null,
+		JToggleButton toggleNight = KUIConstants.setupToggleButton(Game.DISABLE_NIGHT ? "Night Disabled" : "Night Enabled", null,
 				DEBUG_BUTTON_SIZE);
 		toggleNight.addActionListener(new ActionListener() {
 			@Override
@@ -817,7 +686,7 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JButton exit = setupButton("Exit", null, DEBUG_BUTTON_SIZE);
+		JButton exit = KUIConstants.setupButton("Exit", null, DEBUG_BUTTON_SIZE);
 		exit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -855,7 +724,7 @@ public class Frame extends JPanel {
 
 		for (int i = 0; i < ResearchType.values().length; i++) {
 			final ResearchType type = ResearchType.values()[i];
-			KButton button = setupButton(type.toString(), null, RESEARCH_BUTTON_SIZE);
+			KButton button = KUIConstants.setupButton(type.toString(), null, RESEARCH_BUTTON_SIZE);
 			button.setEnabled(false);
 			button.addActionListener(e -> {
 				gameInstance.setResearchTarget(type);
