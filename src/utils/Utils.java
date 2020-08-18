@@ -229,25 +229,6 @@ public final class Utils {
 	}
 	public static List<Tile> getNeighbors(Tile tile, World world) {
 		return tile.getNeighbors();
-//		int x = tile.getLocation().x;
-//		int y = tile.getLocation().y;
-//		int minX = Math.max(0, tile.getLocation().x - 1);
-//		int maxX = Math.min(world.getWidth()-1, tile.getLocation().x + 1);
-//		int minY = Math.max(0, tile.getLocation().y-1);
-//		int maxY = Math.min(world.getHeight()-1, tile.getLocation().y + 1);
-//
-//		LinkedList<Tile> tiles = new LinkedList<>();
-//		for(int i = minX; i <= maxX; i++) {
-//			for(int j = minY; j <= maxY; j++) {
-//				if(i == x || j == y) {
-//					if(i != x || j != y) {
-//						tiles.add(world[new TileLoc(i, j)]);
-//					}
-//				}
-//			}
-//		}
-//		Collections.shuffle(tiles); 
-//		return tiles;
 	}
 	public static double getRandomNormal(int tries) {
 		double rand = 0;

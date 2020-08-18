@@ -20,13 +20,6 @@ public class BuildingInfoPanel extends InfoPanel {
 		if(showing == null) {
 			return;
 		}
-//		g.setFont(KUIConstants.infoFont);
-//		int y = g.getFont().getSize() - 1;
-//		String name = showing.toString();
-//		int w = g.getFontMetrics().stringWidth(name);
-//		g.drawString(name, getWidth()/2 - w/2, y);
-//		
-//		g.drawImage(showing.getImage(25), 5, 5, 25, 25, null);
 
 		g.setFont(KUIConstants.infoFontSmall);
 		int lineHeight = g.getFont().getSize() + 1;

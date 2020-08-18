@@ -324,10 +324,7 @@ public class Tile {
 	}
 
 	public void setNeighbors(List<Tile> tiles) {
-		neighborTiles.clear();
-		for (Tile t : tiles) {
-			neighborTiles.add(t);
-		}
+		neighborTiles = tiles;
 	}
 
 	public List<Tile> getNeighbors() {

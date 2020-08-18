@@ -39,7 +39,7 @@ public class InfoPanel extends JPanel {
 		}
 		int x = 5;
 		if(image != null) {
-			Utils.setTransparency(g, 0.2);
+			Utils.setTransparency(g, 0.3);
 			g.drawImage(image, 1, 5, imageSize, imageSize, null);
 			Utils.setTransparency(g, 1);
 			x = imageSize + 1;

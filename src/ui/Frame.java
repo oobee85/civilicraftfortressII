@@ -494,11 +494,14 @@ public class Frame extends JPanel {
 
 		for (int i = 0; i < BuildingType.values().length; i++) {
 			BuildingType type = BuildingType.values()[i];
-			JButton button = KUIConstants.setupButton(type.toString(),
+			KButton button = KUIConstants.setupButton(type.toString(),
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
 					BUILDING_BUTTON_SIZE);
 			button.addActionListener(e -> {
 				gameInstance.buildBuilding(type);
+			});
+			button.addRightClickActionListener(e -> {
+				switchInfoPanel(new BuildingTypeInfoPanel(type));
 			});
 			buildingButtons[i] = button;
 			workerMenu.add(button);
@@ -507,11 +510,14 @@ public class Frame extends JPanel {
 		spawnMenu = new JPanel();
 		for (int i = 0; i < UnitType.values().length; i++) {
 			UnitType type = UnitType.values()[i];
-			JButton button = KUIConstants.setupButton(type.toString(),
+			KButton button = KUIConstants.setupButton(type.toString(),
 					Utils.resizeImageIcon(type.getImageIcon(0), (int)(BUILDING_ICON_SIZE/1.5), (int)(BUILDING_ICON_SIZE/1.5)),
 					SPAWN_BUTTON_SIZE);
 			button.addActionListener(e -> {
 				gameInstance.setUnit(type);
+			});
+			button.addRightClickActionListener(e -> {
+				switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
 			unitButtons[i] = button;
 			spawnMenu.add(button);
