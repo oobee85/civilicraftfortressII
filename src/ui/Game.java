@@ -223,11 +223,16 @@ public class Game {
 			world.spawnAnimal(type, tiles.remove(0));
 		}
 	}
-	public void generateWorld(MapType mapType, int size) {
+	public void generateWorld(MapType mapType, int size, boolean easymode) {
 		world = new World();
 		world.generateWorld(mapType, size);
-		makeRoads();
+		makeRoads(easymode);
 		updateTerrainImages();
+		if(easymode) {
+			for(ItemType itemType : ItemType.values()) {
+				resources.get(itemType).addAmount(999);
+			}
+		}
 	}
 	
 	public void updateTerrainImages() {
@@ -457,7 +462,7 @@ public class Game {
 		}
 	}
 
-	private void makeRoads() {
+	private void makeRoads(boolean easymode) {
 		double highest = -1000;
 		Tile highestTile = null;
 		double lowest = +1000;
@@ -478,7 +483,7 @@ public class Game {
 		makeRoadBetween(highestTile, lowestTile);
 		turnRoads();
 		
-		makeCastle();
+		makeCastle(easymode);
 	}
 	private void turnRoad(Tile tile) {
 		if(tile.getRoadType() == null) {
@@ -513,7 +518,7 @@ public class Game {
 				turnRoad(tile);
 		}
 	}
-	private void makeCastle() {
+	private void makeCastle(boolean easymode) {
 		int borderPadCastle = 10;
 		for (Tile tile : world.getTilesRandomly()) {
 			if (tile.getRoadType() != null && tile.canBuild() == true
@@ -533,6 +538,20 @@ public class Game {
 				s.setRemainingEffort(0);
 				viewOffset.x += (tile.getLocation().x - 20) * tileSize;
 				viewOffset.y += (tile.getLocation().y - 20) * tileSize;
+				
+				if(easymode) {
+					Tile randomNeighbor = tile.getNeighbors().get(0);
+					Building barrack = new Building(BuildingType.BARRACKS, randomNeighbor);
+					randomNeighbor.setBuilding(barrack);
+					world.buildings.add(barrack);
+					barrack.setRemainingEffort(0);
+					
+					Tile randomNeighbor2 = tile.getNeighbors().get(1);
+					Building workshop = new Building(BuildingType.WORKSHOP, randomNeighbor2);
+					randomNeighbor2.setBuilding(workshop);
+					world.buildings.add(workshop);
+					workshop.setRemainingEffort(0);
+				}
 				break;
 			}
 		}
@@ -995,8 +1014,8 @@ public class Game {
 			// clicking on new selection
 			deselectThing();
 			selectionCandidate.setIsSelected(true);
-			if (selectionCandidate instanceof Unit && ((Unit) selectionCandidate).getUnitType() == UnitType.WORKER) {
-				guiController.selectedWorker(true);
+			if (selectionCandidate instanceof Unit) {
+				guiController.selectedUnit((Unit) selectionCandidate, true);
 			}
 			if (selectionCandidate instanceof Building) {
 				guiController.selectedBuilding((Building) selectionCandidate, true);
@@ -1013,7 +1032,7 @@ public class Game {
 
 				Unit selectedUnit = (Unit) selectedThing;
 				if (selectedUnit.getUnitType() == UnitType.WORKER) {
-					guiController.selectedWorker(false);
+					guiController.selectedUnit(null, false);
 				}
 				
 				selectedThing = null;

@@ -1,0 +1,50 @@
+package ui.infopanels;
+
+import java.awt.*;
+
+import game.*;
+import ui.*;
+
+public class ResearchInfoPanel extends InfoPanel {
+	
+	Research showing;
+
+	public ResearchInfoPanel(Research showing) {
+		super(showing.toString(), null);
+		this.showing = showing;
+	}
+	
+	@Override
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		
+		if(showing == null) {
+			return;
+		}
+		
+		int progressBarHeight = 30;
+		int x = 150;
+		int y = progressBarHeight;
+		
+		g.setColor(Color.black);
+		g.setFont(KUIConstants.infoFont);
+		int offset = g.getFont().getSize();
+		int xoffset = 15;
+
+		if(showing.getRequirement().getRequirements().size() > 0 ) {
+			y = 0;
+			g.drawString("Requires:", x, y += offset);
+			g.drawLine(x + xoffset - 10, y + 4, x + xoffset - 10, y + offset*showing.getRequirement().getRequirements().size() - offset/4);
+			
+			for(Research req : showing.getRequirement().getRequirements()) {
+				g.drawString(req.toString(), x + xoffset, y += offset);
+				g.drawLine(x + xoffset - 10, y - offset/4, x + xoffset - 1, y - offset/4);
+			}
+		}
+		
+		double completedRatio = 1.0 * showing.getPointsSpent() / showing.getType().getRequiredPoints();
+		String progress = String.format("%d/%d", showing.getPointsSpent(), showing.getType().getRequiredPoints());
+		
+		KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress, 0, getHeight() - progressBarHeight, getWidth(), progressBarHeight);
+	}
+}

@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import game.*;
+import ui.infopanels.*;
 import utils.*;
 import world.*;
 
@@ -96,8 +97,16 @@ public class Frame extends JPanel {
 			}
 
 			@Override
-			public void selectedWorker(boolean selected) {
-				manageBuildingTab(selected);
+			public void selectedUnit(Unit unit, boolean selected) {
+				if(unit == null) {
+					return;
+				}
+				if(selected) {
+					switchInfoPanel(new UnitInfoPanel(unit));
+				}
+				if(unit.getType() == UnitType.WORKER) {
+					manageBuildingTab(selected);
+				}
 				frame.repaint();
 			}
 
@@ -199,13 +208,19 @@ public class Frame extends JPanel {
 
 	private void menu() {
 		mainMenuPanel = new JPanel();
+		
+		JToggleButton easyModeButton = KUIConstants.setupToggleButton("Enable Easy Mode", null, BUILDING_BUTTON_SIZE);
+		easyModeButton.addActionListener(e -> {
+			easyModeButton.setText(easyModeButton.isSelected() ? "Disable Easy Mode" : "Enable Easy Mode");
+		});
+		
 		JButton start = KUIConstants.setupButton("Start Game", null, BUILDING_BUTTON_SIZE);
 		start.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					int size = Integer.parseInt(mapSize.getText());
-					gameInstance.generateWorld((MapType) mapType.getSelectedItem(), size);
+					gameInstance.generateWorld((MapType) mapType.getSelectedItem(), size, easyModeButton.isSelected());
 					runGame();
 				} catch (NumberFormatException e) {
 					e.printStackTrace();
@@ -222,6 +237,8 @@ public class Frame extends JPanel {
 		KUIConstants.setComponentAttributes(mapSize, BUILDING_BUTTON_SIZE);
 		mapSize.setFocusable(true);
 		mainMenuPanel.add(mapSize);
+		mainMenuPanel.add(easyModeButton);
+		
 
 		mainMenuPanel.setBackground(Color.WHITE);
 		mainMenuPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));

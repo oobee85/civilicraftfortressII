@@ -23,7 +23,10 @@ public class KUIConstants {
 
 	public static final Font infoFont = new Font(fontName, Font.PLAIN, 22);
 	public static final Font infoFontSmall = new Font(fontName, Font.PLAIN, 20);
+	public static final Font infoFontSmaller = new Font(fontName, Font.PLAIN, 18);
 	public static final Font infoFontTiny = new Font(fontName, Font.PLAIN, 14);
+
+	public static final Font combatStatsFont = new Font(fontName, Font.BOLD, 16);
 	
 	public static final Font buttonFont = new Font(fontName, Font.PLAIN, 17);
 	public static final Font buttonFontSmall = new Font(fontName, Font.PLAIN, 14);
@@ -73,5 +76,16 @@ public class KUIConstants {
 		c.setFocusable(false);
 		if (size != null)
 			c.setPreferredSize(size);
+	}
+	
+
+	public static void drawProgressBar(Graphics g, Color foreground, Color background, Color textColor, double ratio, String text, int x, int y, int w, int h) {
+		g.setColor(background);
+		g.fillRect(x, y, w, h);
+		g.setColor(foreground);
+		g.fillRect(x, y, (int) (w * ratio), h);
+		g.setColor(textColor);
+		int textWidth = g.getFontMetrics().stringWidth(text);
+		g.drawString(text, x + w/2 - textWidth/2, y + h/2 + g.getFont().getSize()/3);
 	}
 }
