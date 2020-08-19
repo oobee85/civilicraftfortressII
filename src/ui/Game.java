@@ -66,7 +66,7 @@ public class Game {
 		
 		for(ItemType itemType : ItemType.values()) {
 			Item item = new Item(0, itemType);
-			if(itemType == ItemType.WOOD || itemType == ItemType.ROCK || itemType == ItemType.FOOD) {
+			if(itemType == ItemType.WOOD || itemType == ItemType.STONE || itemType == ItemType.FOOD) {
 				item = new Item(200, itemType);
 			}
 			resources.put(itemType, item);
@@ -210,7 +210,12 @@ public class Game {
 			updateTerrainImages();
 		}
 	}
-	
+	public void addResources() {
+		for(ItemType itemType : ItemType.values()) {
+			resources.get(itemType).addAmount(1000);
+		}
+		
+	}
 	public void eruptVolcano() {
 		world.eruptVolcano();
 	}
@@ -260,7 +265,7 @@ public class Game {
 			}
 			
 			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getTerrain() == Terrain.ROCK) {
-				resources.get(ItemType.ROCK).addAmount(1);
+				resources.get(ItemType.STONE).addAmount(1);
 			}
 			if(building.getBuildingType() == BuildingType.IRRIGATION && building.getTile().canPlant() == true) {
 				//irrigation produces extra food when placed on water

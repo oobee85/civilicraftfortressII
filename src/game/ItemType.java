@@ -21,7 +21,7 @@ public enum ItemType implements HasImage {
 	FOOD ( "resources/Images/itemicons/wheat.png", null, null, null),
 	HORSE ( "resources/Images/units/horse.png", ResearchType.HORSEBACK_RIDING, null, null),
 	WOOD ( "resources/Images/itemicons/wood.png", null, null, null),
-	ROCK ( "resources/Images/itemicons/rock.png", null, null, null),
+	STONE ( "resources/Images/itemicons/rock.png", null, null, null),
 	
 	COPPER_BAR ( "resources/Images/itemicons/copper_bar.png", null, new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,10); }}, BuildingType.BLACKSMITH),
 	IRON_BAR ( "resources/Images/itemicons/iron_bar.png", ResearchType.IRON_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.IRON_ORE,10);  }}, BuildingType.BLACKSMITH),
