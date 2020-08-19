@@ -3,11 +3,13 @@ package ui;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Map.*;
+import java.util.concurrent.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
 
 import game.*;
+import ui.MainMenuBackground.*;
 import ui.infopanels.*;
 import utils.*;
 import world.*;
@@ -29,8 +31,9 @@ public class Frame extends JPanel {
 	private ImageIcon CITY_TAB_ICON = Utils.resizeImageIcon(BuildingType.CASTLE.getImageIcon(0), 20, 20);
 
 	private Timer repaintingThread;
-	private JPanel mainMenuPanel;
+	private JToggleButton easyModeButton;
 	private JFrame frame;
+	private JPanel mainMenuPanel;
 	private JPanel gamepanel;
 	private JPanel minimapPanel;
 	private JPanel infoPanel;
@@ -43,6 +46,7 @@ public class Frame extends JPanel {
 	private JPanel techView;
 	private JLabel tileSize;
 	private JTabbedPane tabbedPane;
+	private JPanel guiSplitter;
 	private JComboBox<MapType> mapType;
 	private JLabel[] resourceIndicators = new JLabel[ItemType.values().length];
 	private JButton[] researchButtons = new JButton[ResearchType.values().length];
@@ -67,6 +71,8 @@ public class Frame extends JPanel {
 	private int SPAWN_TAB;
 
 	private Thread gameLoopThread;
+	
+	private Semaphore gameUIReady = new Semaphore(0);
 
 	public Frame() {
 
@@ -207,9 +213,15 @@ public class Frame extends JPanel {
 	}
 
 	private void menu() {
-		mainMenuPanel = new JPanel();
+		frame.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+		if(Driver.SHOW_MENU_ANIMATION) {
+			mainMenuPanel = new MainMenuBackground();
+		}
+		else {
+			mainMenuPanel = new JPanel();
+		}
 		
-		JToggleButton easyModeButton = KUIConstants.setupToggleButton("Enable Easy Mode", null, BUILDING_BUTTON_SIZE);
+		easyModeButton = KUIConstants.setupToggleButton("Enable Easy Mode", null, BUILDING_BUTTON_SIZE);
 		easyModeButton.addActionListener(e -> {
 			easyModeButton.setText(easyModeButton.isSelected() ? "Disable Easy Mode" : "Enable Easy Mode");
 		});
@@ -218,13 +230,10 @@ public class Frame extends JPanel {
 		start.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				try {
-					int size = Integer.parseInt(mapSize.getText());
-					gameInstance.generateWorld((MapType) mapType.getSelectedItem(), size, easyModeButton.isSelected());
+				Thread thread = new Thread(() -> {
 					runGame();
-				} catch (NumberFormatException e) {
-					e.printStackTrace();
-				}
+				});
+				thread.start();
 			}
 		});
 		mainMenuPanel.add(start);
@@ -239,14 +248,12 @@ public class Frame extends JPanel {
 		mainMenuPanel.add(mapSize);
 		mainMenuPanel.add(easyModeButton);
 		
-
-		mainMenuPanel.setBackground(Color.WHITE);
-		mainMenuPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-		frame.add(mainMenuPanel);
-		frame.pack();
+		frame.add(mainMenuPanel, BorderLayout.CENTER);
 		frame.setVisible(true);
 		frame.requestFocusInWindow();
-		frame.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+		if(mainMenuPanel instanceof MainMenuBackground) {
+			((MainMenuBackground)mainMenuPanel).start();
+		}
 	}
 
 	private void setupGamePanel() {
@@ -472,9 +479,48 @@ public class Frame extends JPanel {
 		tabbedPane.setEnabledAt(SPAWN_TAB, enabled);
 	}
 
+	private void switchToGame() {
+		frame.remove(mainMenuPanel);
+		mainMenuPanel = null;
+		
+		frame.getContentPane().add(gamepanel, BorderLayout.CENTER);
+		frame.getContentPane().add(guiSplitter, BorderLayout.EAST);
+		frame.pack();
+		
+		gameInstance.setViewSize(gamepanel.getWidth(), gamepanel.getHeight());
+		gameInstance.centerViewOn(gameInstance.world.buildings.get(0).getTile(), 50);
+		gamepanel.requestFocusInWindow();
+		gamepanel.requestFocus();
+		frame.repaint();
+		gameLoopThread.start();
+		repaintingThread.start();
+	}
 	private void runGame() {
 		System.err.println("Starting Game");
-		frame.remove(mainMenuPanel);
+		Runnable menuAnimationStopListener = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					gameUIReady.acquire();
+					SwingUtilities.invokeLater(() -> {
+						switchToGame();
+					});
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		};
+		if(mainMenuPanel instanceof MainMenuBackground) {
+			((MainMenuBackground)mainMenuPanel).stop(menuAnimationStopListener);
+		}
+		else {
+			Thread thread = new Thread(menuAnimationStopListener);
+			thread.start();
+		}
+		
+		
+		int size = Integer.parseInt(mapSize.getText());
+		gameInstance.generateWorld((MapType) mapType.getSelectedItem(), size, easyModeButton.isSelected());
 
 		Dimension RESOURCE_BUTTON_SIZE = new Dimension(100, 35);
 		Dimension RESEARCH_BUTTON_SIZE = new Dimension(125, 35);
@@ -803,7 +849,7 @@ public class Frame extends JPanel {
 		manageMilitaryUnitTab(false);
 		manageSpawnTab(false);
 
-		JPanel guiSplitter = new JPanel();
+		guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());
 		guiSplitter.setPreferredSize(new Dimension(GUIWIDTH, frame.getHeight()));
 		guiSplitter.add(tabbedPane, BorderLayout.CENTER);
@@ -818,14 +864,14 @@ public class Frame extends JPanel {
 		infoPanel.setBackground(gameInstance.getBackgroundColor());
 		infoPanel.setPreferredSize(new Dimension(GUIWIDTH, GUIWIDTH / 3));
 		infoPanel.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-		infoPanel.add(new JLabel("Try right clicking research buttons or build unit buttons."), BorderLayout.CENTER);
 		guiSplitter.add(infoPanel, BorderLayout.SOUTH);
 
-		frame.getContentPane().add(gamepanel, BorderLayout.CENTER);
-		frame.getContentPane().add(guiSplitter, BorderLayout.EAST);
-		frame.pack();
-		frame.setVisible(true);
-		gamepanel.requestFocusInWindow();
+//		frame.remove(background);
+//		frame.getContentPane().add(background, BorderLayout.CENTER);
+//		frame.getContentPane().add(guiSplitter, BorderLayout.EAST);
+//		frame.pack();
+		
+//		frame.setVisible(true);
 
 		repaintingThread = new Timer(30, new ActionListener() {
 			@Override
@@ -833,10 +879,8 @@ public class Frame extends JPanel {
 				frame.repaint();
 			}
 		});
-		repaintingThread.start();
 
 		frame.repaint();
-		gamepanel.requestFocus();
 
 		gameLoopThread = new Thread(() -> {
 			try {
@@ -853,7 +897,7 @@ public class Frame extends JPanel {
 				e1.printStackTrace();
 			}
 		});
-		gameLoopThread.start();
+		gameUIReady.release();
 	}
 
 	public void exitGame() {

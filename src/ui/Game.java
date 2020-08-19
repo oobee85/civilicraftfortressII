@@ -18,8 +18,6 @@ public class Game {
 	private Image blueHitsplatImage = Utils.loadImage("resources/Images/interfaces/bluehitsplat.png");
 	private Image greenHitsplatImage = Utils.loadImage("resources/Images/interfaces/greenhitsplat.png");
 	private Image targetImage = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
-	public static final int NUM_DEBUG_DIGITS = 3;
-	public static int ticks;
 	private int skipUntilTick;
 	private BufferedImage terrainImage;
 	private BufferedImage minimapImage;
@@ -39,7 +37,6 @@ public class Game {
 	
 	private Research researchTarget;
 	
-	public static int tileSize = 25;
 	private int money;
 	private Position viewOffset;
 	private TileLoc hoveredTile;
@@ -51,6 +48,9 @@ public class Game {
 	
 	private GUIController guiController;
 
+	public static final int NUM_DEBUG_DIGITS = 3;
+	public static int ticks;
+	public static int tileSize;
 	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
 	public static boolean DEBUG_DRAW = false;
 	public static boolean DISABLE_NIGHT = false;
@@ -519,42 +519,63 @@ public class Game {
 		}
 	}
 	private void makeCastle(boolean easymode) {
-		int borderPadCastle = 10;
-		for (Tile tile : world.getTilesRandomly()) {
-			if (tile.getRoadType() != null && tile.canBuild() == true
-					&& tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()
-					&& tile.getTerrain() != Terrain.ROCK) {
-				if(Math.abs(tile.getLocation().x - world.getWidth()) <= borderPadCastle || tile.getLocation().x < borderPadCastle
-						|| Math.abs(tile.getLocation().y - world.getHeight()) <= borderPadCastle || tile.getLocation().y < borderPadCastle) {
-					System.out.println("dX"+ (tile.getLocation().x - world.getWidth()) );
-					System.out.println("dY"+ (tile.getLocation().y - world.getHeight()) );
-					System.out.println("location"+ (tile.getLocation()) );
-					continue;
+		LinkedList<HasImage> thingsToPlace = new LinkedList<>();
+		thingsToPlace.add(BuildingType.CASTLE);
+		thingsToPlace.add(UnitType.WORKER);
+		if(easymode) {
+			thingsToPlace.add(BuildingType.BARRACKS);
+			thingsToPlace.add(BuildingType.WORKSHOP);
+		}
+		
+		HashSet<Tile> visited = new HashSet<>();
+		LinkedList<Tile> tovisit = new LinkedList<>();
+		
+		Tile middle = world.get(new TileLoc(world.getWidth()/2, world.getHeight()/2));
+		tovisit.add(middle);
+		visited.add(middle);
+		
+		while(!thingsToPlace.isEmpty()) {
+			Tile current = tovisit.removeFirst();
+			HasImage thing = thingsToPlace.getFirst();
+			if(thing instanceof BuildingType) {
+				BuildingType type = (BuildingType)thing;
+				if (current.canBuild() == true 
+						&& !current.getHasBuilding()
+						&& current.liquidAmount < current.liquidType.getMinimumDamageAmount()
+						&& (current.getTerrain() != Terrain.ROCK || type != BuildingType.CASTLE)) {
+					Building s = new Building(type, current);
+					current.setBuilding(s);
+					world.buildings.add(s);
+					s.setRemainingEffort(0);
+					thing = null;
 				}
-				summonUnit(tile, UnitType.WORKER, true);
-				Building s = new Building(BuildingType.CASTLE, tile);
-				tile.setBuilding(s);
-				world.buildings.add(s);
-				s.setRemainingEffort(0);
-				viewOffset.x += (tile.getLocation().x - 20) * tileSize;
-				viewOffset.y += (tile.getLocation().y - 20) * tileSize;
-				
-				if(easymode) {
-					Tile randomNeighbor = tile.getNeighbors().get(0);
-					Building barrack = new Building(BuildingType.BARRACKS, randomNeighbor);
-					randomNeighbor.setBuilding(barrack);
-					world.buildings.add(barrack);
-					barrack.setRemainingEffort(0);
-					
-					Tile randomNeighbor2 = tile.getNeighbors().get(1);
-					Building workshop = new Building(BuildingType.WORKSHOP, randomNeighbor2);
-					randomNeighbor2.setBuilding(workshop);
-					world.buildings.add(workshop);
-					workshop.setRemainingEffort(0);
+			}
+			else if(thing instanceof UnitType) {
+				UnitType type = (UnitType)thing;
+				if (current.liquidAmount < current.liquidType.getMinimumDamageAmount()) {
+					summonUnit(current, type, true);
+					thing = null;
 				}
-				break;
+			}
+			if(thing == null) {
+				tovisit.clear();
+				visited.clear();
+				visited.add(current);
+				thingsToPlace.remove();
+			}
+			
+			for(Tile neighbor : current.getNeighbors()) {
+				if(!visited.contains(neighbor)) {
+					visited.add(neighbor);
+					tovisit.add(neighbor);
+				}
 			}
 		}
+	}
+	public void centerViewOn(Tile tile, int zoom) {
+		tileSize = zoom;
+		viewOffset.x = (tile.getLocation().x - panelWidth/2/tileSize) * tileSize + tileSize/2;
+		viewOffset.y = (tile.getLocation().y - panelHeight/2/tileSize) * tileSize;
 	}
 	
 	public void draw(Graphics g) {
@@ -1196,20 +1217,22 @@ public class Game {
 		else {
 			newTileSize = (int) ((tileSize + 1) * 1.05);
 		}
+		zoomViewTo(newTileSize, mx, my);
+	}
+	public void zoomViewTo(int newTileSize, int mx, int my) {
 		if (newTileSize > 0) {
 			Position tile = getTileAtPixel(new Position(mx, my));
 			tileSize = newTileSize;
 			Position focalPoint = tile.multiply(tileSize).subtract(viewOffset);
 			viewOffset.x -= mx - focalPoint.x;
 			viewOffset.y -= my - focalPoint.y;
-//			System.out.println("Tilesize: "+tileSize);
 		}
 	}
 
 	public void shiftView(int dx, int dy) {
 		viewOffset.x += dx;
 		viewOffset.y += dy;
-//		System.out.println(viewOffset.x + "curview" + viewOffset.y);
+		System.out.println(viewOffset.x + " curview " + viewOffset.y);
 	}
 	public void moveViewTo(double ratiox, double ratioy) {
 		Position tile = new Position(ratiox*world.getWidth(), ratioy*world.getHeight());

@@ -8,6 +8,8 @@ import javax.imageio.*;
 import utils.*;
 
 public class Driver {
+	
+	public static final boolean SHOW_MENU_ANIMATION = true;
 //	
 //	public Driver() {
 //		Image lava = Utils.loadImage("Images/lava_flow.png");
