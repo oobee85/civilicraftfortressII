@@ -683,6 +683,14 @@ public class Frame extends JPanel {
 				gameInstance.eruptVolcano();
 			}
 		});
+		
+		JButton addResources = KUIConstants.setupButton("Give Resources", null, DEBUG_BUTTON_SIZE);
+		addResources.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.addResources();
+			}
+		});
 
 		JButton makeItRain = KUIConstants.setupButton("Rain", null, DEBUG_BUTTON_SIZE);
 		makeItRain.addActionListener(new ActionListener() {
@@ -799,6 +807,7 @@ public class Frame extends JPanel {
 		buttonPanel.add(ogre);
 		buttonPanel.add(debug);
 		buttonPanel.add(toggleNight);
+		buttonPanel.add(addResources);
 		buttonPanel.add(exit);
 
 		techView = new JPanel();
