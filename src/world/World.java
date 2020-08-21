@@ -22,6 +22,7 @@ public class World {
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
 	private Tile[][] tiles;
+	private LinkedList<Tile> territory = new LinkedList<Tile>();;
 	
 	private int width;
 	private int height;
@@ -31,6 +32,7 @@ public class World {
 	public LinkedList<Unit> units = new LinkedList<Unit>();
 	public LinkedList<Building> buildings = new LinkedList<Building>();
 	public LinkedList<Unit> unitsInTerritory = new LinkedList<Unit>();
+	
 	
 	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
 	
@@ -46,7 +48,9 @@ public class World {
 		tileList = new LinkedList<>();
 		tileListRandom = new LinkedList<>();
 	}
-	
+	public void addToTerritory(Tile tile) {
+		territory.add(tile);
+	}
 	public int getWidth() {
 		return width;
 	}
@@ -95,6 +99,23 @@ public class World {
 	}
 	public void tick() {
 		updateGroundModifiers();
+		
+	}
+	public void addUnitsInTerritory() {
+		LinkedList<Unit> unitsInTerritoryNew = new LinkedList<Unit>();
+		for(Tile tile : territory) {
+			if(tile.getUnits() != null) {
+				for(Unit unit : tile.getUnits()) {
+					if(unitsInTerritoryNew.contains(unit)) {
+						continue;
+					}
+					unitsInTerritoryNew.add(unit);
+				}
+			}
+			
+		}
+		unitsInTerritory = unitsInTerritoryNew;
+//		System.out.println("Units in territory"+ unitsInTerritory.size());
 	}
 	public void updateGroundModifiers() {
 		LinkedList<GroundModifier> GroundModifiersNew = new LinkedList<GroundModifier>();

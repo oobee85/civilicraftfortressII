@@ -974,6 +974,7 @@ public class Game {
 				if(distanceFromCenter < radius) {
 					if(p.x+i >= 0 && p.x+i < world.getWidth() && p.y+j >= 0 && p.y+j < world.getHeight()) {
 						world.get(new TileLoc(p.x+i, p.y+j)).setTerritory(true);
+						world.addToTerritory(world.get(new TileLoc(p.x+i, p.y+j)));
 					}
 				}
 			}
@@ -1133,8 +1134,12 @@ public class Game {
 			if (unit.readyToMove()) {
 				unit.moveTowards(unit.getTargetTile());
 			}
+//			if(unit.getTile().getIsTerritory() && unit.getType().isHostile()) {
+//				world.addUnitsInTerritory(unit);
+//			}
+			
 		}
-		
+		world.addUnitsInTerritory();
 	}
 	
 	private void buildingTick() {
