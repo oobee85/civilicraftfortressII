@@ -997,6 +997,12 @@ public class Game {
 		}
 		
 	}
+	public void setSpawnLocation(Tile tile) {
+		if(selectedThing instanceof Building) {
+			Building building = (Building) selectedThing;
+			building.setSpawnLocation(tile);
+		}
+	}
 
 	public static void printPoint(Point p) {
 		System.out.println("Point: (" + p.x + ", " + p.y + ")");
@@ -1026,6 +1032,7 @@ public class Game {
 		}else {
 			setDestination(mx, my);
 		}
+		setSpawnLocation(tile);
 	}
 
 	public void toggleUnitSelectOnTile(Tile tile) {
@@ -1200,6 +1207,7 @@ public class Game {
 			resources.get(key).addAmount(-value);
 		}
 		tile.getBuilding().setBuildingUnit(unit);
+		unit.setTargetTile(tile.getBuilding().getSpawnLocation());
 //		tile.addUnit(unit);
 //		world.units.add(unit);
 	}

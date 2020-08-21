@@ -13,6 +13,7 @@ public class Building extends Thing {
 	private Unit buildingUnit;
 	private double culture;
 	public static double CULTURE_AREA_MULTIPLIER = 0.1;
+	private Tile spawnLocation;
 
 	private ResearchRequirement req = new ResearchRequirement();
 	
@@ -20,11 +21,17 @@ public class Building extends Thing {
 		super(buildingType.getHealth(), buildingType, true, tile);
 		this.remainingEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
+		this.spawnLocation = tile;
 		
 	}
 	public void tick() {
 		updateInProgressUnit();
-		
+	}
+	public Tile getSpawnLocation() {
+		return spawnLocation;
+	}
+	public void setSpawnLocation(Tile tile) {
+		spawnLocation = tile;
 	}
 	public void setBuildingUnit(Unit buildingUnit) {
 		this.buildingUnit = buildingUnit;
