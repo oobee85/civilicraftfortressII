@@ -156,6 +156,7 @@ public class Unit extends Thing {
 	public void resetTimeToAttack() {
 		timeToAttack = unitType.getCombatStats().getAttackSpeed();
 	}
+	
 	public Thing getTarget() {
 		return target;
 	}

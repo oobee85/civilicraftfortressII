@@ -14,6 +14,8 @@ public class Building extends Thing {
 	private double culture;
 	public static double CULTURE_AREA_MULTIPLIER = 0.1;
 	private Tile spawnLocation;
+	private double timeToHarvest;
+	private double baseTimeToHarvest = 10;
 
 	private ResearchRequirement req = new ResearchRequirement();
 	
@@ -22,10 +24,28 @@ public class Building extends Thing {
 		this.remainingEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
 		this.spawnLocation = tile;
+		this.timeToHarvest = baseTimeToHarvest;
 		
 	}
 	public void tick() {
 		updateInProgressUnit();
+		timeToHarvest --;
+//		System.out.println(timeToHarvest);
+	}
+	public boolean readyToHarvest() {
+//		System.out.println("ready");
+		return timeToHarvest <= 0;
+	}
+	public void resetTimeToHarvest() {
+//		System.out.println("in reset");
+		if(this.getTile().getResource() != null) {
+			System.out.println("reset ore");
+			timeToHarvest = this.getTile().getResource().getType().getTimeToHarvest();
+		}else {
+//			System.out.println("reset normal");
+			timeToHarvest = baseTimeToHarvest;
+		}
+		
 	}
 	public Tile getSpawnLocation() {
 		return spawnLocation;

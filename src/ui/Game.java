@@ -254,30 +254,39 @@ public class Game {
 			if(!building.isBuilt()) {
 				continue;
 			}
+			if(!building.readyToHarvest() ) {
+				continue;
+			}
 			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResource() != null && building.getTile().getResource().getType().isOre() == true) {
 				resources.get(building.getTile().getResource().getType().getItemType()).addAmount(1);
 				building.getTile().getResource().harvest(1);
+				
+				
 				building.getTile().setHeight(building.getTile().getHeight() - 0.001);
 				
 				
 				if(building.getTile().getResource().getYield() <= 0) {
 					building.getTile().setResource(null);
 				}
+				building.resetTimeToHarvest();
 			}
 			
 			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getTerrain() == Terrain.ROCK) {
 				resources.get(ItemType.STONE).addAmount(1);
+				building.resetTimeToHarvest();
 			}
 			if(building.getBuildingType() == BuildingType.IRRIGATION && building.getTile().canPlant() == true) {
 				//irrigation produces extra food when placed on water
 				if(building.getTile().liquidType == LiquidType.WATER && building.getTile().liquidAmount > 0) {
-					int extraFood = (int) (building.getTile().liquidAmount * 10);
-					resources.get(ItemType.FOOD).addAmount(1 + extraFood);
+					int extraFood = (int) (building.getTile().liquidAmount * 100);
+					resources.get(ItemType.FOOD).addAmount(1 + extraFood/2);
+					
 				}else {
 					resources.get(ItemType.FOOD).addAmount(1);
 				}
-				
+				building.resetTimeToHarvest();
 			}
+			
 			if(building.getBuildingType() == BuildingType.SAWMILL) {
 				HashSet<Tile> tilesToCut = new HashSet<>();
 				tilesToCut.add(building.getTile());
@@ -298,17 +307,20 @@ public class Game {
 					}
 				}
 				
-				
+				building.resetTimeToHarvest();
 			}
+			
 			if(building.getBuildingType() == BuildingType.FARM && building.getTile().hasUnit(UnitType.HORSE)) {
 				resources.get(ItemType.HORSE).addAmount(1);
 				resources.get(ItemType.FOOD).addAmount(1);
+				building.resetTimeToHarvest();
 			}
 			
 			if(building.getTile().getPlant() != null) {
 				if(building.getBuildingType() == BuildingType.FARM && building.getTile().getPlant().getPlantType() == PlantType.BERRY) {
 					resources.get(ItemType.FOOD).addAmount(1);
 					building.getTile().getPlant().takeDamage(1);
+					building.resetTimeToHarvest();
 				}
 			}
 			
