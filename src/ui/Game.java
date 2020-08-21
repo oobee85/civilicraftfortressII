@@ -18,6 +18,7 @@ public class Game {
 	private Image blueHitsplatImage = Utils.loadImage("resources/Images/interfaces/bluehitsplat.png");
 	private Image greenHitsplatImage = Utils.loadImage("resources/Images/interfaces/greenhitsplat.png");
 	private Image targetImage = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
+	private Image spawnLocationImage = Utils.loadImage("resources/Images/interfaces/debugtab.png");
 	private int skipUntilTick;
 	private BufferedImage terrainImage;
 	private BufferedImage minimapImage;
@@ -740,6 +741,12 @@ public class Game {
 					}
 				}
 			}
+			if(selectedThing instanceof Building) {
+				Building building = (Building) selectedThing;
+				if(building.getSpawnLocation() != building.getTile()) {
+					g.drawImage(spawnLocationImage, building.getSpawnLocation().getLocation().x * Game.tileSize, building.getSpawnLocation().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+				}
+			}
 			if(DEBUG_DRAW) {
 				if(Game.tileSize >= 36) {
 					int[][] rows = new int[upperX - lowerX][upperY - lowerY];
@@ -777,6 +784,7 @@ public class Game {
 			g.drawRect(hoveredTile.x * Game.tileSize, hoveredTile.y * Game.tileSize, Game.tileSize-1, Game.tileSize-1);
 			g.drawRect(hoveredTile.x * Game.tileSize + 1, hoveredTile.y * Game.tileSize + 1, Game.tileSize - 3, Game.tileSize - 3);
 		}
+		
 	}
 
 	public void drawHitsplat(Graphics g, Thing thing) {
