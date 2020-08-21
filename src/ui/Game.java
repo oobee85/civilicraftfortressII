@@ -18,7 +18,7 @@ public class Game {
 	private Image blueHitsplatImage = Utils.loadImage("resources/Images/interfaces/bluehitsplat.png");
 	private Image greenHitsplatImage = Utils.loadImage("resources/Images/interfaces/greenhitsplat.png");
 	private Image targetImage = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
-	private Image spawnLocationImage = Utils.loadImage("resources/Images/interfaces/debugtab.png");
+	private Image spawnLocationImage = Utils.loadImage("resources/Images/interfaces/queuelocation.png");
 	private int skipUntilTick;
 	private BufferedImage terrainImage;
 	private BufferedImage minimapImage;

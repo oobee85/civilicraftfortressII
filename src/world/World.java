@@ -30,6 +30,7 @@ public class World {
 	public LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
 	public LinkedList<Unit> units = new LinkedList<Unit>();
 	public LinkedList<Building> buildings = new LinkedList<Building>();
+	public LinkedList<Unit> unitsInTerritory = new LinkedList<Unit>();
 	
 	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
 	
