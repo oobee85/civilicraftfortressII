@@ -1245,7 +1245,6 @@ public class Game {
 	public void shiftView(int dx, int dy) {
 		viewOffset.x += dx;
 		viewOffset.y += dy;
-		System.out.println(viewOffset.x + " curview " + viewOffset.y);
 	}
 	public void moveViewTo(double ratiox, double ratioy) {
 		Position tile = new Position(ratiox*world.getWidth(), ratioy*world.getHeight());

@@ -16,6 +16,7 @@ public class MainMenuBackground extends JPanel {
 	private volatile boolean ready;
 	private volatile boolean stop;
 	private volatile boolean phase2;
+	private volatile boolean finished;
 	private volatile Runnable listener;
 
 	private volatile int thisWidth;
@@ -50,14 +51,12 @@ public class MainMenuBackground extends JPanel {
 		});
 	}
 	
-	public void start() {
+	public void start(Runnable startedCallback) {
 		Thread thread = new Thread(() -> {
 			double startingNumTilesOnscreen = 2;
 			double endingNumTiles = 100;
 			int duration1 = 10000;
 			int duration2 = 1000;
-			// sec 0 -> 4
-			// sec 10 -> 200; 
 			game.generateWorld(MapType.PANGEA, 64, false);
 			thisWidth = getWidth();
 			thisHeight = getHeight();
@@ -65,7 +64,6 @@ public class MainMenuBackground extends JPanel {
 			game.centerViewOn(game.world.buildings.get(0).getTile(), (int)(thisWidth/startingNumTilesOnscreen));
 			repaint();
 			ready = true;
-			
 			Thread gameLoopThread = new Thread(() -> {
 				try {
 					while (!stop && !phase2) {
@@ -81,38 +79,46 @@ public class MainMenuBackground extends JPanel {
 					e1.printStackTrace();
 				}
 			});
-			gameLoopThread.start();
-			
-			try {
-				long startTime = System.currentTimeMillis() + 500;
-				double numTiles = 1;
-				while(!phase2) {
-					game.zoomViewTo((int) (thisWidth/numTiles), thisWidth/2, thisHeight/2);
-					this.repaint();
-					Thread.sleep(30);
-					int elapsedTime = (int) (System.currentTimeMillis() - startTime);
-					if(elapsedTime <= duration1) {
-						numTiles = 1.0*startingNumTilesOnscreen + (endingNumTiles - startingNumTilesOnscreen) * elapsedTime/duration1;
-						tickRate = 100 - 90*elapsedTime/duration1;
+			if(startedCallback != null) {
+				startedCallback.run();
+			}
+			if(phase2) {
+			}
+			else {
+				// if the start button is pressed before the fake world has a chance to load, cancel everything
+				gameLoopThread.start();
+				try {
+					long startTime = System.currentTimeMillis() + 500;
+					double numTiles = 1;
+					while(!phase2) {
+						game.zoomViewTo((int) (thisWidth/numTiles), thisWidth/2, thisHeight/2);
+						this.repaint();
+						Thread.sleep(30);
+						int elapsedTime = (int) (System.currentTimeMillis() - startTime);
+						if(elapsedTime <= duration1) {
+							numTiles = 1.0*startingNumTilesOnscreen + (endingNumTiles - startingNumTilesOnscreen) * elapsedTime/duration1;
+							tickRate = 100 - 90*elapsedTime/duration1;
+						}
 					}
-				}
-				startTime = System.currentTimeMillis();
-				startingNumTilesOnscreen = numTiles;
-				endingNumTiles = 0.1;
-				while(phase2) {
-					game.zoomViewTo((int) (thisWidth/numTiles), thisWidth/2, thisHeight/2);
-					this.repaint();
-					Thread.sleep(30);
-					int elapsedTime = (int) (System.currentTimeMillis() - startTime);
-					if(elapsedTime > duration2) {
-						stop = true;
-						break;
+					startTime = System.currentTimeMillis();
+					startingNumTilesOnscreen = numTiles;
+					endingNumTiles = 0.1;
+					while(phase2) {
+						game.zoomViewTo((int) (thisWidth/numTiles), thisWidth/2, thisHeight/2);
+						this.repaint();
+						Thread.sleep(30);
+						int elapsedTime = (int) (System.currentTimeMillis() - startTime);
+						if(elapsedTime > duration2) {
+							stop = true;
+							break;
+						}
+						numTiles = 1.0*startingNumTilesOnscreen + (endingNumTiles - startingNumTilesOnscreen) * elapsedTime/duration2;
 					}
-					numTiles = 1.0*startingNumTilesOnscreen + (endingNumTiles - startingNumTilesOnscreen) * elapsedTime/duration2;
+				} catch (InterruptedException e) {
 				}
-			} catch (InterruptedException e) {
 			}
 			Wildlife.getAnimals().clear();
+			finished = true;
 			listener.run();
 		});
 

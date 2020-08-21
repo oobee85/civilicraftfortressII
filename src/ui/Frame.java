@@ -34,6 +34,7 @@ public class Frame extends JPanel {
 	private JToggleButton easyModeButton;
 	private JFrame frame;
 	private JPanel mainMenuPanel;
+	private volatile boolean readyToStart;
 	private JPanel gamepanel;
 	private JPanel minimapPanel;
 	private JPanel infoPanel;
@@ -211,7 +212,7 @@ public class Frame extends JPanel {
 			}
 		});
 	}
-
+	
 	private void menu() {
 		frame.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		if(Driver.SHOW_MENU_ANIMATION) {
@@ -230,12 +231,18 @@ public class Frame extends JPanel {
 		start.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				Thread thread = new Thread(() -> {
-					runGame();
-				});
-				thread.start();
+				if(readyToStart) {
+					start.setEnabled(false);
+					readyToStart = false;
+					repaint();
+					Thread thread = new Thread(() -> {
+						runGame();
+					});
+					thread.start();
+				}
 			}
 		});
+		start.setEnabled(false);
 		mainMenuPanel.add(start);
 
 		mapType = new JComboBox<>(MapType.values());
@@ -252,7 +259,14 @@ public class Frame extends JPanel {
 		frame.setVisible(true);
 		frame.requestFocusInWindow();
 		if(mainMenuPanel instanceof MainMenuBackground) {
-			((MainMenuBackground)mainMenuPanel).start();
+			((MainMenuBackground)mainMenuPanel).start(() -> {
+				readyToStart = true;
+				start.setEnabled(true);
+			});
+		}
+		else {
+			readyToStart = true;
+			start.setEnabled(true);
 		}
 	}
 
