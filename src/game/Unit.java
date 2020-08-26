@@ -45,6 +45,7 @@ public class Unit extends Thing {
 	
 	public void setTarget(Thing t) {
 		target = t;
+	
 	}
 	
 	public UnitType getUnitType() {
@@ -141,7 +142,7 @@ public class Unit extends Thing {
 	 * @return amount of damage dealt to target
 	 */
 	public double attack(Thing other) {
-		if(other == null || timeToAttack > 0) {
+		if(other == null || timeToAttack > 0 || other.isDead()) {
 			return 0;
 		}
 		double initialHP = other.getHealth();

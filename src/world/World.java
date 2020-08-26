@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.*;
 
 import game.*;
@@ -22,7 +23,7 @@ public class World {
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
 	private Tile[][] tiles;
-	private LinkedList<Tile> territory = new LinkedList<Tile>();;
+	private ConcurrentLinkedQueue<Tile> territory = new ConcurrentLinkedQueue<Tile>();;
 	
 	private int width;
 	private int height;
@@ -31,7 +32,7 @@ public class World {
 	public LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
 	public LinkedList<Unit> units = new LinkedList<Unit>();
 	public LinkedList<Building> buildings = new LinkedList<Building>();
-	public LinkedList<Unit> unitsInTerritory = new LinkedList<Unit>();
+	public HashSet<Unit> unitsInTerritory = new HashSet<Unit>();
 	
 	
 	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
@@ -73,6 +74,12 @@ public class World {
 		return tiles[loc.x][loc.y];
 	}
 
+	public LinkedList<Unit> getHostileUnitsInTerritory(){
+		
+		return unitsInTerritory.stream()
+				.filter(e -> e.getType().isHostile() && e.isPlayerControlled() == false).collect(Collectors.toCollection(LinkedList::new));
+		
+	}
 	public void drought() {
 		for(Tile tile : getTiles()) {
 			tile.liquidAmount = 0;
@@ -99,24 +106,22 @@ public class World {
 	}
 	public void tick() {
 		updateGroundModifiers();
-		
+		addUnitsInTerritory();
 	}
+	
 	public void addUnitsInTerritory() {
-		LinkedList<Unit> unitsInTerritoryNew = new LinkedList<Unit>();
+		HashSet<Unit> unitsInTerritoryNew = new HashSet<Unit>();
+		
 		for(Tile tile : territory) {
 			if(tile.getUnits() != null) {
-				for(Unit unit : tile.getUnits()) {
-					if(unitsInTerritoryNew.contains(unit)) {
-						continue;
-					}
-					unitsInTerritoryNew.add(unit);
-				}
+				unitsInTerritoryNew.addAll(tile.getUnits());
 			}
 			
 		}
 		unitsInTerritory = unitsInTerritoryNew;
 //		System.out.println("Units in territory"+ unitsInTerritory.size());
 	}
+	
 	public void updateGroundModifiers() {
 		LinkedList<GroundModifier> GroundModifiersNew = new LinkedList<GroundModifier>();
 		synchronized(groundModifiers) {
@@ -346,18 +351,36 @@ public class World {
 	}
 	
 	
-	public void updateUnitDamage() {
-		
-		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
-
+	public void updateUnitDealDamage() {
 		
 		for (Unit unit : units) {
 			Tile tile = unit.getTile();
+			
+			
+		
 			if(unit.inRange(unit.getTarget())) {
 				unit.attack(unit.getTarget());
+			}else {
+				for(Unit enemyUnit : getHostileUnitsInTerritory()){
+					if(unit.inRange(enemyUnit)) {
+						unit.attack(enemyUnit);
+					}
+				}
+				
+				
 			}
+			
+		}
+	}
+
+	public void updateUnitLiquidDamage() {
+
+		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
+
+		for (Unit unit : units) {
+			Tile tile = unit.getTile();
 			int tileDamage = tile.computeTileDamage(unit);
-			if(tileDamage != 0) {
+			if (tileDamage != 0) {
 				unit.takeDamage(tileDamage);
 			}
 			if (unit.isDead() == true) {
@@ -365,9 +388,9 @@ public class World {
 			} else {
 				unitsNew.add(unit);
 			}
-			
+
 		}
-		for(Unit unit : newUnits) {
+		for (Unit unit : newUnits) {
 			unitsNew.add(unit);
 			unit.getTile().addUnit(unit);
 		}

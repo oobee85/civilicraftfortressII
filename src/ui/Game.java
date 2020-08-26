@@ -203,7 +203,12 @@ public class Game {
 		Wildlife.tick(world);
 		buildingTick();
 		unitTick();
-		world.updateUnitDamage();
+		world.updateUnitDealDamage();
+		
+		if(ticks%5 == 0) {
+			world.updateUnitLiquidDamage();
+		}
+		
 		
 		
 		guiController.updateGUI();
@@ -240,7 +245,6 @@ public class Game {
 			}
 		}
 	}
-	
 	public void updateTerrainImages() {
 		BufferedImage[] images = world.createTerrainImage();
 		this.terrainImage = images[0];
@@ -1126,7 +1130,9 @@ public class Game {
 	
 	private void unitTick() {
 		
+		
 		for (Unit unit : world.units) {
+			
 			unit.tick();
 			if (unit.getTargetTile() == null) {
 				continue;
@@ -1139,7 +1145,7 @@ public class Game {
 //			}
 			
 		}
-		world.addUnitsInTerritory();
+//		world.addUnitsInTerritory();
 	}
 	
 	private void buildingTick() {
