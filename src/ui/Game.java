@@ -329,11 +329,11 @@ public class Game {
 			}
 			
 			// building builds units
-			if(building.getBuildingUnit() != null && building.getBuildingUnit().isBuilt() == true) {
-				Unit unit = building.getBuildingUnit();
+			if(building.getBuildingUnit().peek() != null && building.getBuildingUnit().peek().isBuilt() == true) {
+				Unit unit = building.getBuildingUnit().peek();
 //				building.getTile().addUnit(unit);
 				world.newUnits.add(unit);
-				building.setBuildingUnit(null);
+				building.getBuildingUnit().remove();
 			}
 		}
 		

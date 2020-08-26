@@ -1,5 +1,6 @@
 package game;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import ui.Game;
@@ -10,7 +11,7 @@ public class Building extends Thing {
 	
 	private BuildingType buildingType;
 	private double remainingEffort;
-	private Unit buildingUnit;
+	private LinkedList<Unit> buildingUnitList = new LinkedList<Unit>();
 	private double culture;
 	public static double CULTURE_AREA_MULTIPLIER = 0.1;
 	private Tile spawnLocation;
@@ -54,11 +55,11 @@ public class Building extends Thing {
 		spawnLocation = tile;
 	}
 	public void setBuildingUnit(Unit buildingUnit) {
-		this.buildingUnit = buildingUnit;
+		this.buildingUnitList.add(buildingUnit);
 	}
 	private void updateInProgressUnit() {
-		if (buildingUnit != null) {
-			buildingUnit.expendEffort(1);
+		if (buildingUnitList.peek() != null) {
+			buildingUnitList.peek().expendEffort(1);
 		}
 	}
 	public void updateCulture() {
@@ -67,8 +68,8 @@ public class Building extends Thing {
 		}
 		
 	}
-	public Unit getBuildingUnit() {
-		return buildingUnit;
+	public LinkedList<Unit> getBuildingUnit() {
+		return buildingUnitList;
 	}
 	public double getCulture() {
 		return culture;
