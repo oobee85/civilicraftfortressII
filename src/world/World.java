@@ -19,7 +19,7 @@ public class World {
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
 	public static final int TRANSITION_PERIOD = 100;
-	
+	public final boolean isNight = false;
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
 	private Tile[][] tiles;

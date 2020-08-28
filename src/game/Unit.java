@@ -17,6 +17,7 @@ public class Unit extends Thing {
 	private UnitType unitType;
 	private double timeToMove;
 	private double timeToAttack;
+	private double timeToHeal;
 	private Thing target;
 	private int remainingEffort;
 	
@@ -26,6 +27,7 @@ public class Unit extends Thing {
 		this.unitType = unitType;
 		this.timeToAttack = unitType.getCombatStats().getAttackSpeed();
 		this.remainingEffort = unitType.getCombatStats().getTicksToBuild();
+		this.timeToHeal = unitType.getCombatStats().getAttackSpeed();
 	}
 	public void expendEffort(int effort) {
 		remainingEffort -= effort;
@@ -45,7 +47,6 @@ public class Unit extends Thing {
 	
 	public void setTarget(Thing t) {
 		target = t;
-	
 	}
 	
 	public UnitType getUnitType() {
@@ -101,6 +102,9 @@ public class Unit extends Thing {
 		}
 		if(timeToAttack > 0) {
 			timeToAttack -= 1;
+		}
+		if(timeToHeal > 0) {
+			timeToHeal -= 1;
 		}
 		if(unitType == UnitType.WORKER) {
 			Building tobuild = this.getTile().getBuilding();
@@ -171,9 +175,17 @@ public class Unit extends Thing {
 	public boolean readyToAttack() {
 		return timeToAttack <= 0;
 	}
-	
 	public double getTimeToAttack() {
 		return timeToAttack;
+	}
+	public double getTimeToHeal() {
+		return timeToHeal;
+	}
+	public boolean readyToHeal() {
+		return timeToHeal <= 0;
+	}
+	public void resetTimeToHeal() {
+		timeToHeal = unitType.getCombatStats().getAttackSpeed();
 	}
 	
 	@Override
