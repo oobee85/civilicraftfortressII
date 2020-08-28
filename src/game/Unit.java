@@ -85,7 +85,7 @@ public class Unit extends Thing {
 		this.setTile(t);
 		
 		if(this.getUnitType() == UnitType.DRAGON && t.canPlant() == true) {
-			t.setTerrain(Terrain.BURNED_GROUND);
+//			t.setTerrain(Terrain.BURNED_GROUND);
 		}
 		if(this.getUnitType() == UnitType.ENT && t.canPlant() == true) {
 			t.setTerrain(Terrain.GRASS);
