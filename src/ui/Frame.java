@@ -38,9 +38,10 @@ public class Frame extends JPanel {
 	private JPanel gamepanel;
 	private JPanel minimapPanel;
 	private JPanel infoPanel;
-	private JPanel cityView;
+	private JPanel castleView;
 	private JPanel craftView;
-	private JPanel militaryUnitView;
+	private JPanel barracksView;
+	private JPanel workshopView;
 	private JPanel tileView;
 	private JPanel workerMenu;
 	private JPanel spawnMenu;
@@ -65,10 +66,11 @@ public class Frame extends JPanel {
 	private int RESOURCE_TAB;
 	private int WORKER_TAB;
 	private int TECH_TAB;
-	private int CRAFT_TAB;
+	private int BLACKSMITH_TAB;
 	private int DEBUG_TAB;
-	private int CITY_TAB;
-	private int MILITARY_TAB;
+	private int CASTLE_TAB;
+	private int BARRACKS_TAB;
+	private int WORKSHOP_TAB;
 	private int SPAWN_TAB;
 
 	private Thread gameLoopThread;
@@ -91,13 +93,16 @@ public class Frame extends JPanel {
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {
 				if (building.getBuildingType() == BuildingType.BARRACKS) {
-					manageMilitaryUnitTab(selected);
+					manageBarracksTab(selected);
 				}
 				if (building.getBuildingType() == BuildingType.CASTLE) {
-					manageCityTab(selected);
+					manageCastleTab(selected);
 				}
-				if (building.getBuildingType() == BuildingType.WORKSHOP || building.getBuildingType() == BuildingType.BLACKSMITH) {
-					manageCraftTab(selected);
+				if (building.getBuildingType() == BuildingType.BLACKSMITH) {
+					manageBlacksmithTab(selected);
+				}
+				if (building.getBuildingType() == BuildingType.WORKSHOP) {
+					manageWorkshopTab(selected);
 				}
 				switchInfoPanel(new BuildingInfoPanel(building));
 				frame.repaint();
@@ -456,31 +461,40 @@ public class Frame extends JPanel {
 		tabbedPane.setEnabledAt(WORKER_TAB, enabled);
 	}
 
-	private void manageCityTab(boolean enabled) {
-		if (enabled == false && tabbedPane.getSelectedIndex() == CITY_TAB) {
+	private void manageCastleTab(boolean enabled) {
+		if (enabled == false && tabbedPane.getSelectedIndex() == CASTLE_TAB) {
 			tabbedPane.setSelectedIndex(0);
 		} else if (enabled == true) {
-			tabbedPane.setSelectedIndex(CITY_TAB);
+			tabbedPane.setSelectedIndex(CASTLE_TAB);
 		}
-		tabbedPane.setEnabledAt(CITY_TAB, enabled);
+		tabbedPane.setEnabledAt(CASTLE_TAB, enabled);
 	}
 
-	private void manageCraftTab(boolean enabled) {
-		if (enabled == false && tabbedPane.getSelectedIndex() == CRAFT_TAB) {
+	private void manageBlacksmithTab(boolean enabled) {
+		if (enabled == false && tabbedPane.getSelectedIndex() == BLACKSMITH_TAB) {
 			tabbedPane.setSelectedIndex(0);
 		} else if (enabled == true) {
-			tabbedPane.setSelectedIndex(CRAFT_TAB);
+			tabbedPane.setSelectedIndex(BLACKSMITH_TAB);
 		}
-		tabbedPane.setEnabledAt(CRAFT_TAB, enabled);
+		tabbedPane.setEnabledAt(BLACKSMITH_TAB, enabled);
 	}
 
-	private void manageMilitaryUnitTab(boolean enabled) {
-		if (enabled == false && tabbedPane.getSelectedIndex() == MILITARY_TAB) {
+	private void manageBarracksTab(boolean enabled) {
+		if (enabled == false && tabbedPane.getSelectedIndex() == BARRACKS_TAB) {
 			tabbedPane.setSelectedIndex(0);
 		} else if (enabled == true) {
-			tabbedPane.setSelectedIndex(MILITARY_TAB);
+			tabbedPane.setSelectedIndex(BARRACKS_TAB);
 		}
-		tabbedPane.setEnabledAt(MILITARY_TAB, enabled);
+		tabbedPane.setEnabledAt(BARRACKS_TAB, enabled);
+	}
+	
+	private void manageWorkshopTab(boolean enabled) {
+		if (enabled == false && tabbedPane.getSelectedIndex() == WORKSHOP_TAB) {
+			tabbedPane.setSelectedIndex(0);
+		} else if (enabled == true) {
+			tabbedPane.setSelectedIndex(WORKSHOP_TAB);
+		}
+		tabbedPane.setEnabledAt(WORKSHOP_TAB, enabled);
 	}
 
 	private void manageSpawnTab(boolean enabled) {
@@ -583,7 +597,7 @@ public class Frame extends JPanel {
 			spawnMenu.add(button);
 		}
 
-		cityView = new JPanel() {
+		castleView = new JPanel() {
 		};
 		for (int i = 0; i < UnitType.values().length; i++) {
 			UnitType type = UnitType.values()[i];
@@ -599,7 +613,25 @@ public class Frame extends JPanel {
 				switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
 			unitButtons[i] = button;
-			cityView.add(button);
+			castleView.add(button);
+		}
+		workshopView = new JPanel() {
+		};
+		for (int i = 0; i < UnitType.values().length; i++) {
+			UnitType type = UnitType.values()[i];
+			if (type != UnitType.CATAPULT && type != UnitType.LONGBOWMAN) {
+				continue;
+			}
+			KButton button = KUIConstants.setupButton("Build " + type.toString(),
+					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
+			button.addActionListener(e -> {
+				gameInstance.tryToBuildUnit(type);
+			});
+			button.addRightClickActionListener(e -> {
+				switchInfoPanel(new UnitTypeInfoPanel(type));
+			});
+			unitButtons[i] = button;
+			workshopView.add(button);
 		}
 
 		craftView = new JPanel();
@@ -622,11 +654,11 @@ public class Frame extends JPanel {
 			craftView.add(craftButtons[i]);
 		}
 
-		militaryUnitView = new JPanel() {
+		barracksView = new JPanel() {
 		};
 		for (int i = 0; i < UnitType.values().length; i++) {
 			UnitType type = UnitType.values()[i];
-			if (type == UnitType.WORKER || type.getCost() == null) {
+			if (type == UnitType.WORKER || type.getCost() == null || type == UnitType.CATAPULT || type == UnitType.LONGBOWMAN) {
 				continue;
 			}
 
@@ -639,7 +671,7 @@ public class Frame extends JPanel {
 				switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
 			unitButtons[i] = button;
-			militaryUnitView.add(button);
+			barracksView.add(button);
 		}
 
 		for (int i = 0; i < ItemType.values().length; i++) {
@@ -842,19 +874,22 @@ public class Frame extends JPanel {
 				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), 20, 20), techView,
 				"Does nothing");
 
-		CRAFT_TAB = tabbedPane.getTabCount();
+		BLACKSMITH_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("Craft Stuff",
 				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), 20, 20),
-				craftView, "Does nothing", CRAFT_TAB);
+				craftView, "Does nothing", BLACKSMITH_TAB);
 
 		WORKER_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("Worker Tab", WORKER_TAB_ICON, workerMenu, "Does nothing", WORKER_TAB);
 
-		CITY_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("City", CITY_TAB_ICON, cityView, "Does nothing", CITY_TAB);
+		CASTLE_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("City", CITY_TAB_ICON, castleView, "Does nothing", CASTLE_TAB);
 
-		MILITARY_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Military", CITY_TAB_ICON, militaryUnitView, "Does nothing", MILITARY_TAB);
+		BARRACKS_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("Barracks", CITY_TAB_ICON, barracksView, "Does nothing", BARRACKS_TAB);
+		
+		WORKSHOP_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("Workshop", CITY_TAB_ICON, workshopView, "Does nothing", WORKSHOP_TAB);
 
 		SPAWN_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("Spawner", Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(0), 20, 20), spawnMenu,
@@ -867,10 +902,12 @@ public class Frame extends JPanel {
 
 		// remove building tab after setting all of the tabs up
 		manageBuildingTab(false);
-		manageCityTab(false);
-		manageCraftTab(false);
-		manageMilitaryUnitTab(false);
-		manageSpawnTab(false);
+		manageCastleTab(false);
+		manageBlacksmithTab(false);
+		manageWorkshopTab(false);
+		manageBarracksTab(false);
+		manageSpawnTab(true);
+		
 
 		guiSplitter = new JPanel();
 		guiSplitter.setLayout(new BorderLayout());

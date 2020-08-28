@@ -547,6 +547,7 @@ public class Game {
 		if(easymode) {
 			thingsToPlace.add(BuildingType.BARRACKS);
 			thingsToPlace.add(BuildingType.WORKSHOP);
+			thingsToPlace.add(BuildingType.BLACKSMITH);
 		}
 		
 		HashSet<Tile> visited = new HashSet<>();

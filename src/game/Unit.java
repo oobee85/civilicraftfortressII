@@ -27,7 +27,7 @@ public class Unit extends Thing {
 		this.unitType = unitType;
 		this.timeToAttack = unitType.getCombatStats().getAttackSpeed();
 		this.remainingEffort = unitType.getCombatStats().getTicksToBuild();
-		this.timeToHeal = unitType.getCombatStats().getAttackSpeed();
+		this.timeToHeal = unitType.getCombatStats().getHealSpeed();
 	}
 	public void expendEffort(int effort) {
 		remainingEffort -= effort;
@@ -185,7 +185,7 @@ public class Unit extends Thing {
 		return timeToHeal <= 0;
 	}
 	public void resetTimeToHeal() {
-		timeToHeal = unitType.getCombatStats().getAttackSpeed();
+		timeToHeal = unitType.getCombatStats().getHealSpeed();
 	}
 	
 	@Override

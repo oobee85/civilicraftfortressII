@@ -47,13 +47,13 @@ public class CombatStats {
 	public int getTicksToBuild() {
 		return ticksToBuild;
 	}
-	public int getTicksToHeal() {
+	public int getHealSpeed() {
 		return ticksToHeal;
 	}
 	
 	@Override
 	public String toString() {
-		return String.format("health:%d, attack:%d, speed:%d, vision:%d, attack speed:%d", health, attack, speed, visionRadius, attackSpeed);
+		return String.format("health:%d, attack:%d, speed:%d, vision:%d, attack speed:%d, heal speed:%d", health, attack, speed, visionRadius, attackSpeed, ticksToHeal);
 	}
 	
 }
