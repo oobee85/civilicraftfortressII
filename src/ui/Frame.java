@@ -922,7 +922,7 @@ public class Frame extends JPanel {
 		infoPanel = new JPanel();
 		infoPanel.setLayout(new BorderLayout());
 		infoPanel.setBackground(gameInstance.getBackgroundColor());
-		infoPanel.setPreferredSize(new Dimension(GUIWIDTH, GUIWIDTH / 3));
+		infoPanel.setPreferredSize(new Dimension(GUIWIDTH, (int) (GUIWIDTH / 2.5)));
 		infoPanel.setBorder(BorderFactory.createLineBorder(Color.black, 1));
 		guiSplitter.add(infoPanel, BorderLayout.SOUTH);
 

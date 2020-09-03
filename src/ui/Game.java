@@ -1128,14 +1128,35 @@ public class Game {
 		}
 		
 	}
+	private Building getBuildingToBuild() {
+		if(world.buildings.isEmpty()) {
+			return null;
+		}
+		for(Building building : world.buildings) {
+			if(building.isBuilt() == false) {
+				return building;
+			}
+		}
+		return null;
+	}
 	
 	private void unitTick() {
-		
 		
 		for (Unit unit : world.units) {
 			
 			unit.tick();
-			if (unit.getTargetTile() == null) {
+			if (unit.getType() == UnitType.WORKER && unit.isIdle() == true) {
+				Building building = getBuildingToBuild();
+				if(building != null && unit.getTargetTile() == null) {
+					
+					if(building.getTile().getIsTerritory() == true && unit.getTile().getIsTerritory() == true) {
+						unit.setTargetTile(building.getTile());
+					}
+					
+				}
+				
+			}
+			if(unit.getTargetTile() == null) {
 				continue;
 			}
 			if (unit.readyToMove()) {

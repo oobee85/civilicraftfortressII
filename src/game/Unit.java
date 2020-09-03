@@ -20,6 +20,7 @@ public class Unit extends Thing {
 	private double timeToHeal;
 	private Thing target;
 	private int remainingEffort;
+	private boolean isIdle;
 	
 	
 	public Unit(UnitType unitType, Tile tile, boolean isPlayerControlled) {
@@ -28,6 +29,7 @@ public class Unit extends Thing {
 		this.timeToAttack = unitType.getCombatStats().getAttackSpeed();
 		this.remainingEffort = unitType.getCombatStats().getTicksToBuild();
 		this.timeToHeal = unitType.getCombatStats().getHealSpeed();
+		this.isIdle = false;
 	}
 	public void expendEffort(int effort) {
 		remainingEffort -= effort;
@@ -77,6 +79,9 @@ public class Unit extends Thing {
 		if(t.canMove(this) == false) {
 			return;
 		}
+		if(this.getTargetTile() == null) {
+			return;
+		}
 		double penalty = movePenaltyTo(this.getTile(), t);
 		timeToMove += penalty;
 		
@@ -105,6 +110,11 @@ public class Unit extends Thing {
 		}
 		if(timeToHeal > 0) {
 			timeToHeal -= 1;
+		}
+		if(readyToMove() && readyToAttack() && target == null) {
+			isIdle = true;
+		}else {
+			isIdle = false;
 		}
 		if(unitType == UnitType.WORKER) {
 			Building tobuild = this.getTile().getBuilding();
@@ -186,6 +196,9 @@ public class Unit extends Thing {
 	}
 	public void resetTimeToHeal() {
 		timeToHeal = unitType.getCombatStats().getHealSpeed();
+	}
+	public boolean isIdle() {
+		return isIdle;
 	}
 	
 	@Override
