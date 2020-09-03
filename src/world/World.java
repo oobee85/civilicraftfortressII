@@ -444,7 +444,7 @@ public class World {
 	public void genPlants() {
 		for(Tile tile : getTiles()) {
 			//generates land plants
-			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoadType() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < bushRarity) {
+			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < bushRarity) {
 				double o = Math.random();
 				if(o < PlantType.BERRY.getRarity()) {
 					Plant p = new Plant(PlantType.BERRY, tile);
@@ -479,7 +479,7 @@ public class World {
 			double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
 			double forestEdge = (dx*dx)/(forestLengthEdge*forestLengthEdge) + (dy*dy)/(forestHeightEdge*forestHeightEdge);
 			
-			if(tile.canPlant() == true && tile.getRoadType() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2) {
+			if(tile.canPlant() == true && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2) {
 				if((forestEdge < 1 && Math.random()<forestDensity-0.2) 
 						|| (forest < 1 && Math.random() < forestDensity)) {
 					Plant plant = new Plant(PlantType.FOREST1, tile);
@@ -612,7 +612,7 @@ public class World {
 				terrainColor = tile.getResource().getType().getColor(0);
 				minimapColor = tile.getResource().getType().getColor(0);
 			}
-			if(tile.getRoadType() != null) {
+			if(tile.getRoad() != null) {
 				terrainColor = Utils.roadColor;
 				minimapColor = Utils.roadColor;
 			}

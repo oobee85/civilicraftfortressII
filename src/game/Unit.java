@@ -62,8 +62,8 @@ public class Unit extends Thing {
 	
 	public double movePenaltyTo(Tile from, Tile to) {
 		double penalty = to.getTerrain().moveSpeed();
-		if(from.getRoadType() != null && to.getRoadType() != null) {
-			penalty = penalty/from.getRoadType().getSpeed()/2;
+		if(from.getRoad() != null && to.getRoad() != null) {
+			penalty = penalty/from.getRoad().getRoadType().getSpeed()/2;
 		}
 		if(this.getUnitType().isFlying()) {
 			penalty = 0;

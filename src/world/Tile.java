@@ -23,10 +23,11 @@ public class Tile {
 	private String roadCorner;
 
 	private Resource resource;
-	private RoadType roadType;
+//	private RoadType roadType;
 	private Plant plant;
 	private Terrain terr;
 	private Building building;
+	private Road road;
 	private GroundModifier modifier;
 	
 	private ConcurrentLinkedQueue<Unit> units;
@@ -51,8 +52,8 @@ public class Tile {
 		return new Tile(location, t);
 	}
 
-	public void setRoad(RoadType r, String s) {
-		this.roadType = r;
+	public void setRoad(Road r, String s) {
+		this.road = r;
 		if (s != null) {
 			roadCorner = s;
 		}
@@ -193,8 +194,8 @@ public class Tile {
 		return getHasBuilding() == true && getBuilding().getBuildingType().canMoveThrough() == false;
 	}
 
-	public RoadType getRoadType() {
-		return roadType;
+	public Road getRoad() {
+		return road;
 	}
 
 	public Image getRoadImage() {

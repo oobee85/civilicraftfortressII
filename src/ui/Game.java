@@ -23,7 +23,6 @@ public class Game {
 	private BufferedImage terrainImage;
 	private BufferedImage minimapImage;
 	private BufferedImage heightMapImage;
-	ArrayList<Position> structureLoc = new ArrayList<Position>();
 	private Thing selectedThing;
 	private UnitType selectedUnitToSpawn;
 	private int numCutTrees = 10;
@@ -377,7 +376,7 @@ public class Game {
 	
 	private double computeCost(Tile current, Tile next, Tile target) {
 		double distanceCosts = 1;
-		if(next.getRoadType() == null) {
+		if(next.getRoad() == null) {
 			double deltaHeight = 10000 * Math.abs(current.getHeight() - next.getHeight());
 			distanceCosts += next.getTerrain().getRoadCost()
 							+ deltaHeight * deltaHeight
@@ -478,8 +477,10 @@ public class Game {
 		
 		if(selectedPath != null) {
 			for(Tile t : selectedPath.getTiles()) {
-				if(t != null) 
-					t.setRoad(RoadType.STONE_ROAD, "asdf");
+				if(t != null) {
+					Road road = new Road(RoadType.STONE_ROAD, t);
+					t.setRoad(road, "asdf");
+				}
 			}
 		}
 	}
@@ -508,14 +509,14 @@ public class Game {
 		makeCastle(easymode);
 	}
 	private void turnRoad(Tile tile) {
-		if(tile.getRoadType() == null) {
+		if(tile.getRoad() == null) {
 			return;
 		}
 		Set<Direction> directions = new HashSet<>();
 		TileLoc loc = tile.getLocation();
 		List<Tile> neighbors = Utils.getNeighbors(tile, world);
 		for(Tile t : neighbors) {
-			if(t.getRoadType() == null)
+			if(t.getRoad() == null)
 				continue;
 			Direction d = Direction.getDirection(loc, t.getLocation());
 			if(d != null)
@@ -532,11 +533,12 @@ public class Game {
 				s += d;
 			}
 		}
-		world.get(loc).setRoad(RoadType.STONE_ROAD, s);
+		Road road = new Road(RoadType.STONE_ROAD, world.get(loc));
+		world.get(loc).setRoad(road, s);
 	}
 	private void turnRoads() {
 		for(Tile tile : world.getTiles()) {
-			if(tile.getRoadType() != null)
+			if(tile.getRoad() != null)
 				turnRoad(tile);
 		}
 	}
@@ -661,7 +663,7 @@ public class Game {
 							g.fillRect(x, y, w, h); 
 							Utils.setTransparency(g, 1);
 						}
-						if (t.getRoadType() != null) {
+						if (t.getRoad() != null) {
 							g.drawImage(t.getRoadImage(), x, y, w, h, null);
 						}
 						if(t.liquidType != LiquidType.DRY) {
@@ -1223,7 +1225,27 @@ public class Game {
 	
 	public void buildRoad(RoadType rt) {
 		if(selectedThing != null && selectedThing instanceof Unit && ((Unit)selectedThing).getUnitType() == UnitType.WORKER) {
-			selectedThing.getTile().setRoad(rt, Direction.NORTH.toString());
+			for (Map.Entry mapElement : rt.getCost().entrySet()) {
+				ItemType key = (ItemType) mapElement.getKey();
+				Integer value = (Integer) mapElement.getValue();
+				
+				if (resources.get(key).getAmount() < value) {
+					return;
+				}
+			}
+			
+			for (Map.Entry mapElement : rt.getCost().entrySet()) {
+				ItemType key = (ItemType) mapElement.getKey();
+				Integer value = (Integer) mapElement.getValue();
+				
+				resources.get(key).addAmount(-value);
+			}
+			
+		
+			Road road = new Road(rt, selectedThing.getTile());
+			selectedThing.getTile().setRoad(road, Direction.NORTH.toString());
+//			world.buildings.add(road);
+			
 			for(Tile tile : Utils.getNeighborsIncludingCurrent(selectedThing.getTile(), world)) {
 				turnRoad(tile);
 			}
