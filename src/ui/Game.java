@@ -658,9 +658,35 @@ public class Game {
 							g.drawImage(t.getResource().getType().getImage(Game.tileSize), x, y, w, h, null);
 						}
 						if(t.getIsTerritory()) {
+//							g.setColor(Color.black);
+//							g.fillRect(x, y, w, h); 
 							g.setColor(Tile.TERRITORY_COLOR);
+							
 							Utils.setTransparency(g, 0.5f);
-							g.fillRect(x, y, w, h); 
+							for(Tile tile : t.getNeighbors()) {
+								if(tile.getIsTerritory() == false) {
+									TileLoc tileLoc = tile.getLocation();
+									
+									if(tileLoc.x == t.getLocation().x ) {
+										if(tileLoc.y < t.getLocation().y) {
+											g.fillRect(x, y, w, 10); 
+										}
+										if(tileLoc.y > t.getLocation().y) {
+											g.fillRect(x, y + h - 10, w, 10); 
+										}
+										
+									}
+									if(tileLoc.y == t.getLocation().y ) {
+										if(tileLoc.x < t.getLocation().x) {
+											g.fillRect(x, y, 10, h); 
+										}
+										if(tileLoc.x > t.getLocation().x) {
+											g.fillRect(x + w - 10, y, 10, h); 
+										}
+									}
+									
+								}
+							}
 							Utils.setTransparency(g, 1);
 						}
 						if (t.getRoad() != null) {
