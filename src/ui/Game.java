@@ -42,6 +42,7 @@ public class Game {
 	private Position viewOffset;
 	private TileLoc hoveredTile;
 	private boolean showHeightMap;
+	private boolean shiftEnabled = false;
 	
 	private volatile int panelWidth;
 	private volatile int panelHeight;
@@ -1048,8 +1049,11 @@ public class Game {
 			Unit unit = new Unit(selectedUnitToSpawn, tile, true);
 			tile.addUnit(unit);
 			world.units.add(unit);
-			selectedUnitToSpawn = null;
-			selectedBuildingToSpawn = null;
+			if(shiftEnabled == false) {
+				selectedUnitToSpawn = null;
+				selectedBuildingToSpawn = null;
+			}
+			
 		}
 		if (selectedBuildingToSpawn != null) {
 			System.out.println("trying to spawn building" + selectedBuildingToSpawn.toString() + loc.toString());
@@ -1057,8 +1061,10 @@ public class Game {
 			tile.setBuilding(building);
 			world.buildings.add(building);
 			building.expendEffort(building.getBuildingType().getBuildingEffort());
-			selectedBuildingToSpawn = null;
-			selectedUnitToSpawn = null;
+			if(shiftEnabled == false) {
+				selectedUnitToSpawn = null;
+				selectedBuildingToSpawn = null;
+			}
 		}
 		toggleUnitSelectOnTile(tile);
 		return;
@@ -1067,6 +1073,9 @@ public class Game {
 		
 		
 //		guiController.openRightClickMenu(mx, my, world.get(loc]);
+	}
+	public void shiftControl(boolean enabled) {
+		shiftEnabled = enabled;
 	}
 	private void summonUnit(Tile tile, UnitType type, boolean playerControlled) {
 		System.out.println("trying to spawn unit" + type.toString() +tile.getLocation());
@@ -1353,8 +1362,8 @@ public class Game {
 			
 			resources.get(key).addAmount(-value);
 		}
+		unit.setTargetTile(unit.getTile().getBuilding().getSpawnLocation());
 		tile.getBuilding().setBuildingUnit(unit);
-		unit.setTargetTile(tile.getBuilding().getSpawnLocation());
 //		tile.addUnit(unit);
 //		world.units.add(unit);
 	}

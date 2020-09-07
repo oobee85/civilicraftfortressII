@@ -399,6 +399,7 @@ public class World {
 		for (Unit unit : newUnits) {
 			unitsNew.add(unit);
 			unit.getTile().addUnit(unit);
+			
 		}
 		newUnits.clear();
 		units = unitsNew;

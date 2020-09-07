@@ -375,10 +375,16 @@ public class Frame extends JPanel {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+					gameInstance.shiftControl(false);
+				}
 			}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+					gameInstance.shiftControl(true);
+				}
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 					gameInstance.deselectThing();
 				}
