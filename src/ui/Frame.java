@@ -408,6 +408,14 @@ public class Frame extends JPanel {
 		SwingUtilities.invokeLater(() -> {
 			infoPanel.removeAll();
 			newInfo.setOpaque(false);
+			JButton explodeUnit = KUIConstants.setupButton("Explode", null, DEBUG_BUTTON_SIZE);
+			explodeUnit.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					gameInstance.explode(gameInstance.getSelectedThing());
+				}
+			});
+			newInfo.add(explodeUnit);
 			infoPanel.add(newInfo, BorderLayout.CENTER);
 			infoPanel.validate();
 		});
@@ -556,7 +564,9 @@ public class Frame extends JPanel {
 		int RESOURCE_ICON_SIZE = 35;
 
 		workerMenu = new JPanel();
-
+		
+		
+		
 		JButton makeRoad = KUIConstants.setupButton("Road",
 				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildroad.png"),
 						BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
@@ -925,6 +935,9 @@ public class Frame extends JPanel {
 		infoPanel.setPreferredSize(new Dimension(GUIWIDTH, (int) (GUIWIDTH / 2.5)));
 		infoPanel.setBorder(BorderFactory.createLineBorder(Color.black, 1));
 		guiSplitter.add(infoPanel, BorderLayout.SOUTH);
+		
+		
+		
 
 //		frame.remove(background);
 //		frame.getContentPane().add(background, BorderLayout.CENTER);

@@ -1410,6 +1410,9 @@ public class Game {
 		}
 		return null;
 	}
+	public Thing getSelectedThing() {
+		return selectedThing;
+	}
 	
 	public void fastForwardToDay() {
 		skipUntilTick = ticks + world.ticksUntilDay();
