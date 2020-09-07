@@ -126,6 +126,7 @@ public class Wildlife {
 					}
 					if(best != null) {
 						animal.moveTo(best);
+//						animal.moveTowards(best);
 					}
 				}
 			}

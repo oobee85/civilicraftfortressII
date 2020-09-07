@@ -114,11 +114,11 @@ public class Unit extends Thing {
 		if(timeToHeal > 0) {
 			timeToHeal -= 1;
 		}
-		if(readyToMove() && readyToAttack() && target == null && isPlayerControlled()) {
-			isIdle = true;
-		}else {
-			isIdle = false;
-		}
+//		if(readyToMove() && readyToAttack() && target == null && isPlayerControlled()) {
+//			isIdle = true;
+//		}else {
+//			isIdle = false;
+//		}
 		if(unitType == UnitType.WORKER) {
 			Building tobuild = this.getTile().getBuilding();
 			if(tobuild != null && tobuild.isBuilt()) {

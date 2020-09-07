@@ -150,11 +150,14 @@ public class Game {
 		if(ticks == 1) {
 			world.rain();
 		}
-		if(ticks >= 10 && Math.random() < 0.0001) {
+		if(ticks >= 10 && Math.random() < 0.0005) {
 			world.spawnAnimal(UnitType.WATER_SPIRIT, world.getTilesRandomly().getFirst());
 		}
 		if(ticks >= 100 && Math.random() < 0.001) {
 			world.spawnAnimal(UnitType.FLAMELET, world.getTilesRandomly().getFirst());
+		}
+		if(ticks >= 100 && Math.random() < 0.0005) {
+			world.spawnAnimal(UnitType.BOMB, world.getTilesRandomly().getFirst());
 		}
 		if(ticks >= 1000 && Math.random() < 0.0001) {
 			world.spawnWerewolf();
@@ -1162,6 +1165,7 @@ public class Game {
 	}
 	
 	public void explode(Thing thing) {
+		
 		world.spawnExplosion(thing.getTile(), 1, 10000);
 	}
 	
@@ -1256,6 +1260,13 @@ public class Game {
 			}
 			if (unit.readyToMove()) {
 				unit.moveTowards(unit.getTargetTile());
+			}
+			
+			if(unit instanceof Animal && ((Animal) unit).getType() == UnitType.BOMB) {
+				if(unit.getTargetTile() == unit.getTile()) {
+					world.spawnExplosion(unit.getTile(), 3, 500);
+				}
+				
 			}
 //			if(unit.getTile().getIsTerritory() && unit.getType().isHostile()) {
 //				world.addUnitsInTerritory(unit);
