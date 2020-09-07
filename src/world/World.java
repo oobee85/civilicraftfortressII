@@ -32,7 +32,10 @@ public class World {
 	public LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
 	public LinkedList<Unit> units = new LinkedList<Unit>();
 	public LinkedList<Building> buildings = new LinkedList<Building>();
+	public LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
+	
 	public HashSet<Unit> unitsInTerritory = new HashSet<Unit>();
+	
 	
 	
 	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
@@ -356,16 +359,50 @@ public class World {
 		plantsLand = newLand;
 	}
 	
-	
+	public void updateProjectileDealDamage() {
+		for(Projectile projectile : projectiles) {
+			if(projectile.reachedTarget()) {
+				for(Unit unit : projectile.getTile().getUnits()) {
+					unit.takeDamage(projectile.getType().getDamage());
+				}
+				
+			}
+			
+		}
+	}
+	public void updateProjectiles() {
+		LinkedList<Projectile> projectilesNew = new LinkedList<Projectile>();
+		
+		for(Projectile projectile : projectiles) {
+			if(projectile.reachedTarget()) {
+				projectile.getTile().removeProjectile(projectile);
+				projectile.setTile(null);
+			}else {
+				projectilesNew.add(projectile);
+			}
+		}
+		projectiles = projectilesNew;
+	}
 	public void updateUnitDealDamage() {
 		
 		for (Unit unit : units) {
 			Tile tile = unit.getTile();
-			
-			
 		
 			if(unit.inRange(unit.getTarget())) {
-				unit.attack(unit.getTarget());
+				if(!unit.isRanged()) {
+					unit.attack(unit.getTarget());
+				}else {
+					if(unit.readyToAttack() && !unit.getTarget().isDead()) {
+						Projectile p = new Projectile(unit.getType().getProjectileType(), unit.getTile(), unit.getTarget().getTile());
+						projectiles.add(p);
+						unit.getTile().addProjectile(p);
+						unit.resetTimeToAttack();
+					}
+				}
+				
+				
+				
+				
 			}else {
 				for(Unit enemyUnit : getHostileUnitsInTerritory()){
 					if(unit.inRange(enemyUnit)) {

@@ -204,7 +204,10 @@ public class Game {
 		Wildlife.tick(world);
 		buildingTick();
 		unitTick();
+		projectileTick();
 		world.updateUnitDealDamage();
+		world.updateProjectileDealDamage();
+		world.updateProjectiles();
 		
 		if(ticks%5 == 0) {
 			world.updateUnitLiquidDamage();
@@ -796,6 +799,9 @@ public class Game {
 				drawHealthBar(g, unit);
 				drawHitsplat(g, unit);
 			}
+			for(Projectile p : world.projectiles) {
+				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+			}
 			if(!showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
@@ -1213,6 +1219,20 @@ public class Game {
 			}
 		}
 		return null;
+	}
+	
+	private void projectileTick() {
+		
+		for(Projectile projectile : world.projectiles) {
+			projectile.tick();
+			if(projectile.getTargetTile() == null) {
+				continue;
+			}
+			if (projectile.readyToMove()) {
+				projectile.moveToTarget();
+			}
+		}
+		
 	}
 	
 	private void unitTick() {

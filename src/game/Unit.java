@@ -23,6 +23,7 @@ public class Unit extends Thing {
 	private boolean isIdle;
 	
 	
+	
 	public Unit(UnitType unitType, Tile tile, boolean isPlayerControlled) {
 		super(unitType.getCombatStats().getHealth(), unitType, isPlayerControlled, tile);
 		this.unitType = unitType;
@@ -30,6 +31,7 @@ public class Unit extends Thing {
 		this.remainingEffort = unitType.getCombatStats().getTicksToBuild();
 		this.timeToHeal = unitType.getCombatStats().getHealSpeed();
 		this.isIdle = false;
+		
 	}
 	public void expendEffort(int effort) {
 		remainingEffort -= effort;
@@ -37,6 +39,7 @@ public class Unit extends Thing {
 			remainingEffort = 0;
 		}
 	}
+	
 	public int getRemainingEffort() {
 		return remainingEffort;
 	}
@@ -111,7 +114,7 @@ public class Unit extends Thing {
 		if(timeToHeal > 0) {
 			timeToHeal -= 1;
 		}
-		if(readyToMove() && readyToAttack() && target == null) {
+		if(readyToMove() && readyToAttack() && target == null && isPlayerControlled()) {
 			isIdle = true;
 		}else {
 			isIdle = false;
@@ -168,6 +171,8 @@ public class Unit extends Thing {
 		}
 		return damageDealt;
 	}
+	
+	
 	public void resetTimeToAttack() {
 		timeToAttack = unitType.getCombatStats().getAttackSpeed();
 	}
@@ -181,6 +186,9 @@ public class Unit extends Thing {
 	
 	public boolean readyToMove() {
 		return timeToMove <= 0;
+	}
+	public double getTimeToMove() {
+		return timeToMove;
 	}
 	public boolean readyToAttack() {
 		return timeToAttack <= 0;
@@ -200,11 +208,16 @@ public class Unit extends Thing {
 	public boolean isIdle() {
 		return isIdle;
 	}
+	public boolean isRanged() {
+		return unitType.isRanged();
+	}
 	
 	@Override
 	public List<String> getDebugStrings() {
 		List<String> strings = super.getDebugStrings();
+		strings.add(String.format("TTM=%.1f", getTimeToMove()));
 		strings.add(String.format("TTA=%.1f", getTimeToAttack()));
+		strings.add(String.format("TTH=%.1f", getTimeToHeal()));
 		return strings;
 	}
 	@Override

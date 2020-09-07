@@ -32,6 +32,7 @@ public class Tile {
 	private GroundModifier modifier;
 	
 	private ConcurrentLinkedQueue<Unit> units;
+	private ConcurrentLinkedQueue<Projectile> projectiles;
 	
 	public double liquidAmount;
 	public LiquidType liquidType;
@@ -46,7 +47,7 @@ public class Tile {
 		liquidType = LiquidType.WATER;
 		liquidAmount = 0;
 		units = new ConcurrentLinkedQueue<Unit>();
-		
+		projectiles = new ConcurrentLinkedQueue<Projectile>();
 	}
 
 	public static Tile makeTile(TileLoc location, Terrain t) {
@@ -106,6 +107,9 @@ public class Tile {
 
 	public ConcurrentLinkedQueue<Unit> getUnits() {
 		return units;
+	}
+	public ConcurrentLinkedQueue<Projectile> getProjectiles() {
+		return projectiles;
 	}
 
 	public boolean hasUnit(UnitType unit) {
@@ -170,6 +174,12 @@ public class Tile {
 
 	public void removeUnit(Unit u) {
 		units.remove(u);
+	}
+	public void addProjectile(Projectile p) {
+		projectiles.add(p);
+	}
+	public void removeProjectile(Projectile p) {
+		projectiles.remove(p);
 	}
 
 	public void drawHeightMap(Graphics g, double height) {
