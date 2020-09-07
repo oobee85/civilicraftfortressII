@@ -25,6 +25,7 @@ public class Game {
 	private BufferedImage heightMapImage;
 	private Thing selectedThing;
 	private UnitType selectedUnitToSpawn;
+	private BuildingType selectedBuildingToSpawn;
 	private int numCutTrees = 10;
 	private int buildingsUntilOgre = 8;
 	
@@ -366,6 +367,22 @@ public class Game {
 		panelHeight = height;
 	}
 
+	private HashSet<Tile> getNeighborsInRadius(Tile tile, int radius) {
+		HashSet<Tile> neighbors = new HashSet<Tile>();
+		
+		Tile farthestTile = tile;
+		for(Tile t : farthestTile.getNeighbors()) {
+			if(t.getLocation().distanceTo(tile.getLocation()) > farthestTile.getLocation().distanceTo(tile.getLocation()) ) {
+				farthestTile = t;
+			}
+			if(farthestTile.getLocation().distanceTo(tile.getLocation()) >= radius) {
+				return neighbors;
+			}
+			neighbors.add(t);
+		}
+		
+		return neighbors;
+	}
 	
 	public void flipTable() {
 		for(Tile tile : world.getTiles()) {
@@ -734,6 +751,11 @@ public class Game {
 					g2d.setStroke(currentStroke);
 					Utils.setTransparency(g, 1f);
 				}
+				HashSet<Tile> buildingVision = getNeighborsInRadius(b.getTile(), b.getBuildingType().getVisionRadius());
+				for(Tile t : buildingVision) {
+					t.setInVisionRange(true);
+				}
+				
 				BufferedImage bI = Utils.toBufferedImage(b.getImage(0));
 				double percentDone = 1 - b.getRemainingEffort()/b.getBuildingType().getBuildingEffort();
 				int h =  Math.max(1, (int) (bI.getHeight() * percentDone));
@@ -1018,18 +1040,30 @@ public class Game {
 		Position tilepos = getTileAtPixel(new Position(mx,my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
 		Tile tile = world.get(loc);
-		
+
 		System.out.println("left click");
-		if(selectedUnitToSpawn != null) {
+		
+		if (selectedUnitToSpawn != null) {
 			System.out.println("trying to spawn unit" + selectedUnitToSpawn.toString() + loc.toString());
 			Unit unit = new Unit(selectedUnitToSpawn, tile, true);
 			tile.addUnit(unit);
 			world.units.add(unit);
 			selectedUnitToSpawn = null;
-			return;
+			selectedBuildingToSpawn = null;
 		}
-		
+		if (selectedBuildingToSpawn != null) {
+			System.out.println("trying to spawn building" + selectedBuildingToSpawn.toString() + loc.toString());
+			Building building = new Building(selectedBuildingToSpawn, tile);
+			tile.setBuilding(building);
+			world.buildings.add(building);
+			building.expendEffort(building.getBuildingType().getBuildingEffort());
+			selectedBuildingToSpawn = null;
+			selectedUnitToSpawn = null;
+		}
 		toggleUnitSelectOnTile(tile);
+		return;
+		
+		
 		
 		
 //		guiController.openRightClickMenu(mx, my, world.get(loc]);
@@ -1205,8 +1239,10 @@ public class Game {
 	private void buildingTick() {
 		updateBuildingDamage();
 		updateBuildingAction();
+		
 		for (Building building : world.buildings) {
 			building.tick();
+			
 		}
 		
 	}
@@ -1248,10 +1284,16 @@ public class Game {
 		}
 		
 	}
-	public void setUnit(UnitType type) {
-		selectedUnitToSpawn = type;
+	public void setThingToSpawn(UnitType ut, BuildingType bt) {
+		if(ut != null) {
+			selectedUnitToSpawn = ut;
+		}
+		if(bt != null) {
+			selectedBuildingToSpawn = bt;
+		}
 		
 	}
+	
 	
 	public void buildRoad(RoadType rt) {
 		if(selectedThing != null && selectedThing instanceof Unit && ((Unit)selectedThing).getUnitType() == UnitType.WORKER) {
@@ -1410,6 +1452,7 @@ public class Game {
 		}
 		return null;
 	}
+	
 	public Thing getSelectedThing() {
 		return selectedThing;
 	}

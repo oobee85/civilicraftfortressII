@@ -15,6 +15,7 @@ public class Tile {
 	public static final Color TERRITORY_COLOR = Color.pink;
 	private boolean isTerritory = false;
 	private boolean isSelected = false;
+	private boolean inVisionRange = false;
 
 	private TileLoc location;
 	private double height;
@@ -115,6 +116,9 @@ public class Tile {
 		}
 		return false;
 	}
+	public void setInVisionRange(boolean inRange) {
+		this.inVisionRange = inRange;
+	}
 
 	private double getBrightnessNonRecursive() {
 		double brightness = 0;
@@ -124,6 +128,9 @@ public class Tile {
 		if (this.isTerritory) {
 			brightness += 0.4;
 		}
+		if(inVisionRange == true) {
+			brightness += 1;
+		}
 		brightness += getTerrain().getBrightness();
 		brightness += liquidAmount * liquidType.getBrightness();
 		if(modifier != null) {
@@ -132,10 +139,14 @@ public class Tile {
 		return brightness;
 	}
 
+	
 	public double getBrightness() {
 		double brightness = this.getBrightnessNonRecursive();
 		for (Tile tile : getNeighbors()) {
 			brightness += tile.getBrightnessNonRecursive();
+		}
+		if(inVisionRange == true) {
+			brightness += 1;
 		}
 		return brightness;
 	}

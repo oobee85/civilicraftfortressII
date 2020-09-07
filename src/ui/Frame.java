@@ -23,7 +23,7 @@ public class Frame extends JPanel {
 
 	public static final Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
 	public static final Dimension DEBUG_BUTTON_SIZE = new Dimension(130, 30);
-	public static final Dimension SPAWN_BUTTON_SIZE = new Dimension(100, 20);
+	public static final Dimension SPAWN_BUTTON_SIZE = new Dimension(30, 30);
 	public static final Dimension BUILD_UNIT_BUTTON_SIZE = new Dimension(170, 35);
 
 
@@ -595,15 +595,29 @@ public class Frame extends JPanel {
 		for (int i = 0; i < UnitType.values().length; i++) {
 			UnitType type = UnitType.values()[i];
 			KButton button = KUIConstants.setupButton(type.toString(),
-					Utils.resizeImageIcon(type.getImageIcon(0), (int)(BUILDING_ICON_SIZE/1.5), (int)(BUILDING_ICON_SIZE/1.5)),
+					Utils.resizeImageIcon(type.getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width/1.2), (int)(SPAWN_BUTTON_SIZE.height/1.2)),
 					SPAWN_BUTTON_SIZE);
 			button.addActionListener(e -> {
-				gameInstance.setUnit(type);
+				gameInstance.setThingToSpawn(type, null);
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
 			unitButtons[i] = button;
+			spawnMenu.add(button);
+		}
+		for (int i = 0; i < BuildingType.values().length; i++) {
+			BuildingType type = BuildingType.values()[i];
+			KButton button = KUIConstants.setupButton(type.toString(),
+					Utils.resizeImageIcon(type.getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width/1.2), (int)(SPAWN_BUTTON_SIZE.height/1.2)),
+					SPAWN_BUTTON_SIZE);
+			button.addActionListener(e -> {
+				gameInstance.setThingToSpawn(null, type);
+			});
+			button.addRightClickActionListener(e -> {
+				switchInfoPanel(new BuildingTypeInfoPanel(type));
+			});
+//			buildingButtons[i] = button;
 			spawnMenu.add(button);
 		}
 
