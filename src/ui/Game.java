@@ -1111,7 +1111,11 @@ public class Game {
 		}
 
 	}
-
+	
+	public void explode(Thing thing) {
+		world.spawnExplosion(thing.getTile(), 1, 10000);
+	}
+	
 	public void deselectThing() {
 		if (selectedThing != null) {
 			selectedThing.setIsSelected(false);

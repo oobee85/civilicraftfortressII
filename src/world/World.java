@@ -193,11 +193,18 @@ public class World {
 	}
 	
 	public void meteorStrike() {
+		
 		Tile t = this.getTilesRandomly().getFirst();
 		
 		int radius = (int) (Math.random()*20 + 5);
 		System.out.println("meteor at: "+t.getLocation().x+ ", "+ t.getLocation().y);
 		
+		spawnExplosion(t, radius, 10000);
+		
+		
+		
+	}
+	public void spawnExplosion(Tile t, int radius, int damage) {
 		for(Tile tile : this.getTiles()) {
 			
 			int i =  tile.getLocation().x;
@@ -209,7 +216,7 @@ public class World {
 				
 				if(distanceFromCenter < radius) {
 					if(tile.getTerrain() != Terrain.ROCK && tile.getTerrain() != Terrain.SNOW && tile.getTerrain() != Terrain.VOLCANO) {
-						tile.setTerrain(Terrain.BURNED_GROUND);
+//						tile.setTerrain(Terrain.BURNED_GROUND);
 					}
 					
 					tile.liquidAmount = 0;
@@ -219,30 +226,29 @@ public class World {
 					}
 					tile.setModifier(fire);
 					if(tile.getHasBuilding() == true) {
-						tile.getBuilding().takeDamage(10000);
+						tile.getBuilding().takeDamage(damage);
 					}
 					for(Unit unit : tile.getUnits()) {
-						unit.takeDamage(10000);
+						unit.takeDamage(damage);
 					}
 					if(tile.getPlant() != null) {
-						tile.getPlant().takeDamage(10000);
+						tile.getPlant().takeDamage(damage);
 					}
 					
-					double height = tile.getHeight()+0.2 - (radius/2 - distanceFromCenter)/radius/4;
-					if(distanceFromCenter > radius/2) {
-						height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
-					}
-//					double height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
+//					double height = tile.getHeight()+0.2 - (radius/2 - distanceFromCenter)/radius/4;
 //					if(distanceFromCenter > radius/2) {
-//						height = tile.getHeight()+0.2 - (radius/2 - distanceFromCenter)/radius/4;
+//						height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
 //					}
-					tile.setHeight(Math.max(height, tile.getHeight()));
+////					double height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
+////					if(distanceFromCenter > radius/2) {
+////						height = tile.getHeight()+0.2 - (radius/2 - distanceFromCenter)/radius/4;
+////					}
+//					tile.setHeight(Math.max(height, tile.getHeight()));
 				}
 				
 				
 		}
-		
-		
+
 	}
 	public void updateTerrainChange(World world) {
 		for(Tile tile : getTiles()) {
