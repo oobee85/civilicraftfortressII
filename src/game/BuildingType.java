@@ -1,6 +1,7 @@
 package game;
 
 import java.awt.*;
+import java.awt.Window.Type;
 import java.util.HashMap;
 
 import javax.swing.*;
@@ -9,11 +10,13 @@ import utils.*;
 public enum BuildingType implements HasImage {
 	 	
 	 	WALL_WOOD (100, 100, "resources/Images/buildings/wall_wood.png", 0, false, 1,
-	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,50);  }}),
+	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
 	 	WALL_STONE (1000, 200, "resources/Images/buildings/wall_stone.png", 0, false, 1,
 	 			ResearchType.ENGINEERING,  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,200);	put(ItemType.WOOD,50);  }}),
 	 	WALL_BRICK (5000, 500, "resources/Images/buildings/wall_brick.png", 0, false, 1,
 	 			ResearchType.MONARCHY,  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,200); put(ItemType.ADAMANTITE_BAR,1);  }}),
+	 	GATE_WOOD (100, 200, "resources/Images/buildings/gate_wood.png", 0, false, 1,
+	 			ResearchType.MASONRY,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200); put(ItemType.IRON_BAR,10); }}),
 	 	BRIDGE (500, 100, "resources/Images/buildings/bridge.png", 0, true, 1,
 	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,50);  }}),
 	 	MINE (500, 100, "resources/Images/buildings/mine256.png", 0, true, 1,
@@ -31,7 +34,7 @@ public enum BuildingType implements HasImage {
 	 	FARM (500, 250, "resources/Images/buildings/farm.png", 0.25, true, 1,
 	 			ResearchType.FARMING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
 	 	GRANARY (500, 500, "resources/Images/buildings/granary.png", 0.25, true, 1,
-	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200);  }}),
+	 			ResearchType.FARMING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200);  }}),
 	 	CASTLE (4000, 1000, "resources/Images/buildings/castle256.png", 1, true, 100,
 	 			ResearchType.MONARCHY,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000); put(ItemType.STONE,1000); put(ItemType.ADAMANTITE_BAR,20); }}),
 		BARRACKS (1000, 250, "resources/Images/buildings/barracks256.png", 0.25, true, 1,

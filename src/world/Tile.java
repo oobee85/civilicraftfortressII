@@ -156,13 +156,14 @@ public class Tile {
 	}
 
 	public void setBuilding(Building b) {
-		if (building != null) {
-			return;
-		}
-		if (b != null) {
-			building = b;
-//			building.setHealth(1);
-		}
+		building = b;
+//		if (building != null) {
+//			return;
+//		}
+//		if (b != null) {
+//			building = b;
+////			building.setHealth(1);
+//		}
 	}
 	public void setModifier(GroundModifier gm) {
 		modifier = gm;
@@ -209,11 +210,17 @@ public class Tile {
 	}
 
 	public boolean isBlocked(Unit u) {
-
 		if (u.getUnitType().isFlying()) {
 			return false;
 		}
-		return getHasBuilding() == true && getBuilding().getBuildingType().canMoveThrough() == false;
+		if(getHasBuilding() == false) {
+			return false;
+		}
+		if(building.getBuildingType() == BuildingType.GATE_WOOD && u instanceof Animal) {
+			return true;
+		}
+		
+		return getBuilding().getBuildingType().canMoveThrough() == false;
 	}
 
 	public Road getRoad() {
