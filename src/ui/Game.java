@@ -1262,12 +1262,7 @@ public class Game {
 				unit.moveTowards(unit.getTargetTile());
 			}
 			
-			if(unit instanceof Animal && ((Animal) unit).getType() == UnitType.BOMB) {
-				if(unit.getTargetTile() == unit.getTile()) {
-					world.spawnExplosion(unit.getTile(), 3, 500);
-				}
-				
-			}
+			
 //			if(unit.getTile().getIsTerritory() && unit.getType().isHostile()) {
 //				world.addUnitsInTerritory(unit);
 //			}

@@ -33,7 +33,7 @@ public class Projectile {
 		}
 	}
 	
-	public void moveTo(Tile t) {
+	private void moveTo(Tile t) {
 		getTile().removeProjectile(this);
 		t.addProjectile(this);
 		this.setTile(t);

@@ -10,7 +10,11 @@ public class LavaGolem extends Animal {
 	public LavaGolem(Tile tile, boolean isPlayerControlled) {
 		super(UnitType.LAVAGOLEM, tile, isPlayerControlled);
 	}
-
+	
+	@Override
+	public boolean isFireResistant() {
+		return true;
+	}
 	@Override
 	public boolean wantsToEat() {
 		return false;

@@ -145,6 +145,12 @@ public class Wildlife {
 				}
 			}
 			animalsCopy.add(animal);
+			
+			if(animal.getType() == UnitType.BOMB) {
+				if(animal.getTargetTile() == animal.getTile()) {
+					world.spawnExplosion(animal.getTile(), 5, 500);
+				}
+			}
 		}
 
 		for(Animal a : dead) {

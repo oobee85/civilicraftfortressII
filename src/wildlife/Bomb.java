@@ -25,7 +25,6 @@ public class Bomb extends Animal {
 	public void tick() {
 		super.tick();
 	}
-	
 
 	@Override
 	public boolean wantsToAttack() {

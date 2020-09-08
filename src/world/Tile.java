@@ -293,11 +293,15 @@ public class Tile {
 			if(aquatic) {
 				if(liquidAmount < LiquidType.DRY.getMinimumDamageAmount()) {
 					damage += (LiquidType.DRY.getMinimumDamageAmount() - liquidAmount) * LiquidType.DRY.getDamage();
+					
 				}
 			}
 			else {
 				if(liquidAmount > liquidType.getMinimumDamageAmount()) {
-					damage += liquidAmount * liquidType.getDamage();
+					if(liquidType != LiquidType.LAVA || !fireResistant) {
+						damage += liquidAmount * liquidType.getDamage();
+					}
+					
 				}
 			}
 			if(modifier != null) {
@@ -344,7 +348,16 @@ public class Tile {
 	public double getHeight() {
 		return height;
 	}
-
+	public boolean hasWall() {
+		if(building == null) {
+			return false;
+		}
+		BuildingType buildingType = building.getBuildingType();
+		if(buildingType == BuildingType.WALL_WOOD || buildingType == BuildingType.WALL_STONE || buildingType == BuildingType.WALL_BRICK) {
+			return true;
+		}
+		return false;
+	}
 	public void setNeighbors(List<Tile> tiles) {
 		neighborTiles = tiles;
 	}
