@@ -3,6 +3,7 @@ package wildlife;
 import java.util.*;
 
 import game.*;
+import liquid.LiquidType;
 import utils.*;
 import world.*;
 
@@ -21,7 +22,10 @@ public class Wildlife {
 				}
 				
 				if(world.get(loc).liquidAmount > world.get(loc).liquidType.getMinimumDamageAmount()) {
-					makeAnimal(UnitType.FISH, world, loc);
+					if(world.get(loc).liquidType != LiquidType.LAVA) {
+						makeAnimal(UnitType.FISH, world, loc);
+					}
+					
 				}
 			}
 			

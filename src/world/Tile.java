@@ -291,9 +291,12 @@ public class Tile {
 		}
 		else {
 			if(aquatic) {
-				if(liquidAmount < LiquidType.DRY.getMinimumDamageAmount()) {
-					damage += (LiquidType.DRY.getMinimumDamageAmount() - liquidAmount) * LiquidType.DRY.getDamage();
+				if(liquidAmount < LiquidType.WATER.getMinimumDamageAmount()) {
 					
+//					damage += (LiquidType.WATER.getMinimumDamageAmount() - liquidAmount) * LiquidType.WATER.getDamage();
+					damage += 1;
+				}else if(liquidType == LiquidType.LAVA && !fireResistant){
+					damage += liquidAmount * liquidType.getDamage();
 				}
 			}
 			else {
