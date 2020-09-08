@@ -188,7 +188,6 @@ public class Game {
 		}
 		if(world.volcano != null) {
 			world.get(world.volcano).liquidType = LiquidType.LAVA;
-//			world.get(world.volcano].liquidAmount += .01;
 			if(Math.random() < 0.0001) {
 				eruptVolcano();
 			}
@@ -217,12 +216,11 @@ public class Game {
 			world.updateBuildingLiquidDamage();
 		}
 		
-		
-		
 		guiController.updateGUI();
 		if(changedTerrain) {
 			updateTerrainImages();
 		}
+		
 	}
 	public void addResources() {
 		for(ItemType itemType : ItemType.values()) {

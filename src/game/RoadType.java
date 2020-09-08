@@ -26,6 +26,7 @@ public enum RoadType implements HasImage {
 		mipmap = new MipMap(s);
 		this.buildingEffort = buildingEffort;
 		this.cost = resourcesNeeded;
+		this.speed = speed;
 		
 	}
 	

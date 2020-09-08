@@ -11,7 +11,7 @@ public class Road extends Thing {
 	
 	private RoadType roadType;
 	private double remainingEffort;
-	
+	private double health;
 
 	private ResearchRequirement req = new ResearchRequirement();
 	
@@ -19,6 +19,7 @@ public class Road extends Thing {
 		super(roadType.getHealth(), roadType, true, tile);
 		this.remainingEffort = roadType.getBuildingEffort();
 		this.roadType = roadType;
+		this.health = roadType.getHealth();
 		
 	}
 	public void expendEffort(double effort) {
@@ -29,6 +30,9 @@ public class Road extends Thing {
 	}
 	public double getRemainingEffort() {
 		return remainingEffort;
+	}
+	public double getHealth() {
+		return health;
 	}
 	public void setRemainingEffort(double effort) {
 		remainingEffort = effort;

@@ -65,6 +65,7 @@ public class Unit extends Thing {
 	
 	public double movePenaltyTo(Tile from, Tile to) {
 		double penalty = to.getTerrain().moveSpeed();
+		
 		if(from.getRoad() != null && to.getRoad() != null) {
 			penalty = penalty/from.getRoad().getRoadType().getSpeed()/2;
 		}
