@@ -441,6 +441,26 @@ public class World {
 		newUnits.clear();
 		units = unitsNew;
 	}
+	public void updateBuildingLiquidDamage() {
+
+		LinkedList<Building> buildingsNew = new LinkedList<Building>();
+
+		for (Building building : buildings) {
+			Tile tile = building.getTile();
+			int tileDamage = tile.computeTileDamage(building);
+			if (tileDamage != 0) {
+				building.takeDamage(tileDamage);
+			}
+			if (building.isDead() == true) {
+				tile.setBuilding(null);
+			} else {
+				buildingsNew.add(building);
+			}
+
+		}
+		newUnits.clear();
+		buildings = buildingsNew;
+	}
 	
 	public void updatePlantDamage() {
 		LinkedList<Plant> plantsLandNew = new LinkedList<Plant>();

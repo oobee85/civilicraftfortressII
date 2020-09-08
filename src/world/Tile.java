@@ -175,6 +175,7 @@ public class Tile {
 	public void removeUnit(Unit u) {
 		units.remove(u);
 	}
+	
 	public void addProjectile(Projectile p) {
 		projectiles.add(p);
 	}

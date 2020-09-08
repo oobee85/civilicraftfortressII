@@ -600,7 +600,7 @@ public class Frame extends JPanel {
 		spawnMenu = new JPanel();
 		for (int i = 0; i < UnitType.values().length; i++) {
 			UnitType type = UnitType.values()[i];
-			KButton button = KUIConstants.setupButton(type.toString(),
+			KButton button = KUIConstants.setupButton(null,
 					Utils.resizeImageIcon(type.getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width/1.2), (int)(SPAWN_BUTTON_SIZE.height/1.2)),
 					SPAWN_BUTTON_SIZE);
 			button.addActionListener(e -> {
@@ -614,7 +614,7 @@ public class Frame extends JPanel {
 		}
 		for (int i = 0; i < BuildingType.values().length; i++) {
 			BuildingType type = BuildingType.values()[i];
-			KButton button = KUIConstants.setupButton(type.toString(),
+			KButton button = KUIConstants.setupButton(null,
 					Utils.resizeImageIcon(type.getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width/1.2), (int)(SPAWN_BUTTON_SIZE.height/1.2)),
 					SPAWN_BUTTON_SIZE);
 			button.addActionListener(e -> {
@@ -803,8 +803,8 @@ public class Frame extends JPanel {
 				gameInstance.meteorStrike();
 			}
 		});
-		JButton ogre = KUIConstants.setupButton("Unit Events", null, DEBUG_BUTTON_SIZE);
-		ogre.addActionListener(new ActionListener() {
+		JButton unitEvents = KUIConstants.setupButton("Unit Events", null, DEBUG_BUTTON_SIZE);
+		unitEvents.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 //				gameInstance.spawnEverything();
@@ -867,7 +867,7 @@ public class Frame extends JPanel {
 		buttonPanel.add(researchEverything);
 		buttonPanel.add(eruptVolcano);
 		buttonPanel.add(meteor);
-		buttonPanel.add(ogre);
+		buttonPanel.add(unitEvents);
 		buttonPanel.add(debug);
 		buttonPanel.add(toggleNight);
 		buttonPanel.add(addResources);

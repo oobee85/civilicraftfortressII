@@ -214,6 +214,7 @@ public class Game {
 		
 		if(ticks%5 == 0) {
 			world.updateUnitLiquidDamage();
+			world.updateBuildingLiquidDamage();
 		}
 		
 		
@@ -349,25 +350,6 @@ public class Game {
 	}
 	
 
-	public void updateBuildingDamage() {
-		LinkedList<Building> buildingsNew = new LinkedList<Building>();
-		for (Building building : world.buildings) {
-			Tile tile = building.getTile();
-			double damage = tile.computeTileDamage(building);
-			if(damage > 0 ) {
-				building.takeDamage(damage);
-			}
-			if (building.isDead() == true) {
-				tile.setBuilding(null);
-			} else {
-				buildingsNew.add(building);
-			}
-		}	
-		world.buildings = buildingsNew;
-	}
-	
-	
-	
 	
 	public void setViewSize(int width, int height) {
 		panelWidth = width;
@@ -1272,7 +1254,6 @@ public class Game {
 	}
 	
 	private void buildingTick() {
-		updateBuildingDamage();
 		updateBuildingAction();
 		
 		for (Building building : world.buildings) {
