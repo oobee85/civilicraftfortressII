@@ -23,6 +23,7 @@ public enum BuildingType implements HasImage {
 	 	WATCHTOWER (500, 250, "resources/Images/buildings/watchtower.png", 0, true, 10,
 				ResearchType.WOODCUTTING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200);  }}),
 	 	
+	 	
 	 	WINDMILL (1000, 500, "resources/Images/buildings/ancientwindmill.png", 0.25, true, 1,
 	 			ResearchType.CONSTRUCTION,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
 		SAWMILL (1000, 250, "resources/Images/buildings/sawmill.png", 0.25, true, 1,
@@ -41,6 +42,8 @@ public enum BuildingType implements HasImage {
 				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200);  }}),
 		RESEARCHLAB (1000, 250, "resources/Images/buildings/research.png", 0.25, true, 1,
 				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200);  }}),
+		HELLFORGE (1000, 500, "resources/Images/buildings/hellforge.png", 0.25, true, 1,
+				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_BAR,20); put(ItemType.STONE,500);  }}),
 		
 	 	
 		;
