@@ -8,49 +8,53 @@ import utils.*;
 
 public enum BuildingType implements HasImage {
 	 	
-	 	WALL_WOOD (250, 100, "resources/Images/buildings/wall_wood.png", 0, false, 
-	 			ResearchType.WOODCUTTING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
-	 	WALL_STONE (1000, 200, "resources/Images/buildings/wall_stone.png", 0, false, 
-	 			ResearchType.MASONRY,  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,100);  }}),
-	 	WALL_BRICK (5000, 500, "resources/Images/buildings/wall_brick.png", 0, false, 
-	 			ResearchType.MASONRY,  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,100);  }}),
-	 	BRIDGE (500, 100, "resources/Images/buildings/bridge.png", 0, true, 
+	 	WALL_WOOD (250, 100, "resources/Images/buildings/wall_wood.png", 0, false, 1,
+	 			ResearchType.WOODCUTTING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,50);  }}),
+	 	WALL_STONE (1000, 200, "resources/Images/buildings/wall_stone.png", 0, false, 1,
+	 			ResearchType.MASONRY,  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,50);	put(ItemType.WOOD,50);  }}),
+	 	WALL_BRICK (5000, 500, "resources/Images/buildings/wall_brick.png", 0, false, 1,
+	 			ResearchType.MASONRY,  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,100); put(ItemType.ADAMANTITE_BAR,1);  }}),
+	 	BRIDGE (500, 100, "resources/Images/buildings/bridge.png", 0, true, 1,
 	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,50);  }}),
-	 	MINE (500, 100, "resources/Images/buildings/mine256.png", 0, true, 
-	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100); put(ItemType.STONE,100);  }}),
-	 	IRRIGATION (100, 100, "resources/Images/buildings/irrigation.png", 0, true, 
+	 	MINE (500, 100, "resources/Images/buildings/mine256.png", 0, true, 1,
+	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,10); put(ItemType.STONE,10);  }}),
+	 	IRRIGATION (100, 100, "resources/Images/buildings/irrigation.png", 0, true, 1,
 	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,50);  }}),
+	 	WATCHTOWER (500, 250, "resources/Images/buildings/watchtower.png", 0, true, 10,
+				ResearchType.WOODCUTTING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200);  }}),
 	 	
-	 	WINDMILL (1000, 500, "resources/Images/buildings/ancientwindmill.png", 0.05, true, 
+	 	WINDMILL (1000, 500, "resources/Images/buildings/ancientwindmill.png", 0.25, true, 1,
 	 			ResearchType.CONSTRUCTION,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
-		SAWMILL (1000, 250, "resources/Images/buildings/sawmill.png", 0.05, true, 
-				null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
-	 	FARM (500, 250, "resources/Images/buildings/farm.png", 0.05, true, 
+		SAWMILL (1000, 250, "resources/Images/buildings/sawmill.png", 0.25, true, 1,
+				null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,10); put(ItemType.STONE,10);  }}),
+	 	FARM (500, 250, "resources/Images/buildings/farm.png", 0.25, true, 1,
 	 			ResearchType.FARMING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
-	 	GRANARY (500, 500, "resources/Images/buildings/granary.png", 0.05, true, 
+	 	GRANARY (500, 500, "resources/Images/buildings/granary.png", 0.25, true, 1,
 	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }}),
-	 	CASTLE (5000, 1000, "resources/Images/buildings/castle256.png", 1, true, 
+	 	CASTLE (4000, 1000, "resources/Images/buildings/castle256.png", 1, true, 100,
 	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000); put(ItemType.STONE,1000);  }}),
-		BARRACKS (1000, 250, "resources/Images/buildings/barracks256.png", 0.1, true, 
-				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.STONE,100);  }}),
-		WORKSHOP (1000, 250, "resources/Images/buildings/workshop.png", 0.1, true, 
-				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.STONE,500);  }}),
-		BLACKSMITH (1000, 250, "resources/Images/buildings/blacksmith.png", 0.1, true, 
-				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.STONE,500);  }}),
-		RESEARCHLAB (1000, 250, "resources/Images/buildings/research.png", 0.1, true, 
-				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.STONE,500);  }}),
+		BARRACKS (1000, 250, "resources/Images/buildings/barracks256.png", 0.25, true, 1,
+				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,100);  }}),
+		WORKSHOP (1000, 250, "resources/Images/buildings/workshop.png", 0.25, true, 1,
+				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200);  }}),
+		BLACKSMITH (1000, 250, "resources/Images/buildings/blacksmith.png", 0.25, true, 1,
+				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200);  }}),
+		RESEARCHLAB (1000, 250, "resources/Images/buildings/research.png", 0.25, true, 1,
+				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200);  }}),
+		
 	 	
 		;
 
 	private final double health;
 	private MipMap mipmap;
 	private boolean canMoveThrough;
+	private int visionRadius;
 	private ResearchType researchRequirement;
 	public double cultureRate;
 	private double buildingEffort;
 	private HashMap <ItemType, Integer> cost;
 	
-	BuildingType(double hp, double buildingEffort, String s, double cultureRate, boolean canMoveThrough, ResearchType requirement, HashMap <ItemType, Integer> resourcesNeeded) {
+	BuildingType(double hp, double buildingEffort, String s, double cultureRate, boolean canMoveThrough, int visionRadius, ResearchType requirement, HashMap <ItemType, Integer> resourcesNeeded) {
 		this.researchRequirement = requirement;
 		this.health = hp;
 		this.cultureRate = cultureRate;
@@ -58,6 +62,7 @@ public enum BuildingType implements HasImage {
 		this.canMoveThrough = canMoveThrough;
 		this.buildingEffort = buildingEffort;
 		this.cost = resourcesNeeded;
+		this.visionRadius = visionRadius;
 		
 	}
 	public ResearchType getResearchRequirement() {
@@ -83,6 +88,9 @@ public enum BuildingType implements HasImage {
 	}
 	public double getHealth() {
 		return health;
+	}
+	public int getVisionRadius() {
+		return visionRadius;
 	}
 	public boolean canMoveThrough() {
 		return canMoveThrough;

@@ -5,16 +5,12 @@ import java.util.*;
 import game.*;
 import world.*;
 
-public class LavaGolem extends Animal {
+public class Bomb extends Animal {
 
-	public LavaGolem(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.LAVAGOLEM, tile, isPlayerControlled);
+	public Bomb(Tile tile, boolean isPlayerControlled) {
+		super(UnitType.BOMB, tile, isPlayerControlled);
 	}
 	
-	@Override
-	public boolean isFireResistant() {
-		return true;
-	}
 	@Override
 	public boolean wantsToEat() {
 		return false;
@@ -23,6 +19,11 @@ public class LavaGolem extends Animal {
 	@Override
 	public boolean wantsToReproduce() {
 		return false;
+	}
+	
+	@Override
+	public void tick() {
+		super.tick();
 	}
 
 	@Override
@@ -33,16 +34,12 @@ public class LavaGolem extends Animal {
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
 		if(buildings.size() > 0) {
-			for(Building building : buildings) {
-				if(building.getBuildingType() == BuildingType.MINE) {
-					setTarget(building);
-					return;
-				}
-			}
-			
+			setTarget(buildings.get((int)(Math.random()*buildings.size())));
+			return;
 		}
 		return;
 	}
 	
 	
+
 }

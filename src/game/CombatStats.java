@@ -8,7 +8,7 @@ public class CombatStats {
 	private int visionRadius;
 	private int attackSpeed;
 	private int ticksToBuild;
-	
+	private int ticksToHeal;
 
 	
 	/**
@@ -18,14 +18,16 @@ public class CombatStats {
 	 * @param visionRadius
 	 * @param attackSpeed
 	 * @param ticksToBuild
+	 * @param ticksToHeal
 	**/
-	public CombatStats(int health, int attack, int speed, int visionRange, int attackSpeed, int ticksToBuild) {
+	public CombatStats(int health, int attack, int speed, int visionRange, int attackSpeed, int ticksToBuild, int ticksToHeal) {
 		this.health = health;
 		this.attack = attack;
 		this.speed = speed;
 		this.visionRadius = visionRange;
 		this.attackSpeed = attackSpeed;
 		this.ticksToBuild = ticksToBuild;
+		this.ticksToHeal = ticksToHeal;	
 	}
 	public int getHealth() {
 		return health;
@@ -45,10 +47,13 @@ public class CombatStats {
 	public int getTicksToBuild() {
 		return ticksToBuild;
 	}
+	public int getHealSpeed() {
+		return ticksToHeal;
+	}
 	
 	@Override
 	public String toString() {
-		return String.format("health:%d, attack:%d, speed:%d, vision:%d, attack speed:%d", health, attack, speed, visionRadius, attackSpeed);
+		return String.format("health:%d, attack:%d, speed:%d, vision:%d, attack speed:%d, heal speed:%d", health, attack, speed, visionRadius, attackSpeed, ticksToHeal);
 	}
 	
 }

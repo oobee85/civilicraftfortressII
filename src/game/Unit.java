@@ -17,8 +17,11 @@ public class Unit extends Thing {
 	private UnitType unitType;
 	private double timeToMove;
 	private double timeToAttack;
+	private double timeToHeal;
 	private Thing target;
 	private int remainingEffort;
+	private boolean isIdle;
+	
 	
 	
 	public Unit(UnitType unitType, Tile tile, boolean isPlayerControlled) {
@@ -26,6 +29,9 @@ public class Unit extends Thing {
 		this.unitType = unitType;
 		this.timeToAttack = unitType.getCombatStats().getAttackSpeed();
 		this.remainingEffort = unitType.getCombatStats().getTicksToBuild();
+		this.timeToHeal = unitType.getCombatStats().getHealSpeed();
+		this.isIdle = false;
+		
 	}
 	public void expendEffort(int effort) {
 		remainingEffort -= effort;
@@ -33,6 +39,7 @@ public class Unit extends Thing {
 			remainingEffort = 0;
 		}
 	}
+	
 	public int getRemainingEffort() {
 		return remainingEffort;
 	}
@@ -58,8 +65,9 @@ public class Unit extends Thing {
 	
 	public double movePenaltyTo(Tile from, Tile to) {
 		double penalty = to.getTerrain().moveSpeed();
-		if(from.getRoadType() != null && to.getRoadType() != null) {
-			penalty = penalty/from.getRoadType().getSpeed()/2;
+		
+		if(from.getRoad() != null && to.getRoad() != null) {
+			penalty = penalty/from.getRoad().getRoadType().getSpeed()/2;
 		}
 		if(this.getUnitType().isFlying()) {
 			penalty = 0;
@@ -75,6 +83,9 @@ public class Unit extends Thing {
 		if(t.canMove(this) == false) {
 			return;
 		}
+		if(this.getTargetTile() == null) {
+			return;
+		}
 		double penalty = movePenaltyTo(this.getTile(), t);
 		timeToMove += penalty;
 		
@@ -83,7 +94,7 @@ public class Unit extends Thing {
 		this.setTile(t);
 		
 		if(this.getUnitType() == UnitType.DRAGON && t.canPlant() == true) {
-			t.setTerrain(Terrain.BURNED_GROUND);
+//			t.setTerrain(Terrain.BURNED_GROUND);
 		}
 		if(this.getUnitType() == UnitType.ENT && t.canPlant() == true) {
 			t.setTerrain(Terrain.GRASS);
@@ -101,6 +112,14 @@ public class Unit extends Thing {
 		if(timeToAttack > 0) {
 			timeToAttack -= 1;
 		}
+		if(timeToHeal > 0) {
+			timeToHeal -= 1;
+		}
+//		if(readyToMove() && readyToAttack() && target == null && isPlayerControlled()) {
+//			isIdle = true;
+//		}else {
+//			isIdle = false;
+//		}
 		if(unitType == UnitType.WORKER) {
 			Building tobuild = this.getTile().getBuilding();
 			if(tobuild != null && tobuild.isBuilt()) {
@@ -141,7 +160,7 @@ public class Unit extends Thing {
 	 * @return amount of damage dealt to target
 	 */
 	public double attack(Thing other) {
-		if(other == null || timeToAttack > 0) {
+		if(other == null || timeToAttack > 0 || other.isDead()) {
 			return 0;
 		}
 		double initialHP = other.getHealth();
@@ -153,9 +172,12 @@ public class Unit extends Thing {
 		}
 		return damageDealt;
 	}
+	
+	
 	public void resetTimeToAttack() {
 		timeToAttack = unitType.getCombatStats().getAttackSpeed();
 	}
+	
 	public Thing getTarget() {
 		return target;
 	}
@@ -166,18 +188,37 @@ public class Unit extends Thing {
 	public boolean readyToMove() {
 		return timeToMove <= 0;
 	}
+	public double getTimeToMove() {
+		return timeToMove;
+	}
 	public boolean readyToAttack() {
 		return timeToAttack <= 0;
 	}
-	
 	public double getTimeToAttack() {
 		return timeToAttack;
+	}
+	public double getTimeToHeal() {
+		return timeToHeal;
+	}
+	public boolean readyToHeal() {
+		return timeToHeal <= 0;
+	}
+	public void resetTimeToHeal() {
+		timeToHeal = unitType.getCombatStats().getHealSpeed();
+	}
+	public boolean isIdle() {
+		return isIdle;
+	}
+	public boolean isRanged() {
+		return unitType.isRanged();
 	}
 	
 	@Override
 	public List<String> getDebugStrings() {
 		List<String> strings = super.getDebugStrings();
+		strings.add(String.format("TTM=%.1f", getTimeToMove()));
 		strings.add(String.format("TTA=%.1f", getTimeToAttack()));
+		strings.add(String.format("TTH=%.1f", getTimeToHeal()));
 		return strings;
 	}
 	@Override

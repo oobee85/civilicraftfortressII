@@ -44,6 +44,7 @@ public class Thing implements HasImage {
 		this.tile = tile;
 	}
 	
+	
 	public boolean isPlayerControlled() {
 		return isPlayerControlled;
 	}

@@ -15,6 +15,7 @@ public class Tile {
 	public static final Color TERRITORY_COLOR = Color.pink;
 	private boolean isTerritory = false;
 	private boolean isSelected = false;
+	private boolean inVisionRange = false;
 
 	private TileLoc location;
 	private double height;
@@ -23,13 +24,15 @@ public class Tile {
 	private String roadCorner;
 
 	private Resource resource;
-	private RoadType roadType;
+//	private RoadType roadType;
 	private Plant plant;
 	private Terrain terr;
 	private Building building;
+	private Road road;
 	private GroundModifier modifier;
 	
 	private ConcurrentLinkedQueue<Unit> units;
+	private ConcurrentLinkedQueue<Projectile> projectiles;
 	
 	public double liquidAmount;
 	public LiquidType liquidType;
@@ -44,15 +47,15 @@ public class Tile {
 		liquidType = LiquidType.WATER;
 		liquidAmount = 0;
 		units = new ConcurrentLinkedQueue<Unit>();
-		
+		projectiles = new ConcurrentLinkedQueue<Projectile>();
 	}
 
 	public static Tile makeTile(TileLoc location, Terrain t) {
 		return new Tile(location, t);
 	}
 
-	public void setRoad(RoadType r, String s) {
-		this.roadType = r;
+	public void setRoad(Road r, String s) {
+		this.road = r;
 		if (s != null) {
 			roadCorner = s;
 		}
@@ -105,6 +108,9 @@ public class Tile {
 	public ConcurrentLinkedQueue<Unit> getUnits() {
 		return units;
 	}
+	public ConcurrentLinkedQueue<Projectile> getProjectiles() {
+		return projectiles;
+	}
 
 	public boolean hasUnit(UnitType unit) {
 		for (Unit u : units) {
@@ -113,6 +119,9 @@ public class Tile {
 			}
 		}
 		return false;
+	}
+	public void setInVisionRange(boolean inRange) {
+		this.inVisionRange = inRange;
 	}
 
 	private double getBrightnessNonRecursive() {
@@ -123,6 +132,9 @@ public class Tile {
 		if (this.isTerritory) {
 			brightness += 0.4;
 		}
+		if(inVisionRange == true) {
+			brightness += 1;
+		}
 		brightness += getTerrain().getBrightness();
 		brightness += liquidAmount * liquidType.getBrightness();
 		if(modifier != null) {
@@ -131,10 +143,14 @@ public class Tile {
 		return brightness;
 	}
 
+	
 	public double getBrightness() {
 		double brightness = this.getBrightnessNonRecursive();
 		for (Tile tile : getNeighbors()) {
 			brightness += tile.getBrightnessNonRecursive();
+		}
+		if(inVisionRange == true) {
+			brightness += 1;
 		}
 		return brightness;
 	}
@@ -158,6 +174,13 @@ public class Tile {
 
 	public void removeUnit(Unit u) {
 		units.remove(u);
+	}
+	
+	public void addProjectile(Projectile p) {
+		projectiles.add(p);
+	}
+	public void removeProjectile(Projectile p) {
+		projectiles.remove(p);
 	}
 
 	public void drawHeightMap(Graphics g, double height) {
@@ -193,8 +216,8 @@ public class Tile {
 		return getHasBuilding() == true && getBuilding().getBuildingType().canMoveThrough() == false;
 	}
 
-	public RoadType getRoadType() {
-		return roadType;
+	public Road getRoad() {
+		return road;
 	}
 
 	public Image getRoadImage() {
@@ -269,13 +292,20 @@ public class Tile {
 		}
 		else {
 			if(aquatic) {
-				if(liquidAmount < LiquidType.DRY.getMinimumDamageAmount()) {
-					damage += (LiquidType.DRY.getMinimumDamageAmount() - liquidAmount) * LiquidType.DRY.getDamage();
+				if(liquidAmount < LiquidType.WATER.getMinimumDamageAmount()) {
+					
+//					damage += (LiquidType.WATER.getMinimumDamageAmount() - liquidAmount) * LiquidType.WATER.getDamage();
+					damage += 1;
+				}else if(liquidType == LiquidType.LAVA && !fireResistant){
+					damage += liquidAmount * liquidType.getDamage();
 				}
 			}
 			else {
 				if(liquidAmount > liquidType.getMinimumDamageAmount()) {
-					damage += liquidAmount * liquidType.getDamage();
+					if(liquidType != LiquidType.LAVA || !fireResistant) {
+						damage += liquidAmount * liquidType.getDamage();
+					}
+					
 				}
 			}
 			if(modifier != null) {
@@ -322,7 +352,16 @@ public class Tile {
 	public double getHeight() {
 		return height;
 	}
-
+	public boolean hasWall() {
+		if(building == null) {
+			return false;
+		}
+		BuildingType buildingType = building.getBuildingType();
+		if(buildingType == BuildingType.WALL_WOOD || buildingType == BuildingType.WALL_STONE || buildingType == BuildingType.WALL_BRICK) {
+			return true;
+		}
+		return false;
+	}
 	public void setNeighbors(List<Tile> tiles) {
 		neighborTiles = tiles;
 	}

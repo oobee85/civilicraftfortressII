@@ -2,6 +2,8 @@ package liquid;
 
 import java.util.*;
 
+import game.GroundModifier;
+import game.GroundModifierType;
 import utils.*;
 import world.*;
 
@@ -95,6 +97,9 @@ public class Liquid {
 		for(Tile otherTile : neighbors) {
 			TileLoc other = otherTile.getLocation();
 			double myh = tile.getHeight();
+			if(tile.hasWall() == true) {
+				myh += 0.1;
+			}
 			double myv = liquidAmountsTemp[x][y];
 			LiquidType mytype = liquidTypesTemp[x][y];
 			

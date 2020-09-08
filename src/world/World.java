@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.*;
 
 import game.*;
@@ -18,10 +19,11 @@ public class World {
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
 	public static final int TRANSITION_PERIOD = 100;
-	
+	public final boolean isNight = false;
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
 	private Tile[][] tiles;
+	private ConcurrentLinkedQueue<Tile> territory = new ConcurrentLinkedQueue<Tile>();;
 	
 	private int width;
 	private int height;
@@ -30,6 +32,11 @@ public class World {
 	public LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
 	public LinkedList<Unit> units = new LinkedList<Unit>();
 	public LinkedList<Building> buildings = new LinkedList<Building>();
+	public LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
+	
+	public HashSet<Unit> unitsInTerritory = new HashSet<Unit>();
+	
+	
 	
 	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
 	
@@ -45,7 +52,9 @@ public class World {
 		tileList = new LinkedList<>();
 		tileListRandom = new LinkedList<>();
 	}
-	
+	public void addToTerritory(Tile tile) {
+		territory.add(tile);
+	}
 	public int getWidth() {
 		return width;
 	}
@@ -68,6 +77,12 @@ public class World {
 		return tiles[loc.x][loc.y];
 	}
 
+	public LinkedList<Unit> getHostileUnitsInTerritory(){
+		
+		return unitsInTerritory.stream()
+				.filter(e -> e.getType().isHostile() && e.isPlayerControlled() == false).collect(Collectors.toCollection(LinkedList::new));
+		
+	}
 	public void drought() {
 		for(Tile tile : getTiles()) {
 			tile.liquidAmount = 0;
@@ -94,7 +109,22 @@ public class World {
 	}
 	public void tick() {
 		updateGroundModifiers();
+		addUnitsInTerritory();
 	}
+	
+	public void addUnitsInTerritory() {
+		HashSet<Unit> unitsInTerritoryNew = new HashSet<Unit>();
+		
+		for(Tile tile : territory) {
+			if(tile.getUnits() != null) {
+				unitsInTerritoryNew.addAll(tile.getUnits());
+			}
+			
+		}
+		unitsInTerritory = unitsInTerritoryNew;
+//		System.out.println("Units in territory"+ unitsInTerritory.size());
+	}
+	
 	public void updateGroundModifiers() {
 		LinkedList<GroundModifier> GroundModifiersNew = new LinkedList<GroundModifier>();
 		synchronized(groundModifiers) {
@@ -166,11 +196,18 @@ public class World {
 	}
 	
 	public void meteorStrike() {
+		
 		Tile t = this.getTilesRandomly().getFirst();
 		
 		int radius = (int) (Math.random()*20 + 5);
 		System.out.println("meteor at: "+t.getLocation().x+ ", "+ t.getLocation().y);
 		
+		spawnExplosion(t, radius, 10000);
+		
+		
+		
+	}
+	public void spawnExplosion(Tile t, int radius, int damage) {
 		for(Tile tile : this.getTiles()) {
 			
 			int i =  tile.getLocation().x;
@@ -182,7 +219,7 @@ public class World {
 				
 				if(distanceFromCenter < radius) {
 					if(tile.getTerrain() != Terrain.ROCK && tile.getTerrain() != Terrain.SNOW && tile.getTerrain() != Terrain.VOLCANO) {
-						tile.setTerrain(Terrain.BURNED_GROUND);
+//						tile.setTerrain(Terrain.BURNED_GROUND);
 					}
 					
 					tile.liquidAmount = 0;
@@ -192,30 +229,29 @@ public class World {
 					}
 					tile.setModifier(fire);
 					if(tile.getHasBuilding() == true) {
-						tile.getBuilding().takeDamage(10000);
+						tile.getBuilding().takeDamage(damage);
 					}
 					for(Unit unit : tile.getUnits()) {
-						unit.takeDamage(10000);
+						unit.takeDamage(damage);
 					}
 					if(tile.getPlant() != null) {
-						tile.getPlant().takeDamage(10000);
+						tile.getPlant().takeDamage(damage);
 					}
 					
-					double height = tile.getHeight()+0.2 - (radius/2 - distanceFromCenter)/radius/4;
-					if(distanceFromCenter > radius/2) {
-						height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
-					}
-//					double height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
+//					double height = tile.getHeight()+0.2 - (radius/2 - distanceFromCenter)/radius/4;
 //					if(distanceFromCenter > radius/2) {
-//						height = tile.getHeight()+0.2 - (radius/2 - distanceFromCenter)/radius/4;
+//						height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
 //					}
-					tile.setHeight(Math.max(height, tile.getHeight()));
+////					double height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
+////					if(distanceFromCenter > radius/2) {
+////						height = tile.getHeight()+0.2 - (radius/2 - distanceFromCenter)/radius/4;
+////					}
+//					tile.setHeight(Math.max(height, tile.getHeight()));
 				}
 				
 				
 		}
-		
-		
+
 	}
 	public void updateTerrainChange(World world) {
 		for(Tile tile : getTiles()) {
@@ -323,19 +359,71 @@ public class World {
 		plantsLand = newLand;
 	}
 	
-	
-	public void updateUnitDamage() {
+	public void updateProjectileDealDamage() {
+		for(Projectile projectile : projectiles) {
+			if(projectile.reachedTarget()) {
+				for(Unit unit : projectile.getTile().getUnits()) {
+					unit.takeDamage(projectile.getType().getDamage());
+				}
+				
+			}
+			
+		}
+	}
+	public void updateProjectiles() {
+		LinkedList<Projectile> projectilesNew = new LinkedList<Projectile>();
 		
-		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
-
+		for(Projectile projectile : projectiles) {
+			if(projectile.reachedTarget()) {
+				projectile.getTile().removeProjectile(projectile);
+				projectile.setTile(null);
+			}else {
+				projectilesNew.add(projectile);
+			}
+		}
+		projectiles = projectilesNew;
+	}
+	public void updateUnitDealDamage() {
 		
 		for (Unit unit : units) {
 			Tile tile = unit.getTile();
+		
 			if(unit.inRange(unit.getTarget())) {
-				unit.attack(unit.getTarget());
+				if(!unit.isRanged()) {
+					unit.attack(unit.getTarget());
+				}else {
+					if(unit.readyToAttack() && !unit.getTarget().isDead()) {
+						Projectile p = new Projectile(unit.getType().getProjectileType(), unit.getTile(), unit.getTarget().getTile());
+						projectiles.add(p);
+						unit.getTile().addProjectile(p);
+						unit.resetTimeToAttack();
+					}
+				}
+				
+				
+				
+				
+			}else {
+				for(Unit enemyUnit : getHostileUnitsInTerritory()){
+					if(unit.inRange(enemyUnit)) {
+						unit.attack(enemyUnit);
+					}
+				}
+				
+				
 			}
+			
+		}
+	}
+
+	public void updateUnitLiquidDamage() {
+
+		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
+
+		for (Unit unit : units) {
+			Tile tile = unit.getTile();
 			int tileDamage = tile.computeTileDamage(unit);
-			if(tileDamage != 0) {
+			if (tileDamage != 0) {
 				unit.takeDamage(tileDamage);
 			}
 			if (unit.isDead() == true) {
@@ -343,14 +431,35 @@ public class World {
 			} else {
 				unitsNew.add(unit);
 			}
-			
+
 		}
-		for(Unit unit : newUnits) {
+		for (Unit unit : newUnits) {
 			unitsNew.add(unit);
 			unit.getTile().addUnit(unit);
+			
 		}
 		newUnits.clear();
 		units = unitsNew;
+	}
+	public void updateBuildingLiquidDamage() {
+
+		LinkedList<Building> buildingsNew = new LinkedList<Building>();
+
+		for (Building building : buildings) {
+			Tile tile = building.getTile();
+			int tileDamage = tile.computeTileDamage(building);
+			if (tileDamage != 0) {
+				building.takeDamage(tileDamage);
+			}
+			if (building.isDead() == true) {
+				tile.setBuilding(null);
+			} else {
+				buildingsNew.add(building);
+			}
+
+		}
+		newUnits.clear();
+		buildings = buildingsNew;
 	}
 	
 	public void updatePlantDamage() {
@@ -399,7 +508,7 @@ public class World {
 	public void genPlants() {
 		for(Tile tile : getTiles()) {
 			//generates land plants
-			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoadType() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < bushRarity) {
+			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < bushRarity) {
 				double o = Math.random();
 				if(o < PlantType.BERRY.getRarity()) {
 					Plant p = new Plant(PlantType.BERRY, tile);
@@ -434,7 +543,7 @@ public class World {
 			double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
 			double forestEdge = (dx*dx)/(forestLengthEdge*forestLengthEdge) + (dy*dy)/(forestHeightEdge*forestHeightEdge);
 			
-			if(tile.canPlant() == true && tile.getRoadType() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2) {
+			if(tile.canPlant() == true && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2) {
 				if((forestEdge < 1 && Math.random()<forestDensity-0.2) 
 						|| (forest < 1 && Math.random() < forestDensity)) {
 					Plant plant = new Plant(PlantType.FOREST1, tile);
@@ -567,7 +676,7 @@ public class World {
 				terrainColor = tile.getResource().getType().getColor(0);
 				minimapColor = tile.getResource().getType().getColor(0);
 			}
-			if(tile.getRoadType() != null) {
+			if(tile.getRoad() != null) {
 				terrainColor = Utils.roadColor;
 				minimapColor = Utils.roadColor;
 			}

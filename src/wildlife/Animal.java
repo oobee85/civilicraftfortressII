@@ -40,10 +40,10 @@ public class Animal extends Unit {
 	
 	public void loseEnergy() {
 		energy -= 0.005;
-		if(getHealth() < super.getType().getCombatStats().getHealth() && readyToAttack()) {
+		if(getHealth() < super.getType().getCombatStats().getHealth() && readyToHeal()) {
 			energy -= 1.0;
 			heal(1);
-			
+			resetTimeToHeal();
 		}
 		if(energy < MAX_ENERGY/20) {
 			takeDamage(0.05);
