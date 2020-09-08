@@ -202,54 +202,95 @@ public class World {
 		int radius = (int) (Math.random()*20 + 5);
 		System.out.println("meteor at: "+t.getLocation().x+ ", "+ t.getLocation().y);
 		
-		spawnExplosion(t, radius, 10000);
+		spawnExplosionCircle(t, radius, 10000);
 		
 		
 		
 	}
-	public void spawnExplosion(Tile t, int radius, int damage) {
-		for(Tile tile : this.getTiles()) {
-			
-			int i =  tile.getLocation().x;
-			int j =  tile.getLocation().y;
-			int dx = i - t.getLocation().x;
-			int dy = j - t.getLocation().y;
+	public HashSet<Tile> getNeighborsInRadius(Tile tile, int radius) {
+		
+		HashSet<Tile> neighbors = new HashSet<>();
+		neighbors.add(tile);
+		for(Tile t : tile.getNeighbors()) {
+			if(t.getLocation().distanceTo(tile.getLocation()) >= radius) {
+				return neighbors;
+			}
+			for(Tile t2 : t.getNeighbors()) {
+				if(t2.getLocation().distanceTo(tile.getLocation()) >= radius) {
+					return neighbors;
+				}
+				for(Tile t3 : t2.getNeighbors()) {
+					if(t3.getLocation().distanceTo(tile.getLocation()) >= radius) {
+						return neighbors;
+					}
+					for(Tile t4 : t3.getNeighbors()) {
+						if(t4.getLocation().distanceTo(tile.getLocation()) >= radius) {
+							return neighbors;
+						}
+						neighbors.add(t4);
+					}
+					neighbors.add(t3);
+				}
+				neighbors.add(t2);
+			}
+			neighbors.add(t);
+		}
+		
+		return neighbors;
+		
+	}
+	public void spawnExplosionCircle(Tile tile, int radius, int damage) {
+
+		for(Tile t : this.getTiles()) {
+			int i =  t.getLocation().x;
+			int j =  t.getLocation().y;
+			int dx = i - tile.getLocation().x;
+			int dy = j - tile.getLocation().y;
 			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
 				
-				
 				if(distanceFromCenter < radius) {
-					if(tile.getTerrain() != Terrain.ROCK && tile.getTerrain() != Terrain.SNOW && tile.getTerrain() != Terrain.VOLCANO) {
+					if(t.getTerrain() != Terrain.ROCK && t.getTerrain() != Terrain.SNOW && t.getTerrain() != Terrain.VOLCANO) {
 //						tile.setTerrain(Terrain.BURNED_GROUND);
 					}
-					
-					tile.liquidAmount = 0;
-					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, tile, 10 + (int)(Math.random()*damage/2));
+					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
 					synchronized(groundModifiers) {
 						groundModifiers.add(fire);
 					}
-					tile.setModifier(fire);
-					if(tile.getHasBuilding() == true) {
-						tile.getBuilding().takeDamage(damage);
+					t.setModifier(fire);
+					if(t.getHasBuilding() == true) {
+						t.getBuilding().takeDamage(damage);
 					}
-					for(Unit unit : tile.getUnits()) {
+					for(Unit unit : t.getUnits()) {
 						unit.takeDamage(damage);
 					}
-					if(tile.getPlant() != null) {
-						tile.getPlant().takeDamage(damage);
+					if(t.getPlant() != null) {
+						t.getPlant().takeDamage(damage);
 					}
+					t.liquidAmount = 0;
 					
-//					double height = tile.getHeight()+0.2 - (radius/2 - distanceFromCenter)/radius/4;
-//					if(distanceFromCenter > radius/2) {
-//						height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
-//					}
-////					double height = tile.getHeight()+0.2 - (distanceFromCenter - radius/2)/radius;
-////					if(distanceFromCenter > radius/2) {
-////						height = tile.getHeight()+0.2 - (radius/2 - distanceFromCenter)/radius/4;
-////					}
-//					tile.setHeight(Math.max(height, tile.getHeight()));
+					
 				}
 				
 				
+		}
+	}
+	public void spawnExplosion(Tile tile, int radius, int damage) {
+	
+		for(Tile t : getNeighborsInRadius(tile, radius)) {
+			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
+			synchronized(groundModifiers) {
+				groundModifiers.add(fire);
+			}
+			t.setModifier(fire);
+			if(t.getHasBuilding() == true) {
+				t.getBuilding().takeDamage(damage);
+			}
+			for(Unit unit : t.getUnits()) {
+				unit.takeDamage(damage);
+			}
+			if(t.getPlant() != null) {
+				t.getPlant().takeDamage(damage);
+			}
 		}
 
 	}

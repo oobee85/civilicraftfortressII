@@ -354,60 +354,7 @@ public class Game {
 		panelHeight = height;
 	}
 
-	private HashSet<Tile> getNeighborsInRadius(Tile tile, int radius) {
-		
-		HashSet<Tile> neighbors = new HashSet<>();
-		neighbors.add(tile);
-		for(Tile t : tile.getNeighbors()) {
-			if(t.getLocation().distanceTo(tile.getLocation()) >= radius) {
-				return neighbors;
-			}
-			for(Tile t2 : t.getNeighbors()) {
-				if(t2.getLocation().distanceTo(tile.getLocation()) >= radius) {
-					return neighbors;
-				}
-				for(Tile t3 : t2.getNeighbors()) {
-					if(t3.getLocation().distanceTo(tile.getLocation()) >= radius) {
-						return neighbors;
-					}
-					for(Tile t4 : t3.getNeighbors()) {
-						if(t4.getLocation().distanceTo(tile.getLocation()) >= radius) {
-							return neighbors;
-						}
-						neighbors.add(t4);
-					}
-					neighbors.add(t3);
-				}
-				neighbors.add(t2);
-			}
-			neighbors.add(t);
-		}
-		
-		return neighbors;
-		
-//		HashSet<Tile> neighbors = new HashSet<Tile>();
-//		int curRadius = 0;
-//		Tile curNeighbor = tile;
-//		radius = 100;
-//		for(Tile t : tile.getNeighbors()) {
-//			
-//			for(Tile neighbor : curNeighbor.getNeighbors()) {
-//				neighbors.add(neighbor);
-//				curRadius ++;
-//				curNeighbor = neighbor;
-//				if(curRadius >= radius) {
-//					continue;
-//				}
-//				
-//			}
-//			
-//			
-//			
-//		}
-		
-		
-	}
-	
+
 	public void flipTable() {
 		for(Tile tile : world.getTiles()) {
 			tile.setHeight(1 - tile.getHeight());
@@ -775,7 +722,7 @@ public class Game {
 					g2d.setStroke(currentStroke);
 					Utils.setTransparency(g, 1f);
 				}
-				HashSet<Tile> buildingVision = getNeighborsInRadius(b.getTile(), b.getBuildingType().getVisionRadius());
+				HashSet<Tile> buildingVision = world.getNeighborsInRadius(b.getTile(), b.getBuildingType().getVisionRadius());
 //				System.out.println(buildingVision.size());
 				for(Tile t : buildingVision) {
 					t.setInVisionRange(true);
