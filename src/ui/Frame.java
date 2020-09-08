@@ -196,7 +196,6 @@ public class Frame extends JPanel {
 					}
 					JButton button = craftButtons[i];
 					ResearchRequirement req = gameInstance.craftResearchRequirements.get(type);
-					System.out.println(i);
 					if (req.areRequirementsMet()) {
 						button.setEnabled(true);
 						button.setVisible(true);
@@ -682,31 +681,23 @@ public class Frame extends JPanel {
 			final ItemType type = ItemType.values()[i];
 			if (type.getCost() == null) {
 				continue;
-			}	
-			System.out.println(type.toString()+ ", " + type.getBuildingNeeded());
-			if (type.getBuildingNeeded() == BuildingType.BLACKSMITH) {
-			
-				KButton button = KUIConstants.setupButton(type.toString(),
-						Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
-						BUILDING_BUTTON_SIZE);
-				button.setEnabled(false);
-				button.addActionListener(e -> {
-					gameInstance.craftItem(type);
-				});
-				button.addRightClickActionListener(e -> {
-					switchInfoPanel(new ItemTypeInfoPanel(type));
-				});
-//				for (int x = 0; x < ItemType.values().length; x++) {
-//					if (craftButtons[i] == button) {
-//						
-//					}
-//				}
-//				if (craftButtons[i] == null) {
-//					craftButtons[i] = button;
-//				}
-				craftButtons[i] = button;
-				blacksmithView.add(button);
 			}
+			
+			if(type == ItemType.ADAMANTITE_BAR || type == ItemType.ADAMANT_SWORD || type == ItemType.RUNITE_BAR || type == ItemType.RUNE_SWORD || type == ItemType.TITANIUM_BAR || type == ItemType.TITANIUM_SWORD) {
+				continue;
+			}
+			KButton button = KUIConstants.setupButton(type.toString(),
+					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
+					BUILDING_BUTTON_SIZE);
+			button.setEnabled(false);
+			button.addActionListener(e -> {
+				gameInstance.craftItem(type);
+			});
+			button.addRightClickActionListener(e -> {
+				switchInfoPanel(new ItemTypeInfoPanel(type));
+			});
+			craftButtons[i] = button;
+			blacksmithView.add(button);
 		}
 		
 		hellforgeView = new JPanel();
@@ -715,8 +706,11 @@ public class Frame extends JPanel {
 			if (type.getCost() == null) {
 				continue;
 			}
-//			if (type.getBuildingNeeded() == BuildingType.HELLFORGE) {
-
+			if (type != ItemType.ADAMANTITE_BAR && type != ItemType.ADAMANT_SWORD && type != ItemType.RUNITE_BAR
+					&& type != ItemType.RUNE_SWORD && type != ItemType.TITANIUM_BAR
+							&& type != ItemType.TITANIUM_SWORD) {
+				continue;
+			}
 				KButton button = KUIConstants.setupButton(type.toString(),
 						Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
 						BUILDING_BUTTON_SIZE);
@@ -728,18 +722,8 @@ public class Frame extends JPanel {
 					switchInfoPanel(new ItemTypeInfoPanel(type));
 				});
 
-//				for (int x = 0; x < ItemType.values().length; x++) {
-//					if (craftButtons[i] == button) {
-//						craftButtons[i] = button;
-//						hellforgeView.add(craftButtons[i]);
-//					}
-//				}
-//				if (craftButtons[i] == null) {
-//					craftButtons[i] = button;
-//				}
 				craftButtons[i] = button;
 				hellforgeView.add(button);
-//			}
 		}
 
 		barracksView = new JPanel() {
