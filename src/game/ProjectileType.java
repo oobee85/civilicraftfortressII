@@ -14,21 +14,27 @@ import utils.Utils;
 public enum ProjectileType implements HasImage {
 
 	
-		ARROW(30, 5, "resources/Images/projectiles/arrow.png"),
-		ROCK(200, 5, "resources/Images/itemicons/rock.png"),
-		FIREBALL(30, 5, "resources/Images/projectiles/fireball.png"),
+		ARROW(30, 5, "resources/Images/projectiles/arrow.png", false),
+		ROCK_CATAPULT(200, 5, "resources/Images/itemicons/rock.png", false),
+		FIREBALL_DRAGON(100, 5, "resources/Images/projectiles/fireball.png", true),
+		FIREBALL_TREBUCHET(400, 5, "resources/Images/projectiles/fireball.png", true),
 	;
 	
 	private MipMap mipmap;
 	private double damage;
 	private double speed;
+	private boolean isExplosive;
 	
-	ProjectileType(double damage, double speed, String s){
+	ProjectileType(double damage, double speed, String s, boolean isExplosive){
 		mipmap = new MipMap(s);
 		this.damage = damage;
 		this.speed = speed;
+		this.isExplosive = isExplosive;
 	}
 
+	public boolean isExplosive() {
+		return isExplosive;
+	}
 	public double getDamage() {
 		return damage;
 	}

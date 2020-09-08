@@ -223,7 +223,7 @@ public class World {
 					}
 					
 					tile.liquidAmount = 0;
-					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, tile, 10 + (int)(Math.random()*990));
+					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, tile, 10 + (int)(Math.random()*damage/2));
 					synchronized(groundModifiers) {
 						groundModifiers.add(fire);
 					}
@@ -375,6 +375,9 @@ public class World {
 		
 		for(Projectile projectile : projectiles) {
 			if(projectile.reachedTarget()) {
+				if(projectile.getType().isExplosive()) {
+					spawnExplosion(projectile.getTile(), 2, (int)projectile.getType().getDamage());
+				}
 				projectile.getTile().removeProjectile(projectile);
 				projectile.setTile(null);
 			}else {
