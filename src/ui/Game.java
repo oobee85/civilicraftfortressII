@@ -1107,6 +1107,10 @@ public class Game {
 	}
 	public void shiftControl(boolean enabled) {
 		shiftEnabled = enabled;
+		if(shiftEnabled == false) {
+			selectedBuildingToSpawn = null;
+			selectedUnitToSpawn = null;
+		}
 	}
 	public void aControl(boolean enabled) {
 		aControl = enabled;
