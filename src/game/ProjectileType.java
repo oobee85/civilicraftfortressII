@@ -16,8 +16,10 @@ public enum ProjectileType implements HasImage {
 	
 		ARROW(30, 5, "resources/Images/projectiles/arrow.png", false),
 		ROCK_CATAPULT(200, 5, "resources/Images/itemicons/rock.png", false),
+		ROCK_CYCLOPS(80, 5, "resources/Images/itemicons/rock.png", false),
 		FIREBALL_DRAGON(100, 5, "resources/Images/projectiles/fireball.png", true),
 		FIREBALL_TREBUCHET(400, 5, "resources/Images/projectiles/fireball.png", true),
+		
 	;
 	
 	private MipMap mipmap;
