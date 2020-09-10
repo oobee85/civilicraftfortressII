@@ -1097,9 +1097,6 @@ public class Game {
 				selectedBuildingToSpawn = null;
 			}
 		}
-		if(aControl == true) {
-			toggleTargetEnemy(tile);
-		}
 		toggleUnitSelectOnTile(tile);
 		return;
 		
@@ -1130,7 +1127,6 @@ public class Game {
 			}
 			
 		}
-		
 	}
 	public void setSpawnLocation(Tile tile) {
 		if(selectedThing instanceof Building) {
@@ -1166,6 +1162,9 @@ public class Game {
 			toggleTargetEnemy(tile);
 		}else {
 			setDestination(mx, my);
+		}
+		if(aControl == true) {
+			aControl = false;
 		}
 		setSpawnLocation(tile);
 	}
