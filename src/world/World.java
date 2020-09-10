@@ -406,6 +406,10 @@ public class World {
 				for(Unit unit : projectile.getTile().getUnits()) {
 					unit.takeDamage(projectile.getType().getDamage());
 				}
+				if(projectile.getTile().getHasBuilding() == true) {
+					projectile.getTile().getBuilding().takeDamage(projectile.getType().getDamage());
+				}
+				
 				
 			}
 			

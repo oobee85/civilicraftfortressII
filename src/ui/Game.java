@@ -1100,14 +1100,12 @@ public class Game {
 		toggleUnitSelectOnTile(tile);
 		return;
 		
-		
-		
-		
 //		guiController.openRightClickMenu(mx, my, world.get(loc]);
 	}
+	
 	public void shiftControl(boolean enabled) {
 		shiftEnabled = enabled;
-		if(shiftEnabled == false) {
+		if(enabled == false) {
 			selectedBuildingToSpawn = null;
 			selectedUnitToSpawn = null;
 		}
@@ -1122,15 +1120,26 @@ public class Game {
 		world.newUnits.add(unit);
 	}
 	public void toggleTargetEnemy(Tile tile) {
+		
 		if(selectedThing instanceof Unit) {
 			Unit unit = (Unit) selectedThing;
 			Unit targetUnit = tile.getUnits().peek();
-			// sets the target if the target isn't itself
-			if(targetUnit != unit && (aControl == true || targetUnit.isPlayerControlled() == false)) {
-				unit.setTarget(targetUnit);
+			Building building = tile.getBuilding();
+			
+			if(targetUnit != null) {
+				// sets the target if the target isn't itself (clicking a lets you attack allies)
+				if(targetUnit != unit && (aControl == true || targetUnit.isPlayerControlled() == false)) {
+					unit.setTarget(targetUnit);
+				}
+			} 
+			if(building != null){
+				if(aControl == true || building.isPlayerControlled() == false) {
+					unit.setTarget(building);
+				}
 			}
 			
 		}
+		
 	}
 	public void setSpawnLocation(Tile tile) {
 		if(selectedThing instanceof Building) {
@@ -1162,7 +1171,7 @@ public class Game {
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
 		Tile tile = world.get(loc);
 		
-		if(tile.getUnits().isEmpty() == false) {
+		if(tile.getUnits().isEmpty() == false || (tile.getHasBuilding() && aControl == true)) {
 			toggleTargetEnemy(tile);
 		}else {
 			setDestination(mx, my);
