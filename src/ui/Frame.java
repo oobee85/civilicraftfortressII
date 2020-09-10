@@ -343,7 +343,7 @@ public class Frame extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON3) {
-					gameInstance.mouseClick(mx, my);
+					gameInstance.rightClick(mx, my);
 				}
 				if (e.getButton() == MouseEvent.BUTTON1 && dragged == false) {
 					gameInstance.leftClick(mx, my);
@@ -389,6 +389,10 @@ public class Frame extends JPanel {
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
 					gameInstance.shiftControl(true);
+				}
+				if(e.getKeyCode() == KeyEvent.VK_A) {
+					gameInstance.aControl(true);
+					
 				}
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 					gameInstance.deselectThing();

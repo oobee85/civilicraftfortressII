@@ -43,6 +43,7 @@ public class Game {
 	private TileLoc hoveredTile;
 	private boolean showHeightMap;
 	private boolean shiftEnabled = false;
+	private boolean aControl = false;
 	
 	private volatile int panelWidth;
 	private volatile int panelHeight;
@@ -1042,6 +1043,9 @@ public class Game {
 				selectedBuildingToSpawn = null;
 			}
 		}
+		if(aControl == true) {
+			toggleTargetEnemy(tile);
+		}
 		toggleUnitSelectOnTile(tile);
 		return;
 		
@@ -1053,6 +1057,9 @@ public class Game {
 	public void shiftControl(boolean enabled) {
 		shiftEnabled = enabled;
 	}
+	public void aControl(boolean enabled) {
+		aControl = enabled;
+	}
 	private void summonUnit(Tile tile, UnitType type, boolean playerControlled) {
 		System.out.println("trying to spawn unit" + type.toString() +tile.getLocation());
 		Unit unit = new Unit(type, tile, playerControlled);
@@ -1063,7 +1070,8 @@ public class Game {
 		if(selectedThing instanceof Unit) {
 			Unit unit = (Unit) selectedThing;
 			Unit targetUnit = tile.getUnits().peek();
-			if(targetUnit != unit && targetUnit.isPlayerControlled() == false) {
+			// sets the target if the target isn't itself
+			if(targetUnit != unit && (aControl == true || targetUnit.isPlayerControlled() == false)) {
 				unit.setTarget(targetUnit);
 			}
 			
@@ -1095,7 +1103,7 @@ public class Game {
 		hoveredTile = new TileLoc(tile.getIntX(), tile.getIntY());
 	}
 	
-	public void mouseClick(int mx, int my) {
+	public void rightClick(int mx, int my) {
 		Position pos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
 		Tile tile = world.get(loc);
