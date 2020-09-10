@@ -20,10 +20,10 @@ public enum UnitType implements HasImage {
  	CATAPULT     ( "resources/Images/units/catapult.png", 		new CombatStats(100, 200, 50, 10, 100, 500, 100), false, false, false, ResearchType.MATHEMATICS, new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.MITHRIL_BAR,10);}}, null, ProjectileType.ROCK_CATAPULT ),
  	TREBUCHET     ( "resources/Images/units/trebuchet.png", 	new CombatStats(100, 400, 50, 20, 100, 500, 100), false, false, false, ResearchType.MONARCHY, new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.RUNITE_BAR,10);}}, null, ProjectileType.FIREBALL_TREBUCHET ),
  	
- 	HORSEMAN       ( "resources/Images/units/horseman.png", new CombatStats(400, 20, 5, 1, 20, 100, 100),  false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.MITHRIL_SWORD,1); put(ItemType.HORSE,10);}}, null, null ),
- 	KNIGHT           ( "resources/Images/units/knight.png", new CombatStats(600, 45, 10, 1, 30, 200, 100), false, false, false, ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,200); put(ItemType.RUNE_SWORD,1); put(ItemType.HORSE,20);}}, null, null ),
- 	CHARIOT         ( "resources/Images/units/chariot.png", new CombatStats(400, 30, 10, 6, 30, 100, 100), false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,200); put(ItemType.WOOD,200); put(ItemType.HORSE,20); put(ItemType.IRON_BAR,10);}}, null, ProjectileType.ARROW ),
- 	HORSEARCHER ( "resources/Images/units/horsearcher.png", new CombatStats(200, 40, 5, 3, 20, 300, 100),  false, false, false, ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,200); put(ItemType.HORSE,10); put(ItemType.RUNITE_BAR,5);}}, null, ProjectileType.ARROW ),
+ 	HORSEMAN       ( "resources/Images/units/horseman.png", new CombatStats(400, 20, 5, 1, 20, 100, 100),  false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.MITHRIL_SWORD,1); put(ItemType.HORSE,50);}}, null, null ),
+ 	KNIGHT           ( "resources/Images/units/knight.png", new CombatStats(600, 45, 10, 1, 30, 200, 100), false, false, false, ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,200); put(ItemType.RUNE_SWORD,1); put(ItemType.HORSE,200);}}, null, null ),
+ 	CHARIOT         ( "resources/Images/units/chariot.png", new CombatStats(400, 30, 10, 5, 30, 100, 100), false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,200); put(ItemType.WOOD,200); put(ItemType.HORSE,100); put(ItemType.IRON_BAR,10);}}, null, ProjectileType.ARROW ),
+ 	HORSEARCHER ( "resources/Images/units/horsearcher.png", new CombatStats(200, 50, 5, 3, 20, 300, 100),  false, false, false, ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,200); put(ItemType.HORSE,200); put(ItemType.RUNITE_BAR,5);}}, null, ProjectileType.RUNE_ARROW ),
  	
 	DEER		("resources/Images/units/deer.png", 	new CombatStats(200, 5, 5, 1, 40, 0, 50), 	false, false, false, null, null, ResourceType.DEAD_ANIMAL, null),
 	HORSE		("resources/Images/units/horse.png",	new CombatStats(200, 5, 5, 1, 40, 0, 50), 	false, false, false, null, null, ResourceType.DEAD_ANIMAL, null),
@@ -33,7 +33,7 @@ public enum UnitType implements HasImage {
 	COW			("resources/Images/units/cow.png",		new CombatStats(200, 10, 30, 1, 40, 0, 50), false, false, false, null, null, ResourceType.DEAD_ANIMAL, null),
 	
 	
-	DRAGON	   ("resources/Images/units/dragon.png",	new CombatStats(1000, 120, 5, 2, 40, 0, 10), 	false, true, true, null, null, ResourceType.DEAD_ANIMAL, ProjectileType.FIREBALL_DRAGON),
+	DRAGON	   ("resources/Images/units/dragon.png",	new CombatStats(1000, 120, 5, 2, 10, 0, 10), 	false, true, true, null, null, ResourceType.DEAD_ANIMAL, ProjectileType.FIREBALL_DRAGON),
 	ROC			("resources/Images/units/roc.png",		new CombatStats(500, 50, 10, 1, 25, 0, 10), 	false, true, true, null, null, ResourceType.DEAD_ANIMAL, null),
 	OGRE	   ("resources/Images/units/ogre.png",		new CombatStats(1000, 40, 50, 1, 40, 0, 10), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
 	ENT		   ("resources/Images/units/ent.png",		new CombatStats(1000, 10, 50, 1, 100, 0, 10), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),

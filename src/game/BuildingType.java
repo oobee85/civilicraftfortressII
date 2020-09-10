@@ -40,7 +40,7 @@ public enum BuildingType implements HasImage {
 	 			ResearchType.FARMING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100); put(ItemType.BRONZE_BAR,10);  }}),
 	 	GRANARY (500, 500, "resources/Images/buildings/granary.png", 0.25, true, 1,
 	 			ResearchType.FARMING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200);  }}),
-	 	CASTLE (4000, 1000, "resources/Images/buildings/castle256.png", 1, true, 100,
+	 	CASTLE (4000, 1000, "resources/Images/buildings/castle256.png", 1, true, 10,
 	 			ResearchType.MONARCHY,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000); put(ItemType.STONE,1000); put(ItemType.ADAMANTITE_BAR,20); }}),
 		BARRACKS (1000, 250, "resources/Images/buildings/barracks256.png", 0.25, true, 1,
 				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,100);  }}),
@@ -49,7 +49,7 @@ public enum BuildingType implements HasImage {
 		BLACKSMITH (1000, 250, "resources/Images/buildings/blacksmith.png", 0.25, true, 1,
 				ResearchType.BRONZE_WORKING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200);  }}),
 		RESEARCHLAB (1000, 250, "resources/Images/buildings/research.png", 0.25, true, 1,
-				null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200);  }}),
+				null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200); put(ItemType.IRON_BAR,10); }}),
 		HELLFORGE (1000, 500, "resources/Images/buildings/hellforge.png", 0.25, true, 1,
 				ResearchType.ARMORING,  new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_BAR,20); put(ItemType.STONE,500);  }}),
 		

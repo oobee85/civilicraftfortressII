@@ -208,38 +208,23 @@ public class World {
 		
 	}
 	public HashSet<Tile> getNeighborsInRadius(Tile tile, int radius) {
-		
 		HashSet<Tile> neighbors = new HashSet<>();
-		neighbors.add(tile);
-		for(Tile t : tile.getNeighbors()) {
-			if(t.getLocation().distanceTo(tile.getLocation()) <= radius) {
-				neighbors.add(t);
-			}
-			
-			for(Tile t2 : t.getNeighbors()) {
-				if(t2.getLocation().distanceTo(tile.getLocation()) <= radius) {
-					neighbors.add(t2);
+		TileLoc tileLoc = tile.getLocation();
+		int x = tileLoc.x;
+		int y = tileLoc.y;
+		for(int i = x - radius ; i <= x + radius ; i ++) {
+			for(int j = y - radius ; j <= y + radius ; j ++) {
+				if(Math.abs(i - x) + Math.abs(j - y) >= radius) {
+					continue;
 				}
-				
-				for(Tile t3 : t2.getNeighbors()) {
-					if(t3.getLocation().distanceTo(tile.getLocation()) <= radius) {
-						neighbors.add(t3);
-					}
-					
-					for(Tile t4 : t3.getNeighbors()) {
-						if(t4.getLocation().distanceTo(tile.getLocation()) <= radius) {
-							neighbors.add(t4);
-						}
-//						return neighbors;
-					}
-//					return neighbors;
+				if( i < 0 || j < 0 || i > 127 || j > 127 ) {
+					continue;
 				}
-//				return neighbors;
+				neighbors.add(tiles[i][j]);
 			}
-//			return neighbors;
 		}
 		return neighbors;
-		
+
 	}
 	public void spawnExplosionCircle(Tile tile, int radius, int damage) {
 

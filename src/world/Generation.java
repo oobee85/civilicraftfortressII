@@ -143,7 +143,7 @@ public class Generation {
 
 	public static void genResources(World world) {
 		for(ResourceType resource : ResourceType.values()) {
-			int numVeins = (int)(world.getWidth() * world.getHeight() * resource.getRarity() / OREMULTIPLIER);
+			int numVeins = (int)(world.getWidth() * world.getHeight() * resource.getNumVeins() / OREMULTIPLIER);
 			
 			System.out.println("Tiles of " + resource.name() + ": " + numVeins);
 			
@@ -158,7 +158,7 @@ public class Generation {
 					// if ore is rare the tile must be able to support rare ore
 					
 					if(!resource.isRare() || tile.canSupportRareOre()) {
-						makeOreVein(tile, resource);
+						makeOreVein(tile, resource, resource.getVeinSize());
 						numVeins --;
 					}
 				}
@@ -167,9 +167,8 @@ public class Generation {
 			}
 		}
 	}
-	private static void makeOreVein(Tile t, ResourceType resource) {
+	private static void makeOreVein(Tile t, ResourceType resource, int veinSize) {
 		HashMap<Tile, Double> visited = new HashMap<>();
-		int oreSize = 10;
 		
 		PriorityQueue<Tile> search = new PriorityQueue<>((x, y) ->  { 
 			double distancex = visited.get(x);
@@ -187,7 +186,7 @@ public class Generation {
 		visited.put(t, 0.0);
 		search.add(t);
 		
-		while(oreSize > 0) {
+		while(veinSize > 0) {
 			Tile potential = search.poll();
 			
 			for(Tile ti : potential.getNeighbors()) {
@@ -203,7 +202,7 @@ public class Generation {
 				
 				if(!resource.isRare() || potential.canSupportRareOre()) {
 					potential.setResource(resource);
-					oreSize--;
+					veinSize--;
 				}
 			}
 		}

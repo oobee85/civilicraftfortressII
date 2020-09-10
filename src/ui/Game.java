@@ -79,7 +79,7 @@ public class Game {
 			researches.put(researchType, res);
 		}
 		for(Research research : researches.values()) {
-			for(ResearchType requiredType : research.getType().getChildren()) {
+			for(ResearchType requiredType : research.getType().getRequiredResearch()) {
 				research.getRequirement().addRequirement(researches.get(requiredType));
 			}
 		}

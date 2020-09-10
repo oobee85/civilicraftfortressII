@@ -29,7 +29,14 @@ public class Frame extends JPanel {
 
 	private ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.PNG"), 20, 20);
 	private ImageIcon CITY_TAB_ICON = Utils.resizeImageIcon(BuildingType.CASTLE.getImageIcon(0), 20, 20);
-
+	private ImageIcon BARRACKS_TAB_ICON = Utils.resizeImageIcon(BuildingType.BARRACKS.getImageIcon(0), 20, 20);
+	private ImageIcon WORKSHOP_TAB_ICON = Utils.resizeImageIcon(BuildingType.WORKSHOP.getImageIcon(0), 20, 20);
+	private ImageIcon RESEARCHLAB_TAB_ICON = Utils.resizeImageIcon(BuildingType.RESEARCHLAB.getImageIcon(0), 20, 20);
+	private ImageIcon HELLFORGE_TAB_ICON = Utils.resizeImageIcon(BuildingType.HELLFORGE.getImageIcon(0), 20, 20);
+	private ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), 20, 20);
+	private ImageIcon TECH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.PNG"), 20, 20);
+	private ImageIcon RESOURCE_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/itemicons/adamantite_ore.png"), 20, 20);
+	
 	private Timer repaintingThread;
 	private JToggleButton easyModeButton;
 	private JFrame frame;
@@ -43,6 +50,7 @@ public class Frame extends JPanel {
 	private JPanel hellforgeView;
 	private JPanel barracksView;
 	private JPanel workshopView;
+	private JPanel researchLabView;
 	private JPanel tileView;
 	private JPanel workerMenu;
 	private JPanel spawnMenu;
@@ -73,6 +81,7 @@ public class Frame extends JPanel {
 	private int CASTLE_TAB;
 	private int BARRACKS_TAB;
 	private int WORKSHOP_TAB;
+	private int RESEARCHLAB_TAB;
 	private int SPAWN_TAB;
 
 	private Thread gameLoopThread;
@@ -108,6 +117,9 @@ public class Frame extends JPanel {
 				}
 				if (building.getBuildingType() == BuildingType.WORKSHOP) {
 					manageWorkshopTab(selected);
+				}
+				if (building.getBuildingType() == BuildingType.RESEARCHLAB) {
+					manageResearchLabTab(selected);
 				}
 				switchInfoPanel(new BuildingInfoPanel(building));
 				frame.repaint();
@@ -145,6 +157,9 @@ public class Frame extends JPanel {
 				}
 				for (int i = 0; i < ResearchType.values().length; i++) {
 					Research r = gameInstance.researches.get(ResearchType.values()[i]);
+//					if(r.getType().getTier() != 1) {
+//						continue;
+//					}
 					boolean unlocked = r.isUnlocked();
 					ResearchRequirement req = r.getRequirement();
 					JButton button = researchButtons[i];
@@ -526,6 +541,15 @@ public class Frame extends JPanel {
 		}
 		tabbedPane.setEnabledAt(WORKSHOP_TAB, enabled);
 	}
+	
+	private void manageResearchLabTab(boolean enabled) {
+		if (enabled == false && tabbedPane.getSelectedIndex() == RESEARCHLAB_TAB) {
+			tabbedPane.setSelectedIndex(0);
+		} else if (enabled == true) {
+			tabbedPane.setSelectedIndex(RESEARCHLAB_TAB);
+		}
+		tabbedPane.setEnabledAt(RESEARCHLAB_TAB, enabled);
+	}
 
 	private void manageSpawnTab(boolean enabled) {
 
@@ -679,7 +703,23 @@ public class Frame extends JPanel {
 			unitButtons[i] = button;
 			workshopView.add(button);
 		}
-
+		
+		researchLabView = new JPanel() {
+		};
+		for (int i = 0; i < ResearchType.values().length; i++) {
+			ResearchType type = ResearchType.values()[i];
+			KButton button = KUIConstants.setupButton(type.toString(),
+					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
+			button.addActionListener(e -> {
+				gameInstance.setResearchTarget(type);;
+			});
+			button.addRightClickActionListener(e -> {
+				switchInfoPanel(new ResearchInfoPanel(gameInstance.researches.get(type)));
+			});
+			researchButtons[i] = button;
+			researchLabView.add(button);
+		}
+		
 		blacksmithView = new JPanel();
 		for (int i = 0; i < ItemType.values().length; i++) {
 			final ItemType type = ItemType.values()[i];
@@ -923,6 +963,9 @@ public class Frame extends JPanel {
 
 		for (int i = 0; i < ResearchType.values().length; i++) {
 			final ResearchType type = ResearchType.values()[i];
+			if(type.getTier() != 1) {
+				continue;
+			}
 			KButton button = KUIConstants.setupButton(type.toString(), null, RESEARCH_BUTTON_SIZE);
 			button.setEnabled(false);
 			button.addActionListener(e -> {
@@ -943,23 +986,16 @@ public class Frame extends JPanel {
 		tabbedPane.setFont(KUIConstants.buttonFontSmall);
 
 		RESOURCE_TAB = tabbedPane.getTabCount();
-		tabbedPane.addTab(null, Utils.resizeImageIcon(ItemType.ADAMANTITE_ORE.getImageIcon(0), 20, 20), resourcePanel,
-				"Does nothing");
+		tabbedPane.addTab(null, RESOURCE_TAB_ICON, resourcePanel,"Does nothing");
 
 		TECH_TAB = tabbedPane.getTabCount();
-		tabbedPane.addTab("Tech Stuff",
-				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), 20, 20), techView,
-				"Does nothing");
+		tabbedPane.addTab("Tech Stuff", TECH_TAB_ICON, techView, "Does nothing");
 
 		BLACKSMITH_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Craft Stuff",
-				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), 20, 20),
-				blacksmithView, "Does nothing", BLACKSMITH_TAB);
+		tabbedPane.insertTab("Craft Stuff", BLACKSMITH_TAB_ICON, blacksmithView, "Does nothing", BLACKSMITH_TAB);
 
 		HELLFORGE_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Craft Advanced Stuff",
-				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/buildings/hellforge.png"), 20, 20),
-				hellforgeView, "Does nothing", HELLFORGE_TAB);
+		tabbedPane.insertTab("Craft Advanced Stuff",HELLFORGE_TAB_ICON, hellforgeView, "Does nothing", HELLFORGE_TAB);
 		
 		WORKER_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("Worker Tab", WORKER_TAB_ICON, workerMenu, "Does nothing", WORKER_TAB);
@@ -968,11 +1004,14 @@ public class Frame extends JPanel {
 		tabbedPane.insertTab("City", CITY_TAB_ICON, castleView, "Does nothing", CASTLE_TAB);
 
 		BARRACKS_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Barracks", CITY_TAB_ICON, barracksView, "Does nothing", BARRACKS_TAB);
+		tabbedPane.insertTab("Barracks", BARRACKS_TAB_ICON, barracksView, "Does nothing", BARRACKS_TAB);
 		
 		WORKSHOP_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Workshop", CITY_TAB_ICON, workshopView, "Does nothing", WORKSHOP_TAB);
-
+		tabbedPane.insertTab("Workshop", WORKSHOP_TAB_ICON, workshopView, "Does nothing", WORKSHOP_TAB);
+		
+		RESEARCHLAB_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("Research Lab", RESEARCHLAB_TAB_ICON, researchLabView, "Does nothing", RESEARCHLAB_TAB);
+		
 		SPAWN_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("Spawner", Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(0), 20, 20), spawnMenu,
 				"Does nothing", SPAWN_TAB);
@@ -988,6 +1027,7 @@ public class Frame extends JPanel {
 		manageBlacksmithTab(false);
 		manageHellforgeTab(false);
 		manageWorkshopTab(false);
+		manageResearchLabTab(false);
 		manageBarracksTab(false);
 		manageSpawnTab(true);
 		

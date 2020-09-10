@@ -14,11 +14,12 @@ import utils.Utils;
 public enum ProjectileType implements HasImage {
 
 	
-		ARROW(30, 5, "resources/Images/projectiles/arrow.png", 0),
-		ROCK_CATAPULT(200, 5, "resources/Images/itemicons/rock.png", 0),
-		ROCK_CYCLOPS(80, 5, "resources/Images/itemicons/rock.png", 0),
-		FIREBALL_DRAGON(100, 5, "resources/Images/projectiles/fireball.png", 1),
-		FIREBALL_TREBUCHET(400, 5, "resources/Images/projectiles/fireball.png", 1),
+		ARROW(30, 5, "resources/Images/projectiles/arrow.png", 1),
+		RUNE_ARROW(50, 5, "resources/Images/projectiles/rune_arrow.png", 1),
+		ROCK_CATAPULT(200, 5, "resources/Images/itemicons/rock.png", 1),
+		ROCK_CYCLOPS(80, 5, "resources/Images/itemicons/rock.png", 1),
+		FIREBALL_DRAGON(100, 5, "resources/Images/projectiles/fireball.png", 2),
+		FIREBALL_TREBUCHET(400, 5, "resources/Images/projectiles/fireball.png", 2),
 		
 	;
 	
@@ -35,7 +36,7 @@ public enum ProjectileType implements HasImage {
 	}
 
 	public boolean isExplosive() {
-		return radius > 0;
+		return radius > 1;
 	}
 	public double getDamage() {
 		return damage;
