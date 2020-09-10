@@ -646,6 +646,8 @@ public class Game {
 						if(t.getResource() != null) {
 							g.drawImage(t.getResource().getType().getImage(Game.tileSize), x, y, w, h, null);
 						}
+						
+						
 						if(t.getIsTerritory()) {
 //							g.setColor(Color.black);
 //							g.fillRect(x, y, w, h); 
@@ -773,6 +775,58 @@ public class Game {
 			for(Projectile p : world.projectiles) {
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 			}
+			
+			if (selectedThing instanceof Unit) {
+				Unit unit = (Unit) selectedThing;
+				int range = unit.getType().getCombatStats().getVisionRadius();
+				if(range == 1) {
+					range = -1;
+				}
+				// draws the range for units
+				for (int i = lowerX; i < upperX; i++) {
+					for (int j = lowerY; j < upperY; j++) {
+						Tile t = world.get(new TileLoc(i, j));
+						if (t == null)
+							continue;
+						int x = t.getLocation().x * Game.tileSize;
+						int y = t.getLocation().y * Game.tileSize;
+						int w = Game.tileSize;
+						int h = Game.tileSize;
+
+						if (t.getLocation().distanceTo(unit.getTile().getLocation()) <= range) {
+							g.setColor(Color.BLACK);
+							Utils.setTransparency(g, 0.5f);
+
+							for (Tile tile : t.getNeighbors()) {
+								if (tile.getLocation().distanceTo(unit.getTile().getLocation()) > range) {
+									TileLoc tileLoc = tile.getLocation();
+
+									if (tileLoc.x == t.getLocation().x) {
+										if (tileLoc.y < t.getLocation().y) {
+											g.fillRect(x, y, w, 5);
+										}
+										if (tileLoc.y > t.getLocation().y) {
+											g.fillRect(x, y + h - 5, w, 5);
+										}
+
+									}
+									if (tileLoc.y == t.getLocation().y) {
+										if (tileLoc.x < t.getLocation().x) {
+											g.fillRect(x, y, 5, h);
+										}
+										if (tileLoc.x > t.getLocation().x) {
+											g.fillRect(x + w - 5, y, 5, h);
+										}
+									}
+
+								}
+							}
+							Utils.setTransparency(g, 1);
+						}
+					}
+				}
+			}
+			
 			if(!showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
