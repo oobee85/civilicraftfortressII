@@ -212,30 +212,32 @@ public class World {
 		HashSet<Tile> neighbors = new HashSet<>();
 		neighbors.add(tile);
 		for(Tile t : tile.getNeighbors()) {
-			if(t.getLocation().distanceTo(tile.getLocation()) >= radius) {
-				return neighbors;
+			if(t.getLocation().distanceTo(tile.getLocation()) <= radius) {
+				neighbors.add(t);
 			}
+			
 			for(Tile t2 : t.getNeighbors()) {
-				if(t2.getLocation().distanceTo(tile.getLocation()) >= radius) {
-					return neighbors;
+				if(t2.getLocation().distanceTo(tile.getLocation()) <= radius) {
+					neighbors.add(t2);
 				}
+				
 				for(Tile t3 : t2.getNeighbors()) {
-					if(t3.getLocation().distanceTo(tile.getLocation()) >= radius) {
-						return neighbors;
+					if(t3.getLocation().distanceTo(tile.getLocation()) <= radius) {
+						neighbors.add(t3);
 					}
+					
 					for(Tile t4 : t3.getNeighbors()) {
-						if(t4.getLocation().distanceTo(tile.getLocation()) >= radius) {
-							return neighbors;
+						if(t4.getLocation().distanceTo(tile.getLocation()) <= radius) {
+							neighbors.add(t4);
 						}
-						neighbors.add(t4);
+//						return neighbors;
 					}
-					neighbors.add(t3);
+//					return neighbors;
 				}
-				neighbors.add(t2);
+//				return neighbors;
 			}
-			neighbors.add(t);
+//			return neighbors;
 		}
-		
 		return neighbors;
 		
 	}
@@ -402,7 +404,7 @@ public class World {
 	
 	public void updateProjectileDealDamage() {
 		for(Projectile projectile : projectiles) {
-			if(projectile.reachedTarget()) {
+			if(projectile.reachedTarget() && projectile.getType().isExplosive() == false) {
 				for(Unit unit : projectile.getTile().getUnits()) {
 					unit.takeDamage(projectile.getType().getDamage());
 				}
@@ -419,9 +421,10 @@ public class World {
 		LinkedList<Projectile> projectilesNew = new LinkedList<Projectile>();
 		
 		for(Projectile projectile : projectiles) {
+			
 			if(projectile.reachedTarget()) {
 				if(projectile.getType().isExplosive()) {
-					spawnExplosion(projectile.getTile(), 2, (int)projectile.getType().getDamage());
+					spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getType().getDamage());
 				}
 				projectile.getTile().removeProjectile(projectile);
 				projectile.setTile(null);
