@@ -92,6 +92,15 @@ public class Tile {
 		}
 		return null;
 	}
+	public int getNumPlayerControlledUnits() {
+		int x = 0;
+		for(Unit unit : units) {
+			if(unit.isPlayerControlled()) {
+				x++;
+			}
+		}
+		return x;
+	}
 
 	public Thing getPlayerControlledThing() {
 		for (Unit u : units) {

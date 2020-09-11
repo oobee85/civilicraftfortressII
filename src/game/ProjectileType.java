@@ -15,6 +15,7 @@ public enum ProjectileType implements HasImage {
 
 	
 		ARROW(30, 5, "resources/Images/projectiles/arrow.png", 1),
+		ARROW_ARCHER(10, 5, "resources/Images/projectiles/arrow.png", 1),
 		RUNE_ARROW(50, 5, "resources/Images/projectiles/rune_arrow.png", 1),
 		ROCK_CATAPULT(200, 5, "resources/Images/itemicons/rock.png", 1),
 		ROCK_CYCLOPS(80, 5, "resources/Images/itemicons/rock.png", 1),

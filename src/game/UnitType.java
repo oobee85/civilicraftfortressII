@@ -13,9 +13,9 @@ import world.ResourceType;
 
 public enum UnitType implements HasImage {
 	WORKER           ( "resources/Images/units/worker.png", 	new CombatStats(100,  0, 15, 1, 20, 30, 50), false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50);  }}, null, null ),
- 	WARRIOR         ( "resources/Images/units/warrior.png", 	new CombatStats(200, 10, 15, 1, 20, 50, 50),  false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.WOOD,50); }}, null, null ),
+ 	WARRIOR         ( "resources/Images/units/warrior.png", 	new CombatStats(200, 10, 10, 1, 20, 50, 50),  false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.WOOD,50); }}, null, null ),
  	SPEARMAN       ( "resources/Images/units/spearman.png", 	new CombatStats(400, 10, 15, 1, 20, 50, 50), false, false, false, ResearchType.BRONZE_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.BRONZE_SWORD,1);}}, null, null ),
- 	ARCHER           ( "resources/Images/units/archer.png", 	new CombatStats(200, 30, 15, 3, 30, 100, 50), false, false, false, ResearchType.WARRIOR_CODE, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); }}, null, ProjectileType.ARROW ),
+ 	ARCHER           ( "resources/Images/units/archer.png", 	new CombatStats(200, 10, 15, 3, 30, 100, 50), false, false, false, ResearchType.WARRIOR_CODE, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); }}, null, ProjectileType.ARROW_ARCHER ),
  	SWORDSMAN     ( "resources/Images/units/swordsman.png",		new CombatStats(300, 20, 15, 1, 20, 100, 50), false, false, false, ResearchType.IRON_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.IRON_SWORD,1);}}, null, null ),
  	LONGBOWMAN     ( "resources/Images/units/longbowman.png", 	new CombatStats(200, 30, 15, 6, 30, 200, 50), false, false, false, ResearchType.ENGINEERING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.MITHRIL_BAR, 5); }}, null, ProjectileType.ARROW ),
  	CATAPULT     ( "resources/Images/units/catapult.png", 		new CombatStats(100, 100, 50, 10, 100, 500, 100), false, false, false, ResearchType.MATHEMATICS, new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.MITHRIL_BAR,10);}}, null, ProjectileType.ROCK_CATAPULT ),

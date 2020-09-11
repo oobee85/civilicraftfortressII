@@ -364,7 +364,7 @@ public class Frame extends JPanel {
 		gamepanel.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				if (e.getButton() == MouseEvent.BUTTON3) {
+				if (e.getButton() == MouseEvent.BUTTON3 && dragged == false) {
 					gameInstance.rightClick(mx, my);
 				}
 				if (e.getButton() == MouseEvent.BUTTON1 && dragged == false) {
@@ -417,25 +417,25 @@ public class Frame extends JPanel {
 					
 				}
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-					gameInstance.deselectThing();
+					gameInstance.deselectThings();
 				}
 				if (e.getKeyCode() == KeyEvent.VK_S) {
 					gameInstance.unitStop();
 				}
 				if (e.getKeyCode() == KeyEvent.VK_R) {
-					if (gameInstance.getSelectedUnit() != null) {
-						gameInstance.buildRoad(RoadType.STONE_ROAD);
-					}
+//					if (gameInstance.getSelectedUnit() != null) {
+//						gameInstance.buildRoad(RoadType.STONE_ROAD);
+//					}
 				}
 				if (e.getKeyCode() == KeyEvent.VK_M) {
-					if (gameInstance.getSelectedUnit() != null) {
-						gameInstance.buildBuilding(BuildingType.MINE);
-					}
+//					if (gameInstance.getSelectedUnit() != null) {
+//						gameInstance.buildBuilding(BuildingType.MINE);
+//					}
 				}
 				if (e.getKeyCode() == KeyEvent.VK_I) {
-					if (gameInstance.getSelectedUnit() != null) {
-						gameInstance.buildBuilding(BuildingType.IRRIGATION);
-					}
+//					if (gameInstance.getSelectedUnit() != null) {
+//						gameInstance.buildBuilding(BuildingType.IRRIGATION);
+//					}
 				}
 			}
 		});
@@ -449,7 +449,10 @@ public class Frame extends JPanel {
 			explodeUnit.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					gameInstance.explode(gameInstance.getSelectedThing());
+					for(Thing thing : gameInstance.getSelectedThings()) {
+						gameInstance.explode(thing);
+					}
+					
 				}
 			});
 			newInfo.setLayout(null);

@@ -52,7 +52,6 @@ public enum BuildingType implements HasImage {
 				ResearchType.IRON_WORKING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200); put(ItemType.IRON_BAR,10); }}),
 		HELLFORGE (1000, 500, "resources/Images/buildings/hellforge.png", 0.25, true, 1,
 				ResearchType.ARMORING,  new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_BAR,20); put(ItemType.STONE,1000);  }}),
-		
 	 	
 		;
 
