@@ -441,8 +441,18 @@ public class World {
 				
 			}else {
 				for(Unit enemyUnit : getHostileUnitsInTerritory()){
-					if(unit.inRange(enemyUnit)) {
+					if(!unit.inRange(enemyUnit)) {
+						continue;
+					}
+					if(unit.readyToAttack() && !unit.isRanged()) {
 						unit.attack(enemyUnit);
+					}else {
+						if(unit.readyToAttack() && !enemyUnit.isDead()) {
+							Projectile p = new Projectile(unit.getType().getProjectileType(), unit.getTile(), enemyUnit.getTile());
+							projectiles.add(p);
+							unit.getTile().addProjectile(p);
+							unit.resetTimeToAttack();
+						}
 					}
 				}
 				

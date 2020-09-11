@@ -225,7 +225,10 @@ public class Tile {
 		if(getHasBuilding() == false) {
 			return false;
 		}
-		if(building.getBuildingType() == BuildingType.GATE_WOOD && u instanceof Animal) {
+//		&& u.isPlayerControlled() == false
+		if((building.getBuildingType() == BuildingType.GATE_WOOD 
+				|| building.getBuildingType() == BuildingType.GATE_STONE 
+				|| building.getBuildingType() == BuildingType.GATE_BRICK) ) {
 			return true;
 		}
 		
@@ -285,6 +288,12 @@ public class Tile {
 		}
 		BuildingType bt = building.getBuildingType();
 		if(bt == BuildingType.WALL_WOOD || bt == BuildingType.WALL_STONE || bt == BuildingType.WALL_BRICK) {
+			return false;
+		}
+
+		if ((building.getBuildingType() == BuildingType.GATE_WOOD
+				|| building.getBuildingType() == BuildingType.GATE_STONE
+				|| building.getBuildingType() == BuildingType.GATE_BRICK) && u.isPlayerControlled() == false) {
 			return false;
 		}
 		return true;

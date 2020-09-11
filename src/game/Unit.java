@@ -107,7 +107,7 @@ public class Unit extends Thing {
 
 	public void tick() {
 		if(timeToMove > 0) {
-			timeToMove -= 2;
+			timeToMove -= 1;
 		}
 		if(timeToAttack > 0) {
 			timeToAttack -= 1;

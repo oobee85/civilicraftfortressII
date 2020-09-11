@@ -1391,11 +1391,11 @@ public class Game {
 				}
 				
 			}
-			if(unit.getTargetTile() == null && unit.getTarget() != null) {
-				unit.setTargetTile(unit.getTarget().getTile());
-			}else {
-				unit.setTargetTile(unit.getTile());
-			}
+//			if(unit.getTargetTile() == null && unit.getTarget() != null) {
+//				unit.setTargetTile(unit.getTarget().getTile());
+//			}else {
+//				unit.setTargetTile(unit.getTile());
+//			}
 			if (unit.readyToMove() && unit.getTargetTile() != null) {
 				unit.moveTowards(unit.getTargetTile());
 			}
