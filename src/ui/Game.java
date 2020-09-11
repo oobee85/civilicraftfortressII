@@ -786,11 +786,12 @@ public class Game {
 				drawTarget(g, unit);
 				drawHealthBar(g, unit);
 				drawHitsplat(g, unit);
-				g.setColor(Color.black);
+				
+				//draws a black square for every unit on the tile
 				int num = unit.getTile().getNumPlayerControlledUnits();
+				g.setColor(Color.black);
 				for (int i = 0; i < num; i++) {
-					g.fillRect(unit.getTile().getLocation().x * Game.tileSize + 10 * i,
-							unit.getTile().getLocation().y * Game.tileSize, 5, 5);
+					g.fillRect(unit.getTile().getLocation().x * Game.tileSize + 10 * i, unit.getTile().getLocation().y * Game.tileSize, 5, 5);
 
 				}
 
@@ -1164,6 +1165,15 @@ public class Game {
 					if(targetUnit != unit && (aControl == true || targetUnit.isPlayerControlled() == false)) {
 						unit.setTarget(targetUnit);
 					}
+					if(aControl == true) {
+						Tile bestTile = targetUnit.getTile();
+						for(Tile t : targetUnit.getTile().getNeighbors()) {
+							if(t.getLocation().distanceTo(unit.getTile().getLocation()) < bestTile.getLocation().distanceTo(unit.getTile().getLocation())) {
+								bestTile = t;
+							}
+						}
+						unit.setTargetTile(bestTile);
+					}
 				} 
 				if(building != null){
 					if(aControl == true || building.isPlayerControlled() == false) {
@@ -1225,11 +1235,13 @@ public class Game {
 		ConcurrentLinkedQueue<Unit> unitsOnTile = tile.getUnits();
 		Building building = tile.getBuilding();
 		
+		//selects the building on the tile
 		if(building != null) {
 			if (shiftEnabled == false) {
 				deselectThings();
 			}
 			guiController.selectedBuilding(building, true);
+			building.setIsSelected(true);
 			selectedThings.add(building);
 		}
 		//goes through all the units on the tile and checks if they are selected
@@ -1241,7 +1253,7 @@ public class Game {
 			if (selectedThings.contains(candidate) && selectedThings.size() == 0) {
 				deselectOneThing(candidate);
 			}
-			
+			//deselects everything if shift isnt enabled
 			if (shiftEnabled == false) {
 				deselectThings();
 			}
@@ -1291,8 +1303,8 @@ public class Game {
 		for (Thing thing : selectedThings) {
 			if (thing != null) {
 				thing.setIsSelected(false);
+				
 				if (thing instanceof Unit) {
-
 					Unit selectedUnit = (Unit) thing;
 					if (selectedUnit.getUnitType() == UnitType.WORKER) {
 						guiController.selectedUnit(null, false);
