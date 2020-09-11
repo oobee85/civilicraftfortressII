@@ -690,7 +690,6 @@ public class Frame extends JPanel {
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.addActionListener(e -> {
 				gameInstance.tryToBuildUnit(type);
-				switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new UnitTypeInfoPanel(type));
@@ -702,14 +701,13 @@ public class Frame extends JPanel {
 		};
 		for (int i = 0; i < UnitType.values().length; i++) {
 			UnitType type = UnitType.values()[i];
-			if (type != UnitType.CATAPULT && type != UnitType.LONGBOWMAN) {
+			if (type != UnitType.CATAPULT && type != UnitType.LONGBOWMAN && type != UnitType.TREBUCHET) {
 				continue;
 			}
 			KButton button = KUIConstants.setupButton("Build " + type.toString(),
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.addActionListener(e -> {
 				gameInstance.tryToBuildUnit(type);
-				switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new UnitTypeInfoPanel(type));
@@ -791,7 +789,7 @@ public class Frame extends JPanel {
 		};
 		for (int i = 0; i < UnitType.values().length; i++) {
 			UnitType type = UnitType.values()[i];
-			if (type == UnitType.WORKER || type.getCost() == null || type == UnitType.CATAPULT || type == UnitType.LONGBOWMAN) {
+			if (type == UnitType.WORKER || type.getCost() == null || type == UnitType.CATAPULT || type == UnitType.LONGBOWMAN || type == UnitType.TREBUCHET) {
 				continue;
 			}
 
@@ -979,7 +977,7 @@ public class Frame extends JPanel {
 		techView = new JPanel();
 		for (int i = 0; i < ResearchType.values().length; i++) {
 			final ResearchType type = ResearchType.values()[i];
-			if(type.getTier() != 1) {
+			if(type.getTier() != 1 && type != ResearchType.IRON_WORKING) {
 				continue;
 			}
 			KButton button = KUIConstants.setupButton(type.toString(), null, RESEARCH_BUTTON_SIZE);

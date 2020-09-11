@@ -144,7 +144,6 @@ public class Animal extends Unit {
 				this.moveTowards(getTarget().getTile());
 			}
 			if(inRange(getTarget())) {
-				
 				if(this instanceof Dragon) {
 					Dragon dragon = (Dragon) this;
 					if(dragon.readyToFireball()) {
