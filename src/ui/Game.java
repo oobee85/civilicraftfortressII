@@ -1165,9 +1165,11 @@ public class Game {
 					if(targetUnit != unit && (aControl == true || targetUnit.isPlayerControlled() == false)) {
 						unit.setTarget(targetUnit);
 					}
+					//attack move makes unit go to the closest tile that it can attack from
 					if(aControl == true) {
 						Tile bestTile = targetUnit.getTile();
-						for(Tile t : targetUnit.getTile().getNeighbors()) {
+						int radius = unit.getType().getCombatStats().getAttackRadius() + 1;
+						for(Tile t : world.getNeighborsInRadius(targetUnit.getTile(), radius)) {
 							if(t.getLocation().distanceTo(unit.getTile().getLocation()) < bestTile.getLocation().distanceTo(unit.getTile().getLocation())) {
 								bestTile = t;
 							}
