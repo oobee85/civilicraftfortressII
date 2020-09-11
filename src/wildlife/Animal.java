@@ -166,7 +166,7 @@ public class Animal extends Unit {
 	}
 	
 	public double getMoveChance() {
-		return getType().getCombatStats().getSpeed()*0.02 
+		return getType().getCombatStats().getMoveSpeed()*0.02 
 				+ 0.2*(1 - energy/MAX_ENERGY) 
 				+ 0.8*(1 - getHealth()/super.getType().getCombatStats().getHealth());
 	}

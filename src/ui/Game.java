@@ -28,6 +28,7 @@ public class Game {
 	private BuildingType selectedBuildingToSpawn;
 	private int numCutTrees = 10;
 	private int buildingsUntilOgre = 8;
+	private CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
 	
 	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
 	HashMap<ResearchType, Research> researches = new HashMap<>();
@@ -222,6 +223,12 @@ public class Game {
 			updateTerrainImages();
 		}
 		
+	}
+	public void addCombatBuff(CombatStats cs) {
+		combatBuffs.add(cs);
+	}
+	public CombatStats getCombatBuffs() {
+		return combatBuffs;
 	}
 	public void addResources() {
 		for(ItemType itemType : ItemType.values()) {
@@ -1206,7 +1213,9 @@ public class Game {
 	}
 	
 	public void explode(Thing thing) {
-		
+		if(thing == null) {
+			return;
+		}
 		world.spawnExplosion(thing.getTile(), 1, 10000);
 	}
 	

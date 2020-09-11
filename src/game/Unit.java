@@ -72,7 +72,7 @@ public class Unit extends Thing {
 		if(this.getUnitType().isFlying()) {
 			penalty = 0;
 		}
-		penalty += unitType.getCombatStats().getSpeed();
+		penalty += unitType.getCombatStats().getMoveSpeed();
 		return penalty;
 	}
 	

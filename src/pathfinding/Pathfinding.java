@@ -16,7 +16,7 @@ public class Pathfinding {
 			return targetTile;
 		}
 		PriorityQueue<Node> search = new PriorityQueue<>((x, y) -> {
-			int speed = unit.getUnitType().getCombatStats().getSpeed();
+			int speed = unit.getUnitType().getCombatStats().getMoveSpeed();
 			// if speed is 0 then A* pathfinding will look through entire map
 			speed = speed <= 0 ? 1 : speed;
 			double xcost = x.cost + x.tile.getLocation().distanceTo(targetTile.getLocation())*speed;
@@ -30,7 +30,7 @@ public class Pathfinding {
 			}
 		});
 		PriorityQueue<Node> reverseSearch = new PriorityQueue<>((x, y) -> {
-			int speed = unit.getUnitType().getCombatStats().getSpeed();
+			int speed = unit.getUnitType().getCombatStats().getMoveSpeed();
 			// if speed is 0 then A* pathfinding will look through entire map
 			speed = speed <= 0 ? 1 : speed;
 			double xcost = x.cost + x.tile.getLocation().distanceTo(startingTile.getLocation())*speed;

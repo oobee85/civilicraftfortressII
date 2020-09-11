@@ -1,26 +1,25 @@
 package ui.infopanels;
 
-import java.awt.*;
-import java.util.*;
-import java.util.Map.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
 
-import game.*;
-import ui.*;
-import utils.*;
+import game.CombatStats;
+import game.Unit;
+import ui.KUIConstants;
+import utils.Utils;
 
-public class UnitTypeInfoPanel extends InfoPanel {
+public class CombatStatInfoPanel extends InfoPanel{
 
+	private CombatStats showing;
 	private static final Image attackImage = Utils.loadImage("resources/Images/interfaces/attack.png");
 	private static final Image attackspeedImage = Utils.loadImage("resources/Images/interfaces/attackspeed.png");
 	private static final Image visionImage = Utils.loadImage("resources/Images/interfaces/vision.png");
 	private static final Image movespeedImage = Utils.loadImage("resources/Images/interfaces/movespeed.png");
 	private static final Image healthImage = Utils.loadImage("resources/Images/interfaces/redhitsplat.png");
 	
-	
-	UnitType showing;
-
-	public UnitTypeInfoPanel(UnitType showing) {
-		super(showing.toString(), showing.getImage(DEFAULT_IMAGE_SIZE));
+	public CombatStatInfoPanel(CombatStats showing) {
+		super(showing.toString(), attackImage);
 		this.showing = showing;
 	}
 	
@@ -49,20 +48,6 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		g.drawString(stats.getHealth() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
 	}
 	
-	public static void drawCosts(Graphics g, HashMap<ItemType, Integer> costs, int x, int y) {
-		g.setFont(KUIConstants.combatStatsFont);
-		int fontSize = g.getFont().getSize();
-		int iconSize = 16;
-		int gap = 1;
-		
-		for(Entry<ItemType, Integer> entry : costs.entrySet()) {
-			g.drawImage(entry.getKey().getImage(iconSize), x, y, iconSize, iconSize, null);
-			String str = entry.getValue() + " " + entry.getKey().toString();
-			g.drawString(str, x + iconSize + gap + 1, y + iconSize/2 + fontSize/3);
-			y += iconSize + gap;
-		}
-	}
-	
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -70,17 +55,10 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		if(showing == null) {
 			return;
 		}
-		int x = getImageSize();
 		g.setColor(Color.black);
-		g.setFont(KUIConstants.infoFontSmaller);
-		int offset = g.getFont().getSize();
-		if(showing.getResearchRequirement() != null) {
-			g.drawString(showing.getResearchRequirement().toString(), x, y += offset);
-		}
-
-		if(showing.getCost() != null) {
-			drawCosts(g, showing.getCost(), x, y + 6);
-		}
-		drawCombatStats(g, showing.getCombatStats(), getWidth() - 80, 4);
+		drawCombatStats(g, showing, getWidth() - 80, 4);
 	}
+	
+	
 }
+

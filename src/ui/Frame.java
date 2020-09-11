@@ -2,6 +2,8 @@ package ui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map.*;
 import java.util.concurrent.*;
 
@@ -36,6 +38,7 @@ public class Frame extends JPanel {
 	private ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), 20, 20);
 	private ImageIcon TECH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.PNG"), 20, 20);
 	private ImageIcon RESOURCE_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/itemicons/adamantite_ore.png"), 20, 20);
+	private ImageIcon STAT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/itemicons/adamant_sword.png"), 20, 20);
 	
 	private Timer repaintingThread;
 	private JToggleButton easyModeButton;
@@ -55,6 +58,7 @@ public class Frame extends JPanel {
 	private JPanel workerMenu;
 	private JPanel spawnMenu;
 	private JPanel techView;
+	private JPanel statView;
 	private JLabel tileSize;
 	private JTabbedPane tabbedPane;
 	private JPanel guiSplitter;
@@ -64,6 +68,8 @@ public class Frame extends JPanel {
 	private JButton[] buildingButtons = new JButton[BuildingType.values().length];
 	private JButton[] unitButtons = new JButton[UnitType.values().length];
 	private JButton[] craftButtons = new JButton[ItemType.values().length];
+	private JButton[] statButtons = new JButton[7];
+	
 	private JTextField mapSize;
 	private int WIDTH;
 	private int HEIGHT;
@@ -82,6 +88,7 @@ public class Frame extends JPanel {
 	private int BARRACKS_TAB;
 	private int WORKSHOP_TAB;
 	private int RESEARCHLAB_TAB;
+	private int STAT_TAB;
 	private int SPAWN_TAB;
 
 	private Thread gameLoopThread;
@@ -445,7 +452,9 @@ public class Frame extends JPanel {
 					gameInstance.explode(gameInstance.getSelectedThing());
 				}
 			});
+			newInfo.setLayout(null);
 			newInfo.add(explodeUnit);
+			explodeUnit.setBounds(10, infoPanel.getHeight()-(int)DEBUG_BUTTON_SIZE.getHeight()- 10, (int)DEBUG_BUTTON_SIZE.getWidth(), (int)DEBUG_BUTTON_SIZE.getHeight());
 			infoPanel.add(newInfo, BorderLayout.CENTER);
 			infoPanel.validate();
 		});
@@ -960,7 +969,6 @@ public class Frame extends JPanel {
 		buttonPanel.add(exit);
 
 		techView = new JPanel();
-
 		for (int i = 0; i < ResearchType.values().length; i++) {
 			final ResearchType type = ResearchType.values()[i];
 			if(type.getTier() != 1) {
@@ -977,7 +985,23 @@ public class Frame extends JPanel {
 			researchButtons[i] = button;
 			techView.add(researchButtons[i]);
 		}
-
+		statView = new JPanel();
+		for (int i = 0; i < gameInstance.getCombatBuffs().getStats().size(); i++) {
+			ArrayList<Integer> stats = gameInstance.getCombatBuffs().getStats();
+			List strings = gameInstance.getCombatBuffs().getStrings();
+			
+			KButton button = KUIConstants.setupButton(strings.getItem(i) + ": " + stats.get(i), null, RESEARCH_BUTTON_SIZE);
+			button.setEnabled(true);
+			button.addActionListener(e -> {
+				gameInstance.addCombatBuff(gameInstance.getCombatBuffs());
+			});
+			button.addRightClickActionListener(e -> {
+				switchInfoPanel(new CombatStatInfoPanel(gameInstance.getCombatBuffs()));
+			});
+			statButtons[i] = button;
+			statView.add(statButtons[i]);
+		}
+		
 		setupGamePanel();
 		setupMinimapPanel();
 
@@ -991,6 +1015,9 @@ public class Frame extends JPanel {
 		TECH_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab("Tech Stuff", TECH_TAB_ICON, techView, "Does nothing");
 
+		STAT_TAB = tabbedPane.getTabCount();
+		tabbedPane.addTab("Unit Stats", STAT_TAB_ICON, statView, "Does nothing");
+		
 		BLACKSMITH_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("Craft Stuff", BLACKSMITH_TAB_ICON, blacksmithView, "Does nothing", BLACKSMITH_TAB);
 
