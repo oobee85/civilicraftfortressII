@@ -73,12 +73,17 @@ public class Thing implements HasImage {
 	}
 	public void heal(double healing) {
 		int roundedHealing = (int)Math.ceil(healing);
-		health += roundedHealing;
-		if(roundedHealing != 0) {
+		double tempHealing = roundedHealing;
+		if((health + healing) > this.maxHealth) {
+			tempHealing = this.maxHealth - health;
+		}
+		int finalHealing = (int)tempHealing;
+		health += finalHealing;
+		if(finalHealing != 0) {
 			timeLastDamageTaken = Game.ticks;
 		}
-		if(roundedHealing > 2) {
-			addHitsplat(-roundedHealing);
+		if(finalHealing > 2) {
+			addHitsplat(-finalHealing);
 		}
 	}
 	private void addHitsplat(int damage) {

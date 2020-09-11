@@ -120,6 +120,11 @@ public class Unit extends Thing {
 //		}else {
 //			isIdle = false;
 //		}
+		
+		if(getHealth() < unitType.getCombatStats().getHealth() && readyToHeal()) {
+//			heal(1);
+//			resetTimeToHeal();
+		}
 		if(unitType == UnitType.WORKER) {
 			Building tobuild = this.getTile().getBuilding();
 			if(tobuild != null && tobuild.isBuilt()) {
@@ -166,6 +171,9 @@ public class Unit extends Thing {
 		double initialHP = other.getHealth();
 		other.takeDamage(this.getType().getCombatStats().getAttack());
 		double damageDealt = initialHP - (other.getHealth() < 0 ? 0 : other.getHealth());
+		if(unitType.hasLifeSteal() && !(other instanceof Building)) {
+			this.heal(this.getType().getCombatStats().getAttack());
+		}
 		resetTimeToAttack();
 		if(other instanceof Unit) {
 			((Unit)other).setTarget(this);
@@ -177,7 +185,6 @@ public class Unit extends Thing {
 	public void resetTimeToAttack() {
 		timeToAttack = unitType.getCombatStats().getAttackSpeed();
 	}
-	
 	public Thing getTarget() {
 		return target;
 	}
@@ -196,6 +203,9 @@ public class Unit extends Thing {
 	}
 	public double getTimeToAttack() {
 		return timeToAttack;
+	}
+	public void setTimeToAttack(int x) {
+		timeToAttack = x;
 	}
 	public double getTimeToHeal() {
 		return timeToHeal;

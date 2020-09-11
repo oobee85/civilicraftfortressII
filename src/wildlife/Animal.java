@@ -144,11 +144,25 @@ public class Animal extends Unit {
 				this.moveTowards(getTarget().getTile());
 			}
 			if(inRange(getTarget())) {
-				attack(getTarget());
+				
 				if(this instanceof Dragon) {
 					Dragon dragon = (Dragon) this;
+					if(dragon.readyToFireball()) {
+						Projectile p = new Projectile(dragon.getType().getProjectileType(), dragon.getTile(), dragon.getTarget().getTile());
+						world.projectiles.add(p);
+						dragon.getTile().addProjectile(p);
+						dragon.resetTimeToFireball();
+					}
 					dragon.moveAroundTarget();
 				}
+				if(this.readyToAttack()) {
+					if(this instanceof Vampire) {
+						this.heal(this.getType().getCombatStats().getAttack());
+					}
+					attack(getTarget());
+					this.resetTimeToAttack();
+				}
+				
 			}
 			if(getTarget().isDead()) {
 				setTarget(null);

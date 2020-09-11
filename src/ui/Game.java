@@ -1087,6 +1087,7 @@ public class Game {
 			Unit unit = new Unit(selectedUnitToSpawn, tile, true);
 			tile.addUnit(unit);
 			world.units.add(unit);
+			unit.setTimeToAttack(0);
 			if(shiftEnabled == false) {
 				selectedUnitToSpawn = null;
 				selectedBuildingToSpawn = null;

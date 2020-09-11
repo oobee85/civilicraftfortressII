@@ -638,6 +638,7 @@ public class Frame extends JPanel {
 					BUILDING_BUTTON_SIZE);
 			button.addActionListener(e -> {
 				gameInstance.buildBuilding(type);
+				switchInfoPanel(new BuildingTypeInfoPanel(type));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new BuildingTypeInfoPanel(type));
@@ -654,6 +655,7 @@ public class Frame extends JPanel {
 					SPAWN_BUTTON_SIZE);
 			button.addActionListener(e -> {
 				gameInstance.setThingToSpawn(type, null);
+				switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new UnitTypeInfoPanel(type));
@@ -668,6 +670,7 @@ public class Frame extends JPanel {
 					SPAWN_BUTTON_SIZE);
 			button.addActionListener(e -> {
 				gameInstance.setThingToSpawn(null, type);
+				switchInfoPanel(new BuildingTypeInfoPanel(type));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new BuildingTypeInfoPanel(type));
@@ -687,6 +690,7 @@ public class Frame extends JPanel {
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.addActionListener(e -> {
 				gameInstance.tryToBuildUnit(type);
+				switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new UnitTypeInfoPanel(type));
@@ -705,6 +709,7 @@ public class Frame extends JPanel {
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.addActionListener(e -> {
 				gameInstance.tryToBuildUnit(type);
+				switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new UnitTypeInfoPanel(type));
@@ -720,7 +725,8 @@ public class Frame extends JPanel {
 			KButton button = KUIConstants.setupButton(type.toString(),
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.addActionListener(e -> {
-				gameInstance.setResearchTarget(type);;
+				gameInstance.setResearchTarget(type);
+				switchInfoPanel(new ResearchInfoPanel(gameInstance.researches.get(type)));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ResearchInfoPanel(gameInstance.researches.get(type)));
@@ -745,6 +751,7 @@ public class Frame extends JPanel {
 			button.setEnabled(false);
 			button.addActionListener(e -> {
 				gameInstance.craftItem(type);
+				switchInfoPanel(new ItemTypeInfoPanel(type));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ItemTypeInfoPanel(type));
@@ -770,6 +777,7 @@ public class Frame extends JPanel {
 				button.setEnabled(false);
 				button.addActionListener(e -> {
 					gameInstance.craftItem(type);
+					switchInfoPanel(new ItemTypeInfoPanel(type));
 				});
 				button.addRightClickActionListener(e -> {
 					switchInfoPanel(new ItemTypeInfoPanel(type));
@@ -978,6 +986,7 @@ public class Frame extends JPanel {
 			button.setEnabled(false);
 			button.addActionListener(e -> {
 				gameInstance.setResearchTarget(type);
+				switchInfoPanel(new ResearchInfoPanel(gameInstance.researches.get(type)));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ResearchInfoPanel(gameInstance.researches.get(type)));
