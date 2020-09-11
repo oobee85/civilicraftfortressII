@@ -103,9 +103,15 @@ public class Generation {
 	}
 	
 	public static TileLoc makeVolcano(World world, double[][] heightMap) {
-		int x = (int) (Math.random() * world.getWidth());
-		int y = (int) (Math.random() * world.getHeight());
+		int x = 0;
+		int y = 0; 
 		
+		for(Tile t : world.getTilesRandomly()) {
+//			if(t.getHeight() >= snowEdgeRatio) {
+				x = t.getLocation().x;
+				y = t.getLocation().y;
+//			}
+		}
 		double lavaRadius = 5;
 		double volcanoRadius = 10;
 		double mountainRadius = 20;

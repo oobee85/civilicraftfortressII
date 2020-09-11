@@ -1157,19 +1157,22 @@ public class Game {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit) thing;
-				Unit targetUnit = tile.getUnits().peek();
-				Building building = tile.getBuilding();
+				Thing targetThing = tile.getUnits().peek();
+				if(targetThing == null && tile.getBuilding() != null) {
+					targetThing = tile.getBuilding();
+				}
+//				Building building = tile.getBuilding();
 				
-				if(targetUnit != null) {
+				if(targetThing != null) {
 					// sets the target if the target isn't itself (clicking a lets you attack allies)
-					if(targetUnit != unit && (aControl == true || targetUnit.isPlayerControlled() == false)) {
-						unit.setTarget(targetUnit);
+					if(targetThing != unit && (aControl == true || targetThing.isPlayerControlled() == false)) {
+						unit.setTarget(targetThing);
 					}
 					//attack move makes unit go to the closest tile that it can attack from
 					if(aControl == true) {
-						Tile bestTile = targetUnit.getTile();
+						Tile bestTile = targetThing.getTile();
 						int radius = unit.getType().getCombatStats().getAttackRadius() + 1;
-						for(Tile t : world.getNeighborsInRadius(targetUnit.getTile(), radius)) {
+						for(Tile t : world.getNeighborsInRadius(targetThing.getTile(), radius)) {
 							if(t.getLocation().distanceTo(unit.getTile().getLocation()) < bestTile.getLocation().distanceTo(unit.getTile().getLocation())) {
 								bestTile = t;
 							}
@@ -1177,11 +1180,6 @@ public class Game {
 						unit.setTargetTile(bestTile);
 					}
 				} 
-				if(building != null){
-					if(aControl == true || building.isPlayerControlled() == false) {
-						unit.setTarget(building);
-					}
-				}
 				
 			}
 		}
