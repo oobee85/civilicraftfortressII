@@ -1379,7 +1379,6 @@ public class Game {
 	private void unitTick() {
 		
 		for (Unit unit : world.units) {
-			
 			unit.tick();
 			if (unit.getType() == UnitType.WORKER && unit.isIdle() == true) {
 				Building building = getBuildingToBuild();
@@ -1392,10 +1391,12 @@ public class Game {
 				}
 				
 			}
-			if(unit.getTargetTile() == null) {
-				continue;
+			if(unit.getTargetTile() == null && unit.getTarget() != null) {
+				unit.setTargetTile(unit.getTarget().getTile());
+			}else {
+				unit.setTargetTile(unit.getTile());
 			}
-			if (unit.readyToMove()) {
+			if (unit.readyToMove() && unit.getTargetTile() != null) {
 				unit.moveTowards(unit.getTargetTile());
 			}
 			

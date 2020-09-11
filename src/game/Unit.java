@@ -84,7 +84,7 @@ public class Unit extends Thing {
 			return;
 		}
 		if(this.getTargetTile() == null) {
-			return;
+			this.setTargetTile(this.getTile());
 		}
 		double penalty = movePenaltyTo(this.getTile(), t);
 		timeToMove += penalty;
