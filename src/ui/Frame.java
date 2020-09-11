@@ -998,11 +998,16 @@ public class Frame extends JPanel {
 		for (int i = 0; i < gameInstance.getCombatBuffs().getStats().size(); i++) {
 			ArrayList<Integer> stats = gameInstance.getCombatBuffs().getStats();
 			List strings = gameInstance.getCombatBuffs().getStrings();
+			int f = i;
 			
-			KButton button = KUIConstants.setupButton(strings.getItem(i) + ": " + stats.get(i), null, RESEARCH_BUTTON_SIZE);
+			KButton button = KUIConstants.setupButton(strings.getItem(i) + ": " + gameInstance.getCombatBuffs().getStat(strings.getItem(i)), null, RESEARCH_BUTTON_SIZE);
 			button.setEnabled(true);
 			button.addActionListener(e -> {
-				gameInstance.addCombatBuff(gameInstance.getCombatBuffs());
+				System.out.println(gameInstance.getCombatBuffs().getStat(strings.getItem(f)));
+				CombatStats cs = new CombatStats(0,0,0,0,0,0,0);
+				cs.getStats().set(f, cs.getStats().get(f)+1);
+				cs.add(strings.getItem(f), cs.getStats().get(f) );
+				gameInstance.addCombatBuff(cs);
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new CombatStatInfoPanel(gameInstance.getCombatBuffs()));

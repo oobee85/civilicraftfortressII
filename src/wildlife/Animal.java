@@ -124,7 +124,7 @@ public class Animal extends Unit {
 			return;
 		}
 		if(foodTarget != null) {
-			if(this.getTile().getLocation().distanceTo(foodTarget.getTile().getLocation()) > getType().getCombatStats().getVisionRadius()) {
+			if(this.getTile().getLocation().distanceTo(foodTarget.getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
 				moveTowards(foodTarget.getTile());
 			}
 			if(inRange(foodTarget)) {
@@ -140,7 +140,7 @@ public class Animal extends Unit {
 			return;
 		}
 		if(getTarget() != null) {
-			if(this.getTile().getLocation().distanceTo(getTarget().getTile().getLocation()) > getType().getCombatStats().getVisionRadius()) {
+			if(this.getTile().getLocation().distanceTo(getTarget().getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
 				this.moveTowards(getTarget().getTile());
 			}
 			if(inRange(getTarget())) {

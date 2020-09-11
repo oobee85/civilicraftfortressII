@@ -12,19 +12,19 @@ import utils.Utils;
 import world.ResourceType;
 
 public enum UnitType implements HasImage {
-	WORKER           ( "resources/Images/units/worker.png", 	new CombatStats(200,  0, 15, 1, 20, 30, 100), false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50);  }}, null, null ),
- 	WARRIOR         ( "resources/Images/units/warrior.png", 	new CombatStats(200, 10, 15, 1, 20, 50, 100),  false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.WOOD,50); }}, null, null ),
- 	SPEARMAN       ( "resources/Images/units/spearman.png", 	new CombatStats(400, 10, 15, 1, 20, 50, 100), false, false, false, ResearchType.BRONZE_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.BRONZE_SWORD,1);}}, null, null ),
- 	ARCHER           ( "resources/Images/units/archer.png", 	new CombatStats(200, 30, 15, 3, 30, 100, 100), false, false, false, ResearchType.WARRIOR_CODE, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); }}, null, ProjectileType.ARROW ),
- 	SWORDSMAN     ( "resources/Images/units/swordsman.png",		new CombatStats(300, 20, 15, 1, 20, 100, 100), false, false, false, ResearchType.IRON_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.IRON_SWORD,1);}}, null, null ),
- 	LONGBOWMAN     ( "resources/Images/units/longbowman.png", 	new CombatStats(200, 30, 15, 6, 30, 200, 100), false, false, false, ResearchType.ENGINEERING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.MITHRIL_BAR, 5); }}, null, ProjectileType.ARROW ),
- 	CATAPULT     ( "resources/Images/units/catapult.png", 		new CombatStats(100, 200, 50, 10, 100, 500, 100), false, false, false, ResearchType.MATHEMATICS, new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.MITHRIL_BAR,10);}}, null, ProjectileType.ROCK_CATAPULT ),
- 	TREBUCHET     ( "resources/Images/units/trebuchet.png", 	new CombatStats(100, 400, 50, 20, 100, 500, 100), false, false, false, ResearchType.MONARCHY, new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.RUNITE_BAR,10);}}, null, ProjectileType.FIREBALL_TREBUCHET ),
+	WORKER           ( "resources/Images/units/worker.png", 	new CombatStats(100,  0, 15, 1, 20, 30, 50), false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50);  }}, null, null ),
+ 	WARRIOR         ( "resources/Images/units/warrior.png", 	new CombatStats(200, 10, 15, 1, 20, 50, 50),  false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.WOOD,50); }}, null, null ),
+ 	SPEARMAN       ( "resources/Images/units/spearman.png", 	new CombatStats(400, 10, 15, 1, 20, 50, 50), false, false, false, ResearchType.BRONZE_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.BRONZE_SWORD,1);}}, null, null ),
+ 	ARCHER           ( "resources/Images/units/archer.png", 	new CombatStats(200, 30, 15, 3, 30, 100, 50), false, false, false, ResearchType.WARRIOR_CODE, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); }}, null, ProjectileType.ARROW ),
+ 	SWORDSMAN     ( "resources/Images/units/swordsman.png",		new CombatStats(300, 20, 15, 1, 20, 100, 50), false, false, false, ResearchType.IRON_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.IRON_SWORD,1);}}, null, null ),
+ 	LONGBOWMAN     ( "resources/Images/units/longbowman.png", 	new CombatStats(200, 30, 15, 6, 30, 200, 50), false, false, false, ResearchType.ENGINEERING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.MITHRIL_BAR, 5); }}, null, ProjectileType.ARROW ),
+ 	CATAPULT     ( "resources/Images/units/catapult.png", 		new CombatStats(100, 200, 50, 10, 100, 500, 50), false, false, false, ResearchType.MATHEMATICS, new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.MITHRIL_BAR,10);}}, null, ProjectileType.ROCK_CATAPULT ),
+ 	TREBUCHET     ( "resources/Images/units/trebuchet.png", 	new CombatStats(100, 400, 50, 20, 100, 500, 50), false, false, false, ResearchType.MONARCHY, new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.RUNITE_BAR,10);}}, null, ProjectileType.FIREBALL_TREBUCHET ),
  	
- 	HORSEMAN       ( "resources/Images/units/horseman.png", new CombatStats(400, 20, 5, 1, 20, 100, 100),  false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.MITHRIL_SWORD,1); put(ItemType.HORSE,50);}}, null, null ),
- 	KNIGHT           ( "resources/Images/units/knight.png", new CombatStats(600, 45, 10, 1, 30, 200, 100), false, false, false, ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,200); put(ItemType.RUNE_SWORD,1); put(ItemType.HORSE,200);}}, null, null ),
- 	CHARIOT         ( "resources/Images/units/chariot.png", new CombatStats(400, 30, 10, 5, 30, 100, 100), false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,200); put(ItemType.WOOD,200); put(ItemType.HORSE,100); put(ItemType.IRON_BAR,10);}}, null, ProjectileType.ARROW ),
- 	HORSEARCHER ( "resources/Images/units/horsearcher.png", new CombatStats(200, 50, 5, 3, 20, 300, 100),  false, false, false, ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,200); put(ItemType.HORSE,200); put(ItemType.RUNITE_BAR,5);}}, null, ProjectileType.RUNE_ARROW ),
+ 	HORSEMAN       ( "resources/Images/units/horseman.png", new CombatStats(400, 20, 5, 1, 20, 100, 50),  false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.MITHRIL_SWORD,1); put(ItemType.HORSE,50);}}, null, null ),
+ 	KNIGHT           ( "resources/Images/units/knight.png", new CombatStats(600, 45, 10, 1, 30, 200, 50), false, false, false, ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,200); put(ItemType.RUNE_SWORD,1); put(ItemType.HORSE,200);}}, null, null ),
+ 	CHARIOT         ( "resources/Images/units/chariot.png", new CombatStats(400, 30, 10, 5, 30, 100, 50), false, false, false, ResearchType.HORSEBACK_RIDING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,200); put(ItemType.WOOD,200); put(ItemType.HORSE,100); put(ItemType.IRON_BAR,10);}}, null, ProjectileType.ARROW ),
+ 	HORSEARCHER ( "resources/Images/units/horsearcher.png", new CombatStats(200, 50, 5, 3, 20, 300, 50),  false, false, false, ResearchType.CHIVALRY, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,200); put(ItemType.HORSE,200); put(ItemType.RUNITE_BAR,5);}}, null, ProjectileType.RUNE_ARROW ),
  	
 	DEER		("resources/Images/units/deer.png", 	new CombatStats(200, 5, 5, 1, 40, 0, 50), 	false, false, false, null, null, ResourceType.DEAD_ANIMAL, null),
 	HORSE		("resources/Images/units/horse.png",	new CombatStats(200, 5, 5, 1, 40, 0, 50), 	false, false, false, null, null, ResourceType.DEAD_ANIMAL, null),
@@ -34,8 +34,8 @@ public enum UnitType implements HasImage {
 	COW			("resources/Images/units/cow.png",		new CombatStats(200, 10, 30, 1, 40, 0, 50), false, false, false, null, null, ResourceType.DEAD_ANIMAL, null),
 	
 	
-	DRAGON	   ("resources/Images/units/dragon.png",	new CombatStats(2000, 100, 5, 2, 30, 0, 10), 	false, true, true, null, null, ResourceType.DEAD_ANIMAL, ProjectileType.FIREBALL_DRAGON),
-	VAMPIRE    ("resources/Images/units/vampire.png", 	new CombatStats(200, 20, 20, 1, 40, 0, 1), 		false, true, true, null, null, ResourceType.DEAD_ANIMAL, null),
+	DRAGON	   ("resources/Images/units/dragon.png",	new CombatStats(2000, 90, 5, 2, 30, 0, 10), 	false, true, true, null, null, ResourceType.DEAD_ANIMAL, ProjectileType.FIREBALL_DRAGON),
+	VAMPIRE    ("resources/Images/units/vampire.png", 	new CombatStats(200, 20, 15, 1, 40, 0, 1), 		false, true, true, null, null, ResourceType.DEAD_ANIMAL, null),
 	ROC			("resources/Images/units/roc.png",		new CombatStats(500, 50, 10, 1, 25, 0, 10), 	false, true, true, null, null, ResourceType.DEAD_ANIMAL, null),
 	
 	OGRE	   ("resources/Images/units/ogre.png",		new CombatStats(1000, 40, 50, 1, 40, 0, 5), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
@@ -106,7 +106,7 @@ public enum UnitType implements HasImage {
 		return isHostile;
 	}
 	public boolean isRanged() {
-		return this.getCombatStats().getVisionRadius() > 1;
+		return this.getCombatStats().getAttackRadius() > 1;
 	}
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;

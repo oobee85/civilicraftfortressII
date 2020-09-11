@@ -36,8 +36,8 @@ public class CombatStats {
 		this.attackSpeed = attackSpeed;
 		this.ticksToBuild = ticksToBuild;
 		this.ticksToHeal = ticksToHeal;	
-		strings.add("Health");
-		strings.add("Attack");
+		strings.add("health");
+		strings.add("attack");
 		strings.add("moveSpeed");
 		strings.add("attackRadius");
 		strings.add("attackSpeed");
@@ -66,7 +66,7 @@ public class CombatStats {
 	public int getMoveSpeed() {
 		return moveSpeed;
 	}
-	public int getVisionRadius() {
+	public int getAttackRadius() {
 		return attackRadius;
 	}
 	public int getAttackSpeed() {
@@ -78,11 +78,59 @@ public class CombatStats {
 	public int getHealSpeed() {
 		return ticksToHeal;
 	}
-	public void add(CombatStats cs) {
+	public int getStat(String s) {
+		if(s.equals("health")) {
+			return health;
+		}
+		if(s.equals("attack")) {
+			return attack;
+		}
+		if(s.equals("moveSpeed")) {
+			return moveSpeed;
+		}
+		if(s.equals("attackRadius")) {
+			return attackRadius;
+		}
+		if(s.equals("attackSpeed")) {
+			return attackSpeed;
+		}
+		if(s.equals("ticksToBuild")) {
+			return ticksToBuild;
+		}
+		if(s.equals("ticksToHeal")) {
+			return ticksToHeal;
+		}
+		return 0;
+	}
+	public void add(String s, int i) {
+		if(s.equals("health")) {
+			health =+ i;
+		}
+		if(s.equals("attack")) {
+			attack =+ i;
+		}
+		if(s.equals("moveSpeed")) {
+			moveSpeed =+ i;
+		}
+		if(s.equals("attackRadius")) {
+			attackRadius =+ i;
+		}
+		if(s.equals("attackSpeed")) {
+			attackSpeed =+ i;
+		}
+		if(s.equals("ticksToBuild")) {
+			ticksToBuild =+ i;
+		}
+		if(s.equals("ticksToHeal")) {
+			ticksToHeal =+ i;
+		}
+		
+	}
+	public void combine(CombatStats cs) {
 		this.health += cs.getHealth();
 		this.attack += cs.getAttack();
 		this.moveSpeed += cs.getMoveSpeed();
-		this.attackRadius += cs.getVisionRadius();
+		this.attackRadius += cs.getAttackRadius();
 		this.attackSpeed += cs.getAttackSpeed();
 		this.ticksToBuild += cs.getTicksToBuild();
 		this.ticksToHeal += cs.getHealSpeed();

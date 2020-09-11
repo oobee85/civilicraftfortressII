@@ -122,8 +122,8 @@ public class Unit extends Thing {
 //		}
 		
 		if(getHealth() < unitType.getCombatStats().getHealth() && readyToHeal()) {
-//			heal(1);
-//			resetTimeToHeal();
+			heal(1);
+			resetTimeToHeal();
 		}
 		if(unitType == UnitType.WORKER) {
 			Building tobuild = this.getTile().getBuilding();
@@ -156,7 +156,7 @@ public class Unit extends Thing {
 		if(other == null) {
 			return false;
 		}
-		return !(this.getTile().getLocation().distanceTo(other.getTile().getLocation()) > getType().getCombatStats().getVisionRadius() 
+		return !(this.getTile().getLocation().distanceTo(other.getTile().getLocation()) > getType().getCombatStats().getAttackRadius() 
 				&& this.getTile() != other.getTile());
 	}
 	

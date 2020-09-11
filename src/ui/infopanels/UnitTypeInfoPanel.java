@@ -38,7 +38,7 @@ public class UnitTypeInfoPanel extends InfoPanel {
 
 		y += iconSize + gap;
 		g.drawImage(visionImage, x, y, iconSize, iconSize, null);
-		g.drawString(stats.getVisionRadius() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
+		g.drawString(stats.getAttackRadius() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
 
 		y += iconSize + gap;
 		g.drawImage(movespeedImage, x, y, iconSize, iconSize, null);

@@ -199,7 +199,7 @@ public class Game {
 		changedTerrain = true;
 		
 		
-		world.updatePlantDamage();
+		
 		
 		world.updateTerrainChange(world);
 		
@@ -216,6 +216,7 @@ public class Game {
 		if(ticks%5 == 0) {
 			world.updateUnitLiquidDamage();
 			world.updateBuildingLiquidDamage();
+			world.updatePlantDamage();
 		}
 		
 		guiController.updateGUI();
@@ -225,7 +226,7 @@ public class Game {
 		
 	}
 	public void addCombatBuff(CombatStats cs) {
-		combatBuffs.add(cs);
+		combatBuffs.combine(cs);
 	}
 	public CombatStats getCombatBuffs() {
 		return combatBuffs;
@@ -785,7 +786,7 @@ public class Game {
 			
 			if (selectedThing instanceof Unit) {
 				Unit unit = (Unit) selectedThing;
-				int range = unit.getType().getCombatStats().getVisionRadius();
+				int range = unit.getType().getCombatStats().getAttackRadius();
 				if(range == 1) {
 					range = -1;
 				}
