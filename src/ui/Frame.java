@@ -22,6 +22,7 @@ public class Frame extends JPanel {
 	int MINIMAPBORDERWIDTH = 40;
 	
 	public static final long MILLISECONDS_PER_TICK = 100;
+	private static final String TITLE = "civilicraftfortressII";
 
 	public static final Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
 	public static final Dimension DEBUG_BUTTON_SIZE = new Dimension(130, 30);
@@ -97,7 +98,7 @@ public class Frame extends JPanel {
 
 	public Frame() {
 
-		frame = new JFrame("Civilization");
+		frame = new JFrame(TITLE);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setIconImage(Utils.loadImage("resources/Images/logo.png"));
 
@@ -1118,6 +1119,9 @@ public class Frame extends JPanel {
 					long start = System.currentTimeMillis();
 					gameInstance.gameTick();
 					long elapsed = System.currentTimeMillis() - start;
+					if(Game.ticks % 10 == 0) {
+						frame.setTitle(TITLE + " " + elapsed);
+					}
 					long sleeptime = 100 - elapsed;
 					if(sleeptime > 0 && !gameInstance.shouldFastForward()) {
 						Thread.sleep(sleeptime);
