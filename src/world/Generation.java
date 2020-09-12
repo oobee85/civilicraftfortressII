@@ -14,8 +14,14 @@ public class Generation {
 	
 	public static double[][] generateHeightMap(int smoothingRadius, int width, int height) {
 		LinkedList<double[][]> noises = new LinkedList<>();
+		
+		int power = 1;
+		while(power < width && power < height) {
+			power *= 2;
+		}
+		
 
-		for (int octave = 2; octave <= width; octave *= 2) {
+		for (int octave = 2; octave <= power; octave *= 2) {
 			double[][] noise1 = new double[octave][octave];
 			for (int i = 0; i < noise1.length; i++) {
 				for (int j = 0; j < noise1[0].length; j++) {
@@ -25,11 +31,11 @@ public class Generation {
 			noises.add(noise1);
 		}
 
-		double[][] combinedNoise = new double[width][height];
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
+		double[][] combinedNoise = new double[power][power];
+		for (int i = 0; i < power; i++) {
+			for (int j = 0; j < power; j++) {
 				double rand = 0;
-				int divider = width;
+				int divider = power;
 				double multiplier = 1;
 				for (double[][] noise : noises) {
 					divider /= 2;
@@ -41,13 +47,21 @@ public class Generation {
 		}
 
 		double[][] heightMap = Utils.smoothingFilter(combinedNoise, smoothingRadius, 100);
-		Utils.normalize(heightMap);
+		double[][] croppedHeightMap = new double[width][height];
+		int croppedWidth = (power - width)/2;
+		int croppedHeight = (power - height)/2;
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				croppedHeightMap[i][j] = heightMap[i + croppedWidth][j + croppedHeight];
+			}
+		}
+		Utils.normalize(croppedHeightMap);
 //		for (int i = 0; i < width; i++) {
 //			for (int j = 0; j < height; j++) {
 //				heightMap[i][j] *= heightMap[i][j];
 //			}
 //		}
-		return heightMap;
+		return croppedHeightMap;
 	}
 	
 	public static TileLoc makeMountain(Tile[][] world, double[][] heightMap) {

@@ -704,6 +704,7 @@ public class World {
 		this.genPlants();
 		this.makeForest();
 		Wildlife.generateWildLife(this);
+		System.out.println("Finished generating " + width + "x" + height + " world with " + tileList.size() + " tiles.");
 	}
 
 	public BufferedImage[] createTerrainImage() {
