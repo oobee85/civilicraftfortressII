@@ -24,7 +24,6 @@ public class Game {
 	private BufferedImage terrainImage;
 	private BufferedImage minimapImage;
 	private BufferedImage heightMapImage;
-	private Thing selectedThing;
 	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
 	private UnitType selectedUnitToSpawn;
 	private BuildingType selectedBuildingToSpawn;
@@ -175,7 +174,7 @@ public class Game {
 		if(ticks >= 2000 && Math.random() < 0.0001) {
 			world.spawnAnimal(UnitType.PARASITE, world.getTilesRandomly().getFirst());
 		}
-		if(ticks >= 100 && Math.random() < (0.00005 * numCutTrees/2)) {
+		if(ticks >= 100 && Math.random() < (0.00005 * numCutTrees/5)) {
 			world.spawnEnt();
 		}
 		if(buildingsUntilOgre == world.buildings.size()) {
@@ -295,7 +294,7 @@ public class Game {
 				building.resetTimeToHarvest();
 			}
 			
-			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getTerrain() == Terrain.ROCK) {
+			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getTerrain() == Terrain.ROCK && building.getTile().getResource() == null) {
 				resources.get(ItemType.STONE).addAmount(1);
 				building.resetTimeToHarvest();
 			}
@@ -314,10 +313,8 @@ public class Game {
 			if(building.getBuildingType() == BuildingType.SAWMILL) {
 				HashSet<Tile> tilesToCut = new HashSet<>();
 				tilesToCut.add(building.getTile());
-				for(Tile t : building.getTile().getNeighbors()) {
-					for(Tile t2 : t.getNeighbors()) {
-						tilesToCut.add(t2);
-					}
+				
+				for(Tile t : world.getNeighborsInRadius((building.getTile()), 3)) {
 					tilesToCut.add(t);
 				}
 				for(Tile tile : tilesToCut) {
@@ -1158,10 +1155,14 @@ public class Game {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit) thing;
 				Thing targetThing = tile.getUnits().peek();
+				for(Unit tempUnit : tile.getUnits()) {
+					if(!tempUnit.isPlayerControlled()) {
+						targetThing = tempUnit;
+					}
+				}
 				if(targetThing == null && tile.getBuilding() != null) {
 					targetThing = tile.getBuilding();
 				}
-//				Building building = tile.getBuilding();
 				
 				if(targetThing != null) {
 					// sets the target if the target isn't itself (clicking a lets you attack allies)
@@ -1380,7 +1381,7 @@ public class Game {
 		
 		for (Unit unit : world.units) {
 			unit.tick();
-			if (unit.getType() == UnitType.WORKER && unit.isIdle() == true) {
+			if (unit.getType() == UnitType.WORKER && unit.isIdle() == true && unit.getTile().getIsTerritory()) {
 				Building building = getBuildingToBuild();
 				if(building != null && unit.getTargetTile() == null) {
 					

@@ -87,24 +87,24 @@ public class Dragon extends Animal {
 		} else {
 			
 			//chance to attack building or unit
-			if(Math.random() < 0.4) {
-				for (Building b : buildings) {
-					if (buildings.size() > 0) {
-						Building targetBuilding = buildings.get((int) (Math.random() * buildings.size()));
-						if(targetBuilding.getBuildingType() != BuildingType.CASTLE) {
-							setTarget(targetBuilding);
-						}
-						return;
-					}
-				}
-			}else {
-				for (Unit u : units) {
-					if (u.isPlayerControlled()) {
-						setTarget(u);
-						return;
-					}
-				}
-			}
+//			if(Math.random() < 0.4) {
+//				for (Building b : buildings) {
+//					if (buildings.size() > 0) {
+//						Building targetBuilding = buildings.get((int) (Math.random() * buildings.size()));
+//						if(targetBuilding.getBuildingType() != BuildingType.CASTLE) {
+//							setTarget(targetBuilding);
+//						}
+//						return;
+//					}
+//				}
+//			}else {
+//				for (Unit u : units) {
+//					if (u.isPlayerControlled()) {
+//						setTarget(u);
+//						return;
+//					}
+//				}
+//			}
 			
 			
 		}

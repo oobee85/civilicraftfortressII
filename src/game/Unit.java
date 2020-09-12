@@ -115,7 +115,7 @@ public class Unit extends Thing {
 		if(timeToHeal > 0) {
 			timeToHeal -= 1;
 		}
-		if(readyToMove() && readyToAttack() && target == null && isPlayerControlled()) {
+		if(readyToMove() && readyToAttack() && target == null && isPlayerControlled() && getIsSelected() == false) {
 			isIdle = true;
 		}else {
 			isIdle = false;
