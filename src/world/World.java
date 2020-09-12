@@ -630,8 +630,14 @@ public class World {
 		height = size;
 		tiles = new Tile[width][height];
 		int smoothingRadius = (int) (Math.sqrt((width + height)/2)/2);
+		
+		Profiler.start();
 		double[][] heightMap = Generation.generateHeightMap(smoothingRadius, width, height);
+		Profiler.end("generateHeightMap");
+		Profiler.start();
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
+		Profiler.end("3x3 smooth");
+		Profiler.start();
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
 				tiles[i][j] = Tile.makeTile(new TileLoc(i, j), Terrain.DIRT);
@@ -639,19 +645,28 @@ public class World {
 				tileListRandom.add(tiles[i][j]);
 			}
 		}
-		
+		Profiler.end("making tiles");
+
+		Profiler.start();
 		for(Tile tile : getTiles()) {
 			tile.setNeighbors(getNeighbors(tile));
 		}
-		
+		Profiler.end("setting neighbors");
+
+		Profiler.start();
 		volcano = Generation.makeVolcano(this, heightMap);
+		Profiler.end("volcano");
+		Profiler.start();
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
-		
+		Profiler.end("3x3 smooth");
+
+		Profiler.start();
 		for(Tile tile : getTiles()) {
 			tile.setHeight(heightMap[tile.getLocation().x][tile.getLocation().y]);
 		}
+		Profiler.end("set height");
 
-		
+		Profiler.start();
 		for(Tile tile : getTiles()) {
 			if(tile.getTerrain() == Terrain.DIRT) {
 				Terrain t;
@@ -673,22 +688,31 @@ public class World {
 				tile.setTerrain(t);
 			}
 		}
+		Profiler.end("set terrain");
 		
 		
 		int numTiles = width*height;
+		Profiler.start();
 		Generation.makeLake(numTiles * 1.0/100, this);
 		Generation.makeLake(numTiles * 1.0/200, this);
 		Generation.makeLake(numTiles * 1.0/400, this);
 		Generation.makeLake(numTiles * 1.0/800, this);
+		Profiler.end("make lakes");
 		System.out.println("Simulating water for 100 iterations");
+		Profiler.start();
 		for(int i = 0; i < 100; i++) {
 			Liquid.propogate(this);
 		}
+		Profiler.end("simulate water");
 
+		Profiler.start();
 		Generation.genResources(this);
 		this.genPlants();
 		this.makeForest();
 		Wildlife.generateWildLife(this);
+		Profiler.end("resource_plant_forest_wildlife");
+		Profiler.printLog();
+		System.exit(0);
 	}
 
 	public BufferedImage[] createTerrainImage() {

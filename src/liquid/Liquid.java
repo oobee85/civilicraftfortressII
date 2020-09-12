@@ -15,7 +15,6 @@ public class Liquid {
 	
 	private static double[][] liquidAmountsTemp;
 	private static LiquidType[][] liquidTypesTemp;
-
 	
 	
 	// idea: create constant arraylist of positions, initialize it once, then every time simply use a random permutation to access all elements randomly.
@@ -41,21 +40,26 @@ public class Liquid {
 //		for(int i = 0; i < totals.length; i++) {
 //			System.out.println("Total " + LiquidType.values()[i].name() + ": " + totals[i]);
 //		}
+		Profiler.start2();
 		for(Tile tile : world.getTilesRandomly()) {
 			liquidAmountsTemp[tile.getLocation().x][tile.getLocation().y] = world.get(tile.getLocation()).liquidAmount;
 			liquidTypesTemp[tile.getLocation().x][tile.getLocation().y] = world.get(tile.getLocation()).liquidType;
 		}
+		Profiler.end2("A");
 //		for(int x = 0; x < world.getWidth(); x++) {
 //			for(int y = 0; y < world.getHeight(); y++) {
 //				liquidAmountsTemp[x][y] = world.get(new TileLoc(x, y)].liquidAmount;
 //				liquidTypesTemp[x][y] = world.get(new TileLoc(x, y)].liquidType;
 //			}
 //		}
-		
+
+		Profiler.start2();
 		for(Tile tile : world.getTiles()) {
 			propogate(tile, world);
 		}
-		
+		Profiler.end2("B");
+
+		Profiler.start2();
 		for(Tile tile : world.getTiles()) {
 			int x = tile.getLocation().x;
 			int y = tile.getLocation().y;
@@ -82,16 +86,13 @@ public class Liquid {
 				tile.liquidAmount -= 0.00001;
 			}
 		}
+		Profiler.end2("C");
 		//Utils.normalize(heightMap);
 	}
 	private static void propogate(Tile tile, World world) {
 		TileLoc current = tile.getLocation();
 		int x = current.x;
 		int y = current.y;
-		int minX = Math.max(0, x - 1);
-		int maxX = Math.min(world.getWidth()-1, x + 1);
-		int minY = Math.max(0, y-1);
-		int maxY = Math.min(world.getHeight()-1, y + 1);
 		
 		List<Tile> neighbors = Utils.getNeighbors(tile, world);
 		for(Tile otherTile : neighbors) {

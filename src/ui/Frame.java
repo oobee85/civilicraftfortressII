@@ -281,7 +281,7 @@ public class Frame extends JPanel {
 		KUIConstants.setComponentAttributes(mapType, BUILDING_BUTTON_SIZE);
 		mainMenuPanel.add(mapType);
 
-		mapSize = new JTextField("128", 10);
+		mapSize = new JTextField("64", 10);
 		KUIConstants.setComponentAttributes(mapSize, BUILDING_BUTTON_SIZE);
 		mapSize.setFocusable(true);
 		mainMenuPanel.add(mapSize);
