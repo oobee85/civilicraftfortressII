@@ -192,7 +192,7 @@ public class Generation {
 		visited.put(t, 0.0);
 		search.add(t);
 		
-		while(veinSize > 0) {
+		while(veinSize > 0 && !search.isEmpty()) {
 			Tile potential = search.poll();
 			
 			for(Tile ti : potential.getNeighbors()) {
