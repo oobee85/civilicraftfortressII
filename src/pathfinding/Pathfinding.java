@@ -8,12 +8,15 @@ import world.*;
 
 public class Pathfinding {
 	
-	public static Tile chooseBestTile(Unit unit, Tile startingTile, Tile targetTile) {
+	public static LinkedList<Tile> getBestPath(Unit unit, Tile startingTile, Tile targetTile) {
+		LinkedList<Tile> bestTilePath = new LinkedList<Tile>();
 		if(startingTile == targetTile) {
-			return startingTile;
+			bestTilePath.add(startingTile);
+			return bestTilePath;
 		}
 		if(startingTile.getLocation().distanceTo(targetTile.getLocation()) == 1) {
-			return targetTile;
+			bestTilePath.add(targetTile);
+			return bestTilePath;
 		}
 		PriorityQueue<Node> search = new PriorityQueue<>((x, y) -> {
 			int speed = unit.getUnitType().getCombatStats().getMoveSpeed();
@@ -62,7 +65,10 @@ public class Pathfinding {
 		boolean forwardDone = false;
 		boolean reverseDone = !Game.USE_BIDIRECTIONAL_A_STAR;
 		
-		
+
+		Node bestNode = null;
+		Node bestNodeReverse = null;
+		boolean reverseFinish = true;
 		while (true) {
 			if(search.isEmpty() || reverseSearch.isEmpty()) {
 				break;
@@ -86,6 +92,9 @@ public class Pathfinding {
 						bestForwardCost = results[0].cost;
 						bestTile = results[0].tile;
 						bestReverseCost = results[1].cost;
+						bestNode= currentNode;
+						bestNodeReverse = results[2];
+						reverseFinish = false;
 					}
 				}
 			}
@@ -105,11 +114,39 @@ public class Pathfinding {
 						bestForwardCost = results[0].cost;
 						bestTile = results[0].tile;
 						bestReverseCost = results[1].cost;
+						bestNode = currentNode;
+						bestNodeReverse = results[2];
+						reverseFinish = true;
 					}
 				}
 			}
 		}
-		return bestTile;
+		Node prev = bestNode;
+		while(prev.previous != null) {
+			if(reverseFinish) {
+				bestTilePath.addLast(prev.tile);
+			}
+			else {
+				bestTilePath.addFirst(prev.tile);
+			}
+			prev = prev.previous;
+		}
+		prev = bestNodeReverse;
+		boolean skip = true;
+		while(prev.previous != null) {
+			if(!skip) {
+				if(reverseFinish) {
+					bestTilePath.addFirst(prev.tile);
+				}
+				else {
+					bestTilePath.addLast(prev.tile);
+				}
+			}
+			skip = false;
+			prev = prev.previous;
+		}
+		bestTilePath.add(targetTile);
+		return bestTilePath;
 	}
 	private static Node[] processNode(Unit unit, Node currentNode, Tile targetTile, HashMap<Tile, Node> visited, HashMap<Tile, Node> reverseVisited, PriorityQueue<Node> search, boolean forward) {
 		Tile currentTile = currentNode.tile;
@@ -124,7 +161,8 @@ public class Pathfinding {
 				Tile bestTile = parent.tile;
 				return new Node[] {
 						new Node(bestTile, null, currentNode.cost),
-						new Node(bestTile, null, reverseVisited.get(currentTile).cost)
+						new Node(bestTile, null, reverseVisited.get(currentTile).cost),
+						reverseVisited.get(currentTile)
 					};
 			}
 			else {
@@ -140,7 +178,8 @@ public class Pathfinding {
 				}
 				return new Node[] {
 					new Node(bestTile, null, reverseVisited.get(currentTile).cost),
-					new Node(bestTile, null, currentNode.cost)
+					new Node(bestTile, null, currentNode.cost),
+					reverseVisited.get(currentTile)
 				};
 			}
 		}

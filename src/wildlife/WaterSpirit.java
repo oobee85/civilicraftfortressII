@@ -23,8 +23,8 @@ public class WaterSpirit extends Animal {
 	}
 	
 	@Override
-	public void moveTo(Tile t) {
-		super.moveTo(t);
+	public boolean moveTo(Tile t) {
+		return super.moveTo(t);
 	}
 	
 	@Override

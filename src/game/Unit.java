@@ -22,6 +22,7 @@ public class Unit extends Thing {
 	private int remainingEffort;
 	private boolean isIdle;
 	
+	private LinkedList<Tile> currentPath;
 	
 	
 	public Unit(UnitType unitType, Tile tile, boolean isPlayerControlled) {
@@ -76,12 +77,12 @@ public class Unit extends Thing {
 		return penalty;
 	}
 	
-	public void moveTo(Tile t) {
+	public boolean moveTo(Tile t) {
 		if(!readyToMove()) {
-			return;
+			return false;
 		}
 		if(t.canMove(this) == false) {
-			return;
+			return false;
 		}
 		if(this.getTargetTile() == null) {
 			this.setTargetTile(this.getTile());
@@ -99,10 +100,21 @@ public class Unit extends Thing {
 		if(this.getUnitType() == UnitType.ENT && t.canPlant() == true) {
 			t.setTerrain(Terrain.GRASS);
 		}
+		return true;
 	}
 	
 	public void moveTowards(Tile tile) {
-		this.moveTo(Pathfinding.chooseBestTile(this, this.getTile(), tile));
+		if(((currentPath == null || currentPath.isEmpty() || currentPath.getLast() != tile) && tile != this.getTile())
+				|| (currentPath != null && !currentPath.isEmpty() && !currentPath.getFirst().canMove(this))) {
+			currentPath = Pathfinding.getBestPath(this, this.getTile(), tile);
+		}
+		if(!currentPath.isEmpty()) {
+			Tile targetTile = currentPath.getFirst();
+			boolean success = this.moveTo(targetTile);
+			if(success) {
+				currentPath.removeFirst();
+			}
+		}
 	}
 
 	public void tick() {
