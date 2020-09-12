@@ -22,6 +22,9 @@ public class World {
 	public final boolean isNight = false;
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
+	
+	private static final int NUM_LIQUID_SIMULATION_PHASES = 9;
+	private ArrayList<ArrayList<Tile>> liquidSimulationPhases = new ArrayList<>(NUM_LIQUID_SIMULATION_PHASES);
 	private Tile[][] tiles;
 	private ConcurrentLinkedQueue<Tile> territory = new ConcurrentLinkedQueue<Tile>();;
 	
@@ -68,6 +71,9 @@ public class World {
 	public LinkedList<Tile> getTilesRandomly() {
 		Collections.shuffle(tileListRandom);
 		return tileListRandom;
+	}
+	public ArrayList<ArrayList<Tile>> getLiquidSimulationPhases() {
+		return liquidSimulationPhases;
 	}
 	
 	public Tile get(TileLoc loc) {
@@ -626,6 +632,10 @@ public class World {
 	}
 	
 	public void generateWorld(MapType mapType, int size) {
+		liquidSimulationPhases.clear();
+		for(int i = 0; i < NUM_LIQUID_SIMULATION_PHASES; i++) {
+			liquidSimulationPhases.add(new ArrayList<>());
+		}
 		width = size;
 		height = size;
 		tiles = new Tile[width][height];
@@ -643,6 +653,12 @@ public class World {
 				tiles[i][j] = Tile.makeTile(new TileLoc(i, j), Terrain.DIRT);
 				tileList.add(tiles[i][j]);
 				tileListRandom.add(tiles[i][j]);
+				
+				// This one only has 5 phases
+//				int phase = (i + 5 - (2*j)%5) % 5;
+				// but this one has fewer cache invalidations
+				int phase = 3*(i%3) + j%3;
+				liquidSimulationPhases.get(phase).add(tiles[i][j]);
 			}
 		}
 		Profiler.end("making tiles");
@@ -712,7 +728,7 @@ public class World {
 		Wildlife.generateWildLife(this);
 		Profiler.end("resource_plant_forest_wildlife");
 		Profiler.printLog();
-		System.exit(0);
+//		System.exit(0);
 	}
 
 	public BufferedImage[] createTerrainImage() {

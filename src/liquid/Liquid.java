@@ -1,6 +1,7 @@
 package liquid;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import game.GroundModifier;
 import game.GroundModifierType;
@@ -16,6 +17,7 @@ public class Liquid {
 	private static double[][] liquidAmountsTemp;
 	private static LiquidType[][] liquidTypesTemp;
 	
+	private static final boolean MULTITHREADED = true;
 	
 	// idea: create constant arraylist of positions, initialize it once, then every time simply use a random permutation to access all elements randomly.
 	
@@ -41,11 +43,11 @@ public class Liquid {
 //			System.out.println("Total " + LiquidType.values()[i].name() + ": " + totals[i]);
 //		}
 		Profiler.start2();
-		for(Tile tile : world.getTilesRandomly()) {
+		for(Tile tile : world.getTiles()) {
 			liquidAmountsTemp[tile.getLocation().x][tile.getLocation().y] = world.get(tile.getLocation()).liquidAmount;
 			liquidTypesTemp[tile.getLocation().x][tile.getLocation().y] = world.get(tile.getLocation()).liquidType;
 		}
-		Profiler.end2("A");
+		Profiler.end2("copy");
 //		for(int x = 0; x < world.getWidth(); x++) {
 //			for(int y = 0; y < world.getHeight(); y++) {
 //				liquidAmountsTemp[x][y] = world.get(new TileLoc(x, y)].liquidAmount;
@@ -54,10 +56,41 @@ public class Liquid {
 //		}
 
 		Profiler.start2();
-		for(Tile tile : world.getTiles()) {
-			propogate(tile, world);
+		long startTime = System.currentTimeMillis();
+		if(MULTITHREADED) {
+			for(ArrayList<Tile> tiles : world.getLiquidSimulationPhases()) {
+				int chunkSize = tiles.size()/world.getWidth();
+				chunkSize = chunkSize<1 ? 1 : chunkSize;
+				ArrayList<Future<?>> futures = new ArrayList<>();
+				for(int chunkIndex = 0; chunkIndex < tiles.size(); chunkIndex+=chunkSize) {
+					final int start = chunkIndex;
+					final int end = Math.min(chunkIndex + chunkSize, tiles.size());
+					Future<?> future = Utils.executorService.submit(() -> {
+						for(int i = start; i < end; i++) {
+							propogate(tiles.get(i), world);
+						}
+					});
+					futures.add(future);
+				}
+				try {
+					for(Future<?> future : futures) {
+						future.get();
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
+			}
 		}
-		Profiler.end2("B");
+		else {
+			for(Tile tile : world.getTiles()) {
+				propogate(tile, world);
+			}
+		}
+		long elapsed = System.currentTimeMillis() - startTime;
+		System.err.println(elapsed);
+		Profiler.end2("propogate");
 
 		Profiler.start2();
 		for(Tile tile : world.getTiles()) {
@@ -86,7 +119,8 @@ public class Liquid {
 				tile.liquidAmount -= 0.00001;
 			}
 		}
-		Profiler.end2("C");
+		Profiler.end2("effects");
+		Profiler.printLog();
 		//Utils.normalize(heightMap);
 	}
 	private static void propogate(Tile tile, World world) {
@@ -120,12 +154,14 @@ public class Liquid {
 					if(myv < MINIMUM_LIQUID_THRESHOLD && change < otype.surfaceTension) { 
 						change = 0;
 					}
-					if(myh < oh) {
-						double deltah = oh - myh;
-						double changeh = deltah/2 * Math.min(change* FRICTION_RATIO, 1);
-						world.get(current).setHeight(world.get(current).getHeight() + changeh);
-						world.get(other).setHeight(world.get(other).getHeight() - changeh);
-					}
+					// disabled erosion due to making it hard to parallelize
+					// could probably fix by making height variable in Tile volatile
+//					if(myh < oh) {
+//						double deltah = oh - myh;
+//						double changeh = deltah/2 * Math.min(change* FRICTION_RATIO, 1);
+//						world.get(current).setHeight(world.get(current).getHeight() + changeh);
+//						world.get(other).setHeight(world.get(other).getHeight() - changeh);
+//					}
 					liquidAmountsTemp[x][y] += change;
 					liquidTypesTemp[x][y] = otype;
 					

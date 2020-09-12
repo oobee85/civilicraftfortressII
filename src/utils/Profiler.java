@@ -14,6 +14,9 @@ public class Profiler {
 		
 	}
 	private static HashMap<String, Long> timings = new HashMap<>();
+	private static LinkedList<String> keyOrder = new LinkedList<>();
+	
+	
 	private static LinkedList<LogEntry> entries = new LinkedList<>();
 	private static long startTime;
 	private static long startTime2;
@@ -31,6 +34,7 @@ public class Profiler {
 		long delta = System.currentTimeMillis() - startTime2;
 		if(!timings.containsKey(text)) {
 			timings.put(text, delta);
+			keyOrder.add(text);
 		}
 		else {
 			timings.put(text, timings.get(text) + delta);
@@ -54,10 +58,14 @@ public class Profiler {
 		
 		String categories = "";
 		String times = "";
-		for(Entry<String, Long> entry : timings.entrySet()) {
-			categories += entry.getKey() + ",";
-			times += entry.getValue() + ",";
+		for(String key : keyOrder) {
+			categories += key + ",";
+			times += timings.get(key) + ",";
 		}
+//		for(Entry<String, Long> entry : timings.entrySet()) {
+//			categories += entry.getKey() + ",";
+//			times += entry.getValue() + ",";
+//		}
 		System.out.println("Cumulative table:");
 		System.out.println(categories);
 		System.out.println(times);

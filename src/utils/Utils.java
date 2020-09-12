@@ -31,7 +31,7 @@ public final class Utils {
 		}
 	}
 	
-	private static ExecutorService executorService = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors()-1, 1));
+	public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	
 	public static String getName(Object o) {
 		// TODO use map to record these so I can just lookup
