@@ -4,6 +4,7 @@ import java.awt.image.*;
 import java.net.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.*;
 
 import javax.swing.*;
 
@@ -29,6 +30,8 @@ public final class Utils {
 			}
 		}
 	}
+	
+	public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	
 	public static String getName(Object o) {
 		// TODO use map to record these so I can just lookup
@@ -155,13 +158,13 @@ public final class Utils {
 	 * @param alpha
 	 */
 	public static Color blendColors(Color top, Color bottom, double alpha) {
-		alpha = Math.max(Math.min(alpha, 1), 0);
-		return new Color(snap((int) (top.getRed()*alpha + bottom.getRed()*(1-alpha))), 
-				snap((int) (top.getGreen()*alpha + bottom.getGreen()*(1-alpha))),
-				snap((int) (top.getBlue()*alpha + bottom.getBlue()*(1-alpha))));
-	}
-	private static int snap(int color) {
-		return Math.min(Math.max(color, 0), 255);
+		alpha = alpha > 1 ? 1 : (alpha < 0 ? 0 : alpha);
+		double beta = 1-alpha;
+		return new Color(
+				(int) (top.getRed()*alpha + bottom.getRed()*beta),
+				(int) (top.getGreen()*alpha + bottom.getGreen()*beta),
+				(int) (top.getBlue()*alpha + bottom.getBlue()*beta)
+				);
 	}
 	
 	public static double getAlphaOfLiquid(double amount) {
@@ -197,26 +200,44 @@ public final class Utils {
 	 * @return
 	 */
 	public static double[][] smoothingFilter(double[][] data, double radius, double c) {
-		double[][] smoothed = new double[data.length][data[0].length];
+		ArrayList<Future<double[]>> tasks = new ArrayList<>(data.length);
 		// apply smoothing filter
+		// each thread applies smoothing for 1 row
 		for (int i = 0; i < data.length; i++) {
-			for (int j = 0; j < data[0].length; j++) {
-				int mini = (int) Math.max(0, i-radius);
-				int maxi = (int) Math.min(data.length-1, i+radius);
-				int minj = (int) Math.max(0, j-radius);
-				int maxj = (int) Math.min(data[0].length-1, j+radius);
-				double count = 0;
-				for(int ii = mini; ii <= maxi; ii++) {
-					for(int jj = minj; jj < maxj; jj++) {
-						double distance = Math.sqrt((ii-i)*(ii-i) + (jj-j)*(jj-j));
-						double gaussian = Math.exp(-distance*distance / c);
-						smoothed[i][j] += gaussian * data[ii][jj];
-						//smoothed[i][j] += data[ii][jj];
-						count += gaussian;
+			final int myI = i;
+			Future<double[]> future = executorService.submit(() -> {
+				double[] myRow = new double[data[0].length];
+				for (int j = 0; j < data[0].length; j++) {
+					int mini = (int) Math.max(0, myI-radius);
+					int maxi = (int) Math.min(data.length-1, myI+radius);
+					int minj = (int) Math.max(0, j-radius);
+					int maxj = (int) Math.min(data[0].length-1, j+radius);
+					double count = 0;
+					for(int ii = mini; ii <= maxi; ii++) {
+						for(int jj = minj; jj < maxj; jj++) {
+							double distance = Math.sqrt((ii-myI)*(ii-myI) + (jj-j)*(jj-j));
+							double gaussian = Math.exp(-distance*distance / c);
+							myRow[j] += gaussian * data[ii][jj];
+							count += gaussian;
+						}
 					}
+					myRow[j] /= count;
 				}
-				smoothed[i][j] /= count;
+				return myRow;
+			});
+			tasks.add(future);
+		}
+		// combine the results from all the threads
+		double[][] smoothed = new double[data.length][];
+		try {
+			for (int i = 0; i < data.length; i++) {
+				Future<double[]> task = tasks.get(i);
+				smoothed[i] = task.get();
 			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
 		return smoothed;
 	}

@@ -39,7 +39,7 @@ public class Generation {
 				combinedNoise[i][j] = rand;
 			}
 		}
-		
+
 		double[][] heightMap = Utils.smoothingFilter(combinedNoise, smoothingRadius, 100);
 		Utils.normalize(heightMap);
 //		for (int i = 0; i < width; i++) {

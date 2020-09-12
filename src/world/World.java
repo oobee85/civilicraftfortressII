@@ -22,6 +22,9 @@ public class World {
 	public final boolean isNight = false;
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
+	
+	private static final int NUM_LIQUID_SIMULATION_PHASES = 9;
+	private ArrayList<ArrayList<Tile>> liquidSimulationPhases = new ArrayList<>(NUM_LIQUID_SIMULATION_PHASES);
 	private Tile[][] tiles;
 	private ConcurrentLinkedQueue<Tile> territory = new ConcurrentLinkedQueue<Tile>();;
 	
@@ -68,6 +71,9 @@ public class World {
 	public LinkedList<Tile> getTilesRandomly() {
 		Collections.shuffle(tileListRandom);
 		return tileListRandom;
+	}
+	public ArrayList<ArrayList<Tile>> getLiquidSimulationPhases() {
+		return liquidSimulationPhases;
 	}
 	
 	public Tile get(TileLoc loc) {
@@ -626,10 +632,15 @@ public class World {
 	}
 	
 	public void generateWorld(MapType mapType, int size) {
+		liquidSimulationPhases.clear();
+		for(int i = 0; i < NUM_LIQUID_SIMULATION_PHASES; i++) {
+			liquidSimulationPhases.add(new ArrayList<>());
+		}
 		width = size;
 		height = size;
 		tiles = new Tile[width][height];
 		int smoothingRadius = (int) (Math.sqrt((width + height)/2)/2);
+		
 		double[][] heightMap = Generation.generateHeightMap(smoothingRadius, width, height);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		for (int i = 0; i < width; i++) {
@@ -637,21 +648,26 @@ public class World {
 				tiles[i][j] = Tile.makeTile(new TileLoc(i, j), Terrain.DIRT);
 				tileList.add(tiles[i][j]);
 				tileListRandom.add(tiles[i][j]);
+				
+				// This one only has 5 phases
+//				int phase = (i + 5 - (2*j)%5) % 5;
+				// but this one has fewer cache invalidations
+				int phase = 3*(i%3) + j%3;
+				liquidSimulationPhases.get(phase).add(tiles[i][j]);
 			}
 		}
-		
+
 		for(Tile tile : getTiles()) {
 			tile.setNeighbors(getNeighbors(tile));
 		}
-		
+
 		volcano = Generation.makeVolcano(this, heightMap);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
-		
+
 		for(Tile tile : getTiles()) {
 			tile.setHeight(heightMap[tile.getLocation().x][tile.getLocation().y]);
 		}
 
-		
 		for(Tile tile : getTiles()) {
 			if(tile.getTerrain() == Terrain.DIRT) {
 				Terrain t;
@@ -673,7 +689,6 @@ public class World {
 				tile.setTerrain(t);
 			}
 		}
-		
 		
 		int numTiles = width*height;
 		Generation.makeLake(numTiles * 1.0/100, this);

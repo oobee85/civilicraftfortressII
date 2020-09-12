@@ -445,6 +445,10 @@ public class Game {
 		public Path() {
 			cost = 0;
 		}
+		public Path(Path other) {
+			tiles.addAll(other.tiles);
+			this.cost = other.cost;
+		}
 		public void addTile(Tile tile, double addedCost) {
 			tiles.add(tile);
 			cost += addedCost;
@@ -453,12 +457,7 @@ public class Game {
 			return tiles.getLast();
 		}
 		public Path clone() {
-			Path p = new Path();
-			for(Tile t : tiles) {
-				p.addTile(t, 0);
-			}
-			p.cost = cost;
-			return p;
+			return new Path(this);
 		}
 		public double getCost() {
 			return cost;
