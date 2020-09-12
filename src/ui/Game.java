@@ -174,8 +174,11 @@ public class Game {
 		if(ticks >= 2000 && Math.random() < 0.0001) {
 			world.spawnAnimal(UnitType.PARASITE, world.getTilesRandomly().getFirst());
 		}
-		if(ticks >= 100 && Math.random() < (0.00005 * numCutTrees/5)) {
+		if(ticks >= 1000 && Math.random() < (0.00005 * numCutTrees/5)) {
 			world.spawnEnt();
+		}
+		if(ticks >= 1000 && Math.random() < 0.00001 ) {
+			spawnOrcs();
 		}
 		if(buildingsUntilOgre == world.buildings.size()) {
 			world.spawnOgre();
@@ -263,6 +266,58 @@ public class Game {
 				resources.get(itemType).addAmount(999);
 			}
 		}
+	}
+	public void spawnOrcs() {
+		LinkedList<Tile> tiles = world.getTilesRandomly();
+		Tile tile = tiles.peek();
+		for(Tile t : tiles) {
+			if(t.getTerrain() == Terrain.ROCK) {
+				tile = t;
+				break;
+			}
+		}
+		TileLoc tloc = new TileLoc(tile.getLocation().x-1, tile.getLocation().y-1);
+		Tile barracks = world.get(tloc) ;
+		summonThing(tile, null, BuildingType.BARRACKS, false);
+		summonThing(barracks, null, BuildingType.BARRACKS, false);
+		
+		//makes the walls
+		for(int i = 0; i < 6; i ++) {
+			
+			TileLoc wallLoc = new TileLoc(tile.getLocation().x-3, tile.getLocation().y-3 + i);
+			Tile wall = world.get(wallLoc) ;
+			if(wallLoc.x <= 0 || wallLoc.y <= 0) {
+				continue;
+			}
+			if(i != 3) {
+				summonThing(wall, null, BuildingType.WALL_WOOD, false);
+			}
+			
+			
+			wallLoc = new TileLoc(tile.getLocation().x+3, tile.getLocation().y-3 + i);
+			wall = world.get(wallLoc) ;
+			if(i != 3) {
+				summonThing(wall, null, BuildingType.WALL_WOOD, false);
+			}
+			
+			
+			wallLoc = new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y-3);
+			wall = world.get(wallLoc) ;
+			summonThing(wall, null, BuildingType.WALL_WOOD, false);
+			
+			wallLoc = new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y+3);
+			wall = world.get(wallLoc) ;
+			summonThing(wall, null, BuildingType.WALL_WOOD, false);
+		}
+		for(int i = -1; i < 2; i ++) {
+			for(int j = -1; j < 2; j ++) {
+				tloc = new TileLoc(tile.getLocation().x + i, tile.getLocation().y + j);
+				Tile temp = world.get(tloc);
+				world.spawnAnimal(UnitType.CYCLOPS, temp);
+			}
+			
+		}
+		
 	}
 	public void updateTerrainImages() {
 		BufferedImage[] images = world.createTerrainImage();
@@ -577,7 +632,7 @@ public class Game {
 			else if(thing instanceof UnitType) {
 				UnitType type = (UnitType)thing;
 				if (current.liquidAmount < current.liquidType.getMinimumDamageAmount()) {
-					summonUnit(current, type, true);
+					summonThing(current, type, null, true);
 					thing = null;
 				}
 			}
@@ -1143,11 +1198,20 @@ public class Game {
 	public void aControl(boolean enabled) {
 		aControl = enabled;
 	}
-	private void summonUnit(Tile tile, UnitType type, boolean playerControlled) {
-		System.out.println("trying to spawn unit" + type.toString() +tile.getLocation());
-		Unit unit = new Unit(type, tile, playerControlled);
-//		tile.addUnit(unit);
-		world.newUnits.add(unit);
+	private void summonThing(Tile tile, UnitType unitType, BuildingType buildingType, boolean playerControlled) {
+		
+		if(unitType != null) {
+			System.out.println("spawn unit" + unitType.toString() +tile.getLocation());
+			Unit unit = new Unit(unitType, tile, playerControlled);
+			world.newUnits.add(unit);
+		}
+		if(buildingType != null) {
+			System.out.println("spawn building" + buildingType.toString() +tile.getLocation());
+			Building building = new Building(buildingType, tile);
+			building.setRemainingEffort(0);
+			world.buildings.add(building);
+		}
+		
 	}
 	
 	public void toggleTargetEnemy(Tile tile) {

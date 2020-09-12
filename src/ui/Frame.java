@@ -864,6 +864,7 @@ public class Frame extends JPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				gameInstance.world.rain();
 				gameInstance.world.grow();
+			
 			}
 		});
 
@@ -921,6 +922,7 @@ public class Frame extends JPanel {
 				gameInstance.world.spawnEnt();
 				gameInstance.world.spawnLavaGolem();
 				gameInstance.world.spawnAnimal(UnitType.BOMB, gameInstance.world.getTilesRandomly().getFirst());
+				gameInstance.spawnOrcs();
 			}
 		});
 

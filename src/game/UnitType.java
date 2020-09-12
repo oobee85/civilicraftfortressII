@@ -13,7 +13,7 @@ import world.ResourceType;
 
 public enum UnitType implements HasImage {
 	WORKER           ( "resources/Images/units/worker.png", 	new CombatStats(100,  0, 15, 1, 20, 30, 50), false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50);  }}, null, null ),
- 	WARRIOR         ( "resources/Images/units/warrior.png", 	new CombatStats(200, 10, 10, 1, 20, 50, 50),  false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.WOOD,50); }}, null, null ),
+ 	WARRIOR         ( "resources/Images/units/warrior.png", 	new CombatStats(200, 10, 15, 1, 20, 50, 50),  false, false, false, null, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.WOOD,50); }}, null, null ),
  	SPEARMAN       ( "resources/Images/units/spearman.png", 	new CombatStats(400, 10, 15, 1, 20, 50, 50), false, false, false, ResearchType.BRONZE_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.BRONZE_SWORD,1);}}, null, null ),
  	ARCHER           ( "resources/Images/units/archer.png", 	new CombatStats(200, 10, 15, 3, 30, 100, 50), false, false, false, ResearchType.WARRIOR_CODE, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.BRONZE_BAR,1); }}, null, ProjectileType.ARROW_ARCHER ),
  	SWORDSMAN     ( "resources/Images/units/swordsman.png",		new CombatStats(300, 20, 15, 1, 20, 100, 50), false, false, false, ResearchType.IRON_WORKING, new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,100); put(ItemType.IRON_SWORD,1);}}, null, null ),
@@ -40,14 +40,15 @@ public enum UnitType implements HasImage {
 	
 	OGRE	   ("resources/Images/units/ogre.png",		new CombatStats(1000, 40, 50, 1, 40, 0, 5), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
 	ENT		   ("resources/Images/units/ent.png",		new CombatStats(1000, 50, 50, 1, 100, 0, 10), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
-	WEREWOLF   ("resources/Images/units/werewolf.png",	new CombatStats(200, 20, 10, 1, 5, 0, 10), 		false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
+	WEREWOLF   ("resources/Images/units/werewolf.png",	new CombatStats(100, 20, 10, 1, 5, 0, 10), 		false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
 	LAVAGOLEM  ("resources/Images/units/lavagolem.png", new CombatStats(1000, 50, 50, 1, 100, 0, 10), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
 	WOLF		("resources/Images/units/wolf.png",		new CombatStats(200, 40, 15, 1, 20, 0, 50), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
 	CYCLOPS    ("resources/Images/units/cyclops.png", 	new CombatStats(500, 80, 50, 6, 40, 0, 10), 	false, true, true, null, null, ResourceType.DEAD_ANIMAL, ProjectileType.ROCK_CYCLOPS),
+	SKELETON	("resources/Images/units/skeleton.png",	new CombatStats(200, 10, 20, 1, 20, 0, 50), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
 	
 	FLAMELET	    ("resources/Images/units/flamelet.png", new CombatStats(1, 0, 25, 0, 1000, 0, 50), 	false, false, true, null, null, null, null),
 	WATER_SPIRIT ("resources/Images/units/waterspirit.png", new CombatStats(1, 0, 25, 0, 1000, 0, 50), 	false, false, false, null, null, null, null),
-	PARASITE	 ("resources/Images/units/parasite.png", 	new CombatStats(1, 0, 1, 0, 1000, 0, 50), 	false, false, true, null, null, null, null),
+	PARASITE	 ("resources/Images/units/parasite.png", 	new CombatStats(1, 0, 5, 0, 1000, 0, 50), 	false, false, true, null, null, null, null),
 	FIREFLY			("resources/Images/units/firefly.png",	new CombatStats(1, 0, 25, 1, 1000, 0, 50),  false, false, false, null, null, null, null),
 	BOMB			("resources/Images/units/bomb.png",		new CombatStats(1, 0, 25, 1, 1000, 0, 50),  false, false, false, null, null, null, null),
 	;

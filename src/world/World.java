@@ -195,6 +195,7 @@ public class World {
 		Wildlife.addAnimal(animal);
 	}
 	
+	
 	public void meteorStrike() {
 		
 		Tile t = this.getTilesRandomly().getFirst();

@@ -166,13 +166,6 @@ public class Tile {
 
 	public void setBuilding(Building b) {
 		building = b;
-//		if (building != null) {
-//			return;
-//		}
-//		if (b != null) {
-//			building = b;
-////			building.setHealth(1);
-//		}
 	}
 	public void setModifier(GroundModifier gm) {
 		modifier = gm;
@@ -225,10 +218,9 @@ public class Tile {
 		if(getHasBuilding() == false) {
 			return false;
 		}
-//		&& u.isPlayerControlled() == false
 		if((building.getBuildingType() == BuildingType.GATE_WOOD 
 				|| building.getBuildingType() == BuildingType.GATE_STONE 
-				|| building.getBuildingType() == BuildingType.GATE_BRICK) ) {
+				|| building.getBuildingType() == BuildingType.GATE_BRICK) && u.isPlayerControlled() == false) {
 			return true;
 		}
 		
