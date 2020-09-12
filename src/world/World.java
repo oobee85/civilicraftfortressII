@@ -219,12 +219,9 @@ public class World {
 		TileLoc tileLoc = tile.getLocation();
 		int x = tileLoc.x;
 		int y = tileLoc.y;
-		for(int i = x - radius ; i <= x + radius ; i ++) {
-			for(int j = y - radius ; j <= y + radius ; j ++) {
+		for(int i = Math.max(x - radius, 0) ; i <= x + radius && i < tiles.length ; i ++) {
+			for(int j = Math.max(y - radius, 0) ; j <= y + radius && j < tiles[i].length ; j ++) {
 				if(Math.abs(i - x) + Math.abs(j - y) >= radius) {
-					continue;
-				}
-				if( i < 0 || j < 0 || i > 127 || j > 127 ) {
 					continue;
 				}
 				neighbors.add(tiles[i][j]);
