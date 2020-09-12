@@ -158,13 +158,13 @@ public final class Utils {
 	 * @param alpha
 	 */
 	public static Color blendColors(Color top, Color bottom, double alpha) {
-		alpha = Math.max(Math.min(alpha, 1), 0);
-		return new Color(snap((int) (top.getRed()*alpha + bottom.getRed()*(1-alpha))), 
-				snap((int) (top.getGreen()*alpha + bottom.getGreen()*(1-alpha))),
-				snap((int) (top.getBlue()*alpha + bottom.getBlue()*(1-alpha))));
-	}
-	private static int snap(int color) {
-		return Math.min(Math.max(color, 0), 255);
+		alpha = alpha > 1 ? 1 : (alpha < 0 ? 0 : alpha);
+		double beta = 1-alpha;
+		return new Color(
+				(int) (top.getRed()*alpha + bottom.getRed()*beta),
+				(int) (top.getGreen()*alpha + bottom.getGreen()*beta),
+				(int) (top.getBlue()*alpha + bottom.getBlue()*beta)
+				);
 	}
 	
 	public static double getAlphaOfLiquid(double amount) {
