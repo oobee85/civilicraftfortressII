@@ -62,10 +62,6 @@ public class Profiler {
 			categories += key + ",";
 			times += timings.get(key) + ",";
 		}
-//		for(Entry<String, Long> entry : timings.entrySet()) {
-//			categories += entry.getKey() + ",";
-//			times += entry.getValue() + ",";
-//		}
 		System.out.println("Cumulative table:");
 		System.out.println(categories);
 		System.out.println(times);

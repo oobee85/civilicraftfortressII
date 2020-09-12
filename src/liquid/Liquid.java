@@ -42,12 +42,10 @@ public class Liquid {
 //		for(int i = 0; i < totals.length; i++) {
 //			System.out.println("Total " + LiquidType.values()[i].name() + ": " + totals[i]);
 //		}
-		Profiler.start2();
 		for(Tile tile : world.getTiles()) {
 			liquidAmountsTemp[tile.getLocation().x][tile.getLocation().y] = world.get(tile.getLocation()).liquidAmount;
 			liquidTypesTemp[tile.getLocation().x][tile.getLocation().y] = world.get(tile.getLocation()).liquidType;
 		}
-		Profiler.end2("copy");
 //		for(int x = 0; x < world.getWidth(); x++) {
 //			for(int y = 0; y < world.getHeight(); y++) {
 //				liquidAmountsTemp[x][y] = world.get(new TileLoc(x, y)].liquidAmount;
@@ -55,8 +53,6 @@ public class Liquid {
 //			}
 //		}
 
-		Profiler.start2();
-		long startTime = System.currentTimeMillis();
 		if(MULTITHREADED) {
 			for(ArrayList<Tile> tiles : world.getLiquidSimulationPhases()) {
 				int chunkSize = tiles.size()/world.getWidth();
@@ -88,11 +84,7 @@ public class Liquid {
 				propogate(tile, world);
 			}
 		}
-		long elapsed = System.currentTimeMillis() - startTime;
-		System.err.println(elapsed);
-		Profiler.end2("propogate");
 
-		Profiler.start2();
 		for(Tile tile : world.getTiles()) {
 			int x = tile.getLocation().x;
 			int y = tile.getLocation().y;
@@ -119,8 +111,6 @@ public class Liquid {
 				tile.liquidAmount -= 0.00001;
 			}
 		}
-		Profiler.end2("effects");
-		Profiler.printLog();
 		//Utils.normalize(heightMap);
 	}
 	private static void propogate(Tile tile, World world) {

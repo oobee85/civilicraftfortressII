@@ -15,7 +15,6 @@ public class Generation {
 	public static double[][] generateHeightMap(int smoothingRadius, int width, int height) {
 		LinkedList<double[][]> noises = new LinkedList<>();
 
-//		Profiler.start2();
 		for (int octave = 2; octave <= width; octave *= 2) {
 			double[][] noise1 = new double[octave][octave];
 			for (int i = 0; i < noise1.length; i++) {
@@ -25,9 +24,7 @@ public class Generation {
 			}
 			noises.add(noise1);
 		}
-//		Profiler.end2("D");
 
-//		Profiler.start2();
 		double[][] combinedNoise = new double[width][height];
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
@@ -42,14 +39,9 @@ public class Generation {
 				combinedNoise[i][j] = rand;
 			}
 		}
-//		Profiler.end2("E");
 
-//		Profiler.start2();
 		double[][] heightMap = Utils.smoothingFilter(combinedNoise, smoothingRadius, 100);
-//		Profiler.end2("F");
-//		Profiler.start2();
 		Utils.normalize(heightMap);
-//		Profiler.end2("G");
 //		for (int i = 0; i < width; i++) {
 //			for (int j = 0; j < height; j++) {
 //				heightMap[i][j] *= heightMap[i][j];
