@@ -108,7 +108,7 @@ public class Unit extends Thing {
 				|| (currentPath != null && !currentPath.isEmpty() && !currentPath.getFirst().canMove(this))) {
 			currentPath = Pathfinding.getBestPath(this, this.getTile(), tile);
 		}
-		if(!currentPath.isEmpty()) {
+		if(currentPath != null && !currentPath.isEmpty()) {
 			Tile targetTile = currentPath.getFirst();
 			boolean success = this.moveTo(targetTile);
 			if(success) {

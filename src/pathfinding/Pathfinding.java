@@ -122,6 +122,9 @@ public class Pathfinding {
 			}
 		}
 		Node prev = bestNode;
+		if(prev == null) {
+			return null;
+		}
 		while(prev.previous != null) {
 			if(reverseFinish) {
 				bestTilePath.addLast(prev.tile);
