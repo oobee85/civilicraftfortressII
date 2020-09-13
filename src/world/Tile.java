@@ -212,19 +212,23 @@ public class Tile {
 	}
 
 	public boolean isBlocked(Unit u) {
-		if (u.getUnitType().isFlying()) {
+		if(u.getType().isFlying()) {
 			return false;
 		}
 		if(getHasBuilding() == false) {
 			return false;
 		}
-		if((building.getBuildingType() == BuildingType.GATE_WOOD 
-				|| building.getBuildingType() == BuildingType.GATE_STONE 
-				|| building.getBuildingType() == BuildingType.GATE_BRICK) && u.isPlayerControlled() == false) {
+		BuildingType bt = building.getBuildingType();
+		if(bt == BuildingType.WALL_WOOD || bt == BuildingType.WALL_STONE || bt == BuildingType.WALL_BRICK) {
 			return true;
 		}
-		
-		return getBuilding().getBuildingType().canMoveThrough() == false;
+
+		if((building.getBuildingType() == BuildingType.GATE_WOOD 
+				|| building.getBuildingType() == BuildingType.GATE_STONE 
+				|| building.getBuildingType() == BuildingType.GATE_BRICK) && u.isPlayerControlled() == building.getIsPlayerControlled()) {
+			return false;
+		}
+		return false;
 	}
 
 	public Road getRoad() {

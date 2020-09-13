@@ -17,15 +17,17 @@ public class Building extends Thing {
 	private Tile spawnLocation;
 	private double timeToHarvest;
 	private double baseTimeToHarvest = 10;
-
+	private boolean isPlaterControlled;
+	
 	private ResearchRequirement req = new ResearchRequirement();
 	
-	public Building(BuildingType buildingType, Tile tile) {
+	public Building(BuildingType buildingType, Tile tile, boolean isPlayerControlled) {
 		super(buildingType.getHealth(), buildingType, true, tile);
 		this.remainingEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
 		this.spawnLocation = tile;
 		this.timeToHarvest = baseTimeToHarvest;
+		this.isPlaterControlled = isPlaterControlled;
 		
 	}
 	public void tick() {
@@ -67,6 +69,10 @@ public class Building extends Thing {
 			culture += buildingType.cultureRate;
 		}
 		
+	}
+	
+	public boolean getIsPlayerControlled(){
+		return isPlaterControlled;
 	}
 	public LinkedList<Unit> getBuildingUnit() {
 		return buildingUnitList;

@@ -621,7 +621,7 @@ public class Game {
 						&& !current.getHasBuilding()
 						&& current.liquidAmount < current.liquidType.getMinimumDamageAmount()
 						&& (current.getTerrain() != Terrain.ROCK || type != BuildingType.CASTLE)) {
-					Building s = new Building(type, current);
+					Building s = new Building(type, current, true);
 					current.setBuilding(s);
 					world.buildings.add(s);
 					s.setRemainingEffort(0);
@@ -1172,7 +1172,7 @@ public class Game {
 		}
 		if (selectedBuildingToSpawn != null) {
 			System.out.println("trying to spawn building" + selectedBuildingToSpawn.toString() + loc.toString());
-			Building building = new Building(selectedBuildingToSpawn, tile);
+			Building building = new Building(selectedBuildingToSpawn, tile, true);
 			tile.setBuilding(building);
 			world.buildings.add(building);
 			building.expendEffort(building.getBuildingType().getBuildingEffort());
@@ -1206,7 +1206,7 @@ public class Game {
 		}
 		if(buildingType != null) {
 			System.out.println("spawn building" + buildingType.toString() +tile.getLocation());
-			Building building = new Building(buildingType, tile);
+			Building building = new Building(buildingType, tile, playerControlled);
 			building.setRemainingEffort(0);
 			world.buildings.add(building);
 		}
@@ -1508,7 +1508,7 @@ public class Game {
 						resources.get(key).addAmount(-value);
 					}
 
-					Building building = new Building(bt, thing.getTile());
+					Building building = new Building(bt, thing.getTile(), true);
 					thing.getTile().setBuilding(building);
 					world.buildings.add(building);
 
@@ -1562,7 +1562,7 @@ public class Game {
 	public void tryToBuildUnit(UnitType u) {
 		
 		for(Thing thing : selectedThings) {
-			if(thing != null && thing instanceof Building ) {
+			if(selectedThings != null && thing instanceof Building ) {
 				buildUnit(u, thing.getTile());
 			}
 		}
