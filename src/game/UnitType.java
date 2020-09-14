@@ -42,7 +42,7 @@ public enum UnitType implements HasImage {
 	ENT		   ("resources/Images/units/ent.png",		new CombatStats(1000, 50, 50, 1, 100, 0, 10), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
 	WEREWOLF   ("resources/Images/units/werewolf.png",	new CombatStats(100, 20, 10, 1, 5, 0, 10), 		false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
 	LAVAGOLEM  ("resources/Images/units/lavagolem.png", new CombatStats(1000, 50, 50, 1, 100, 0, 10), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
-	WOLF		("resources/Images/units/wolf.png",		new CombatStats(200, 40, 15, 1, 20, 0, 50), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
+	WOLF		("resources/Images/units/wolf.png",		new CombatStats(200, 40, 20, 1, 20, 0, 50), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
 	CYCLOPS    ("resources/Images/units/cyclops.png", 	new CombatStats(500, 80, 50, 6, 40, 0, 10), 	false, true, true, null, null, ResourceType.DEAD_ANIMAL, ProjectileType.ROCK_CYCLOPS),
 	SKELETON	("resources/Images/units/skeleton.png",	new CombatStats(200, 10, 20, 1, 20, 0, 50), 	false, false, true, null, null, ResourceType.DEAD_ANIMAL, null),
 	

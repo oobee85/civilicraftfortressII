@@ -1181,7 +1181,7 @@ public class Game {
 				selectedBuildingToSpawn = null;
 			}
 		}
-		toggleUnitSelectOnTile(tile);
+		toggleSelectionOnTile(tile);
 		return;
 		
 //		guiController.openRightClickMenu(mx, my, world.get(loc]);
@@ -1294,10 +1294,15 @@ public class Game {
 		setSpawnLocation(tile);
 	}
 
-	public void toggleUnitSelectOnTile(Tile tile) {
+	public void toggleSelectionOnTile(Tile tile) {
 //		Thing selectionCandidate = tile.getPlayerControlledThing();
 		ConcurrentLinkedQueue<Unit> unitsOnTile = tile.getUnits();
 		Building building = tile.getBuilding();
+		
+		//deselects everything if shift isnt enabled
+		if (shiftEnabled == false) {
+			deselectThings();
+		}
 		
 		//selects the building on the tile
 		if(building != null) {
@@ -1313,20 +1318,22 @@ public class Game {
 			if (candidate == null) {
 				return;
 			}
+			
+			// clicking on new selection
+			if (candidate.isPlayerControlled()) {
+				candidate.setIsSelected(true);
+				guiController.selectedUnit(candidate, true);
+				selectedThings.add(candidate);
+			}
 			// clicking only on current selection
 			if (selectedThings.contains(candidate) && selectedThings.size() == 0) {
 				deselectOneThing(candidate);
 			}
-			//deselects everything if shift isnt enabled
-			if (shiftEnabled == false) {
-				deselectThings();
-			}
 			
-			// clicking on new selection
-			candidate.setIsSelected(true);
-			guiController.selectedUnit(candidate, true);
 			
-			selectedThings.add(candidate);
+			
+			
+			
 		}
 		
 		
