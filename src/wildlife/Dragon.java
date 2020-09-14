@@ -10,11 +10,13 @@ public class Dragon extends Animal {
 	
 	private Tile home;
 	private int timeToFireball;
+	private int timeToSleep;
 	
 	public Dragon(Tile tile, boolean isPlayerControlled) {
 		super(UnitType.DRAGON, tile, isPlayerControlled);
 		home = tile;
 		this.timeToFireball = UnitType.DRAGON.getCombatStats().getAttackSpeed()*10;
+		this.timeToSleep = UnitType.DRAGON.getCombatStats().getMoveSpeed()*100;
 	}
 	
 	public Tile getHome() {
@@ -35,13 +37,25 @@ public class Dragon extends Animal {
 		if(timeToFireball > 0) {
 			timeToFireball --;
 		}
+		if(timeToSleep > 0) {
+			timeToSleep --;
+		}
 		
 	}
 	public void resetTimeToFireball() {
 		timeToFireball = UnitType.DRAGON.getCombatStats().getAttackSpeed()*10;
 	}
+	public void resetTimeToSleep() {
+		timeToSleep = UnitType.DRAGON.getCombatStats().getMoveSpeed()*100;
+	}
 	public boolean readyToFireball() {
 		return timeToFireball <= 0;
+	}
+	public boolean readyToWakeUp() {
+		return timeToSleep <= 0;
+	}
+	public int getTimeToSleep() {
+		return timeToSleep;
 	}
 	@Override
 	public double attack(Thing other) {
@@ -55,7 +69,7 @@ public class Dragon extends Animal {
 
 	@Override
 	public boolean wantsToAttack() {
-		return true;
+		return readyToWakeUp();
 	}
 	
 	public void moveAroundTarget() {
@@ -77,14 +91,14 @@ public class Dragon extends Animal {
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
 		//chance to attack either wildlife or player
-		if(Math.random() < 0.95) {
+//		if(Math.random() < 0.95) {
 			for (Animal a : animals) {
 				if (a != null) {
 					setTarget(animals.get((int) (Math.random() * animals.size())));
 					return;
 				}
 			}
-		} else {
+//		} else {
 			
 			//chance to attack building or unit
 //			if(Math.random() < 0.4) {
@@ -107,10 +121,15 @@ public class Dragon extends Animal {
 //			}
 			
 			
-		}
+//		}
 		
 		return;
 	}
-	
+	@Override 
+	public List<String> getDebugStrings(){
+		List<String> strings = super.getDebugStrings();
+//		strings.add(String.format("TTS=%.1f", getTimeToSleep()));
+		return strings;
+	}
 	
 }
