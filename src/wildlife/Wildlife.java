@@ -88,7 +88,7 @@ public class Wildlife {
 				
 			}
 			if(animal.isDead()) {
-				if(animal.getType().getDeadItem() != null) {
+				if(animal.getType().getDeadItem() != null && animal.getTarget() != null && animal.getTarget().isPlayerControlled()) {
 					animal.getTile().addItem(new Item(100, animal.getType().getDeadItem()));
 				}
 				dead.add(animal);

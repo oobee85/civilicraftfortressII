@@ -20,6 +20,7 @@ public class Game {
 	private Image greenHitsplatImage = Utils.loadImage("resources/Images/interfaces/greenhitsplat.png");
 	private Image targetImage = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
 	private Image spawnLocationImage = Utils.loadImage("resources/Images/interfaces/queuelocation.png");
+	private Image flag = Utils.loadImage("resources/Images/interfaces/flag.png");
 	private int skipUntilTick;
 	private BufferedImage terrainImage;
 	private BufferedImage minimapImage;
@@ -828,9 +829,11 @@ public class Game {
 					int strokeWidth = Game.tileSize /8;
 					g2d.setStroke(new BasicStroke(strokeWidth));
 					g.drawOval(unit.getTile().getLocation().x * Game.tileSize + strokeWidth/2, unit.getTile().getLocation().y * Game.tileSize + strokeWidth/2, Game.tileSize-1 - strokeWidth, Game.tileSize-1 - strokeWidth);
-					
 					g2d.setStroke(currentStroke);
 					Utils.setTransparency(g, 1f);
+					if(unit.getTargetTile() != null) {
+						g.drawImage(flag, unit.getTargetTile().getLocation().x * Game.tileSize, unit.getTargetTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+					}
 				}
 				
 				g.drawImage(unit.getImage(0), unit.getTile().getLocation().x * Game.tileSize, unit.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
@@ -845,6 +848,7 @@ public class Game {
 					g.fillRect(unit.getTile().getLocation().x * Game.tileSize + 10 * i, unit.getTile().getLocation().y * Game.tileSize, 5, 5);
 
 				}
+				
 
 			}
 			for(Projectile p : world.projectiles) {
@@ -1315,7 +1319,7 @@ public class Game {
 		}
 		
 		//selects the building on the tile
-		if(building != null) {
+		if(building != null && unitsOnTile.isEmpty()) {
 			if (shiftEnabled == false) {
 				deselectThings();
 			}

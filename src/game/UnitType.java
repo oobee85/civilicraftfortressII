@@ -30,7 +30,7 @@ public enum UnitType implements HasImage {
 	HORSE		("resources/Images/units/horse.png",	new CombatStats(200, 5, 5, 1, 40, 0, 50), 	false, false, false, null, null, ItemType.FOOD, null),
 	PIG			("resources/Images/units/pig.png",		new CombatStats(200, 10, 30, 1, 40, 0, 50), false, false, false, null, null, ItemType.FOOD, null),
 	SHEEP		("resources/Images/units/sheep.png",	new CombatStats(200, 5, 30, 1, 40, 0, 50), 	false, false, false, null, null, ItemType.FOOD, null),
-	FISH		("resources/Images/units/fish2.png",	new CombatStats( 10, 1, 5, 1, 40, 0, 50),  	true, false, false, null, null, null, null),
+	FISH		("resources/Images/units/fish2.png",	new CombatStats( 10, 1, 5, 1, 40, 0, 50),  	true, false, false, null, null, ItemType.FOOD, null),
 	COW			("resources/Images/units/cow.png",		new CombatStats(200, 10, 30, 1, 40, 0, 50), false, false, false, null, null, ItemType.FOOD, null),
 	
 	
@@ -39,14 +39,14 @@ public enum UnitType implements HasImage {
 	ROC			("resources/Images/units/roc.png",		new CombatStats(500, 50, 10, 1, 25, 0, 10), 	false, true, true, null, null, ItemType.FOOD, null),
 	
 	OGRE	   ("resources/Images/units/ogre.png",		new CombatStats(1000, 40, 50, 1, 40, 0, 5), 	false, false, true, null, null, ItemType.FOOD, null),
-	ENT		   ("resources/Images/units/ent.png",		new CombatStats(1000, 50, 50, 1, 100, 0, 10), 	false, false, true, null, null, ItemType.FOOD, null),
-	WEREWOLF   ("resources/Images/units/werewolf.png",	new CombatStats(100, 20, 10, 1, 5, 0, 10), 		false, false, true, null, null, ItemType.FOOD, null),
+	ENT		   ("resources/Images/units/ent.png",		new CombatStats(1000, 50, 50, 1, 100, 0, 10), 	false, false, true, null, null, ItemType.WOOD, null),
+	WEREWOLF   ("resources/Images/units/werewolf.png",	new CombatStats(100, 20, 10, 1, 5, 0, 10), 		false, false, true, null, null, null, null),
 	LAVAGOLEM  ("resources/Images/units/lavagolem.png", new CombatStats(1000, 50, 50, 1, 100, 0, 10), 	false, false, true, null, null, ItemType.FOOD, null),
 	WOLF		("resources/Images/units/wolf.png",		new CombatStats(200, 40, 20, 1, 20, 0, 50), 	false, false, true, null, null, ItemType.FOOD, null),
 	CYCLOPS    ("resources/Images/units/cyclops.png", 	new CombatStats(500, 80, 50, 6, 40, 0, 10), 	false, true, true, null, null, ItemType.FOOD, ProjectileType.ROCK_CYCLOPS),
 	SKELETON	("resources/Images/units/skeleton.png",	new CombatStats(200, 10, 20, 1, 20, 0, 50), 	false, false, true, null, null, ItemType.FOOD, null),
 	
-	FLAMELET	    ("resources/Images/units/flamelet.png", new CombatStats(1, 0, 25, 0, 1000, 0, 50), 	false, false, true, null, null, null, null),
+	FLAMELET	    ("resources/Images/units/flamelet.png", new CombatStats(1, 0, 25, 0, 1000, 0, 50), 	false, false, true, null, null, ItemType.COAL, null),
 	WATER_SPIRIT ("resources/Images/units/waterspirit.png", new CombatStats(1, 0, 25, 0, 1000, 0, 50), 	false, false, false, null, null, null, null),
 	PARASITE	 ("resources/Images/units/parasite.png", 	new CombatStats(1, 0, 5, 0, 1000, 0, 50), 	false, false, true, null, null, null, null),
 	FIREFLY			("resources/Images/units/firefly.png",	new CombatStats(1, 0, 25, 1, 1000, 0, 50),  false, false, false, null, null, null, null),
