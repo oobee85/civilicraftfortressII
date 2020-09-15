@@ -16,8 +16,8 @@ public class Building extends Thing {
 	public static double CULTURE_AREA_MULTIPLIER = 0.1;
 	private Tile spawnLocation;
 	private double timeToHarvest;
-	private double baseTimeToHarvest = 10;
-	private boolean isPlaterControlled;
+	private double baseTimeToHarvest = 20;
+	private boolean isPlayerControlled;
 	
 	private ResearchRequirement req = new ResearchRequirement();
 	
@@ -27,7 +27,7 @@ public class Building extends Thing {
 		this.buildingType = buildingType;
 		this.spawnLocation = tile;
 		this.timeToHarvest = baseTimeToHarvest;
-		this.isPlaterControlled = isPlaterControlled;
+		this.isPlayerControlled = isPlayerControlled;
 		
 	}
 	public void tick() {
@@ -72,7 +72,7 @@ public class Building extends Thing {
 	}
 	
 	public boolean getIsPlayerControlled(){
-		return isPlaterControlled;
+		return isPlayerControlled;
 	}
 	public LinkedList<Unit> getBuildingUnit() {
 		return buildingUnitList;
@@ -95,7 +95,7 @@ public class Building extends Thing {
 	public boolean isBuilt() {
 		return remainingEffort <= 0;
 	}
-	public BuildingType getBuildingType() {
+	public BuildingType getType() {
 		return buildingType;
 	}
 	

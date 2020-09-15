@@ -33,6 +33,7 @@ public class Tile {
 	
 	private ConcurrentLinkedQueue<Unit> units;
 	private ConcurrentLinkedQueue<Projectile> projectiles;
+	private ConcurrentLinkedQueue<Item> items;
 	
 	public double liquidAmount;
 	public LiquidType liquidType;
@@ -43,11 +44,11 @@ public class Tile {
 	private Tile(TileLoc location, Terrain t) {
 		this.location = location;
 		terr = t;
-		
 		liquidType = LiquidType.WATER;
 		liquidAmount = 0;
 		units = new ConcurrentLinkedQueue<Unit>();
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
+		items = new ConcurrentLinkedQueue<Item>();
 	}
 
 	public static Tile makeTile(TileLoc location, Terrain t) {
@@ -120,6 +121,9 @@ public class Tile {
 	public ConcurrentLinkedQueue<Projectile> getProjectiles() {
 		return projectiles;
 	}
+	public ConcurrentLinkedQueue<Item> getItems() {
+		return items;
+	}
 
 	public boolean hasUnit(UnitType unit) {
 		for (Unit u : units) {
@@ -185,6 +189,12 @@ public class Tile {
 	public void removeProjectile(Projectile p) {
 		projectiles.remove(p);
 	}
+	public void addItem(Item i) {
+		items.add(i);
+	}
+	public void removeItem(Item i) {
+		items.remove(i);
+	}
 
 	public void drawHeightMap(Graphics g, double height) {
 		int r = Math.max(Math.min((int) (255 * height), 255), 0);
@@ -218,14 +228,14 @@ public class Tile {
 		if(getHasBuilding() == false) {
 			return false;
 		}
-		BuildingType bt = building.getBuildingType();
+		BuildingType bt = building.getType();
 		if(bt == BuildingType.WALL_WOOD || bt == BuildingType.WALL_STONE || bt == BuildingType.WALL_BRICK) {
 			return true;
 		}
 
-		if((building.getBuildingType() == BuildingType.GATE_WOOD 
-				|| building.getBuildingType() == BuildingType.GATE_STONE 
-				|| building.getBuildingType() == BuildingType.GATE_BRICK) && u.isPlayerControlled() == building.getIsPlayerControlled()) {
+		if((building.getType() == BuildingType.GATE_WOOD 
+				|| building.getType() == BuildingType.GATE_STONE 
+				|| building.getType() == BuildingType.GATE_BRICK) && u.isPlayerControlled() == building.getIsPlayerControlled()) {
 			return false;
 		}
 		return false;
@@ -282,14 +292,14 @@ public class Tile {
 		if (building == null) {
 			return true;
 		}
-		BuildingType bt = building.getBuildingType();
+		BuildingType bt = building.getType();
 		if(bt == BuildingType.WALL_WOOD || bt == BuildingType.WALL_STONE || bt == BuildingType.WALL_BRICK) {
 			return false;
 		}
 
-		if ((building.getBuildingType() == BuildingType.GATE_WOOD
-				|| building.getBuildingType() == BuildingType.GATE_STONE
-				|| building.getBuildingType() == BuildingType.GATE_BRICK) && u.isPlayerControlled() == false) {
+		if ((building.getType() == BuildingType.GATE_WOOD
+				|| building.getType() == BuildingType.GATE_STONE
+				|| building.getType() == BuildingType.GATE_BRICK) && u.isPlayerControlled() == false) {
 			return false;
 		}
 		return true;
@@ -377,7 +387,7 @@ public class Tile {
 		if(building == null) {
 			return false;
 		}
-		BuildingType buildingType = building.getBuildingType();
+		BuildingType buildingType = building.getType();
 		if(buildingType == BuildingType.WALL_WOOD || buildingType == BuildingType.WALL_STONE || buildingType == BuildingType.WALL_BRICK) {
 			return true;
 		}

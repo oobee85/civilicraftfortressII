@@ -111,22 +111,22 @@ public class Frame extends JPanel {
 		GUIController guiController = new GUIController() {
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {
-				if (building.getBuildingType() == BuildingType.BARRACKS) {
+				if (building.getType() == BuildingType.BARRACKS) {
 					manageBarracksTab(selected);
 				}
-				if (building.getBuildingType() == BuildingType.CASTLE) {
+				if (building.getType() == BuildingType.CASTLE) {
 					manageCastleTab(selected);
 				}
-				if (building.getBuildingType() == BuildingType.BLACKSMITH) {
+				if (building.getType() == BuildingType.BLACKSMITH) {
 					manageBlacksmithTab(selected);
 				}
-				if (building.getBuildingType() == BuildingType.HELLFORGE) {
+				if (building.getType() == BuildingType.HELLFORGE) {
 					manageHellforgeTab(selected);
 				}
-				if (building.getBuildingType() == BuildingType.WORKSHOP) {
+				if (building.getType() == BuildingType.WORKSHOP) {
 					manageWorkshopTab(selected);
 				}
-				if (building.getBuildingType() == BuildingType.RESEARCHLAB) {
+				if (building.getType() == BuildingType.RESEARCHLAB) {
 					manageResearchLabTab(selected);
 				}
 				switchInfoPanel(new BuildingInfoPanel(building));

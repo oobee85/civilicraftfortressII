@@ -31,7 +31,7 @@ public class Game {
 	private int buildingsUntilOgre = 8;
 	private CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
 	
-	HashMap<ItemType, Item> resources = new HashMap<ItemType, Item>();
+	HashMap<ItemType, Item> items = new HashMap<ItemType, Item>();
 	HashMap<ResearchType, Research> researches = new HashMap<>();
 	
 	HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
@@ -74,7 +74,7 @@ public class Game {
 			if(itemType == ItemType.WOOD || itemType == ItemType.STONE || itemType == ItemType.FOOD) {
 				item = new Item(200, itemType);
 			}
-			resources.put(itemType, item);
+			items.put(itemType, item);
 		}
 		for(ResearchType researchType : ResearchType.values()) {
 			Research res = new Research(researchType);
@@ -240,7 +240,7 @@ public class Game {
 	}
 	public void addResources() {
 		for(ItemType itemType : ItemType.values()) {
-			resources.get(itemType).addAmount(1000);
+			items.get(itemType).addAmount(1000);
 		}
 		
 	}
@@ -263,7 +263,7 @@ public class Game {
 		updateTerrainImages();
 		if(easymode) {
 			for(ItemType itemType : ItemType.values()) {
-				resources.get(itemType).addAmount(999);
+				items.get(itemType).addAmount(999);
 			}
 		}
 	}
@@ -335,8 +335,8 @@ public class Game {
 			if(!building.readyToHarvest() ) {
 				continue;
 			}
-			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getResource() != null && building.getTile().getResource().getType().isOre() == true) {
-				resources.get(building.getTile().getResource().getType().getItemType()).addAmount(1);
+			if(building.getType() == BuildingType.MINE && building.getTile().getResource() != null && building.getTile().getResource().getType().isOre() == true) {
+				items.get(building.getTile().getResource().getType().getItemType()).addAmount(1);
 				building.getTile().getResource().harvest(1);
 				
 				
@@ -349,23 +349,23 @@ public class Game {
 				building.resetTimeToHarvest();
 			}
 			
-			if(building.getBuildingType() == BuildingType.MINE && building.getTile().getTerrain() == Terrain.ROCK && building.getTile().getResource() == null) {
-				resources.get(ItemType.STONE).addAmount(1);
+			if(building.getType() == BuildingType.MINE && building.getTile().getTerrain() == Terrain.ROCK && building.getTile().getResource() == null) {
+				items.get(ItemType.STONE).addAmount(1);
 				building.resetTimeToHarvest();
 			}
-			if(building.getBuildingType() == BuildingType.IRRIGATION && building.getTile().canPlant() == true) {
+			if(building.getType() == BuildingType.IRRIGATION && building.getTile().canPlant() == true) {
 				//irrigation produces extra food when placed on water
 				if(building.getTile().liquidType == LiquidType.WATER && building.getTile().liquidAmount > 0) {
-					int extraFood = (int) (building.getTile().liquidAmount * 100);
-					resources.get(ItemType.FOOD).addAmount(1 + extraFood/2);
+					int extraFood = (int) (building.getTile().liquidAmount * 50);
+					items.get(ItemType.FOOD).addAmount(1 + extraFood);
 					
 				}else {
-					resources.get(ItemType.FOOD).addAmount(1);
+					items.get(ItemType.FOOD).addAmount(1);
 				}
 				building.resetTimeToHarvest();
 			}
 			
-			if(building.getBuildingType() == BuildingType.SAWMILL) {
+			if(building.getType() == BuildingType.SAWMILL) {
 				HashSet<Tile> tilesToCut = new HashSet<>();
 				tilesToCut.add(building.getTile());
 				
@@ -376,7 +376,7 @@ public class Game {
 					if(tile.getPlant() != null && tile.getPlant().getPlantType() == PlantType.FOREST1) {
 						tile.getPlant().harvest(1);
 						tile.getPlant().takeDamage(1);
-						resources.get(ItemType.WOOD).addAmount(1);
+						items.get(ItemType.WOOD).addAmount(1);
 						if(tile.getPlant().isDead() ) {
 							numCutTrees ++;
 						}
@@ -386,15 +386,15 @@ public class Game {
 				building.resetTimeToHarvest();
 			}
 			
-			if(building.getBuildingType() == BuildingType.FARM && building.getTile().hasUnit(UnitType.HORSE)) {
-				resources.get(ItemType.HORSE).addAmount(1);
-				resources.get(ItemType.FOOD).addAmount(1);
+			if(building.getType() == BuildingType.FARM && building.getTile().hasUnit(UnitType.HORSE)) {
+				items.get(ItemType.HORSE).addAmount(1);
+				items.get(ItemType.FOOD).addAmount(1);
 				building.resetTimeToHarvest();
 			}
 			
 			if(building.getTile().getPlant() != null) {
-				if(building.getBuildingType() == BuildingType.FARM && building.getTile().getPlant().getPlantType() == PlantType.BERRY) {
-					resources.get(ItemType.FOOD).addAmount(1);
+				if(building.getType() == BuildingType.FARM && building.getTile().getPlant().getPlantType() == PlantType.BERRY) {
+					items.get(ItemType.FOOD).addAmount(1);
 					building.getTile().getPlant().takeDamage(1);
 					building.resetTimeToHarvest();
 				}
@@ -789,7 +789,7 @@ public class Game {
 					g2d.setStroke(currentStroke);
 					Utils.setTransparency(g, 1f);
 				}
-				HashSet<Tile> buildingVision = world.getNeighborsInRadius(b.getTile(), b.getBuildingType().getVisionRadius());
+				HashSet<Tile> buildingVision = world.getNeighborsInRadius(b.getTile(), b.getType().getVisionRadius());
 //				System.out.println(buildingVision.size());
 				for(Tile t : buildingVision) {
 					t.setInVisionRange(true);
@@ -798,7 +798,7 @@ public class Game {
 				}
 				
 				BufferedImage bI = Utils.toBufferedImage(b.getImage(0));
-				double percentDone = 1 - b.getRemainingEffort()/b.getBuildingType().getBuildingEffort();
+				double percentDone = 1 - b.getRemainingEffort()/b.getType().getBuildingEffort();
 				int h =  Math.max(1, (int) (bI.getHeight() * percentDone));
 				int tileh = Math.max(1, (int) (Game.tileSize * percentDone));
 				bI = bI.getSubimage(0, bI.getHeight() - h, bI.getWidth(), h);
@@ -928,6 +928,16 @@ public class Game {
 					}
 				}
 			}
+			for(Tile tile : world.getTiles()) {
+				if(!tile.getItems().isEmpty()) {
+					for(Item item : tile.getItems()) {
+						if(item != null && tile != null) {
+							g.drawImage(item.getType().getImage(0), tile.getLocation().x * Game.tileSize, tile.getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+						}
+					}
+				}
+			}
+			
 			
 			if(DEBUG_DRAW) {
 				if(Game.tileSize >= 36) {
@@ -1108,7 +1118,7 @@ public class Game {
 			ItemType key = (ItemType) mapElement.getKey();
 			Integer value = (Integer) mapElement.getValue();
 
-			if (resources.get(key).getAmount() < value) {
+			if (items.get(key).getAmount() < value) {
 				return;
 			}
 		}
@@ -1117,8 +1127,8 @@ public class Game {
 			ItemType key = (ItemType) mapElement.getKey();
 			Integer value = (Integer) mapElement.getValue();
 
-			resources.get(key).addAmount(-value);
-			resources.get(type).addAmount(1);
+			items.get(key).addAmount(-value);
+			items.get(type).addAmount(1);
 		}
 
 
@@ -1175,7 +1185,7 @@ public class Game {
 			Building building = new Building(selectedBuildingToSpawn, tile, true);
 			tile.setBuilding(building);
 			world.buildings.add(building);
-			building.expendEffort(building.getBuildingType().getBuildingEffort());
+			building.expendEffort(building.getType().getBuildingEffort());
 			if(shiftEnabled == false) {
 				selectedUnitToSpawn = null;
 				selectedBuildingToSpawn = null;
@@ -1450,17 +1460,24 @@ public class Game {
 	private void unitTick() {
 		
 		for (Unit unit : world.units) {
+			Tile tile = unit.getTile();
 			unit.tick();
-			if (unit.getType() == UnitType.WORKER && unit.isIdle() == true && unit.getTile().getIsTerritory()) {
+			if (unit.getType() == UnitType.WORKER && unit.isIdle() == true && tile.getIsTerritory()) {
 				Building building = getBuildingToBuild();
 				if(building != null && unit.getTargetTile() == null) {
 					
-					if(building.getTile().getIsTerritory() == true && unit.getTile().getIsTerritory() == true) {
+					if(building.getTile().getIsTerritory() == true && tile.getIsTerritory() == true) {
 						unit.setTargetTile(building.getTile());
 					}
 					
 				}
 				
+			}
+			if(unit.isPlayerControlled() && !tile.getItems().isEmpty()) {
+				for(Item item : tile.getItems()) {
+					items.get(item.getType()).addAmount(item.getAmount());
+					tile.removeItem(item);
+				}
 			}
 //			if(unit.getTargetTile() == null && unit.getTarget() != null) {
 //				unit.setTargetTile(unit.getTarget().getTile());
@@ -1500,7 +1517,7 @@ public class Game {
 						ItemType key = (ItemType) mapElement.getKey();
 						Integer value = (Integer) mapElement.getValue();
 
-						if (resources.get(key).getAmount() < value) {
+						if (items.get(key).getAmount() < value) {
 							return;
 						}
 					}
@@ -1512,7 +1529,7 @@ public class Game {
 						ItemType key = (ItemType) mapElement.getKey();
 						Integer value = (Integer) mapElement.getValue();
 
-						resources.get(key).addAmount(-value);
+						items.get(key).addAmount(-value);
 					}
 
 					Building building = new Building(bt, thing.getTile(), true);
@@ -1543,7 +1560,7 @@ public class Game {
 					ItemType key = (ItemType) mapElement.getKey();
 					Integer value = (Integer) mapElement.getValue();
 
-					if (resources.get(key).getAmount() < value) {
+					if (items.get(key).getAmount() < value) {
 						return;
 					}
 				}
@@ -1552,7 +1569,7 @@ public class Game {
 					ItemType key = (ItemType) mapElement.getKey();
 					Integer value = (Integer) mapElement.getValue();
 
-					resources.get(key).addAmount(-value);
+					items.get(key).addAmount(-value);
 				}
 
 				Road road = new Road(rt, thing.getTile());
@@ -1581,7 +1598,7 @@ public class Game {
 			ItemType key = (ItemType) mapElement.getKey();
 			Integer value = (Integer) mapElement.getValue();
 			
-			if (resources.get(key).getAmount() < value) {
+			if (items.get(key).getAmount() < value) {
 				return;
 			}
 		}
@@ -1595,7 +1612,7 @@ public class Game {
 			ItemType key = (ItemType) mapElement.getKey();
 			Integer value = (Integer) mapElement.getValue();
 			
-			resources.get(key).addAmount(-value);
+			items.get(key).addAmount(-value);
 		}
 		unit.setTargetTile(unit.getTile().getBuilding().getSpawnLocation());
 		tile.getBuilding().setBuildingUnit(unit);
@@ -1649,7 +1666,7 @@ public class Game {
 		return money;
 	}
 	public int getResourceAmount(ItemType resourceType) {
-		return resources.get(resourceType).getAmount();
+		return items.get(resourceType).getAmount();
 	}
 	public int getTileSize() {
 		return tileSize;

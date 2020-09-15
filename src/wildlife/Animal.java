@@ -108,19 +108,19 @@ public class Animal extends Unit {
 			if(getTile() != resourceTarget) {
 				moveTowards(resourceTarget);
 			}
-			if(getTile() == resourceTarget) {
-				if(resourceTarget.getResource() == null || resourceTarget.getResource().getYield() <= 0 || resourceTarget.getResource().getType() != ResourceType.DEAD_ANIMAL) {
-					resourceTarget = null;
-				}
-				else {
-					resourceTarget.getResource().harvest(1);
-					eat(1);
-					if(resourceTarget.getResource().getYield() <= 0) {
-						resourceTarget.setResource(null);
-						resourceTarget = null;
-					}
-				}
-			}
+//			if(getTile() == resourceTarget) {
+//				if(resourceTarget.getResource() == null || resourceTarget.getResource().getYield() <= 0 || resourceTarget.getResource().getType() != ResourceType.DEAD_ANIMAL) {
+//					resourceTarget = null;
+//				}
+//				else {
+//					resourceTarget.getResource().harvest(1);
+//					eat(1);
+//					if(resourceTarget.getResource().getYield() <= 0) {
+//						resourceTarget.setResource(null);
+//						resourceTarget = null;
+//					}
+//				}
+//			}
 			return;
 		}
 		if(foodTarget != null) {

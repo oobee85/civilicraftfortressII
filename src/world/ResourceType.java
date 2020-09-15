@@ -20,7 +20,6 @@ public enum ResourceType implements HasImage {
 	RUNITE ( 100, new String[] {"resources/Images/resources/runite/ore_rune16.png", "resources/Images/resources/runite/ore_rune128.png"} , 					1, 10, true, ItemType.RUNITE_ORE, true, 100),
 	TITANIUM ( 100, new String[] {"resources/Images/resources/titanium/ore_titanium16.png", "resources/Images/resources/titanium/ore_titanium128.png"} , 	1, 8, true, ItemType.TITANIUM_ORE, true, 100),
 	
-	DEAD_ANIMAL(100, new String[] {"resources/Images/resources/dead_animal.png"} 																		, 0, 0, true, ItemType.FOOD, false, 10),
 	;
 	
 	

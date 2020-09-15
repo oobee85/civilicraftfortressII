@@ -34,7 +34,7 @@ public class LavaGolem extends Animal {
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
 		if(buildings.size() > 0) {
 			for(Building building : buildings) {
-				if(building.getBuildingType() == BuildingType.MINE) {
+				if(building.getType() == BuildingType.MINE) {
 					setTarget(building);
 					return;
 				}
