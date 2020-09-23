@@ -29,7 +29,7 @@ public class Game {
 	private UnitType selectedUnitToSpawn;
 	private BuildingType selectedBuildingToSpawn;
 	private int numCutTrees = 10;
-	private int buildingsUntilOgre = 8;
+	private int buildingsUntilOgre = 10;
 	private CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
 	
 	HashMap<ItemType, Item> items = new HashMap<ItemType, Item>();
@@ -116,12 +116,12 @@ public class Game {
 			// make a new researchrequirement object
 			ResearchRequirement req = new ResearchRequirement();
 			// only add requirement if it isnt null
-			if(type.getResearchRequirement() != null) {
-				// get the research that type requires
-				Research typesRequirement = researches.get(type.getResearchRequirement());
-				// add the required research to the req
-				req.addRequirement(typesRequirement);
-			}
+//			if(type.getResearchRequirement() != null) {
+//				// get the research that type requires
+//				Research typesRequirement = researches.get(type.getResearchRequirement());
+//				// add the required research to the req
+//				req.addRequirement(typesRequirement);
+//			}
 			// put it in the hashmap
 			craftResearchRequirements.put(type, req);
 		}
@@ -185,6 +185,7 @@ public class Game {
 			world.spawnOgre();
 			buildingsUntilOgre += buildingsUntilOgre;
 		}
+		
 		if(ticks >= 1000 && Math.random() < 0.00001) {
 			meteorStrike();
 		}
@@ -1141,6 +1142,22 @@ public class Game {
 	
 	public void setResearchTarget(ResearchType type) {
 		if(researches.get(type).getRequirement().areRequirementsMet()) {
+			for (Map.Entry mapElement : type.getCost().entrySet()) {
+				ItemType key = (ItemType) mapElement.getKey();
+				Integer value = (Integer) mapElement.getValue();
+
+				if (items.get(key) != null && items.get(key).getAmount() < value) {
+					return;
+				}
+			}
+
+			for (Map.Entry mapElement : type.getCost().entrySet()) {
+				ItemType key = (ItemType) mapElement.getKey();
+				Integer value = (Integer) mapElement.getValue();
+
+				items.get(key).addAmount(-value);
+			}
+
 			researchTarget = researches.get(type);
 		}
 	}

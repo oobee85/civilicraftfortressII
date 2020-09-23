@@ -15,7 +15,6 @@ public class Animal extends Unit {
 	
 	private double energy;
 	private double drive;
-	
 	private Thing foodTarget;
 	private Tile resourceTarget;
 	
@@ -23,6 +22,9 @@ public class Animal extends Unit {
 		super(type, tile, isPlayerControlled);
 		energy = MAX_ENERGY;
 		drive = 0;
+	}
+	public boolean getHasHome() {
+		return false;
 	}
 	
 	@Override

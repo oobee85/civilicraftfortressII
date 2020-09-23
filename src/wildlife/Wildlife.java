@@ -89,8 +89,11 @@ public class Wildlife {
 			}
 			if(animal.isDead()) {
 				if(animal.getType().getDeadItem() != null && animal.getTarget() != null && animal.getTarget().isPlayerControlled()) {
-					animal.getTile().addItem(new Item(100, animal.getType().getDeadItem()));
+					animal.getTile().addItem(animal.getType().getDeadItem());
 				}
+//				if(animal.getTarget() != null && ((Animal) animal.getTarget()).getHasHome()) {
+//					animal.getTarget()
+//				}
 				dead.add(animal);
 				continue;
 			}
