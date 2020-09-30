@@ -17,12 +17,12 @@ public class Wildlife {
 		for(Tile tile : world.getTilesRandomly()) {
 			TileLoc loc = tile.getLocation();
 			if(Math.random() < 0.01) {
-				if(world.get(loc).checkTerrain(Terrain.GRASS) || world.get(loc).checkTerrain(Terrain.DIRT)) {
+				if(tile.checkTerrain(Terrain.GRASS) || tile.checkTerrain(Terrain.DIRT)) {
 					makeAnimal(UnitType.DEER, world, loc);
 				}
 				
-				if(world.get(loc).liquidAmount > world.get(loc).liquidType.getMinimumDamageAmount()) {
-					if(world.get(loc).liquidType != LiquidType.LAVA) {
+				if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+					if(tile.liquidType != LiquidType.LAVA) {
 						makeAnimal(UnitType.FISH, world, loc);
 					}
 					
@@ -30,31 +30,31 @@ public class Wildlife {
 			}
 			
 			if(Math.random() < 0.01) {
-				if(world.get(loc).checkTerrain(Terrain.DIRT)) {
+				if(tile.checkTerrain(Terrain.DIRT)) {
 					makeAnimal(UnitType.HORSE, world, loc);
 				}
 			}
 			
 			if(Math.random() < 0.01) {
-				if(world.get(loc).checkTerrain(Terrain.GRASS)) {
+				if(tile.checkTerrain(Terrain.GRASS)) {
 					makeAnimal(UnitType.PIG, world, loc);
 				}
 			}
 			if(Math.random() < 0.01) {
-				if(world.get(loc).checkTerrain(Terrain.GRASS)) {
+				if(tile.checkTerrain(Terrain.GRASS)) {
 					makeAnimal(UnitType.SHEEP, world, loc);
 				}
 			}
 			if(Math.random() < 0.01) {
-				if(world.get(loc).checkTerrain(Terrain.GRASS)) {
+				if(tile.checkTerrain(Terrain.GRASS)) {
 					makeAnimal(UnitType.COW, world, loc);
 				}
 			}
 			
-			if(world.get(loc).getTerrain() == Terrain.VOLCANO && Math.random() < 0.01) {
+			if(tile.getTerrain() == Terrain.VOLCANO && Math.random() < 0.01) {
 				world.spawnDragon();
 			}
-			if(world.get(loc).getTerrain() == Terrain.SNOW && Math.random() < 0.005) {
+			if(tile.getTerrain() == Terrain.SNOW && Math.random() < 0.005) {
 				makeAnimal(UnitType.WOLF, world, loc);
 			}
 		}
