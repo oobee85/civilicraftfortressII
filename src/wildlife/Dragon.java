@@ -10,11 +10,13 @@ public class Dragon extends Animal {
 	
 	private Tile home;
 	private int timeToFireball;
+	private int timeToHunt;
 	
 	public Dragon(Tile tile, boolean isPlayerControlled) {
 		super(UnitType.DRAGON, tile, isPlayerControlled);
-		home = tile;
+		this.home = tile;
 		this.timeToFireball = UnitType.DRAGON.getCombatStats().getAttackSpeed()*10;
+		this.timeToHunt = UnitType.DRAGON.getCombatStats().getMoveSpeed()*100;
 	}
 	
 	public Tile getHome() {
@@ -35,13 +37,25 @@ public class Dragon extends Animal {
 		if(timeToFireball > 0) {
 			timeToFireball --;
 		}
+		if(timeToHunt > 0) {
+			timeToHunt --;
+		}
 		
 	}
 	public void resetTimeToFireball() {
 		timeToFireball = UnitType.DRAGON.getCombatStats().getAttackSpeed()*10;
 	}
+	public void resetTimeToHunt() {
+		timeToHunt = UnitType.DRAGON.getCombatStats().getMoveSpeed()*100;
+	}
 	public boolean readyToFireball() {
 		return timeToFireball <= 0;
+	}
+	public boolean readyToHunt() {
+		return timeToHunt <= 0;
+	}
+	public int getTimeToHunt() {
+		return timeToHunt;
 	}
 	@Override
 	public double attack(Thing other) {
@@ -54,8 +68,15 @@ public class Dragon extends Animal {
 	}
 
 	@Override
-	public boolean wantsToAttack() {
+	public boolean getHasHome() {
 		return true;
+	}
+	@Override
+	public boolean wantsToAttack() {
+		return readyToHunt();
+	}
+	public void goHome() {
+		this.setTargetTile(home);
 	}
 	
 	public void moveAroundTarget() {
@@ -77,14 +98,15 @@ public class Dragon extends Animal {
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
 		//chance to attack either wildlife or player
-		if(Math.random() < 0.95) {
+//		if(Math.random() < 0.95) {
 			for (Animal a : animals) {
-				if (a != null) {
+				if (a != null && a != this) {
 					setTarget(animals.get((int) (Math.random() * animals.size())));
+					resetTimeToHunt();
 					return;
 				}
 			}
-		} else {
+//		} else {
 			
 			//chance to attack building or unit
 //			if(Math.random() < 0.4) {
@@ -107,10 +129,15 @@ public class Dragon extends Animal {
 //			}
 			
 			
-		}
+//		}
 		
 		return;
 	}
-	
+	@Override 
+	public List<String> getDebugStrings(){
+		List<String> strings = super.getDebugStrings();
+//		strings.add(String.format("TTS=%.1f", getTimeToSleep()));
+		return strings;
+	}
 	
 }

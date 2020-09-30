@@ -88,9 +88,12 @@ public class Wildlife {
 				
 			}
 			if(animal.isDead()) {
-				if(animal.getType().getDeadResource() != null) {
-					animal.getTile().setResource(animal.getType().getDeadResource());
+				if(animal.getType().getDeadItem() != null && animal.getTarget() != null && animal.getTarget().isPlayerControlled()) {
+					animal.getTile().addItem(animal.getType().getDeadItem());
 				}
+//				if(animal.getTarget() != null && ((Animal) animal.getTarget()).getHasHome()) {
+//					animal.getTarget()
+//				}
 				dead.add(animal);
 				continue;
 			}
@@ -109,7 +112,7 @@ public class Wildlife {
 			}
 			else if(Math.random() < animal.getMoveChance() && animal.readyToMove()) {
 				
-				if(animal.getTile().getBuilding() != null && animal.getTile().getBuilding().getBuildingType() == BuildingType.FARM) {
+				if(animal.getTile().getBuilding() != null && animal.getTile().getBuilding().getType() == BuildingType.FARM) {
 				//stuck inside farm
 				}
 				else {

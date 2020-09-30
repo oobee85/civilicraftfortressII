@@ -19,7 +19,7 @@ public class Item extends Quantity {
 		isUnlocked = unlock;
 	}
 
-	public ItemType getResourceType() {
+	public ItemType getType() {
 		return itemType;
 	}
 

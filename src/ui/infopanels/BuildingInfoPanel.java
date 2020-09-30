@@ -50,7 +50,7 @@ public class BuildingInfoPanel extends InfoPanel {
 
 		g.setFont(KUIConstants.infoFontTiny);
 		int hpbarHeight = g.getFont().getSize();
-		String hpstring =  String.format("%d/%d",(int)showing.getHealth(), (int)showing.getBuildingType().getHealth());
-		KUIConstants.drawProgressBar(g, Color.green, Color.red, Color.black, showing.getHealth()/showing.getBuildingType().getHealth(), hpstring, 0, getHeight()-hpbarHeight, getWidth(), hpbarHeight);
+		String hpstring =  String.format("%d/%d",(int)showing.getHealth(), (int)showing.getType().getHealth());
+		KUIConstants.drawProgressBar(g, Color.green, Color.red, Color.black, showing.getHealth()/showing.getType().getHealth(), hpstring, 0, getHeight()-hpbarHeight, getWidth(), hpbarHeight);
 	}
 }

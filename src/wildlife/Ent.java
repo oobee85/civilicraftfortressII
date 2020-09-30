@@ -29,7 +29,7 @@ public class Ent extends Animal {
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
 		for(Building b : buildings) {
-			if(b.getBuildingType() == BuildingType.SAWMILL) {
+			if(b.getType() == BuildingType.SAWMILL) {
 				setTarget(b);
 				return;
 			}
