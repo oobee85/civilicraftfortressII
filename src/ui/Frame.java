@@ -1007,6 +1007,8 @@ public class Frame extends JPanel {
 			KButton button = KUIConstants.setupButton(strings.getItem(i) + ": " + gameInstance.getCombatBuffs().getStat(strings.getItem(i)), null, RESEARCH_BUTTON_SIZE);
 			button.setEnabled(true);
 			button.addActionListener(e -> {
+				button.setText(strings.getItem(f) + ": " + gameInstance.getCombatBuffs().getStat(strings.getItem(f)));
+//				System.out.println(gameInstance.getCombatBuffs().getStat(strings.getItem(f)));
 				System.out.println(gameInstance.getCombatBuffs().getStat(strings.getItem(f)));
 				CombatStats cs = new CombatStats(0,0,0,0,0,0,0);
 				cs.getStats().set(f, cs.getStats().get(f)+1);
