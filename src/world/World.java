@@ -430,6 +430,12 @@ public class World {
 		
 			if(unit.inRange(unit.getTarget())) {
 				if(!unit.isRanged()) {
+					CombatStats combine = new CombatStats(0,0,0,0,0,0,0);
+					combine.set(unit.getType().getCombatStats());
+					combine.combine(Game.combatBuffs);
+					
+//					unit.getCombatStats().set(combine);
+					unit.setCombatStats(combine);
 					unit.attack(unit.getTarget());
 				}else {
 					if(unit.readyToAttack() && !unit.getTarget().isDead()) {

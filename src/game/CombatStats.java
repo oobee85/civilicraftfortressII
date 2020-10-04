@@ -110,27 +110,45 @@ public class CombatStats {
 			attack =+ i;
 		}
 		if(s.equals("moveSpeed")) {
-			moveSpeed =+ i;
+			moveSpeed =- i;
 		}
 		if(s.equals("attackRadius")) {
 			attackRadius =+ i;
 		}
 		if(s.equals("attackSpeed")) {
-			attackSpeed =+ i;
+			attackSpeed =- i;
 		}
 		if(s.equals("ticksToBuild")) {
-			ticksToBuild =+ i;
+			ticksToBuild =- i;
 		}
 		if(s.equals("ticksToHeal")) {
-			ticksToHeal =+ i;
+			ticksToHeal =- i;
 		}
 		
+	}
+	public void set(CombatStats cs) {
+		this.health = cs.getHealth();
+		this.attack = cs.getAttack();
+		this.moveSpeed = cs.getMoveSpeed();
+		this.attackRadius = cs.getAttackRadius();
+		this.attackSpeed = cs.getAttackSpeed();
+		this.ticksToBuild = cs.getTicksToBuild();
+		this.ticksToHeal = cs.getHealSpeed();
 	}
 	public void combine(CombatStats cs) {
 		this.health += cs.getHealth();
 		this.attack += cs.getAttack();
-		this.moveSpeed += cs.getMoveSpeed();
+		this.moveSpeed -= cs.getMoveSpeed();
 		this.attackRadius += cs.getAttackRadius();
+		this.attackSpeed -= cs.getAttackSpeed();
+		this.ticksToBuild -= cs.getTicksToBuild();
+		this.ticksToHeal -= cs.getHealSpeed();
+	}
+	public void subtract(CombatStats cs) {
+		this.health -= cs.getHealth();
+		this.attack -= cs.getAttack();
+		this.moveSpeed += cs.getMoveSpeed();
+		this.attackRadius -= cs.getAttackRadius();
 		this.attackSpeed += cs.getAttackSpeed();
 		this.ticksToBuild += cs.getTicksToBuild();
 		this.ticksToHeal += cs.getHealSpeed();

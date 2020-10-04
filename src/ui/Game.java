@@ -30,7 +30,7 @@ public class Game {
 	private BuildingType selectedBuildingToSpawn;
 	private int numCutTrees = 10;
 	private int buildingsUntilOgre = 10;
-	private CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
+	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
 	
 	HashMap<ItemType, Item> items = new HashMap<ItemType, Item>();
 	HashMap<ResearchType, Research> researches = new HashMap<>();

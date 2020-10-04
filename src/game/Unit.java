@@ -21,6 +21,7 @@ public class Unit extends Thing {
 	private Thing target;
 	private int remainingEffort;
 	private boolean isIdle;
+	private CombatStats combatStats;
 	
 	private LinkedList<Tile> currentPath;
 	
@@ -28,10 +29,12 @@ public class Unit extends Thing {
 	public Unit(UnitType unitType, Tile tile, boolean isPlayerControlled) {
 		super(unitType.getCombatStats().getHealth(), unitType, isPlayerControlled, tile);
 		this.unitType = unitType;
+		this.combatStats = unitType.getCombatStats();
 		this.timeToAttack = unitType.getCombatStats().getAttackSpeed();
 		this.remainingEffort = unitType.getCombatStats().getTicksToBuild();
 		this.timeToHeal = unitType.getCombatStats().getHealSpeed();
 		this.isIdle = false;
+		
 		
 	}
 	public void expendEffort(int effort) {
@@ -40,6 +43,13 @@ public class Unit extends Thing {
 			remainingEffort = 0;
 		}
 	}
+	public CombatStats getCombatStats() {
+		return combatStats;
+	}
+	public void setCombatStats(CombatStats cm) {
+		combatStats = cm;
+	}
+	
 	
 	public int getRemainingEffort() {
 		return remainingEffort;
@@ -73,7 +83,7 @@ public class Unit extends Thing {
 		if(this.getUnitType().isFlying()) {
 			penalty = 0;
 		}
-		penalty += unitType.getCombatStats().getMoveSpeed();
+		penalty += combatStats.getMoveSpeed();
 		return penalty;
 	}
 	
@@ -94,9 +104,6 @@ public class Unit extends Thing {
 		t.addUnit(this);
 		this.setTile(t);
 		
-		if(this.getUnitType() == UnitType.DRAGON && t.canPlant() == true) {
-//			t.setTerrain(Terrain.BURNED_GROUND);
-		}
 		if(this.getUnitType() == UnitType.ENT && t.canPlant() == true) {
 			t.setTerrain(Terrain.GRASS);
 		}
@@ -133,7 +140,7 @@ public class Unit extends Thing {
 			isIdle = false;
 		}
 		
-		if(getHealth() < unitType.getCombatStats().getHealth() && readyToHeal()) {
+		if(getHealth() < combatStats.getHealth() && readyToHeal()) {
 			heal(1);
 			resetTimeToHeal();
 		}
@@ -165,7 +172,7 @@ public class Unit extends Thing {
 		if(other == null) {
 			return false;
 		}
-		return !(this.getTile().getLocation().distanceTo(other.getTile().getLocation()) > getType().getCombatStats().getAttackRadius() 
+		return !(this.getTile().getLocation().distanceTo(other.getTile().getLocation()) > combatStats.getAttackRadius() 
 				&& this.getTile() != other.getTile());
 	}
 	
@@ -178,10 +185,11 @@ public class Unit extends Thing {
 			return 0;
 		}
 		double initialHP = other.getHealth();
-		other.takeDamage(this.getType().getCombatStats().getAttack());
+		
+		other.takeDamage(combatStats.getAttack());
 		double damageDealt = initialHP - (other.getHealth() < 0 ? 0 : other.getHealth());
 		if(unitType.hasLifeSteal() && !(other instanceof Building)) {
-			this.heal(this.getType().getCombatStats().getAttack());
+			this.heal(combatStats.getAttack());
 		}
 		resetTimeToAttack();
 		if(other instanceof Unit) {
@@ -192,7 +200,7 @@ public class Unit extends Thing {
 	
 	
 	public void resetTimeToAttack() {
-		timeToAttack = unitType.getCombatStats().getAttackSpeed();
+		timeToAttack = combatStats.getAttackSpeed();
 	}
 	public Thing getTarget() {
 		return target;
@@ -223,7 +231,7 @@ public class Unit extends Thing {
 		return timeToHeal <= 0;
 	}
 	public void resetTimeToHeal() {
-		timeToHeal = unitType.getCombatStats().getHealSpeed();
+		timeToHeal = combatStats.getHealSpeed();
 	}
 	public boolean isIdle() {
 		return isIdle;

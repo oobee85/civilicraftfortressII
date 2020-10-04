@@ -24,9 +24,9 @@ public class UnitInfoPanel extends InfoPanel {
 		
 		g.setFont(KUIConstants.infoFontTiny);
 		int hpbarHeight = g.getFont().getSize();
-		String hpstring =  String.format("%d/%d",(int)showing.getHealth(), (int)showing.getType().getCombatStats().getHealth());
-		KUIConstants.drawProgressBar(g, Color.green, Color.red, Color.black, showing.getHealth()/showing.getType().getCombatStats().getHealth(), hpstring, 0, getHeight()-hpbarHeight, getWidth() - 85, hpbarHeight);
+		String hpstring =  String.format("%d/%d",(int)showing.getHealth(), (int)showing.getCombatStats().getHealth());
+		KUIConstants.drawProgressBar(g, Color.green, Color.red, Color.black, showing.getHealth()/showing.getCombatStats().getHealth(), hpstring, 0, getHeight()-hpbarHeight, getWidth() - 85, hpbarHeight);
 
-		UnitTypeInfoPanel.drawCombatStats(g, showing.getType().getCombatStats(), getWidth() - 80, 4);
+		UnitTypeInfoPanel.drawCombatStats(g, showing.getCombatStats(), getWidth() - 80, 4);
 	}
 }
