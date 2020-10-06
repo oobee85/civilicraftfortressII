@@ -1753,6 +1753,7 @@ public class Game {
 			return;
 		}
 		
+		
 		for (Map.Entry mapElement : u.getCost().entrySet()) {
 			ItemType key = (ItemType) mapElement.getKey();
 			Integer value = (Integer) mapElement.getValue();

@@ -9,11 +9,11 @@ import java.util.List;
 import javax.swing.ImageIcon;
 
 import pathfinding.Pathfinding;
-import utils.HasImage;
+import utils.*;
 import world.Terrain;
 import world.Tile;
 
-public class Projectile {
+public class Projectile implements HasImage {
 
 	private ProjectileType type;
 	private Tile targetTile;
@@ -21,12 +21,26 @@ public class Projectile {
 	private Tile tile;
 	private HasImage hasImage;
 	
-	public Projectile(ProjectileType type, Tile tile, Tile targetTile) {
+	private int damageBuff;
+	private Unit source;
+	
+	public Projectile(ProjectileType type, Tile tile, Tile targetTile, Unit source) {
 		this.type = type;
 		this.tile = tile;
 		this.hasImage = type;
 		this.targetTile = targetTile;
+		this.damageBuff = 0;
+		this.source = source;
 	}
+	
+	public Unit getSource() {
+		return source;
+	}
+	
+	public void setDamageBuff(int damageBuff) {
+		this.damageBuff = damageBuff;
+	}
+	
 	public void tick() {
 		if(timeToMove > 0) {
 			timeToMove -= 2;

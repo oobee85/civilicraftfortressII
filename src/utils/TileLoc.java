@@ -21,7 +21,7 @@ public class TileLoc {
 		return false;
 	}
 	
-	public double distanceTo(TileLoc other) {
+	public int distanceTo(TileLoc other) {
 		return Math.abs(this.x - other.x) + Math.abs(this.y - other.y);
 //		return Math.sqrt((this.x - other.x)*(this.x - other.x) + (this.y - other.y)*(this.y - other.y));
 	}

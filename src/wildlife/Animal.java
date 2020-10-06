@@ -145,20 +145,7 @@ public class Animal extends Unit {
 			if(this.getTile().getLocation().distanceTo(getTarget().getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
 				this.moveTowards(getTarget().getTile());
 			}
-			if(inRange(getTarget())) {
-				if(this instanceof Dragon) {
-					Dragon dragon = (Dragon) this;
-					if(dragon.readyToFireball()) {
-						Projectile p = new Projectile(dragon.getType().getProjectileType(), dragon.getTile(), dragon.getTarget().getTile());
-						world.projectiles.add(p);
-						dragon.getTile().addProjectile(p);
-						dragon.resetTimeToFireball();
-					}
-					dragon.moveAroundTarget();
-				}
-				attack(getTarget());
-				
-			}
+			Attack.tryToAttack(this, getTarget());
 			if(getTarget().isDead()) {
 				setTarget(null);
 			}

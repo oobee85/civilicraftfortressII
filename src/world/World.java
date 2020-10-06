@@ -397,6 +397,7 @@ public class World {
 			if(projectile.reachedTarget() && projectile.getType().isExplosive() == false) {
 				for(Unit unit : projectile.getTile().getUnits()) {
 					unit.takeDamage(projectile.getType().getDamage());
+					unit.aggro(projectile.getSource());
 				}
 				if(projectile.getTile().getHasBuilding() == true) {
 					projectile.getTile().getBuilding().takeDamage(projectile.getType().getDamage());
@@ -424,26 +425,18 @@ public class World {
 		}
 		projectiles = projectilesNew;
 	}
-	public boolean tryToAttack(Unit unit, Thing target) {
-		if(unit.inRange(target)) {
-			if(!unit.isRanged()) {
-				Attack.smack(unit, target);
-			}else {
-				Attack.shoot(unit, target);
-			}
-			return true;
-		}
-		return false;
-	}
 	public void updateUnitDealDamage() {
 		for (Unit unit : units) {
-			boolean attacked = tryToAttack(unit, unit.getTarget());
+			boolean attacked = false;
+			if(unit.getTarget() != null) {
+				attacked = Attack.tryToAttack(unit, unit.getTarget());
+			}
 			if(!attacked) {
 				for(Unit enemyUnit : getHostileUnitsInTerritory()){
 					if(!unit.inRange(enemyUnit)) {
 						continue;
 					}
-					tryToAttack(unit, enemyUnit);
+					Attack.tryToAttack(unit, enemyUnit);
 				}
 			}
 		}
