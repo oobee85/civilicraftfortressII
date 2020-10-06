@@ -48,7 +48,7 @@ public class World {
 	
 	private double bushRarity = 0.005;
 	private double waterPlantRarity = 0.05;
-	private double forestDensity = 0.3;
+	private double forestDensity = 0.2;
 
 	public TileLoc volcano;
 	
@@ -598,27 +598,41 @@ public class World {
 
 
 	public void makeForest() {
-		int x0 = (int) (Math.random() * tiles.length);
-		int y0 = (int) (Math.random() * tiles.length);
-		double forestLength = Math.random()*70+1;
-		double forestHeight = Math.random()*70+1;
-		double forestLengthEdge = forestLength+30;
-		double forestHeightEdge = forestHeight+30;
-		for(Tile tile : getTiles()) {
-			int dx = tile.getLocation().x - x0;
-			int dy = tile.getLocation().y - y0;
-			double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
-			double forestEdge = (dx*dx)/(forestLengthEdge*forestLengthEdge) + (dy*dy)/(forestHeightEdge*forestHeightEdge);
-			
-			if(tile.canPlant() == true && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2) {
-				if((forestEdge < 1 && Math.random()<forestDensity-0.2) 
-						|| (forest < 1 && Math.random() < forestDensity)) {
-					Plant plant = new Plant(PlantType.FOREST1, tile);
-					tile.setHasPlant(plant);
-					plantsLand.add(plant);
-				}	
+		
+		for(Tile t : tileListRandom) {
+			double tempDensity = forestDensity;
+			if(t.getTerrain() == Terrain.DIRT) {
+				tempDensity /= 2;
 			}
+			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < t.liquidType.getMinimumDamageAmount() / 2)
+				if (Math.random() < tempDensity) {
+					Plant plant = new Plant(PlantType.FOREST1, t);
+					t.setHasPlant(plant);
+					plantsLand.add(plant);
+				}
 		}
+		
+//		int x0 = (int) (Math.random() * tiles.length);
+//		int y0 = (int) (Math.random() * tiles.length);
+//		double forestLength = Math.random()*70+1;
+//		double forestHeight = Math.random()*70+1;
+//		double forestLengthEdge = forestLength+30;
+//		double forestHeightEdge = forestHeight+30;
+//		for(Tile tile : getTiles()) {
+//			int dx = tile.getLocation().x - x0;
+//			int dy = tile.getLocation().y - y0;
+//			double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
+//			double forestEdge = (dx*dx)/(forestLengthEdge*forestLengthEdge) + (dy*dy)/(forestHeightEdge*forestHeightEdge);
+//			
+//			if(tile.canPlant() == true && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2) {
+//				if((forestEdge < 1 && Math.random()<forestDensity-0.2) 
+//						|| (forest < 1 && Math.random() < forestDensity)) {
+//					Plant plant = new Plant(PlantType.FOREST1, tile);
+//					tile.setHasPlant(plant);
+//					plantsLand.add(plant);
+//				}	
+//			}
+//		}
 	}
 	
 	public List<Tile> getNeighbors(Tile tile) {

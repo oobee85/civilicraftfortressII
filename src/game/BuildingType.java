@@ -67,7 +67,7 @@ public enum BuildingType implements HasImage {
 	 			ResearchType.FARMING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200);  }},
 	 			null),
 	 	
-	 	CASTLE (4000, 1000, "resources/Images/buildings/castle256.png", 1, true, 10,
+	 	CASTLE (4000, 1000, "resources/Images/buildings/castle256.png", 1, true, 5,
 	 			ResearchType.MONARCHY,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,10000); put(ItemType.STONE,10000); put(ItemType.ADAMANTITE_BAR,20); }},
 	 			new LinkedList<UnitType>() {{add(UnitType.WORKER);}}),
 	 	
