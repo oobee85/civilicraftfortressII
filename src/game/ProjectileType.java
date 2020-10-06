@@ -14,13 +14,14 @@ import utils.Utils;
 public enum ProjectileType implements HasImage {
 
 	
-		ARROW(30, 5, "resources/Images/projectiles/arrow.png", 1, 2),
-		ARROW_ARCHER(10, 5, "resources/Images/projectiles/arrow.png", 1, 2),
-		RUNE_ARROW(50, 5, "resources/Images/projectiles/rune_arrow.png", 1, 2),
-		ROCK_CATAPULT(200, 5, "resources/Images/itemicons/rock.png", 1, 3),
-		ROCK_CYCLOPS(80, 5, "resources/Images/itemicons/rock.png", 1, 2),
-		FIREBALL_DRAGON(100, 5, "resources/Images/projectiles/fireball.png", 2, 3),
-		FIREBALL_TREBUCHET(400, 5, "resources/Images/projectiles/fireball.png", 2, 3),
+		ARROW(30, 1, "resources/Images/projectiles/arrow.png", 1, 2, null),
+		ARROW_ARCHER(10, 1, "resources/Images/projectiles/arrow.png", 1, 2, null),
+		RUNE_ARROW(50, 1, "resources/Images/projectiles/rune_arrow.png", 1, 2, null),
+		ROCK_CATAPULT(200, 2, "resources/Images/itemicons/rock.png", 1, 3, null),
+		ROCK_CYCLOPS(80, 2, "resources/Images/itemicons/rock.png", 1, 2, null),
+		FIREBALL_DRAGON(100, 2, "resources/Images/projectiles/fireball2.png", 2, 3, null),
+		FIREBALL_TREBUCHET(400, 2, "resources/Images/projectiles/fireball.png", 2, 3, null),
+		FIREWAVE(200, 5, "resources/Images/ground_modifiers/fire.gif", 1, 1, GroundModifierType.FIRE),
 		
 	;
 	
@@ -29,13 +30,18 @@ public enum ProjectileType implements HasImage {
 	private double speed;
 	private int radius;
 	private int minimumRange;
+	private GroundModifierType groundModifierType;
 	
-	ProjectileType(double damage, double speed, String s, int radius, int minimumRange){
+	ProjectileType(double damage, double speed, String s, int radius, int minimumRange, GroundModifierType groundModifierType){
 		mipmap = new MipMap(s);
 		this.damage = damage;
 		this.speed = speed;
 		this.radius = radius;
 		this.minimumRange = minimumRange;
+		this.groundModifierType = groundModifierType;
+	}
+	public GroundModifierType getGroundModifierType() {
+		return groundModifierType;
 	}
 
 	public boolean isExplosive() {

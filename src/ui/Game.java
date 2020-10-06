@@ -336,24 +336,24 @@ public class Game {
 				continue;
 			}
 			if(i != 3) {
-				summonThing(wall, null, BuildingType.WALL_STONE, false);
+				summonThing(wall, null, BuildingType.WALL_WOOD, false);
 			}
 			
 			
 			wallLoc = new TileLoc(tile.getLocation().x+3, tile.getLocation().y-3 + i);
 			wall = world.get(wallLoc) ;
 			if(i != 3) {
-				summonThing(wall, null, BuildingType.WALL_STONE, false);
+				summonThing(wall, null, BuildingType.WALL_WOOD, false);
 			}
 			
 			
 			wallLoc = new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y-3);
 			wall = world.get(wallLoc) ;
-			summonThing(wall, null, BuildingType.WALL_STONE, false);
+			summonThing(wall, null, BuildingType.WALL_WOOD, false);
 			
 			wallLoc = new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y+3);
 			wall = world.get(wallLoc) ;
-			summonThing(wall, null, BuildingType.WALL_STONE, false);
+			summonThing(wall, null, BuildingType.WALL_WOOD, false);
 		}
 		for(int i = -1; i < 2; i ++) {
 			for(int j = -1; j < 2; j ++) {
@@ -1585,6 +1585,11 @@ public class Game {
 			}
 			if (projectile.readyToMove()) {
 				projectile.moveToTarget();
+				if(projectile.getType().getGroundModifierType() != null) {
+					GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), (int)projectile.getType().getDamage()/5);
+					projectile.getTile().setModifier(gm);
+					world.groundModifiers.add(gm);
+				}
 			}
 		}
 		
