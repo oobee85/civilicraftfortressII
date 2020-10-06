@@ -424,53 +424,28 @@ public class World {
 		}
 		projectiles = projectilesNew;
 	}
-	public void updateUnitDealDamage() {
-		
-		for (Unit unit : units) {
-			Tile tile = unit.getTile();
-		
-			if(unit.inRange(unit.getTarget())) {
-				if(!unit.isRanged()) {
-					CombatStats combine = new CombatStats(0,0,0,0,0,0,0);
-					combine.set(unit.getType().getCombatStats());
-					combine.combine(Game.combatBuffs);
-					
-//					unit.getCombatStats().set(combine);
-					unit.setCombatStats(combine);
-					
-					unit.attack(unit.getTarget());
-				}else {
-					if(unit.readyToAttack() && !unit.getTarget().isDead()) {
-						Projectile p = new Projectile(unit.getType().getProjectileType(), unit.getTile(), unit.getTarget().getTile());
-						projectiles.add(p);
-						unit.getTile().addProjectile(p);
-						unit.resetTimeToAttack();
-					}
-				}
-				
-				
-				
-				
+	public boolean tryToAttack(Unit unit, Thing target) {
+		if(unit.inRange(target)) {
+			if(!unit.isRanged()) {
+				Attack.smack(unit, target);
 			}else {
+				Attack.shoot(unit, target);
+			}
+			return true;
+		}
+		return false;
+	}
+	public void updateUnitDealDamage() {
+		for (Unit unit : units) {
+			boolean attacked = tryToAttack(unit, unit.getTarget());
+			if(!attacked) {
 				for(Unit enemyUnit : getHostileUnitsInTerritory()){
 					if(!unit.inRange(enemyUnit)) {
 						continue;
 					}
-					if(unit.readyToAttack() && !unit.isRanged()) {
-						unit.attack(enemyUnit);
-					}else {
-						if(unit.readyToAttack() && !enemyUnit.isDead()) {
-							Projectile p = new Projectile(unit.getType().getProjectileType(), unit.getTile(), enemyUnit.getTile());
-							projectiles.add(p);
-							unit.getTile().addProjectile(p);
-							unit.resetTimeToAttack();
-						}
-					}
+					tryToAttack(unit, enemyUnit);
 				}
-				
-				
 			}
-			
 		}
 	}
 

@@ -80,8 +80,7 @@ public class Game {
 		}
 		// Load up costs
 		URL path = Utils.class.getClassLoader().getResource("resources/costs/ResearchType.txt");
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(path.getPath()));
+		try (BufferedReader br = new BufferedReader(new FileReader(path.getPath()))) {
 			String line;
 			while((line = br.readLine()) != null) {
 				line = line.trim();
@@ -304,6 +303,7 @@ public class Game {
 	}
 	public void generateWorld(MapType mapType, int size, boolean easymode) {
 		world = new World();
+		Attack.world = world;
 		world.generateWorld(mapType, size);
 		makeRoads(easymode);
 		updateTerrainImages();
