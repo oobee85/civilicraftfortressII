@@ -957,7 +957,27 @@ public class Game {
 					}
 				}
 			}
-			
+			if (selectedBuildingToSpawn != null) {
+				Utils.setTransparency(g, 0.5f);
+				Graphics2D g2d = (Graphics2D)g;
+				BufferedImage bI = Utils.toBufferedImage(selectedBuildingToSpawn.getImage(0));
+				g2d.drawImage(bI, hoveredTile.x * Game.tileSize, hoveredTile.y * Game.tileSize, Game.tileSize, Game.tileSize , null);
+				Utils.setTransparency(g, 1f);
+			}
+			if (selectedBuildingToPlan != null) {
+				Utils.setTransparency(g, 0.5f);
+				Graphics2D g2d = (Graphics2D)g;
+				BufferedImage bI = Utils.toBufferedImage(selectedBuildingToPlan.getImage(0));
+				g2d.drawImage(bI, hoveredTile.x * Game.tileSize, hoveredTile.y * Game.tileSize, Game.tileSize, Game.tileSize , null);
+				Utils.setTransparency(g, 1f);
+			}
+			if (selectedUnitToSpawn != null) {
+				Utils.setTransparency(g, 0.5f);
+				Graphics2D g2d = (Graphics2D)g;
+				BufferedImage bI = Utils.toBufferedImage(selectedUnitToSpawn.getImage(0));
+				g2d.drawImage(bI, hoveredTile.x * Game.tileSize, hoveredTile.y * Game.tileSize, Game.tileSize, Game.tileSize , null);
+				Utils.setTransparency(g, 1f);
+			}
 			
 			if(DEBUG_DRAW) {
 				if(Game.tileSize >= 36) {
@@ -995,6 +1015,8 @@ public class Game {
 			g.setColor(new Color(0, 0, 0, 64));
 			g.drawRect(hoveredTile.x * Game.tileSize, hoveredTile.y * Game.tileSize, Game.tileSize-1, Game.tileSize-1);
 			g.drawRect(hoveredTile.x * Game.tileSize + 1, hoveredTile.y * Game.tileSize + 1, Game.tileSize - 3, Game.tileSize - 3);
+		
+			
 		}
 		
 	}
@@ -1232,6 +1254,9 @@ public class Game {
 		if (selectedBuildingToPlan != null) {
 			System.out.println("planning building" + selectedBuildingToPlan.toString() + loc.toString());
 			if (selectedBuildingToPlan == BuildingType.IRRIGATION && tile.canPlant() == false) {
+				return;
+			}
+			if(tile.getHasBuilding() == true) {
 				return;
 			}
 			Building building = new Building(selectedBuildingToPlan, tile, true);
