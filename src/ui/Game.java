@@ -1674,7 +1674,13 @@ public class Game {
 		
 		for(Thing thing : selectedThings) {
 			if(selectedThings != null && thing instanceof Building ) {
-				buildUnit(u, thing.getTile());
+				Building building = (Building)thing;
+				for(UnitType ut : building.getType().unitsCanBuild()) {
+					if(ut == u) {
+						buildUnit(u, thing.getTile());
+					}
+				}
+				
 			}
 		}
 		
