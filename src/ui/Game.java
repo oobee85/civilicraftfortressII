@@ -1179,9 +1179,9 @@ public class Game {
 
 			
 	}
-	
+
 	public void setResearchTarget(ResearchType type) {
-		if(researches.get(type).getRequirement().areRequirementsMet()) {
+		if (researches.get(type).getRequirement().areRequirementsMet()) {
 			for (Map.Entry mapElement : type.getCost().entrySet()) {
 				ItemType key = (ItemType) mapElement.getKey();
 				Integer value = (Integer) mapElement.getValue();
@@ -1201,6 +1201,7 @@ public class Game {
 			researchTarget = researches.get(type);
 		}
 	}
+
 	private void setTerritory(TileLoc p) {
 		double culture = world.get(p).getBuilding().getCulture();
 		double area = culture * Building.CULTURE_AREA_MULTIPLIER;

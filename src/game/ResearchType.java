@@ -9,10 +9,10 @@ import utils.*;
 
 public enum ResearchType implements HasImage {
 	
-	WARRIOR_CODE (100, "resources/Images/research/warrior_code.png", new ResearchType[] {}, 1, 			null),
-	BRONZE_WORKING (100, "resources/Images/research/bronze_working.png", new ResearchType[] {}, 1,	 	null),
-	WRITING (100, "resources/Images/research/writing.png", new ResearchType[] {}, 1, 					null), 
-	WHEEL (100, "resources/Images/research/wheel.png", new ResearchType[] {}, 1, 						null),
+	WARRIOR_CODE (100, "resources/Images/research/warrior_code.png", new ResearchType[] {}, 1, 			new HashMap<ItemType, Integer>() {{}}),
+	BRONZE_WORKING (100, "resources/Images/research/bronze_working.png", new ResearchType[] {}, 1,	 	new HashMap<ItemType, Integer>() {{}}),
+	WRITING (100, "resources/Images/research/writing.png", new ResearchType[] {}, 1, 					new HashMap<ItemType, Integer>() {{}}), 
+	WHEEL (100, "resources/Images/research/wheel.png", new ResearchType[] {}, 1, 						new HashMap<ItemType, Integer>() {{}}),
 	
 	IRON_WORKING (200, "resources/Images/research/iron_working.png", new ResearchType[] {ResearchType.WARRIOR_CODE, ResearchType.BRONZE_WORKING}, 2, 	new HashMap<ItemType, Integer>() { {put(ItemType.BRONZE_SWORD,2); }}),
 	FARMING (200, "resources/Images/research/farming.png", new ResearchType[] {ResearchType.BRONZE_WORKING}, 2, 										new HashMap<ItemType, Integer>() { {put(ItemType.BRONZE_BAR,10); }}),

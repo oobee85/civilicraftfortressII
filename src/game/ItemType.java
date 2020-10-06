@@ -45,7 +45,6 @@ public enum ItemType implements HasImage {
 	;
 	
 	private MipMap mipmap;
-//	private ResearchType researchRequirement;
 	private HashMap <ItemType, Integer> cost;
 	
 	ItemType(String s, HashMap <ItemType, Integer> resourcesNeeded) {
