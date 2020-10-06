@@ -317,12 +317,12 @@ public class Game {
 		LinkedList<Tile> tiles = world.getTilesRandomly();
 		Tile tile = tiles.peek();
 		for(Tile t : tiles) {
-			if(t.getTerrain() == Terrain.ROCK) {
+			if(t.getTerrain() == Terrain.ROCK && t.getLocation().x > 3 && t.getLocation().y > 3 && t.getLocation().x < world.getWidth()-3 && t.getLocation().y < world.getHeight()-3) {
 				tile = t;
 				break;
 			}
 		}
-		TileLoc tloc = new TileLoc(tile.getLocation().x-1, tile.getLocation().y-1);
+		TileLoc tloc = new TileLoc(tile.getLocation().x, tile.getLocation().y);
 		Tile barracks = world.get(tloc) ;
 		summonThing(tile, null, BuildingType.BARRACKS, false);
 		summonThing(barracks, null, BuildingType.BARRACKS, false);
@@ -1341,9 +1341,13 @@ public class Game {
 			world.newUnits.add(unit);
 		}
 		if(buildingType != null) {
+			if(tile.getBuilding() != null) {
+				tile.getBuilding().setHealth(0);
+			}
 			System.out.println("spawn building" + buildingType.toString() +tile.getLocation());
 			Building building = new Building(buildingType, tile, playerControlled);
 			building.setRemainingEffort(0);
+			tile.setBuilding(building);
 			world.buildings.add(building);
 		}
 		

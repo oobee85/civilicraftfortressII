@@ -30,8 +30,8 @@ public enum UnitType implements HasImage {
 	HORSE		("resources/Images/units/horse.png",	new CombatStats(200, 5, 5, 1, 40, 0, 50), 	false, false, false, null, null, new Item(100, ItemType.FOOD), null),
 	PIG			("resources/Images/units/pig.png",		new CombatStats(200, 10, 30, 1, 40, 0, 50), false, false, false, null, null, new Item(200, ItemType.FOOD), null),
 	SHEEP		("resources/Images/units/sheep.png",	new CombatStats(200, 5, 30, 1, 40, 0, 50), 	false, false, false, null, null, new Item(100, ItemType.FOOD), null),
-	FISH		("resources/Images/units/fish2.png",	new CombatStats( 10, 1, 5, 1, 40, 0, 50),  	true, false, false, null, null, new Item(100, ItemType.FOOD), null),
 	COW			("resources/Images/units/cow.png",		new CombatStats(200, 10, 30, 1, 40, 0, 50), false, false, false, null, null, new Item(200, ItemType.FOOD), null),
+	FISH		("resources/Images/units/fish2.png",	new CombatStats( 10, 1, 5, 1, 40, 0, 50),  	true, false, false, null, null, new Item(100, ItemType.FOOD), null),
 	
 	DRAGON	   ("resources/Images/units/dragon.png",	new CombatStats(2000, 90, 5, 1, 30, 0, 10), 	false, true, true, null, null, new Item(10, ItemType.RUNITE_ORE), ProjectileType.FIREBALL_DRAGON),
 	VAMPIRE    ("resources/Images/units/vampire.png", 	new CombatStats(200, 20, 15, 1, 40, 0, 1), 		false, true, true, null, null, new Item(100, ItemType.FOOD), null),
