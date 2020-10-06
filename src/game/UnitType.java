@@ -33,7 +33,6 @@ public enum UnitType implements HasImage {
 	FISH		("resources/Images/units/fish2.png",	new CombatStats( 10, 1, 5, 1, 40, 0, 50),  	true, false, false, null, null, new Item(100, ItemType.FOOD), null),
 	COW			("resources/Images/units/cow.png",		new CombatStats(200, 10, 30, 1, 40, 0, 50), false, false, false, null, null, new Item(200, ItemType.FOOD), null),
 	
-	
 	DRAGON	   ("resources/Images/units/dragon.png",	new CombatStats(2000, 90, 5, 1, 30, 0, 10), 	false, true, true, null, null, new Item(10, ItemType.RUNITE_ORE), ProjectileType.FIREBALL_DRAGON),
 	VAMPIRE    ("resources/Images/units/vampire.png", 	new CombatStats(200, 20, 15, 1, 40, 0, 1), 		false, true, true, null, null, new Item(100, ItemType.FOOD), null),
 	ROC			("resources/Images/units/roc.png",		new CombatStats(500, 50, 10, 1, 25, 0, 10), 	false, true, true, null, null, new Item(100, ItemType.FOOD), null),
@@ -43,7 +42,7 @@ public enum UnitType implements HasImage {
 	WEREWOLF   ("resources/Images/units/werewolf.png",	new CombatStats(100, 20, 10, 1, 5, 0, 10), 		false, false, true, null, null, null, null),
 	LAVAGOLEM  ("resources/Images/units/lavagolem.png", new CombatStats(1000, 50, 50, 1, 100, 0, 10), 	false, false, true, null, null, new Item(50, ItemType.MITHRIL_ORE), null),
 	WOLF		("resources/Images/units/wolf.png",		new CombatStats(200, 40, 20, 1, 20, 0, 50), 	false, false, true, null, null, new Item(100, ItemType.FOOD), null),
-	CYCLOPS    ("resources/Images/units/cyclops.png", 	new CombatStats(500, 80, 50, 6, 40, 0, 10), 	false, true, true, null, null, new Item(10, ItemType.MITHRIL_BAR), ProjectileType.ROCK_CYCLOPS),
+	CYCLOPS    ("resources/Images/units/cyclops.png", 	new CombatStats(500, 80, 50, 6, 40, 0, 10), 	false, false, true, null, null, new Item(10, ItemType.MITHRIL_BAR), ProjectileType.ROCK_CYCLOPS),
 	SKELETON	("resources/Images/units/skeleton.png",	new CombatStats(200, 10, 20, 1, 20, 0, 50), 	false, false, true, null, null, new Item(100, ItemType.FOOD), null),
 	
 	FLAMELET	    ("resources/Images/units/flamelet.png", new CombatStats(1, 0, 25, 0, 1000, 0, 50), 	false, false, true, null, null, new Item(10 ,ItemType.COAL), null),

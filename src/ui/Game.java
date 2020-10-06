@@ -296,24 +296,24 @@ public class Game {
 				continue;
 			}
 			if(i != 3) {
-				summonThing(wall, null, BuildingType.WALL_WOOD, false);
+				summonThing(wall, null, BuildingType.WALL_STONE, false);
 			}
 			
 			
 			wallLoc = new TileLoc(tile.getLocation().x+3, tile.getLocation().y-3 + i);
 			wall = world.get(wallLoc) ;
 			if(i != 3) {
-				summonThing(wall, null, BuildingType.WALL_WOOD, false);
+				summonThing(wall, null, BuildingType.WALL_STONE, false);
 			}
 			
 			
 			wallLoc = new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y-3);
 			wall = world.get(wallLoc) ;
-			summonThing(wall, null, BuildingType.WALL_WOOD, false);
+			summonThing(wall, null, BuildingType.WALL_STONE, false);
 			
 			wallLoc = new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y+3);
 			wall = world.get(wallLoc) ;
-			summonThing(wall, null, BuildingType.WALL_WOOD, false);
+			summonThing(wall, null, BuildingType.WALL_STONE, false);
 		}
 		for(int i = -1; i < 2; i ++) {
 			for(int j = -1; j < 2; j ++) {
