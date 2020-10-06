@@ -474,6 +474,35 @@ public class World {
 		}
 	}
 
+	public void updateUnitColdDamage() {
+		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
+		
+		for (Unit unit : units) {
+			Tile tile = unit.getTile();
+			int tileDamage = 0;
+			if(tile.getTerrain() == Terrain.SNOW) {
+				tileDamage ++;
+			}
+			
+			if (tileDamage != 0) {
+				unit.takeDamage(tileDamage);
+			}
+			if (unit.isDead() == true) {
+				tile.removeUnit(unit);
+			} else {
+				unitsNew.add(unit);
+			}
+
+		}
+		for (Unit unit : newUnits) {
+			unitsNew.add(unit);
+			unit.getTile().addUnit(unit);
+			
+		}
+		newUnits.clear();
+		units = unitsNew;
+	}
+	
 	public void updateUnitLiquidDamage() {
 
 		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
@@ -498,7 +527,9 @@ public class World {
 		}
 		newUnits.clear();
 		units = unitsNew;
+		
 	}
+	
 	public void updateBuildingLiquidDamage() {
 
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
@@ -612,27 +643,6 @@ public class World {
 				}
 		}
 		
-//		int x0 = (int) (Math.random() * tiles.length);
-//		int y0 = (int) (Math.random() * tiles.length);
-//		double forestLength = Math.random()*70+1;
-//		double forestHeight = Math.random()*70+1;
-//		double forestLengthEdge = forestLength+30;
-//		double forestHeightEdge = forestHeight+30;
-//		for(Tile tile : getTiles()) {
-//			int dx = tile.getLocation().x - x0;
-//			int dy = tile.getLocation().y - y0;
-//			double forest = (dx*dx)/(forestLength*forestLength) + (dy*dy)/(forestHeight*forestHeight);
-//			double forestEdge = (dx*dx)/(forestLengthEdge*forestLengthEdge) + (dy*dy)/(forestHeightEdge*forestHeightEdge);
-//			
-//			if(tile.canPlant() == true && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2) {
-//				if((forestEdge < 1 && Math.random()<forestDensity-0.2) 
-//						|| (forest < 1 && Math.random() < forestDensity)) {
-//					Plant plant = new Plant(PlantType.FOREST1, tile);
-//					tile.setHasPlant(plant);
-//					plantsLand.add(plant);
-//				}	
-//			}
-//		}
 	}
 	
 	public List<Tile> getNeighbors(Tile tile) {

@@ -228,6 +228,9 @@ public class Game {
 			world.updateBuildingLiquidDamage();
 			world.updatePlantDamage();
 		}
+		if(ticks%20 == 0) {
+			world.updateUnitColdDamage();
+		}
 		
 		guiController.updateGUI();
 		if(changedTerrain) {
