@@ -156,13 +156,7 @@ public class Animal extends Unit {
 					}
 					dragon.moveAroundTarget();
 				}
-				if(this.readyToAttack()) {
-					if(this instanceof Vampire) {
-						this.heal(this.getType().getCombatStats().getAttack());
-					}
-					attack(getTarget());
-					this.resetTimeToAttack();
-				}
+				attack(getTarget());
 				
 			}
 			if(getTarget().isDead()) {
