@@ -13,7 +13,6 @@ import world.*;
 
 public class Unit extends Thing  {
 	
-	
 	private UnitType unitType;
 	private double timeToMove;
 	private double timeToAttack;
@@ -24,6 +23,8 @@ public class Unit extends Thing  {
 	private CombatStats combatStats;
 	private LinkedList<Tile> currentPath;
 	
+	private LinkedList<Attack> attacks;
+	
 	
 	public Unit(UnitType unitType, Tile tile, boolean isPlayerControlled) {
 		super(unitType.getCombatStats().getHealth(), unitType, isPlayerControlled, tile);
@@ -33,9 +34,22 @@ public class Unit extends Thing  {
 		this.remainingEffort = unitType.getCombatStats().getTicksToBuild();
 		this.timeToHeal = unitType.getCombatStats().getHealSpeed();
 		this.isIdle = false;
-		
-		
+
+		attacks = new LinkedList<>();
+		// projectile attacks
+		if(unitType.getProjectileType() != null) {
+			addAttackType(new Attack(unitType.getCombatStats().getAttackRadius(), unitType.getProjectileType(), unitType.getCombatStats().getAttackSpeed()));
+		}
+		// melee attacks
+		if(unitType.getCombatStats().getAttack() > 0) {
+			addAttackType(new Attack(1, unitType.getCombatStats().getAttack(), unitType.getCombatStats().getAttackSpeed()));
+		}
 	}
+	
+	public void addAttackType(Attack a) {
+		attacks.add(a);
+	}
+	
 	public void expendEffort(int effort) {
 		remainingEffort -= effort;
 		if(remainingEffort < 0) {
@@ -192,10 +206,25 @@ public class Unit extends Thing  {
 		}
 		resetTimeToAttack();
 		if(other instanceof Unit) {
-			((Unit)other).setTarget(this);
+			((Unit)other).aggro(this);
 		}
 		return damageDealt;
 	}
+	
+	public void aggro(Unit attacker) {
+		this.setTarget(attacker);
+	}
+	
+	public Attack chooseAttack(Thing target) {
+		for(Attack a : attacks) {
+			int distance = this.getTile().getLocation().distanceTo(target.getTile().getLocation());
+			if(distance <= a.range && (a.projectileType == null || distance >= a.projectileType.getMinimumRange())) {
+				return a;
+			}
+		}
+		return null;
+	}
+	
 	
 	
 	public void resetTimeToAttack() {
