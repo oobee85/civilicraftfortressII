@@ -11,7 +11,7 @@ import wildlife.Animal;
 import wildlife.Dragon;
 import world.*;
 
-public class Unit extends Thing {
+public class Unit extends Thing  {
 	
 	
 	private UnitType unitType;
@@ -22,7 +22,6 @@ public class Unit extends Thing {
 	private int remainingEffort;
 	private boolean isIdle;
 	private CombatStats combatStats;
-	
 	private LinkedList<Tile> currentPath;
 	
 	

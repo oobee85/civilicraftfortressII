@@ -28,6 +28,7 @@ public class Game {
 	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
 	private UnitType selectedUnitToSpawn;
 	private BuildingType selectedBuildingToSpawn;
+	private BuildingType selectedBuildingToPlan;
 	private int numCutTrees = 10;
 	private int buildingsUntilOgre = 10;
 	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
@@ -800,6 +801,13 @@ public class Game {
 				}
 				
 				BufferedImage bI = Utils.toBufferedImage(b.getImage(0));
+				//draws the transparent version
+				Utils.setTransparency(g, 0.5f);
+				Graphics2D g2d = (Graphics2D)g;
+				g2d.drawImage(bI, b.getTile().getLocation().x * Game.tileSize, b.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize , null);
+				Utils.setTransparency(g, 1f);
+				
+				//draws the partial image
 				double percentDone = 1 - b.getRemainingEffort()/b.getType().getBuildingEffort();
 				int h =  Math.max(1, (int) (bI.getHeight() * percentDone));
 				int tileh = Math.max(1, (int) (Game.tileSize * percentDone));
@@ -814,6 +822,13 @@ public class Game {
 					int hi = (int)(Game.tileSize*.75);
 					g.drawImage(Utils.loadImage("resources/Images/interfaces/building.PNG"), x, y, w, hi, null);
 				}
+			}
+			for(Building planned : world.plannedBuildings) {
+				Utils.setTransparency(g, 0.5f);
+				Graphics2D g2d = (Graphics2D)g;
+				BufferedImage bI = Utils.toBufferedImage(planned.getImage(0));
+				g2d.drawImage(bI, planned.getTile().getLocation().x * Game.tileSize, planned.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize , null);
+				Utils.setTransparency(g, 1f);
 			}
 			for(Animal animal : Wildlife.getAnimals()) {
 				g.drawImage(animal.getImage(0), animal.getTile().getLocation().x * Game.tileSize, animal.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
@@ -1198,6 +1213,7 @@ public class Game {
 			if(shiftEnabled == false) {
 				selectedUnitToSpawn = null;
 				selectedBuildingToSpawn = null;
+				selectedBuildingToPlan = null;
 			}
 			
 		}
@@ -1210,6 +1226,21 @@ public class Game {
 			if(shiftEnabled == false) {
 				selectedUnitToSpawn = null;
 				selectedBuildingToSpawn = null;
+				selectedBuildingToPlan = null;
+			}
+		}
+		if (selectedBuildingToPlan != null) {
+			System.out.println("planning building" + selectedBuildingToPlan.toString() + loc.toString());
+			if (selectedBuildingToPlan == BuildingType.IRRIGATION && tile.canPlant() == false) {
+				return;
+			}
+			Building building = new Building(selectedBuildingToPlan, tile, true);
+			tile.setBuilding(building);
+			world.plannedBuildings.add(building);
+			if(shiftEnabled == false) {
+				selectedUnitToSpawn = null;
+				selectedBuildingToSpawn = null;
+				selectedBuildingToPlan = null;
 			}
 		}
 		toggleSelectionOnTile(tile);
@@ -1223,6 +1254,7 @@ public class Game {
 		if(enabled == false) {
 			selectedBuildingToSpawn = null;
 			selectedUnitToSpawn = null;
+			selectedBuildingToPlan = null;
 		}
 	}
 	public void aControl(boolean enabled) {
@@ -1461,6 +1493,9 @@ public class Game {
 				return building;
 			}
 		}
+		for(Building pBuilding : world.plannedBuildings) {
+			return pBuilding;
+		}
 		return null;
 	}
 	
@@ -1529,7 +1564,7 @@ public class Game {
 	}
 	
 	public void buildBuilding(BuildingType bt) {
-
+		
 		for (Thing thing : selectedThings) {
 			if (thing != null && thing instanceof Unit && ((Unit) thing).getUnitType() == UnitType.WORKER) {
 				if (thing.getTile().getHasBuilding() == false) {
@@ -1562,6 +1597,12 @@ public class Game {
 		}
 
 	}
+	public void setBuildingToPlan(BuildingType bt) {
+		if(bt != null) {
+			selectedBuildingToPlan = bt;
+		}
+	}
+	
 	public void setThingToSpawn(UnitType ut, BuildingType bt) {
 		if(ut != null) {
 			selectedUnitToSpawn = ut;

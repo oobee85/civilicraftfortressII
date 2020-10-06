@@ -24,7 +24,6 @@ public class Tile {
 	private String roadCorner;
 
 	private Resource resource;
-//	private RoadType roadType;
 	private Plant plant;
 	private Terrain terr;
 	private Building building;

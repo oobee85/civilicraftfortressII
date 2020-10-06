@@ -31,6 +31,7 @@ public class Frame extends JPanel {
 
 
 	private ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.PNG"), 20, 20);
+	private ImageIcon BUILDING_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.PNG"), 20, 20);
 	private ImageIcon CITY_TAB_ICON = Utils.resizeImageIcon(BuildingType.CASTLE.getImageIcon(0), 20, 20);
 	private ImageIcon BARRACKS_TAB_ICON = Utils.resizeImageIcon(BuildingType.BARRACKS.getImageIcon(0), 20, 20);
 	private ImageIcon WORKSHOP_TAB_ICON = Utils.resizeImageIcon(BuildingType.WORKSHOP.getImageIcon(0), 20, 20);
@@ -59,6 +60,7 @@ public class Frame extends JPanel {
 	private JPanel workerMenu;
 	private JPanel spawnMenu;
 	private JPanel techView;
+	private JPanel buildingPlanner;
 	private JPanel statView;
 	private JLabel tileSize;
 	private JTabbedPane tabbedPane;
@@ -85,10 +87,11 @@ public class Frame extends JPanel {
 	private int BLACKSMITH_TAB;
 	private int HELLFORGE_TAB;
 	private int DEBUG_TAB;
-	private int CASTLE_TAB;
+	private int BUILDING_TAB;
 	private int BARRACKS_TAB;
 	private int WORKSHOP_TAB;
 	private int RESEARCHLAB_TAB;
+	private int CASTLE_TAB;
 	private int STAT_TAB;
 	private int SPAWN_TAB;
 
@@ -511,6 +514,15 @@ public class Frame extends JPanel {
 		}
 		tabbedPane.setEnabledAt(WORKER_TAB, enabled);
 	}
+	
+	private void managePlanBuildingTab(boolean enabled) {
+		if (enabled == false && tabbedPane.getSelectedIndex() == BUILDING_TAB) {
+			tabbedPane.setSelectedIndex(0);
+		} else if (enabled == true) {
+			tabbedPane.setSelectedIndex(BUILDING_TAB);
+		}
+		tabbedPane.setEnabledAt(BUILDING_TAB, enabled);
+	}
 
 	private void manageCastleTab(boolean enabled) {
 		if (enabled == false && tabbedPane.getSelectedIndex() == CASTLE_TAB) {
@@ -622,10 +634,8 @@ public class Frame extends JPanel {
 		int BUILDING_ICON_SIZE = 25;
 		int RESOURCE_ICON_SIZE = 35;
 
+		
 		workerMenu = new JPanel();
-		
-		
-		
 		JButton makeRoad = KUIConstants.setupButton("Road",
 				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildroad.png"),
 						BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
@@ -634,7 +644,7 @@ public class Frame extends JPanel {
 			gameInstance.buildRoad(RoadType.STONE_ROAD);
 		});
 		workerMenu.add(makeRoad);
-
+		
 		for (int i = 0; i < BuildingType.values().length; i++) {
 			BuildingType type = BuildingType.values()[i];
 			KButton button = KUIConstants.setupButton(type.toString(),
@@ -650,7 +660,35 @@ public class Frame extends JPanel {
 			buildingButtons[i] = button;
 			workerMenu.add(button);
 		}
-
+		
+		
+		
+		buildingPlanner = new JPanel();
+		JButton planRoad = KUIConstants.setupButton("plan road",
+				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildroad.png"),
+						BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
+				BUILDING_BUTTON_SIZE);
+		planRoad.addActionListener(e -> {
+			gameInstance.buildRoad(RoadType.STONE_ROAD);
+		});
+		buildingPlanner.add(planRoad);
+		
+		for (int i = 0; i < BuildingType.values().length; i++) {
+			BuildingType type = BuildingType.values()[i];
+			KButton button = KUIConstants.setupButton(type.toString(),
+					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
+					BUILDING_BUTTON_SIZE);
+			button.addActionListener(e -> {
+				gameInstance.setBuildingToPlan(type);
+				switchInfoPanel(new BuildingTypeInfoPanel(type));
+			});
+			button.addRightClickActionListener(e -> {
+				switchInfoPanel(new BuildingTypeInfoPanel(type));
+			});
+//			buildingButtons[i] = button;
+			buildingPlanner.add(button);
+		}
+		
 		spawnMenu = new JPanel();
 		for (int i = 0; i < UnitType.values().length; i++) {
 			UnitType type = UnitType.values()[i];
@@ -1046,6 +1084,9 @@ public class Frame extends JPanel {
 		
 		WORKER_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("Worker Tab", WORKER_TAB_ICON, workerMenu, "Does nothing", WORKER_TAB);
+		
+		BUILDING_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("plan buildings", BUILDING_TAB_ICON, buildingPlanner, "Does nothing", BUILDING_TAB);
 
 		CASTLE_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("City", CITY_TAB_ICON, castleView, "Does nothing", CASTLE_TAB);

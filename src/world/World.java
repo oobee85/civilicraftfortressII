@@ -35,6 +35,7 @@ public class World {
 	public LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
 	public LinkedList<Unit> units = new LinkedList<Unit>();
 	public LinkedList<Building> buildings = new LinkedList<Building>();
+	public LinkedList<Building> plannedBuildings = new LinkedList<Building>();
 	public LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
 	
 	public HashSet<Unit> unitsInTerritory = new HashSet<Unit>();
@@ -436,6 +437,7 @@ public class World {
 					
 //					unit.getCombatStats().set(combine);
 					unit.setCombatStats(combine);
+					
 					unit.attack(unit.getTarget());
 				}else {
 					if(unit.readyToAttack() && !unit.getTarget().isDead()) {
@@ -500,7 +502,8 @@ public class World {
 	public void updateBuildingLiquidDamage() {
 
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
-
+		LinkedList<Building> plannedBuildingsNew = new LinkedList<Building>();
+		
 		for (Building building : buildings) {
 			Tile tile = building.getTile();
 			int tileDamage = tile.computeTileDamage(building);
@@ -514,7 +517,15 @@ public class World {
 			}
 
 		}
+		for(Building plannedBuilding : plannedBuildings) {
+			if(plannedBuilding.getRemainingEffort() < plannedBuilding.getType().getBuildingEffort()) {
+				buildingsNew.add(plannedBuilding);
+			}else {
+				plannedBuildingsNew.add(plannedBuilding);
+			}
+		}
 		newUnits.clear();
+		plannedBuildings = plannedBuildingsNew;
 		buildings = buildingsNew;
 	}
 	
