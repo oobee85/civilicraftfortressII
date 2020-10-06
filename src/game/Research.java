@@ -1,10 +1,14 @@
 package game;
 
+import java.util.*;
+
 public class Research {
 
 	private int researchPointsSpent;
 	private boolean isUnlocked = false;
 	private ResearchType type;
+	
+	private HashMap<ItemType, Integer> cost = new HashMap<>();
 	
 	private ResearchRequirement req = new ResearchRequirement();
 	
@@ -37,6 +41,17 @@ public class Research {
 				researchPointsSpent = type.getRequiredPoints();
 			}
 		}
+	}
+
+	public HashMap<ItemType, Integer> getCost(){
+		return cost;
+	}
+	
+	public void addCost(ItemType type, int quanity) {
+		if(!cost.containsKey(type)) {
+			cost.put(type, 0);
+		}
+		cost.put(type, cost.get(type) + quanity);
 	}
 	
 	@Override

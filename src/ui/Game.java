@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.awt.image.*;
+import java.io.*;
+import java.net.*;
 import java.util.*;
 
 import game.*;
@@ -64,6 +66,52 @@ public class Game {
 	
 	public World world;
 	
+	public void setupResearch() {
+		// Instantiate each research type
+		for(ResearchType researchType : ResearchType.values()) {
+			Research res = new Research(researchType);
+			researches.put(researchType, res);
+		}
+		// Link research requirements
+		for(Research research : researches.values()) {
+			for(ResearchType requiredType : research.getType().getRequiredResearch()) {
+				research.getRequirement().addRequirement(researches.get(requiredType));
+			}
+		}
+		// Load up costs
+		URL path = Utils.class.getClassLoader().getResource("resources/costs/ResearchType.txt");
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(path.getPath()));
+			String line;
+			while((line = br.readLine()) != null) {
+				line = line.trim();
+				if(line.length() == 0) {
+					continue;
+				}
+				String[] split = line.split("\\$");
+				String researchName = split[0].trim();
+				System.out.println("researchName: " + researchName);
+				ResearchType type = ResearchType.valueOf(researchName);
+				Research research = researches.get(type);
+				String[] costSplit = split[1].split(",");
+				for(int i = 0; i < costSplit.length; i++) {
+					String item = costSplit[i].trim();
+					System.out.println("item: " + item);
+					String[] itemSplit = item.split("\\:");
+					
+					String itemName = itemSplit[0].trim();
+					String itemAmount = itemSplit[1].trim();
+					System.out.println("itemName: " + itemName);
+					System.out.println("itemAmount: " + itemAmount);
+					
+					research.addCost(ItemType.valueOf(itemName), Integer.parseInt(itemAmount));
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public Game(GUIController guiController) {
 		this.guiController = guiController;
 		money = 100;
@@ -78,15 +126,7 @@ public class Game {
 			}
 			items.put(itemType, item);
 		}
-		for(ResearchType researchType : ResearchType.values()) {
-			Research res = new Research(researchType);
-			researches.put(researchType, res);
-		}
-		for(Research research : researches.values()) {
-			for(ResearchType requiredType : research.getType().getRequiredResearch()) {
-				research.getRequirement().addRequirement(researches.get(requiredType));
-			}
-		}
+		setupResearch();
 		for(BuildingType type : BuildingType.values()) {
 			// make a new researchrequirement object
 			ResearchRequirement req = new ResearchRequirement();
@@ -1181,8 +1221,9 @@ public class Game {
 	}
 	
 	public void setResearchTarget(ResearchType type) {
-		if(researches.get(type).getRequirement().areRequirementsMet()) {
-			for (Map.Entry mapElement : type.getCost().entrySet()) {
+		Research research = researches.get(type);
+		if(research.getRequirement().areRequirementsMet()) {
+			for (Map.Entry mapElement : research.getCost().entrySet()) {
 				ItemType key = (ItemType) mapElement.getKey();
 				Integer value = (Integer) mapElement.getValue();
 
@@ -1191,14 +1232,14 @@ public class Game {
 				}
 			}
 
-			for (Map.Entry mapElement : type.getCost().entrySet()) {
+			for (Map.Entry mapElement : research.getCost().entrySet()) {
 				ItemType key = (ItemType) mapElement.getKey();
 				Integer value = (Integer) mapElement.getValue();
 
 				items.get(key).addAmount(-value);
 			}
 
-			researchTarget = researches.get(type);
+			researchTarget = research;
 		}
 	}
 	private void setTerritory(TileLoc p) {
