@@ -449,7 +449,9 @@ public class Frame extends JPanel {
 		SwingUtilities.invokeLater(() -> {
 			infoPanel.removeAll();
 			newInfo.setOpaque(false);
-			JButton explodeUnit = KUIConstants.setupButton("Explode", null, DEBUG_BUTTON_SIZE);
+			Dimension size = new Dimension(DEBUG_BUTTON_SIZE.width*1/2, DEBUG_BUTTON_SIZE.height*2/3);
+			JButton explodeUnit = KUIConstants.setupButton("Explode", null, size);
+			explodeUnit.setFont(KUIConstants.buttonFontMini);
 			explodeUnit.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
@@ -461,7 +463,7 @@ public class Frame extends JPanel {
 			});
 			newInfo.setLayout(null);
 			newInfo.add(explodeUnit);
-			explodeUnit.setBounds(10, infoPanel.getHeight()-(int)DEBUG_BUTTON_SIZE.getHeight()- 10, (int)DEBUG_BUTTON_SIZE.getWidth(), (int)DEBUG_BUTTON_SIZE.getHeight());
+			explodeUnit.setBounds((int) (infoPanel.getWidth() - size.getWidth()), infoPanel.getHeight()-(int)size.getHeight(), (int)size.getWidth(), (int)size.getHeight());
 			infoPanel.add(newInfo, BorderLayout.CENTER);
 			infoPanel.validate();
 		});
