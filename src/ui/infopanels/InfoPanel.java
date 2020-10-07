@@ -31,6 +31,17 @@ public class InfoPanel extends JPanel {
 		return imageSize;
 	}
 	
+	public JButton addButton(String text) {
+		Dimension size = new Dimension(60, 20);
+		JButton button = KUIConstants.setupButton(text, null, size);
+		button.setFont(KUIConstants.buttonFontMini);
+		this.setLayout(null);
+		this.add(button);
+		System.out.println(this.getWidth());
+		button.setBounds(this.getWidth() - size.width, this.getHeight()-size.height, size.width, size.height);
+		return button;
+	}
+	
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);

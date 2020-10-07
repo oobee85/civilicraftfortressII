@@ -2,4 +2,4 @@
 asdf
 
 Requirements:
-https://amelentev.github.io/java-oo/
+Download the release jar from: [https://github.com/stleary/JSON-java](https://github.com/stleary/JSON-java)

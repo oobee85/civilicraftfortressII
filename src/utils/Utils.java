@@ -42,8 +42,8 @@ public final class Utils {
 		else if(o instanceof ItemType) {
 			rawName = ((ItemType)o).name();
 		}
-		else if(o instanceof ResearchType) {
-			rawName = ((ResearchType)o).name();
+		else if(o instanceof Research) {
+			rawName = ((Research)o).getName();
 		}
 		else if(o instanceof RoadType) {
 			rawName = ((RoadType)o).name();
