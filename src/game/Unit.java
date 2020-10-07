@@ -175,6 +175,9 @@ public class Unit extends Thing  {
 			}
 			if(tobuild != null) {
 				tobuild.expendEffort(1);
+				if(tobuild.getRemainingEffort() < tobuild.getType().getBuildingEffort()) {
+					tobuild.setPlanned(false);
+				}
 //				tobuild.setHealth(tobuild.getHealth() + 1);
 			}
 		}

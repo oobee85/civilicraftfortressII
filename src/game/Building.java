@@ -18,6 +18,7 @@ public class Building extends Thing {
 	private double timeToHarvest;
 	private double baseTimeToHarvest = 20;
 	private boolean isPlayerControlled;
+	private boolean isPlanned;
 	
 	private ResearchRequirement req = new ResearchRequirement();
 	
@@ -28,7 +29,12 @@ public class Building extends Thing {
 		this.spawnLocation = tile;
 		this.timeToHarvest = baseTimeToHarvest;
 		this.isPlayerControlled = isPlayerControlled;
+		this.isPlanned = false;
 		
+		
+	}
+	public void setPlanned(boolean planned) {
+		isPlanned = planned;
 	}
 	public void tick() {
 		updateInProgressUnit();

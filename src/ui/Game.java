@@ -1263,9 +1263,8 @@ public class Game {
 			if(tile.getHasBuilding() == true) {
 				return;
 			}
-			Building building = new Building(selectedBuildingToPlan, tile, true);
-			tile.setBuilding(building);
-			world.plannedBuildings.add(building);
+			buildBuilding(selectedBuildingToPlan, tile);
+			
 			if(shiftEnabled == false) {
 				selectedUnitToSpawn = null;
 				selectedBuildingToSpawn = null;
@@ -1601,7 +1600,7 @@ public class Game {
 		
 	}
 	
-	public void buildBuilding(BuildingType bt) {
+	public void buildBuilding(BuildingType bt, Tile tile) {
 		
 		for (Thing thing : selectedThings) {
 			if (thing != null && thing instanceof Unit && ((Unit) thing).getUnitType() == UnitType.WORKER) {
@@ -1618,6 +1617,9 @@ public class Game {
 					if (bt == BuildingType.IRRIGATION && thing.getTile().canPlant() == false) {
 						return;
 					}
+					if (bt == BuildingType.IRRIGATION && tile != null && tile.canPlant() == false) {
+						return;
+					}
 
 					for (Map.Entry mapElement : bt.getCost().entrySet()) {
 						ItemType key = (ItemType) mapElement.getKey();
@@ -1625,10 +1627,19 @@ public class Game {
 
 						items.get(key).addAmount(-value);
 					}
-
-					Building building = new Building(bt, thing.getTile(), true);
-					thing.getTile().setBuilding(building);
-					world.buildings.add(building);
+					
+					if(tile != null) {
+						Building building = new Building(bt, tile, true);
+						tile.setBuilding(building);
+						world.buildings.add(building);
+//						building.setPlanned(true);
+						
+					}else if(tile == null) {
+						Building building = new Building(bt, thing.getTile(), true);
+						thing.getTile().setBuilding(building);
+						world.buildings.add(building);
+					}
+					
 
 				}
 			}
