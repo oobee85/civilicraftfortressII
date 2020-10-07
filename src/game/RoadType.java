@@ -15,12 +15,12 @@ public enum RoadType implements HasImage {
 	
 	private final double health;
 	private MipMap mipmap;
-	private ResearchType researchRequirement;
+	private String researchRequirement;
 	private double buildingEffort;
 	private HashMap <ItemType, Integer> cost;
 	private double speed;
 	
-	RoadType(double hp, double buildingEffort, String s, double speed,  ResearchType requirement, HashMap <ItemType, Integer> resourcesNeeded) {
+	RoadType(double hp, double buildingEffort, String s, double speed,  String requirement, HashMap <ItemType, Integer> resourcesNeeded) {
 		this.researchRequirement = requirement;
 		this.health = hp;
 		mipmap = new MipMap(s);
@@ -30,7 +30,7 @@ public enum RoadType implements HasImage {
 		
 	}
 	
-	public ResearchType getResearchRequirement() {
+	public String getResearchRequirement() {
 		return researchRequirement;
 	}
 

@@ -36,7 +36,8 @@ public class Game {
 	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
 	
 	HashMap<ItemType, Item> items = new HashMap<ItemType, Item>();
-	HashMap<ResearchType, Research> researches = new HashMap<>();
+	ArrayList<Research> researchList = new ArrayList<>();
+	HashMap<String, Research> researchMap = new HashMap<>();
 	
 	HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
 	HashMap<UnitType, ResearchRequirement> unitResearchRequirements = new HashMap<>();
@@ -66,50 +67,6 @@ public class Game {
 	
 	public World world;
 	
-	public void setupResearch() {
-		// Instantiate each research type
-		for(ResearchType researchType : ResearchType.values()) {
-			Research res = new Research(researchType);
-			researches.put(researchType, res);
-		}
-		// Link research requirements
-		for(Research research : researches.values()) {
-			for(ResearchType requiredType : research.getType().getRequiredResearch()) {
-				research.getRequirement().addRequirement(researches.get(requiredType));
-			}
-		}
-		// Load up costs
-		URL path = Utils.class.getClassLoader().getResource("resources/costs/ResearchType.txt");
-		try (BufferedReader br = new BufferedReader(new FileReader(path.getPath()))) {
-			String line;
-			while((line = br.readLine()) != null) {
-				line = line.trim();
-				if(line.length() == 0) {
-					continue;
-				}
-				String[] split = line.split("\\$");
-				String researchName = split[0].trim();
-				System.out.println("researchName: " + researchName);
-				ResearchType type = ResearchType.valueOf(researchName);
-				Research research = researches.get(type);
-				String[] costSplit = split[1].split(",");
-				for(int i = 0; i < costSplit.length; i++) {
-					String item = costSplit[i].trim();
-					System.out.println("item: " + item);
-					String[] itemSplit = item.split("\\:");
-					
-					String itemName = itemSplit[0].trim();
-					String itemAmount = itemSplit[1].trim();
-					System.out.println("itemName: " + itemName);
-					System.out.println("itemAmount: " + itemAmount);
-					
-					research.addCost(ItemType.valueOf(itemName), Integer.parseInt(itemAmount));
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 	
 	public Game(GUIController guiController) {
 		this.guiController = guiController;
@@ -125,14 +82,14 @@ public class Game {
 			}
 			items.put(itemType, item);
 		}
-		setupResearch();
+		Loader.setupResearch(researchMap, researchList);
 		for(BuildingType type : BuildingType.values()) {
 			// make a new researchrequirement object
 			ResearchRequirement req = new ResearchRequirement();
 			// only add requirement if it isnt null
 			if(type.getResearchRequirement() != null) {
 				// get the research that type requires
-				Research typesRequirement = researches.get(type.getResearchRequirement());
+				Research typesRequirement = researchMap.get(type.getResearchRequirement());
 				// add the required research to the req
 				req.addRequirement(typesRequirement);
 			}
@@ -145,7 +102,7 @@ public class Game {
 			// only add requirement if it isnt null
 			if(type.getResearchRequirement() != null) {
 				// get the research that type requires
-				Research typesRequirement = researches.get(type.getResearchRequirement());
+				Research typesRequirement = researchMap.get(type.getResearchRequirement());
 				// add the required research to the req
 				req.addRequirement(typesRequirement);
 			}
@@ -1220,24 +1177,23 @@ public class Game {
 			
 	}
 
-	public void setResearchTarget(ResearchType type) {
-		
+	public void setResearchTarget(Research research) {
 	
-		Research research = researches.get(type);
 		if(research.getRequirement().areRequirementsMet()) {
-			for (Map.Entry mapElement : research.getCost().entrySet()) {
+			for (Entry<ItemType, Integer> mapElement : research.getCost().entrySet()) {
 				
-				ItemType key = (ItemType) mapElement.getKey();
-				Integer value = (Integer) mapElement.getValue();
+				ItemType key = mapElement.getKey();
+				Integer value = mapElement.getValue();
 
 				if (items.get(key) != null && items.get(key).getAmount() < value) {
+					System.out.println("Not enough " + key);
 					return;
 				}
 			}
 
-			for (Map.Entry mapElement : research.getCost().entrySet()) {
-				ItemType key = (ItemType) mapElement.getKey();
-				Integer value = (Integer) mapElement.getValue();
+			for (Entry<ItemType, Integer> mapElement : research.getCost().entrySet()) {
+				ItemType key = mapElement.getKey();
+				Integer value = mapElement.getValue();
 
 				items.get(key).addAmount(-value);
 			}
@@ -1876,7 +1832,7 @@ public class Game {
 	}
 	
 	public void researchEverything() {
-		for(Research research : researches.values()) {
+		for(Research research : researchList) {
 			researchTarget = research;
 			researchTarget.spendResearch(100000);
 			if (researchTarget.isUnlocked()) {

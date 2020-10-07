@@ -67,7 +67,7 @@ public class Frame extends JPanel {
 	private JPanel guiSplitter;
 	private JComboBox<MapType> mapType;
 	private JLabel[] resourceIndicators = new JLabel[ItemType.values().length];
-	private JButton[] researchButtons = new JButton[ResearchType.values().length];
+	private HashMap<JButton, Research> researchButtons = new HashMap<>();
 	private JButton[] buildingButtons = new JButton[BuildingType.values().length];
 	private JButton[] unitButtons = new JButton[UnitType.values().length];
 	private JButton[] craftButtons = new JButton[ItemType.values().length];
@@ -166,15 +166,11 @@ public class Frame extends JPanel {
 				for (int i = 0; i < ItemType.values().length; i++) {
 					resourceIndicators[i].setText("" + gameInstance.getResourceAmount(ItemType.values()[i]));
 				}
-				for (int i = 0; i < ResearchType.values().length; i++) {
-					Research r = gameInstance.researches.get(ResearchType.values()[i]);
-//					if(r.getType().getTier() != 1) {
-//						continue;
-//					}
-					boolean unlocked = r.isUnlocked();
+				for(Entry<JButton, Research> entry : researchButtons.entrySet()) {
+					JButton button = entry.getKey();
+					Research r = entry.getValue();
 					ResearchRequirement req = r.getRequirement();
-					JButton button = researchButtons[i];
-					if (unlocked) {
+					if (r.isUnlocked()) {
 						button.setEnabled(false);
 						button.setVisible(true);
 					} else if (req.areRequirementsMet()) {
@@ -760,20 +756,20 @@ public class Frame extends JPanel {
 			workshopView.add(button);
 		}
 		
-		researchLabView = new JPanel() {
-		};
-		for (int i = 0; i < ResearchType.values().length; i++) {
-			ResearchType type = ResearchType.values()[i];
-			KButton button = KUIConstants.setupButton(type.toString(),
-					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
+		researchLabView = new JPanel();
+		for (int i = 0; i < gameInstance.researchList.size(); i++) {
+			Research research = gameInstance.researchList.get(i);
+			KButton button = KUIConstants.setupButton(research.toString(),
+					Utils.resizeImageIcon(research.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
+			button.setEnabled(false);
 			button.addActionListener(e -> {
-				gameInstance.setResearchTarget(type);
-				switchInfoPanel(new ResearchInfoPanel(gameInstance.researches.get(type)));
+				gameInstance.setResearchTarget(research);
+				switchInfoPanel(new ResearchInfoPanel(research));
 			});
 			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new ResearchInfoPanel(gameInstance.researches.get(type)));
+				switchInfoPanel(new ResearchInfoPanel(research));
 			});
-			researchButtons[i] = button;
+			researchButtons.put(button, research);
 			researchLabView.add(button);
 		}
 		
@@ -1021,22 +1017,23 @@ public class Frame extends JPanel {
 		buttonPanel.add(exit);
 
 		techView = new JPanel();
-		for (int i = 0; i < ResearchType.values().length; i++) {
-			final ResearchType type = ResearchType.values()[i];
-			if(type.getTier() != 1 && type != ResearchType.IRON_WORKING) {
+		for (int i = 0; i < gameInstance.researchList.size(); i++) {
+			Research research = gameInstance.researchList.get(i);
+			if(research.getTier() > 1) {
 				continue;
 			}
-			KButton button = KUIConstants.setupButton(type.toString(), null, RESEARCH_BUTTON_SIZE);
+			KButton button = KUIConstants.setupButton(research.toString(),
+					Utils.resizeImageIcon(research.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.setEnabled(false);
 			button.addActionListener(e -> {
-				gameInstance.setResearchTarget(type);
-				switchInfoPanel(new ResearchInfoPanel(gameInstance.researches.get(type)));
+				gameInstance.setResearchTarget(research);
+				switchInfoPanel(new ResearchInfoPanel(research));
 			});
 			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new ResearchInfoPanel(gameInstance.researches.get(type)));
+				switchInfoPanel(new ResearchInfoPanel(research));
 			});
-			researchButtons[i] = button;
-			techView.add(researchButtons[i]);
+			researchButtons.put(button, research);
+			techView.add(button);
 		}
 		statView = new JPanel();
 		for (int i = 0; i < gameInstance.getCombatBuffs().getStats().size(); i++) {

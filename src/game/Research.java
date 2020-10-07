@@ -1,23 +1,45 @@
 package game;
 
+import java.awt.*;
 import java.util.*;
 
-public class Research {
+import javax.swing.*;
 
+import utils.*;
+
+public class Research implements HasImage {
+	
+	public static final String DEFAULT_RESEARCH_IMAGE_PATH = "resources/Images/interfaces/tech.png";
+	
+	private final int requiredResearchPoints;
+	private final int tier;
+	private final String name;
+	
 	private int researchPointsSpent;
 	private boolean isUnlocked = false;
-	private ResearchType type;
+	private MipMap mipmap;
 	
 	private HashMap<ItemType, Integer> cost = new HashMap<>();
 	
 	private ResearchRequirement req = new ResearchRequirement();
 	
-	public Research(ResearchType researchType) {
-		this.type = researchType;
+	public Research(String researchName, String imagePath, int points, int tier) {
+		this.name = researchName;
+		mipmap = new MipMap(imagePath);
+		requiredResearchPoints = points;
+		this.tier = tier;
+	}
+
+	public int getTier() {
+		return tier;
+	}
+
+	public int getRequiredPoints() {
+		return requiredResearchPoints;
 	}
 	
-	public ResearchType getType() {
-		return type;
+	public String getName() {
+		return name;
 	}
 	
 	public ResearchRequirement getRequirement() {
@@ -35,10 +57,9 @@ public class Research {
 	public void spendResearch(int points) {
 		if(!isUnlocked()) {
 			researchPointsSpent += points;
-			System.out.println(researchPointsSpent);
-			if(researchPointsSpent >= type.getRequiredPoints()) {
+			if(researchPointsSpent >= requiredResearchPoints) {
 				isUnlocked = true;
-				researchPointsSpent = type.getRequiredPoints();
+				researchPointsSpent = requiredResearchPoints;
 			}
 		}
 	}
@@ -56,7 +77,19 @@ public class Research {
 	
 	@Override
 	public String toString() {
-		return type.toString();
+		return Utils.getName(this);
+	}
+	@Override
+	public Image getImage(int size) {
+		return mipmap.getImage(size);
+	}
+	@Override
+	public ImageIcon getImageIcon(int size) {
+		return mipmap.getImageIcon(size);
+	}
+	@Override
+	public Color getColor(int size) {
+		return mipmap.getColor(size);
 	}
 	
 }

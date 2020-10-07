@@ -16,23 +16,23 @@ public enum BuildingType implements HasImage {
 	 			null),
 	 	
 	 	WALL_STONE (1000, 200, "resources/Images/buildings/wall_stone.png", 0.25, false, 1,
-	 			ResearchType.ENGINEERING,  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,300);	put(ItemType.WOOD,200);  }},
+	 			"ENGINEERING",  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,300);	put(ItemType.WOOD,200);  }},
 	 			null),
 	 	
 	 	WALL_BRICK (5000, 500, "resources/Images/buildings/wall_brick.png", 0.25, false, 1,
-	 			ResearchType.MONARCHY,  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,500); put(ItemType.ADAMANTITE_BAR,1);  }},
+	 			"MONARCHY",  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,500); put(ItemType.ADAMANTITE_BAR,1);  }},
 	 			null),
 	 	
 	 	GATE_WOOD (100, 200, "resources/Images/buildings/gate_wood.png", 0.25, false, 1,
-	 			ResearchType.MASONRY,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200); put(ItemType.IRON_BAR,10); }},
+	 			"MASONRY",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200); put(ItemType.IRON_BAR,10); }},
 	 			null),
 	 	
 	 	GATE_STONE (1000, 400, "resources/Images/buildings/gate_stone.png", 0.25, false, 1,
-	 			ResearchType.ENGINEERING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,400); put(ItemType.STONE,600); put(ItemType.MITHRIL_BAR,10); }},
+	 			"ENGINEERING",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,400); put(ItemType.STONE,600); put(ItemType.MITHRIL_BAR,10); }},
 	 			null),
 	 	
 	 	GATE_BRICK (5000, 1000, "resources/Images/buildings/gate_brick.png", 0.25, false, 1,
-	 			ResearchType.MONARCHY,  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,1000); put(ItemType.WOOD,1000); put(ItemType.ADAMANTITE_BAR,10); }},
+	 			"MONARCHY",  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,1000); put(ItemType.WOOD,1000); put(ItemType.ADAMANTITE_BAR,10); }},
 	 			null),
 	 	
 	 	BRIDGE (500, 100, "resources/Images/buildings/bridge.png", 0.25, true, 1,
@@ -48,7 +48,7 @@ public enum BuildingType implements HasImage {
 	 			null),
 	 	
 	 	WATCHTOWER (500, 250, "resources/Images/buildings/watchtower.png", 0.25, true, 10,
-				ResearchType.MYSTICISM,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000); put(ItemType.MITHRIL_BAR,5); }},
+				"MYSTICISM",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000); put(ItemType.MITHRIL_BAR,5); }},
 				null),
 	 	
 	 	WINDMILL (1000, 500, "resources/Images/buildings/ancientwindmill.png", 0.5, true, 1,
@@ -60,35 +60,35 @@ public enum BuildingType implements HasImage {
 				null),
 	 	
 		FARM (500, 250, "resources/Images/buildings/farm.png", 0.5, true, 1,
-	 			ResearchType.FARMING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000); put(ItemType.BRONZE_BAR,10);  }},
+	 			"FARMING",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000); put(ItemType.BRONZE_BAR,10);  }},
 	 			null),
 		
 	 	GRANARY (500, 500, "resources/Images/buildings/granary.png", 0.5, true, 1,
-	 			ResearchType.FARMING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200);  }},
+	 			"FARMING",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200);  }},
 	 			null),
 	 	
 	 	CASTLE (4000, 1000, "resources/Images/buildings/castle256.png", 1, true, 5,
-	 			ResearchType.MONARCHY,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,10000); put(ItemType.STONE,10000); put(ItemType.ADAMANTITE_BAR,20); }},
+	 			"MONARCHY",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,10000); put(ItemType.STONE,10000); put(ItemType.ADAMANTITE_BAR,20); }},
 	 			new LinkedList<UnitType>() {{add(UnitType.WORKER);}}),
 	 	
 	 	BARRACKS (1000, 250, "resources/Images/buildings/barracks256.png", 0.5, true, 1,
-				ResearchType.WARRIOR_CODE,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,300); put(ItemType.STONE,150);  }},
+				"WARRIOR_CODE",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,300); put(ItemType.STONE,150);  }},
 				new LinkedList<UnitType>() {{add(UnitType.WARRIOR);add(UnitType.ARCHER);add(UnitType.HORSE);add(UnitType.HORSEARCHER);add(UnitType.KNIGHT);add(UnitType.SPEARMAN);add(UnitType.SWORDSMAN);add(UnitType.CHARIOT);add(UnitType.ARCHER);}}),	
 	 	
 		WORKSHOP (1000, 250, "resources/Images/buildings/workshop.png", 0.5, true, 1,
-				ResearchType.MATHEMATICS,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000); put(ItemType.STONE,1000); put(ItemType.IRON_BAR,10); }},
+				"MATHEMATICS",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000); put(ItemType.STONE,1000); put(ItemType.IRON_BAR,10); }},
 				new LinkedList<UnitType>() {{add(UnitType.LONGBOWMAN); add(UnitType.CATAPULT); add(UnitType.TREBUCHET);}}),
 		
 		BLACKSMITH (1000, 250, "resources/Images/buildings/blacksmith.png", 0.5, true, 1,
-				ResearchType.BRONZE_WORKING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200);  }},
+				"BRONZE_WORKING",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200);  }},
 				null),
 		
 		RESEARCHLAB (1000, 250, "resources/Images/buildings/research.png", 0.5, true, 1,
-				ResearchType.IRON_WORKING,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200); put(ItemType.IRON_BAR,10); }},
+				"IRON_WORKING",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200); put(ItemType.IRON_BAR,10); }},
 				null),
 		
 		HELLFORGE (1000, 500, "resources/Images/buildings/hellforge.png", 0.5, true, 1,
-				ResearchType.ARMORING,  new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_BAR,20); put(ItemType.STONE,1000);  }},
+				"ARMORING",  new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_BAR,20); put(ItemType.STONE,1000);  }},
 				null),
 		;
 
@@ -96,13 +96,13 @@ public enum BuildingType implements HasImage {
 	private MipMap mipmap;
 	private boolean canMoveThrough;
 	private int visionRadius;
-	private ResearchType researchRequirement;
+	private String researchRequirement;
 	public double cultureRate;
 	private double buildingEffort;
 	private HashMap <ItemType, Integer> cost;
 	private LinkedList<UnitType> canBuild;
 	
-	BuildingType(double hp, double buildingEffort, String s, double cultureRate, boolean canMoveThrough, int visionRadius, ResearchType requirement, HashMap <ItemType, Integer> resourcesNeeded, LinkedList<UnitType> canBuild) {
+	BuildingType(double hp, double buildingEffort, String s, double cultureRate, boolean canMoveThrough, int visionRadius, String requirement, HashMap <ItemType, Integer> resourcesNeeded, LinkedList<UnitType> canBuild) {
 		this.researchRequirement = requirement;
 		this.health = hp;
 		this.cultureRate = cultureRate;
@@ -117,7 +117,7 @@ public enum BuildingType implements HasImage {
 	public LinkedList<UnitType> unitsCanBuild(){
 		return canBuild;
 	}
-	public ResearchType getResearchRequirement() {
+	public String getResearchRequirement() {
 		return researchRequirement;
 	}
 

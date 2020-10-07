@@ -10,7 +10,7 @@ public class ResearchInfoPanel extends InfoPanel {
 	Research showing;
 
 	public ResearchInfoPanel(Research showing) {
-		super(showing.toString(), showing.getType().getImage(70), 70);
+		super(showing.toString(), showing.getImage(70), 70);
 		this.showing = showing;
 	}
 	
@@ -39,8 +39,8 @@ public class ResearchInfoPanel extends InfoPanel {
 			}
 		}
 		
-		double completedRatio = 1.0 * showing.getPointsSpent() / showing.getType().getRequiredPoints();
-		String progress = String.format("%d/%d", showing.getPointsSpent(), showing.getType().getRequiredPoints());
+		double completedRatio = 1.0 * showing.getPointsSpent() / showing.getRequiredPoints();
+		String progress = String.format("%d/%d", showing.getPointsSpent(), showing.getRequiredPoints());
 		
 		KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress, 0, getHeight() - progressBarHeight, getWidth(), progressBarHeight);
 	}
