@@ -132,7 +132,11 @@ public class Frame extends JPanel {
 				if (building.getType() == BuildingType.RESEARCHLAB) {
 					manageResearchLabTab(selected);
 				}
-				switchInfoPanel(new BuildingInfoPanel(building));
+				InfoPanel infoPanel = new BuildingInfoPanel(building);
+				switchInfoPanel(infoPanel);
+				SwingUtilities.invokeLater(() -> {
+					infoPanel.addButton("Explode").addActionListener(e -> gameInstance.explode(building));
+				});
 				frame.repaint();
 			}
 
@@ -142,7 +146,11 @@ public class Frame extends JPanel {
 					return;
 				}
 				if(selected) {
-					switchInfoPanel(new UnitInfoPanel(unit));
+					UnitInfoPanel infoPanel = new UnitInfoPanel(unit);
+					switchInfoPanel(infoPanel);
+					SwingUtilities.invokeLater(() -> {
+						infoPanel.addButton("Explode").addActionListener(e -> gameInstance.explode(unit));
+					});
 				}
 				if(unit.getType() == UnitType.WORKER) {
 					manageBuildingTab(selected);
@@ -445,21 +453,6 @@ public class Frame extends JPanel {
 		SwingUtilities.invokeLater(() -> {
 			infoPanel.removeAll();
 			newInfo.setOpaque(false);
-			Dimension size = new Dimension(DEBUG_BUTTON_SIZE.width*1/2, DEBUG_BUTTON_SIZE.height*2/3);
-			JButton explodeUnit = KUIConstants.setupButton("Explode", null, size);
-			explodeUnit.setFont(KUIConstants.buttonFontMini);
-			explodeUnit.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					for(Thing thing : gameInstance.getSelectedThings()) {
-						gameInstance.explode(thing);
-					}
-					
-				}
-			});
-			newInfo.setLayout(null);
-			newInfo.add(explodeUnit);
-			explodeUnit.setBounds((int) (infoPanel.getWidth() - size.getWidth()), infoPanel.getHeight()-(int)size.getHeight(), (int)size.getWidth(), (int)size.getHeight());
 			infoPanel.add(newInfo, BorderLayout.CENTER);
 			infoPanel.validate();
 		});
