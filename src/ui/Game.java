@@ -274,12 +274,12 @@ public class Game {
 		LinkedList<Tile> tiles = world.getTilesRandomly();
 		Tile tile = tiles.peek();
 		for(Tile t : tiles) {
-			if(t.getTerrain() == Terrain.ROCK) {
+			if(t.getTerrain() == Terrain.ROCK && t.getLocation().x > 3 && t.getLocation().y > 3 && t.getLocation().x < world.getWidth()-3 && t.getLocation().y < world.getHeight()-3) {
 				tile = t;
 				break;
 			}
 		}
-		TileLoc tloc = new TileLoc(tile.getLocation().x-1, tile.getLocation().y-1);
+		TileLoc tloc = new TileLoc(tile.getLocation().x, tile.getLocation().y);
 		Tile barracks = world.get(tloc) ;
 		summonThing(tile, null, BuildingType.BARRACKS, false);
 		summonThing(barracks, null, BuildingType.BARRACKS, false);
@@ -293,24 +293,24 @@ public class Game {
 				continue;
 			}
 			if(i != 3) {
-				summonThing(wall, null, BuildingType.WALL_STONE, false);
+				summonThing(wall, null, BuildingType.WALL_WOOD, false);
 			}
 			
 			
 			wallLoc = new TileLoc(tile.getLocation().x+3, tile.getLocation().y-3 + i);
 			wall = world.get(wallLoc) ;
 			if(i != 3) {
-				summonThing(wall, null, BuildingType.WALL_STONE, false);
+				summonThing(wall, null, BuildingType.WALL_WOOD, false);
 			}
 			
 			
 			wallLoc = new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y-3);
 			wall = world.get(wallLoc) ;
-			summonThing(wall, null, BuildingType.WALL_STONE, false);
+			summonThing(wall, null, BuildingType.WALL_WOOD, false);
 			
 			wallLoc = new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y+3);
 			wall = world.get(wallLoc) ;
-			summonThing(wall, null, BuildingType.WALL_STONE, false);
+			summonThing(wall, null, BuildingType.WALL_WOOD, false);
 		}
 		for(int i = -1; i < 2; i ++) {
 			for(int j = -1; j < 2; j ++) {
@@ -1297,9 +1297,13 @@ public class Game {
 			world.newUnits.add(unit);
 		}
 		if(buildingType != null) {
+			if(tile.getBuilding() != null) {
+				tile.getBuilding().setHealth(0);
+			}
 			System.out.println("spawn building" + buildingType.toString() +tile.getLocation());
 			Building building = new Building(buildingType, tile, playerControlled);
 			building.setRemainingEffort(0);
+			tile.setBuilding(building);
 			world.buildings.add(building);
 		}
 		
@@ -1537,6 +1541,11 @@ public class Game {
 			}
 			if (projectile.readyToMove()) {
 				projectile.moveToTarget();
+				if(projectile.getType().getGroundModifierType() != null) {
+					GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), (int)projectile.getType().getDamage()/5);
+					projectile.getTile().setModifier(gm);
+					world.groundModifiers.add(gm);
+				}
 			}
 		}
 		

@@ -31,6 +31,7 @@ public class Projectile implements HasImage {
 		this.targetTile = targetTile;
 		this.damageBuff = 0;
 		this.source = source;
+		this.timeToMove = type.getSpeed();
 	}
 	
 	public Unit getSource() {
@@ -43,7 +44,7 @@ public class Projectile implements HasImage {
 	
 	public void tick() {
 		if(timeToMove > 0) {
-			timeToMove -= 2;
+			timeToMove -= 1;
 		}
 	}
 	
@@ -66,6 +67,7 @@ public class Projectile implements HasImage {
 			}
 		}
 		moveTo(nextTile);
+		resetTimeToMove();
 	}
 	public boolean reachedTarget() {
 		return this.targetTile == this.tile;
@@ -81,6 +83,9 @@ public class Projectile implements HasImage {
 	}
 	public double getTimeToMove() {
 		return timeToMove;
+	}
+	public void resetTimeToMove() {
+		timeToMove = type.getSpeed();
 	}
 	public Tile getTargetTile() {
 		return targetTile;
