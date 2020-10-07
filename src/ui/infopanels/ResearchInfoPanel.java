@@ -36,9 +36,6 @@ public class ResearchInfoPanel extends InfoPanel {
 			
 			HashMap<ItemType, Integer> cost = showing.getCost();
 			g.drawString(cost.toString(), x + xoffset-5, y += offset);
-//			for(int i = 0; i < cost.size(); i++) {
-//				
-//			}
 			
 			for(Research req : showing.getRequirement().getRequirements()) {
 				g.drawString(req.toString(), x + xoffset, y += offset);

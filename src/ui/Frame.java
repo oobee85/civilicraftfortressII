@@ -69,6 +69,7 @@ public class Frame extends JPanel {
 	private JLabel[] resourceIndicators = new JLabel[ItemType.values().length];
 	private HashMap<JButton, Research> researchButtons = new HashMap<>();
 	private JButton[] buildingButtons = new JButton[BuildingType.values().length];
+	private JButton[] planningButtons = new JButton[BuildingType.values().length];
 	private JButton[] unitButtons = new JButton[UnitType.values().length];
 	private JButton[] craftButtons = new JButton[ItemType.values().length];
 	private JButton[] statButtons = new JButton[7];
@@ -195,15 +196,21 @@ public class Frame extends JPanel {
 				for (int i = 0; i < BuildingType.values().length; i++) {
 					BuildingType type = BuildingType.values()[i];
 					JButton button = buildingButtons[i];
+					JButton button2 = planningButtons[i];
 					ResearchRequirement req = gameInstance.buildingResearchRequirements.get(type);
 					if (req.areRequirementsMet()) {
 						button.setEnabled(true);
 						button.setVisible(true);
+						button2.setEnabled(true);
+						button2.setVisible(true);
 					} else {
 						button.setEnabled(false);
 						button.setVisible(false);
+						button2.setEnabled(false);
+						button2.setVisible(false);
 					}
 				}
+				
 				for (int i = 0; i < UnitType.values().length; i++) {
 					JButton button = unitButtons[i];
 					if (button == null) {
@@ -649,7 +656,10 @@ public class Frame extends JPanel {
 				switchInfoPanel(new BuildingTypeInfoPanel(type));
 			});
 			buildingButtons[i] = button;
-			workerMenu.add(button);
+			if(buildingButtons[i].isVisible()) {
+				workerMenu.add(button);
+			}
+			
 		}
 		
 		
@@ -676,8 +686,11 @@ public class Frame extends JPanel {
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new BuildingTypeInfoPanel(type));
 			});
-//			buildingButtons[i] = button;
-			buildingPlanner.add(button);
+			planningButtons[i] = button;
+			if(planningButtons[i].isVisible()) {
+				buildingPlanner.add(button);
+			}
+			
 		}
 		
 		spawnMenu = new JPanel();
