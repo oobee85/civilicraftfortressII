@@ -43,7 +43,7 @@ public class Attack {
 	}
 
 	public static void shoot(Unit unit, Thing target, Attack attack) {
-		if(unit.readyToAttack() && !target.isDead() && attack.projectileType == ProjectileType.FIREWAVE) {
+		if(attack.projectileType == ProjectileType.FIREWAVE && unit.readyToAttack() && !target.isDead()) {
 			fireWave(unit, target, attack);
 		}
 		if(unit.readyToAttack() && !target.isDead()) {

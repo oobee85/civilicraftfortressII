@@ -324,7 +324,7 @@ public class Game {
 		}
 		TileLoc tloc = new TileLoc(tile.getLocation().x, tile.getLocation().y);
 		Tile barracks = world.get(tloc) ;
-		summonThing(tile, null, BuildingType.BARRACKS, false);
+//		summonThing(tile, null, BuildingType.BARRACKS, false);
 		summonThing(barracks, null, BuildingType.BARRACKS, false);
 		
 		//makes the walls
@@ -742,7 +742,7 @@ public class Game {
 					int w = Game.tileSize;
 					int h = Game.tileSize;
 					
-					if(t.getHasBuilding() == true) {
+					if(t.getHasBuilding() == true && t.getBuilding().getIsPlayerControlled()) {
 						setTerritory(new TileLoc(i,j));
 					}
 					
@@ -836,11 +836,11 @@ public class Game {
 					Utils.setTransparency(g, 1f);
 				}
 				HashSet<Tile> buildingVision = world.getNeighborsInRadius(b.getTile(), b.getType().getVisionRadius());
-//				System.out.println(buildingVision.size());
 				for(Tile t : buildingVision) {
-					t.setInVisionRange(true);
-//					g.setColor(Color.black);
-//					g.fillRect(t.getLocation().x* Game.tileSize, t.getLocation().y* Game.tileSize, Game.tileSize, Game.tileSize); 
+					if(t.getBuilding() != null && t.getBuilding().getIsPlayerControlled()) {
+						t.setInVisionRange(true);
+					}
+					
 				}
 				
 				BufferedImage bI = Utils.toBufferedImage(b.getImage(0));
@@ -1344,7 +1344,7 @@ public class Game {
 			if(tile.getBuilding() != null) {
 				tile.getBuilding().setHealth(0);
 			}
-			System.out.println("spawn building" + buildingType.toString() +tile.getLocation());
+			System.out.println("spawn building" + buildingType.toString() + tile.getLocation());
 			Building building = new Building(buildingType, tile, playerControlled);
 			building.setRemainingEffort(0);
 			tile.setBuilding(building);

@@ -11,7 +11,7 @@ import world.Tile;
 
 public enum BuildingType implements HasImage {
 	 	
-	 	WALL_WOOD (100, 100, "resources/Images/buildings/wall_wood.png", 0.25, false, 1,
+	 	WALL_WOOD (100, 100, "resources/Images/buildings/wall_wood.png", 0.25, false, 0,
 	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }},
 	 			null),
 	 	
