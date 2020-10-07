@@ -189,6 +189,7 @@ public class Unit extends Thing  {
 				&& this.getTile() != other.getTile());
 	}
 	
+	
 	/**
 	 * this function does not check the attack range!
 	 * @return amount of damage dealt to target

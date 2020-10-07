@@ -1,6 +1,7 @@
 package ui.infopanels;
 
 import java.awt.*;
+import java.util.HashMap;
 
 import game.*;
 import ui.*;
@@ -32,6 +33,12 @@ public class ResearchInfoPanel extends InfoPanel {
 
 		if(showing.getRequirement().getRequirements().size() > 0 ) {
 			g.drawLine(x + xoffset - 10, y, x + xoffset - 10, y + offset*showing.getRequirement().getRequirements().size() - offset/4);
+			
+			HashMap<ItemType, Integer> cost = showing.getCost();
+			g.drawString(cost.toString(), x + xoffset-5, y += offset);
+//			for(int i = 0; i < cost.size(); i++) {
+//				
+//			}
 			
 			for(Research req : showing.getRequirement().getRequirements()) {
 				g.drawString(req.toString(), x + xoffset, y += offset);
