@@ -23,7 +23,7 @@ public enum RoadType implements HasImage {
 	RoadType(double hp, double buildingEffort, String s, double speed,  String requirement, HashMap <ItemType, Integer> resourcesNeeded) {
 		this.researchRequirement = requirement;
 		this.health = hp;
-		mipmap = new MipMap(s);
+		this.mipmap = new MipMap(s);
 		this.buildingEffort = buildingEffort;
 		this.cost = resourcesNeeded;
 		this.speed = speed;

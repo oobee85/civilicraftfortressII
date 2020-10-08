@@ -1743,6 +1743,7 @@ public class Game {
 	
 	
 	public void buildRoad(RoadType rt) {
+		
 		for(Thing thing : selectedThings) {
 			if (thing != null && thing instanceof Unit
 					&& ((Unit) thing).getUnitType() == UnitType.WORKER) {
@@ -1764,7 +1765,6 @@ public class Game {
 
 				Road road = new Road(rt, thing.getTile());
 				thing.getTile().setRoad(road, Direction.NORTH.toString());
-//			world.buildings.add(road);
 
 				for (Tile tile : Utils.getNeighborsIncludingCurrent(thing.getTile(), world)) {
 					turnRoad(tile);
