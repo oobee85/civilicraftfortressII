@@ -5,7 +5,7 @@ import java.util.List;
 
 import ui.Game;
 import utils.*;
-import world.Tile;
+import world.*;
 
 public class Building extends Thing {
 	
@@ -42,6 +42,15 @@ public class Building extends Thing {
 	public void tick() {
 		updateInProgressUnit();
 		timeToHarvest --;
+		
+		if(Game.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
+			Tile tile = getTile();
+			int tileDamage = tile.computeTileDamage(this);
+			if (tileDamage != 0) {
+				this.takeDamage(tileDamage);
+			}
+		}
+	
 //		System.out.println(timeToHarvest);
 	}
 	public boolean readyToHarvest() {

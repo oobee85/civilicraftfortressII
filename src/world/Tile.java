@@ -190,8 +190,8 @@ public class Tile {
 	public void addItem(Item i) {
 		items.add(i);
 	}
-	public void removeItem(Item i) {
-		items.remove(i);
+	public void clearItems() {
+		items.clear();
 	}
 
 	public void drawHeightMap(Graphics g, double height) {

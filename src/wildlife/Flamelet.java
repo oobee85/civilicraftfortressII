@@ -26,8 +26,8 @@ public class Flamelet extends Animal {
 	}
 	
 	@Override
-	public void tick() {
-		super.tick();
+	public void updateState() {
+		super.updateState();
 		if(getTile().getModifier() != null) {
 			if(getTile().getModifier().getType() != GroundModifierType.FIRE) {
 				this.getTile().getModifier().finish();

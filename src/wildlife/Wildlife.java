@@ -79,7 +79,7 @@ public class Wildlife {
 		LinkedList<Animal> animalsCopy = new LinkedList<>();
 		HashMap<Tile, Animal> trying = new HashMap<>();
 		for(Animal animal : animals) {
-			animal.tick();
+			animal.updateState();
 			double liquidDamage = animal.getTile().computeTileDamage(animal);
 			if(animal.getType().isFlying() != true) {
 				if(liquidDamage >= 1) {
@@ -98,7 +98,7 @@ public class Wildlife {
 				continue;
 			}
 			animal.loseEnergy();
-			animal.tick();
+			animal.updateState();
 			if(animal.wantsToEat()) {
 				animal.chooseWhatToEat(world.units, getAnimals());
 			}

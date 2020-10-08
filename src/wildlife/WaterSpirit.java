@@ -28,8 +28,8 @@ public class WaterSpirit extends Animal {
 	}
 	
 	@Override
-	public void tick() {
-		super.tick();
+	public void updateState() {
+		super.updateState();
 		if(getTile().liquidType == LiquidType.DRY) {
 			getTile().liquidType = LiquidType.WATER;
 		}

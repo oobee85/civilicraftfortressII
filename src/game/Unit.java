@@ -137,7 +137,7 @@ public class Unit extends Thing  {
 		}
 	}
 
-	public void tick() {
+	public void updateState() {
 		if(timeToMove > 0) {
 			timeToMove -= 1;
 		}
@@ -147,45 +147,24 @@ public class Unit extends Thing  {
 		if(timeToHeal > 0) {
 			timeToHeal -= 1;
 		}
-		if(readyToMove() && readyToAttack() && target == null && isPlayerControlled() && getIsSelected() == false) {
-			isIdle = true;
-		}else {
-			isIdle = false;
-		}
+		isIdle = readyToMove() && readyToAttack() && target == null && getTargetTile() == null && isPlayerControlled() && getIsSelected() == false;
 		
 		if(getHealth() < combatStats.getHealth() && readyToHeal()) {
 			heal(1, false);
 			resetTimeToHeal();
 		}
-		if(unitType == UnitType.WORKER) {
-			Building tobuild = this.getTile().getBuilding();
-			if(tobuild != null && tobuild.isBuilt()) {
-				tobuild = null;
-			}
-			if(tobuild == null) {
-				for(Tile tile : this.getTile().getNeighbors()) {
-					tobuild = tile.getBuilding();
-					if(tobuild != null && tobuild.isBuilt()) {
-						tobuild = null;
-					}
-					if(tobuild != null) {
-						break;
-					}
+		// Take environment damage every 5 ticks
+		if(Game.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
+			int tileDamage = getTile().computeTileDamage(this);
+			if(Game.ticks/World.TICKS_PER_ENVIRONMENTAL_DAMAGE % 4 == 0) {
+				if(getTile().getTerrain() == Terrain.SNOW) {
+					tileDamage += 5;
 				}
 			}
-			if(tobuild != null) {
-				tobuild.expendEffort(1);
-				if(tobuild.getRemainingEffort() > 0) {
-					tobuild.heal(tobuild.getMaxHealth()/tobuild.getType().getBuildingEffort(), false);
-				}
-				
-				if(tobuild.getRemainingEffort() < tobuild.getType().getBuildingEffort()) {
-					tobuild.setPlanned(false);
-				}
-//				tobuild.setHealth(tobuild.getHealth() + 1);
+			if (tileDamage != 0) {
+				this.takeDamage(tileDamage);
 			}
 		}
-		
 	}
 	
 	public boolean inRange(Thing other) {
@@ -236,7 +215,89 @@ public class Unit extends Thing  {
 		return null;
 	}
 	
+
+	private Building getBuildingToBuild(LinkedList<Building> buildings, LinkedList<Building> plannedBuildings) {
+		if(buildings.isEmpty()) {
+			return null;
+		}
+		for(Building building : buildings) {
+			if(building.isBuilt() == false) {
+				return building;
+			}
+		}
+		for(Building pBuilding : plannedBuildings) {
+			return pBuilding;
+		}
+		return null;
+	}
 	
+	public void planActions(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings, LinkedList<Building> plannedBuildings) {
+		// Workers deciding whether to move toward something to build
+		if (unitType.isBuilder() && isIdle && getTile().getIsTerritory()) {
+			Building building = getBuildingToBuild(buildings, plannedBuildings);
+			if(building != null && building.getTile().getIsTerritory() == true) {
+				setTargetTile(building.getTile());
+			}
+		}
+	}
+	
+	public void doMovement(HashMap<ItemType, Item> items) {
+		if (readyToMove() && getTargetTile() != null) {
+			moveTowards(getTargetTile());
+		}
+		// If on tile with an item, take the item
+		if(this.isPlayerControlled()) {
+			for(Item item : getTile().getItems()) {
+				items.get(item.getType()).addAmount(item.getAmount());
+			}
+			getTile().clearItems();
+		}
+	}
+	
+	public void doAttacks(World world) {
+		boolean attacked = false;
+		if(getTarget() != null) {
+			attacked = Attack.tryToAttack(this, getTarget());
+		}
+		if(!attacked && isPlayerControlled()) {
+			for(Unit enemyUnit : world.getHostileUnitsInTerritory()){
+				if(!inRange(enemyUnit)) {
+					continue;
+				}
+				Attack.tryToAttack(this, enemyUnit);
+			}
+		}
+	}
+
+	private Building getAdjacentUnfinishedBuilding(Tile tile) {
+		Building tobuild = tile.getBuilding();
+		if(tobuild != null && !tobuild.isBuilt()) {
+			return tobuild;
+		}
+		for(Tile neighbor : tile.getNeighbors()) {
+			tobuild = neighbor.getBuilding();
+			if(tobuild != null && !tobuild.isBuilt()) {
+				return tobuild;
+			}
+		}
+		return null;
+	}
+	
+	public void doPassiveThings() {
+		// Workers building stuff
+		if(getType().isBuilder()) {
+			Building tobuild = getAdjacentUnfinishedBuilding(getTile());
+			if(tobuild != null) {
+				tobuild.expendEffort(1);
+				if(tobuild.getRemainingEffort() > 0) {
+					tobuild.heal(tobuild.getMaxHealth()/tobuild.getType().getBuildingEffort(), false);
+				}
+				if(tobuild.getRemainingEffort() < tobuild.getType().getBuildingEffort()) {
+					tobuild.setPlanned(false);
+				}
+			}
+		}
+	}
 	
 	public void resetTimeToAttack() {
 		timeToAttack = combatStats.getAttackSpeed();

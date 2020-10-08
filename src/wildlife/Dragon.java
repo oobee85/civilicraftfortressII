@@ -32,8 +32,8 @@ public class Dragon extends Animal {
 	}
 
 	@Override
-	public void tick() {
-		super.tick();
+	public void updateState() {
+		super.updateState();
 		if(timeToFireball > 0) {
 			timeToFireball --;
 		}

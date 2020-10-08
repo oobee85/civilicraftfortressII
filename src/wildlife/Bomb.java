@@ -22,8 +22,8 @@ public class Bomb extends Animal {
 	}
 	
 	@Override
-	public void tick() {
-		super.tick();
+	public void updateState() {
+		super.updateState();
 	}
 
 	@Override

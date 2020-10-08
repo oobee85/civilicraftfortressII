@@ -134,25 +134,8 @@ public class Game {
 		
 	}
 	
-	public void gameTick() {
-		boolean changedTerrain = false;
-		// Do all the game events like unit movement, time passing, building things, growing, etc
-		// happens once every 100ms
-		ticks++;
-		
-		for(Thing thing : selectedThings) {
-			if(thing != null && !thing.isPlayerControlled()) {
-//				deselectThing();
-			}
-		}
-		
-		
-		if(ticks%20 == 0) {
-			updateTerritory();
-			doResearch();
-			changedTerrain = true;
-		}
-		
+	public void randomEvents() {
+
 		if(ticks == 1) {
 			world.rain();
 		}
@@ -184,11 +167,10 @@ public class Game {
 			world.spawnOgre();
 			buildingsUntilOgre += buildingsUntilOgre;
 		}
-		
 		if(ticks >= 1000 && Math.random() < 0.00001) {
 			meteorStrike();
 		}
-		world.tick();
+
 		// rain event
 		if(Math.random() < 0.008) {
 			world.rain();
@@ -196,45 +178,46 @@ public class Game {
 		if(Math.random() < 0.01) {
 			world.grow();
 		}
+		
 		if(world.volcano != null) {
 			world.get(world.volcano).liquidType = LiquidType.LAVA;
 			if(Math.random() < 0.0001) {
 				eruptVolcano();
 			}
 		}
+	}
+	
+	public void gameTick() {
+		// Do all the game events like unit movement, time passing, building things, growing, etc
+		// happens once every 100ms
+		ticks++;
+
+		if(ticks%20 == 0) {
+			updateTerritory();
+			doResearch();
+		}
 		
 		Liquid.propogate(world);
-		changedTerrain = true;
 		
+		// Remove dead things
+		world.clearDeadAndAddNewThings();
 		
-		
-		
-		world.updateTerrainChange(world);
-		
-		changedTerrain = true;
+		world.addUnitsInTerritory();
 		
 		Wildlife.tick(world);
 		buildingTick();
 		unitTick();
-		projectileTick();
-		world.updateUnitDealDamage();
-		world.updateProjectileDealDamage();
-		world.updateProjectiles();
-		
-		if(ticks%5 == 0) {
-			world.updateUnitLiquidDamage();
-			world.updateBuildingLiquidDamage();
+		world.doProjectileUpdates();
+		if(ticks%World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			world.updatePlantDamage();
 		}
-		if(ticks%20 == 0) {
-			world.updateUnitColdDamage();
-		}
 		
+		randomEvents();
+		
+		// GUI updates
+		world.updateTerrainChange(world);
 		guiController.updateGUI();
-		if(changedTerrain) {
-			updateTerrainImages();
-		}
-		
+		updateTerrainImages();
 	}
 	public void addCombatBuff(CombatStats cs) {
 		combatBuffs.combine(cs);
@@ -408,14 +391,11 @@ public class Game {
 			// building builds units
 			if(building.getBuildingUnit().peek() != null && building.getBuildingUnit().peek().isBuilt() == true) {
 				Unit unit = building.getBuildingUnit().peek();
-//				building.getTile().addUnit(unit);
+				building.getTile().addUnit(unit);
 				world.newUnits.add(unit);
 				building.getBuildingUnit().remove();
 			}
 		}
-		
-		
-		
 	}
 	
 
@@ -1336,6 +1316,7 @@ public class Game {
 			System.out.println("spawn unit" + unitType.toString() +tile.getLocation());
 			Unit unit = new Unit(unitType, tile, playerControlled);
 			world.newUnits.add(unit);
+			tile.addUnit(unit);
 		}
 		if(buildingType != null) {
 			if(tile.getBuilding() != null) {
@@ -1576,86 +1557,22 @@ public class Game {
 		
 		
 	}
-	private Building getBuildingToBuild() {
-		if(world.buildings.isEmpty()) {
-			return null;
-		}
-		for(Building building : world.buildings) {
-			if(building.isBuilt() == false) {
-				return building;
-			}
-		}
-		for(Building pBuilding : world.plannedBuildings) {
-			return pBuilding;
-		}
-		return null;
-	}
 	
-	private void projectileTick() {
-		
-		for(Projectile projectile : world.projectiles) {
-			projectile.tick();
-			if(projectile.getTargetTile() == null) {
-				continue;
-			}
-			if (projectile.readyToMove()) {
-				projectile.moveToTarget();
-				if(projectile.getType().getGroundModifierType() != null) {
-					GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), (int)projectile.getType().getDamage()/5);
-					projectile.getTile().setModifier(gm);
-					world.groundModifiers.add(gm);
-				}
-			}
-		}
-		
-	}
 	
 	private void unitTick() {
-		
 		for (Unit unit : world.units) {
-			Tile tile = unit.getTile();
-			unit.tick();
-			if (unit.getType() == UnitType.WORKER && unit.isIdle() == true && tile.getIsTerritory()) {
-				Building building = getBuildingToBuild();
-				if(building != null && unit.getTargetTile() == null) {
-					
-					if(building.getTile().getIsTerritory() == true && tile.getIsTerritory() == true) {
-						unit.setTargetTile(building.getTile());
-					}
-					
-				}
-				
-			}
-			if(unit.isPlayerControlled() && !tile.getItems().isEmpty()) {
-				for(Item item : tile.getItems()) {
-					items.get(item.getType()).addAmount(item.getAmount());
-					tile.removeItem(item);
-				}
-			}
-//			if(unit.getTargetTile() == null && unit.getTarget() != null) {
-//				unit.setTargetTile(unit.getTarget().getTile());
-//			}else {
-//				unit.setTargetTile(unit.getTile());
-//			}
-			if (unit.readyToMove() && unit.getTargetTile() != null) {
-				unit.moveTowards(unit.getTargetTile());
-			}
-			
-			
-//			if(unit.getTile().getIsTerritory() && unit.getType().isHostile()) {
-//				world.addUnitsInTerritory(unit);
-//			}
-			
+			unit.updateState();
+			unit.planActions(world.units, Wildlife.getAnimals(), world.buildings, world.plannedBuildings);
+			unit.doMovement(items);
+			unit.doAttacks(world);
+			unit.doPassiveThings();
 		}
-//		world.addUnitsInTerritory();
 	}
 	
 	private void buildingTick() {
 		updateBuildingAction();
-		
 		for (Building building : world.buildings) {
 			building.tick();
-			
 		}
 		
 	}
@@ -1665,9 +1582,9 @@ public class Game {
 			return false;
 		}
 
-		for (Map.Entry mapElement : bt.getCost().entrySet()) {
-			ItemType key = (ItemType) mapElement.getKey();
-			Integer value = (Integer) mapElement.getValue();
+		for (Entry<ItemType, Integer> mapElement : bt.getCost().entrySet()) {
+			ItemType key = mapElement.getKey();
+			Integer value = mapElement.getValue();
 
 			if (items.get(key).getAmount() < value) {
 				return false;
@@ -1681,9 +1598,9 @@ public class Game {
 
 	}
 	private void chargePrice(BuildingType bt) {
-		for (Map.Entry mapElement : bt.getCost().entrySet()) {
-			ItemType key = (ItemType) mapElement.getKey();
-			Integer value = (Integer) mapElement.getValue();
+		for (Entry<ItemType, Integer> mapElement : bt.getCost().entrySet()) {
+			ItemType key = mapElement.getKey();
+			Integer value = mapElement.getValue();
 
 			items.get(key).addAmount(-value);
 		}
@@ -1789,11 +1706,12 @@ public class Game {
 	}
 	
 	private void buildUnit(UnitType u, Tile tile) {
-		for (Map.Entry mapElement : u.getCost().entrySet()) {
-			ItemType key = (ItemType) mapElement.getKey();
-			Integer value = (Integer) mapElement.getValue();
+		for (Entry<ItemType, Integer> mapElement : u.getCost().entrySet()) {
+			ItemType key = mapElement.getKey();
+			Integer value = mapElement.getValue();
 			
 			if (items.get(key).getAmount() < value) {
+				System.out.println("Not enough " + key);
 				return;
 			}
 		}
@@ -1803,10 +1721,9 @@ public class Game {
 			return;
 		}
 		
-		
-		for (Map.Entry mapElement : u.getCost().entrySet()) {
-			ItemType key = (ItemType) mapElement.getKey();
-			Integer value = (Integer) mapElement.getValue();
+		for (Entry<ItemType, Integer> mapElement : u.getCost().entrySet()) {
+			ItemType key = mapElement.getKey();
+			Integer value = mapElement.getValue();
 			
 			items.get(key).addAmount(-value);
 		}

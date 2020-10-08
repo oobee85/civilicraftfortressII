@@ -27,8 +27,8 @@ public class Parasite extends Animal {
 	}
 	
 	@Override
-	public void tick() {
-		super.tick();
+	public void updateState() {
+		super.updateState();
 		if(getTarget() != null) {
 			if(getTarget().isDead() || !getTarget().isPlayerControlled()) {
 				setTarget(null);

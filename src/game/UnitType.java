@@ -108,6 +108,9 @@ public enum UnitType implements HasImage {
 	public boolean isRanged() {
 		return this.getCombatStats().getAttackRadius() > 1;
 	}
+	public boolean isBuilder() {
+		return this == WORKER;
+	}
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;
 	}

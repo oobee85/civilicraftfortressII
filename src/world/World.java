@@ -14,12 +14,12 @@ import utils.*;
 import wildlife.*;
 
 public class World {
-	
+
+	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 5;
 	public static final double SNOW_LEVEL = 0.75;
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
 	public static final int TRANSITION_PERIOD = 100;
-	public final boolean isNight = false;
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
 	
@@ -114,10 +114,6 @@ public class World {
 //		world[volcano].liquidType = LiquidType.WATER;
 //		world[volcano].liquidAmount += 200;
 	}
-	public void tick() {
-		updateGroundModifiers();
-		addUnitsInTerritory();
-	}
 	
 	public void addUnitsInTerritory() {
 		HashSet<Unit> unitsInTerritoryNew = new HashSet<Unit>();
@@ -130,22 +126,6 @@ public class World {
 		}
 		unitsInTerritory = unitsInTerritoryNew;
 //		System.out.println("Units in territory"+ unitsInTerritory.size());
-	}
-	
-	public void updateGroundModifiers() {
-		LinkedList<GroundModifier> GroundModifiersNew = new LinkedList<GroundModifier>();
-		synchronized(groundModifiers) {
-			for(GroundModifier modifier : groundModifiers) {
-				Tile tile = modifier.getTile();
-				if(modifier.updateTime() == false) {
-					
-					GroundModifiersNew.add(modifier);
-				}else {
-					tile.setModifier(null);
-				}
-			}
-			groundModifiers = GroundModifiersNew;
-		}
 	}
 	
 	public void spawnOgre() {
@@ -399,40 +379,39 @@ public class World {
 		plantsLand = newLand;
 	}
 	
-	public void updateProjectileDealDamage() {
+	public void doProjectileUpdates() {
+
 		for(Projectile projectile : projectiles) {
-			if(projectile.reachedTarget() && projectile.getType().isExplosive() == false) {
-				for(Unit unit : projectile.getTile().getUnits()) {
-					unit.takeDamage(projectile.getType().getDamage());
-					unit.aggro(projectile.getSource());
-				}
-				if(projectile.getTile().getHasBuilding() == true) {
-					projectile.getTile().getBuilding().takeDamage(projectile.getType().getDamage());
-				}
-				
-				
+			projectile.tick();
+			if(projectile.getTargetTile() == null) {
+				continue;
 			}
-			
-		}
-	}
-	public void updateProjectiles() {
-		LinkedList<Projectile> projectilesNew = new LinkedList<Projectile>();
-		
-		for(Projectile projectile : projectiles) {
-			
+			if (projectile.readyToMove()) {
+				projectile.moveToTarget();
+				if(projectile.getType().getGroundModifierType() != null) {
+					GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), (int)projectile.getType().getDamage()/5);
+					projectile.getTile().setModifier(gm);
+					groundModifiers.add(gm);
+				}
+			}
 			if(projectile.reachedTarget()) {
 				if(projectile.getType().isExplosive()) {
 					spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getType().getDamage());
+				} 
+				else {
+					for(Unit unit : projectile.getTile().getUnits()) {
+						unit.takeDamage(projectile.getType().getDamage());
+						unit.aggro(projectile.getSource());
+					}
+					if(projectile.getTile().getHasBuilding() == true) {
+						projectile.getTile().getBuilding().takeDamage(projectile.getType().getDamage());
+					}
 				}
-				projectile.getTile().removeProjectile(projectile);
-				projectile.setTile(null);
-			}else {
-				projectilesNew.add(projectile);
 			}
 		}
-		projectiles = projectilesNew;
 	}
-	public void updateUnitDealDamage() {
+	
+	public void doUnitAttacks() {
 		for (Unit unit : units) {
 			boolean attacked = false;
 			if(unit.getTarget() != null) {
@@ -478,46 +457,41 @@ public class World {
 		units = unitsNew;
 	}
 	
-	public void updateUnitLiquidDamage() {
-
+	public void clearDeadAndAddNewThings() {
+		// UNITS
 		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
-
 		for (Unit unit : units) {
-			Tile tile = unit.getTile();
-			int tileDamage = tile.computeTileDamage(unit);
-			if (tileDamage != 0) {
-				unit.takeDamage(tileDamage);
-			}
 			if (unit.isDead() == true) {
-				tile.removeUnit(unit);
+				unit.getTile().removeUnit(unit);
 			} else {
 				unitsNew.add(unit);
 			}
-
 		}
-		for (Unit unit : newUnits) {
-			unitsNew.add(unit);
-			unit.getTile().addUnit(unit);
-			
-		}
+		unitsNew.addAll(newUnits);
 		newUnits.clear();
 		units = unitsNew;
 		
-	}
-	
-	public void updateBuildingLiquidDamage() {
-
+		// GROUND MODIFIERS
+		LinkedList<GroundModifier> GroundModifiersNew = new LinkedList<GroundModifier>();
+		synchronized(groundModifiers) {
+			for(GroundModifier modifier : groundModifiers) {
+				Tile tile = modifier.getTile();
+				if(modifier.updateTime() == false) {
+					GroundModifiersNew.add(modifier);
+				} else {
+					tile.setModifier(null);
+				}
+			}
+			groundModifiers = GroundModifiersNew;
+		}
+		
+		// BUILDINGS
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
 		LinkedList<Building> plannedBuildingsNew = new LinkedList<Building>();
 		
 		for (Building building : buildings) {
-			Tile tile = building.getTile();
-			int tileDamage = tile.computeTileDamage(building);
-			if (tileDamage != 0) {
-				building.takeDamage(tileDamage);
-			}
 			if (building.isDead() == true) {
-				tile.setBuilding(null);
+				building.getTile().setBuilding(null);
 			} else {
 				buildingsNew.add(building);
 			}
@@ -530,13 +504,44 @@ public class World {
 				plannedBuildingsNew.add(plannedBuilding);
 			}
 		}
-		newUnits.clear();
 		plannedBuildings = plannedBuildingsNew;
 		buildings = buildingsNew;
+	
+		// PLANTS
+		LinkedList<Plant> plantsLandNew = new LinkedList<Plant>();
+		for(Plant plant : plantsLand) {
+			if(plant.isDead() == true) {
+				plant.getTile().setHasPlant(null);
+			} else {
+				plantsLandNew.add(plant);
+			}
+		}	
+		plantsLand = plantsLandNew;
+
+		LinkedList<Plant> plantsAquaticNew = new LinkedList<Plant>();
+		for (Plant plant : plantsAquatic) {
+			if (plant.isDead() == true) {
+				plant.getTile().setHasPlant(null);
+			} else {
+				plantsAquaticNew.add(plant);
+			}
+		}
+		plantsAquatic = plantsAquaticNew;
+	
+		// PROJECTILES
+		LinkedList<Projectile> projectilesNew = new LinkedList<Projectile>();
+		for(Projectile projectile : projectiles) {
+			if(projectile.reachedTarget()) {
+				projectile.getTile().removeProjectile(projectile);
+				projectile.setTile(null);
+			} else {
+				projectilesNew.add(projectile);
+			}
+		}
+		projectiles = projectilesNew;
 	}
 	
 	public void updatePlantDamage() {
-		LinkedList<Plant> plantsLandNew = new LinkedList<Plant>();
 		for(Plant plant : plantsLand) {
 			Tile tile = plant.getTile();
 			
@@ -561,15 +566,8 @@ public class World {
 			if(totalDamage >= 1) {
 				plant.takeDamage(totalDamage);
 			}
-			if(plant.isDead() == true) {
-				tile.setHasPlant(null);
-			}else {
-				plantsLandNew.add(plant);
-			}
 		}	
-		plantsLand = plantsLandNew;
 
-		LinkedList<Plant> plantsAquaticNew = new LinkedList<Plant>();
 		for (Plant plant : plantsAquatic) {
 			Tile tile = plant.getTile();
 			if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
@@ -582,13 +580,7 @@ public class World {
 					}
 				}
 			}
-			if (plant.isDead() == true) {
-				tile.setHasPlant(null);
-			} else {
-				plantsAquaticNew.add(plant);
-			}
 		}
-		plantsAquatic = plantsAquaticNew;
 	}
 
 	public void genPlants() {
