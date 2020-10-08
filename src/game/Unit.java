@@ -90,7 +90,7 @@ public class Unit extends Thing  {
 	public double movePenaltyTo(Tile from, Tile to) {
 		double penalty = to.getTerrain().moveSpeed();
 		
-		if(from.getRoad() != null && to.getRoad() != null) {
+		if(from.getRoad() != null && to.getRoad() != null && from.getRoad().isBuilt() && to.getRoad().isBuilt()) {
 			penalty = penalty/from.getRoad().getRoadType().getSpeed()/2;
 		}
 		if(this.getUnitType().isFlying()) {
@@ -296,6 +296,12 @@ public class Unit extends Thing  {
 					tobuild.setPlanned(false);
 				}
 			}
+			for(Tile tile : this.getTile().getNeighbors()) {
+				if(tile.getRoad() != null && tile.getRoad().getRemainingEffort() > 0) {
+					tile.getRoad().expendEffort(1);
+				}
+			}
+			
 		}
 	}
 	

@@ -22,6 +22,7 @@ public class Game {
 	private Image greenHitsplatImage = Utils.loadImage("resources/Images/interfaces/greenhitsplat.png");
 	private Image targetImage = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
 	private Image spawnLocationImage = Utils.loadImage("resources/Images/interfaces/queuelocation.png");
+	private Image buildIcon = Utils.loadImage("resources/Images/interfaces/building.PNG");
 	private Image flag = Utils.loadImage("resources/Images/interfaces/flag.png");
 	private int skipUntilTick;
 	private BufferedImage terrainImage;
@@ -518,6 +519,7 @@ public class Game {
 			for(Tile t : selectedPath.getTiles()) {
 				if(t != null) {
 					Road road = new Road(RoadType.STONE_ROAD, t);
+					road.setRemainingEffort(0);
 					t.setRoad(road, "asdf");
 				}
 			}
@@ -573,7 +575,9 @@ public class Game {
 			}
 		}
 		Road road = new Road(RoadType.STONE_ROAD, world.get(loc));
+		road.setRemainingEffort(tile.getRoad().getRemainingEffort());
 		world.get(loc).setRoad(road, s);
+		
 	}
 	private void turnRoads() {
 		for(Tile tile : world.getTiles()) {
@@ -693,9 +697,6 @@ public class Game {
 						g.drawImage(t.getTerrain().getImage(Game.tileSize), x, y, w, h, null);
 //						t.drawEntities(g, currentMode);
 						
-						if(t.getResource() != null) {
-							g.drawImage(t.getResource().getType().getImage(Game.tileSize), x, y, w, h, null);
-						}
 						
 						
 						if(t.getIsTerritory()) {
@@ -732,7 +733,11 @@ public class Game {
 						}
 						if (t.getRoad() != null) {
 							g.drawImage(t.getRoadImage(), x, y, w, h, null);
+							if(t.getRoad().isBuilt() == false) {
+								g.drawImage(buildIcon, x, y, w, h, null);
+							}
 						}
+						
 						if(t.liquidType != LiquidType.DRY) {
 							double alpha = Utils.getAlphaOfLiquid(t.liquidAmount);
 //							 transparency liquids
@@ -748,6 +753,10 @@ public class Game {
 						}
 						if(t.getModifier() != null) {
 							g.drawImage(t.getModifier().getType().getImage(Game.tileSize), x, y, w, h, null);
+						}
+						
+						if(t.getResource() != null) {
+							g.drawImage(t.getResource().getType().getImage(Game.tileSize), x, y, w, h, null);
 						}
 					}
 				}
@@ -803,7 +812,7 @@ public class Game {
 					int y = (int) ((b.getTile().getLocation().y * Game.tileSize) + Game.tileSize*.25);
 					int w = (int) (Game.tileSize*.75);
 					int hi = (int)(Game.tileSize*.75);
-					g.drawImage(Utils.loadImage("resources/Images/interfaces/building.PNG"), x, y, w, hi, null);
+					g.drawImage(buildIcon, x, y, w, hi, null);
 				}
 			}
 			for(Building planned : world.plannedBuildings) {
@@ -813,6 +822,7 @@ public class Game {
 				g2d.drawImage(bI, planned.getTile().getLocation().x * Game.tileSize, planned.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize , null);
 				Utils.setTransparency(g, 1f);
 			}
+			
 			for(Animal animal : Wildlife.getAnimals()) {
 				g.drawImage(animal.getImage(0), animal.getTile().getLocation().x * Game.tileSize, animal.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 				drawHealthBar(g, animal);
@@ -1031,6 +1041,10 @@ public class Game {
 							}
 							if(tile.getHasBuilding()) {
 								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getBuilding().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
+							}
+							if(tile.getRoad() != null) {
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getRoad().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
+								
 							}
 						}
 					}
@@ -1321,8 +1335,9 @@ public class Game {
 		}
 		if(buildingType != null) {
 			if(tile.getBuilding() != null) {
-				tile.getBuilding().setHealth(0);
+				tile.getBuilding().takeDamage(tile.getBuilding().getType().getHealth() + 1);
 			}
+				
 			System.out.println("spawn building" + buildingType.toString() + tile.getLocation());
 			Building building = new Building(buildingType, tile, playerControlled);
 			building.setRemainingEffort(0);
@@ -1674,7 +1689,7 @@ public class Game {
 
 				Road road = new Road(rt, thing.getTile());
 				thing.getTile().setRoad(road, Direction.NORTH.toString());
-
+				
 				for (Tile tile : Utils.getNeighborsIncludingCurrent(thing.getTile(), world)) {
 					turnRoad(tile);
 				}
