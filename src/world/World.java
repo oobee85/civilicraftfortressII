@@ -168,7 +168,7 @@ public class World {
 		Unit wolf = wolves.get((int)(Math.random()*wolves.size()));
 		Tile t = wolf.getTile();
 		
-		wolf.takeDamage(wolf.getHealth());
+		wolf.takeDamage(wolf.getHealth() + 1);
 		System.out.println("Werewolf at: "+t.getLocation().x+ ", "+ t.getLocation().y);
 		spawnAnimal(UnitType.WEREWOLF, t);
 	}
@@ -196,6 +196,15 @@ public class World {
 		}
 	}
 	
+	public void spawnSkeletonArmy() {
+		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.ROCK ).findFirst();
+		if(potential.isPresent()) {
+			Tile t = potential.get();
+			for(Tile tile : t.getNeighbors()) {
+				spawnAnimal(UnitType.SKELETON, tile);
+			}
+		}
+	}
 	public void spawnAnimal(UnitType type, Tile tile) {
 		Animal animal = AnimalFactory.makeAnimal(type, tile);
 		tile.addUnit(animal);
@@ -449,7 +458,7 @@ public class World {
 			Tile tile = unit.getTile();
 			int tileDamage = 0;
 			if(tile.getTerrain() == Terrain.SNOW) {
-				tileDamage ++;
+				tileDamage += 5;
 			}
 			
 			if (tileDamage != 0) {

@@ -38,12 +38,12 @@ public enum UnitType implements HasImage {
 	ROC			("resources/Images/units/roc.png",		new CombatStats(500, 50, 10, 1, 25, 0, 10), 	false, true, true, null, null, new Item(100, ItemType.FOOD), null),
 	
 	OGRE	   ("resources/Images/units/ogre.png",		new CombatStats(1000, 40, 50, 1, 40, 0, 5), 	false, false, true, null, null, new Item(10, ItemType.BRONZE_BAR), null),
-	ENT		   ("resources/Images/units/ent.png",		new CombatStats(1000, 50, 50, 1, 100, 0, 10), 	false, false, true, null, null, new Item(100, ItemType.WOOD), null),
+	ENT		   ("resources/Images/units/ent.png",		new CombatStats(1000, 50, 50, 1, 100, 0, 10), 	false, false, true, null, null, new Item(200, ItemType.WOOD), null),
 	WEREWOLF   ("resources/Images/units/werewolf.png",	new CombatStats(100, 20, 10, 1, 5, 0, 10), 		false, false, true, null, null, null, null),
-	LAVAGOLEM  ("resources/Images/units/lavagolem.png", new CombatStats(1000, 50, 50, 1, 100, 0, 10), 	false, false, true, null, null, new Item(50, ItemType.MITHRIL_ORE), null),
+	LAVAGOLEM  ("resources/Images/units/lavagolem.png", new CombatStats(1000, 200, 50, 1, 100, 0, 10), 	false, false, true, null, null, new Item(50, ItemType.MITHRIL_ORE), null),
 	WOLF		("resources/Images/units/wolf.png",		new CombatStats(200, 40, 20, 1, 20, 0, 50), 	false, false, true, null, null, new Item(100, ItemType.FOOD), null),
-	CYCLOPS    ("resources/Images/units/cyclops.png", 	new CombatStats(500, 40, 50, 6, 40, 0, 10), 	false, false, true, null, null, new Item(10, ItemType.MITHRIL_BAR), ProjectileType.ROCK_CYCLOPS),
-	SKELETON	("resources/Images/units/skeleton.png",	new CombatStats(200, 10, 20, 1, 20, 0, 50), 	false, false, true, null, null, new Item(100, ItemType.FOOD), null),
+	CYCLOPS    ("resources/Images/units/cyclops.png", 	new CombatStats(500, 40, 50, 6, 40, 0, 10), 	false, false, true, null, null, new Item(1, ItemType.MITHRIL_BAR), ProjectileType.ROCK_CYCLOPS),
+	SKELETON	("resources/Images/units/skeleton.png",	new CombatStats(200, 20, 20, 1, 20, 0, 50), 	false, false, true, null, null, new Item(100, ItemType.FOOD), null),
 	
 	FLAMELET	    ("resources/Images/units/flamelet.png", new CombatStats(1, 0, 25, 0, 1000, 0, 50), 	false, false, true, null, null, new Item(10 ,ItemType.COAL), null),
 	WATER_SPIRIT ("resources/Images/units/waterspirit.png", new CombatStats(1, 0, 25, 0, 1000, 0, 50), 	false, false, false, null, null, null, null),

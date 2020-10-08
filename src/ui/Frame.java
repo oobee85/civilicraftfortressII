@@ -965,6 +965,7 @@ public class Frame extends JPanel {
 				gameInstance.world.spawnAnimal(UnitType.PARASITE, gameInstance.world.getTilesRandomly().getFirst());
 				gameInstance.world.spawnEnt();
 				gameInstance.world.spawnLavaGolem();
+				gameInstance.world.spawnSkeletonArmy();
 				gameInstance.world.spawnAnimal(UnitType.BOMB, gameInstance.world.getTilesRandomly().getFirst());
 				gameInstance.spawnOrcs();
 			}

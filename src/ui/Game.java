@@ -834,7 +834,28 @@ public class Game {
 				g.drawImage(animal.getImage(0), animal.getTile().getLocation().x * Game.tileSize, animal.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 				drawHealthBar(g, animal);
 				drawHitsplat(g, animal);
-		
+				
+				if(animal.getTile().getNumPlayerControlledUnits() <= 0) {
+					int animals = 0;
+					for(Unit u : animal.getTile().getUnits()) {
+						if(u.isPlayerControlled() == false) {
+							animals ++;
+						}else {
+							break;
+						}
+					}
+					//draws a square for every other unit
+					for (int i = 0; i < animals; i++) {
+						g.setColor(Color.RED);
+						int x = animal.getTile().getLocation().x * Game.tileSize + 10 * i;
+						int y = animal.getTile().getLocation().y * Game.tileSize;
+						g.fillRect(x, y, 5, 5);
+						g.setColor(Color.BLACK);
+						g.drawRect(x, y, 5, 5);
+
+					}
+				}
+				
 			}
 			for(Unit unit : world.units) {
 				if(unit.getIsSelected()) {
@@ -857,14 +878,34 @@ public class Game {
 				drawHealthBar(g, unit);
 				drawHitsplat(g, unit);
 				
-				//draws a black square for every unit on the tile
+				//draws a square for every player unit on the tile
 				int num = unit.getTile().getNumPlayerControlledUnits();
-				g.setColor(Color.black);
+				int total = num;
+				int other = 0;
 				for (int i = 0; i < num; i++) {
-					g.fillRect(unit.getTile().getLocation().x * Game.tileSize + 10 * i, unit.getTile().getLocation().y * Game.tileSize, 5, 5);
+					g.setColor(Color.pink);
+					int x = unit.getTile().getLocation().x * Game.tileSize + 10 * i;
+					int y = unit.getTile().getLocation().y * Game.tileSize;
+					g.fillRect(x, y, 5, 5);
+					g.setColor(Color.BLACK);
+					g.drawRect(x, y, 5, 5);
+				}
+				for(Unit u : unit.getTile().getUnits()) {
+					if(u.isPlayerControlled() == false) {
+						other ++;
+						total ++;
+					}
+				}
+				//draws a square for every other unit
+				for (int i = 0; i < other; i++) {
+					g.setColor(Color.RED);
+					int x = unit.getTile().getLocation().x * Game.tileSize + (10 * num) + (10 * i);
+					int y = unit.getTile().getLocation().y * Game.tileSize;
+					g.fillRect(x, y, 5, 5);
+					g.setColor(Color.BLACK);
+					g.drawRect(x, y, 5, 5);
 
 				}
-				
 
 			}
 			for(Projectile p : world.projectiles) {
