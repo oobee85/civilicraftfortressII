@@ -227,6 +227,9 @@ public class Tile {
 		if(getHasBuilding() == false) {
 			return false;
 		}
+		if(building.isPlanned() == true) {
+			return false;
+		}
 		BuildingType bt = building.getType();
 		if(bt == BuildingType.WALL_WOOD || bt == BuildingType.WALL_STONE || bt == BuildingType.WALL_BRICK) {
 			return true;
@@ -289,6 +292,9 @@ public class Tile {
 			return true;
 		}
 		if (building == null) {
+			return true;
+		}
+		if(building.isPlanned() == true) {
 			return true;
 		}
 		BuildingType bt = building.getType();
@@ -384,6 +390,9 @@ public class Tile {
 	}
 	public boolean hasWall() {
 		if(building == null) {
+			return false;
+		}
+		if(building.isPlanned() == true) {
 			return false;
 		}
 		BuildingType buildingType = building.getType();

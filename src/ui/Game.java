@@ -1637,7 +1637,7 @@ public class Game {
 				chargePrice(bt);
 				Building building = new Building(bt, tile, true);
 				tile.setBuilding(building);
-				world.buildings.add(building);
+				world.plannedBuildings.add(building);
 				building.setPlanned(true);
 				return;
 			}

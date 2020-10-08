@@ -36,6 +36,9 @@ public class Building extends Thing {
 	public void setPlanned(boolean planned) {
 		isPlanned = planned;
 	}
+	public boolean isPlanned() {
+		return isPlanned;
+	}
 	public void tick() {
 		updateInProgressUnit();
 		timeToHarvest --;

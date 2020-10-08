@@ -514,7 +514,7 @@ public class World {
 			} else {
 				buildingsNew.add(building);
 			}
-
+			
 		}
 		for(Building plannedBuilding : plannedBuildings) {
 			if(plannedBuilding.getRemainingEffort() < plannedBuilding.getType().getBuildingEffort()) {
