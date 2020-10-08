@@ -32,7 +32,7 @@ public class Game {
 	private BuildingType selectedBuildingToSpawn;
 	private BuildingType selectedBuildingToPlan;
 	private int numCutTrees = 10;
-	private int buildingsUntilOgre = 10;
+	private int buildingsUntilOgre = 20;
 	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
 	public static final Color playerColor = Color.pink;
 	public static final Color neutralColor = Color.lightGray;
@@ -159,25 +159,25 @@ public class Game {
 		if(ticks >= 10 && Math.random() < 0.0005) {
 			world.spawnAnimal(UnitType.WATER_SPIRIT, world.getTilesRandomly().getFirst());
 		}
-		if(ticks >= 100 && Math.random() < 0.001) {
+		if(ticks >= 1000 && Math.random() < 0.001) {
 			world.spawnAnimal(UnitType.FLAMELET, world.getTilesRandomly().getFirst());
 		}
-		if(ticks >= 100 && Math.random() < 0.0005) {
+		if(ticks >= 3000 && Math.random() < 0.0005) {
 			world.spawnAnimal(UnitType.BOMB, world.getTilesRandomly().getFirst());
 		}
-		if(ticks >= 1000 && Math.random() < 0.0001) {
+		if(ticks >= 6000 && Math.random() < 0.0005) {
 			world.spawnWerewolf();
 		}
-		if(ticks >= 1000 && Math.random() < 0.0001) {
+		if(ticks >= 3000 && Math.random() < 0.0005) {
 			world.spawnLavaGolem();
 		}
-		if(ticks >= 2000 && Math.random() < 0.0001) {
+		if(ticks >= 6000 && Math.random() < 0.0001) {
 			world.spawnAnimal(UnitType.PARASITE, world.getTilesRandomly().getFirst());
 		}
-		if(ticks >= 1000 && Math.random() < (0.00005 * numCutTrees/5)) {
+		if(ticks >= 3000 && Math.random() < (0.00005 * numCutTrees/5)) {
 			world.spawnEnt();
 		}
-		if(ticks >= 1000 && Math.random() < 0.00001 ) {
+		if(ticks >= 12000 && Math.random() < 0.0001 ) {
 			spawnOrcs();
 		}
 		if(buildingsUntilOgre == world.buildings.size()) {
@@ -1213,10 +1213,9 @@ public class Game {
 			Integer value = (Integer) mapElement.getValue();
 
 			items.get(key).addAmount(-value);
-			items.get(type).addAmount(1);
 		}
 
-
+		items.get(type).addAmount(1);
 			
 	}
 

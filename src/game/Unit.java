@@ -220,6 +220,9 @@ public class Unit extends Thing  {
 	}
 	
 	public void aggro(Unit attacker) {
+		if(this.isPlayerControlled() && attacker.isPlayerControlled()) {
+			return;
+		}
 		this.setTarget(attacker);
 	}
 	
