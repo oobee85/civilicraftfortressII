@@ -1435,6 +1435,24 @@ public class Game {
 		
 	}
 
+	public void workerRoad() {
+		for(Thing thing : selectedThings) {
+			if(thing instanceof Unit) {
+				Unit unit = (Unit)thing;
+				
+				if(unit.getType() == UnitType.WORKER && unit.isIdle()) {
+					for(Tile tile : world.territory) {
+						if(tile.getRoad() != null) {
+							unit.setTargetTile(tile);
+							
+						}
+					}
+				}
+					
+			}
+		}
+		
+	}
 	public void explode(Thing thing) {
 		if(thing == null) {
 			return;
@@ -1639,6 +1657,7 @@ public class Game {
 				tile.setBuilding(building);
 				world.plannedBuildings.add(building);
 				building.setPlanned(true);
+				building.setHealth(1);
 				return;
 			}
 		}
@@ -1654,6 +1673,7 @@ public class Game {
 					thing.getTile().setBuilding(building);
 					world.buildings.add(building);
 					building.setPlanned(false);
+					building.setHealth(1);
 					
 				}
 				

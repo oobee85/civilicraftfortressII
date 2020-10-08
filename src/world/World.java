@@ -26,7 +26,7 @@ public class World {
 	private static final int NUM_LIQUID_SIMULATION_PHASES = 9;
 	private ArrayList<ArrayList<Tile>> liquidSimulationPhases = new ArrayList<>(NUM_LIQUID_SIMULATION_PHASES);
 	private Tile[][] tiles;
-	private ConcurrentLinkedQueue<Tile> territory = new ConcurrentLinkedQueue<Tile>();;
+	public ConcurrentLinkedQueue<Tile> territory = new ConcurrentLinkedQueue<Tile>();;
 	
 	private int width;
 	private int height;

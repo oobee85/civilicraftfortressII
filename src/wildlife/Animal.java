@@ -44,7 +44,7 @@ public class Animal extends Unit {
 		energy -= 0.005;
 		if(getHealth() < super.getType().getCombatStats().getHealth() && readyToHeal()) {
 			energy -= 1.0;
-			heal(1);
+			heal(1, false);
 			resetTimeToHeal();
 		}
 		if(energy < MAX_ENERGY/20) {

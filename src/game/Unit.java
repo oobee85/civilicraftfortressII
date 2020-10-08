@@ -154,7 +154,7 @@ public class Unit extends Thing  {
 		}
 		
 		if(getHealth() < combatStats.getHealth() && readyToHeal()) {
-			heal(1);
+			heal(1, false);
 			resetTimeToHeal();
 		}
 		if(unitType == UnitType.WORKER) {
@@ -175,6 +175,10 @@ public class Unit extends Thing  {
 			}
 			if(tobuild != null) {
 				tobuild.expendEffort(1);
+				if(tobuild.getRemainingEffort() > 0) {
+					tobuild.heal(tobuild.getMaxHealth()/tobuild.getType().getBuildingEffort(), false);
+				}
+				
 				if(tobuild.getRemainingEffort() < tobuild.getType().getBuildingEffort()) {
 					tobuild.setPlanned(false);
 				}
@@ -206,7 +210,7 @@ public class Unit extends Thing  {
 		other.takeDamage(combatStats.getAttack());
 		double damageDealt = initialHP - (other.getHealth() < 0 ? 0 : other.getHealth());
 		if(unitType.hasLifeSteal() && !(other instanceof Building)) {
-			this.heal(combatStats.getAttack());
+			this.heal(combatStats.getAttack(), true);
 		}
 		resetTimeToAttack();
 		if(other instanceof Unit) {
