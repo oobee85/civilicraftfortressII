@@ -1599,51 +1599,67 @@ public class Game {
 		}
 		
 	}
-	
-	public void buildBuilding(BuildingType bt, Tile tile) {
-		
-		for (Thing thing : selectedThings) {
-			if (thing != null && thing instanceof Unit && ((Unit) thing).getUnitType() == UnitType.WORKER) {
-				if (thing.getTile().getHasBuilding() == false) {
 
-					for (Map.Entry mapElement : bt.getCost().entrySet()) {
-						ItemType key = (ItemType) mapElement.getKey();
-						Integer value = (Integer) mapElement.getValue();
+	private boolean canBuild(BuildingType bt, Tile tile) {
+		if (tile.getHasBuilding() == true) {
+			return false;
+		}
 
-						if (items.get(key).getAmount() < value) {
-							return;
-						}
-					}
-					if (bt == BuildingType.IRRIGATION && thing.getTile().canPlant() == false) {
-						return;
-					}
-					if (bt == BuildingType.IRRIGATION && tile != null && tile.canPlant() == false) {
-						return;
-					}
+		for (Map.Entry mapElement : bt.getCost().entrySet()) {
+			ItemType key = (ItemType) mapElement.getKey();
+			Integer value = (Integer) mapElement.getValue();
 
-					for (Map.Entry mapElement : bt.getCost().entrySet()) {
-						ItemType key = (ItemType) mapElement.getKey();
-						Integer value = (Integer) mapElement.getValue();
-
-						items.get(key).addAmount(-value);
-					}
-					
-					if(tile != null) {
-						Building building = new Building(bt, tile, true);
-						tile.setBuilding(building);
-						world.buildings.add(building);
-//						building.setPlanned(true);
-						
-					}else if(tile == null) {
-						Building building = new Building(bt, thing.getTile(), true);
-						thing.getTile().setBuilding(building);
-						world.buildings.add(building);
-					}
-					
-
-				}
+			if (items.get(key).getAmount() < value) {
+				return false;
 			}
 		}
+		if (bt == BuildingType.IRRIGATION && tile.canPlant() == false) {
+			return false;
+		}
+
+		return true;
+
+	}
+	private void chargePrice(BuildingType bt) {
+		for (Map.Entry mapElement : bt.getCost().entrySet()) {
+			ItemType key = (ItemType) mapElement.getKey();
+			Integer value = (Integer) mapElement.getValue();
+
+			items.get(key).addAmount(-value);
+		}
+	}
+
+	public void buildBuilding(BuildingType bt, Tile tile) {
+		
+		//if passed in a tile, it builds it on the tile
+		if(tile != null) {
+			if(canBuild(bt, tile) == true) {
+				chargePrice(bt);
+				Building building = new Building(bt, tile, true);
+				tile.setBuilding(building);
+				world.buildings.add(building);
+				building.setPlanned(true);
+				return;
+			}
+		}
+		
+		
+		//if not passed in tile, builds the building on each worker
+		for (Thing thing : selectedThings) {
+			if (thing != null && thing instanceof Unit && ((Unit) thing).getUnitType() == UnitType.WORKER) {
+
+				if(canBuild(bt, thing.getTile()) == true) {
+					chargePrice(bt);
+					Building building = new Building(bt, thing.getTile(), true);
+					thing.getTile().setBuilding(building);
+					world.buildings.add(building);
+					building.setPlanned(false);
+					
+				}
+				
+			}
+		}
+		
 
 	}
 	public void setBuildingToPlan(BuildingType bt) {
