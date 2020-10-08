@@ -314,9 +314,10 @@ public class Game {
 		this.heightMapImage = images[2];
 	}
 
-	public void updateBuildingAction() {
+	public void buildingTick() {
 		
 		for(Building building : world.buildings) {
+			building.tick();
 			if(!building.isBuilt()) {
 				continue;
 			}
@@ -1567,14 +1568,6 @@ public class Game {
 			unit.doAttacks(world);
 			unit.doPassiveThings();
 		}
-	}
-	
-	private void buildingTick() {
-		updateBuildingAction();
-		for (Building building : world.buildings) {
-			building.tick();
-		}
-		
 	}
 
 	private boolean canBuild(BuildingType bt, Tile tile) {
