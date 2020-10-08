@@ -12,7 +12,6 @@ import utils.*;
 import wildlife.*;
 
 public class Tile {
-	public static final Color TERRITORY_COLOR = Color.pink;
 	private boolean isTerritory = false;
 	private boolean isSelected = false;
 	private boolean inVisionRange = false;

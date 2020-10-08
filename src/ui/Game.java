@@ -34,6 +34,8 @@ public class Game {
 	private int numCutTrees = 10;
 	private int buildingsUntilOgre = 10;
 	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
+	public static final Color playerColor = Color.pink;
+	public static final Color neutralColor = Color.lightGray;
 	
 	HashMap<ItemType, Item> items = new HashMap<ItemType, Item>();
 	ArrayList<Research> researchList = new ArrayList<>();
@@ -718,7 +720,7 @@ public class Game {
 						if(t.getIsTerritory()) {
 //							g.setColor(Color.black);
 //							g.fillRect(x, y, w, h); 
-							g.setColor(Tile.TERRITORY_COLOR);
+							g.setColor(playerColor);
 							
 							Utils.setTransparency(g, 0.5f);
 							for(Tile tile : t.getNeighbors()) {
@@ -782,7 +784,7 @@ public class Game {
 			
 			for(Building b : this.world.buildings) {
 				if(b.getIsSelected()) {
-					g.setColor(Color.pink);
+					g.setColor(playerColor);
 					Utils.setTransparency(g, 0.8f);
 					Graphics2D g2d = (Graphics2D)g;
 					Stroke currentStroke = g2d.getStroke();
@@ -846,7 +848,7 @@ public class Game {
 					}
 					//draws a square for every other unit
 					for (int i = 0; i < animals; i++) {
-						g.setColor(Color.RED);
+						g.setColor(neutralColor);
 						int x = animal.getTile().getLocation().x * Game.tileSize + 10 * i;
 						int y = animal.getTile().getLocation().y * Game.tileSize;
 						g.fillRect(x, y, 5, 5);
@@ -859,7 +861,7 @@ public class Game {
 			}
 			for(Unit unit : world.units) {
 				if(unit.getIsSelected()) {
-					g.setColor(Color.pink);
+					g.setColor(playerColor);
 					Utils.setTransparency(g, 0.8f);
 					Graphics2D g2d = (Graphics2D)g;
 					Stroke currentStroke = g2d.getStroke();
@@ -883,7 +885,7 @@ public class Game {
 				int total = num;
 				int other = 0;
 				for (int i = 0; i < num; i++) {
-					g.setColor(Color.pink);
+					g.setColor(playerColor);
 					int x = unit.getTile().getLocation().x * Game.tileSize + 10 * i;
 					int y = unit.getTile().getLocation().y * Game.tileSize;
 					g.fillRect(x, y, 5, 5);
@@ -898,7 +900,7 @@ public class Game {
 				}
 				//draws a square for every other unit
 				for (int i = 0; i < other; i++) {
-					g.setColor(Color.RED);
+					g.setColor(neutralColor);
 					int x = unit.getTile().getLocation().x * Game.tileSize + (10 * num) + (10 * i);
 					int y = unit.getTile().getLocation().y * Game.tileSize;
 					g.fillRect(x, y, 5, 5);

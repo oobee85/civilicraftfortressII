@@ -772,8 +772,8 @@ public class World {
 				minimapColor = tile.getBuilding().getColor(0);
 			}
 			if(tile.getIsTerritory()) {
-				minimapColor = Utils.blendColors(Tile.TERRITORY_COLOR, minimapColor, 0.3);
-				terrainColor = Utils.blendColors(Tile.TERRITORY_COLOR, terrainColor, 0.3);
+				minimapColor = Utils.blendColors(Game.playerColor, minimapColor, 0.3);
+				terrainColor = Utils.blendColors(Game.playerColor, terrainColor, 0.3);
 			}
 			
 			double tilebrightness = tile.getBrightness();
