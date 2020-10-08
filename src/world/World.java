@@ -16,7 +16,8 @@ import wildlife.*;
 public class World {
 
 	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 5;
-	public static final double SNOW_LEVEL = 0.75;
+	public static final double TERRAIN_SNOW_LEVEL = 0.9;
+	public static final double MODIFIER_SNOW_LEVEL = 0.8;
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
 	public static final int TRANSITION_PERIOD = 100;
@@ -105,7 +106,13 @@ public class World {
 				tile.liquidType = LiquidType.WATER;
 				tile.liquidAmount += 0.001;
 			}
+			if(tile.getHeight() >= MODIFIER_SNOW_LEVEL && tile.getTerrain().isCold(tile.getTerrain()) && tile.getModifier() == null && tile.liquidType != LiquidType.LAVA) {
+				GroundModifier gm = new GroundModifier(GroundModifierType.SNOW, tile, 1000);
+				tile.setModifier(gm);
+				groundModifiers.add(gm);
+			}
 		}
+		
 	}
 	public void eruptVolcano() {
 		System.out.println("eruption");
@@ -275,6 +282,7 @@ public class World {
 	}
 	public void updateTerrainChange(World world) {
 		for(Tile tile : getTiles()) {
+			
 			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				
 				if(tile.checkTerrain(Terrain.DIRT) || tile.checkTerrain(Terrain.GRASS)) {
@@ -689,7 +697,7 @@ public class World {
 		for(Tile tile : getTiles()) {
 			if(tile.getTerrain() == Terrain.DIRT) {
 				Terrain t;
-				if (tile.getHeight() > SNOW_LEVEL) {
+				if (tile.getHeight() > TERRAIN_SNOW_LEVEL) {
 					t = Terrain.SNOW;
 				}
 				else if (tile.getHeight() > 0.6) {

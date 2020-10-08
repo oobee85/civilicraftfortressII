@@ -12,9 +12,12 @@ public class GroundModifier {
 	
 	public GroundModifier(GroundModifierType type, Tile tile, int duration) {
 		this.type = type;
-		timeAlive = 0;
+		this.timeAlive = 0;
 		this.tile = tile;
-		maxTime = duration;
+		this.maxTime = duration;
+	}
+	public void refreshDuration() {
+		timeAlive = 0;
 	}
 	
 	public GroundModifierType getType() {

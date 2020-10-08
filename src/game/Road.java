@@ -12,7 +12,6 @@ public class Road extends Thing {
 	private RoadType roadType;
 	private double remainingEffort;
 	private double health;
-	private boolean isPlanned;
 	private ResearchRequirement req = new ResearchRequirement();
 	
 	public Road(RoadType roadType, Tile tile) {
@@ -20,14 +19,6 @@ public class Road extends Thing {
 		this.remainingEffort = roadType.getBuildingEffort();
 		this.roadType = roadType;
 		this.health = roadType.getHealth();
-		this.isPlanned = false;
-		
-	}
-	public boolean getIsPlanned() {
-		return isPlanned;
-	}
-	public void setIsPlanned(boolean planned) {
-		isPlanned = planned;
 	}
 	public void expendEffort(double effort) {
 		remainingEffort -= effort;

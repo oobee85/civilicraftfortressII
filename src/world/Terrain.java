@@ -63,6 +63,12 @@ public enum Terrain {
 		return true;
 
 	}
+	public boolean isCold(Terrain t) {
+		if (t == Terrain.VOLCANO || t == Terrain.BURNED_GROUND) {
+			return false;
+		}
+		return true;
+	}
 	public boolean canSupportRare(Terrain t) {
 		if (t == Terrain.VOLCANO) {
 			return true;

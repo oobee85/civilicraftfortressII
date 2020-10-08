@@ -676,6 +676,7 @@ public class Game {
 					}
 				}
 			}
+			
 			for (int i = lowerX; i < upperX; i++) {
 				for (int j = lowerY; j < upperY; j++) {
 					Tile t = world.get(new TileLoc(i, j));
@@ -685,6 +686,8 @@ public class Game {
 					int y = t.getLocation().y * Game.tileSize;
 					int w = Game.tileSize;
 					int h = Game.tileSize;
+					
+					
 					
 					if(t.getHasBuilding() == true && t.getBuilding().getIsPlayerControlled()) {
 						setTerritory(new TileLoc(i,j));
@@ -697,7 +700,9 @@ public class Game {
 						g.drawImage(t.getTerrain().getImage(Game.tileSize), x, y, w, h, null);
 //						t.drawEntities(g, currentMode);
 						
-						
+						if(t.getResource() != null) {
+							g.drawImage(t.getResource().getType().getImage(Game.tileSize), x, y, w, h, null);
+						}
 						
 						if(t.getIsTerritory()) {
 //							g.setColor(Color.black);
@@ -751,13 +756,14 @@ public class Game {
 							g.fillRect(x + Game.tileSize/2 - size/2, y + Game.tileSize/2 - size/2, size, size);
 							g.drawImage(t.liquidType.getImage(Game.tileSize), x + Game.tileSize/2 - size/2, y + Game.tileSize/2 - size/2, size, size, null);
 						}
+						
+						
+						
 						if(t.getModifier() != null) {
 							g.drawImage(t.getModifier().getType().getImage(Game.tileSize), x, y, w, h, null);
 						}
 						
-						if(t.getResource() != null) {
-							g.drawImage(t.getResource().getType().getImage(Game.tileSize), x, y, w, h, null);
-						}
+						
 					}
 				}
 			}
@@ -1483,7 +1489,6 @@ public class Game {
 				if(unit.getType() == UnitType.WORKER) {
 					for(Tile tile : world.territory) {
 						if(tile.getRoad() == null) {
-//							unit.setTargetTile(tile);
 							unit.addToPath(tile);
 							setPlannedRoad(tile);
 							

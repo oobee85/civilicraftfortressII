@@ -103,6 +103,9 @@ public class Liquid {
 				if(tile.checkTerrain(Terrain.SNOW)) {
 					tile.setTerrain(Terrain.ROCK);
 				}
+				if(tile.getModifier() != null && tile.getModifier().getType().isCold(tile.getModifier().getType())) {
+					tile.getModifier().finish();
+				}
 			}
 			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= 0.001) {
 				tile.liquidAmount -= 0.00001;

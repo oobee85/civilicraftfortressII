@@ -12,7 +12,7 @@ import utils.Utils;
 public enum GroundModifierType implements HasImage{
 
 	FIRE(new String[] { "resources/Images/ground_modifiers/fire.gif" }, 1, 0.5),
-
+	SNOW(new String[] { "resources/Images/ground_modifiers/snow128.png" }, 1, 0),
 	;
 
 	int damage;
@@ -31,6 +31,12 @@ public enum GroundModifierType implements HasImage{
 	}
 	public double getBrightness() {
 		return brightness;
+	}
+	public boolean isCold(GroundModifierType gmt) {
+		if(gmt == GroundModifierType.SNOW) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override

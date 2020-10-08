@@ -346,12 +346,15 @@ public class Tile {
 			if(modifier != null) {
 				if(modifier.getType() == GroundModifierType.FIRE && !fireResistant) {
 					damage += modifier.getType().getDamage();
+				}else {
+					damage += modifier.getType().getDamage();
 				}
+				
 			}
 		}
 		if(checkTerrain(Terrain.SNOW)) {
-			if(getHeight() > World.SNOW_LEVEL) {
-				damage += 0.1 *(getHeight() - World.SNOW_LEVEL) / (1 - World.SNOW_LEVEL);
+			if(getHeight() > World.TERRAIN_SNOW_LEVEL) {
+				damage += 0.1 *(getHeight() - World.TERRAIN_SNOW_LEVEL) / (1 - World.TERRAIN_SNOW_LEVEL);
 			}
 			else {
 				damage += 0.01;

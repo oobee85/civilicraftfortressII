@@ -9,7 +9,7 @@ import javax.swing.ImageIcon;
 import utils.*;
 
 public enum RoadType implements HasImage {
-	STONE_ROAD (50, 50, "resources/Images/buildings/research.png", 4, 
+	STONE_ROAD (50, 20, "resources/Images/buildings/research.png", 4, 
 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,10);  }}),
 	;
 	
