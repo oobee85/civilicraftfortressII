@@ -138,9 +138,7 @@ public class World {
 			for(GroundModifier modifier : groundModifiers) {
 				Tile tile = modifier.getTile();
 				if(modifier.updateTime() == false) {
-					if(tile.getPlant() != null) {
-						tile.getPlant().takeDamage(modifier.getType().getDamage());
-					}
+					
 					GroundModifiersNew.add(modifier);
 				}else {
 					tile.setModifier(null);
@@ -541,14 +539,27 @@ public class World {
 		LinkedList<Plant> plantsLandNew = new LinkedList<Plant>();
 		for(Plant plant : plantsLand) {
 			Tile tile = plant.getTile();
+			
+			int totalDamage = 0;
+			double modifierDamage = 0;
+			
+			//adds the damage of groundmodifier
+			if(tile.getModifier() != null) {
+				modifierDamage += tile.getModifier().getType().getDamage();
+			}
+			
+			
 			if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(plant.isAquatic() == false || tile.liquidType != LiquidType.WATER) {
-					double damageTaken = tile.liquidAmount * tile.liquidType.getDamage();
-					int roundedDamage = (int) (damageTaken+1);
-					if(roundedDamage >= 1) {
-						plant.takeDamage(roundedDamage);
-					}
+					//adds damage of liquids
+					double liquidDamage = tile.liquidAmount * tile.liquidType.getDamage();
+					totalDamage += liquidDamage;
 				}
+			}
+			
+			totalDamage = (int) (modifierDamage+totalDamage);
+			if(totalDamage >= 1) {
+				plant.takeDamage(totalDamage);
 			}
 			if(plant.isDead() == true) {
 				tile.setHasPlant(null);
