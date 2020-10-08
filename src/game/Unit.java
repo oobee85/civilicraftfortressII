@@ -22,6 +22,7 @@ public class Unit extends Thing  {
 	private boolean isIdle;
 	private CombatStats combatStats;
 	private LinkedList<Tile> currentPath;
+	private LinkedList<Tile> queuedPath;
 	private LinkedList<Attack> attacks;
 	
 	
@@ -45,6 +46,13 @@ public class Unit extends Thing  {
 		}
 	}
 	
+	public void addToPath(Tile t) {
+		if(queuedPath == null) {
+			queuedPath = new LinkedList<Tile>();
+		}
+		queuedPath.add(t);
+
+	}
 	public void addAttackType(Attack a) {
 		attacks.add(a);
 	}
@@ -241,6 +249,10 @@ public class Unit extends Thing  {
 	}
 	
 	public void doMovement(HashMap<ItemType, Item> items) {
+		if(getTargetTile() == null && queuedPath != null && !queuedPath.isEmpty()) {
+			setTargetTile(queuedPath.getFirst());
+			queuedPath.remove();
+		}
 		if (readyToMove() && getTargetTile() != null) {
 			moveTowards(getTargetTile());
 		}

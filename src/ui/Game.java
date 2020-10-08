@@ -1483,7 +1483,8 @@ public class Game {
 				if(unit.getType() == UnitType.WORKER) {
 					for(Tile tile : world.territory) {
 						if(tile.getRoad() == null) {
-							unit.setTargetTile(tile);
+//							unit.setTargetTile(tile);
+							unit.addToPath(tile);
 							setPlannedRoad(tile);
 							
 						}
