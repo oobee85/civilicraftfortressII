@@ -14,7 +14,7 @@ public class InfoPanel extends JPanel {
 	private int imageSize = DEFAULT_IMAGE_SIZE;
 	private String name;
 	private Image image;
-	
+	private int numButtons;
 	protected int y;
 
 	public InfoPanel(String name, Image image, int imageSize) {
@@ -32,13 +32,15 @@ public class InfoPanel extends JPanel {
 	}
 	
 	public JButton addButton(String text) {
+		numButtons ++;
 		Dimension size = new Dimension(60, 20);
 		JButton button = KUIConstants.setupButton(text, null, size);
 		button.setFont(KUIConstants.buttonFontMini);
 		this.setLayout(null);
 		this.add(button);
 		System.out.println(this.getWidth());
-		button.setBounds(this.getWidth() - size.width, this.getHeight()-size.height, size.width, size.height);
+		button.setBounds(this.getWidth() - size.width, this.getHeight()-size.height*numButtons, size.width, size.height);
+		
 		return button;
 	}
 	

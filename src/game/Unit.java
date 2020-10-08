@@ -22,7 +22,6 @@ public class Unit extends Thing  {
 	private boolean isIdle;
 	private CombatStats combatStats;
 	private LinkedList<Tile> currentPath;
-	
 	private LinkedList<Attack> attacks;
 	
 	

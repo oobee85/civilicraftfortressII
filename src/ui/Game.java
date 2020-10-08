@@ -1475,14 +1475,16 @@ public class Game {
 	}
 
 	public void workerRoad() {
+		
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;
 				
-				if(unit.getType() == UnitType.WORKER && unit.isIdle()) {
+				if(unit.getType() == UnitType.WORKER) {
 					for(Tile tile : world.territory) {
-						if(tile.getRoad() != null) {
+						if(tile.getRoad() == null) {
 							unit.setTargetTile(tile);
+							setPlannedRoad(tile);
 							
 						}
 					}
@@ -1652,6 +1654,16 @@ public class Game {
 	public void setBuildingToPlan(BuildingType bt) {
 		if(bt != null) {
 			selectedBuildingToPlan = bt;
+		}
+	}
+	private void setPlannedRoad(Tile t) {
+		if(t != null && t.getRoad() == null) {
+			Road road = new Road(RoadType.STONE_ROAD, t);
+			t.setRoad(road, Direction.NORTH.toString());
+			
+			for (Tile tile : Utils.getNeighborsIncludingCurrent(t, world)) {
+				turnRoad(tile);
+			}
 		}
 	}
 	

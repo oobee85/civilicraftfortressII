@@ -137,7 +137,6 @@ public class Frame extends JPanel {
 				switchInfoPanel(infoPanel);
 				SwingUtilities.invokeLater(() -> {
 					infoPanel.addButton("Explode").addActionListener(e -> gameInstance.explode(building));
-					infoPanel.addButton("Road everything").addActionListener(e -> gameInstance.workerRoad());
 				});
 				frame.repaint();
 			}
@@ -152,10 +151,12 @@ public class Frame extends JPanel {
 					switchInfoPanel(infoPanel);
 					SwingUtilities.invokeLater(() -> {
 						infoPanel.addButton("Explode").addActionListener(e -> gameInstance.explode(unit));
+						infoPanel.addButton("Road everything").addActionListener(e -> gameInstance.workerRoad());
 					});
 				}
 				if(unit.getType() == UnitType.WORKER) {
 					manageBuildingTab(selected);
+					
 				}
 				frame.repaint();
 			}
