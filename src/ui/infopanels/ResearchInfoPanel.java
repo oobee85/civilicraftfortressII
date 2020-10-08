@@ -34,15 +34,17 @@ public class ResearchInfoPanel extends InfoPanel {
 		if(showing.getRequirement().getRequirements().size() > 0 ) {
 			g.drawLine(x + xoffset - 10, y, x + xoffset - 10, y + offset*showing.getRequirement().getRequirements().size() - offset/4);
 			
-			HashMap<ItemType, Integer> cost = showing.getCost();
-			g.drawString(cost.toString(), x + xoffset-5, y += offset);
-			
 			for(Research req : showing.getRequirement().getRequirements()) {
 				g.drawString(req.toString(), x + xoffset, y += offset);
 				g.drawLine(x + xoffset - 10, y - offset/4, x + xoffset - 1, y - offset/4);
 			}
+
+			g.setFont(KUIConstants.infoFontSmall);
+			HashMap<ItemType, Integer> cost = showing.getCost();
+			g.drawString(cost.toString(), x + xoffset-5, y += offset);
 		}
-		
+
+		g.setFont(KUIConstants.infoFont);
 		double completedRatio = 1.0 * showing.getPointsSpent() / showing.getRequiredPoints();
 		String progress = String.format("%d/%d", showing.getPointsSpent(), showing.getRequiredPoints());
 		
