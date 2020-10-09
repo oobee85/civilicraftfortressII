@@ -39,13 +39,14 @@ public class World {
 	public LinkedList<Building> buildings = new LinkedList<Building>();
 	public LinkedList<Building> plannedBuildings = new LinkedList<Building>();
 	public LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
+	public LinkedList<GroundModifier> groundModifiers = new LinkedList<>();
+	public LinkedList<GroundModifier> newGroundModifiers = new LinkedList<>();
 	
 	public HashSet<Unit> unitsInTerritory = new HashSet<Unit>();
 	
 	
 	
 	
-	public static LinkedList<GroundModifier> groundModifiers = new LinkedList<>();
 	
 	private double bushRarity = 0.005;
 	private double waterPlantRarity = 0.05;
@@ -109,7 +110,7 @@ public class World {
 			if(tile.getHeight() >= MODIFIER_SNOW_LEVEL && tile.getTerrain().isCold(tile.getTerrain()) && tile.getModifier() == null && tile.liquidType != LiquidType.LAVA) {
 				GroundModifier gm = new GroundModifier(GroundModifierType.SNOW, tile, 1000);
 				tile.setModifier(gm);
-				groundModifiers.add(gm);
+				newGroundModifiers.add(gm);
 			}
 		}
 		
@@ -221,6 +222,9 @@ public class World {
 		else if(type == UnitType.DRAGON) {
 			return new Dragon(tile, false);
 		}
+		else if(type == UnitType.ICE_GIANT) {
+			return new IceGiant(tile, false);
+		}
 		else {
 			return new Animal(type, tile, false);
 		}
@@ -282,9 +286,7 @@ public class World {
 //						tile.setTerrain(Terrain.BURNED_GROUND);
 					}
 					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
-					synchronized(groundModifiers) {
-						groundModifiers.add(fire);
-					}
+					newGroundModifiers.add(fire);
 					t.setModifier(fire);
 					if(t.getHasBuilding() == true) {
 						t.getBuilding().takeDamage(damage);
@@ -303,9 +305,7 @@ public class World {
 	
 		for(Tile t : getNeighborsInRadius(tile, radius)) {
 			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
-			synchronized(groundModifiers) {
-				groundModifiers.add(fire);
-			}
+			newGroundModifiers.add(fire);
 			t.setModifier(fire);
 			if(t.getHasBuilding() == true) {
 				t.getBuilding().takeDamage(damage);
@@ -437,7 +437,7 @@ public class World {
 				if(projectile.getType().getGroundModifierType() != null) {
 					GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), (int)projectile.getType().getDamage()/5);
 					projectile.getTile().setModifier(gm);
-					groundModifiers.add(gm);
+					newGroundModifiers.add(gm);
 				}
 			}
 			if(projectile.reachedTarget()) {
@@ -518,18 +518,18 @@ public class World {
 		units = unitsNew;
 		
 		// GROUND MODIFIERS
-		LinkedList<GroundModifier> GroundModifiersNew = new LinkedList<GroundModifier>();
-		synchronized(groundModifiers) {
-			for(GroundModifier modifier : groundModifiers) {
-				Tile tile = modifier.getTile();
-				if(modifier.updateTime() == false) {
-					GroundModifiersNew.add(modifier);
-				} else {
-					tile.setModifier(null);
-				}
+		LinkedList<GroundModifier> groundModifiersNew = new LinkedList<GroundModifier>();
+		for(GroundModifier modifier : groundModifiers) {
+			Tile tile = modifier.getTile();
+			if(modifier.updateTime() == false) {
+				groundModifiersNew.add(modifier);
+			} else {
+				tile.setModifier(null);
 			}
-			groundModifiers = GroundModifiersNew;
 		}
+		groundModifiersNew.addAll(newGroundModifiers);
+		newGroundModifiers.clear();
+		groundModifiers = groundModifiersNew;
 		
 		// BUILDINGS
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();

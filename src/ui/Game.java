@@ -139,6 +139,10 @@ public class Game {
 
 		if(ticks == 1) {
 			world.rain();
+			world.spawnAnimal(UnitType.ICE_GIANT, world.getTilesRandomly().getFirst());
+			world.spawnAnimal(UnitType.ICE_GIANT, world.getTilesRandomly().getFirst());
+			world.spawnAnimal(UnitType.ICE_GIANT, world.getTilesRandomly().getFirst());
+			world.spawnAnimal(UnitType.ICE_GIANT, world.getTilesRandomly().getFirst());
 		}
 		if(ticks >= 10 && Math.random() < 0.0005) {
 			world.spawnAnimal(UnitType.WATER_SPIRIT, world.getTilesRandomly().getFirst());
@@ -1564,7 +1568,7 @@ public class Game {
 			unit.planActions(world.units, world.buildings, world.plannedBuildings);
 			unit.doMovement(items);
 			unit.doAttacks(world);
-			unit.doPassiveThings();
+			unit.doPassiveThings(world);
 		}
 	}
 

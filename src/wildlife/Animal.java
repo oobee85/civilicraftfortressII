@@ -97,7 +97,7 @@ public class Animal extends Unit {
 	}
 	
 	@Override
-	public void doPassiveThings() {
+	public void doPassiveThings(World world) {
 	}
 	
 	public void chooseWhereToMove() {

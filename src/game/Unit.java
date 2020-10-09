@@ -297,7 +297,7 @@ public class Unit extends Thing  {
 		return null;
 	}
 	
-	public void doPassiveThings() {
+	public void doPassiveThings(World world) {
 		// Workers building stuff
 		if(getType().isBuilder()) {
 			Building tobuild = getAdjacentUnfinishedBuilding(getTile());

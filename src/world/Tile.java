@@ -313,12 +313,17 @@ public class Tile {
 		boolean flying = false;
 		boolean aquatic = false;
 		boolean fireResistant = false;
+		boolean coldResistant = false;
 		
 		if(thing instanceof Unit) {
 			Unit unit = (Unit)thing;
 			flying = unit.getType().isFlying();
 			aquatic = unit.getType().isAquatic();
 			fireResistant = unit.isFireResistant();
+			coldResistant = unit.getType().isColdResist();
+		}
+		if(thing instanceof Building) {
+			coldResistant = true;
 		}
 		
 		double damage = 0;
@@ -344,9 +349,11 @@ public class Tile {
 				}
 			}
 			if(modifier != null) {
-				if(modifier.getType() == GroundModifierType.FIRE && !fireResistant) {
-					damage += modifier.getType().getDamage();
-				}else {
+				if((modifier.getType() == GroundModifierType.FIRE && fireResistant)
+						|| (modifier.getType() == GroundModifierType.SNOW && coldResistant)) {
+					// resisted environment damage
+				} 
+				else {
 					damage += modifier.getType().getDamage();
 				}
 				

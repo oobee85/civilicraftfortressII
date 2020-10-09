@@ -28,22 +28,25 @@ public class Flamelet extends Animal {
 	@Override
 	public void updateState() {
 		super.updateState();
+	}
+	
+	@Override
+	public void doPassiveThings(World world) {
+		super.doPassiveThings(world);
 		if(getTile().getModifier() != null) {
 			if(getTile().getModifier().getType() != GroundModifierType.FIRE) {
 				this.getTile().getModifier().finish();
-				makeFlame();
+				makeFlame(world);
 			}
 		}
 		else {
-			makeFlame();
+			makeFlame(world);
 		}
 	}
 	
-	private void makeFlame() {
-		getTile().setModifier(new GroundModifier(GroundModifierType.FIRE, this.getTile(), 15));
-		synchronized(World.groundModifiers) {
-			World.groundModifiers.add(getTile().getModifier());
-		}
+	private void makeFlame(World world) {
+		getTile().setModifier(new GroundModifier(GroundModifierType.FIRE, this.getTile(), 30));
+		world.newGroundModifiers.add(getTile().getModifier());
 	}
 
 	@Override
