@@ -1244,70 +1244,7 @@ public class Game {
 		}
 	}
 	
-	public void leftClick(int mx, int my) {
-		Position tilepos = getTileAtPixel(new Position(mx,my));
-		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
-		Tile tile = world.get(loc);
-
-		System.out.println("left click");
-		
-		// spawning unit
-		if (selectedUnitToSpawn != null) {
-			summonThing(tile, selectedUnitToSpawn, null, summonPlayerControlled);
-			if(shiftEnabled == false) {
-				selectedUnitToSpawn = null;
-				selectedBuildingToSpawn = null;
-				selectedBuildingToPlan = null;
-			}
-			
-		}
-		
-		//spawning building
-		if (selectedBuildingToSpawn != null) {
-			summonThing(tile, null, selectedBuildingToSpawn, summonPlayerControlled);
-			if(shiftEnabled == false) {
-				selectedUnitToSpawn = null;
-				selectedBuildingToSpawn = null;
-				selectedBuildingToPlan = null;
-			}
-		}
-		
-		//planning building
-		if (selectedBuildingToPlan != null) {
-			System.out.println("planning building" + selectedBuildingToPlan.toString() + loc.toString());
-			if (selectedBuildingToPlan == BuildingType.IRRIGATION && tile.canPlant() == false) {
-				return;
-			}
-			if(tile.getHasBuilding() == true) {
-				return;
-			}
-			buildBuilding(selectedBuildingToPlan, tile);
-			
-			if(shiftEnabled == false) {
-				selectedUnitToSpawn = null;
-				selectedBuildingToSpawn = null;
-				selectedBuildingToPlan = null;
-			}
-		}
-		
-		//select units on tile
-		toggleSelectionOnTile(tile);
-		return;
-		
-//		guiController.openRightClickMenu(mx, my, world.get(loc]);
-	}
 	
-	public void shiftControl(boolean enabled) {
-		shiftEnabled = enabled;
-		if(enabled == false) {
-			selectedBuildingToSpawn = null;
-			selectedUnitToSpawn = null;
-			selectedBuildingToPlan = null;
-		}
-	}
-	public void aControl(boolean enabled) {
-		aControl = enabled;
-	}
 	private void summonThing(Tile tile, UnitType unitType, BuildingType buildingType, boolean playerControlled) {
 		
 		if(unitType != null) {
@@ -1395,22 +1332,99 @@ public class Game {
 //		System.out.println("Mouse is on tile " + tile);
 		hoveredTile = new TileLoc(tile.getIntX(), tile.getIntY());
 	}
-	
+	public void leftClick(int mx, int my) {
+		Position tilepos = getTileAtPixel(new Position(mx,my));
+		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
+		Tile tile = world.get(loc);
+
+		System.out.println("left click");
+		
+		//if a-click and the tile has a building or unit
+		if(aControl == true) {
+			if(tile.getHasBuilding() || !tile.getUnits().isEmpty()) {
+				toggleTargetEnemy(tile);
+				aControl = false;
+				return;
+			}
+		}
+		// spawning unit
+		if (selectedUnitToSpawn != null) {
+			summonThing(tile, selectedUnitToSpawn, null, summonPlayerControlled);
+			if(shiftEnabled == false) {
+				selectedUnitToSpawn = null;
+				selectedBuildingToSpawn = null;
+				selectedBuildingToPlan = null;
+			}
+			
+		}
+		
+		//spawning building
+		if (selectedBuildingToSpawn != null) {
+			summonThing(tile, null, selectedBuildingToSpawn, summonPlayerControlled);
+			if(shiftEnabled == false) {
+				selectedUnitToSpawn = null;
+				selectedBuildingToSpawn = null;
+				selectedBuildingToPlan = null;
+			}
+		}
+		
+		//planning building
+		if (selectedBuildingToPlan != null) {
+			System.out.println("planning building" + selectedBuildingToPlan.toString() + loc.toString());
+			if (selectedBuildingToPlan == BuildingType.IRRIGATION && tile.canPlant() == false) {
+				return;
+			}
+			if(tile.getHasBuilding() == true) {
+				return;
+			}
+			buildBuilding(selectedBuildingToPlan, tile);
+			
+			if(shiftEnabled == false) {
+				selectedUnitToSpawn = null;
+				selectedBuildingToSpawn = null;
+				selectedBuildingToPlan = null;
+			}
+		}
+		
+		//select units on tile
+		toggleSelectionOnTile(tile);
+		return;
+		
+//		guiController.openRightClickMenu(mx, my, world.get(loc]);
+	}
 	public void rightClick(int mx, int my) {
 		Position pos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(pos.getIntX(), pos.getIntY());
 		Tile tile = world.get(loc);
-		
-		if(tile.getUnits().isEmpty() == false || (tile.getHasBuilding() && aControl == true)) {
-			toggleTargetEnemy(tile);
-		}else {
-			setDestination(mx, my);
-		}
-		if(aControl == true) {
-			aControl = false;
-		}
 		setSpawnLocation(tile);
+		
+	
+		for(Unit unit : tile.getUnits()) {
+			//if there is a non-player unit, cant move onto it
+			if(!unit.isPlayerControlled()) {
+				//instead attack the non-player unit
+				toggleTargetEnemy(tile);
+				return;
+			}
+		}
+		//sets the target tile if there isnt an enemy
+		setDestination(mx, my);
+		
+		
 	}
+	
+	public void shiftControl(boolean enabled) {
+		shiftEnabled = enabled;
+		if(enabled == false) {
+			selectedBuildingToSpawn = null;
+			selectedUnitToSpawn = null;
+			selectedBuildingToPlan = null;
+		}
+	}
+	public void aControl(boolean enabled) {
+		aControl = enabled;
+	}
+	
 
 	public void toggleSelectionOnTile(Tile tile) {
 //		Thing selectionCandidate = tile.getPlayerControlledThing();
@@ -1423,7 +1437,7 @@ public class Game {
 		}
 		
 		//selects the building on the tile
-		if(building != null && unitsOnTile.isEmpty()) {
+		if(building != null && unitsOnTile.isEmpty() && building.getIsPlayerControlled()) {
 			if (shiftEnabled == false) {
 				deselectThings();
 			}
@@ -1437,16 +1451,26 @@ public class Game {
 				return;
 			}
 			
-			// clicking on new selection
+			// clicking on tile w/o shift i.e only selects top unit
 			if (candidate.isPlayerControlled()) {
-				candidate.setIsSelected(true);
-				guiController.selectedUnit(candidate, true);
-				selectedThings.add(candidate);
+				//shift disabled -> selects top unit
+				if (shiftEnabled == false) {
+					candidate.setIsSelected(true);
+					guiController.selectedUnit(candidate, true);
+					selectedThings.add(candidate);
+					break;
+				}else {
+					//shift enabled -> selects whole stack
+					candidate.setIsSelected(true);
+					guiController.selectedUnit(candidate, true);
+					selectedThings.add(candidate);
+				}
 			}
-			// clicking only on current selection
-			if (selectedThings.contains(candidate) && selectedThings.size() == 0) {
-				deselectOneThing(candidate);
-			}
+			
+			// clicking on tile with one unit
+//			if (selectedThings.contains(candidate) && selectedThings.size() == 0) {
+//				deselectOneThing(candidate);
+//			}
 			
 			
 			
