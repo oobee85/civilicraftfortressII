@@ -32,6 +32,7 @@ public class Game {
 	private UnitType selectedUnitToSpawn;
 	private BuildingType selectedBuildingToSpawn;
 	private BuildingType selectedBuildingToPlan;
+	private boolean summonPlayerControlled;
 	private int numCutTrees = 10;
 	private int buildingsUntilOgre = 20;
 	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
@@ -169,7 +170,7 @@ public class Game {
 			world.spawnOgre();
 			buildingsUntilOgre += buildingsUntilOgre;
 		}
-		if(ticks >= 1000 && Math.random() < 0.00001) {
+		if(ticks >= 12000 && Math.random() < 0.00001) {
 			meteorStrike();
 		}
 
@@ -1249,12 +1250,9 @@ public class Game {
 
 		System.out.println("left click");
 		
+		// spawning unit
 		if (selectedUnitToSpawn != null) {
-			System.out.println("trying to spawn unit" + selectedUnitToSpawn.toString() + loc.toString());
-			Unit unit = new Unit(selectedUnitToSpawn, tile, true);
-			tile.addUnit(unit);
-			world.units.add(unit);
-			unit.setTimeToAttack(0);
+			summonThing(tile, selectedUnitToSpawn, null, summonPlayerControlled);
 			if(shiftEnabled == false) {
 				selectedUnitToSpawn = null;
 				selectedBuildingToSpawn = null;
@@ -1262,18 +1260,18 @@ public class Game {
 			}
 			
 		}
+		
+		//spawning building
 		if (selectedBuildingToSpawn != null) {
-			System.out.println("trying to spawn building" + selectedBuildingToSpawn.toString() + loc.toString());
-			Building building = new Building(selectedBuildingToSpawn, tile, true);
-			tile.setBuilding(building);
-			world.buildings.add(building);
-			building.expendEffort(building.getType().getBuildingEffort());
+			summonThing(tile, null, selectedBuildingToSpawn, summonPlayerControlled);
 			if(shiftEnabled == false) {
 				selectedUnitToSpawn = null;
 				selectedBuildingToSpawn = null;
 				selectedBuildingToPlan = null;
 			}
 		}
+		
+		//planning building
 		if (selectedBuildingToPlan != null) {
 			System.out.println("planning building" + selectedBuildingToPlan.toString() + loc.toString());
 			if (selectedBuildingToPlan == BuildingType.IRRIGATION && tile.canPlant() == false) {
@@ -1290,6 +1288,8 @@ public class Game {
 				selectedBuildingToPlan = null;
 			}
 		}
+		
+		//select units on tile
 		toggleSelectionOnTile(tile);
 		return;
 		
@@ -1314,6 +1314,7 @@ public class Game {
 			Unit unit = new Unit(unitType, tile, playerControlled);
 			world.newUnits.add(unit);
 			tile.addUnit(unit);
+			unit.setTimeToAttack(0);
 		}
 		if(buildingType != null) {
 			if(tile.getBuilding() != null) {
@@ -1637,6 +1638,9 @@ public class Game {
 		if(bt != null) {
 			selectedBuildingToPlan = bt;
 		}
+	}
+	public void setSummonPlayerControlled(boolean playerControlled) {
+		summonPlayerControlled = playerControlled;
 	}
 	private void setPlannedRoad(Tile t) {
 		if(t != null && t.getRoad() == null) {
