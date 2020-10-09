@@ -213,6 +213,7 @@ public class Game {
 		if(ticks%World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			world.updatePlantDamage();
 		}
+		groundModifierTick();
 		
 		randomEvents();
 		
@@ -1591,6 +1592,21 @@ public class Game {
 			unit.doMovement(items);
 			unit.doAttacks(world);
 			unit.doPassiveThings(world);
+		}
+	}
+	
+	private void groundModifierTick() {
+		for(GroundModifier modifier : world.groundModifiers) {
+			if(modifier.updateTime()) {
+				if(modifier.getType() == GroundModifierType.SNOW) {
+					Tile tile = modifier.getTile();
+					if(tile.liquidType != LiquidType.WATER) {
+						tile.liquidType = LiquidType.WATER;
+						tile.liquidAmount = 0;
+					} 
+					tile.liquidAmount += 0.01;
+				}
+			}
 		}
 	}
 

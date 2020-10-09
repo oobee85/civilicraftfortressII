@@ -108,9 +108,18 @@ public class World {
 				tile.liquidAmount += 0.001;
 			}
 			if(tile.getHeight() >= MODIFIER_SNOW_LEVEL && tile.getTerrain().isCold(tile.getTerrain()) && tile.getModifier() == null && tile.liquidType != LiquidType.LAVA) {
-				GroundModifier gm = new GroundModifier(GroundModifierType.SNOW, tile, 1000);
-				tile.setModifier(gm);
-				newGroundModifiers.add(gm);
+				int duration = (int) ((tile.getHeight() - MODIFIER_SNOW_LEVEL) * 10000);
+				if(tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.SNOW) {
+					tile.getModifier().addDuration(duration);
+				}
+				else {
+					if(tile.getModifier() != null) {
+						tile.getModifier().finish();
+					}
+					GroundModifier gm = new GroundModifier(GroundModifierType.SNOW, tile, duration);
+					tile.setModifier(gm);
+					newGroundModifiers.add(gm);
+				}
 			}
 		}
 		
@@ -527,7 +536,7 @@ public class World {
 		LinkedList<GroundModifier> groundModifiersNew = new LinkedList<GroundModifier>();
 		for(GroundModifier modifier : groundModifiers) {
 			Tile tile = modifier.getTile();
-			if(modifier.updateTime() == false) {
+			if(modifier.isDead() == false) {
 				groundModifiersNew.add(modifier);
 			} else {
 				tile.setModifier(null);
