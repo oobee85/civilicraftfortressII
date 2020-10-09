@@ -380,7 +380,6 @@ public class World {
 	}
 	
 	public void grow() {
-		System.out.println(plantsLand.size() + " land plants and " + plantsAquatic.size() + " aquatic plants.");
 		LinkedList<Plant> newAquatic = new LinkedList<>();
 		LinkedList<Plant> newLand = new LinkedList<>();
 		
@@ -585,6 +584,17 @@ public class World {
 			}
 		}
 		projectiles = projectilesNew;
+		
+		if(Game.ticks % 50 == 0) {
+			System.out.println(
+					"units: " 				+ units.size() + 
+					" \tbuildings: " 		+ buildings.size() + 
+					" \tplannedBuildings: " + plannedBuildings.size() + 
+					" \tplantsLand: " 		+ plantsLand.size() + 
+					" \tplantsAquatic: " 	+ plantsAquatic.size() + 
+					" \tgroundModifiers: " 	+ groundModifiers.size() + 
+					" \tprojectiles: " 		+ projectiles.size());
+		}
 	}
 	
 	public void updatePlantDamage() {
