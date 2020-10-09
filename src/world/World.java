@@ -16,7 +16,7 @@ import wildlife.*;
 public class World {
 
 	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 5;
-	public static final double TERRAIN_SNOW_LEVEL = 0.9;
+	public static final double TERRAIN_SNOW_LEVEL = 1;
 	public static final double MODIFIER_SNOW_LEVEL = 0.8;
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
@@ -185,7 +185,7 @@ public class World {
 		}
 	}
 	public void spawnIceGiant() {
-		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.SNOW ).findFirst();
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getModifier() != null && e.getModifier().getType() == GroundModifierType.SNOW).findFirst();
 		if(tile.isPresent()) {
 			spawnAnimal(UnitType.ICE_GIANT, tile.get());
 		}
