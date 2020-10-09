@@ -107,15 +107,12 @@ public class World {
 				tile.liquidType = LiquidType.WATER;
 				tile.liquidAmount += 0.001;
 			}
-			if(tile.getHeight() >= MODIFIER_SNOW_LEVEL && tile.getTerrain().isCold(tile.getTerrain()) && tile.getModifier() == null && tile.liquidType != LiquidType.LAVA) {
-				int duration = (int) ((tile.getHeight() - MODIFIER_SNOW_LEVEL) * 10000);
+			if(tile.getHeight() >= MODIFIER_SNOW_LEVEL && tile.getTerrain().isCold(tile.getTerrain()) && tile.liquidType != LiquidType.LAVA) {
+				int duration = (int) ((tile.getHeight() - MODIFIER_SNOW_LEVEL) * 8000);
 				if(tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.SNOW) {
 					tile.getModifier().addDuration(duration);
 				}
-				else {
-					if(tile.getModifier() != null) {
-						tile.getModifier().finish();
-					}
+				else if(tile.getModifier() == null){
 					GroundModifier gm = new GroundModifier(GroundModifierType.SNOW, tile, duration);
 					tile.setModifier(gm);
 					newGroundModifiers.add(gm);
