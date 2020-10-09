@@ -1436,7 +1436,7 @@ public class Game {
 		}
 		
 		//selects the building on the tile
-		if(building != null && unitsOnTile.isEmpty() && building.getIsPlayerControlled()) {
+		if(building != null && building.getIsPlayerControlled() && tile.getPlayerControlledUnit() == null) {
 			if (shiftEnabled == false) {
 				deselectThings();
 			}
