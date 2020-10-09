@@ -23,7 +23,9 @@ public class GroundModifier {
 	public GroundModifierType getType() {
 		return type;
 	}
-	
+	public boolean isDead() {
+		return timeAlive >= maxTime;
+	}
 	public int timeLeft() {
 		return maxTime - timeAlive;
 	}
@@ -31,6 +33,10 @@ public class GroundModifier {
 		timeAlive ++;
 		return timeAlive >= maxTime;
 	}
+	public void addDuration(int duration) {
+		timeAlive -= duration;
+	}
+	
 	public void finish() {
 		timeAlive = maxTime;
 	}
