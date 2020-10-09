@@ -44,7 +44,7 @@ public class WaterSpirit extends Animal {
 	}
 	
 	@Override
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
+	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		return;
 	}
 

@@ -35,17 +35,15 @@ public class World {
 	public LinkedList<Plant> plantsLand = new LinkedList<Plant>();
 	public LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
 	public LinkedList<Unit> units = new LinkedList<Unit>();
+	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
 	public LinkedList<Building> buildings = new LinkedList<Building>();
 	public LinkedList<Building> plannedBuildings = new LinkedList<Building>();
 	public LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
-	public LinkedList<Animal> animals = new LinkedList<>();
-	public LinkedList<Animal> newAnimals = new LinkedList<>();
 	
 	public HashSet<Unit> unitsInTerritory = new HashSet<Unit>();
 	
 	
 	
-	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
 	
 	public static LinkedList<GroundModifier> groundModifiers = new LinkedList<>();
 	
@@ -145,7 +143,7 @@ public class World {
 	}
 	
 	public void spawnWerewolf() {
-		List<Animal> wolves = animals
+		List<Unit> wolves = units
 				.stream()
 				.filter(e -> e.getType() == UnitType.WOLF)
 				.collect(Collectors.toList());
@@ -195,7 +193,7 @@ public class World {
 	public void spawnAnimal(UnitType type, Tile tile) {
 		Animal animal = makeAnimal(type, tile);
 		tile.addUnit(animal);
-		newAnimals.add(animal);
+		newUnits.add(animal);
 	}
 
 	public Animal makeAnimal(UnitType type, Tile tile) {
@@ -235,7 +233,7 @@ public class World {
 		}
 		Animal animal = new Animal(animalType, world.get(loc), false);
 		animal.setTile(world.get(loc));
-		newAnimals.add(animal);
+		newUnits.add(animal);
 		world.get(loc).addUnit(animal);
 		
 	}
@@ -506,16 +504,6 @@ public class World {
 		units = unitsNew;
 	}
 	
-	public void doOnDeathActions() {
-		for(Animal animal : animals) {
-			if(animal.isDead()) {
-				if(animal.getType().getDeadItem() != null && animal.getTarget() != null && animal.getTarget().isPlayerControlled()) {
-					animal.getTile().addItem(animal.getType().getDeadItem());
-				}
-			}
-		}
-	}
-	
 	public void clearDeadAndAddNewThings() {
 		// UNITS
 		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
@@ -529,19 +517,6 @@ public class World {
 		unitsNew.addAll(newUnits);
 		newUnits.clear();
 		units = unitsNew;
-		
-		// ANIMALS
-		LinkedList<Animal> animalsCopy = new LinkedList<>();
-		for(Animal animal : animals) {
-			if(animal.isDead()) {
-				animal.getTile().removeUnit(animal);
-			} else {
-				animalsCopy.add(animal);
-			}
-		}
-		animalsCopy.addAll(newAnimals);
-		newAnimals.clear();
-		animals = animalsCopy;
 		
 		// GROUND MODIFIERS
 		LinkedList<GroundModifier> GroundModifiersNew = new LinkedList<GroundModifier>();

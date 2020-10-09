@@ -53,6 +53,16 @@ public class Animal extends Unit {
 			takeDamage(0.05);
 		}
 	}
+	@Override
+	public boolean takeDamage(double damage) {
+		boolean lethal = super.takeDamage(damage);
+		if(lethal) {
+			if(getType().getDeadItem() != null && getTarget() != null && getTarget().isPlayerControlled()) {
+				getTile().addItem(getType().getDeadItem());
+			}
+		}
+		return lethal;
+	}
 	
 	public void reproduced() {
 		drive = 0;
@@ -78,12 +88,16 @@ public class Animal extends Unit {
 	}
 	
 	@Override
-	public void planActions(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings, LinkedList<Building> plannedBuildings) {
-		chooseWhatToEat(units, animals);
+	public void planActions(LinkedList<Unit> units, LinkedList<Building> buildings, LinkedList<Building> plannedBuildings) {
+		chooseWhatToEat(units);
 		if(wantsToAttack() && getTarget() == null) {
-			chooseWhatToAttack(units, animals, buildings);
+			chooseWhatToAttack(units, buildings);
 		}
 		chooseWhereToMove();
+	}
+	
+	@Override
+	public void doPassiveThings() {
 	}
 	
 	public void chooseWhereToMove() {
@@ -105,22 +119,42 @@ public class Animal extends Unit {
 				return;
 			}
 		}
+		if(Math.random() < getMoveChance() && readyToMove()) {
+			if(getTile().getBuilding() != null && getTile().getBuilding().getType() == BuildingType.FARM) {
+				//stuck inside farm
+			}
+			else {
+				List<Tile> neighbors = getTile().getNeighbors();
+				neighbors.add(getTile());
+				Tile best = null;
+				double bestDanger = Double.MAX_VALUE;
+				for(Tile t : neighbors) {
+					if(t.isBlocked(this)) {
+						continue;
+					}
+					double danger = computeDanger(t);
+					if(danger < bestDanger) {
+						best = t;
+						bestDanger = danger;
+					}
+				}
+				if(best != null) {
+					setTargetTile(best);
+				}
+			}
+		}
 	}
 	
-	private void chooseWhatToEat(LinkedList<Unit> units, LinkedList<Animal> animals) {
+	private void chooseWhatToEat(LinkedList<Unit> units) {
 		if(foodTarget != null || !wantsToEat()) {
 			return;
 		}
 		if(getType().isHostile() == true) {
-			Unit iveGotYouInMySights;
-			if(Math.random() < 0.01 && units.isEmpty() == false) {
+			Unit iveGotYouInMySights = null;
+			if(!units.isEmpty()) {
 				int pickUnit = (int) (units.size()*Math.random());
 				iveGotYouInMySights = units.get(pickUnit);
-			}else {
-				int pickAnimal = (int) (animals.size()*Math.random());
-				iveGotYouInMySights = animals.get(pickAnimal);
 			}
-			
 			if(iveGotYouInMySights != this) {
 				foodTarget = iveGotYouInMySights;
 			}
@@ -156,7 +190,7 @@ public class Animal extends Unit {
 		return false;
 	}
 	
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
+	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		return;
 	}
 	

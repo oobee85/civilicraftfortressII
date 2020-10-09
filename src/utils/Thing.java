@@ -73,12 +73,18 @@ public class Thing implements HasImage {
 	public boolean isDead() {
 		return health <= 0 || isDead;
 	}
-	public void takeDamage(double damage) {
+	/**
+	 * @return true if this is lethal damage, false otherwise
+	 */
+	public boolean takeDamage(double damage) {
+		boolean before = isDead();
 		health -= damage;
 		if(damage != 0) {
 			timeLastDamageTaken = Game.ticks;
 		}
 		addHitsplat((int)(Math.ceil(damage)));
+		// Return true if isDead changed from false to true.
+		return !before && isDead();
 	}
 	
 	public void heal(double healing, boolean hitsplat) {

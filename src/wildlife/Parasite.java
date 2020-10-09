@@ -73,13 +73,15 @@ public class Parasite extends Animal {
 	}
 	
 	@Override
-	public void takeDamage(double damage) {
-		super.takeDamage(damage);
+	public boolean takeDamage(double damage) {
+		boolean lethal = super.takeDamage(damage);
 		if(transformed) {
-			if(isDead()) {
+			if(lethal) {
 				transformBack();
+				lethal = false;
 			}
 		}
+		return lethal;
 	}
 
 	@Override
@@ -88,7 +90,7 @@ public class Parasite extends Animal {
 	}
 	
 	@Override
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
+	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		if(!transformed) {
 			for(Unit unit : units) {
 				if(unit.isPlayerControlled()) {

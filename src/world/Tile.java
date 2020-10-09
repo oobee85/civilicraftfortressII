@@ -309,7 +309,7 @@ public class Tile {
 		return true;
 	}
 	
-	public int computeTileDamage(Thing thing) {
+	public double computeTileDamage(Thing thing) {
 		boolean flying = false;
 		boolean aquatic = false;
 		boolean fireResistant = false;
@@ -352,8 +352,7 @@ public class Tile {
 				
 			}
 		}
-		int roundedDamage = (int) (damage);
-		return roundedDamage;
+		return damage;
 	}
 
 	public void setTerrain(Terrain t) {

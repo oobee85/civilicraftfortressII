@@ -94,7 +94,7 @@ public class Unit extends Thing  {
 		return unitType;
 	}
 	
-	public int computeDanger(Tile tile) {
+	public double computeDanger(Tile tile) {
 		// currently only tile damage but at some point might check if enemies there
 		return tile.computeTileDamage(this);
 	}
@@ -167,7 +167,7 @@ public class Unit extends Thing  {
 		}
 		// Take environment damage every 5 ticks
 		if(Game.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
-			int tileDamage = getTile().computeTileDamage(this);
+			int tileDamage = (int)getTile().computeTileDamage(this);
 			if (tileDamage != 0) {
 				this.takeDamage(tileDamage);
 			}
@@ -238,7 +238,7 @@ public class Unit extends Thing  {
 		return null;
 	}
 	
-	public void planActions(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings, LinkedList<Building> plannedBuildings) {
+	public void planActions(LinkedList<Unit> units, LinkedList<Building> buildings, LinkedList<Building> plannedBuildings) {
 		// Workers deciding whether to move toward something to build
 		if (unitType.isBuilder() && isIdle && getTile().getIsTerritory()) {
 			Building building = getBuildingToBuild(buildings, plannedBuildings);

@@ -27,7 +27,7 @@ public class Bomb extends Animal {
 	}
 	
 	@Override
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
+	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		if(buildings.size() > 0) {
 			setTarget(buildings.get((int)(Math.random()*buildings.size())));
 			return;
@@ -35,6 +35,12 @@ public class Bomb extends Animal {
 		return;
 	}
 	
-	
+	@Override
+	public void doAttacks(World world) {
+		if(getTargetTile() == getTile()) {
+			world.spawnExplosion(getTile(), 5, 500);
+			this.setDead(true);
+		}
+	}
 
 }

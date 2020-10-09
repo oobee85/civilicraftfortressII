@@ -201,12 +201,10 @@ public class Game {
 		Liquid.propogate(world);
 		
 		// Remove dead things
-		world.doOnDeathActions();
 		world.clearDeadAndAddNewThings();
 		
 		world.addUnitsInTerritory();
 		
-		animalsTick(world);
 		buildingTick();
 		unitTick();
 		world.doProjectileUpdates();
@@ -830,33 +828,6 @@ public class Game {
 				Utils.setTransparency(g, 1f);
 			}
 			
-			for(Animal animal : world.animals) {
-				g.drawImage(animal.getImage(0), animal.getTile().getLocation().x * Game.tileSize, animal.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
-				drawHealthBar(g, animal);
-				drawHitsplat(g, animal);
-				
-				if(animal.getTile().getNumPlayerControlledUnits() <= 0) {
-					int animals = 0;
-					for(Unit u : animal.getTile().getUnits()) {
-						if(u.isPlayerControlled() == false) {
-							animals ++;
-						}else {
-							break;
-						}
-					}
-					//draws a square for every other unit
-					for (int i = 0; i < animals; i++) {
-						g.setColor(neutralColor);
-						int x = animal.getTile().getLocation().x * Game.tileSize + 10 * i;
-						int y = animal.getTile().getLocation().y * Game.tileSize;
-						g.fillRect(x, y, 5, 5);
-						g.setColor(Color.BLACK);
-						g.drawRect(x, y, 5, 5);
-
-					}
-				}
-				
-			}
 			for(Unit unit : world.units) {
 				if(unit.getIsSelected()) {
 					g.setColor(playerColor);
@@ -874,7 +845,10 @@ public class Game {
 				}
 				
 				g.drawImage(unit.getImage(0), unit.getTile().getLocation().x * Game.tileSize, unit.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
-				drawTarget(g, unit);
+
+				if(unit.getIsSelected()) {
+					drawTarget(g, unit);
+				}
 				drawHealthBar(g, unit);
 				drawHitsplat(g, unit);
 				
@@ -1587,73 +1561,10 @@ public class Game {
 	private void unitTick() {
 		for (Unit unit : world.units) {
 			unit.updateState();
-			unit.planActions(world.units, world.animals, world.buildings, world.plannedBuildings);
+			unit.planActions(world.units, world.buildings, world.plannedBuildings);
 			unit.doMovement(items);
 			unit.doAttacks(world);
 			unit.doPassiveThings();
-		}
-	}
-
-	public void animalsTick(World world) {
-		
-		HashMap<Tile, Animal> trying = new HashMap<>();
-		for(Animal animal : world.animals) {
-			animal.updateState();
-			animal.planActions(world.units, world.animals, world.buildings, world.plannedBuildings);
-			animal.doMovement(items);
-
-			animal.doAttacks(world);
-//			animal.imOnTheHunt(world);
-			if(animal.getTarget() != null) {
-				
-			}
-			else if(Math.random() < animal.getMoveChance() && animal.readyToMove()) {
-				
-				if(animal.getTile().getBuilding() != null && animal.getTile().getBuilding().getType() == BuildingType.FARM) {
-				//stuck inside farm
-				}
-				else {
-					List<Tile> neighbors = Utils.getNeighborsIncludingCurrent(animal.getTile(), world);
-					Tile best = null;
-					
-					double bestDanger = Double.MAX_VALUE;
-					for(Tile t : neighbors) {
-						// deer cant move onto walls
-						if(t.isBlocked(animal)) {
-							continue;
-						}
-						double danger = animal.computeDanger(t);
-						if(danger < bestDanger) {
-							best = t;
-							bestDanger = danger;
-						}
-					}
-					if(best != null) {
-						animal.moveTo(best);
-//						animal.moveTowards(best);
-					}
-				}
-			}
-			
-			else if(animal.wantsToReproduce()) {
-				if(trying.containsKey(animal.getTile())) {
-					Animal other = trying.remove(animal.getTile());
-					animal.reproduced();
-					other.reproduced();
-					Animal newanimal = new Animal(animal.getType(), animal.getTile(), false);
-					newanimal.setTile(animal.getTile());
-					world.newAnimals.add(newanimal);
-				}
-				else {
-					trying.put(animal.getTile(), animal);
-				}
-			}
-			
-			if(animal.getType() == UnitType.BOMB) {
-				if(animal.getTargetTile() == animal.getTile()) {
-					world.spawnExplosion(animal.getTile(), 5, 500);
-				}
-			}
 		}
 	}
 
