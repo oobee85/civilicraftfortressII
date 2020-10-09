@@ -46,6 +46,11 @@ public class Unit extends Thing  {
 		}
 	}
 	
+	public void setType(UnitType type) {
+		this.unitType = type;
+		this.setImage(this.getType());
+	}
+	
 	public void addToPath(Tile t) {
 		if(queuedPath == null) {
 			queuedPath = new LinkedList<Tile>();
@@ -163,11 +168,6 @@ public class Unit extends Thing  {
 		// Take environment damage every 5 ticks
 		if(Game.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			int tileDamage = getTile().computeTileDamage(this);
-			if(Game.ticks/World.TICKS_PER_ENVIRONMENTAL_DAMAGE % 4 == 0) {
-				if(getTile().getTerrain() == Terrain.SNOW) {
-					tileDamage += 5;
-				}
-			}
 			if (tileDamage != 0) {
 				this.takeDamage(tileDamage);
 			}
@@ -267,8 +267,11 @@ public class Unit extends Thing  {
 	
 	public void doAttacks(World world) {
 		boolean attacked = false;
-		if(getTarget() != null) {
-			attacked = Attack.tryToAttack(this, getTarget());
+		if(target != null) {
+			attacked = Attack.tryToAttack(this, target);
+			if(target.isDead()) {
+				target = null;
+			}
 		}
 		if(!attacked && isPlayerControlled()) {
 			for(Unit enemyUnit : world.getHostileUnitsInTerritory()){

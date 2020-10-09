@@ -20,11 +20,6 @@ public class Bomb extends Animal {
 	public boolean wantsToReproduce() {
 		return false;
 	}
-	
-	@Override
-	public void updateState() {
-		super.updateState();
-	}
 
 	@Override
 	public boolean wantsToAttack() {

@@ -117,7 +117,7 @@ public class MainMenuBackground extends JPanel {
 				} catch (InterruptedException e) {
 				}
 			}
-			Wildlife.getAnimals().clear();
+			game.world.animals.clear();
 			finished = true;
 			listener.run();
 		});

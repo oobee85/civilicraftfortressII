@@ -40,7 +40,9 @@ public class Animal extends Unit {
 		}
 	}
 	
-	public void loseEnergy() {
+	@Override
+	public void updateState() {
+		super.updateState();
 		energy -= 0.005;
 		if(getHealth() < super.getType().getCombatStats().getHealth() && readyToHeal()) {
 			energy -= 1.0;
@@ -75,8 +77,38 @@ public class Animal extends Unit {
 		drive += 0.01;
 	}
 	
-	public void chooseWhatToEat(LinkedList<Unit> units, LinkedList<Animal> animals) {
+	@Override
+	public void planActions(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings, LinkedList<Building> plannedBuildings) {
+		chooseWhatToEat(units, animals);
+		if(wantsToAttack() && getTarget() == null) {
+			chooseWhatToAttack(units, animals, buildings);
+		}
+		chooseWhereToMove();
+	}
+	
+	public void chooseWhereToMove() {
+		if(resourceTarget != null) {
+			if(getTile() != resourceTarget) {
+				setTargetTile(resourceTarget);
+				return;
+			}
+		}
 		if(foodTarget != null) {
+			if(this.getTile().getLocation().distanceTo(foodTarget.getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
+				setTargetTile(foodTarget.getTile());
+				return;
+			}
+		}
+		if(getTarget() != null) {
+			if(this.getTile().getLocation().distanceTo(getTarget().getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
+				setTargetTile(getTarget().getTile());
+				return;
+			}
+		}
+	}
+	
+	private void chooseWhatToEat(LinkedList<Unit> units, LinkedList<Animal> animals) {
+		if(foodTarget != null || !wantsToEat()) {
 			return;
 		}
 		if(getType().isHostile() == true) {
@@ -102,33 +134,10 @@ public class Animal extends Unit {
 		}
 	}
 	
-	/**
-	 * Moves toward the target and tries to eat it.
-	 */
-	public void imOnTheHunt(World world) {
-		if(resourceTarget != null) {
-			if(getTile() != resourceTarget) {
-				moveTowards(resourceTarget);
-			}
-//			if(getTile() == resourceTarget) {
-//				if(resourceTarget.getResource() == null || resourceTarget.getResource().getYield() <= 0 || resourceTarget.getResource().getType() != ResourceType.DEAD_ANIMAL) {
-//					resourceTarget = null;
-//				}
-//				else {
-//					resourceTarget.getResource().harvest(1);
-//					eat(1);
-//					if(resourceTarget.getResource().getYield() <= 0) {
-//						resourceTarget.setResource(null);
-//						resourceTarget = null;
-//					}
-//				}
-//			}
-			return;
-		}
+	@Override
+	public void doAttacks(World world) {
+		super.doAttacks(world);
 		if(foodTarget != null) {
-			if(this.getTile().getLocation().distanceTo(foodTarget.getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
-				moveTowards(foodTarget.getTile());
-			}
 			if(inRange(foodTarget)) {
 				double damageDealt = attack(foodTarget);
 				if(damageDealt > 0) {
@@ -138,16 +147,6 @@ public class Animal extends Unit {
 					resourceTarget = foodTarget.getTile();
 					foodTarget = null;
 				}
-			}
-			return;
-		}
-		if(getTarget() != null) {
-			if(this.getTile().getLocation().distanceTo(getTarget().getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
-				this.moveTowards(getTarget().getTile());
-			}
-			Attack.tryToAttack(this, getTarget());
-			if(getTarget().isDead()) {
-				setTarget(null);
 			}
 			return;
 		}

@@ -7,13 +7,18 @@ import utils.*;
 import world.*;
 
 public class Parasite extends Animal {
+	
+	private boolean transformed;
+	private boolean fireResistant;
+	private Tile volcano;
 
-	public Parasite(Tile tile, boolean isPlayerControlled) {
+	public Parasite(Tile tile, boolean isPlayerControlled, Tile volcano) {
 		super(UnitType.PARASITE, tile, isPlayerControlled);
+		this.volcano = volcano;
 	}
 	@Override
 	public boolean isFireResistant() {
-		return true;
+		return fireResistant;
 	}
 	
 	@Override
@@ -38,11 +43,43 @@ public class Parasite extends Animal {
 	
 	@Override
 	public double attack(Thing other) {
-		if(inRange(other)) {
-			other.setPlayerControlled(false);
-			this.setHealth(0);
+		if(!transformed) {
+			if(other instanceof Unit && inRange(other)) {
+				Unit otherUnit = (Unit)other;
+				transform(otherUnit);
+			}
+			return 0;
 		}
-		return 0;
+		else {
+			return super.attack(other);
+		}
+	}
+	
+	private void transform(Unit host) {
+		host.setDead(true);
+		this.setType(host.getType());
+		this.fireResistant = host.isFireResistant();
+		this.setHealth(host.getHealth());
+		this.setMaxHealth(host.getMaxHealth());
+		transformed = true;
+	}
+	
+	private void transformBack() {
+		this.setType(UnitType.PARASITE);
+		this.fireResistant = true;
+		this.setHealth(1);
+		this.setMaxHealth(1);
+		transformed = false;
+	}
+	
+	@Override
+	public void takeDamage(double damage) {
+		super.takeDamage(damage);
+		if(transformed) {
+			if(isDead()) {
+				transformBack();
+			}
+		}
 	}
 
 	@Override
@@ -52,17 +89,27 @@ public class Parasite extends Animal {
 	
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
-		for(Unit unit : units) {
-			if(unit.isPlayerControlled()) {
-				setTarget(unit);
-				if(Math.random() < 0.2) {
-					return;
+		if(!transformed) {
+			for(Unit unit : units) {
+				if(unit.isPlayerControlled()) {
+					setTarget(unit);
+					if(Math.random() < 0.2) {
+						return;
+					}
 				}
 			}
 		}
-		return;
 	}
 	
-	
-
+	@Override
+	public void chooseWhereToMove() {
+		if(!transformed) {
+			super.chooseWhereToMove();
+		}
+		else {
+			if(getTile() != volcano) {
+				setTargetTile(volcano);
+			}
+		}
+	}
 }

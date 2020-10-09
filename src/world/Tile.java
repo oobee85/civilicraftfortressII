@@ -352,14 +352,6 @@ public class Tile {
 				
 			}
 		}
-		if(checkTerrain(Terrain.SNOW)) {
-			if(getHeight() > World.TERRAIN_SNOW_LEVEL) {
-				damage += 0.1 *(getHeight() - World.TERRAIN_SNOW_LEVEL) / (1 - World.TERRAIN_SNOW_LEVEL);
-			}
-			else {
-				damage += 0.01;
-			}
-		}
 		int roundedDamage = (int) (damage);
 		return roundedDamage;
 	}

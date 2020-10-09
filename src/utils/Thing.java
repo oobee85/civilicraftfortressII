@@ -14,6 +14,7 @@ public class Thing implements HasImage {
 	private boolean isPlayerControlled;
 	private double maxHealth;
 	private double health;
+	private boolean isDead;
 	private int timeLastDamageTaken = -1000;
 	private Tile tile;
 	private Tile targetTile;
@@ -44,6 +45,10 @@ public class Thing implements HasImage {
 		this.tile = tile;
 	}
 	
+	public void setImage(HasImage hasImage) {
+		this.hasImage = hasImage;
+	}
+	
 	
 	public boolean isPlayerControlled() {
 		return isPlayerControlled;
@@ -61,8 +66,12 @@ public class Thing implements HasImage {
 		return sideHealthBar;
 	}
 
+	public void setDead(boolean state) {
+		isDead = state;
+	}
+	
 	public boolean isDead() {
-		return health <= 0;
+		return health <= 0 || isDead;
 	}
 	public void takeDamage(double damage) {
 		health -= damage;
@@ -104,6 +113,12 @@ public class Thing implements HasImage {
 	}
 	public double getMaxHealth() {
 		return maxHealth;
+	}
+	public void setMaxHealth(double maxHealth) {
+		this.maxHealth = maxHealth;
+		if(health > maxHealth) {
+			health = maxHealth;
+		}
 	}
 	public void setHealth(double hp) {
 		health = hp;

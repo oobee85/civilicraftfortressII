@@ -47,7 +47,7 @@ public enum UnitType implements HasImage {
 	
 	FLAMELET	    ("resources/Images/units/flamelet.png", new CombatStats(1, 0, 25, 0, 1000, 0, 50), 	false, false, true, null, null, new Item(10 ,ItemType.COAL), null),
 	WATER_SPIRIT ("resources/Images/units/waterspirit.png", new CombatStats(1, 0, 25, 0, 1000, 0, 50), 	false, false, false, null, null, null, null),
-	PARASITE	 ("resources/Images/units/parasite.png", 	new CombatStats(1, 0, 5, 0, 1000, 0, 50), 	false, false, true, null, null, null, null),
+	PARASITE	 ("resources/Images/units/parasite.png", 	new CombatStats(1, 1, 5, 0, 1000, 0, 50), 	false, false, true, null, null, null, null),
 	FIREFLY			("resources/Images/units/firefly.png",	new CombatStats(1, 0, 25, 1, 1000, 0, 50),  false, false, false, null, null, null, null),
 	BOMB			("resources/Images/units/bomb.png",		new CombatStats(1, 0, 25, 1, 1000, 0, 50),  false, false, false, null, null, null, null),
 	;

@@ -2,6 +2,7 @@ package world;
 
 import java.util.*;
 
+import game.*;
 import liquid.*;
 import utils.*;
 
@@ -304,6 +305,52 @@ public class Generation {
 //				queue.add(new TileLoc(i, j+1));
 //				visited[i][j+1] = true;
 //			}
+		}
+	}
+	public static void generateWildLife(World world) {
+		for(Tile tile : world.getTilesRandomly()) {
+			TileLoc loc = tile.getLocation();
+			if(Math.random() < 0.01) {
+				if(tile.checkTerrain(Terrain.GRASS) || tile.checkTerrain(Terrain.DIRT)) {
+					world.makeAnimal(UnitType.DEER, world, loc);
+				}
+				
+				if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+					if(tile.liquidType != LiquidType.LAVA) {
+						world.makeAnimal(UnitType.FISH, world, loc);
+					}
+					
+				}
+			}
+			
+			if(Math.random() < 0.01) {
+				if(tile.checkTerrain(Terrain.DIRT)) {
+					world.makeAnimal(UnitType.HORSE, world, loc);
+				}
+			}
+			
+			if(Math.random() < 0.01) {
+				if(tile.checkTerrain(Terrain.GRASS)) {
+					world.makeAnimal(UnitType.PIG, world, loc);
+				}
+			}
+			if(Math.random() < 0.01) {
+				if(tile.checkTerrain(Terrain.GRASS)) {
+					world.makeAnimal(UnitType.SHEEP, world, loc);
+				}
+			}
+			if(Math.random() < 0.01) {
+				if(tile.checkTerrain(Terrain.GRASS)) {
+					world.makeAnimal(UnitType.COW, world, loc);
+				}
+			}
+			
+			if(tile.getTerrain() == Terrain.VOLCANO && Math.random() < 0.01) {
+				world.spawnDragon();
+			}
+			if(tile.getTerrain() == Terrain.SNOW && Math.random() < 0.005) {
+				world.makeAnimal(UnitType.WOLF, world, loc);
+			}
 		}
 	}
 }
