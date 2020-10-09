@@ -31,7 +31,7 @@ public class LavaGolem extends Animal {
 	}
 	
 	@Override
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
+	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		if(buildings.size() > 0) {
 			for(Building building : buildings) {
 				if(building.getType() == BuildingType.MINE) {

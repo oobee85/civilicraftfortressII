@@ -46,6 +46,11 @@ public class Unit extends Thing  {
 		}
 	}
 	
+	public void setType(UnitType type) {
+		this.unitType = type;
+		this.setImage(this.getType());
+	}
+	
 	public void addToPath(Tile t) {
 		if(queuedPath == null) {
 			queuedPath = new LinkedList<Tile>();
@@ -89,7 +94,7 @@ public class Unit extends Thing  {
 		return unitType;
 	}
 	
-	public int computeDanger(Tile tile) {
+	public double computeDanger(Tile tile) {
 		// currently only tile damage but at some point might check if enemies there
 		return tile.computeTileDamage(this);
 	}
@@ -162,12 +167,7 @@ public class Unit extends Thing  {
 		}
 		// Take environment damage every 5 ticks
 		if(Game.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
-			int tileDamage = getTile().computeTileDamage(this);
-			if(Game.ticks/World.TICKS_PER_ENVIRONMENTAL_DAMAGE % 4 == 0) {
-				if(getTile().getTerrain() == Terrain.SNOW) {
-					tileDamage += 5;
-				}
-			}
+			int tileDamage = (int)getTile().computeTileDamage(this);
 			if (tileDamage != 0) {
 				this.takeDamage(tileDamage);
 			}
@@ -238,7 +238,7 @@ public class Unit extends Thing  {
 		return null;
 	}
 	
-	public void planActions(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings, LinkedList<Building> plannedBuildings) {
+	public void planActions(LinkedList<Unit> units, LinkedList<Building> buildings, LinkedList<Building> plannedBuildings) {
 		// Workers deciding whether to move toward something to build
 		if (unitType.isBuilder() && isIdle && getTile().getIsTerritory()) {
 			Building building = getBuildingToBuild(buildings, plannedBuildings);
@@ -267,8 +267,11 @@ public class Unit extends Thing  {
 	
 	public void doAttacks(World world) {
 		boolean attacked = false;
-		if(getTarget() != null) {
-			attacked = Attack.tryToAttack(this, getTarget());
+		if(target != null) {
+			attacked = Attack.tryToAttack(this, target);
+			if(target.isDead()) {
+				target = null;
+			}
 		}
 		if(!attacked && isPlayerControlled()) {
 			for(Unit enemyUnit : world.getHostileUnitsInTerritory()){
@@ -294,7 +297,7 @@ public class Unit extends Thing  {
 		return null;
 	}
 	
-	public void doPassiveThings() {
+	public void doPassiveThings(World world) {
 		// Workers building stuff
 		if(getType().isBuilder()) {
 			Building tobuild = getAdjacentUnfinishedBuilding(getTile());

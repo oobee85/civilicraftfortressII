@@ -35,17 +35,18 @@ public class World {
 	public LinkedList<Plant> plantsLand = new LinkedList<Plant>();
 	public LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
 	public LinkedList<Unit> units = new LinkedList<Unit>();
+	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
 	public LinkedList<Building> buildings = new LinkedList<Building>();
 	public LinkedList<Building> plannedBuildings = new LinkedList<Building>();
 	public LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
+	public LinkedList<GroundModifier> groundModifiers = new LinkedList<>();
+	public LinkedList<GroundModifier> newGroundModifiers = new LinkedList<>();
 	
 	public HashSet<Unit> unitsInTerritory = new HashSet<Unit>();
 	
 	
 	
-	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
 	
-	public static LinkedList<GroundModifier> groundModifiers = new LinkedList<>();
 	
 	private double bushRarity = 0.005;
 	private double waterPlantRarity = 0.05;
@@ -109,7 +110,7 @@ public class World {
 			if(tile.getHeight() >= MODIFIER_SNOW_LEVEL && tile.getTerrain().isCold(tile.getTerrain()) && tile.getModifier() == null && tile.liquidType != LiquidType.LAVA) {
 				GroundModifier gm = new GroundModifier(GroundModifierType.SNOW, tile, 1000);
 				tile.setModifier(gm);
-				groundModifiers.add(gm);
+				newGroundModifiers.add(gm);
 			}
 		}
 		
@@ -143,7 +144,7 @@ public class World {
 	}
 	
 	public void spawnWerewolf() {
-		List<Animal> wolves = Wildlife.getAnimals()
+		List<Unit> wolves = units
 				.stream()
 				.filter(e -> e.getType() == UnitType.WOLF)
 				.collect(Collectors.toList());
@@ -174,6 +175,12 @@ public class World {
 			spawnAnimal(UnitType.ENT, tile.get());
 		}
 	}
+	public void spawnIceGiant() {
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.SNOW ).findFirst();
+		if(tile.isPresent()) {
+			spawnAnimal(UnitType.ICE_GIANT, tile.get());
+		}
+	}
 	public void spawnDragon() {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.VOLCANO ).findFirst();
 		if(tile.isPresent()) {
@@ -191,10 +198,56 @@ public class World {
 		}
 	}
 	public void spawnAnimal(UnitType type, Tile tile) {
-		Animal animal = AnimalFactory.makeAnimal(type, tile);
+		Animal animal = makeAnimal(type, tile);
 		tile.addUnit(animal);
-		Wildlife.addAnimal(animal);
+		newUnits.add(animal);
 	}
+
+	public Animal makeAnimal(UnitType type, Tile tile) {
+		if(type == UnitType.FLAMELET) {
+			return new Flamelet(tile, false);
+		}
+		else if(type == UnitType.OGRE) {
+			return new Ogre(tile, false);
+		}
+		else if(type == UnitType.PARASITE) {
+			return new Parasite(tile, false, this.get(volcano));
+		}
+		else if(type == UnitType.WEREWOLF) {
+			return new Werewolf(tile, false);
+		}
+		else if(type == UnitType.WATER_SPIRIT) {
+			return new WaterSpirit(tile, false);
+		}
+		else if(type == UnitType.LAVAGOLEM) {
+			return new LavaGolem(tile, false);
+		}
+		else if(type == UnitType.ENT) {
+			return new Ent(tile, false);
+		}
+		else if(type == UnitType.DRAGON) {
+			return new Dragon(tile, false);
+		}
+		else if(type == UnitType.ICE_GIANT) {
+			return new IceGiant(tile, false);
+		}
+		else {
+			return new Animal(type, tile, false);
+		}
+	}
+	
+	
+	public void makeAnimal(UnitType animalType, World world, TileLoc loc) {
+		if(animalType.isAquatic() == false && world.get(loc).liquidAmount > world.get(loc).liquidType.getMinimumDamageAmount()/2 ) {
+			return;
+		}
+		Animal animal = new Animal(animalType, world.get(loc), false);
+		animal.setTile(world.get(loc));
+		newUnits.add(animal);
+		world.get(loc).addUnit(animal);
+		
+	}
+	
 	
 	
 	public void meteorStrike() {
@@ -239,9 +292,7 @@ public class World {
 //						tile.setTerrain(Terrain.BURNED_GROUND);
 					}
 					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
-					synchronized(groundModifiers) {
-						groundModifiers.add(fire);
-					}
+					newGroundModifiers.add(fire);
 					t.setModifier(fire);
 					if(t.getHasBuilding() == true) {
 						t.getBuilding().takeDamage(damage);
@@ -253,20 +304,14 @@ public class World {
 						t.getPlant().takeDamage(damage);
 					}
 					t.liquidAmount = 0;
-					
-					
 				}
-				
-				
 		}
 	}
 	public void spawnExplosion(Tile tile, int radius, int damage) {
 	
 		for(Tile t : getNeighborsInRadius(tile, radius)) {
 			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
-			synchronized(groundModifiers) {
-				groundModifiers.add(fire);
-			}
+			newGroundModifiers.add(fire);
 			t.setModifier(fire);
 			if(t.getHasBuilding() == true) {
 				t.getBuilding().takeDamage(damage);
@@ -341,7 +386,6 @@ public class World {
 	}
 	
 	public void grow() {
-		System.out.println(plantsLand.size() + " land plants and " + plantsAquatic.size() + " aquatic plants.");
 		LinkedList<Plant> newAquatic = new LinkedList<>();
 		LinkedList<Plant> newLand = new LinkedList<>();
 		
@@ -399,7 +443,7 @@ public class World {
 				if(projectile.getType().getGroundModifierType() != null) {
 					GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), (int)projectile.getType().getDamage()/5);
 					projectile.getTile().setModifier(gm);
-					groundModifiers.add(gm);
+					newGroundModifiers.add(gm);
 				}
 			}
 			if(projectile.reachedTarget()) {
@@ -480,18 +524,18 @@ public class World {
 		units = unitsNew;
 		
 		// GROUND MODIFIERS
-		LinkedList<GroundModifier> GroundModifiersNew = new LinkedList<GroundModifier>();
-		synchronized(groundModifiers) {
-			for(GroundModifier modifier : groundModifiers) {
-				Tile tile = modifier.getTile();
-				if(modifier.updateTime() == false) {
-					GroundModifiersNew.add(modifier);
-				} else {
-					tile.setModifier(null);
-				}
+		LinkedList<GroundModifier> groundModifiersNew = new LinkedList<GroundModifier>();
+		for(GroundModifier modifier : groundModifiers) {
+			Tile tile = modifier.getTile();
+			if(modifier.updateTime() == false) {
+				groundModifiersNew.add(modifier);
+			} else {
+				tile.setModifier(null);
 			}
-			groundModifiers = GroundModifiersNew;
 		}
+		groundModifiersNew.addAll(newGroundModifiers);
+		newGroundModifiers.clear();
+		groundModifiers = groundModifiersNew;
 		
 		// BUILDINGS
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
@@ -541,12 +585,22 @@ public class World {
 		for(Projectile projectile : projectiles) {
 			if(projectile.reachedTarget()) {
 				projectile.getTile().removeProjectile(projectile);
-				projectile.setTile(null);
 			} else {
 				projectilesNew.add(projectile);
 			}
 		}
 		projectiles = projectilesNew;
+		
+		if(Game.ticks % 50 == 0) {
+			System.out.println(
+					"units: " 				+ units.size() + 
+					" \tbuildings: " 		+ buildings.size() + 
+					" \tplannedBuildings: " + plannedBuildings.size() + 
+					" \tplantsLand: " 		+ plantsLand.size() + 
+					" \tplantsAquatic: " 	+ plantsAquatic.size() + 
+					" \tgroundModifiers: " 	+ groundModifiers.size() + 
+					" \tprojectiles: " 		+ projectiles.size());
+		}
 	}
 	
 	public void updatePlantDamage() {
@@ -729,7 +783,7 @@ public class World {
 		Generation.genResources(this);
 		this.genPlants();
 		this.makeForest();
-		Wildlife.generateWildLife(this);
+		Generation.generateWildLife(this);
 		System.out.println("Finished generating " + width + "x" + height + " world with " + tileList.size() + " tiles.");
 	}
 

@@ -40,7 +40,9 @@ public class Animal extends Unit {
 		}
 	}
 	
-	public void loseEnergy() {
+	@Override
+	public void updateState() {
+		super.updateState();
 		energy -= 0.005;
 		if(getHealth() < super.getType().getCombatStats().getHealth() && readyToHeal()) {
 			energy -= 1.0;
@@ -50,6 +52,16 @@ public class Animal extends Unit {
 		if(energy < MAX_ENERGY/20) {
 			takeDamage(0.05);
 		}
+	}
+	@Override
+	public boolean takeDamage(double damage) {
+		boolean lethal = super.takeDamage(damage);
+		if(lethal) {
+			if(getType().getDeadItem() != null && getTarget() != null && getTarget().isPlayerControlled()) {
+				getTile().addItem(getType().getDeadItem());
+			}
+		}
+		return lethal;
 	}
 	
 	public void reproduced() {
@@ -75,20 +87,74 @@ public class Animal extends Unit {
 		drive += 0.01;
 	}
 	
-	public void chooseWhatToEat(LinkedList<Unit> units, LinkedList<Animal> animals) {
+	@Override
+	public void planActions(LinkedList<Unit> units, LinkedList<Building> buildings, LinkedList<Building> plannedBuildings) {
+		chooseWhatToEat(units);
+		if(wantsToAttack() && getTarget() == null) {
+			chooseWhatToAttack(units, buildings);
+		}
+		chooseWhereToMove();
+	}
+	
+	@Override
+	public void doPassiveThings(World world) {
+	}
+	
+	public void chooseWhereToMove() {
+		if(resourceTarget != null) {
+			if(getTile() != resourceTarget) {
+				setTargetTile(resourceTarget);
+				return;
+			}
+		}
 		if(foodTarget != null) {
+			if(this.getTile().getLocation().distanceTo(foodTarget.getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
+				setTargetTile(foodTarget.getTile());
+				return;
+			}
+		}
+		if(getTarget() != null) {
+			if(this.getTile().getLocation().distanceTo(getTarget().getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
+				setTargetTile(getTarget().getTile());
+				return;
+			}
+		}
+		if(Math.random() < getMoveChance() && readyToMove()) {
+			if(getTile().getBuilding() != null && getTile().getBuilding().getType() == BuildingType.FARM) {
+				//stuck inside farm
+			}
+			else {
+				List<Tile> neighbors = getTile().getNeighbors();
+				neighbors.add(getTile());
+				Tile best = null;
+				double bestDanger = Double.MAX_VALUE;
+				for(Tile t : neighbors) {
+					if(t.isBlocked(this)) {
+						continue;
+					}
+					double danger = computeDanger(t);
+					if(danger < bestDanger) {
+						best = t;
+						bestDanger = danger;
+					}
+				}
+				if(best != null) {
+					setTargetTile(best);
+				}
+			}
+		}
+	}
+	
+	private void chooseWhatToEat(LinkedList<Unit> units) {
+		if(foodTarget != null || !wantsToEat()) {
 			return;
 		}
 		if(getType().isHostile() == true) {
-			Unit iveGotYouInMySights;
-			if(Math.random() < 0.01 && units.isEmpty() == false) {
+			Unit iveGotYouInMySights = null;
+			if(!units.isEmpty()) {
 				int pickUnit = (int) (units.size()*Math.random());
 				iveGotYouInMySights = units.get(pickUnit);
-			}else {
-				int pickAnimal = (int) (animals.size()*Math.random());
-				iveGotYouInMySights = animals.get(pickAnimal);
 			}
-			
 			if(iveGotYouInMySights != this) {
 				foodTarget = iveGotYouInMySights;
 			}
@@ -102,33 +168,10 @@ public class Animal extends Unit {
 		}
 	}
 	
-	/**
-	 * Moves toward the target and tries to eat it.
-	 */
-	public void imOnTheHunt(World world) {
-		if(resourceTarget != null) {
-			if(getTile() != resourceTarget) {
-				moveTowards(resourceTarget);
-			}
-//			if(getTile() == resourceTarget) {
-//				if(resourceTarget.getResource() == null || resourceTarget.getResource().getYield() <= 0 || resourceTarget.getResource().getType() != ResourceType.DEAD_ANIMAL) {
-//					resourceTarget = null;
-//				}
-//				else {
-//					resourceTarget.getResource().harvest(1);
-//					eat(1);
-//					if(resourceTarget.getResource().getYield() <= 0) {
-//						resourceTarget.setResource(null);
-//						resourceTarget = null;
-//					}
-//				}
-//			}
-			return;
-		}
+	@Override
+	public void doAttacks(World world) {
+		super.doAttacks(world);
 		if(foodTarget != null) {
-			if(this.getTile().getLocation().distanceTo(foodTarget.getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
-				moveTowards(foodTarget.getTile());
-			}
 			if(inRange(foodTarget)) {
 				double damageDealt = attack(foodTarget);
 				if(damageDealt > 0) {
@@ -141,23 +184,13 @@ public class Animal extends Unit {
 			}
 			return;
 		}
-		if(getTarget() != null) {
-			if(this.getTile().getLocation().distanceTo(getTarget().getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
-				this.moveTowards(getTarget().getTile());
-			}
-			Attack.tryToAttack(this, getTarget());
-			if(getTarget().isDead()) {
-				setTarget(null);
-			}
-			return;
-		}
 	}
 	
 	public boolean wantsToAttack() {
 		return false;
 	}
 	
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
+	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		return;
 	}
 	

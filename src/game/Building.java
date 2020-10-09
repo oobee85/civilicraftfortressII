@@ -45,7 +45,7 @@ public class Building extends Thing {
 		
 		if(Game.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			Tile tile = getTile();
-			int tileDamage = tile.computeTileDamage(this);
+			int tileDamage = (int)tile.computeTileDamage(this);
 			if (tileDamage != 0) {
 				this.takeDamage(tileDamage);
 			}

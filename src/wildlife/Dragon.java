@@ -96,12 +96,12 @@ public class Dragon extends Animal {
 	}
 	
 	@Override
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
+	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		//chance to attack either wildlife or player
 //		if(Math.random() < 0.95) {
-			for (Animal a : animals) {
-				if (a != null && a != this) {
-					setTarget(animals.get((int) (Math.random() * animals.size())));
+			for (Unit a : units) {
+				if (a != this) {
+					setTarget(units.get((int) (Math.random() * units.size())));
 					resetTimeToHunt();
 					return;
 				}

@@ -309,16 +309,21 @@ public class Tile {
 		return true;
 	}
 	
-	public int computeTileDamage(Thing thing) {
+	public double computeTileDamage(Thing thing) {
 		boolean flying = false;
 		boolean aquatic = false;
 		boolean fireResistant = false;
+		boolean coldResistant = false;
 		
 		if(thing instanceof Unit) {
 			Unit unit = (Unit)thing;
 			flying = unit.getType().isFlying();
 			aquatic = unit.getType().isAquatic();
 			fireResistant = unit.isFireResistant();
+			coldResistant = unit.getType().isColdResist();
+		}
+		if(thing instanceof Building) {
+			coldResistant = true;
 		}
 		
 		double damage = 0;
@@ -344,24 +349,17 @@ public class Tile {
 				}
 			}
 			if(modifier != null) {
-				if(modifier.getType() == GroundModifierType.FIRE && !fireResistant) {
-					damage += modifier.getType().getDamage();
-				}else {
+				if((modifier.getType() == GroundModifierType.FIRE && fireResistant)
+						|| (modifier.getType() == GroundModifierType.SNOW && coldResistant)) {
+					// resisted environment damage
+				} 
+				else {
 					damage += modifier.getType().getDamage();
 				}
 				
 			}
 		}
-		if(checkTerrain(Terrain.SNOW)) {
-			if(getHeight() > World.TERRAIN_SNOW_LEVEL) {
-				damage += 0.1 *(getHeight() - World.TERRAIN_SNOW_LEVEL) / (1 - World.TERRAIN_SNOW_LEVEL);
-			}
-			else {
-				damage += 0.01;
-			}
-		}
-		int roundedDamage = (int) (damage);
-		return roundedDamage;
+		return damage;
 	}
 
 	public void setTerrain(Terrain t) {
