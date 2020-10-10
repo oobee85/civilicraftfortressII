@@ -108,16 +108,20 @@ public class World {
 		double snowLevel = getSnowLevel();
 		System.out.println("raining snowLevel=" + snowLevel);
 		for(Tile tile : getTiles()) {
+			
 			if(tile.getHeight() >= snowLevel && tile.liquidType != LiquidType.LAVA) {
 				int duration = (int) (1000*(tile.getHeight() - snowLevel)/(1-snowLevel));
+				
 				if(tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.SNOW) {
 					tile.getModifier().addDuration(duration);
-				}
-				else if(tile.getModifier() == null){
+				}else if(tile.getModifier() == null){
 					GroundModifier gm = new GroundModifier(GroundModifierType.SNOW, tile, duration);
 					tile.setModifier(gm);
 					addGroundModifier(gm);
 				}
+			}
+			if(tile.getHeight() >= snowLevel && tile.liquidType == LiquidType.WATER) {
+				tile.liquidType = LiquidType.ICE;
 			}
 			if(tile.getTerrain() != Terrain.ROCK) {
 				continue;
@@ -664,8 +668,10 @@ public class World {
 
 		for (Plant plant : plantsAquatic) {
 			Tile tile = plant.getTile();
+			
 			if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 				if (plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
+					
 					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
 					double damageTaken = difInLiquids * tile.liquidType.getDamage();
 					int roundedDamage = (int) (damageTaken+1);

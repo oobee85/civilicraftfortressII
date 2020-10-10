@@ -13,6 +13,8 @@ public enum LiquidType implements HasImage {
 						0.2, 0.0005, 10, 0.08, 0, new Color[] {new Color(50, 70, 250)}),
 		LAVA(new String[] {"resources/Images/liquid/lava16.png", "resources/Images/liquid/lavaanim32.gif"}, 
 				0.1, 0.005, 100, 0.001, 10),
+		ICE(new String[] {"resources/Images/liquid/ice.png"}, 
+				0, 0.005, 0, 1, 0),
 		FOG(new String[] {"resources/Images/liquid/lavaanim32.gif"}, 
 				0.5, 0.0005, 0, 1000, 0),
 		;
