@@ -356,34 +356,34 @@ public class World {
 			tile.updateHumidity(Game.ticks);
 			
 			if(tile.getTerrain().isPlantable(tile.getTerrain()) && tile.getHumidity() <= DESERT_HUMIDITY) {
-				int fail = 0;
+				int failTiles = 0;
 				
 				for(Tile t : tile.getNeighbors()) {
 					//if the other tiles nearby arent turning into desert either
-					if(t.getTerrain() != Terrain.SAND) {
-						fail ++;
+					if(t.getHumidity() > DESERT_HUMIDITY + 0.01) {
+						failTiles ++;
 					}
 				}
-				if(fail <= 3) {
+				if(failTiles >= 1) {
+					tile.setTerrain(Terrain.DIRT);
+				}else if(failTiles < 1){
 					tile.setTerrain(Terrain.SAND);
-				}else if(fail > 3){
-					tile.setTerrain(Terrain.VOLCANO);
 				}
 				
 				
 			}
-			if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY){
-				tile.setTerrain(Terrain.DIRT);
-			}
-			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				
-				if(tile.checkTerrain(Terrain.DIRT) || tile.checkTerrain(Terrain.GRASS)) {
-					double chance = 0.001 * tile.liquidAmount * tile.liquidType.getDamage();
-					if(Math.random() < chance) {
-//						tile.setTerrain(Terrain.SAND);
-					}
-				}
-			}
+//			if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY){
+//				tile.setTerrain(Terrain.DIRT);
+//			}
+//			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+//				
+//				if(tile.checkTerrain(Terrain.DIRT) || tile.checkTerrain(Terrain.GRASS)) {
+//					double chance = 0.001 * tile.liquidAmount * tile.liquidType.getDamage();
+//					if(Math.random() < chance) {
+////						tile.setTerrain(Terrain.SAND);
+//					}
+//				}
+//			}
 //			else if(tile.checkTerrain(Terrain.SAND) && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()){
 //				double chance = 0.001 * tile.liquidType.getDamage();
 //				if(Math.random() < chance) {

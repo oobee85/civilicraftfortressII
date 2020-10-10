@@ -65,7 +65,7 @@ public class Tile {
 		tickLastTouchedWater = tick;
 	}
 	public void updateHumidity(int currentTick) {
-		if(liquidType == LiquidType.WATER) {
+		if(liquidType == LiquidType.WATER || liquidType == LiquidType.ICE) {
 			humidity += 1;
 		}
 //			else if(liquidType == LiquidType.LAVA){
@@ -75,9 +75,8 @@ public class Tile {
 //			if (difference != 0) {
 //				humidity -= (1 / difference / 100);
 //			}
-		if(humidity != 0) {
-			humidity -= 0.001;
-		}
+		
+		humidity -= 0.01;
 		if(humidity < 0) {
 			humidity = 0;
 		}
