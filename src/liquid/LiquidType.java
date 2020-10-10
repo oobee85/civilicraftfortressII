@@ -9,8 +9,8 @@ import utils.*;
 public enum LiquidType implements HasImage {
 		DRY(new String[] {"resources/Images/lava/lavaanim32.gif"}, 
 				0, 1000, 5, 0.08, 0),
-		WATER(new String[] {"resources/Images/water/water16.png", "resources/Images/water/water128.png", "resources/Images/water/water512.png", "resources/Images/water/water1024.jpg"}, 
-				0.2, 0.0005, 10, 0.08, 0),
+		WATER(new String[] {"resources/Images/water/watermoving.gif"}, 
+						0.2, 0.0005, 10, 0.08, 0, new Color[] {new Color(60, 60, 250)}),
 		LAVA(new String[] {"resources/Images/lava/lava16.png", "resources/Images/lava/lavaanim32.gif"}, 
 				0.1, 0.005, 100, 0.001, 10),
 		FOG(new String[] {"resources/Images/mountain/rock_snow128.png"}, 
@@ -32,6 +32,10 @@ public enum LiquidType implements HasImage {
 		this.minimumDamageAmount = minimumDamageAmount;
 		this.brightness = brightness;
 		this.mipmap = new MipMap(s);
+	}
+	LiquidType(String[] s, double viscosity, double surfaceTension, double damage, double minimumDamageAmount, double brightness, Color[] colors) {
+		this(s, viscosity, surfaceTension, damage, minimumDamageAmount, brightness);
+		this.mipmap = new MipMap(s, colors);
 	}
 	public double getDamage() {
 		return damage;

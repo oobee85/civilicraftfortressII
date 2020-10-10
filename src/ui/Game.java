@@ -762,7 +762,9 @@ public class Game {
 						
 						
 						if(t.getModifier() != null) {
+							Utils.setTransparency(g, 0.9);
 							g.drawImage(t.getModifier().getType().getImage(Game.tileSize), x, y, w, h, null);
+							Utils.setTransparency(g, 1);
 						}
 						
 						

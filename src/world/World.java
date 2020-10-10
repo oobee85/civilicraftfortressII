@@ -848,11 +848,14 @@ public class World {
 				terrainColor = tile.getBuilding().getColor(0);
 				minimapColor = tile.getBuilding().getColor(0);
 			}
+			if(tile.getModifier() != null) {
+				minimapColor = tile.getModifier().getType().getColor(0);
+				terrainColor = Utils.blendColors(tile.getModifier().getType().getColor(0), terrainColor, 0.9);
+			}
 			if(tile.getIsTerritory()) {
 				minimapColor = Utils.blendColors(Game.playerColor, minimapColor, 0.3);
 				terrainColor = Utils.blendColors(Game.playerColor, terrainColor, 0.3);
 			}
-			
 			double tilebrightness = tile.getBrightness();
 			minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);
 			terrainColor = Utils.blendColors(terrainColor, Color.black, brighnessModifier + tilebrightness);
