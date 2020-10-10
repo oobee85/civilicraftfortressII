@@ -1029,7 +1029,7 @@ public class Game {
 							
 							
 							if(tile.getModifier() != null) {
-								strings.add(tile.getModifier().timeLeft() + "");
+								strings.add("GM=" + tile.getModifier().timeLeft());
 							}
 							rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, strings, rows[i-lowerX][j-lowerY], fontsize);
 							
