@@ -910,7 +910,7 @@ public class World {
 	}
 	
 	public boolean isNightTime() {
-		return getDaylight() < 0.2;
+		return getDaylight() < 0.5;
 	}
 	
 	public double getDaylight() {
@@ -919,6 +919,7 @@ public class World {
 		}
 		int currentDayOffset = (Game.ticks + TRANSITION_PERIOD)%(DAY_DURATION + NIGHT_DURATION);
 		double ratio = 1;
+		
 		if(currentDayOffset < TRANSITION_PERIOD) {
 			ratio = 0.5 + 0.5*currentDayOffset/TRANSITION_PERIOD;
 		}

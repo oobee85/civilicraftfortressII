@@ -24,6 +24,9 @@ public class Game {
 	private Image spawnLocationImage = Utils.loadImage("resources/Images/interfaces/queuelocation.png");
 	private Image buildIcon = Utils.loadImage("resources/Images/interfaces/building.PNG");
 	private Image flag = Utils.loadImage("resources/Images/interfaces/flag.png");
+	private Image moonIcon = Utils.loadImage("resources/Images/interfaces/moon.png");
+	private Image sunIcon = Utils.loadImage("resources/Images/interfaces/sun.png");
+	
 	private int skipUntilTick;
 	private BufferedImage terrainImage;
 	private BufferedImage minimapImage;
@@ -233,6 +236,12 @@ public class Game {
 			items.get(itemType).addAmount(1000);
 		}
 		
+	}
+	public Image getTimeImage() {
+		if(world.isNightTime() == true) {
+			return moonIcon;
+		}
+		return sunIcon;
 	}
 	public void eruptVolcano() {
 		world.eruptVolcano();
