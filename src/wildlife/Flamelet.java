@@ -10,10 +10,6 @@ public class Flamelet extends Animal {
 	public Flamelet(Tile tile, boolean isPlayerControlled) {
 		super(UnitType.FLAMELET, tile, isPlayerControlled);
 	}
-	@Override
-	public boolean isFireResistant() {
-		return true;
-	}
 	
 	@Override
 	public boolean wantsToEat() {

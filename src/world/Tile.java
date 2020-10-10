@@ -319,7 +319,7 @@ public class Tile {
 			Unit unit = (Unit)thing;
 			flying = unit.getType().isFlying();
 			aquatic = unit.getType().isAquatic();
-			fireResistant = unit.isFireResistant();
+			fireResistant = unit.getType().isFireResist();
 			coldResistant = unit.getType().isColdResist();
 		}
 		if(thing instanceof Building) {

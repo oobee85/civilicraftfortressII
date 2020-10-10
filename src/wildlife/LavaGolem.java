@@ -12,10 +12,6 @@ public class LavaGolem extends Animal {
 	}
 	
 	@Override
-	public boolean isFireResistant() {
-		return true;
-	}
-	@Override
 	public boolean wantsToEat() {
 		return false;
 	}

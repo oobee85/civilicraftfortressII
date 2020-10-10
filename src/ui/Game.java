@@ -32,7 +32,7 @@ public class Game {
 	private UnitType selectedUnitToSpawn;
 	private BuildingType selectedBuildingToSpawn;
 	private BuildingType selectedBuildingToPlan;
-	private boolean summonPlayerControlled;
+	private boolean summonPlayerControlled = true;
 	private int numCutTrees = 10;
 	private int buildingsUntilOgre = 20;
 	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);

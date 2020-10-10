@@ -726,13 +726,14 @@ public class Frame extends JPanel {
 //			buildingButtons[i] = button;
 			spawnMenu.add(button);
 		}
-		JToggleButton toggle = KUIConstants.setupToggleButton("playerControlled", null, DEBUG_BUTTON_SIZE);
+		JToggleButton toggle = KUIConstants.setupToggleButton("Non-playerControlled", null, DEBUG_BUTTON_SIZE);
 		toggle.addActionListener(e -> {
-			toggle.setText(toggle.isSelected() ? "playerControlled" : "Non-playerControlled");
-			gameInstance.setSummonPlayerControlled(toggle.isSelected());
+			toggle.setText(!toggle.isSelected() ? "Non-playerControlled" : "playerControlled");
+			gameInstance.setSummonPlayerControlled(!toggle.isSelected());
 		});
 		spawnMenu.add(toggle);
-
+		
+		
 		castleView = new JPanel() {
 		};
 		for (int i = 0; i < UnitType.values().length; i++) {

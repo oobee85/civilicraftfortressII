@@ -9,16 +9,11 @@ import world.*;
 public class Parasite extends Animal {
 	
 	private boolean transformed;
-	private boolean fireResistant;
 	private Tile volcano;
 
 	public Parasite(Tile tile, boolean isPlayerControlled, Tile volcano) {
 		super(UnitType.PARASITE, tile, isPlayerControlled);
 		this.volcano = volcano;
-	}
-	@Override
-	public boolean isFireResistant() {
-		return fireResistant;
 	}
 	
 	@Override
@@ -58,7 +53,6 @@ public class Parasite extends Animal {
 	private void transform(Unit host) {
 		host.setDead(true);
 		this.setType(host.getType());
-		this.fireResistant = host.isFireResistant();
 		this.setHealth(host.getHealth());
 		this.setMaxHealth(host.getMaxHealth());
 		transformed = true;
@@ -66,7 +60,6 @@ public class Parasite extends Animal {
 	
 	private void transformBack() {
 		this.setType(UnitType.PARASITE);
-		this.fireResistant = true;
 		this.setHealth(1);
 		this.setMaxHealth(1);
 		transformed = false;
