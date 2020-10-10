@@ -95,13 +95,7 @@ public class Generation {
 				double ratio = Math.sqrt(dx*dx/mountLength/mountLength + dy*dy/mountHeight/mountHeight);
 				//double ratio = dist / Math.max(mountLength, mountHeight);
 				TileLoc p = new TileLoc(i, j);
-				if(snowMountainEdge < 1 && Math.random()<snowEdgeRatio) {
-					world[i][j].setTerrain(Terrain.SNOW);
-					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
-				}else if (snowMountain < 1 ) {
-					world[i][j].setTerrain(Terrain.SNOW);
-					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
-				}else if(mountainEdge < 1 && Math.random()<rockEdgeRatio) {
+				if(mountainEdge < 1 && Math.random()<rockEdgeRatio) {
 					world[i][j].setTerrain(Terrain.ROCK);
 					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
 				}else if(mountain < 1) {
@@ -152,7 +146,7 @@ public class Generation {
 					tile.liquidAmount = 0.2;
 				}else if(distanceFromCenter < volcanoRadius) {
 					tile.setTerrain(Terrain.VOLCANO);
-				}else if(distanceFromCenter < mountainRadius && tile.checkTerrain(Terrain.SNOW) == false) {
+				}else if(distanceFromCenter < mountainRadius) {
 					tile.setTerrain(Terrain.ROCK);
 				}else if(distanceFromCenter < mountainEdgeRadius && Math.random()<rockEdgeRatio) {
 					tile.setTerrain(Terrain.ROCK);
@@ -348,7 +342,7 @@ public class Generation {
 			if(tile.getTerrain() == Terrain.VOLCANO && Math.random() < 0.01) {
 				world.spawnDragon();
 			}
-			if(tile.getTerrain() == Terrain.SNOW && Math.random() < 0.005) {
+			if(tile.getTerrain() == Terrain.ROCK && Math.random() < 0.005) {
 				world.makeAnimal(UnitType.WOLF, world, loc);
 			}
 		}

@@ -101,9 +101,6 @@ public class Liquid {
 				if(tile.checkTerrain(Terrain.GRASS) || tile.checkTerrain(Terrain.DIRT)) {
 					tile.setTerrain(Terrain.BURNED_GROUND);
 				}
-				if(tile.checkTerrain(Terrain.SNOW)) {
-					tile.setTerrain(Terrain.ROCK);
-				}
 				if(tile.getModifier() != null && tile.getModifier().getType().isCold(tile.getModifier().getType())) {
 					tile.getModifier().finish();
 				}

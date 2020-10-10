@@ -1697,6 +1697,22 @@ public class Game {
 	}
 	private void setPlannedRoad(Tile t) {
 		if(t != null && t.getRoad() == null) {
+			for (Map.Entry mapElement : RoadType.STONE_ROAD.getCost().entrySet()) {
+				ItemType key = (ItemType) mapElement.getKey();
+				Integer value = (Integer) mapElement.getValue();
+
+				if (items.get(key).getAmount() < value) {
+					return;
+				}
+			}
+
+			for (Map.Entry mapElement : RoadType.STONE_ROAD.getCost().entrySet()) {
+				ItemType key = (ItemType) mapElement.getKey();
+				Integer value = (Integer) mapElement.getValue();
+
+				items.get(key).addAmount(-value);
+			}
+			
 			Road road = new Road(RoadType.STONE_ROAD, t);
 			t.setRoad(road, Direction.NORTH.toString());
 			

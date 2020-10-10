@@ -119,7 +119,7 @@ public class World {
 					addGroundModifier(gm);
 				}
 			}
-			if(tile.getTerrain() != Terrain.SNOW && tile.getTerrain() != Terrain.ROCK) {
+			if(tile.getTerrain() != Terrain.ROCK) {
 				continue;
 			}
 			if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.DRY) {
@@ -302,7 +302,7 @@ public class World {
 			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
 				
 				if(distanceFromCenter < radius) {
-					if(t.getTerrain() != Terrain.ROCK && t.getTerrain() != Terrain.SNOW && t.getTerrain() != Terrain.VOLCANO) {
+					if(t.getTerrain() != Terrain.ROCK && t.getTerrain() != Terrain.VOLCANO) {
 //						tile.setTerrain(Terrain.BURNED_GROUND);
 					}
 					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
@@ -507,9 +507,6 @@ public class World {
 		for (Unit unit : units) {
 			Tile tile = unit.getTile();
 			int tileDamage = 0;
-			if(tile.getTerrain() == Terrain.SNOW) {
-				tileDamage += 5;
-			}
 			
 			if (tileDamage != 0) {
 				unit.takeDamage(tileDamage);
@@ -787,7 +784,7 @@ public class World {
 			if(tile.getTerrain() == Terrain.DIRT) {
 				Terrain t;
 				if (tile.getHeight() > TERRAIN_SNOW_LEVEL) {
-					t = Terrain.SNOW;
+					t = Terrain.ROCK;
 				}
 				else if (tile.getHeight() > 0.6) {
 					t = Terrain.ROCK;
