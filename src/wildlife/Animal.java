@@ -124,11 +124,9 @@ public class Animal extends Unit {
 				//stuck inside farm
 			}
 			else {
-				List<Tile> neighbors = getTile().getNeighbors();
-				neighbors.add(getTile());
-				Tile best = null;
-				double bestDanger = Double.MAX_VALUE;
-				for(Tile t : neighbors) {
+				Tile best = getTile();
+				double bestDanger = computeDanger(best);
+				for(Tile t : getTile().getNeighbors()) {
 					if(t.isBlocked(this)) {
 						continue;
 					}
@@ -138,7 +136,7 @@ public class Animal extends Unit {
 						bestDanger = danger;
 					}
 				}
-				if(best != null) {
+				if(best != getTile()) {
 					setTargetTile(best);
 				}
 			}

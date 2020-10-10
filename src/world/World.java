@@ -19,11 +19,9 @@ public class World {
 	public static final double TERRAIN_SNOW_LEVEL = 1;
 	public static final double DESERT_HUMIDITY = 0.001;
 	public static final int SEASON_DURATION = 6000;
-	public double getSnowLevel() {
-		int season = (Game.ticks + SEASON_DURATION*3/2)%(SEASON_DURATION*2);
-		int coldness = Math.abs(SEASON_DURATION - season);
-//		return 0;
-		return coldness*0.35/SEASON_DURATION + 0.6;
+	public double getSeason() {
+		int season =  (Game.ticks + SEASON_DURATION*1/2)%(SEASON_DURATION*2);
+		return Math.abs(SEASON_DURATION - season) / (double)SEASON_DURATION;
 	}
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
@@ -34,6 +32,8 @@ public class World {
 	private static final int NUM_LIQUID_SIMULATION_PHASES = 9;
 	private ArrayList<ArrayList<Tile>> liquidSimulationPhases = new ArrayList<>(NUM_LIQUID_SIMULATION_PHASES);
 	private Tile[][] tiles;
+	private double[] winter;
+	private double[] summer;
 	public ConcurrentLinkedQueue<Tile> territory = new ConcurrentLinkedQueue<Tile>();;
 	
 	private int width;
@@ -105,19 +105,24 @@ public class World {
 		}
 	}
 	public void rain() {
-		double snowLevel = getSnowLevel();
-		System.out.println("raining snowLevel=" + snowLevel);
+		double summerRatio = getSeason();
+		double winterRatio = 1 - summerRatio;
+		System.out.println(String.format("raining, winterRatio=%." + Game.NUM_DEBUG_DIGITS + "f", winterRatio));
 		for(Tile tile : getTiles()) {
-			
-			if(tile.getHeight() >= snowLevel && tile.liquidType != LiquidType.LAVA) {
-				int duration = (int) (1000*(tile.getHeight() - snowLevel)/(1-snowLevel));
-				
-				if(tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.SNOW) {
-					tile.getModifier().addDuration(duration);
-				}else if(tile.getModifier() == null){
-					GroundModifier gm = new GroundModifier(GroundModifierType.SNOW, tile, duration);
-					tile.setModifier(gm);
-					addGroundModifier(gm);
+			double snowLevel = 1-(winterRatio* winter[tile.getLocation().y] + summerRatio*summer[tile.getLocation().y]);
+			if(tile.liquidType != LiquidType.LAVA) {
+				if(tile.getHeight() >= snowLevel) {
+					int duration = (int) (400 * (tile.getHeight() - snowLevel)/(1-snowLevel));
+					
+					if(tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.SNOW) {
+						tile.getModifier().addDuration(duration);
+					} else if(tile.getModifier() == null){
+						if(duration > 30 ) {
+							GroundModifier gm = new GroundModifier(GroundModifierType.SNOW, tile, duration);
+							tile.setModifier(gm);
+							addGroundModifier(gm);
+						}
+					}
 				}
 			}
 			if(tile.getHeight() >= snowLevel && tile.liquidType == LiquidType.WATER) {
@@ -803,7 +808,34 @@ public class World {
 		this.genPlants();
 		this.makeForest();
 		Generation.generateWildLife(this);
+		makeSeasonArrays();
 		System.out.println("Finished generating " + width + "x" + height + " world with " + tileList.size() + " tiles.");
+	}
+	
+	private static final double SNOWY_POLES_RATIO = 0.04;
+	public void makeSeasonArrays() {
+		summer = new double[getHeight()];
+		winter = new double[getHeight()];
+		int northPole = (int) (summer.length * SNOWY_POLES_RATIO);
+		int southPole = (int) (summer.length - summer.length * SNOWY_POLES_RATIO);
+		
+		int winterPoint = summer.length;
+		
+		for(int i = 0; i < summer.length; i++) {
+			double snowyPoles = 0;
+			if(i < northPole) {
+				snowyPoles += (1.0*northPole - i) / northPole;
+			}
+//			else if(i > southPole) {
+//				snowyPoles += (1.0*i - southPole) / northPole;
+//			}
+			summer[i] = snowyPoles;
+			double winterSeason = 0;
+			if(i < winterPoint) {
+				winterSeason += (1.0 * winterPoint - i) / winterPoint;
+			}
+			winter[i] = snowyPoles > winterSeason ? snowyPoles : winterSeason;
+		}
 	}
 
 	public BufferedImage[] createTerrainImage() {
