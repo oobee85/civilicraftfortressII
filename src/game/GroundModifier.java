@@ -1,44 +1,44 @@
 package game;
 
+import ui.*;
 import world.Tile;
 
 public class GroundModifier {
 
 	
 	private GroundModifierType type;
-	private int timeAlive;
-	private int maxTime;
+	private int aliveUntil;
+	private int duration;
 	private Tile tile;
 	
 	public GroundModifier(GroundModifierType type, Tile tile, int duration) {
 		this.type = type;
-		this.timeAlive = 0;
 		this.tile = tile;
-		this.maxTime = duration;
+		this.aliveUntil = Game.ticks + duration;
+		this.duration = duration;
 	}
 	public void refreshDuration() {
-		timeAlive = 0;
+		this.aliveUntil = Game.ticks + duration;
 	}
 	
 	public GroundModifierType getType() {
 		return type;
 	}
 	public boolean isDead() {
-		return timeAlive >= maxTime;
+		return Game.ticks >= aliveUntil;
 	}
 	public int timeLeft() {
-		return maxTime - timeAlive;
+		return aliveUntil - Game.ticks;
 	}
 	public boolean updateTime() {
-		timeAlive ++;
-		return timeAlive >= maxTime;
+		return isDead();
 	}
 	public void addDuration(int duration) {
-		timeAlive -= duration;
+		aliveUntil += duration;
 	}
 	
 	public void finish() {
-		timeAlive = maxTime;
+		aliveUntil = Game.ticks;
 	}
 	public Tile getTile() {
 		return tile;
