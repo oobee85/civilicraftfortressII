@@ -789,12 +789,7 @@ public class Game {
 					
 				}
 			}
-			for(Plant p : world.plantsLand) {
-				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
-				drawHealthBar(g, p);
-				drawHitsplat(g, p);
-			}
-			for(Plant p : world.plantsAquatic) {
+			for(Plant p : world.plants) {
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 				drawHealthBar(g, p);
 				drawHitsplat(g, p);
@@ -1871,7 +1866,7 @@ public class Game {
 	
 	
 	protected void drawMinimap(Graphics g, int x, int y, int w, int h) {
-		
+		g.drawImage(getTimeImage(), 5, 5, 30, 30, null);
 		if(showHeightMap) {
 			g.drawImage(heightMapImage, x, y, w, h, null);
 		}

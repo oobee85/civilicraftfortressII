@@ -38,9 +38,9 @@ public class World {
 	
 	private int width;
 	private int height;
-	
-	public LinkedList<Plant> plantsLand = new LinkedList<Plant>();
-	public LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
+
+	public LinkedList<Plant> plants = new LinkedList<Plant>();
+	public LinkedList<Plant> newPlants = new LinkedList<Plant>();
 	public LinkedList<Unit> units = new LinkedList<Unit>();
 	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
 	public LinkedList<Building> buildings = new LinkedList<Building>();
@@ -411,8 +411,6 @@ public class World {
 	}
 	
 	public void grow() {
-		LinkedList<Plant> newAquatic = new LinkedList<>();
-		LinkedList<Plant> newLand = new LinkedList<>();
 		
 		for(Tile tile : getTilesRandomly()) {
 			
@@ -424,7 +422,7 @@ public class World {
 				for(Tile t : tile.getNeighbors()) {
 					if(Math.random() < 0.01 && t.getPlant() == null && t != tile && t.canPlant()) {
 						t.setHasPlant(new Plant(PlantType.FOREST1, t));
-						newLand.add(t.getPlant());
+						newPlants.add(t.getPlant());
 					}
 				}
 			}
@@ -436,24 +434,16 @@ public class World {
 				if(Math.random() < 0.01) {
 					Plant plant = new Plant(PlantType.CATTAIL, tile);
 					tile.setHasPlant(plant);
-					newAquatic.add(plant);
+					newPlants.add(plant);
 				}
 			}
 			
 			if (Math.random() < 0.001) {
 				tile.setHasPlant(new Plant(PlantType.BERRY, tile));
-				newLand.add(tile.getPlant());
+				newPlants.add(tile.getPlant());
 			}
 
 		}
-		for(Plant p : plantsAquatic) {
-			newAquatic.add(p);
-		}
-		for(Plant p : plantsLand) {
-			newLand.add(p);
-		}
-		plantsAquatic = newAquatic;
-		plantsLand = newLand;
 	}
 	
 	public void doProjectileUpdates() {
@@ -593,26 +583,18 @@ public class World {
 		buildings = buildingsNew;
 	
 		// PLANTS
-		LinkedList<Plant> plantsLandNew = new LinkedList<Plant>();
-		for(Plant plant : plantsLand) {
+		LinkedList<Plant> plantsCopy = new LinkedList<Plant>();
+		for(Plant plant : plants) {
 			if(plant.isDead() == true) {
 				plant.getTile().setHasPlant(null);
 			} else {
-				plantsLandNew.add(plant);
-			}
-		}	
-		plantsLand = plantsLandNew;
-
-		LinkedList<Plant> plantsAquaticNew = new LinkedList<Plant>();
-		for (Plant plant : plantsAquatic) {
-			if (plant.isDead() == true) {
-				plant.getTile().setHasPlant(null);
-			} else {
-				plantsAquaticNew.add(plant);
+				plantsCopy.add(plant);
 			}
 		}
-		plantsAquatic = plantsAquaticNew;
-	
+		plantsCopy.addAll(newPlants);
+		newPlants.clear();
+		plants = plantsCopy;
+
 		// PROJECTILES
 		LinkedList<Projectile> projectilesNew = new LinkedList<Projectile>();
 		for(Projectile projectile : projectiles) {
@@ -629,58 +611,57 @@ public class World {
 					"units: " 				+ units.size() + 
 					" \tbuildings: " 		+ buildings.size() + 
 					" \tplannedBuildings: " + plannedBuildings.size() + 
-					" \tplantsLand: " 		+ plantsLand.size() + 
-					" \tplantsAquatic: " 	+ plantsAquatic.size() + 
+					" \tplants: " 		+ plants.size() + 
 					" \tgroundModifiers: " 	+ groundModifiers.size() + 
 					" \tprojectiles: " 		+ projectiles.size());
 		}
 	}
 	
 	public void updatePlantDamage() {
-		for(Plant plant : plantsLand) {
+		for(Plant plant : plants) {
 			Tile tile = plant.getTile();
 			
-			int totalDamage = 0;
-			double modifierDamage = 0;
-			
-			//adds the damage of groundmodifier
-			if(tile.getModifier() != null) {
-				modifierDamage += tile.getModifier().getType().getDamage();
-			}
-			
-			
-			if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				if(plant.isAquatic() == false || tile.liquidType != LiquidType.WATER) {
-					//adds damage of liquids
-					double liquidDamage = tile.liquidAmount * tile.liquidType.getDamage();
-					totalDamage += liquidDamage;
-				}
-			}
-			if(tile.getTerrain().isPlantable(tile.getTerrain()) == false) {
-				totalDamage += 5;
-			}
-			
-			totalDamage = (int) (modifierDamage+totalDamage);
-			if(totalDamage >= 1) {
-				plant.takeDamage(totalDamage);
-			}
-		}	
-
-		for (Plant plant : plantsAquatic) {
-			Tile tile = plant.getTile();
-			
-			if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
-				if (plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
-					
-					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
-					double damageTaken = difInLiquids * tile.liquidType.getDamage();
-					int roundedDamage = (int) (damageTaken+1);
-					if(roundedDamage >= 1) {
-						plant.takeDamage(roundedDamage);
+			if(plant.isAquatic()) {
+				if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+					if (plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
+						
+						double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
+						double damageTaken = difInLiquids * tile.liquidType.getDamage();
+						int roundedDamage = (int) (damageTaken+1);
+						if(roundedDamage >= 1) {
+							plant.takeDamage(roundedDamage);
+						}
 					}
 				}
 			}
-		}
+			else {
+			
+				int totalDamage = 0;
+				double modifierDamage = 0;
+				
+				//adds the damage of groundmodifier
+				if(tile.getModifier() != null) {
+					modifierDamage += tile.getModifier().getType().getDamage();
+				}
+				
+				
+				if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+					if(plant.isAquatic() == false || tile.liquidType != LiquidType.WATER) {
+						//adds damage of liquids
+						double liquidDamage = tile.liquidAmount * tile.liquidType.getDamage();
+						totalDamage += liquidDamage;
+					}
+				}
+				if(tile.getTerrain().isPlantable(tile.getTerrain()) == false) {
+					totalDamage += 5;
+				}
+				
+				totalDamage = (int) (modifierDamage+totalDamage);
+				if(totalDamage >= 1) {
+					plant.takeDamage(totalDamage);
+				}
+			}
+		}	
 	}
 
 	public void genPlants() {
@@ -691,7 +672,7 @@ public class World {
 				if(o < PlantType.BERRY.getRarity()) {
 					Plant p = new Plant(PlantType.BERRY, tile);
 					tile.setHasPlant(p);
-					plantsLand.add(tile.getPlant());
+					newPlants.add(tile.getPlant());
 				}
 			}
 			//tile.liquidType.WATER &&
@@ -701,7 +682,7 @@ public class World {
 				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()  && o < PlantType.CATTAIL.getRarity()) {
 					Plant p = new Plant(PlantType.CATTAIL, tile);
 					tile.setHasPlant(p);
-					plantsAquatic.add(tile.getPlant());
+					newPlants.add(tile.getPlant());
 				}
 			}
 		}
@@ -719,7 +700,7 @@ public class World {
 				if (Math.random() < tempDensity) {
 					Plant plant = new Plant(PlantType.FOREST1, t);
 					t.setHasPlant(plant);
-					plantsLand.add(plant);
+					newPlants.add(plant);
 				}
 		}
 		

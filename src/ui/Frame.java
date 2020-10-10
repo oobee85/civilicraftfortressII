@@ -476,7 +476,6 @@ public class Frame extends JPanel {
 				g.fillRect(0, 0, getWidth(), getHeight());
 				g.setColor(Color.black);
 				g.drawRect(0, 0, getWidth(), getHeight());
-				g.drawImage(gameInstance.getTimeImage(), 5, 5, 30, 30, null);
 				gameInstance.drawMinimap(g, MINIMAPBORDERWIDTH, MINIMAPBORDERWIDTH,
 						minimapPanel.getWidth() - 2 * MINIMAPBORDERWIDTH,
 						minimapPanel.getHeight() - 2 * MINIMAPBORDERWIDTH);
