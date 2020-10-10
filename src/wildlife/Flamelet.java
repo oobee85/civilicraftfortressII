@@ -42,7 +42,7 @@ public class Flamelet extends Animal {
 	
 	private void makeFlame(World world) {
 		getTile().setModifier(new GroundModifier(GroundModifierType.FIRE, this.getTile(), 30));
-		world.newGroundModifiers.add(getTile().getModifier());
+		world.addGroundModifier(getTile().getModifier());
 	}
 
 	@Override

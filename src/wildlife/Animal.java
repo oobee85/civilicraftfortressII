@@ -57,7 +57,7 @@ public class Animal extends Unit {
 	public boolean takeDamage(double damage) {
 		boolean lethal = super.takeDamage(damage);
 		if(lethal) {
-			if(getType().getDeadItem() != null && getTarget() != null && getTarget().isPlayerControlled()) {
+			if(getType().getDeadItem() != null) {
 				getTile().addItem(getType().getDeadItem());
 			}
 		}

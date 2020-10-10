@@ -54,6 +54,6 @@ public class IceGiant extends Animal {
 	
 	private void makeIce(World world) {
 		getTile().setModifier(new GroundModifier(GroundModifierType.SNOW, getTile(), 500));
-		world.newGroundModifiers.add(getTile().getModifier());
+		world.addGroundModifier(getTile().getModifier());
 	}
 }

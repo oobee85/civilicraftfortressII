@@ -32,7 +32,7 @@ public enum UnitType implements HasImage {
 	PIG			("resources/Images/units/pig.png",		new CombatStats(200, 10, 30, 1, 40, 0, 50), false, false, false, false, false, null, null, new Item(200, ItemType.FOOD), null),
 	SHEEP		("resources/Images/units/sheep.png",	new CombatStats(200, 5, 30, 1, 40, 0, 50), 	false, false, false, true, false, null, null, new Item(100, ItemType.FOOD), null),
 	COW			("resources/Images/units/cow.png",		new CombatStats(200, 10, 30, 1, 40, 0, 50), false, false, false, false, false, null, null, new Item(200, ItemType.FOOD), null),
-	FISH		("resources/Images/units/fish2.png",	new CombatStats( 10, 1, 5, 1, 40, 0, 50),  	true, false, false, false, false, null, null, new Item(100, ItemType.FOOD), null),
+	FISH		("resources/Images/units/fish2.png",	new CombatStats( 10, 1, 5, 1, 40, 0, 50),  	true, false, false, true, false, null, null, new Item(100, ItemType.FOOD), null),
 	
 	DRAGON	   ("resources/Images/units/dragon.png",	new CombatStats(2000, 50, 5, 1, 30, 0, 10), 	false, true, true, false, true, null, null, new Item(10, ItemType.RUNITE_ORE), ProjectileType.FIREBALL_DRAGON),
 	VAMPIRE    ("resources/Images/units/vampire.png", 	new CombatStats(200, 20, 15, 1, 40, 0, 1), 		false, true, true, false, false, null, null, new Item(100, ItemType.FOOD), null),
@@ -49,7 +49,7 @@ public enum UnitType implements HasImage {
 	
 	FLAMELET	    ("resources/Images/units/flamelet.png", new CombatStats(1, 0, 25, 0, 1000, 0, 50), 	false, false, true, false, true, null, null, new Item(10 ,ItemType.COAL), null),
 	WATER_SPIRIT ("resources/Images/units/waterspirit.png", new CombatStats(1, 0, 25, 0, 1000, 0, 50), 	false, false, false, false, false, null, null, null, null),
-	PARASITE	 ("resources/Images/units/parasite.png", 	new CombatStats(1, 1, 5, 0, 1000, 0, 50), 	false, false, true, false, false, null, null, null, null),
+	PARASITE	 ("resources/Images/units/parasite.png", 	new CombatStats(1, 1, 5, 0, 1000, 0, 50), 	false, false, true, false, true, null, null, null, null),
 	FIREFLY			("resources/Images/units/firefly.png",	new CombatStats(1, 0, 25, 1, 1000, 0, 50),  false, false, false, false, false, null, null, null, null),
 	BOMB			("resources/Images/units/bomb.png",		new CombatStats(1, 0, 25, 1, 1000, 0, 50),  false, false, false, false, false, null, null, null, null),
 	;

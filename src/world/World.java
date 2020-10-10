@@ -21,7 +21,8 @@ public class World {
 	public double getSnowLevel() {
 		int season = (Game.ticks + SEASON_DURATION*3/2)%(SEASON_DURATION*2);
 		int coldness = Math.abs(SEASON_DURATION - season);
-		return coldness*0.45/SEASON_DURATION + 0.5;
+//		return 0;
+		return coldness*0.35/SEASON_DURATION + 0.6;
 	}
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
@@ -45,7 +46,7 @@ public class World {
 	public LinkedList<Building> plannedBuildings = new LinkedList<Building>();
 	public LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
 	public LinkedList<GroundModifier> groundModifiers = new LinkedList<>();
-	public LinkedList<GroundModifier> newGroundModifiers = new LinkedList<>();
+	private LinkedList<GroundModifier> newGroundModifiers = new LinkedList<>();
 	
 	public HashSet<Unit> unitsInTerritory = new HashSet<Unit>();
 	
@@ -114,7 +115,7 @@ public class World {
 				else if(tile.getModifier() == null){
 					GroundModifier gm = new GroundModifier(GroundModifierType.SNOW, tile, duration);
 					tile.setModifier(gm);
-					newGroundModifiers.add(gm);
+					addGroundModifier(gm);
 				}
 			}
 			if(tile.getTerrain() != Terrain.SNOW && tile.getTerrain() != Terrain.ROCK) {
@@ -304,7 +305,7 @@ public class World {
 //						tile.setTerrain(Terrain.BURNED_GROUND);
 					}
 					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
-					newGroundModifiers.add(fire);
+					addGroundModifier(fire);
 					t.setModifier(fire);
 					if(t.getHasBuilding() == true) {
 						t.getBuilding().takeDamage(damage);
@@ -323,7 +324,7 @@ public class World {
 	
 		for(Tile t : getNeighborsInRadius(tile, radius)) {
 			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
-			newGroundModifiers.add(fire);
+			addGroundModifier(fire);
 			t.setModifier(fire);
 			if(t.getHasBuilding() == true) {
 				t.getBuilding().takeDamage(damage);
@@ -455,7 +456,7 @@ public class World {
 				if(projectile.getType().getGroundModifierType() != null) {
 					GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), (int)projectile.getType().getDamage()/5);
 					projectile.getTile().setModifier(gm);
-					newGroundModifiers.add(gm);
+					addGroundModifier(gm);
 				}
 			}
 			if(projectile.reachedTarget()) {
@@ -521,6 +522,14 @@ public class World {
 		units = unitsNew;
 	}
 	
+	public void addGroundModifier(GroundModifier gm) {
+
+		synchronized (newGroundModifiers) {
+
+			newGroundModifiers.add(gm);
+		}
+		
+	}
 	public void clearDeadAndAddNewThings() {
 		// UNITS
 		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
@@ -545,8 +554,11 @@ public class World {
 				tile.setModifier(null);
 			}
 		}
-		groundModifiersNew.addAll(newGroundModifiers);
-		newGroundModifiers.clear();
+		synchronized (newGroundModifiers) {
+			groundModifiersNew.addAll(newGroundModifiers);
+			newGroundModifiers.clear();
+		}
+		
 		groundModifiers = groundModifiersNew;
 		
 		// BUILDINGS

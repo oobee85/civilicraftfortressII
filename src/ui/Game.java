@@ -767,8 +767,17 @@ public class Game {
 							Utils.setTransparency(g, 1);
 						}
 						
+						if (!t.getItems().isEmpty()) {
+							for (Item item : t.getItems()) {
+//								if (item != null && t != null) {
+									g.drawImage(item.getType().getImage(0), t.getLocation().x * Game.tileSize + Game.tileSize/4,
+											t.getLocation().y * Game.tileSize + Game.tileSize/4, Game.tileSize/2, Game.tileSize/2, null);
+//								}
+							}
+						}
 						
 					}
+					
 				}
 			}
 			for(Plant p : world.plantsLand) {
@@ -968,15 +977,7 @@ public class Game {
 					}
 				}
 			}
-			for(Tile tile : world.getTiles()) {
-				if(!tile.getItems().isEmpty()) {
-					for(Item item : tile.getItems()) {
-						if(item != null && tile != null) {
-							g.drawImage(item.getType().getImage(0), tile.getLocation().x * Game.tileSize, tile.getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
-						}
-					}
-				}
-			}
+			
 			if (selectedBuildingToSpawn != null) {
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
@@ -1252,6 +1253,12 @@ public class Game {
 		if(unitType != null) {
 			System.out.println("spawn unit" + unitType.toString() +tile.getLocation());
 			Unit unit = new Unit(unitType, tile, playerControlled);
+			if(playerControlled) {
+			}else {
+//				unit = new Animal(unitType, tile, playerControlled);
+				world.spawnAnimal(unitType, tile);
+				return;
+			}
 			world.newUnits.add(unit);
 			tile.addUnit(unit);
 			unit.setTimeToAttack(0);
