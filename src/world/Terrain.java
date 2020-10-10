@@ -57,7 +57,7 @@ public enum Terrain {
 
 	}
 	public boolean isPlantable(Terrain t) {
-		if (t == Terrain.VOLCANO || t == Terrain.SNOW || t == Terrain.ROCK || t == Terrain.BURNED_GROUND) {
+		if (t == Terrain.VOLCANO || t == Terrain.SNOW || t == Terrain.ROCK || t == Terrain.BURNED_GROUND || t == Terrain.SAND) {
 			return false;
 		}
 		return true;
@@ -76,13 +76,6 @@ public enum Terrain {
 		return false;
 	}
 
-//	public boolean isBridgeable(Terrain t) {
-//		if (t == Terrain.WATER) {
-//			return true;
-//		}
-//		return false;
-//
-//	}
 
 	@Override
 	public String toString() {

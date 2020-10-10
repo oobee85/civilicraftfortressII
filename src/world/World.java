@@ -17,6 +17,7 @@ public class World {
 
 	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 5;
 	public static final double TERRAIN_SNOW_LEVEL = 1;
+	public static final double DESERT_HUMIDITY = 0.001;
 	public static final int SEASON_DURATION = 6000;
 	public double getSnowLevel() {
 		int season = (Game.ticks + SEASON_DURATION*3/2)%(SEASON_DURATION*2);
@@ -340,21 +341,28 @@ public class World {
 	}
 	public void updateTerrainChange(World world) {
 		for(Tile tile : getTiles()) {
-			
+			tile.updateHumidity(Game.ticks);
+			if(tile.getTerrain().isPlantable(tile.getTerrain()) && tile.getHumidity() <= DESERT_HUMIDITY) {
+				tile.setTerrain(Terrain.SAND);
+			}
+			if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY){
+				tile.setTerrain(Terrain.DIRT);
+			}
 			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				
 				if(tile.checkTerrain(Terrain.DIRT) || tile.checkTerrain(Terrain.GRASS)) {
 					double chance = 0.001 * tile.liquidAmount * tile.liquidType.getDamage();
 					if(Math.random() < chance) {
-						tile.setTerrain(Terrain.SAND);
+//						tile.setTerrain(Terrain.SAND);
 					}
 				}
-			}else if(tile.checkTerrain(Terrain.SAND) && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()){
-				double chance = 0.001 * tile.liquidType.getDamage();
-				if(Math.random() < chance) {
-					tile.setTerrain(Terrain.GRASS);
-				}
 			}
+//			else if(tile.checkTerrain(Terrain.SAND) && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()){
+//				double chance = 0.001 * tile.liquidType.getDamage();
+//				if(Math.random() < chance) {
+//					tile.setTerrain(Terrain.GRASS);
+//				}
+//			}
 			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA 
 //					&& (tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.FIRE)
 					) {
@@ -646,6 +654,9 @@ public class World {
 					double liquidDamage = tile.liquidAmount * tile.liquidType.getDamage();
 					totalDamage += liquidDamage;
 				}
+			}
+			if(tile.getTerrain().isPlantable(tile.getTerrain()) == false) {
+				totalDamage += 5;
 			}
 			
 			totalDamage = (int) (modifierDamage+totalDamage);

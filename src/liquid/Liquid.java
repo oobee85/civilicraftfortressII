@@ -5,6 +5,7 @@ import java.util.concurrent.*;
 
 import game.GroundModifier;
 import game.GroundModifierType;
+import ui.Game;
 import utils.*;
 import world.*;
 
@@ -111,6 +112,7 @@ public class Liquid {
 				tile.liquidAmount -= 0.00001;
 			}
 			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount <= 0.001) {
+				tile.setWaterTouched(Game.ticks);
 				tile.liquidAmount -= 0.00001;
 			}
 		}

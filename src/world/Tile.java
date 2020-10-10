@@ -18,6 +18,8 @@ public class Tile {
 
 	private TileLoc location;
 	private double height;
+	private double humidity;
+	private int tickLastTouchedWater = 0;
 	int minEntitySize = 20;
 
 	private String roadCorner;
@@ -47,10 +49,35 @@ public class Tile {
 		units = new ConcurrentLinkedQueue<Unit>();
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
 		items = new ConcurrentLinkedQueue<Item>();
+		this.humidity = 1;
 	}
 
 	public static Tile makeTile(TileLoc location, Terrain t) {
 		return new Tile(location, t);
+	}
+	public double getHumidity() {
+		return humidity;
+	}
+	public void setHumidity(double set) {
+		humidity = set;
+	}
+	public void setWaterTouched(int tick) {
+		tickLastTouchedWater = tick;
+	}
+	public void updateHumidity(int currentTick) {
+		if(liquidType == LiquidType.WATER) {
+			humidity += 1;
+		}
+//			else if(liquidType == LiquidType.LAVA){
+//			humidity = 0;
+//		} else {
+//			int difference = currentTick - tickLastTouchedWater;
+//			if (difference != 0) {
+//				humidity -= (1 / difference / 100);
+//			}
+			humidity -= 0.001;
+//		}
+		
 	}
 
 	public void setRoad(Road r, String s) {
