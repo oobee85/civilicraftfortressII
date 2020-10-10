@@ -75,7 +75,13 @@ public class Tile {
 //			if (difference != 0) {
 //				humidity -= (1 / difference / 100);
 //			}
+		if(humidity != 0) {
 			humidity -= 0.001;
+		}
+		if(humidity < 0) {
+			humidity = 0;
+		}
+			
 //		}
 		
 	}

@@ -354,8 +354,23 @@ public class World {
 	public void updateTerrainChange(World world) {
 		for(Tile tile : getTiles()) {
 			tile.updateHumidity(Game.ticks);
+			
 			if(tile.getTerrain().isPlantable(tile.getTerrain()) && tile.getHumidity() <= DESERT_HUMIDITY) {
-				tile.setTerrain(Terrain.SAND);
+				int fail = 0;
+				
+				for(Tile t : tile.getNeighbors()) {
+					//if the other tiles nearby arent turning into desert either
+					if(t.getTerrain() != Terrain.SAND) {
+						fail ++;
+					}
+				}
+				if(fail <= 3) {
+					tile.setTerrain(Terrain.SAND);
+				}else if(fail > 3){
+					tile.setTerrain(Terrain.VOLCANO);
+				}
+				
+				
 			}
 			if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY){
 				tile.setTerrain(Terrain.DIRT);
