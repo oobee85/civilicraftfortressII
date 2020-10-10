@@ -24,6 +24,9 @@ public class Projectile implements HasImage {
 	private int damageBuff;
 	private Unit source;
 	
+	private int totalDistance;
+	public int currentHeight = 0;
+	
 	public Projectile(ProjectileType type, Tile tile, Tile targetTile, Unit source) {
 		this.type = type;
 		this.tile = tile;
@@ -32,6 +35,17 @@ public class Projectile implements HasImage {
 		this.damageBuff = 0;
 		this.source = source;
 		this.timeToMove = type.getSpeed();
+		totalDistance = tile.getLocation().distanceTo(targetTile.getLocation());
+	}
+	
+	public int getHeight() {
+		return currentHeight;
+	}
+	
+	public double getExtraSize() {
+		int div = (int) (7 - getType().getSpeed());
+		div = div < 1 ? 1 : div;
+		return currentHeight/div/30.0;
 	}
 	
 	public Unit getSource() {
@@ -61,13 +75,17 @@ public class Projectile implements HasImage {
 			return;
 		}
 		Tile nextTile = this.tile;
+		int nextDistance = nextTile.getLocation().distanceTo(this.targetTile.getLocation());
 		for(Tile t : tile.getNeighbors()) {
-			if(t.getLocation().distanceTo(this.targetTile.getLocation()) < nextTile.getLocation().distanceTo(this.targetTile.getLocation())) {
+			int dist = t.getLocation().distanceTo(this.targetTile.getLocation());
+			if(dist < nextDistance) {
 				nextTile = t;
+				nextDistance = nextTile.getLocation().distanceTo(this.targetTile.getLocation());
 			}
 		}
 		moveTo(nextTile);
 		resetTimeToMove();
+		currentHeight = (int) (nextDistance * (totalDistance - nextDistance)*type.getSpeed()*2);
 	}
 	public boolean reachedTarget() {
 		return this.targetTile == this.tile;
