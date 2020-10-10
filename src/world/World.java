@@ -17,7 +17,12 @@ public class World {
 
 	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 5;
 	public static final double TERRAIN_SNOW_LEVEL = 1;
-	public static final double MODIFIER_SNOW_LEVEL = 0.8;
+	public static final int SEASON_DURATION = 6000;
+	public double getSnowLevel() {
+		int season = (Game.ticks + SEASON_DURATION*3/2)%(SEASON_DURATION*2);
+		int coldness = Math.abs(SEASON_DURATION - season);
+		return coldness*0.45/SEASON_DURATION + 0.5;
+	}
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
 	public static final int TRANSITION_PERIOD = 100;
@@ -98,17 +103,11 @@ public class World {
 		}
 	}
 	public void rain() {
-		System.out.println("raining");
+		double snowLevel = getSnowLevel();
+		System.out.println("raining snowLevel=" + snowLevel);
 		for(Tile tile : getTiles()) {
-			if(tile.getTerrain() != Terrain.SNOW && tile.getTerrain() != Terrain.ROCK) {
-				continue;
-			}
-			if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.DRY) {
-				tile.liquidType = LiquidType.WATER;
-				tile.liquidAmount += 0.001;
-			}
-			if(tile.getHeight() >= MODIFIER_SNOW_LEVEL && tile.getTerrain().isCold(tile.getTerrain()) && tile.liquidType != LiquidType.LAVA) {
-				int duration = (int) ((tile.getHeight() - MODIFIER_SNOW_LEVEL) * 8000);
+			if(tile.getHeight() >= snowLevel && tile.liquidType != LiquidType.LAVA) {
+				int duration = (int) (1000*(tile.getHeight() - snowLevel)/(1-snowLevel));
 				if(tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.SNOW) {
 					tile.getModifier().addDuration(duration);
 				}
@@ -117,6 +116,13 @@ public class World {
 					tile.setModifier(gm);
 					newGroundModifiers.add(gm);
 				}
+			}
+			if(tile.getTerrain() != Terrain.SNOW && tile.getTerrain() != Terrain.ROCK) {
+				continue;
+			}
+			if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.DRY) {
+				tile.liquidType = LiquidType.WATER;
+				tile.liquidAmount += 0.001;
 			}
 		}
 		
