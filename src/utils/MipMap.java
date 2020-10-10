@@ -33,6 +33,14 @@ public class MipMap {
 			index++;
 		}
 	}
+	public MipMap(String[] paths, Color[] averageColor) {
+		this(paths);
+		int index = 0;
+		for (String s : paths) {
+			avgColors[index] = averageColor[index];
+			index++;
+		}
+	}
 	
 	public MipMap(String path) {
 		this(new String[] { path});
