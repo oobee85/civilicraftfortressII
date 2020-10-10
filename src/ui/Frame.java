@@ -466,14 +466,58 @@ public class Frame extends JPanel {
 			infoPanel.validate();
 		});
 	}
+	
 
 	private void setupMinimapPanel() {
 		minimapPanel = new JPanel() {
+			private void drawSunMoon(Graphics g) {
+				int offset = gameInstance.world.getCurrentDayOffset() + World.TRANSITION_PERIOD;
+				int pathwidth = getWidth() - 40;
+				int pathheight = getHeight() - 40;
+				int totallength = 2*pathwidth + 2*pathheight;
+				offset = totallength*offset / (World.DAY_DURATION + World.NIGHT_DURATION);
+				Image sun = gameInstance.getTimeImage(true);
+				Image moon = gameInstance.getTimeImage(false);
+				if(offset < pathheight) {
+					g.drawImage(sun, 5, 5 + pathheight - offset, 30, 30, null);
+					g.drawImage(moon, 5 + pathwidth, 5 + offset, 30, 30, null);
+				}
+				else {
+					offset -= pathheight;
+					if(offset < pathwidth) {
+						g.drawImage(sun, 5 + offset, 5, 30, 30, null);
+						g.drawImage(moon, 5 + pathwidth - offset, 5 + pathheight, 30, 30, null);
+					}
+					else {
+						offset -= pathwidth;
+						if(offset < pathheight) {
+							g.drawImage(sun, 5 + pathwidth, 5 + offset, 30, 30, null);
+							g.drawImage(moon, 5, 5 + pathheight - offset, 30, 30, null);
+						}
+						else {
+							offset -= pathheight;
+							if(offset < pathwidth) {
+								g.drawImage(sun, 5 + pathwidth - offset, 5 + pathheight, 30, 30, null);
+								g.drawImage(moon, 5 + offset, 5, 30, 30, null);
+							}
+							else {
+								offset -= pathwidth;
+								if(offset < pathheight) {
+									g.drawImage(sun, 5, 5 + pathheight - offset, 30, 30, null);
+									g.drawImage(moon, 5 + pathwidth, 5 + offset, 30, 30, null);
+								}
+							}
+						}
+					}
+				}
+			}
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
 				g.setColor(gameInstance.getBackgroundColor());
 				g.fillRect(0, 0, getWidth(), getHeight());
+				drawSunMoon(g);
+				g.fillRect(0, getHeight()*4/5, getWidth(), getHeight() - getHeight()*4/5);
 				g.setColor(Color.black);
 				g.drawRect(0, 0, getWidth(), getHeight());
 				gameInstance.drawMinimap(g, MINIMAPBORDERWIDTH, MINIMAPBORDERWIDTH,

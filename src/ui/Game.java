@@ -237,11 +237,13 @@ public class Game {
 		}
 		
 	}
-	public Image getTimeImage() {
-		if(world.isNightTime() == true) {
+	public Image getTimeImage(boolean day) {
+		if(day) {
+			return sunIcon;
+		}
+		else {
 			return moonIcon;
 		}
-		return sunIcon;
 	}
 	public void eruptVolcano() {
 		world.eruptVolcano();
@@ -1866,7 +1868,6 @@ public class Game {
 	
 	
 	protected void drawMinimap(Graphics g, int x, int y, int w, int h) {
-		g.drawImage(getTimeImage(), 5, 5, 30, 30, null);
 		if(showHeightMap) {
 			g.drawImage(heightMapImage, x, y, w, h, null);
 		}
