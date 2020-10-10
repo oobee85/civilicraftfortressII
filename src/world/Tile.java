@@ -381,7 +381,7 @@ public class Tile {
 					// resisted environment damage
 				} 
 				else {
-					damage += modifier.getType().getDamage();
+					damage += modifier.getType().getDamage() + modifier.timeLeft()*0.0001;
 				}
 				
 			}
@@ -434,5 +434,9 @@ public class Tile {
 
 	public List<Tile> getNeighbors() {
 		return neighborTiles;
+	}
+	@Override
+	public String toString() {
+		return location.toString();
 	}
 }

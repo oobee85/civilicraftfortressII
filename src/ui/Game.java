@@ -1608,7 +1608,7 @@ public class Game {
 	private void unitTick() {
 		for (Unit unit : world.units) {
 			unit.updateState();
-			unit.planActions(world.units, world.buildings, world.plannedBuildings);
+			unit.planActions(world);
 			unit.doMovement(items);
 			unit.doAttacks(world);
 			unit.doPassiveThings(world);

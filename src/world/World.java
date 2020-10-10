@@ -19,9 +19,12 @@ public class World {
 	public static final double TERRAIN_SNOW_LEVEL = 1;
 	public static final double DESERT_HUMIDITY = 0.001;
 	public static final int SEASON_DURATION = 6000;
-	public double getSeason() {
+	public static double getSeason2() {
 		int season =  (Game.ticks + SEASON_DURATION*1/2)%(SEASON_DURATION*2);
 		return Math.abs(SEASON_DURATION - season) / (double)SEASON_DURATION;
+	}
+	public static double getSeason4() {
+		return (Game.ticks + SEASON_DURATION*1/2)%(SEASON_DURATION*2) / (double)SEASON_DURATION;
 	}
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
@@ -105,7 +108,7 @@ public class World {
 		}
 	}
 	public void rain() {
-		double summerRatio = getSeason();
+		double summerRatio = getSeason2();
 		double winterRatio = 1 - summerRatio;
 		System.out.println(String.format("raining, winterRatio=%." + Game.NUM_DEBUG_DIGITS + "f", winterRatio));
 		for(Tile tile : getTiles()) {

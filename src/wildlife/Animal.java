@@ -18,6 +18,8 @@ public class Animal extends Unit {
 	private Thing foodTarget;
 	private Tile resourceTarget;
 	
+	private int migratingUntil;
+	
 	public Animal(UnitType type, Tile tile, boolean isPlayerControlled) {
 		super(type, tile, isPlayerControlled);
 		energy = MAX_ENERGY;
@@ -88,28 +90,45 @@ public class Animal extends Unit {
 	}
 	
 	@Override
-	public void planActions(LinkedList<Unit> units, LinkedList<Building> buildings, LinkedList<Building> plannedBuildings) {
-		chooseWhatToEat(units);
+	public void planActions(World world) {
+		chooseWhatToEat(world.units);
 		if(wantsToAttack() && getTarget() == null) {
-			chooseWhatToAttack(units, buildings);
+			chooseWhatToAttack(world.units, world.buildings);
 		}
-		chooseWhereToMove();
+		chooseWhereToMove(world);
 	}
 	
 	@Override
 	public void doPassiveThings(World world) {
 	}
 	
-	public void chooseWhereToMove() {
+	private int computeHerd(Tile tile) {
+		int herd = 0;
+		for(Tile t : tile.getNeighbors()) {
+			for(Unit u : t.getUnits()) {
+				if(u != this && u.getUnitType() == this.getUnitType()) {
+					herd+=10;
+				}
+			}
+		}
+		for(Unit u : tile.getUnits()) {
+			if(u == this) {
+				continue;
+			}
+			if(u.getUnitType() == this.getUnitType()) {
+				herd-=5;
+			}
+			else {
+				herd -= 1;
+			}
+		}
+		return herd;
+	}
+	
+	public void chooseWhereToMove(World world) {
 		if(resourceTarget != null) {
 			if(getTile() != resourceTarget) {
 				setTargetTile(resourceTarget);
-				return;
-			}
-		}
-		if(foodTarget != null) {
-			if(this.getTile().getLocation().distanceTo(foodTarget.getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
-				setTargetTile(foodTarget.getTile());
 				return;
 			}
 		}
@@ -119,32 +138,78 @@ public class Animal extends Unit {
 				return;
 			}
 		}
-		if(Math.random() < getMoveChance() && readyToMove()) {
-			if(getTile().getBuilding() != null && getTile().getBuilding().getType() == BuildingType.FARM) {
-				//stuck inside farm
+		// Try to avoid danger
+		Tile best = getTile();
+		double currentDanger = computeDanger(best);
+		double bestDanger = currentDanger;
+		for(Tile t : getTile().getNeighbors()) {
+			if(t.isBlocked(this)) {
+				continue;
 			}
-			else {
-				Tile best = getTile();
-				double bestDanger = computeDanger(best);
-				for(Tile t : getTile().getNeighbors()) {
-					if(t.isBlocked(this)) {
-						continue;
-					}
-					double danger = computeDanger(t);
-					if(danger < bestDanger) {
-						best = t;
-						bestDanger = danger;
-					}
+			double danger = computeDanger(t);
+			if(danger < bestDanger) {
+				best = t;
+				bestDanger = danger;
+			}
+		}
+		if(bestDanger < currentDanger && currentDanger >= 0.9) {
+			if(best != getTile()) {
+				setTargetTile(best);
+			}
+			return;
+		}
+		// everything below only if idle
+		if(!isIdle()) {
+			return;
+		}
+		// Try to stay next to same species
+		if(Math.random() < 0.1) {
+			Tile bestHerd = getTile();
+			int currentHerdAmount = computeHerd(bestHerd); 
+			int bestHerdAmount = currentHerdAmount; 
+			for(Tile t : getTile().getNeighbors()) {
+				if(t.isBlocked(this)) {
+					continue;
 				}
-				if(best != getTile()) {
-					setTargetTile(best);
+				int herdAmount = computeHerd(t); 
+				if(herdAmount > bestHerdAmount) {
+					bestHerd = t;
+					bestHerdAmount = herdAmount;
+				}
+			}
+			if(bestHerdAmount > currentHerdAmount && computeDanger(bestHerd) < 1) {
+				if(bestHerd != getTile()) {
+					setTargetTile(bestHerd);
+					return;
+				}
+			}
+		}
+		// Migrate according to the season
+		if(Game.ticks > migratingUntil && Math.random() < 0.1) {
+			double season = World.getSeason4();
+			if(season > 0.4 && season < 0.8) {
+				// heading into winter
+				if(getTile().getLocation().y < world.getHeight()/2) { 
+					TileLoc migrationTarget = new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y + (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4));
+					setTargetTile(world.get(migrationTarget));
+					System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + this.getTargetTile());
+					migratingUntil = Game.ticks + World.SEASON_DURATION/2;
+				}
+			}
+			if(season > 1.4 && season < 1.8) {
+				// heading into summer
+				if(getTile().getLocation().y > world.getHeight()/2) { 
+					TileLoc migrationTarget = new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y - (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4));
+					setTargetTile(world.get(migrationTarget));
+					System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + this.getTargetTile());
+					migratingUntil = Game.ticks + World.SEASON_DURATION/2;
 				}
 			}
 		}
 	}
 	
 	private void chooseWhatToEat(LinkedList<Unit> units) {
-		if(foodTarget != null || !wantsToEat()) {
+		if(!wantsToEat()) {
 			return;
 		}
 		if(getType().isHostile() == true) {
@@ -154,7 +219,7 @@ public class Animal extends Unit {
 				iveGotYouInMySights = units.get(pickUnit);
 			}
 			if(iveGotYouInMySights != this) {
-				foodTarget = iveGotYouInMySights;
+				setTarget(iveGotYouInMySights);
 			}
 		}
 		else {
@@ -182,6 +247,14 @@ public class Animal extends Unit {
 			}
 			return;
 		}
+	}
+	
+	@Override
+	public boolean readyToMove() {
+		if(getTile().getBuilding() != null && getTile().getBuilding().getType() == BuildingType.FARM) {
+			return false;
+		}
+		return super.readyToMove();
 	}
 	
 	public boolean wantsToAttack() {

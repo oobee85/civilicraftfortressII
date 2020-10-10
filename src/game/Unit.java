@@ -119,9 +119,6 @@ public class Unit extends Thing  {
 		if(t.canMove(this) == false) {
 			return false;
 		}
-		if(this.getTargetTile() == null) {
-			this.setTargetTile(this.getTile());
-		}
 		double penalty = movePenaltyTo(this.getTile(), t);
 		timeToMove += penalty;
 		
@@ -159,8 +156,10 @@ public class Unit extends Thing  {
 		if(timeToHeal > 0) {
 			timeToHeal -= 1;
 		}
-		isIdle = readyToMove() && readyToAttack() && target == null && getTargetTile() == null && isPlayerControlled() && getIsSelected() == false;
-		
+		if(getTile() == getTargetTile()) {
+			setTargetTile(null);
+		}
+		isIdle = readyToMove() && readyToAttack() && target == null && getTargetTile() == null && getIsSelected() == false;
 		if(getHealth() < combatStats.getHealth() && readyToHeal()) {
 			heal(1, false);
 			resetTimeToHeal();
@@ -238,10 +237,10 @@ public class Unit extends Thing  {
 		return null;
 	}
 	
-	public void planActions(LinkedList<Unit> units, LinkedList<Building> buildings, LinkedList<Building> plannedBuildings) {
+	public void planActions(World world) {
 		// Workers deciding whether to move toward something to build
 		if (unitType.isBuilder() && isIdle && getTile().getIsTerritory()) {
-			Building building = getBuildingToBuild(buildings, plannedBuildings);
+			Building building = getBuildingToBuild(world.buildings, world.plannedBuildings);
 			if(building != null && building.getTile().getIsTerritory() == true) {
 				setTargetTile(building.getTile());
 			}

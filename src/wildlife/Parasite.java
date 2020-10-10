@@ -97,9 +97,9 @@ public class Parasite extends Animal {
 	}
 	
 	@Override
-	public void chooseWhereToMove() {
+	public void chooseWhereToMove(World world) {
 		if(!transformed) {
-			super.chooseWhereToMove();
+			super.chooseWhereToMove(world);
 		}
 		else {
 			if(getTile() != volcano) {
