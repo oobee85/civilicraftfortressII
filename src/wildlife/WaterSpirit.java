@@ -16,11 +16,6 @@ public class WaterSpirit extends Animal {
 	public boolean wantsToEat() {
 		return false;
 	}
-
-	@Override
-	public boolean wantsToReproduce() {
-		return false;
-	}
 	
 	@Override
 	public boolean moveTo(Tile t) {

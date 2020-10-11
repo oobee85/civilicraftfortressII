@@ -20,11 +20,6 @@ public class Parasite extends Animal {
 	public boolean wantsToEat() {
 		return false;
 	}
-
-	@Override
-	public boolean wantsToReproduce() {
-		return false;
-	}
 	
 	@Override
 	public void updateState() {

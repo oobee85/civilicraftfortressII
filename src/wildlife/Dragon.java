@@ -63,11 +63,6 @@ public class Dragon extends Animal {
 	}
 
 	@Override
-	public boolean wantsToReproduce() {
-		return false;
-	}
-
-	@Override
 	public boolean getHasHome() {
 		return true;
 	}

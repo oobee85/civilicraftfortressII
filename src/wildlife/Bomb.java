@@ -17,11 +17,6 @@ public class Bomb extends Animal {
 	}
 
 	@Override
-	public boolean wantsToReproduce() {
-		return false;
-	}
-
-	@Override
 	public boolean wantsToAttack() {
 		return true;
 	}

@@ -16,11 +16,6 @@ public class IceGiant extends Animal {
 	public boolean wantsToEat() {
 		return false;
 	}
-
-	@Override
-	public boolean wantsToReproduce() {
-		return false;
-	}
 	
 	@Override
 	public boolean wantsToAttack() {
