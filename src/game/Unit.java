@@ -145,6 +145,10 @@ public class Unit extends Thing  {
 			}
 		}
 	}
+	
+	public LinkedList<Tile> getCurrentPath() {
+		return currentPath;
+	}
 
 	public void updateState() {
 		if(timeToMove > 0) {

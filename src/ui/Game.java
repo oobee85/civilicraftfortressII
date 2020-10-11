@@ -860,6 +860,18 @@ public class Game {
 					g2d.setStroke(currentStroke);
 					Utils.setTransparency(g, 1f);
 					if(unit.getTargetTile() != null) {
+						LinkedList<Tile> path = unit.getCurrentPath();
+						if(path != null) {
+							g.setColor(Color.green);
+							TileLoc prev = unit.getTile().getLocation();
+							for(Tile t : path) {
+								if(prev != null) {
+									g.drawLine(prev.x * Game.tileSize + Game.tileSize/2, prev.y * Game.tileSize + Game.tileSize/2, 
+											t.getLocation().x * Game.tileSize + Game.tileSize/2, t.getLocation().y * Game.tileSize + Game.tileSize/2);
+								}
+								prev = t.getLocation();
+							}
+						}
 						g.drawImage(flag, unit.getTargetTile().getLocation().x * Game.tileSize, unit.getTargetTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 					}
 				}
