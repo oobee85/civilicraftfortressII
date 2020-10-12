@@ -198,6 +198,10 @@ public class Animal extends Unit {
 		if(foodTarget != null) {
 			if(inRange(foodTarget)) {
 				double damageDealt = attack(foodTarget);
+//				if(this.getType() == UnitType.WEREWOLF) {
+//					
+//				}
+				
 				if(damageDealt > 0) {
 				}
 				if(foodTarget.isDead()) {
