@@ -49,7 +49,6 @@ public class Road extends Thing {
 	@Override
 	public List<String> getDebugStrings() {
 		List<String> strings = super.getDebugStrings();
-		strings.add(String.format("HP=%.1f", getHealth() ));
 		if(!isBuilt()) {
 			strings.add(String.format("work^2=%.0f", getRemainingEffort() ));
 		}
