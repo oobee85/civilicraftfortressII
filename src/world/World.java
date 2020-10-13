@@ -370,7 +370,8 @@ public class World {
 					tile.setTerrain(Terrain.SAND);
 				}
 				
-				
+			}else if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY) {
+				tile.setTerrain(Terrain.DIRT);
 			}
 //			if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY){
 //				tile.setTerrain(Terrain.DIRT);
