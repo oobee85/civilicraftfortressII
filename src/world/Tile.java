@@ -65,8 +65,7 @@ public class Tile {
 		tickLastTouchedWater = tick;
 	}
 	public void updateHumidity(int currentTick) {
-		if(liquidType == LiquidType.WATER || liquidType == LiquidType.ICE || 
-				(modifier != null && modifier.getType() == GroundModifierType.SNOW)) {
+		if(liquidType == LiquidType.WATER || liquidType == LiquidType.ICE ||  liquidType == LiquidType.SNOW) {
 			if(humidity > 0) {
 				humidity += 1/humidity;
 			}
@@ -385,8 +384,7 @@ public class Tile {
 				}
 			}
 			if(modifier != null) {
-				if((modifier.getType() == GroundModifierType.FIRE && fireResistant)
-						|| (modifier.getType() == GroundModifierType.SNOW && coldResistant)) {
+				if(modifier.getType() == GroundModifierType.FIRE && fireResistant) {
 					// resisted environment damage
 				} 
 				else {

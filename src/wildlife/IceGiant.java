@@ -3,6 +3,7 @@ package wildlife;
 import java.util.*;
 
 import game.*;
+import liquid.LiquidType;
 import utils.Thing;
 import world.*;
 
@@ -36,19 +37,17 @@ public class IceGiant extends Animal {
 	@Override
 	public void doPassiveThings(World world) {
 		super.doPassiveThings(world);
-		if(getTile().getModifier() != null) {
-			if(getTile().getModifier().getType() != GroundModifierType.SNOW) {
-				this.getTile().getModifier().finish();
-				makeIce(world);
-			}
-		}
-		else {
-			makeIce(world);
-		}
+		makeIce(world);
 	}
 	
 	private void makeIce(World world) {
-		getTile().setModifier(new GroundModifier(GroundModifierType.SNOW, getTile(), 500));
-		world.addGroundModifier(getTile().getModifier());
+		if(getTile().liquidType != LiquidType.LAVA && getTile().liquidType != LiquidType.WATER) {
+			getTile().liquidType = LiquidType.SNOW;
+		}else if(getTile().liquidType == LiquidType.WATER) {
+			getTile().liquidType = LiquidType.ICE;
+		}
+		
+//		getTile().setModifier(new GroundModifier(GroundModifierType.SNOW, getTile(), 500));
+//		world.addGroundModifier(getTile().getModifier());
 	}
 }

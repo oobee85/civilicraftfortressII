@@ -117,14 +117,9 @@ public class World {
 				if(tile.getHeight() >= snowLevel) {
 					int duration = (int) (400 * (tile.getHeight() - snowLevel)/(1-snowLevel));
 					
-					if(tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.SNOW) {
-						tile.getModifier().addDuration(duration);
-					} else if(tile.getModifier() == null){
-						if(duration > 30 ) {
-							GroundModifier gm = new GroundModifier(GroundModifierType.SNOW, tile, duration);
-							tile.setModifier(gm);
-							addGroundModifier(gm);
-						}
+					if(tile.liquidType == LiquidType.SNOW || tile.liquidType == LiquidType.DRY) {
+						tile.liquidType = LiquidType.SNOW;
+						tile.liquidAmount += 0.1;
 					}
 				}
 			}
@@ -202,7 +197,7 @@ public class World {
 		}
 	}
 	public void spawnIceGiant() {
-		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getModifier() != null && e.getModifier().getType() == GroundModifierType.SNOW).findFirst();
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getModifier() != null && e.liquidType == LiquidType.SNOW).findFirst();
 		if(tile.isPresent()) {
 			spawnAnimal(UnitType.ICE_GIANT, tile.get());
 		}
