@@ -388,7 +388,14 @@ public class Game {
 				}
 				building.resetTimeToHarvest();
 			}
-			
+			if(building.getType() == BuildingType.GRANARY) {
+				items.get(ItemType.FOOD).addAmount(2);
+				building.resetTimeToHarvest();
+			}
+			if(building.getType() == BuildingType.WINDMILL) {
+				items.get(ItemType.FOOD).addAmount(10);
+				building.resetTimeToHarvest();
+			}
 			if(building.getType() == BuildingType.SAWMILL) {
 				HashSet<Tile> tilesToCut = new HashSet<>();
 				tilesToCut.add(building.getTile());

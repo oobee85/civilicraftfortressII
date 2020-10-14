@@ -14,14 +14,14 @@ import utils.Utils;
 public enum ProjectileType implements HasImage {
 
 	
-		ARROW_LONGBOWMAN(45, 1, "resources/Images/projectiles/arrow.png", 1, 2, null),
-		ARROW_ARCHER(15, 1, "resources/Images/projectiles/arrow.png", 1, 1, null),
-		RUNE_ARROW(60, 1, "resources/Images/projectiles/rune_arrow.png", 1, 2, null),
-		ROCK_CATAPULT(200, 2, "resources/Images/itemicons/rock.png", 1, 3, null),
-		ROCK_CYCLOPS(80, 2, "resources/Images/itemicons/rock.png", 1, 2, null),
-		FIREBALL_DRAGON(100, 2, "resources/Images/projectiles/fireball2.png", 2, 3, null),
-		FIREBALL_TREBUCHET(400, 2, "resources/Images/projectiles/fireball.png", 2, 3, null),
-		FIREWAVE(200, 5, "resources/Images/ground_modifiers/fire.gif", 1, 3, GroundModifierType.FIRE),
+		ARROW_LONGBOWMAN(45, 2, "resources/Images/projectiles/arrow.png", 1, 2, null),
+		ARROW_ARCHER(15, 2, "resources/Images/projectiles/arrow.png", 1, 1, null),
+		RUNE_ARROW(60, 2, "resources/Images/projectiles/rune_arrow.png", 1, 2, null),
+		ROCK_CATAPULT(200, 3, "resources/Images/itemicons/rock.png", 1, 3, null),
+		ROCK_CYCLOPS(80, 3, "resources/Images/itemicons/rock.png", 1, 2, null),
+		FIREBALL_DRAGON(100, 3, "resources/Images/projectiles/fireball2.png", 2, 3, null),
+		FIREBALL_TREBUCHET(400, 3, "resources/Images/projectiles/fireball.png", 2, 3, null),
+		FIREWAVE(200, 6, "resources/Images/ground_modifiers/fire.gif", 1, 3, GroundModifierType.FIRE),
 		
 	;
 	

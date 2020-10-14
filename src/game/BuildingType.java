@@ -35,24 +35,24 @@ public enum BuildingType implements HasImage {
 	 			"MONARCHY",  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,1000); put(ItemType.WOOD,1000); put(ItemType.ADAMANTITE_BAR,5); }},
 	 			null),
 	 	
-	 	BRIDGE (500, 100, "resources/Images/buildings/bridge.png", 0.25, true, 1,
-	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }},
-	 			null),
+//	 	BRIDGE (500, 100, "resources/Images/buildings/bridge.png", 0.25, true, 1,
+//	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }},
+//	 			null),
 	 	
 	 	MINE (500, 100, "resources/Images/buildings/mine256.png", 0.25, true, 1,
-	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,75); }},
+	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,50); }},
 	 			null),
 	 	
 	 	IRRIGATION (100, 100, "resources/Images/buildings/irrigation.png", 0.25, true, 1,
 	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,50);  }},
 	 			null),
 	 	
-	 	WATCHTOWER (500, 250, "resources/Images/buildings/watchtower.png", 0.25, true, 10,
-				"MYSTICISM",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000); put(ItemType.MITHRIL_BAR,5); }},
-				null),
+	 	GRANARY (500, 250, "resources/Images/buildings/granary.png", 0.25, true, 1,
+	 			"WHEEL",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200);  }},
+	 			null),
 	 	
 	 	WINDMILL (1000, 500, "resources/Images/buildings/ancientwindmill.png", 0.5, true, 1,
-	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000);  }},
+	 			"MATHEMATICS",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.IRON_BAR,10); }},
 	 			null),
 	 	
 	 	SAWMILL (1000, 250, "resources/Images/buildings/sawmill.png", 0.5, true, 2,
@@ -62,10 +62,10 @@ public enum BuildingType implements HasImage {
 		FARM (500, 250, "resources/Images/buildings/farm.png", 0.5, true, 1,
 	 			"FARMING",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,300); put(ItemType.BRONZE_BAR,5);  }},
 	 			null),
-		
-	 	GRANARY (500, 500, "resources/Images/buildings/granary.png", 0.5, true, 1,
-	 			"FARMING",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200);  }},
-	 			null),
+	 	
+	 	WATCHTOWER (500, 250, "resources/Images/buildings/watchtower.png", 0.25, true, 10,
+				"MYSTICISM",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000); put(ItemType.MITHRIL_BAR,5); }},
+				null),
 	 	
 	 	CASTLE (2000, 1000, "resources/Images/buildings/castle256.png", 1, true, 5,
 	 			"MONARCHY",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000); put(ItemType.STONE,1000); put(ItemType.ADAMANTITE_BAR,20); }},
@@ -80,7 +80,7 @@ public enum BuildingType implements HasImage {
 				new LinkedList<UnitType>() {{add(UnitType.LONGBOWMAN); add(UnitType.CATAPULT); add(UnitType.TREBUCHET);}}),
 		
 		BLACKSMITH (1000, 250, "resources/Images/buildings/blacksmith.png", 0.5, true, 1,
-				"BRONZE_WORKING",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200);  }},
+				"BRONZE_WORKING",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100); put(ItemType.STONE,100);  }},
 				null),
 		
 		RESEARCHLAB (1000, 250, "resources/Images/buildings/research.png", 0.5, true, 1,

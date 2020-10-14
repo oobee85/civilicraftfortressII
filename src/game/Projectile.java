@@ -85,7 +85,7 @@ public class Projectile implements HasImage {
 		}
 		moveTo(nextTile);
 		resetTimeToMove();
-		currentHeight = (int) (nextDistance * (totalDistance - nextDistance)*type.getSpeed()*2);
+		currentHeight = (int) (nextDistance * (totalDistance - nextDistance)*type.getSpeed());
 	}
 	public boolean reachedTarget() {
 		return this.targetTile == this.tile;
