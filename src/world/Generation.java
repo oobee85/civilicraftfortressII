@@ -339,12 +339,12 @@ public class Generation {
 				}
 			}
 			
-			if(tile.getTerrain() == Terrain.VOLCANO && Math.random() < 0.01) {
-				world.spawnDragon();
-			}
+			
 			if(tile.getTerrain() == Terrain.ROCK && Math.random() < 0.001) {
 				world.makeAnimal(UnitType.WOLF, world, loc);
 			}
 		}
+		world.spawnDragon();
 	}
+	
 }

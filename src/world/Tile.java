@@ -65,12 +65,9 @@ public class Tile {
 	public double getHumidity() {
 		return humidity;
 	}
-	public void setHumidity(double set) {
-		humidity = set;
-	}
 	public void updateHumidity(int currentTick) {
 		if(liquidType == LiquidType.WATER || liquidType == LiquidType.ICE ||  liquidType == LiquidType.SNOW) {
-			humidity += 1/(humidity + 1);
+			humidity += 2/(humidity + liquidAmount);
 			
 		}
 		if(liquidType == LiquidType.LAVA) {
@@ -80,6 +77,9 @@ public class Tile {
 		humidity -= 0.01;
 		if(humidity < 0) {
 			humidity = 0;
+		}
+		if(humidity > 20) {
+			humidity = 20;
 		}
 			
 //		}

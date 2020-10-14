@@ -418,21 +418,33 @@ public class World {
 		
 	}
 	
+	private void spreadForest() {
+		
+		for(Plant plant : plants) {
+			
+			if(plant.getPlantType() == PlantType.FOREST1) {
+				if(Math.random() < 0.01) {
+					
+					for(Tile tile : plant.getTile().getNeighbors()) {
+						if(tile.canPlant() && tile.getTempurature() > Season.FREEZING_TEMPURATURE && tile.getPlant() == null) {
+							tile.setHasPlant(new Plant(PlantType.FOREST1, tile));
+							newPlants.add(tile.getPlant());
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		
+	}
 	public void grow() {
+		spreadForest();
 		
 		for(Tile tile : getTilesRandomly()) {
 			
-			if(tile.canPlant() == false) {
+			if(tile.canPlant() == false && tile.getTempurature() < Season.FREEZING_TEMPURATURE) {
 				continue;
-			}
-			
-			if(tile.getPlant() != null && tile.getPlant().getPlantType() == PlantType.FOREST1 && tile.canPlant()) {
-				for(Tile t : tile.getNeighbors()) {
-					if(Math.random() < 0.01 && t.getPlant() == null && t != tile && t.canPlant()) {
-						t.setHasPlant(new Plant(PlantType.FOREST1, t));
-						newPlants.add(t.getPlant());
-					}
-				}
 			}
 			
 			if(tile.getPlant() != null) {
