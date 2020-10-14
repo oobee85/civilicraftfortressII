@@ -25,4 +25,7 @@ public class TileLoc {
 		return Math.abs(this.x - other.x) + Math.abs(this.y - other.y);
 //		return Math.sqrt((this.x - other.x)*(this.x - other.x) + (this.y - other.y)*(this.y - other.y));
 	}
+	public double euclideanDistance(TileLoc other) {
+		return Math.sqrt((this.x - other.x)*(this.x - other.x) + (this.y - other.y)*(this.y - other.y));
+	}
 }

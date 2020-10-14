@@ -104,8 +104,7 @@ public final class Utils {
 	/**
 	 * Converts a given Image into a BufferedImage
 	 *
-	 * @param img
-	 *            The Image to be converted
+	 * @param img The Image to be converted
 	 * @return The converted BufferedImage
 	 */
 	public static BufferedImage toBufferedImage(Image img) {
@@ -232,7 +231,7 @@ public final class Utils {
 					int maxj = (int) Math.min(data[0].length-1, j+radius);
 					double count = 0;
 					for(int ii = mini; ii <= maxi; ii++) {
-						for(int jj = minj; jj < maxj; jj++) {
+						for(int jj = minj; jj <= maxj; jj++) {
 							double distance = Math.sqrt((ii-myI)*(ii-myI) + (jj-j)*(jj-j));
 							double gaussian = Math.exp(-distance*distance / c);
 							myRow[j] += gaussian * data[ii][jj];
@@ -268,6 +267,27 @@ public final class Utils {
 	}
 	public static List<Tile> getNeighbors(Tile tile, World world) {
 		return tile.getNeighbors();
+	}
+	public static List<Tile> getTilesInRadius(Tile tile, World world, double radius) {
+		int maxr = (int) Math.ceil(radius);
+		TileLoc center = tile.getLocation();
+		int mini = (int) Math.max(0, center.x-maxr);
+		int maxi = (int) Math.min(world.getWidth()-1, center.x+maxr);
+		int minj = (int) Math.max(0, center.y-maxr);
+		int maxj = (int) Math.min(world.getHeight()-1, center.y+maxr);
+		LinkedList<Tile> tiles = new LinkedList<>();
+		for(int i = mini; i <= maxi; i++) {
+			for(int j = minj; j <= maxj; j++) {
+				TileLoc otherLoc = new TileLoc(i, j);
+				Tile otherTile = world.get(otherLoc);
+				if(otherTile != null) {
+					if(center.euclideanDistance(otherLoc) <= radius) {
+						tiles.add(otherTile);
+					}
+				}
+			}
+		}
+		return tiles;
 	}
 	public static double getRandomNormal(int tries) {
 		double rand = 0;

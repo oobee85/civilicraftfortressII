@@ -18,14 +18,6 @@ public class World {
 	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 5;
 	public static final double TERRAIN_SNOW_LEVEL = 1;
 	public static final double DESERT_HUMIDITY = 0.001;
-	public static final int SEASON_DURATION = 6000;
-	public static double getSeason2() {
-		int season =  (Game.ticks + SEASON_DURATION*1/2)%(SEASON_DURATION*2);
-		return Math.abs(SEASON_DURATION - season) / (double)SEASON_DURATION;
-	}
-	public static double getSeason4() {
-		return (Game.ticks + SEASON_DURATION*1/2)%(SEASON_DURATION*2) / (double)SEASON_DURATION;
-	}
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
 	public static final int TRANSITION_PERIOD = 100;
@@ -35,8 +27,6 @@ public class World {
 	private static final int NUM_LIQUID_SIMULATION_PHASES = 9;
 	private ArrayList<ArrayList<Tile>> liquidSimulationPhases = new ArrayList<>(NUM_LIQUID_SIMULATION_PHASES);
 	private Tile[][] tiles;
-	private double[] winter;
-	private double[] summer;
 	public ConcurrentLinkedQueue<Tile> territory = new ConcurrentLinkedQueue<Tile>();;
 	
 	private int width;
@@ -107,66 +97,29 @@ public class World {
 			tile.liquidAmount = 0;
 		}
 	}
+	
 	public void rain() {
 		
-		double summerRatio = getSeason2();
-		double winterRatio = 1 - summerRatio;
-		
 		Tile rainTile = this.getTilesRandomly().peek();
-		int rad = (int) (Math.random()*10 +10);
+		int radius = (int) (Math.random()*20 + 10);
 		
-		LinkedList<Tile> rainTiles = new LinkedList<Tile>();
-		
-		for(Tile t : this.getTiles()) {
-			if(Math.abs(t.getLocation().x - rainTile.getLocation().x) < rad) {
-				rainTiles.add(t);
-			}
-			if(Math.abs(t.getLocation().y - rainTile.getLocation().y) < rad) {
-				rainTiles.add(t);
-			}
-		}
+		List<Tile> rainTiles = Utils.getTilesInRadius(rainTile, this, radius);
 		
 		for(Tile t : rainTiles) {
-			int i =  t.getLocation().x;
-			int j =  t.getLocation().y;
-			int dx = i - rainTile.getLocation().x;
-			int dy = j - rainTile.getLocation().y;
-			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
-				
-				if(distanceFromCenter < rad) {
-					t.liquidType = LiquidType.WATER;
-					t.liquidAmount += 0.01;
-					
-				}
-		
+			if(t.liquidType == LiquidType.LAVA) {
+				continue;
+			}
+			double temperature = t.getTempurature();
+			if(temperature < Season.FREEZING_TEMPURATURE) {
+				t.liquidType = LiquidType.SNOW;
+				t.liquidAmount += 0.005;
+			}
+			else {
+				t.liquidType = LiquidType.WATER;
+				t.liquidAmount += 0.005;
+			}
 		}
-		
-		System.out.println(String.format("raining, winterRatio=%." + Game.NUM_DEBUG_DIGITS + "f", winterRatio));
-		
-//		for(Tile tile : getTiles()) {
-//			double snowLevel = 1-(winterRatio* winter[tile.getLocation().y] + summerRatio*summer[tile.getLocation().y]);
-//			if(tile.liquidType != LiquidType.LAVA) {
-//				if(tile.getHeight() >= snowLevel) {
-//					int duration = (int) (400 * (tile.getHeight() - snowLevel)/(1-snowLevel));
-//					
-//					if(tile.liquidType == LiquidType.SNOW || tile.liquidType == LiquidType.DRY) {
-//						tile.liquidType = LiquidType.SNOW;
-//						tile.liquidAmount += 0.1;
-//					}
-//				}
-//			}
-//			if(tile.getHeight() >= snowLevel && tile.liquidType == LiquidType.WATER) {
-//				tile.liquidType = LiquidType.ICE;
-//			}
-//			if(tile.getTerrain() != Terrain.ROCK) {
-//				continue;
-//			}
-//			if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.DRY) {
-//				tile.liquidType = LiquidType.WATER;
-//				tile.liquidAmount += 0.001;
-//			}
-//		}
-		
+		System.out.println("Raining at " + rainTile + "with radius " + radius);
 	}
 	
 	public void eruptVolcano() {
@@ -399,6 +352,9 @@ public class World {
 				}
 				
 			}else if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY) {
+				tile.setTerrain(Terrain.DIRT);
+			}
+			if(tile.checkTerrain(Terrain.GRASS) && (tile.liquidType == LiquidType.SNOW || tile.liquidType == LiquidType.ICE) && tile.liquidAmount * tile.liquidType.getDamage() > 1) {
 				tile.setTerrain(Terrain.DIRT);
 			}
 //			if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY){
@@ -840,7 +796,8 @@ public class World {
 				tile.setTerrain(t);
 			}
 		}
-		
+
+		Season.makeSeasonArrays(getHeight());
 		int numTiles = width*height;
 		Generation.makeLake(numTiles * 1.0/100, this);
 		Generation.makeLake(numTiles * 1.0/200, this);
@@ -855,35 +812,9 @@ public class World {
 		this.genPlants();
 		this.makeForest();
 		Generation.generateWildLife(this);
-		makeSeasonArrays();
 		System.out.println("Finished generating " + width + "x" + height + " world with " + tileList.size() + " tiles.");
 	}
 	
-	private static final double SNOWY_POLES_RATIO = 0.04;
-	public void makeSeasonArrays() {
-		summer = new double[getHeight()];
-		winter = new double[getHeight()];
-		int northPole = (int) (summer.length * SNOWY_POLES_RATIO);
-		int southPole = (int) (summer.length - summer.length * SNOWY_POLES_RATIO);
-		
-		int winterPoint = summer.length;
-		
-		for(int i = 0; i < summer.length; i++) {
-			double snowyPoles = 0;
-			if(i < northPole) {
-				snowyPoles += (1.0*northPole - i) / northPole;
-			}
-//			else if(i > southPole) {
-//				snowyPoles += (1.0*i - southPole) / northPole;
-//			}
-			summer[i] = snowyPoles;
-			double winterSeason = 0;
-			if(i < winterPoint) {
-				winterSeason += (1.0 * winterPoint - i) / winterPoint;
-			}
-			winter[i] = snowyPoles > winterSeason ? snowyPoles : winterSeason;
-		}
-	}
 
 	public BufferedImage[] createTerrainImage() {
 		double brighnessModifier = getDaylight();
@@ -969,13 +900,13 @@ public class World {
 		return skipAmount;
 	}
 	
-	public boolean isNightTime() {
-		return getDaylight() < 0.5;
+	public static boolean isNightTime() {
+		return getDaylight() < 0.4;
 	}
-	public int getCurrentDayOffset() {
+	public static int getCurrentDayOffset() {
 		return (Game.ticks + TRANSITION_PERIOD)%(DAY_DURATION + NIGHT_DURATION);
 	}
-	public double getDaylight() {
+	public static double getDaylight() {
 		if(Game.DISABLE_NIGHT) {
 			return 1;
 		}

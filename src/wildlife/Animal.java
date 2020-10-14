@@ -147,14 +147,14 @@ public class Animal extends Unit {
 		}
 		// Migrate according to the season
 		if(Game.ticks > migratingUntil && Math.random() < 0.1) {
-			double season = World.getSeason4();
+			double season = Season.getSeason4();
 			if(season > 0.4 && season < 0.8) {
 				// heading into winter
 				if(getTile().getLocation().y < world.getHeight()/2) { 
 					TileLoc migrationTarget = new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y + (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4));
 					setTargetTile(world.get(migrationTarget));
 					System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + this.getTargetTile());
-					migratingUntil = Game.ticks + World.SEASON_DURATION/2;
+					migratingUntil = Game.ticks + Season.SEASON_DURATION/2;
 				}
 			}
 			if(season > 1.4 && season < 1.8) {
@@ -163,7 +163,7 @@ public class Animal extends Unit {
 					TileLoc migrationTarget = new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y - (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4));
 					setTargetTile(world.get(migrationTarget));
 					System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + this.getTargetTile());
-					migratingUntil = Game.ticks + World.SEASON_DURATION/2;
+					migratingUntil = Game.ticks + Season.SEASON_DURATION/2;
 				}
 			}
 		}
