@@ -35,9 +35,6 @@ public class Thing implements HasImage {
 		sideHealthBar = false;
 		if(hasImage instanceof UnitType) {
 			UnitType t = (UnitType)hasImage;
-			if(t == UnitType.ARCHER || t == UnitType.HORSEMAN || t == UnitType.SWORDSMAN || t == UnitType.SPEARMAN || t == UnitType.WORKER) {
-				sideHealthBar = true;
-			}
 		}
 	}
 	public Thing(double maxHealth, HasImage hasImage, boolean isPlayerControlled, Tile tile) {
