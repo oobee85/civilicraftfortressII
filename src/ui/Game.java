@@ -782,9 +782,7 @@ public class Game {
 			Building b = theTile.getBuilding();
 			HashSet<Tile> buildingVision = world.getNeighborsInRadius(b.getTile(), b.getType().getVisionRadius());
 			for(Tile invision : buildingVision) {
-				if(invision.getBuilding() != null && invision.getBuilding().getIsPlayerControlled()) {
-					invision.setInVisionRange(true);
-				}
+				invision.setInVisionRange(true);
 			}
 			
 			BufferedImage bI = Utils.toBufferedImage(b.getImage(0));
