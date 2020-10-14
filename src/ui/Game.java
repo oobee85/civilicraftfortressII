@@ -682,7 +682,7 @@ public class Game {
 		int column = theTile.getLocation().x;
 		int row = theTile.getLocation().y;
 		int drawx = column * Game.tileSize;
-		int drawy = row * Game.tileSize;
+		int drawy = (int) (row * Game.tileSize);
 		int draww = Game.tileSize;
 		int drawh = Game.tileSize;
 		int imagesize = draww < drawh ? draww : drawh;

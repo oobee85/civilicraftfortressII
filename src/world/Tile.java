@@ -66,9 +66,7 @@ public class Tile {
 	}
 	public void updateHumidity(int currentTick) {
 		if(liquidType == LiquidType.WATER || liquidType == LiquidType.ICE ||  liquidType == LiquidType.SNOW) {
-			if(humidity > 0) {
-				humidity += 1/humidity;
-			}
+			humidity += 1/(humidity + 1);
 			
 		}
 //			else if(liquidType == LiquidType.LAVA){

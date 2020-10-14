@@ -108,34 +108,67 @@ public class World {
 		}
 	}
 	public void rain() {
+		
 		double summerRatio = getSeason2();
 		double winterRatio = 1 - summerRatio;
-		System.out.println(String.format("raining, winterRatio=%." + Game.NUM_DEBUG_DIGITS + "f", winterRatio));
-		for(Tile tile : getTiles()) {
-			double snowLevel = 1-(winterRatio* winter[tile.getLocation().y] + summerRatio*summer[tile.getLocation().y]);
-			if(tile.liquidType != LiquidType.LAVA) {
-				if(tile.getHeight() >= snowLevel) {
-					int duration = (int) (400 * (tile.getHeight() - snowLevel)/(1-snowLevel));
-					
-					if(tile.liquidType == LiquidType.SNOW || tile.liquidType == LiquidType.DRY) {
-						tile.liquidType = LiquidType.SNOW;
-						tile.liquidAmount += 0.1;
-					}
-				}
+		
+		Tile rainTile = this.getTilesRandomly().peek();
+		int rad = (int) (Math.random()*10 +10);
+		
+		LinkedList<Tile> rainTiles = new LinkedList<Tile>();
+		
+		for(Tile t : this.getTiles()) {
+			if(Math.abs(t.getLocation().x - rainTile.getLocation().x) < rad) {
+				rainTiles.add(t);
 			}
-			if(tile.getHeight() >= snowLevel && tile.liquidType == LiquidType.WATER) {
-				tile.liquidType = LiquidType.ICE;
-			}
-			if(tile.getTerrain() != Terrain.ROCK) {
-				continue;
-			}
-			if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.DRY) {
-				tile.liquidType = LiquidType.WATER;
-				tile.liquidAmount += 0.001;
+			if(Math.abs(t.getLocation().y - rainTile.getLocation().y) < rad) {
+				rainTiles.add(t);
 			}
 		}
 		
+		for(Tile t : rainTiles) {
+			int i =  t.getLocation().x;
+			int j =  t.getLocation().y;
+			int dx = i - rainTile.getLocation().x;
+			int dy = j - rainTile.getLocation().y;
+			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
+				
+				if(distanceFromCenter < rad) {
+					t.liquidType = LiquidType.WATER;
+					t.liquidAmount += 0.01;
+					
+				}
+		
+		}
+		
+		System.out.println(String.format("raining, winterRatio=%." + Game.NUM_DEBUG_DIGITS + "f", winterRatio));
+		
+//		for(Tile tile : getTiles()) {
+//			double snowLevel = 1-(winterRatio* winter[tile.getLocation().y] + summerRatio*summer[tile.getLocation().y]);
+//			if(tile.liquidType != LiquidType.LAVA) {
+//				if(tile.getHeight() >= snowLevel) {
+//					int duration = (int) (400 * (tile.getHeight() - snowLevel)/(1-snowLevel));
+//					
+//					if(tile.liquidType == LiquidType.SNOW || tile.liquidType == LiquidType.DRY) {
+//						tile.liquidType = LiquidType.SNOW;
+//						tile.liquidAmount += 0.1;
+//					}
+//				}
+//			}
+//			if(tile.getHeight() >= snowLevel && tile.liquidType == LiquidType.WATER) {
+//				tile.liquidType = LiquidType.ICE;
+//			}
+//			if(tile.getTerrain() != Terrain.ROCK) {
+//				continue;
+//			}
+//			if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.DRY) {
+//				tile.liquidType = LiquidType.WATER;
+//				tile.liquidAmount += 0.001;
+//			}
+//		}
+		
 	}
+	
 	public void eruptVolcano() {
 		System.out.println("eruption");
 		this.get(volcano).liquidAmount += 500;
