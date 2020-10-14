@@ -47,15 +47,15 @@ public enum BuildingType implements HasImage {
 	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,50);  }},
 	 			null),
 	 	
-	 	GRANARY (500, 250, "resources/Images/buildings/granary.png", 0.25, true, 1,
+	 	GRANARY (250, 250, "resources/Images/buildings/granary.png", 0.25, true, 1,
 	 			"WHEEL",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200);  }},
 	 			null),
 	 	
-	 	WINDMILL (1000, 500, "resources/Images/buildings/ancientwindmill.png", 0.5, true, 1,
+	 	WINDMILL (500, 500, "resources/Images/buildings/ancientwindmill.png", 0.5, true, 1,
 	 			"MATHEMATICS",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.IRON_BAR,10); }},
 	 			null),
 	 	
-	 	SAWMILL (1000, 250, "resources/Images/buildings/sawmill.png", 0.5, true, 2,
+	 	SAWMILL (250, 250, "resources/Images/buildings/sawmill.png", 0.5, true, 2,
 				null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,50); put(ItemType.STONE,25);  }},
 				null),
 	 	
@@ -71,7 +71,7 @@ public enum BuildingType implements HasImage {
 	 			"MONARCHY",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,1000); put(ItemType.STONE,1000); put(ItemType.ADAMANTITE_BAR,20); }},
 	 			new LinkedList<UnitType>() {{add(UnitType.WORKER);}}),
 	 	
-	 	BARRACKS (1000, 250, "resources/Images/buildings/barracks256.png", 0.5, true, 1,
+	 	BARRACKS (500, 250, "resources/Images/buildings/barracks256.png", 0.5, true, 1,
 				"WARRIOR_CODE",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,300); put(ItemType.STONE,150);  }},
 				new LinkedList<UnitType>() {{add(UnitType.WARRIOR);add(UnitType.ARCHER);add(UnitType.HORSE);add(UnitType.HORSEARCHER);add(UnitType.KNIGHT);add(UnitType.SPEARMAN);add(UnitType.SWORDSMAN);add(UnitType.CHARIOT);add(UnitType.ARCHER);}}),	
 	 	
@@ -79,7 +79,7 @@ public enum BuildingType implements HasImage {
 				"MATHEMATICS",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.STONE,500); put(ItemType.IRON_BAR,10); }},
 				new LinkedList<UnitType>() {{add(UnitType.LONGBOWMAN); add(UnitType.CATAPULT); add(UnitType.TREBUCHET);}}),
 		
-		BLACKSMITH (1000, 250, "resources/Images/buildings/blacksmith.png", 0.5, true, 1,
+		BLACKSMITH (500, 250, "resources/Images/buildings/blacksmith.png", 0.5, true, 1,
 				"BRONZE_WORKING",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100); put(ItemType.STONE,100);  }},
 				null),
 		

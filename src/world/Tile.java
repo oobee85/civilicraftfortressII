@@ -19,7 +19,6 @@ public class Tile {
 	private TileLoc location;
 	private double height;
 	private double humidity;
-	private int tickLastTouchedWater = 0;
 	int minEntitySize = 20;
 
 	private String roadCorner;
@@ -69,21 +68,14 @@ public class Tile {
 	public void setHumidity(double set) {
 		humidity = set;
 	}
-	public void setWaterTouched(int tick) {
-		tickLastTouchedWater = tick;
-	}
 	public void updateHumidity(int currentTick) {
 		if(liquidType == LiquidType.WATER || liquidType == LiquidType.ICE ||  liquidType == LiquidType.SNOW) {
 			humidity += 1/(humidity + 1);
 			
 		}
-//			else if(liquidType == LiquidType.LAVA){
-//			humidity = 0;
-//		} else {
-//			int difference = currentTick - tickLastTouchedWater;
-//			if (difference != 0) {
-//				humidity -= (1 / difference / 100);
-//			}
+		if(liquidType == LiquidType.LAVA) {
+			humidity = 0;
+		}
 		
 		humidity -= 0.01;
 		if(humidity < 0) {

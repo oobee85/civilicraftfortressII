@@ -112,7 +112,7 @@ public class World {
 			double temperature = t.getTempurature();
 			if(temperature < Season.FREEZING_TEMPURATURE) {
 				t.liquidType = LiquidType.SNOW;
-				t.liquidAmount += 0.005;
+				t.liquidAmount += 0.01;
 			}
 			else {
 				t.liquidType = LiquidType.WATER;
