@@ -21,6 +21,7 @@ public class World {
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
 	public static final int TRANSITION_PERIOD = 100;
+	private static final double CHANCE_TO_SWITCH_TERRAIN = 0.05;
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
 	
@@ -50,7 +51,7 @@ public class World {
 	
 	private double bushRarity = 0.005;
 	private double waterPlantRarity = 0.05;
-	private double forestDensity = 0.2;
+	private double forestDensity = 0.3;
 
 	public TileLoc volcano;
 	
@@ -346,35 +347,28 @@ public class World {
 					}
 				}
 				if(failTiles >= 1) {
-					tile.setTerrain(Terrain.DIRT);
+					if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+						tile.setTerrain(Terrain.DIRT);
+					}
+					
 				}else if(failTiles < 1){
-					tile.setTerrain(Terrain.SAND);
+					if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+						tile.setTerrain(Terrain.SAND);
+					}
+					
 				}
 				
 			}else if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY) {
-				tile.setTerrain(Terrain.DIRT);
+				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+					tile.setTerrain(Terrain.DIRT);
+				}
 			}
 			if(tile.checkTerrain(Terrain.GRASS) && (tile.liquidType == LiquidType.SNOW || tile.liquidType == LiquidType.ICE) && tile.liquidAmount * tile.liquidType.getDamage() > 1) {
-				tile.setTerrain(Terrain.DIRT);
+				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+					tile.setTerrain(Terrain.DIRT);
+				}
+				
 			}
-//			if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY){
-//				tile.setTerrain(Terrain.DIRT);
-//			}
-//			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-//				
-//				if(tile.checkTerrain(Terrain.DIRT) || tile.checkTerrain(Terrain.GRASS)) {
-//					double chance = 0.001 * tile.liquidAmount * tile.liquidType.getDamage();
-//					if(Math.random() < chance) {
-////						tile.setTerrain(Terrain.SAND);
-//					}
-//				}
-//			}
-//			else if(tile.checkTerrain(Terrain.SAND) && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()){
-//				double chance = 0.001 * tile.liquidType.getDamage();
-//				if(Math.random() < chance) {
-//					tile.setTerrain(Terrain.GRASS);
-//				}
-//			}
 			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA 
 //					&& (tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.FIRE)
 					) {
@@ -397,7 +391,7 @@ public class World {
 						adjacentWater = true;
 					}
 				}
-				double threshold = 0;
+				double threshold = CHANCE_TO_SWITCH_TERRAIN;
 				if(tile.liquidType == LiquidType.WATER) {
 					threshold += 0.001;
 				}
@@ -410,8 +404,9 @@ public class World {
 				if(adjacentGrass && adjacentWater) {
 					threshold += 0.05;
 				}
-				if(Math.random() < tile.liquidAmount*threshold) {
+				if(tile.getTempurature() > Season.FREEZING_TEMPURATURE && Math.random() < tile.liquidAmount*threshold) {
 					tile.setTerrain(Terrain.GRASS);
+					
 				}
 			}
 		}

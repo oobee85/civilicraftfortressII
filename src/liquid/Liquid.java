@@ -98,7 +98,7 @@ public class Liquid {
 			}
 			
 			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount > tile.liquidType.surfaceTension*2) {
-				if(tile.checkTerrain(Terrain.GRASS) || tile.checkTerrain(Terrain.DIRT)) {
+				if(tile.getTerrain().isPlantable(tile.getTerrain())) {
 					tile.setTerrain(Terrain.BURNED_GROUND);
 				}
 				if(tile.getModifier() != null && tile.getModifier().getType().isCold(tile.getModifier().getType())) {
