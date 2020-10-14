@@ -1063,10 +1063,7 @@ public class Game {
 			g.setColor(new Color(0, 0, 0, 64));
 			g.drawRect(hoveredTile.x * Game.tileSize, hoveredTile.y * Game.tileSize, Game.tileSize-1, Game.tileSize-1);
 			g.drawRect(hoveredTile.x * Game.tileSize + 1, hoveredTile.y * Game.tileSize + 1, Game.tileSize - 3, Game.tileSize - 3);
-		
-			
 		}
-		
 	}
 
 	public void drawHitsplat(Graphics g, Thing thing) {
@@ -1851,6 +1848,12 @@ public class Game {
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
 		draw(g);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
+		if(researchTarget != null && !researchTarget.isUnlocked()) {
+			g.setFont(KUIConstants.infoFont);
+			double completedRatio = 1.0 * researchTarget.getPointsSpent() / researchTarget.getRequiredPoints();
+			String progress = String.format(researchTarget + " %d/%d", researchTarget.getPointsSpent(), researchTarget.getRequiredPoints());
+			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress, 4, 4, 400, 30);
+		}
 		Toolkit.getDefaultToolkit().sync();
 	}
 	
