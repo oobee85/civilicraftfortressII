@@ -120,9 +120,27 @@ public class Liquid {
 		int x = current.x;
 		int y = current.y;
 		
+		double tempurature = tile.getTempurature();
+		if(tempurature > Season.MELTING_TEMPURATURE) {
+			if(tile.liquidType == LiquidType.SNOW || tile.liquidType == LiquidType.ICE) {
+				tile.liquidType = LiquidType.WATER;
+				liquidTypesTemp[x][y] = LiquidType.WATER;
+			}
+		}
+		else if(tempurature < Season.FREEZING_TEMPURATURE) {
+			if(tile.liquidType == LiquidType.WATER) {
+				tile.liquidType = LiquidType.ICE;
+				liquidTypesTemp[x][y] = LiquidType.ICE;
+			}
+		}
+		
 		List<Tile> neighbors = Utils.getNeighbors(tile, world);
 		for(Tile otherTile : neighbors) {
 			TileLoc other = otherTile.getLocation();
+			LiquidType otype = liquidTypesTemp[other.x][other.y];
+			if(otype.viscosity == 0) {
+				continue;
+			}
 			double myh = tile.getHeight();
 			if(tile.hasWall() == true) {
 				myh += 0.1;
@@ -132,7 +150,6 @@ public class Liquid {
 			
 			double oh = otherTile.getHeight();
 			double ov = world.get(other).liquidAmount;
-			LiquidType otype = liquidTypesTemp[other.x][other.y];
 			
 			if(myh + myv < oh + ov) {
 				double delta = (oh + ov) - (myh + myv);
@@ -142,7 +159,7 @@ public class Liquid {
 					change = ov;
 				}
 				
-				if(otype == mytype || mytype == LiquidType.DRY) {
+				if(otype == mytype || mytype == LiquidType.DRY || (otype.isWater && mytype.isWater)) {
 					if(myv < MINIMUM_LIQUID_THRESHOLD && change < otype.surfaceTension) { 
 						change = 0;
 					}
@@ -155,14 +172,17 @@ public class Liquid {
 //						world.get(other).setHeight(world.get(other).getHeight() - changeh);
 //					}
 					liquidAmountsTemp[x][y] += change;
-					liquidTypesTemp[x][y] = otype;
+					if(mytype == LiquidType.DRY) {
+						liquidTypesTemp[x][y] = otype;
+					}
 					
 					liquidAmountsTemp[other.x][other.y] -= change;
 					world.get(other).liquidAmount -= change;
 				}
 				else {
-					if(otype == LiquidType.WATER && mytype == LiquidType.LAVA ||
-							otype == LiquidType.LAVA && mytype == LiquidType.WATER) {
+					// Subtractive combination
+					if(		(otype.isWater && mytype == LiquidType.LAVA) ||
+							(otype == LiquidType.LAVA && mytype.isWater)) {
 						if(change < otype.surfaceTension) { 
 							change = 0;
 						}

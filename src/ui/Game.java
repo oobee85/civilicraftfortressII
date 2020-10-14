@@ -1031,6 +1031,7 @@ public class Game {
 							List<String> strings = new LinkedList<String>();
 							strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
 							strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getHumidity()));
+							strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTempurature()));
 							
 							if(tile.liquidType != LiquidType.DRY) {
 								strings.add(String.format(tile.liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount));

@@ -55,6 +55,14 @@ public class Tile {
 	public static Tile makeTile(TileLoc location, Terrain t) {
 		return new Tile(location, t);
 	}
+	public double getTempurature() {
+		double season = Season.getSeason2();
+		double seasonTemp = 1 - ((1 - season) * Season.winter[getLocation().y] + season*Season.summer[getLocation().y]);
+		double heightTemp = 1 - height;
+		heightTemp = heightTemp*heightTemp;
+		double nightMultiplier = World.isNightTime() ? 0.9 : 1;
+		return (seasonTemp + heightTemp)*nightMultiplier/2;
+	}
 	public double getHumidity() {
 		return humidity;
 	}
@@ -77,7 +85,7 @@ public class Tile {
 //				humidity -= (1 / difference / 100);
 //			}
 		
-		humidity -= 0.02;
+		humidity -= 0.01;
 		if(humidity < 0) {
 			humidity = 0;
 		}
