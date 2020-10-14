@@ -1569,7 +1569,7 @@ public class Game {
 	private void unitTick() {
 		Item food = this.items.get(ItemType.FOOD);
 		Iterator<Unit> it = world.units.descendingIterator();
-		double cost = 0.5;
+		double cost = 0;
 		while(it.hasNext()) {
 			Unit unit = it.next();
 			unit.updateState();
