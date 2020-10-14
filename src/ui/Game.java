@@ -1567,12 +1567,25 @@ public class Game {
 	
 	
 	private void unitTick() {
-		for (Unit unit : world.units) {
+		Item food = this.items.get(ItemType.FOOD);
+		Iterator<Unit> it = world.units.descendingIterator();
+		double cost = 0.5;
+		while(it.hasNext()) {
+			Unit unit = it.next();
 			unit.updateState();
 			unit.planActions(world);
 			unit.doMovement(items);
 			unit.doAttacks(world);
 			unit.doPassiveThings(world);
+			if(Game.ticks % 60 == 0 && unit.isPlayerControlled()) {
+				if(food.getAmount() < cost) {
+					unit.setDead(true);
+				}
+				else {
+					food.addAmount(-(int)cost);
+				}
+				cost += 0.2;
+			}
 		}
 	}
 	
