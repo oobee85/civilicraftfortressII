@@ -198,9 +198,11 @@ public class Game {
 		// happens once every 100ms
 		ticks++;
 
+		if(ticks%10 == 0) {
+			doResearch();
+		}
 		if(ticks%20 == 0) {
 			updateTerritory();
-			doResearch();
 		}
 		
 		Liquid.propogate(world);
@@ -1163,7 +1165,7 @@ public class Game {
 	}
 	private void doResearch() {
 		if(researchTarget != null) {
-			researchTarget.spendResearch(50);
+			researchTarget.spendResearch(10);
 			if(researchTarget.isUnlocked()) {
 				guiController.updateGUI();
 			}

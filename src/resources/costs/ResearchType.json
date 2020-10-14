@@ -52,7 +52,7 @@
 	{
 		"name": "HORSEBACK_RIDING", 
 		"points": 300, "tier": 3,
-		"cost": {"HORSE": 50}, 
+		"cost": {"HORSE": 25}, 
 		"requirements": ["FARMING", "IRON_WORKING"],
 		"image": "resources/Images/research/horseback_riding.png"},
 	{
