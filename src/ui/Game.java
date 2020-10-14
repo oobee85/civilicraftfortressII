@@ -868,8 +868,8 @@ public class Game {
 			}
 			
 			for(Projectile p : world.projectiles) {
-				g.drawImage(p.getShadow(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 				int extra = (int) (Game.tileSize * p.getExtraSize());
+				g.drawImage(p.getShadow(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize - extra/2, p.getTile().getLocation().y * Game.tileSize - p.getHeight() - extra/2, Game.tileSize + extra, Game.tileSize + extra, null);
 			}
 			
@@ -1323,7 +1323,7 @@ public class Game {
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
 		Tile tile = world.get(loc);
 
-		System.out.println("left click");
+		System.out.println("left clicked on " + loc);
 		
 		//if a-click and the tile has a building or unit
 		if(aControl == true) {
@@ -1356,14 +1356,23 @@ public class Game {
 		
 		//planning building
 		if (selectedBuildingToPlan != null) {
-			System.out.println("planning building" + selectedBuildingToPlan.toString() + loc.toString());
+			System.out.println("planning building " + selectedBuildingToPlan.toString() + loc.toString());
 			if (selectedBuildingToPlan == BuildingType.IRRIGATION && tile.canPlant() == false) {
 				return;
 			}
 			if(tile.getHasBuilding() == true) {
 				return;
 			}
-			buildBuilding(selectedBuildingToPlan, tile);
+			if(buildBuilding(selectedBuildingToPlan, tile)) {
+				for(Thing thing : selectedThings) {
+					if(thing instanceof Unit) {
+						Unit unit = (Unit) thing;
+						if(unit.getType() == UnitType.WORKER) {
+							unit.setTargetTile(tile);
+						}
+					}
+				}
+			}
 			
 			if(shiftEnabled == false) {
 				selectedUnitToSpawn = null;
@@ -1638,7 +1647,7 @@ public class Game {
 		}
 	}
 
-	public void buildBuilding(BuildingType bt, Tile tile) {
+	public boolean buildBuilding(BuildingType bt, Tile tile) {
 		
 		//if passed in a tile, it builds it on the tile
 		if(tile != null) {
@@ -1649,15 +1658,14 @@ public class Game {
 				world.plannedBuildings.add(building);
 				building.setPlanned(true);
 				building.setHealth(1);
-				return;
+				return true;
 			}
 		}
 		
-		
 		//if not passed in tile, builds the building on each worker
+		boolean built = false;
 		for (Thing thing : selectedThings) {
 			if (thing != null && thing instanceof Unit && ((Unit) thing).getUnitType() == UnitType.WORKER) {
-
 				if(canBuild(bt, thing.getTile()) == true) {
 					chargePrice(bt);
 					Building building = new Building(bt, thing.getTile(), true);
@@ -1665,12 +1673,11 @@ public class Game {
 					world.buildings.add(building);
 					building.setPlanned(false);
 					building.setHealth(1);
-					
+					built = true;
 				}
-				
 			}
 		}
-		
+		return built;
 
 	}
 	public void setBuildingToPlan(BuildingType bt) {

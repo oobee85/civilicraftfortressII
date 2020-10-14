@@ -703,7 +703,8 @@ public class Frame extends JPanel {
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
 					BUILDING_BUTTON_SIZE);
 			button.addActionListener(e -> {
-				gameInstance.buildBuilding(type, null);
+//				gameInstance.buildBuilding(type, null);
+				gameInstance.setBuildingToPlan(type);
 				switchInfoPanel(new BuildingTypeInfoPanel(type));
 			});
 			button.addRightClickActionListener(e -> {
