@@ -57,6 +57,7 @@ public class KUIConstants {
 		b.setText(text);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
 		setComponentAttributes(b, size);
+		b.setOpaque(true);
 		return b;
 	}
 

@@ -1174,9 +1174,9 @@ public class Game {
 	
 	public void craftItem(ItemType type) {
 		
-		for (Map.Entry mapElement : type.getCost().entrySet()) {
-			ItemType key = (ItemType) mapElement.getKey();
-			Integer value = (Integer) mapElement.getValue();
+		for (Entry<ItemType, Integer> mapElement : type.getCost().entrySet()) {
+			ItemType key = mapElement.getKey();
+			Integer value = mapElement.getValue();
 
 			if (items.get(key).getAmount() < value) {
 				return;
@@ -1854,7 +1854,7 @@ public class Game {
 			g.setFont(KUIConstants.infoFont);
 			double completedRatio = 1.0 * researchTarget.getPointsSpent() / researchTarget.getRequiredPoints();
 			String progress = String.format(researchTarget + " %d/%d", researchTarget.getPointsSpent(), researchTarget.getRequiredPoints());
-			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress, 4, 4, 400, 30);
+			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress, 4, this.panelHeight - 30 - 4, this.panelWidth/3, 30);
 		}
 		Toolkit.getDefaultToolkit().sync();
 	}

@@ -66,7 +66,9 @@ public class Frame extends JPanel {
 	private JTabbedPane tabbedPane;
 	private JPanel guiSplitter;
 	private JComboBox<MapType> mapType;
+	private JPanel resourcePanel;
 	private JLabel[] resourceIndicators = new JLabel[ItemType.values().length];
+	private boolean[] resourceIndicatorsAdded = new boolean[ItemType.values().length];
 	private HashMap<JButton, Research> researchButtons = new HashMap<>();
 	private JButton[] buildingButtons = new JButton[BuildingType.values().length];
 	private JButton[] planningButtons = new JButton[BuildingType.values().length];
@@ -82,7 +84,7 @@ public class Frame extends JPanel {
 	private int my;
 	private boolean dragged = false;
 
-	private int RESOURCE_TAB;
+//	private int RESOURCE_TAB;
 	private int WORKER_TAB;
 	private int TECH_TAB;
 	private int BLACKSMITH_TAB;
@@ -175,7 +177,13 @@ public class Frame extends JPanel {
 			@Override
 			public void updateGUI() {
 				for (int i = 0; i < ItemType.values().length; i++) {
-					resourceIndicators[i].setText("" + gameInstance.getResourceAmount(ItemType.values()[i]));
+					int amount = gameInstance.getResourceAmount(ItemType.values()[i]);
+					resourceIndicators[i].setText("" + amount);
+					if(amount > 0 && !resourceIndicatorsAdded[i]) {
+						resourceIndicatorsAdded[i] = true;
+						gamepanel.add(resourceIndicators[i]);
+						gamepanel.revalidate();
+					}
 				}
 				for(Entry<JButton, Research> entry : researchButtons.entrySet()) {
 					JButton button = entry.getKey();
@@ -673,10 +681,10 @@ public class Frame extends JPanel {
 		int size = Integer.parseInt(mapSize.getText());
 		gameInstance.generateWorld((MapType) mapType.getSelectedItem(), size, easyModeButton.isSelected());
 
-		Dimension RESOURCE_BUTTON_SIZE = new Dimension(100, 35);
+		Dimension RESOURCE_BUTTON_SIZE = new Dimension(80, 30);
 		Dimension RESEARCH_BUTTON_SIZE = new Dimension(125, 35);
 		int BUILDING_ICON_SIZE = 25;
-		int RESOURCE_ICON_SIZE = 35;
+		int RESOURCE_ICON_SIZE = 25;
 
 		
 		workerMenu = new JPanel();
@@ -1050,13 +1058,10 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JPanel resourcePanel = new JPanel();
+		resourcePanel = new JPanel();
 		int RESOURCE_PANEL_WIDTH = 100;
 		resourcePanel.setPreferredSize(new Dimension(RESOURCE_PANEL_WIDTH, 1000));
 //		resourcePanel.setLayout(new BoxLayout(resourcePanel, BoxLayout.Y_AXIS));
-		for (JLabel label : resourceIndicators) {
-			resourcePanel.add(label);
-		}
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setPreferredSize(new Dimension(GUIWIDTH - RESOURCE_PANEL_WIDTH, 1000));
 		buttonPanel.add(tileSize);
@@ -1126,9 +1131,6 @@ public class Frame extends JPanel {
 		tabbedPane = new JTabbedPane();
 		tabbedPane.setFocusable(false);
 		tabbedPane.setFont(KUIConstants.buttonFontSmall);
-
-		RESOURCE_TAB = tabbedPane.getTabCount();
-		tabbedPane.addTab(null, RESOURCE_TAB_ICON, resourcePanel,"Does nothing");
 
 		TECH_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab("Tech Stuff", TECH_TAB_ICON, techView, "Does nothing");
