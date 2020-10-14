@@ -121,6 +121,9 @@ public class Projectile implements HasImage {
 	public Image getImage(int size) {
 		return hasImage.getImage(size);
 	}
+	public Image getShadow(int size) {
+		return hasImage.getShadow(size);
+	}
 	public ImageIcon getImageIcon(int size) {
 		return hasImage.getImageIcon(size);
 	}

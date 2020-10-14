@@ -125,6 +125,24 @@ public final class Utils {
 		return bimage;
 	}
 	
+	public static ImageIcon shadowFilter(ImageIcon icon) {
+		BufferedImage image = toBufferedImage(icon.getImage());
+		Color blank = new Color(0, 0, 0, 0);
+		for(int x = 0; x < image.getWidth(); x++) {
+			for(int y = 0; y < image.getHeight(); y++) {
+				Color c = new Color(image.getRGB(x, y), true);
+				if(c.getAlpha() > 0.1) {
+					int avg = (c.getRed() + c.getGreen() + c.getBlue())/255;
+					image.setRGB(x, y, new Color(avg, avg, avg, c.getAlpha()).getRGB());
+				}
+				else {
+					image.setRGB(x, y, blank.getRGB());
+				}
+			}
+		}
+		return new ImageIcon(image);
+	}
+	
 	public static Color getAverageColor(BufferedImage image) {
 		float sumr = 0;
 		float sumg = 0;

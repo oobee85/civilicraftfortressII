@@ -84,6 +84,10 @@ public class Research implements HasImage {
 		return mipmap.getImage(size);
 	}
 	@Override
+	public Image getShadow(int size) {
+		return mipmap.getShadow(size);
+	}
+	@Override
 	public ImageIcon getImageIcon(int size) {
 		return mipmap.getImageIcon(size);
 	}

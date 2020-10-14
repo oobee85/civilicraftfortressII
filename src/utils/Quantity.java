@@ -18,6 +18,10 @@ public class Quantity implements HasImage {
 		return hasImage.getImage(size);
 	}
 	@Override
+	public Image getShadow(int size) {
+		return hasImage.getShadow(size);
+	}
+	@Override
 	public ImageIcon getImageIcon(int size) {
 		return hasImage.getImageIcon(size);
 	}

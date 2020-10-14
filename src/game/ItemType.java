@@ -66,6 +66,10 @@ public enum ItemType implements HasImage {
 	public Image getImage(int size) {
 		return mipmap.getImage(size);
 	}
+	@Override
+	public Image getShadow(int size) {
+		return mipmap.getShadow(size);
+	}
 
 	@Override
 	public ImageIcon getImageIcon(int size) {

@@ -861,6 +861,7 @@ public class Game {
 			}
 			
 			for(Projectile p : world.projectiles) {
+				g.drawImage(p.getShadow(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
 				int extra = (int) (Game.tileSize * p.getExtraSize());
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize - extra/2, p.getTile().getLocation().y * Game.tileSize - p.getHeight() - extra/2, Game.tileSize + extra, Game.tileSize + extra, null);
 			}
