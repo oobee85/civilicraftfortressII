@@ -14,9 +14,9 @@ import utils.Utils;
 public enum ProjectileType implements HasImage {
 
 	
-		ARROW_LONGBOWMAN(30, 1, "resources/Images/projectiles/arrow.png", 1, 2, null),
+		ARROW_LONGBOWMAN(45, 1, "resources/Images/projectiles/arrow.png", 1, 2, null),
 		ARROW_ARCHER(15, 1, "resources/Images/projectiles/arrow.png", 1, 1, null),
-		RUNE_ARROW(50, 1, "resources/Images/projectiles/rune_arrow.png", 1, 2, null),
+		RUNE_ARROW(60, 1, "resources/Images/projectiles/rune_arrow.png", 1, 2, null),
 		ROCK_CATAPULT(200, 2, "resources/Images/itemicons/rock.png", 1, 3, null),
 		ROCK_CYCLOPS(80, 2, "resources/Images/itemicons/rock.png", 1, 2, null),
 		FIREBALL_DRAGON(100, 2, "resources/Images/projectiles/fireball2.png", 2, 3, null),

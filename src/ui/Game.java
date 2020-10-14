@@ -967,8 +967,8 @@ public class Game {
 				visited.put(unit.getTile(), count+1);
 					
 				//draws a square for every player unit on the tile
-				int xx = unit.getTile().getLocation().x * Game.tileSize + Game.tileSize - indicatorSize;
-				int yy = unit.getTile().getLocation().y * Game.tileSize + (indicatorSize + offset)*count;
+				int xx = unit.getTile().getLocation().x * Game.tileSize + offset;
+				int yy = unit.getTile().getLocation().y * Game.tileSize + (indicatorSize + offset)*count + offset;
 				if(unit.isPlayerControlled()) {
 					g.setColor(playerColor);
 				}
