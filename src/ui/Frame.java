@@ -519,6 +519,11 @@ public class Frame extends JPanel {
 						}
 					}
 				}
+				Color temp = g.getColor();
+				g.setColor(Color.black);
+				g.drawString("Day: " + gameInstance.getDays(), 5, 10 );
+				g.drawString("Night: " + gameInstance.getNights(), 50, 10 );
+				g.setColor(temp);
 			}
 			@Override
 			public void paintComponent(Graphics g) {

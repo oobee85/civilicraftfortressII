@@ -74,7 +74,8 @@ public class Game {
 	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
 	public static boolean DEBUG_DRAW = false;
 	public static boolean DISABLE_NIGHT = false;
-	
+	public static int days = 1;
+	public static int nights = 0;
 	public World world;
 	
 	
@@ -179,6 +180,7 @@ public class Game {
 		if(ticks >= 12000 && Math.random() < 0.00001) {
 			meteorStrike();
 		}
+		
 
 		// rain event
 		if(Math.random() < 0.008) {
@@ -195,7 +197,12 @@ public class Game {
 			}
 		}
 	}
-	
+	public int getDays() {
+		return days;
+	}
+	public int getNights() {
+		return nights;
+	}
 	public void gameTick() {
 		// Do all the game events like unit movement, time passing, building things, growing, etc
 		// happens once every 100ms
@@ -224,7 +231,12 @@ public class Game {
 		groundModifierTick();
 		
 		randomEvents();
-		
+		if(ticks % (world.DAY_DURATION + world.NIGHT_DURATION) == 0) {
+			days ++;
+		}
+		if((ticks + world.DAY_DURATION) % (world.DAY_DURATION + world.NIGHT_DURATION) == 0) {
+			nights ++;
+		}
 		// GUI updates
 		world.updateTerrainChange(world);
 		guiController.updateGUI();

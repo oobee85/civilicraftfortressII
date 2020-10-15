@@ -428,6 +428,9 @@ public class World {
 	
 	private void spreadForest() {
 		
+		if(plants.size() >= 3000) {
+			return;
+		}
 		for(Plant plant : plants) {
 			
 			if(plant.getPlantType() == PlantType.FOREST1) {
