@@ -72,7 +72,7 @@ public enum BuildingType implements HasImage {
 	 	
 	 	BARRACKS (500, 250, "resources/Images/buildings/barracks256.png", 0.5, true, 1,
 				"WARRIOR_CODE",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,300); put(ItemType.STONE,150);  }},
-				new String[] {"WARRIOR", "ARCHER", "HORSE", "HORSEARCHER", "KNIGHT", "SPEARMAN", "SWORDSMAN", "CHARIOT", "ARCHER"}),	
+				new String[] {"WARRIOR", "ARCHER", "HORSEARCHER", "KNIGHT", "SPEARMAN", "SWORDSMAN", "CHARIOT", "ARCHER"}),	
 	 	
 		WORKSHOP (1000, 500, "resources/Images/buildings/workshop.png", 0.5, true, 1,
 				"MATHEMATICS",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.STONE,500); put(ItemType.IRON_BAR,10); }},

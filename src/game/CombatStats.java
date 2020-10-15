@@ -1,11 +1,6 @@
 package game;
 
-import java.awt.Image;
-import java.awt.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import world.Tile;
+import java.util.*;
 
 public class CombatStats {
 
@@ -17,7 +12,7 @@ public class CombatStats {
 	private int ticksToBuild;
 	private int ticksToHeal;
 	private ArrayList<Integer> stats = new ArrayList<Integer>();
-	private List strings = new List();
+	private LinkedList<String> strings = new LinkedList<String>();
 	
 	/**
 	 * @param health
@@ -51,7 +46,7 @@ public class CombatStats {
 		stats.add(ticksToBuild);
 		stats.add(ticksToHeal);
 	}
-	public List getStrings() {
+	public LinkedList<String> getStrings() {
 		return strings;
 	}
 	public ArrayList<Integer> getStats() {

@@ -1742,7 +1742,7 @@ public class Game {
 					}
 				}
 
-				for (Map.Entry mapElement : rt.getCost().entrySet()) {
+				for (Entry<ItemType, Integer> mapElement : rt.getCost().entrySet()) {
 					ItemType key = (ItemType) mapElement.getKey();
 					Integer value = (Integer) mapElement.getValue();
 

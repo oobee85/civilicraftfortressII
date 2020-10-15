@@ -2,12 +2,12 @@ package ui;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.Map.*;
 import java.util.concurrent.*;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.border.*;
 
 import game.*;
@@ -72,7 +72,15 @@ public class Frame extends JPanel {
 	private HashMap<JButton, Research> researchButtons = new HashMap<>();
 	private JButton[] buildingButtons = new JButton[BuildingType.values().length];
 	private JButton[] planningButtons = new JButton[BuildingType.values().length];
-	private JButton[] unitButtons = new JButton[Game.unitTypeList.size()];
+	private class Pair {
+		public final JButton button;
+		public final UnitType unitType;
+		public Pair(JButton button, UnitType unitType) {
+			this.button = button;
+			this.unitType = unitType;
+		}
+	}
+	private LinkedList<Pair> unitButtons = new LinkedList<>();
 	private JButton[] craftButtons = new JButton[ItemType.values().length];
 	private JButton[] statButtons = new JButton[7];
 	
@@ -219,19 +227,14 @@ public class Frame extends JPanel {
 						button2.setVisible(false);
 					}
 				}
-				for (int i = 0; i < Game.unitTypeList.size(); i++) {
-					JButton button = unitButtons[i];
-					if (button == null) {
-						continue;
-					}
-					UnitType type = Game.unitTypeList.get(i);
-					ResearchRequirement req = gameInstance.unitResearchRequirements.get(type);
+				for(Pair pair : unitButtons) {
+					ResearchRequirement req = gameInstance.unitResearchRequirements.get(pair.unitType);
 					if (req.areRequirementsMet()) {
-						button.setEnabled(true);
-						button.setVisible(true);
+						pair.button.setEnabled(true);
+						pair.button.setVisible(true);
 					} else {
-						button.setEnabled(false);
-						button.setVisible(false);
+						pair.button.setEnabled(false);
+						pair.button.setVisible(false);
 					}
 				}
 				for (int i = 0; i < ItemType.values().length; i++) {
@@ -785,39 +788,12 @@ public class Frame extends JPanel {
 		
 		
 		castleView = new JPanel();
-		for (int i = 0; i < Game.unitTypeList.size(); i++) {
-			UnitType type = Game.unitTypeList.get(i);
-			if (type != Game.unitTypeMap.get("WORKER")) {
-				continue;
-			}
-			KButton button = KUIConstants.setupButton("Build " + type.toString(),
-					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
-			button.addActionListener(e -> {
-				gameInstance.tryToBuildUnit(type);
-			});
-			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new UnitTypeInfoPanel(type));
-			});
-			unitButtons[i] = button;
-			castleView.add(button);
-		}
+		Pair[] buttons = populateUnitTypeUI(castleView, BuildingType.CASTLE, BUILDING_ICON_SIZE);
+		Collections.addAll(unitButtons, buttons);
+		
 		workshopView = new JPanel();
-		for (int i = 0; i < Game.unitTypeList.size(); i++) {
-			UnitType type = Game.unitTypeList.get(i);
-			if (type != Game.unitTypeMap.get("CATAPULT") && type != Game.unitTypeMap.get("LONGBOWMAN") && type != Game.unitTypeMap.get("TREBUCHET")) {
-				continue;
-			}
-			KButton button = KUIConstants.setupButton("Build " + type.toString(),
-					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
-			button.addActionListener(e -> {
-				gameInstance.tryToBuildUnit(type);
-			});
-			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new UnitTypeInfoPanel(type));
-			});
-			unitButtons[i] = button;
-			workshopView.add(button);
-		}
+		buttons = populateUnitTypeUI(workshopView, BuildingType.WORKSHOP, BUILDING_ICON_SIZE);
+		Collections.addAll(unitButtons, buttons);
 		
 		researchLabView = new JPanel();
 		for (int i = 0; i < gameInstance.researchList.size(); i++) {
@@ -889,23 +865,8 @@ public class Frame extends JPanel {
 		}
 
 		barracksView = new JPanel();
-		for (int i = 0; i < Game.unitTypeList.size(); i++) {
-			UnitType type = Game.unitTypeList.get(i);
-			if (type.getCost() == null || type == Game.unitTypeMap.get("WORKER") || type == Game.unitTypeMap.get("CATAPULT") || type != Game.unitTypeMap.get("LONGBOWMAN") || type != Game.unitTypeMap.get("TREBUCHET")) {
-				continue;
-			}
-
-			KButton button = KUIConstants.setupButton("Build " + type.toString(),
-					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
-			button.addActionListener(e -> {
-				gameInstance.tryToBuildUnit(type);
-			});
-			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new UnitTypeInfoPanel(type));
-			});
-			unitButtons[i] = button;
-			barracksView.add(button);
-		}
+		buttons = populateUnitTypeUI(barracksView, BuildingType.BARRACKS, BUILDING_ICON_SIZE);
+		Collections.addAll(unitButtons, buttons);
 
 		for (int i = 0; i < ItemType.values().length; i++) {
 			ItemType type = ItemType.values()[i];
@@ -1099,17 +1060,17 @@ public class Frame extends JPanel {
 		statView = new JPanel();
 		for (int i = 0; i < gameInstance.getCombatBuffs().getStats().size(); i++) {
 			CombatStats combatBuffs = gameInstance.getCombatBuffs();
-			List strings = combatBuffs.getStrings();
+			LinkedList<String> strings = combatBuffs.getStrings();
 			int f = i;
 			
-			KButton button = KUIConstants.setupButton(strings.getItem(i) + ": " + combatBuffs.getStat(strings.getItem(i)), null, RESEARCH_BUTTON_SIZE);
+			KButton button = KUIConstants.setupButton(strings.get(i) + ": " + combatBuffs.getStat(strings.get(i)), null, RESEARCH_BUTTON_SIZE);
 			button.setEnabled(true);
 			button.addActionListener(e -> {
-				button.setText(strings.getItem(f) + ": " + combatBuffs.getStat(strings.getItem(f)));
-				System.out.println(strings.getItem(f) + ": " + combatBuffs.getStat(strings.getItem(f)));
+				button.setText(strings.get(f) + ": " + combatBuffs.getStat(strings.get(f)));
+				System.out.println(button.getText());
 				CombatStats cs = new CombatStats(0,0,0,0,0,0,0);
 				cs.getStats().set(f, cs.getStats().get(f)+1);
-				cs.add(strings.getItem(f), cs.getStats().get(f) );
+				cs.add(strings.get(f), cs.getStats().get(f) );
 				gameInstance.addCombatBuff(cs);
 				
 			});
@@ -1232,6 +1193,24 @@ public class Frame extends JPanel {
 			}
 		});
 		gameUIReady.release();
+	}
+	
+	public Pair[] populateUnitTypeUI(JPanel panel, BuildingType buildingType, int BUILDING_ICON_SIZE) {
+		Pair[] pairs = new Pair[buildingType.unitsCanBuild().length];
+		for(int i = 0; i < buildingType.unitsCanBuild().length; i++) {
+			UnitType type = Game.unitTypeMap.get(buildingType.unitsCanBuild()[i]);
+			KButton button = KUIConstants.setupButton("Build " + type.toString(),
+					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
+			button.addActionListener(e -> {
+				gameInstance.tryToBuildUnit(type);
+			});
+			button.addRightClickActionListener(e -> {
+				switchInfoPanel(new UnitTypeInfoPanel(type));
+			});
+			pairs[i] = new Pair(button, type);
+			panel.add(button);
+		}
+		return pairs;
 	}
 
 	public void exitGame() {
