@@ -434,7 +434,7 @@ public class World {
 				if(Math.random() < 0.01) {
 					
 					for(Tile tile : plant.getTile().getNeighbors()) {
-						if(tile.canPlant() && tile.getTempurature() > Season.FREEZING_TEMPURATURE && tile.getPlant() == null) {
+						if(tile.getPlant() == null && tile.canPlant() && tile.getTempurature() > Season.FREEZING_TEMPURATURE ) {
 							tile.setHasPlant(new Plant(PlantType.FOREST1, tile));
 							newPlants.add(tile.getPlant());
 							break;
