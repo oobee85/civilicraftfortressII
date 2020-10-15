@@ -60,6 +60,7 @@ public class Game {
 	private TileLoc hoveredTile;
 	private boolean showHeightMap;
 	private boolean shiftEnabled = false;
+	private boolean controlEnabled = false;
 	private boolean aControl = false;
 	
 	private volatile int panelWidth;
@@ -1428,6 +1429,12 @@ public class Game {
 			selectedBuildingToPlan = null;
 		}
 	}
+	public void controlPressed(boolean enabled) {
+		controlEnabled = enabled;
+	}
+	public boolean isControlDown() {
+		return controlEnabled;
+	}
 	public void aControl(boolean enabled) {
 		aControl = enabled;
 	}
@@ -1435,7 +1442,6 @@ public class Game {
 
 	public void toggleSelectionOnTile(Tile tile) {
 //		Thing selectionCandidate = tile.getPlayerControlledThing();
-		ConcurrentLinkedQueue<Unit> unitsOnTile = tile.getUnits();
 		Building building = tile.getBuilding();
 		
 		//deselects everything if shift isnt enabled
@@ -1453,11 +1459,7 @@ public class Game {
 			selectedThings.add(building);
 		}
 		//goes through all the units on the tile and checks if they are selected
-		for(Unit candidate : unitsOnTile) {
-			if (candidate == null) {
-				return;
-			}
-			
+		for(Unit candidate : tile.getUnits()) {
 			// clicking on tile w/o shift i.e only selects top unit
 			if (candidate.isPlayerControlled()) {
 				//shift disabled -> selects top unit
@@ -1473,16 +1475,10 @@ public class Game {
 					selectedThings.add(candidate);
 				}
 			}
-			
 			// clicking on tile with one unit
 //			if (selectedThings.contains(candidate) && selectedThings.size() == 0) {
 //				deselectOneThing(candidate);
 //			}
-			
-			
-			
-			
-			
 		}
 		
 		
@@ -1516,27 +1512,23 @@ public class Game {
 		world.spawnExplosion(thing.getTile(), 1, 10000);
 	}
 	public void deselectOneThing(Thing deselect) {
-		for(Thing thing : selectedThings) {
-			if (thing != null) {
+		selectedThings.remove(deselect);
+		deselect.setIsSelected(false);
+		if(deselect instanceof Unit) {
+			guiController.selectedUnit((Unit)deselect, false);
+		}
+	}
+	public void deselectOtherThings(Thing keep) {
+		for (Thing thing : selectedThings) {
+			if(thing != keep) {
 				thing.setIsSelected(false);
-				if (thing instanceof Unit) {
-
-					Unit selectedUnit = (Unit) thing;
-					if (selectedUnit.getUnitType().isBuilder()) {
-						guiController.selectedUnit(null, false);
-					}
-					
-					thing = null;
+				if(thing instanceof Unit) {
+					guiController.selectedUnit((Unit)thing, false);
 				}
-				if (thing instanceof Building) {
-					guiController.selectedBuilding((Building) thing, false);
-					thing = null;
-				}
-			
-				
 			}
 		}
-		
+		selectedThings.clear();
+		selectedThings.add(keep);
 	}
 
 	public void deselectThings() {
@@ -1545,10 +1537,7 @@ public class Game {
 				thing.setIsSelected(false);
 				
 				if (thing instanceof Unit) {
-					Unit selectedUnit = (Unit) thing;
-					if (selectedUnit.getUnitType().isBuilder()) {
-						guiController.selectedUnit(null, false);
-					}
+					guiController.selectedUnit((Unit) thing, false);
 				}
 				if (thing instanceof Building) {
 					guiController.selectedBuilding((Building) thing, false);

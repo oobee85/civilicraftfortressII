@@ -82,6 +82,8 @@ public class Frame extends JPanel {
 	private JButton[] craftButtons = new JButton[ItemType.values().length];
 	private JButton[] statButtons = new JButton[7];
 	
+	private HashMap<Thing, JButton> selectedButtons = new HashMap<>();
+	
 	private JTextField mapSize;
 	private int WIDTH;
 	private int HEIGHT;
@@ -156,12 +158,33 @@ public class Frame extends JPanel {
 					return;
 				}
 				if(selected) {
+					if(!selectedButtons.containsKey(unit)) {
+						JButton button = KUIConstants.setupButton(null, unit.getImageIcon(0), null);
+						button.addActionListener(e -> {
+							if(gameInstance.isControlDown()) {
+								gameInstance.deselectOneThing(unit);
+							}
+							else {
+								gameInstance.deselectOtherThings(unit);
+							}
+						});
+						selectedButtons.put(unit, button);
+						gamepanel.add(button);
+						gamepanel.revalidate();
+					}
 					UnitInfoPanel infoPanel = new UnitInfoPanel(unit);
 					switchInfoPanel(infoPanel);
 					SwingUtilities.invokeLater(() -> {
 						infoPanel.addButton("Explode").addActionListener(e -> gameInstance.explode(unit));
 						infoPanel.addButton("Road everything").addActionListener(e -> gameInstance.workerRoad());
 					});
+				}
+				else {
+					if(selectedButtons.containsKey(unit)) {
+						JButton button = selectedButtons.remove(unit);
+						gamepanel.remove(button);
+						gamepanel.revalidate();
+					}
 				}
 				if(unit.getType().isBuilder()) {
 					manageBuildingTab(selected);
@@ -430,12 +453,18 @@ public class Frame extends JPanel {
 				if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
 					gameInstance.shiftControl(false);
 				}
+				else if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
+					gameInstance.controlPressed(false);
+				}
 			}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
 					gameInstance.shiftControl(true);
+				}
+				else if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
+					gameInstance.controlPressed(true);
 				}
 				if(e.getKeyCode() == KeyEvent.VK_A) {
 					gameInstance.aControl(true);
