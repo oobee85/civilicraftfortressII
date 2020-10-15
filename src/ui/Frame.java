@@ -8,20 +8,18 @@ import java.util.concurrent.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
-import javax.swing.border.*;
 
 import game.*;
-import ui.MainMenuBackground.*;
 import ui.infopanels.*;
 import utils.*;
 import world.*;
 
 public class Frame extends JPanel {
 	public static final Color BACKGROUND_COLOR = new Color(200, 200, 200);
-	int GUIWIDTH = 350;
-	int MINIMAPBORDERWIDTH = 40;
+	public static final int GUIWIDTH = 350;
+	public static final int MINIMAPBORDERWIDTH = 40;
 	
-	public static final long MILLISECONDS_PER_TICK = 100;
+	public static final int MILLISECONDS_PER_TICK = 100;
 	private static final String TITLE = "civilicraftfortressII";
 
 	public static final Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
@@ -107,6 +105,7 @@ public class Frame extends JPanel {
 	private int SPAWN_TAB;
 
 	private Thread gameLoopThread;
+	private Thread terrainImageThread;
 	
 	private Semaphore gameUIReady = new Semaphore(0);
 
@@ -480,50 +479,54 @@ public class Frame extends JPanel {
 	private void setupMinimapPanel() {
 		minimapPanel = new JPanel() {
 			private void drawSunMoon(Graphics g) {
+				int padding = 5;
+				g.setFont(KUIConstants.infoFontSmaller);
+				String dayCounter = "Day: " + gameInstance.getDays() + "   Night: " + gameInstance.getNights();
+				g.setColor(Color.white);
+				g.drawString(dayCounter, padding-1, g.getFont().getSize() + padding-1 );
+				g.setColor(Color.black);
+				g.drawString(dayCounter, padding, g.getFont().getSize() + padding );
+				
 				int offset = gameInstance.world.getCurrentDayOffset() + World.TRANSITION_PERIOD;
-				int pathwidth = getWidth() - 40;
-				int pathheight = getHeight() - 40;
+				int pathwidth = getWidth() - Frame.MINIMAPBORDERWIDTH;
+				int pathheight = getHeight() - Frame.MINIMAPBORDERWIDTH;
 				int totallength = 2*pathwidth + 2*pathheight;
 				offset = totallength*offset / (World.DAY_DURATION + World.NIGHT_DURATION);
 				Image sun = gameInstance.getTimeImage(true);
 				Image moon = gameInstance.getTimeImage(false);
+				int imagesize = Frame.MINIMAPBORDERWIDTH - padding*2;
 				if(offset < pathheight) {
-					g.drawImage(sun, 5, 5 + pathheight - offset, 30, 30, null);
-					g.drawImage(moon, 5 + pathwidth, 5 + offset, 30, 30, null);
+					g.drawImage(sun, padding, padding + pathheight - offset, imagesize, imagesize, null);
+					g.drawImage(moon, padding + pathwidth, padding + offset, imagesize, imagesize, null);
 				}
 				else {
 					offset -= pathheight;
 					if(offset < pathwidth) {
-						g.drawImage(sun, 5 + offset, 5, 30, 30, null);
-						g.drawImage(moon, 5 + pathwidth - offset, 5 + pathheight, 30, 30, null);
+						g.drawImage(sun, padding + offset, padding, imagesize, imagesize, null);
+						g.drawImage(moon, padding + pathwidth - offset, padding + pathheight, imagesize, imagesize, null);
 					}
 					else {
 						offset -= pathwidth;
 						if(offset < pathheight) {
-							g.drawImage(sun, 5 + pathwidth, 5 + offset, 30, 30, null);
-							g.drawImage(moon, 5, 5 + pathheight - offset, 30, 30, null);
+							g.drawImage(sun, padding + pathwidth, padding + offset, imagesize, imagesize, null);
+							g.drawImage(moon, padding, padding + pathheight - offset, imagesize, imagesize, null);
 						}
 						else {
 							offset -= pathheight;
 							if(offset < pathwidth) {
-								g.drawImage(sun, 5 + pathwidth - offset, 5 + pathheight, 30, 30, null);
-								g.drawImage(moon, 5 + offset, 5, 30, 30, null);
+								g.drawImage(sun, padding + pathwidth - offset, padding + pathheight, imagesize, imagesize, null);
+								g.drawImage(moon, padding + offset, padding, imagesize, imagesize, null);
 							}
 							else {
 								offset -= pathwidth;
 								if(offset < pathheight) {
-									g.drawImage(sun, 5, 5 + pathheight - offset, 30, 30, null);
-									g.drawImage(moon, 5 + pathwidth, 5 + offset, 30, 30, null);
+									g.drawImage(sun, padding, padding + pathheight - offset, imagesize, imagesize, null);
+									g.drawImage(moon, padding + pathwidth, padding + offset, imagesize, imagesize, null);
 								}
 							}
 						}
 					}
 				}
-				Color temp = g.getColor();
-				g.setColor(Color.black);
-				g.drawString("Day: " + gameInstance.getDays(), 5, 10 );
-				g.drawString("Night: " + gameInstance.getNights(), 50, 10 );
-				g.setColor(temp);
 			}
 			@Override
 			public void paintComponent(Graphics g) {
@@ -659,6 +662,7 @@ public class Frame extends JPanel {
 		frame.repaint();
 		gameLoopThread.start();
 		repaintingThread.start();
+		terrainImageThread.start();
 	}
 	private void runGame() {
 		System.err.println("Starting Game");
@@ -1170,10 +1174,25 @@ public class Frame extends JPanel {
 		
 //		frame.setVisible(true);
 
-		repaintingThread = new Timer(30, new ActionListener() {
+		repaintingThread = new Timer(MILLISECONDS_PER_TICK, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				frame.repaint();
+			}
+		});
+		terrainImageThread = new Thread(() -> {
+			try {
+				while (true) {
+					long start = System.currentTimeMillis();
+					gameInstance.updateTerrainImages();
+					long elapsed = System.currentTimeMillis() - start;
+					long sleeptime = MILLISECONDS_PER_TICK - elapsed;
+					if(sleeptime > 0) {
+						Thread.sleep(sleeptime);
+					}
+				}
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
 			}
 		});
 
@@ -1188,7 +1207,7 @@ public class Frame extends JPanel {
 					if(Game.ticks % 10 == 0) {
 						frame.setTitle(TITLE + " " + elapsed);
 					}
-					long sleeptime = 100 - elapsed;
+					long sleeptime = MILLISECONDS_PER_TICK - elapsed;
 					if(sleeptime > 0 && !gameInstance.shouldFastForward()) {
 						Thread.sleep(sleeptime);
 					}

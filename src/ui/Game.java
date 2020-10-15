@@ -28,9 +28,9 @@ public class Game {
 	private Image sunIcon = Utils.loadImage("resources/Images/interfaces/sun.png");
 	
 	private int skipUntilTick;
-	private BufferedImage terrainImage;
-	private BufferedImage minimapImage;
-	private BufferedImage heightMapImage;
+	private volatile BufferedImage terrainImage;
+	private volatile BufferedImage minimapImage;
+	private volatile BufferedImage heightMapImage;
 	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
 	private UnitType selectedUnitToSpawn;
 	private BuildingType selectedBuildingToSpawn;
@@ -238,7 +238,6 @@ public class Game {
 		// GUI updates
 		world.updateTerrainChange(world);
 		guiController.updateGUI();
-		updateTerrainImages();
 	}
 	public void addCombatBuff(CombatStats cs) {
 		combatBuffs.combine(cs);
