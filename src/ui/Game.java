@@ -1550,7 +1550,6 @@ public class Game {
 					if (selectedUnit.getUnitType().isBuilder()) {
 						guiController.selectedUnit(null, false);
 					}
-
 				}
 				if (thing instanceof Building) {
 					guiController.selectedBuilding((Building) thing, false);
@@ -1560,6 +1559,9 @@ public class Game {
 			selectedThings.remove(thing);
 		}
 		selectedThings.clear();
+		selectedBuildingToPlan = null;
+		selectedBuildingToSpawn = null;
+		selectedUnitToSpawn = null;
 	}
 
 	public void spawnUnit(boolean show) {
