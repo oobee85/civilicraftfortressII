@@ -144,7 +144,7 @@ public class Game {
 		if(ticks == 1) {
 			world.rain();
 		}
-		if(ticks >= 10 && Math.random() < 0.0005) {
+		if(Math.random() < 0.0005) {
 			world.spawnAnimal(UnitType.WATER_SPIRIT, world.getTilesRandomly().getFirst());
 		}
 		if(ticks >= 1000 && Math.random() < 0.001) {
@@ -153,10 +153,10 @@ public class Game {
 		if(ticks >= 3000 && Math.random() < 0.0005) {
 			world.spawnAnimal(UnitType.BOMB, world.getTilesRandomly().getFirst());
 		}
-		if(ticks >= 6000 && Math.random() < 0.0005) {
+		if(ticks >= 6000 && Math.random() < 0.0005 ) {
 			world.spawnWerewolf();
 		}
-		if(ticks >= 3000 && Math.random() < 0.0005) {
+		if(ticks >= 3000 && Math.random() < 0.0005 ) {
 			world.spawnLavaGolem();
 			world.spawnIceGiant();
 		}

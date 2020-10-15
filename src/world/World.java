@@ -59,6 +59,9 @@ public class World {
 		tileList = new LinkedList<>();
 		tileListRandom = new LinkedList<>();
 	}
+	public int getTerritorySize() {
+		return territory.size();
+	}
 	public void addToTerritory(Tile tile) {
 		territory.add(tile);
 	}
@@ -337,38 +340,49 @@ public class World {
 		for(Tile tile : getTiles()) {
 			tile.updateHumidity(Game.ticks);
 			
+			//spreads desert tiles
 			if(tile.getTerrain().isPlantable(tile.getTerrain()) && tile.getHumidity() <= DESERT_HUMIDITY) {
 				int failTiles = 0;
 				
 				for(Tile t : tile.getNeighbors()) {
-					//if the other tiles nearby arent turning into desert either
-					if(t.getHumidity() > DESERT_HUMIDITY + 0.01) {
+					//count how many neighbors is a failed tile
+					if(t.getHumidity() > DESERT_HUMIDITY + 0.01 || t.getTerrain() == Terrain.GRASS) {
 						failTiles ++;
 					}
 				}
-				if(failTiles >= 1) {
+				//if one neighbor fails, make the tile dirt
+				if(failTiles == 1) {
 					if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
 						tile.setTerrain(Terrain.DIRT);
 					}
-					
-				}else if(failTiles < 1){
+				//if all neighbors are eligible for desert, convert tile to desert
+				}else if(failTiles == 0){
 					if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
 						tile.setTerrain(Terrain.SAND);
 					}
 					
 				}
-				
+			//turns the tile back into dirt if its above desert humidity
 			}else if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY) {
 				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
 					tile.setTerrain(Terrain.DIRT);
 				}
 			}
+			//turns grass into dirt if the tile has a cold liquid
 			if(tile.checkTerrain(Terrain.GRASS) && (tile.liquidType == LiquidType.SNOW || tile.liquidType == LiquidType.ICE) && tile.liquidAmount * tile.liquidType.getDamage() > 1) {
 				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
 					tile.setTerrain(Terrain.DIRT);
 				}
 				
 			}
+			//turns tile into dirt if its very cold
+			if(tile.checkTerrain(Terrain.GRASS) && tile.getTempurature() < Season.FREEZING_TEMPURATURE * 0.75) {
+				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+					tile.setTerrain(Terrain.DIRT);
+				}
+				
+			}
+			
 			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA 
 //					&& (tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.FIRE)
 					) {
@@ -396,17 +410,16 @@ public class World {
 					threshold += 0.001;
 				}
 				if(adjacentGrass) {
-					threshold += 0.005;
+					threshold += 0.01;
 				}
 				if(adjacentWater) {
-					threshold += 0.005;
+					threshold += 0.01;
 				}
 				if(adjacentGrass && adjacentWater) {
-					threshold += 0.05;
+					threshold += 0.1;
 				}
-				if(tile.getTempurature() > Season.FREEZING_TEMPURATURE && Math.random() < tile.liquidAmount*threshold) {
+				if(tile.getTempurature() > Season.FREEZING_TEMPURATURE && Math.random() < tile.liquidAmount*threshold*tile.getHumidity()) {
 					tile.setTerrain(Terrain.GRASS);
-					
 				}
 			}
 		}
