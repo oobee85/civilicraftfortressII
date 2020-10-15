@@ -273,11 +273,13 @@ public class Unit extends Thing  {
 			}
 		}
 		if(!attacked && isPlayerControlled()) {
-			for(Unit enemyUnit : world.getHostileUnitsInTerritory()){
-				if(!inRange(enemyUnit)) {
-					continue;
+			HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getType().getCombatStats().getAttackRadius());
+			for(Tile tile : inrange) {
+				for(Unit unit : tile.getUnits()) {
+					if(unit.getType().isHostile()) {
+						Attack.tryToAttack(this, unit);
+					}
 				}
-				Attack.tryToAttack(this, enemyUnit);
 			}
 		}
 	}

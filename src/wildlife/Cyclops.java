@@ -41,7 +41,6 @@ public class Cyclops extends Animal {
 //			return;
 //		}
 //		return;
-		setTarget(null);
 	}
 	
 	

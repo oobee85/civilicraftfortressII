@@ -220,8 +220,6 @@ public class Game {
 		// Remove dead things
 		world.clearDeadAndAddNewThings();
 		
-		world.addUnitsInTerritory();
-		
 		buildingTick();
 		unitTick();
 		world.doProjectileUpdates();

@@ -44,11 +44,6 @@ public class World {
 	public LinkedList<GroundModifier> groundModifiers = new LinkedList<>();
 	private LinkedList<GroundModifier> newGroundModifiers = new LinkedList<>();
 	
-	public HashSet<Unit> unitsInTerritory = new HashSet<Unit>();
-	
-	
-	
-	
 	
 	private double bushRarity = 0.005;
 	private double waterPlantRarity = 0.05;
@@ -91,12 +86,6 @@ public class World {
 		return tiles[loc.x][loc.y];
 	}
 
-	public LinkedList<Unit> getHostileUnitsInTerritory(){
-		
-		return unitsInTerritory.stream()
-				.filter(e -> e.getType().isHostile() && e.isPlayerControlled() == false).collect(Collectors.toCollection(LinkedList::new));
-		
-	}
 	public void drought() {
 		for(Tile tile : getTiles()) {
 			tile.liquidAmount = 0;
@@ -133,19 +122,6 @@ public class World {
 		
 //		world[volcano].liquidType = LiquidType.WATER;
 //		world[volcano].liquidAmount += 200;
-	}
-	
-	public void addUnitsInTerritory() {
-		HashSet<Unit> unitsInTerritoryNew = new HashSet<Unit>();
-		
-		for(Tile tile : territory) {
-			if(tile.getUnits() != null) {
-				unitsInTerritoryNew.addAll(tile.getUnits());
-			}
-			
-		}
-		unitsInTerritory = unitsInTerritoryNew;
-//		System.out.println("Units in territory"+ unitsInTerritory.size());
 	}
 	
 	public void spawnOgre() {
@@ -504,23 +480,6 @@ public class World {
 					if(projectile.getTile().getHasBuilding() == true) {
 						projectile.getTile().getBuilding().takeDamage(projectile.getType().getDamage());
 					}
-				}
-			}
-		}
-	}
-	
-	public void doUnitAttacks() {
-		for (Unit unit : units) {
-			boolean attacked = false;
-			if(unit.getTarget() != null) {
-				attacked = Attack.tryToAttack(unit, unit.getTarget());
-			}
-			if(!attacked) {
-				for(Unit enemyUnit : getHostileUnitsInTerritory()){
-					if(!unit.inRange(enemyUnit)) {
-						continue;
-					}
-					Attack.tryToAttack(unit, enemyUnit);
 				}
 			}
 		}
