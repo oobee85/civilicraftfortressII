@@ -9,7 +9,7 @@
 	{
 		"image":"resources/Images/units/warrior.png",
 		"cost":{"WOOD":50,"FOOD":50},
-		"stats":{"movespeed":15,"attackspeed":30,"attack":10,"buildtime":50,"range":1,"health":200,"healspeed":50},
+		"stats":{"movespeed":15,"attackspeed":30,"attack":10,"buildtime":50,"range":1,"health":100,"healspeed":50},
 		"name":"WARRIOR",
 		"attributes":[]},
 	{
@@ -128,7 +128,7 @@
 		"image":"resources/Images/units/dragon.png",
 		"stats":{"movespeed":5,"attackspeed":30,"attack":50,"buildtime":0,"range":1,"health":2000,"healspeed":10},
 		"name":"DRAGON",
-		"attributes":["flying","hostile","fireresistant"],
+		"attributes":["flying","hostile","fireresistant","coldresistant"],
 		"loot":{"RUNITE_ORE":10},
 		"projectile":"FIREBALL_DRAGON"},
 	{
@@ -153,7 +153,7 @@
 		"image":"resources/Images/units/ent.png",
 		"stats":{"movespeed":50,"attackspeed":50,"attack":25,"buildtime":0,"range":1,"health":1000,"healspeed":10},
 		"name":"ENT",
-		"attributes":["hostile"],
+		"attributes":["hostile","coldresistant"],
 		"loot":{"WOOD":500}},
 	{
 		"image":"resources/Images/units/werewolf.png",
@@ -184,7 +184,7 @@
 		"image":"resources/Images/units/skeleton.png",
 		"stats":{"movespeed":20,"attackspeed":20,"attack":20,"buildtime":0,"range":1,"health":200,"healspeed":50},
 		"name":"SKELETON",
-		"attributes":["hostile"],
+		"attributes":["hostile","coldresistant"],
 		"loot":{"BRONZE_BAR":1}},
 	{
 		"image":"resources/Images/units/icegiant.png",
@@ -212,7 +212,7 @@
 		"image":"resources/Images/units/firefly.png",
 		"stats":{"movespeed":25,"attackspeed":1000,"attack":0,"buildtime":0,"range":1,"health":1,"healspeed":50},
 		"name":"FIREFLY",
-		"attributes":[]},
+		"attributes":["flying"]},
 	{
 		"image":"resources/Images/units/bomb.png",
 		"stats":{"movespeed":25,"attackspeed":1000,"attack":0,"buildtime":0,"range":1,"health":1,"healspeed":50},
