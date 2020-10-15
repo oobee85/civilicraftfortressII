@@ -1156,25 +1156,19 @@ public class Game {
 			int y = thing.getTile().getLocation().y * Game.tileSize + 1;
 			int w = Game.tileSize - 1;
 			int h = Game.tileSize / 4 - 1;
-			int greenBarWidth = (int) (thing.getHealth() / thing.getMaxHealth() * (w - 4));
-			int greenBarHeight = h - 4;
-			if (thing.isSideHealthBar()) {
-				int temp = w;
-				w = h;
-				h = temp;
-				temp = greenBarWidth;
-				greenBarWidth =greenBarHeight;
-				greenBarHeight = temp;
-			}
-			g.setColor(Color.BLACK);
-			g.fillRect(x, y, w, h);
-			
-			g.setColor(Color.RED);
-			g.fillRect(x + 2, y + 2, w - 4, h - 4);
-
-			g.setColor(Color.GREEN);
-			g.fillRect(x + 2, y + 2, greenBarWidth, greenBarHeight);
+			drawHealthBar2(g, thing, x, y, w, h, 2, thing.getHealth() / thing.getMaxHealth());
 		}
+	}
+	public static void drawHealthBar2(Graphics g, Thing thing, int x, int y, int w, int h, int thickness, double ratio) {
+		g.setColor(Color.BLACK);
+		g.fillRect(x, y, w, h);
+		
+		g.setColor(Color.RED);
+		g.fillRect(x + thickness, y + thickness, w - thickness*2, h - thickness*2);
+
+		int greenBarWidth = (int) (ratio * (w - thickness*2));
+		g.setColor(Color.GREEN);
+		g.fillRect(x + thickness, y + thickness, greenBarWidth, h - thickness*2);
 	}
 	private void updateTerritory() {
 		for(Building building : world.buildings) {
@@ -1445,15 +1439,12 @@ public class Game {
 		Building building = tile.getBuilding();
 		
 		//deselects everything if shift isnt enabled
-		if (shiftEnabled == false) {
+		if (shiftEnabled == false && !controlEnabled) {
 			deselectThings();
 		}
 		
 		//selects the building on the tile
 		if(building != null && building.getIsPlayerControlled() && tile.getPlayerControlledUnit() == null) {
-			if (shiftEnabled == false) {
-				deselectThings();
-			}
 			guiController.selectedBuilding(building, true);
 			building.setIsSelected(true);
 			selectedThings.add(building);
@@ -1462,17 +1453,18 @@ public class Game {
 		for(Unit candidate : tile.getUnits()) {
 			// clicking on tile w/o shift i.e only selects top unit
 			if (candidate.isPlayerControlled()) {
-				//shift disabled -> selects top unit
-				if (shiftEnabled == false) {
-					candidate.setIsSelected(true);
-					guiController.selectedUnit(candidate, true);
-					selectedThings.add(candidate);
-					break;
-				}else {
+				if (shiftEnabled) {
 					//shift enabled -> selects whole stack
 					candidate.setIsSelected(true);
 					guiController.selectedUnit(candidate, true);
 					selectedThings.add(candidate);
+				}
+				else {
+					//shift disabled -> selects top unit
+					candidate.setIsSelected(true);
+					guiController.selectedUnit(candidate, true);
+					selectedThings.add(candidate);
+					break;
 				}
 			}
 			// clicking on tile with one unit

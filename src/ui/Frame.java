@@ -159,7 +159,7 @@ public class Frame extends JPanel {
 				}
 				if(selected) {
 					if(!selectedButtons.containsKey(unit)) {
-						JButton button = KUIConstants.setupButton(null, unit.getImageIcon(0), null);
+						JButton button = setupUnitButton(unit);
 						button.addActionListener(e -> {
 							if(gameInstance.isControlDown()) {
 								gameInstance.deselectOneThing(unit);
@@ -291,6 +291,28 @@ public class Frame extends JPanel {
 				}
 			}
 		});
+	}
+	
+	private JButton setupUnitButton(Unit unit) {
+		KButton button = new KButton(null, unit.getImageIcon(0)) {
+			@Override
+			public void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				Game.drawHealthBar2(g, unit, 0, getHeight() - 6, getWidth(), 6, 1, unit.getHealth()/unit.getMaxHealth());
+			}
+		};
+		button.setMargin(KUIConstants.zeroMargin);
+		button.setHorizontalAlignment(SwingConstants.CENTER);
+		KUIConstants.setComponentAttributes(button, null);
+		button.addActionListener(e -> {
+			if(gameInstance.isControlDown()) {
+				gameInstance.deselectOneThing(unit);
+			}
+			else {
+				gameInstance.deselectOtherThings(unit);
+			}
+		});
+		return button;
 	}
 	
 	private void menu() {
