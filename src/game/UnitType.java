@@ -1,7 +1,6 @@
 package game;
 import java.awt.Color;
 import java.awt.Image;
-import java.awt.Window.Type;
 import java.util.HashMap;
 
 import javax.swing.ImageIcon;
@@ -9,7 +8,6 @@ import javax.swing.ImageIcon;
 import utils.HasImage;
 import utils.MipMap;
 import utils.Utils;
-import world.ResourceType;
 
 public enum UnitType implements HasImage {
 	
@@ -58,6 +56,7 @@ public enum UnitType implements HasImage {
 	;
 	
 	private MipMap mipmap;
+	public String image;
     private CombatStats combatStats;
 	private boolean isAquatic;
 	private boolean isFlying;
@@ -81,6 +80,7 @@ public enum UnitType implements HasImage {
     
     UnitType( String s, CombatStats cs, boolean isAquatic, boolean isFlying, boolean isHostile, boolean isColdResist, boolean isFireResist, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, Item deadItem, ProjectileType projectileType) {
     	mipmap = new MipMap(s);
+    	this.image = s;
     	this.combatStats = cs;
 		this.isAquatic = isAquatic;
 		this.isFlying = isFlying;

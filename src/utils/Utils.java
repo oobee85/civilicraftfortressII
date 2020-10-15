@@ -60,6 +60,9 @@ public final class Utils {
 		else if(o instanceof ResourceType) {
 			rawName = ((ResourceType)o).name();
 		}
+		else if(o instanceof ProjectileType) {
+			rawName = ((ProjectileType)o).name();
+		}
 		else if(o instanceof Terrain) {
 			rawName = ((Terrain)o).name();
 		}

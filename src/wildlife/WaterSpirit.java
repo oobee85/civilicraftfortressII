@@ -4,6 +4,7 @@ import java.util.*;
 
 import game.*;
 import liquid.*;
+import ui.*;
 import world.*;
 
 public class WaterSpirit extends Animal {
@@ -25,11 +26,13 @@ public class WaterSpirit extends Animal {
 	@Override
 	public void updateState() {
 		super.updateState();
-		if(getTile().liquidType == LiquidType.DRY) {
-			getTile().liquidType = LiquidType.WATER;
-		}
-		if(getTile().liquidType == LiquidType.WATER) {
-			getTile().liquidAmount += 0.003;
+		if(Game.ticks % 20 == 0) {
+			if(getTile().liquidType == LiquidType.DRY) {
+				getTile().liquidType = LiquidType.WATER;
+			}
+			if(getTile().liquidType == LiquidType.WATER) {
+				getTile().liquidAmount += 0.06;
+			}
 		}
 	}
 

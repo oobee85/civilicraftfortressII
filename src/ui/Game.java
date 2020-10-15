@@ -45,6 +45,9 @@ public class Game {
 	HashMap<ItemType, Item> items = new HashMap<ItemType, Item>();
 	ArrayList<Research> researchList = new ArrayList<>();
 	HashMap<String, Research> researchMap = new HashMap<>();
+
+	public static final ArrayList<UnitType2> unitTypeList = new ArrayList<>();
+	public static final HashMap<String, UnitType2> unitTypeMap = new HashMap<>();
 	
 	HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
 	HashMap<UnitType, ResearchRequirement> unitResearchRequirements = new HashMap<>();
@@ -90,6 +93,8 @@ public class Game {
 			items.put(itemType, item);
 		}
 		Loader.setupResearch(researchMap, researchList);
+		Loader.writeUnitTypes();
+		Loader.loadUnitType(unitTypeMap, unitTypeList);
 		for(BuildingType type : BuildingType.values()) {
 			// make a new researchrequirement object
 			ResearchRequirement req = new ResearchRequirement();

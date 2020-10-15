@@ -17,7 +17,8 @@ public class World {
 
 	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 5;
 	public static final double TERRAIN_SNOW_LEVEL = 1;
-	public static final double DESERT_HUMIDITY = 0.001;
+//	public static final double DESERT_HUMIDITY = 0.001;
+	public static final double DESERT_HUMIDITY = 2;
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
 	public static final int TRANSITION_PERIOD = 100;
