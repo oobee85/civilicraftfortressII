@@ -70,7 +70,7 @@ public class UnitType implements HasImage {
 		return this.getCombatStats().getAttackRadius() > 1;
 	}
 	public boolean isBuilder() {
-		return name.equals("WORKER");
+		return attributes.contains("builder");
 	}
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;

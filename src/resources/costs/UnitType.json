@@ -5,7 +5,7 @@
 		"cost":{"FOOD":10},
 		"stats":{"movespeed":15,"attackspeed":20,"attack":0,"buildtime":30,"range":1,"health":100,"healspeed":50},
 		"name":"WORKER",
-		"attributes":[]},
+		"attributes":["builder"]},
 	{
 		"image":"resources/Images/units/warrior.png",
 		"cost":{"WOOD":50,"FOOD":50},

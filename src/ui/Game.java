@@ -1370,7 +1370,7 @@ public class Game {
 				for(Thing thing : selectedThings) {
 					if(thing instanceof Unit) {
 						Unit unit = (Unit) thing;
-						if(unit.getType() == Game.unitTypeMap.get("WORKER")) {
+						if(unit.getType().isBuilder()) {
 							unit.setTargetTile(tile);
 						}
 					}
@@ -1486,7 +1486,7 @@ public class Game {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;
 				
-				if(unit.getType() == Game.unitTypeMap.get("WORKER")) {
+				if(unit.getType().isBuilder()) {
 					for(Tile tile : world.territory) {
 						if(tile.getRoad() == null) {
 							unit.addToPath(tile);
@@ -1513,7 +1513,7 @@ public class Game {
 				if (thing instanceof Unit) {
 
 					Unit selectedUnit = (Unit) thing;
-					if (selectedUnit.getUnitType() == Game.unitTypeMap.get("WORKER")) {
+					if (selectedUnit.getUnitType().isBuilder()) {
 						guiController.selectedUnit(null, false);
 					}
 					
@@ -1537,7 +1537,7 @@ public class Game {
 				
 				if (thing instanceof Unit) {
 					Unit selectedUnit = (Unit) thing;
-					if (selectedUnit.getUnitType() == Game.unitTypeMap.get("WORKER")) {
+					if (selectedUnit.getUnitType().isBuilder()) {
 						guiController.selectedUnit(null, false);
 					}
 
@@ -1668,7 +1668,7 @@ public class Game {
 		//if not passed in tile, builds the building on each worker
 		boolean built = false;
 		for (Thing thing : selectedThings) {
-			if (thing != null && thing instanceof Unit && ((Unit) thing).getUnitType() == Game.unitTypeMap.get("WORKER")) {
+			if (thing != null && thing instanceof Unit && ((Unit) thing).getUnitType().isBuilder()) {
 				if(canBuild(bt, thing.getTile()) == true) {
 					chargePrice(bt);
 					Building building = new Building(bt, thing.getTile(), true);
@@ -1732,8 +1732,7 @@ public class Game {
 	public void buildRoad(RoadType rt) {
 		
 		for(Thing thing : selectedThings) {
-			if (thing != null && thing instanceof Unit
-					&& ((Unit) thing).getUnitType() == Game.unitTypeMap.get("WORKER")) {
+			if (thing != null && thing instanceof Unit && ((Unit) thing).getUnitType().isBuilder()) {
 				for (Entry<ItemType, Integer> mapElement : rt.getCost().entrySet()) {
 					ItemType key = (ItemType) mapElement.getKey();
 					Integer value = (Integer) mapElement.getValue();

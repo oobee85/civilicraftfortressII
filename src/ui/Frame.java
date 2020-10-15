@@ -156,7 +156,7 @@ public class Frame extends JPanel {
 						infoPanel.addButton("Road everything").addActionListener(e -> gameInstance.workerRoad());
 					});
 				}
-				if(unit.getType() == Game.unitTypeMap.get("WORKER")) {
+				if(unit.getType().isBuilder()) {
 					manageBuildingTab(selected);
 				}
 				frame.repaint();
