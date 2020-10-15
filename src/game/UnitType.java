@@ -60,6 +60,12 @@ public class UnitType implements HasImage {
 	public boolean isFireResist() {
 		return attributes.contains("fireresistant");
 	}
+	public boolean hasLifeSteal() {
+		return attributes.contains("lifesteal");
+	}
+	public boolean isMigratory() {
+		return attributes.contains("migratory");
+	}
 	public boolean isRanged() {
 		return this.getCombatStats().getAttackRadius() > 1;
 	}
@@ -68,9 +74,6 @@ public class UnitType implements HasImage {
 	}
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;
-	}
-	public boolean hasLifeSteal() {
-		return name.equals("VAMPIRE");
 	}
 
 	@Override

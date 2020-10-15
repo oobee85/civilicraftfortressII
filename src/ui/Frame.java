@@ -759,7 +759,6 @@ public class Frame extends JPanel {
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
-			unitButtons[i] = button;
 			spawnMenu.add(button);
 		}
 		for (int i = 0; i < BuildingType.values().length; i++) {
