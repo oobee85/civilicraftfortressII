@@ -125,10 +125,6 @@ public class Unit extends Thing  {
 		getTile().removeUnit(this);
 		t.addUnit(this);
 		this.setTile(t);
-		
-		if(this.getUnitType() == UnitType.ENT && t.canPlant() == true) {
-			t.setTerrain(Terrain.GRASS);
-		}
 		return true;
 	}
 	

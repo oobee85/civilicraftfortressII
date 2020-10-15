@@ -3,12 +3,13 @@ package wildlife;
 import java.util.*;
 
 import game.*;
+import ui.*;
 import world.*;
 
 public class Ogre extends Animal {
 
 	public Ogre(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.OGRE, tile, isPlayerControlled);
+		super(Game.unitTypeMap.get("OGRE"), tile, isPlayerControlled);
 	}
 
 	@Override

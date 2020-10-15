@@ -3,12 +3,13 @@ package wildlife;
 import java.util.*;
 
 import game.*;
+import ui.*;
 import world.Tile;
 
 public class Cyclops extends Animal {
 
 	public Cyclops(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.CYCLOPS, tile, isPlayerControlled);
+		super(Game.unitTypeMap.get("CYCLOPS"), tile, isPlayerControlled);
 	}
 
 	@Override

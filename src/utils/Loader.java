@@ -35,7 +35,7 @@ public class Loader {
 		}
 		return map;
 	}
-	public static void loadUnitType(HashMap<String, UnitType2> unitTypeMap, ArrayList<UnitType2> unitTypeList) {
+	public static void loadUnitType(HashMap<String, UnitType> unitTypeMap, ArrayList<UnitType> unitTypeList) {
 		String unitTypeString = readFile("resources/costs/UnitType.json");
 		System.out.println("Loaded :" + unitTypeString);
 		JSONObject obj = new JSONObject(unitTypeString);
@@ -89,77 +89,77 @@ public class Loader {
 				projectile = ProjectileType.valueOf(unitTypeObject.getString("projectile"));
 			}
 			
-			UnitType2 unitType = new UnitType2(name, image, combatStats, attributes, researchReq, cost, item, projectile);
+			UnitType unitType = new UnitType(name, image, combatStats, attributes, researchReq, cost, item, projectile);
 			unitTypeMap.put(name, unitType);
 			unitTypeList.add(unitType);
 		}
 	}
 	
 	public static void writeUnitTypes() {
-		JSONObject obj = new JSONObject();
-		for(UnitType u : UnitType.values()) {
-			JSONObject unitObject = new JSONObject();
-			
-			unitObject.accumulate("name", u.name());
-			
-			unitObject.accumulate("image", u.image);
-			
-			JSONObject statsObject = new JSONObject();
-			statsObject.accumulate("attack", u.getCombatStats().getAttack());
-			statsObject.accumulate("range", u.getCombatStats().getAttackRadius());
-			statsObject.accumulate("attackspeed", u.getCombatStats().getAttackSpeed());
-			statsObject.accumulate("healspeed", u.getCombatStats().getHealSpeed());
-			statsObject.accumulate("health", u.getCombatStats().getHealth());
-			statsObject.accumulate("movespeed", u.getCombatStats().getMoveSpeed());
-			statsObject.accumulate("buildtime", u.getCombatStats().getTicksToBuild());
-			unitObject.accumulate("stats", statsObject);
-			
-			JSONArray attributeArray = new JSONArray();
-			if(u.isAquatic()) {
-				attributeArray.put("aquatic");
-			}
-			if(u.isFlying()) {
-				attributeArray.put("flying");
-			}
-			if(u.isHostile()) {
-				attributeArray.put("hostile");
-			}
-			if(u.isColdResist()) {
-				attributeArray.put("coldresistant");
-			}
-			if(u.isFireResist()) {
-				attributeArray.put("fireresistant");
-			}
-			unitObject.put("attributes", attributeArray);
-			
-			if(u.getResearchRequirement() != null) {
-				unitObject.accumulate("research", u.getResearchRequirement());
-			}
-			if(u.getCost() != null && !u.getCost().isEmpty()) {
-				JSONObject costObject = new JSONObject();
-				for(Entry<ItemType, Integer> entry : u.getCost().entrySet()) {
-					costObject.accumulate(entry.getKey().name(), entry.getValue());
-				}
-				unitObject.accumulate("cost", costObject);
-			}
-			if(u.getDeadItem() != null) {
-				JSONObject lootObject = new JSONObject();
-				lootObject.accumulate(u.getDeadItem().getType().name(), u.getDeadItem().getAmount());
-				unitObject.accumulate("loot", lootObject);
-			}
-			if(u.getProjectileType() != null) {
-				unitObject.accumulate("projectile", u.getProjectileType().name());
-			}
-			
-			obj.accumulate("unittypes", unitObject);
-		}
-		String arr = obj.toString();
-		System.out.println(arr);
-		try(FileWriter fw = new FileWriter("UnitType.json"); BufferedWriter bw = new BufferedWriter(fw);) {
-			bw.write(arr);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		JSONObject obj = new JSONObject();
+//		for(UnitType u : UnitType.values()) {
+//			JSONObject unitObject = new JSONObject();
+//			
+//			unitObject.accumulate("name", u.name());
+//			
+//			unitObject.accumulate("image", u.image);
+//			
+//			JSONObject statsObject = new JSONObject();
+//			statsObject.accumulate("attack", u.getCombatStats().getAttack());
+//			statsObject.accumulate("range", u.getCombatStats().getAttackRadius());
+//			statsObject.accumulate("attackspeed", u.getCombatStats().getAttackSpeed());
+//			statsObject.accumulate("healspeed", u.getCombatStats().getHealSpeed());
+//			statsObject.accumulate("health", u.getCombatStats().getHealth());
+//			statsObject.accumulate("movespeed", u.getCombatStats().getMoveSpeed());
+//			statsObject.accumulate("buildtime", u.getCombatStats().getTicksToBuild());
+//			unitObject.accumulate("stats", statsObject);
+//			
+//			JSONArray attributeArray = new JSONArray();
+//			if(u.isAquatic()) {
+//				attributeArray.put("aquatic");
+//			}
+//			if(u.isFlying()) {
+//				attributeArray.put("flying");
+//			}
+//			if(u.isHostile()) {
+//				attributeArray.put("hostile");
+//			}
+//			if(u.isColdResist()) {
+//				attributeArray.put("coldresistant");
+//			}
+//			if(u.isFireResist()) {
+//				attributeArray.put("fireresistant");
+//			}
+//			unitObject.put("attributes", attributeArray);
+//			
+//			if(u.getResearchRequirement() != null) {
+//				unitObject.accumulate("research", u.getResearchRequirement());
+//			}
+//			if(u.getCost() != null && !u.getCost().isEmpty()) {
+//				JSONObject costObject = new JSONObject();
+//				for(Entry<ItemType, Integer> entry : u.getCost().entrySet()) {
+//					costObject.accumulate(entry.getKey().name(), entry.getValue());
+//				}
+//				unitObject.accumulate("cost", costObject);
+//			}
+//			if(u.getDeadItem() != null) {
+//				JSONObject lootObject = new JSONObject();
+//				lootObject.accumulate(u.getDeadItem().getType().name(), u.getDeadItem().getAmount());
+//				unitObject.accumulate("loot", lootObject);
+//			}
+//			if(u.getProjectileType() != null) {
+//				unitObject.accumulate("projectile", u.getProjectileType().name());
+//			}
+//			
+//			obj.accumulate("unittypes", unitObject);
+//		}
+//		String arr = obj.toString();
+//		System.out.println(arr);
+//		try(FileWriter fw = new FileWriter("UnitType.json"); BufferedWriter bw = new BufferedWriter(fw);) {
+//			bw.write(arr);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	public static void setupResearch(HashMap<String, Research> researches, ArrayList<Research> researchList) {

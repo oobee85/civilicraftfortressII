@@ -3,12 +3,13 @@ package wildlife;
 import java.util.*;
 
 import game.*;
+import ui.*;
 import world.*;
 
 public class Flamelet extends Animal {
 
 	public Flamelet(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.FLAMELET, tile, isPlayerControlled);
+		super(Game.unitTypeMap.get("FLAMELET"), tile, isPlayerControlled);
 	}
 	
 	@Override

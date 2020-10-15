@@ -3,6 +3,7 @@ package wildlife;
 import java.util.*;
 
 import game.*;
+import ui.*;
 import utils.*;
 import world.*;
 
@@ -12,7 +13,7 @@ public class Parasite extends Animal {
 	private Tile volcano;
 
 	public Parasite(Tile tile, boolean isPlayerControlled, Tile volcano) {
-		super(UnitType.PARASITE, tile, isPlayerControlled);
+		super(Game.unitTypeMap.get("PARASITE"), tile, isPlayerControlled);
 		this.volcano = volcano;
 	}
 	
@@ -54,7 +55,7 @@ public class Parasite extends Animal {
 	}
 	
 	private void transformBack() {
-		this.setType(UnitType.PARASITE);
+		this.setType(Game.unitTypeMap.get("PARASITE"));
 		this.setHealth(1);
 		this.setMaxHealth(1);
 		transformed = false;

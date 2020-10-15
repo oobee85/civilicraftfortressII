@@ -3,12 +3,13 @@ package wildlife;
 import java.util.*;
 
 import game.*;
+import ui.*;
 import world.*;
 
 public class Vampire extends Animal {
 
 	public Vampire(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.VAMPIRE, tile, isPlayerControlled);
+		super(Game.unitTypeMap.get("VAMPIRE"), tile, isPlayerControlled);
 	}
 
 	@Override

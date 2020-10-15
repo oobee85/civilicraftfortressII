@@ -4,13 +4,14 @@ import java.util.*;
 
 import game.*;
 import liquid.LiquidType;
+import ui.*;
 import utils.Thing;
 import world.*;
 
 public class IceGiant extends Animal {
 	
 	public IceGiant(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.ICE_GIANT, tile, isPlayerControlled);
+		super(Game.unitTypeMap.get("ICE_GIANT"), tile, isPlayerControlled);
 	}
 	
 	@Override

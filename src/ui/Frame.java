@@ -72,7 +72,7 @@ public class Frame extends JPanel {
 	private HashMap<JButton, Research> researchButtons = new HashMap<>();
 	private JButton[] buildingButtons = new JButton[BuildingType.values().length];
 	private JButton[] planningButtons = new JButton[BuildingType.values().length];
-	private JButton[] unitButtons = new JButton[UnitType.values().length];
+	private JButton[] unitButtons = new JButton[Game.unitTypeList.size()];
 	private JButton[] craftButtons = new JButton[ItemType.values().length];
 	private JButton[] statButtons = new JButton[7];
 	
@@ -156,9 +156,8 @@ public class Frame extends JPanel {
 						infoPanel.addButton("Road everything").addActionListener(e -> gameInstance.workerRoad());
 					});
 				}
-				if(unit.getType() == UnitType.WORKER) {
+				if(unit.getType() == Game.unitTypeMap.get("WORKER")) {
 					manageBuildingTab(selected);
-					
 				}
 				frame.repaint();
 			}
@@ -220,13 +219,12 @@ public class Frame extends JPanel {
 						button2.setVisible(false);
 					}
 				}
-				
-				for (int i = 0; i < UnitType.values().length; i++) {
+				for (int i = 0; i < Game.unitTypeList.size(); i++) {
 					JButton button = unitButtons[i];
 					if (button == null) {
 						continue;
 					}
-					UnitType type = UnitType.values()[i];
+					UnitType type = Game.unitTypeList.get(i);
 					ResearchRequirement req = gameInstance.unitResearchRequirements.get(type);
 					if (req.areRequirementsMet()) {
 						button.setEnabled(true);
@@ -749,8 +747,8 @@ public class Frame extends JPanel {
 		}
 		
 		spawnMenu = new JPanel();
-		for (int i = 0; i < UnitType.values().length; i++) {
-			UnitType type = UnitType.values()[i];
+		for (int i = 0; i < Game.unitTypeList.size(); i++) {
+			UnitType type = Game.unitTypeList.get(i);
 			KButton button = KUIConstants.setupButton(null,
 					Utils.resizeImageIcon(type.getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width/1.2), (int)(SPAWN_BUTTON_SIZE.height/1.2)),
 					SPAWN_BUTTON_SIZE);
@@ -787,11 +785,10 @@ public class Frame extends JPanel {
 		spawnMenu.add(toggle);
 		
 		
-		castleView = new JPanel() {
-		};
-		for (int i = 0; i < UnitType.values().length; i++) {
-			UnitType type = UnitType.values()[i];
-			if (type != UnitType.WORKER) {
+		castleView = new JPanel();
+		for (int i = 0; i < Game.unitTypeList.size(); i++) {
+			UnitType type = Game.unitTypeList.get(i);
+			if (type != Game.unitTypeMap.get("WORKER")) {
 				continue;
 			}
 			KButton button = KUIConstants.setupButton("Build " + type.toString(),
@@ -805,11 +802,10 @@ public class Frame extends JPanel {
 			unitButtons[i] = button;
 			castleView.add(button);
 		}
-		workshopView = new JPanel() {
-		};
-		for (int i = 0; i < UnitType.values().length; i++) {
-			UnitType type = UnitType.values()[i];
-			if (type != UnitType.CATAPULT && type != UnitType.LONGBOWMAN && type != UnitType.TREBUCHET) {
+		workshopView = new JPanel();
+		for (int i = 0; i < Game.unitTypeList.size(); i++) {
+			UnitType type = Game.unitTypeList.get(i);
+			if (type != Game.unitTypeMap.get("CATAPULT") && type != Game.unitTypeMap.get("LONGBOWMAN") && type != Game.unitTypeMap.get("TREBUCHET")) {
 				continue;
 			}
 			KButton button = KUIConstants.setupButton("Build " + type.toString(),
@@ -893,11 +889,10 @@ public class Frame extends JPanel {
 				hellforgeView.add(button);
 		}
 
-		barracksView = new JPanel() {
-		};
-		for (int i = 0; i < UnitType.values().length; i++) {
-			UnitType type = UnitType.values()[i];
-			if (type == UnitType.WORKER || type.getCost() == null || type == UnitType.CATAPULT || type == UnitType.LONGBOWMAN || type == UnitType.TREBUCHET) {
+		barracksView = new JPanel();
+		for (int i = 0; i < Game.unitTypeList.size(); i++) {
+			UnitType type = Game.unitTypeList.get(i);
+			if (type.getCost() == null || type == Game.unitTypeMap.get("WORKER") || type == Game.unitTypeMap.get("CATAPULT") || type != Game.unitTypeMap.get("LONGBOWMAN") || type != Game.unitTypeMap.get("TREBUCHET")) {
 				continue;
 			}
 
@@ -1021,14 +1016,14 @@ public class Frame extends JPanel {
 				gameInstance.world.spawnOgre();
 				gameInstance.world.spawnDragon();
 				gameInstance.world.spawnWerewolf();
-				gameInstance.world.spawnAnimal(UnitType.FLAMELET, gameInstance.world.getTilesRandomly().getFirst());
-				gameInstance.world.spawnAnimal(UnitType.WATER_SPIRIT, gameInstance.world.getTilesRandomly().getFirst());
-				gameInstance.world.spawnAnimal(UnitType.PARASITE, gameInstance.world.getTilesRandomly().getFirst());
+				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("FLAMELET"), gameInstance.world.getTilesRandomly().getFirst());
+				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("WATER_SPIRIT"), gameInstance.world.getTilesRandomly().getFirst());
+				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), gameInstance.world.getTilesRandomly().getFirst());
 				gameInstance.world.spawnEnt();
 				gameInstance.world.spawnLavaGolem();
 				gameInstance.world.spawnIceGiant();
 				gameInstance.world.spawnSkeletonArmy();
-				gameInstance.world.spawnAnimal(UnitType.BOMB, gameInstance.world.getTilesRandomly().getFirst());
+				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("BOMB"), gameInstance.world.getTilesRandomly().getFirst());
 				gameInstance.spawnOrcs();
 			}
 		});
@@ -1164,7 +1159,7 @@ public class Frame extends JPanel {
 		tabbedPane.insertTab("Research Lab", RESEARCHLAB_TAB_ICON, researchLabView, "Does nothing", RESEARCHLAB_TAB);
 		
 		SPAWN_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Spawner", Utils.resizeImageIcon(UnitType.ARCHER.getImageIcon(0), 20, 20), spawnMenu,
+		tabbedPane.insertTab("Spawner", Utils.resizeImageIcon(Game.unitTypeMap.get("ARCHER").getImageIcon(0), 20, 20), spawnMenu,
 				"Does nothing", SPAWN_TAB);
 
 		DEBUG_TAB = tabbedPane.getTabCount();

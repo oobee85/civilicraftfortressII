@@ -3,12 +3,13 @@ package wildlife;
 import java.util.*;
 
 import game.*;
-import world.Tile;
+import ui.*;
+import world.*;
 
 public class Ent extends Animal {
 
 	public Ent(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.ENT, tile, isPlayerControlled);
+		super(Game.unitTypeMap.get("ENT"), tile, isPlayerControlled);
 	}
 
 	@Override
@@ -19,6 +20,15 @@ public class Ent extends Animal {
 	@Override
 	public boolean wantsToAttack() {
 		return true;
+	}
+	
+	@Override
+	public boolean moveTo(Tile t) {
+		boolean moved = super.moveTo(t);
+		if(moved && t.canPlant() == true) {
+			t.setTerrain(Terrain.GRASS);
+		}
+		return moved;
 	}
 	
 	@Override

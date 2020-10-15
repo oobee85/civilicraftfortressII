@@ -3,6 +3,7 @@ package wildlife;
 import java.util.*;
 
 import game.*;
+import ui.*;
 import utils.Thing;
 import world.*;
 
@@ -11,7 +12,7 @@ public class Werewolf extends Animal {
 	boolean transformed = false;
 	
 	public Werewolf(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.WEREWOLF, tile, isPlayerControlled);
+		super(Game.unitTypeMap.get("WEREWOLF"), tile, isPlayerControlled);
 	}
 
 	private void transformBack(Unit host) {
@@ -23,9 +24,9 @@ public class Werewolf extends Animal {
 	}
 	
 	private void transform() {
-		this.setType(UnitType.WEREWOLF);
+		this.setType(Game.unitTypeMap.get("WEREWOLF"));
 //		this.setHealth(UnitType.WEREWOLF.getCombatStats().getHealth());
-		this.setMaxHealth(UnitType.WEREWOLF.getCombatStats().getHealth());
+		this.setMaxHealth(getType().getCombatStats().getHealth());
 		transformed = true;
 	}
 	

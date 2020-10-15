@@ -3,12 +3,13 @@ package wildlife;
 import java.util.*;
 
 import game.*;
+import ui.*;
 import world.*;
 
 public class LavaGolem extends Animal {
 
 	public LavaGolem(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.LAVAGOLEM, tile, isPlayerControlled);
+		super(Game.unitTypeMap.get("LAVAGOLEM"), tile, isPlayerControlled);
 	}
 	
 	@Override

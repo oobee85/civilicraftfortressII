@@ -3,12 +3,13 @@ package wildlife;
 import java.util.*;
 
 import game.*;
+import ui.*;
 import world.*;
 
 public class Bomb extends Animal {
 
 	public Bomb(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.BOMB, tile, isPlayerControlled);
+		super(Game.unitTypeMap.get("BOMB"), tile, isPlayerControlled);
 	}
 	
 	@Override

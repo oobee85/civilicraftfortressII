@@ -46,8 +46,8 @@ public class Game {
 	ArrayList<Research> researchList = new ArrayList<>();
 	HashMap<String, Research> researchMap = new HashMap<>();
 
-	public static final ArrayList<UnitType2> unitTypeList = new ArrayList<>();
-	public static final HashMap<String, UnitType2> unitTypeMap = new HashMap<>();
+	public static final ArrayList<UnitType> unitTypeList = new ArrayList<>();
+	public static final HashMap<String, UnitType> unitTypeMap = new HashMap<>();
 	
 	HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
 	HashMap<UnitType, ResearchRequirement> unitResearchRequirements = new HashMap<>();
@@ -93,8 +93,6 @@ public class Game {
 			items.put(itemType, item);
 		}
 		Loader.setupResearch(researchMap, researchList);
-		Loader.writeUnitTypes();
-		Loader.loadUnitType(unitTypeMap, unitTypeList);
 		for(BuildingType type : BuildingType.values()) {
 			// make a new researchrequirement object
 			ResearchRequirement req = new ResearchRequirement();
@@ -108,7 +106,7 @@ public class Game {
 			// put it in the hashmap
 			buildingResearchRequirements.put(type, req);
 		}
-		for(UnitType type : UnitType.values()) {
+		for(UnitType type : Game.unitTypeList) {
 			// make a new researchrequirement object
 			ResearchRequirement req = new ResearchRequirement();
 			// only add requirement if it isnt null
@@ -150,13 +148,13 @@ public class Game {
 			world.rain();
 		}
 		if(Math.random() < 0.0005) {
-			world.spawnAnimal(UnitType.WATER_SPIRIT, world.getTilesRandomly().getFirst());
+			world.spawnAnimal(Game.unitTypeMap.get("WATER_SPIRIT"), world.getTilesRandomly().getFirst());
 		}
 		if(ticks >= 1000 && Math.random() < 0.001) {
-			world.spawnAnimal(UnitType.FLAMELET, world.getTilesRandomly().getFirst());
+			world.spawnAnimal(Game.unitTypeMap.get("FLAMELET"), world.getTilesRandomly().getFirst());
 		}
 		if(ticks >= 3000 && Math.random() < 0.0005) {
-			world.spawnAnimal(UnitType.BOMB, world.getTilesRandomly().getFirst());
+			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst());
 		}
 		if(ticks >= 6000 && Math.random() < 0.0005 ) {
 			world.spawnWerewolf();
@@ -166,7 +164,7 @@ public class Game {
 			world.spawnIceGiant();
 		}
 		if(ticks >= 6000 && Math.random() < 0.0001) {
-			world.spawnAnimal(UnitType.PARASITE, world.getTilesRandomly().getFirst());
+			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst());
 		}
 		if(ticks >= 3000 && Math.random() < (0.00005 * numCutTrees/5)) {
 			world.spawnEnt();
@@ -260,7 +258,7 @@ public class Game {
 	}
 	public void spawnEverything() {
 		List<Tile> tiles = world.getTilesRandomly();
-		for(UnitType type : UnitType.values()) {
+		for(UnitType type : Game.unitTypeList) {
 			world.spawnAnimal(type, tiles.remove(0));
 		}
 	}
@@ -322,7 +320,7 @@ public class Game {
 			for(int j = -1; j < 2; j ++) {
 				tloc = new TileLoc(tile.getLocation().x + i, tile.getLocation().y + j);
 				Tile temp = world.get(tloc);
-				world.spawnAnimal(UnitType.CYCLOPS, temp);
+				world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp);
 			}
 			
 		}
@@ -422,7 +420,7 @@ public class Game {
 				building.resetTimeToHarvest();
 			}
 			
-			if(building.getType() == BuildingType.FARM && building.getTile().hasUnit(UnitType.HORSE)) {
+			if(building.getType() == BuildingType.FARM && building.getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
 				items.get(ItemType.HORSE).addAmount(1);
 				items.get(ItemType.FOOD).addAmount(1);
 				building.resetTimeToHarvest();
@@ -634,7 +632,7 @@ public class Game {
 	private void makeCastle(boolean easymode) {
 		LinkedList<HasImage> thingsToPlace = new LinkedList<>();
 		thingsToPlace.add(BuildingType.CASTLE);
-		thingsToPlace.add(UnitType.WORKER);
+		thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 		if(easymode) {
 			thingsToPlace.add(BuildingType.BARRACKS);
 			thingsToPlace.add(BuildingType.WORKSHOP);
@@ -1372,7 +1370,7 @@ public class Game {
 				for(Thing thing : selectedThings) {
 					if(thing instanceof Unit) {
 						Unit unit = (Unit) thing;
-						if(unit.getType() == UnitType.WORKER) {
+						if(unit.getType() == Game.unitTypeMap.get("WORKER")) {
 							unit.setTargetTile(tile);
 						}
 					}
@@ -1488,7 +1486,7 @@ public class Game {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;
 				
-				if(unit.getType() == UnitType.WORKER) {
+				if(unit.getType() == Game.unitTypeMap.get("WORKER")) {
 					for(Tile tile : world.territory) {
 						if(tile.getRoad() == null) {
 							unit.addToPath(tile);
@@ -1515,7 +1513,7 @@ public class Game {
 				if (thing instanceof Unit) {
 
 					Unit selectedUnit = (Unit) thing;
-					if (selectedUnit.getUnitType() == UnitType.WORKER) {
+					if (selectedUnit.getUnitType() == Game.unitTypeMap.get("WORKER")) {
 						guiController.selectedUnit(null, false);
 					}
 					
@@ -1539,7 +1537,7 @@ public class Game {
 				
 				if (thing instanceof Unit) {
 					Unit selectedUnit = (Unit) thing;
-					if (selectedUnit.getUnitType() == UnitType.WORKER) {
+					if (selectedUnit.getUnitType() == Game.unitTypeMap.get("WORKER")) {
 						guiController.selectedUnit(null, false);
 					}
 
@@ -1670,7 +1668,7 @@ public class Game {
 		//if not passed in tile, builds the building on each worker
 		boolean built = false;
 		for (Thing thing : selectedThings) {
-			if (thing != null && thing instanceof Unit && ((Unit) thing).getUnitType() == UnitType.WORKER) {
+			if (thing != null && thing instanceof Unit && ((Unit) thing).getUnitType() == Game.unitTypeMap.get("WORKER")) {
 				if(canBuild(bt, thing.getTile()) == true) {
 					chargePrice(bt);
 					Building building = new Building(bt, thing.getTile(), true);
@@ -1735,8 +1733,8 @@ public class Game {
 		
 		for(Thing thing : selectedThings) {
 			if (thing != null && thing instanceof Unit
-					&& ((Unit) thing).getUnitType() == UnitType.WORKER) {
-				for (Map.Entry mapElement : rt.getCost().entrySet()) {
+					&& ((Unit) thing).getUnitType() == Game.unitTypeMap.get("WORKER")) {
+				for (Entry<ItemType, Integer> mapElement : rt.getCost().entrySet()) {
 					ItemType key = (ItemType) mapElement.getKey();
 					Integer value = (Integer) mapElement.getValue();
 
@@ -1767,8 +1765,8 @@ public class Game {
 		for(Thing thing : selectedThings) {
 			if(selectedThings != null && thing instanceof Building ) {
 				Building building = (Building)thing;
-				for(UnitType ut : building.getType().unitsCanBuild()) {
-					if(ut == u) {
+				for(String ut : building.getType().unitsCanBuild()) {
+					if(u == Game.unitTypeMap.get(ut)) {
 						buildUnit(u, thing.getTile());
 					}
 				}

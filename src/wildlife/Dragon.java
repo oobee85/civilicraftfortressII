@@ -3,6 +3,7 @@ package wildlife;
 import java.util.*;
 
 import game.*;
+import ui.*;
 import utils.Thing;
 import world.Tile;
 
@@ -13,10 +14,10 @@ public class Dragon extends Animal {
 	private int timeToHunt;
 	
 	public Dragon(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.DRAGON, tile, isPlayerControlled);
+		super(Game.unitTypeMap.get("DRAGON"), tile, isPlayerControlled);
 		this.home = tile;
-		this.timeToFireball = UnitType.DRAGON.getCombatStats().getAttackSpeed()*10;
-		this.timeToHunt = UnitType.DRAGON.getCombatStats().getMoveSpeed()*100;
+		resetTimeToFireball();
+		resetTimeToHunt();
 	}
 	
 	public Tile getHome() {
@@ -43,10 +44,10 @@ public class Dragon extends Animal {
 		
 	}
 	public void resetTimeToFireball() {
-		timeToFireball = UnitType.DRAGON.getCombatStats().getAttackSpeed()*10;
+		timeToFireball = getType().getCombatStats().getAttackSpeed()*10;
 	}
 	public void resetTimeToHunt() {
-		timeToHunt = UnitType.DRAGON.getCombatStats().getMoveSpeed()*100;
+		timeToHunt = getType().getCombatStats().getMoveSpeed()*100;
 	}
 	public boolean readyToFireball() {
 		return timeToFireball <= 0;

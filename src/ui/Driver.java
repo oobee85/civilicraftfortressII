@@ -74,6 +74,8 @@ public class Driver {
 //		rotateAndScaleImage("fish2.png", "rotated.png");
 //		resizeImage("roadtile.png", "newroadtile.png", 16, 16);
 //		ImageCreation.createRoadImages("roadtile.png");
+//		Loader.writeUnitTypes();
+		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
 		new Frame();
 	}
 

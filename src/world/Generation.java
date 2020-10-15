@@ -4,6 +4,7 @@ import java.util.*;
 
 import game.*;
 import liquid.*;
+import ui.*;
 import utils.*;
 
 public class Generation {
@@ -306,12 +307,12 @@ public class Generation {
 			TileLoc loc = tile.getLocation();
 			if(Math.random() < 0.01) {
 				if(tile.checkTerrain(Terrain.GRASS) || tile.checkTerrain(Terrain.DIRT)) {
-					world.makeAnimal(UnitType.DEER, world, loc);
+					world.makeAnimal(Game.unitTypeMap.get("DEER"), world, loc);
 				}
 				
 				if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 					if(tile.liquidType != LiquidType.LAVA) {
-						world.makeAnimal(UnitType.FISH, world, loc);
+						world.makeAnimal(Game.unitTypeMap.get("FISH"), world, loc);
 					}
 					
 				}
@@ -319,29 +320,29 @@ public class Generation {
 			
 			if(Math.random() < 0.01) {
 				if(tile.checkTerrain(Terrain.DIRT)) {
-					world.makeAnimal(UnitType.HORSE, world, loc);
+					world.makeAnimal(Game.unitTypeMap.get("HORSE"), world, loc);
 				}
 			}
 			
 			if(Math.random() < 0.01) {
 				if(tile.checkTerrain(Terrain.GRASS)) {
-					world.makeAnimal(UnitType.PIG, world, loc);
+					world.makeAnimal(Game.unitTypeMap.get("PIG"), world, loc);
 				}
 			}
 			if(Math.random() < 0.01) {
 				if(tile.checkTerrain(Terrain.GRASS)) {
-					world.makeAnimal(UnitType.SHEEP, world, loc);
+					world.makeAnimal(Game.unitTypeMap.get("SHEEP"), world, loc);
 				}
 			}
 			if(Math.random() < 0.01) {
 				if(tile.checkTerrain(Terrain.GRASS)) {
-					world.makeAnimal(UnitType.COW, world, loc);
+					world.makeAnimal(Game.unitTypeMap.get("COW"), world, loc);
 				}
 			}
 			
 			
 			if(tile.getTerrain() == Terrain.ROCK && Math.random() < 0.001) {
-				world.makeAnimal(UnitType.WOLF, world, loc);
+				world.makeAnimal(Game.unitTypeMap.get("WOLF"), world, loc);
 			}
 		}
 		world.spawnDragon();

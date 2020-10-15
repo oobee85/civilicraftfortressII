@@ -10,7 +10,7 @@ import world.*;
 public class WaterSpirit extends Animal {
 
 	public WaterSpirit(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.WATER_SPIRIT, tile, isPlayerControlled);
+		super(Game.unitTypeMap.get("WATER_SPIRIT"), tile, isPlayerControlled);
 	}
 	
 	@Override

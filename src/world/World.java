@@ -151,24 +151,23 @@ public class World {
 	public void spawnOgre() {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.ROCK ).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(UnitType.OGRE, tile.get());
+			spawnAnimal(Game.unitTypeMap.get("OGRE"), tile.get());
 		}
 	}
 	
 	public void spawnWerewolf() {
 		List<Unit> wolves = units
 				.stream()
-				.filter(e -> e.getType() == UnitType.WOLF)
+				.filter(e -> e.getType() == Game.unitTypeMap.get("WOLF"))
 				.collect(Collectors.toList());
 		if(wolves.size() == 0) {
 			return;
 		}
 		Unit wolf = wolves.get((int)(Math.random()*wolves.size()));
+		wolf.setDead(true);
 		Tile t = wolf.getTile();
-		
-		wolf.takeDamage(wolf.getHealth() + 1);
 		System.out.println("Werewolf at: "+t.getLocation().x+ ", "+ t.getLocation().y);
-		spawnAnimal(UnitType.WEREWOLF, t);
+		spawnAnimal(Game.unitTypeMap.get("WEREWOLF"), t);
 	}
 	
 	public void spawnLavaGolem() {
@@ -177,26 +176,26 @@ public class World {
 				.filter(e -> e.getTerrain() == Terrain.VOLCANO )
 				.findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(UnitType.LAVAGOLEM, tile.get());
+			spawnAnimal(Game.unitTypeMap.get("LAVAGOLEM"), tile.get());
 		}
 	}
 	
 	public void spawnEnt() {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.GRASS ).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(UnitType.ENT, tile.get());
+			spawnAnimal(Game.unitTypeMap.get("ENT"), tile.get());
 		}
 	}
 	public void spawnIceGiant() {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getModifier() != null && e.liquidType == LiquidType.SNOW).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(UnitType.ICE_GIANT, tile.get());
+			spawnAnimal(Game.unitTypeMap.get("ICE_GIANT"), tile.get());
 		}
 	}
 	public void spawnDragon() {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.VOLCANO ).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(UnitType.DRAGON, tile.get());
+			spawnAnimal(Game.unitTypeMap.get("DRAGON"), tile.get());
 		}
 	}
 	
@@ -205,7 +204,7 @@ public class World {
 		if(potential.isPresent()) {
 			Tile t = potential.get();
 			for(Tile tile : t.getNeighbors()) {
-				spawnAnimal(UnitType.SKELETON, tile);
+				spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile);
 			}
 		}
 	}
@@ -216,31 +215,31 @@ public class World {
 	}
 
 	public Animal makeAnimal(UnitType type, Tile tile) {
-		if(type == UnitType.FLAMELET) {
+		if(type == Game.unitTypeMap.get("FLAMELET")) {
 			return new Flamelet(tile, false);
 		}
-		else if(type == UnitType.OGRE) {
+		else if(type == Game.unitTypeMap.get("OGRE")) {
 			return new Ogre(tile, false);
 		}
-		else if(type == UnitType.PARASITE) {
+		else if(type == Game.unitTypeMap.get("PARASITE")) {
 			return new Parasite(tile, false, this.get(volcano));
 		}
-		else if(type == UnitType.WEREWOLF) {
+		else if(type == Game.unitTypeMap.get("WEREWOLF")) {
 			return new Werewolf(tile, false);
 		}
-		else if(type == UnitType.WATER_SPIRIT) {
+		else if(type == Game.unitTypeMap.get("WATER_SPIRIT")) {
 			return new WaterSpirit(tile, false);
 		}
-		else if(type == UnitType.LAVAGOLEM) {
+		else if(type == Game.unitTypeMap.get("LAVAGOLEM")) {
 			return new LavaGolem(tile, false);
 		}
-		else if(type == UnitType.ENT) {
+		else if(type == Game.unitTypeMap.get("ENT")) {
 			return new Ent(tile, false);
 		}
-		else if(type == UnitType.DRAGON) {
+		else if(type == Game.unitTypeMap.get("DRAGON")) {
 			return new Dragon(tile, false);
 		}
-		else if(type == UnitType.ICE_GIANT) {
+		else if(type == Game.unitTypeMap.get("ICE_GIANT")) {
 			return new IceGiant(tile, false);
 		}
 		else {
