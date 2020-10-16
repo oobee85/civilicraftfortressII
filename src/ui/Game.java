@@ -1166,6 +1166,7 @@ public class Game {
 		}
 		return choseTarget;
 	}
+	
 	public void setSpawnLocation(Tile tile) {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Building) {
@@ -1173,7 +1174,6 @@ public class Game {
 				building.setSpawnLocation(tile);
 			}
 		}
-		
 	}
 
 	public static void printPoint(Point p) {
@@ -1293,6 +1293,16 @@ public class Game {
 		aControl = enabled;
 	}
 	
+	private void selectBuilding(Building building) {
+		guiController.selectedBuilding(building, true);
+		building.setIsSelected(true);
+		selectedThings.add(building);
+	}
+	private void selectUnit(Unit unit) {
+		unit.setIsSelected(true);
+		guiController.selectedUnit(unit, true);
+		selectedThings.add(unit);
+	}
 
 	public void toggleSelectionOnTile(Tile tile) {
 //		Thing selectionCandidate = tile.getPlayerControlledThing();
@@ -1300,30 +1310,21 @@ public class Game {
 		
 		//deselects everything if shift isnt enabled
 		if (shiftEnabled == false && !controlEnabled) {
-			deselectThings();
+			deselectEverything();
 		}
 		
 		//selects the building on the tile
 		if(building != null && building.getFaction() == World.PLAYER_FACTION && tile.getUnitOfFaction(World.PLAYER_FACTION) == null) {
-			guiController.selectedBuilding(building, true);
-			building.setIsSelected(true);
-			selectedThings.add(building);
+			selectBuilding(building);
 		}
 		//goes through all the units on the tile and checks if they are selected
 		for(Unit candidate : tile.getUnits()) {
 			// clicking on tile w/o shift i.e only selects top unit
 			if (candidate.getFaction() == World.PLAYER_FACTION) {
-				if (shiftEnabled) {
-					//shift enabled -> selects whole stack
-					candidate.setIsSelected(true);
-					guiController.selectedUnit(candidate, true);
-					selectedThings.add(candidate);
-				}
-				else {
-					//shift disabled -> selects top unit
-					candidate.setIsSelected(true);
-					guiController.selectedUnit(candidate, true);
-					selectedThings.add(candidate);
+				selectUnit(candidate);
+				//shift enabled -> selects whole stack
+				//shift disabled -> selects top unit
+				if (!shiftEnabled) {
 					break;
 				}
 			}
@@ -1382,7 +1383,7 @@ public class Game {
 		selectedThings.add(keep);
 	}
 
-	public void deselectThings() {
+	public void deselectEverything() {
 		for (Thing thing : selectedThings) {
 			if (thing != null) {
 				thing.setIsSelected(false);
@@ -1402,6 +1403,13 @@ public class Game {
 		selectedBuildingToSpawn = null;
 		selectedUnitToSpawn = null;
 	}
+	public void selectAllUnits() {
+		for(Unit unit : world.units) {
+			if(unit.getFaction() == World.PLAYER_FACTION) {
+				selectUnit(unit);
+			}
+		}
+	}
 
 	public void spawnUnit(boolean show) {
 		guiController.selectedSpawnUnit(show);
@@ -1414,9 +1422,7 @@ public class Game {
 				selectedUnit.setTarget(null);
 				selectedUnit.setTargetTile(null);
 			}
-
 		}
-
 	}
 	
 	public void setDestination(int mx, int my) {
@@ -1429,10 +1435,7 @@ public class Game {
 				thing.setTargetTile(destination);
 			}
 		}
-		
-		
 	}
-	
 	
 	private void unitTick() {
 		Iterator<Unit> it = world.units.descendingIterator();

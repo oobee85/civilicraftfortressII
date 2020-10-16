@@ -505,11 +505,16 @@ public class Frame extends JPanel {
 					gameInstance.controlPressed(true);
 				}
 				if(e.getKeyCode() == KeyEvent.VK_A) {
-					gameInstance.aControl(true);
+					if(e.isControlDown()) {
+						gameInstance.selectAllUnits();
+					}
+					else {
+						gameInstance.aControl(true);
+					}
 					
 				}
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-					gameInstance.deselectThings();
+					gameInstance.deselectEverything();
 				}
 				if (e.getKeyCode() == KeyEvent.VK_S) {
 					gameInstance.unitStop();
