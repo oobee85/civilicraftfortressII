@@ -1,8 +1,8 @@
 package game;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
+import liquid.*;
 import ui.Game;
 import utils.*;
 import world.*;
@@ -21,7 +21,7 @@ public class Building extends Thing {
 	
 	private ResearchRequirement req = new ResearchRequirement();
 	
-	public Building(BuildingType buildingType, Tile tile, int faction) {
+	public Building(BuildingType buildingType, Tile tile, Faction faction) {
 		super(buildingType.getHealth(), buildingType, faction, tile);
 		this.remainingEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
@@ -37,7 +37,7 @@ public class Building extends Thing {
 	public boolean isPlanned() {
 		return isPlanned;
 	}
-	public void tick() {
+	public void tick(World world) {
 		updateInProgressUnit();
 		timeToHarvest --;
 		
@@ -46,6 +46,86 @@ public class Building extends Thing {
 			int tileDamage = (int)tile.computeTileDamage(this);
 			if (tileDamage != 0) {
 				this.takeDamage(tileDamage);
+			}
+		}
+
+		if(!isBuilt()) {
+			return;
+		}
+		
+		// building builds units
+		if(!getBuildingUnit().isEmpty() && getBuildingUnit().peek().isBuilt() == true) {
+			Unit unit = getBuildingUnit().remove();
+			getTile().addUnit(unit);
+			world.newUnits.add(unit);
+		}
+		
+		if(!readyToHarvest() ) {
+			return;
+		}
+		if(getType() == BuildingType.MINE) {
+			if(getTile().getResource() != null && getTile().getResource().getType().isOre() == true) {
+				getFaction().addItem(getTile().getResource().getType().getItemType(), 1);
+				getTile().getResource().harvest(1);
+				getTile().setHeight(getTile().getHeight() - 0.001);
+				if(getTile().getResource().getYield() <= 0) {
+					getTile().setResource(null);
+				}
+				resetTimeToHarvest();
+			}
+			if(getTile().getTerrain() == Terrain.ROCK && getTile().getResource() == null) {
+				getFaction().addItem(ItemType.STONE, 1);
+				resetTimeToHarvest();
+			}
+		}
+		if(getType() == BuildingType.IRRIGATION && getTile().canPlant() == true) {
+			int extraFood = 0;
+			//irrigation produces extra food when placed on water
+			if(getTile().liquidType == LiquidType.WATER && getTile().liquidAmount > 0) {
+				extraFood = (int) (getTile().liquidAmount * 50);
+			}
+			getFaction().addItem(ItemType.FOOD, 1 + extraFood);
+			resetTimeToHarvest();
+		}
+		if(getType() == BuildingType.GRANARY) {
+			getFaction().addItem(ItemType.FOOD, 2);
+			resetTimeToHarvest();
+		}
+		if(getType() == BuildingType.WINDMILL) {
+			getFaction().addItem(ItemType.FOOD, 10);
+			resetTimeToHarvest();
+		}
+		if(getType() == BuildingType.SAWMILL) {
+			HashSet<Tile> tilesToCut = new HashSet<>();
+			tilesToCut.add(getTile());
+			
+			for(Tile t : world.getNeighborsInRadius(getTile(), 3)) {
+				tilesToCut.add(t);
+			}
+			for(Tile tile : tilesToCut) {
+				if(tile.getPlant() != null && tile.getPlant().getPlantType() == PlantType.FOREST1) {
+					tile.getPlant().harvest(1);
+					tile.getPlant().takeDamage(1);
+					getFaction().addItem(ItemType.WOOD, 1);
+					if(tile.getPlant().isDead() ) {
+						world.numCutTrees ++;
+					}
+				}
+			}
+			
+			resetTimeToHarvest();
+		}
+
+		if(getType() == BuildingType.FARM && getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
+			getFaction().addItem(ItemType.HORSE, 1);
+			getFaction().addItem(ItemType.FOOD, 1);
+			resetTimeToHarvest();
+		}
+		if(getTile().getPlant() != null) {
+			if(getType() == BuildingType.FARM && getTile().getPlant().getPlantType() == PlantType.BERRY) {
+				getFaction().addItem(ItemType.FOOD, 1);
+				getTile().getPlant().takeDamage(1);
+				resetTimeToHarvest();
 			}
 		}
 	}

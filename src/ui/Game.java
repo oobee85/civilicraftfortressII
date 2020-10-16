@@ -36,13 +36,11 @@ public class Game {
 	private BuildingType selectedBuildingToSpawn;
 	private BuildingType selectedBuildingToPlan;
 	private boolean summonPlayerControlled = true;
-	private int numCutTrees = 10;
 	private int buildingsUntilOgre = 20;
 	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
 	public static final Color playerColor = Color.pink;
 	public static final Color neutralColor = Color.lightGray;
 	
-	HashMap<ItemType, Item> items = new HashMap<ItemType, Item>();
 	ArrayList<Research> researchList = new ArrayList<>();
 	HashMap<String, Research> researchMap = new HashMap<>();
 
@@ -87,14 +85,11 @@ public class Game {
 		viewOffset = new Position(0, 0);
 		showHeightMap = false;
 		
-		for(ItemType itemType : ItemType.values()) {
-			Item item = new Item(0, itemType);
-			if(itemType == ItemType.WOOD || itemType == ItemType.STONE || itemType == ItemType.FOOD) {
-				item = new Item(200, itemType);
-			}
-			items.put(itemType, item);
-		}
 		Loader.setupResearch(researchMap, researchList);
+		World.PLAYER_FACTION.addItem(ItemType.WOOD, 200);
+		World.PLAYER_FACTION.addItem(ItemType.STONE, 200);
+		World.PLAYER_FACTION.addItem(ItemType.FOOD, 200);
+		World.CYCLOPS_FACTION.addItem(ItemType.FOOD, 50);
 		for(BuildingType type : BuildingType.values()) {
 			// make a new researchrequirement object
 			ResearchRequirement req = new ResearchRequirement();
@@ -168,7 +163,7 @@ public class Game {
 		if(ticks >= 6000 && Math.random() < 0.0001) {
 			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
 		}
-		if(ticks >= 3000 && Math.random() < (0.00005 * numCutTrees/5)) {
+		if(ticks >= 3000 && Math.random() < (0.00005 * world.numCutTrees/5)) {
 			world.spawnEnt();
 		}
 		if(ticks >= 12000 && Math.random() < 0.0001 ) {
@@ -248,7 +243,7 @@ public class Game {
 	}
 	public void addResources() {
 		for(ItemType itemType : ItemType.values()) {
-			items.get(itemType).addAmount(1000);
+			World.PLAYER_FACTION.addItem(itemType, 1000);
 		}
 		
 	}
@@ -279,14 +274,11 @@ public class Game {
 		makeRoads(easymode);
 		updateTerrainImages();
 		if(easymode) {
-			for(ItemType itemType : ItemType.values()) {
-				items.get(itemType).addAmount(999);
-			}
+			addResources();
 		}
 		world.clearDeadAndAddNewThings();
 	}
 	public void spawnOrcs() {
-		int ORC_FACTION = 2;
 		LinkedList<Tile> tiles = world.getTilesRandomly();
 		Tile tile = tiles.peek();
 		for(Tile t : tiles) {
@@ -295,10 +287,11 @@ public class Game {
 				break;
 			}
 		}
-		TileLoc tloc = new TileLoc(tile.getLocation().x, tile.getLocation().y);
-		Tile barracks = world.get(tloc) ;
-//		summonThing(tile, null, BuildingType.BARRACKS, false);
-		summonThing(barracks, null, BuildingType.BARRACKS, ORC_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x, tile.getLocation().y)), null, BuildingType.WATCHTOWER, World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x-1, tile.getLocation().y-1)), null, BuildingType.GRANARY, World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x+1, tile.getLocation().y-1)), null, BuildingType.BARRACKS, World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x+1, tile.getLocation().y+1)), null, BuildingType.WINDMILL, World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x-1, tile.getLocation().y+1)), null, BuildingType.MINE, World.CYCLOPS_FACTION);
 		
 		//makes the walls
 		for(int i = 0; i < 6; i++) {
@@ -307,19 +300,18 @@ public class Game {
 				type = BuildingType.GATE_WOOD;
 			}
 			Tile wall = world.get(new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y-3));
-			summonThing(wall, null, type, ORC_FACTION);
+			summonThing(wall, null, type, World.CYCLOPS_FACTION);
 			wall = world.get(new TileLoc(tile.getLocation().x+3, tile.getLocation().y-3 + i));
-			summonThing(wall, null, type, ORC_FACTION);
+			summonThing(wall, null, type, World.CYCLOPS_FACTION);
 			wall = world.get(new TileLoc(tile.getLocation().x+3 - i, tile.getLocation().y+3));
-			summonThing(wall, null, type, ORC_FACTION);
+			summonThing(wall, null, type, World.CYCLOPS_FACTION);
 			wall = world.get(new TileLoc(tile.getLocation().x-3, tile.getLocation().y+3 - i));
-			summonThing(wall, null, type, ORC_FACTION);
+			summonThing(wall, null, type, World.CYCLOPS_FACTION);
 		}
 		for(int i = -1; i < 2; i ++) {
 			for(int j = -1; j < 2; j ++) {
-				tloc = new TileLoc(tile.getLocation().x + i, tile.getLocation().y + j);
-				Tile temp = world.get(tloc);
-				world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp, ORC_FACTION);
+				Tile temp = world.get(new TileLoc(tile.getLocation().x + i, tile.getLocation().y + j));
+				world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp, World.CYCLOPS_FACTION);
 			}
 			
 		}
@@ -352,92 +344,7 @@ public class Game {
 					}
 				}
 			}
-			building.tick();
-			if(!building.isBuilt()) {
-				continue;
-			}
-			if(!building.readyToHarvest() ) {
-				continue;
-			}
-			if(building.getType() == BuildingType.MINE && building.getTile().getResource() != null && building.getTile().getResource().getType().isOre() == true) {
-				items.get(building.getTile().getResource().getType().getItemType()).addAmount(1);
-				building.getTile().getResource().harvest(1);
-				
-				
-				building.getTile().setHeight(building.getTile().getHeight() - 0.001);
-				
-				
-				if(building.getTile().getResource().getYield() <= 0) {
-					building.getTile().setResource(null);
-				}
-				building.resetTimeToHarvest();
-			}
-			
-			if(building.getType() == BuildingType.MINE && building.getTile().getTerrain() == Terrain.ROCK && building.getTile().getResource() == null) {
-				items.get(ItemType.STONE).addAmount(1);
-				building.resetTimeToHarvest();
-			}
-			if(building.getType() == BuildingType.IRRIGATION && building.getTile().canPlant() == true) {
-				//irrigation produces extra food when placed on water
-				if(building.getTile().liquidType == LiquidType.WATER && building.getTile().liquidAmount > 0) {
-					int extraFood = (int) (building.getTile().liquidAmount * 50);
-					items.get(ItemType.FOOD).addAmount(1 + extraFood);
-					
-				}else {
-					items.get(ItemType.FOOD).addAmount(1);
-				}
-				building.resetTimeToHarvest();
-			}
-			if(building.getType() == BuildingType.GRANARY) {
-				items.get(ItemType.FOOD).addAmount(2);
-				building.resetTimeToHarvest();
-			}
-			if(building.getType() == BuildingType.WINDMILL) {
-				items.get(ItemType.FOOD).addAmount(10);
-				building.resetTimeToHarvest();
-			}
-			if(building.getType() == BuildingType.SAWMILL) {
-				HashSet<Tile> tilesToCut = new HashSet<>();
-				tilesToCut.add(building.getTile());
-				
-				for(Tile t : world.getNeighborsInRadius((building.getTile()), 3)) {
-					tilesToCut.add(t);
-				}
-				for(Tile tile : tilesToCut) {
-					if(tile.getPlant() != null && tile.getPlant().getPlantType() == PlantType.FOREST1) {
-						tile.getPlant().harvest(1);
-						tile.getPlant().takeDamage(1);
-						items.get(ItemType.WOOD).addAmount(1);
-						if(tile.getPlant().isDead() ) {
-							numCutTrees ++;
-						}
-					}
-				}
-				
-				building.resetTimeToHarvest();
-			}
-			
-			if(building.getType() == BuildingType.FARM && building.getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
-				items.get(ItemType.HORSE).addAmount(1);
-				items.get(ItemType.FOOD).addAmount(1);
-				building.resetTimeToHarvest();
-			}
-			
-			if(building.getTile().getPlant() != null) {
-				if(building.getType() == BuildingType.FARM && building.getTile().getPlant().getPlantType() == PlantType.BERRY) {
-					items.get(ItemType.FOOD).addAmount(1);
-					building.getTile().getPlant().takeDamage(1);
-					building.resetTimeToHarvest();
-				}
-			}
-			
-			// building builds units
-			if(building.getBuildingUnit().peek() != null && building.getBuildingUnit().peek().isBuilt() == true) {
-				Unit unit = building.getBuildingUnit().peek();
-				building.getTile().addUnit(unit);
-				world.newUnits.add(unit);
-				building.getBuildingUnit().remove();
-			}
+			building.tick(world);
 		}
 	}
 	
@@ -710,7 +617,7 @@ public class Game {
 			if(theTile.getIsTerritory() != World.NEUTRAL_FACTION) {
 //				g.setColor(Color.black);
 //				g.fillRect(x, y, w, h); 
-				g.setColor(world.getFactionColor(theTile.getIsTerritory()));
+				g.setColor(theTile.getIsTerritory().color);
 				
 				Utils.setTransparency(g, 0.5f);
 				for(Tile tile : theTile.getNeighbors()) {
@@ -978,7 +885,7 @@ public class Game {
 				//draws a square for every player unit on the tile
 				int xx = unit.getTile().getLocation().x * Game.tileSize + offset;
 				int yy = unit.getTile().getLocation().y * Game.tileSize + (indicatorSize + offset)*count + offset;
-				g.setColor(world.getFactionColor(unit.getFaction()));
+				g.setColor(unit.getFaction().color);
 				g.fillRect(xx, yy, indicatorSize, indicatorSize);
 				g.setColor(Color.BLACK);
 				g.drawRect(xx, yy, indicatorSize, indicatorSize);
@@ -1169,54 +1076,24 @@ public class Game {
 	}
 	
 	public void craftItem(ItemType type) {
-		
-		for (Entry<ItemType, Integer> mapElement : type.getCost().entrySet()) {
-			ItemType key = mapElement.getKey();
-			Integer value = mapElement.getValue();
-
-			if (items.get(key).getAmount() < value) {
-				return;
-			}
+		if(World.PLAYER_FACTION.canAfford(type.getCost())) {
+			World.PLAYER_FACTION.payCost(type.getCost());
+			World.PLAYER_FACTION.addItem(type, 1);
 		}
-
-		for (Map.Entry mapElement : type.getCost().entrySet()) {
-			ItemType key = (ItemType) mapElement.getKey();
-			Integer value = (Integer) mapElement.getValue();
-
-			items.get(key).addAmount(-value);
-		}
-
-		items.get(type).addAmount(1);
-			
 	}
 
 	public void setResearchTarget(Research research) {
-	
-		if(research.getRequirement().areRequirementsMet()) {
-			for (Entry<ItemType, Integer> mapElement : research.getCost().entrySet()) {
-				
-				ItemType key = mapElement.getKey();
-				Integer value = mapElement.getValue();
-
-				if (items.get(key) != null && items.get(key).getAmount() < value) {
-					System.out.println("Not enough " + key);
-					return;
-				}
-			}
-
-			for (Entry<ItemType, Integer> mapElement : research.getCost().entrySet()) {
-				ItemType key = mapElement.getKey();
-				Integer value = mapElement.getValue();
-
-				items.get(key).addAmount(-value);
-			}
-
+		
+		if(!research.getRequirement().areRequirementsMet()) {
+			return;
+		}
+		if(World.PLAYER_FACTION.canAfford(research.getCost())) {
+			World.PLAYER_FACTION.payCost(research.getCost());
 			researchTarget = research;
 		}
 	}
-
 	
-	private void summonThing(Tile tile, UnitType unitType, BuildingType buildingType, int faction) {
+	private void summonThing(Tile tile, UnitType unitType, BuildingType buildingType, Faction faction) {
 		
 		if(unitType != null) {
 			System.out.println("spawn unit" + unitType.toString() +tile.getLocation());
@@ -1328,7 +1205,7 @@ public class Game {
 		}
 		// spawning unit
 		if (selectedUnitToSpawn != null) {
-			summonThing(tile, selectedUnitToSpawn, null, summonPlayerControlled ? 1 : 0);
+			summonThing(tile, selectedUnitToSpawn, null, summonPlayerControlled ? World.PLAYER_FACTION : World.NEUTRAL_FACTION);
 			if(shiftEnabled == false) {
 				selectedUnitToSpawn = null;
 				selectedBuildingToSpawn = null;
@@ -1339,7 +1216,7 @@ public class Game {
 		
 		//spawning building
 		if (selectedBuildingToSpawn != null) {
-			summonThing(tile, null, selectedBuildingToSpawn, summonPlayerControlled ? 1 : 0);
+			summonThing(tile, null, selectedBuildingToSpawn, summonPlayerControlled ? World.PLAYER_FACTION : World.NEUTRAL_FACTION);
 			if(shiftEnabled == false) {
 				selectedUnitToSpawn = null;
 				selectedBuildingToSpawn = null;
@@ -1459,7 +1336,7 @@ public class Game {
 				Unit unit = (Unit)thing;
 				
 				if(unit.getType().isBuilder()) {
-					for(Entry<Tile, Integer> entry : world.territory.entrySet()) {
+					for(Entry<Tile, Faction> entry : world.territory.entrySet()) {
 						if(entry.getValue() != World.PLAYER_FACTION) {
 							continue;
 						}
@@ -1553,25 +1430,14 @@ public class Game {
 	
 	
 	private void unitTick() {
-		Item food = this.items.get(ItemType.FOOD);
 		Iterator<Unit> it = world.units.descendingIterator();
-		double cost = 0;
 		while(it.hasNext()) {
 			Unit unit = it.next();
 			unit.updateState();
 			unit.planActions(world);
-			unit.doMovement(items);
+			unit.doMovement();
 			unit.doAttacks(world);
 			unit.doPassiveThings(world);
-			if(Game.ticks % 60 == 0 && unit.getFaction() == World.PLAYER_FACTION) {
-				if(food.getAmount() < cost) {
-					unit.setDead(true);
-				}
-				else {
-					food.addAmount(-(int)cost);
-				}
-				cost += 0.2;
-			}
 		}
 	}
 	
@@ -1594,29 +1460,14 @@ public class Game {
 		if (tile.getHasBuilding() == true) {
 			return false;
 		}
-
-		for (Entry<ItemType, Integer> mapElement : bt.getCost().entrySet()) {
-			ItemType key = mapElement.getKey();
-			Integer value = mapElement.getValue();
-
-			if (items.get(key).getAmount() < value) {
-				return false;
-			}
+		if(!World.PLAYER_FACTION.canAfford(bt.getCost())) {
+			return false;
 		}
 		if (bt == BuildingType.IRRIGATION && tile.canPlant() == false) {
 			return false;
 		}
-
 		return true;
 
-	}
-	private void chargePrice(BuildingType bt) {
-		for (Entry<ItemType, Integer> mapElement : bt.getCost().entrySet()) {
-			ItemType key = mapElement.getKey();
-			Integer value = mapElement.getValue();
-
-			items.get(key).addAmount(-value);
-		}
 	}
 
 	public boolean buildBuilding(BuildingType bt, Tile tile) {
@@ -1624,7 +1475,7 @@ public class Game {
 		//if passed in a tile, it builds it on the tile
 		if(tile != null) {
 			if(canBuild(bt, tile) == true) {
-				chargePrice(bt);
+				World.PLAYER_FACTION.payCost(bt.getCost());
 				Building building = new Building(bt, tile, World.PLAYER_FACTION);
 				tile.setBuilding(building);
 				world.plannedBuildings.add(building);
@@ -1639,7 +1490,7 @@ public class Game {
 		for (Thing thing : selectedThings) {
 			if (thing != null && thing instanceof Unit && ((Unit) thing).getUnitType().isBuilder()) {
 				if(canBuild(bt, thing.getTile()) == true) {
-					chargePrice(bt);
+					World.PLAYER_FACTION.payCost(bt.getCost());
 					Building building = new Building(bt, thing.getTile(), World.PLAYER_FACTION);
 					thing.getTile().setBuilding(building);
 					world.newBuildings.add(building);
@@ -1661,23 +1512,11 @@ public class Game {
 		summonPlayerControlled = playerControlled;
 	}
 	private void setPlannedRoad(Tile t) {
-		if(t != null && t.getRoad() == null) {
-			for (Map.Entry mapElement : RoadType.STONE_ROAD.getCost().entrySet()) {
-				ItemType key = (ItemType) mapElement.getKey();
-				Integer value = (Integer) mapElement.getValue();
-
-				if (items.get(key).getAmount() < value) {
-					return;
-				}
-			}
-
-			for (Map.Entry mapElement : RoadType.STONE_ROAD.getCost().entrySet()) {
-				ItemType key = (ItemType) mapElement.getKey();
-				Integer value = (Integer) mapElement.getValue();
-
-				items.get(key).addAmount(-value);
-			}
-			
+		if(t.getRoad() != null) {
+			return;
+		}
+		if(World.PLAYER_FACTION.canAfford(RoadType.STONE_ROAD.getCost())) {
+			World.PLAYER_FACTION.payCost(RoadType.STONE_ROAD.getCost());
 			Road road = new Road(RoadType.STONE_ROAD, t);
 			t.setRoad(road, Direction.NORTH.toString());
 			
@@ -1701,28 +1540,15 @@ public class Game {
 	public void buildRoad(RoadType rt) {
 		
 		for(Thing thing : selectedThings) {
-			if (thing != null && thing instanceof Unit && ((Unit) thing).getUnitType().isBuilder()) {
-				for (Entry<ItemType, Integer> mapElement : rt.getCost().entrySet()) {
-					ItemType key = (ItemType) mapElement.getKey();
-					Integer value = (Integer) mapElement.getValue();
-
-					if (items.get(key).getAmount() < value) {
-						return;
+			if (thing instanceof Unit && ((Unit) thing).getUnitType().isBuilder()) {
+				if(World.PLAYER_FACTION.canAfford(rt.getCost())) {
+					World.PLAYER_FACTION.payCost(rt.getCost());
+					Road road = new Road(rt, thing.getTile());
+					thing.getTile().setRoad(road, Direction.NORTH.toString());
+					
+					for (Tile tile : Utils.getNeighborsIncludingCurrent(thing.getTile(), world)) {
+						turnRoad(tile);
 					}
-				}
-
-				for (Entry<ItemType, Integer> mapElement : rt.getCost().entrySet()) {
-					ItemType key = (ItemType) mapElement.getKey();
-					Integer value = (Integer) mapElement.getValue();
-
-					items.get(key).addAmount(-value);
-				}
-
-				Road road = new Road(rt, thing.getTile());
-				thing.getTile().setRoad(road, Direction.NORTH.toString());
-				
-				for (Tile tile : Utils.getNeighborsIncludingCurrent(thing.getTile(), world)) {
-					turnRoad(tile);
 				}
 			}
 		}
@@ -1745,38 +1571,20 @@ public class Game {
 	}
 	
 	private void buildUnit(UnitType u, Tile tile) {
-		for (Entry<ItemType, Integer> mapElement : u.getCost().entrySet()) {
-			ItemType key = mapElement.getKey();
-			Integer value = mapElement.getValue();
-			
-			if (items.get(key).getAmount() < value) {
-				System.out.println("Not enough " + key);
+		if(World.PLAYER_FACTION.canAfford(u.getCost())) {
+			Unit unit = new Unit(u, tile, World.PLAYER_FACTION);
+			if (tile.isBlocked(unit)) {
 				return;
 			}
+			World.PLAYER_FACTION.payCost(u.getCost());
+			unit.setTargetTile(unit.getTile().getBuilding().getSpawnLocation());
+			tile.getBuilding().setBuildingUnit(unit);
 		}
-		
-		Unit unit = new Unit(u, tile, World.PLAYER_FACTION);
-		if (tile.isBlocked(unit)) {
-			return;
-		}
-		
-		for (Entry<ItemType, Integer> mapElement : u.getCost().entrySet()) {
-			ItemType key = mapElement.getKey();
-			Integer value = mapElement.getValue();
-			
-			items.get(key).addAmount(-value);
-		}
-		unit.setTargetTile(unit.getTile().getBuilding().getSpawnLocation());
-		tile.getBuilding().setBuildingUnit(unit);
-//		tile.addUnit(unit);
-//		world.units.add(unit);
 	}
 
 	public void doubleClick(int mx, int my) {
 		Position tilepos = getTileAtPixel(new Position(mx, my));
 		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
-
-		
 	}
 	public void exitTile() {
 		guiController.toggleTileView();
@@ -1816,9 +1624,6 @@ public class Game {
 
 	public int getMoney() {
 		return money;
-	}
-	public int getResourceAmount(ItemType resourceType) {
-		return items.get(resourceType).getAmount();
 	}
 	public int getTileSize() {
 		return tileSize;

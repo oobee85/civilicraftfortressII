@@ -20,13 +20,14 @@ public class Unit extends Thing  {
 	private Thing target;
 	private int remainingEffort;
 	private boolean isIdle;
+	private int starving;
 	private CombatStats combatStats;
 	private LinkedList<Tile> currentPath;
 	private LinkedList<Tile> queuedPath;
 	private LinkedList<Attack> attacks;
 	
 	
-	public Unit(UnitType unitType, Tile tile, int faction) {
+	public Unit(UnitType unitType, Tile tile, Faction faction) {
 		super(unitType.getCombatStats().getHealth(), unitType, faction, tile);
 		this.unitType = unitType;
 		this.combatStats = unitType.getCombatStats();
@@ -171,6 +172,16 @@ public class Unit extends Thing  {
 				this.takeDamage(tileDamage);
 			}
 		}
+		if(Game.ticks % 60 == 0 && getFaction().hasItems()) {
+			if(getFaction().canAfford(ItemType.FOOD, 1)) {
+				getFaction().payCost(ItemType.FOOD, 1);
+				starving = 0;
+			}
+			else {
+				starving++;
+				takeDamage(starving);
+			}
+		}
 	}
 	
 	public boolean inRange(Thing other) {
@@ -246,7 +257,7 @@ public class Unit extends Thing  {
 		}
 	}
 	
-	public void doMovement(HashMap<ItemType, Item> items) {
+	public void doMovement() {
 		if(getTargetTile() == null && queuedPath != null && !queuedPath.isEmpty()) {
 			setTargetTile(queuedPath.getFirst());
 			queuedPath.remove();
@@ -255,9 +266,9 @@ public class Unit extends Thing  {
 			moveTowards(getTargetTile());
 		}
 		// If on tile with an item, take the item
-		if(getFaction() == World.PLAYER_FACTION) {
+		if(getFaction().hasItems()) {
 			for(Item item : getTile().getItems()) {
-				items.get(item.getType()).addAmount(item.getAmount());
+				getFaction().addItem(item.getType(), item.getAmount());
 			}
 			getTile().clearItems();
 		}

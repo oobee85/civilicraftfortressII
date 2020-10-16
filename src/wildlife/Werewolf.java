@@ -11,7 +11,7 @@ public class Werewolf extends Animal {
 
 	boolean transformed = false;
 	
-	public Werewolf(Tile tile, int faction) {
+	public Werewolf(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("WEREWOLF"), tile, faction);
 	}
 

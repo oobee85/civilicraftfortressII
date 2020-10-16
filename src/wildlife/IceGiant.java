@@ -10,7 +10,7 @@ import world.*;
 
 public class IceGiant extends Animal {
 	
-	public IceGiant(Tile tile, int faction) {
+	public IceGiant(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("ICE_GIANT"), tile, faction);
 	}
 	

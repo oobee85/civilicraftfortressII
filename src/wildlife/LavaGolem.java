@@ -8,7 +8,7 @@ import world.*;
 
 public class LavaGolem extends Animal {
 
-	public LavaGolem(Tile tile, int faction) {
+	public LavaGolem(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("LAVAGOLEM"), tile, faction);
 	}
 	

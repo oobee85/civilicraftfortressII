@@ -9,7 +9,7 @@ import world.*;
 
 public class WaterSpirit extends Animal {
 
-	public WaterSpirit(Tile tile, int faction) {
+	public WaterSpirit(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("WATER_SPIRIT"), tile, faction);
 	}
 	

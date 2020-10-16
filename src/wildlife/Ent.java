@@ -8,7 +8,7 @@ import world.*;
 
 public class Ent extends Animal {
 
-	public Ent(Tile tile, int faction) {
+	public Ent(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("ENT"), tile, faction);
 	}
 

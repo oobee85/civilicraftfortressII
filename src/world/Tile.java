@@ -12,7 +12,7 @@ import utils.*;
 import wildlife.*;
 
 public class Tile {
-	private int isTerritory = World.NEUTRAL_FACTION;
+	private Faction isTerritory = World.NEUTRAL_FACTION;
 	private boolean isSelected = false;
 	private boolean inVisionRange = false;
 
@@ -93,7 +93,7 @@ public class Tile {
 		}
 	}
 
-	public void setTerritory(int faction) {
+	public void setTerritory(Faction faction) {
 		this.isTerritory = faction;
 	}
 
@@ -116,7 +116,7 @@ public class Tile {
 		plant = p;
 	}
 
-	public Unit getUnitOfFaction(int faction) {
+	public Unit getUnitOfFaction(Faction faction) {
 		for (Unit u : units) {
 			if (u.getFaction() == faction) {
 				return u;
@@ -124,7 +124,7 @@ public class Tile {
 		}
 		return null;
 	}
-	public int countUnitsOfFaction(int faction) {
+	public int countUnitsOfFaction(Faction faction) {
 		int x = 0;
 		for(Unit unit : units) {
 			if(unit.getFaction() == faction) {
@@ -134,7 +134,7 @@ public class Tile {
 		return x;
 	}
 
-	public Thing getThingOfFaction(int faction) {
+	public Thing getThingOfFaction(Faction faction) {
 		for (Unit u : units) {
 			if (u.getFaction() == faction) {
 				return u;
@@ -168,7 +168,7 @@ public class Tile {
 		this.inVisionRange = inRange;
 	}
 
-	private double getBrightnessNonRecursive(int faction) {
+	private double getBrightnessNonRecursive(Faction faction) {
 		double brightness = 0;
 		if (this.getThingOfFaction(faction) != null) {
 			brightness += 1;
@@ -188,7 +188,7 @@ public class Tile {
 	}
 
 	
-	public double getBrightness(int faction) {
+	public double getBrightness(Faction faction) {
 		double brightness = this.getBrightnessNonRecursive(faction);
 		for (Tile tile : getNeighbors()) {
 			brightness += tile.getBrightnessNonRecursive(faction);
@@ -281,7 +281,7 @@ public class Tile {
 		return isSelected;
 	}
 
-	public int getIsTerritory() {
+	public Faction getIsTerritory() {
 		return isTerritory;
 	}
 

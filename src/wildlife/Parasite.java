@@ -12,7 +12,7 @@ public class Parasite extends Animal {
 	private boolean transformed;
 	private Tile volcano;
 
-	public Parasite(Tile tile, int faction, Tile volcano) {
+	public Parasite(Tile tile, Faction faction, Tile volcano) {
 		super(Game.unitTypeMap.get("PARASITE"), tile, faction);
 		this.volcano = volcano;
 	}

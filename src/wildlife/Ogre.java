@@ -8,7 +8,7 @@ import world.*;
 
 public class Ogre extends Animal {
 
-	public Ogre(Tile tile, int faction) {
+	public Ogre(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("OGRE"), tile, faction);
 	}
 

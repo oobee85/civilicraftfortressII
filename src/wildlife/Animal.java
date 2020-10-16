@@ -14,7 +14,7 @@ public class Animal extends Unit {
 	
 	private int migratingUntil;
 	
-	public Animal(UnitType type, Tile tile, int faction) {
+	public Animal(UnitType type, Tile tile, Faction faction) {
 		super(type, tile, faction);
 	}
 	

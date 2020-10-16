@@ -11,7 +11,7 @@ import world.*;
 
 public class Thing implements HasImage {
 
-	private int faction;
+	private Faction faction;
 	private double maxHealth;
 	private double health;
 	private boolean isDead;
@@ -26,13 +26,13 @@ public class Thing implements HasImage {
 	
 	private String name;
 	
-	public Thing(double maxHealth, HasImage hasImage, int faction) {
+	public Thing(double maxHealth, HasImage hasImage, Faction faction) {
 		health = maxHealth;
 		this.maxHealth = maxHealth;
 		this.hasImage = hasImage;
 		this.faction = faction;
 	}
-	public Thing(double maxHealth, HasImage hasImage, int faction, Tile tile) {
+	public Thing(double maxHealth, HasImage hasImage, Faction faction, Tile tile) {
 		this(maxHealth, hasImage, faction);
 		this.tile = tile;
 	}
@@ -41,11 +41,11 @@ public class Thing implements HasImage {
 		this.hasImage = hasImage;
 	}
 	
-	public int getFaction() {
+	public Faction getFaction() {
 		return faction;
 	}
 	
-	public void setFaction(int faction) {
+	public void setFaction(Faction faction) {
 		this.faction = faction;
 	}
 

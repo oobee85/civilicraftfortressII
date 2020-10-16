@@ -5,7 +5,7 @@ import java.util.*;
 import game.*;
 import ui.*;
 import utils.Thing;
-import world.Tile;
+import world.*;
 
 public class Dragon extends Animal {
 	
@@ -13,7 +13,7 @@ public class Dragon extends Animal {
 	private int timeToFireball;
 	private int timeToHunt;
 	
-	public Dragon(Tile tile, int faction) {
+	public Dragon(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("DRAGON"), tile, faction);
 		this.home = tile;
 		resetTimeToFireball();

@@ -4,11 +4,11 @@ import java.util.*;
 
 import game.*;
 import ui.*;
-import world.Tile;
+import world.*;
 
 public class Cyclops extends Animal {
 
-	public Cyclops(Tile tile, int faction) {
+	public Cyclops(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("CYCLOPS"), tile, faction);
 	}
 

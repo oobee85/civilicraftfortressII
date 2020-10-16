@@ -30,26 +30,16 @@ public class World {
 	private ArrayList<ArrayList<Tile>> liquidSimulationPhases = new ArrayList<>(NUM_LIQUID_SIMULATION_PHASES);
 	private Tile[][] tiles;
 	
-	public ConcurrentHashMap<Tile, Integer> territory = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<Tile, Faction> territory = new ConcurrentHashMap<>();
 	private int width;
 	private int height;
 
-	public static final int NEUTRAL_FACTION = 0;
-	public static int PLAYER_FACTION = 1;
-	private HashMap<Integer, Color> factionColors = new HashMap<Integer, Color>() {
-		{
-			put(0, Game.neutralColor);
-			put(1, Game.playerColor);
-			put(2, Color.BLUE);
-			put(3, Color.GREEN.darker());
-		}
-	};
-	public Color getFactionColor(int faction) {
-		if(factionColors.containsKey(faction)) {
-			return factionColors.get(faction);
-		}
-		return Game.neutralColor;
-	}
+	
+	public static final Faction NEUTRAL_FACTION = new Faction("Neutral", false);
+	public static Faction PLAYER_FACTION = new Faction("Player", true);
+	public static final Faction CYCLOPS_FACTION = new Faction("Cyclops", true);
+	public static final Faction[] factions = new Faction[] {NEUTRAL_FACTION, PLAYER_FACTION, CYCLOPS_FACTION};
+	
 	public LinkedList<Plant> plants = new LinkedList<Plant>();
 	public LinkedList<Plant> newPlants = new LinkedList<Plant>();
 	public LinkedList<Unit> units = new LinkedList<Unit>();
@@ -67,6 +57,7 @@ public class World {
 	private double forestDensity = 0.3;
 
 	public TileLoc volcano;
+	public int numCutTrees = 10;
 	
 	public World() {
 		tileList = new LinkedList<>();
@@ -75,7 +66,7 @@ public class World {
 	public int getTerritorySize() {
 		return territory.size();
 	}
-	public void addToTerritory(Tile tile, int faction) {
+	public void addToTerritory(Tile tile, Faction faction) {
 		if(!territory.contains(tile)) {
 			territory.put(tile, faction);
 		}
@@ -203,13 +194,13 @@ public class World {
 			}
 		}
 	}
-	public void spawnAnimal(UnitType type, Tile tile, int faction) {
+	public void spawnAnimal(UnitType type, Tile tile, Faction faction) {
 		Animal animal = makeAnimal(type, tile, faction);
 		tile.addUnit(animal);
 		newUnits.add(animal);
 	}
 
-	public Animal makeAnimal(UnitType type, Tile tile, int faction) {
+	public Animal makeAnimal(UnitType type, Tile tile, Faction faction) {
 		if(type == Game.unitTypeMap.get("FLAMELET")) {
 			return new Flamelet(tile, faction);
 		}
@@ -872,9 +863,8 @@ public class World {
 				terrainColor = Utils.blendColors(tile.getModifier().getType().getColor(0), terrainColor, 0.9);
 			}
 			if(tile.getIsTerritory() != World.NEUTRAL_FACTION) {
-				Color c = getFactionColor(tile.getIsTerritory());
-				minimapColor = Utils.blendColors(c, minimapColor, 0.3);
-				terrainColor = Utils.blendColors(c, terrainColor, 0.3);
+				minimapColor = Utils.blendColors(tile.getIsTerritory().color, minimapColor, 0.3);
+				terrainColor = Utils.blendColors(tile.getIsTerritory().color, terrainColor, 0.3);
 			}
 			double tilebrightness = tile.getBrightness(World.PLAYER_FACTION);
 			minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);

@@ -8,7 +8,7 @@ import world.*;
 
 public class Vampire extends Animal {
 
-	public Vampire(Tile tile, int faction) {
+	public Vampire(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("VAMPIRE"), tile, faction);
 	}
 

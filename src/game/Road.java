@@ -5,7 +5,7 @@ import java.util.List;
 
 import ui.Game;
 import utils.*;
-import world.Tile;
+import world.*;
 
 public class Road extends Thing {
 	
@@ -15,7 +15,7 @@ public class Road extends Thing {
 	private ResearchRequirement req = new ResearchRequirement();
 	
 	public Road(RoadType roadType, Tile tile) {
-		super(roadType.getHealth(), roadType, 0, tile);
+		super(roadType.getHealth(), roadType, World.NEUTRAL_FACTION, tile);
 		this.remainingEffort = roadType.getBuildingEffort();
 		this.roadType = roadType;
 		this.health = roadType.getHealth();

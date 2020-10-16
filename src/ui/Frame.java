@@ -210,7 +210,7 @@ public class Frame extends JPanel {
 			@Override
 			public void updateGUI() {
 				for (int i = 0; i < ItemType.values().length; i++) {
-					int amount = gameInstance.getResourceAmount(ItemType.values()[i]);
+					int amount = World.PLAYER_FACTION.getItemAmount(ItemType.values()[i]);
 					resourceIndicators[i].setText("" + amount);
 					if(amount > 0 && !resourceIndicatorsAdded[i]) {
 						resourceIndicatorsAdded[i] = true;
@@ -1067,14 +1067,9 @@ public class Frame extends JPanel {
 		});
 		JButton setPlayerFaction = KUIConstants.setupButton("Change Faction", null, DEBUG_BUTTON_SIZE);
 		setPlayerFaction.addActionListener(e -> {
-			String choice = JOptionPane.showInputDialog("Choose faction");
-			if(choice != null) {
-				try { 
-					int faction = Integer.parseInt(choice);
-					World.PLAYER_FACTION = faction;
-				}
-				catch(NumberFormatException ex) {
-				}
+			int choice = JOptionPane.showOptionDialog(null, "Choose faction", "Choose faction", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, World.factions, World.NEUTRAL_FACTION);
+			if(choice >= 0 && choice < World.factions.length) {
+				World.PLAYER_FACTION = World.factions[choice];
 			}
 		});
 
