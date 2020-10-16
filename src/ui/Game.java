@@ -1176,10 +1176,6 @@ public class Game {
 		}
 	}
 
-	public static void printPoint(Point p) {
-		System.out.println("Point: (" + p.x + ", " + p.y + ")");
-	}
-
 	public Position getTileAtPixel(Position pixel) {
 		Position tile = pixel.add(viewOffset).divide(tileSize);
 		return tile;
@@ -1293,15 +1289,15 @@ public class Game {
 		aControl = enabled;
 	}
 	
-	private void selectBuilding(Building building) {
-		guiController.selectedBuilding(building, true);
-		building.setIsSelected(true);
-		selectedThings.add(building);
-	}
-	private void selectUnit(Unit unit) {
-		unit.setIsSelected(true);
-		guiController.selectedUnit(unit, true);
-		selectedThings.add(unit);
+	private void selectThing(Thing thing) {
+		thing.setIsSelected(true);
+		selectedThings.add(thing);
+		if(thing instanceof Unit) {
+			guiController.selectedUnit((Unit)thing, true);
+		}
+		else if(thing instanceof Building) {
+			guiController.selectedBuilding((Building)thing, true);
+		}
 	}
 
 	public void toggleSelectionOnTile(Tile tile) {
@@ -1315,13 +1311,13 @@ public class Game {
 		
 		//selects the building on the tile
 		if(building != null && building.getFaction() == World.PLAYER_FACTION && tile.getUnitOfFaction(World.PLAYER_FACTION) == null) {
-			selectBuilding(building);
+			selectThing(building);
 		}
 		//goes through all the units on the tile and checks if they are selected
 		for(Unit candidate : tile.getUnits()) {
 			// clicking on tile w/o shift i.e only selects top unit
 			if (candidate.getFaction() == World.PLAYER_FACTION) {
-				selectUnit(candidate);
+				selectThing(candidate);
 				//shift enabled -> selects whole stack
 				//shift disabled -> selects top unit
 				if (!shiftEnabled) {
@@ -1372,15 +1368,13 @@ public class Game {
 	}
 	public void deselectOtherThings(Thing keep) {
 		for (Thing thing : selectedThings) {
-			if(thing != keep) {
-				thing.setIsSelected(false);
-				if(thing instanceof Unit) {
-					guiController.selectedUnit((Unit)thing, false);
-				}
+			thing.setIsSelected(false);
+			if(thing instanceof Unit) {
+				guiController.selectedUnit((Unit)thing, false);
 			}
 		}
 		selectedThings.clear();
-		selectedThings.add(keep);
+		selectThing(keep);
 	}
 
 	public void deselectEverything() {
@@ -1406,7 +1400,7 @@ public class Game {
 	public void selectAllUnits() {
 		for(Unit unit : world.units) {
 			if(unit.getFaction() == World.PLAYER_FACTION) {
-				selectUnit(unit);
+				selectThing(unit);
 			}
 		}
 	}

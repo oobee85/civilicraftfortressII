@@ -158,9 +158,6 @@ public class Frame extends JPanel {
 
 			@Override
 			public void selectedUnit(Unit unit, boolean selected) {
-				if(unit == null) {
-					return;
-				}
 				if(selected) {
 					if(!selectedButtons.containsKey(unit)) {
 						JButton button = setupUnitButton(unit);
@@ -170,6 +167,16 @@ public class Frame extends JPanel {
 							}
 							else {
 								gameInstance.deselectOtherThings(unit);
+							}
+						});
+						button.addMouseListener(new MouseAdapter() {
+							@Override
+							public void mouseEntered(MouseEvent e) {
+								pushInfoPanel(new UnitInfoPanel(unit));
+							}
+							@Override
+							public void mouseExited(MouseEvent e) {
+								popInfoPanel();
 							}
 						});
 						selectedButtons.put(unit, button);
