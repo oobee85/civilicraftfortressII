@@ -7,6 +7,7 @@ import java.util.Map.*;
 import java.util.concurrent.*;
 
 import javax.swing.*;
+import javax.swing.GroupLayout.*;
 import javax.swing.Timer;
 
 import game.*;
@@ -46,6 +47,8 @@ public class Frame extends JPanel {
 	private JPanel mainMenuPanel;
 	private volatile boolean readyToStart;
 	private JPanel gamepanel;
+	private JPanel selectedUnitsPanel;
+	private JPanel resourcePanel2;
 	private JPanel minimapPanel;
 	private JPanel infoPanel;
 	private JPanel castleView;
@@ -169,7 +172,7 @@ public class Frame extends JPanel {
 							}
 						});
 						selectedButtons.put(unit, button);
-						gamepanel.add(button);
+						selectedUnitsPanel.add(button);
 						gamepanel.revalidate();
 					}
 					UnitInfoPanel infoPanel = new UnitInfoPanel(unit);
@@ -182,7 +185,7 @@ public class Frame extends JPanel {
 				else {
 					if(selectedButtons.containsKey(unit)) {
 						JButton button = selectedButtons.remove(unit);
-						gamepanel.remove(button);
+						selectedUnitsPanel.remove(button);
 						gamepanel.revalidate();
 					}
 				}
@@ -210,7 +213,7 @@ public class Frame extends JPanel {
 					resourceIndicators[i].setText("" + amount);
 					if(amount > 0 && !resourceIndicatorsAdded[i]) {
 						resourceIndicatorsAdded[i] = true;
-						gamepanel.add(resourceIndicators[i]);
+						resourcePanel2.add(resourceIndicators[i]);
 						gamepanel.revalidate();
 					}
 				}
@@ -387,6 +390,18 @@ public class Frame extends JPanel {
 				g.drawRect(-1, 0, getWidth() + 1, getHeight());
 			}
 		};
+		resourcePanel2 = new JPanel();
+		resourcePanel2.setLayout(new BoxLayout(resourcePanel2, BoxLayout.Y_AXIS));
+		resourcePanel2.setOpaque(false);
+		JPanel filler = new JPanel();
+		filler.setLayout(new BorderLayout());
+		filler.setOpaque(false);
+		selectedUnitsPanel = new JPanel();
+		selectedUnitsPanel.setOpaque(false);
+		gamepanel.setLayout(new BorderLayout());
+		gamepanel.add(resourcePanel2, BorderLayout.WEST);
+		gamepanel.add(filler, BorderLayout.CENTER);
+		filler.add(selectedUnitsPanel, BorderLayout.SOUTH);
 		gamepanel.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
