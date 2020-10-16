@@ -533,10 +533,12 @@ public class Frame extends JPanel {
 				int padding = 5;
 				g.setFont(KUIConstants.infoFontSmaller);
 				String dayCounter = "Day: " + gameInstance.getDays() + "   Night: " + gameInstance.getNights();
+				Color temp = g.getColor();
 				g.setColor(Color.white);
 				g.drawString(dayCounter, padding-1, g.getFont().getSize() + padding-1 );
 				g.setColor(Color.black);
 				g.drawString(dayCounter, padding, g.getFont().getSize() + padding );
+				g.setColor(temp);
 				
 				int offset = gameInstance.world.getCurrentDayOffset() + World.TRANSITION_PERIOD;
 				int pathwidth = getWidth() - Frame.MINIMAPBORDERWIDTH;
