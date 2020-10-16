@@ -17,10 +17,10 @@ public class UnitType implements HasImage {
 	private HashSet<String> attributes;
 	private HashMap <ItemType, Integer> cost;
 	private String researchRequirement;
-	private Item deadItem;
+	private LinkedList<Item> deadItem;
 	private ProjectileType projectileType;
 
-	public UnitType(String name, String image, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, Item deadItem, ProjectileType projectileType) {
+	public UnitType(String name, String image, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, ProjectileType projectileType) {
 		this.name = name;
 		this.mipmap = new MipMap(image);
 		this.combatStats = cs;
@@ -42,7 +42,7 @@ public class UnitType implements HasImage {
 	public CombatStats getCombatStats() {
 		return combatStats;
 	}
-	public Item getDeadItem() {
+	public LinkedList<Item> getDeadItem() {
 		return deadItem;
 	}
 	public boolean isAquatic() {

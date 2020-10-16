@@ -183,6 +183,16 @@ public class Unit extends Thing  {
 			}
 		}
 	}
+	@Override
+	public boolean takeDamage(double damage) {
+		boolean lethal = super.takeDamage(damage);
+		if(lethal) {
+			for(Item item : getType().getDeadItem()) {
+				getTile().addItem(item);
+			}
+		}
+		return lethal;
+	}
 	
 	public boolean inRange(Thing other) {
 		if(other == null) {

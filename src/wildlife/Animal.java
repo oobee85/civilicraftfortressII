@@ -30,16 +30,6 @@ public class Animal extends Unit {
 			resetTimeToHeal();
 		}
 	}
-	@Override
-	public boolean takeDamage(double damage) {
-		boolean lethal = super.takeDamage(damage);
-		if(lethal) {
-			if(getType().getDeadItem() != null) {
-				getTile().addItem(getType().getDeadItem());
-			}
-		}
-		return lethal;
-	}
 
 	public boolean wantsToEat() {
 		return Math.random() < 0.005;

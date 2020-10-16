@@ -75,13 +75,11 @@ public class Loader {
 				cost = loadItemTypeMap(unitTypeObject.getJSONObject("cost"));
 			}
 			
-			Item item = null;
+			LinkedList<Item> items = new LinkedList<>();
 			if(unitTypeObject.has("loot")) {
 				HashMap<ItemType, Integer> loot = loadItemTypeMap(unitTypeObject.getJSONObject("loot"));
 				for(Entry<ItemType, Integer> entry : loot.entrySet()) {
-					item = new Item(entry.getValue(), entry.getKey());
-					// TODO only get first loot for now but make it list eventually
-					break;
+					items.add(new Item(entry.getValue(), entry.getKey()));
 				}
 			}
 			ProjectileType projectile = null;
@@ -89,7 +87,7 @@ public class Loader {
 				projectile = ProjectileType.valueOf(unitTypeObject.getString("projectile"));
 			}
 			
-			UnitType unitType = new UnitType(name, image, combatStats, attributes, researchReq, cost, item, projectile);
+			UnitType unitType = new UnitType(name, image, combatStats, attributes, researchReq, cost, items, projectile);
 			unitTypeMap.put(name, unitType);
 			unitTypeList.add(unitType);
 		}
