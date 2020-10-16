@@ -529,6 +529,11 @@ public class World {
 		
 	}
 	public void clearDeadAndAddNewThings() {
+		// FACTIONS
+		for(Faction f : factions) {
+			f.clearExpiredAttackedNotifications();
+		}
+		
 		// UNITS
 		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
 		for (Unit unit : units) {
@@ -869,8 +874,13 @@ public class World {
 			double tilebrightness = tile.getBrightness(World.PLAYER_FACTION);
 			minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);
 			terrainColor = Utils.blendColors(terrainColor, Color.black, brighnessModifier + tilebrightness);
+
 			minimapImage.setRGB(tile.getLocation().x, tile.getLocation().y, minimapColor.getRGB());
 			terrainImage.setRGB(tile.getLocation().x, tile.getLocation().y, terrainColor.getRGB());
+		}
+		for(AttackedNotification notification : World.PLAYER_FACTION.getAttackedNotifications()) {
+			minimapImage.setRGB(notification.tile.getLocation().x, notification.tile.getLocation().y, Color.red.getRGB());
+			terrainImage.setRGB(notification.tile.getLocation().x, notification.tile.getLocation().y, Color.red.getRGB());
 		}
 		minimapGraphics.dispose();
 		terrainGraphics.dispose();

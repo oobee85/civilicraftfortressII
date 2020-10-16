@@ -1,11 +1,11 @@
-package world;
+package game;
 
 import java.awt.*;
 import java.util.*;
 import java.util.Map.*;
 
-import game.*;
 import ui.*;
+import world.*;
 
 public class Faction {
 	
@@ -15,6 +15,7 @@ public class Faction {
 	private static int idCounter = 0;
 
 	private final HashMap<ItemType, Item> items;
+	private LinkedList<AttackedNotification> attacked = new LinkedList<>();
 	public final int id;
 	public final Color color;
 	public final String name;
@@ -24,6 +25,22 @@ public class Faction {
 		this.color = id < factionColors.length ? factionColors[id] : Game.neutralColor;
 		this.name = name;
 		this.items = useItems ? new HashMap<ItemType, Item>() : null;
+	}
+	
+	public void gotAttacked(Tile tile) {
+		attacked.add(new AttackedNotification(tile));
+	}
+	public LinkedList<AttackedNotification> getAttackedNotifications() {
+		return attacked;
+	}
+	public void clearExpiredAttackedNotifications() {
+		LinkedList<AttackedNotification> attackedNew = new LinkedList<>();
+		for(AttackedNotification a : attacked) {
+			if(!a.isExpired()) {
+				attackedNew.add(a);
+			}
+		}
+		attacked = attackedNew;
 	}
 	
 	public boolean hasItems() {

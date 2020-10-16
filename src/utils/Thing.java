@@ -64,6 +64,7 @@ public class Thing implements HasImage {
 		health -= damage;
 		if(damage != 0) {
 			timeLastDamageTaken = Game.ticks;
+			getFaction().gotAttacked(getTile());
 		}
 		addHitsplat((int)(Math.ceil(damage)));
 		// Return true if isDead changed from false to true.

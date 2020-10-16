@@ -1644,12 +1644,10 @@ public class Game {
 		int boxy = (int) (offsetTile.y * h / world.getHeight() / 2);
 		int boxw = (int) (panelWidth * w / Game.tileSize / world.getWidth());
 		int boxh = (int) (panelHeight * h / Game.tileSize / world.getHeight());
-//		System.out.println(boxx);
 		g.setColor(Color.yellow);
 		g.drawRect(x + boxx, y + boxy, boxw, boxh);
 	}
 	protected void drawGame(Graphics g) {
-		
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
 		draw(g);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
@@ -1657,7 +1655,7 @@ public class Game {
 			g.setFont(KUIConstants.infoFont);
 			double completedRatio = 1.0 * researchTarget.getPointsSpent() / researchTarget.getRequiredPoints();
 			String progress = String.format(researchTarget + " %d/%d", researchTarget.getPointsSpent(), researchTarget.getRequiredPoints());
-			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress, 4, this.panelHeight - 30 - 4, this.panelWidth/3, 30);
+			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress, this.panelWidth - this.panelWidth/3 - 4, 4, this.panelWidth/3, 30);
 		}
 		Toolkit.getDefaultToolkit().sync();
 	}
