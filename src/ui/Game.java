@@ -688,8 +688,6 @@ public class Game {
 		if(theTile.getPlant() != null) {
 			Plant p = theTile.getPlant();
 			g.drawImage(p.getImage(Game.tileSize), drawx, drawy, draww, drawh, null);
-			drawHealthBar(g, p);
-			drawHitsplat(g, p);
 		}
 		
 		if(theTile.getBuilding() != null) {
@@ -714,18 +712,13 @@ public class Game {
 			int partialHeight = Math.max(1, (int) (Game.tileSize * percentDone));
 			bI = bI.getSubimage(0, bI.getHeight() - imageRatio, bI.getWidth(), imageRatio);
 			g.drawImage(bI, drawx, drawy - partialHeight + drawh, draww, partialHeight , null);
-			drawHealthBar(g, b);
-			drawHitsplat(g, b);
 			if(b.isBuilt() == false) {
 				g.drawImage(buildIcon, drawx + Game.tileSize/4, drawy + Game.tileSize/4, draww*3/4, drawh*3/4, null);
 			}
 		}
 		for(Unit unit : theTile.getUnits()) {
 			g.drawImage(unit.getImage(Game.tileSize), drawx, drawy, draww, drawh, null);
-			drawHealthBar(g, unit);
-			drawHitsplat(g, unit);
 		}
-		
 	}
 	
 	public void draw(Graphics g) {
@@ -774,6 +767,18 @@ public class Game {
 				BufferedImage bI = Utils.toBufferedImage(planned.getImage(0));
 				g2d.drawImage(bI, planned.getTile().getLocation().x * Game.tileSize, planned.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize , null);
 				Utils.setTransparency(g, 1f);
+			}
+			for(Building building : world.buildings) {
+				drawHealthBar(g, building);
+				drawHitsplat(g, building);
+			}
+			for(Plant plant : world.plants) {
+				drawHealthBar(g, plant);
+				drawHitsplat(g, plant);
+			}
+			for(Unit unit : world.units) {
+				drawHealthBar(g, unit);
+				drawHitsplat(g, unit);
 			}
 			
 			for(Projectile p : world.projectiles) {
