@@ -188,6 +188,7 @@ public class Frame extends JPanel {
 					SwingUtilities.invokeLater(() -> {
 						infoPanel.addButton("Explode").addActionListener(e -> gameInstance.explode(unit));
 						infoPanel.addButton("Road everything").addActionListener(e -> gameInstance.workerRoad());
+						infoPanel.addButton("AutoBuild").addActionListener(e -> gameInstance.setAutoBuild());
 					});
 				}
 				else {

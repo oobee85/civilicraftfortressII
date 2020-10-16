@@ -1330,7 +1330,22 @@ public class Game {
 //			}
 		}
 	}
-
+	public void setAutoBuild() {
+		for(Thing thing : selectedThings) {
+			if(thing instanceof Unit) {
+				Unit unit = (Unit)thing;
+				
+				if(unit.getType().isBuilder()) {
+					if(unit.getAutoBuild() == true) {
+						unit.setAutoBuild(false);
+					}else {
+						unit.setAutoBuild(true);
+					}
+					
+				}
+			}
+		}
+	}
 	public void workerRoad() {
 		
 		for(Thing thing : selectedThings) {

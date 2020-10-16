@@ -1,6 +1,5 @@
 package game;
 
-
 import java.util.*;
 
 import liquid.*;
@@ -11,8 +10,8 @@ import wildlife.Animal;
 import wildlife.Dragon;
 import world.*;
 
-public class Unit extends Thing  {
-	
+public class Unit extends Thing {
+
 	private UnitType unitType;
 	private double timeToMove;
 	private double timeToAttack;
@@ -25,8 +24,8 @@ public class Unit extends Thing  {
 	private LinkedList<Tile> currentPath;
 	private LinkedList<Tile> queuedPath;
 	private LinkedList<Attack> attacks;
-	
-	
+	private boolean isAutoBuilding;
+
 	public Unit(UnitType unitType, Tile tile, Faction faction) {
 		super(unitType.getCombatStats().getHealth(), unitType, faction, tile);
 		this.unitType = unitType;
@@ -38,237 +37,254 @@ public class Unit extends Thing  {
 
 		attacks = new LinkedList<>();
 		// projectile attacks
-		if(unitType.getProjectileType() != null) {
-			addAttackType(new Attack(unitType.getCombatStats().getAttackRadius(), unitType.getProjectileType(), unitType.getCombatStats().getAttackSpeed()));
+		if (unitType.getProjectileType() != null) {
+			addAttackType(new Attack(unitType.getCombatStats().getAttackRadius(), unitType.getProjectileType(),
+					unitType.getCombatStats().getAttackSpeed()));
 		}
 		// melee attacks
-		if(unitType.getCombatStats().getAttack() > 0) {
-			addAttackType(new Attack(1, unitType.getCombatStats().getAttack(), unitType.getCombatStats().getAttackSpeed()));
+		if (unitType.getCombatStats().getAttack() > 0) {
+			addAttackType(
+					new Attack(1, unitType.getCombatStats().getAttack(), unitType.getCombatStats().getAttackSpeed()));
 		}
 	}
-	
+
+	public void setAutoBuild(boolean auto) {
+		isAutoBuilding = auto;
+	}
+
+	public boolean getAutoBuild() {
+		return isAutoBuilding;
+	}
+
 	public void setType(UnitType type) {
 		this.unitType = type;
 		this.setImage(this.getType());
 	}
-	
+
 	public void addToPath(Tile t) {
-		if(queuedPath == null) {
+		if (queuedPath == null) {
 			queuedPath = new LinkedList<Tile>();
 		}
 		queuedPath.add(t);
 
 	}
+
 	public void addAttackType(Attack a) {
 		attacks.add(a);
 	}
-	
+
 	public void expendEffort(int effort) {
 		remainingEffort -= effort;
-		if(remainingEffort < 0) {
+		if (remainingEffort < 0) {
 			remainingEffort = 0;
 		}
 	}
+
 	public CombatStats getCombatStats() {
 		return combatStats;
 	}
+
 	public void setCombatStats(CombatStats cm) {
 		combatStats = cm;
 	}
-	
-	
+
 	public int getRemainingEffort() {
 		return remainingEffort;
 	}
+
 	public void setRemainingEffort(int effort) {
 		remainingEffort = effort;
 	}
+
 	public boolean isBuilt() {
 		return remainingEffort <= 0;
 	}
-	
+
 	public void setTarget(Thing t) {
+		if (isAutoBuilding == true) {
+			isAutoBuilding = false;
+		}
 		target = t;
 	}
-	
+
 	public UnitType getUnitType() {
 		return unitType;
 	}
-	
+
 	public double computeDanger(Tile tile) {
 		// currently only tile damage but at some point might check if enemies there
 		return tile.computeTileDamage(this);
 	}
-	
+
 	public double movePenaltyTo(Tile from, Tile to) {
 		double penalty = to.getTerrain().moveSpeed();
-		
-		if(from.getRoad() != null && to.getRoad() != null && from.getRoad().isBuilt() && to.getRoad().isBuilt()) {
-			penalty = penalty/from.getRoad().getRoadType().getSpeed()/2;
+
+		if (from.getRoad() != null && to.getRoad() != null && from.getRoad().isBuilt() && to.getRoad().isBuilt()) {
+			penalty = penalty / from.getRoad().getRoadType().getSpeed() / 2;
 		}
-		if(this.getUnitType().isFlying()) {
+		if (this.getUnitType().isFlying()) {
 			penalty = 0;
 		}
 		penalty += combatStats.getMoveSpeed();
 		return penalty;
 	}
-	
+
 	public boolean moveTo(Tile t) {
-		if(!readyToMove()) {
+		if (!readyToMove()) {
 			return false;
 		}
-		if(t.isBlocked(this) == true) {
+		if (t.isBlocked(this) == true) {
 			return false;
 		}
 		double penalty = movePenaltyTo(this.getTile(), t);
 		timeToMove += penalty;
-		
+
 		getTile().removeUnit(this);
 		t.addUnit(this);
 		this.setTile(t);
 		return true;
 	}
-	
+
 	public void moveTowards(Tile tile) {
-		if(((currentPath == null || currentPath.isEmpty() || currentPath.getLast() != tile) && tile != this.getTile())
+		if (((currentPath == null || currentPath.isEmpty() || currentPath.getLast() != tile) && tile != this.getTile())
 				|| (currentPath != null && !currentPath.isEmpty() && currentPath.getFirst().isBlocked(this))) {
 			currentPath = Pathfinding.getBestPath(this, this.getTile(), tile);
 		}
-		if(currentPath != null && !currentPath.isEmpty()) {
+		if (currentPath != null && !currentPath.isEmpty()) {
 			Tile targetTile = currentPath.getFirst();
 			boolean success = this.moveTo(targetTile);
-			if(success) {
+			if (success) {
 				currentPath.removeFirst();
 			}
 		}
 	}
-	
+
 	public LinkedList<Tile> getCurrentPath() {
 		return currentPath;
 	}
 
 	public void updateState() {
-		if(timeToMove > 0) {
+		if (timeToMove > 0) {
 			timeToMove -= 1;
 		}
-		if(timeToAttack > 0) {
+		if (timeToAttack > 0) {
 			timeToAttack -= 1;
 		}
-		if(timeToHeal > 0) {
+		if (timeToHeal > 0) {
 			timeToHeal -= 1;
 		}
-		if(getTile() == getTargetTile()) {
+		if (getTile() == getTargetTile()) {
 			setTargetTile(null);
 		}
-		isIdle = readyToMove() && readyToAttack() && target == null && getTargetTile() == null && getIsSelected() == false;
-		if(getHealth() < combatStats.getHealth() && readyToHeal()) {
+		isIdle = readyToMove() && readyToAttack() && target == null && getTargetTile() == null
+				&& getIsSelected() == false;
+		if (getHealth() < combatStats.getHealth() && readyToHeal()) {
 			heal(1, false);
 			resetTimeToHeal();
 		}
 		// Take environment damage every 5 ticks
-		if(Game.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
-			int tileDamage = (int)getTile().computeTileDamage(this);
+		if (Game.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
+			int tileDamage = (int) getTile().computeTileDamage(this);
 			if (tileDamage != 0) {
 				this.takeDamage(tileDamage);
 			}
 		}
-		if(Game.ticks % 60 == 0 && getFaction().hasItems()) {
-			if(getFaction().canAfford(ItemType.FOOD, 1)) {
+		if (Game.ticks % 60 == 0 && getFaction().hasItems()) {
+			if (getFaction().canAfford(ItemType.FOOD, 1)) {
 				getFaction().payCost(ItemType.FOOD, 1);
 				starving = 0;
-			}
-			else {
+			} else {
 				starving++;
 				takeDamage(starving);
 			}
 		}
 	}
+
 	@Override
 	public boolean takeDamage(double damage) {
 		boolean lethal = super.takeDamage(damage);
-		if(lethal) {
-			for(Item item : getType().getDeadItem()) {
+		if (lethal) {
+			for (Item item : getType().getDeadItem()) {
 				getTile().addItem(item);
 			}
 		}
 		return lethal;
 	}
-	
+
 	public boolean inRange(Thing other) {
-		if(other == null) {
+		if (other == null) {
 			return false;
 		}
-		return !(this.getTile().getLocation().distanceTo(other.getTile().getLocation()) > combatStats.getAttackRadius() 
+		return !(this.getTile().getLocation().distanceTo(other.getTile().getLocation()) > combatStats.getAttackRadius()
 				&& this.getTile() != other.getTile());
 	}
-	
-	
+
 	/**
 	 * this function does not check the attack range!
+	 * 
 	 * @return amount of damage dealt to target
 	 */
 	public double attack(Thing other) {
-		if(other == null || timeToAttack > 0 || other.isDead()) {
+		if (other == null || timeToAttack > 0 || other.isDead()) {
 			return 0;
 		}
 		double initialHP = other.getHealth();
-		
+
 		other.takeDamage(combatStats.getAttack());
 		double damageDealt = initialHP - (other.getHealth() < 0 ? 0 : other.getHealth());
-		if(unitType.hasLifeSteal() && !(other instanceof Building)) {
+		if (unitType.hasLifeSteal() && !(other instanceof Building)) {
 			this.heal(combatStats.getAttack(), true);
 		}
 		resetTimeToAttack();
-		if(other instanceof Unit) {
-			((Unit)other).aggro(this);
+		if (other instanceof Unit) {
+			((Unit) other).aggro(this);
 		}
 		return damageDealt;
 	}
-	
+
 	public void aggro(Unit attacker) {
-		if(this.getFaction() != attacker.getFaction()) {
+		if (this.getFaction() != attacker.getFaction()) {
 			this.setTarget(attacker);
 		}
 	}
-	
+
 	public Attack chooseAttack(Thing target) {
-		for(Attack a : attacks) {
+		for (Attack a : attacks) {
 			int distance = this.getTile().getLocation().distanceTo(target.getTile().getLocation());
-			if(distance <= a.range && (a.projectileType == null || distance >= a.projectileType.getMinimumRange())) {
+			if (distance <= a.range && (a.projectileType == null || distance >= a.projectileType.getMinimumRange())) {
 				return a;
 			}
 		}
 		return null;
 	}
-	
 
 	private Building getBuildingToBuild(LinkedList<Building> buildings, LinkedList<Building> plannedBuildings) {
-		if(buildings.isEmpty()) {
+		if (buildings.isEmpty()) {
 			return null;
 		}
-		for(Building building : buildings) {
-			if(building.isBuilt() == false) {
+		for (Building building : buildings) {
+			if (building.isBuilt() == false) {
 				return building;
 			}
 		}
-		for(Building pBuilding : plannedBuildings) {
+		for (Building pBuilding : plannedBuildings) {
 			return pBuilding;
 		}
 		return null;
 	}
-	
+
 	public void planActions(World world) {
 		// Workers deciding whether to move toward something to build
-		if (unitType.isBuilder() && isIdle && getTile().getIsTerritory() == getFaction()) {
+		if (unitType.isBuilder() && isAutoBuilding && getTile().getIsTerritory() == getFaction()) {
 			Building building = getBuildingToBuild(world.buildings, world.plannedBuildings);
-			if(building != null && building.getTile().getIsTerritory() == getFaction()) {
+			if (building != null && building.getTile().getIsTerritory() == getFaction()) {
 				setTargetTile(building.getTile());
 			}
 		}
 	}
-	
+
 	public void doMovement() {
-		if(getTargetTile() == null && queuedPath != null && !queuedPath.isEmpty()) {
+		if (getTargetTile() == null && queuedPath != null && !queuedPath.isEmpty()) {
 			setTargetTile(queuedPath.getFirst());
 			queuedPath.remove();
 		}
@@ -276,30 +292,30 @@ public class Unit extends Thing  {
 			moveTowards(getTargetTile());
 		}
 		// If on tile with an item, take the item
-		if(getFaction().hasItems()) {
-			for(Item item : getTile().getItems()) {
+		if (getFaction().hasItems()) {
+			for (Item item : getTile().getItems()) {
 				getFaction().addItem(item.getType(), item.getAmount());
 			}
 			getTile().clearItems();
 		}
 	}
-	
+
 	public boolean doAttacks(World world) {
 		boolean attacked = false;
-		if(target != null) {
+		if (target != null) {
 			attacked = Attack.tryToAttack(this, target);
-			if(target.isDead()) {
+			if (target.isDead()) {
 				target = null;
 			}
 		}
-		if(!attacked && getFaction() != World.NEUTRAL_FACTION) {
+		if (!attacked && getFaction() != World.NEUTRAL_FACTION) {
 			HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getType().getCombatStats().getAttackRadius());
-			for(Tile tile : inrange) {
-				if(tile.getIsTerritory() == getFaction()) {
-					for(Unit unit : tile.getUnits()) {
-						if(unit.getFaction() != this.getFaction() && unit.getType().isHostile() && unit != this) {
+			for (Tile tile : inrange) {
+				if (tile.getIsTerritory() == getFaction()) {
+					for (Unit unit : tile.getUnits()) {
+						if (unit.getFaction() != this.getFaction() && unit.getType().isHostile() && unit != this) {
 							attacked = attacked || Attack.tryToAttack(this, unit);
-							if(attacked) {
+							if (attacked) {
 								break;
 							}
 						}
@@ -312,81 +328,92 @@ public class Unit extends Thing  {
 
 	private Building getAdjacentUnfinishedBuilding(Tile tile) {
 		Building tobuild = tile.getBuilding();
-		if(tobuild != null && !tobuild.isBuilt()) {
+		if (tobuild != null && !tobuild.isBuilt()) {
 			return tobuild;
 		}
-		for(Tile neighbor : tile.getNeighbors()) {
+		for (Tile neighbor : tile.getNeighbors()) {
 			tobuild = neighbor.getBuilding();
-			if(tobuild != null && !tobuild.isBuilt()) {
+			if (tobuild != null && !tobuild.isBuilt()) {
 				return tobuild;
 			}
 		}
 		return null;
 	}
-	
+
 	public void doPassiveThings(World world) {
 		// Workers building stuff
-		if(getType().isBuilder()) {
+		if (getType().isBuilder()) {
 			Building tobuild = getAdjacentUnfinishedBuilding(getTile());
-			if(tobuild != null) {
+			if (tobuild != null) {
 				tobuild.expendEffort(1);
-				if(tobuild.getRemainingEffort() > 0) {
-					tobuild.heal(tobuild.getMaxHealth()/tobuild.getType().getBuildingEffort(), false);
+				if (tobuild.getRemainingEffort() > 0) {
+					tobuild.heal(tobuild.getMaxHealth() / tobuild.getType().getBuildingEffort(), false);
 				}
-				if(tobuild.getRemainingEffort() < tobuild.getType().getBuildingEffort()) {
+				if (tobuild.getRemainingEffort() < tobuild.getType().getBuildingEffort()) {
 					tobuild.setPlanned(false);
 				}
 			}
-			for(Tile tile : this.getTile().getNeighbors()) {
-				if(tile.getRoad() != null && tile.getRoad().getRemainingEffort() > 0) {
+			for (Tile tile : this.getTile().getNeighbors()) {
+				if (tile.getRoad() != null && tile.getRoad().getRemainingEffort() > 0) {
 					tile.getRoad().expendEffort(1);
 				}
 			}
-			
+
 		}
 	}
-	
+
 	public void resetTimeToAttack() {
 		timeToAttack = combatStats.getAttackSpeed();
 	}
+
 	public Thing getTarget() {
 		return target;
 	}
+
 	public UnitType getType() {
 		return unitType;
 	}
-	
+
 	public boolean readyToMove() {
 		return timeToMove <= 0;
 	}
+
 	public double getTimeToMove() {
 		return timeToMove;
 	}
+
 	public boolean readyToAttack() {
 		return timeToAttack <= 0;
 	}
+
 	public double getTimeToAttack() {
 		return timeToAttack;
 	}
+
 	public void setTimeToAttack(int x) {
 		timeToAttack = x;
 	}
+
 	public double getTimeToHeal() {
 		return timeToHeal;
 	}
+
 	public boolean readyToHeal() {
 		return timeToHeal <= 0;
 	}
+
 	public void resetTimeToHeal() {
 		timeToHeal = combatStats.getHealSpeed();
 	}
+
 	public boolean isIdle() {
 		return isIdle;
 	}
+
 	public boolean isRanged() {
 		return unitType.isRanged();
 	}
-	
+
 	@Override
 	public List<String> getDebugStrings() {
 		List<String> strings = super.getDebugStrings();
@@ -395,6 +422,7 @@ public class Unit extends Thing  {
 		strings.add(String.format("TTH=%.1f", getTimeToHeal()));
 		return strings;
 	}
+
 	@Override
 	public String toString() {
 		return unitType.toString();
