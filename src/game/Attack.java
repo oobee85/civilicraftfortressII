@@ -43,6 +43,9 @@ public class Attack {
 	}
 
 	public static void shoot(Unit unit, Thing target, Attack attack) {
+		if(target.getTile().getThingOfFaction(unit.getFaction()) != null) {
+			return;
+		}
 		if(attack.projectileType == ProjectileType.FIREWAVE && unit.readyToAttack() && !target.isDead()) {
 			fireWave(unit, target, attack);
 		}

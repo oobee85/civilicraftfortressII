@@ -307,6 +307,9 @@ public class Tile {
 		if(building.isPlanned() == true) {
 			return false;
 		}
+		if(this.countUnitsOfFaction(u.getFaction()) != this.getUnits().size()) {
+			return true;
+		}
 		BuildingType bt = building.getType();
 		if(bt == BuildingType.WALL_WOOD || bt == BuildingType.WALL_STONE || bt == BuildingType.WALL_BRICK) {
 			return true;

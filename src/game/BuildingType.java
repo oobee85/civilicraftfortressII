@@ -11,27 +11,27 @@ import world.Tile;
 
 public enum BuildingType implements HasImage {
 	 	
-	 	WALL_WOOD (100, 100, "resources/Images/buildings/wall_wood.png", 0, false, 0,
+	 	WALL_WOOD (100, 100, "resources/Images/buildings/wall_wood.png", 0.25, false, 0,
 	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }},
 	 			null),
 	 	
-	 	WALL_STONE (1000, 200, "resources/Images/buildings/wall_stone.png", 0, false, 1,
+	 	WALL_STONE (1000, 200, "resources/Images/buildings/wall_stone.png", 0.25, false, 1,
 	 			"ENGINEERING",  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,200);	put(ItemType.WOOD,200);  }},
 	 			null),
 	 	
-	 	WALL_BRICK (5000, 500, "resources/Images/buildings/wall_brick.png", 0, false, 1,
+	 	WALL_BRICK (5000, 500, "resources/Images/buildings/wall_brick.png", 0.25, false, 1,
 	 			"MONARCHY",  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,400); put(ItemType.ADAMANTITE_BAR,1);  }},
 	 			null),
 	 	
-	 	GATE_WOOD (100, 200, "resources/Images/buildings/gate_wood.png", 0, false, 1,
+	 	GATE_WOOD (100, 200, "resources/Images/buildings/gate_wood.png", 0.5, false, 1,
 	 			"MASONRY",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,200); put(ItemType.STONE,200); put(ItemType.IRON_BAR,5); }},
 	 			null),
 	 	
-	 	GATE_STONE (1000, 400, "resources/Images/buildings/gate_stone.png", 0, false, 1,
+	 	GATE_STONE (1000, 400, "resources/Images/buildings/gate_stone.png", 0.5, false, 1,
 	 			"ENGINEERING",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,400); put(ItemType.STONE,400); put(ItemType.MITHRIL_BAR,5); }},
 	 			null),
 	 	
-	 	GATE_BRICK (5000, 1000, "resources/Images/buildings/gate_brick.png", 0, false, 1,
+	 	GATE_BRICK (5000, 1000, "resources/Images/buildings/gate_brick.png", 0.5, false, 1,
 	 			"MONARCHY",  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,1000); put(ItemType.WOOD,1000); put(ItemType.ADAMANTITE_BAR,5); }},
 	 			null),
 	 	

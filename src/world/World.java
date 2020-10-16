@@ -403,7 +403,7 @@ public class World {
 				if(adjacentGrass && adjacentWater) {
 					threshold += 0.1;
 				}
-				if(tile.getTempurature() > Season.FREEZING_TEMPURATURE && Math.random() < tile.liquidAmount*threshold*tile.getHumidity()) {
+				if(tile.getTempurature() > Season.FREEZING_TEMPURATURE && Math.random() < tile.liquidAmount*threshold*tile.getHumidity() && tile.liquidType != LiquidType.ICE) {
 					tile.setTerrain(Terrain.GRASS);
 				}
 			}
