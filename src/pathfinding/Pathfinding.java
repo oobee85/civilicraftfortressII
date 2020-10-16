@@ -188,7 +188,7 @@ public class Pathfinding {
 		}
 		
 		for (Tile neighbor : currentTile.getNeighbors()) {
-			if(!neighbor.canMove(unit)) {
+			if(neighbor.isBlocked(unit)) {
 				continue;
 			}
 			double tiledamage = neighbor.computeTileDamage(unit);

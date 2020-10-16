@@ -26,8 +26,8 @@ public class Unit extends Thing  {
 	private LinkedList<Attack> attacks;
 	
 	
-	public Unit(UnitType unitType, Tile tile, boolean isPlayerControlled) {
-		super(unitType.getCombatStats().getHealth(), unitType, isPlayerControlled, tile);
+	public Unit(UnitType unitType, Tile tile, int faction) {
+		super(unitType.getCombatStats().getHealth(), unitType, faction, tile);
 		this.unitType = unitType;
 		this.combatStats = unitType.getCombatStats();
 		this.timeToAttack = unitType.getCombatStats().getAttackSpeed();
@@ -116,7 +116,7 @@ public class Unit extends Thing  {
 		if(!readyToMove()) {
 			return false;
 		}
-		if(t.canMove(this) == false) {
+		if(t.isBlocked(this) == true) {
 			return false;
 		}
 		double penalty = movePenaltyTo(this.getTile(), t);
@@ -130,7 +130,7 @@ public class Unit extends Thing  {
 	
 	public void moveTowards(Tile tile) {
 		if(((currentPath == null || currentPath.isEmpty() || currentPath.getLast() != tile) && tile != this.getTile())
-				|| (currentPath != null && !currentPath.isEmpty() && !currentPath.getFirst().canMove(this))) {
+				|| (currentPath != null && !currentPath.isEmpty() && currentPath.getFirst().isBlocked(this))) {
 			currentPath = Pathfinding.getBestPath(this, this.getTile(), tile);
 		}
 		if(currentPath != null && !currentPath.isEmpty()) {
@@ -205,10 +205,9 @@ public class Unit extends Thing  {
 	}
 	
 	public void aggro(Unit attacker) {
-		if(this.isPlayerControlled() && attacker.isPlayerControlled()) {
-			return;
+		if(this.getFaction() != attacker.getFaction()) {
+			this.setTarget(attacker);
 		}
-		this.setTarget(attacker);
 	}
 	
 	public Attack chooseAttack(Thing target) {
@@ -256,7 +255,7 @@ public class Unit extends Thing  {
 			moveTowards(getTargetTile());
 		}
 		// If on tile with an item, take the item
-		if(this.isPlayerControlled()) {
+		if(getFaction() == World.PLAYER_FACTION) {
 			for(Item item : getTile().getItems()) {
 				items.get(item.getType()).addAmount(item.getAmount());
 			}
@@ -272,11 +271,11 @@ public class Unit extends Thing  {
 				target = null;
 			}
 		}
-		if(!attacked && isPlayerControlled()) {
+		if(!attacked && getFaction() != World.NEUTRAL_FACTION) {
 			HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getType().getCombatStats().getAttackRadius());
 			for(Tile tile : inrange) {
 				for(Unit unit : tile.getUnits()) {
-					if(!unit.isPlayerControlled() && unit.getType().isHostile() && unit != this) {
+					if(unit.getFaction() != this.getFaction() && unit.getType().isHostile() && unit != this) {
 						Attack.tryToAttack(this, unit);
 					}
 				}

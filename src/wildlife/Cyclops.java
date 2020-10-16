@@ -8,8 +8,8 @@ import world.Tile;
 
 public class Cyclops extends Animal {
 
-	public Cyclops(Tile tile, boolean isPlayerControlled) {
-		super(Game.unitTypeMap.get("CYCLOPS"), tile, isPlayerControlled);
+	public Cyclops(Tile tile, int faction) {
+		super(Game.unitTypeMap.get("CYCLOPS"), tile, faction);
 	}
 
 	@Override

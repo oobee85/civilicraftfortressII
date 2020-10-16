@@ -8,8 +8,8 @@ import world.*;
 
 public class Flamelet extends Animal {
 
-	public Flamelet(Tile tile, boolean isPlayerControlled) {
-		super(Game.unitTypeMap.get("FLAMELET"), tile, isPlayerControlled);
+	public Flamelet(Tile tile, int faction) {
+		super(Game.unitTypeMap.get("FLAMELET"), tile, faction);
 	}
 	
 	@Override

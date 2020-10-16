@@ -150,13 +150,13 @@ public class Game {
 			world.rain();
 		}
 		if(Math.random() < 0.0005) {
-			world.spawnAnimal(Game.unitTypeMap.get("WATER_SPIRIT"), world.getTilesRandomly().getFirst());
+			world.spawnAnimal(Game.unitTypeMap.get("WATER_SPIRIT"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
 		}
 		if(ticks >= 1000 && Math.random() < 0.001) {
-			world.spawnAnimal(Game.unitTypeMap.get("FLAMELET"), world.getTilesRandomly().getFirst());
+			world.spawnAnimal(Game.unitTypeMap.get("FLAMELET"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
 		}
 		if(ticks >= 3000 && Math.random() < 0.0005) {
-			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst());
+			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
 		}
 		if(ticks >= 6000 && Math.random() < 0.0005 ) {
 			world.spawnWerewolf();
@@ -166,7 +166,7 @@ public class Game {
 			world.spawnIceGiant();
 		}
 		if(ticks >= 6000 && Math.random() < 0.0001) {
-			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst());
+			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
 		}
 		if(ticks >= 3000 && Math.random() < (0.00005 * numCutTrees/5)) {
 			world.spawnEnt();
@@ -269,7 +269,7 @@ public class Game {
 	public void spawnEverything() {
 		List<Tile> tiles = world.getTilesRandomly();
 		for(UnitType type : Game.unitTypeList) {
-			world.spawnAnimal(type, tiles.remove(0));
+			world.spawnAnimal(type, tiles.remove(0), World.NEUTRAL_FACTION);
 		}
 	}
 	public void generateWorld(MapType mapType, int size, boolean easymode) {
@@ -286,6 +286,7 @@ public class Game {
 		world.clearDeadAndAddNewThings();
 	}
 	public void spawnOrcs() {
+		int ORC_FACTION = 2;
 		LinkedList<Tile> tiles = world.getTilesRandomly();
 		Tile tile = tiles.peek();
 		for(Tile t : tiles) {
@@ -297,7 +298,7 @@ public class Game {
 		TileLoc tloc = new TileLoc(tile.getLocation().x, tile.getLocation().y);
 		Tile barracks = world.get(tloc) ;
 //		summonThing(tile, null, BuildingType.BARRACKS, false);
-		summonThing(barracks, null, BuildingType.BARRACKS, false);
+		summonThing(barracks, null, BuildingType.BARRACKS, ORC_FACTION);
 		
 		//makes the walls
 		for(int i = 0; i < 6; i ++) {
@@ -308,30 +309,30 @@ public class Game {
 				continue;
 			}
 			if(i != 3) {
-				summonThing(wall, null, BuildingType.WALL_WOOD, false);
+				summonThing(wall, null, BuildingType.WALL_WOOD, ORC_FACTION);
 			}
 			
 			
 			wallLoc = new TileLoc(tile.getLocation().x+3, tile.getLocation().y-3 + i);
 			wall = world.get(wallLoc) ;
 			if(i != 3) {
-				summonThing(wall, null, BuildingType.WALL_WOOD, false);
+				summonThing(wall, null, BuildingType.WALL_WOOD, ORC_FACTION);
 			}
 			
 			
 			wallLoc = new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y-3);
 			wall = world.get(wallLoc) ;
-			summonThing(wall, null, BuildingType.WALL_WOOD, false);
+			summonThing(wall, null, BuildingType.WALL_WOOD, ORC_FACTION);
 			
 			wallLoc = new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y+3);
 			wall = world.get(wallLoc) ;
-			summonThing(wall, null, BuildingType.WALL_WOOD, false);
+			summonThing(wall, null, BuildingType.WALL_WOOD, ORC_FACTION);
 		}
 		for(int i = -1; i < 2; i ++) {
 			for(int j = -1; j < 2; j ++) {
 				tloc = new TileLoc(tile.getLocation().x + i, tile.getLocation().y + j);
 				Tile temp = world.get(tloc);
-				world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp);
+				world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp, ORC_FACTION);
 			}
 			
 		}
@@ -347,7 +348,7 @@ public class Game {
 	public void buildingTick() {
 		
 		for(Building building : world.buildings) {
-			if(building.getIsPlayerControlled()) {
+			if(building.getFaction() == World.PLAYER_FACTION) {
 				double culture = building.getCulture();
 				double area = culture * Building.CULTURE_AREA_MULTIPLIER;
 				double radius = Math.sqrt(area);
@@ -360,6 +361,7 @@ public class Game {
 							Tile tile = world.get(tileloc);
 							if(tile != null) {
 								tile.setTerritory(true);
+								// TODO pretty sure this adds duplicate tiles to territory
 								world.addToTerritory(tile);
 							}
 						}
@@ -666,7 +668,7 @@ public class Game {
 						&& !current.getHasBuilding()
 						&& current.liquidAmount < current.liquidType.getMinimumDamageAmount()
 						&& (current.getTerrain() != Terrain.ROCK || type != BuildingType.CASTLE)) {
-					Building s = new Building(type, current, true);
+					Building s = new Building(type, current, World.PLAYER_FACTION);
 					current.setBuilding(s);
 					world.newBuildings.add(s);
 					s.setRemainingEffort(0);
@@ -676,7 +678,7 @@ public class Game {
 			else if(thing instanceof UnitType) {
 				UnitType type = (UnitType)thing;
 				if (current.liquidAmount < current.liquidType.getMinimumDamageAmount()) {
-					summonThing(current, type, null, true);
+					summonThing(current, type, null, World.PLAYER_FACTION);
 					thing = null;
 				}
 			}
@@ -990,8 +992,8 @@ public class Game {
 				//draws a square for every player unit on the tile
 				int xx = unit.getTile().getLocation().x * Game.tileSize + offset;
 				int yy = unit.getTile().getLocation().y * Game.tileSize + (indicatorSize + offset)*count + offset;
-				if(unit.isPlayerControlled()) {
-					g.setColor(playerColor);
+				if(world.factionColors.containsKey(unit.getFaction())) {
+					g.setColor(world.factionColors.get(unit.getFaction()));
 				}
 				else {
 					g.setColor(neutralColor);
@@ -1009,7 +1011,7 @@ public class Game {
 						Tile tile = world.get(new TileLoc(i, j));
 						if(tile == null)
 							continue;
-						double brightness = world.getDaylight() + tile.getBrightness();
+						double brightness = world.getDaylight() + tile.getBrightness(World.PLAYER_FACTION);
 						brightness = Math.max(Math.min(brightness, 1), 0);
 						g.setColor(new Color(0, 0, 0, (int)(255 * (1 - brightness))));
 						g.fillRect(i * Game.tileSize, j * Game.tileSize, Game.tileSize, Game.tileSize);
@@ -1233,28 +1235,25 @@ public class Game {
 	}
 
 	
-	private void summonThing(Tile tile, UnitType unitType, BuildingType buildingType, boolean playerControlled) {
+	private void summonThing(Tile tile, UnitType unitType, BuildingType buildingType, int faction) {
 		
 		if(unitType != null) {
 			System.out.println("spawn unit" + unitType.toString() +tile.getLocation());
-			Unit unit = new Unit(unitType, tile, playerControlled);
-			if(playerControlled) {
-			}else {
-//				unit = new Animal(unitType, tile, playerControlled);
-				world.spawnAnimal(unitType, tile);
-				return;
+			if(faction == World.PLAYER_FACTION) {
+				Unit unit = new Unit(unitType, tile, faction);
+				world.newUnits.add(unit);
+				tile.addUnit(unit);
+				unit.setTimeToAttack(0);
+			} else {
+				world.spawnAnimal(unitType, tile, faction);
 			}
-			world.newUnits.add(unit);
-			tile.addUnit(unit);
-			unit.setTimeToAttack(0);
 		}
-		if(buildingType != null) {
+		else if(buildingType != null) {
 			if(tile.getBuilding() != null) {
 				tile.getBuilding().takeDamage(tile.getBuilding().getType().getHealth() + 1);
 			}
-				
 			System.out.println("spawn building" + buildingType.toString() + tile.getLocation());
-			Building building = new Building(buildingType, tile, playerControlled);
+			Building building = new Building(buildingType, tile, faction);
 			building.setRemainingEffort(0);
 			tile.setBuilding(building);
 			world.newBuildings.add(building);
@@ -1262,13 +1261,17 @@ public class Game {
 		
 	}
 	
-	public void toggleTargetEnemy(Tile tile) {
+	/**
+	 * @return true if chose target, false otherwise
+	 */
+	public boolean toggleTargetEnemy(Tile tile) {
+		boolean choseTarget = false;
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit) thing;
 				Thing targetThing = tile.getUnits().peek();
 				for(Unit tempUnit : tile.getUnits()) {
-					if(!tempUnit.isPlayerControlled()) {
+					if(tempUnit.getFaction() != unit.getFaction()) {
 						targetThing = tempUnit;
 					}
 				}
@@ -1278,8 +1281,9 @@ public class Game {
 				
 				if(targetThing != null) {
 					// sets the target if the target isn't itself (clicking a lets you attack allies)
-					if(targetThing != unit && (aControl == true || targetThing.isPlayerControlled() == false)) {
+					if(targetThing != unit && (aControl == true || targetThing.getFaction() != unit.getFaction())) {
 						unit.setTarget(targetThing);
+						choseTarget = true;
 					}
 					//attack move makes unit go to the closest tile that it can attack from
 					if(aControl == true) {
@@ -1291,13 +1295,13 @@ public class Game {
 							}
 						}
 						unit.setTargetTile(bestTile);
+						choseTarget = true;
 					}
 				} 
 				
 			}
 		}
-		
-		
+		return choseTarget;
 	}
 	public void setSpawnLocation(Tile tile) {
 		for(Thing thing : selectedThings) {
@@ -1343,7 +1347,7 @@ public class Game {
 		}
 		// spawning unit
 		if (selectedUnitToSpawn != null) {
-			summonThing(tile, selectedUnitToSpawn, null, summonPlayerControlled);
+			summonThing(tile, selectedUnitToSpawn, null, summonPlayerControlled ? 1 : 0);
 			if(shiftEnabled == false) {
 				selectedUnitToSpawn = null;
 				selectedBuildingToSpawn = null;
@@ -1354,7 +1358,7 @@ public class Game {
 		
 		//spawning building
 		if (selectedBuildingToSpawn != null) {
-			summonThing(tile, null, selectedBuildingToSpawn, summonPlayerControlled);
+			summonThing(tile, null, selectedBuildingToSpawn, summonPlayerControlled ? 1 : 0);
 			if(shiftEnabled == false) {
 				selectedUnitToSpawn = null;
 				selectedBuildingToSpawn = null;
@@ -1401,19 +1405,11 @@ public class Game {
 		Tile tile = world.get(loc);
 		setSpawnLocation(tile);
 		
-	
-		for(Unit unit : tile.getUnits()) {
-			//if there is a non-player unit, cant move onto it
-			if(!unit.isPlayerControlled()) {
-				//instead attack the non-player unit
-				toggleTargetEnemy(tile);
-				return;
-			}
+		boolean choseTarget = toggleTargetEnemy(tile);
+		if(!choseTarget) {
+			//sets the target tile if there isnt an enemy
+			setDestination(mx, my);
 		}
-		//sets the target tile if there isnt an enemy
-		setDestination(mx, my);
-		
-		
 	}
 	
 	public void shiftControl(boolean enabled) {
@@ -1445,7 +1441,7 @@ public class Game {
 		}
 		
 		//selects the building on the tile
-		if(building != null && building.getIsPlayerControlled() && tile.getPlayerControlledUnit() == null) {
+		if(building != null && building.getFaction() == World.PLAYER_FACTION && tile.getUnitOfFaction(World.PLAYER_FACTION) == null) {
 			guiController.selectedBuilding(building, true);
 			building.setIsSelected(true);
 			selectedThings.add(building);
@@ -1453,7 +1449,7 @@ public class Game {
 		//goes through all the units on the tile and checks if they are selected
 		for(Unit candidate : tile.getUnits()) {
 			// clicking on tile w/o shift i.e only selects top unit
-			if (candidate.isPlayerControlled()) {
+			if (candidate.getFaction() == World.PLAYER_FACTION) {
 				if (shiftEnabled) {
 					//shift enabled -> selects whole stack
 					candidate.setIsSelected(true);
@@ -1587,7 +1583,7 @@ public class Game {
 			unit.doMovement(items);
 			unit.doAttacks(world);
 			unit.doPassiveThings(world);
-			if(Game.ticks % 60 == 0 && unit.isPlayerControlled()) {
+			if(Game.ticks % 60 == 0 && unit.getFaction() == World.PLAYER_FACTION) {
 				if(food.getAmount() < cost) {
 					unit.setDead(true);
 				}
@@ -1649,7 +1645,7 @@ public class Game {
 		if(tile != null) {
 			if(canBuild(bt, tile) == true) {
 				chargePrice(bt);
-				Building building = new Building(bt, tile, true);
+				Building building = new Building(bt, tile, World.PLAYER_FACTION);
 				tile.setBuilding(building);
 				world.plannedBuildings.add(building);
 				building.setPlanned(true);
@@ -1664,7 +1660,7 @@ public class Game {
 			if (thing != null && thing instanceof Unit && ((Unit) thing).getUnitType().isBuilder()) {
 				if(canBuild(bt, thing.getTile()) == true) {
 					chargePrice(bt);
-					Building building = new Building(bt, thing.getTile(), true);
+					Building building = new Building(bt, thing.getTile(), World.PLAYER_FACTION);
 					thing.getTile().setBuilding(building);
 					world.newBuildings.add(building);
 					building.setPlanned(false);
@@ -1779,7 +1775,7 @@ public class Game {
 			}
 		}
 		
-		Unit unit = new Unit(u, tile, true);
+		Unit unit = new Unit(u, tile, World.PLAYER_FACTION);
 		if (tile.isBlocked(unit)) {
 			return;
 		}

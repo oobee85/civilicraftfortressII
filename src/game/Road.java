@@ -15,7 +15,7 @@ public class Road extends Thing {
 	private ResearchRequirement req = new ResearchRequirement();
 	
 	public Road(RoadType roadType, Tile tile) {
-		super(roadType.getHealth(), roadType, true, tile);
+		super(roadType.getHealth(), roadType, 0, tile);
 		this.remainingEffort = roadType.getBuildingEffort();
 		this.roadType = roadType;
 		this.health = roadType.getHealth();

@@ -8,8 +8,8 @@ import world.*;
 
 public class Bomb extends Animal {
 
-	public Bomb(Tile tile, boolean isPlayerControlled) {
-		super(Game.unitTypeMap.get("BOMB"), tile, isPlayerControlled);
+	public Bomb(Tile tile, int faction) {
+		super(Game.unitTypeMap.get("BOMB"), tile, faction);
 	}
 	
 	@Override

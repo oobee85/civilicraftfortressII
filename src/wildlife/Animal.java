@@ -15,8 +15,8 @@ public class Animal extends Unit {
 	
 	private int migratingUntil;
 	
-	public Animal(UnitType type, Tile tile, boolean isPlayerControlled) {
-		super(type, tile, isPlayerControlled);
+	public Animal(UnitType type, Tile tile, int faction) {
+		super(type, tile, faction);
 	}
 	
 	public boolean getHasHome() {

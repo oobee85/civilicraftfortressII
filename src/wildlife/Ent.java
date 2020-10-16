@@ -8,8 +8,8 @@ import world.*;
 
 public class Ent extends Animal {
 
-	public Ent(Tile tile, boolean isPlayerControlled) {
-		super(Game.unitTypeMap.get("ENT"), tile, isPlayerControlled);
+	public Ent(Tile tile, int faction) {
+		super(Game.unitTypeMap.get("ENT"), tile, faction);
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class Ent extends Animal {
 			}
 		}
 		for(Unit u : units) {
-			if(u.isPlayerControlled()) {
+			if(u.getFaction() == World.PLAYER_FACTION) {
 				setTarget(u);
 				return;
 			}

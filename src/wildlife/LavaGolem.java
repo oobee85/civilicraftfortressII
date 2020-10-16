@@ -8,8 +8,8 @@ import world.*;
 
 public class LavaGolem extends Animal {
 
-	public LavaGolem(Tile tile, boolean isPlayerControlled) {
-		super(Game.unitTypeMap.get("LAVAGOLEM"), tile, isPlayerControlled);
+	public LavaGolem(Tile tile, int faction) {
+		super(Game.unitTypeMap.get("LAVAGOLEM"), tile, faction);
 	}
 	
 	@Override

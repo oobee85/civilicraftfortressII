@@ -12,8 +12,8 @@ public class Parasite extends Animal {
 	private boolean transformed;
 	private Tile volcano;
 
-	public Parasite(Tile tile, boolean isPlayerControlled, Tile volcano) {
-		super(Game.unitTypeMap.get("PARASITE"), tile, isPlayerControlled);
+	public Parasite(Tile tile, int faction, Tile volcano) {
+		super(Game.unitTypeMap.get("PARASITE"), tile, faction);
 		this.volcano = volcano;
 	}
 	
@@ -26,7 +26,7 @@ public class Parasite extends Animal {
 	public void updateState() {
 		super.updateState();
 		if(getTarget() != null) {
-			if(getTarget().isDead() || !getTarget().isPlayerControlled()) {
+			if(getTarget().isDead() || getTarget().getFaction() != World.PLAYER_FACTION) {
 				setTarget(null);
 			}
 		}
@@ -82,7 +82,7 @@ public class Parasite extends Animal {
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		if(!transformed) {
 			for(Unit unit : units) {
-				if(unit.isPlayerControlled()) {
+				if(unit.getFaction() == World.PLAYER_FACTION) {
 					setTarget(unit);
 					if(Math.random() < 0.2) {
 						return;

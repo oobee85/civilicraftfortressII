@@ -11,8 +11,8 @@ public class Werewolf extends Animal {
 
 	boolean transformed = false;
 	
-	public Werewolf(Tile tile, boolean isPlayerControlled) {
-		super(Game.unitTypeMap.get("WEREWOLF"), tile, isPlayerControlled);
+	public Werewolf(Tile tile, int faction) {
+		super(Game.unitTypeMap.get("WEREWOLF"), tile, faction);
 	}
 
 	private void transformBack(Unit host) {
@@ -61,7 +61,7 @@ public class Werewolf extends Animal {
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		if(transformed) {
 			for(Unit unit : units) {
-				if(unit.isPlayerControlled()) {
+				if(unit.getFaction() == World.PLAYER_FACTION) {
 					setTarget(unit);
 				}
 			}

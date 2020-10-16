@@ -10,8 +10,8 @@ import world.*;
 
 public class IceGiant extends Animal {
 	
-	public IceGiant(Tile tile, boolean isPlayerControlled) {
-		super(Game.unitTypeMap.get("ICE_GIANT"), tile, isPlayerControlled);
+	public IceGiant(Tile tile, int faction) {
+		super(Game.unitTypeMap.get("ICE_GIANT"), tile, faction);
 	}
 	
 	@Override
@@ -27,7 +27,7 @@ public class IceGiant extends Animal {
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		for(Unit u : units) {
-			if(u.isPlayerControlled()) {
+			if(u.getFaction() == World.PLAYER_FACTION) {
 				setTarget(u);
 				return;
 			}

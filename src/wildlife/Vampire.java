@@ -8,8 +8,8 @@ import world.*;
 
 public class Vampire extends Animal {
 
-	public Vampire(Tile tile, boolean isPlayerControlled) {
-		super(Game.unitTypeMap.get("VAMPIRE"), tile, isPlayerControlled);
+	public Vampire(Tile tile, int faction) {
+		super(Game.unitTypeMap.get("VAMPIRE"), tile, faction);
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class Vampire extends Animal {
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		for(Unit u : units) {
-			if(u.isPlayerControlled()) {
+			if(u.getFaction() == World.PLAYER_FACTION) {
 				setTarget(u);
 				return;
 			}

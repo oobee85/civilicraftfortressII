@@ -11,7 +11,7 @@ import world.*;
 
 public class Thing implements HasImage {
 
-	private boolean isPlayerControlled;
+	private int faction;
 	private double maxHealth;
 	private double health;
 	private boolean isDead;
@@ -21,24 +21,19 @@ public class Thing implements HasImage {
 	private boolean isSelected;
 	
 	private HasImage hasImage;
-	private boolean sideHealthBar;
 //	private LinkedList<Hitsplat> hitsplats = new LinkedList<Hitsplat>();
 	private Hitsplat[] hitsplats = new Hitsplat[4];
 	
 	private String name;
 	
-	public Thing(double maxHealth, HasImage hasImage, boolean isPlayerControlled) {
+	public Thing(double maxHealth, HasImage hasImage, int faction) {
 		health = maxHealth;
 		this.maxHealth = maxHealth;
 		this.hasImage = hasImage;
-		this.isPlayerControlled = isPlayerControlled;
-		sideHealthBar = false;
-		if(hasImage instanceof UnitType) {
-			UnitType t = (UnitType)hasImage;
-		}
+		this.faction = faction;
 	}
-	public Thing(double maxHealth, HasImage hasImage, boolean isPlayerControlled, Tile tile) {
-		this(maxHealth, hasImage, isPlayerControlled);
+	public Thing(double maxHealth, HasImage hasImage, int faction, Tile tile) {
+		this(maxHealth, hasImage, faction);
 		this.tile = tile;
 	}
 	
@@ -46,17 +41,12 @@ public class Thing implements HasImage {
 		this.hasImage = hasImage;
 	}
 	
-	
-	public boolean isPlayerControlled() {
-		return isPlayerControlled;
+	public int getFaction() {
+		return faction;
 	}
 	
-	public void setPlayerControlled(boolean pc) {
-		this.isPlayerControlled = pc;
-	}
-	
-	public boolean isSideHealthBar() {
-		return sideHealthBar;
+	public void setFaction(int faction) {
+		this.faction = faction;
 	}
 
 	public void setDead(boolean state) {

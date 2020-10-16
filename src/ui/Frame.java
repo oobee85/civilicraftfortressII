@@ -1053,14 +1053,14 @@ public class Frame extends JPanel {
 				gameInstance.world.spawnOgre();
 				gameInstance.world.spawnDragon();
 				gameInstance.world.spawnWerewolf();
-				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("FLAMELET"), gameInstance.world.getTilesRandomly().getFirst());
-				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("WATER_SPIRIT"), gameInstance.world.getTilesRandomly().getFirst());
-				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), gameInstance.world.getTilesRandomly().getFirst());
+				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("FLAMELET"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
+				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("WATER_SPIRIT"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
+				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
 				gameInstance.world.spawnEnt();
 				gameInstance.world.spawnLavaGolem();
 				gameInstance.world.spawnIceGiant();
 				gameInstance.world.spawnSkeletonArmy();
-				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("BOMB"), gameInstance.world.getTilesRandomly().getFirst());
+				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("BOMB"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
 				gameInstance.spawnOrcs();
 			}
 		});

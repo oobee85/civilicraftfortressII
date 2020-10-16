@@ -13,8 +13,8 @@ public class Dragon extends Animal {
 	private int timeToFireball;
 	private int timeToHunt;
 	
-	public Dragon(Tile tile, boolean isPlayerControlled) {
-		super(Game.unitTypeMap.get("DRAGON"), tile, isPlayerControlled);
+	public Dragon(Tile tile, int faction) {
+		super(Game.unitTypeMap.get("DRAGON"), tile, faction);
 		this.home = tile;
 		resetTimeToFireball();
 		resetTimeToHunt();

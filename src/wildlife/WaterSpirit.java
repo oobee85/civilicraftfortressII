@@ -9,8 +9,8 @@ import world.*;
 
 public class WaterSpirit extends Animal {
 
-	public WaterSpirit(Tile tile, boolean isPlayerControlled) {
-		super(Game.unitTypeMap.get("WATER_SPIRIT"), tile, isPlayerControlled);
+	public WaterSpirit(Tile tile, int faction) {
+		super(Game.unitTypeMap.get("WATER_SPIRIT"), tile, faction);
 	}
 	
 	@Override

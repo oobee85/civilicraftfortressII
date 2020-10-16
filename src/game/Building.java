@@ -17,18 +17,16 @@ public class Building extends Thing {
 	private Tile spawnLocation;
 	private double timeToHarvest;
 	private double baseTimeToHarvest = 20;
-	private boolean isPlayerControlled;
 	private boolean isPlanned;
 	
 	private ResearchRequirement req = new ResearchRequirement();
 	
-	public Building(BuildingType buildingType, Tile tile, boolean isPlayerControlled) {
-		super(buildingType.getHealth(), buildingType, true, tile);
+	public Building(BuildingType buildingType, Tile tile, int faction) {
+		super(buildingType.getHealth(), buildingType, faction, tile);
 		this.remainingEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
 		this.spawnLocation = tile;
 		this.timeToHarvest = baseTimeToHarvest;
-		this.isPlayerControlled = isPlayerControlled;
 		this.isPlanned = false;
 		
 		
@@ -83,9 +81,6 @@ public class Building extends Thing {
 		
 	}
 	
-	public boolean getIsPlayerControlled(){
-		return isPlayerControlled;
-	}
 	public LinkedList<Unit> getBuildingUnit() {
 		return buildingUnitList;
 	}

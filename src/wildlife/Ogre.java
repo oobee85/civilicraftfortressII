@@ -8,8 +8,8 @@ import world.*;
 
 public class Ogre extends Animal {
 
-	public Ogre(Tile tile, boolean isPlayerControlled) {
-		super(Game.unitTypeMap.get("OGRE"), tile, isPlayerControlled);
+	public Ogre(Tile tile, int faction) {
+		super(Game.unitTypeMap.get("OGRE"), tile, faction);
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class Ogre extends Animal {
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		for(Unit u : units) {
-			if(u != this && u.isPlayerControlled()) {
+			if(u != this && u.getFaction() == World.PLAYER_FACTION) {
 				setTarget(u);
 				return;
 			}

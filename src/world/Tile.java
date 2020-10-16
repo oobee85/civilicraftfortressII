@@ -116,31 +116,31 @@ public class Tile {
 		plant = p;
 	}
 
-	public Unit getPlayerControlledUnit() {
+	public Unit getUnitOfFaction(int faction) {
 		for (Unit u : units) {
-			if (u.isPlayerControlled()) {
+			if (u.getFaction() == faction) {
 				return u;
 			}
 		}
 		return null;
 	}
-	public int getNumPlayerControlledUnits() {
+	public int countUnitsOfFaction(int faction) {
 		int x = 0;
 		for(Unit unit : units) {
-			if(unit.isPlayerControlled()) {
+			if(unit.getFaction() == faction) {
 				x++;
 			}
 		}
 		return x;
 	}
 
-	public Thing getPlayerControlledThing() {
+	public Thing getThingOfFaction(int faction) {
 		for (Unit u : units) {
-			if (u.isPlayerControlled()) {
+			if (u.getFaction() == faction) {
 				return u;
 			}
 		}
-		if (building != null) {
+		if (building != null && building.getFaction() == faction) {
 			return building;
 		}
 		return null;
@@ -168,9 +168,9 @@ public class Tile {
 		this.inVisionRange = inRange;
 	}
 
-	private double getBrightnessNonRecursive() {
+	private double getBrightnessNonRecursive(int faction) {
 		double brightness = 0;
-		if (this.getHasBuilding() || this.getPlayerControlledThing() != null) {
+		if (this.getHasBuilding() || this.getThingOfFaction(faction) != null) {
 			brightness += 1;
 		}
 		if (this.isTerritory) {
@@ -188,10 +188,10 @@ public class Tile {
 	}
 
 	
-	public double getBrightness() {
-		double brightness = this.getBrightnessNonRecursive();
+	public double getBrightness(int faction) {
+		double brightness = this.getBrightnessNonRecursive(faction);
 		for (Tile tile : getNeighbors()) {
-			brightness += tile.getBrightnessNonRecursive();
+			brightness += tile.getBrightnessNonRecursive(faction);
 		}
 		if(inVisionRange == true) {
 			brightness += 1;
@@ -252,28 +252,6 @@ public class Tile {
 		return row;
 	}
 
-	public boolean isBlocked(Unit u) {
-		if(u.getType().isFlying()) {
-			return false;
-		}
-		if(getHasBuilding() == false) {
-			return false;
-		}
-		if(building.isPlanned() == true) {
-			return false;
-		}
-		BuildingType bt = building.getType();
-		if(bt == BuildingType.WALL_WOOD || bt == BuildingType.WALL_STONE || bt == BuildingType.WALL_BRICK) {
-			return true;
-		}
-
-		if((building.getType() == BuildingType.GATE_WOOD 
-				|| building.getType() == BuildingType.GATE_STONE 
-				|| building.getType() == BuildingType.GATE_BRICK) && u.isPlayerControlled() == building.getIsPlayerControlled()) {
-			return false;
-		}
-		return false;
-	}
 
 	public Road getRoad() {
 		return road;
@@ -319,27 +297,25 @@ public class Tile {
 		return terr.isOreable(terr);
 	}
 
-	public boolean canMove(Unit u) {
+	public boolean isBlocked(Unit u) {
 		if(u.getType().isFlying()) {
-			return true;
+			return false;
 		}
-		if (building == null) {
-			return true;
+		if(getHasBuilding() == false) {
+			return false;
 		}
 		if(building.isPlanned() == true) {
-			return true;
+			return false;
 		}
 		BuildingType bt = building.getType();
 		if(bt == BuildingType.WALL_WOOD || bt == BuildingType.WALL_STONE || bt == BuildingType.WALL_BRICK) {
-			return false;
+			return true;
 		}
-
-		if ((building.getType() == BuildingType.GATE_WOOD
-				|| building.getType() == BuildingType.GATE_STONE
-				|| building.getType() == BuildingType.GATE_BRICK) && u.isPlayerControlled() == false) {
-			return false;
+		if((bt == BuildingType.GATE_WOOD || bt == BuildingType.GATE_STONE || bt == BuildingType.GATE_BRICK) &&
+				u.getFaction() != building.getFaction()) {
+			return true;
 		}
-		return true;
+		return false;
 	}
 	
 	public double computeTileDamage(Thing thing) {
