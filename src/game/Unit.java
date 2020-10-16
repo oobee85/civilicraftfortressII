@@ -274,9 +274,11 @@ public class Unit extends Thing  {
 		if(!attacked && getFaction() != World.NEUTRAL_FACTION) {
 			HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getType().getCombatStats().getAttackRadius());
 			for(Tile tile : inrange) {
-				for(Unit unit : tile.getUnits()) {
-					if(unit.getFaction() != this.getFaction() && unit.getType().isHostile() && unit != this) {
-						Attack.tryToAttack(this, unit);
+				if(tile.getIsTerritory() == getFaction()) {
+					for(Unit unit : tile.getUnits()) {
+						if(unit.getFaction() != this.getFaction() && unit.getType().isHostile() && unit != this) {
+							Attack.tryToAttack(this, unit);
+						}
 					}
 				}
 			}
