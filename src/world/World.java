@@ -39,6 +39,7 @@ public class World {
 	public LinkedList<Unit> units = new LinkedList<Unit>();
 	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
 	public LinkedList<Building> buildings = new LinkedList<Building>();
+	public LinkedList<Building> newBuildings = new LinkedList<Building>();
 	public LinkedList<Building> plannedBuildings = new LinkedList<Building>();
 	public LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
 	public LinkedList<GroundModifier> groundModifiers = new LinkedList<>();
@@ -552,8 +553,6 @@ public class World {
 		
 		// BUILDINGS
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
-		LinkedList<Building> plannedBuildingsNew = new LinkedList<Building>();
-		
 		for (Building building : buildings) {
 			if (building.isDead() == true) {
 				building.getTile().setBuilding(null);
@@ -562,6 +561,11 @@ public class World {
 			}
 			
 		}
+		buildingsNew.addAll(newBuildings);
+		newBuildings.clear();
+		buildings = buildingsNew;
+
+		LinkedList<Building> plannedBuildingsNew = new LinkedList<Building>();
 		for(Building plannedBuilding : plannedBuildings) {
 			if(plannedBuilding.getRemainingEffort() < plannedBuilding.getType().getBuildingEffort()) {
 				buildingsNew.add(plannedBuilding);
@@ -570,7 +574,6 @@ public class World {
 			}
 		}
 		plannedBuildings = plannedBuildingsNew;
-		buildings = buildingsNew;
 	
 		// PLANTS
 		LinkedList<Plant> plantsCopy = new LinkedList<Plant>();

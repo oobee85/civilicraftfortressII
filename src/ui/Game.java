@@ -283,6 +283,7 @@ public class Game {
 				items.get(itemType).addAmount(999);
 			}
 		}
+		world.clearDeadAndAddNewThings();
 	}
 	public void spawnOrcs() {
 		LinkedList<Tile> tiles = world.getTilesRandomly();
@@ -601,7 +602,7 @@ public class Game {
 		makeRoadBetween(highestTile, lowestTile);
 		turnRoads();
 		
-		makeCastle(easymode);
+		makeStartingCastleAndUnits(easymode);
 	}
 	private void turnRoad(Tile tile) {
 		if(tile.getRoad() == null) {
@@ -639,7 +640,7 @@ public class Game {
 				turnRoad(tile);
 		}
 	}
-	private void makeCastle(boolean easymode) {
+	private void makeStartingCastleAndUnits(boolean easymode) {
 		LinkedList<HasImage> thingsToPlace = new LinkedList<>();
 		thingsToPlace.add(BuildingType.CASTLE);
 		thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
@@ -667,7 +668,7 @@ public class Game {
 						&& (current.getTerrain() != Terrain.ROCK || type != BuildingType.CASTLE)) {
 					Building s = new Building(type, current, true);
 					current.setBuilding(s);
-					world.buildings.add(s);
+					world.newBuildings.add(s);
 					s.setRemainingEffort(0);
 					thing = null;
 				}
@@ -1256,7 +1257,7 @@ public class Game {
 			Building building = new Building(buildingType, tile, playerControlled);
 			building.setRemainingEffort(0);
 			tile.setBuilding(building);
-			world.buildings.add(building);
+			world.newBuildings.add(building);
 		}
 		
 	}
@@ -1665,7 +1666,7 @@ public class Game {
 					chargePrice(bt);
 					Building building = new Building(bt, thing.getTile(), true);
 					thing.getTile().setBuilding(building);
-					world.buildings.add(building);
+					world.newBuildings.add(building);
 					building.setPlanned(false);
 					building.setHealth(1);
 					built = true;
@@ -1858,8 +1859,8 @@ public class Game {
 		Position offsetTile = getTileAtPixel(viewOffset);
 		int boxx = (int) (offsetTile.x * w / world.getWidth() / 2);
 		int boxy = (int) (offsetTile.y * h / world.getHeight() / 2);
-		int boxw = (int) (panelWidth/Game.tileSize * w / world.getWidth());
-		int boxh = (int) (panelHeight/Game.tileSize * h / world.getHeight());
+		int boxw = (int) (panelWidth * w / Game.tileSize / world.getWidth());
+		int boxh = (int) (panelHeight * h / Game.tileSize / world.getHeight());
 //		System.out.println(boxx);
 		g.setColor(Color.yellow);
 		g.drawRect(x + boxx, y + boxy, boxw, boxh);
