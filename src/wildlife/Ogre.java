@@ -25,7 +25,7 @@ public class Ogre extends Animal {
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		for(Unit u : units) {
-			if(u.isPlayerControlled()) {
+			if(u != this && u.isPlayerControlled()) {
 				setTarget(u);
 				return;
 			}

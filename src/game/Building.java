@@ -50,20 +50,14 @@ public class Building extends Thing {
 				this.takeDamage(tileDamage);
 			}
 		}
-	
-//		System.out.println(timeToHarvest);
 	}
 	public boolean readyToHarvest() {
-//		System.out.println("ready");
 		return timeToHarvest <= 0;
 	}
 	public void resetTimeToHarvest() {
-//		System.out.println("in reset");
 		if(this.getTile().getResource() != null) {
-//			System.out.println("reset ore");
 			timeToHarvest = this.getTile().getResource().getType().getTimeToHarvest();
 		}else {
-//			System.out.println("reset normal");
 			timeToHarvest = baseTimeToHarvest;
 		}
 		

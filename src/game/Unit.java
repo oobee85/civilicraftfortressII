@@ -276,7 +276,7 @@ public class Unit extends Thing  {
 			HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getType().getCombatStats().getAttackRadius());
 			for(Tile tile : inrange) {
 				for(Unit unit : tile.getUnits()) {
-					if(unit.getType().isHostile()) {
+					if(!unit.isPlayerControlled() && unit.getType().isHostile() && unit != this) {
 						Attack.tryToAttack(this, unit);
 					}
 				}

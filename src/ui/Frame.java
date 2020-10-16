@@ -297,7 +297,7 @@ public class Frame extends JPanel {
 	}
 	
 	private JButton setupUnitButton(Unit unit) {
-		KButton button = new KButton(null, unit.getImageIcon(0)) {
+		KButton button = new KButton(null, Utils.resizeImageIcon(unit.getImageIcon(10), 30, 30)) {
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
@@ -1144,7 +1144,6 @@ public class Frame extends JPanel {
 			button.setEnabled(true);
 			button.addActionListener(e -> {
 				button.setText(strings.get(f) + ": " + combatBuffs.getStat(strings.get(f)));
-				System.out.println(button.getText());
 				CombatStats cs = new CombatStats(0,0,0,0,0,0,0);
 				cs.getStats().set(f, cs.getStats().get(f)+1);
 				cs.add(strings.get(f), cs.getStats().get(f) );

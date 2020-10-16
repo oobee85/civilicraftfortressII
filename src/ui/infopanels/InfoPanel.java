@@ -38,7 +38,6 @@ public class InfoPanel extends JPanel {
 		button.setFont(KUIConstants.buttonFontMini);
 		this.setLayout(null);
 		this.add(button);
-		System.out.println(this.getWidth());
 		button.setBounds(this.getWidth() - size.width, this.getHeight()-size.height*numButtons, size.width, size.height);
 		
 		return button;
