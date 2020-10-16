@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.*;
 import java.util.stream.*;
 
 import game.*;
@@ -29,14 +29,14 @@ public class World {
 	private static final int NUM_LIQUID_SIMULATION_PHASES = 9;
 	private ArrayList<ArrayList<Tile>> liquidSimulationPhases = new ArrayList<>(NUM_LIQUID_SIMULATION_PHASES);
 	private Tile[][] tiles;
-	public ConcurrentLinkedQueue<Tile> territory = new ConcurrentLinkedQueue<Tile>();;
 	
+	public ConcurrentHashMap<Tile, Integer> territory = new ConcurrentHashMap<>();
 	private int width;
 	private int height;
 
 	public static final int NEUTRAL_FACTION = 0;
 	public static final int PLAYER_FACTION = 1;
-	public HashMap<Integer, Color> factionColors = new HashMap<Integer, Color>() {
+	private HashMap<Integer, Color> factionColors = new HashMap<Integer, Color>() {
 		{
 			put(0, Game.neutralColor);
 			put(1, Game.playerColor);
@@ -44,6 +44,12 @@ public class World {
 			put(3, Color.GREEN.darker());
 		}
 	};
+	public Color getFactionColor(int faction) {
+		if(factionColors.containsKey(faction)) {
+			return factionColors.get(faction);
+		}
+		return Game.neutralColor;
+	}
 	public LinkedList<Plant> plants = new LinkedList<Plant>();
 	public LinkedList<Plant> newPlants = new LinkedList<Plant>();
 	public LinkedList<Unit> units = new LinkedList<Unit>();
@@ -69,8 +75,10 @@ public class World {
 	public int getTerritorySize() {
 		return territory.size();
 	}
-	public void addToTerritory(Tile tile) {
-		territory.add(tile);
+	public void addToTerritory(Tile tile, int faction) {
+		if(!territory.contains(tile)) {
+			territory.put(tile, faction);
+		}
 	}
 	public int getWidth() {
 		return width;
@@ -860,9 +868,10 @@ public class World {
 				minimapColor = tile.getModifier().getType().getColor(0);
 				terrainColor = Utils.blendColors(tile.getModifier().getType().getColor(0), terrainColor, 0.9);
 			}
-			if(tile.getIsTerritory()) {
-				minimapColor = Utils.blendColors(Game.playerColor, minimapColor, 0.3);
-				terrainColor = Utils.blendColors(Game.playerColor, terrainColor, 0.3);
+			if(tile.getIsTerritory() != World.NEUTRAL_FACTION) {
+				Color c = getFactionColor(tile.getIsTerritory());
+				minimapColor = Utils.blendColors(c, minimapColor, 0.3);
+				terrainColor = Utils.blendColors(c, terrainColor, 0.3);
 			}
 			double tilebrightness = tile.getBrightness(World.PLAYER_FACTION);
 			minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);

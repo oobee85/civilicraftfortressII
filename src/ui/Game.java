@@ -301,32 +301,19 @@ public class Game {
 		summonThing(barracks, null, BuildingType.BARRACKS, ORC_FACTION);
 		
 		//makes the walls
-		for(int i = 0; i < 6; i ++) {
-			
-			TileLoc wallLoc = new TileLoc(tile.getLocation().x-3, tile.getLocation().y-3 + i);
-			Tile wall = world.get(wallLoc) ;
-			if(wallLoc.x <= 0 || wallLoc.y <= 0) {
-				continue;
+		for(int i = 0; i < 6; i++) {
+			BuildingType type = BuildingType.WALL_WOOD;
+			if(i == 3) {
+				type = BuildingType.GATE_WOOD;
 			}
-			if(i != 3) {
-				summonThing(wall, null, BuildingType.WALL_WOOD, ORC_FACTION);
-			}
-			
-			
-			wallLoc = new TileLoc(tile.getLocation().x+3, tile.getLocation().y-3 + i);
-			wall = world.get(wallLoc) ;
-			if(i != 3) {
-				summonThing(wall, null, BuildingType.WALL_WOOD, ORC_FACTION);
-			}
-			
-			
-			wallLoc = new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y-3);
-			wall = world.get(wallLoc) ;
-			summonThing(wall, null, BuildingType.WALL_WOOD, ORC_FACTION);
-			
-			wallLoc = new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y+3);
-			wall = world.get(wallLoc) ;
-			summonThing(wall, null, BuildingType.WALL_WOOD, ORC_FACTION);
+			Tile wall = world.get(new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y-3));
+			summonThing(wall, null, type, ORC_FACTION);
+			wall = world.get(new TileLoc(tile.getLocation().x+3, tile.getLocation().y-3 + i));
+			summonThing(wall, null, type, ORC_FACTION);
+			wall = world.get(new TileLoc(tile.getLocation().x+3 - i, tile.getLocation().y+3));
+			summonThing(wall, null, type, ORC_FACTION);
+			wall = world.get(new TileLoc(tile.getLocation().x-3, tile.getLocation().y+3 - i));
+			summonThing(wall, null, type, ORC_FACTION);
 		}
 		for(int i = -1; i < 2; i ++) {
 			for(int j = -1; j < 2; j ++) {
@@ -348,22 +335,19 @@ public class Game {
 	public void buildingTick() {
 		
 		for(Building building : world.buildings) {
-			if(building.getFaction() == World.PLAYER_FACTION) {
-				double culture = building.getCulture();
-				double area = culture * Building.CULTURE_AREA_MULTIPLIER;
-				double radius = Math.sqrt(area);
-				int r = (int)Math.ceil(radius);
-				for (int i = -r; i <= r; i++) {
-					for (int j = -r; j <= r; j++) {
-						double distanceFromCenter = Math.sqrt(i*i + j*j);
-						if(distanceFromCenter < radius) {
-							TileLoc tileloc = new TileLoc(building.getTile().getLocation().x+i, building.getTile().getLocation().y+j);
-							Tile tile = world.get(tileloc);
-							if(tile != null) {
-								tile.setTerritory(true);
-								// TODO pretty sure this adds duplicate tiles to territory
-								world.addToTerritory(tile);
-							}
+			double culture = building.getCulture();
+			double area = culture * Building.CULTURE_AREA_MULTIPLIER;
+			double radius = Math.sqrt(area);
+			int r = (int)Math.ceil(radius);
+			for (int i = -r; i <= r; i++) {
+				for (int j = -r; j <= r; j++) {
+					double distanceFromCenter = Math.sqrt(i*i + j*j);
+					if(distanceFromCenter < radius) {
+						TileLoc tileloc = new TileLoc(building.getTile().getLocation().x+i, building.getTile().getLocation().y+j);
+						Tile tile = world.get(tileloc);
+						if(tile != null && tile.getIsTerritory() == World.NEUTRAL_FACTION) {
+							tile.setTerritory(building.getFaction());
+							world.addToTerritory(tile, building.getFaction());
 						}
 					}
 				}
@@ -723,14 +707,14 @@ public class Game {
 				g.drawImage(theTile.getResource().getType().getImage(imagesize), drawx, drawy, draww, drawh, null);
 			}
 			
-			if(theTile.getIsTerritory()) {
+			if(theTile.getIsTerritory() != World.NEUTRAL_FACTION) {
 //				g.setColor(Color.black);
 //				g.fillRect(x, y, w, h); 
-				g.setColor(playerColor);
+				g.setColor(world.getFactionColor(theTile.getIsTerritory()));
 				
 				Utils.setTransparency(g, 0.5f);
 				for(Tile tile : theTile.getNeighbors()) {
-					if(tile.getIsTerritory() == false) {
+					if(tile.getIsTerritory() != theTile.getIsTerritory()) {
 						TileLoc tileLoc = tile.getLocation();
 						
 						if(tileLoc.x == theTile.getLocation().x ) {
@@ -803,9 +787,11 @@ public class Game {
 		
 		if(theTile.getBuilding() != null) {
 			Building b = theTile.getBuilding();
-			HashSet<Tile> buildingVision = world.getNeighborsInRadius(b.getTile(), b.getType().getVisionRadius());
-			for(Tile invision : buildingVision) {
-				invision.setInVisionRange(true);
+			if(b.getFaction() == World.PLAYER_FACTION) {
+				HashSet<Tile> buildingVision = world.getNeighborsInRadius(b.getTile(), b.getType().getVisionRadius());
+				for(Tile invision : buildingVision) {
+					invision.setInVisionRange(true);
+				}
 			}
 			
 			BufferedImage bI = Utils.toBufferedImage(b.getImage(0));
@@ -992,12 +978,7 @@ public class Game {
 				//draws a square for every player unit on the tile
 				int xx = unit.getTile().getLocation().x * Game.tileSize + offset;
 				int yy = unit.getTile().getLocation().y * Game.tileSize + (indicatorSize + offset)*count + offset;
-				if(world.factionColors.containsKey(unit.getFaction())) {
-					g.setColor(world.factionColors.get(unit.getFaction()));
-				}
-				else {
-					g.setColor(neutralColor);
-				}
+				g.setColor(world.getFactionColor(unit.getFaction()));
 				g.fillRect(xx, yy, indicatorSize, indicatorSize);
 				g.setColor(Color.BLACK);
 				g.drawRect(xx, yy, indicatorSize, indicatorSize);
@@ -1469,9 +1450,6 @@ public class Game {
 //				deselectOneThing(candidate);
 //			}
 		}
-		
-		
-		
 	}
 
 	public void workerRoad() {
@@ -1481,7 +1459,11 @@ public class Game {
 				Unit unit = (Unit)thing;
 				
 				if(unit.getType().isBuilder()) {
-					for(Tile tile : world.territory) {
+					for(Entry<Tile, Integer> entry : world.territory.entrySet()) {
+						if(entry.getValue() != World.PLAYER_FACTION) {
+							continue;
+						}
+						Tile tile = entry.getKey();
 						if(tile.getRoad() == null) {
 							unit.addToPath(tile);
 							setPlannedRoad(tile);
@@ -1489,10 +1471,8 @@ public class Game {
 						}
 					}
 				}
-					
 			}
 		}
-		
 	}
 	public void explode(Thing thing) {
 		if(thing == null) {

@@ -12,7 +12,7 @@ import utils.*;
 import wildlife.*;
 
 public class Tile {
-	private boolean isTerritory = false;
+	private int isTerritory = World.NEUTRAL_FACTION;
 	private boolean isSelected = false;
 	private boolean inVisionRange = false;
 
@@ -93,8 +93,8 @@ public class Tile {
 		}
 	}
 
-	public void setTerritory(boolean b) {
-		this.isTerritory = b;
+	public void setTerritory(int faction) {
+		this.isTerritory = faction;
 	}
 
 	public void setResource(ResourceType o) {
@@ -170,10 +170,10 @@ public class Tile {
 
 	private double getBrightnessNonRecursive(int faction) {
 		double brightness = 0;
-		if (this.getHasBuilding() || this.getThingOfFaction(faction) != null) {
+		if (this.getThingOfFaction(faction) != null) {
 			brightness += 1;
 		}
-		if (this.isTerritory) {
+		if (this.isTerritory == faction) {
 			brightness += 0.4;
 		}
 		if(inVisionRange == true) {
@@ -281,7 +281,7 @@ public class Tile {
 		return isSelected;
 	}
 
-	public boolean getIsTerritory() {
+	public int getIsTerritory() {
 		return isTerritory;
 	}
 

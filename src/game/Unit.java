@@ -238,9 +238,9 @@ public class Unit extends Thing  {
 	
 	public void planActions(World world) {
 		// Workers deciding whether to move toward something to build
-		if (unitType.isBuilder() && isIdle && getTile().getIsTerritory()) {
+		if (unitType.isBuilder() && isIdle && getTile().getIsTerritory() == getFaction()) {
 			Building building = getBuildingToBuild(world.buildings, world.plannedBuildings);
-			if(building != null && building.getTile().getIsTerritory() == true) {
+			if(building != null && building.getTile().getIsTerritory() == getFaction()) {
 				setTargetTile(building.getTile());
 			}
 		}
