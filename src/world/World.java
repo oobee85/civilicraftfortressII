@@ -35,7 +35,7 @@ public class World {
 	private int height;
 
 	public static final int NEUTRAL_FACTION = 0;
-	public static final int PLAYER_FACTION = 1;
+	public static int PLAYER_FACTION = 1;
 	private HashMap<Integer, Color> factionColors = new HashMap<Integer, Color>() {
 		{
 			put(0, Game.neutralColor);
@@ -236,6 +236,9 @@ public class World {
 		}
 		else if(type == Game.unitTypeMap.get("ICE_GIANT")) {
 			return new IceGiant(tile, faction);
+		}
+		else if(type == Game.unitTypeMap.get("CYCLOPS")) {
+			return new Cyclops(tile, faction);
 		}
 		else {
 			return new Animal(type, tile, faction);

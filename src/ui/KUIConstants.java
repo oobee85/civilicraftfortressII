@@ -60,6 +60,13 @@ public class KUIConstants {
 		b.setOpaque(true);
 		return b;
 	}
+	public static JTextField setupTextField(String text, Dimension size) {
+		JTextField b = new JTextField(text, 6);
+		b.setHorizontalAlignment(SwingConstants.LEFT);
+		setComponentAttributes(b, size);
+		b.setOpaque(true);
+		return b;
+	}
 
 	public static JLabel setupMiniLabel(String text, Icon icon, Dimension size) {
 		JLabel b = new JLabel(icon);

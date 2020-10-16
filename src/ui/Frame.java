@@ -8,6 +8,7 @@ import java.util.concurrent.*;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.*;
+import javax.swing.event.*;
 import javax.swing.Timer;
 
 import game.*;
@@ -1064,6 +1065,18 @@ public class Frame extends JPanel {
 				gameInstance.spawnOrcs();
 			}
 		});
+		JButton setPlayerFaction = KUIConstants.setupButton("Change Faction", null, DEBUG_BUTTON_SIZE);
+		setPlayerFaction.addActionListener(e -> {
+			String choice = JOptionPane.showInputDialog("Choose faction");
+			if(choice != null) {
+				try { 
+					int faction = Integer.parseInt(choice);
+					World.PLAYER_FACTION = faction;
+				}
+				catch(NumberFormatException ex) {
+				}
+			}
+		});
 
 		JToggleButton debug = KUIConstants.setupToggleButton(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix", null, DEBUG_BUTTON_SIZE);
 		debug.addActionListener(new ActionListener() {
@@ -1113,6 +1126,7 @@ public class Frame extends JPanel {
 		buttonPanel.add(debug);
 		buttonPanel.add(toggleNight);
 		buttonPanel.add(addResources);
+		buttonPanel.add(setPlayerFaction);
 		buttonPanel.add(exit);
 
 		techView = new JPanel();

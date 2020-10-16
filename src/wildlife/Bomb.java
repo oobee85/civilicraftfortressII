@@ -32,11 +32,13 @@ public class Bomb extends Animal {
 	}
 	
 	@Override
-	public void doAttacks(World world) {
+	public boolean doAttacks(World world) {
 		if(getTargetTile() == getTile()) {
 			world.spawnExplosion(getTile(), 5, 500);
 			this.setDead(true);
+			return true;
 		}
+		return false;
 	}
 
 }

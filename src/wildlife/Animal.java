@@ -10,8 +10,7 @@ import world.*;
 
 public class Animal extends Unit {
 	
-	private Thing foodTarget;
-	private Tile resourceTarget;
+	private Thing plantTarget;
 	
 	private int migratingUntil;
 	
@@ -40,10 +39,6 @@ public class Animal extends Unit {
 			}
 		}
 		return lethal;
-	}
-	
-	public boolean isDead() {
-		return super.isDead();
 	}
 
 	public boolean wantsToEat() {
@@ -87,12 +82,6 @@ public class Animal extends Unit {
 	}
 	
 	public void chooseWhereToMove(World world) {
-		if(resourceTarget != null) {
-			if(getTile() != resourceTarget) {
-				setTargetTile(resourceTarget);
-				return;
-			}
-		}
 		if(getTarget() != null) {
 			if(this.getTile().getLocation().distanceTo(getTarget().getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
 				setTargetTile(getTarget().getTile());
@@ -186,31 +175,22 @@ public class Animal extends Unit {
 		else {
 			if(!getType().isHostile() && getTile().getPlant() != null) {
 				if(readyToAttack()) {
-					foodTarget = getTile().getPlant();
+					plantTarget = getTile().getPlant();
 				}
 			}
 		}
 	}
 	
 	@Override
-	public void doAttacks(World world) {
-		super.doAttacks(world);
-		if(foodTarget != null) {
-			if(inRange(foodTarget)) {
-				double damageDealt = attack(foodTarget);
-//				if(this.getType() == UnitType.WEREWOLF) {
-//					
-//				}
-				
-				if(damageDealt > 0) {
-				}
-				if(foodTarget.isDead()) {
-					resourceTarget = foodTarget.getTile();
-					foodTarget = null;
-				}
+	public boolean doAttacks(World world) {
+		boolean attacked = super.doAttacks(world);
+		if(!attacked && plantTarget != null && inRange(plantTarget)) {
+			attacked = Attack.tryToAttack(this, plantTarget);
+			if(plantTarget.isDead()) {
+				plantTarget = null;
 			}
-			return;
 		}
+		return attacked;
 	}
 	
 	@Override

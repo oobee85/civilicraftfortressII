@@ -263,7 +263,7 @@ public class Unit extends Thing  {
 		}
 	}
 	
-	public void doAttacks(World world) {
+	public boolean doAttacks(World world) {
 		boolean attacked = false;
 		if(target != null) {
 			attacked = Attack.tryToAttack(this, target);
@@ -277,12 +277,16 @@ public class Unit extends Thing  {
 				if(tile.getIsTerritory() == getFaction()) {
 					for(Unit unit : tile.getUnits()) {
 						if(unit.getFaction() != this.getFaction() && unit.getType().isHostile() && unit != this) {
-							Attack.tryToAttack(this, unit);
+							attacked = attacked || Attack.tryToAttack(this, unit);
+							if(attacked) {
+								break;
+							}
 						}
 					}
 				}
 			}
 		}
+		return attacked;
 	}
 
 	private Building getAdjacentUnfinishedBuilding(Tile tile) {
