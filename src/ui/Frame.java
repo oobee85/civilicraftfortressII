@@ -39,7 +39,6 @@ public class Frame extends JPanel {
 	private ImageIcon HELLFORGE_TAB_ICON = Utils.resizeImageIcon(BuildingType.HELLFORGE.getImageIcon(0), 20, 20);
 	private ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), 20, 20);
 	private ImageIcon TECH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.PNG"), 20, 20);
-	private ImageIcon RESOURCE_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/itemicons/adamantite_ore.png"), 20, 20);
 	private ImageIcon STAT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/itemicons/adamant_sword.png"), 20, 20);
 	
 	private Timer repaintingThread;
@@ -52,6 +51,7 @@ public class Frame extends JPanel {
 	private JPanel resourcePanel2;
 	private JPanel minimapPanel;
 	private JPanel infoPanel;
+	private LinkedList<JPanel> infoPanelStack = new LinkedList<>();
 	private JPanel castleView;
 	private JPanel blacksmithView;
 	private JPanel hellforgeView;
@@ -538,7 +538,25 @@ public class Frame extends JPanel {
 		});
 	}
 
+	/** 
+	 * clears infoPanelStack
+	 */
 	private void switchInfoPanel(JPanel newInfo) {
+		infoPanelStack.clear();
+		pushInfoPanel(newInfo);
+	}
+	private void pushInfoPanel(JPanel newInfo) {
+		infoPanelStack.addFirst(newInfo);
+		setInfoPanel(newInfo);
+	}
+	private void popInfoPanel() {
+		if(infoPanelStack.size() > 1) {
+			infoPanelStack.removeFirst();
+		}
+		JPanel newInfo = infoPanelStack.getFirst();
+		setInfoPanel(newInfo);
+	}
+	private void setInfoPanel(JPanel newInfo) {
 		SwingUtilities.invokeLater(() -> {
 			infoPanel.removeAll();
 			newInfo.setOpaque(false);
@@ -546,7 +564,6 @@ public class Frame extends JPanel {
 			infoPanel.validate();
 		});
 	}
-	
 
 	private void setupMinimapPanel() {
 		minimapPanel = new JPanel() {
@@ -794,6 +811,16 @@ public class Frame extends JPanel {
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new BuildingTypeInfoPanel(type));
 			});
+			button.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					pushInfoPanel(new BuildingTypeInfoPanel(type));
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					popInfoPanel();
+				}
+			});
 			buildingButtons[i] = button;
 			if(buildingButtons[i].isVisible()) {
 				workerMenu.add(button);
@@ -825,6 +852,16 @@ public class Frame extends JPanel {
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new BuildingTypeInfoPanel(type));
 			});
+			button.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					pushInfoPanel(new BuildingTypeInfoPanel(type));
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					popInfoPanel();
+				}
+			});
 			planningButtons[i] = button;
 			if(planningButtons[i].isVisible()) {
 				buildingPlanner.add(button);
@@ -845,6 +882,16 @@ public class Frame extends JPanel {
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
+			button.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					pushInfoPanel(new UnitTypeInfoPanel(type));
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					popInfoPanel();
+				}
+			});
 			spawnMenu.add(button);
 		}
 		for (int i = 0; i < BuildingType.values().length; i++) {
@@ -858,6 +905,16 @@ public class Frame extends JPanel {
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new BuildingTypeInfoPanel(type));
+			});
+			button.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					pushInfoPanel(new BuildingTypeInfoPanel(type));
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					popInfoPanel();
+				}
 			});
 //			buildingButtons[i] = button;
 			spawnMenu.add(button);
@@ -891,6 +948,16 @@ public class Frame extends JPanel {
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ResearchInfoPanel(research));
 			});
+			button.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					pushInfoPanel(new ResearchInfoPanel(research));
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					popInfoPanel();
+				}
+			});
 			researchButtons.put(button, research);
 			researchLabView.add(button);
 		}
@@ -915,6 +982,16 @@ public class Frame extends JPanel {
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ItemTypeInfoPanel(type));
+			});
+			button.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					pushInfoPanel(new ItemTypeInfoPanel(type));
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					popInfoPanel();
+				}
 			});
 			craftButtons[i] = button;
 			blacksmithView.add(button);
@@ -942,6 +1019,16 @@ public class Frame extends JPanel {
 				button.addRightClickActionListener(e -> {
 					switchInfoPanel(new ItemTypeInfoPanel(type));
 				});
+				button.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseEntered(MouseEvent e) {
+						pushInfoPanel(new ItemTypeInfoPanel(type));
+					}
+					@Override
+					public void mouseExited(MouseEvent e) {
+						popInfoPanel();
+					}
+				});
 
 				craftButtons[i] = button;
 				hellforgeView.add(button);
@@ -958,6 +1045,16 @@ public class Frame extends JPanel {
 					RESOURCE_BUTTON_SIZE);
 			label.addRightClickActionListener(e -> {
 				switchInfoPanel(new ItemTypeInfoPanel(type));
+			});
+			label.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					pushInfoPanel(new ItemTypeInfoPanel(type));
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					popInfoPanel();
+				}
 			});
 			resourceIndicators[i] = label;
 		}
@@ -1145,6 +1242,16 @@ public class Frame extends JPanel {
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ResearchInfoPanel(research));
 			});
+			button.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					pushInfoPanel(new ResearchInfoPanel(research));
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					popInfoPanel();
+				}
+			});
 			researchButtons.put(button, research);
 			techView.add(button);
 		}
@@ -1166,6 +1273,16 @@ public class Frame extends JPanel {
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new CombatStatInfoPanel(combatBuffs));
+			});
+			button.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					pushInfoPanel(new CombatStatInfoPanel(combatBuffs));
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					popInfoPanel();
+				}
 			});
 			statButtons[i] = button;
 			statView.add(statButtons[i]);
@@ -1311,6 +1428,16 @@ public class Frame extends JPanel {
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new UnitTypeInfoPanel(type));
+			});
+			button.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					pushInfoPanel(new UnitTypeInfoPanel(type));
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					popInfoPanel();
+				}
 			});
 			pairs[i] = new Pair(button, type);
 			panel.add(button);
