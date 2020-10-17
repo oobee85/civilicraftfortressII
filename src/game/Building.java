@@ -118,15 +118,8 @@ public class Building extends Thing {
 
 		if(getType() == BuildingType.FARM && getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
 			getFaction().addItem(ItemType.HORSE, 1);
-			getFaction().addItem(ItemType.FOOD, 1);
+			getFaction().addItem(ItemType.FOOD, 3);
 			resetTimeToHarvest();
-		}
-		if(getTile().getPlant() != null) {
-			if(getType() == BuildingType.FARM && getTile().getPlant().getPlantType() == PlantType.BERRY) {
-				getFaction().addItem(ItemType.FOOD, 1);
-				getTile().getPlant().takeDamage(1);
-				resetTimeToHarvest();
-			}
 		}
 	}
 	public boolean readyToHarvest() {

@@ -361,7 +361,7 @@ public class World {
 				
 			}
 			//turns tile into dirt if its very cold
-			if(tile.checkTerrain(Terrain.GRASS) && tile.getTempurature() < Season.FREEZING_TEMPURATURE * 0.75) {
+			if(tile.checkTerrain(Terrain.GRASS) && tile.isCold()) {
 				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
 					tile.setTerrain(Terrain.DIRT);
 				}
@@ -418,11 +418,14 @@ public class World {
 		}
 		for(Plant plant : plants) {
 			
+			if(plant.getTile().isCold() == true) {
+				continue;
+			}
 			if(plant.getPlantType() == PlantType.FOREST1) {
 				if(Math.random() < 0.01) {
 					
 					for(Tile tile : plant.getTile().getNeighbors()) {
-						if(tile.getPlant() == null && tile.canPlant() && tile.getTempurature() > Season.FREEZING_TEMPURATURE ) {
+						if(tile.getPlant() == null && tile.canPlant()) {
 							tile.setHasPlant(new Plant(PlantType.FOREST1, tile));
 							newPlants.add(tile.getPlant());
 							break;
@@ -439,7 +442,7 @@ public class World {
 		
 		for(Tile tile : getTilesRandomly()) {
 			
-			if(tile.canPlant() == false && tile.getTempurature() < Season.FREEZING_TEMPURATURE) {
+			if(tile.canPlant() == false || tile.isCold() == true) {
 				continue;
 			}
 			

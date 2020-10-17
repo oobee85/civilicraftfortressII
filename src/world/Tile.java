@@ -292,7 +292,15 @@ public class Tile {
 	public boolean canPlant() {
 		return terr.isPlantable(terr);
 	}
-
+	public boolean isCold() {
+		if(liquidType == LiquidType.ICE || liquidType == LiquidType.SNOW) {
+			return true;
+		}
+		if(this.getTempurature() < Season.FREEZING_TEMPURATURE * 1.1) {
+			return true;
+		}
+		return false;
+	}
 	public boolean canOre() {
 		return terr.isOreable(terr);
 	}
