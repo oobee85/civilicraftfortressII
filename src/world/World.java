@@ -403,7 +403,7 @@ public class World {
 				if(adjacentGrass && adjacentWater) {
 					threshold += 0.1;
 				}
-				if(tile.getTempurature() > Season.FREEZING_TEMPURATURE && Math.random() < tile.liquidAmount*threshold*tile.getHumidity() && tile.liquidType != LiquidType.ICE) {
+				if(tile.isCold() == false && Math.random() < tile.liquidAmount*threshold*tile.getHumidity() && tile.liquidType != LiquidType.ICE) {
 					tile.setTerrain(Terrain.GRASS);
 				}
 			}
@@ -456,11 +456,13 @@ public class World {
 					newPlants.add(plant);
 				}
 			}
-			
-			if (Math.random() < 0.001) {
-				tile.setHasPlant(new Plant(PlantType.BERRY, tile));
-				newPlants.add(tile.getPlant());
+			if(tile.liquidType != null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+				if (Math.random() < 0.001) {
+					tile.setHasPlant(new Plant(PlantType.BERRY, tile));
+					newPlants.add(tile.getPlant());
+				}
 			}
+			
 
 		}
 	}
@@ -630,20 +632,17 @@ public class World {
 		for(Plant plant : plants) {
 			Tile tile = plant.getTile();
 			
-			if(plant.isAquatic()) {
-				if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
-					if (plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
-						
-						double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
-						double damageTaken = difInLiquids * tile.liquidType.getDamage();
-						int roundedDamage = (int) (damageTaken+1);
-						if(roundedDamage >= 1) {
-							plant.takeDamage(roundedDamage);
-						}
+			if (plant.isAquatic()) {
+				if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() || tile.liquidType != LiquidType.WATER) {
+
+					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
+					double damageTaken = difInLiquids * tile.liquidType.getDamage();
+					int roundedDamage = (int) (damageTaken + 1);
+					if (roundedDamage >= 1) {
+						plant.takeDamage(roundedDamage);
 					}
 				}
-			}
-			else {
+			} else {
 			
 				int totalDamage = 0;
 				double modifierDamage = 0;
