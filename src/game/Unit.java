@@ -28,6 +28,7 @@ public class Unit extends Thing {
 	private boolean isHarvesting;
 	private double timeToHarvest;
 	private double baseTimeToHarvest = 10;
+	private int ticksForFoodCost = 60;
 
 	public Unit(UnitType unitType, Tile tile, Faction faction) {
 		super(unitType.getCombatStats().getHealth(), unitType, faction, tile);
@@ -208,7 +209,12 @@ public class Unit extends Thing {
 				this.takeDamage(tileDamage);
 			}
 		}
-		if (Game.ticks % 60 == 0 && getFaction().hasItems()) {
+		int ticksToCost =  ticksForFoodCost;
+		if(isHarvesting == true) {
+			ticksToCost = (int) (ticksForFoodCost/2);
+		}
+		
+		if (Game.ticks % ticksToCost == 0 && getFaction().hasItems()) {
 			if (getFaction().canAfford(ItemType.FOOD, 1)) {
 				getFaction().payCost(ItemType.FOOD, 1);
 				starving = 0;
