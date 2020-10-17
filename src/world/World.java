@@ -632,7 +632,10 @@ public class World {
 		for(Plant plant : plants) {
 			Tile tile = plant.getTile();
 			
-			if ((plant.isAquatic() && tile.liquidType == LiquidType.WATER) || tile.liquidAmount == 0) {
+			if(tile.isCold()) {
+				plant.takeDamage(1);
+			}
+			if (plant.isAquatic()) {
 				if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 
 					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
