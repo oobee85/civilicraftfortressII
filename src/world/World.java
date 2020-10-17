@@ -632,8 +632,8 @@ public class World {
 		for(Plant plant : plants) {
 			Tile tile = plant.getTile();
 			
-			if (plant.isAquatic()) {
-				if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() || tile.liquidType != LiquidType.WATER) {
+			if ((plant.isAquatic() && tile.liquidType == LiquidType.WATER) || tile.liquidAmount == 0) {
+				if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 
 					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
 					double damageTaken = difInLiquids * tile.liquidType.getDamage();
