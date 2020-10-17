@@ -1,5 +1,6 @@
 package world;
 
+import game.ItemType;
 import utils.*;
 
 public class Plant extends Thing {
@@ -11,7 +12,9 @@ public class Plant extends Thing {
 		super(pt.getHealth(), pt, World.NEUTRAL_FACTION, t);
 		plantType = pt;
 	}
-	
+	public ItemType getItem() {
+		return plantType.getItem();
+	}
 	public int getYield() {
 		return currentYield;
 	}

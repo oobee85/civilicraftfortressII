@@ -67,7 +67,7 @@ public class Building extends Thing {
 			if(getTile().getResource() != null && getTile().getResource().getType().isOre() == true) {
 				getFaction().addItem(getTile().getResource().getType().getItemType(), 1);
 				getTile().getResource().harvest(1);
-				getTile().setHeight(getTile().getHeight() - 0.001);
+//				getTile().setHeight(getTile().getHeight() - 0.001);
 				if(getTile().getResource().getYield() <= 0) {
 					getTile().setResource(null);
 				}

@@ -25,6 +25,9 @@ public class Unit extends Thing {
 	private LinkedList<Tile> queuedPath;
 	private LinkedList<Attack> attacks;
 	private boolean isAutoBuilding;
+	private boolean isHarvesting;
+	private double timeToHarvest;
+	private double baseTimeToHarvest = 10;
 
 	public Unit(UnitType unitType, Tile tile, Faction faction) {
 		super(unitType.getCombatStats().getHealth(), unitType, faction, tile);
@@ -47,13 +50,26 @@ public class Unit extends Thing {
 					new Attack(1, unitType.getCombatStats().getAttack(), unitType.getCombatStats().getAttackSpeed()));
 		}
 	}
-
+	
+	public boolean readyToHarvest() {
+		return timeToHarvest <= 0;
+	}
+	public void resetTimeToHarvest() {
+		timeToHarvest = baseTimeToHarvest;
+		
+	}
 	public void setAutoBuild(boolean auto) {
 		isAutoBuilding = auto;
 	}
-
 	public boolean getAutoBuild() {
 		return isAutoBuilding;
+	}
+	
+	public void setHarvesting(boolean harvesting) {
+		isHarvesting = harvesting;
+	}
+	public boolean getIsHarvesting() {
+		return isHarvesting;
 	}
 
 	public void setType(UnitType type) {
@@ -172,6 +188,9 @@ public class Unit extends Thing {
 		}
 		if (timeToHeal > 0) {
 			timeToHeal -= 1;
+		}
+		if (timeToHarvest > 0) {
+			timeToHarvest -= 1;
 		}
 		if (getTile() == getTargetTile()) {
 			setTargetTile(null);
@@ -358,10 +377,21 @@ public class Unit extends Thing {
 					tile.getRoad().expendEffort(1);
 				}
 			}
-
+			
+			if(readyToHarvest() == false) {
+				return;
+			}
+			//worker harvesting
+			if(isHarvesting == true && this.getTile().getPlant() != null) {
+				ItemType itemType = this.getTile().getPlant().getItem();
+				if(itemType != null) {
+					world.PLAYER_FACTION.addItem(itemType, 1);
+					this.getTile().getPlant().takeDamage(1);
+					resetTimeToHarvest();
+				}
+			}
 		}
 	}
-
 	public void resetTimeToAttack() {
 		timeToAttack = combatStats.getAttackSpeed();
 	}

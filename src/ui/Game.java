@@ -23,6 +23,7 @@ public class Game {
 	private Image targetImage = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
 	private Image spawnLocationImage = Utils.loadImage("resources/Images/interfaces/queuelocation.png");
 	private Image buildIcon = Utils.loadImage("resources/Images/interfaces/building.PNG");
+	private Image harvestIcon = Utils.loadImage("resources/Images/interfaces/farming.png");
 	private Image flag = Utils.loadImage("resources/Images/interfaces/flag.png");
 	private Image moonIcon = Utils.loadImage("resources/Images/interfaces/moon.png");
 	private Image sunIcon = Utils.loadImage("resources/Images/interfaces/sun.png");
@@ -718,6 +719,9 @@ public class Game {
 		}
 		for(Unit unit : theTile.getUnits()) {
 			g.drawImage(unit.getImage(Game.tileSize), drawx, drawy, draww, drawh, null);
+			if(unit.getIsHarvesting() == true) {
+				g.drawImage(harvestIcon, drawx+draww/4+10, drawy+drawh/4, draww/2, drawh/2, null);
+			}
 		}
 	}
 	
@@ -1340,6 +1344,22 @@ public class Game {
 						unit.setAutoBuild(false);
 					}else {
 						unit.setAutoBuild(true);
+					}
+					
+				}
+			}
+		}
+	}
+	public void setHarvesting() {
+		for(Thing thing : selectedThings) {
+			if(thing instanceof Unit) {
+				Unit unit = (Unit)thing;
+				
+				if(unit.getType().isBuilder()) {
+					if(unit.getIsHarvesting() == true) {
+						unit.setHarvesting(false);
+					}else {
+						unit.setHarvesting(true);
 					}
 					
 				}
