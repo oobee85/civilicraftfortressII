@@ -632,9 +632,9 @@ public class World {
 		for(Plant plant : plants) {
 			Tile tile = plant.getTile();
 			
-			if(tile.isCold()) {
-				plant.takeDamage(1);
-			}
+//			if(tile.isCold()) {
+//				plant.takeDamage(1);
+//			}
 			if (plant.isAquatic()) {
 				if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 

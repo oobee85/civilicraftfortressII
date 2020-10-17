@@ -30,7 +30,7 @@
 	{
 		"image":"resources/Images/units/swordsman.png",
 		"cost":{"IRON_SWORD":1,"FOOD":50},
-		"stats":{"movespeed":15,"attackspeed":20,"attack":20,"buildtime":150,"range":1,"health":400,"healspeed":50},
+		"stats":{"movespeed":15,"attackspeed":20,"attack":20,"buildtime":150,"range":1,"health":300,"healspeed":50},
 		"name":"SWORDSMAN",
 		"attributes":["hostile"],
 		"research":"IRON_WORKING"},
