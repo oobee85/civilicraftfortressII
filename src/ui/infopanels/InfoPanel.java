@@ -33,7 +33,7 @@ public class InfoPanel extends JPanel {
 	
 	public JButton addButton(String text) {
 		numButtons ++;
-		Dimension size = new Dimension(60, 20);
+		Dimension size = new Dimension(80, 20);
 		JButton button = KUIConstants.setupButton(text, null, size);
 		button.setFont(KUIConstants.buttonFontMini);
 		this.setLayout(null);

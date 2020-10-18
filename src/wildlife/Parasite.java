@@ -27,7 +27,7 @@ public class Parasite extends Animal {
 		super.updateState();
 		if(getTarget() != null) {
 			if(getTarget().isDead() || getTarget().getFaction() != World.PLAYER_FACTION) {
-				setTarget(null);
+				clearPlannedActions();
 			}
 		}
 	}
@@ -98,9 +98,8 @@ public class Parasite extends Animal {
 			super.chooseWhereToMove(world);
 		}
 		else {
-			if(getTile() != volcano) {
-				setTargetTile(volcano);
-			}
+			clearPlannedActions();
+			queuePlannedAction(new PlannedAction(volcano, null));
 		}
 	}
 }

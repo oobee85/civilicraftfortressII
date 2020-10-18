@@ -30,7 +30,7 @@ public class World {
 	private ArrayList<ArrayList<Tile>> liquidSimulationPhases = new ArrayList<>(NUM_LIQUID_SIMULATION_PHASES);
 	private Tile[][] tiles;
 	
-	public ConcurrentHashMap<Tile, Faction> territory = new ConcurrentHashMap<>();
+	public volatile ConcurrentHashMap<Tile, Faction> territory = new ConcurrentHashMap<>();
 	private int width;
 	private int height;
 
@@ -194,10 +194,11 @@ public class World {
 			}
 		}
 	}
-	public void spawnAnimal(UnitType type, Tile tile, Faction faction) {
+	public Animal spawnAnimal(UnitType type, Tile tile, Faction faction) {
 		Animal animal = makeAnimal(type, tile, faction);
 		tile.addUnit(animal);
 		newUnits.add(animal);
+		return animal;
 	}
 
 	public Animal makeAnimal(UnitType type, Tile tile, Faction faction) {
@@ -230,6 +231,9 @@ public class World {
 		}
 		else if(type == Game.unitTypeMap.get("CYCLOPS")) {
 			return new Cyclops(tile, faction);
+		}
+		else if(type == Game.unitTypeMap.get("BOMB")) {
+			return new Bomb(tile, faction);
 		}
 		else {
 			return new Animal(type, tile, faction);

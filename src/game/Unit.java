@@ -1,30 +1,29 @@
 package game;
 
 import java.util.*;
+import java.util.concurrent.*;
 
-import liquid.*;
 import pathfinding.*;
 import ui.*;
 import utils.*;
-import wildlife.Animal;
-import wildlife.Dragon;
 import world.*;
 
 public class Unit extends Thing {
-
+	
 	private UnitType unitType;
 	private double timeToMove;
 	private double timeToAttack;
 	private double timeToHeal;
-	private Thing target;
 	private int remainingEffort;
 	private boolean isIdle;
 	private int starving;
 	private CombatStats combatStats;
 	private LinkedList<Tile> currentPath;
-	private LinkedList<Tile> queuedPath;
+	
+	public ConcurrentLinkedQueue<PlannedAction> actionQueue = new ConcurrentLinkedQueue<>();
+	private PlannedAction passiveAction = PlannedAction.NOTHING;
+	
 	private LinkedList<Attack> attacks;
-	private boolean isAutoBuilding;
 	private boolean isHarvesting;
 	private double timeToHarvest;
 	private double baseTimeToHarvest = 10;
@@ -60,10 +59,17 @@ public class Unit extends Thing {
 		
 	}
 	public void setAutoBuild(boolean auto) {
-		isAutoBuilding = auto;
+		passiveAction = auto ? PlannedAction.BUILD : PlannedAction.NOTHING;
 	}
 	public boolean getAutoBuild() {
-		return isAutoBuilding;
+		return passiveAction == PlannedAction.BUILD;
+	}
+	
+	public void setGuarding(boolean guarding) {
+		passiveAction = guarding ? PlannedAction.GUARD : PlannedAction.NOTHING;
+	}
+	public boolean isGuarding() {
+		return passiveAction == PlannedAction.GUARD;
 	}
 	
 	public void setHarvesting(boolean harvesting) {
@@ -76,14 +82,6 @@ public class Unit extends Thing {
 	public void setType(UnitType type) {
 		this.unitType = type;
 		this.setImage(this.getType());
-	}
-
-	public void addToPath(Tile t) {
-		if (queuedPath == null) {
-			queuedPath = new LinkedList<Tile>();
-		}
-		queuedPath.add(t);
-
 	}
 
 	public void addAttackType(Attack a) {
@@ -117,11 +115,20 @@ public class Unit extends Thing {
 		return remainingEffort <= 0;
 	}
 
-	public void setTarget(Thing t) {
-		if (isAutoBuilding == true) {
-			isAutoBuilding = false;
+	public void setPassiveAction(PlannedAction action) {
+		this.passiveAction = action;
+	}
+	public void clearPlannedActions() {
+		actionQueue.clear();
+	}
+	public Tile getTargetTile() {
+		if(!actionQueue.isEmpty()) {
+			return actionQueue.peek().targetTile;
 		}
-		target = t;
+		return null;
+	}
+	public void queuePlannedAction(PlannedAction plan) {
+		actionQueue.add(plan);
 	}
 
 	public UnitType getUnitType() {
@@ -162,7 +169,7 @@ public class Unit extends Thing {
 		return true;
 	}
 
-	public void moveTowards(Tile tile) {
+	public boolean moveTowards(Tile tile) {
 		if (((currentPath == null || currentPath.isEmpty() || currentPath.getLast() != tile) && tile != this.getTile())
 				|| (currentPath != null && !currentPath.isEmpty() && currentPath.getFirst().isBlocked(this))) {
 			currentPath = Pathfinding.getBestPath(this, this.getTile(), tile);
@@ -173,7 +180,9 @@ public class Unit extends Thing {
 			if (success) {
 				currentPath.removeFirst();
 			}
+			return success;
 		}
+		return false;
 	}
 
 	public LinkedList<Tile> getCurrentPath() {
@@ -193,11 +202,7 @@ public class Unit extends Thing {
 		if (timeToHarvest > 0) {
 			timeToHarvest -= 1;
 		}
-		if (getTile() == getTargetTile()) {
-			setTargetTile(null);
-		}
-		isIdle = readyToMove() && readyToAttack() && target == null && getTargetTile() == null
-				&& getIsSelected() == false;
+		isIdle = readyToMove() && readyToAttack() && actionQueue.isEmpty() && getIsSelected() == false;
 		if (getHealth() < combatStats.getHealth() && readyToHeal()) {
 			heal(1, false);
 			resetTimeToHeal();
@@ -222,6 +227,14 @@ public class Unit extends Thing {
 				starving++;
 				takeDamage(starving);
 			}
+		}
+
+		// If on tile with an item, take the item
+		if (getFaction().hasItems()) {
+			for (Item item : getTile().getItems()) {
+				getFaction().addItem(item.getType(), item.getAmount());
+			}
+			getTile().clearItems();
 		}
 	}
 
@@ -268,8 +281,8 @@ public class Unit extends Thing {
 	}
 
 	public void aggro(Unit attacker) {
-		if (this.getFaction() != attacker.getFaction()) {
-			this.setTarget(attacker);
+		if (this.getFaction() != attacker.getFaction() && getTarget() != attacker && isIdle()) {
+			this.queuePlannedAction(new PlannedAction(null, attacker));
 		}
 	}
 
@@ -300,40 +313,50 @@ public class Unit extends Thing {
 
 	public void planActions(World world) {
 		// Workers deciding whether to move toward something to build
-		if (unitType.isBuilder() && isAutoBuilding && getTile().getIsTerritory() == getFaction()) {
+		if (unitType.isBuilder() && isIdle() && passiveAction == PlannedAction.BUILD && getTile().getIsTerritory() == getFaction()) {
 			Building building = getBuildingToBuild(world.buildings, world.plannedBuildings);
 			if (building != null && building.getTile().getIsTerritory() == getFaction()) {
-				setTargetTile(building.getTile());
+				queuePlannedAction(new PlannedAction(building.getTile(), null));
 			}
 		}
 	}
 
 	public void doMovement() {
-		if (getTargetTile() == null && queuedPath != null && !queuedPath.isEmpty()) {
-			setTargetTile(queuedPath.getFirst());
-			queuedPath.remove();
-		}
-		if (readyToMove() && getTargetTile() != null) {
-			moveTowards(getTargetTile());
-		}
-		// If on tile with an item, take the item
-		if (getFaction().hasItems()) {
-			for (Item item : getTile().getItems()) {
-				getFaction().addItem(item.getType(), item.getAmount());
+		if(readyToMove()) {
+			Tile targetTile = null; 
+			Thing targetThing = null;
+			while(!actionQueue.isEmpty()) {
+				PlannedAction plan = actionQueue.peek();
+				targetThing = plan.target;
+				targetTile = plan.getTile();
+				if(targetTile == getTile()) {
+					actionQueue.poll();
+					targetTile = null;
+					targetThing = null;
+				}
+				else {
+					break;
+				}
 			}
-			getTile().clearItems();
+			boolean alreadyInRange = targetThing != null && this.inRange(targetThing);
+			if(targetTile != null && !alreadyInRange) {
+				moveTowards(targetTile);
+			}
 		}
 	}
 
 	public boolean doAttacks(World world) {
 		boolean attacked = false;
-		if (target != null) {
-			attacked = Attack.tryToAttack(this, target);
-			if (target.isDead()) {
-				target = null;
+		if(!actionQueue.isEmpty()) {
+			PlannedAction plan = actionQueue.peek();
+			if(plan.target != null) {
+				attacked = Attack.tryToAttack(this, plan.target);
+				if (plan.target.isDead()) {
+					actionQueue.poll();
+				}
 			}
 		}
-		if (!attacked && getFaction() != World.NEUTRAL_FACTION) {
+		if (!attacked && getFaction() != World.NEUTRAL_FACTION && isGuarding()) {
 			HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getType().getCombatStats().getAttackRadius());
 			for (Tile tile : inrange) {
 				if (tile.getIsTerritory() == getFaction()) {
@@ -378,10 +401,8 @@ public class Unit extends Thing {
 					tobuild.setPlanned(false);
 				}
 			}
-			for (Tile tile : this.getTile().getNeighbors()) {
-				if (tile.getRoad() != null && tile.getRoad().getRemainingEffort() > 0) {
-					tile.getRoad().expendEffort(1);
-				}
+			if (getTile().getRoad() != null && getTile().getRoad().getRemainingEffort() > 0) {
+				getTile().getRoad().expendEffort(1);
 			}
 			
 			if(readyToHarvest() == false) {
@@ -391,7 +412,7 @@ public class Unit extends Thing {
 			if(isHarvesting == true && this.getTile().getPlant() != null) {
 				ItemType itemType = this.getTile().getPlant().getItem();
 				if(itemType != null) {
-					world.PLAYER_FACTION.addItem(itemType, 1);
+					getFaction().addItem(itemType, 1);
 					this.getTile().getPlant().takeDamage(1);
 					resetTimeToHarvest();
 				}
@@ -403,7 +424,10 @@ public class Unit extends Thing {
 	}
 
 	public Thing getTarget() {
-		return target;
+		if(!actionQueue.isEmpty()) {
+			return actionQueue.peek().target;
+		}
+		return null;
 	}
 
 	public UnitType getType() {
@@ -456,6 +480,9 @@ public class Unit extends Thing {
 		strings.add(String.format("TTM=%.1f", getTimeToMove()));
 		strings.add(String.format("TTA=%.1f", getTimeToAttack()));
 		strings.add(String.format("TTH=%.1f", getTimeToHeal()));
+		if(isGuarding()) {
+			strings.add("GUARD");
+		}
 		return strings;
 	}
 

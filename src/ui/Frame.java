@@ -187,9 +187,10 @@ public class Frame extends JPanel {
 					switchInfoPanel(infoPanel);
 					SwingUtilities.invokeLater(() -> {
 						infoPanel.addButton("Explode").addActionListener(e -> gameInstance.explode(unit));
-						infoPanel.addButton("Road everything").addActionListener(e -> gameInstance.workerRoad());
-						infoPanel.addButton("AutoBuild").addActionListener(e -> gameInstance.setAutoBuild());
-						infoPanel.addButton("Set Harvesting").addActionListener(e -> gameInstance.setHarvesting());
+						infoPanel.addButton("RoadEverything").addActionListener(e -> gameInstance.workerRoad());
+						infoPanel.addButton("AutoBuild").addActionListener(e -> gameInstance.toggleAutoBuild());
+						infoPanel.addButton("SetHarvesting").addActionListener(e -> gameInstance.setHarvesting());
+						infoPanel.addButton("Guard").addActionListener(e -> gameInstance.toggleGuarding());
 					});
 				}
 				else {
@@ -815,7 +816,6 @@ public class Frame extends JPanel {
 			button.addActionListener(e -> {
 //				gameInstance.buildBuilding(type, null);
 				gameInstance.setBuildingToPlan(type);
-				switchInfoPanel(new BuildingTypeInfoPanel(type));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new BuildingTypeInfoPanel(type));
@@ -856,7 +856,6 @@ public class Frame extends JPanel {
 					BUILDING_BUTTON_SIZE);
 			button.addActionListener(e -> {
 				gameInstance.setBuildingToPlan(type);
-				switchInfoPanel(new BuildingTypeInfoPanel(type));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new BuildingTypeInfoPanel(type));
@@ -886,7 +885,6 @@ public class Frame extends JPanel {
 					SPAWN_BUTTON_SIZE);
 			button.addActionListener(e -> {
 				gameInstance.setThingToSpawn(type, null);
-				switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new UnitTypeInfoPanel(type));
@@ -910,7 +908,6 @@ public class Frame extends JPanel {
 					SPAWN_BUTTON_SIZE);
 			button.addActionListener(e -> {
 				gameInstance.setThingToSpawn(null, type);
-				switchInfoPanel(new BuildingTypeInfoPanel(type));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new BuildingTypeInfoPanel(type));
@@ -952,7 +949,6 @@ public class Frame extends JPanel {
 			button.setEnabled(false);
 			button.addActionListener(e -> {
 				gameInstance.setResearchTarget(research);
-				switchInfoPanel(new ResearchInfoPanel(research));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ResearchInfoPanel(research));
@@ -987,7 +983,6 @@ public class Frame extends JPanel {
 			button.setEnabled(false);
 			button.addActionListener(e -> {
 				gameInstance.craftItem(type);
-				switchInfoPanel(new ItemTypeInfoPanel(type));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ItemTypeInfoPanel(type));
@@ -1023,7 +1018,6 @@ public class Frame extends JPanel {
 				button.setEnabled(false);
 				button.addActionListener(e -> {
 					gameInstance.craftItem(type);
-					switchInfoPanel(new ItemTypeInfoPanel(type));
 				});
 				button.addRightClickActionListener(e -> {
 					switchInfoPanel(new ItemTypeInfoPanel(type));
@@ -1246,7 +1240,6 @@ public class Frame extends JPanel {
 			button.setEnabled(false);
 			button.addActionListener(e -> {
 				gameInstance.setResearchTarget(research);
-				switchInfoPanel(new ResearchInfoPanel(research));
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ResearchInfoPanel(research));
@@ -1278,7 +1271,6 @@ public class Frame extends JPanel {
 				cs.getStats().set(f, cs.getStats().get(f)+1);
 				cs.add(strings.get(f), cs.getStats().get(f) );
 				gameInstance.addCombatBuff(cs);
-				
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new CombatStatInfoPanel(combatBuffs));
@@ -1381,7 +1373,7 @@ public class Frame extends JPanel {
 		
 //		frame.setVisible(true);
 
-		repaintingThread = new Timer(MILLISECONDS_PER_TICK, new ActionListener() {
+		repaintingThread = new Timer(30, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				frame.repaint();

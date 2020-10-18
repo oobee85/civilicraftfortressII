@@ -71,9 +71,6 @@ public class Dragon extends Animal {
 	public boolean wantsToAttack() {
 		return readyToHunt();
 	}
-	public void goHome() {
-		this.setTargetTile(home);
-	}
 	
 	public void moveAroundTarget() {
 		if(this.getTarget() == null) {

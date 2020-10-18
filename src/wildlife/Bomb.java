@@ -7,7 +7,7 @@ import ui.*;
 import world.*;
 
 public class Bomb extends Animal {
-
+	
 	public Bomb(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("BOMB"), tile, faction);
 	}
@@ -33,7 +33,7 @@ public class Bomb extends Animal {
 	
 	@Override
 	public boolean doAttacks(World world) {
-		if(getTargetTile() == getTile()) {
+		if(getTarget().getTile().getLocation().distanceTo(getTile().getLocation()) == 0) {
 			world.spawnExplosion(getTile(), 5, 500);
 			this.setDead(true);
 			return true;

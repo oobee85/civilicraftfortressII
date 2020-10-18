@@ -72,11 +72,9 @@ public class Animal extends Unit {
 	}
 	
 	public void chooseWhereToMove(World world) {
-		if(getTarget() != null) {
-			if(this.getTile().getLocation().distanceTo(getTarget().getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
-				setTargetTile(getTarget().getTile());
-				return;
-			}
+		// everything below only if idle
+		if(!isIdle()) {
+			return;
 		}
 		// Try to avoid danger
 		Tile best = getTile();
@@ -94,12 +92,8 @@ public class Animal extends Unit {
 		}
 		if(bestDanger < currentDanger && currentDanger >= 0.9) {
 			if(best != getTile()) {
-				setTargetTile(best);
+				queuePlannedAction(new PlannedAction(best, null));
 			}
-			return;
-		}
-		// everything below only if idle
-		if(!isIdle()) {
 			return;
 		}
 		// Try to stay next to same species
@@ -119,7 +113,7 @@ public class Animal extends Unit {
 			}
 			if(bestHerdAmount > currentHerdAmount && computeDanger(bestHerd) < 1) {
 				if(bestHerd != getTile()) {
-					setTargetTile(bestHerd);
+					queuePlannedAction(new PlannedAction(bestHerd, null));
 					return;
 				}
 			}
@@ -127,27 +121,28 @@ public class Animal extends Unit {
 		// Migrate according to the season
 		if(getType().isMigratory() && Game.ticks > migratingUntil && Math.random() < 0.1) {
 			double season = Season.getSeason4();
-			if(season > 0.4 && season < 0.8) {
-				// heading into winter
-				if(getTile().getLocation().y < world.getHeight()/2) { 
-					TileLoc migrationTarget = new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y + (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4));
-					setTargetTile(world.get(migrationTarget));
-					System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + this.getTargetTile());
-					migratingUntil = Game.ticks + Season.SEASON_DURATION/2;
-				}
+			Tile migrationTarget = null;
+			// heading into winter
+			if(season > 0.4 && season < 0.8 && getTile().getLocation().y < world.getHeight()/2) {
+				migrationTarget = world.get(new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y + (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4)));
 			}
-			if(season > 1.4 && season < 1.8) {
-				// heading into summer
-				if(getTile().getLocation().y > world.getHeight()/2) { 
-					TileLoc migrationTarget = new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y - (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4));
-					setTargetTile(world.get(migrationTarget));
-					System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + this.getTargetTile());
-					migratingUntil = Game.ticks + Season.SEASON_DURATION/2;
-				}
+			// heading into summer
+			else if(season > 1.4 && season < 1.8 && getTile().getLocation().y > world.getHeight()/2) {
+				migrationTarget = world.get(new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y - (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4)));
+			}
+			if(migrationTarget != null) {
+				System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + migrationTarget);
+				migratingUntil = Game.ticks + Season.SEASON_DURATION/2;
+				queuePlannedAction(new PlannedAction(migrationTarget, null));
 			}
 		}
 	}
-	
+
+	// TODO need to remove this and instead use queuePlannedAction directly
+	public void setTarget(Thing t) {
+		clearPlannedActions();
+		queuePlannedAction(new PlannedAction(t.getTile(), t));
+	}
 	private void chooseWhatToEat(LinkedList<Unit> units) {
 		if(!wantsToEat()) {
 			return;

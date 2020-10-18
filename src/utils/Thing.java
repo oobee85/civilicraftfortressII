@@ -17,7 +17,6 @@ public class Thing implements HasImage {
 	private boolean isDead;
 	private int timeLastDamageTaken = -1000;
 	private Tile tile;
-	private Tile targetTile;
 	private boolean isSelected;
 	
 	private HasImage hasImage;
@@ -154,23 +153,12 @@ public class Thing implements HasImage {
 	
 	public void setTile(Tile tile) {
 		this.tile = tile;
-		if(targetTile == getTile() ) {
-			targetTile = null;
-		}
 	}
 	
 	public Tile getTile() {
 		return tile;
 	}
 	
-	public Tile getTargetTile() {
-		return targetTile;
-	}
-	public void setTargetTile(Tile t) {
-		if(t != getTile()) {
-			targetTile = t;
-		}
-	}
 	@Override
 	public Image getImage(int size) {
 		return hasImage.getImage(size);
