@@ -469,7 +469,8 @@ public class Game {
 				if(t != null) {
 					Road road = new Road(RoadType.STONE_ROAD, t);
 					road.setRemainingEffort(0);
-					t.setRoad(road, "asdf");
+					t.setRoad(road);
+					world.newBuildings.add(road);
 				}
 			}
 		}
@@ -523,10 +524,9 @@ public class Game {
 				s += d;
 			}
 		}
-		Road road = new Road(RoadType.STONE_ROAD, world.get(loc));
-		road.setRemainingEffort(tile.getRoad().getRemainingEffort());
-		world.get(loc).setRoad(road, s);
-		
+//		Road road = new Road(RoadType.STONE_ROAD, world.get(loc));
+//		road.setRemainingEffort(tile.getRoad().getRemainingEffort());
+		tile.setRoadCorner(s);
 	}
 	private void turnRoads() {
 		for(Tile tile : world.getTiles()) {
@@ -648,10 +648,7 @@ public class Game {
 				Utils.setTransparency(g, 1);
 			}
 			if (theTile.getRoad() != null) {
-				g.drawImage(theTile.getRoadImage(), drawx, drawy, draww, drawh, null);
-				if(theTile.getRoad().isBuilt() == false) {
-					g.drawImage(buildIcon, drawx, drawy, draww, drawh, null);
-				}
+				drawBuilding(theTile.getRoad(), g, drawx, drawy, draww, drawh);
 			}
 			
 			if(theTile.liquidType != LiquidType.DRY) {
@@ -668,8 +665,6 @@ public class Game {
 				g.drawImage(theTile.liquidType.getImage(imagesize), drawx + draww/2 - imageSize/2, drawy + draww/2 - imageSize/2, imageSize, imageSize, null);
 			}
 			
-			
-			
 			if(theTile.getModifier() != null) {
 				Utils.setTransparency(g, 0.9);
 				g.drawImage(theTile.getModifier().getType().getImage(imagesize), drawx, drawy, draww, drawh, null);
@@ -678,50 +673,51 @@ public class Game {
 			
 			if (!theTile.getItems().isEmpty()) {
 				for (Item item : theTile.getItems()) {
-//					if (item != null && t != null) {
-						g.drawImage(item.getType().getImage(imagesize), drawx + Game.tileSize/4,
-								drawy + Game.tileSize/4, Game.tileSize/2, Game.tileSize/2, null);
-//					}
+					g.drawImage(item.getType().getImage(imagesize), drawx + Game.tileSize/4,
+							drawy + Game.tileSize/4, Game.tileSize/2, Game.tileSize/2, null);
 				}
 			}
+			if(theTile.getPlant() != null) {
+				Plant p = theTile.getPlant();
+				g.drawImage(p.getImage(Game.tileSize), drawx, drawy, draww, drawh, null);
+			}
 			
+			if(theTile.getBuilding() != null) {
+				drawBuilding(theTile.getBuilding(), g, drawx, drawy, draww, drawh);
+			}
+			for(Unit unit : theTile.getUnits()) {
+				g.drawImage(unit.getImage(Game.tileSize), drawx, drawy, draww, drawh, null);
+				if(unit.getIsHarvesting() == true) {
+					g.drawImage(harvestIcon, drawx+draww/4+10, drawy+drawh/4, draww/2, drawh/2, null);
+				}
+			}
 		}
-		if(theTile.getPlant() != null) {
-			Plant p = theTile.getPlant();
-			g.drawImage(p.getImage(Game.tileSize), drawx, drawy, draww, drawh, null);
+	}
+	public void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh) {
+		if(building.getFaction() == World.PLAYER_FACTION) {
+			HashSet<Tile> buildingVision = world.getNeighborsInRadius(building.getTile(), building.getType().getVisionRadius());
+			for(Tile invision : buildingVision) {
+				invision.setInVisionRange(true);
+			}
 		}
 		
-		if(theTile.getBuilding() != null) {
-			Building b = theTile.getBuilding();
-			if(b.getFaction() == World.PLAYER_FACTION) {
-				HashSet<Tile> buildingVision = world.getNeighborsInRadius(b.getTile(), b.getType().getVisionRadius());
-				for(Tile invision : buildingVision) {
-					invision.setInVisionRange(true);
-				}
-			}
-			
-			BufferedImage bI = Utils.toBufferedImage(b.getImage(0));
+		BufferedImage bI = Utils.toBufferedImage(building.getImage(0));
+		if(building.isBuilt() == false) {
 			//draws the transparent version
 			Utils.setTransparency(g, 0.5f);
 			Graphics2D g2d = (Graphics2D)g;
 			g2d.drawImage(bI, drawx, drawy, draww, drawh, null);
 			Utils.setTransparency(g, 1f);
-			
 			//draws the partial image
-			double percentDone = 1 - b.getRemainingEffort()/b.getType().getBuildingEffort();
+			double percentDone = 1 - building.getRemainingEffort()/building.getType().getBuildingEffort();
 			int imageRatio =  Math.max(1, (int) (bI.getHeight() * percentDone));
 			int partialHeight = Math.max(1, (int) (Game.tileSize * percentDone));
 			bI = bI.getSubimage(0, bI.getHeight() - imageRatio, bI.getWidth(), imageRatio);
 			g.drawImage(bI, drawx, drawy - partialHeight + drawh, draww, partialHeight , null);
-			if(b.isBuilt() == false) {
-				g.drawImage(buildIcon, drawx + Game.tileSize/4, drawy + Game.tileSize/4, draww*3/4, drawh*3/4, null);
-			}
+			g.drawImage(buildIcon, drawx + Game.tileSize/4, drawy + Game.tileSize/4, draww*3/4, drawh*3/4, null);
 		}
-		for(Unit unit : theTile.getUnits()) {
-			g.drawImage(unit.getImage(Game.tileSize), drawx, drawy, draww, drawh, null);
-			if(unit.getIsHarvesting() == true) {
-				g.drawImage(harvestIcon, drawx+draww/4+10, drawy+drawh/4, draww/2, drawh/2, null);
-			}
+		else {
+			g.drawImage(bI, drawx, drawy, draww, drawh, null);
 		}
 	}
 	
@@ -765,13 +761,6 @@ public class Game {
 				}
 			}
 			
-			for(Building planned : world.plannedBuildings) {
-				Utils.setTransparency(g, 0.5f);
-				Graphics2D g2d = (Graphics2D)g;
-				BufferedImage bI = Utils.toBufferedImage(planned.getImage(0));
-				g2d.drawImage(bI, planned.getTile().getLocation().x * Game.tileSize, planned.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize , null);
-				Utils.setTransparency(g, 1f);
-			}
 			for(Building building : world.buildings) {
 				drawHealthBar(g, building);
 				drawHitsplat(g, building);
@@ -815,21 +804,20 @@ public class Game {
 					Unit unit = (Unit) thing;
 					// draw attacking target
 					drawTarget(g, unit);
-					// draw path and destination flag
-					if(unit.getTargetTile() != null) {
-						LinkedList<Tile> path = unit.getCurrentPath();
-						if(path != null) {
-							g.setColor(Color.green);
-							TileLoc prev = unit.getTile().getLocation();
-							for(Tile t : path) {
-								if(prev != null) {
-									g.drawLine(prev.x * Game.tileSize + Game.tileSize/2, prev.y * Game.tileSize + Game.tileSize/2, 
-											t.getLocation().x * Game.tileSize + Game.tileSize/2, t.getLocation().y * Game.tileSize + Game.tileSize/2);
-								}
-								prev = t.getLocation();
+					// draw path 
+					LinkedList<Tile> path = unit.getCurrentPath();
+					if(path != null) {
+						g.setColor(Color.green);
+						TileLoc prev = unit.getTile().getLocation();
+						for(Tile t : path) {
+							if(prev != null) {
+								g.drawLine(prev.x * Game.tileSize + Game.tileSize/2, prev.y * Game.tileSize + Game.tileSize/2, 
+										t.getLocation().x * Game.tileSize + Game.tileSize/2, t.getLocation().y * Game.tileSize + Game.tileSize/2);
 							}
+							prev = t.getLocation();
 						}
-						}
+					}
+					// draw destination flags
 					for(PlannedAction plan : unit.actionQueue) {
 						Tile targetTile = plan.targetTile == null ? plan.target.getTile() : plan.targetTile;
 						g.drawImage(flag, targetTile.getLocation().x * Game.tileSize, targetTile.getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
@@ -1121,14 +1109,27 @@ public class Game {
 		}
 		else if(buildingType != null) {
 			if(tile.getBuilding() != null) {
-				tile.getBuilding().takeDamage(tile.getBuilding().getType().getHealth() + 1);
+				tile.getBuilding().setDead(true);
 			}
 			System.out.println("spawn building" + buildingType.toString() + tile.getLocation());
-			Building building = new Building(buildingType, tile, faction);
-			building.setRemainingEffort(0);
-			tile.setBuilding(building);
-			world.newBuildings.add(building);
-			return building;
+			if(buildingType == BuildingType.ROAD) {
+				Road road = new Road(RoadType.STONE_ROAD, tile);
+				road.setRemainingEffort(0);
+				tile.setRoad(road);
+				turnRoad(tile);
+				for(Tile neighbor : tile.getNeighbors()) {
+					turnRoad(neighbor);
+				}
+				world.newBuildings.add(road);
+				return road;
+			}
+			else {
+				Building building = new Building(buildingType, tile, faction);
+				building.setRemainingEffort(0);
+				tile.setBuilding(building);
+				world.newBuildings.add(building);
+				return building;
+			}
 		}
 		return null;
 	}
@@ -1148,10 +1149,12 @@ public class Game {
 	}
 	public void leftClick(int mx, int my) {
 		Position tilepos = getTileAtPixel(new Position(mx,my));
-		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
-		Tile tile = world.get(loc);
-
-		System.out.println("left clicked on " + loc);
+		Tile tile = world.get(new TileLoc(tilepos.getIntX(), tilepos.getIntY()));
+		
+		System.out.println("left clicked on " + tile);
+		if(tile == null) {
+			return;
+		}
 		
 		//if a-click and the tile has a building or unit
 		if(aControl == true) {
@@ -1167,16 +1170,16 @@ public class Game {
 		}
 		//planning building
 		else if (selectedBuildingToPlan != null) {
-			System.out.println("planning building " + selectedBuildingToPlan.toString() + loc.toString());
-			if(buildBuilding(selectedBuildingToPlan, tile)) {
+			Building plannedBuilding = buildBuilding(selectedBuildingToPlan, tile);
+			if(plannedBuilding != null) {
 				for(Thing thing : selectedThings) {
 					if(thing instanceof Unit) {
 						Unit unit = (Unit) thing;
+						if(!shiftEnabled) {
+							unit.clearPlannedActions();
+						}
 						if(unit.getType().isBuilder()) {
-							if(!shiftEnabled) {
-								unit.clearPlannedActions();
-							}
-							unit.queuePlannedAction(new PlannedAction(tile, null));
+							unit.queuePlannedAction(new PlannedAction(plannedBuilding, true));
 						}
 					}
 				}
@@ -1195,35 +1198,60 @@ public class Game {
 	public void rightClick(int mx, int my) {
 		Position targetPosition = getTileAtPixel(new Position(mx, my));
 		Tile targetTile = world.get(new TileLoc(targetPosition.getIntX(), targetPosition.getIntY()));
+		if(targetTile == null) {
+			return;
+		}
 		
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Building) {
 				((Building) thing).setSpawnLocation(targetTile);
 			}
-			if(thing instanceof Unit) {
+			else if(thing instanceof Unit) {
 				Unit unit = (Unit) thing;
-				Thing targetThing = null;
-				for(Unit tempUnit : targetTile.getUnits()) {
-					if(tempUnit == unit) {
-						continue;
-					}
-					if(tempUnit.getFaction() != unit.getFaction() || aControl) {
-						targetThing = tempUnit;
-					}
-				}
-				if(targetThing == null && targetTile.getBuilding() != null) {
-					if(targetTile.getBuilding().getFaction() != unit.getFaction() || aControl) {
-						targetThing = targetTile.getBuilding();
-					}
-				}
-				// initially set the target even though it might 
 				if(!shiftEnabled) {
 					unit.clearPlannedActions();
 				}
-				unit.queuePlannedAction(new PlannedAction(targetTile, targetThing));
+				if(unit.getType().isBuilder()) {
+					Building targetBuilding = targetTile.getBuilding();
+					if(targetBuilding == null) {
+						targetBuilding = targetTile.getRoad();
+					}
+					if(targetBuilding != null && (targetBuilding.getFaction() == unit.getFaction() || targetBuilding instanceof Road) && !targetBuilding.isBuilt()) {
+						unit.queuePlannedAction(new PlannedAction(targetBuilding, true));
+					}
+					else {
+						unit.queuePlannedAction(new PlannedAction(targetTile));
+					}
+				}
+				else {
+					Thing targetThing = null;
+					for(Unit tempUnit : targetTile.getUnits()) {
+						if(tempUnit == unit) {
+							continue;
+						}
+						if(tempUnit.getFaction() != unit.getFaction() || aControl) {
+							targetThing = tempUnit;
+						}
+					}
+					if(targetThing == null && targetTile.getBuilding() != null
+							&& (targetTile.getBuilding().getFaction() != unit.getFaction() || aControl)) {
+						targetThing = targetTile.getBuilding();
+					}
+					if(targetThing != null) {
+						unit.queuePlannedAction(new PlannedAction(targetThing));
+					}
+					else {
+						unit.queuePlannedAction(new PlannedAction(targetTile));
+					}
+				}
 			}
 		}
 		aControl = false;
+		if(shiftEnabled == false) {
+			selectedUnitToSpawn = null;
+			selectedBuildingToSpawn = null;
+			selectedBuildingToPlan = null;
+		}
 	}
 	private void attackCommand(Tile tile) {
 		for(Thing thing : selectedThings) {
@@ -1240,11 +1268,16 @@ public class Game {
 				if(targetThing == null) {
 					targetThing = tile.getBuilding();
 				}
-				// initially set the target even though it might 
-				if(!shiftEnabled) {
-					unit.clearPlannedActions();
+				if(targetThing == null) {
+					targetThing = tile.getRoad();
 				}
-				unit.queuePlannedAction(new PlannedAction(targetThing.getTile(), targetThing));
+				if(targetThing != null) {
+					// initially set the target even though it might 
+					if(!shiftEnabled) {
+						unit.clearPlannedActions();
+					}
+					unit.queuePlannedAction(new PlannedAction(targetThing));
+				}
 			}
 		}
 	}
@@ -1334,11 +1367,9 @@ public class Game {
 		}
 	}
 	public void workerRoad() {
-		
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;
-				
 				if(unit.getType().isBuilder()) {
 					for(Entry<Tile, Faction> entry : world.territory.entrySet()) {
 						System.out.println("Tile " + entry.getKey() + ": " + entry.getValue());
@@ -1346,9 +1377,9 @@ public class Game {
 							continue;
 						}
 						Tile tile = entry.getKey();
-						boolean plannedRoad = setPlannedRoad(tile);
-						if(plannedRoad) {
-							unit.queuePlannedAction(new PlannedAction(tile, null));
+						Building building = buildBuilding(BuildingType.ROAD, tile);
+						if(building != null) {
+							unit.queuePlannedAction(new PlannedAction(building, true));
 						}
 					}
 				}
@@ -1447,7 +1478,10 @@ public class Game {
 	}
 
 	private boolean canBuild(BuildingType bt, Tile tile) {
-		if (tile.getHasBuilding() == true) {
+		if(bt == BuildingType.ROAD && tile.getRoad() != null) {
+			return false;
+		}
+		if (bt != BuildingType.ROAD && tile.getHasBuilding()) {
 			return false;
 		}
 		if(!World.PLAYER_FACTION.canAfford(bt.getCost())) {
@@ -1460,70 +1494,40 @@ public class Game {
 
 	}
 
-	public boolean buildBuilding(BuildingType bt, Tile tile) {
-		if (bt == BuildingType.IRRIGATION && tile.canPlant() == false) {
-			return false;
-		}
-		if(tile.getHasBuilding() == true) {
-			return false;
-		}
-		
-		//if passed in a tile, it builds it on the tile
-		if(tile != null) {
-			if(canBuild(bt, tile) == true) {
+	public Building buildBuilding(BuildingType bt, Tile tile) {
+		if(canBuild(bt, tile) == true) {
+			World.PLAYER_FACTION.payCost(bt.getCost());
+			if(bt == BuildingType.ROAD) {
 				World.PLAYER_FACTION.payCost(bt.getCost());
+				Road road = new Road(RoadType.STONE_ROAD, tile);
+				tile.setRoad(road);
+				turnRoad(tile);
+				for(Tile neighbor : tile.getNeighbors()) {
+					turnRoad(neighbor);
+				}
+				world.plannedBuildings.add(road);
+				road.setPlanned(true);
+				road.setHealth(1);
+				return road;
+			}
+			else {
 				Building building = new Building(bt, tile, World.PLAYER_FACTION);
 				tile.setBuilding(building);
 				world.plannedBuildings.add(building);
 				building.setPlanned(true);
 				building.setHealth(1);
-				return true;
+				return building;
 			}
 		}
-		
-		//if not passed in tile, builds the building on each worker
-		boolean built = false;
-		for (Thing thing : selectedThings) {
-			if (thing != null && thing instanceof Unit && ((Unit) thing).getUnitType().isBuilder()) {
-				if(canBuild(bt, thing.getTile()) == true) {
-					World.PLAYER_FACTION.payCost(bt.getCost());
-					Building building = new Building(bt, thing.getTile(), World.PLAYER_FACTION);
-					thing.getTile().setBuilding(building);
-					world.newBuildings.add(building);
-					building.setPlanned(false);
-					building.setHealth(1);
-					built = true;
-				}
-			}
-		}
-		return built;
-
+		return null;
 	}
 	public void setBuildingToPlan(BuildingType bt) {
-		if(bt != null) {
-			selectedBuildingToPlan = bt;
-		}
+		selectedBuildingToPlan = bt;
 	}
 	public void setSummonPlayerControlled(boolean playerControlled) {
 		summonPlayerControlled = playerControlled;
 	}
-	private boolean setPlannedRoad(Tile t) {
-		if(t.getRoad() != null) {
-			return false;
-		}
-		if(World.PLAYER_FACTION.canAfford(RoadType.STONE_ROAD.getCost())) {
-			World.PLAYER_FACTION.payCost(RoadType.STONE_ROAD.getCost());
-			Road road = new Road(RoadType.STONE_ROAD, t);
-			t.setRoad(road, Direction.NORTH.toString());
-			
-			for (Tile tile : Utils.getNeighborsIncludingCurrent(t, world)) {
-				turnRoad(tile);
-			}
-			return true;
-		}
-		return false;
-	}
-	
+
 	public void setThingToSpawn(UnitType ut, BuildingType bt) {
 		if(ut != null) {
 			selectedUnitToSpawn = ut;
@@ -1534,24 +1538,6 @@ public class Game {
 		
 	}
 	
-	
-	public void buildRoad(RoadType rt) {
-		
-		for(Thing thing : selectedThings) {
-			if (thing instanceof Unit && ((Unit) thing).getUnitType().isBuilder()) {
-				if(World.PLAYER_FACTION.canAfford(rt.getCost())) {
-					World.PLAYER_FACTION.payCost(rt.getCost());
-					Road road = new Road(rt, thing.getTile());
-					thing.getTile().setRoad(road, Direction.NORTH.toString());
-					
-					for (Tile tile : Utils.getNeighborsIncludingCurrent(thing.getTile(), world)) {
-						turnRoad(tile);
-					}
-				}
-			}
-		}
-	}
-
 	public void tryToBuildUnit(UnitType u) {
 		
 		for(Thing thing : selectedThings) {
@@ -1575,8 +1561,6 @@ public class Game {
 				return;
 			}
 			World.PLAYER_FACTION.payCost(u.getCost());
-			unit.clearPlannedActions();
-			unit.queuePlannedAction(new PlannedAction(unit.getTile().getBuilding().getSpawnLocation(), null));
 			tile.getBuilding().setBuildingUnit(unit);
 		}
 	}
@@ -1666,17 +1650,6 @@ public class Game {
 	public void setShowHeightMap(boolean show) {
 		this.showHeightMap = show;
 	}
-//	public UnitType getSelectedUnit() {
-//		if(selectedThing != null && selectedThing instanceof Unit) {
-//			
-//			return ((Unit)selectedThing).getUnitType();
-//		}
-//		return null;
-//	}
-	
-//	public Thing getSelectedThing() {
-//		return selectedThing;
-//	}
 	public ConcurrentLinkedQueue<Thing> getSelectedThings() {
 		return selectedThings;
 	}

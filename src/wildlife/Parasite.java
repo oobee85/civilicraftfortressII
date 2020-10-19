@@ -83,7 +83,8 @@ public class Parasite extends Animal {
 		if(!transformed) {
 			for(Unit unit : units) {
 				if(unit.getFaction() == World.PLAYER_FACTION) {
-					setTarget(unit);
+					clearPlannedActions();
+					queuePlannedAction(new PlannedAction(unit));
 					if(Math.random() < 0.2) {
 						return;
 					}
@@ -99,7 +100,7 @@ public class Parasite extends Animal {
 		}
 		else {
 			clearPlannedActions();
-			queuePlannedAction(new PlannedAction(volcano, null));
+			queuePlannedAction(new PlannedAction(volcano));
 		}
 	}
 }

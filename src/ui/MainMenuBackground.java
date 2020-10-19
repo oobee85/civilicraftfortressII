@@ -61,7 +61,7 @@ public class MainMenuBackground extends JPanel {
 			thisWidth = getWidth();
 			thisHeight = getHeight();
 			game.setViewSize(thisWidth, thisHeight);
-			game.centerViewOn(game.world.buildings.get(0).getTile(), (int)(thisWidth/startingNumTilesOnscreen));
+			game.centerViewOn(game.world.buildings.getLast().getTile(), (int)(thisWidth/startingNumTilesOnscreen));
 			repaint();
 			ready = true;
 			Thread gameLoopThread = new Thread(() -> {

@@ -757,7 +757,7 @@ public class Frame extends JPanel {
 		frame.pack();
 		
 		gameInstance.setViewSize(gamepanel.getWidth(), gamepanel.getHeight());
-		gameInstance.centerViewOn(gameInstance.world.buildings.get(0).getTile(), 50);
+		gameInstance.centerViewOn(gameInstance.world.buildings.getLast().getTile(), 50);
 		gamepanel.requestFocusInWindow();
 		gamepanel.requestFocus();
 		frame.repaint();
@@ -799,15 +799,6 @@ public class Frame extends JPanel {
 
 		
 		workerMenu = new JPanel();
-		JButton makeRoad = KUIConstants.setupButton("Road",
-				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildroad.png"),
-						BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
-				BUILDING_BUTTON_SIZE);
-		makeRoad.addActionListener(e -> {
-			gameInstance.buildRoad(RoadType.STONE_ROAD);
-		});
-		workerMenu.add(makeRoad);
-		
 		for (int i = 0; i < BuildingType.values().length; i++) {
 			BuildingType type = BuildingType.values()[i];
 			KButton button = KUIConstants.setupButton(type.toString(),
@@ -837,18 +828,7 @@ public class Frame extends JPanel {
 			
 		}
 		
-		
-		
 		buildingPlanner = new JPanel();
-		JButton planRoad = KUIConstants.setupButton("plan road",
-				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/buildroad.png"),
-						BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
-				BUILDING_BUTTON_SIZE);
-		planRoad.addActionListener(e -> {
-			gameInstance.buildRoad(RoadType.STONE_ROAD);
-		});
-		buildingPlanner.add(planRoad);
-		
 		for (int i = 0; i < BuildingType.values().length; i++) {
 			BuildingType type = BuildingType.values()[i];
 			KButton button = KUIConstants.setupButton(type.toString(),

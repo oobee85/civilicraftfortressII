@@ -94,7 +94,9 @@ public class Dragon extends Animal {
 //		if(Math.random() < 0.95) {
 			for (Unit a : units) {
 				if (a != this) {
-					setTarget(units.get((int) (Math.random() * units.size())));
+					Unit target = units.get((int) (Math.random() * units.size()));
+					clearPlannedActions();
+					queuePlannedAction(new PlannedAction(target));
 					resetTimeToHunt();
 					return;
 				}

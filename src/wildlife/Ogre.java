@@ -26,12 +26,15 @@ public class Ogre extends Animal {
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		for(Unit u : units) {
 			if(u != this && u.getFaction() == World.PLAYER_FACTION) {
-				setTarget(u);
+				clearPlannedActions();
+				queuePlannedAction(new PlannedAction(u));
 				return;
 			}
 		}
 		if(buildings.size() > 0) {
-			setTarget(buildings.get((int)(Math.random()*buildings.size())));
+			Building building = buildings.get((int)(Math.random()*buildings.size()));
+			clearPlannedActions();
+			queuePlannedAction(new PlannedAction(building));
 			return;
 		}
 		return;

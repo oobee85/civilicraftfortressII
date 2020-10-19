@@ -38,7 +38,6 @@ public class Werewolf extends Animal {
 		if(transformed) {
 			if(other instanceof Unit && inRange(other)) {
 				Unit otherUnit = (Unit)other;
-				
 			}
 			return super.attack(other);
 		}
@@ -62,7 +61,8 @@ public class Werewolf extends Animal {
 		if(transformed) {
 			for(Unit unit : units) {
 				if(unit.getFaction() == World.PLAYER_FACTION) {
-					setTarget(unit);
+					clearPlannedActions();
+					queuePlannedAction(new PlannedAction(unit));
 				}
 			}
 		}

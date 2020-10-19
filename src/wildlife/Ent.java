@@ -35,18 +35,22 @@ public class Ent extends Animal {
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		for(Building b : buildings) {
 			if(b.getType() == BuildingType.SAWMILL) {
-				setTarget(b);
+				clearPlannedActions();
+				queuePlannedAction(new PlannedAction(b));
 				return;
 			}
 		}
 		for(Unit u : units) {
 			if(u.getFaction() == World.PLAYER_FACTION) {
-				setTarget(u);
+				clearPlannedActions();
+				queuePlannedAction(new PlannedAction(u));
 				return;
 			}
 		}
 		if(buildings.size() > 0) {
-			setTarget(buildings.get((int)(Math.random()*buildings.size())));
+			Building b = buildings.get((int)(Math.random()*buildings.size()));
+			clearPlannedActions();
+			queuePlannedAction(new PlannedAction(b));
 			return;
 		}
 		return;

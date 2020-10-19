@@ -49,7 +49,9 @@ public class Flamelet extends Animal {
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		if(buildings.size() > 0) {
-			setTarget(buildings.get((int)(Math.random()*buildings.size())));
+			Building target = buildings.get((int)(Math.random()*buildings.size()));
+			clearPlannedActions();
+			queuePlannedAction(new PlannedAction(target));
 			return;
 		}
 		return;

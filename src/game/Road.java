@@ -1,63 +1,23 @@
 package game;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.awt.*;
 
-import ui.Game;
-import utils.*;
 import world.*;
 
-public class Road extends Thing {
+public class Road extends Building {
 	
 	private RoadType roadType;
-	private double remainingEffort;
-	private double health;
-	private ResearchRequirement req = new ResearchRequirement();
 	
 	public Road(RoadType roadType, Tile tile) {
-		super(roadType.getHealth(), roadType, World.NEUTRAL_FACTION, tile);
-		this.remainingEffort = roadType.getBuildingEffort();
+		super(BuildingType.ROAD, tile, World.NEUTRAL_FACTION);
 		this.roadType = roadType;
-		this.health = roadType.getHealth();
-	}
-	public void expendEffort(double effort) {
-		remainingEffort -= effort;
-		if(remainingEffort < 0) {
-			remainingEffort = 0;
-		}
-	}
-	public double getRemainingEffort() {
-		return remainingEffort;
-	}
-	public double getHealth() {
-		return health;
-	}
-	public void setRemainingEffort(double effort) {
-		remainingEffort = effort;
-	}
-	public boolean isBuilt() {
-		return remainingEffort <= 0;
 	}
 	public RoadType getRoadType() {
 		return roadType;
 	}
 	
-	
-	public ResearchRequirement getRequirement() {
-		return req;
-	}
 	@Override
-	public List<String> getDebugStrings() {
-		List<String> strings = super.getDebugStrings();
-		if(!isBuilt()) {
-			strings.add(String.format("work^2=%.0f", getRemainingEffort() ));
-		}
-		return strings;
+	public Image getImage(int size) {
+		return getTile().getRoadImage();
 	}
-	
-	@Override
-	public String toString() {
-		return roadType.toString();
-	}
-	
 }

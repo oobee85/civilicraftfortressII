@@ -92,7 +92,7 @@ public class Animal extends Unit {
 		}
 		if(bestDanger < currentDanger && currentDanger >= 0.9) {
 			if(best != getTile()) {
-				queuePlannedAction(new PlannedAction(best, null));
+				queuePlannedAction(new PlannedAction(best));
 			}
 			return;
 		}
@@ -113,7 +113,7 @@ public class Animal extends Unit {
 			}
 			if(bestHerdAmount > currentHerdAmount && computeDanger(bestHerd) < 1) {
 				if(bestHerd != getTile()) {
-					queuePlannedAction(new PlannedAction(bestHerd, null));
+					queuePlannedAction(new PlannedAction(bestHerd));
 					return;
 				}
 			}
@@ -133,16 +133,11 @@ public class Animal extends Unit {
 			if(migrationTarget != null) {
 				System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + migrationTarget);
 				migratingUntil = Game.ticks + Season.SEASON_DURATION/2;
-				queuePlannedAction(new PlannedAction(migrationTarget, null));
+				queuePlannedAction(new PlannedAction(migrationTarget));
 			}
 		}
 	}
 
-	// TODO need to remove this and instead use queuePlannedAction directly
-	public void setTarget(Thing t) {
-		clearPlannedActions();
-		queuePlannedAction(new PlannedAction(t.getTile(), t));
-	}
 	private void chooseWhatToEat(LinkedList<Unit> units) {
 		if(!wantsToEat()) {
 			return;
@@ -150,11 +145,11 @@ public class Animal extends Unit {
 		if(getType().isHostile() == true) {
 			Unit iveGotYouInMySights = null;
 			if(!units.isEmpty()) {
-				int pickUnit = (int) (units.size()*Math.random());
-				iveGotYouInMySights = units.get(pickUnit);
+				iveGotYouInMySights = units.get((int) (units.size()*Math.random()));
 			}
 			if(iveGotYouInMySights != this) {
-				setTarget(iveGotYouInMySights);
+				clearPlannedActions();
+				queuePlannedAction(new PlannedAction(iveGotYouInMySights));
 			}
 		}
 		else {

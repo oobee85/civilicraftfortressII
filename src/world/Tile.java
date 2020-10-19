@@ -19,7 +19,6 @@ public class Tile {
 	private TileLoc location;
 	private double height;
 	private double humidity;
-	int minEntitySize = 20;
 
 	private String roadCorner;
 
@@ -86,11 +85,13 @@ public class Tile {
 		
 	}
 
-	public void setRoad(Road r, String s) {
-		this.road = r;
+	public void setRoadCorner(String s) {
 		if (s != null) {
 			roadCorner = s;
 		}
+	}
+	public void setRoad(Road r) {
+		this.road = r;
 	}
 
 	public void setTerritory(Faction faction) {

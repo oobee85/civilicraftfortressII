@@ -575,18 +575,6 @@ public class World {
 		
 		// BUILDINGS
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
-		for (Building building : buildings) {
-			if (building.isDead() == true) {
-				building.getTile().setBuilding(null);
-			} else {
-				buildingsNew.add(building);
-			}
-			
-		}
-		buildingsNew.addAll(newBuildings);
-		newBuildings.clear();
-		buildings = buildingsNew;
-
 		LinkedList<Building> plannedBuildingsNew = new LinkedList<Building>();
 		for(Building plannedBuilding : plannedBuildings) {
 			if(plannedBuilding.getRemainingEffort() < plannedBuilding.getType().getBuildingEffort()) {
@@ -596,6 +584,23 @@ public class World {
 			}
 		}
 		plannedBuildings = plannedBuildingsNew;
+		for (Building building : buildings) {
+			if (building.isDead() == true) {
+				if(building instanceof Road) {
+					building.getTile().setRoad(null);
+				}
+				else {
+					building.getTile().setBuilding(null);
+				}
+			} else {
+				buildingsNew.add(building);
+			}
+			
+		}
+		buildingsNew.addAll(newBuildings);
+		newBuildings.clear();
+		buildings = buildingsNew;
+
 	
 		// PLANTS
 		LinkedList<Plant> plantsCopy = new LinkedList<Plant>();
@@ -815,7 +820,7 @@ public class World {
 			Liquid.propogate(this);
 		}
 
-		Generation.genResources(this);
+		Generation.generateResources(this);
 		this.genPlants();
 		this.makeForest();
 		Generation.generateWildLife(this);

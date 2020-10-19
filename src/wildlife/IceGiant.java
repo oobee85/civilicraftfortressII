@@ -28,7 +28,8 @@ public class IceGiant extends Animal {
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		for(Unit u : units) {
 			if(u.getFaction() == World.PLAYER_FACTION) {
-				setTarget(u);
+				clearPlannedActions();
+				queuePlannedAction(new PlannedAction(u));
 				return;
 			}
 		}

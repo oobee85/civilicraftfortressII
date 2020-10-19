@@ -157,7 +157,7 @@ public class Generation {
 		return new TileLoc(x, y);
 	}
 
-	public static void genResources(World world) {
+	public static void generateResources(World world) {
 		for(ResourceType resource : ResourceType.values()) {
 			int numVeins = (int)(world.getWidth() * world.getHeight() * resource.getNumVeins() / OREMULTIPLIER);
 			

@@ -56,6 +56,7 @@ public class Building extends Thing {
 		// building builds units
 		if(!getBuildingUnit().isEmpty() && getBuildingUnit().peek().isBuilt() == true) {
 			Unit unit = getBuildingUnit().remove();
+			unit.queuePlannedAction(new PlannedAction(getSpawnLocation()));
 			getTile().addUnit(unit);
 			world.newUnits.add(unit);
 		}

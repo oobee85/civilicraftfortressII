@@ -10,6 +10,10 @@ import utils.*;
 import world.Tile;
 
 public enum BuildingType implements HasImage {
+	
+	 	ROAD (50, 20, "resources/Images/road/road_northeastsouthwest.png", 0, false, 0,
+	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.STONE,10);  }},
+	 			null),
 	 	
 	 	WALL_WOOD (100, 100, "resources/Images/buildings/wall_wood.png", 0.25, false, 0,
 	 			null,  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,100);  }},
@@ -72,7 +76,7 @@ public enum BuildingType implements HasImage {
 	 	
 	 	BARRACKS (500, 250, "resources/Images/buildings/barracks256.png", 0.5, true, 1,
 				"WARRIOR_CODE",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,300); put(ItemType.STONE,150);  }},
-				new String[] {"WARRIOR", "ARCHER", "HORSEARCHER", "KNIGHT", "SPEARMAN", "SWORDSMAN", "CHARIOT", "ARCHER"}),	
+				new String[] {"WARRIOR", "ARCHER", "HORSEARCHER", "KNIGHT", "SPEARMAN", "SWORDSMAN", "CHARIOT"}),	
 	 	
 		WORKSHOP (1000, 500, "resources/Images/buildings/workshop.png", 0.5, true, 1,
 				"MATHEMATICS",  new HashMap<ItemType, Integer>() { {put(ItemType.WOOD,500); put(ItemType.STONE,500); put(ItemType.IRON_BAR,10); }},
