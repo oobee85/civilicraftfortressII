@@ -18,7 +18,7 @@ public class Loader {
 			String line;
 			while((line = br.readLine()) != null) {
 				line = line.replaceAll("\\s+","");
-				builder.append(line);
+				builder.append(line + "\n");
 			}
 			researchCosts = builder.toString();
 		} catch (FileNotFoundException e) {
@@ -39,7 +39,7 @@ public class Loader {
 	public static void loadBuildingType(HashMap<String, BuildingType> buildingTypeMap, ArrayList<BuildingType> buildingTypeList) {
 
 		String buildingTypeString = readFile("resources/costs/BuildingType.json");
-		System.out.println("Loaded :" + buildingTypeString);
+//		System.out.println("Loaded :" + buildingTypeString);
 		JSONObject obj = new JSONObject(buildingTypeString);
 		JSONArray arr = obj.getJSONArray("buildingtypes");
 		for (int i = 0; i < arr.length(); i++) {
@@ -144,7 +144,7 @@ public class Loader {
 	}
 	public static void loadUnitType(HashMap<String, UnitType> unitTypeMap, ArrayList<UnitType> unitTypeList) {
 		String unitTypeString = readFile("resources/costs/UnitType.json");
-		System.out.println("Loaded :" + unitTypeString);
+//		System.out.println("Loaded :" + unitTypeString);
 		JSONObject obj = new JSONObject(unitTypeString);
 		JSONArray arr = obj.getJSONArray("unittypes");
 		for (int i = 0; i < arr.length(); i++) {
