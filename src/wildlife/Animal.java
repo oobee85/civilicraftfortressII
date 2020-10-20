@@ -175,7 +175,7 @@ public class Animal extends Unit {
 	
 	@Override
 	public boolean readyToMove() {
-		if(getTile().getBuilding() != null && getTile().getBuilding().getType() == BuildingType.FARM) {
+		if(getTile().getBuilding() != null && getTile().getBuilding().getType() == Game.buildingTypeMap.get("FARM")) {
 			return false;
 		}
 		return super.readyToMove();

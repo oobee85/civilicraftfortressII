@@ -47,6 +47,8 @@ public class Game {
 
 	public static final ArrayList<UnitType> unitTypeList = new ArrayList<>();
 	public static final HashMap<String, UnitType> unitTypeMap = new HashMap<>();
+	public static final ArrayList<BuildingType> buildingTypeList = new ArrayList<>();
+	public static final HashMap<String, BuildingType> buildingTypeMap = new HashMap<>();
 	
 	HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
 	HashMap<UnitType, ResearchRequirement> unitResearchRequirements = new HashMap<>();
@@ -91,7 +93,7 @@ public class Game {
 		World.PLAYER_FACTION.addItem(ItemType.STONE, 200);
 		World.PLAYER_FACTION.addItem(ItemType.FOOD, 200);
 		World.CYCLOPS_FACTION.addItem(ItemType.FOOD, 50);
-		for(BuildingType type : BuildingType.values()) {
+		for(BuildingType type : buildingTypeList) {
 			// make a new researchrequirement object
 			ResearchRequirement req = new ResearchRequirement();
 			// only add requirement if it isnt null
@@ -288,17 +290,17 @@ public class Game {
 				break;
 			}
 		}
-		summonThing(world.get(new TileLoc(tile.getLocation().x, tile.getLocation().y)), null, BuildingType.WATCHTOWER, World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x-1, tile.getLocation().y-1)), null, BuildingType.GRANARY, World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x+1, tile.getLocation().y-1)), null, BuildingType.BARRACKS, World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x+1, tile.getLocation().y+1)), null, BuildingType.WINDMILL, World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x-1, tile.getLocation().y+1)), null, BuildingType.MINE, World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x, tile.getLocation().y)), null, Game.buildingTypeMap.get("WATCHTOWER"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x-1, tile.getLocation().y-1)), null, Game.buildingTypeMap.get("GRANARY"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x+1, tile.getLocation().y-1)), null, Game.buildingTypeMap.get("BARRACKS"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x+1, tile.getLocation().y+1)), null, Game.buildingTypeMap.get("WINDMILL"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x-1, tile.getLocation().y+1)), null, Game.buildingTypeMap.get("MINE"), World.CYCLOPS_FACTION);
 		
 		//makes the walls
 		for(int i = 0; i < 6; i++) {
-			BuildingType type = BuildingType.WALL_WOOD;
+			BuildingType type = Game.buildingTypeMap.get("WALL_WOOD");
 			if(i == 3) {
-				type = BuildingType.GATE_WOOD;
+				type = Game.buildingTypeMap.get("GATE_WOOD");
 			}
 			Tile wall = world.get(new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y-3));
 			summonThing(wall, null, type, World.CYCLOPS_FACTION);
@@ -467,7 +469,7 @@ public class Game {
 		if(selectedPath != null) {
 			for(Tile t : selectedPath.getTiles()) {
 				if(t != null) {
-					Building road = new Building(BuildingType.ROAD, t, World.NEUTRAL_FACTION);
+					Building road = new Building(Game.buildingTypeMap.get("ROAD"), t, World.NEUTRAL_FACTION);
 					road.setRemainingEffort(0);
 					t.setRoad(road);
 					world.newBuildings.add(road);
@@ -534,12 +536,12 @@ public class Game {
 	}
 	private void makeStartingCastleAndUnits(boolean easymode) {
 		LinkedList<HasImage> thingsToPlace = new LinkedList<>();
-		thingsToPlace.add(BuildingType.CASTLE);
+		thingsToPlace.add(Game.buildingTypeMap.get("CASTLE"));
 		thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 		if(easymode) {
-			thingsToPlace.add(BuildingType.BARRACKS);
-			thingsToPlace.add(BuildingType.WORKSHOP);
-			thingsToPlace.add(BuildingType.BLACKSMITH);
+			thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
+			thingsToPlace.add(Game.buildingTypeMap.get("WORKSHOP"));
+			thingsToPlace.add(Game.buildingTypeMap.get("BLACKSMITH"));
 		}
 		
 		HashSet<Tile> visited = new HashSet<>();
@@ -557,7 +559,7 @@ public class Game {
 				if (current.canBuild() == true 
 						&& !current.getHasBuilding()
 						&& current.liquidAmount < current.liquidType.getMinimumDamageAmount()
-						&& (current.getTerrain() != Terrain.ROCK || type != BuildingType.CASTLE)) {
+						&& (current.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"))) {
 					Building s = new Building(type, current, World.PLAYER_FACTION);
 					current.setBuilding(s);
 					world.newBuildings.add(s);
@@ -1110,8 +1112,8 @@ public class Game {
 				tile.getBuilding().setDead(true);
 			}
 			System.out.println("spawn building" + buildingType.toString() + tile.getLocation());
-			if(buildingType == BuildingType.ROAD) {
-				Building road = new Building(BuildingType.ROAD, tile, World.NEUTRAL_FACTION);
+			if(buildingType == Game.buildingTypeMap.get("ROAD")) {
+				Building road = new Building(Game.buildingTypeMap.get("ROAD"), tile, World.NEUTRAL_FACTION);
 				road.setRemainingEffort(0);
 				tile.setRoad(road);
 				turnRoad(tile);
@@ -1375,7 +1377,7 @@ public class Game {
 							continue;
 						}
 						Tile tile = entry.getKey();
-						Building building = buildBuilding(BuildingType.ROAD, tile);
+						Building building = buildBuilding(Game.buildingTypeMap.get("ROAD"), tile);
 						if(building != null) {
 							unit.queuePlannedAction(new PlannedAction(building, true));
 						}
@@ -1476,16 +1478,16 @@ public class Game {
 	}
 
 	private boolean canBuild(BuildingType bt, Tile tile) {
-		if(bt == BuildingType.ROAD && tile.getRoad() != null) {
+		if(bt == Game.buildingTypeMap.get("ROAD") && tile.getRoad() != null) {
 			return false;
 		}
-		if (bt != BuildingType.ROAD && tile.getHasBuilding()) {
+		if (bt != Game.buildingTypeMap.get("ROAD") && tile.getHasBuilding()) {
 			return false;
 		}
 		if(!World.PLAYER_FACTION.canAfford(bt.getCost())) {
 			return false;
 		}
-		if (bt == BuildingType.IRRIGATION && tile.canPlant() == false) {
+		if (bt == Game.buildingTypeMap.get("IRRIGATION") && tile.canPlant() == false) {
 			return false;
 		}
 		return true;
@@ -1495,9 +1497,9 @@ public class Game {
 	public Building buildBuilding(BuildingType bt, Tile tile) {
 		if(canBuild(bt, tile) == true) {
 			World.PLAYER_FACTION.payCost(bt.getCost());
-			if(bt == BuildingType.ROAD) {
+			if(bt == Game.buildingTypeMap.get("ROAD")) {
 				World.PLAYER_FACTION.payCost(bt.getCost());
-				Building road = new Building(BuildingType.ROAD, tile, World.PLAYER_FACTION);
+				Building road = new Building(Game.buildingTypeMap.get("ROAD"), tile, World.PLAYER_FACTION);
 				tile.setRoad(road);
 				turnRoad(tile);
 				for(Tile neighbor : tile.getNeighbors()) {
@@ -1537,11 +1539,12 @@ public class Game {
 	}
 	
 	public void tryToBuildUnit(UnitType u) {
-		
+		System.out.println("Trying to build " + u.name());
 		for(Thing thing : selectedThings) {
 			if(selectedThings != null && thing instanceof Building ) {
 				Building building = (Building)thing;
 				for(String ut : building.getType().unitsCanBuild()) {
+					System.out.println("Can build " + ut);
 					if(u == Game.unitTypeMap.get(ut)) {
 						buildUnit(u, thing.getTile());
 					}
@@ -1553,13 +1556,16 @@ public class Game {
 	}
 	
 	private void buildUnit(UnitType u, Tile tile) {
+		System.out.println("building " + u);
 		if(World.PLAYER_FACTION.canAfford(u.getCost())) {
+			System.out.println("can afford " + u);
 			Unit unit = new Unit(u, tile, World.PLAYER_FACTION);
 			if (tile.isBlocked(unit)) {
 				return;
 			}
 			World.PLAYER_FACTION.payCost(u.getCost());
 			tile.getBuilding().setBuildingUnit(unit);
+			System.out.println("built " + u);
 		}
 	}
 

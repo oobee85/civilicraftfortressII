@@ -35,6 +35,113 @@ public class Loader {
 		}
 		return map;
 	}
+	
+	public static void loadBuildingType(HashMap<String, BuildingType> buildingTypeMap, ArrayList<BuildingType> buildingTypeList) {
+
+		String buildingTypeString = readFile("resources/costs/BuildingType.json");
+		System.out.println("Loaded :" + buildingTypeString);
+		JSONObject obj = new JSONObject(buildingTypeString);
+		JSONArray arr = obj.getJSONArray("buildingtypes");
+		for (int i = 0; i < arr.length(); i++) {
+			JSONObject buildingTypeObject = arr.getJSONObject(i);
+			
+			String name = buildingTypeObject.getString("name");
+			String image = buildingTypeObject.getString("image");
+
+			double culture = buildingTypeObject.getDouble("culture");
+			double health = buildingTypeObject.getDouble("health");
+			int vision = buildingTypeObject.getInt("vision");
+			double effort = buildingTypeObject.getDouble("effort");
+			double movespeed = 1;
+			if(buildingTypeObject.has("movespeed")) {
+				movespeed = buildingTypeObject.getDouble("movespeed");
+			}
+			
+			HashSet<String> attributes = new HashSet<>();
+			if(buildingTypeObject.has("attributes")) {
+				JSONArray attributelist = buildingTypeObject.getJSONArray("attributes");
+				for(int j = 0; j < attributelist.length(); j++) {
+					attributes.add(attributelist.getString(j));
+				}
+			}
+			String[] buildsunits = null;
+			if(buildingTypeObject.has("buildsunits")) {
+				JSONArray buildsUnitsArray = buildingTypeObject.getJSONArray("buildsunits");
+				buildsunits = new String[buildsUnitsArray.length()];
+				for(int j = 0; j < buildsUnitsArray.length(); j++) {
+					buildsunits[j] = buildsUnitsArray.getString(j);
+				}
+			}
+			
+			String researchReq = null;
+			if(buildingTypeObject.has("research")) {
+				researchReq = buildingTypeObject.getString("research");
+			}
+			
+			HashMap<ItemType, Integer> cost = null;
+			if(buildingTypeObject.has("cost")) {
+				cost = loadItemTypeMap(buildingTypeObject.getJSONObject("cost"));
+			}
+			
+			BuildingType buildingType = new BuildingType(name, health, effort, image, culture, vision, researchReq, cost, buildsunits, movespeed, attributes);
+			buildingTypeMap.put(name, buildingType);
+			buildingTypeList.add(buildingType);
+		}
+	}
+	public static void writeBuildingTypes() {
+//		JSONObject obj = new JSONObject();
+//		for(BuildingType b : BuildingType.values()) {
+//			JSONObject buildingObject = new JSONObject();
+//			
+//			buildingObject.accumulate("name", b.name());
+//			
+//			buildingObject.accumulate("image", b.image);
+//			buildingObject.accumulate("health", b.getHealth());
+//			buildingObject.accumulate("effort", b.getBuildingEffort());
+//			buildingObject.accumulate("culture", b.cultureRate);
+//			buildingObject.accumulate("vision", b.getVisionRadius());
+//			if(b.getSpeed() != 1) {
+//				buildingObject.accumulate("movespeed", b.getSpeed());
+//			}
+//			if(b.getResearchRequirement() != null) {
+//				buildingObject.accumulate("research", b.getResearchRequirement());
+//			}
+//			if(b.getCost() != null && !b.getCost().isEmpty()) {
+//				JSONObject costObject = new JSONObject();
+//				for(Entry<ItemType, Integer> entry : b.getCost().entrySet()) {
+//					costObject.accumulate(entry.getKey().name(), entry.getValue());
+//				}
+//				buildingObject.accumulate("cost", costObject);
+//			}
+//			if(b.unitsCanBuild() != null && b.unitsCanBuild().length > 0) {
+//				JSONArray attributeArray = new JSONArray();
+//				for(String unittype : b.unitsCanBuild()) {
+//					attributeArray.put(unittype);
+//				}
+//				buildingObject.put("buildsunits", attributeArray);
+//			}
+//			
+//			JSONArray attributeArray = new JSONArray();
+//			if(!b.canMoveThrough()) {
+//				attributeArray.put("blocksmovement");
+//			}
+//			if(b.isRoad()) {
+//				attributeArray.put("road");
+//			}
+//			if(!attributeArray.isEmpty()) {
+//				buildingObject.put("attributes", attributeArray);
+//			}
+//			
+//			obj.accumulate("buildingtypes", buildingObject);
+//		}
+//		String arr = obj.toString();
+//		System.out.println(arr);
+//		try(FileWriter fw = new FileWriter("BuildingType.json"); BufferedWriter bw = new BufferedWriter(fw);) {
+//			bw.write(arr);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+	}
 	public static void loadUnitType(HashMap<String, UnitType> unitTypeMap, ArrayList<UnitType> unitTypeList) {
 		String unitTypeString = readFile("resources/costs/UnitType.json");
 		System.out.println("Loaded :" + unitTypeString);
@@ -56,10 +163,9 @@ public class Loader {
 			int buildtime = statsObject.getInt("buildtime");
 			CombatStats combatStats = new CombatStats(health, attack, movespeed, range, attackspeed, buildtime, healspeed);
 			
-			HashSet<String> attributes = null;
+			HashSet<String> attributes = new HashSet<>();;
 			if(unitTypeObject.has("attributes")) {
 				JSONArray attributelist = unitTypeObject.getJSONArray("attributes");
-				attributes = new HashSet<>();
 				for(int j = 0; j < attributelist.length(); j++) {
 					attributes.add(attributelist.getString(j));
 				}

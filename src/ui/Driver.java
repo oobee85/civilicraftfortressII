@@ -69,13 +69,18 @@ public class Driver {
 	}
 	
 	
+	static {
+		Loader.writeBuildingTypes();
+		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
+		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);
+	}
 	
 	public static void main(String[] run) {
 //		rotateAndScaleImage("fish2.png", "rotated.png");
 //		resizeImage("roadtile.png", "newroadtile.png", 16, 16);
 //		ImageCreation.createRoadImages("roadtile.png");
 //		Loader.writeUnitTypes();
-		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
+		
 		new Frame();
 	}
 

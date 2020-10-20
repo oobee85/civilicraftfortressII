@@ -627,8 +627,8 @@ public class World {
 		projectiles = projectilesNew;
 		
 		if(Game.ticks % 50 == 0) {
-			System.out.println(
-					"units: " 				+ units.size() + 
+			System.out.println("Tick " + Game.ticks +
+					" \tunits: " 				+ units.size() + 
 					" \tbuildings: " 		+ buildings.size() + 
 					" \tplannedBuildings: " + plannedBuildings.size() + 
 					" \tplants: " 		+ plants.size() + 

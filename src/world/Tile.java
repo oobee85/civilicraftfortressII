@@ -309,11 +309,10 @@ public class Tile {
 			return true;
 		}
 		BuildingType bt = building.getType();
-		if(bt == BuildingType.WALL_WOOD || bt == BuildingType.WALL_STONE || bt == BuildingType.WALL_BRICK) {
-			return true;
-		}
-		if((bt == BuildingType.GATE_WOOD || bt == BuildingType.GATE_STONE || bt == BuildingType.GATE_BRICK) &&
-				u.getFaction() != building.getFaction()) {
+		if(bt.blocksMovement()) {
+			if(bt.isGate() && u.getFaction() == building.getFaction()) {
+				return false;
+			}
 			return true;
 		}
 		return false;
@@ -405,7 +404,7 @@ public class Tile {
 			return false;
 		}
 		BuildingType buildingType = building.getType();
-		if(buildingType == BuildingType.WALL_WOOD || buildingType == BuildingType.WALL_STONE || buildingType == BuildingType.WALL_BRICK) {
+		if(buildingType.blocksMovement()) {
 			return true;
 		}
 		return false;

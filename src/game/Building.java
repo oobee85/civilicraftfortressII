@@ -66,7 +66,7 @@ public class Building extends Thing {
 		if(!readyToHarvest() ) {
 			return;
 		}
-		if(getType() == BuildingType.MINE) {
+		if(getType() == Game.buildingTypeMap.get("MINE")) {
 			if(getTile().getResource() != null && getTile().getResource().getType().isOre() == true) {
 				getFaction().addItem(getTile().getResource().getType().getItemType(), 1);
 				getTile().getResource().harvest(1);
@@ -81,7 +81,7 @@ public class Building extends Thing {
 				resetTimeToHarvest();
 			}
 		}
-		if(getType() == BuildingType.IRRIGATION && getTile().canPlant() == true) {
+		if(getType() == Game.buildingTypeMap.get("IRRIGATION") && getTile().canPlant() == true) {
 			int extraFood = 0;
 			//irrigation produces extra food when placed on water
 			if(getTile().liquidType == LiquidType.WATER && getTile().liquidAmount > 0) {
@@ -90,15 +90,15 @@ public class Building extends Thing {
 			getFaction().addItem(ItemType.FOOD, 1 + extraFood);
 			resetTimeToHarvest();
 		}
-		if(getType() == BuildingType.GRANARY) {
+		if(getType() == Game.buildingTypeMap.get("GRANARY")) {
 			getFaction().addItem(ItemType.FOOD, 2);
 			resetTimeToHarvest();
 		}
-		if(getType() == BuildingType.WINDMILL) {
+		if(getType() == Game.buildingTypeMap.get("WINDMILL")) {
 			getFaction().addItem(ItemType.FOOD, 10);
 			resetTimeToHarvest();
 		}
-		if(getType() == BuildingType.SAWMILL) {
+		if(getType() == Game.buildingTypeMap.get("SAWMILL")) {
 			HashSet<Tile> tilesToCut = new HashSet<>();
 			tilesToCut.add(getTile());
 			
@@ -119,7 +119,7 @@ public class Building extends Thing {
 			resetTimeToHarvest();
 		}
 
-		if(getType() == BuildingType.FARM && getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
+		if(getType() == Game.buildingTypeMap.get("FARM") && getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
 			getFaction().addItem(ItemType.HORSE, 1);
 			getFaction().addItem(ItemType.FOOD, 3);
 			resetTimeToHarvest();

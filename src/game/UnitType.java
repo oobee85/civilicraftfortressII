@@ -11,14 +11,14 @@ import utils.Utils;
 
 public class UnitType implements HasImage {
 	
-	private String name;
-	private MipMap mipmap;
-	private CombatStats combatStats;
-	private HashSet<String> attributes;
-	private HashMap <ItemType, Integer> cost;
-	private String researchRequirement;
-	private LinkedList<Item> deadItem;
-	private ProjectileType projectileType;
+	private final String name;
+	private final MipMap mipmap;
+	private final CombatStats combatStats;
+	private final HashSet<String> attributes;
+	private final HashMap <ItemType, Integer> cost;
+	private final String researchRequirement;
+	private final LinkedList<Item> deadItem;
+	private final ProjectileType projectileType;
 
 	public UnitType(String name, String image, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, ProjectileType projectileType) {
 		this.name = name;

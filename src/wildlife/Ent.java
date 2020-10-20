@@ -34,7 +34,7 @@ public class Ent extends Animal {
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		for(Building b : buildings) {
-			if(b.getType() == BuildingType.SAWMILL) {
+			if(b.getType() == Game.buildingTypeMap.get("SAWMILL")) {
 				clearPlannedActions();
 				queuePlannedAction(new PlannedAction(b));
 				return;
