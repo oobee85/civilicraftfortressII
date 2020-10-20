@@ -85,6 +85,36 @@ public class Tile {
 
 	public void setRoad(Building road) {
 		this.road = road;
+		turnRoad();
+		for(Tile neighbor : getNeighbors()) {
+			neighbor.turnRoad();
+		}
+	}
+	private void turnRoad() {
+		if(getRoad() == null) {
+			return;
+		}
+		Set<Direction> directions = new HashSet<>();
+		TileLoc loc = getLocation();
+		for(Tile t : getNeighbors()) {
+			if(t.getRoad() == null)
+				continue;
+			Direction d = Direction.getDirection(loc, t.getLocation());
+			if(d != null)
+				directions.add(d);
+		}
+		String s = "";
+		for(Direction d : Direction.values()) {
+			if(directions.contains(d)) {
+				s += d;
+			}
+		}
+		if(s.equals("")) {
+			for(Direction d : Direction.values()) {
+				s += d;
+			}
+		}
+		getRoad().setRoadCorner(s);
 	}
 
 	public void setTerritory(Faction faction) {

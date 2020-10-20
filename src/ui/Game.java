@@ -497,42 +497,8 @@ public class Game {
 		makeRoadBetween(world.get(new TileLoc(world.getWidth()-1, 0)), world.get(new TileLoc(0, world.getHeight()-1)));
 		makeRoadBetween(world.get(new TileLoc(0, 0)), world.get(new TileLoc(world.getWidth()-1, world.getHeight()-1)));
 		makeRoadBetween(highestTile, lowestTile);
-		turnRoads();
 		
 		makeStartingCastleAndUnits(easymode);
-	}
-	private void turnRoad(Tile tile) {
-		if(tile.getRoad() == null) {
-			return;
-		}
-		Set<Direction> directions = new HashSet<>();
-		TileLoc loc = tile.getLocation();
-		List<Tile> neighbors = Utils.getNeighbors(tile, world);
-		for(Tile t : neighbors) {
-			if(t.getRoad() == null)
-				continue;
-			Direction d = Direction.getDirection(loc, t.getLocation());
-			if(d != null)
-				directions.add(d);
-		}
-		String s = "";
-		for(Direction d : Direction.values()) {
-			if(directions.contains(d)) {
-				s += d;
-			}
-		}
-		if(s.equals("")) {
-			for(Direction d : Direction.values()) {
-				s += d;
-			}
-		}
-		tile.getRoad().setRoadCorner(s);
-	}
-	private void turnRoads() {
-		for(Tile tile : world.getTiles()) {
-			if(tile.getRoad() != null)
-				turnRoad(tile);
-		}
 	}
 	private void makeStartingCastleAndUnits(boolean easymode) {
 		LinkedList<HasImage> thingsToPlace = new LinkedList<>();
@@ -1112,24 +1078,16 @@ public class Game {
 				tile.getBuilding().setDead(true);
 			}
 			System.out.println("spawn building" + buildingType.toString() + tile.getLocation());
-			if(buildingType == Game.buildingTypeMap.get("ROAD")) {
-				Building road = new Building(Game.buildingTypeMap.get("ROAD"), tile, World.NEUTRAL_FACTION);
-				road.setRemainingEffort(0);
-				tile.setRoad(road);
-				turnRoad(tile);
-				for(Tile neighbor : tile.getNeighbors()) {
-					turnRoad(neighbor);
-				}
-				world.newBuildings.add(road);
-				return road;
+			Building building = new Building(buildingType, tile, faction);
+			building.setRemainingEffort(0);
+			world.newBuildings.add(building);
+			if(buildingType.isRoad()) {
+				tile.setRoad(building);
 			}
 			else {
-				Building building = new Building(buildingType, tile, faction);
-				building.setRemainingEffort(0);
 				tile.setBuilding(building);
-				world.newBuildings.add(building);
-				return building;
 			}
+			return building;
 		}
 		return null;
 	}
@@ -1478,10 +1436,10 @@ public class Game {
 	}
 
 	private boolean canBuild(BuildingType bt, Tile tile) {
-		if(bt == Game.buildingTypeMap.get("ROAD") && tile.getRoad() != null) {
+		if(bt.isRoad() && tile.getRoad() != null) {
 			return false;
 		}
-		if (bt != Game.buildingTypeMap.get("ROAD") && tile.getHasBuilding()) {
+		if (!bt.isRoad() && tile.getHasBuilding()) {
 			return false;
 		}
 		if(!World.PLAYER_FACTION.canAfford(bt.getCost())) {
@@ -1497,27 +1455,17 @@ public class Game {
 	public Building buildBuilding(BuildingType bt, Tile tile) {
 		if(canBuild(bt, tile) == true) {
 			World.PLAYER_FACTION.payCost(bt.getCost());
-			if(bt == Game.buildingTypeMap.get("ROAD")) {
-				World.PLAYER_FACTION.payCost(bt.getCost());
-				Building road = new Building(Game.buildingTypeMap.get("ROAD"), tile, World.PLAYER_FACTION);
-				tile.setRoad(road);
-				turnRoad(tile);
-				for(Tile neighbor : tile.getNeighbors()) {
-					turnRoad(neighbor);
-				}
-				world.plannedBuildings.add(road);
-				road.setPlanned(true);
-				road.setHealth(1);
-				return road;
+			Building building = new Building(bt, tile, World.PLAYER_FACTION);
+			world.plannedBuildings.add(building);
+			building.setPlanned(true);
+			building.setHealth(1);
+			if(bt.isRoad()) {
+				tile.setRoad(building);
 			}
 			else {
-				Building building = new Building(bt, tile, World.PLAYER_FACTION);
 				tile.setBuilding(building);
-				world.plannedBuildings.add(building);
-				building.setPlanned(true);
-				building.setHealth(1);
-				return building;
 			}
+			return building;
 		}
 		return null;
 	}
