@@ -32,14 +32,14 @@ public class InfoPanel extends JPanel {
 	}
 	
 	public JButton addButton(String text) {
-		numButtons ++;
+		
 		Dimension size = new Dimension(80, 20);
 		JButton button = KUIConstants.setupButton(text, null, size);
 		button.setFont(KUIConstants.buttonFontMini);
 		this.setLayout(null);
 		this.add(button);
-		button.setBounds(this.getWidth() - size.width, this.getHeight()-size.height*numButtons, size.width, size.height);
-		
+		button.setBounds(this.getWidth()/2 +2, size.height*numButtons +2, size.width, size.height);
+		numButtons ++;
 		return button;
 	}
 	

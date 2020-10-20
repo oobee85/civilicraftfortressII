@@ -23,7 +23,9 @@ public class Game {
 	private Image targetImage = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
 	private Image spawnLocationImage = Utils.loadImage("resources/Images/interfaces/queuelocation.png");
 	private Image buildIcon = Utils.loadImage("resources/Images/interfaces/building.PNG");
-	private Image harvestIcon = Utils.loadImage("resources/Images/interfaces/farming.png");
+	private Image harvestIcon = Utils.loadImage("resources/Images/interfaces/harvest.png");
+	private Image guardIcon = Utils.loadImage("resources/Images/interfaces/guard.png");
+	private Image autoBuildIcon = Utils.loadImage("resources/Images/interfaces/autobuild.png");
 	private Image flag = Utils.loadImage("resources/Images/interfaces/flag.png");
 	private Image moonIcon = Utils.loadImage("resources/Images/interfaces/moon.png");
 	private Image sunIcon = Utils.loadImage("resources/Images/interfaces/sun.png");
@@ -654,7 +656,13 @@ public class Game {
 			for(Unit unit : theTile.getUnits()) {
 				g.drawImage(unit.getImage(Game.tileSize), drawx, drawy, draww, drawh, null);
 				if(unit.getIsHarvesting() == true) {
-					g.drawImage(harvestIcon, drawx+draww/4+10, drawy+drawh/4, draww/2, drawh/2, null);
+					g.drawImage(harvestIcon, drawx+draww/4, drawy+drawh/4, draww/2, drawh/2, null);
+				}
+				if(unit.isGuarding() == true) {
+					g.drawImage(guardIcon, drawx+draww/4, drawy+drawh/4, draww/2, drawh/2, null);
+				}
+				if(unit.getAutoBuild() == true) {
+					g.drawImage(autoBuildIcon, drawx+draww/4, drawy+drawh/4, draww/2, drawh/2, null);
 				}
 			}
 		}
