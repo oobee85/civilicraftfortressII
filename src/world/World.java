@@ -104,7 +104,12 @@ public class World {
 	
 	public void rain() {
 		
+		//makes it so that it doesnt spawn the center of rain in deserts or on the volcano
 		Tile rainTile = this.getTilesRandomly().peek();
+		while(rainTile.getTerrain() == Terrain.SAND || rainTile.getTerrain() == Terrain.VOLCANO) {
+			rainTile = this.getTilesRandomly().peek();
+		}
+		
 		int radius = (int) (Math.random()*20 + 10);
 		
 		List<Tile> rainTiles = Utils.getTilesInRadius(rainTile, this, radius);
@@ -115,11 +120,18 @@ public class World {
 			}
 			double temperature = t.getTempurature();
 			if(temperature < Season.FREEZING_TEMPURATURE) {
-				t.liquidType = LiquidType.SNOW;
-				t.liquidAmount += 0.01;
+				if(t.liquidType == LiquidType.DRY) {
+					t.liquidType = LiquidType.SNOW;
+					t.liquidAmount += 0.02;
+				}else {
+					t.liquidAmount += 0.005;
+				}
+				
 			}
 			else {
-				t.liquidType = LiquidType.WATER;
+				if(t.isCold() == false) {
+					t.liquidType = LiquidType.WATER;
+				}
 				t.liquidAmount += 0.005;
 			}
 		}
