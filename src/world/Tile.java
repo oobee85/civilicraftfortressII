@@ -20,13 +20,11 @@ public class Tile {
 	private double height;
 	private double humidity;
 
-	private String roadCorner;
-
 	private Resource resource;
 	private Plant plant;
 	private Terrain terr;
 	private Building building;
-	private Road road;
+	private Building road;
 	private GroundModifier modifier;
 	
 	private ConcurrentLinkedQueue<Unit> units;
@@ -85,13 +83,8 @@ public class Tile {
 		
 	}
 
-	public void setRoadCorner(String s) {
-		if (s != null) {
-			roadCorner = s;
-		}
-	}
-	public void setRoad(Road r) {
-		this.road = r;
+	public void setRoad(Building road) {
+		this.road = road;
 	}
 
 	public void setTerritory(Faction faction) {
@@ -254,12 +247,8 @@ public class Tile {
 	}
 
 
-	public Road getRoad() {
+	public Building getRoad() {
 		return road;
-	}
-
-	public Image getRoadImage() {
-		return Utils.roadImages.get(roadCorner);
 	}
 
 	public boolean getHasBuilding() {

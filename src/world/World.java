@@ -586,7 +586,7 @@ public class World {
 		plannedBuildings = plannedBuildingsNew;
 		for (Building building : buildings) {
 			if (building.isDead() == true) {
-				if(building instanceof Road) {
+				if(building == building.getTile().getRoad()) {
 					building.getTile().setRoad(null);
 				}
 				else {

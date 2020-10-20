@@ -467,7 +467,7 @@ public class Game {
 		if(selectedPath != null) {
 			for(Tile t : selectedPath.getTiles()) {
 				if(t != null) {
-					Road road = new Road(RoadType.STONE_ROAD, t);
+					Building road = new Building(BuildingType.ROAD, t, World.NEUTRAL_FACTION);
 					road.setRemainingEffort(0);
 					t.setRoad(road);
 					world.newBuildings.add(road);
@@ -524,9 +524,7 @@ public class Game {
 				s += d;
 			}
 		}
-//		Road road = new Road(RoadType.STONE_ROAD, world.get(loc));
-//		road.setRemainingEffort(tile.getRoad().getRemainingEffort());
-		tile.setRoadCorner(s);
+		tile.getRoad().setRoadCorner(s);
 	}
 	private void turnRoads() {
 		for(Tile tile : world.getTiles()) {
@@ -1113,7 +1111,7 @@ public class Game {
 			}
 			System.out.println("spawn building" + buildingType.toString() + tile.getLocation());
 			if(buildingType == BuildingType.ROAD) {
-				Road road = new Road(RoadType.STONE_ROAD, tile);
+				Building road = new Building(BuildingType.ROAD, tile, World.NEUTRAL_FACTION);
 				road.setRemainingEffort(0);
 				tile.setRoad(road);
 				turnRoad(tile);
@@ -1216,7 +1214,7 @@ public class Game {
 					if(targetBuilding == null) {
 						targetBuilding = targetTile.getRoad();
 					}
-					if(targetBuilding != null && (targetBuilding.getFaction() == unit.getFaction() || targetBuilding instanceof Road) && !targetBuilding.isBuilt()) {
+					if(targetBuilding != null && (targetBuilding.getFaction() == unit.getFaction() || targetBuilding.getType().isRoad()) && !targetBuilding.isBuilt()) {
 						unit.queuePlannedAction(new PlannedAction(targetBuilding, true));
 					}
 					else {
@@ -1499,7 +1497,7 @@ public class Game {
 			World.PLAYER_FACTION.payCost(bt.getCost());
 			if(bt == BuildingType.ROAD) {
 				World.PLAYER_FACTION.payCost(bt.getCost());
-				Road road = new Road(RoadType.STONE_ROAD, tile);
+				Building road = new Building(BuildingType.ROAD, tile, World.PLAYER_FACTION);
 				tile.setRoad(road);
 				turnRoad(tile);
 				for(Tile neighbor : tile.getNeighbors()) {

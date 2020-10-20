@@ -144,7 +144,7 @@ public class Unit extends Thing {
 		double penalty = to.getTerrain().moveSpeed();
 
 		if (from.getRoad() != null && to.getRoad() != null && from.getRoad().isBuilt() && to.getRoad().isBuilt()) {
-			penalty = penalty / from.getRoad().getRoadType().getSpeed() / 2;
+			penalty = penalty / from.getRoad().getType().getSpeed();
 		}
 		if (this.getUnitType().isFlying()) {
 			penalty = 0;

@@ -1,6 +1,8 @@
 package game;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 import liquid.*;
 import ui.Game;
@@ -191,6 +193,19 @@ public class Building extends Thing {
 			strings.add(String.format("work^2=%.0f", getRemainingEffort() ));
 		}
 		return strings;
+	}
+	private String roadCorner;
+	public void setRoadCorner(String s) {
+		roadCorner = s;
+	}
+	@Override
+	public Image getImage(int size) {
+		if(getType().isRoad()) {
+			return Utils.roadImages.get(roadCorner);
+		}
+		else {
+			return super.getImage(size);
+		}
 	}
 	
 	@Override
