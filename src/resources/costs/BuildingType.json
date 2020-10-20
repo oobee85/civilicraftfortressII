@@ -10,7 +10,7 @@
 		"health":50,
 		"effort":20,
 		"attributes":["road"],
-		"research":"ENGINEERING"},
+		"research":"WHEEL"},
 	{
 		"image":"resources/Images/buildings/brick_road.png",
 		"vision":0,

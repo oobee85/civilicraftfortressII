@@ -256,11 +256,27 @@ public class World {
 		
 		int radius = (int) (Math.random()*20 + 5);
 		System.out.println("meteor at: "+t.getLocation().x+ ", "+ t.getLocation().y);
-		
 		spawnExplosionCircle(t, radius, 10000);
-		
-		
-		
+		int rockRadius = radius/5;
+		spawnRock(t, rockRadius);
+	}
+	public void spawnRock(Tile tile, int radius) {
+		int numTiles = 0;
+		for(Tile t : this.getTiles()) {
+			int i =  t.getLocation().x;
+			int j =  t.getLocation().y;
+			int dx = i - tile.getLocation().x;
+			int dy = j - tile.getLocation().y;
+			double distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
+			
+			if (distanceFromCenter < radius) {
+				t.setTerrain(Terrain.VOLCANO);
+				numTiles ++;
+			}
+		}
+		int resource = (int) (Math.random()*ResourceType.values().length);
+		ResourceType resourceType = ResourceType.values()[resource];
+		Generation.makeOreVein(tile, resourceType, numTiles/2);
 	}
 	public HashSet<Tile> getNeighborsInRadius(Tile tile, int radius) {
 		HashSet<Tile> neighbors = new HashSet<>();

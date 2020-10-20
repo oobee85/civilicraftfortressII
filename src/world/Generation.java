@@ -183,7 +183,7 @@ public class Generation {
 			}
 		}
 	}
-	private static void makeOreVein(Tile t, ResourceType resource, int veinSize) {
+	public static void makeOreVein(Tile t, ResourceType resource, int veinSize) {
 		HashMap<Tile, Double> visited = new HashMap<>();
 		
 		PriorityQueue<Tile> search = new PriorityQueue<>((x, y) ->  { 
