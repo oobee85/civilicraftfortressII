@@ -201,7 +201,7 @@ public class Building extends Thing {
 	@Override
 	public Image getImage(int size) {
 		if(getType().isRoad()) {
-			return Utils.roadImages.get(roadCorner);
+			return getType().getRoadImage(roadCorner);
 		}
 		else {
 			return super.getImage(size);

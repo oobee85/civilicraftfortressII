@@ -11,6 +11,7 @@ public class BuildingType implements HasImage {
 	private final String name;
 	private final double health;
 	private MipMap mipmap;
+	private HashMap<String, Image> roadImages;
 	private double moveSpeedEnhancement;
 	private int visionRadius;
 	private String researchRequirement;
@@ -23,16 +24,20 @@ public class BuildingType implements HasImage {
 	public BuildingType(String name, double hp, double buildingEffort, String s, double cultureRate, int visionRadius, 
 			String requirement, HashMap <ItemType, Integer> resourcesNeeded, String[] canBuild, double moveSpeedEnhancement, HashSet<String> attributes) {
 		this.name = name;
+		mipmap = new MipMap(s);
 		this.researchRequirement = requirement;
 		this.health = hp;
 		this.cultureRate = cultureRate;
-		mipmap = new MipMap(s);
 		this.moveSpeedEnhancement = moveSpeedEnhancement;
 		this.buildingEffort = buildingEffort;
 		this.cost = resourcesNeeded;
 		this.visionRadius = visionRadius;
 		this.canBuild = canBuild;
 		this.attributes = attributes;
+		
+		if(isRoad()) {
+			roadImages = ImageCreation.createRoadImages(s);
+		}
 	}
 	public String[] unitsCanBuild(){
 		return canBuild;
@@ -41,9 +46,17 @@ public class BuildingType implements HasImage {
 		return researchRequirement;
 	}
 
+	public Image getRoadImage(String roadCorner) {
+		return roadImages.get(roadCorner);
+	}
 	@Override
 	public Image getImage(int size) {
-		return mipmap.getImage(size);
+		if(isRoad()) {
+			return roadImages.get(Utils.ALL_DIRECTIONS);
+		}
+		else {
+			return mipmap.getImage(size);
+		}
 	}
 	@Override
 	public Image getShadow(int size) {
@@ -52,7 +65,12 @@ public class BuildingType implements HasImage {
 
 	@Override
 	public ImageIcon getImageIcon(int size) {
-		return mipmap.getImageIcon(size);
+		if(isRoad()) {
+			return new ImageIcon(roadImages.get(Utils.ALL_DIRECTIONS));
+		}
+		else {
+			return mipmap.getImageIcon(size);
+		}
 	}
 
 	public boolean blocksMovement() {

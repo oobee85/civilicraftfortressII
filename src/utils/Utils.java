@@ -14,22 +14,8 @@ import world.*;
 
 public final class Utils {
 	
-	public static Color roadColor;
-	public static final HashMap<String, Image> roadImages;
 	public static final String[] DIRECTION_STRINGS = new String[] {"north", "east", "south", "west"};
-	static {
-		roadImages = new HashMap<>();
-		for(Direction[] arr : ImageCreation.getAllDirectionCombinations()) {
-			String s = "";
-			for(Direction d: arr) {
-				s += d;
-			}
-			roadImages.put(s, loadImage("resources/Images/road/road_" + s + ".png"));
-			if(roadColor == null) {
-				roadColor = getAverageColor(Utils.toBufferedImage(roadImages.get(s)));
-			}
-		}
-	}
+	public static final String ALL_DIRECTIONS = DIRECTION_STRINGS[0] + DIRECTION_STRINGS[1] + DIRECTION_STRINGS[2] + DIRECTION_STRINGS[3];
 	
 	public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	

@@ -338,7 +338,7 @@ public class Game {
 			for (int i = -r; i <= r; i++) {
 				for (int j = -r; j <= r; j++) {
 					double distanceFromCenter = Math.sqrt(i*i + j*j);
-					if(distanceFromCenter <= radius) {
+					if(distanceFromCenter < radius) {
 						Tile tile = world.get(new TileLoc(building.getTile().getLocation().x+i, building.getTile().getLocation().y+j));
 						if(tile != null && tile.getIsTerritory() == World.NEUTRAL_FACTION) {
 							tile.setTerritory(building.getFaction());
@@ -469,7 +469,7 @@ public class Game {
 		if(selectedPath != null) {
 			for(Tile t : selectedPath.getTiles()) {
 				if(t != null) {
-					Building road = new Building(Game.buildingTypeMap.get("ROAD"), t, World.NEUTRAL_FACTION);
+					Building road = new Building(Game.buildingTypeMap.get("STONE_ROAD"), t, World.NEUTRAL_FACTION);
 					road.setRemainingEffort(0);
 					t.setRoad(road);
 					world.newBuildings.add(road);
@@ -1324,7 +1324,7 @@ public class Game {
 			}
 		}
 	}
-	public void workerRoad() {
+	public void workerRoad(BuildingType type) {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;
@@ -1335,7 +1335,7 @@ public class Game {
 							continue;
 						}
 						Tile tile = entry.getKey();
-						Building building = buildBuilding(Game.buildingTypeMap.get("ROAD"), tile);
+						Building building = buildBuilding(type, tile);
 						if(building != null) {
 							unit.queuePlannedAction(new PlannedAction(building, true));
 						}

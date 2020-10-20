@@ -36,6 +36,7 @@ public class KUIConstants {
 	public static final Insets zeroMargin = new Insets(0, 0, 0, 0);
 
 	public static final Border massiveBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(5, 5, 5, 5));
+	public static final Border tinyBorder = BorderFactory.createLineBorder(Color.GRAY, 1);
 	
 	public static KButton setupButton(String text, Icon icon, Dimension size) {
 		KButton b = new KButton(text, icon);

@@ -187,7 +187,7 @@ public class Frame extends JPanel {
 					switchInfoPanel(infoPanel);
 					SwingUtilities.invokeLater(() -> {
 						infoPanel.addButton("Explode").addActionListener(e -> gameInstance.explode(unit));
-						infoPanel.addButton("RoadEverything").addActionListener(e -> gameInstance.workerRoad());
+						infoPanel.addButton("RoadEverything").addActionListener(e -> gameInstance.workerRoad(Game.buildingTypeMap.get("STONE_ROAD")));
 						infoPanel.addButton("AutoBuild").addActionListener(e -> gameInstance.toggleAutoBuild());
 						infoPanel.addButton("SetHarvesting").addActionListener(e -> gameInstance.setHarvesting());
 						infoPanel.addButton("Guard").addActionListener(e -> gameInstance.toggleGuarding());
@@ -863,8 +863,9 @@ public class Frame extends JPanel {
 		for (int i = 0; i < Game.unitTypeList.size(); i++) {
 			UnitType type = Game.unitTypeList.get(i);
 			KButton button = KUIConstants.setupButton(null,
-					Utils.resizeImageIcon(type.getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width/1.2), (int)(SPAWN_BUTTON_SIZE.height/1.2)),
+					Utils.resizeImageIcon(type.getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width), (int)(SPAWN_BUTTON_SIZE.height)),
 					SPAWN_BUTTON_SIZE);
+			button.setBorder(KUIConstants.tinyBorder);
 			button.addActionListener(e -> {
 				gameInstance.setThingToSpawn(type, null);
 			});
@@ -886,8 +887,9 @@ public class Frame extends JPanel {
 		for (int i = 0; i < Game.buildingTypeList.size(); i++) {
 			BuildingType type = Game.buildingTypeList.get(i);
 			KButton button = KUIConstants.setupButton(null,
-					Utils.resizeImageIcon(type.getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width/1.2), (int)(SPAWN_BUTTON_SIZE.height/1.2)),
+					Utils.resizeImageIcon(type.getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width), (int)(SPAWN_BUTTON_SIZE.height)),
 					SPAWN_BUTTON_SIZE);
+			button.setBorder(KUIConstants.tinyBorder);
 			button.addActionListener(e -> {
 				gameInstance.setThingToSpawn(null, type);
 			});

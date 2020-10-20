@@ -31,35 +31,32 @@ public class ImageCreation {
 		return result;
 	}
 	
-	public static void createRoadImages(String roadtilefile) {
-		try {
-			BufferedImage roadtile = ImageIO.read(new File(roadtilefile));
-			int width = roadtile.getWidth();
-			int height = roadtile.getHeight();
+	public static HashMap<String, Image> createRoadImages(String roadtilefile) {
+		HashMap<String, Image> roadImages = new HashMap<String, Image>();
+		BufferedImage roadtile = Utils.toBufferedImage(Utils.loadImage(roadtilefile));
+		int width = roadtile.getWidth();
+		int height = roadtile.getHeight();
 
-			int centerx = width*3/2;
-			int centery = height*3/2;
-			int roadimagewidth = width * 4;
-			int roadimageheight = height*4;
-			
-			for(Direction[] arr : getAllDirectionCombinations()) {
-				BufferedImage target = new BufferedImage(roadimagewidth, roadimageheight, BufferedImage.TYPE_INT_ARGB);
-				Graphics2D g = target.createGraphics();
-				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-				g.drawImage(roadtile, centerx, centery, null);
-				String filename = "road_";
-				for(Direction dir : arr) {
-					filename += dir;
-					TileLoc delta = dir.getDelta();
-					g.drawImage(roadtile, centerx + delta.x*width, centery + delta.y*width, null);
-					g.drawImage(roadtile, centerx + delta.x*width*3/2, centery + delta.y*width*3/2, null);
-				}
-				filename += ".png";
-				g.dispose();
-				ImageIO.write(target, "png", new File(filename));
+		int centerx = width*3/2;
+		int centery = height*3/2;
+		int roadimagewidth = width * 4;
+		int roadimageheight = height*4;
+		
+		for(Direction[] arr : getAllDirectionCombinations()) {
+			BufferedImage target = new BufferedImage(roadimagewidth, roadimageheight, BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g = target.createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+			g.drawImage(roadtile, centerx, centery, null);
+			String filename = "";
+			for(Direction dir : arr) {
+				filename += dir;
+				TileLoc delta = dir.getDelta();
+				g.drawImage(roadtile, centerx + delta.x*width, centery + delta.y*width, null);
+				g.drawImage(roadtile, centerx + delta.x*width*3/2, centery + delta.y*width*3/2, null);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			g.dispose();
+			roadImages.put(filename, target);
 		}
+		return roadImages;
 	}
 }

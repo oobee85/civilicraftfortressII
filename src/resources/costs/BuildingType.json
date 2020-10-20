@@ -1,15 +1,27 @@
 {
 "buildingtypes":[
 	{
-		"image":"resources/Images/road/road_northeastsouthwest.png",
+		"image":"resources/Images/buildings/stone_road.png",
 		"vision":0,
 		"movespeed":4,
 		"cost":{"STONE":10},
 		"culture":0,
-		"name":"ROAD",
+		"name":"STONE_ROAD",
 		"health":50,
 		"effort":20,
-		"attributes":["blocksmovement", "road"]},
+		"attributes":["road"],
+		"research":"ENGINEERING"},
+	{
+		"image":"resources/Images/buildings/brick_road.png",
+		"vision":0,
+		"movespeed":20,
+		"cost":{"STONE":50},
+		"culture":0,
+		"name":"BRICK_ROAD",
+		"health":400,
+		"effort":50,
+		"attributes":["road"],
+		"research":"MONARCHY"},
 	{
 		"image":"resources/Images/buildings/wall_wood.png",
 		"vision":0,
