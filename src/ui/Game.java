@@ -1131,6 +1131,9 @@ public class Game {
 		else if (selectedUnitToSpawn != null || selectedBuildingToSpawn != null) {
 			Thing summoned = summonThing(tile, selectedUnitToSpawn, selectedBuildingToSpawn, summonPlayerControlled ? World.PLAYER_FACTION : World.NEUTRAL_FACTION);
 			if(summoned.getFaction() == World.PLAYER_FACTION) {
+				if(shiftEnabled == false) {
+					deselectEverything();
+				}
 				selectThing(summoned);
 			}
 		}

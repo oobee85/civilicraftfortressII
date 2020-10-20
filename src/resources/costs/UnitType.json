@@ -223,6 +223,13 @@
 		"stats":{"movespeed":15,"attackspeed":20,"attack":40,"buildtime":0,"range":1,"health":500,"healspeed":50},
 		"name":"TRADER",
 		"attributes":[],
-		"loot":{"GOLD_ORE":50}}
+		"loot":{"GOLD_ORE":50}},
+	{
+		"image":"resources/Images/units/stonegolem.png",
+		"stats":{"movespeed":50,"attackspeed":50,"attack":100,"buildtime":0,"range":6,"health":1000,"healspeed":50},
+		"name":"STONE_GOLEM",
+		"attributes":["fireresistant","hostile","coldresistant"],
+		"projectile":"ROCK_STONE_GOLEM",
+		"loot":{"STONE":1000}},
 ]
 }
