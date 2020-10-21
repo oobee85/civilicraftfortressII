@@ -193,7 +193,7 @@
 		"vision":1,
 		"cost":{"WOOD":200, "IRON_BAR":5, "STONE":200},
 		"culture":0.5,
-		"name":"RESEARCHLAB",
+		"name":"RESEARCH_LAB",
 		"health":1000,
 		"effort":250,
 		"research":"IRON_WORKING"},

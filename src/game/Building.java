@@ -67,11 +67,11 @@ public class Building extends Thing {
 			return;
 		}
 		if(getType() == Game.buildingTypeMap.get("CASTLE")) {
-			getFaction().spendResearch(50);
+			getFaction().spendResearch(20);
 			resetTimeToHarvest();
 		}
 		if(getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
-			getFaction().spendResearch(100);
+			getFaction().spendResearch(20);
 			resetTimeToHarvest();
 		}
 		if(getType() == Game.buildingTypeMap.get("MINE")) {

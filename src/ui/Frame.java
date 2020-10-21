@@ -35,7 +35,7 @@ public class Frame extends JPanel {
 	private ImageIcon CITY_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("CASTLE").getImageIcon(0), 20, 20);
 	private ImageIcon BARRACKS_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("BARRACKS").getImageIcon(0), 20, 20);
 	private ImageIcon WORKSHOP_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("WORKSHOP").getImageIcon(0), 20, 20);
-	private ImageIcon RESEARCHLAB_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("RESEARCHLAB").getImageIcon(0), 20, 20);
+	private ImageIcon RESEARCH_LAB_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("RESEARCH_LAB").getImageIcon(0), 20, 20);
 	private ImageIcon HELLFORGE_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("HELLFORGE").getImageIcon(0), 20, 20);
 	private ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), 20, 20);
 	private ImageIcon TECH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.PNG"), 20, 20);
@@ -105,7 +105,7 @@ public class Frame extends JPanel {
 	private int BUILDING_TAB;
 	private int BARRACKS_TAB;
 	private int WORKSHOP_TAB;
-	private int RESEARCHLAB_TAB;
+	private int RESEARCH_LAB_TAB;
 	private int CASTLE_TAB;
 	private int STAT_TAB;
 	private int SPAWN_TAB;
@@ -145,7 +145,7 @@ public class Frame extends JPanel {
 				if (building.getType() == Game.buildingTypeMap.get("WORKSHOP")) {
 					manageWorkshopTab(selected);
 				}
-				if (building.getType() == Game.buildingTypeMap.get("RESEARCHLAB")) {
+				if (building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
 					manageResearchLabTab(selected);
 				}
 				InfoPanel infoPanel = new BuildingInfoPanel(building);
@@ -727,12 +727,12 @@ public class Frame extends JPanel {
 	}
 	
 	private void manageResearchLabTab(boolean enabled) {
-		if (enabled == false && tabbedPane.getSelectedIndex() == RESEARCHLAB_TAB) {
+		if (enabled == false && tabbedPane.getSelectedIndex() == RESEARCH_LAB_TAB) {
 			tabbedPane.setSelectedIndex(0);
 		} else if (enabled == true) {
-			tabbedPane.setSelectedIndex(RESEARCHLAB_TAB);
+			tabbedPane.setSelectedIndex(RESEARCH_LAB_TAB);
 		}
-		tabbedPane.setEnabledAt(RESEARCHLAB_TAB, enabled);
+		tabbedPane.setEnabledAt(RESEARCH_LAB_TAB, enabled);
 	}
 
 	private void manageSpawnTab(boolean enabled) {
@@ -1304,8 +1304,8 @@ public class Frame extends JPanel {
 		WORKSHOP_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("Workshop", WORKSHOP_TAB_ICON, workshopView, "Does nothing", WORKSHOP_TAB);
 		
-		RESEARCHLAB_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Research Lab", RESEARCHLAB_TAB_ICON, researchLabView, "Does nothing", RESEARCHLAB_TAB);
+		RESEARCH_LAB_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("Research Lab", RESEARCH_LAB_TAB_ICON, researchLabView, "Does nothing", RESEARCH_LAB_TAB);
 		
 		SPAWN_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("Spawner", Utils.resizeImageIcon(Game.unitTypeMap.get("ARCHER").getImageIcon(0), 20, 20), spawnMenu,

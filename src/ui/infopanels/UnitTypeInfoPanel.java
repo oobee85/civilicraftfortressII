@@ -7,6 +7,7 @@ import java.util.Map.*;
 import game.*;
 import ui.*;
 import utils.*;
+import world.*;
 
 public class UnitTypeInfoPanel extends InfoPanel {
 
@@ -75,7 +76,7 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		g.setFont(KUIConstants.infoFontSmaller);
 		int offset = g.getFont().getSize();
 		if(showing.getResearchRequirement() != null) {
-			g.drawString(showing.getResearchRequirement().toString(), x, y += offset);
+			g.drawString(Game.researchTypeMap.get(showing.getResearchRequirement()).toString(), x, y += offset);
 		}
 
 		if(showing.getCost() != null) {
