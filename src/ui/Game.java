@@ -144,40 +144,9 @@ public class Game {
 		
 	}
 	
-	public void randomEvents() {
+	public void weatherEvents() {
 
-		if(ticks == 1) {
-			world.rain();
-		}
-		if(Math.random() < 0.0005) {
-			world.spawnAnimal(Game.unitTypeMap.get("WATER_SPIRIT"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
-		}
-		if(ticks >= 1000 && Math.random() < 0.001) {
-			world.spawnAnimal(Game.unitTypeMap.get("FLAMELET"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
-		}
-		if(ticks >= 3000 && Math.random() < 0.0005) {
-			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
-		}
-		if(ticks >= 6000 && Math.random() < 0.0005 ) {
-			world.spawnWerewolf();
-		}
-		if(ticks >= 3000 && Math.random() < 0.0005 ) {
-			world.spawnLavaGolem();
-			world.spawnIceGiant();
-		}
-		if(ticks >= 6000 && Math.random() < 0.0001) {
-			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
-		}
-		if(ticks >= 3000 && Math.random() < (0.00005 * world.numCutTrees/5)) {
-			world.spawnEnt();
-		}
-		if(ticks >= 12000 && Math.random() < 0.0001 ) {
-			spawnOrcs();
-		}
-		if(buildingsUntilOgre == world.buildings.size()) {
-			world.spawnOgre();
-			buildingsUntilOgre += buildingsUntilOgre;
-		}
+		
 		if(ticks >= 12000 && Math.random() < 0.00001) {
 			meteorStrike();
 		}
@@ -229,16 +198,96 @@ public class Game {
 		}
 		groundModifierTick();
 		
-		randomEvents();
+		
 		if(ticks % (world.DAY_DURATION + world.NIGHT_DURATION) == 0) {
+			dayEvents();
 			days ++;
 		}
 		if((ticks + world.DAY_DURATION) % (world.DAY_DURATION + world.NIGHT_DURATION) == 0) {
+			nightEvents();
 			nights ++;
 		}
+		weatherEvents();
 		// GUI updates
 		world.updateTerrainChange(world);
 		guiController.updateGUI();
+	}
+	private void makeAnimal(Tile tile, UnitType unitType, int number) {
+		for(Tile t: tile.getNeighbors()) {
+			if(number > 0) {
+				world.spawnAnimal(unitType, t, World.NEUTRAL_FACTION);
+				number --;
+			}else {
+				break;
+			}
+			
+			
+		}
+		
+	}
+	private void dayEvents() {
+		//all the forced spawns
+		if(days % 5 == 0) {
+			for(int i = 0; i < days/5; i++) {
+				world.spawnLavaGolem();
+				world.spawnIceGiant();
+				System.out.println("lava");
+				System.out.println("ice");
+			}
+			
+		}
+		if(days % 10 == 0) {
+			for(int i = 0; i < days/10; i++) {
+				world.spawnOgre();
+				System.out.println("ogre");
+			}
+			
+		}
+		if(days % 20 == 0) {
+			spawnOrcs();
+			System.out.println("orcs");
+		}
+		if(days % 15 == 0) {
+			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
+			System.out.println("PARASITE");
+		}
+		
+		
+		if(days >= 10) {
+			int number = (int)(Math.random() / Season.FREEZING_TEMPURATURE * days/10);
+			for(int i = 0; i < number; i++) {
+				world.spawnIceGiant();
+				System.out.println("ICE_GIANT: " + number + ", " + days);
+			}
+		}
+		if(days >= 5) {
+			int number = (int)(Math.random()*days/2);
+			for(int i = 0; i < number; i++) {
+				world.spawnEnt();
+				System.out.println("ENT: " + number + ", " + days);
+			}
+			
+		}
+		if(days >= 1) {
+			int number = (int)(Season.MELTING_TEMPURATURE + Math.random()*days);
+			makeAnimal(world.getTilesRandomly().getFirst(), Game.unitTypeMap.get("FLAMELET"), number);
+			System.out.println("FLAMELET: " + number + ", " + days);
+		}
+		
+		if(Math.random() < 0.2) {
+			makeAnimal(world.getTilesRandomly().getFirst(), Game.unitTypeMap.get("WATER_SPIRIT"), 4);
+			System.out.println("WATER_SPIRIT: " + ", " + days);
+		}
+//		if(ticks >= 3000 && Math.random() < 0.0005) {
+//			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
+//		}
+	}
+	private void nightEvents() {
+		if(days >= 10) {
+			if(Math.random() > 0.5) {
+				world.spawnWerewolf();
+			}
+		}
 	}
 	public void addCombatBuff(CombatStats cs) {
 		combatBuffs.combine(cs);

@@ -131,7 +131,7 @@ public class Animal extends Unit {
 				migrationTarget = world.get(new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y - (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4)));
 			}
 			if(migrationTarget != null) {
-				System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + migrationTarget);
+//				System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + migrationTarget);
 				migratingUntil = Game.ticks + Season.SEASON_DURATION/2;
 				queuePlannedAction(new PlannedAction(migrationTarget));
 			}

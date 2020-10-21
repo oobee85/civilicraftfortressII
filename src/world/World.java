@@ -135,7 +135,7 @@ public class World {
 				t.liquidAmount += 0.005;
 			}
 		}
-		System.out.println("Raining at " + rainTile + "with radius " + radius);
+//		System.out.println("Raining at " + rainTile + "with radius " + radius);
 	}
 	
 	public void eruptVolcano() {
@@ -655,13 +655,13 @@ public class World {
 		projectiles = projectilesNew;
 		
 		if(Game.ticks % 50 == 0) {
-			System.out.println("Tick " + Game.ticks +
-					" \tunits: " 				+ units.size() + 
-					" \tbuildings: " 		+ buildings.size() + 
-					" \tplannedBuildings: " + plannedBuildings.size() + 
-					" \tplants: " 		+ plants.size() + 
-					" \tgroundModifiers: " 	+ groundModifiers.size() + 
-					" \tprojectiles: " 		+ projectiles.size());
+//			System.out.println("Tick " + Game.ticks +
+//					" \tunits: " 				+ units.size() + 
+//					" \tbuildings: " 		+ buildings.size() + 
+//					" \tplannedBuildings: " + plannedBuildings.size() + 
+//					" \tplants: " 		+ plants.size() + 
+//					" \tgroundModifiers: " 	+ groundModifiers.size() + 
+//					" \tprojectiles: " 		+ projectiles.size());
 		}
 	}
 	
