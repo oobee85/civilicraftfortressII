@@ -28,21 +28,30 @@ public class ResearchInfoPanel extends InfoPanel {
 		
 		g.setColor(Color.black);
 		g.setFont(KUIConstants.infoFont);
-		int offset = g.getFont().getSize();
 		int xoffset = 15;
 
+		g.setFont(KUIConstants.combatStatsFont);
+		int offset = g.getFont().getSize();
 		if(showing.getRequirement().getRequirements().size() > 0 ) {
 			g.drawLine(x + xoffset - 10, y, x + xoffset - 10, y + offset*showing.getRequirement().getRequirements().size() - offset/4);
 			
 			for(Research req : showing.getRequirement().getRequirements()) {
+				if(req.isUnlocked()) {
+					g.setColor(Color.black);
+				}
+				else if(req.getRequirement().areRequirementsMet()) {
+					g.setColor(Color.red);
+				}
+				else {
+					g.setColor(Color.red);
+				}
 				g.drawString(req.toString(), x + xoffset, y += offset);
+				g.setColor(Color.black);
 				g.drawLine(x + xoffset - 10, y - offset/4, x + xoffset - 1, y - offset/4);
 			}
-
-			g.setFont(KUIConstants.infoFontSmall);
-			HashMap<ItemType, Integer> cost = showing.getCost();
-			g.drawString(cost.toString(), x + xoffset-5, y += offset);
 		}
+		y += offset/2;
+		UnitTypeInfoPanel.drawCosts(g, showing.getCost(), x, y);
 
 		g.setFont(KUIConstants.infoFont);
 		double completedRatio = 1.0 * showing.getPointsSpent() / showing.getRequiredPoints();
