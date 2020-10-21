@@ -219,7 +219,7 @@ public class Unit extends Thing {
 			ticksToCost = (int) (ticksForFoodCost/2);
 		}
 		
-		if (Game.ticks % ticksToCost == 0 && getFaction().hasItems()) {
+		if (Game.ticks % ticksToCost == 0 && getFaction().usesItems()) {
 			if (getFaction().canAfford(ItemType.FOOD, 1)) {
 				getFaction().payCost(ItemType.FOOD, 1);
 				starving = 0;
@@ -230,7 +230,7 @@ public class Unit extends Thing {
 		}
 
 		// If on tile with an item, take the item
-		if (getFaction().hasItems()) {
+		if (getFaction().usesItems()) {
 			for (Item item : getTile().getItems()) {
 				getFaction().addItem(item.getType(), item.getAmount());
 			}

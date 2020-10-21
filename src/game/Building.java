@@ -66,6 +66,14 @@ public class Building extends Thing {
 		if(!readyToHarvest() ) {
 			return;
 		}
+		if(getType() == Game.buildingTypeMap.get("CASTLE")) {
+			getFaction().spendResearch(50);
+			resetTimeToHarvest();
+		}
+		if(getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
+			getFaction().spendResearch(100);
+			resetTimeToHarvest();
+		}
 		if(getType() == Game.buildingTypeMap.get("MINE")) {
 			if(getTile().getResource() != null && getTile().getResource().getType().isOre() == true) {
 				getFaction().addItem(getTile().getResource().getType().getItemType(), 1);

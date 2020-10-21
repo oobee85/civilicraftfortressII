@@ -11,7 +11,7 @@ public class ResearchInfoPanel extends InfoPanel {
 	Research showing;
 
 	public ResearchInfoPanel(Research showing) {
-		super(showing.toString(), showing.getImage(70), 70);
+		super(showing.toString(), showing.type.getImage(70), 70);
 		this.showing = showing;
 	}
 	

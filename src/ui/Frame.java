@@ -71,7 +71,7 @@ public class Frame extends JPanel {
 	private JPanel resourcePanel;
 	private JLabel[] resourceIndicators = new JLabel[ItemType.values().length];
 	private boolean[] resourceIndicatorsAdded = new boolean[ItemType.values().length];
-	private HashMap<JButton, Research> researchButtons = new HashMap<>();
+	private HashMap<JButton, ResearchType> researchButtons = new HashMap<>();
 	private JButton[] buildingButtons;
 	private JButton[] planningButtons;
 	private class Pair {
@@ -228,11 +228,11 @@ public class Frame extends JPanel {
 						gamepanel.revalidate();
 					}
 				}
-				for(Entry<JButton, Research> entry : researchButtons.entrySet()) {
+				for(Entry<JButton, ResearchType> entry : researchButtons.entrySet()) {
 					JButton button = entry.getKey();
-					Research r = entry.getValue();
-					ResearchRequirement req = r.getRequirement();
-					if (r.isUnlocked()) {
+					Research research = World.PLAYER_FACTION.getResearch(entry.getValue());
+					ResearchRequirement req = research.getRequirement();
+					if (research.isUnlocked()) {
 						button.setEnabled(false);
 						button.setVisible(true);
 					} else if (req.areRequirementsMet()) {
@@ -250,8 +250,7 @@ public class Frame extends JPanel {
 					BuildingType type = Game.buildingTypeList.get(i);
 					JButton button = buildingButtons[i];
 					JButton button2 = planningButtons[i];
-					ResearchRequirement req = gameInstance.buildingResearchRequirements.get(type);
-					if (req.areRequirementsMet()) {
+					if (World.PLAYER_FACTION.areRequirementsMet(type)) {
 						button.setEnabled(true);
 						button.setVisible(true);
 						button2.setEnabled(true);
@@ -264,8 +263,7 @@ public class Frame extends JPanel {
 					}
 				}
 				for(Pair pair : unitButtons) {
-					ResearchRequirement req = gameInstance.unitResearchRequirements.get(pair.unitType);
-					if (req.areRequirementsMet()) {
+					if (World.PLAYER_FACTION.areRequirementsMet(pair.unitType)) {
 						pair.button.setEnabled(true);
 						pair.button.setVisible(true);
 					} else {
@@ -279,8 +277,7 @@ public class Frame extends JPanel {
 						continue;
 					}
 					JButton button = craftButtons[i];
-					ResearchRequirement req = gameInstance.craftResearchRequirements.get(type);
-					if (req.areRequirementsMet()) {
+					if (World.PLAYER_FACTION.areRequirementsMet(type)) {
 						button.setEnabled(true);
 						button.setVisible(true);
 					} else {
@@ -926,28 +923,28 @@ public class Frame extends JPanel {
 		Collections.addAll(unitButtons, buttons);
 		
 		researchLabView = new JPanel();
-		for (int i = 0; i < gameInstance.researchList.size(); i++) {
-			Research research = gameInstance.researchList.get(i);
-			KButton button = KUIConstants.setupButton(research.toString(),
-					Utils.resizeImageIcon(research.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
+		for (int i = 0; i < Game.researchTypeList.size(); i++) {
+			ResearchType researchType = Game.researchTypeList.get(i);
+			KButton button = KUIConstants.setupButton(researchType.toString(),
+					Utils.resizeImageIcon(researchType.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.setEnabled(false);
 			button.addActionListener(e -> {
-				gameInstance.setResearchTarget(research);
+				gameInstance.setResearchTarget(researchType);
 			});
 			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new ResearchInfoPanel(research));
+				switchInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					pushInfoPanel(new ResearchInfoPanel(research));
+					pushInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
 					popInfoPanel();
 				}
 			});
-			researchButtons.put(button, research);
+			researchButtons.put(button, researchType);
 			researchLabView.add(button);
 		}
 		
@@ -1214,31 +1211,31 @@ public class Frame extends JPanel {
 		buttonPanel.add(exit);
 
 		techView = new JPanel();
-		for (int i = 0; i < gameInstance.researchList.size(); i++) {
-			Research research = gameInstance.researchList.get(i);
-			if(research.getTier() > 1) {
+		for (int i = 0; i < Game.researchTypeList.size(); i++) {
+			ResearchType researchType = Game.researchTypeList.get(i);
+			if(researchType.tier > 1) {
 				continue;
 			}
-			KButton button = KUIConstants.setupButton(research.toString(),
-					Utils.resizeImageIcon(research.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
+			KButton button = KUIConstants.setupButton(researchType.toString(),
+					Utils.resizeImageIcon(researchType.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.setEnabled(false);
 			button.addActionListener(e -> {
-				gameInstance.setResearchTarget(research);
+				gameInstance.setResearchTarget(researchType);
 			});
 			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new ResearchInfoPanel(research));
+				switchInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					pushInfoPanel(new ResearchInfoPanel(research));
+					pushInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
 					popInfoPanel();
 				}
 			});
-			researchButtons.put(button, research);
+			researchButtons.put(button, researchType);
 			techView.add(button);
 		}
 		statView = new JPanel();

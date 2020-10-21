@@ -28,6 +28,9 @@ public final class Utils {
 		else if(o instanceof ItemType) {
 			rawName = ((ItemType)o).name();
 		}
+		else if(o instanceof ResearchType) {
+			rawName = ((ResearchType)o).name();
+		}
 		else if(o instanceof Research) {
 			rawName = ((Research)o).getName();
 		}
@@ -152,6 +155,13 @@ public final class Utils {
 	 */
 	public static void setTransparency(Graphics g, double alpha) {
 	    ((Graphics2D)g).setComposite(java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)alpha));
+	}
+	
+	/**
+	 * @return transparent version of provided color with specified alpha
+	 */
+	public static Color getTransparentColor(Color color, int alpha) {
+		return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
 	}
 	
 	/**

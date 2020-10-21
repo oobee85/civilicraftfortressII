@@ -39,24 +39,15 @@ public class Game {
 	private BuildingType selectedBuildingToSpawn;
 	private BuildingType selectedBuildingToPlan;
 	private boolean summonPlayerControlled = true;
-	private int buildingsUntilOgre = 20;
 	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
-	public static final Color playerColor = Color.pink;
-	public static final Color neutralColor = Color.lightGray;
-	
-	ArrayList<Research> researchList = new ArrayList<>();
-	HashMap<String, Research> researchMap = new HashMap<>();
 
 	public static final ArrayList<UnitType> unitTypeList = new ArrayList<>();
 	public static final HashMap<String, UnitType> unitTypeMap = new HashMap<>();
 	public static final ArrayList<BuildingType> buildingTypeList = new ArrayList<>();
 	public static final HashMap<String, BuildingType> buildingTypeMap = new HashMap<>();
-	
-	HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
-	HashMap<UnitType, ResearchRequirement> unitResearchRequirements = new HashMap<>();
-	HashMap<ItemType, ResearchRequirement> craftResearchRequirements = new HashMap<>();
-	
-	private Research researchTarget;
+	public static final ArrayList<ResearchType> researchTypeList = new ArrayList<>();
+	public static final HashMap<String, ResearchType> researchTypeMap = new HashMap<>();
+
 	
 	private int money;
 	private Position viewOffset;
@@ -90,50 +81,14 @@ public class Game {
 		viewOffset = new Position(0, 0);
 		showHeightMap = false;
 		
-		Loader.setupResearch(researchMap, researchList);
+		World.NEUTRAL_FACTION.setupResearch();
+		World.PLAYER_FACTION.setupResearch();
+		World.CYCLOPS_FACTION.setupResearch();
+		
 		World.PLAYER_FACTION.addItem(ItemType.WOOD, 200);
 		World.PLAYER_FACTION.addItem(ItemType.STONE, 200);
 		World.PLAYER_FACTION.addItem(ItemType.FOOD, 200);
 		World.CYCLOPS_FACTION.addItem(ItemType.FOOD, 50);
-		for(BuildingType type : buildingTypeList) {
-			// make a new researchrequirement object
-			ResearchRequirement req = new ResearchRequirement();
-			// only add requirement if it isnt null
-			if(type.getResearchRequirement() != null) {
-				// get the research that type requires
-				Research typesRequirement = researchMap.get(type.getResearchRequirement());
-				// add the required research to the req
-				req.addRequirement(typesRequirement);
-			}
-			// put it in the hashmap
-			buildingResearchRequirements.put(type, req);
-		}
-		for(UnitType type : Game.unitTypeList) {
-			// make a new researchrequirement object
-			ResearchRequirement req = new ResearchRequirement();
-			// only add requirement if it isnt null
-			if(type.getResearchRequirement() != null) {
-				// get the research that type requires
-				Research typesRequirement = researchMap.get(type.getResearchRequirement());
-				// add the required research to the req
-				req.addRequirement(typesRequirement);
-			}
-			// put it in the hashmap
-			unitResearchRequirements.put(type, req);
-		}
-		for(ItemType type : ItemType.values()) {
-			// make a new researchrequirement object
-			ResearchRequirement req = new ResearchRequirement();
-			// only add requirement if it isnt null
-//			if(type.getResearchRequirement() != null) {
-//				// get the research that type requires
-//				Research typesRequirement = researches.get(type.getResearchRequirement());
-//				// add the required research to the req
-//				req.addRequirement(typesRequirement);
-//			}
-			// put it in the hashmap
-			craftResearchRequirements.put(type, req);
-		}
 		
 //		resources.get(ItemType.IRON_ORE).addAmount(200);
 //		resources.get(ItemType.COPPER_ORE).addAmount(200);
@@ -177,10 +132,7 @@ public class Game {
 		// Do all the game events like unit movement, time passing, building things, growing, etc
 		// happens once every 100ms
 		ticks++;
-
-		if(ticks%10 == 0) {
-			doResearch();
-		}
+		
 		if(ticks%20 == 0) {
 			updateTerritory();
 		}
@@ -805,15 +757,15 @@ public class Game {
 			
 			for(Thing thing : selectedThings) {
 				// draw selection circle
-				g.setColor(playerColor);
-				Utils.setTransparency(g, 0.8f);
+				g.setColor(Utils.getTransparentColor(World.PLAYER_FACTION.color, 150));
+//				Utils.setTransparency(g, 0.8f);
 				Graphics2D g2d = (Graphics2D)g;
 				Stroke currentStroke = g2d.getStroke();
 				int strokeWidth = Game.tileSize/12;
 				g2d.setStroke(new BasicStroke(strokeWidth));
 				g.drawOval(thing.getTile().getLocation().x * Game.tileSize + strokeWidth/2, thing.getTile().getLocation().y * Game.tileSize + strokeWidth/2, Game.tileSize-1 - strokeWidth, Game.tileSize-1 - strokeWidth);
 				g2d.setStroke(currentStroke);
-				Utils.setTransparency(g, 1f);
+//				Utils.setTransparency(g, 1f);
 
 				// draw spawn location for buildings
 				if(thing instanceof Building) {
@@ -1089,14 +1041,16 @@ public class Game {
 			building.updateCulture();
 		}
 	}
-	private void doResearch() {
-		if(researchTarget != null) {
-			researchTarget.spendResearch(10);
-			if(researchTarget.isUnlocked()) {
-				guiController.updateGUI();
-			}
-		}
-	}
+//	private void doResearch() {
+//		for(Faction faction : World.factions) {
+//			if(faction.researchTarget != null) {
+//				faction.researchTarget.spendResearch(10);
+//				if(faction.researchTarget.isUnlocked()) {
+//					guiController.updateGUI();
+//				}
+//			}
+//		}
+//	}
 	
 	public void craftItem(ItemType type) {
 		if(World.PLAYER_FACTION.canAfford(type.getCost())) {
@@ -1105,15 +1059,8 @@ public class Game {
 		}
 	}
 
-	public void setResearchTarget(Research research) {
-		
-		if(!research.getRequirement().areRequirementsMet()) {
-			return;
-		}
-		if(World.PLAYER_FACTION.canAfford(research.getCost())) {
-			World.PLAYER_FACTION.payCost(research.getCost());
-			researchTarget = research;
-		}
+	public void setResearchTarget(ResearchType researchType) {
+		World.PLAYER_FACTION.setResearchTarget(researchType);
 	}
 	
 	private Thing summonThing(Tile tile, UnitType unitType, BuildingType buildingType, Faction faction) {
@@ -1644,17 +1591,17 @@ public class Game {
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
 		draw(g);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
-		if(researchTarget != null && !researchTarget.isUnlocked()) {
+		if(World.PLAYER_FACTION.getResearchTarget() != null && !World.PLAYER_FACTION.getResearchTarget().isUnlocked()) {
 			g.setFont(KUIConstants.infoFont);
-			double completedRatio = 1.0 * researchTarget.getPointsSpent() / researchTarget.getRequiredPoints();
-			String progress = String.format(researchTarget + " %d/%d", researchTarget.getPointsSpent(), researchTarget.getRequiredPoints());
+			double completedRatio = 1.0 * World.PLAYER_FACTION.getResearchTarget().getPointsSpent() / World.PLAYER_FACTION.getResearchTarget().getRequiredPoints();
+			String progress = String.format(World.PLAYER_FACTION.getResearchTarget() + " %d/%d", World.PLAYER_FACTION.getResearchTarget().getPointsSpent(), World.PLAYER_FACTION.getResearchTarget().getRequiredPoints());
 			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress, this.panelWidth - this.panelWidth/3 - 4, 4, this.panelWidth/3, 30);
 		}
 		Toolkit.getDefaultToolkit().sync();
 	}
 	
 	public Color getBackgroundColor() {
-		double ratio = world.getDaylight();
+		double ratio = World.getDaylight();
 		int c = (int)(ratio * 255);
 		return new Color(c, c, c);
 	}
@@ -1678,13 +1625,8 @@ public class Game {
 	}
 	
 	public void researchEverything() {
-		for(Research research : researchList) {
-			researchTarget = research;
-			researchTarget.spendResearch(100000);
-			if (researchTarget.isUnlocked()) {
-				guiController.updateGUI();
-			}
-		}
+		World.PLAYER_FACTION.researchEverything();
+		guiController.updateGUI();
 	}
 	
 	public boolean shouldFastForward() {

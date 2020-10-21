@@ -8,6 +8,7 @@ import java.util.Map.*;
 import org.json.*;
 
 import game.*;
+import ui.*;
 
 public class Loader {
 	private static String readFile(String filename) {
@@ -265,8 +266,8 @@ public class Loader {
 //			e.printStackTrace();
 //		}
 	}
-
-	public static void setupResearch(HashMap<String, Research> researches, ArrayList<Research> researchList) {
+	
+	public static void loadResearchType(HashMap<String, ResearchType> researchTypeMap, ArrayList<ResearchType> researchTypeList) {
 		HashMap<Research, LinkedList<String>> researchRequirements = new HashMap<>();
 		String researchCosts = readFile("resources/costs/ResearchType.json");
 		System.out.println(researchCosts);
@@ -281,36 +282,24 @@ public class Loader {
 			}
 			int points = researchObject.getInt("points");
 			int tier = researchObject.getInt("tier");
-			Research research = new Research(researchName, imagePath, points, tier);
-			researches.put(researchName, research);
-			researchList.add(research);
-			
+			HashMap<ItemType, Integer> cost = new HashMap<>();
 			if(researchObject.has("cost")) {
-				HashMap<ItemType, Integer> cost = loadItemTypeMap(researchObject.getJSONObject("cost"));
-				for(Entry<ItemType, Integer> entry : cost.entrySet()) {
-					System.out.println(researchName + ":" + entry.getKey() + ":" + entry.getValue());
-					research.addCost(entry.getKey(), entry.getValue());
-				}
+				cost = loadItemTypeMap(researchObject.getJSONObject("cost"));
 			}
+			LinkedList<String> reqs = new LinkedList<>();
 			if(researchObject.has("requirements")) {
 				JSONArray requirementArray = researchObject.getJSONArray("requirements");
-				LinkedList<String> reqs = new LinkedList<>();
 				for(int j = 0; j < requirementArray.length(); j++) {
 					String requirement = requirementArray.getString(j);
 					reqs.add(requirement);
 				}
-				researchRequirements.put(research, reqs);
 			}
+			ResearchType researchType = new ResearchType(researchName, imagePath, reqs, points, tier, cost);
+			researchTypeMap.put(researchName, researchType);
+			researchTypeList.add(researchType);
 		}
-		// Link research requirements
-		for(Research research : researchRequirements.keySet()) {
-			for(String req : researchRequirements.get(research)) {
-				Research requirement = researches.get(req);
-				if(requirement != null) {
-					research.getRequirement().addRequirement(requirement);
-				}
-				System.out.println(research + " require  " + requirement);
-			}
-		}
+	}
+
+	public static void setupResearch(HashMap<String, Research> researches, ArrayList<Research> researchList) {
 	}
 }

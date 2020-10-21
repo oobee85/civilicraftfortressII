@@ -70,7 +70,8 @@ public class Driver {
 	
 	
 	static {
-		Loader.writeBuildingTypes();
+//		Loader.writeBuildingTypes();
+		Loader.loadResearchType(Game.researchTypeMap, Game.researchTypeList);
 		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
 		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);
 	}
