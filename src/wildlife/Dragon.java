@@ -58,10 +58,6 @@ public class Dragon extends Animal {
 	public int getTimeToHunt() {
 		return timeToHunt;
 	}
-	@Override
-	public double attack(Thing other) {
-		return super.attack(other);
-	}
 
 	@Override
 	public boolean getHasHome() {

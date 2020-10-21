@@ -4,12 +4,14 @@ import java.util.*;
 
 import game.*;
 import ui.*;
+import utils.*;
 import world.*;
 
 public class Bomb extends Animal {
-	
-	public Bomb(Tile tile, Faction faction) {
+	private World world;
+	public Bomb(Tile tile, Faction faction, World world) {
 		super(Game.unitTypeMap.get("BOMB"), tile, faction);
+		this.world = world;
 	}
 	
 	@Override
@@ -25,20 +27,35 @@ public class Bomb extends Animal {
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		if(!buildings.isEmpty()) {
-			Building target = buildings.get((int)(Math.random()*buildings.size()));
-			clearPlannedActions();
-			queuePlannedAction(new PlannedAction(target));
+			for(Building building : buildings) {
+				if(building.getFaction() == World.PLAYER_FACTION) {
+					clearPlannedActions();
+					queuePlannedAction(new PlannedAction(building));
+					return;
+				}
+			}
+		
 		}
 	}
 	
 	@Override
-	public boolean doAttacks(World world) {
-		if(getTarget() != null && getTarget().getTile().getLocation().distanceTo(getTile().getLocation()) == 0) {
+	public boolean takeDamage(double damage) {
+		if(!isDead()) {
+			super.takeDamage(damage);
 			world.spawnExplosion(getTile(), 5, 500);
 			this.setDead(true);
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean attack(Thing target) {
+		if(target.getTile().getLocation().distanceTo(getTile().getLocation()) == 0) {
+			takeDamage(1);
 			return true;
 		}
 		return false;
+	
 	}
 
 }

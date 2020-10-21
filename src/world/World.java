@@ -48,6 +48,7 @@ public class World {
 	public LinkedList<Building> newBuildings = new LinkedList<Building>();
 	public LinkedList<Building> plannedBuildings = new LinkedList<Building>();
 	public LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
+	public LinkedList<Projectile> newProjectiles = new LinkedList<Projectile>();
 	public LinkedList<GroundModifier> groundModifiers = new LinkedList<>();
 	private LinkedList<GroundModifier> newGroundModifiers = new LinkedList<>();
 	
@@ -245,7 +246,7 @@ public class World {
 			return new Cyclops(tile, faction);
 		}
 		else if(type == Game.unitTypeMap.get("BOMB")) {
-			return new Bomb(tile, faction);
+			return new Bomb(tile, faction, this);
 		}
 		else {
 			return new Animal(type, tile, faction);
@@ -652,6 +653,8 @@ public class World {
 				projectilesNew.add(projectile);
 			}
 		}
+		projectilesNew.addAll(newProjectiles);
+		newProjectiles.clear();
 		projectiles = projectilesNew;
 		
 		if(Game.ticks % 50 == 0) {

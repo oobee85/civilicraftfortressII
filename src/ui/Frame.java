@@ -30,16 +30,17 @@ public class Frame extends JPanel {
 	public static final Dimension BUILD_UNIT_BUTTON_SIZE = new Dimension(170, 35);
 
 
-	private ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.PNG"), 20, 20);
-	private ImageIcon BUILDING_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.PNG"), 20, 20);
-	private ImageIcon CITY_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("CASTLE").getImageIcon(0), 20, 20);
-	private ImageIcon BARRACKS_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("BARRACKS").getImageIcon(0), 20, 20);
-	private ImageIcon WORKSHOP_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("WORKSHOP").getImageIcon(0), 20, 20);
-	private ImageIcon RESEARCH_LAB_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("RESEARCH_LAB").getImageIcon(0), 20, 20);
-	private ImageIcon HELLFORGE_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("HELLFORGE").getImageIcon(0), 20, 20);
-	private ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), 20, 20);
-	private ImageIcon TECH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.PNG"), 20, 20);
-	private ImageIcon STAT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/itemicons/adamant_sword.png"), 20, 20);
+	private static final int TAB_ICON_SIZE = 25;
+	private ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon BUILDING_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon CITY_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("CASTLE").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon BARRACKS_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("BARRACKS").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon WORKSHOP_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("WORKSHOP").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon RESEARCH_LAB_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("RESEARCH_LAB").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon HELLFORGE_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("HELLFORGE").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("BLACKSMITH").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon TECH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon STAT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/itemicons/adamant_sword.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	
 	private Timer repaintingThread;
 	private JToggleButton easyModeButton;
@@ -1295,43 +1296,45 @@ public class Frame extends JPanel {
 		tabbedPane.setFont(KUIConstants.buttonFontSmall);
 
 		TECH_TAB = tabbedPane.getTabCount();
-		tabbedPane.addTab("Tech Stuff", TECH_TAB_ICON, techView, "Does nothing");
+		tabbedPane.addTab("Research", TECH_TAB_ICON, techView, "Does nothing");
 
-		STAT_TAB = tabbedPane.getTabCount();
-		tabbedPane.addTab("Unit Stats", STAT_TAB_ICON, statView, "Does nothing");
-		
-		BLACKSMITH_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Craft Stuff", BLACKSMITH_TAB_ICON, blacksmithView, "Does nothing", BLACKSMITH_TAB);
-
-		HELLFORGE_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Craft Advanced Stuff",HELLFORGE_TAB_ICON, hellforgeView, "Does nothing", HELLFORGE_TAB);
-		
-		WORKER_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Worker Tab", WORKER_TAB_ICON, workerMenu, "Does nothing", WORKER_TAB);
+//		STAT_TAB = tabbedPane.getTabCount();
+//		tabbedPane.addTab("Unit Stats", STAT_TAB_ICON, statView, "Does nothing");
 		
 		BUILDING_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("plan buildings", BUILDING_TAB_ICON, buildingPlanner, "Does nothing", BUILDING_TAB);
-
-		CASTLE_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("City", CITY_TAB_ICON, castleView, "Does nothing", CASTLE_TAB);
-
-		BARRACKS_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Barracks", BARRACKS_TAB_ICON, barracksView, "Does nothing", BARRACKS_TAB);
-		
-		WORKSHOP_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Workshop", WORKSHOP_TAB_ICON, workshopView, "Does nothing", WORKSHOP_TAB);
-		
-		RESEARCH_LAB_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Research Lab", RESEARCH_LAB_TAB_ICON, researchLabView, "Does nothing", RESEARCH_LAB_TAB);
 		
 		SPAWN_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Spawner", Utils.resizeImageIcon(Game.unitTypeMap.get("ARCHER").getImageIcon(0), 20, 20), spawnMenu,
+		tabbedPane.insertTab("Spawner", Utils.resizeImageIcon(Game.unitTypeMap.get("ARCHER").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE), spawnMenu,
 				"Does nothing", SPAWN_TAB);
+
 
 		DEBUG_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab(null,
-				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), 20, 20),
+				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE),
 				buttonPanel, "Does nothing");
+		
+		WORKER_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("", WORKER_TAB_ICON, workerMenu, "Does nothing", WORKER_TAB);
+
+		CASTLE_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("", CITY_TAB_ICON, castleView, "Does nothing", CASTLE_TAB);
+
+		BARRACKS_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("", BARRACKS_TAB_ICON, barracksView, "Does nothing", BARRACKS_TAB);
+		
+		WORKSHOP_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("", WORKSHOP_TAB_ICON, workshopView, "Does nothing", WORKSHOP_TAB);
+		
+		RESEARCH_LAB_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("", RESEARCH_LAB_TAB_ICON, researchLabView, "Does nothing", RESEARCH_LAB_TAB);
+
+		BLACKSMITH_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("", BLACKSMITH_TAB_ICON, blacksmithView, "Does nothing", BLACKSMITH_TAB);
+
+		HELLFORGE_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("",HELLFORGE_TAB_ICON, hellforgeView, "Does nothing", HELLFORGE_TAB);
+		
 
 		// remove building tab after setting all of the tabs up
 		manageBuildingTab(false);

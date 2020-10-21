@@ -34,7 +34,7 @@ public class Werewolf extends Animal {
 		
 	}
 	@Override
-	public double attack(Thing other) {
+	public boolean attack(Thing other) {
 		if(transformed) {
 			if(other instanceof Unit && inRange(other)) {
 				Unit otherUnit = (Unit)other;

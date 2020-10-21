@@ -39,9 +39,9 @@ public enum ItemType implements HasImage {
 	IRON_SWORD ( "resources/Images/itemicons/iron_sword.png", 			new HashMap<ItemType, Integer>() { {put(ItemType.IRON_BAR,5); put(ItemType.WOOD, 50); }}, "BLACKSMITH"),
 	MITHRIL_SWORD ( "resources/Images/itemicons/mithril_sword.png",		new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_BAR,5); put(ItemType.WOOD, 50); }}, "BLACKSMITH"),
 	
-	ADAMANT_SWORD ( "resources/Images/itemicons/adamant_sword.png", 	new HashMap<ItemType, Integer>() { {put(ItemType.ADAMANTITE_BAR,5); put(ItemType.WOOD, 50); }}, "HELLFORGE"),
-	RUNE_SWORD ( "resources/Images/itemicons/rune_sword.png", 			new HashMap<ItemType, Integer>() { {put(ItemType.RUNITE_BAR,5); put(ItemType.WOOD, 50); }}, "HELLFORGE"),
-	TITANIUM_SWORD ( "resources/Images/itemicons/titanium_sword.png", 	new HashMap<ItemType, Integer>() { {put(ItemType.TITANIUM_BAR,5); put(ItemType.WOOD, 50); }}, "HELLFORGE"),
+	ADAMANT_SWORD ( "resources/Images/itemicons/adamant_sword.png", 	new HashMap<ItemType, Integer>() { {put(ItemType.ADAMANTITE_BAR,5); put(ItemType.IRON_BAR,5); put(ItemType.WOOD, 50); }}, "HELLFORGE"),
+	RUNE_SWORD ( "resources/Images/itemicons/rune_sword.png", 			new HashMap<ItemType, Integer>() { {put(ItemType.RUNITE_BAR,5); put(ItemType.IRON_BAR,5); put(ItemType.WOOD, 50); }}, "HELLFORGE"),
+	TITANIUM_SWORD ( "resources/Images/itemicons/titanium_sword.png", 	new HashMap<ItemType, Integer>() { {put(ItemType.TITANIUM_BAR,5); put(ItemType.IRON_BAR,5); put(ItemType.WOOD, 50); }}, "HELLFORGE"),
 	;
 	
 	private MipMap mipmap;

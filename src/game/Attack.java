@@ -28,20 +28,6 @@ public class Attack {
 	
 	public static World world;
 
-	public static boolean tryToAttack(Unit unit, Thing target) {
-		Attack attack = unit.chooseAttack(target);
-		if(attack != null) {
-			// actually do the attack
-			if(attack.projectileType == null) {
-				smack(unit, target);
-			}
-			else {
-				shoot(unit, target, attack);
-			}
-		}
-		return false;
-	}
-
 	public static void shoot(Unit unit, Thing target, Attack attack) {
 		for(Unit u : target.getTile().getUnits()) {
 			if(target.getTile().getThingOfFaction(unit.getFaction()) != null && u.getFaction() != unit.getFaction()) {
@@ -55,7 +41,7 @@ public class Attack {
 		if(unit.readyToAttack() && !target.isDead()) {
 			Projectile p = new Projectile(attack.projectileType, unit.getTile(), target.getTile(), unit);
 			p.setDamageBuff(Game.combatBuffs.getAttack());
-			world.projectiles.add(p);
+			world.newProjectiles.add(p);
 			unit.getTile().addProjectile(p);
 			unit.resetTimeToAttack();
 		}
@@ -73,7 +59,7 @@ public class Attack {
 					
 					Projectile p = new Projectile(attack.projectileType, world.get(tl), world.get(tileLoc), unit);
 					p.setDamageBuff(Game.combatBuffs.getAttack());
-					world.projectiles.add(p);
+					world.newProjectiles.add(p);
 					unit.getTile().addProjectile(p);
 				}
 				
@@ -86,7 +72,7 @@ public class Attack {
 					
 					Projectile p = new Projectile(attack.projectileType, world.get(tl), world.get(tileLoc), unit);
 					p.setDamageBuff(Game.combatBuffs.getAttack());
-					world.projectiles.add(p);
+					world.newProjectiles.add(p);
 					unit.getTile().addProjectile(p);
 				}
 			}
@@ -94,13 +80,5 @@ public class Attack {
 			
 		}
 		unit.resetTimeToAttack();
-	}
-	
-	public static void smack(Unit unit, Thing target) {
-		CombatStats combine = new CombatStats(0,0,0,0,0,0,0);
-		combine.set(unit.getType().getCombatStats());
-		combine.combine(Game.combatBuffs);
-		unit.setCombatStats(combine);
-		unit.attack(target);
 	}
 }

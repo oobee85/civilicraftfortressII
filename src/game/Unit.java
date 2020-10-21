@@ -41,13 +41,17 @@ public class Unit extends Thing {
 		attacks = new LinkedList<>();
 		// projectile attacks
 		if (unitType.getProjectileType() != null) {
-			addAttackType(new Attack(unitType.getCombatStats().getAttackRadius(), unitType.getProjectileType(),
-					unitType.getCombatStats().getAttackSpeed()));
+			if(unitType.getProjectileType().getSpeed() != 0) {
+				addAttackType(new Attack(unitType.getCombatStats().getAttackRadius(), unitType.getProjectileType(),
+						unitType.getCombatStats().getAttackSpeed()));
+			}
+			else {
+				addAttackType(new Attack(unitType.getCombatStats().getAttackRadius(), unitType.getProjectileType().getDamage(), unitType.getCombatStats().getAttackSpeed()));
+			}
 		}
 		// melee attacks
 		if (unitType.getCombatStats().getAttack() > 0) {
-			addAttackType(
-					new Attack(1, unitType.getCombatStats().getAttack(), unitType.getCombatStats().getAttackSpeed()));
+			addAttackType(new Attack(1, unitType.getCombatStats().getAttack(), unitType.getCombatStats().getAttackSpeed()));
 		}
 	}
 	
@@ -258,26 +262,32 @@ public class Unit extends Thing {
 	}
 
 	/**
-	 * this function does not check the attack range!
+	 * this function does not check the attack range or if unit is ready to attack
 	 * 
-	 * @return amount of damage dealt to target
+	 * @return true if attacked, false otherwise
 	 */
-	public double attack(Thing other) {
-		if (other == null || timeToAttack > 0 || other.isDead()) {
-			return 0;
+	public boolean attack(Thing target) {
+		Attack attack = chooseAttack(target);
+		if(attack != null) {
+			// actually do the attack
+			if(attack.projectileType == null) {
+				double initialHP = target.getHealth();
+				target.takeDamage(attack.damage);
+				double damageDealt = initialHP - (target.getHealth() < 0 ? 0 : target.getHealth());
+				if (unitType.hasLifeSteal() && !(target instanceof Building)) {
+					this.heal(damageDealt, true);
+				}
+				resetTimeToAttack();
+				if (target instanceof Unit) {
+					((Unit) target).aggro(this);
+				}
+			}
+			else {
+				Attack.shoot(this, target, attack);
+			}
+			return true;
 		}
-		double initialHP = other.getHealth();
-
-		other.takeDamage(combatStats.getAttack());
-		double damageDealt = initialHP - (other.getHealth() < 0 ? 0 : other.getHealth());
-		if (unitType.hasLifeSteal() && !(other instanceof Building)) {
-			this.heal(combatStats.getAttack(), true);
-		}
-		resetTimeToAttack();
-		if (other instanceof Unit) {
-			((Unit) other).aggro(this);
-		}
-		return damageDealt;
+		return false;
 	}
 
 	public void aggro(Unit attacker) {
@@ -287,8 +297,8 @@ public class Unit extends Thing {
 	}
 
 	public Attack chooseAttack(Thing target) {
+		int distance = this.getTile().getLocation().distanceTo(target.getTile().getLocation());
 		for (Attack a : attacks) {
-			int distance = this.getTile().getLocation().distanceTo(target.getTile().getLocation());
 			if (distance <= a.range && (a.projectileType == null || distance >= a.projectileType.getMinimumRange())) {
 				return a;
 			}
@@ -342,29 +352,37 @@ public class Unit extends Thing {
 		}
 	}
 
-	public boolean doAttacks(World world) {
+	public final boolean doAttacks(World world) {
 		boolean attacked = false;
+		// remove already finished planned actions
 		if(!actionQueue.isEmpty()) {
 			PlannedAction plan = actionQueue.peek();
 			if(plan.isDone(getTile())) {
 				actionQueue.poll();
 			}
+		}
+		if(!readyToAttack()) {
+			return false;
+		}
+		if(!actionQueue.isEmpty()) {
+			PlannedAction plan = actionQueue.peek();
 			if(plan.target != null) {
 				if(plan.isBuildAction() && unitType.isBuilder() && inRange(plan.target)) {
 					boolean finished = buildBuilding((Building)plan.target);
+					attacked = true;
 				}
 				else {
-					attacked = Attack.tryToAttack(this, plan.target);
+					attacked = attack(plan.target);
 				}
 			}
 		}
-		if (!attacked && getFaction() != World.NEUTRAL_FACTION && isGuarding()) {
+		if (!attacked && isGuarding()) {
 			HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getType().getCombatStats().getAttackRadius());
 			for (Tile tile : inrange) {
 				if (tile.getIsTerritory() == getFaction()) {
 					for (Unit unit : tile.getUnits()) {
 						if (unit.getFaction() != this.getFaction() && unit.getType().isHostile() && unit != this) {
-							attacked = attacked || Attack.tryToAttack(this, unit);
+							attacked = attacked || attack(unit);
 							if (attacked) {
 								break;
 							}

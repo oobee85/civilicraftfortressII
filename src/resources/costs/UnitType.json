@@ -44,7 +44,7 @@
 		"research":"ENGINEERING"},
 	{
 		"image":"resources/Images/units/catapult.png",
-		"cost":{"WOOD":1000,"MITHRIL_BAR":5},
+		"cost":{"WOOD":1000,"MITHRIL_BAR":5,"STONE":100},
 		"stats":{"movespeed":50,"attackspeed":100,"attack":0,"buildtime":750,"range":10,"health":200,"healspeed":100},
 		"name":"CATAPULT",
 		"attributes":["hostile"],
@@ -52,11 +52,19 @@
 		"research":"MATHEMATICS"},
 	{
 		"image":"resources/Images/units/trebuchet.png",
-		"cost":{"RUNITE_BAR":10,"WOOD":1000},
+		"cost":{"RUNITE_BAR":10,"WOOD":1000,"COAL":100,"STONE":100},
 		"stats":{"movespeed":50,"attackspeed":100,"attack":0,"buildtime":1000,"range":20,"health":200,"healspeed":100},
 		"name":"TREBUCHET",
 		"attributes":["hostile"],
 		"projectile":"FIREBALL_TREBUCHET",
+		"research":"MONARCHY"},
+	{
+		"image":"resources/Images/units/sniper.png",
+		"cost":{"MITHRIL_SWORD":5,"ADAMANT_SWORD":5,"RUNE_SWORD":5,"TITANIUM_SWORD":5},
+		"stats":{"movespeed":100,"attackspeed":200,"attack":0,"buildtime":2000,"range":30,"health":20,"healspeed":50},
+		"name":"SNIPER",
+		"projectile":"BULLET",
+		"attributes":["hostile"],
 		"research":"MONARCHY"},
 	{
 		"image":"resources/Images/units/horseman.png",
@@ -126,7 +134,7 @@
 		"loot":{"FOOD":200}},
 	{
 		"image":"resources/Images/units/dragon.png",
-		"stats":{"movespeed":5,"attackspeed":30,"attack":50,"buildtime":0,"range":1,"health":2000,"healspeed":10},
+		"stats":{"movespeed":5,"attackspeed":30,"attack":50,"buildtime":0,"range":4,"health":2000,"healspeed":10},
 		"name":"DRAGON",
 		"attributes":["flying","hostile","fireresistant","coldresistant"],
 		"loot":{"RUNITE_ORE":10},
@@ -215,9 +223,9 @@
 		"attributes":["flying"]},
 	{
 		"image":"resources/Images/units/bomb.png",
-		"stats":{"movespeed":25,"attackspeed":1000,"attack":0,"buildtime":0,"range":0,"health":1,"healspeed":50},
+		"stats":{"movespeed":25,"attackspeed":1,"attack":1,"buildtime":0,"range":0,"health":1,"healspeed":50},
 		"name":"BOMB",
-		"attributes":[]},
+		"attributes":["hostile"]},
 	{
 		"image":"resources/Images/units/trader.png",
 		"stats":{"movespeed":15,"attackspeed":20,"attack":40,"buildtime":0,"range":1,"health":500,"healspeed":50},

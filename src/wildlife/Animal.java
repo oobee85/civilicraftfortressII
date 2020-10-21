@@ -10,8 +10,6 @@ import world.*;
 
 public class Animal extends Unit {
 	
-	private Thing plantTarget;
-	
 	private int migratingUntil;
 	
 	public Animal(UnitType type, Tile tile, Faction faction) {
@@ -153,24 +151,17 @@ public class Animal extends Unit {
 			}
 		}
 		else {
-			if(!getType().isHostile() && getTile().getPlant() != null) {
-				if(readyToAttack()) {
-					plantTarget = getTile().getPlant();
+			if(getTile().getPlant() != null) {
+				queuePlannedAction(new PlannedAction(getTile().getPlant()));
+			}
+			else {
+				for(Tile neighbor : getTile().getNeighbors()) {
+					if(neighbor.getPlant() != null) {
+						queuePlannedAction(new PlannedAction(neighbor.getPlant()));
+					}
 				}
 			}
 		}
-	}
-	
-	@Override
-	public boolean doAttacks(World world) {
-		boolean attacked = super.doAttacks(world);
-		if(!attacked && plantTarget != null && inRange(plantTarget)) {
-			attacked = Attack.tryToAttack(this, plantTarget);
-			if(plantTarget.isDead()) {
-				plantTarget = null;
-			}
-		}
-		return attacked;
 	}
 	
 	@Override
