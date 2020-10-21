@@ -29,6 +29,7 @@ public class LavaGolem extends Animal {
 				if(building.getType() == Game.buildingTypeMap.get("MINE")) {
 					clearPlannedActions();
 					queuePlannedAction(new PlannedAction(building));
+					return;
 				}
 			}
 		}

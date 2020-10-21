@@ -63,6 +63,7 @@ public class Werewolf extends Animal {
 				if(unit.getFaction() == World.PLAYER_FACTION) {
 					clearPlannedActions();
 					queuePlannedAction(new PlannedAction(unit));
+					return;
 				}
 			}
 		}
