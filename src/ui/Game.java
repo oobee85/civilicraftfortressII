@@ -102,10 +102,12 @@ public class Game {
 	public void weatherEvents() {
 
 		
-		if(ticks >= 12000 && Math.random() < 0.00001) {
+		if(days > 10 && Math.random() < 0.00001) {
 			meteorStrike();
 		}
-		
+		if(days % 20 == 0) {
+			meteorStrike();
+		}
 
 		// rain event
 		if(Math.random() < 0.008) {
@@ -188,12 +190,18 @@ public class Game {
 			}
 			
 		}
-		if(days % 10 == 0) {
-			for(int i = 0; i < days/10; i++) {
+		if(days % 8 == 0) {
+			for(int i = 0; i < days/8; i++) {
 				world.spawnOgre();
 				System.out.println("ogre");
 			}
 			
+		}
+		if(days % 10 == 0) {
+			for(int i = 0; i < days/10; i++) {
+				world.spawnSkeletonArmy();
+				System.out.println("skeletons");
+			}
 		}
 		if(days % 20 == 0) {
 			spawnOrcs();
@@ -213,7 +221,7 @@ public class Game {
 			}
 		}
 		if(days >= 5) {
-			int number = (int)(Math.random()*days/2);
+			int number = (int)(Math.random()*days/4);
 			for(int i = 0; i < number; i++) {
 				world.spawnEnt();
 				System.out.println("ENT: " + number + ", " + days);

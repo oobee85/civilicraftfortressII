@@ -203,7 +203,9 @@ public class World {
 		if(potential.isPresent()) {
 			Tile t = potential.get();
 			for(Tile tile : t.getNeighbors()) {
-				spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, World.NEUTRAL_FACTION);
+				spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, World.CYCLOPS_FACTION);
+				spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, World.CYCLOPS_FACTION);
+				spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, World.CYCLOPS_FACTION);
 			}
 		}
 	}

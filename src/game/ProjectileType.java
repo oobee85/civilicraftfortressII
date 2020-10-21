@@ -20,8 +20,8 @@ public enum ProjectileType implements HasImage {
 		ROCK_CATAPULT(200, 3, "resources/Images/itemicons/rock.png", 1, 3, null),
 		ROCK_CYCLOPS(80, 3, "resources/Images/itemicons/rock.png", 1, 2, null),
 		ROCK_STONE_GOLEM(200, 5, "resources/Images/itemicons/rock.png", 2, 3, null),
-		FIREBALL_DRAGON(100, 3, "resources/Images/projectiles/fireball2.png", 2, 3, GroundModifierType.FIRE),
-		FIREBALL_TREBUCHET(400, 3, "resources/Images/projectiles/fireball.png", 2, 3, GroundModifierType.FIRE),
+		FIREBALL_DRAGON(100, 3, "resources/Images/projectiles/fireball2.png", 2, 3, null),
+		FIREBALL_TREBUCHET(400, 3, "resources/Images/projectiles/fireball.png", 2, 3, null),
 		BULLET(1000, 0, "resources/Images/projectiles/bullet.png", 1, 1, null),
 		FIREWAVE(200, 6, "resources/Images/ground_modifiers/fire.gif", 1, 3, GroundModifierType.FIRE),
 		
@@ -47,7 +47,7 @@ public enum ProjectileType implements HasImage {
 	}
 
 	public boolean isExplosive() {
-		return (radius > 1 && groundModifierType == GroundModifierType.FIRE);
+		return (radius > 1);
 	}
 	public int getDamage() {
 		return damage;

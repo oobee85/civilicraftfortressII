@@ -63,6 +63,7 @@ public class UnitTypeInfoPanel extends InfoPanel {
 			g.setColor(currentAmount >= entry.getValue() ? Color.black : Color.red);
 			g.drawString(str, x + iconSize + gap + 1, y + iconSize/2 + fontSize/3);
 			y += iconSize + gap;
+			g.setColor(Color.black);
 		}
 	}
 	

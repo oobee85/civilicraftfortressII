@@ -93,7 +93,7 @@ public class Building extends Thing {
 			int extraFood = 0;
 			//irrigation produces extra food when placed on water
 			if(getTile().liquidType == LiquidType.WATER && getTile().liquidAmount > 0) {
-				extraFood = (int) (getTile().liquidAmount * 50);
+				extraFood = (int) (getTile().liquidAmount * 10 + 0.5);
 			}
 			getFaction().addItem(ItemType.FOOD, 1 + extraFood);
 			resetTimeToHarvest();
