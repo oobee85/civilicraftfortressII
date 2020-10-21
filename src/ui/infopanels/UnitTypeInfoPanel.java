@@ -58,7 +58,9 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		
 		for(Entry<ItemType, Integer> entry : costs.entrySet()) {
 			g.drawImage(entry.getKey().getImage(iconSize), x, y, iconSize, iconSize, null);
-			String str = entry.getValue() + " " + entry.getKey().toString();
+			int currentAmount = World.PLAYER_FACTION.getItemAmount(entry.getKey());
+			String str = currentAmount + "/" + entry.getValue() + " " + entry.getKey().toString();
+			g.setColor(currentAmount >= entry.getValue() ? Color.black : Color.red);
 			g.drawString(str, x + iconSize + gap + 1, y + iconSize/2 + fontSize/3);
 			y += iconSize + gap;
 		}
