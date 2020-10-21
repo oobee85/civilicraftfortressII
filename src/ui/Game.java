@@ -1052,11 +1052,11 @@ public class Game {
 //		}
 //	}
 	
-	public void craftItem(ItemType type) {
+	public void craftItem(ItemType type, int amount) {
 		BuildingType requiredBuilding = Game.buildingTypeMap.get(type.getBuilding());
 		for(Building building : world.buildings) {
 			if(building.getType() == requiredBuilding && building.getFaction() == World.PLAYER_FACTION) {
-				if(World.PLAYER_FACTION.canAfford(type.getCost())) {
+				for(int i = 0; i < amount && World.PLAYER_FACTION.canAfford(type.getCost()); i++) {
 					World.PLAYER_FACTION.payCost(type.getCost());
 					World.PLAYER_FACTION.addItem(type, 1);
 				}

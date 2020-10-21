@@ -963,7 +963,11 @@ public class Frame extends JPanel {
 					BUILDING_BUTTON_SIZE);
 			button.setEnabled(false);
 			button.addActionListener(e -> {
-				gameInstance.craftItem(type);
+				int amount = 1;
+				if((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
+					amount = 10;
+				}
+				gameInstance.craftItem(type, amount);
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ItemTypeInfoPanel(type));
@@ -997,7 +1001,11 @@ public class Frame extends JPanel {
 					BUILDING_BUTTON_SIZE);
 			button.setEnabled(false);
 			button.addActionListener(e -> {
-				gameInstance.craftItem(type);
+				int amount = 1;
+				if((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
+					amount = 10;
+				}
+				gameInstance.craftItem(type, amount);
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ItemTypeInfoPanel(type));
@@ -1029,7 +1037,11 @@ public class Frame extends JPanel {
 			button.setEnabled(false);
 			if(type.getCost() != null) {
 				button.addActionListener(e -> {
-					gameInstance.craftItem(type);
+					int amount = 1;
+					if((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
+						amount = 10;
+					}
+					gameInstance.craftItem(type, amount);
 				});
 			}
 			button.addRightClickActionListener(e -> {
