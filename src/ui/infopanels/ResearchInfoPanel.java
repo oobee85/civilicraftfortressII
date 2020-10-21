@@ -1,7 +1,6 @@
 package ui.infopanels;
 
 import java.awt.*;
-import java.util.HashMap;
 
 import game.*;
 import ui.*;

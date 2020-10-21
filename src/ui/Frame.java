@@ -69,7 +69,7 @@ public class Frame extends JPanel {
 	private JPanel guiSplitter;
 	private JComboBox<MapType> mapType;
 	private JPanel resourcePanel;
-	private JLabel[] resourceIndicators = new JLabel[ItemType.values().length];
+	private JButton[] resourceIndicators = new JButton[ItemType.values().length];
 	private boolean[] resourceIndicatorsAdded = new boolean[ItemType.values().length];
 	private HashMap<JButton, ResearchType> researchButtons = new HashMap<>();
 	private JButton[] buildingButtons;
@@ -949,13 +949,13 @@ public class Frame extends JPanel {
 		}
 		
 		blacksmithView = new JPanel();
+		BuildingType blacksmithType = Game.buildingTypeMap.get("BLACKSMITH");
 		for (int i = 0; i < ItemType.values().length; i++) {
 			final ItemType type = ItemType.values()[i];
 			if (type.getCost() == null) {
 				continue;
 			}
-			
-			if(type == ItemType.ADAMANTITE_BAR || type == ItemType.ADAMANT_SWORD || type == ItemType.RUNITE_BAR || type == ItemType.RUNE_SWORD || type == ItemType.TITANIUM_BAR || type == ItemType.TITANIUM_SWORD) {
+			if(Game.buildingTypeMap.get(type.getBuilding()) != blacksmithType) {
 				continue;
 			}
 			KButton button = KUIConstants.setupButton(type.toString(),
@@ -983,54 +983,26 @@ public class Frame extends JPanel {
 		}
 		
 		hellforgeView = new JPanel();
+		BuildingType hellforgeType = Game.buildingTypeMap.get("HELLFORGE");
 		for (int i = 0; i < ItemType.values().length; i++) {
 			final ItemType type = ItemType.values()[i];
 			if (type.getCost() == null) {
 				continue;
 			}
-			if (type != ItemType.ADAMANTITE_BAR && type != ItemType.ADAMANT_SWORD && type != ItemType.RUNITE_BAR
-					&& type != ItemType.RUNE_SWORD && type != ItemType.TITANIUM_BAR
-							&& type != ItemType.TITANIUM_SWORD) {
+			if(Game.buildingTypeMap.get(type.getBuilding()) != hellforgeType) {
 				continue;
 			}
-				KButton button = KUIConstants.setupButton(type.toString(),
-						Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
-						BUILDING_BUTTON_SIZE);
-				button.setEnabled(false);
-				button.addActionListener(e -> {
-					gameInstance.craftItem(type);
-				});
-				button.addRightClickActionListener(e -> {
-					switchInfoPanel(new ItemTypeInfoPanel(type));
-				});
-				button.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseEntered(MouseEvent e) {
-						pushInfoPanel(new ItemTypeInfoPanel(type));
-					}
-					@Override
-					public void mouseExited(MouseEvent e) {
-						popInfoPanel();
-					}
-				});
-
-				craftButtons[i] = button;
-				hellforgeView.add(button);
-		}
-
-		barracksView = new JPanel();
-		buttons = populateUnitTypeUI(barracksView, Game.buildingTypeMap.get("BARRACKS"), BUILDING_ICON_SIZE);
-		Collections.addAll(unitButtons, buttons);
-
-		for (int i = 0; i < ItemType.values().length; i++) {
-			ItemType type = ItemType.values()[i];
-			KLabel label = KUIConstants.setupLabel("",
-					Utils.resizeImageIcon(type.getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE),
-					RESOURCE_BUTTON_SIZE);
-			label.addRightClickActionListener(e -> {
+			KButton button = KUIConstants.setupButton(type.toString(),
+					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
+					BUILDING_BUTTON_SIZE);
+			button.setEnabled(false);
+			button.addActionListener(e -> {
+				gameInstance.craftItem(type);
+			});
+			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ItemTypeInfoPanel(type));
 			});
-			label.addMouseListener(new MouseAdapter() {
+			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
 					pushInfoPanel(new ItemTypeInfoPanel(type));
@@ -1040,7 +1012,40 @@ public class Frame extends JPanel {
 					popInfoPanel();
 				}
 			});
-			resourceIndicators[i] = label;
+
+			craftButtons[i] = button;
+			hellforgeView.add(button);
+		}
+
+		barracksView = new JPanel();
+		buttons = populateUnitTypeUI(barracksView, Game.buildingTypeMap.get("BARRACKS"), BUILDING_ICON_SIZE);
+		Collections.addAll(unitButtons, buttons);
+
+		for (int i = 0; i < ItemType.values().length; i++) {
+			ItemType type = ItemType.values()[i];
+			KButton button = KUIConstants.setupButton("",
+					Utils.resizeImageIcon(type.getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE),
+					RESOURCE_BUTTON_SIZE);
+			button.setEnabled(false);
+			if(type.getCost() != null) {
+				button.addActionListener(e -> {
+					gameInstance.craftItem(type);
+				});
+			}
+			button.addRightClickActionListener(e -> {
+				switchInfoPanel(new ItemTypeInfoPanel(type));
+			});
+			button.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					pushInfoPanel(new ItemTypeInfoPanel(type));
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					popInfoPanel();
+				}
+			});
+			resourceIndicators[i] = button;
 		}
 
 		tileSize = KUIConstants.setupLabel("TileSize = " + gameInstance.getTileSize(), null, DEBUG_BUTTON_SIZE);

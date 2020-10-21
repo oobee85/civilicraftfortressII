@@ -1053,9 +1053,15 @@ public class Game {
 //	}
 	
 	public void craftItem(ItemType type) {
-		if(World.PLAYER_FACTION.canAfford(type.getCost())) {
-			World.PLAYER_FACTION.payCost(type.getCost());
-			World.PLAYER_FACTION.addItem(type, 1);
+		BuildingType requiredBuilding = Game.buildingTypeMap.get(type.getBuilding());
+		for(Building building : world.buildings) {
+			if(building.getType() == requiredBuilding && building.getFaction() == World.PLAYER_FACTION) {
+				if(World.PLAYER_FACTION.canAfford(type.getCost())) {
+					World.PLAYER_FACTION.payCost(type.getCost());
+					World.PLAYER_FACTION.addItem(type, 1);
+				}
+				return;
+			}
 		}
 	}
 
