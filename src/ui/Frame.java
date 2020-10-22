@@ -1341,8 +1341,8 @@ public class Frame extends JPanel {
 			}
 		});
 		terrainImageThread = new Thread(() -> {
-			try {
-				while (true) {
+			while (true) {
+				try {
 					long start = System.currentTimeMillis();
 					gameInstance.updateTerrainImages();
 					long elapsed = System.currentTimeMillis() - start;
@@ -1350,9 +1350,12 @@ public class Frame extends JPanel {
 					if(sleeptime > 0) {
 						Thread.sleep(sleeptime);
 					}
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					if(e1 instanceof InterruptedException) {
+						break;
+					}
 				}
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
 			}
 		});
 

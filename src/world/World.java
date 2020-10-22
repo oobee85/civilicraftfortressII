@@ -15,7 +15,7 @@ import wildlife.*;
 
 public class World {
 
-	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 5;
+	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 10;
 	public static final double TERRAIN_SNOW_LEVEL = 1;
 //	public static final double DESERT_HUMIDITY = 0.001;
 	public static final double DESERT_HUMIDITY = 2;
@@ -132,10 +132,8 @@ public class World {
 			if(temperature < Season.FREEZING_TEMPURATURE) {
 				if(t.liquidType == LiquidType.DRY) {
 					t.liquidType = LiquidType.SNOW;
-					t.liquidAmount += 0.05;
-				}else {
-					t.liquidAmount += 0.005;
 				}
+				t.liquidAmount += 0.1;
 				
 			}
 			else {

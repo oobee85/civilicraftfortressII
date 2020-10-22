@@ -124,11 +124,12 @@ public class Liquid {
 			if(tile.liquidType == LiquidType.ICE) {
 				tile.liquidType = LiquidType.WATER;
 				liquidTypesTemp[x][y] = LiquidType.WATER;
+				liquidAmountsTemp[x][y] /= 4;
 			}
 			if(tile.liquidType == LiquidType.SNOW) {
 				tile.liquidType = LiquidType.WATER;
 				liquidTypesTemp[x][y] = LiquidType.WATER;
-				liquidAmountsTemp[x][y] /= 5;
+				liquidAmountsTemp[x][y] /= 4;
 			}
 		}
 		else if(tempurature < Season.FREEZING_TEMPURATURE) {
@@ -138,8 +139,7 @@ public class Liquid {
 			}
 		}
 		
-		List<Tile> neighbors = Utils.getNeighbors(tile, world);
-		for(Tile otherTile : neighbors) {
+		for(Tile otherTile : tile.getNeighbors()) {
 			TileLoc other = otherTile.getLocation();
 			LiquidType otype = liquidTypesTemp[other.x][other.y];
 			if(otype.viscosity == 0) {
@@ -162,9 +162,8 @@ public class Liquid {
 				if(ov - change < 0) {
 					change = ov;
 				}
-				
 				if(otype == mytype || mytype == LiquidType.DRY || (otype.isWater && mytype.isWater)) {
-					if(myv < MINIMUM_LIQUID_THRESHOLD && change < otype.surfaceTension) { 
+					if(change < otype.selfSurfaceTension) { 
 						change = 0;
 					}
 					// disabled erosion due to making it hard to parallelize
