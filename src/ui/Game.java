@@ -167,15 +167,14 @@ public class Game {
 		guiController.updateGUI();
 	}
 	private void makeAnimal(Tile tile, UnitType unitType, int number) {
-		for(Tile t: tile.getNeighbors()) {
+		for(Tile t: Utils.getTilesInRadius(tile, world, Math.max(1, (int)(Math.sqrt(number))-2))) {
 			if(number > 0) {
 				world.spawnAnimal(unitType, t, World.NO_FACTION);
 				number --;
-			}else {
+			}
+			else {
 				break;
 			}
-			
-			
 		}
 		
 	}
@@ -185,9 +184,8 @@ public class Game {
 			for(int i = 0; i < days/5; i++) {
 				world.spawnLavaGolem();
 				world.spawnIceGiant();
-				System.out.println("lava");
-				System.out.println("ice");
 			}
+			System.out.println(days/5 + " lava & ice giants");
 			
 		}
 		if(days % 20 == 0) {
@@ -196,23 +194,23 @@ public class Game {
 		if(days % 8 == 0) {
 			for(int i = 0; i < days/8; i++) {
 				world.spawnOgre();
-				System.out.println("ogre");
 			}
+			System.out.println(days/8 + " ogres");
 			
 		}
 		if(days % 10 == 0) {
 			for(int i = 0; i < days/10; i++) {
 				world.spawnSkeletonArmy();
-				System.out.println("skeletons");
 			}
+			System.out.println(days/10 + " skeletons");
 		}
 		if(days % 20 == 0) {
-			spawnOrcs();
-			System.out.println("orcs");
+			spawnCyclops();
+			System.out.println("cyclops");
 		}
 		if(days % 15 == 0) {
 			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), World.NO_FACTION);
-			System.out.println("PARASITE");
+			System.out.println("parasite");
 		}
 		
 		
@@ -220,26 +218,26 @@ public class Game {
 			int number = (int)(Math.random() / Season.FREEZING_TEMPURATURE * days/10);
 			for(int i = 0; i < number; i++) {
 				world.spawnIceGiant();
-				System.out.println("ICE_GIANT: " + number + ", " + days);
 			}
+			System.out.println(number + " ice giants");
 		}
 		if(days >= 5) {
 			int number = (int)(Math.random()*days/4);
 			for(int i = 0; i < number; i++) {
 				world.spawnEnt();
-				System.out.println("ENT: " + number + ", " + days);
 			}
+			System.out.println(number + " ents");
 			
 		}
 		if(days >= 1) {
 			int number = (int)(Season.MELTING_TEMPURATURE + Math.random()*days);
 			makeAnimal(world.getTilesRandomly().getFirst(), Game.unitTypeMap.get("FLAMELET"), number);
-			System.out.println("FLAMELET: " + number + ", " + days);
+			System.out.println(number + " flamelets");
 		}
 		
 		if(Math.random() < 0.2) {
 			makeAnimal(world.getTilesRandomly().getFirst(), Game.unitTypeMap.get("WATER_SPIRIT"), 4);
-			System.out.println("WATER_SPIRIT: " + ", " + days);
+			System.out.println(4 + " water spirits");
 		}
 //		if(ticks >= 3000 && Math.random() < 0.0005) {
 //			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
@@ -288,7 +286,7 @@ public class Game {
 			world.spawnIceGiant();
 			world.spawnSkeletonArmy();
 			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), World.NO_FACTION);
-			spawnOrcs();
+			spawnCyclops();
 		}
 		for(int i = 0; i < num/2; i++) {
 			spawnEverything();
@@ -313,7 +311,7 @@ public class Game {
 		}
 		world.clearDeadAndAddNewThings();
 	}
-	public void spawnOrcs() {
+	public void spawnCyclops() {
 		LinkedList<Tile> tiles = world.getTilesRandomly();
 		Tile tile = tiles.peek();
 		for(Tile t : tiles) {
