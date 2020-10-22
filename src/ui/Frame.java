@@ -32,7 +32,7 @@ public class Frame extends JPanel {
 
 	private static final int TAB_ICON_SIZE = 25;
 	private ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon BUILDING_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon MAKE_UNIT_TAB_ICON = Utils.resizeImageIcon(Game.unitTypeMap.get("WARRIOR").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon CITY_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("CASTLE").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon BARRACKS_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("BARRACKS").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon WORKSHOP_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("WORKSHOP").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
@@ -43,6 +43,7 @@ public class Frame extends JPanel {
 
 	private ImageIcon COLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/collapsed.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon UNCOLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/uncollapsed.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon FAST_FORWARD_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/fastforward.PNG"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	
 	private Timer repaintingThread;
 	private JToggleButton easyModeButton;
@@ -55,16 +56,15 @@ public class Frame extends JPanel {
 	private JPanel minimapPanel;
 	private JPanel infoPanel;
 	private LinkedList<JPanel> infoPanelStack = new LinkedList<>();
-	private JPanel castleView;
+	private JPanel makeUnitView;
 	private JPanel blacksmithView;
 	private JPanel hellforgeView;
-	private JPanel barracksView;
-	private JPanel workshopView;
+//	private JPanel barracksView;
+//	private JPanel workshopView;
 	private JPanel tileView;
 	private JPanel workerMenu;
 	private JPanel spawnMenu;
 	private JPanel researchView;
-	private JPanel buildingPlanner;
 	private JPanel statView;
 	private JLabel tileSize;
 	private JTabbedPane tabbedPane;
@@ -75,7 +75,6 @@ public class Frame extends JPanel {
 	private boolean[] resourceIndicatorsAdded = new boolean[ItemType.values().length];
 	private HashMap<JButton, ResearchType> researchButtons = new HashMap<>();
 	private JButton[] buildingButtons;
-	private JButton[] planningButtons;
 	private class Pair {
 		public final JButton button;
 		public final UnitType unitType;
@@ -103,9 +102,8 @@ public class Frame extends JPanel {
 	private int BLACKSMITH_TAB;
 	private int HELLFORGE_TAB;
 	private int DEBUG_TAB;
-	private int BUILDING_TAB;
-	private int BARRACKS_TAB;
-	private int WORKSHOP_TAB;
+//	private int BARRACKS_TAB;
+//	private int WORKSHOP_TAB;
 	private int CASTLE_TAB;
 	private int STAT_TAB;
 	private int SPAWN_TAB;
@@ -131,7 +129,7 @@ public class Frame extends JPanel {
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {
 				if (building.getType() == Game.buildingTypeMap.get("BARRACKS")) {
-					manageBarracksTab(selected);
+					manageCastleTab(selected);
 				}
 				if (building.getType() == Game.buildingTypeMap.get("CASTLE")) {
 					manageCastleTab(selected);
@@ -143,7 +141,7 @@ public class Frame extends JPanel {
 					manageHellforgeTab(selected);
 				}
 				if (building.getType() == Game.buildingTypeMap.get("WORKSHOP")) {
-					manageWorkshopTab(selected);
+					manageCastleTab(selected);
 				}
 				if (building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
 					manageResearchLabTab(selected);
@@ -253,27 +251,30 @@ public class Frame extends JPanel {
 				for (int i = 0; i < Game.buildingTypeList.size(); i++) {
 					BuildingType type = Game.buildingTypeList.get(i);
 					JButton button = buildingButtons[i];
-					JButton button2 = planningButtons[i];
 					if (World.PLAYER_FACTION.areRequirementsMet(type)) {
 						button.setEnabled(true);
 //						button.setVisible(true);
-						button2.setEnabled(true);
-//						button2.setVisible(true);
 					} else {
 						button.setEnabled(false);
 //						button.setVisible(false);
-						button2.setEnabled(false);
-//						button2.setVisible(false);
 					}
 				}
+				boolean castleSelected = World.PLAYER_FACTION.isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("CASTLE"));
+				boolean barracksSelected = World.PLAYER_FACTION.isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("BARRACKS"));
+				boolean workshopSelected = World.PLAYER_FACTION.isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("WORKSHOP"));
+				
 				for(Pair pair : unitButtons) {
-					if (World.PLAYER_FACTION.areRequirementsMet(pair.unitType)) {
-						pair.button.setEnabled(true);
-						pair.button.setVisible(true);
-					} else {
-						pair.button.setEnabled(false);
-						pair.button.setVisible(false);
+					if((castleSelected && Game.buildingTypeMap.get("CASTLE").unitsCanBuildSet().contains(pair.unitType)) 
+							|| (barracksSelected && Game.buildingTypeMap.get("BARRACKS").unitsCanBuildSet().contains(pair.unitType))
+							|| (workshopSelected && Game.buildingTypeMap.get("WORKSHOP").unitsCanBuildSet().contains(pair.unitType))) {
+						if (World.PLAYER_FACTION.areRequirementsMet(pair.unitType)) {
+							pair.button.setEnabled(true);
+							pair.button.setVisible(true);
+							continue;
+						}
 					}
+					pair.button.setEnabled(false);
+					pair.button.setVisible(false);
 				}
 				for (int i = 0; i < ItemType.values().length; i++) {
 					ItemType type = ItemType.values()[i];
@@ -678,22 +679,11 @@ public class Frame extends JPanel {
 		tabbedPane.setEnabledAt(WORKER_TAB, enabled);
 	}
 	
-	private void managePlanBuildingTab(boolean enabled) {
-		if (enabled == false && tabbedPane.getSelectedIndex() == BUILDING_TAB) {
-			tabbedPane.setSelectedIndex(0);
-		} else if (enabled == true) {
-			tabbedPane.setSelectedIndex(BUILDING_TAB);
-		}
-		tabbedPane.setEnabledAt(BUILDING_TAB, enabled);
-	}
-
 	private void manageCastleTab(boolean enabled) {
-		if (enabled == false && tabbedPane.getSelectedIndex() == CASTLE_TAB) {
-			tabbedPane.setSelectedIndex(0);
-		} else if (enabled == true) {
+		if(enabled) {
+			tabbedPane.setEnabledAt(CASTLE_TAB, enabled);
 			tabbedPane.setSelectedIndex(CASTLE_TAB);
 		}
-		tabbedPane.setEnabledAt(CASTLE_TAB, enabled);
 	}
 
 	private void manageBlacksmithTab(boolean enabled) {
@@ -711,23 +701,6 @@ public class Frame extends JPanel {
 			tabbedPane.setSelectedIndex(HELLFORGE_TAB);
 		}
 		tabbedPane.setEnabledAt(HELLFORGE_TAB, enabled);
-	}
-	private void manageBarracksTab(boolean enabled) {
-		if (enabled == false && tabbedPane.getSelectedIndex() == BARRACKS_TAB) {
-			tabbedPane.setSelectedIndex(0);
-		} else if (enabled == true) {
-			tabbedPane.setSelectedIndex(BARRACKS_TAB);
-		}
-		tabbedPane.setEnabledAt(BARRACKS_TAB, enabled);
-	}
-	
-	private void manageWorkshopTab(boolean enabled) {
-		if (enabled == false && tabbedPane.getSelectedIndex() == WORKSHOP_TAB) {
-			tabbedPane.setSelectedIndex(0);
-		} else if (enabled == true) {
-			tabbedPane.setSelectedIndex(WORKSHOP_TAB);
-		}
-		tabbedPane.setEnabledAt(WORKSHOP_TAB, enabled);
 	}
 	
 	private void manageResearchLabTab(boolean enabled) {
@@ -880,36 +853,6 @@ public class Frame extends JPanel {
 //			workerMenu.add(buildingButtons[i], c);
 //		}
 		
-		buildingPlanner = new JPanel();
-		planningButtons = new JButton[Game.buildingTypeList.size()];
-		for (int i = 0; i < Game.buildingTypeList.size(); i++) {
-			BuildingType type = Game.buildingTypeList.get(i);
-			KButton button = KUIConstants.setupButton(type.toString(),
-					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
-					BUILDING_BUTTON_SIZE);
-			button.addActionListener(e -> {
-				gameInstance.setBuildingToPlan(type);
-			});
-			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new BuildingTypeInfoPanel(type));
-			});
-			button.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					pushInfoPanel(new BuildingTypeInfoPanel(type));
-				}
-				@Override
-				public void mouseExited(MouseEvent e) {
-					popInfoPanel();
-				}
-			});
-			planningButtons[i] = button;
-			if(planningButtons[i].isVisible()) {
-				buildingPlanner.add(button);
-			}
-			
-		}
-		
 		spawnMenu = new JPanel();
 		for (int i = 0; i < Game.unitTypeList.size(); i++) {
 			UnitType type = Game.unitTypeList.get(i);
@@ -968,13 +911,13 @@ public class Frame extends JPanel {
 		spawnMenu.add(toggle);
 		
 		
-		castleView = new JPanel();
-		Pair[] buttons = populateUnitTypeUI(castleView, Game.buildingTypeMap.get("CASTLE"), BUILDING_ICON_SIZE);
+		makeUnitView = new JPanel();
+		Pair[] buttons = populateUnitTypeUI(makeUnitView, BUILDING_ICON_SIZE);
 		Collections.addAll(unitButtons, buttons);
 		
-		workshopView = new JPanel();
-		buttons = populateUnitTypeUI(workshopView, Game.buildingTypeMap.get("WORKSHOP"), BUILDING_ICON_SIZE);
-		Collections.addAll(unitButtons, buttons);
+//		workshopView = new JPanel();
+//		buttons = populateUnitTypeUI(workshopView, BUILDING_ICON_SIZE);
+//		Collections.addAll(unitButtons, buttons);
 		
 		blacksmithView = new JPanel();
 		BuildingType blacksmithType = Game.buildingTypeMap.get("BLACKSMITH");
@@ -1053,9 +996,9 @@ public class Frame extends JPanel {
 			hellforgeView.add(button);
 		}
 
-		barracksView = new JPanel();
-		buttons = populateUnitTypeUI(barracksView, Game.buildingTypeMap.get("BARRACKS"), BUILDING_ICON_SIZE);
-		Collections.addAll(unitButtons, buttons);
+//		barracksView = new JPanel();
+//		buttons = populateUnitTypeUI(barracksView, BUILDING_ICON_SIZE);
+//		Collections.addAll(unitButtons, buttons);
 
 		for (int i = 0; i < ItemType.values().length; i++) {
 			ItemType type = ItemType.values()[i];
@@ -1088,6 +1031,7 @@ public class Frame extends JPanel {
 			resourceIndicators[i] = button;
 		}
 
+		JPanel buttonPanel = new JPanel();
 		tileSize = KUIConstants.setupLabel("TileSize = " + gameInstance.getTileSize(), null, DEBUG_BUTTON_SIZE);
 
 		JToggleButton showHeightMap = KUIConstants.setupToggleButton("Show Height Map", null, DEBUG_BUTTON_SIZE);
@@ -1145,15 +1089,7 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JButton makeItDay = KUIConstants.setupButton("Day", null, DEBUG_BUTTON_SIZE);
-		makeItDay.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.fastForwardToDay();
-			}
-		});
-
-		JToggleButton fastForward = KUIConstants.setupToggleButton("Fast Forward", null, DEBUG_BUTTON_SIZE);
+		JToggleButton fastForward = KUIConstants.setupToggleButton("Fast Forward", FAST_FORWARD_ICON, DEBUG_BUTTON_SIZE);
 		fastForward.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -1162,11 +1098,12 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JButton researchEverything = KUIConstants.setupButton("Research", null, DEBUG_BUTTON_SIZE);
+		JButton researchEverything = KUIConstants.setupButton("Research All", null, DEBUG_BUTTON_SIZE);
 		researchEverything.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gameInstance.researchEverything();
+				buttonPanel.remove(researchEverything);
 			}
 		});
 
@@ -1234,7 +1171,6 @@ public class Frame extends JPanel {
 		int RESOURCE_PANEL_WIDTH = 100;
 		resourcePanel.setPreferredSize(new Dimension(RESOURCE_PANEL_WIDTH, 1000));
 //		resourcePanel.setLayout(new BoxLayout(resourcePanel, BoxLayout.Y_AXIS));
-		JPanel buttonPanel = new JPanel();
 		buttonPanel.setPreferredSize(new Dimension(GUIWIDTH - RESOURCE_PANEL_WIDTH, 1000));
 		buttonPanel.add(tileSize);
 
@@ -1243,7 +1179,6 @@ public class Frame extends JPanel {
 		buttonPanel.add(spawnUnit);
 		buttonPanel.add(makeItRain);
 		buttonPanel.add(makeItDry);
-		buttonPanel.add(makeItDay);
 		buttonPanel.add(fastForward);
 		buttonPanel.add(researchEverything);
 		buttonPanel.add(eruptVolcano);
@@ -1319,14 +1254,32 @@ public class Frame extends JPanel {
 		tabbedPane.setFocusable(false);
 		tabbedPane.setFont(KUIConstants.buttonFontSmall);
 
+		WORKER_TAB = tabbedPane.getTabCount();
+//		workerMenu.setPreferredSize(new Dimension(GUIWIDTH, 0));
+		JScrollPane scrollPane = new JScrollPane(workerMenu, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+		tabbedPane.insertTab("", WORKER_TAB_ICON, scrollPane, "Build buildings with worker.", WORKER_TAB);
+
+		CASTLE_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("", MAKE_UNIT_TAB_ICON, makeUnitView, "Does nothing", CASTLE_TAB);
+
+//		BARRACKS_TAB = tabbedPane.getTabCount();
+//		tabbedPane.insertTab("", BARRACKS_TAB_ICON, barracksView, "Does nothing", BARRACKS_TAB);
+//		
+//		WORKSHOP_TAB = tabbedPane.getTabCount();
+//		tabbedPane.insertTab("", WORKSHOP_TAB_ICON, workshopView, "Does nothing", WORKSHOP_TAB);
+
+		BLACKSMITH_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("", BLACKSMITH_TAB_ICON, blacksmithView, "Does nothing", BLACKSMITH_TAB);
+
+		HELLFORGE_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab("",HELLFORGE_TAB_ICON, hellforgeView, "Does nothing", HELLFORGE_TAB);
+		
 		RESEARCH_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab("Research", RESEARCH_TAB_ICON, researchView, "Does nothing");
 
 //		STAT_TAB = tabbedPane.getTabCount();
 //		tabbedPane.addTab("Unit Stats", STAT_TAB_ICON, statView, "Does nothing");
-		
-		BUILDING_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("plan buildings", BUILDING_TAB_ICON, buildingPlanner, "Does nothing", BUILDING_TAB);
 		
 		SPAWN_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("Spawner", Utils.resizeImageIcon(Game.unitTypeMap.get("ARCHER").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE), spawnMenu,
@@ -1338,36 +1291,14 @@ public class Frame extends JPanel {
 				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE),
 				buttonPanel, "Does nothing");
 		
-		WORKER_TAB = tabbedPane.getTabCount();
-//		workerMenu.setPreferredSize(new Dimension(GUIWIDTH, 0));
-		JScrollPane scrollPane = new JScrollPane(workerMenu, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-		tabbedPane.insertTab("", WORKER_TAB_ICON, scrollPane, "Does nothing", WORKER_TAB);
-
-		CASTLE_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("", CITY_TAB_ICON, castleView, "Does nothing", CASTLE_TAB);
-
-		BARRACKS_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("", BARRACKS_TAB_ICON, barracksView, "Does nothing", BARRACKS_TAB);
-		
-		WORKSHOP_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("", WORKSHOP_TAB_ICON, workshopView, "Does nothing", WORKSHOP_TAB);
-
-		BLACKSMITH_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("", BLACKSMITH_TAB_ICON, blacksmithView, "Does nothing", BLACKSMITH_TAB);
-
-		HELLFORGE_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("",HELLFORGE_TAB_ICON, hellforgeView, "Does nothing", HELLFORGE_TAB);
-		
 
 		// remove building tab after setting all of the tabs up
 		manageBuildingTab(false);
-		manageCastleTab(false);
 		manageBlacksmithTab(false);
 		manageHellforgeTab(false);
-		manageWorkshopTab(false);
+//		manageWorkshopTab(false);
 		manageResearchLabTab(false);
-		manageBarracksTab(false);
+//		manageBarracksTab(false);
 		manageSpawnTab(true);
 		
 
@@ -1443,10 +1374,10 @@ public class Frame extends JPanel {
 		gameUIReady.release();
 	}
 	
-	public Pair[] populateUnitTypeUI(JPanel panel, BuildingType buildingType, int BUILDING_ICON_SIZE) {
-		Pair[] pairs = new Pair[buildingType.unitsCanBuild().length];
-		for(int i = 0; i < buildingType.unitsCanBuild().length; i++) {
-			UnitType type = Game.unitTypeMap.get(buildingType.unitsCanBuild()[i]);
+	public Pair[] populateUnitTypeUI(JPanel panel, int BUILDING_ICON_SIZE) {
+		Pair[] pairs = new Pair[Game.unitTypeList.size()];
+		for(int i = 0; i < Game.unitTypeList.size(); i++) {
+			UnitType type = Game.unitTypeList.get(i);
 			KButton button = KUIConstants.setupButton("Build " + type.toString(),
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.addActionListener(e -> {

@@ -74,6 +74,8 @@ public class Driver {
 		Loader.loadResearchType(Game.researchTypeMap, Game.researchTypeList);
 		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
 		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);
+		
+		Loader.doMappings();
 	}
 	
 	public static void main(String[] run) {

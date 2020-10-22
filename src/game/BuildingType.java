@@ -10,16 +10,18 @@ public class BuildingType implements HasImage {
 
 	private final String name;
 	private final double health;
-	private MipMap mipmap;
-	private HashMap<String, Image> roadImages;
-	private double moveSpeedEnhancement;
-	private int visionRadius;
-	private String researchRequirement;
-	public double cultureRate;
-	private double buildingEffort;
-	private HashMap <ItemType, Integer> cost;
+	private final MipMap mipmap;
+	private final double moveSpeedEnhancement;
+	private final int visionRadius;
+	private final String researchRequirement;
+	public final double cultureRate;
+	private final double buildingEffort;
+	private final HashMap <ItemType, Integer> cost;
 	private final HashSet<String> attributes;
-	private String[] canBuild;
+	private final String[] canBuild;
+	private final HashSet<UnitType> canBuildSet = new HashSet<>();
+	
+	private HashMap<String, Image> roadImages;
 	
 	public BuildingType(String name, double hp, double buildingEffort, String s, double cultureRate, int visionRadius, 
 			String requirement, HashMap <ItemType, Integer> resourcesNeeded, String[] canBuild, double moveSpeedEnhancement, HashSet<String> attributes) {
@@ -38,6 +40,9 @@ public class BuildingType implements HasImage {
 		if(isRoad()) {
 			roadImages = ImageCreation.createRoadImages(s);
 		}
+	}
+	public HashSet<UnitType> unitsCanBuildSet() {
+		return canBuildSet;
 	}
 	public String[] unitsCanBuild(){
 		return canBuild;

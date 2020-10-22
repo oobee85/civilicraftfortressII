@@ -65,7 +65,7 @@ public class Loader {
 					attributes.add(attributelist.getString(j));
 				}
 			}
-			String[] buildsunits = null;
+			String[] buildsunits = new String[0];
 			if(buildingTypeObject.has("buildsunits")) {
 				JSONArray buildsUnitsArray = buildingTypeObject.getJSONArray("buildsunits");
 				buildsunits = new String[buildsUnitsArray.length()];
@@ -299,7 +299,12 @@ public class Loader {
 			researchTypeList.add(researchType);
 		}
 	}
-
-	public static void setupResearch(HashMap<String, Research> researches, ArrayList<Research> researchList) {
+	
+	public static void doMappings() {
+		for(BuildingType type : Game.buildingTypeList) {
+			for(String unittypestring : type.unitsCanBuild()) {
+				type.unitsCanBuildSet().add(Game.unitTypeMap.get(unittypestring));
+			}
+		}
 	}
 }

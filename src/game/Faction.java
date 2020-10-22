@@ -35,6 +35,16 @@ public class Faction {
 		this.name = name;
 		this.usesItems = usesItems;
 	}
+
+	public boolean isBuildingSelected(World world, BuildingType type) {
+		for(Building building : world.buildings) {
+			if(building.getIsSelected() && building.getFaction() == this && building.getType() == type) {
+				return true;
+			}
+		}
+		return false;
+	
+	}
 	
 	public boolean hasResearchLab(World world) {
 		for(Building building : world.buildings) {
