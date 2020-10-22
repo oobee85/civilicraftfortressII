@@ -26,15 +26,17 @@ public class Frame extends JPanel {
 
 	public static final Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
 	public static final Dimension DEBUG_BUTTON_SIZE = new Dimension(140, 30);
+	public static final Dimension LONG_BUTTON_SIZE = new Dimension(285, 30);
 	public static final Dimension SPAWN_BUTTON_SIZE = new Dimension(30, 30);
 	public static final Dimension BUILD_UNIT_BUTTON_SIZE = new Dimension(170, 35);
 
 	private static final int TAB_ICON_SIZE = 25;
 	private ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon MAKE_UNIT_TAB_ICON = Utils.resizeImageIcon(Game.unitTypeMap.get("WARRIOR").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon MAKE_UNIT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/barracks.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon HELLFORGE_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("HELLFORGE").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("BLACKSMITH").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon SHADOW_WORD_DEATH = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/soyouhavechosendeath.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon SPAWN_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/spawn_tab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 
 	private ImageIcon COLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/collapsed.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
@@ -1123,6 +1125,13 @@ public class Frame extends JPanel {
 				buttonPanel.remove(researchEverything);
 			}
 		});
+		JButton shadowWordDeath = KUIConstants.setupButton("Shadow Word: Death", SHADOW_WORD_DEATH, LONG_BUTTON_SIZE);
+		shadowWordDeath.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.shadowWordDeath(100);
+			}
+		});
 
 		JButton meteor = KUIConstants.setupButton("Meteor", METEOR_ICON, DEBUG_BUTTON_SIZE);
 		meteor.addActionListener(new ActionListener() {
@@ -1135,19 +1144,20 @@ public class Frame extends JPanel {
 		unitEvents.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.shadowWordDeath(1);
 //				gameInstance.spawnEverything();
-				gameInstance.world.spawnOgre();
-				gameInstance.world.spawnDragon();
-				gameInstance.world.spawnWerewolf();
-				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("FLAMELET"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
-				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("WATER_SPIRIT"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
-				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
-				gameInstance.world.spawnEnt();
-				gameInstance.world.spawnLavaGolem();
-				gameInstance.world.spawnIceGiant();
-				gameInstance.world.spawnSkeletonArmy();
-				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("BOMB"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
-				gameInstance.spawnOrcs();
+//				gameInstance.world.spawnOgre();
+//				gameInstance.world.spawnDragon();
+//				gameInstance.world.spawnWerewolf();
+//				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("FLAMELET"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
+//				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("WATER_SPIRIT"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
+//				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
+//				gameInstance.world.spawnEnt();
+//				gameInstance.world.spawnLavaGolem();
+//				gameInstance.world.spawnIceGiant();
+//				gameInstance.world.spawnSkeletonArmy();
+//				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("BOMB"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
+//				gameInstance.spawnOrcs();
 			}
 		});
 		JButton setPlayerFaction = KUIConstants.setupButton("Change Faction", CHANGE_FACTION_ICON, DEBUG_BUTTON_SIZE);
@@ -1208,6 +1218,7 @@ public class Frame extends JPanel {
 		buttonPanel.add(addResources);
 		buttonPanel.add(setPlayerFaction);
 		buttonPanel.add(exit);
+		buttonPanel.add(shadowWordDeath);
 
 		researchView = new JPanel();
 		for (int i = 0; i < Game.researchTypeList.size(); i++) {

@@ -276,6 +276,24 @@ public class Game {
 	public void meteorStrike(){
 		world.meteorStrike();
 	}
+	public void shadowWordDeath(int num){
+		for(int i = 0; i < num; i++) {
+			world.spawnOgre();
+			world.spawnDragon();
+			world.spawnWerewolf();
+			world.spawnEnt();
+			world.spawnLavaGolem();
+			world.spawnIceGiant();
+			world.spawnSkeletonArmy();
+			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
+			spawnOrcs();
+		}
+		for(int i = 0; i < num/2; i++) {
+			spawnEverything();
+		}
+		
+		
+	}
 	public void spawnEverything() {
 		List<Tile> tiles = world.getTilesRandomly();
 		for(UnitType type : Game.unitTypeList) {

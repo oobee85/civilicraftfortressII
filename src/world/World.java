@@ -123,7 +123,7 @@ public class World {
 			if(temperature < Season.FREEZING_TEMPURATURE) {
 				if(t.liquidType == LiquidType.DRY) {
 					t.liquidType = LiquidType.SNOW;
-					t.liquidAmount += 0.02;
+					t.liquidAmount += 0.05;
 				}else {
 					t.liquidAmount += 0.005;
 				}

@@ -121,9 +121,14 @@ public class Liquid {
 		
 		double tempurature = tile.getTempurature();
 		if(tempurature > Season.MELTING_TEMPURATURE) {
-			if(tile.liquidType == LiquidType.SNOW || tile.liquidType == LiquidType.ICE) {
+			if(tile.liquidType == LiquidType.ICE) {
 				tile.liquidType = LiquidType.WATER;
 				liquidTypesTemp[x][y] = LiquidType.WATER;
+			}
+			if(tile.liquidType == LiquidType.SNOW) {
+				tile.liquidType = LiquidType.WATER;
+				liquidTypesTemp[x][y] = LiquidType.WATER;
+				liquidAmountsTemp[x][y] /= 5;
 			}
 		}
 		else if(tempurature < Season.FREEZING_TEMPURATURE) {
