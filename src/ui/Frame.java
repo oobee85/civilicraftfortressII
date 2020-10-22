@@ -45,6 +45,7 @@ public class Frame extends JPanel {
 	private ImageIcon CHANGE_FACTION_ICON = Utils.resizeImageIcon(Game.unitTypeMap.get("CYCLOPS").getImageIcon(DEBUG_BUTTON_SIZE.height-5), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private ImageIcon NIGHT_DISABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_disabled.PNG"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private ImageIcon NIGHT_ENABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_enabled.PNG"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private ImageIcon METEOR_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/meteor.PNG"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 
 	private Timer repaintingThread;
 	private JToggleButton easyModeButton;
@@ -830,14 +831,12 @@ public class Frame extends JPanel {
 		});
 		
 		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.gridwidth = 2;
+		c.gridx = 0; c.gridy = 0; c.weightx = 1; c.gridwidth = 2;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		workerMenu.add(toggleButton, c);
 		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 4;
-		c.gridwidth = 2;
+		c.gridx = 0; c.gridy = 4; c.weightx = 1; c.gridwidth = 2;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		workerMenu.add(toggleButton2, c);
 		int index1 = 0;
 		int index2 = 0;
@@ -846,6 +845,9 @@ public class Frame extends JPanel {
 				c = new GridBagConstraints();
 				c.gridx = index1/3;
 				c.gridy = index1%3 + 1;
+				c.gridwidth = 1;
+				c.weightx = 0.5;
+				c.fill = GridBagConstraints.HORIZONTAL;
 				workerMenu.add(buildingButtons[i], c);
 				index1++;
 			}
@@ -853,16 +855,20 @@ public class Frame extends JPanel {
 				c = new GridBagConstraints();
 				c.gridx = index2%2;
 				c.gridy = index2/2 + 5;
+				c.gridwidth = 1;
+				c.weightx = 0.5;
+				c.fill = GridBagConstraints.HORIZONTAL;
 				workerMenu.add(buildingButtons[i], c);
 				index2++;
 			}
 		}
-//		for (int i = 0; i < Game.buildingTypeList.size(); i++) {
-//			c = new GridBagConstraints();
-//			c.gridx = i%2;
-//			c.gridy = i/2 + 4;
-//			workerMenu.add(buildingButtons[i], c);
-//		}
+		c = new GridBagConstraints();
+		c.gridy = Game.buildingTypeList.size()/2 + 3; 
+		c.gridx = 0; c.gridwidth = 2; c.weightx = 1; c.weighty = 1;
+		c.fill = GridBagConstraints.BOTH;
+		JPanel p = new JPanel();
+		p.setOpaque(false);
+		workerMenu.add(p, c);
 		
 		spawnMenu = new JPanel();
 		for (int i = 0; i < Game.unitTypeList.size(); i++) {
@@ -1118,7 +1124,7 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JButton meteor = KUIConstants.setupButton("Meteor", null, DEBUG_BUTTON_SIZE);
+		JButton meteor = KUIConstants.setupButton("Meteor", METEOR_ICON, DEBUG_BUTTON_SIZE);
 		meteor.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -1273,6 +1279,7 @@ public class Frame extends JPanel {
 		WORKER_TAB = tabbedPane.getTabCount();
 		JScrollPane scrollPane = new JScrollPane(workerMenu, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+		workerMenu.setPreferredSize(new Dimension(GUIWIDTH, BUILDING_BUTTON_SIZE.height * (Game.buildingTypeList.size()/2 + 4)));
 		tabbedPane.insertTab(null, WORKER_TAB_ICON, scrollPane, "Build buildings with workers", WORKER_TAB);
 
 		MAKE_UNIT_TAB = tabbedPane.getTabCount();
@@ -1284,10 +1291,6 @@ public class Frame extends JPanel {
 		HELLFORGE_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab(null,HELLFORGE_TAB_ICON, hellforgeView, "Craft items adamantite and above", HELLFORGE_TAB);
 		
-
-//		STAT_TAB = tabbedPane.getTabCount();
-//		tabbedPane.addTab("Unit Stats", STAT_TAB_ICON, statView, "Does nothing");
-		
 		SPAWN_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab(null, SPAWN_TAB_ICON, spawnMenu, "Summon units for testing", SPAWN_TAB);
 
@@ -1295,7 +1298,6 @@ public class Frame extends JPanel {
 		tabbedPane.addTab(null,
 				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE),
 				buttonPanel, "Various testing functions");
-		
 
 		// disable building tab after setting all of the tabs up
 		manageBuildingTab(false);
