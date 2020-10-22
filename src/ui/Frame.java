@@ -1261,7 +1261,7 @@ public class Frame extends JPanel {
 		tabbedPane.insertTab("", WORKER_TAB_ICON, scrollPane, "Build buildings with worker.", WORKER_TAB);
 
 		CASTLE_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("", MAKE_UNIT_TAB_ICON, makeUnitView, "Does nothing", CASTLE_TAB);
+		tabbedPane.insertTab("", MAKE_UNIT_TAB_ICON, makeUnitView, "Make units from castle, barracks, or workshop", CASTLE_TAB);
 
 //		BARRACKS_TAB = tabbedPane.getTabCount();
 //		tabbedPane.insertTab("", BARRACKS_TAB_ICON, barracksView, "Does nothing", BARRACKS_TAB);
@@ -1270,26 +1270,26 @@ public class Frame extends JPanel {
 //		tabbedPane.insertTab("", WORKSHOP_TAB_ICON, workshopView, "Does nothing", WORKSHOP_TAB);
 
 		BLACKSMITH_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("", BLACKSMITH_TAB_ICON, blacksmithView, "Does nothing", BLACKSMITH_TAB);
+		tabbedPane.insertTab("", BLACKSMITH_TAB_ICON, blacksmithView, "Craft items up to mithril", BLACKSMITH_TAB);
 
 		HELLFORGE_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("",HELLFORGE_TAB_ICON, hellforgeView, "Does nothing", HELLFORGE_TAB);
+		tabbedPane.insertTab("",HELLFORGE_TAB_ICON, hellforgeView, "Craft items adamantite and above", HELLFORGE_TAB);
 		
 		RESEARCH_TAB = tabbedPane.getTabCount();
-		tabbedPane.addTab("Research", RESEARCH_TAB_ICON, researchView, "Does nothing");
+		tabbedPane.addTab("Research", RESEARCH_TAB_ICON, researchView, "Research new technologies");
 
 //		STAT_TAB = tabbedPane.getTabCount();
 //		tabbedPane.addTab("Unit Stats", STAT_TAB_ICON, statView, "Does nothing");
 		
 		SPAWN_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("Spawner", Utils.resizeImageIcon(Game.unitTypeMap.get("ARCHER").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE), spawnMenu,
-				"Does nothing", SPAWN_TAB);
+				"Summon units for testing", SPAWN_TAB);
 
 
 		DEBUG_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab(null,
 				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE),
-				buttonPanel, "Does nothing");
+				buttonPanel, "Various testing functions");
 		
 
 		// remove building tab after setting all of the tabs up

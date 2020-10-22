@@ -23,15 +23,14 @@ public class BuildingInfoPanel extends InfoPanel {
 
 		g.setFont(KUIConstants.infoFontSmall);
 		int lineHeight = g.getFont().getSize() + 1;
-		y += lineHeight;
 		
 		if(showing.getCulture() > 0 ) {
-			g.drawString("culture " + (int)showing.getCulture(), getImageSize(), y);
-			y += lineHeight;
+			g.drawString("culture " + (int)showing.getCulture(), getImageSize(), y += lineHeight);
 		}
 		
 		
 		if(showing.getBuildingUnit().peek() != null) {
+			y += lineHeight/2;
 			int x = getImageSize();
 			int progressBarHeight = 30;
 			int buffer = 1;
@@ -42,10 +41,23 @@ public class BuildingInfoPanel extends InfoPanel {
 			int totalEffort = showing.getBuildingUnit().peek().getType().getCombatStats().getTicksToBuild();
 			int expendedEffort = totalEffort - showing.getBuildingUnit().peek().getRemainingEffort();
 			double completedRatio = 1.0 * expendedEffort / totalEffort;
-			String progressString = String.format("%s %d/%d", showing.getBuildingUnit(), expendedEffort, totalEffort);
+			String progressString = String.format("%s %d/%d", showing.getBuildingUnit().peek(), expendedEffort, totalEffort);
 			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progressString, x + progressBarHeight, y, getWidth() - x - progressBarHeight - 10, progressBarHeight);
 			
-			y += progressBarHeight + lineHeight;
+			y += progressBarHeight;
+			int offset = 0;
+			boolean first = true;
+			if(showing.getBuildingUnit().size() > 1) {
+				y += lineHeight/4;
+				for(Unit unit : showing.getBuildingUnit()) {
+					if(first) {
+						first = false;
+						continue;
+					}
+					g.drawImage(unit.getImage(imageSize), x + buffer + offset, y + buffer, imageSize, imageSize, null);
+					offset += imageSize + buffer;
+				}
+			}
 		}
 
 		g.setFont(KUIConstants.infoFontTiny);
