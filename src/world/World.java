@@ -820,13 +820,19 @@ public class World {
 			tile.setHeight(heightMap[tile.getLocation().x][tile.getLocation().y]);
 		}
 
+		LinkedList<Tile> tiles = getTilesRandomly();
+		Collections.sort(tiles, new Comparator<Tile>() {
+			@Override
+			public int compare(Tile o1, Tile o2) {
+				return o1.getHeight() > o2.getHeight() ? 1 : -1;
+			}
+		});
+		double rockpercentage = 0.35;
+		double cutoff = tiles.get((int)((1-rockpercentage)*tiles.size())).getHeight();
 		for(Tile tile : getTiles()) {
 			if(tile.getTerrain() == Terrain.DIRT) {
 				Terrain t;
-				if (tile.getHeight() > TERRAIN_SNOW_LEVEL) {
-					t = Terrain.ROCK;
-				}
-				else if (tile.getHeight() > 0.6) {
+				if (tile.getHeight() > cutoff) {
 					t = Terrain.ROCK;
 				}
 				else if (tile.getHeight() > 0.4) {
