@@ -105,9 +105,7 @@ public class Game {
 		if(days > 10 && Math.random() < 0.00001) {
 			meteorStrike();
 		}
-		if(days % 20 == 0) {
-			meteorStrike();
-		}
+		
 
 		// rain event
 		if(Math.random() < 0.008) {
@@ -189,6 +187,9 @@ public class Game {
 				System.out.println("ice");
 			}
 			
+		}
+		if(days % 20 == 0) {
+			meteorStrike();
 		}
 		if(days % 8 == 0) {
 			for(int i = 0; i < days/8; i++) {
