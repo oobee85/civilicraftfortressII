@@ -45,8 +45,8 @@ public class KUIConstants {
 		setComponentAttributes(b, size);
 		return b;
 	}
-	public static JToggleButton setupToggleButton(String text, Icon icon, Dimension size) {
-		JToggleButton b = new KToggleButton(text, icon);
+	public static KToggleButton setupToggleButton(String text, Icon icon, Dimension size) {
+		KToggleButton b = new KToggleButton(text, icon);
 		b.setMargin(zeroMargin);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
 		setComponentAttributes(b, size);
