@@ -25,26 +25,27 @@ public class Frame extends JPanel {
 	private static final String TITLE = "civilicraftfortressII";
 
 	public static final Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
-	public static final Dimension DEBUG_BUTTON_SIZE = new Dimension(130, 30);
+	public static final Dimension DEBUG_BUTTON_SIZE = new Dimension(140, 30);
 	public static final Dimension SPAWN_BUTTON_SIZE = new Dimension(30, 30);
 	public static final Dimension BUILD_UNIT_BUTTON_SIZE = new Dimension(170, 35);
-
 
 	private static final int TAB_ICON_SIZE = 25;
 	private ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon MAKE_UNIT_TAB_ICON = Utils.resizeImageIcon(Game.unitTypeMap.get("WARRIOR").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon CITY_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("CASTLE").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon BARRACKS_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("BARRACKS").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon WORKSHOP_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("WORKSHOP").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon HELLFORGE_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("HELLFORGE").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("BLACKSMITH").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon STAT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/itemicons/adamant_sword.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon SPAWN_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/spawn_tab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 
 	private ImageIcon COLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/collapsed.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon UNCOLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/uncollapsed.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon FAST_FORWARD_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/fastforward.PNG"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-	
+	private ImageIcon RAIN_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/rain.PNG"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private ImageIcon ERUPTION_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/erupt.PNG"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private ImageIcon CHANGE_FACTION_ICON = Utils.resizeImageIcon(Game.unitTypeMap.get("CYCLOPS").getImageIcon(DEBUG_BUTTON_SIZE.height-5), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private ImageIcon NIGHT_DISABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_disabled.PNG"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private ImageIcon NIGHT_ENABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_enabled.PNG"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+
 	private Timer repaintingThread;
 	private JToggleButton easyModeButton;
 	private JFrame frame;
@@ -104,7 +105,7 @@ public class Frame extends JPanel {
 	private int DEBUG_TAB;
 //	private int BARRACKS_TAB;
 //	private int WORKSHOP_TAB;
-	private int CASTLE_TAB;
+	private int MAKE_UNIT_TAB;
 	private int STAT_TAB;
 	private int SPAWN_TAB;
 
@@ -129,10 +130,10 @@ public class Frame extends JPanel {
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {
 				if (building.getType() == Game.buildingTypeMap.get("BARRACKS")) {
-					manageCastleTab(selected);
+					manageMakeUnitTab(selected);
 				}
 				if (building.getType() == Game.buildingTypeMap.get("CASTLE")) {
-					manageCastleTab(selected);
+					manageMakeUnitTab(selected);
 				}
 				if (building.getType() == Game.buildingTypeMap.get("BLACKSMITH")) {
 					manageBlacksmithTab(selected);
@@ -141,7 +142,7 @@ public class Frame extends JPanel {
 					manageHellforgeTab(selected);
 				}
 				if (building.getType() == Game.buildingTypeMap.get("WORKSHOP")) {
-					manageCastleTab(selected);
+					manageMakeUnitTab(selected);
 				}
 				if (building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
 					manageResearchLabTab(selected);
@@ -679,10 +680,20 @@ public class Frame extends JPanel {
 		tabbedPane.setEnabledAt(WORKER_TAB, enabled);
 	}
 	
-	private void manageCastleTab(boolean enabled) {
+	private void manageMakeUnitTab(boolean enabled) {
 		if(enabled) {
-			tabbedPane.setEnabledAt(CASTLE_TAB, enabled);
-			tabbedPane.setSelectedIndex(CASTLE_TAB);
+			tabbedPane.setEnabledAt(MAKE_UNIT_TAB, enabled);
+			tabbedPane.setSelectedIndex(MAKE_UNIT_TAB);
+		}
+		else {
+			if(!(World.PLAYER_FACTION.isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("CASTLE"))
+					|| World.PLAYER_FACTION.isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("BARRACKS"))
+					|| World.PLAYER_FACTION.isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("WORKSHOP")))) {
+				if(tabbedPane.getSelectedIndex() == MAKE_UNIT_TAB) {
+					tabbedPane.setSelectedIndex(0);
+				}
+				tabbedPane.setEnabledAt(MAKE_UNIT_TAB, false);
+			}
 		}
 	}
 
@@ -1055,7 +1066,7 @@ public class Frame extends JPanel {
 			gameInstance.spawnUnit(spawnUnit.isSelected());
 		});
 
-		JButton eruptVolcano = KUIConstants.setupButton("Erupt Volcano", null, DEBUG_BUTTON_SIZE);
+		JButton eruptVolcano = KUIConstants.setupButton("Erupt Volcano", ERUPTION_ICON, DEBUG_BUTTON_SIZE);
 		eruptVolcano.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -1071,7 +1082,7 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JButton makeItRain = KUIConstants.setupButton("Rain", null, DEBUG_BUTTON_SIZE);
+		JButton makeItRain = KUIConstants.setupButton("Rain", RAIN_ICON, DEBUG_BUTTON_SIZE);
 		makeItRain.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -1098,7 +1109,7 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JButton researchEverything = KUIConstants.setupButton("Research All", null, DEBUG_BUTTON_SIZE);
+		JButton researchEverything = KUIConstants.setupButton("Research All", RESEARCH_TAB_ICON, DEBUG_BUTTON_SIZE);
 		researchEverything.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -1133,7 +1144,7 @@ public class Frame extends JPanel {
 				gameInstance.spawnOrcs();
 			}
 		});
-		JButton setPlayerFaction = KUIConstants.setupButton("Change Faction", null, DEBUG_BUTTON_SIZE);
+		JButton setPlayerFaction = KUIConstants.setupButton("Change Faction", CHANGE_FACTION_ICON, DEBUG_BUTTON_SIZE);
 		setPlayerFaction.addActionListener(e -> {
 			int choice = JOptionPane.showOptionDialog(null, "Choose faction", "Choose faction", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, World.factions, World.NEUTRAL_FACTION);
 			if(choice >= 0 && choice < World.factions.length) {
@@ -1149,13 +1160,15 @@ public class Frame extends JPanel {
 				debug.setText(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix");
 			}
 		});
-		JToggleButton toggleNight = KUIConstants.setupToggleButton(Game.DISABLE_NIGHT ? "Night Disabled" : "Night Enabled", null,
+		JToggleButton toggleNight = KUIConstants.setupToggleButton(Game.DISABLE_NIGHT ? "Night Disabled" : "Night Enabled", NIGHT_ENABLED_ICON,
 				DEBUG_BUTTON_SIZE);
+		toggleNight.setSelected(true);
 		toggleNight.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Game.DISABLE_NIGHT = toggleNight.isSelected();
+				Game.DISABLE_NIGHT = !toggleNight.isSelected();
 				toggleNight.setText(Game.DISABLE_NIGHT ? "Night Disabled" : "Night Enabled");
+				toggleNight.setIcon(Game.DISABLE_NIGHT ? NIGHT_DISABLED_ICON : NIGHT_ENABLED_ICON);
 			}
 		});
 
@@ -1254,37 +1267,29 @@ public class Frame extends JPanel {
 		tabbedPane.setFocusable(false);
 		tabbedPane.setFont(KUIConstants.buttonFontSmall);
 
+		RESEARCH_TAB = tabbedPane.getTabCount();
+		tabbedPane.addTab(null, RESEARCH_TAB_ICON, researchView, "Research new technologies");
+		
 		WORKER_TAB = tabbedPane.getTabCount();
-//		workerMenu.setPreferredSize(new Dimension(GUIWIDTH, 0));
 		JScrollPane scrollPane = new JScrollPane(workerMenu, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-		tabbedPane.insertTab("", WORKER_TAB_ICON, scrollPane, "Build buildings with worker.", WORKER_TAB);
+		tabbedPane.insertTab(null, WORKER_TAB_ICON, scrollPane, "Build buildings with workers", WORKER_TAB);
 
-		CASTLE_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("", MAKE_UNIT_TAB_ICON, makeUnitView, "Make units from castle, barracks, or workshop", CASTLE_TAB);
-
-//		BARRACKS_TAB = tabbedPane.getTabCount();
-//		tabbedPane.insertTab("", BARRACKS_TAB_ICON, barracksView, "Does nothing", BARRACKS_TAB);
-//		
-//		WORKSHOP_TAB = tabbedPane.getTabCount();
-//		tabbedPane.insertTab("", WORKSHOP_TAB_ICON, workshopView, "Does nothing", WORKSHOP_TAB);
+		MAKE_UNIT_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab(null, MAKE_UNIT_TAB_ICON, makeUnitView, "Make units from castles, barracks, or workshops", MAKE_UNIT_TAB);
 
 		BLACKSMITH_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("", BLACKSMITH_TAB_ICON, blacksmithView, "Craft items up to mithril", BLACKSMITH_TAB);
+		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, blacksmithView, "Craft items up to mithril", BLACKSMITH_TAB);
 
 		HELLFORGE_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("",HELLFORGE_TAB_ICON, hellforgeView, "Craft items adamantite and above", HELLFORGE_TAB);
+		tabbedPane.insertTab(null,HELLFORGE_TAB_ICON, hellforgeView, "Craft items adamantite and above", HELLFORGE_TAB);
 		
-		RESEARCH_TAB = tabbedPane.getTabCount();
-		tabbedPane.addTab("Research", RESEARCH_TAB_ICON, researchView, "Research new technologies");
 
 //		STAT_TAB = tabbedPane.getTabCount();
 //		tabbedPane.addTab("Unit Stats", STAT_TAB_ICON, statView, "Does nothing");
 		
 		SPAWN_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("Spawner", Utils.resizeImageIcon(Game.unitTypeMap.get("ARCHER").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE), spawnMenu,
-				"Summon units for testing", SPAWN_TAB);
-
+		tabbedPane.insertTab(null, SPAWN_TAB_ICON, spawnMenu, "Summon units for testing", SPAWN_TAB);
 
 		DEBUG_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab(null,
@@ -1292,13 +1297,12 @@ public class Frame extends JPanel {
 				buttonPanel, "Various testing functions");
 		
 
-		// remove building tab after setting all of the tabs up
+		// disable building tab after setting all of the tabs up
 		manageBuildingTab(false);
 		manageBlacksmithTab(false);
 		manageHellforgeTab(false);
-//		manageWorkshopTab(false);
 		manageResearchLabTab(false);
-//		manageBarracksTab(false);
+		manageMakeUnitTab(false);
 		manageSpawnTab(true);
 		
 
