@@ -36,6 +36,15 @@ public class Faction {
 		this.usesItems = usesItems;
 	}
 	
+	public boolean hasResearchLab(World world) {
+		for(Building building : world.buildings) {
+			if(building.getFaction() == this && building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public void researchEverything() {
 		for(Research research : researchMap.values()) {
 			research.spendResearch(research.getRequiredPoints());

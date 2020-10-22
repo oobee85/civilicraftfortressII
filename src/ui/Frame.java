@@ -36,10 +36,9 @@ public class Frame extends JPanel {
 	private ImageIcon CITY_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("CASTLE").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon BARRACKS_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("BARRACKS").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon WORKSHOP_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("WORKSHOP").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon RESEARCH_LAB_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("RESEARCH_LAB").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon HELLFORGE_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("HELLFORGE").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("BLACKSMITH").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon TECH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private ImageIcon STAT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/itemicons/adamant_sword.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 
 	private ImageIcon COLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/collapsed.PNG"), TAB_ICON_SIZE, TAB_ICON_SIZE);
@@ -61,11 +60,10 @@ public class Frame extends JPanel {
 	private JPanel hellforgeView;
 	private JPanel barracksView;
 	private JPanel workshopView;
-	private JPanel researchLabView;
 	private JPanel tileView;
 	private JPanel workerMenu;
 	private JPanel spawnMenu;
-	private JPanel techView;
+	private JPanel researchView;
 	private JPanel buildingPlanner;
 	private JPanel statView;
 	private JLabel tileSize;
@@ -100,16 +98,14 @@ public class Frame extends JPanel {
 	private int my;
 	private boolean dragged = false;
 
-//	private int RESOURCE_TAB;
 	private int WORKER_TAB;
-	private int TECH_TAB;
+	private int RESEARCH_TAB;
 	private int BLACKSMITH_TAB;
 	private int HELLFORGE_TAB;
 	private int DEBUG_TAB;
 	private int BUILDING_TAB;
 	private int BARRACKS_TAB;
 	private int WORKSHOP_TAB;
-	private int RESEARCH_LAB_TAB;
 	private int CASTLE_TAB;
 	private int STAT_TAB;
 	private int SPAWN_TAB;
@@ -232,6 +228,7 @@ public class Frame extends JPanel {
 						gamepanel.revalidate();
 					}
 				}
+				boolean hasResearchLab = World.PLAYER_FACTION.hasResearchLab(gameInstance.world);
 				for(Entry<JButton, ResearchType> entry : researchButtons.entrySet()) {
 					JButton button = entry.getKey();
 					Research research = World.PLAYER_FACTION.getResearch(entry.getValue());
@@ -239,6 +236,9 @@ public class Frame extends JPanel {
 					if (research.isUnlocked()) {
 						button.setEnabled(false);
 						button.setVisible(true);
+					} else if(research.getTier() > 1 && !hasResearchLab) {
+						button.setEnabled(false);
+						button.setVisible(false);
 					} else if (req.areRequirementsMet()) {
 						button.setEnabled(true);
 						button.setVisible(true);
@@ -731,12 +731,9 @@ public class Frame extends JPanel {
 	}
 	
 	private void manageResearchLabTab(boolean enabled) {
-		if (enabled == false && tabbedPane.getSelectedIndex() == RESEARCH_LAB_TAB) {
-			tabbedPane.setSelectedIndex(0);
-		} else if (enabled == true) {
-			tabbedPane.setSelectedIndex(RESEARCH_LAB_TAB);
+		if (enabled == true) {
+			tabbedPane.setSelectedIndex(RESEARCH_TAB);
 		}
-		tabbedPane.setEnabledAt(RESEARCH_LAB_TAB, enabled);
 	}
 
 	private void manageSpawnTab(boolean enabled) {
@@ -800,7 +797,6 @@ public class Frame extends JPanel {
 
 		
 		workerMenu = new JPanel();
-//		workerMenu.setLayout(new BoxLayout(workerMenu, BoxLayout.Y_AXIS));
 		workerMenu.setLayout(new GridBagLayout());
 		buildingButtons = new JButton[Game.buildingTypeList.size()];
 		
@@ -810,7 +806,6 @@ public class Frame extends JPanel {
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
 					BUILDING_BUTTON_SIZE);
 			button.addActionListener(e -> {
-//				gameInstance.buildBuilding(type, null);
 				gameInstance.setBuildingToPlan(type);
 			});
 			button.addRightClickActionListener(e -> {
@@ -980,32 +975,6 @@ public class Frame extends JPanel {
 		workshopView = new JPanel();
 		buttons = populateUnitTypeUI(workshopView, Game.buildingTypeMap.get("WORKSHOP"), BUILDING_ICON_SIZE);
 		Collections.addAll(unitButtons, buttons);
-		
-		researchLabView = new JPanel();
-		for (int i = 0; i < Game.researchTypeList.size(); i++) {
-			ResearchType researchType = Game.researchTypeList.get(i);
-			KButton button = KUIConstants.setupButton(researchType.toString(),
-					Utils.resizeImageIcon(researchType.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
-			button.setEnabled(false);
-			button.addActionListener(e -> {
-				gameInstance.setResearchTarget(researchType);
-			});
-			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
-			});
-			button.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					pushInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
-				}
-				@Override
-				public void mouseExited(MouseEvent e) {
-					popInfoPanel();
-				}
-			});
-			researchButtons.put(button, researchType);
-			researchLabView.add(button);
-		}
 		
 		blacksmithView = new JPanel();
 		BuildingType blacksmithType = Game.buildingTypeMap.get("BLACKSMITH");
@@ -1286,12 +1255,9 @@ public class Frame extends JPanel {
 		buttonPanel.add(setPlayerFaction);
 		buttonPanel.add(exit);
 
-		techView = new JPanel();
+		researchView = new JPanel();
 		for (int i = 0; i < Game.researchTypeList.size(); i++) {
 			ResearchType researchType = Game.researchTypeList.get(i);
-			if(researchType.tier > 1) {
-				continue;
-			}
 			KButton button = KUIConstants.setupButton(researchType.toString(),
 					Utils.resizeImageIcon(researchType.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.setEnabled(false);
@@ -1312,7 +1278,7 @@ public class Frame extends JPanel {
 				}
 			});
 			researchButtons.put(button, researchType);
-			techView.add(button);
+			researchView.add(button);
 		}
 		statView = new JPanel();
 		for (int i = 0; i < gameInstance.getCombatBuffs().getStats().size(); i++) {
@@ -1353,8 +1319,8 @@ public class Frame extends JPanel {
 		tabbedPane.setFocusable(false);
 		tabbedPane.setFont(KUIConstants.buttonFontSmall);
 
-		TECH_TAB = tabbedPane.getTabCount();
-		tabbedPane.addTab("Research", TECH_TAB_ICON, techView, "Does nothing");
+		RESEARCH_TAB = tabbedPane.getTabCount();
+		tabbedPane.addTab("Research", RESEARCH_TAB_ICON, researchView, "Does nothing");
 
 //		STAT_TAB = tabbedPane.getTabCount();
 //		tabbedPane.addTab("Unit Stats", STAT_TAB_ICON, statView, "Does nothing");
@@ -1386,9 +1352,6 @@ public class Frame extends JPanel {
 		
 		WORKSHOP_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("", WORKSHOP_TAB_ICON, workshopView, "Does nothing", WORKSHOP_TAB);
-		
-		RESEARCH_LAB_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab("", RESEARCH_LAB_TAB_ICON, researchLabView, "Does nothing", RESEARCH_LAB_TAB);
 
 		BLACKSMITH_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab("", BLACKSMITH_TAB_ICON, blacksmithView, "Does nothing", BLACKSMITH_TAB);
