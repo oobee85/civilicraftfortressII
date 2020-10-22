@@ -1367,12 +1367,10 @@ public class Game {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;
 				if(unit.getType().isBuilder()) {
-					for(Entry<Tile, Faction> entry : world.territory.entrySet()) {
-						System.out.println("Tile " + entry.getKey() + ": " + entry.getValue());
-						if(entry.getValue() != World.PLAYER_FACTION) {
+					for(Tile tile : Utils.getTilesInRadius(unit.getTile(), world, 4)) {
+						if(world.territory.get(tile) != World.PLAYER_FACTION) {
 							continue;
 						}
-						Tile tile = entry.getKey();
 						Building building = buildBuilding(type, tile);
 						if(building != null) {
 							unit.queuePlannedAction(new PlannedAction(building, true));
