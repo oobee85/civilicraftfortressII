@@ -2,6 +2,7 @@ package ui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 import java.util.Map.*;
 import java.util.concurrent.*;
@@ -1145,24 +1146,11 @@ public class Frame extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gameInstance.shadowWordDeath(1);
-//				gameInstance.spawnEverything();
-//				gameInstance.world.spawnOgre();
-//				gameInstance.world.spawnDragon();
-//				gameInstance.world.spawnWerewolf();
-//				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("FLAMELET"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
-//				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("WATER_SPIRIT"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
-//				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
-//				gameInstance.world.spawnEnt();
-//				gameInstance.world.spawnLavaGolem();
-//				gameInstance.world.spawnIceGiant();
-//				gameInstance.world.spawnSkeletonArmy();
-//				gameInstance.world.spawnAnimal(Game.unitTypeMap.get("BOMB"), gameInstance.world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
-//				gameInstance.spawnOrcs();
 			}
 		});
 		JButton setPlayerFaction = KUIConstants.setupButton("Change Faction", CHANGE_FACTION_ICON, DEBUG_BUTTON_SIZE);
 		setPlayerFaction.addActionListener(e -> {
-			int choice = JOptionPane.showOptionDialog(null, "Choose faction", "Choose faction", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, World.factions, World.NEUTRAL_FACTION);
+			int choice = JOptionPane.showOptionDialog(null, "Choose faction", "Choose faction", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, World.factions, World.NO_FACTION);
 			if(choice >= 0 && choice < World.factions.length) {
 				World.PLAYER_FACTION = World.factions[choice];
 			}
@@ -1209,7 +1197,6 @@ public class Frame extends JPanel {
 		buttonPanel.add(makeItRain);
 		buttonPanel.add(makeItDry);
 		buttonPanel.add(fastForward);
-		buttonPanel.add(researchEverything);
 		buttonPanel.add(eruptVolcano);
 		buttonPanel.add(meteor);
 		buttonPanel.add(unitEvents);
@@ -1217,6 +1204,7 @@ public class Frame extends JPanel {
 		buttonPanel.add(toggleNight);
 		buttonPanel.add(addResources);
 		buttonPanel.add(setPlayerFaction);
+		buttonPanel.add(researchEverything);
 		buttonPanel.add(exit);
 		buttonPanel.add(shadowWordDeath);
 
@@ -1371,8 +1359,8 @@ public class Frame extends JPanel {
 		frame.repaint();
 
 		gameLoopThread = new Thread(() -> {
-			try {
-				while (true) {
+			while (true) {
+				try {
 					long start = System.currentTimeMillis();
 					gameInstance.gameTick();
 					long elapsed = System.currentTimeMillis() - start;
@@ -1384,8 +1372,18 @@ public class Frame extends JPanel {
 						Thread.sleep(sleeptime);
 					}
 				}
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
+				catch(Exception e) {
+					try (FileWriter fw = new FileWriter("ERROR_LOG.txt", true);
+							BufferedWriter bw = new BufferedWriter(fw);
+							PrintWriter out = new PrintWriter(bw)) {
+						e.printStackTrace(out);
+					} catch (IOException ee) {
+					}
+					e.printStackTrace();
+					if(e instanceof InterruptedException) {
+						break;
+					}
+				}
 			}
 		});
 		gameUIReady.release();

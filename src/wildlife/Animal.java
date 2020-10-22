@@ -9,8 +9,10 @@ import utils.*;
 import world.*;
 
 public class Animal extends Unit {
+	private static final int TARGETING_COOLDOWN = 10;
 	
 	private int migratingUntil;
+	private int nextTimeToChooseTarget;
 	
 	public Animal(UnitType type, Tile tile, Faction faction) {
 		super(type, tile, faction);
@@ -30,14 +32,15 @@ public class Animal extends Unit {
 	}
 
 	public boolean wantsToEat() {
-		return Math.random() < 0.005;
+		return getType().getTargetingInfo().isEmpty() && Math.random() < 0.005;
 	}
 	
 	@Override
 	public void planActions(World world) {
 		chooseWhatToEat(world.units);
-		if(wantsToAttack() && getTarget() == null) {
+		if(wantsToAttack() && getTarget() == null && Game.ticks >= nextTimeToChooseTarget) {
 			chooseWhatToAttack(world.units, world.buildings);
+			nextTimeToChooseTarget = Game.ticks + TARGETING_COOLDOWN;
 		}
 		chooseWhereToMove(world);
 	}
@@ -173,11 +176,18 @@ public class Animal extends Unit {
 	}
 	
 	public boolean wantsToAttack() {
-		return false;
+		return !getType().getTargetingInfo().isEmpty();
 	}
 	
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
-		return;
+		for(TargetingInfo targetType : getType().getTargetingInfo()) {
+			Thing target = targetType.getValidTargetFor(this, units, buildings);
+			if(target != null) {
+				clearPlannedActions();
+				queuePlannedAction(new PlannedAction(target));
+				return;
+			}
+		}
 	}
 	
 	public double getMoveChance() {

@@ -26,11 +26,6 @@ public class Dragon extends Animal {
 	public void setHome(Tile tile) {
 		home = tile;
 	}
-	
-	@Override
-	public boolean wantsToEat() {
-		return false;
-	}
 
 	@Override
 	public void updateState() {
@@ -84,46 +79,6 @@ public class Dragon extends Animal {
 		this.moveTowards(target);
 	}
 	
-	@Override
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
-		//chance to attack either wildlife or player
-//		if(Math.random() < 0.95) {
-			for (Unit a : units) {
-				if (a != this) {
-					Unit target = units.get((int) (Math.random() * units.size()));
-					clearPlannedActions();
-					queuePlannedAction(new PlannedAction(target));
-					resetTimeToHunt();
-					return;
-				}
-			}
-//		} else {
-			
-			//chance to attack building or unit
-//			if(Math.random() < 0.4) {
-//				for (Building b : buildings) {
-//					if (buildings.size() > 0) {
-//						Building targetBuilding = buildings.get((int) (Math.random() * buildings.size()));
-//						if(targetBuilding.getBuildingType() != BuildingType.CASTLE) {
-//							setTarget(targetBuilding);
-//						}
-//						return;
-//					}
-//				}
-//			}else {
-//				for (Unit u : units) {
-//					if (u.isPlayerControlled()) {
-//						setTarget(u);
-//						return;
-//					}
-//				}
-//			}
-			
-			
-//		}
-		
-		return;
-	}
 	@Override 
 	public List<String> getDebugStrings(){
 		List<String> strings = super.getDebugStrings();

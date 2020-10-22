@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.Map.*;
 
 import ui.*;
+import utils.*;
 import world.*;
 
 public class Faction {
@@ -196,6 +197,6 @@ public class Faction {
 	
 	@Override
 	public String toString() {
-		return name;
+		return Utils.getNiceName(name);
 	}
 }

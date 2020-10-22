@@ -54,6 +54,9 @@ public final class Utils {
 		}
 		return rawName.toLowerCase().replace('_', ' ');
 	}
+	public static String getNiceName(String rawName) {
+		return rawName.toLowerCase().replace('_', ' ');
+	}
 
 	public static final Image getDefaultSkin() {
 		Image temp = new BufferedImage(50, 50, BufferedImage.TYPE_3BYTE_BGR);

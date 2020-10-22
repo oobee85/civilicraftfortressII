@@ -87,12 +87,18 @@ public class Thing implements HasImage {
 	}
 	private void addHitsplat(int damage) {
 		int oldest = 0;
+		Hitsplat oldestHitsplat = hitsplats[0];
 		for(int i = 0; i < hitsplats.length; i++) {
-			if(hitsplats[i] == null) {
+			Hitsplat current = hitsplats[i];
+			if(current == null) {
 				oldest = i;
+				oldestHitsplat = current;
 				break;
 			}
-			oldest = hitsplats[i].getMaxDuration() < hitsplats[oldest].getMaxDuration() ? i : oldest;
+			if(oldestHitsplat == null || current.getMaxDuration() < oldestHitsplat.getMaxDuration() ) {
+				oldest = i;
+				oldestHitsplat = current;
+			}
 		}
 		Hitsplat hit = new Hitsplat(damage, oldest);
 		hitsplats[oldest] = hit;

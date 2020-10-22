@@ -13,16 +13,6 @@ public class Flamelet extends Animal {
 	}
 	
 	@Override
-	public boolean wantsToEat() {
-		return false;
-	}
-	
-	@Override
-	public void updateState() {
-		super.updateState();
-	}
-	
-	@Override
 	public void doPassiveThings(World world) {
 		super.doPassiveThings(world);
 		if(getTile().getModifier() != null) {
@@ -40,25 +30,5 @@ public class Flamelet extends Animal {
 		getTile().setModifier(new GroundModifier(GroundModifierType.FIRE, this.getTile(), 30));
 		world.addGroundModifier(getTile().getModifier());
 	}
-
-	@Override
-	public boolean wantsToAttack() {
-		return true;
-	}
 	
-	@Override
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
-		if(buildings.size() > 0) {
-			for(Building building : buildings) {
-				if(building.getFaction() == World.PLAYER_FACTION) {
-					clearPlannedActions();
-					queuePlannedAction(new PlannedAction(building));
-					return;
-				}
-			}
-		}
-	}
-	
-	
-
 }

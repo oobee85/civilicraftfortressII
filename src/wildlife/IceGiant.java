@@ -13,28 +13,6 @@ public class IceGiant extends Animal {
 	public IceGiant(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("ICE_GIANT"), tile, faction);
 	}
-	
-	@Override
-	public boolean wantsToEat() {
-		return false;
-	}
-	
-	@Override
-	public boolean wantsToAttack() {
-		return true;
-	}
-
-	@Override
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
-		for(Unit u : units) {
-			if(u.getFaction() == World.PLAYER_FACTION) {
-				clearPlannedActions();
-				queuePlannedAction(new PlannedAction(u));
-				return;
-			}
-		}
-		return;
-	}
 
 	@Override
 	public void doPassiveThings(World world) {

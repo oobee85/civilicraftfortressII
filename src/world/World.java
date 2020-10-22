@@ -35,10 +35,19 @@ public class World {
 	private int height;
 
 	
-	public static final Faction NEUTRAL_FACTION = new Faction("Neutral", false);
-	public static Faction PLAYER_FACTION = new Faction("Player", true);
-	public static final Faction CYCLOPS_FACTION = new Faction("Cyclops", true);
-	public static final Faction[] factions = new Faction[] {NEUTRAL_FACTION, PLAYER_FACTION, CYCLOPS_FACTION};
+	public static final Faction NO_FACTION = new Faction("NONE", false);
+	public static Faction PLAYER_FACTION = new Faction("PLAYER", true);
+	public static final Faction CYCLOPS_FACTION = new Faction("CYCLOPS", true);
+	public static final Faction UNDEAD_FACTION = new Faction("UNDEAD", true);
+	public static final Faction[] factions = new Faction[] {NO_FACTION, PLAYER_FACTION, CYCLOPS_FACTION, UNDEAD_FACTION};
+	public static Faction getFaction(String name) {
+		for(Faction faction : factions) {
+			if(faction.name.equals(name)) {
+				return faction;
+			}
+		}
+		return null;
+	}
 	
 	public LinkedList<Plant> plants = new LinkedList<Plant>();
 	public LinkedList<Plant> newPlants = new LinkedList<Plant>();
@@ -150,7 +159,7 @@ public class World {
 	public void spawnOgre() {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.ROCK ).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("OGRE"), tile.get(), World.NEUTRAL_FACTION);
+			spawnAnimal(Game.unitTypeMap.get("OGRE"), tile.get(), World.NO_FACTION);
 		}
 	}
 	
@@ -166,7 +175,7 @@ public class World {
 		wolf.setDead(true);
 		Tile t = wolf.getTile();
 		System.out.println("Werewolf at: "+t.getLocation().x+ ", "+ t.getLocation().y);
-		spawnAnimal(Game.unitTypeMap.get("WEREWOLF"), t, World.NEUTRAL_FACTION);
+		spawnAnimal(Game.unitTypeMap.get("WEREWOLF"), t, World.NO_FACTION);
 	}
 	
 	public void spawnLavaGolem() {
@@ -175,26 +184,26 @@ public class World {
 				.filter(e -> e.getTerrain() == Terrain.VOLCANO )
 				.findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("LAVAGOLEM"), tile.get(), World.NEUTRAL_FACTION);
+			spawnAnimal(Game.unitTypeMap.get("LAVAGOLEM"), tile.get(), World.NO_FACTION);
 		}
 	}
 	
 	public void spawnEnt() {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.GRASS ).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("ENT"), tile.get(), World.NEUTRAL_FACTION);
+			spawnAnimal(Game.unitTypeMap.get("ENT"), tile.get(), World.NO_FACTION);
 		}
 	}
 	public void spawnIceGiant() {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getModifier() != null && e.liquidType == LiquidType.SNOW).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("ICE_GIANT"), tile.get(), World.NEUTRAL_FACTION);
+			spawnAnimal(Game.unitTypeMap.get("ICE_GIANT"), tile.get(), World.NO_FACTION);
 		}
 	}
 	public void spawnDragon() {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.VOLCANO ).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("DRAGON"), tile.get(), World.NEUTRAL_FACTION);
+			spawnAnimal(Game.unitTypeMap.get("DRAGON"), tile.get(), World.NO_FACTION);
 		}
 	}
 	
@@ -203,9 +212,9 @@ public class World {
 		if(potential.isPresent()) {
 			Tile t = potential.get();
 			for(Tile tile : t.getNeighbors()) {
-				spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, World.CYCLOPS_FACTION);
-				spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, World.CYCLOPS_FACTION);
-				spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, World.CYCLOPS_FACTION);
+				spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, World.UNDEAD_FACTION);
+				spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, World.UNDEAD_FACTION);
+				spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, World.UNDEAD_FACTION);
 			}
 		}
 	}
@@ -220,9 +229,6 @@ public class World {
 		if(type == Game.unitTypeMap.get("FLAMELET")) {
 			return new Flamelet(tile, faction);
 		}
-		else if(type == Game.unitTypeMap.get("OGRE")) {
-			return new Ogre(tile, faction);
-		}
 		else if(type == Game.unitTypeMap.get("PARASITE")) {
 			return new Parasite(tile, faction, this.get(volcano));
 		}
@@ -232,9 +238,6 @@ public class World {
 		else if(type == Game.unitTypeMap.get("WATER_SPIRIT")) {
 			return new WaterSpirit(tile, faction);
 		}
-		else if(type == Game.unitTypeMap.get("LAVAGOLEM")) {
-			return new LavaGolem(tile, faction);
-		}
 		else if(type == Game.unitTypeMap.get("ENT")) {
 			return new Ent(tile, faction);
 		}
@@ -243,9 +246,6 @@ public class World {
 		}
 		else if(type == Game.unitTypeMap.get("ICE_GIANT")) {
 			return new IceGiant(tile, faction);
-		}
-		else if(type == Game.unitTypeMap.get("CYCLOPS")) {
-			return new Cyclops(tile, faction);
 		}
 		else if(type == Game.unitTypeMap.get("BOMB")) {
 			return new Bomb(tile, faction, this);
@@ -259,7 +259,7 @@ public class World {
 		if(animalType.isAquatic() == false && world.get(loc).liquidAmount > world.get(loc).liquidType.getMinimumDamageAmount()/2 ) {
 			return;
 		}
-		Animal animal = new Animal(animalType, world.get(loc), World.NEUTRAL_FACTION);
+		Animal animal = new Animal(animalType, world.get(loc), World.NO_FACTION);
 		animal.setTile(world.get(loc));
 		newUnits.add(animal);
 		world.get(loc).addUnit(animal);
@@ -659,14 +659,14 @@ public class World {
 		newProjectiles.clear();
 		projectiles = projectilesNew;
 		
-		if(Game.ticks % 50 == 0) {
-//			System.out.println("Tick " + Game.ticks +
-//					" \tunits: " 				+ units.size() + 
-//					" \tbuildings: " 		+ buildings.size() + 
-//					" \tplannedBuildings: " + plannedBuildings.size() + 
-//					" \tplants: " 		+ plants.size() + 
-//					" \tgroundModifiers: " 	+ groundModifiers.size() + 
-//					" \tprojectiles: " 		+ projectiles.size());
+		if(Game.ticks % 200 == 0) {
+			System.out.println("Tick " + Game.ticks +
+					" \tunits: " 				+ units.size() + 
+					" \tbuildings: " 		+ buildings.size() + 
+					" \tplannedBuildings: " + plannedBuildings.size() + 
+					" \tplants: " 		+ plants.size() + 
+					" \tgroundModifiers: " 	+ groundModifiers.size() + 
+					" \tprojectiles: " 		+ projectiles.size());
 		}
 	}
 	
@@ -920,7 +920,7 @@ public class World {
 				minimapColor = tile.getModifier().getType().getColor(0);
 				terrainColor = Utils.blendColors(tile.getModifier().getType().getColor(0), terrainColor, 0.9);
 			}
-			if(tile.getIsTerritory() != World.NEUTRAL_FACTION) {
+			if(tile.getIsTerritory() != World.NO_FACTION) {
 				minimapColor = Utils.blendColors(tile.getIsTerritory().color, minimapColor, 0.3);
 				terrainColor = Utils.blendColors(tile.getIsTerritory().color, terrainColor, 0.3);
 			}

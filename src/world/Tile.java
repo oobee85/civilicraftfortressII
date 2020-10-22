@@ -12,7 +12,7 @@ import utils.*;
 import wildlife.*;
 
 public class Tile {
-	private Faction isTerritory = World.NEUTRAL_FACTION;
+	private Faction isTerritory = World.NO_FACTION;
 	private boolean isSelected = false;
 	private boolean inVisionRange = false;
 

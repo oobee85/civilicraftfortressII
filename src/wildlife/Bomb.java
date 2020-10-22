@@ -15,30 +15,6 @@ public class Bomb extends Animal {
 	}
 	
 	@Override
-	public boolean wantsToEat() {
-		return false;
-	}
-
-	@Override
-	public boolean wantsToAttack() {
-		return true;
-	}
-	
-	@Override
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
-		if(!buildings.isEmpty()) {
-			for(Building building : buildings) {
-				if(building.getFaction() == World.PLAYER_FACTION) {
-					clearPlannedActions();
-					queuePlannedAction(new PlannedAction(building));
-					return;
-				}
-			}
-		
-		}
-	}
-	
-	@Override
 	public boolean takeDamage(double damage) {
 		if(!isDead()) {
 			super.takeDamage(damage);

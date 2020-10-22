@@ -81,14 +81,16 @@ public class Game {
 		viewOffset = new Position(0, 0);
 		showHeightMap = false;
 		
-		World.NEUTRAL_FACTION.setupResearch();
-		World.PLAYER_FACTION.setupResearch();
-		World.CYCLOPS_FACTION.setupResearch();
+		Loader.doTargetingMappings();
+		for(Faction f : World.factions) {
+			f.setupResearch();
+		}
 		
 		World.PLAYER_FACTION.addItem(ItemType.WOOD, 200);
 		World.PLAYER_FACTION.addItem(ItemType.STONE, 200);
 		World.PLAYER_FACTION.addItem(ItemType.FOOD, 200);
 		World.CYCLOPS_FACTION.addItem(ItemType.FOOD, 50);
+		World.UNDEAD_FACTION.addItem(ItemType.FOOD, 999999);
 		
 //		resources.get(ItemType.IRON_ORE).addAmount(200);
 //		resources.get(ItemType.COPPER_ORE).addAmount(200);
@@ -167,7 +169,7 @@ public class Game {
 	private void makeAnimal(Tile tile, UnitType unitType, int number) {
 		for(Tile t: tile.getNeighbors()) {
 			if(number > 0) {
-				world.spawnAnimal(unitType, t, World.NEUTRAL_FACTION);
+				world.spawnAnimal(unitType, t, World.NO_FACTION);
 				number --;
 			}else {
 				break;
@@ -209,7 +211,7 @@ public class Game {
 			System.out.println("orcs");
 		}
 		if(days % 15 == 0) {
-			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
+			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), World.NO_FACTION);
 			System.out.println("PARASITE");
 		}
 		
@@ -285,7 +287,7 @@ public class Game {
 			world.spawnLavaGolem();
 			world.spawnIceGiant();
 			world.spawnSkeletonArmy();
-			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
+			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), World.NO_FACTION);
 			spawnOrcs();
 		}
 		for(int i = 0; i < num/2; i++) {
@@ -297,7 +299,7 @@ public class Game {
 	public void spawnEverything() {
 		List<Tile> tiles = world.getTilesRandomly();
 		for(UnitType type : Game.unitTypeList) {
-			world.spawnAnimal(type, tiles.remove(0), World.NEUTRAL_FACTION);
+			world.spawnAnimal(type, tiles.remove(0), World.NO_FACTION);
 		}
 	}
 	public void generateWorld(MapType mapType, int size, boolean easymode) {
@@ -370,7 +372,7 @@ public class Game {
 					double distanceFromCenter = Math.sqrt(i*i + j*j);
 					if(distanceFromCenter < radius) {
 						Tile tile = world.get(new TileLoc(building.getTile().getLocation().x+i, building.getTile().getLocation().y+j));
-						if(tile != null && tile.getIsTerritory() == World.NEUTRAL_FACTION) {
+						if(tile != null && tile.getIsTerritory() == World.NO_FACTION) {
 							tile.setTerritory(building.getFaction());
 							world.addToTerritory(tile, building.getFaction());
 						}
@@ -499,7 +501,7 @@ public class Game {
 		if(selectedPath != null) {
 			for(Tile t : selectedPath.getTiles()) {
 				if(t != null) {
-					Building road = new Building(Game.buildingTypeMap.get("STONE_ROAD"), t, World.NEUTRAL_FACTION);
+					Building road = new Building(Game.buildingTypeMap.get("STONE_ROAD"), t, World.NO_FACTION);
 					road.setRemainingEffort(0);
 					t.setRoad(road);
 					world.newBuildings.add(road);
@@ -611,7 +613,7 @@ public class Game {
 				g.drawImage(theTile.getResource().getType().getImage(imagesize), drawx, drawy, draww, drawh, null);
 			}
 			
-			if(theTile.getIsTerritory() != World.NEUTRAL_FACTION) {
+			if(theTile.getIsTerritory() != World.NO_FACTION) {
 //				g.setColor(Color.black);
 //				g.fillRect(x, y, w, h); 
 				g.setColor(theTile.getIsTerritory().color);
@@ -1099,7 +1101,6 @@ public class Game {
 	private Thing summonThing(Tile tile, UnitType unitType, BuildingType buildingType, Faction faction) {
 		
 		if(unitType != null) {
-			System.out.println("spawn unit" + unitType.toString() +tile.getLocation());
 			if(faction == World.PLAYER_FACTION) {
 				Unit unit = new Unit(unitType, tile, faction);
 				world.newUnits.add(unit);
@@ -1114,7 +1115,6 @@ public class Game {
 			if(tile.getBuilding() != null) {
 				tile.getBuilding().setDead(true);
 			}
-			System.out.println("spawn building" + buildingType.toString() + tile.getLocation());
 			Building building = new Building(buildingType, tile, faction);
 			building.setRemainingEffort(0);
 			world.newBuildings.add(building);
@@ -1158,7 +1158,7 @@ public class Game {
 		}
 		// spawning unit or building
 		else if (selectedUnitToSpawn != null || selectedBuildingToSpawn != null) {
-			Thing summoned = summonThing(tile, selectedUnitToSpawn, selectedBuildingToSpawn, summonPlayerControlled ? World.PLAYER_FACTION : World.NEUTRAL_FACTION);
+			Thing summoned = summonThing(tile, selectedUnitToSpawn, selectedBuildingToSpawn, summonPlayerControlled ? World.PLAYER_FACTION : World.NO_FACTION);
 			if(summoned.getFaction() == World.PLAYER_FACTION) {
 				if(shiftEnabled == false) {
 					deselectEverything();

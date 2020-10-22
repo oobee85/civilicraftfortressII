@@ -9,7 +9,7 @@ public class Plant extends Thing {
 	private int currentYield;
 	
 	public Plant(PlantType pt, Tile t) {
-		super(pt.getHealth(), pt, World.NEUTRAL_FACTION, t);
+		super(pt.getHealth(), pt, World.NO_FACTION, t);
 		plantType = pt;
 	}
 	public ItemType getItem() {

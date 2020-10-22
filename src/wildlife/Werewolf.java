@@ -45,27 +45,4 @@ public class Werewolf extends Animal {
 			return super.attack(other);
 		}
 	}
-	
-	@Override
-	public boolean wantsToEat() {
-		return false;
-	}
-
-	@Override
-	public boolean wantsToAttack() {
-		return true;
-	}
-	
-	@Override
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
-		if(transformed) {
-			for(Unit unit : units) {
-				if(unit.getFaction() == World.PLAYER_FACTION) {
-					clearPlannedActions();
-					queuePlannedAction(new PlannedAction(unit));
-					return;
-				}
-			}
-		}
-	}
 }

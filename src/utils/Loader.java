@@ -9,6 +9,7 @@ import org.json.*;
 
 import game.*;
 import ui.*;
+import world.*;
 
 public class Loader {
 	private static String readFile(String filename) {
@@ -193,8 +194,16 @@ public class Loader {
 			if(unitTypeObject.has("projectile")) {
 				projectile = ProjectileType.valueOf(unitTypeObject.getString("projectile"));
 			}
+			TargetInfo[] targeting = null;
+			if(unitTypeObject.has("targeting")) {
+				JSONArray targetingList = unitTypeObject.getJSONArray("targeting");
+				targeting = new TargetInfo[targetingList.length()];
+				for(int j = 0; j < targetingList.length(); j++) {
+					targeting[j] = parseTargetInfoFromJSON(targetingList.getJSONObject(j));
+				}
+			}
 			
-			UnitType unitType = new UnitType(name, image, combatStats, attributes, researchReq, cost, items, projectile);
+			UnitType unitType = new UnitType(name, image, combatStats, attributes, researchReq, cost, items, projectile, targeting);
 			unitTypeMap.put(name, unitType);
 			unitTypeList.add(unitType);
 		}
@@ -300,11 +309,51 @@ public class Loader {
 		}
 	}
 	
-	public static void doMappings() {
+	public static void doMakingUnitMappings() {
 		for(BuildingType type : Game.buildingTypeList) {
 			for(String unittypestring : type.unitsCanBuild()) {
 				type.unitsCanBuildSet().add(Game.unitTypeMap.get(unittypestring));
 			}
 		}
+	}
+	public static void doTargetingMappings() {
+		for(UnitType type : Game.unitTypeList) {
+			if(type.getTargetingInfoStrings() != null) {
+				for(TargetInfo targetingInfo : type.getTargetingInfoStrings()) {
+					if(Game.unitTypeMap.containsKey(targetingInfo.type)) {
+						type.getTargetingInfo().add(new TargetingInfo(Game.unitTypeMap.get(targetingInfo.type), targetingInfo.faction));
+						continue;
+					}
+					else if(Game.buildingTypeMap.containsKey(targetingInfo.type)) {
+						type.getTargetingInfo().add(new TargetingInfo(Game.buildingTypeMap.get(targetingInfo.type), targetingInfo.faction));
+						continue;
+					}
+					try {
+						Class<?> cls = Class.forName(targetingInfo.type);
+						type.getTargetingInfo().add(new TargetingInfo(cls, targetingInfo.faction));
+						continue;
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+	public static class TargetInfo {
+		public final String type;
+		public final String faction;
+		public TargetInfo(String type, String faction) {
+			this.type = type;
+			this.faction = faction;
+		}
+	}
+	
+	private static TargetInfo parseTargetInfoFromJSON(JSONObject obj) {
+		String type = obj.getString("type");
+		String faction = null;
+		if(obj.has("faction")) {
+			faction = obj.getString("faction");
+		}
+		return new TargetInfo(type, faction);
 	}
 }

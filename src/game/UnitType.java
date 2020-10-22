@@ -5,9 +5,8 @@ import java.util.*;
 
 import javax.swing.ImageIcon;
 
-import utils.HasImage;
-import utils.MipMap;
-import utils.Utils;
+import utils.*;
+import utils.Loader.*;
 
 public class UnitType implements HasImage {
 	
@@ -19,8 +18,10 @@ public class UnitType implements HasImage {
 	private final String researchRequirement;
 	private final LinkedList<Item> deadItem;
 	private final ProjectileType projectileType;
+	private final TargetInfo[] targetingInfoStrings;
+	private final ArrayList<TargetingInfo> targetingInfo = new ArrayList<>();
 
-	public UnitType(String name, String image, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, ProjectileType projectileType) {
+	public UnitType(String name, String image, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, ProjectileType projectileType, TargetInfo[] targeting) {
 		this.name = name;
 		this.mipmap = new MipMap(image);
 		this.combatStats = cs;
@@ -29,6 +30,13 @@ public class UnitType implements HasImage {
 		this.researchRequirement = researchNeeded;
 		this.deadItem = deadItem;
 		this.projectileType = projectileType;
+		this.targetingInfoStrings = targeting;
+	}
+	public TargetInfo[] getTargetingInfoStrings() {
+		return targetingInfoStrings;
+	}
+	public ArrayList<TargetingInfo> getTargetingInfo() {
+		return targetingInfo;
 	}
 	public String name() {
 		return name;
@@ -53,6 +61,9 @@ public class UnitType implements HasImage {
 	}
 	public boolean isHostile() {
 		return attributes.contains("hostile");
+	}
+	public boolean isHerbivore() {
+		return attributes.contains("herbivore");
 	}
 	public boolean isColdResist() {
 		return attributes.contains("coldresistant");

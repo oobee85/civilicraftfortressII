@@ -18,11 +18,6 @@ public class Parasite extends Animal {
 	}
 	
 	@Override
-	public boolean wantsToEat() {
-		return false;
-	}
-	
-	@Override
 	public void updateState() {
 		super.updateState();
 		if(getTarget() != null) {
@@ -72,24 +67,11 @@ public class Parasite extends Animal {
 		}
 		return lethal;
 	}
-
-	@Override
-	public boolean wantsToAttack() {
-		return true;
-	}
 	
 	@Override
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		if(!transformed) {
-			for(Unit unit : units) {
-				if(unit.getFaction() == World.PLAYER_FACTION) {
-					clearPlannedActions();
-					queuePlannedAction(new PlannedAction(unit));
-					if(Math.random() < 0.2) {
-						return;
-					}
-				}
-			}
+			super.chooseWhatToAttack(units, buildings);
 		}
 	}
 	

@@ -348,6 +348,10 @@ public class Unit extends Thing {
 			boolean alreadyInRange = targetThing != null && this.inRange(targetThing);
 			if(targetTile != null && !alreadyInRange) {
 				moveTowards(targetTile);
+				// can't reach target
+				if(currentPath == null) {
+					actionQueue.poll();
+				}
 			}
 		}
 	}

@@ -19,11 +19,6 @@ public class WaterSpirit extends Animal {
 	}
 	
 	@Override
-	public boolean moveTo(Tile t) {
-		return super.moveTo(t);
-	}
-	
-	@Override
 	public void updateState() {
 		super.updateState();
 		if(Game.ticks % 20 == 0) {
@@ -35,15 +30,4 @@ public class WaterSpirit extends Animal {
 			}
 		}
 	}
-
-	@Override
-	public boolean wantsToAttack() {
-		return false;
-	}
-	
-	@Override
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
-		return;
-	}
-
 }
