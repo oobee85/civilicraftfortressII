@@ -109,8 +109,6 @@ public class Frame extends JPanel {
 	private Thread terrainImageThread;
 	private boolean isFastForwarding = false;
 	
-	private Semaphore gameUIReady = new Semaphore(0);
-
 	public Frame() {
 
 		frame = new JFrame(TITLE);
@@ -570,21 +568,6 @@ public class Frame extends JPanel {
 	private void runGame() {
 		setupGamePanel();
 		System.err.println("Starting Game");
-		Runnable menuAnimationStopListener = new Runnable() {
-			@Override
-			public void run() {
-				try {
-					gameUIReady.acquire();
-					SwingUtilities.invokeLater(() -> {
-						switchToGame();
-					});
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-			}
-		};
-		Thread thread = new Thread(menuAnimationStopListener);
-		thread.start();
 		
 		int size = Integer.parseInt(mapSize.getText());
 		gameInstance.generateWorld(size, easyModeButton.isSelected());
@@ -1192,7 +1175,10 @@ public class Frame extends JPanel {
 				}
 			}
 		});
-		gameUIReady.release();
+
+		SwingUtilities.invokeLater(() -> {
+			switchToGame();
+		});
 	}
 	
 	public Pair[] populateUnitTypeUI(JPanel panel, int BUILDING_ICON_SIZE) {
