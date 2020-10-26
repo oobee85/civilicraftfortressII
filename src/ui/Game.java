@@ -21,13 +21,10 @@ public class Game {
 	private Image redHitsplatImage = Utils.loadImage("resources/Images/interfaces/redhitsplat.png");
 	private Image blueHitsplatImage = Utils.loadImage("resources/Images/interfaces/bluehitsplat.png");
 	private Image greenHitsplatImage = Utils.loadImage("resources/Images/interfaces/greenhitsplat.png");
-	private Image targetImage = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
-	private Image spawnLocationImage = Utils.loadImage("resources/Images/interfaces/queuelocation.png");
 	private Image buildIcon = Utils.loadImage("resources/Images/interfaces/building.PNG");
 	private Image harvestIcon = Utils.loadImage("resources/Images/interfaces/harvest.png");
 	private Image guardIcon = Utils.loadImage("resources/Images/interfaces/guard.png");
 	private Image autoBuildIcon = Utils.loadImage("resources/Images/interfaces/autobuild.png");
-	private Image flag = Utils.loadImage("resources/Images/interfaces/flag.png");
 	private Image moonIcon = Utils.loadImage("resources/Images/interfaces/moon.png");
 	private Image sunIcon = Utils.loadImage("resources/Images/interfaces/sun.png");
 	
@@ -35,10 +32,10 @@ public class Game {
 	public volatile BufferedImage terrainImage;
 	public volatile BufferedImage minimapImage;
 	public volatile BufferedImage heightMapImage;
-	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
-	private UnitType selectedUnitToSpawn;
-	private BuildingType selectedBuildingToSpawn;
-	private BuildingType selectedBuildingToPlan;
+	public ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
+	public UnitType selectedUnitToSpawn;
+	public BuildingType selectedBuildingToSpawn;
+	public BuildingType selectedBuildingToPlan;
 	private boolean summonPlayerControlled = true;
 	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
 
@@ -49,19 +46,15 @@ public class Game {
 	public static final ArrayList<ResearchType> researchTypeList = new ArrayList<>();
 	public static final HashMap<String, ResearchType> researchTypeMap = new HashMap<>();
 
-	
 	private int money;
-	private TileLoc hoveredTile;
+	public TileLoc hoveredTile;
 	public boolean showHeightMap;
 	private boolean shiftEnabled = false;
 	private boolean controlEnabled = false;
 	private boolean aControl = false;
 	
-	private int fastModeTileSize = 1;
-	
 	private GUIController guiController;
 
-	public static final int NUM_DEBUG_DIGITS = 3;
 	public static int ticks;
 	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
 	public static boolean DEBUG_DRAW = false;
@@ -574,7 +567,7 @@ public class Game {
 		}
 	}
 	
-	private void drawTile(Graphics g, Tile theTile, double lowest, double highest) {
+	public void drawTile(Graphics g, Tile theTile, double lowest, double highest) {
 		int column = theTile.getLocation().x;
 		int row = theTile.getLocation().y;
 		int drawx = column * GameView.tileSize;
@@ -706,261 +699,7 @@ public class Game {
 		}
 	}
 	
-	public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffset) {
-		
-		// Try to only draw stuff that is visible on the screen
-		int lowerX = Math.max(0, viewOffset.divide(GameView.tileSize).getIntX() - 2);
-		int lowerY = Math.max(0, viewOffset.divide(GameView.tileSize).getIntY() - 2);
-		int upperX = Math.min(world.getWidth(), lowerX + panelWidth/GameView.tileSize + 4);
-		int upperY = Math.min(world.getHeight(), lowerY + panelHeight/GameView.tileSize + 4);
-		
-		if(GameView.tileSize < fastModeTileSize) {
-			if(showHeightMap) {
-				g.drawImage(heightMapImage, 0, 0, GameView.tileSize*world.getWidth(), GameView.tileSize*world.getHeight(), null);
-			}
-			else {
-				g.drawImage(terrainImage, 0, 0, GameView.tileSize*world.getWidth(), GameView.tileSize*world.getHeight(), null);
-			}
-		}
-		else {
-			double highest = 0;
-			double lowest = 1;
-			if(showHeightMap) {
-				for (int i = lowerX; i < upperX; i++) {
-					for (int j = lowerY; j < upperY; j++) {
-						Tile tile = world.get(new TileLoc(i, j));
-						if(tile == null)
-							continue;
-						highest = Math.max(highest, tile.getHeight());
-						lowest = Math.min(lowest, tile.getHeight());
-					}
-				}
-			}
-			
-			for (int i = lowerX; i < upperX; i++) {
-				for (int j = lowerY; j < upperY; j++) {
-					Tile tile = world.get(new TileLoc(i, j));
-					if(tile == null)
-						continue;
-					drawTile(g, tile, lowest, highest);
-				}
-			}
-			
-			for(Building building : world.buildings) {
-				drawHealthBar(g, building);
-				drawHitsplat(g, building);
-			}
-			for(Plant plant : world.plants) {
-				drawHealthBar(g, plant);
-				drawHitsplat(g, plant);
-			}
-			for(Unit unit : world.units) {
-				drawHealthBar(g, unit);
-				drawHitsplat(g, unit);
-			}
-			
-			for(Projectile p : world.projectiles) {
-				int extra = (int) (GameView.tileSize * p.getExtraSize());
-				g.drawImage(p.getShadow(0), p.getTile().getLocation().x * GameView.tileSize, p.getTile().getLocation().y * GameView.tileSize, GameView.tileSize, GameView.tileSize, null);
-				g.drawImage(p.getImage(0), p.getTile().getLocation().x * GameView.tileSize - extra/2, p.getTile().getLocation().y * GameView.tileSize - p.getHeight() - extra/2, GameView.tileSize + extra, GameView.tileSize + extra, null);
-			}
-			
-			for(Thing thing : selectedThings) {
-				// draw selection circle
-				g.setColor(Utils.getTransparentColor(World.PLAYER_FACTION.color, 150));
-//				Utils.setTransparency(g, 0.8f);
-				Graphics2D g2d = (Graphics2D)g;
-				Stroke currentStroke = g2d.getStroke();
-				int strokeWidth = GameView.tileSize/12;
-				g2d.setStroke(new BasicStroke(strokeWidth));
-				g.drawOval(thing.getTile().getLocation().x * GameView.tileSize + strokeWidth/2, thing.getTile().getLocation().y * GameView.tileSize + strokeWidth/2, GameView.tileSize-1 - strokeWidth, GameView.tileSize-1 - strokeWidth);
-				g2d.setStroke(currentStroke);
-//				Utils.setTransparency(g, 1f);
-
-				// draw spawn location for buildings
-				if(thing instanceof Building) {
-					Building building = (Building) thing;
-					if(building.getSpawnLocation() != building.getTile()) {
-						g.drawImage(spawnLocationImage, building.getSpawnLocation().getLocation().x * GameView.tileSize, building.getSpawnLocation().getLocation().y * GameView.tileSize, GameView.tileSize, GameView.tileSize, null);
-					}
-				}
-				
-				if (thing instanceof Unit) {
-					Unit unit = (Unit) thing;
-					// draw attacking target
-					drawTarget(g, unit);
-					// draw path 
-					LinkedList<Tile> path = unit.getCurrentPath();
-					if(path != null) {
-						g.setColor(Color.green);
-						TileLoc prev = unit.getTile().getLocation();
-						for(Tile t : path) {
-							if(prev != null) {
-								g.drawLine(prev.x * GameView.tileSize + GameView.tileSize/2, prev.y * GameView.tileSize + GameView.tileSize/2, 
-										t.getLocation().x * GameView.tileSize + GameView.tileSize/2, t.getLocation().y * GameView.tileSize + GameView.tileSize/2);
-							}
-							prev = t.getLocation();
-						}
-					}
-					// draw destination flags
-					for(PlannedAction plan : unit.actionQueue) {
-						Tile targetTile = plan.targetTile == null ? plan.target.getTile() : plan.targetTile;
-						g.drawImage(flag, targetTile.getLocation().x * GameView.tileSize, targetTile.getLocation().y * GameView.tileSize, GameView.tileSize, GameView.tileSize, null);
-					}
-					int range = unit.getType().getCombatStats().getAttackRadius();
-					if(range == 1) {
-						range = -1;
-					}
-					// draws the attack range for units
-					for (int i = lowerX; i < upperX; i++) {
-						for (int j = lowerY; j < upperY; j++) {
-							Tile t = world.get(new TileLoc(i, j));
-							if (t == null)
-								continue;
-							int x = t.getLocation().x * GameView.tileSize;
-							int y = t.getLocation().y * GameView.tileSize;
-							int w = GameView.tileSize;
-							int h = GameView.tileSize;
-
-							if (t.getLocation().distanceTo(unit.getTile().getLocation()) <= range) {
-								g.setColor(Color.BLACK);
-								Utils.setTransparency(g, 0.3f);
-
-								for (Tile tile : t.getNeighbors()) {
-									if (tile.getLocation().distanceTo(unit.getTile().getLocation()) > range) {
-										TileLoc tileLoc = tile.getLocation();
-
-										if (tileLoc.x == t.getLocation().x) {
-											if (tileLoc.y < t.getLocation().y) {
-												g.fillRect(x, y, w, 5);
-											}
-											if (tileLoc.y > t.getLocation().y) {
-												g.fillRect(x, y + h - 5, w, 5);
-											}
-
-										}
-										if (tileLoc.y == t.getLocation().y) {
-											if (tileLoc.x < t.getLocation().x) {
-												g.fillRect(x, y, 5, h);
-											}
-											if (tileLoc.x > t.getLocation().x) {
-												g.fillRect(x + w - 5, y, 5, h);
-											}
-										}
-
-									}
-								}
-								Utils.setTransparency(g, 1);
-							}
-						}
-					}
-				}
-			}
-
-			int indicatorSize = GameView.tileSize/12;
-			int offset = 4;
-			HashMap<Tile, Integer> visited = new HashMap<>();
-			for(Unit unit : world.units) {
-				int count = 0;
-				if(visited.containsKey(unit.getTile())) {
-					count = visited.get(unit.getTile());
-				}
-				visited.put(unit.getTile(), count+1);
-					
-				//draws a square for every player unit on the tile
-				int xx = unit.getTile().getLocation().x * GameView.tileSize + offset;
-				int yy = unit.getTile().getLocation().y * GameView.tileSize + (indicatorSize + offset)*count + offset;
-				g.setColor(unit.getFaction().color);
-				g.fillRect(xx, yy, indicatorSize, indicatorSize);
-				g.setColor(Color.BLACK);
-				g.drawRect(xx, yy, indicatorSize, indicatorSize);
-				count++;
-			}
-			
-			
-			if(!showHeightMap) {
-				for (int i = lowerX; i < upperX; i++) {
-					for (int j = lowerY; j < upperY; j++) {
-						Tile tile = world.get(new TileLoc(i, j));
-						if(tile == null)
-							continue;
-						double brightness = world.getDaylight() + tile.getBrightness(World.PLAYER_FACTION);
-						brightness = Math.max(Math.min(brightness, 1), 0);
-						g.setColor(new Color(0, 0, 0, (int)(255 * (1 - brightness))));
-						g.fillRect(i * GameView.tileSize, j * GameView.tileSize, GameView.tileSize, GameView.tileSize);
-					}
-				}
-			}
-			
-			if (selectedBuildingToSpawn != null) {
-				Utils.setTransparency(g, 0.5f);
-				Graphics2D g2d = (Graphics2D)g;
-				BufferedImage bI = Utils.toBufferedImage(selectedBuildingToSpawn.getImage(0));
-				g2d.drawImage(bI, hoveredTile.x * GameView.tileSize, hoveredTile.y * GameView.tileSize, GameView.tileSize, GameView.tileSize , null);
-				Utils.setTransparency(g, 1f);
-			}
-			if (selectedBuildingToPlan != null) {
-				Utils.setTransparency(g, 0.5f);
-				Graphics2D g2d = (Graphics2D)g;
-				BufferedImage bI = Utils.toBufferedImage(selectedBuildingToPlan.getImage(0));
-				g2d.drawImage(bI, hoveredTile.x * GameView.tileSize, hoveredTile.y * GameView.tileSize, GameView.tileSize, GameView.tileSize , null);
-				Utils.setTransparency(g, 1f);
-			}
-			if (selectedUnitToSpawn != null) {
-				Utils.setTransparency(g, 0.5f);
-				Graphics2D g2d = (Graphics2D)g;
-				BufferedImage bI = Utils.toBufferedImage(selectedUnitToSpawn.getImage(0));
-				g2d.drawImage(bI, hoveredTile.x * GameView.tileSize, hoveredTile.y * GameView.tileSize, GameView.tileSize, GameView.tileSize , null);
-				Utils.setTransparency(g, 1f);
-			}
-			
-			if(DEBUG_DRAW) {
-				if(GameView.tileSize >= 36) {
-					int[][] rows = new int[upperX - lowerX][upperY - lowerY];
-					int fontsize = GameView.tileSize/4;
-					fontsize = Math.min(fontsize, 13);
-					Font font = new Font("Consolas", Font.PLAIN, fontsize);
-					g.setFont(font);
-					for (int i = lowerX; i < upperX; i++) {
-						for (int j = lowerY; j < upperY; j++) {
-							Tile tile = world.get(new TileLoc(i, j));
-							List<String> strings = new LinkedList<String>();
-							strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
-							strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getHumidity()));
-							strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTempurature()));
-							
-							if(tile.liquidType != LiquidType.DRY) {
-								strings.add(String.format(tile.liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount));
-							}
-							
-							
-							if(tile.getModifier() != null) {
-								strings.add("GM=" + tile.getModifier().timeLeft());
-							}
-							rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, strings, rows[i-lowerX][j-lowerY], fontsize);
-							
-							for(Unit unit : tile.getUnits()) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, unit.getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
-							}
-							if(tile.getPlant() != null) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getPlant().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
-							}
-							if(tile.getHasBuilding()) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getBuilding().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
-							}
-							if(tile.getRoad() != null) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getRoad().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
-								
-							}
-						}
-					}
-				}
-			}
-			g.setColor(new Color(0, 0, 0, 64));
-			g.drawRect(hoveredTile.x * GameView.tileSize, hoveredTile.y * GameView.tileSize, GameView.tileSize-1, GameView.tileSize-1);
-			g.drawRect(hoveredTile.x * GameView.tileSize + 1, hoveredTile.y * GameView.tileSize + 1, GameView.tileSize - 3, GameView.tileSize - 3);
-		}
-	}
+	
 
 	public void drawHitsplat(Graphics g, Thing thing) {
 
@@ -1010,16 +749,6 @@ public class Game {
 			int width = g.getFontMetrics().stringWidth(text);
 			g.setColor(Color.WHITE);
 			g.drawString(text, x + splatWidth/2 - width/2, (int) (y+fontSize*1.5));
-		}
-	}
-	public void drawTarget(Graphics g, Unit unit) {
-		if(unit.getTarget() != null) {
-			Thing target = unit.getTarget();
-			int x = (int) ((target.getTile().getLocation().x * GameView.tileSize + GameView.tileSize*1/10) );
-			int y = (int) ((target.getTile().getLocation().y * GameView.tileSize + GameView.tileSize*1/10) );
-			int w = (int) (GameView.tileSize*8/10);
-			int hi = (int)(GameView.tileSize*8/10);
-			g.drawImage(targetImage, x, y, w, hi, null);
 		}
 	}
 	
