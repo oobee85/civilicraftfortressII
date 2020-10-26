@@ -10,6 +10,7 @@ import java.util.*;
 
 import game.*;
 import liquid.*;
+import networking.view.*;
 import ui.*;
 import utils.*;
 import wildlife.*;
@@ -31,9 +32,9 @@ public class Game {
 	private Image sunIcon = Utils.loadImage("resources/Images/interfaces/sun.png");
 	
 	private int skipUntilTick;
-	private volatile BufferedImage terrainImage;
-	private volatile BufferedImage minimapImage;
-	private volatile BufferedImage heightMapImage;
+	public volatile BufferedImage terrainImage;
+	public volatile BufferedImage minimapImage;
+	public volatile BufferedImage heightMapImage;
 	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
 	private UnitType selectedUnitToSpawn;
 	private BuildingType selectedBuildingToSpawn;
@@ -50,9 +51,8 @@ public class Game {
 
 	
 	private int money;
-	private Position viewOffset;
 	private TileLoc hoveredTile;
-	private boolean showHeightMap;
+	public boolean showHeightMap;
 	private boolean shiftEnabled = false;
 	private boolean controlEnabled = false;
 	private boolean aControl = false;
@@ -63,7 +63,6 @@ public class Game {
 
 	public static final int NUM_DEBUG_DIGITS = 3;
 	public static int ticks;
-	public static int tileSize = 9;
 	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
 	public static boolean DEBUG_DRAW = false;
 	public static boolean DISABLE_NIGHT = false;
@@ -76,7 +75,6 @@ public class Game {
 		this.guiController = guiController;
 		money = 100;
 		hoveredTile = new TileLoc(-1,-1);
-		viewOffset = new Position(0, 0);
 		showHeightMap = false;
 		
 		Loader.doTargetingMappings();
@@ -575,19 +573,14 @@ public class Game {
 			}
 		}
 	}
-	public void centerViewOn(Tile tile, int zoom, int panelWidth, int panelHeight) {
-		tileSize = zoom;
-		viewOffset.x = (tile.getLocation().x - panelWidth/2/tileSize) * tileSize + tileSize/2;
-		viewOffset.y = (tile.getLocation().y - panelHeight/2/tileSize) * tileSize;
-	}
 	
 	private void drawTile(Graphics g, Tile theTile, double lowest, double highest) {
 		int column = theTile.getLocation().x;
 		int row = theTile.getLocation().y;
-		int drawx = column * Game.tileSize;
-		int drawy = (int) (row * Game.tileSize);
-		int draww = Game.tileSize;
-		int drawh = Game.tileSize;
+		int drawx = column * GameView.tileSize;
+		int drawy = (int) (row * GameView.tileSize);
+		int draww = GameView.tileSize;
+		int drawh = GameView.tileSize;
 		int imagesize = draww < drawh ? draww : drawh;
 		
 		if(showHeightMap) {
@@ -659,20 +652,20 @@ public class Game {
 			
 			if (!theTile.getItems().isEmpty()) {
 				for (Item item : theTile.getItems()) {
-					g.drawImage(item.getType().getImage(imagesize), drawx + Game.tileSize/4,
-							drawy + Game.tileSize/4, Game.tileSize/2, Game.tileSize/2, null);
+					g.drawImage(item.getType().getImage(imagesize), drawx + GameView.tileSize/4,
+							drawy + GameView.tileSize/4, GameView.tileSize/2, GameView.tileSize/2, null);
 				}
 			}
 			if(theTile.getPlant() != null) {
 				Plant p = theTile.getPlant();
-				g.drawImage(p.getImage(Game.tileSize), drawx, drawy, draww, drawh, null);
+				g.drawImage(p.getImage(GameView.tileSize), drawx, drawy, draww, drawh, null);
 			}
 			
 			if(theTile.getBuilding() != null) {
 				drawBuilding(theTile.getBuilding(), g, drawx, drawy, draww, drawh);
 			}
 			for(Unit unit : theTile.getUnits()) {
-				g.drawImage(unit.getImage(Game.tileSize), drawx, drawy, draww, drawh, null);
+				g.drawImage(unit.getImage(GameView.tileSize), drawx, drawy, draww, drawh, null);
 				if(unit.getIsHarvesting() == true) {
 					g.drawImage(harvestIcon, drawx+draww/4, drawy+drawh/4, draww/2, drawh/2, null);
 				}
@@ -703,30 +696,30 @@ public class Game {
 			//draws the partial image
 			double percentDone = 1 - building.getRemainingEffort()/building.getType().getBuildingEffort();
 			int imageRatio =  Math.max(1, (int) (bI.getHeight() * percentDone));
-			int partialHeight = Math.max(1, (int) (Game.tileSize * percentDone));
+			int partialHeight = Math.max(1, (int) (GameView.tileSize * percentDone));
 			bI = bI.getSubimage(0, bI.getHeight() - imageRatio, bI.getWidth(), imageRatio);
 			g.drawImage(bI, drawx, drawy - partialHeight + drawh, draww, partialHeight , null);
-			g.drawImage(buildIcon, drawx + Game.tileSize/4, drawy + Game.tileSize/4, draww*3/4, drawh*3/4, null);
+			g.drawImage(buildIcon, drawx + GameView.tileSize/4, drawy + GameView.tileSize/4, draww*3/4, drawh*3/4, null);
 		}
 		else {
 			g.drawImage(bI, drawx, drawy, draww, drawh, null);
 		}
 	}
 	
-	public void draw(Graphics g, int panelWidth, int panelHeight) {
+	public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffset) {
 		
 		// Try to only draw stuff that is visible on the screen
-		int lowerX = Math.max(0, viewOffset.divide(tileSize).getIntX() - 2);
-		int lowerY = Math.max(0, viewOffset.divide(tileSize).getIntY() - 2);
-		int upperX = Math.min(world.getWidth(), lowerX + panelWidth/tileSize + 4);
-		int upperY = Math.min(world.getHeight(), lowerY + panelHeight/tileSize + 4);
+		int lowerX = Math.max(0, viewOffset.divide(GameView.tileSize).getIntX() - 2);
+		int lowerY = Math.max(0, viewOffset.divide(GameView.tileSize).getIntY() - 2);
+		int upperX = Math.min(world.getWidth(), lowerX + panelWidth/GameView.tileSize + 4);
+		int upperY = Math.min(world.getHeight(), lowerY + panelHeight/GameView.tileSize + 4);
 		
-		if(Game.tileSize < fastModeTileSize) {
+		if(GameView.tileSize < fastModeTileSize) {
 			if(showHeightMap) {
-				g.drawImage(heightMapImage, 0, 0, Game.tileSize*world.getWidth(), Game.tileSize*world.getHeight(), null);
+				g.drawImage(heightMapImage, 0, 0, GameView.tileSize*world.getWidth(), GameView.tileSize*world.getHeight(), null);
 			}
 			else {
-				g.drawImage(terrainImage, 0, 0, Game.tileSize*world.getWidth(), Game.tileSize*world.getHeight(), null);
+				g.drawImage(terrainImage, 0, 0, GameView.tileSize*world.getWidth(), GameView.tileSize*world.getHeight(), null);
 			}
 		}
 		else {
@@ -767,9 +760,9 @@ public class Game {
 			}
 			
 			for(Projectile p : world.projectiles) {
-				int extra = (int) (Game.tileSize * p.getExtraSize());
-				g.drawImage(p.getShadow(0), p.getTile().getLocation().x * Game.tileSize, p.getTile().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
-				g.drawImage(p.getImage(0), p.getTile().getLocation().x * Game.tileSize - extra/2, p.getTile().getLocation().y * Game.tileSize - p.getHeight() - extra/2, Game.tileSize + extra, Game.tileSize + extra, null);
+				int extra = (int) (GameView.tileSize * p.getExtraSize());
+				g.drawImage(p.getShadow(0), p.getTile().getLocation().x * GameView.tileSize, p.getTile().getLocation().y * GameView.tileSize, GameView.tileSize, GameView.tileSize, null);
+				g.drawImage(p.getImage(0), p.getTile().getLocation().x * GameView.tileSize - extra/2, p.getTile().getLocation().y * GameView.tileSize - p.getHeight() - extra/2, GameView.tileSize + extra, GameView.tileSize + extra, null);
 			}
 			
 			for(Thing thing : selectedThings) {
@@ -778,9 +771,9 @@ public class Game {
 //				Utils.setTransparency(g, 0.8f);
 				Graphics2D g2d = (Graphics2D)g;
 				Stroke currentStroke = g2d.getStroke();
-				int strokeWidth = Game.tileSize/12;
+				int strokeWidth = GameView.tileSize/12;
 				g2d.setStroke(new BasicStroke(strokeWidth));
-				g.drawOval(thing.getTile().getLocation().x * Game.tileSize + strokeWidth/2, thing.getTile().getLocation().y * Game.tileSize + strokeWidth/2, Game.tileSize-1 - strokeWidth, Game.tileSize-1 - strokeWidth);
+				g.drawOval(thing.getTile().getLocation().x * GameView.tileSize + strokeWidth/2, thing.getTile().getLocation().y * GameView.tileSize + strokeWidth/2, GameView.tileSize-1 - strokeWidth, GameView.tileSize-1 - strokeWidth);
 				g2d.setStroke(currentStroke);
 //				Utils.setTransparency(g, 1f);
 
@@ -788,7 +781,7 @@ public class Game {
 				if(thing instanceof Building) {
 					Building building = (Building) thing;
 					if(building.getSpawnLocation() != building.getTile()) {
-						g.drawImage(spawnLocationImage, building.getSpawnLocation().getLocation().x * Game.tileSize, building.getSpawnLocation().getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+						g.drawImage(spawnLocationImage, building.getSpawnLocation().getLocation().x * GameView.tileSize, building.getSpawnLocation().getLocation().y * GameView.tileSize, GameView.tileSize, GameView.tileSize, null);
 					}
 				}
 				
@@ -803,8 +796,8 @@ public class Game {
 						TileLoc prev = unit.getTile().getLocation();
 						for(Tile t : path) {
 							if(prev != null) {
-								g.drawLine(prev.x * Game.tileSize + Game.tileSize/2, prev.y * Game.tileSize + Game.tileSize/2, 
-										t.getLocation().x * Game.tileSize + Game.tileSize/2, t.getLocation().y * Game.tileSize + Game.tileSize/2);
+								g.drawLine(prev.x * GameView.tileSize + GameView.tileSize/2, prev.y * GameView.tileSize + GameView.tileSize/2, 
+										t.getLocation().x * GameView.tileSize + GameView.tileSize/2, t.getLocation().y * GameView.tileSize + GameView.tileSize/2);
 							}
 							prev = t.getLocation();
 						}
@@ -812,7 +805,7 @@ public class Game {
 					// draw destination flags
 					for(PlannedAction plan : unit.actionQueue) {
 						Tile targetTile = plan.targetTile == null ? plan.target.getTile() : plan.targetTile;
-						g.drawImage(flag, targetTile.getLocation().x * Game.tileSize, targetTile.getLocation().y * Game.tileSize, Game.tileSize, Game.tileSize, null);
+						g.drawImage(flag, targetTile.getLocation().x * GameView.tileSize, targetTile.getLocation().y * GameView.tileSize, GameView.tileSize, GameView.tileSize, null);
 					}
 					int range = unit.getType().getCombatStats().getAttackRadius();
 					if(range == 1) {
@@ -824,10 +817,10 @@ public class Game {
 							Tile t = world.get(new TileLoc(i, j));
 							if (t == null)
 								continue;
-							int x = t.getLocation().x * Game.tileSize;
-							int y = t.getLocation().y * Game.tileSize;
-							int w = Game.tileSize;
-							int h = Game.tileSize;
+							int x = t.getLocation().x * GameView.tileSize;
+							int y = t.getLocation().y * GameView.tileSize;
+							int w = GameView.tileSize;
+							int h = GameView.tileSize;
 
 							if (t.getLocation().distanceTo(unit.getTile().getLocation()) <= range) {
 								g.setColor(Color.BLACK);
@@ -864,7 +857,7 @@ public class Game {
 				}
 			}
 
-			int indicatorSize = Game.tileSize/12;
+			int indicatorSize = GameView.tileSize/12;
 			int offset = 4;
 			HashMap<Tile, Integer> visited = new HashMap<>();
 			for(Unit unit : world.units) {
@@ -875,8 +868,8 @@ public class Game {
 				visited.put(unit.getTile(), count+1);
 					
 				//draws a square for every player unit on the tile
-				int xx = unit.getTile().getLocation().x * Game.tileSize + offset;
-				int yy = unit.getTile().getLocation().y * Game.tileSize + (indicatorSize + offset)*count + offset;
+				int xx = unit.getTile().getLocation().x * GameView.tileSize + offset;
+				int yy = unit.getTile().getLocation().y * GameView.tileSize + (indicatorSize + offset)*count + offset;
 				g.setColor(unit.getFaction().color);
 				g.fillRect(xx, yy, indicatorSize, indicatorSize);
 				g.setColor(Color.BLACK);
@@ -894,7 +887,7 @@ public class Game {
 						double brightness = world.getDaylight() + tile.getBrightness(World.PLAYER_FACTION);
 						brightness = Math.max(Math.min(brightness, 1), 0);
 						g.setColor(new Color(0, 0, 0, (int)(255 * (1 - brightness))));
-						g.fillRect(i * Game.tileSize, j * Game.tileSize, Game.tileSize, Game.tileSize);
+						g.fillRect(i * GameView.tileSize, j * GameView.tileSize, GameView.tileSize, GameView.tileSize);
 					}
 				}
 			}
@@ -903,28 +896,28 @@ public class Game {
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
 				BufferedImage bI = Utils.toBufferedImage(selectedBuildingToSpawn.getImage(0));
-				g2d.drawImage(bI, hoveredTile.x * Game.tileSize, hoveredTile.y * Game.tileSize, Game.tileSize, Game.tileSize , null);
+				g2d.drawImage(bI, hoveredTile.x * GameView.tileSize, hoveredTile.y * GameView.tileSize, GameView.tileSize, GameView.tileSize , null);
 				Utils.setTransparency(g, 1f);
 			}
 			if (selectedBuildingToPlan != null) {
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
 				BufferedImage bI = Utils.toBufferedImage(selectedBuildingToPlan.getImage(0));
-				g2d.drawImage(bI, hoveredTile.x * Game.tileSize, hoveredTile.y * Game.tileSize, Game.tileSize, Game.tileSize , null);
+				g2d.drawImage(bI, hoveredTile.x * GameView.tileSize, hoveredTile.y * GameView.tileSize, GameView.tileSize, GameView.tileSize , null);
 				Utils.setTransparency(g, 1f);
 			}
 			if (selectedUnitToSpawn != null) {
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
 				BufferedImage bI = Utils.toBufferedImage(selectedUnitToSpawn.getImage(0));
-				g2d.drawImage(bI, hoveredTile.x * Game.tileSize, hoveredTile.y * Game.tileSize, Game.tileSize, Game.tileSize , null);
+				g2d.drawImage(bI, hoveredTile.x * GameView.tileSize, hoveredTile.y * GameView.tileSize, GameView.tileSize, GameView.tileSize , null);
 				Utils.setTransparency(g, 1f);
 			}
 			
 			if(DEBUG_DRAW) {
-				if(Game.tileSize >= 36) {
+				if(GameView.tileSize >= 36) {
 					int[][] rows = new int[upperX - lowerX][upperY - lowerY];
-					int fontsize = Game.tileSize/4;
+					int fontsize = GameView.tileSize/4;
 					fontsize = Math.min(fontsize, 13);
 					Font font = new Font("Consolas", Font.PLAIN, fontsize);
 					g.setFont(font);
@@ -964,15 +957,15 @@ public class Game {
 				}
 			}
 			g.setColor(new Color(0, 0, 0, 64));
-			g.drawRect(hoveredTile.x * Game.tileSize, hoveredTile.y * Game.tileSize, Game.tileSize-1, Game.tileSize-1);
-			g.drawRect(hoveredTile.x * Game.tileSize + 1, hoveredTile.y * Game.tileSize + 1, Game.tileSize - 3, Game.tileSize - 3);
+			g.drawRect(hoveredTile.x * GameView.tileSize, hoveredTile.y * GameView.tileSize, GameView.tileSize-1, GameView.tileSize-1);
+			g.drawRect(hoveredTile.x * GameView.tileSize + 1, hoveredTile.y * GameView.tileSize + 1, GameView.tileSize - 3, GameView.tileSize - 3);
 		}
 	}
 
 	public void drawHitsplat(Graphics g, Thing thing) {
 
-		int splatWidth = (int) (Game.tileSize*.5);
-		int splatHeight = (int) (Game.tileSize*.5);
+		int splatWidth = (int) (GameView.tileSize*.5);
+		int splatHeight = (int) (GameView.tileSize*.5);
 		
 		thing.updateHitsplats();
 		Hitsplat[] hitsplats = thing.getHitsplatList();
@@ -984,20 +977,20 @@ public class Game {
 			double damage = hitsplats[m].getDamage();
 			int i = hitsplats[m].getSquare();
 			
-			int x = (int) ((thing.getTile().getLocation().x * Game.tileSize) );
-			int y = (int) ((thing.getTile().getLocation().y * Game.tileSize) );
+			int x = (int) ((thing.getTile().getLocation().x * GameView.tileSize) );
+			int y = (int) ((thing.getTile().getLocation().y * GameView.tileSize) );
 			
 			if(i == 1) {
-				x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*0.5);
-				y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*0.5);
+				x = (int) ((thing.getTile().getLocation().x * GameView.tileSize) + GameView.tileSize*0.5);
+				y = (int) ((thing.getTile().getLocation().y * GameView.tileSize) + GameView.tileSize*0.5);
 			}
 			if(i == 2) {
-				x = (int) ((thing.getTile().getLocation().x * Game.tileSize) + Game.tileSize*0.5);
-				y = (int) ((thing.getTile().getLocation().y * Game.tileSize) );
+				x = (int) ((thing.getTile().getLocation().x * GameView.tileSize) + GameView.tileSize*0.5);
+				y = (int) ((thing.getTile().getLocation().y * GameView.tileSize) );
 			}
 			if( i == 3) {
-				x = (int) ((thing.getTile().getLocation().x * Game.tileSize) );
-				y = (int) ((thing.getTile().getLocation().y * Game.tileSize) + Game.tileSize*0.5);
+				x = (int) ((thing.getTile().getLocation().x * GameView.tileSize) );
+				y = (int) ((thing.getTile().getLocation().y * GameView.tileSize) + GameView.tileSize*0.5);
 			}
 			
 			String text = String.format("%.0f", damage);
@@ -1012,7 +1005,7 @@ public class Game {
 				text = String.format("%.0f", -thing.getHitsplatDamage());
 			}
 			
-			int fontSize = Game.tileSize/4;
+			int fontSize = GameView.tileSize/4;
 			g.setFont(new Font(damageFont.getFontName(), Font.BOLD, fontSize));
 			int width = g.getFontMetrics().stringWidth(text);
 			g.setColor(Color.WHITE);
@@ -1022,23 +1015,23 @@ public class Game {
 	public void drawTarget(Graphics g, Unit unit) {
 		if(unit.getTarget() != null) {
 			Thing target = unit.getTarget();
-			int x = (int) ((target.getTile().getLocation().x * Game.tileSize + Game.tileSize*1/10) );
-			int y = (int) ((target.getTile().getLocation().y * Game.tileSize + Game.tileSize*1/10) );
-			int w = (int) (Game.tileSize*8/10);
-			int hi = (int)(Game.tileSize*8/10);
+			int x = (int) ((target.getTile().getLocation().x * GameView.tileSize + GameView.tileSize*1/10) );
+			int y = (int) ((target.getTile().getLocation().y * GameView.tileSize + GameView.tileSize*1/10) );
+			int w = (int) (GameView.tileSize*8/10);
+			int hi = (int)(GameView.tileSize*8/10);
 			g.drawImage(targetImage, x, y, w, hi, null);
 		}
 	}
 	
 	public void drawHealthBar(Graphics g, Thing thing) {
-		if( Game.tileSize <= 30) {
+		if( GameView.tileSize <= 30) {
 			return;
 		}
 		if(Game.ticks - thing.getTimeLastDamageTaken() < 20 || thing.getTile().getLocation().equals(hoveredTile)) {
-			int x = thing.getTile().getLocation().x * Game.tileSize + 1;
-			int y = thing.getTile().getLocation().y * Game.tileSize + 1;
-			int w = Game.tileSize - 1;
-			int h = Game.tileSize / 4 - 1;
+			int x = thing.getTile().getLocation().x * GameView.tileSize + 1;
+			int y = thing.getTile().getLocation().y * GameView.tileSize + 1;
+			int w = GameView.tileSize - 1;
+			int h = GameView.tileSize / 4 - 1;
 			drawHealthBar2(g, thing, x, y, w, h, 2, thing.getHealth() / thing.getMaxHealth());
 		}
 	}
@@ -1116,22 +1109,11 @@ public class Game {
 		}
 		return null;
 	}
-	
-	public Position getTileAtPixel(Position pixel) {
-		Position tile = pixel.add(viewOffset).divide(tileSize);
-		return tile;
-	}
-	public Position getPixelForTile(Position tile) {
-		return tile.multiply(tileSize).subtract(viewOffset);
-	}
 
-	public void mouseOver(int mx, int my) {
-		Position tile = getTileAtPixel(new Position(mx, my));
-//		System.out.println("Mouse is on tile " + tile);
-		hoveredTile = new TileLoc(tile.getIntX(), tile.getIntY());
+	public void mouseOver(Position tilepos) {
+		hoveredTile = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
 	}
-	public void leftClick(int mx, int my) {
-		Position tilepos = getTileAtPixel(new Position(mx,my));
+	public void leftClick(Position tilepos) {
 		Tile tile = world.get(new TileLoc(tilepos.getIntX(), tilepos.getIntY()));
 		
 		System.out.println("left clicked on " + tile);
@@ -1181,9 +1163,8 @@ public class Game {
 			selectedBuildingToPlan = null;
 		}
 	}
-	public void rightClick(int mx, int my) {
-		Position targetPosition = getTileAtPixel(new Position(mx, my));
-		Tile targetTile = world.get(new TileLoc(targetPosition.getIntX(), targetPosition.getIntY()));
+	public void rightClick(Position tilepos) {
+		Tile targetTile = world.get(new TileLoc(tilepos.getIntX(), tilepos.getIntY()));
 		if(targetTile == null) {
 			return;
 		}
@@ -1543,81 +1524,11 @@ public class Game {
 		}
 	}
 
-	public void doubleClick(int mx, int my) {
-		Position tilepos = getTileAtPixel(new Position(mx, my));
-		TileLoc loc = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
-	}
-	public void exitTile() {
-		guiController.toggleTileView();
-	}
-	
-	public void zoomView(int scroll, int mx, int my) {
-		int newTileSize;
-		if(scroll > 0) {
-			newTileSize = (int) ((tileSize - 1) * 0.95);
-		}
-		else {
-			newTileSize = (int) ((tileSize + 1) * 1.05);
-		}
-		zoomViewTo(newTileSize, mx, my);
-	}
-	public void zoomViewTo(int newTileSize, int mx, int my) {
-		if (newTileSize > 0) {
-			Position tile = getTileAtPixel(new Position(mx, my));
-			tileSize = newTileSize;
-			Position focalPoint = tile.multiply(tileSize).subtract(viewOffset);
-			viewOffset.x -= mx - focalPoint.x;
-			viewOffset.y -= my - focalPoint.y;
-		}
-	}
-	
-	
-	public void shiftView(int dx, int dy) {
-		viewOffset.x += dx;
-		viewOffset.y += dy;
-	}
-	public void moveViewTo(double ratiox, double ratioy, int panelWidth, int panelHeight) {
-		Position tile = new Position(ratiox*world.getWidth(), ratioy*world.getHeight());
-		Position pixel = tile.multiply(tileSize).subtract(new Position(panelWidth/2, panelHeight/2));
-		viewOffset = pixel;
-	}
-
-
 	public int getMoney() {
 		return money;
 	}
-	public int getTileSize() {
-		return tileSize;
-	}
 	
-	
-	protected void drawMinimap(Graphics g, int x, int y, int w, int h, int panelWidth, int panelHeight) {
-		if(showHeightMap) {
-			g.drawImage(heightMapImage, x, y, w, h, null);
-		}
-		else {
-			g.drawImage(minimapImage, x, y, w, h, null);
-		}
-		Position offsetTile = getTileAtPixel(viewOffset);
-		int boxx = (int) (offsetTile.x * w / world.getWidth() / 2);
-		int boxy = (int) (offsetTile.y * h / world.getHeight() / 2);
-		int boxw = (int) (panelWidth * w / Game.tileSize / world.getWidth());
-		int boxh = (int) (panelHeight * h / Game.tileSize / world.getHeight());
-		g.setColor(Color.yellow);
-		g.drawRect(x + boxx, y + boxy, boxw, boxh);
-	}
-	protected void drawGame(Graphics g, int panelWidth, int panelHeight) {
-		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
-		draw(g, panelWidth, panelHeight);
-		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
-		if(World.PLAYER_FACTION.getResearchTarget() != null && !World.PLAYER_FACTION.getResearchTarget().isUnlocked()) {
-			g.setFont(KUIConstants.infoFont);
-			double completedRatio = 1.0 * World.PLAYER_FACTION.getResearchTarget().getPointsSpent() / World.PLAYER_FACTION.getResearchTarget().getRequiredPoints();
-			String progress = String.format(World.PLAYER_FACTION.getResearchTarget() + " %d/%d", World.PLAYER_FACTION.getResearchTarget().getPointsSpent(), World.PLAYER_FACTION.getResearchTarget().getRequiredPoints());
-			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress, panelWidth - panelWidth/3 - 4, 4, panelWidth/3, 30);
-		}
-		Toolkit.getDefaultToolkit().sync();
-	}
+
 	
 	public Color getBackgroundColor() {
 		double ratio = World.getDaylight();

@@ -12,10 +12,9 @@ public class ServerGUI extends JPanel {
 
 //	private Server server;
 	private JLabel info;
+	private GameView gameView;
 	private JPanel connectionPanelBar;
 	private HashSet<JPanel> connectionPanels = new HashSet<>();
-	
-	private Game gameInstance;
 	
 	public ServerGUI() {
 		
@@ -32,21 +31,14 @@ public class ServerGUI extends JPanel {
 		topPanel.add(info, BorderLayout.NORTH);
 		topPanel.add(connectionPanelBar, BorderLayout.CENTER);
 		this.add(topPanel, BorderLayout.NORTH);
-		
-		JPanel gameView = new JPanel() {
-			@Override
-			protected void paintComponent(Graphics g) {
-				super.paintComponent(g);
-				if(gameInstance != null) {
-					gameInstance.draw(g, getWidth(), getHeight());
-				}
-			}
-		};
-		this.add(gameView, BorderLayout.CENTER);
 	}
 	
 	public void setGameInstance(Game instance) {
-		this.gameInstance = instance;
+		if(gameView != null) {
+			this.remove(gameView);
+		}
+		gameView = new GameView(instance);
+		this.add(gameView, BorderLayout.CENTER);
 		repaint();
 	}
 	

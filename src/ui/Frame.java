@@ -8,11 +8,10 @@ import java.util.Map.*;
 import java.util.concurrent.*;
 
 import javax.swing.*;
-import javax.swing.GroupLayout.*;
-import javax.swing.event.*;
 import javax.swing.Timer;
 
 import game.*;
+import networking.view.*;
 import ui.infopanels.*;
 import utils.*;
 import world.*;
@@ -55,7 +54,7 @@ public class Frame extends JPanel {
 	private JFrame frame;
 	private JPanel mainMenuPanel;
 	private volatile boolean readyToStart;
-	private JPanel gamepanel;
+	private GameView gamepanel;
 	private JPanel selectedUnitsPanel;
 	private JPanel resourcePanel2;
 	private JPanel minimapPanel;
@@ -99,7 +98,6 @@ public class Frame extends JPanel {
 	private Game gameInstance;
 	private int mx;
 	private int my;
-	private boolean dragged = false;
 
 	private int WORKER_TAB;
 	private int RESEARCH_TAB;
@@ -376,20 +374,8 @@ public class Frame extends JPanel {
 	}
 
 	private void setupGamePanel() {
-		gamepanel = new JPanel() {
-			@Override
-			public void paintComponent(Graphics g) {
-				super.paintComponent(g);
-				((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				((Graphics2D) g).setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-				((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-				g.setColor(gameInstance.getBackgroundColor());
-				g.fillRect(0, 0, getWidth(), getHeight());
-				gameInstance.drawGame(g, getWidth(), getHeight());
-				g.setColor(Color.black);
-				g.drawRect(-1, 0, getWidth() + 1, getHeight());
-			}
-		};
+		gamepanel = new GameView(gameInstance);
+		
 		resourcePanel2 = new JPanel();
 		resourcePanel2.setLayout(new BoxLayout(resourcePanel2, BoxLayout.Y_AXIS));
 		resourcePanel2.setOpaque(false);
@@ -402,77 +388,6 @@ public class Frame extends JPanel {
 		gamepanel.add(resourcePanel2, BorderLayout.WEST);
 		gamepanel.add(filler, BorderLayout.CENTER);
 		filler.add(selectedUnitsPanel, BorderLayout.SOUTH);
-		gamepanel.addMouseWheelListener(new MouseWheelListener() {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				// +1 is in -1 is out
-				gameInstance.zoomView(e.getWheelRotation(), mx, my);
-				tileSize.setText("TileSize = " + gameInstance.getTileSize());
-			}
-		});
-		gamepanel.addMouseMotionListener(new MouseMotionListener() {
-			@Override
-			public void mouseMoved(MouseEvent e) {
-				mx = e.getX();
-				my = e.getY();
-				gameInstance.mouseOver(mx, my);
-			}
-
-			@Override
-			public void mouseDragged(MouseEvent e) {
-//				System.out.println("mouse drag");
-				dragged = true;
-				if (SwingUtilities.isLeftMouseButton(e)) {
-					int mrx = e.getX();
-					int mry = e.getY();
-					int dx = mx - mrx;
-					int dy = my - mry;
-					gameInstance.shiftView(dx, dy);
-					mx = mrx;
-					my = mry;
-
-					gameInstance.mouseOver(mx, my);
-				} else if (SwingUtilities.isRightMouseButton(e)) {
-					int mx2 = e.getX();
-					int my2 = e.getY();
-					gameInstance.mouseOver(mx2, my2);
-				}
-			}
-		});
-
-		gamepanel.addMouseListener(new MouseListener() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				if (e.getButton() == MouseEvent.BUTTON3 && dragged == false) {
-					gameInstance.rightClick(mx, my);
-				}
-				if (e.getButton() == MouseEvent.BUTTON1 && dragged == false) {
-					gameInstance.leftClick(mx, my);
-				}
-				dragged = false;
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				mx = e.getX();
-				my = e.getY();
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-			}
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
-					gameInstance.doubleClick(mx, my);
-				}
-			}
-		});
 
 		gamepanel.addKeyListener(new KeyListener() {
 			@Override
@@ -504,7 +419,6 @@ public class Frame extends JPanel {
 					else {
 						gameInstance.aControl(true);
 					}
-					
 				}
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 					gameInstance.deselectEverything();
@@ -621,7 +535,7 @@ public class Frame extends JPanel {
 				g.fillRect(0, getHeight()*4/5, getWidth(), getHeight() - getHeight()*4/5);
 				g.setColor(Color.black);
 				g.drawRect(0, 0, getWidth(), getHeight());
-				gameInstance.drawMinimap(g, MINIMAPBORDERWIDTH, MINIMAPBORDERWIDTH,
+				gamepanel.drawMinimap(g, MINIMAPBORDERWIDTH, MINIMAPBORDERWIDTH,
 						minimapPanel.getWidth() - 2 * MINIMAPBORDERWIDTH,
 						minimapPanel.getHeight() - 2 * MINIMAPBORDERWIDTH, gamepanel.getWidth(), gamepanel.getHeight());
 			}
@@ -634,7 +548,7 @@ public class Frame extends JPanel {
 						/ (minimapPanel.getWidth() - 2 * MINIMAPBORDERWIDTH);
 				double ratioy = ((double) e.getY() - MINIMAPBORDERWIDTH)
 						/ (minimapPanel.getHeight() - 2 * MINIMAPBORDERWIDTH);
-				gameInstance.moveViewTo(ratiox, ratioy, gamepanel.getWidth(), gamepanel.getHeight());
+				gamepanel.moveViewTo(ratiox, ratioy, gamepanel.getWidth(), gamepanel.getHeight());
 				frame.repaint();
 			}
 		});
@@ -645,7 +559,7 @@ public class Frame extends JPanel {
 						/ (minimapPanel.getWidth() - 2 * MINIMAPBORDERWIDTH);
 				double ratioy = ((double) e.getY() - MINIMAPBORDERWIDTH)
 						/ (minimapPanel.getHeight() - 2 * MINIMAPBORDERWIDTH);
-				gameInstance.moveViewTo(ratiox, ratioy, gamepanel.getWidth(), gamepanel.getHeight());
+				gamepanel.moveViewTo(ratiox, ratioy, gamepanel.getWidth(), gamepanel.getHeight());
 				frame.repaint();
 			}
 		});
@@ -718,7 +632,7 @@ public class Frame extends JPanel {
 		frame.getContentPane().add(guiSplitter, BorderLayout.EAST);
 		frame.pack();
 		
-		gameInstance.centerViewOn(gameInstance.world.buildings.getLast().getTile(), 50, gamepanel.getWidth(), gamepanel.getHeight());
+		gamepanel.centerViewOn(gameInstance.world.buildings.getLast().getTile(), 50, gamepanel.getWidth(), gamepanel.getHeight());
 		gamepanel.requestFocusInWindow();
 		gamepanel.requestFocus();
 		frame.repaint();
@@ -1021,7 +935,7 @@ public class Frame extends JPanel {
 		}
 
 		JPanel buttonPanel = new JPanel();
-		tileSize = KUIConstants.setupLabel("TileSize = " + gameInstance.getTileSize(), null, DEBUG_BUTTON_SIZE);
+		tileSize = KUIConstants.setupLabel("TileSize = " + GameView.tileSize, null, DEBUG_BUTTON_SIZE);
 
 		JToggleButton showHeightMap = KUIConstants.setupToggleButton("Show Height Map", null, DEBUG_BUTTON_SIZE);
 		showHeightMap.addActionListener(e -> {

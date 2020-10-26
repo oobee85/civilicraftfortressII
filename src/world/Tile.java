@@ -7,6 +7,7 @@ import java.util.concurrent.*;
 
 import game.*;
 import liquid.*;
+import networking.view.*;
 import ui.*;
 import utils.*;
 import wildlife.*;
@@ -254,12 +255,12 @@ public class Tile {
 	public void drawHeightMap(Graphics g, double height) {
 		int r = Math.max(Math.min((int) (255 * height), 255), 0);
 		g.setColor(new Color(r, 0, 255 - r));
-		g.fillRect(location.x * Game.tileSize, location.y * Game.tileSize, Game.tileSize, Game.tileSize);
+		g.fillRect(location.x * GameView.tileSize, location.y * GameView.tileSize, GameView.tileSize, GameView.tileSize);
 	}
 
 	public int drawDebugStrings(Graphics g, List<String> strings, int row, int fontsize) {
-		int x = location.x * Game.tileSize + 2;
-		int y = location.y * Game.tileSize + fontsize / 2;
+		int x = location.x * GameView.tileSize + 2;
+		int y = location.y * GameView.tileSize + fontsize / 2;
 		int maxWidth = 0;
 		for (String s : strings) {
 			int stringWidth = g.getFontMetrics().stringWidth(s)+2;
