@@ -228,7 +228,7 @@ public class GameView extends JPanel {
 		}
 		//if a-click and the tile has a building or unit
 		else if(leftClickAction == LeftClickAction.ATTACK) {
-			game.attackCommand(selectedThings, tile, shiftDown, true);
+			attackCommand(selectedThings, tile, shiftDown, true);
 		}
 		//select units on tile
 		else {
@@ -237,6 +237,34 @@ public class GameView extends JPanel {
 		
 		if(!shiftDown) {
 			leftClickAction = LeftClickAction.NONE;
+		}
+	}
+
+	public void attackCommand(ConcurrentLinkedQueue<Thing> selectedThings, Tile tile, boolean shiftEnabled, boolean forceAttack) {
+		for(Thing thing : selectedThings) {
+			if(thing instanceof Unit) {
+				Unit unit = (Unit) thing;
+				Thing targetThing = null;
+				for(Unit tempUnit : tile.getUnits()) {
+					if(tempUnit == unit) {
+						continue;
+					}
+					targetThing = tempUnit;
+					break;
+				}
+				if(targetThing == null) {
+					targetThing = tile.getBuilding();
+				}
+				if(targetThing == null) {
+					targetThing = tile.getRoad();
+				}
+				if(targetThing != null) {
+					if(!shiftEnabled) {
+						unit.clearPlannedActions();
+					}
+					unit.queuePlannedAction(new PlannedAction(targetThing));
+				}
+			}
 		}
 	}
 
@@ -249,7 +277,51 @@ public class GameView extends JPanel {
 			leftClickAction = LeftClickAction.NONE;
 			return;
 		}
-		game.rightClick(selectedThings, targetTile, shiftDown);
+
+		for(Thing thing : selectedThings) {
+			if(thing instanceof Building) {
+				((Building) thing).setSpawnLocation(targetTile);
+			}
+			else if(thing instanceof Unit) {
+				Unit unit = (Unit) thing;
+				if(!shiftDown) {
+					unit.clearPlannedActions();
+				}
+				if(unit.getType().isBuilder()) {
+					Building targetBuilding = targetTile.getBuilding();
+					if(targetBuilding == null) {
+						targetBuilding = targetTile.getRoad();
+					}
+					if(targetBuilding != null && (targetBuilding.getFaction() == unit.getFaction() || targetBuilding.getType().isRoad()) && !targetBuilding.isBuilt()) {
+						unit.queuePlannedAction(new PlannedAction(targetBuilding, true));
+					}
+					else {
+						unit.queuePlannedAction(new PlannedAction(targetTile));
+					}
+				}
+				else {
+					Thing targetThing = null;
+					for(Unit tempUnit : targetTile.getUnits()) {
+						if(tempUnit == unit) {
+							continue;
+						}
+						if(tempUnit.getFaction() != unit.getFaction()) {
+							targetThing = tempUnit;
+						}
+					}
+					if(targetThing == null && targetTile.getBuilding() != null
+							&& (targetTile.getBuilding().getFaction() != unit.getFaction())) {
+						targetThing = targetTile.getBuilding();
+					}
+					if(targetThing != null) {
+						unit.queuePlannedAction(new PlannedAction(targetThing));
+					}
+					else {
+						unit.queuePlannedAction(new PlannedAction(targetTile));
+					}
+				}
+			}
+		}
 	}
 
 	public void setThingToSpawn(HasImage thingType) {
