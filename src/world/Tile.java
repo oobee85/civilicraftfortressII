@@ -252,15 +252,15 @@ public class Tile {
 		items.clear();
 	}
 
-	public void drawHeightMap(Graphics g, double height) {
+	public void drawHeightMap(Graphics g, double height, int tileSize) {
 		int r = Math.max(Math.min((int) (255 * height), 255), 0);
 		g.setColor(new Color(r, 0, 255 - r));
-		g.fillRect(location.x * GameView.tileSize, location.y * GameView.tileSize, GameView.tileSize, GameView.tileSize);
+		g.fillRect(location.x * tileSize, location.y * tileSize, tileSize, tileSize);
 	}
 
-	public int drawDebugStrings(Graphics g, List<String> strings, int row, int fontsize) {
-		int x = location.x * GameView.tileSize + 2;
-		int y = location.y * GameView.tileSize + fontsize / 2;
+	public int drawDebugStrings(Graphics g, List<String> strings, int row, int fontsize, int tileSize) {
+		int x = location.x * tileSize + 2;
+		int y = location.y * tileSize + fontsize / 2;
 		int maxWidth = 0;
 		for (String s : strings) {
 			int stringWidth = g.getFontMetrics().stringWidth(s)+2;

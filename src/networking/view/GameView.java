@@ -16,20 +16,29 @@ import world.*;
 
 public class GameView extends JPanel {
 
-	public static int tileSize = 9;
 	public static final int FAST_MODE_TILE_SIZE = 1;
 	public static final int NUM_DEBUG_DIGITS = 3;
 
 	private static final Image RALLY_POINT_IMAGE = Utils.loadImage("resources/Images/interfaces/queuelocation.png");
 	private static final Image TARGET_IMAGE = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
 	private static final Image FLAG = Utils.loadImage("resources/Images/interfaces/flag.png");
+	private Font damageFont = new Font("Comic Sans MS", Font.BOLD, 14);
+	private Image redHitsplatImage = Utils.loadImage("resources/Images/interfaces/redhitsplat.png");
+	private Image blueHitsplatImage = Utils.loadImage("resources/Images/interfaces/bluehitsplat.png");
+	private Image greenHitsplatImage = Utils.loadImage("resources/Images/interfaces/greenhitsplat.png");
 	
-	
+
+	public volatile BufferedImage terrainImage;
+	public volatile BufferedImage minimapImage;
+	public volatile BufferedImage heightMapImage;
 	
 	private Game game;
-	public Position viewOffset;
+	private Position viewOffset;
 	private Point previousMouse;
+	private boolean showHeightMap = false;
 	private boolean draggingMouse = false;
+	private TileLoc hoveredTile = new TileLoc(-1,-1);
+	private int tileSize = 9;
 	
 	
 	public GameView(Game game) {
@@ -46,7 +55,7 @@ public class GameView extends JPanel {
 		addMouseMotionListener(new MouseMotionListener() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				game.mouseOver(getTileAtPixel(e.getPoint()));
+				mouseOver(getTileAtPixel(e.getPoint()));
 				repaint();
 				previousMouse = e.getPoint();
 			}
@@ -62,7 +71,7 @@ public class GameView extends JPanel {
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						shiftView(dx, dy);
 					}
-					game.mouseOver(getTileAtPixel(currentMouse));
+					mouseOver(getTileAtPixel(currentMouse));
 					previousMouse = currentMouse;
 				}
 			}
@@ -103,6 +112,21 @@ public class GameView extends JPanel {
 				previousMouse = e.getPoint();
 			}
 		});
+	}
+	
+	public void updateTerrainImages() {
+		BufferedImage[] images = game.world.createTerrainImage();
+		this.terrainImage = images[0];
+		this.minimapImage = images[1];
+		this.heightMapImage = images[2];
+	}
+	
+	public void setShowHeightMap(boolean show) {
+		this.showHeightMap = show;
+	}
+
+	public void mouseOver(Position tilepos) {
+		hoveredTile = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
 	}
 	
 	public void centerViewOn(Tile tile, int zoom, int panelWidth, int panelHeight) {
@@ -187,26 +211,25 @@ public class GameView extends JPanel {
 		Toolkit.getDefaultToolkit().sync();
 	}
 	
-public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffset) {
-		
+	public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffset) {
 		// Try to only draw stuff that is visible on the screen
-		int lowerX = Math.max(0, viewOffset.divide(GameView.tileSize).getIntX() - 2);
-		int lowerY = Math.max(0, viewOffset.divide(GameView.tileSize).getIntY() - 2);
-		int upperX = Math.min(game.world.getWidth(), lowerX + panelWidth/GameView.tileSize + 4);
-		int upperY = Math.min(game.world.getHeight(), lowerY + panelHeight/GameView.tileSize + 4);
+		int lowerX = Math.max(0, viewOffset.divide(tileSize).getIntX() - 2);
+		int lowerY = Math.max(0, viewOffset.divide(tileSize).getIntY() - 2);
+		int upperX = Math.min(game.world.getWidth(), lowerX + panelWidth/tileSize + 4);
+		int upperY = Math.min(game.world.getHeight(), lowerY + panelHeight/tileSize + 4);
 		
-		if(GameView.tileSize < FAST_MODE_TILE_SIZE) {
-			if(game.showHeightMap) {
-				g.drawImage(game.heightMapImage, 0, 0, GameView.tileSize*game.world.getWidth(), GameView.tileSize*game.world.getHeight(), null);
+		if(tileSize < FAST_MODE_TILE_SIZE) {
+			if(showHeightMap) {
+				g.drawImage(heightMapImage, 0, 0, tileSize*game.world.getWidth(), tileSize*game.world.getHeight(), null);
 			}
 			else {
-				g.drawImage(game.terrainImage, 0, 0, GameView.tileSize*game.world.getWidth(), GameView.tileSize*game.world.getHeight(), null);
+				g.drawImage(terrainImage, 0, 0, tileSize*game.world.getWidth(), tileSize*game.world.getHeight(), null);
 			}
 		}
 		else {
 			double highest = 0;
 			double lowest = 1;
-			if(game.showHeightMap) {
+			if(showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
@@ -223,38 +246,38 @@ public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffse
 					Tile tile = game.world.get(new TileLoc(i, j));
 					if(tile == null)
 						continue;
-					game.drawTile(g, tile, lowest, highest);
+					game.drawTile(g, tile, lowest, highest, showHeightMap, tileSize);
 				}
 			}
 			
 			for(Building building : game.world.buildings) {
-				game.drawHealthBar(g, building);
-				game.drawHitsplat(g, building);
+				drawHealthBar(g, building);
+				drawHitsplat(g, building);
 			}
 			for(Plant plant : game.world.plants) {
-				game.drawHealthBar(g, plant);
-				game.drawHitsplat(g, plant);
+				drawHealthBar(g, plant);
+				drawHitsplat(g, plant);
 			}
 			for(Unit unit : game.world.units) {
-				game.drawHealthBar(g, unit);
-				game.drawHitsplat(g, unit);
+				drawHealthBar(g, unit);
+				drawHitsplat(g, unit);
 			}
 			
 			for(Projectile p : game.world.projectiles) {
-				int extra = (int) (GameView.tileSize * p.getExtraSize());
-				g.drawImage(p.getShadow(0), p.getTile().getLocation().x * GameView.tileSize, p.getTile().getLocation().y * GameView.tileSize, GameView.tileSize, GameView.tileSize, null);
-				g.drawImage(p.getImage(0), p.getTile().getLocation().x * GameView.tileSize - extra/2, p.getTile().getLocation().y * GameView.tileSize - p.getHeight() - extra/2, GameView.tileSize + extra, GameView.tileSize + extra, null);
+				int extra = (int) (tileSize * p.getExtraSize());
+				g.drawImage(p.getShadow(0), p.getTile().getLocation().x * tileSize, p.getTile().getLocation().y * tileSize, tileSize, tileSize, null);
+				g.drawImage(p.getImage(0), p.getTile().getLocation().x * tileSize - extra/2, p.getTile().getLocation().y * tileSize - p.getHeight() - extra/2, tileSize + extra, tileSize + extra, null);
 			}
 			
-			for(Thing thing : game.selectedThings) {
+			for(Thing thing : game.getSelectedThings()) {
 				// draw selection circle
 				g.setColor(Utils.getTransparentColor(World.PLAYER_FACTION.color, 150));
 //				Utils.setTransparency(g, 0.8f);
 				Graphics2D g2d = (Graphics2D)g;
 				Stroke currentStroke = g2d.getStroke();
-				int strokeWidth = GameView.tileSize/12;
+				int strokeWidth = tileSize/12;
 				g2d.setStroke(new BasicStroke(strokeWidth));
-				g.drawOval(thing.getTile().getLocation().x * GameView.tileSize + strokeWidth/2, thing.getTile().getLocation().y * GameView.tileSize + strokeWidth/2, GameView.tileSize-1 - strokeWidth, GameView.tileSize-1 - strokeWidth);
+				g.drawOval(thing.getTile().getLocation().x * tileSize + strokeWidth/2, thing.getTile().getLocation().y * tileSize + strokeWidth/2, tileSize-1 - strokeWidth, tileSize-1 - strokeWidth);
 				g2d.setStroke(currentStroke);
 //				Utils.setTransparency(g, 1f);
 
@@ -262,7 +285,7 @@ public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffse
 				if(thing instanceof Building) {
 					Building building = (Building) thing;
 					if(building.getSpawnLocation() != building.getTile()) {
-						g.drawImage(RALLY_POINT_IMAGE, building.getSpawnLocation().getLocation().x * GameView.tileSize, building.getSpawnLocation().getLocation().y * GameView.tileSize, GameView.tileSize, GameView.tileSize, null);
+						g.drawImage(RALLY_POINT_IMAGE, building.getSpawnLocation().getLocation().x * tileSize, building.getSpawnLocation().getLocation().y * tileSize, tileSize, tileSize, null);
 					}
 				}
 				
@@ -277,8 +300,8 @@ public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffse
 						TileLoc prev = unit.getTile().getLocation();
 						for(Tile t : path) {
 							if(prev != null) {
-								g.drawLine(prev.x * GameView.tileSize + GameView.tileSize/2, prev.y * GameView.tileSize + GameView.tileSize/2, 
-										t.getLocation().x * GameView.tileSize + GameView.tileSize/2, t.getLocation().y * GameView.tileSize + GameView.tileSize/2);
+								g.drawLine(prev.x * tileSize + tileSize/2, prev.y * tileSize + tileSize/2, 
+										t.getLocation().x * tileSize + tileSize/2, t.getLocation().y * tileSize + tileSize/2);
 							}
 							prev = t.getLocation();
 						}
@@ -286,7 +309,7 @@ public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffse
 					// draw destination flags
 					for(PlannedAction plan : unit.actionQueue) {
 						Tile targetTile = plan.targetTile == null ? plan.target.getTile() : plan.targetTile;
-						g.drawImage(FLAG, targetTile.getLocation().x * GameView.tileSize, targetTile.getLocation().y * GameView.tileSize, GameView.tileSize, GameView.tileSize, null);
+						g.drawImage(FLAG, targetTile.getLocation().x * tileSize, targetTile.getLocation().y * tileSize, tileSize, tileSize, null);
 					}
 					int range = unit.getType().getCombatStats().getAttackRadius();
 					if(range == 1) {
@@ -298,10 +321,10 @@ public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffse
 							Tile t = game.world.get(new TileLoc(i, j));
 							if (t == null)
 								continue;
-							int x = t.getLocation().x * GameView.tileSize;
-							int y = t.getLocation().y * GameView.tileSize;
-							int w = GameView.tileSize;
-							int h = GameView.tileSize;
+							int x = t.getLocation().x * tileSize;
+							int y = t.getLocation().y * tileSize;
+							int w = tileSize;
+							int h = tileSize;
 
 							if (t.getLocation().distanceTo(unit.getTile().getLocation()) <= range) {
 								g.setColor(Color.BLACK);
@@ -338,7 +361,7 @@ public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffse
 				}
 			}
 
-			int indicatorSize = GameView.tileSize/12;
+			int indicatorSize = tileSize/12;
 			int offset = 4;
 			HashMap<Tile, Integer> visited = new HashMap<>();
 			for(Unit unit : game.world.units) {
@@ -349,8 +372,8 @@ public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffse
 				visited.put(unit.getTile(), count+1);
 					
 				//draws a square for every player unit on the tile
-				int xx = unit.getTile().getLocation().x * GameView.tileSize + offset;
-				int yy = unit.getTile().getLocation().y * GameView.tileSize + (indicatorSize + offset)*count + offset;
+				int xx = unit.getTile().getLocation().x * tileSize + offset;
+				int yy = unit.getTile().getLocation().y * tileSize + (indicatorSize + offset)*count + offset;
 				g.setColor(unit.getFaction().color);
 				g.fillRect(xx, yy, indicatorSize, indicatorSize);
 				g.setColor(Color.BLACK);
@@ -359,16 +382,16 @@ public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffse
 			}
 			
 			
-			if(!game.showHeightMap) {
+			if(!showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
 						if(tile == null)
 							continue;
-						double brightness = game.world.getDaylight() + tile.getBrightness(World.PLAYER_FACTION);
+						double brightness = World.getDaylight() + tile.getBrightness(World.PLAYER_FACTION);
 						brightness = Math.max(Math.min(brightness, 1), 0);
 						g.setColor(new Color(0, 0, 0, (int)(255 * (1 - brightness))));
-						g.fillRect(i * GameView.tileSize, j * GameView.tileSize, GameView.tileSize, GameView.tileSize);
+						g.fillRect(i * tileSize, j * tileSize, tileSize, tileSize);
 					}
 				}
 			}
@@ -377,28 +400,28 @@ public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffse
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
 				BufferedImage bI = Utils.toBufferedImage(game.selectedBuildingToSpawn.getImage(0));
-				g2d.drawImage(bI, game.hoveredTile.x * GameView.tileSize, game.hoveredTile.y * GameView.tileSize, GameView.tileSize, GameView.tileSize , null);
+				g2d.drawImage(bI, hoveredTile.x * tileSize, hoveredTile.y * tileSize, tileSize, tileSize , null);
 				Utils.setTransparency(g, 1f);
 			}
 			if (game.selectedBuildingToPlan != null) {
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
 				BufferedImage bI = Utils.toBufferedImage(game.selectedBuildingToPlan.getImage(0));
-				g2d.drawImage(bI, game.hoveredTile.x * GameView.tileSize, game.hoveredTile.y * GameView.tileSize, GameView.tileSize, GameView.tileSize , null);
+				g2d.drawImage(bI, hoveredTile.x * tileSize, hoveredTile.y * tileSize, tileSize, tileSize , null);
 				Utils.setTransparency(g, 1f);
 			}
 			if (game.selectedUnitToSpawn != null) {
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
 				BufferedImage bI = Utils.toBufferedImage(game.selectedUnitToSpawn.getImage(0));
-				g2d.drawImage(bI, game.hoveredTile.x * GameView.tileSize, game.hoveredTile.y * GameView.tileSize, GameView.tileSize, GameView.tileSize , null);
+				g2d.drawImage(bI, hoveredTile.x * tileSize, hoveredTile.y * tileSize, tileSize, tileSize , null);
 				Utils.setTransparency(g, 1f);
 			}
 			
 			if(Game.DEBUG_DRAW) {
-				if(GameView.tileSize >= 36) {
+				if(tileSize >= 36) {
 					int[][] rows = new int[upperX - lowerX][upperY - lowerY];
-					int fontsize = GameView.tileSize/4;
+					int fontsize = tileSize/4;
 					fontsize = Math.min(fontsize, 13);
 					Font font = new Font("Consolas", Font.PLAIN, fontsize);
 					g.setFont(font);
@@ -418,19 +441,19 @@ public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffse
 							if(tile.getModifier() != null) {
 								strings.add("GM=" + tile.getModifier().timeLeft());
 							}
-							rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, strings, rows[i-lowerX][j-lowerY], fontsize);
+							rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, strings, rows[i-lowerX][j-lowerY], fontsize, tileSize);
 							
 							for(Unit unit : tile.getUnits()) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, unit.getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, unit.getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize);
 							}
 							if(tile.getPlant() != null) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getPlant().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getPlant().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize);
 							}
 							if(tile.getHasBuilding()) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getBuilding().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getBuilding().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize);
 							}
 							if(tile.getRoad() != null) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getRoad().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize);
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getRoad().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize);
 								
 							}
 						}
@@ -438,34 +461,110 @@ public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffse
 				}
 			}
 			g.setColor(new Color(0, 0, 0, 64));
-			g.drawRect(game.hoveredTile.x * GameView.tileSize, game.hoveredTile.y * GameView.tileSize, GameView.tileSize-1, GameView.tileSize-1);
-			g.drawRect(game.hoveredTile.x * GameView.tileSize + 1, game.hoveredTile.y * GameView.tileSize + 1, GameView.tileSize - 3, GameView.tileSize - 3);
+			g.drawRect(hoveredTile.x * tileSize, hoveredTile.y * tileSize, tileSize-1, tileSize-1);
+			g.drawRect(hoveredTile.x * tileSize + 1, hoveredTile.y * tileSize + 1, tileSize - 3, tileSize - 3);
 		}
 	}
 
 	public void drawTarget(Graphics g, Unit unit) {
 		if(unit.getTarget() != null) {
 			Thing target = unit.getTarget();
-			int x = (int) ((target.getTile().getLocation().x * GameView.tileSize + GameView.tileSize*1/10) );
-			int y = (int) ((target.getTile().getLocation().y * GameView.tileSize + GameView.tileSize*1/10) );
-			int w = (int) (GameView.tileSize*8/10);
-			int hi = (int)(GameView.tileSize*8/10);
+			int x = (int) ((target.getTile().getLocation().x * tileSize + tileSize*1/10) );
+			int y = (int) ((target.getTile().getLocation().y * tileSize + tileSize*1/10) );
+			int w = (int) (tileSize*8/10);
+			int hi = (int)(tileSize*8/10);
 			g.drawImage(TARGET_IMAGE, x, y, w, hi, null);
 		}
 	}
 	
+	public void drawHealthBar(Graphics g, Thing thing) {
+		if( tileSize <= 30) {
+			return;
+		}
+		if(Game.ticks - thing.getTimeLastDamageTaken() < 20 || thing.getTile().getLocation().equals(hoveredTile)) {
+			int x = thing.getTile().getLocation().x * tileSize + 1;
+			int y = thing.getTile().getLocation().y * tileSize + 1;
+			int w = tileSize - 1;
+			int h = tileSize / 4 - 1;
+			drawHealthBar2(g, thing, x, y, w, h, 2, thing.getHealth() / thing.getMaxHealth());
+		}
+	}
+	
+	public static void drawHealthBar2(Graphics g, Thing thing, int x, int y, int w, int h, int thickness, double ratio) {
+		g.setColor(Color.BLACK);
+		g.fillRect(x, y, w, h);
+		
+		g.setColor(Color.RED);
+		g.fillRect(x + thickness, y + thickness, w - thickness*2, h - thickness*2);
+
+		int greenBarWidth = (int) (ratio * (w - thickness*2));
+		g.setColor(Color.GREEN);
+		g.fillRect(x + thickness, y + thickness, greenBarWidth, h - thickness*2);
+	}
+	
+	public void drawHitsplat(Graphics g, Thing thing) {
+
+		int splatWidth = (int) (tileSize*.5);
+		int splatHeight = (int) (tileSize*.5);
+		
+		thing.updateHitsplats();
+		Hitsplat[] hitsplats = thing.getHitsplatList();
+		
+		for(int m = 0; m < hitsplats.length; m++) {
+			if(hitsplats[m] == null) {
+				continue;
+			}
+			double damage = hitsplats[m].getDamage();
+			int i = hitsplats[m].getSquare();
+			
+			int x = (int) ((thing.getTile().getLocation().x * tileSize) );
+			int y = (int) ((thing.getTile().getLocation().y * tileSize) );
+			
+			if(i == 1) {
+				x = (int) ((thing.getTile().getLocation().x * tileSize) + tileSize*0.5);
+				y = (int) ((thing.getTile().getLocation().y * tileSize) + tileSize*0.5);
+			}
+			if(i == 2) {
+				x = (int) ((thing.getTile().getLocation().x * tileSize) + tileSize*0.5);
+				y = (int) ((thing.getTile().getLocation().y * tileSize) );
+			}
+			if( i == 3) {
+				x = (int) ((thing.getTile().getLocation().x * tileSize) );
+				y = (int) ((thing.getTile().getLocation().y * tileSize) + tileSize*0.5);
+			}
+			
+			String text = String.format("%.0f", damage);
+
+			if(damage > 0) {
+				g.drawImage(redHitsplatImage, x, y, splatWidth, splatHeight, null);
+			}else if(damage == 0){
+				g.drawImage(blueHitsplatImage, x, y, splatWidth, splatHeight, null);
+			}
+			else if(damage < 0) {
+				g.drawImage(greenHitsplatImage, x, y, splatWidth, splatHeight, null);
+				text = String.format("%.0f", -thing.getHitsplatDamage());
+			}
+			
+			int fontSize = tileSize/4;
+			g.setFont(new Font(damageFont.getFontName(), Font.BOLD, fontSize));
+			int width = g.getFontMetrics().stringWidth(text);
+			g.setColor(Color.WHITE);
+			g.drawString(text, x + splatWidth/2 - width/2, (int) (y+fontSize*1.5));
+		}
+	}
+	
 	public void drawMinimap(Graphics g, int x, int y, int w, int h, int panelWidth, int panelHeight) {
-		if(game.showHeightMap) {
-			g.drawImage(game.heightMapImage, x, y, w, h, null);
+		if(showHeightMap) {
+			g.drawImage(heightMapImage, x, y, w, h, null);
 		}
 		else {
-			g.drawImage(game.minimapImage, x, y, w, h, null);
+			g.drawImage(minimapImage, x, y, w, h, null);
 		}
 		Position offsetTile = getTileAtPixel(viewOffset);
 		int boxx = (int) (offsetTile.x * w / game.world.getWidth() / 2);
 		int boxy = (int) (offsetTile.y * h / game.world.getHeight() / 2);
-		int boxw = (int) (panelWidth * w / GameView.tileSize / game.world.getWidth());
-		int boxh = (int) (panelHeight * h / GameView.tileSize / game.world.getHeight());
+		int boxw = (int) (panelWidth * w / tileSize / game.world.getWidth());
+		int boxh = (int) (panelHeight * h / tileSize / game.world.getHeight());
 		g.setColor(Color.yellow);
 		g.drawRect(x + boxx, y + boxy, boxw, boxh);
 	}

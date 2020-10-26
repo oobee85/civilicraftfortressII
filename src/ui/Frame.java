@@ -49,6 +49,9 @@ public class Frame extends JPanel {
 	private ImageIcon NIGHT_ENABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_enabled.PNG"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private ImageIcon METEOR_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/meteor.PNG"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 
+	private static final Image MOON_IMAGE = Utils.loadImage("resources/Images/interfaces/moon.png");
+	private static final Image SUN_IMAGE = Utils.loadImage("resources/Images/interfaces/sun.png");
+	
 	private Timer repaintingThread;
 	private JToggleButton easyModeButton;
 	private JFrame frame;
@@ -63,14 +66,11 @@ public class Frame extends JPanel {
 	private JPanel makeUnitView;
 	private JPanel blacksmithView;
 	private JPanel hellforgeView;
-//	private JPanel barracksView;
-//	private JPanel workshopView;
 	private JPanel tileView;
 	private JPanel workerMenu;
 	private JPanel spawnMenu;
 	private JPanel researchView;
 	private JPanel statView;
-	private JLabel tileSize;
 	private JTabbedPane tabbedPane;
 	private JPanel guiSplitter;
 	private JPanel resourcePanel;
@@ -316,7 +316,7 @@ public class Frame extends JPanel {
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				Game.drawHealthBar2(g, unit, 0, getHeight() - 6, getWidth(), 6, 1, unit.getHealth()/unit.getMaxHealth());
+				GameView.drawHealthBar2(g, unit, 0, getHeight() - 6, getWidth(), 6, 1, unit.getHealth()/unit.getMaxHealth());
 			}
 		};
 		button.setMargin(KUIConstants.zeroMargin);
@@ -490,36 +490,34 @@ public class Frame extends JPanel {
 				int pathheight = getHeight() - Frame.MINIMAPBORDERWIDTH;
 				int totallength = 2*pathwidth + 2*pathheight;
 				offset = totallength*offset / (World.DAY_DURATION + World.NIGHT_DURATION);
-				Image sun = gameInstance.getTimeImage(true);
-				Image moon = gameInstance.getTimeImage(false);
 				int imagesize = Frame.MINIMAPBORDERWIDTH - padding*2;
 				if(offset < pathheight) {
-					g.drawImage(sun, padding, padding + pathheight - offset, imagesize, imagesize, null);
-					g.drawImage(moon, padding + pathwidth, padding + offset, imagesize, imagesize, null);
+					g.drawImage(SUN_IMAGE, padding, padding + pathheight - offset, imagesize, imagesize, null);
+					g.drawImage(MOON_IMAGE, padding + pathwidth, padding + offset, imagesize, imagesize, null);
 				}
 				else {
 					offset -= pathheight;
 					if(offset < pathwidth) {
-						g.drawImage(sun, padding + offset, padding, imagesize, imagesize, null);
-						g.drawImage(moon, padding + pathwidth - offset, padding + pathheight, imagesize, imagesize, null);
+						g.drawImage(SUN_IMAGE, padding + offset, padding, imagesize, imagesize, null);
+						g.drawImage(MOON_IMAGE, padding + pathwidth - offset, padding + pathheight, imagesize, imagesize, null);
 					}
 					else {
 						offset -= pathwidth;
 						if(offset < pathheight) {
-							g.drawImage(sun, padding + pathwidth, padding + offset, imagesize, imagesize, null);
-							g.drawImage(moon, padding, padding + pathheight - offset, imagesize, imagesize, null);
+							g.drawImage(SUN_IMAGE, padding + pathwidth, padding + offset, imagesize, imagesize, null);
+							g.drawImage(MOON_IMAGE, padding, padding + pathheight - offset, imagesize, imagesize, null);
 						}
 						else {
 							offset -= pathheight;
 							if(offset < pathwidth) {
-								g.drawImage(sun, padding + pathwidth - offset, padding + pathheight, imagesize, imagesize, null);
-								g.drawImage(moon, padding + offset, padding, imagesize, imagesize, null);
+								g.drawImage(SUN_IMAGE, padding + pathwidth - offset, padding + pathheight, imagesize, imagesize, null);
+								g.drawImage(MOON_IMAGE, padding + offset, padding, imagesize, imagesize, null);
 							}
 							else {
 								offset -= pathwidth;
 								if(offset < pathheight) {
-									g.drawImage(sun, padding, padding + pathheight - offset, imagesize, imagesize, null);
-									g.drawImage(moon, padding + pathwidth, padding + offset, imagesize, imagesize, null);
+									g.drawImage(SUN_IMAGE, padding, padding + pathheight - offset, imagesize, imagesize, null);
+									g.drawImage(MOON_IMAGE, padding + pathwidth, padding + offset, imagesize, imagesize, null);
 								}
 							}
 						}
@@ -935,12 +933,11 @@ public class Frame extends JPanel {
 		}
 
 		JPanel buttonPanel = new JPanel();
-		tileSize = KUIConstants.setupLabel("TileSize = " + GameView.tileSize, null, DEBUG_BUTTON_SIZE);
 
 		JToggleButton showHeightMap = KUIConstants.setupToggleButton("Show Height Map", null, DEBUG_BUTTON_SIZE);
 		showHeightMap.addActionListener(e -> {
 			showHeightMap.setText(showHeightMap.isSelected() ? "Hide Height Map" : "Show Height Map");
-			gameInstance.setShowHeightMap(showHeightMap.isSelected());
+			gamepanel.setShowHeightMap(showHeightMap.isSelected());
 		});
 
 		JToggleButton flipTable = KUIConstants.setupToggleButton("Flip Table", null, DEBUG_BUTTON_SIZE);
@@ -1072,7 +1069,6 @@ public class Frame extends JPanel {
 		resourcePanel.setPreferredSize(new Dimension(RESOURCE_PANEL_WIDTH, 1000));
 //		resourcePanel.setLayout(new BoxLayout(resourcePanel, BoxLayout.Y_AXIS));
 		buttonPanel.setPreferredSize(new Dimension(GUIWIDTH - RESOURCE_PANEL_WIDTH, 1000));
-		buttonPanel.add(tileSize);
 
 		buttonPanel.add(showHeightMap);
 		buttonPanel.add(flipTable);
@@ -1227,7 +1223,7 @@ public class Frame extends JPanel {
 			while (true) {
 				try {
 					long start = System.currentTimeMillis();
-					gameInstance.updateTerrainImages();
+					gamepanel.updateTerrainImages();
 					long elapsed = System.currentTimeMillis() - start;
 					long sleeptime = MILLISECONDS_PER_TICK - elapsed;
 					if(sleeptime > 0) {

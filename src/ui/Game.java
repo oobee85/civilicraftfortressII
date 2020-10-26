@@ -17,22 +17,13 @@ import wildlife.*;
 import world.*;
 
 public class Game {
-	private Font damageFont = new Font("Comic Sans MS", Font.BOLD, 14);
-	private Image redHitsplatImage = Utils.loadImage("resources/Images/interfaces/redhitsplat.png");
-	private Image blueHitsplatImage = Utils.loadImage("resources/Images/interfaces/bluehitsplat.png");
-	private Image greenHitsplatImage = Utils.loadImage("resources/Images/interfaces/greenhitsplat.png");
 	private Image buildIcon = Utils.loadImage("resources/Images/interfaces/building.PNG");
 	private Image harvestIcon = Utils.loadImage("resources/Images/interfaces/harvest.png");
 	private Image guardIcon = Utils.loadImage("resources/Images/interfaces/guard.png");
 	private Image autoBuildIcon = Utils.loadImage("resources/Images/interfaces/autobuild.png");
-	private Image moonIcon = Utils.loadImage("resources/Images/interfaces/moon.png");
-	private Image sunIcon = Utils.loadImage("resources/Images/interfaces/sun.png");
 	
-	private int skipUntilTick;
-	public volatile BufferedImage terrainImage;
-	public volatile BufferedImage minimapImage;
-	public volatile BufferedImage heightMapImage;
-	public ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
+	private boolean isFastForwarding = false;
+	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
 	public UnitType selectedUnitToSpawn;
 	public BuildingType selectedBuildingToSpawn;
 	public BuildingType selectedBuildingToPlan;
@@ -46,9 +37,6 @@ public class Game {
 	public static final ArrayList<ResearchType> researchTypeList = new ArrayList<>();
 	public static final HashMap<String, ResearchType> researchTypeMap = new HashMap<>();
 
-	private int money;
-	public TileLoc hoveredTile;
-	public boolean showHeightMap;
 	private boolean shiftEnabled = false;
 	private boolean controlEnabled = false;
 	private boolean aControl = false;
@@ -66,9 +54,6 @@ public class Game {
 	
 	public Game(GUIController guiController) {
 		this.guiController = guiController;
-		money = 100;
-		hoveredTile = new TileLoc(-1,-1);
-		showHeightMap = false;
 		
 		Loader.doTargetingMappings();
 		for(Faction f : World.factions) {
@@ -251,14 +236,6 @@ public class Game {
 		}
 		
 	}
-	public Image getTimeImage(boolean day) {
-		if(day) {
-			return sunIcon;
-		}
-		else {
-			return moonIcon;
-		}
-	}
 	public void eruptVolcano() {
 		world.eruptVolcano();
 	}
@@ -294,7 +271,6 @@ public class Game {
 		Attack.world = world;
 		world.generateWorld(size);
 		makeRoads(easymode);
-		updateTerrainImages();
 		if(easymode) {
 			addResources();
 		}
@@ -338,13 +314,6 @@ public class Game {
 			}
 			
 		}
-		
-	}
-	public void updateTerrainImages() {
-		BufferedImage[] images = world.createTerrainImage();
-		this.terrainImage = images[0];
-		this.minimapImage = images[1];
-		this.heightMapImage = images[2];
 	}
 
 	public void buildingTick() {
@@ -374,7 +343,6 @@ public class Game {
 		for(Tile tile : world.getTiles()) {
 			tile.setHeight(1 - tile.getHeight());
 		}
-		updateTerrainImages();
 	}
 	
 	private double computeCost(Tile current, Tile next, Tile target) {
@@ -567,17 +535,17 @@ public class Game {
 		}
 	}
 	
-	public void drawTile(Graphics g, Tile theTile, double lowest, double highest) {
+	public void drawTile(Graphics g, Tile theTile, double lowest, double highest, boolean showHeightMap, int tileSize) {
 		int column = theTile.getLocation().x;
 		int row = theTile.getLocation().y;
-		int drawx = column * GameView.tileSize;
-		int drawy = (int) (row * GameView.tileSize);
-		int draww = GameView.tileSize;
-		int drawh = GameView.tileSize;
+		int drawx = column * tileSize;
+		int drawy = (int) (row * tileSize);
+		int draww = tileSize;
+		int drawh = tileSize;
 		int imagesize = draww < drawh ? draww : drawh;
 		
 		if(showHeightMap) {
-			theTile.drawHeightMap(g, (world.get(new TileLoc(column, row)).getHeight() - lowest) / (highest - lowest));
+			theTile.drawHeightMap(g, (world.get(new TileLoc(column, row)).getHeight() - lowest) / (highest - lowest), tileSize);
 		}
 		else {
 			g.drawImage(theTile.getTerrain().getImage(imagesize), drawx, drawy, draww, drawh, null);
@@ -620,7 +588,7 @@ public class Game {
 				Utils.setTransparency(g, 1);
 			}
 			if (theTile.getRoad() != null) {
-				drawBuilding(theTile.getRoad(), g, drawx, drawy, draww, drawh);
+				drawBuilding(theTile.getRoad(), g, drawx, drawy, draww, drawh, tileSize);
 			}
 			
 			if(theTile.liquidType != LiquidType.DRY) {
@@ -645,20 +613,20 @@ public class Game {
 			
 			if (!theTile.getItems().isEmpty()) {
 				for (Item item : theTile.getItems()) {
-					g.drawImage(item.getType().getImage(imagesize), drawx + GameView.tileSize/4,
-							drawy + GameView.tileSize/4, GameView.tileSize/2, GameView.tileSize/2, null);
+					g.drawImage(item.getType().getImage(imagesize), drawx + tileSize/4,
+							drawy + tileSize/4, tileSize/2, tileSize/2, null);
 				}
 			}
 			if(theTile.getPlant() != null) {
 				Plant p = theTile.getPlant();
-				g.drawImage(p.getImage(GameView.tileSize), drawx, drawy, draww, drawh, null);
+				g.drawImage(p.getImage(tileSize), drawx, drawy, draww, drawh, null);
 			}
 			
 			if(theTile.getBuilding() != null) {
-				drawBuilding(theTile.getBuilding(), g, drawx, drawy, draww, drawh);
+				drawBuilding(theTile.getBuilding(), g, drawx, drawy, draww, drawh, tileSize);
 			}
 			for(Unit unit : theTile.getUnits()) {
-				g.drawImage(unit.getImage(GameView.tileSize), drawx, drawy, draww, drawh, null);
+				g.drawImage(unit.getImage(tileSize), drawx, drawy, draww, drawh, null);
 				if(unit.getIsHarvesting() == true) {
 					g.drawImage(harvestIcon, drawx+draww/4, drawy+drawh/4, draww/2, drawh/2, null);
 				}
@@ -671,13 +639,7 @@ public class Game {
 			}
 		}
 	}
-	public void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh) {
-		if(building.getFaction() == World.PLAYER_FACTION) {
-			HashSet<Tile> buildingVision = world.getNeighborsInRadius(building.getTile(), building.getType().getVisionRadius());
-			for(Tile invision : buildingVision) {
-				invision.setInVisionRange(true);
-			}
-		}
+	public void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh, int tileSize) {
 		
 		BufferedImage bI = Utils.toBufferedImage(building.getImage(0));
 		if(building.isBuilt() == false) {
@@ -689,107 +651,21 @@ public class Game {
 			//draws the partial image
 			double percentDone = 1 - building.getRemainingEffort()/building.getType().getBuildingEffort();
 			int imageRatio =  Math.max(1, (int) (bI.getHeight() * percentDone));
-			int partialHeight = Math.max(1, (int) (GameView.tileSize * percentDone));
+			int partialHeight = Math.max(1, (int) (tileSize * percentDone));
 			bI = bI.getSubimage(0, bI.getHeight() - imageRatio, bI.getWidth(), imageRatio);
 			g.drawImage(bI, drawx, drawy - partialHeight + drawh, draww, partialHeight , null);
-			g.drawImage(buildIcon, drawx + GameView.tileSize/4, drawy + GameView.tileSize/4, draww*3/4, drawh*3/4, null);
+			g.drawImage(buildIcon, drawx + tileSize/4, drawy + tileSize/4, draww*3/4, drawh*3/4, null);
 		}
 		else {
 			g.drawImage(bI, drawx, drawy, draww, drawh, null);
 		}
 	}
 	
-	
-
-	public void drawHitsplat(Graphics g, Thing thing) {
-
-		int splatWidth = (int) (GameView.tileSize*.5);
-		int splatHeight = (int) (GameView.tileSize*.5);
-		
-		thing.updateHitsplats();
-		Hitsplat[] hitsplats = thing.getHitsplatList();
-		
-		for(int m = 0; m < hitsplats.length; m++) {
-			if(hitsplats[m] == null) {
-				continue;
-			}
-			double damage = hitsplats[m].getDamage();
-			int i = hitsplats[m].getSquare();
-			
-			int x = (int) ((thing.getTile().getLocation().x * GameView.tileSize) );
-			int y = (int) ((thing.getTile().getLocation().y * GameView.tileSize) );
-			
-			if(i == 1) {
-				x = (int) ((thing.getTile().getLocation().x * GameView.tileSize) + GameView.tileSize*0.5);
-				y = (int) ((thing.getTile().getLocation().y * GameView.tileSize) + GameView.tileSize*0.5);
-			}
-			if(i == 2) {
-				x = (int) ((thing.getTile().getLocation().x * GameView.tileSize) + GameView.tileSize*0.5);
-				y = (int) ((thing.getTile().getLocation().y * GameView.tileSize) );
-			}
-			if( i == 3) {
-				x = (int) ((thing.getTile().getLocation().x * GameView.tileSize) );
-				y = (int) ((thing.getTile().getLocation().y * GameView.tileSize) + GameView.tileSize*0.5);
-			}
-			
-			String text = String.format("%.0f", damage);
-
-			if(damage > 0) {
-				g.drawImage(redHitsplatImage, x, y, splatWidth, splatHeight, null);
-			}else if(damage == 0){
-				g.drawImage(blueHitsplatImage, x, y, splatWidth, splatHeight, null);
-			}
-			else if(damage < 0) {
-				g.drawImage(greenHitsplatImage, x, y, splatWidth, splatHeight, null);
-				text = String.format("%.0f", -thing.getHitsplatDamage());
-			}
-			
-			int fontSize = GameView.tileSize/4;
-			g.setFont(new Font(damageFont.getFontName(), Font.BOLD, fontSize));
-			int width = g.getFontMetrics().stringWidth(text);
-			g.setColor(Color.WHITE);
-			g.drawString(text, x + splatWidth/2 - width/2, (int) (y+fontSize*1.5));
-		}
-	}
-	
-	public void drawHealthBar(Graphics g, Thing thing) {
-		if( GameView.tileSize <= 30) {
-			return;
-		}
-		if(Game.ticks - thing.getTimeLastDamageTaken() < 20 || thing.getTile().getLocation().equals(hoveredTile)) {
-			int x = thing.getTile().getLocation().x * GameView.tileSize + 1;
-			int y = thing.getTile().getLocation().y * GameView.tileSize + 1;
-			int w = GameView.tileSize - 1;
-			int h = GameView.tileSize / 4 - 1;
-			drawHealthBar2(g, thing, x, y, w, h, 2, thing.getHealth() / thing.getMaxHealth());
-		}
-	}
-	public static void drawHealthBar2(Graphics g, Thing thing, int x, int y, int w, int h, int thickness, double ratio) {
-		g.setColor(Color.BLACK);
-		g.fillRect(x, y, w, h);
-		
-		g.setColor(Color.RED);
-		g.fillRect(x + thickness, y + thickness, w - thickness*2, h - thickness*2);
-
-		int greenBarWidth = (int) (ratio * (w - thickness*2));
-		g.setColor(Color.GREEN);
-		g.fillRect(x + thickness, y + thickness, greenBarWidth, h - thickness*2);
-	}
 	private void updateTerritory() {
 		for(Building building : world.buildings) {
 			building.updateCulture();
 		}
 	}
-//	private void doResearch() {
-//		for(Faction faction : World.factions) {
-//			if(faction.researchTarget != null) {
-//				faction.researchTarget.spendResearch(10);
-//				if(faction.researchTarget.isUnlocked()) {
-//					guiController.updateGUI();
-//				}
-//			}
-//		}
-//	}
 	
 	public void craftItem(ItemType type, int amount) {
 		BuildingType requiredBuilding = Game.buildingTypeMap.get(type.getBuilding());
@@ -838,10 +714,6 @@ public class Game {
 		}
 		return null;
 	}
-
-	public void mouseOver(Position tilepos) {
-		hoveredTile = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
-	}
 	public void leftClick(Position tilepos) {
 		Tile tile = world.get(new TileLoc(tilepos.getIntX(), tilepos.getIntY()));
 		
@@ -868,6 +740,12 @@ public class Game {
 		//planning building
 		else if (selectedBuildingToPlan != null) {
 			Building plannedBuilding = buildBuilding(selectedBuildingToPlan, tile);
+			if(plannedBuilding.getFaction() == World.PLAYER_FACTION) {
+				HashSet<Tile> buildingVision = world.getNeighborsInRadius(plannedBuilding.getTile(), plannedBuilding.getType().getVisionRadius());
+				for(Tile invision : buildingVision) {
+					invision.setInVisionRange(true);
+				}
+			}
 			if(plannedBuilding != null) {
 				for(Thing thing : selectedThings) {
 					if(thing instanceof Unit) {
@@ -1252,43 +1130,26 @@ public class Game {
 			System.out.println("built " + u);
 		}
 	}
-
-	public int getMoney() {
-		return money;
-	}
-	
-
 	
 	public Color getBackgroundColor() {
 		double ratio = World.getDaylight();
 		int c = (int)(ratio * 255);
 		return new Color(c, c, c);
 	}
-	
-	public void setShowHeightMap(boolean show) {
-		this.showHeightMap = show;
-	}
 	public ConcurrentLinkedQueue<Thing> getSelectedThings() {
 		return selectedThings;
-	}
-	public void fastForwardToDay() {
-		skipUntilTick = ticks + world.ticksUntilDay();
-	}
-	public void toggleFastForward(boolean enabled) {
-		if(enabled) {
-			skipUntilTick = Integer.MAX_VALUE;
-		}
-		else {
-			skipUntilTick = ticks - 1;
-		}
 	}
 	
 	public void researchEverything() {
 		World.PLAYER_FACTION.researchEverything();
 		guiController.updateGUI();
 	}
+
+	public void toggleFastForward(boolean enabled) {
+		isFastForwarding = enabled;
+	}
 	
 	public boolean shouldFastForward() {
-		return ticks < skipUntilTick;
+		return isFastForwarding;
 	}
 }
