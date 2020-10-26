@@ -70,6 +70,12 @@ public class ClientGUI extends JPanel {
 		});
 		myinfoPanel.add(disconnectButton);
 		
+		JButton makeWorldButton = new JButton("Make World");
+		makeWorldButton.addActionListener(e -> {
+			client.sendMessage(new ClientMessage(ClientMessageType.MAKE_WORLD, null));
+		});
+		myinfoPanel.add(makeWorldButton);
+		
 		lobbyInfo = new JPanel();
 		lobbyInfo.setLayout(new BoxLayout(lobbyInfo, BoxLayout.Y_AXIS));
 		this.add(lobbyInfo, BorderLayout.CENTER);

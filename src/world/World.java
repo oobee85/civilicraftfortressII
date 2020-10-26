@@ -781,7 +781,7 @@ public class World {
 		return tiles;
 	}
 	
-	public void generateWorld(MapType mapType, int size) {
+	public void generateWorld(int size) {
 		liquidSimulationPhases.clear();
 		for(int i = 0; i < NUM_LIQUID_SIMULATION_PHASES; i++) {
 			liquidSimulationPhases.add(new ArrayList<>());

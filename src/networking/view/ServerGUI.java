@@ -6,43 +6,65 @@ import java.util.*;
 import javax.swing.*;
 
 import networking.server.*;
+import ui.*;
 
 public class ServerGUI extends JPanel {
 
 //	private Server server;
 	private JLabel info;
+	private JPanel connectionPanelBar;
 	private HashSet<JPanel> connectionPanels = new HashSet<>();
+	
+	private Game gameInstance;
+	
 	public ServerGUI() {
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		
+		this.setLayout(new BorderLayout());
+		
+		JPanel topPanel = new JPanel();
+		topPanel.setLayout(new BorderLayout());
+		
+		connectionPanelBar = new JPanel();
+		connectionPanelBar.setLayout(new BoxLayout(connectionPanelBar, BoxLayout.X_AXIS));
+		
 		info = new JLabel("info");
 		
-		this.add(info);
+		topPanel.add(info, BorderLayout.NORTH);
+		topPanel.add(connectionPanelBar, BorderLayout.CENTER);
+		this.add(topPanel, BorderLayout.NORTH);
 		
-//		JPanel blank = new JPanel();
-//		blank.setOpaque(false);
-//		constraints.gridx = 0;
-//		constraints.gridy = 1;
-//		constraints.weightx = 1; 
-//		constraints.weighty = 1;
-//		constraints.fill = GridBagConstraints.BOTH;
-//		this.add(blank, constraints);
+		JPanel gameView = new JPanel() {
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				if(gameInstance != null) {
+					gameInstance.draw(g, getWidth(), getHeight());
+				}
+			}
+		};
+		this.add(gameView, BorderLayout.CENTER);
+	}
+	
+	public void setGameInstance(Game instance) {
+		this.gameInstance = instance;
+		repaint();
 	}
 	
 	public void addedConnection(JPanel panel) {
 		if(!connectionPanels.contains(panel)) {
 			connectionPanels.add(panel);
-			this.add(panel);
-			this.revalidate();
-			this.repaint();
+			connectionPanelBar.add(panel);
+			connectionPanelBar.revalidate();
+			connectionPanelBar.repaint();
 		}
 	}
 	
 	public void lostConnection(JPanel panel) {
 		if(connectionPanels.contains(panel)) {
 			connectionPanels.remove(panel);
-			this.remove(panel);
-			this.revalidate();
-			this.repaint();
+			connectionPanelBar.remove(panel);
+			connectionPanelBar.revalidate();
+			connectionPanelBar.repaint();
 		}
 	}
 	

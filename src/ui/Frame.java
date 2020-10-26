@@ -74,7 +74,6 @@ public class Frame extends JPanel {
 	private JLabel tileSize;
 	private JTabbedPane tabbedPane;
 	private JPanel guiSplitter;
-	private JComboBox<MapType> mapType;
 	private JPanel resourcePanel;
 	private JButton[] resourceIndicators = new JButton[ItemType.values().length];
 	private boolean[] resourceIndicatorsAdded = new boolean[ItemType.values().length];
@@ -338,12 +337,7 @@ public class Frame extends JPanel {
 	
 	private void menu() {
 		frame.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-		if(Driver.SHOW_MENU_ANIMATION) {
-			mainMenuPanel = new MainMenuBackground();
-		}
-		else {
-			mainMenuPanel = new JPanel();
-		}
+		mainMenuPanel = new JPanel();
 		
 		easyModeButton = KUIConstants.setupToggleButton("Enable Easy Mode", null, BUILDING_BUTTON_SIZE);
 		easyModeButton.addActionListener(e -> {
@@ -368,10 +362,6 @@ public class Frame extends JPanel {
 		start.setEnabled(false);
 		mainMenuPanel.add(start);
 
-		mapType = new JComboBox<>(MapType.values());
-		KUIConstants.setComponentAttributes(mapType, BUILDING_BUTTON_SIZE);
-		mainMenuPanel.add(mapType);
-
 		mapSize = new JTextField("128", 10);
 		KUIConstants.setComponentAttributes(mapSize, BUILDING_BUTTON_SIZE);
 		mapSize.setFocusable(true);
@@ -381,16 +371,8 @@ public class Frame extends JPanel {
 		frame.add(mainMenuPanel, BorderLayout.CENTER);
 		frame.setVisible(true);
 		frame.requestFocusInWindow();
-		if(mainMenuPanel instanceof MainMenuBackground) {
-			((MainMenuBackground)mainMenuPanel).start(() -> {
-				readyToStart = true;
-				start.setEnabled(true);
-			});
-		}
-		else {
-			readyToStart = true;
-			start.setEnabled(true);
-		}
+		readyToStart = true;
+		start.setEnabled(true);
 	}
 
 	private void setupGamePanel() {
@@ -403,7 +385,7 @@ public class Frame extends JPanel {
 				((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 				g.setColor(gameInstance.getBackgroundColor());
 				g.fillRect(0, 0, getWidth(), getHeight());
-				gameInstance.drawGame(g);
+				gameInstance.drawGame(g, getWidth(), getHeight());
 				g.setColor(Color.black);
 				g.drawRect(-1, 0, getWidth() + 1, getHeight());
 			}
@@ -420,12 +402,6 @@ public class Frame extends JPanel {
 		gamepanel.add(resourcePanel2, BorderLayout.WEST);
 		gamepanel.add(filler, BorderLayout.CENTER);
 		filler.add(selectedUnitsPanel, BorderLayout.SOUTH);
-		gamepanel.addComponentListener(new ComponentAdapter() {
-			@Override
-			public void componentResized(ComponentEvent e) {
-				gameInstance.setViewSize(gamepanel.getWidth(), gamepanel.getHeight());
-			}
-		});
 		gamepanel.addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -647,7 +623,7 @@ public class Frame extends JPanel {
 				g.drawRect(0, 0, getWidth(), getHeight());
 				gameInstance.drawMinimap(g, MINIMAPBORDERWIDTH, MINIMAPBORDERWIDTH,
 						minimapPanel.getWidth() - 2 * MINIMAPBORDERWIDTH,
-						minimapPanel.getHeight() - 2 * MINIMAPBORDERWIDTH);
+						minimapPanel.getHeight() - 2 * MINIMAPBORDERWIDTH, gamepanel.getWidth(), gamepanel.getHeight());
 			}
 		};
 		minimapPanel.addMouseListener(new MouseAdapter() {
@@ -658,7 +634,7 @@ public class Frame extends JPanel {
 						/ (minimapPanel.getWidth() - 2 * MINIMAPBORDERWIDTH);
 				double ratioy = ((double) e.getY() - MINIMAPBORDERWIDTH)
 						/ (minimapPanel.getHeight() - 2 * MINIMAPBORDERWIDTH);
-				gameInstance.moveViewTo(ratiox, ratioy);
+				gameInstance.moveViewTo(ratiox, ratioy, gamepanel.getWidth(), gamepanel.getHeight());
 				frame.repaint();
 			}
 		});
@@ -669,7 +645,7 @@ public class Frame extends JPanel {
 						/ (minimapPanel.getWidth() - 2 * MINIMAPBORDERWIDTH);
 				double ratioy = ((double) e.getY() - MINIMAPBORDERWIDTH)
 						/ (minimapPanel.getHeight() - 2 * MINIMAPBORDERWIDTH);
-				gameInstance.moveViewTo(ratiox, ratioy);
+				gameInstance.moveViewTo(ratiox, ratioy, gamepanel.getWidth(), gamepanel.getHeight());
 				frame.repaint();
 			}
 		});
@@ -742,8 +718,7 @@ public class Frame extends JPanel {
 		frame.getContentPane().add(guiSplitter, BorderLayout.EAST);
 		frame.pack();
 		
-		gameInstance.setViewSize(gamepanel.getWidth(), gamepanel.getHeight());
-		gameInstance.centerViewOn(gameInstance.world.buildings.getLast().getTile(), 50);
+		gameInstance.centerViewOn(gameInstance.world.buildings.getLast().getTile(), 50, gamepanel.getWidth(), gamepanel.getHeight());
 		gamepanel.requestFocusInWindow();
 		gamepanel.requestFocus();
 		frame.repaint();
@@ -766,17 +741,11 @@ public class Frame extends JPanel {
 				}
 			}
 		};
-		if(mainMenuPanel instanceof MainMenuBackground) {
-			((MainMenuBackground)mainMenuPanel).stop(menuAnimationStopListener);
-		}
-		else {
-			Thread thread = new Thread(menuAnimationStopListener);
-			thread.start();
-		}
-		
+		Thread thread = new Thread(menuAnimationStopListener);
+		thread.start();
 		
 		int size = Integer.parseInt(mapSize.getText());
-		gameInstance.generateWorld((MapType) mapType.getSelectedItem(), size, easyModeButton.isSelected());
+		gameInstance.generateWorld(size, easyModeButton.isSelected());
 
 		Dimension RESOURCE_BUTTON_SIZE = new Dimension(80, 30);
 		Dimension RESEARCH_BUTTON_SIZE = new Dimension(125, 35);

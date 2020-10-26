@@ -2,6 +2,6 @@ package networking.message;
 
 public enum ClientMessageType {
 
-	INFO;
+	INFO, MAKE_WORLD;
 	
 }

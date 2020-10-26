@@ -57,15 +57,13 @@ public class Game {
 	private boolean controlEnabled = false;
 	private boolean aControl = false;
 	
-	private volatile int panelWidth;
-	private volatile int panelHeight;
-	private int fastModeTileSize = 10;
+	private int fastModeTileSize = 1;
 	
 	private GUIController guiController;
 
 	public static final int NUM_DEBUG_DIGITS = 3;
 	public static int ticks;
-	public static int tileSize;
+	public static int tileSize = 9;
 	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
 	public static boolean DEBUG_DRAW = false;
 	public static boolean DISABLE_NIGHT = false;
@@ -300,10 +298,10 @@ public class Game {
 			world.spawnAnimal(type, tiles.remove(0), World.NO_FACTION);
 		}
 	}
-	public void generateWorld(MapType mapType, int size, boolean easymode) {
+	public void generateWorld(int size, boolean easymode) {
 		world = new World();
 		Attack.world = world;
-		world.generateWorld(mapType, size);
+		world.generateWorld(size);
 		makeRoads(easymode);
 		updateTerrainImages();
 		if(easymode) {
@@ -380,14 +378,6 @@ public class Game {
 			building.tick(world);
 		}
 	}
-	
-
-	
-	public void setViewSize(int width, int height) {
-		panelWidth = width;
-		panelHeight = height;
-	}
-
 
 	public void flipTable() {
 		for(Tile tile : world.getTiles()) {
@@ -585,7 +575,7 @@ public class Game {
 			}
 		}
 	}
-	public void centerViewOn(Tile tile, int zoom) {
+	public void centerViewOn(Tile tile, int zoom, int panelWidth, int panelHeight) {
 		tileSize = zoom;
 		viewOffset.x = (tile.getLocation().x - panelWidth/2/tileSize) * tileSize + tileSize/2;
 		viewOffset.y = (tile.getLocation().y - panelHeight/2/tileSize) * tileSize;
@@ -723,7 +713,7 @@ public class Game {
 		}
 	}
 	
-	public void draw(Graphics g) {
+	public void draw(Graphics g, int panelWidth, int panelHeight) {
 		
 		// Try to only draw stuff that is visible on the screen
 		int lowerX = Math.max(0, viewOffset.divide(tileSize).getIntX() - 2);
@@ -1586,7 +1576,7 @@ public class Game {
 		viewOffset.x += dx;
 		viewOffset.y += dy;
 	}
-	public void moveViewTo(double ratiox, double ratioy) {
+	public void moveViewTo(double ratiox, double ratioy, int panelWidth, int panelHeight) {
 		Position tile = new Position(ratiox*world.getWidth(), ratioy*world.getHeight());
 		Position pixel = tile.multiply(tileSize).subtract(new Position(panelWidth/2, panelHeight/2));
 		viewOffset = pixel;
@@ -1601,7 +1591,7 @@ public class Game {
 	}
 	
 	
-	protected void drawMinimap(Graphics g, int x, int y, int w, int h) {
+	protected void drawMinimap(Graphics g, int x, int y, int w, int h, int panelWidth, int panelHeight) {
 		if(showHeightMap) {
 			g.drawImage(heightMapImage, x, y, w, h, null);
 		}
@@ -1616,15 +1606,15 @@ public class Game {
 		g.setColor(Color.yellow);
 		g.drawRect(x + boxx, y + boxy, boxw, boxh);
 	}
-	protected void drawGame(Graphics g) {
+	protected void drawGame(Graphics g, int panelWidth, int panelHeight) {
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
-		draw(g);
+		draw(g, panelWidth, panelHeight);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
 		if(World.PLAYER_FACTION.getResearchTarget() != null && !World.PLAYER_FACTION.getResearchTarget().isUnlocked()) {
 			g.setFont(KUIConstants.infoFont);
 			double completedRatio = 1.0 * World.PLAYER_FACTION.getResearchTarget().getPointsSpent() / World.PLAYER_FACTION.getResearchTarget().getRequiredPoints();
 			String progress = String.format(World.PLAYER_FACTION.getResearchTarget() + " %d/%d", World.PLAYER_FACTION.getResearchTarget().getPointsSpent(), World.PLAYER_FACTION.getResearchTarget().getRequiredPoints());
-			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress, this.panelWidth - this.panelWidth/3 - 4, 4, this.panelWidth/3, 30);
+			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress, panelWidth - panelWidth/3 - 4, 4, panelWidth/3, 30);
 		}
 		Toolkit.getDefaultToolkit().sync();
 	}

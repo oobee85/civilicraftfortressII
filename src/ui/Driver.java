@@ -9,8 +9,6 @@ import utils.*;
 
 public class Driver {
 	
-	public static final boolean SHOW_MENU_ANIMATION = false;
-//	
 //	public Driver() {
 //		Image lava = Utils.loadImage("Images/lava_flow.png");
 //		System.out.println(lava.getWidth());
@@ -70,7 +68,6 @@ public class Driver {
 	
 	
 	static {
-//		Loader.writeBuildingTypes();
 		Loader.loadResearchType(Game.researchTypeMap, Game.researchTypeList);
 		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
 		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);

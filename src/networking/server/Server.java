@@ -6,9 +6,12 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import game.*;
 import networking.*;
 import networking.message.*;
 import networking.view.*;
+import ui.*;
+import world.*;
 
 public class Server {
 	public static final int PORT = 25565;
@@ -20,6 +23,8 @@ public class Server {
 	private Thread thread;
 	
 	private ServerGUI gui;
+	
+	private Game gameInstance;
 
 	public Server() {
 		
@@ -106,6 +111,23 @@ public class Server {
 					if(message.getType() == ClientMessageType.INFO) {
 						connection.setPlayerInfo(message.getPlayerInfo());
 						updatedLobbyList();
+					}
+					else if(message.getType() == ClientMessageType.MAKE_WORLD) {
+						System.out.println("Making world");
+						gameInstance = new Game(new GUIController() {
+							@Override
+							public void updateGUI() {}
+							@Override
+							public void toggleTileView() {}
+							@Override
+							public void selectedUnit(Unit unit, boolean selected) {}
+							@Override
+							public void selectedSpawnUnit(boolean selected) {}
+							@Override
+							public void selectedBuilding(Building building, boolean selected) {}
+						});
+						gameInstance.generateWorld(128, false);
+						gui.setGameInstance(gameInstance);
 					}
 				}
 			} catch (InterruptedException e) {

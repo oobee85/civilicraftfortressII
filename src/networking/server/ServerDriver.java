@@ -4,6 +4,8 @@ package networking.server;
 import javax.swing.*;
 
 import networking.view.*;
+import ui.*;
+import utils.*;
 
 public class ServerDriver {
 	JFrame frame;
@@ -24,6 +26,12 @@ public class ServerDriver {
 		server.startAcceptingConnections();
 	}
 
+	static {
+		Loader.loadResearchType(Game.researchTypeMap, Game.researchTypeList);
+		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
+		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);
+		Loader.doMakingUnitMappings();
+	}
 
 	public static void main(String[] args) {
 		ServerDriver driver = new ServerDriver();
