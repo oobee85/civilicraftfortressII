@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.awt.image.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.*;
 
 import javax.swing.*;
 
@@ -32,6 +33,7 @@ public class GameView extends JPanel {
 	
 	private static final Font DAMAGE_FONT = new Font("Comic Sans MS", Font.BOLD, 14);
 	
+	private GUIController guiController;
 
 	private volatile BufferedImage terrainImage;
 	private volatile BufferedImage minimapImage;
@@ -42,9 +44,12 @@ public class GameView extends JPanel {
 	private Point previousMouse;
 	private boolean showHeightMap = false;
 	private boolean draggingMouse = false;
+	private boolean drawDebugStrings = false;
 	private TileLoc hoveredTile = new TileLoc(-1,-1);
 	private int tileSize = 9;
 	private boolean controlDown = false;
+
+	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
 
 	private LeftClickAction leftClickAction = LeftClickAction.NONE;
 	private HasImage selectedThingToSpawn;
@@ -54,6 +59,7 @@ public class GameView extends JPanel {
 	
 	public GameView(Game game) {
 		this.game = game;
+		this.guiController = game.getGUIController();
 		this.setBackground(Color.black);
 		viewOffset = new Position(0, 0);
 		addMouseWheelListener(new MouseWheelListener() {
@@ -143,7 +149,7 @@ public class GameView extends JPanel {
 				}
 				else if(e.getKeyCode() == KeyEvent.VK_A) {
 					if(e.isControlDown()) {
-						game.selectAllUnits();
+						selectAllUnits();
 					}
 					else {
 						leftClickAction = LeftClickAction.ATTACK;
@@ -153,14 +159,32 @@ public class GameView extends JPanel {
 					deselectEverything();
 				}
 				else if (e.getKeyCode() == KeyEvent.VK_S) {
-					game.unitStop();
+					game.unitStop(selectedThings);
 				}
 			}
 		});
 	}
+	public void tryToBuildUnit(UnitType u) {
+		game.tryToBuildUnit(selectedThings, u);
+	}
+	public void toggleAutoBuild() {
+		game.toggleAutoBuild(selectedThings);
+	}
+	public void setHarvesting() {
+		game.setHarvesting(selectedThings);
+	}
+	public void toggleGuarding() {
+		game.toggleGuarding(selectedThings);
+	}
+	public void workerRoad(BuildingType type) {
+		game.workerRoad(selectedThings, type);
+	}
 	
-	public boolean isControlDown() {
-		return controlDown;
+	public void setDrawDebugStrings(boolean enabled) {
+		drawDebugStrings = enabled;
+	}
+	public boolean getDrawDebugStrings() {
+		return drawDebugStrings;
 	}
 
 	public void leftClick(Position tilepos, boolean shiftDown) {
@@ -176,7 +200,7 @@ public class GameView extends JPanel {
 				if(!shiftDown) {
 					deselectEverything();
 				}
-				game.selectThing(summoned);
+				selectThing(summoned);
 			}
 		}
 		//planning building
@@ -189,7 +213,7 @@ public class GameView extends JPanel {
 				}
 			}
 			if(plannedBuilding != null) {
-				for(Thing thing : game.getSelectedThings()) {
+				for(Thing thing : selectedThings) {
 					if(thing instanceof Unit) {
 						Unit unit = (Unit) thing;
 						if(!shiftDown) {
@@ -204,11 +228,11 @@ public class GameView extends JPanel {
 		}
 		//if a-click and the tile has a building or unit
 		else if(leftClickAction == LeftClickAction.ATTACK) {
-			game.attackCommand(tile, shiftDown, true);
+			game.attackCommand(selectedThings, tile, shiftDown, true);
 		}
 		//select units on tile
 		else {
-			game.toggleSelectionOnTile(tile, shiftDown, controlDown);
+			toggleSelectionOnTile(tile, shiftDown, controlDown);
 		}
 		
 		if(!shiftDown) {
@@ -225,7 +249,7 @@ public class GameView extends JPanel {
 			leftClickAction = LeftClickAction.NONE;
 			return;
 		}
-		game.rightClick(targetTile, shiftDown);
+		game.rightClick(selectedThings, targetTile, shiftDown);
 	}
 
 	public void setThingToSpawn(HasImage thingType) {
@@ -241,12 +265,99 @@ public class GameView extends JPanel {
 		leftClickAction = LeftClickAction.PLAN_BUILDING;
 		selectedBuildingToPlan = buildingType;
 	}
+
+	public void selectAllUnits() {
+		for(Unit unit : game.world.units) {
+			if(unit.getFaction() == World.PLAYER_FACTION) {
+				selectThing(unit);
+			}
+		}
+	}
+	
+	public void toggleSelectionOnTile(Tile tile, boolean shiftEnabled, boolean controlEnabled) {
+		
+		//deselects everything if shift or control isnt enabled
+		if (shiftEnabled == false && !controlEnabled) {
+			deselectEverything();
+		}
+		
+		//selects the building on the tile
+		Building building = tile.getBuilding();
+		if(building != null && building.getFaction() == World.PLAYER_FACTION && tile.getUnitOfFaction(World.PLAYER_FACTION) == null) {
+			selectThing(building);
+		}
+		//goes through all the units on the tile and checks if they are selected
+		for(Unit candidate : tile.getUnits()) {
+			// clicking on tile w/o shift i.e only selects top unit
+			if (candidate.getFaction() == World.PLAYER_FACTION) {
+				selectThing(candidate);
+				//shift enabled -> selects whole stack
+				//shift disabled -> selects top unit
+				if (!shiftEnabled) {
+					break;
+				}
+			}
+		}
+	}
+	
+	public void selectThing(Thing thing) {
+		thing.setIsSelected(true);
+		selectedThings.add(thing);
+		if(thing instanceof Unit) {
+			guiController.selectedUnit((Unit)thing, true);
+		}
+		else if(thing instanceof Building) {
+			guiController.selectedBuilding((Building)thing, true);
+		}
+	}
 	
 	public void deselectEverything() {
-		game.deselectEverything();
+		for (Thing thing : selectedThings) {
+			if (thing != null) {
+				thing.setIsSelected(false);
+				
+				if (thing instanceof Unit) {
+					guiController.selectedUnit((Unit) thing, false);
+				}
+				if (thing instanceof Building) {
+					guiController.selectedBuilding((Building) thing, false);
+				}
+
+			}
+			selectedThings.remove(thing);
+		}
+		selectedThings.clear();
 		leftClickAction = LeftClickAction.NONE;
 	}
 	
+	public void pressedSelectedUnitPortrait(Unit unit) {
+		if(controlDown) {
+			deselectOneThing(unit);
+		}
+		else {
+			deselectOtherThings(unit);
+		}
+	}
+
+	public void deselectOneThing(Thing deselect) {
+		selectedThings.remove(deselect);
+		deselect.setIsSelected(false);
+		if(deselect instanceof Unit) {
+			guiController.selectedUnit((Unit)deselect, false);
+		}
+	}
+	
+	public void deselectOtherThings(Thing keep) {
+		for (Thing thing : selectedThings) {
+			thing.setIsSelected(false);
+			if(thing instanceof Unit) {
+				guiController.selectedUnit((Unit)thing, false);
+			}
+		}
+		selectedThings.clear();
+		selectThing(keep);
+	}
+
 	public void updateTerrainImages() {
 		BufferedImage[] images = game.world.createTerrainImage();
 		this.terrainImage = images[0];
@@ -402,7 +513,7 @@ public class GameView extends JPanel {
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x * tileSize - extra/2, p.getTile().getLocation().y * tileSize - p.getHeight() - extra/2, tileSize + extra, tileSize + extra, null);
 			}
 			
-			for(Thing thing : game.getSelectedThings()) {
+			for(Thing thing : selectedThings) {
 				// draw selection circle
 				g.setColor(Utils.getTransparentColor(World.PLAYER_FACTION.color, 150));
 //				Utils.setTransparency(g, 0.8f);
@@ -547,7 +658,7 @@ public class GameView extends JPanel {
 				Utils.setTransparency(g, 1f);
 			}
 			
-			if(Game.DEBUG_DRAW) {
+			if(drawDebugStrings) {
 				if(tileSize >= 36) {
 					int[][] rows = new int[upperX - lowerX][upperY - lowerY];
 					int fontsize = tileSize/4;
@@ -822,5 +933,9 @@ public class GameView extends JPanel {
 		int boxh = (int) (panelHeight * h / tileSize / game.world.getHeight());
 		g.setColor(Color.yellow);
 		g.drawRect(x + boxx, y + boxy, boxw, boxh);
+	}
+
+	public ConcurrentLinkedQueue<Thing> getSelectedThings() {
+		return selectedThings;
 	}
 }

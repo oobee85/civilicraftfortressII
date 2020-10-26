@@ -96,22 +96,18 @@ public class Frame extends JPanel {
 	private int WIDTH;
 	private int HEIGHT;
 	private Game gameInstance;
-	private int mx;
-	private int my;
 
 	private int WORKER_TAB;
 	private int RESEARCH_TAB;
 	private int BLACKSMITH_TAB;
 	private int HELLFORGE_TAB;
 	private int DEBUG_TAB;
-//	private int BARRACKS_TAB;
-//	private int WORKSHOP_TAB;
 	private int MAKE_UNIT_TAB;
-	private int STAT_TAB;
 	private int SPAWN_TAB;
 
 	private Thread gameLoopThread;
 	private Thread terrainImageThread;
+	private boolean isFastForwarding = false;
 	
 	private Semaphore gameUIReady = new Semaphore(0);
 
@@ -161,24 +157,6 @@ public class Frame extends JPanel {
 				if(selected) {
 					if(!selectedButtons.containsKey(unit)) {
 						JButton button = setupUnitButton(unit);
-						button.addActionListener(e -> {
-							if(gamepanel.isControlDown()) {
-								gameInstance.deselectOneThing(unit);
-							}
-							else {
-								gameInstance.deselectOtherThings(unit);
-							}
-						});
-						button.addMouseListener(new MouseAdapter() {
-							@Override
-							public void mouseEntered(MouseEvent e) {
-								pushInfoPanel(new UnitInfoPanel(unit));
-							}
-							@Override
-							public void mouseExited(MouseEvent e) {
-								popInfoPanel();
-							}
-						});
 						selectedButtons.put(unit, button);
 						selectedUnitsPanel.add(button);
 						gamepanel.revalidate();
@@ -187,10 +165,10 @@ public class Frame extends JPanel {
 					switchInfoPanel(infoPanel);
 					SwingUtilities.invokeLater(() -> {
 						infoPanel.addButton("Explode").addActionListener(e -> gameInstance.explode(unit));
-						infoPanel.addButton("RoadEverything").addActionListener(e -> gameInstance.workerRoad(Game.buildingTypeMap.get("STONE_ROAD")));
-						infoPanel.addButton("AutoBuild").addActionListener(e -> gameInstance.toggleAutoBuild());
-						infoPanel.addButton("SetHarvesting").addActionListener(e -> gameInstance.setHarvesting());
-						infoPanel.addButton("Guard").addActionListener(e -> gameInstance.toggleGuarding());
+						infoPanel.addButton("RoadEverything").addActionListener(e -> gamepanel.workerRoad(Game.buildingTypeMap.get("STONE_ROAD")));
+						infoPanel.addButton("AutoBuild").addActionListener(e -> gamepanel.toggleAutoBuild());
+						infoPanel.addButton("SetHarvesting").addActionListener(e -> gamepanel.setHarvesting());
+						infoPanel.addButton("Guard").addActionListener(e -> gamepanel.toggleGuarding());
 					});
 				}
 				else {
@@ -323,11 +301,16 @@ public class Frame extends JPanel {
 		button.setHorizontalAlignment(SwingConstants.CENTER);
 		KUIConstants.setComponentAttributes(button, null);
 		button.addActionListener(e -> {
-			if(gamepanel.isControlDown()) {
-				gameInstance.deselectOneThing(unit);
+			gamepanel.pressedSelectedUnitPortrait(unit);
+		});
+		button.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				pushInfoPanel(new UnitInfoPanel(unit));
 			}
-			else {
-				gameInstance.deselectOtherThings(unit);
+			@Override
+			public void mouseExited(MouseEvent e) {
+				popInfoPanel();
 			}
 		});
 		return button;
@@ -585,6 +568,7 @@ public class Frame extends JPanel {
 		terrainImageThread.start();
 	}
 	private void runGame() {
+		setupGamePanel();
 		System.err.println("Starting Game");
 		Runnable menuAnimationStopListener = new Runnable() {
 			@Override
@@ -934,7 +918,7 @@ public class Frame extends JPanel {
 		fastForward.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.toggleFastForward(fastForward.isSelected());
+				isFastForwarding = fastForward.isSelected();
 				fastForward.setText(fastForward.isSelected() ? "Stop Fast Forward" : "Fast Forward");
 			}
 		});
@@ -977,12 +961,12 @@ public class Frame extends JPanel {
 			}
 		});
 
-		JToggleButton debug = KUIConstants.setupToggleButton(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix", null, DEBUG_BUTTON_SIZE);
+		JToggleButton debug = KUIConstants.setupToggleButton(gamepanel.getDrawDebugStrings() ? "Leave Matrix" : "Matrix", null, DEBUG_BUTTON_SIZE);
 		debug.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				Game.DEBUG_DRAW = debug.isSelected();
-				debug.setText(Game.DEBUG_DRAW ? "Leave Matrix" : "Matrix");
+				gamepanel.setDrawDebugStrings(debug.isSelected());
+				debug.setText(gamepanel.getDrawDebugStrings() ? "Leave Matrix" : "Matrix");
 			}
 		});
 		JToggleButton toggleNight = KUIConstants.setupToggleButton(Game.DISABLE_NIGHT ? "Night Disabled" : "Night Enabled", NIGHT_ENABLED_ICON,
@@ -1085,7 +1069,6 @@ public class Frame extends JPanel {
 			statView.add(statButtons[i]);
 		}
 		
-		setupGamePanel();
 		setupMinimapPanel();
 
 		tabbedPane = new JTabbedPane();
@@ -1191,7 +1174,7 @@ public class Frame extends JPanel {
 						frame.setTitle(TITLE + " " + elapsed);
 					}
 					long sleeptime = MILLISECONDS_PER_TICK - elapsed;
-					if(sleeptime > 0 && !gameInstance.shouldFastForward()) {
+					if(sleeptime > 0 && !isFastForwarding) {
 						Thread.sleep(sleeptime);
 					}
 				}
@@ -1219,7 +1202,7 @@ public class Frame extends JPanel {
 			KButton button = KUIConstants.setupButton("Build " + type.toString(),
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.addActionListener(e -> {
-				gameInstance.tryToBuildUnit(type);
+				gamepanel.tryToBuildUnit(type);
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new UnitTypeInfoPanel(type));

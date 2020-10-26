@@ -26,13 +26,9 @@ public class Game {
 
 	public static int ticks;
 	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
-	public static boolean DEBUG_DRAW = false;
 	public static boolean DISABLE_NIGHT = false;
 	public static int days = 1;
 	public static int nights = 0;
-	private boolean isFastForwarding = false;
-
-	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
 	
 	public World world;
 	
@@ -82,6 +78,9 @@ public class Game {
 				eruptVolcano();
 			}
 		}
+	}
+	public GUIController getGUIController() {
+		return guiController;
 	}
 	public int getDays() {
 		return days;
@@ -575,7 +574,7 @@ public class Game {
 		}
 		return null;
 	}
-	public void rightClick(Tile targetTile, boolean shiftEnabled) {
+	public void rightClick(ConcurrentLinkedQueue<Thing> selectedThings, Tile targetTile, boolean shiftEnabled) {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Building) {
 				((Building) thing).setSpawnLocation(targetTile);
@@ -621,7 +620,7 @@ public class Game {
 			}
 		}
 	}
-	public void attackCommand(Tile tile, boolean shiftEnabled, boolean forceAttack) {
+	public void attackCommand(ConcurrentLinkedQueue<Thing> selectedThings, Tile tile, boolean shiftEnabled, boolean forceAttack) {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit) thing;
@@ -649,44 +648,8 @@ public class Game {
 			}
 		}
 	}
-	
-	public void selectThing(Thing thing) {
-		thing.setIsSelected(true);
-		selectedThings.add(thing);
-		if(thing instanceof Unit) {
-			guiController.selectedUnit((Unit)thing, true);
-		}
-		else if(thing instanceof Building) {
-			guiController.selectedBuilding((Building)thing, true);
-		}
-	}
 
-	public void toggleSelectionOnTile(Tile tile, boolean shiftEnabled, boolean controlEnabled) {
-		
-		//deselects everything if shift or control isnt enabled
-		if (shiftEnabled == false && !controlEnabled) {
-			deselectEverything();
-		}
-		
-		//selects the building on the tile
-		Building building = tile.getBuilding();
-		if(building != null && building.getFaction() == World.PLAYER_FACTION && tile.getUnitOfFaction(World.PLAYER_FACTION) == null) {
-			selectThing(building);
-		}
-		//goes through all the units on the tile and checks if they are selected
-		for(Unit candidate : tile.getUnits()) {
-			// clicking on tile w/o shift i.e only selects top unit
-			if (candidate.getFaction() == World.PLAYER_FACTION) {
-				selectThing(candidate);
-				//shift enabled -> selects whole stack
-				//shift disabled -> selects top unit
-				if (!shiftEnabled) {
-					break;
-				}
-			}
-		}
-	}
-	public void toggleAutoBuild() {
+	public void toggleAutoBuild(ConcurrentLinkedQueue<Thing> selectedThings) {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;
@@ -696,7 +659,7 @@ public class Game {
 			}
 		}
 	}
-	public void toggleGuarding() {
+	public void toggleGuarding(ConcurrentLinkedQueue<Thing> selectedThings) {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;
@@ -704,7 +667,7 @@ public class Game {
 			}
 		}
 	}
-	public void setHarvesting() {
+	public void setHarvesting(ConcurrentLinkedQueue<Thing> selectedThings) {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;
@@ -714,7 +677,7 @@ public class Game {
 			}
 		}
 	}
-	public void workerRoad(BuildingType type) {
+	public void workerRoad(ConcurrentLinkedQueue<Thing> selectedThings, BuildingType type) {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;
@@ -738,54 +701,12 @@ public class Game {
 		}
 		world.spawnExplosion(thing.getTile(), 1, 10000);
 	}
-	public void deselectOneThing(Thing deselect) {
-		selectedThings.remove(deselect);
-		deselect.setIsSelected(false);
-		if(deselect instanceof Unit) {
-			guiController.selectedUnit((Unit)deselect, false);
-		}
-	}
-	public void deselectOtherThings(Thing keep) {
-		for (Thing thing : selectedThings) {
-			thing.setIsSelected(false);
-			if(thing instanceof Unit) {
-				guiController.selectedUnit((Unit)thing, false);
-			}
-		}
-		selectedThings.clear();
-		selectThing(keep);
-	}
-
-	public void deselectEverything() {
-		for (Thing thing : selectedThings) {
-			if (thing != null) {
-				thing.setIsSelected(false);
-				
-				if (thing instanceof Unit) {
-					guiController.selectedUnit((Unit) thing, false);
-				}
-				if (thing instanceof Building) {
-					guiController.selectedBuilding((Building) thing, false);
-				}
-
-			}
-			selectedThings.remove(thing);
-		}
-		selectedThings.clear();
-	}
-	public void selectAllUnits() {
-		for(Unit unit : world.units) {
-			if(unit.getFaction() == World.PLAYER_FACTION) {
-				selectThing(unit);
-			}
-		}
-	}
 
 	public void spawnUnit(boolean show) {
 		guiController.selectedSpawnUnit(show);
 	}
 	
-	public void unitStop() {
+	public void unitStop(ConcurrentLinkedQueue<Thing> selectedThings) {
 		for (Thing thing : selectedThings) {
 			if (thing instanceof Unit) {
 				((Unit) thing).clearPlannedActions();
@@ -855,7 +776,7 @@ public class Game {
 		return null;
 	}
 	
-	public void tryToBuildUnit(UnitType u) {
+	public void tryToBuildUnit(ConcurrentLinkedQueue<Thing> selectedThings, UnitType u) {
 		System.out.println("Trying to build " + u.name());
 		for(Thing thing : selectedThings) {
 			if(selectedThings != null && thing instanceof Building ) {
@@ -869,7 +790,6 @@ public class Game {
 				
 			}
 		}
-		
 	}
 	
 	private void buildUnit(UnitType u, Tile tile) {
@@ -891,20 +811,9 @@ public class Game {
 		int c = (int)(ratio * 255);
 		return new Color(c, c, c);
 	}
-	public ConcurrentLinkedQueue<Thing> getSelectedThings() {
-		return selectedThings;
-	}
 	
 	public void researchEverything() {
 		World.PLAYER_FACTION.researchEverything();
 		guiController.updateGUI();
-	}
-
-	public void toggleFastForward(boolean enabled) {
-		isFastForwarding = enabled;
-	}
-	
-	public boolean shouldFastForward() {
-		return isFastForwarding;
 	}
 }
