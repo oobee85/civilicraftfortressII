@@ -46,10 +46,10 @@ public class GameView extends JPanel {
 	private int tileSize = 9;
 	private boolean controlDown = false;
 
+	private LeftClickAction leftClickAction = LeftClickAction.NONE;
 	private HasImage selectedThingToSpawn;
 	private boolean summonPlayerControlled = true;
 	private BuildingType selectedBuildingToPlan;
-	private boolean aControl = false;
 	
 	
 	public GameView(Game game) {
@@ -146,7 +146,7 @@ public class GameView extends JPanel {
 						game.selectAllUnits();
 					}
 					else {
-						aControl = true;
+						leftClickAction = LeftClickAction.ATTACK;
 					}
 				}
 				else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -170,7 +170,7 @@ public class GameView extends JPanel {
 		}
 
 		// spawning unit or building
-		if(selectedThingToSpawn != null) {
+		if(leftClickAction == LeftClickAction.SPAWN_THING) {
 			Thing summoned = game.summonThing(tile, selectedThingToSpawn, summonPlayerControlled ? World.PLAYER_FACTION : World.NO_FACTION);
 			if(summoned.getFaction() == World.PLAYER_FACTION) {
 				if(!shiftDown) {
@@ -180,7 +180,7 @@ public class GameView extends JPanel {
 			}
 		}
 		//planning building
-		else if (selectedBuildingToPlan != null) {
+		else if (leftClickAction == LeftClickAction.PLAN_BUILDING) {
 			Building plannedBuilding = game.buildBuilding(selectedBuildingToPlan, tile);
 			if(plannedBuilding.getFaction() == World.PLAYER_FACTION) {
 				HashSet<Tile> buildingVision = game.world.getNeighborsInRadius(plannedBuilding.getTile(), plannedBuilding.getType().getVisionRadius());
@@ -203,8 +203,8 @@ public class GameView extends JPanel {
 			}
 		}
 		//if a-click and the tile has a building or unit
-		else if(aControl == true) {
-			game.attackCommand(tile, shiftDown, aControl);
+		else if(leftClickAction == LeftClickAction.ATTACK) {
+			game.attackCommand(tile, shiftDown, true);
 		}
 		//select units on tile
 		else {
@@ -212,9 +212,7 @@ public class GameView extends JPanel {
 		}
 		
 		if(!shiftDown) {
-			selectedThingToSpawn = null;
-			selectedBuildingToPlan = null;
-			aControl = false;
+			leftClickAction = LeftClickAction.NONE;
 		}
 	}
 
@@ -223,18 +221,16 @@ public class GameView extends JPanel {
 		if(targetTile == null) {
 			return;
 		}
-		if(selectedThingToSpawn != null || selectedBuildingToPlan != null || aControl) {
-			selectedThingToSpawn = null;
-			selectedBuildingToPlan = null;
-			aControl = false;
+		if(leftClickAction != LeftClickAction.NONE) {
+			leftClickAction = LeftClickAction.NONE;
 			return;
 		}
 		game.rightClick(targetTile, shiftDown);
 	}
 
 	public void setThingToSpawn(HasImage thingType) {
+		leftClickAction = LeftClickAction.SPAWN_THING;
 		selectedThingToSpawn = thingType;
-		selectedBuildingToPlan = null;
 	}
 	
 	public void setSummonPlayerControlled(boolean playerControlled) {
@@ -242,14 +238,13 @@ public class GameView extends JPanel {
 	}
 	
 	public void setBuildingToPlan(BuildingType buildingType) {
+		leftClickAction = LeftClickAction.PLAN_BUILDING;
 		selectedBuildingToPlan = buildingType;
-		selectedThingToSpawn = null;
 	}
 	
 	public void deselectEverything() {
 		game.deselectEverything();
-		selectedThingToSpawn = null;
-		selectedBuildingToPlan = null;
+		leftClickAction = LeftClickAction.NONE;
 	}
 	
 	public void updateTerrainImages() {
@@ -430,7 +425,10 @@ public class GameView extends JPanel {
 				if (thing instanceof Unit) {
 					Unit unit = (Unit) thing;
 					// draw attacking target
-					drawTarget(g, unit.getTile().getLocation());
+					Thing target = unit.getTarget();
+					if(target != null) {
+						drawTarget(g, target.getTile().getLocation());
+					}
 					// draw path 
 					LinkedList<Tile> path = unit.getCurrentPath();
 					if(path != null) {
@@ -534,14 +532,14 @@ public class GameView extends JPanel {
 				}
 			}
 			
-			if (selectedBuildingToPlan != null) {
+			if (leftClickAction == LeftClickAction.PLAN_BUILDING) {
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
 				BufferedImage bI = Utils.toBufferedImage(selectedBuildingToPlan.getImage(tileSize));
 				g2d.drawImage(bI, hoveredTile.x * tileSize, hoveredTile.y * tileSize, tileSize, tileSize , null);
 				Utils.setTransparency(g, 1f);
 			}
-			if (selectedThingToSpawn != null) {
+			if (leftClickAction == LeftClickAction.SPAWN_THING) {
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
 				BufferedImage bI = Utils.toBufferedImage(selectedThingToSpawn.getImage(tileSize));
@@ -591,7 +589,7 @@ public class GameView extends JPanel {
 					}
 				}
 			}
-			if(aControl) {
+			if(leftClickAction == LeftClickAction.ATTACK) {
 				drawTarget(g, hoveredTile);
 			}
 			g.setColor(new Color(0, 0, 0, 64));

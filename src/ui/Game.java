@@ -112,11 +112,11 @@ public class Game {
 		groundModifierTick();
 		
 		
-		if(ticks % (world.DAY_DURATION + world.NIGHT_DURATION) == 0) {
+		if(ticks % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
 			dayEvents();
 			days ++;
 		}
-		if((ticks + world.DAY_DURATION) % (world.DAY_DURATION + world.NIGHT_DURATION) == 0) {
+		if((ticks + World.DAY_DURATION) % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
 			nightEvents();
 			nights ++;
 		}
@@ -621,7 +621,7 @@ public class Game {
 			}
 		}
 	}
-	public void attackCommand(Tile tile, boolean shiftEnabled, boolean aControl) {
+	public void attackCommand(Tile tile, boolean shiftEnabled, boolean forceAttack) {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit) thing;
