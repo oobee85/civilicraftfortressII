@@ -762,7 +762,7 @@ public class Frame extends JPanel {
 					SPAWN_BUTTON_SIZE);
 			button.setBorder(KUIConstants.tinyBorder);
 			button.addActionListener(e -> {
-				gameInstance.setThingToSpawn(type, null);
+				gameInstance.setThingToSpawn(type);
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new UnitTypeInfoPanel(type));
@@ -786,7 +786,7 @@ public class Frame extends JPanel {
 					SPAWN_BUTTON_SIZE);
 			button.setBorder(KUIConstants.tinyBorder);
 			button.addActionListener(e -> {
-				gameInstance.setThingToSpawn(null, type);
+				gameInstance.setThingToSpawn(type);
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new BuildingTypeInfoPanel(type));

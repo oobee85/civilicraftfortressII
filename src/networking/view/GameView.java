@@ -22,10 +22,15 @@ public class GameView extends JPanel {
 	private static final Image RALLY_POINT_IMAGE = Utils.loadImage("resources/Images/interfaces/queuelocation.png");
 	private static final Image TARGET_IMAGE = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
 	private static final Image FLAG = Utils.loadImage("resources/Images/interfaces/flag.png");
-	private Font damageFont = new Font("Comic Sans MS", Font.BOLD, 14);
-	private Image redHitsplatImage = Utils.loadImage("resources/Images/interfaces/redhitsplat.png");
-	private Image blueHitsplatImage = Utils.loadImage("resources/Images/interfaces/bluehitsplat.png");
-	private Image greenHitsplatImage = Utils.loadImage("resources/Images/interfaces/greenhitsplat.png");
+	private static final Image BUILD_ICON = Utils.loadImage("resources/Images/interfaces/building.PNG");
+	private static final Image HARVEST_ICON = Utils.loadImage("resources/Images/interfaces/harvest.png");
+	private static final Image GUARD_ICON = Utils.loadImage("resources/Images/interfaces/guard.png");
+	private static final Image AUTO_BUILD_ICON = Utils.loadImage("resources/Images/interfaces/autobuild.png");
+	private static final Image RED_HITSPLAT = Utils.loadImage("resources/Images/interfaces/redhitsplat.png");
+	private static final Image BLUE_HITSPLAT = Utils.loadImage("resources/Images/interfaces/bluehitsplat.png");
+	private static final Image GREEN_HITSPLAT = Utils.loadImage("resources/Images/interfaces/greenhitsplat.png");
+	
+	private static final Font DAMAGE_FONT = new Font("Comic Sans MS", Font.BOLD, 14);
 	
 
 	public volatile BufferedImage terrainImage;
@@ -246,7 +251,7 @@ public class GameView extends JPanel {
 					Tile tile = game.world.get(new TileLoc(i, j));
 					if(tile == null)
 						continue;
-					game.drawTile(g, tile, lowest, highest, showHeightMap, tileSize);
+					drawTile(g, tile, lowest, highest);
 				}
 			}
 			
@@ -396,13 +401,6 @@ public class GameView extends JPanel {
 				}
 			}
 			
-			if (game.selectedBuildingToSpawn != null) {
-				Utils.setTransparency(g, 0.5f);
-				Graphics2D g2d = (Graphics2D)g;
-				BufferedImage bI = Utils.toBufferedImage(game.selectedBuildingToSpawn.getImage(0));
-				g2d.drawImage(bI, hoveredTile.x * tileSize, hoveredTile.y * tileSize, tileSize, tileSize , null);
-				Utils.setTransparency(g, 1f);
-			}
 			if (game.selectedBuildingToPlan != null) {
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
@@ -410,10 +408,10 @@ public class GameView extends JPanel {
 				g2d.drawImage(bI, hoveredTile.x * tileSize, hoveredTile.y * tileSize, tileSize, tileSize , null);
 				Utils.setTransparency(g, 1f);
 			}
-			if (game.selectedUnitToSpawn != null) {
+			if (game.selectedThingToSpawn != null) {
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
-				BufferedImage bI = Utils.toBufferedImage(game.selectedUnitToSpawn.getImage(0));
+				BufferedImage bI = Utils.toBufferedImage(game.selectedThingToSpawn.getImage(0));
 				g2d.drawImage(bI, hoveredTile.x * tileSize, hoveredTile.y * tileSize, tileSize, tileSize , null);
 				Utils.setTransparency(g, 1f);
 			}
@@ -463,6 +461,132 @@ public class GameView extends JPanel {
 			g.setColor(new Color(0, 0, 0, 64));
 			g.drawRect(hoveredTile.x * tileSize, hoveredTile.y * tileSize, tileSize-1, tileSize-1);
 			g.drawRect(hoveredTile.x * tileSize + 1, hoveredTile.y * tileSize + 1, tileSize - 3, tileSize - 3);
+		}
+	}
+
+	public void drawTile(Graphics g, Tile theTile, double lowest, double highest) {
+		int column = theTile.getLocation().x;
+		int row = theTile.getLocation().y;
+		int drawx = column * tileSize;
+		int drawy = (int) (row * tileSize);
+		int draww = tileSize;
+		int drawh = tileSize;
+		int imagesize = draww < drawh ? draww : drawh;
+		
+		if(showHeightMap) {
+			theTile.drawHeightMap(g, (game.world.get(new TileLoc(column, row)).getHeight() - lowest) / (highest - lowest), tileSize);
+		}
+		else {
+			g.drawImage(theTile.getTerrain().getImage(imagesize), drawx, drawy, draww, drawh, null);
+//			t.drawEntities(g, currentMode);
+			
+			if(theTile.getResource() != null) {
+				g.drawImage(theTile.getResource().getType().getImage(imagesize), drawx, drawy, draww, drawh, null);
+			}
+			
+			if(theTile.getIsTerritory() != World.NO_FACTION) {
+//				g.setColor(Color.black);
+//				g.fillRect(x, y, w, h); 
+				g.setColor(theTile.getIsTerritory().color);
+				
+				Utils.setTransparency(g, 0.5f);
+				for(Tile tile : theTile.getNeighbors()) {
+					if(tile.getIsTerritory() != theTile.getIsTerritory()) {
+						TileLoc tileLoc = tile.getLocation();
+						
+						if(tileLoc.x == theTile.getLocation().x ) {
+							if(tileLoc.y < theTile.getLocation().y) {
+								g.fillRect(drawx, drawy, draww, 10); 
+							}
+							if(tileLoc.y > theTile.getLocation().y) {
+								g.fillRect(drawx, drawy + drawh - 10, draww, 10); 
+							}
+							
+						}
+						if(tileLoc.y == theTile.getLocation().y ) {
+							if(tileLoc.x < theTile.getLocation().x) {
+								g.fillRect(drawx, drawy, 10, drawh); 
+							}
+							if(tileLoc.x > theTile.getLocation().x) {
+								g.fillRect(drawx + draww - 10, drawy, 10, drawh); 
+							}
+						}
+						
+					}
+				}
+				Utils.setTransparency(g, 1);
+			}
+			if (theTile.getRoad() != null) {
+				drawBuilding(theTile.getRoad(), g, drawx, drawy, draww, drawh);
+			}
+			
+			if(theTile.liquidType != LiquidType.DRY) {
+				double alpha = Utils.getAlphaOfLiquid(theTile.liquidAmount);
+//				 transparency liquids
+				Utils.setTransparency(g, alpha);
+				g.setColor(theTile.liquidType.getColor(imagesize));
+				g.fillRect(drawx, drawy, draww, drawh);
+				Utils.setTransparency(g, 1);
+				
+				int imageSize = (int) Math.min(Math.max(draww*theTile.liquidAmount / 0.2, 1), draww);
+				g.setColor(theTile.liquidType.getColor(imagesize));
+				g.fillRect(drawx + draww/2 - imageSize/2, drawy + drawh/2 - imageSize/2, imageSize, imageSize);
+				g.drawImage(theTile.liquidType.getImage(imagesize), drawx + draww/2 - imageSize/2, drawy + draww/2 - imageSize/2, imageSize, imageSize, null);
+			}
+			
+			if(theTile.getModifier() != null) {
+				Utils.setTransparency(g, 0.9);
+				g.drawImage(theTile.getModifier().getType().getImage(imagesize), drawx, drawy, draww, drawh, null);
+				Utils.setTransparency(g, 1);
+			}
+			
+			if (!theTile.getItems().isEmpty()) {
+				for (Item item : theTile.getItems()) {
+					g.drawImage(item.getType().getImage(imagesize), drawx + tileSize/4,
+							drawy + tileSize/4, tileSize/2, tileSize/2, null);
+				}
+			}
+			if(theTile.getPlant() != null) {
+				Plant p = theTile.getPlant();
+				g.drawImage(p.getImage(tileSize), drawx, drawy, draww, drawh, null);
+			}
+			
+			if(theTile.getBuilding() != null) {
+				drawBuilding(theTile.getBuilding(), g, drawx, drawy, draww, drawh);
+			}
+			for(Unit unit : theTile.getUnits()) {
+				g.drawImage(unit.getImage(tileSize), drawx, drawy, draww, drawh, null);
+				if(unit.getIsHarvesting() == true) {
+					g.drawImage(HARVEST_ICON, drawx+draww/4, drawy+drawh/4, draww/2, drawh/2, null);
+				}
+				if(unit.isGuarding() == true) {
+					g.drawImage(GUARD_ICON, drawx+draww/4, drawy+drawh/4, draww/2, drawh/2, null);
+				}
+				if(unit.getAutoBuild() == true) {
+					g.drawImage(AUTO_BUILD_ICON, drawx+draww/4, drawy+drawh/4, draww/2, drawh/2, null);
+				}
+			}
+		}
+	}
+	public void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh) {
+		
+		BufferedImage bI = Utils.toBufferedImage(building.getImage(0));
+		if(building.isBuilt() == false) {
+			//draws the transparent version
+			Utils.setTransparency(g, 0.5f);
+			Graphics2D g2d = (Graphics2D)g;
+			g2d.drawImage(bI, drawx, drawy, draww, drawh, null);
+			Utils.setTransparency(g, 1f);
+			//draws the partial image
+			double percentDone = 1 - building.getRemainingEffort()/building.getType().getBuildingEffort();
+			int imageRatio =  Math.max(1, (int) (bI.getHeight() * percentDone));
+			int partialHeight = Math.max(1, (int) (tileSize * percentDone));
+			bI = bI.getSubimage(0, bI.getHeight() - imageRatio, bI.getWidth(), imageRatio);
+			g.drawImage(bI, drawx, drawy - partialHeight + drawh, draww, partialHeight , null);
+			g.drawImage(BUILD_ICON, drawx + tileSize/4, drawy + tileSize/4, draww*3/4, drawh*3/4, null);
+		}
+		else {
+			g.drawImage(bI, drawx, drawy, draww, drawh, null);
 		}
 	}
 
@@ -536,17 +660,17 @@ public class GameView extends JPanel {
 			String text = String.format("%.0f", damage);
 
 			if(damage > 0) {
-				g.drawImage(redHitsplatImage, x, y, splatWidth, splatHeight, null);
+				g.drawImage(RED_HITSPLAT, x, y, splatWidth, splatHeight, null);
 			}else if(damage == 0){
-				g.drawImage(blueHitsplatImage, x, y, splatWidth, splatHeight, null);
+				g.drawImage(BLUE_HITSPLAT, x, y, splatWidth, splatHeight, null);
 			}
 			else if(damage < 0) {
-				g.drawImage(greenHitsplatImage, x, y, splatWidth, splatHeight, null);
+				g.drawImage(GREEN_HITSPLAT, x, y, splatWidth, splatHeight, null);
 				text = String.format("%.0f", -thing.getHitsplatDamage());
 			}
 			
 			int fontSize = tileSize/4;
-			g.setFont(new Font(damageFont.getFontName(), Font.BOLD, fontSize));
+			g.setFont(new Font(DAMAGE_FONT.getFontName(), Font.BOLD, fontSize));
 			int width = g.getFontMetrics().stringWidth(text);
 			g.setColor(Color.WHITE);
 			g.drawString(text, x + splatWidth/2 - width/2, (int) (y+fontSize*1.5));

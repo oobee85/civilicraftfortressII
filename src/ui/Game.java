@@ -1,31 +1,20 @@
 package ui;
 import java.awt.*;
 import java.util.List;
-import java.util.Map.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.awt.image.*;
-import java.io.*;
-import java.net.*;
 import java.util.*;
 
 import game.*;
 import liquid.*;
-import networking.view.*;
-import ui.*;
 import utils.*;
 import wildlife.*;
 import world.*;
 
 public class Game {
-	private Image buildIcon = Utils.loadImage("resources/Images/interfaces/building.PNG");
-	private Image harvestIcon = Utils.loadImage("resources/Images/interfaces/harvest.png");
-	private Image guardIcon = Utils.loadImage("resources/Images/interfaces/guard.png");
-	private Image autoBuildIcon = Utils.loadImage("resources/Images/interfaces/autobuild.png");
 	
 	private boolean isFastForwarding = false;
 	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
-	public UnitType selectedUnitToSpawn;
-	public BuildingType selectedBuildingToSpawn;
+	public HasImage selectedThingToSpawn;
 	public BuildingType selectedBuildingToPlan;
 	private boolean summonPlayerControlled = true;
 	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
@@ -285,11 +274,11 @@ public class Game {
 				break;
 			}
 		}
-		summonThing(world.get(new TileLoc(tile.getLocation().x, tile.getLocation().y)), null, Game.buildingTypeMap.get("WATCHTOWER"), World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x-1, tile.getLocation().y-1)), null, Game.buildingTypeMap.get("GRANARY"), World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x+1, tile.getLocation().y-1)), null, Game.buildingTypeMap.get("BARRACKS"), World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x+1, tile.getLocation().y+1)), null, Game.buildingTypeMap.get("WINDMILL"), World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x-1, tile.getLocation().y+1)), null, Game.buildingTypeMap.get("MINE"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x, tile.getLocation().y)), Game.buildingTypeMap.get("WATCHTOWER"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x-1, tile.getLocation().y-1)), Game.buildingTypeMap.get("GRANARY"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x+1, tile.getLocation().y-1)), Game.buildingTypeMap.get("BARRACKS"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x+1, tile.getLocation().y+1)), Game.buildingTypeMap.get("WINDMILL"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x-1, tile.getLocation().y+1)), Game.buildingTypeMap.get("MINE"), World.CYCLOPS_FACTION);
 		
 		//makes the walls
 		for(int i = 0; i < 6; i++) {
@@ -298,13 +287,13 @@ public class Game {
 				type = Game.buildingTypeMap.get("GATE_WOOD");
 			}
 			Tile wall = world.get(new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y-3));
-			summonThing(wall, null, type, World.CYCLOPS_FACTION);
+			summonThing(wall, type, World.CYCLOPS_FACTION);
 			wall = world.get(new TileLoc(tile.getLocation().x+3, tile.getLocation().y-3 + i));
-			summonThing(wall, null, type, World.CYCLOPS_FACTION);
+			summonThing(wall, type, World.CYCLOPS_FACTION);
 			wall = world.get(new TileLoc(tile.getLocation().x+3 - i, tile.getLocation().y+3));
-			summonThing(wall, null, type, World.CYCLOPS_FACTION);
+			summonThing(wall, type, World.CYCLOPS_FACTION);
 			wall = world.get(new TileLoc(tile.getLocation().x-3, tile.getLocation().y+3 - i));
-			summonThing(wall, null, type, World.CYCLOPS_FACTION);
+			summonThing(wall, type, World.CYCLOPS_FACTION);
 		}
 		for(int i = -1; i < 2; i ++) {
 			for(int j = -1; j < 2; j ++) {
@@ -513,9 +502,8 @@ public class Game {
 				}
 			}
 			else if(thing instanceof UnitType) {
-				UnitType type = (UnitType)thing;
 				if (current.liquidAmount < current.liquidType.getMinimumDamageAmount()) {
-					summonThing(current, type, null, World.PLAYER_FACTION);
+					summonThing(current, thing, World.PLAYER_FACTION);
 					thing = null;
 				}
 			}
@@ -535,131 +523,6 @@ public class Game {
 		}
 	}
 	
-	public void drawTile(Graphics g, Tile theTile, double lowest, double highest, boolean showHeightMap, int tileSize) {
-		int column = theTile.getLocation().x;
-		int row = theTile.getLocation().y;
-		int drawx = column * tileSize;
-		int drawy = (int) (row * tileSize);
-		int draww = tileSize;
-		int drawh = tileSize;
-		int imagesize = draww < drawh ? draww : drawh;
-		
-		if(showHeightMap) {
-			theTile.drawHeightMap(g, (world.get(new TileLoc(column, row)).getHeight() - lowest) / (highest - lowest), tileSize);
-		}
-		else {
-			g.drawImage(theTile.getTerrain().getImage(imagesize), drawx, drawy, draww, drawh, null);
-//			t.drawEntities(g, currentMode);
-			
-			if(theTile.getResource() != null) {
-				g.drawImage(theTile.getResource().getType().getImage(imagesize), drawx, drawy, draww, drawh, null);
-			}
-			
-			if(theTile.getIsTerritory() != World.NO_FACTION) {
-//				g.setColor(Color.black);
-//				g.fillRect(x, y, w, h); 
-				g.setColor(theTile.getIsTerritory().color);
-				
-				Utils.setTransparency(g, 0.5f);
-				for(Tile tile : theTile.getNeighbors()) {
-					if(tile.getIsTerritory() != theTile.getIsTerritory()) {
-						TileLoc tileLoc = tile.getLocation();
-						
-						if(tileLoc.x == theTile.getLocation().x ) {
-							if(tileLoc.y < theTile.getLocation().y) {
-								g.fillRect(drawx, drawy, draww, 10); 
-							}
-							if(tileLoc.y > theTile.getLocation().y) {
-								g.fillRect(drawx, drawy + drawh - 10, draww, 10); 
-							}
-							
-						}
-						if(tileLoc.y == theTile.getLocation().y ) {
-							if(tileLoc.x < theTile.getLocation().x) {
-								g.fillRect(drawx, drawy, 10, drawh); 
-							}
-							if(tileLoc.x > theTile.getLocation().x) {
-								g.fillRect(drawx + draww - 10, drawy, 10, drawh); 
-							}
-						}
-						
-					}
-				}
-				Utils.setTransparency(g, 1);
-			}
-			if (theTile.getRoad() != null) {
-				drawBuilding(theTile.getRoad(), g, drawx, drawy, draww, drawh, tileSize);
-			}
-			
-			if(theTile.liquidType != LiquidType.DRY) {
-				double alpha = Utils.getAlphaOfLiquid(theTile.liquidAmount);
-//				 transparency liquids
-				Utils.setTransparency(g, alpha);
-				g.setColor(theTile.liquidType.getColor(imagesize));
-				g.fillRect(drawx, drawy, draww, drawh);
-				Utils.setTransparency(g, 1);
-				
-				int imageSize = (int) Math.min(Math.max(draww*theTile.liquidAmount / 0.2, 1), draww);
-				g.setColor(theTile.liquidType.getColor(imagesize));
-				g.fillRect(drawx + draww/2 - imageSize/2, drawy + drawh/2 - imageSize/2, imageSize, imageSize);
-				g.drawImage(theTile.liquidType.getImage(imagesize), drawx + draww/2 - imageSize/2, drawy + draww/2 - imageSize/2, imageSize, imageSize, null);
-			}
-			
-			if(theTile.getModifier() != null) {
-				Utils.setTransparency(g, 0.9);
-				g.drawImage(theTile.getModifier().getType().getImage(imagesize), drawx, drawy, draww, drawh, null);
-				Utils.setTransparency(g, 1);
-			}
-			
-			if (!theTile.getItems().isEmpty()) {
-				for (Item item : theTile.getItems()) {
-					g.drawImage(item.getType().getImage(imagesize), drawx + tileSize/4,
-							drawy + tileSize/4, tileSize/2, tileSize/2, null);
-				}
-			}
-			if(theTile.getPlant() != null) {
-				Plant p = theTile.getPlant();
-				g.drawImage(p.getImage(tileSize), drawx, drawy, draww, drawh, null);
-			}
-			
-			if(theTile.getBuilding() != null) {
-				drawBuilding(theTile.getBuilding(), g, drawx, drawy, draww, drawh, tileSize);
-			}
-			for(Unit unit : theTile.getUnits()) {
-				g.drawImage(unit.getImage(tileSize), drawx, drawy, draww, drawh, null);
-				if(unit.getIsHarvesting() == true) {
-					g.drawImage(harvestIcon, drawx+draww/4, drawy+drawh/4, draww/2, drawh/2, null);
-				}
-				if(unit.isGuarding() == true) {
-					g.drawImage(guardIcon, drawx+draww/4, drawy+drawh/4, draww/2, drawh/2, null);
-				}
-				if(unit.getAutoBuild() == true) {
-					g.drawImage(autoBuildIcon, drawx+draww/4, drawy+drawh/4, draww/2, drawh/2, null);
-				}
-			}
-		}
-	}
-	public void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh, int tileSize) {
-		
-		BufferedImage bI = Utils.toBufferedImage(building.getImage(0));
-		if(building.isBuilt() == false) {
-			//draws the transparent version
-			Utils.setTransparency(g, 0.5f);
-			Graphics2D g2d = (Graphics2D)g;
-			g2d.drawImage(bI, drawx, drawy, draww, drawh, null);
-			Utils.setTransparency(g, 1f);
-			//draws the partial image
-			double percentDone = 1 - building.getRemainingEffort()/building.getType().getBuildingEffort();
-			int imageRatio =  Math.max(1, (int) (bI.getHeight() * percentDone));
-			int partialHeight = Math.max(1, (int) (tileSize * percentDone));
-			bI = bI.getSubimage(0, bI.getHeight() - imageRatio, bI.getWidth(), imageRatio);
-			g.drawImage(bI, drawx, drawy - partialHeight + drawh, draww, partialHeight , null);
-			g.drawImage(buildIcon, drawx + tileSize/4, drawy + tileSize/4, draww*3/4, drawh*3/4, null);
-		}
-		else {
-			g.drawImage(bI, drawx, drawy, draww, drawh, null);
-		}
-	}
 	
 	private void updateTerritory() {
 		for(Building building : world.buildings) {
@@ -684,9 +547,10 @@ public class Game {
 		World.PLAYER_FACTION.setResearchTarget(researchType);
 	}
 	
-	private Thing summonThing(Tile tile, UnitType unitType, BuildingType buildingType, Faction faction) {
+	private Thing summonThing(Tile tile, HasImage thingType, Faction faction) {
 		
-		if(unitType != null) {
+		if(thingType instanceof UnitType) {
+			UnitType unitType = (UnitType)thingType;
 			if(faction == World.PLAYER_FACTION) {
 				Unit unit = new Unit(unitType, tile, faction);
 				world.newUnits.add(unit);
@@ -697,7 +561,8 @@ public class Game {
 				return world.spawnAnimal(unitType, tile, faction);
 			}
 		}
-		else if(buildingType != null) {
+		else if(thingType instanceof BuildingType) {
+			BuildingType buildingType = (BuildingType)thingType;
 			if(tile.getBuilding() != null) {
 				tile.getBuilding().setDead(true);
 			}
@@ -728,8 +593,8 @@ public class Game {
 			aControl = false;
 		}
 		// spawning unit or building
-		else if (selectedUnitToSpawn != null || selectedBuildingToSpawn != null) {
-			Thing summoned = summonThing(tile, selectedUnitToSpawn, selectedBuildingToSpawn, summonPlayerControlled ? World.PLAYER_FACTION : World.NO_FACTION);
+		else if (selectedThingToSpawn != null) {
+			Thing summoned = summonThing(tile, selectedThingToSpawn, summonPlayerControlled ? World.PLAYER_FACTION : World.NO_FACTION);
 			if(summoned.getFaction() == World.PLAYER_FACTION) {
 				if(shiftEnabled == false) {
 					deselectEverything();
@@ -765,8 +630,7 @@ public class Game {
 			toggleSelectionOnTile(tile);
 		}
 		if(shiftEnabled == false) {
-			selectedUnitToSpawn = null;
-			selectedBuildingToSpawn = null;
+			selectedThingToSpawn = null;
 			selectedBuildingToPlan = null;
 		}
 	}
@@ -822,8 +686,7 @@ public class Game {
 		}
 		aControl = false;
 		if(shiftEnabled == false) {
-			selectedUnitToSpawn = null;
-			selectedBuildingToSpawn = null;
+			selectedThingToSpawn = null;
 			selectedBuildingToPlan = null;
 		}
 	}
@@ -859,8 +722,7 @@ public class Game {
 	public void shiftControl(boolean enabled) {
 		shiftEnabled = enabled;
 		if(enabled == false) {
-			selectedBuildingToSpawn = null;
-			selectedUnitToSpawn = null;
+			selectedThingToSpawn = null;
 			selectedBuildingToPlan = null;
 		}
 	}
@@ -999,8 +861,7 @@ public class Game {
 		}
 		selectedThings.clear();
 		selectedBuildingToPlan = null;
-		selectedBuildingToSpawn = null;
-		selectedUnitToSpawn = null;
+		selectedThingToSpawn = null;
 	}
 	public void selectAllUnits() {
 		for(Unit unit : world.units) {
@@ -1090,14 +951,8 @@ public class Game {
 		summonPlayerControlled = playerControlled;
 	}
 
-	public void setThingToSpawn(UnitType ut, BuildingType bt) {
-		if(ut != null) {
-			selectedUnitToSpawn = ut;
-		}
-		if(bt != null) {
-			selectedBuildingToSpawn = bt;
-		}
-		
+	public void setThingToSpawn(HasImage thingType) {
+		selectedThingToSpawn = thingType;
 	}
 	
 	public void tryToBuildUnit(UnitType u) {
