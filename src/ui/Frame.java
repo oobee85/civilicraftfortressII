@@ -162,7 +162,7 @@ public class Frame extends JPanel {
 					if(!selectedButtons.containsKey(unit)) {
 						JButton button = setupUnitButton(unit);
 						button.addActionListener(e -> {
-							if(gameInstance.isControlDown()) {
+							if(gamepanel.isControlDown()) {
 								gameInstance.deselectOneThing(unit);
 							}
 							else {
@@ -323,7 +323,7 @@ public class Frame extends JPanel {
 		button.setHorizontalAlignment(SwingConstants.CENTER);
 		KUIConstants.setComponentAttributes(button, null);
 		button.addActionListener(e -> {
-			if(gameInstance.isControlDown()) {
+			if(gamepanel.isControlDown()) {
 				gameInstance.deselectOneThing(unit);
 			}
 			else {
@@ -389,60 +389,6 @@ public class Frame extends JPanel {
 		gamepanel.add(filler, BorderLayout.CENTER);
 		filler.add(selectedUnitsPanel, BorderLayout.SOUTH);
 
-		gamepanel.addKeyListener(new KeyListener() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
-					gameInstance.shiftControl(false);
-				}
-				else if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
-					gameInstance.controlPressed(false);
-				}
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
-					gameInstance.shiftControl(true);
-				}
-				else if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
-					gameInstance.controlPressed(true);
-				}
-				if(e.getKeyCode() == KeyEvent.VK_A) {
-					if(e.isControlDown()) {
-						gameInstance.selectAllUnits();
-					}
-					else {
-						gameInstance.aControl(true);
-					}
-				}
-				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-					gameInstance.deselectEverything();
-				}
-				if (e.getKeyCode() == KeyEvent.VK_S) {
-					gameInstance.unitStop();
-				}
-				if (e.getKeyCode() == KeyEvent.VK_R) {
-//					if (gameInstance.getSelectedUnit() != null) {
-//						gameInstance.buildRoad(RoadType.STONE_ROAD);
-//					}
-				}
-				if (e.getKeyCode() == KeyEvent.VK_M) {
-//					if (gameInstance.getSelectedUnit() != null) {
-//						gameInstance.buildBuilding(BuildingType.MINE);
-//					}
-				}
-				if (e.getKeyCode() == KeyEvent.VK_I) {
-//					if (gameInstance.getSelectedUnit() != null) {
-//						gameInstance.buildBuilding(BuildingType.IRRIGATION);
-//					}
-				}
-			}
-		});
 	}
 
 	/** 
@@ -485,7 +431,7 @@ public class Frame extends JPanel {
 				g.drawString(dayCounter, padding, g.getFont().getSize() + padding );
 				g.setColor(temp);
 				
-				int offset = gameInstance.world.getCurrentDayOffset() + World.TRANSITION_PERIOD;
+				int offset = World.getCurrentDayOffset() + World.TRANSITION_PERIOD;
 				int pathwidth = getWidth() - Frame.MINIMAPBORDERWIDTH;
 				int pathheight = getHeight() - Frame.MINIMAPBORDERWIDTH;
 				int totallength = 2*pathwidth + 2*pathheight;
@@ -675,7 +621,7 @@ public class Frame extends JPanel {
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
 					BUILDING_BUTTON_SIZE);
 			button.addActionListener(e -> {
-				gameInstance.setBuildingToPlan(type);
+				gamepanel.setBuildingToPlan(type);
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new BuildingTypeInfoPanel(type));
@@ -762,7 +708,7 @@ public class Frame extends JPanel {
 					SPAWN_BUTTON_SIZE);
 			button.setBorder(KUIConstants.tinyBorder);
 			button.addActionListener(e -> {
-				gameInstance.setThingToSpawn(type);
+				gamepanel.setThingToSpawn(type);
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new UnitTypeInfoPanel(type));
@@ -786,7 +732,7 @@ public class Frame extends JPanel {
 					SPAWN_BUTTON_SIZE);
 			button.setBorder(KUIConstants.tinyBorder);
 			button.addActionListener(e -> {
-				gameInstance.setThingToSpawn(type);
+				gamepanel.setThingToSpawn(type);
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new BuildingTypeInfoPanel(type));
@@ -807,18 +753,13 @@ public class Frame extends JPanel {
 		JToggleButton toggle = KUIConstants.setupToggleButton("Non-playerControlled", null, DEBUG_BUTTON_SIZE);
 		toggle.addActionListener(e -> {
 			toggle.setText(!toggle.isSelected() ? "Non-playerControlled" : "playerControlled");
-			gameInstance.setSummonPlayerControlled(!toggle.isSelected());
+			gamepanel.setSummonPlayerControlled(!toggle.isSelected());
 		});
 		spawnMenu.add(toggle);
-		
 		
 		makeUnitView = new JPanel();
 		Pair[] buttons = populateUnitTypeUI(makeUnitView, BUILDING_ICON_SIZE);
 		Collections.addAll(unitButtons, buttons);
-		
-//		workshopView = new JPanel();
-//		buttons = populateUnitTypeUI(workshopView, BUILDING_ICON_SIZE);
-//		Collections.addAll(unitButtons, buttons);
 		
 		blacksmithView = new JPanel();
 		BuildingType blacksmithType = Game.buildingTypeMap.get("BLACKSMITH");

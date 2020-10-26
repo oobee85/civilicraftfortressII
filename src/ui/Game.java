@@ -12,11 +12,6 @@ import world.*;
 
 public class Game {
 	
-	private boolean isFastForwarding = false;
-	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
-	public HasImage selectedThingToSpawn;
-	public BuildingType selectedBuildingToPlan;
-	private boolean summonPlayerControlled = true;
 	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
 
 	public static final ArrayList<UnitType> unitTypeList = new ArrayList<>();
@@ -26,9 +21,6 @@ public class Game {
 	public static final ArrayList<ResearchType> researchTypeList = new ArrayList<>();
 	public static final HashMap<String, ResearchType> researchTypeMap = new HashMap<>();
 
-	private boolean shiftEnabled = false;
-	private boolean controlEnabled = false;
-	private boolean aControl = false;
 	
 	private GUIController guiController;
 
@@ -38,6 +30,10 @@ public class Game {
 	public static boolean DISABLE_NIGHT = false;
 	public static int days = 1;
 	public static int nights = 0;
+	private boolean isFastForwarding = false;
+
+	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
+	
 	public World world;
 	
 	
@@ -547,7 +543,7 @@ public class Game {
 		World.PLAYER_FACTION.setResearchTarget(researchType);
 	}
 	
-	private Thing summonThing(Tile tile, HasImage thingType, Faction faction) {
+	public Thing summonThing(Tile tile, HasImage thingType, Faction faction) {
 		
 		if(thingType instanceof UnitType) {
 			UnitType unitType = (UnitType)thingType;
@@ -579,67 +575,7 @@ public class Game {
 		}
 		return null;
 	}
-	public void leftClick(Position tilepos) {
-		Tile tile = world.get(new TileLoc(tilepos.getIntX(), tilepos.getIntY()));
-		
-		System.out.println("left clicked on " + tile);
-		if(tile == null) {
-			return;
-		}
-		
-		//if a-click and the tile has a building or unit
-		if(aControl == true) {
-			attackCommand(tile);
-			aControl = false;
-		}
-		// spawning unit or building
-		else if (selectedThingToSpawn != null) {
-			Thing summoned = summonThing(tile, selectedThingToSpawn, summonPlayerControlled ? World.PLAYER_FACTION : World.NO_FACTION);
-			if(summoned.getFaction() == World.PLAYER_FACTION) {
-				if(shiftEnabled == false) {
-					deselectEverything();
-				}
-				selectThing(summoned);
-			}
-		}
-		//planning building
-		else if (selectedBuildingToPlan != null) {
-			Building plannedBuilding = buildBuilding(selectedBuildingToPlan, tile);
-			if(plannedBuilding.getFaction() == World.PLAYER_FACTION) {
-				HashSet<Tile> buildingVision = world.getNeighborsInRadius(plannedBuilding.getTile(), plannedBuilding.getType().getVisionRadius());
-				for(Tile invision : buildingVision) {
-					invision.setInVisionRange(true);
-				}
-			}
-			if(plannedBuilding != null) {
-				for(Thing thing : selectedThings) {
-					if(thing instanceof Unit) {
-						Unit unit = (Unit) thing;
-						if(!shiftEnabled) {
-							unit.clearPlannedActions();
-						}
-						if(unit.getType().isBuilder()) {
-							unit.queuePlannedAction(new PlannedAction(plannedBuilding, true));
-						}
-					}
-				}
-			}
-		}
-		//select units on tile
-		else {
-			toggleSelectionOnTile(tile);
-		}
-		if(shiftEnabled == false) {
-			selectedThingToSpawn = null;
-			selectedBuildingToPlan = null;
-		}
-	}
-	public void rightClick(Position tilepos) {
-		Tile targetTile = world.get(new TileLoc(tilepos.getIntX(), tilepos.getIntY()));
-		if(targetTile == null) {
-			return;
-		}
-		
+	public void rightClick(Tile targetTile, boolean shiftEnabled) {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Building) {
 				((Building) thing).setSpawnLocation(targetTile);
@@ -667,12 +603,12 @@ public class Game {
 						if(tempUnit == unit) {
 							continue;
 						}
-						if(tempUnit.getFaction() != unit.getFaction() || aControl) {
+						if(tempUnit.getFaction() != unit.getFaction()) {
 							targetThing = tempUnit;
 						}
 					}
 					if(targetThing == null && targetTile.getBuilding() != null
-							&& (targetTile.getBuilding().getFaction() != unit.getFaction() || aControl)) {
+							&& (targetTile.getBuilding().getFaction() != unit.getFaction())) {
 						targetThing = targetTile.getBuilding();
 					}
 					if(targetThing != null) {
@@ -684,13 +620,8 @@ public class Game {
 				}
 			}
 		}
-		aControl = false;
-		if(shiftEnabled == false) {
-			selectedThingToSpawn = null;
-			selectedBuildingToPlan = null;
-		}
 	}
-	private void attackCommand(Tile tile) {
+	public void attackCommand(Tile tile, boolean shiftEnabled, boolean aControl) {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit) thing;
@@ -719,26 +650,7 @@ public class Game {
 		}
 	}
 	
-	public void shiftControl(boolean enabled) {
-		shiftEnabled = enabled;
-		if(enabled == false) {
-			selectedThingToSpawn = null;
-			selectedBuildingToPlan = null;
-		}
-	}
-	public void controlPressed(boolean enabled) {
-		controlEnabled = enabled;
-	}
-	public boolean isControlDown() {
-		return controlEnabled;
-	}
-	public void aControl(boolean enabled) {
-		if(!selectedThings.isEmpty()) {
-			aControl = enabled;
-		}
-	}
-	
-	private void selectThing(Thing thing) {
+	public void selectThing(Thing thing) {
 		thing.setIsSelected(true);
 		selectedThings.add(thing);
 		if(thing instanceof Unit) {
@@ -749,7 +661,7 @@ public class Game {
 		}
 	}
 
-	public void toggleSelectionOnTile(Tile tile) {
+	public void toggleSelectionOnTile(Tile tile, boolean shiftEnabled, boolean controlEnabled) {
 		
 		//deselects everything if shift or control isnt enabled
 		if (shiftEnabled == false && !controlEnabled) {
@@ -860,8 +772,6 @@ public class Game {
 			selectedThings.remove(thing);
 		}
 		selectedThings.clear();
-		selectedBuildingToPlan = null;
-		selectedThingToSpawn = null;
 	}
 	public void selectAllUnits() {
 		for(Unit unit : world.units) {
@@ -943,16 +853,6 @@ public class Game {
 			return building;
 		}
 		return null;
-	}
-	public void setBuildingToPlan(BuildingType bt) {
-		selectedBuildingToPlan = bt;
-	}
-	public void setSummonPlayerControlled(boolean playerControlled) {
-		summonPlayerControlled = playerControlled;
-	}
-
-	public void setThingToSpawn(HasImage thingType) {
-		selectedThingToSpawn = thingType;
 	}
 	
 	public void tryToBuildUnit(UnitType u) {
