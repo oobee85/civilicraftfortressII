@@ -206,13 +206,13 @@ public class GameView extends JPanel {
 		//planning building
 		else if (leftClickAction == LeftClickAction.PLAN_BUILDING) {
 			Building plannedBuilding = game.buildBuilding(selectedBuildingToPlan, tile);
-			if(plannedBuilding.getFaction() == World.PLAYER_FACTION) {
-				HashSet<Tile> buildingVision = game.world.getNeighborsInRadius(plannedBuilding.getTile(), plannedBuilding.getType().getVisionRadius());
-				for(Tile invision : buildingVision) {
-					invision.setInVisionRange(true);
-				}
-			}
 			if(plannedBuilding != null) {
+				if(plannedBuilding.getFaction() == World.PLAYER_FACTION) {
+					HashSet<Tile> buildingVision = game.world.getNeighborsInRadius(plannedBuilding.getTile(), plannedBuilding.getType().getVisionRadius());
+					for(Tile invision : buildingVision) {
+						invision.setInVisionRange(true);
+					}
+				}
 				for(Thing thing : selectedThings) {
 					if(thing instanceof Unit) {
 						Unit unit = (Unit) thing;
