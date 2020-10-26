@@ -4,8 +4,8 @@ import ui.*;
 
 public class Season {
 
-	public static final double FREEZING_TEMPURATURE = 0.35;
-	public static final double MELTING_TEMPURATURE = 0.45;
+	public static final double FREEZING_TEMPURATURE = 0.33;
+	public static final double MELTING_TEMPURATURE = 0.43;
 	public static final int SEASON_DURATION = 6000;
 	public static double[] winter;
 	public static double[] summer;
