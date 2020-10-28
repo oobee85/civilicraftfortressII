@@ -148,6 +148,7 @@ public class Server {
 		}
 		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, tileInfos.toArray(new Tile[0]));
 		worldInfo.getThings().addAll(gameInstance.world.plants);
+		worldInfo.getThings().addAll(gameInstance.world.buildings);
 		sendToAllConnections(worldInfo);
 	}
 	

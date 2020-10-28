@@ -94,6 +94,21 @@ public class Client {
 			newPlant.getTile().setHasPlant(newPlant);
 			gameInstance.world.newPlants.add(newPlant);
 		}
+		else if(update instanceof Building) {
+			Building buildingUpdate = (Building)update;
+			Building newBuilding = new Building(
+					Game.buildingTypeMap.get(buildingUpdate.getType().name()), 
+					gameInstance.world.get(buildingUpdate.getTile().getLocation()), 
+					World.factions[buildingUpdate.getFaction().id]);
+			things.put(update.id, newBuilding);
+			gameInstance.world.newBuildings.add(newBuilding);
+			if(newBuilding.getType().isRoad()) {
+				newBuilding.getTile().setRoad(newBuilding);
+			}
+			else {
+				newBuilding.getTile().setBuilding(newBuilding);
+			}
+		}
 	}
 	
 	private void updateThing(Thing existing, Thing update) {
@@ -101,6 +116,14 @@ public class Client {
 			Plant existingPlant = (Plant)existing;
 			Plant plantUpdate = (Plant)update;
 			existingPlant.setPlantType(plantUpdate.getPlantType());
+		}
+		else if(update instanceof Building) {
+			Building existingBuilding = (Building)existing;
+			Building buildingUpdate = (Building)update;
+			existingBuilding.setType(Game.buildingTypeMap.get(buildingUpdate.getType().name()));
+			existingBuilding.setRemainingEffort(buildingUpdate.getRemainingEffort());
+			existingBuilding.setCulture(buildingUpdate.getCulture());
+			existingBuilding.setPlanned(buildingUpdate.isPlanned());
 		}
 		existing.setFaction(update.getFaction());
 		existing.setMaxHealth(update.getMaxHealth());

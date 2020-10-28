@@ -1,27 +1,28 @@
 package game;
 
 import java.awt.*;
+import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
 import utils.*;
 
-public class BuildingType implements HasImage {
+public class BuildingType implements HasImage, Serializable {
 
 	private final String name;
-	private final double health;
-	private final MipMap mipmap;
-	private final double moveSpeedEnhancement;
-	private final int visionRadius;
-	private final String researchRequirement;
-	public final double cultureRate;
-	private final double buildingEffort;
-	private final HashMap <ItemType, Integer> cost;
-	private final HashSet<String> attributes;
-	private final String[] canBuild;
-	private final HashSet<UnitType> canBuildSet = new HashSet<>();
+	private transient final double health;
+	private transient final MipMap mipmap;
+	private transient final double moveSpeedEnhancement;
+	private transient final int visionRadius;
+	private transient final String researchRequirement;
+	private transient final double cultureRate;
+	private transient final double buildingEffort;
+	private transient final HashMap <ItemType, Integer> cost;
+	private transient final HashSet<String> attributes;
+	private transient final String[] canBuild;
+	private transient final HashSet<UnitType> canBuildSet = new HashSet<>();
 	
-	private HashMap<String, Image> roadImages;
+	private transient HashMap<String, Image> roadImages;
 	
 	public BuildingType(String name, double hp, double buildingEffort, String s, double cultureRate, int visionRadius, 
 			String requirement, HashMap <ItemType, Integer> resourcesNeeded, String[] canBuild, double moveSpeedEnhancement, HashSet<String> attributes) {
@@ -49,6 +50,9 @@ public class BuildingType implements HasImage {
 	}
 	public String getResearchRequirement() {
 		return researchRequirement;
+	}
+	public double getCultureRate() {
+		return cultureRate;
 	}
 
 	public Image getRoadImage(String roadCorner) {

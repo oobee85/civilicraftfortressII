@@ -3,6 +3,8 @@ package networking.client;
 import javax.swing.*;
 
 import networking.view.*;
+import ui.*;
+import utils.*;
 
 public class ClientDriver {
 
@@ -22,6 +24,13 @@ public class ClientDriver {
 	
 	public void start() {
 		frame.setVisible(true);
+	}
+	
+	static {
+		Loader.loadResearchType(Game.researchTypeMap, Game.researchTypeList);
+		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
+		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);
+		Loader.doMakingUnitMappings();
 	}
 
 	public static void main(String[] args) {

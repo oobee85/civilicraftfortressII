@@ -1,6 +1,7 @@
 package game;
 
 import java.awt.*;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 
@@ -9,19 +10,17 @@ import ui.Game;
 import utils.*;
 import world.*;
 
-public class Building extends Thing {
+public class Building extends Thing implements Serializable {
 	
 	private BuildingType buildingType;
 	private double remainingEffort;
-	private LinkedList<Unit> buildingUnitList = new LinkedList<Unit>();
+	private transient LinkedList<Unit> buildingUnitList = new LinkedList<Unit>();
 	private double culture;
-	public static double CULTURE_AREA_MULTIPLIER = 0.1;
-	private Tile spawnLocation;
-	private double timeToHarvest;
-	private double baseTimeToHarvest = 20;
+	public transient static double CULTURE_AREA_MULTIPLIER = 0.1;
+	private transient Tile spawnLocation;
+	private transient double timeToHarvest;
+	private transient double baseTimeToHarvest = 20;
 	private boolean isPlanned;
-	
-	private ResearchRequirement req = new ResearchRequirement();
 	
 	public Building(BuildingType buildingType, Tile tile, Faction faction) {
 		super(buildingType.getHealth(), buildingType, faction, tile);
@@ -159,9 +158,8 @@ public class Building extends Thing {
 	}
 	public void updateCulture() {
 		if(isBuilt()) {
-			culture += buildingType.cultureRate;
+			culture += buildingType.getCultureRate();
 		}
-		
 	}
 	
 	public LinkedList<Unit> getBuildingUnit() {
@@ -169,6 +167,9 @@ public class Building extends Thing {
 	}
 	public double getCulture() {
 		return culture;
+	}
+	public void setCulture(double culture) {
+		this.culture = culture;
 	}
 	public void expendEffort(double effort) {
 		remainingEffort -= effort;
@@ -188,9 +189,8 @@ public class Building extends Thing {
 	public BuildingType getType() {
 		return buildingType;
 	}
-	
-	public ResearchRequirement getRequirement() {
-		return req;
+	public void setType(BuildingType type) {
+		this.buildingType = type;
 	}
 	@Override
 	public List<String> getDebugStrings() {
