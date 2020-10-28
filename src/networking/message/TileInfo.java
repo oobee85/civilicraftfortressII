@@ -4,6 +4,7 @@ import java.io.*;
 
 import liquid.*;
 import utils.*;
+import world.*;
 
 public class TileInfo implements Serializable {
 
@@ -13,13 +14,15 @@ public class TileInfo implements Serializable {
 	private final double humidity;
 	private final double liquidAmount;
 	private final LiquidType liquidType;
-	public TileInfo(double height, int faction, TileLoc tileLoc, double humidity, double liquidAmount, LiquidType liquidType) {
+	private final Terrain terrain;
+	public TileInfo(double height, int faction, TileLoc tileLoc, double humidity, double liquidAmount, LiquidType liquidType, Terrain terrain) {
 		this.height = height;
 		this.faction = faction;
 		this.tileLoc = tileLoc;
 		this.humidity = humidity;
 		this.liquidAmount = liquidAmount;
 		this.liquidType = liquidType;
+		this.terrain = terrain;
 	}
 	public double getHeight() {
 		return height;
@@ -38,5 +41,12 @@ public class TileInfo implements Serializable {
 	}
 	public LiquidType getLiquidType() {
 		return liquidType;
+	}
+	public Terrain getTerrain() {
+		return terrain;
+	}
+	@Override
+	public String toString() {
+		return "TileInfo " + tileLoc;
 	}
 }

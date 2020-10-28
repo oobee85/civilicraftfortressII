@@ -59,6 +59,9 @@ public class Tile {
 	public double getHumidity() {
 		return humidity;
 	}
+	public void setHumidity(double humidity) {
+		this.humidity = humidity;
+	}
 	public void updateHumidity(int currentTick) {
 		if(liquidType == LiquidType.WATER || liquidType == LiquidType.ICE ||  liquidType == LiquidType.SNOW) {
 			humidity += 2/(humidity + liquidAmount);
@@ -75,9 +78,6 @@ public class Tile {
 		if(humidity > 20) {
 			humidity = 20;
 		}
-			
-//		}
-		
 	}
 
 	public void setRoad(Building road) {

@@ -100,10 +100,19 @@ public class World {
 			tile.setNeighbors(getNeighbors(tile));
 		}
 	}
-	public void updateTiles(LinkedList<TileInfo> tileInfos) {
-		System.out.println("updating " + tileInfos.size() + " tiles");
+	public void updateTiles(TileInfo[] tileInfos) {
+		System.out.println("updating " + tileInfos.length + " tiles");
 		for(TileInfo info : tileInfos) {
-			
+			Tile tile = get(info.getTileLoc());
+			if(tile == null) {
+				System.out.println("Tried to update null tile at " + info.getTileLoc());
+			}
+			tile.liquidAmount = info.getLiquidAmount();
+			tile.liquidType = info.getLiquidType();
+			tile.setHeight(info.getHeight());
+			tile.setTerritory(factions[info.getFaction()]);
+			tile.setHumidity(info.getHumidity());
+			tile.setTerrain(info.getTerrain());
 		}
 	}
 	public int getTerritorySize() {

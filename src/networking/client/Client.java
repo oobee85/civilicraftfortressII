@@ -53,6 +53,8 @@ public class Client {
 		if(gameInstance.world == null) {
 			gameInstance.initializeWorld(worldInfo.getWidth(), worldInfo.getHeight());
 		}
+		gameInstance.world.updateTiles(worldInfo.getTileInfos());
+		clientGUI.repaint();
 	}
 	
 	public void startReceiving() {
@@ -81,5 +83,18 @@ public class Client {
 	
 	public void setGUI(ClientGUI clientGUI) {
 		this.clientGUI = clientGUI;
+		gameInstance = new Game(new GUIController() {
+			@Override
+			public void updateGUI() {}
+			@Override
+			public void toggleTileView() {}
+			@Override
+			public void selectedUnit(Unit unit, boolean selected) {}
+			@Override
+			public void selectedSpawnUnit(boolean selected) {}
+			@Override
+			public void selectedBuilding(Building building, boolean selected) {}
+		});
+		clientGUI.setGameInstance(gameInstance);
 	}
 }

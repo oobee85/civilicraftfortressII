@@ -528,6 +528,9 @@ public class GameView extends JPanel {
 	}
 	
 	public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffset) {
+		if(game.world == null) {
+			return;
+		}
 		// Try to only draw stuff that is visible on the screen
 		int lowerX = Math.max(0, viewOffset.divide(tileSize).getIntX() - 2);
 		int lowerY = Math.max(0, viewOffset.divide(tileSize).getIntY() - 2);

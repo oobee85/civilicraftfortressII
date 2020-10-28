@@ -128,7 +128,7 @@ public class Server {
 	private void sendFullWorld() {
 		ArrayList<TileInfo> tileInfos = new ArrayList<>(gameInstance.world.getTiles().size()); 
 		for(Tile t : gameInstance.world.getTiles()) {
-			TileInfo info = new TileInfo(t.getHeight(), t.getIsTerritory().id, t.getLocation(), t.getHumidity(), t.liquidAmount, t.liquidType);
+			TileInfo info = new TileInfo(t.getHeight(), t.getIsTerritory().id, t.getLocation(), t.getHumidity(), t.liquidAmount, t.liquidType, t.getTerrain());
 			tileInfos.add(info);
 		}
 		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), tileInfos.toArray(new TileInfo[0]));

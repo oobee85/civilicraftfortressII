@@ -21,4 +21,8 @@ public class WorldInfo implements Serializable {
 	public TileInfo[] getTileInfos() {
 		return tileInfos;
 	}
+	@Override
+	public String toString() {
+		return "WorldInfo (" + width + "," + height + ") " + tileInfos.length + " tile updates";
+	}
 }
