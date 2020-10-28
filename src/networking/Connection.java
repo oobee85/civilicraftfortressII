@@ -95,6 +95,8 @@ public class Connection {
 				while(true) {
 					message = messagesToSend.take();
 					output.writeObject(message);
+					// reset stream to allow sending same object with updated values
+					output.reset();
 				}
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();

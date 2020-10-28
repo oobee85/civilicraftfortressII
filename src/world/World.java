@@ -100,27 +100,33 @@ public class World {
 			tile.setNeighbors(getNeighbors(tile));
 		}
 	}
-	public void updateTiles(TileInfo[] tileInfos) {
+	public void updateTiles(Tile[] tileInfos) {
 		System.out.println("updating " + tileInfos.length + " tiles");
-		for(TileInfo info : tileInfos) {
-			Tile tile = get(info.getTileLoc());
+		for(Tile info : tileInfos) {
+			Tile tile = get(info.getLocation());
 			if(tile == null) {
-				System.out.println("Tried to update null tile at " + info.getTileLoc());
+				System.out.println("Tried to update null tile at " + info.getLocation());
 			}
-			tile.liquidAmount = info.getLiquidAmount();
-			tile.liquidType = info.getLiquidType();
+			if(tile.getFaction().id != info.getFaction().id) {
+				tile.setFaction(factions[info.getFaction().id]);
+				addToTerritory(tile);
+			}
 			tile.setHeight(info.getHeight());
-			tile.setTerritory(factions[info.getFaction()]);
 			tile.setHumidity(info.getHumidity());
+			tile.setResource(info.getResource());
+
 			tile.setTerrain(info.getTerrain());
+			tile.setModifier(info.getModifier());
+			tile.liquidAmount = info.liquidAmount;
+			tile.liquidType = info.liquidType;
 		}
 	}
 	public int getTerritorySize() {
 		return territory.size();
 	}
-	public void addToTerritory(Tile tile, Faction faction) {
+	public void addToTerritory(Tile tile) {
 		if(!territory.contains(tile)) {
-			territory.put(tile, faction);
+			territory.put(tile, tile.getFaction());
 		}
 	}
 	public int getWidth() {
@@ -934,9 +940,9 @@ public class World {
 				minimapColor = tile.getModifier().getType().getColor(0);
 				terrainColor = Utils.blendColors(tile.getModifier().getType().getColor(0), terrainColor, 0.9);
 			}
-			if(tile.getIsTerritory() != World.NO_FACTION) {
-				minimapColor = Utils.blendColors(tile.getIsTerritory().color, minimapColor, 0.3);
-				terrainColor = Utils.blendColors(tile.getIsTerritory().color, terrainColor, 0.3);
+			if(tile.getFaction() != World.NO_FACTION) {
+				minimapColor = Utils.blendColors(tile.getFaction().color, minimapColor, 0.3);
+				terrainColor = Utils.blendColors(tile.getFaction().color, terrainColor, 0.3);
 			}
 			double tilebrightness = tile.getBrightness(World.PLAYER_FACTION);
 			minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);

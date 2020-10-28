@@ -323,9 +323,9 @@ public class Unit extends Thing {
 
 	public void planActions(World world) {
 		// Workers deciding whether to move toward something to build
-		if (unitType.isBuilder() && isIdle() && passiveAction == PlannedAction.BUILD && getTile().getIsTerritory() == getFaction()) {
+		if (unitType.isBuilder() && isIdle() && passiveAction == PlannedAction.BUILD && getTile().getFaction() == getFaction()) {
 			Building building = getBuildingToBuild(world.buildings, world.plannedBuildings);
-			if (building != null && building.getTile().getIsTerritory() == getFaction()) {
+			if (building != null && building.getTile().getFaction() == getFaction()) {
 				queuePlannedAction(new PlannedAction(building, true));
 			}
 		}
@@ -383,7 +383,7 @@ public class Unit extends Thing {
 		if (!attacked && isGuarding()) {
 			HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getType().getCombatStats().getAttackRadius());
 			for (Tile tile : inrange) {
-				if (tile.getIsTerritory() == getFaction()) {
+				if (tile.getFaction() == getFaction()) {
 					for (Unit unit : tile.getUnits()) {
 						if (unit.getFaction() != this.getFaction() && unit.getType().isHostile() && unit != this) {
 							attacked = attacked || attack(unit);

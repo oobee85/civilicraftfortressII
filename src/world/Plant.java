@@ -1,12 +1,13 @@
 package world;
 
+import java.io.*;
+
 import game.ItemType;
 import utils.*;
 
-public class Plant extends Thing {
+public class Plant extends Thing implements Serializable {
 
 	private PlantType plantType;
-	private int currentYield;
 	
 	public Plant(PlantType pt, Tile t) {
 		super(pt.getHealth(), pt, World.NO_FACTION, t);
@@ -15,17 +16,14 @@ public class Plant extends Thing {
 	public ItemType getItem() {
 		return plantType.getItem();
 	}
-	public int getYield() {
-		return currentYield;
-	}
-	public void harvest(int h) {
-		currentYield -= h;
-	}
 	public boolean isAquatic() {
 		return plantType.isAquatic();
 	}
 	public PlantType getPlantType() {
 		return plantType;
+	}
+	public void setPlantType(PlantType type) {
+		this.plantType = type;
 	}
 
 	@Override

@@ -1,16 +1,24 @@
 package networking.message;
 
 import java.io.*;
+import java.util.*;
+
+import utils.*;
+import world.*;
 
 public class WorldInfo implements Serializable {
 
 	private final int width;
 	private final int height;
-	private final TileInfo[] tileInfos;
-	public WorldInfo(int width, int height, TileInfo[] tileInfos) {
+	private final int tick;
+	private final Tile[] tileInfos;
+	private final HashSet<Thing> things;
+	public WorldInfo(int width, int height, int tick, Tile[] tileInfos) {
 		this.width = width;
 		this.height = height;
+		this.tick = tick;
 		this.tileInfos = tileInfos;
+		things = new HashSet<>();
 	}
 	public int getWidth() {
 		return width;
@@ -18,8 +26,14 @@ public class WorldInfo implements Serializable {
 	public int getHeight() {
 		return height;
 	}
-	public TileInfo[] getTileInfos() {
+	public int getTick() {
+		return tick;
+	}
+	public Tile[] getTileInfos() {
 		return tileInfos;
+	}
+	public HashSet<Thing> getThings() {
+		return things;
 	}
 	@Override
 	public String toString() {

@@ -13,6 +13,8 @@ import networking.message.*;
 import networking.server.*;
 import networking.view.*;
 import ui.*;
+import utils.*;
+import world.*;
 
 public class Client {
 	
@@ -53,16 +55,61 @@ public class Client {
 		}
 	}
 	
+	private HashMap<Integer, Thing> things = new HashMap<>();
+	
 	private void worldInfoUpdate(WorldInfo worldInfo) {
 		if(gameInstance.world == null) {
 			gameInstance.initializeWorld(worldInfo.getWidth(), worldInfo.getHeight());
 			clientGUI.worldReceived();
+			Thread cleaningThread = new Thread(() -> {
+				try {
+					while (true) {
+						gameInstance.world.clearDeadAndAddNewThings();
+						Thread.sleep(Server.MILLISECONDS_PER_TICK);
+					}
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			});
+			cleaningThread.start();
 		}
+		World.ticks = worldInfo.getTick();
 		gameInstance.world.updateTiles(worldInfo.getTileInfos());
+		for(Thing update : worldInfo.getThings()) {
+			if(!things.containsKey(update.id)) {
+				createThing(update);
+			}
+			updateThing(things.get(update.id), update);
+		}
 		synchronized (updatedTerrain) {
 			updatedTerrain.notify();
 		}
 		clientGUI.repaint();
+	}
+	private void createThing(Thing update) {
+		if(update instanceof Plant) {
+			Plant plantUpdate = (Plant)update;
+			Plant newPlant = new Plant(plantUpdate.getPlantType(), gameInstance.world.get(plantUpdate.getTile().getLocation()));
+			things.put(update.id, newPlant);
+			newPlant.getTile().setHasPlant(newPlant);
+			gameInstance.world.newPlants.add(newPlant);
+		}
+	}
+	
+	private void updateThing(Thing existing, Thing update) {
+		if(existing instanceof Plant) {
+			Plant existingPlant = (Plant)existing;
+			Plant plantUpdate = (Plant)update;
+			existingPlant.setPlantType(plantUpdate.getPlantType());
+		}
+		existing.setFaction(update.getFaction());
+		existing.setMaxHealth(update.getMaxHealth());
+		existing.setHealth(update.getHealth());
+		existing.setDead(update.isDead());
+		existing.setTile(gameInstance.world.get(update.getTile().getLocation()));
+		if(existing.isDead()) {
+			things.remove(update.id);
+		}
 	}
 	
 	public void startReceiving() {
@@ -70,7 +117,7 @@ public class Client {
 			try {
 				while(true) {
 					Object message = connection.getMessage();
-					System.out.println("received message " + message);
+					System.err.println("processing message " + message);
 					if(message instanceof ServerMessage) {
 						ServerMessage serverMessage = (ServerMessage)message;
 						if(serverMessage.getServerMessageType() == ServerMessageType.LOBBY) {
@@ -128,6 +175,5 @@ public class Client {
 			}
 		});
 		terrainImageThread.start();
-	
 	}
 }

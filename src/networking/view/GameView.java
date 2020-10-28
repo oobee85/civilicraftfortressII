@@ -804,14 +804,14 @@ public class GameView extends JPanel {
 				g.drawImage(theTile.getResource().getType().getImage(imagesize), drawx, drawy, draww, drawh, null);
 			}
 			
-			if(theTile.getIsTerritory() != World.NO_FACTION) {
+			if(theTile.getFaction() != World.NO_FACTION) {
 //				g.setColor(Color.black);
 //				g.fillRect(x, y, w, h); 
-				g.setColor(theTile.getIsTerritory().color);
+				g.setColor(theTile.getFaction().color);
 				
 				Utils.setTransparency(g, 0.5f);
 				for(Tile tile : theTile.getNeighbors()) {
-					if(tile.getIsTerritory() != theTile.getIsTerritory()) {
+					if(tile.getFaction() != theTile.getFaction()) {
 						TileLoc tileLoc = tile.getLocation();
 						
 						if(tileLoc.x == theTile.getLocation().x ) {

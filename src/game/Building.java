@@ -115,7 +115,6 @@ public class Building extends Thing {
 			}
 			for(Tile tile : tilesToCut) {
 				if(tile.getPlant() != null && tile.getPlant().getPlantType() == PlantType.FOREST1) {
-					tile.getPlant().harvest(1);
 					tile.getPlant().takeDamage(1);
 					getFaction().addItem(ItemType.WOOD, 1);
 					if(tile.getPlant().isDead() ) {

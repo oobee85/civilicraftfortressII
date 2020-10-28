@@ -1,15 +1,15 @@
 package game;
 
-import ui.*;
+import java.io.*;
+
 import world.*;
 
-public class GroundModifier {
+public class GroundModifier implements Serializable {
 
-	
 	private GroundModifierType type;
-	private int aliveUntil;
-	private int duration;
-	private Tile tile;
+	private transient int aliveUntil;
+	private transient int duration;
+	private transient Tile tile;
 	
 	public GroundModifier(GroundModifierType type, Tile tile, int duration) {
 		this.type = type;

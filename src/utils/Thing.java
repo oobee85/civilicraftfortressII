@@ -1,29 +1,29 @@
 package utils;
 import java.awt.*;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
 
 import game.*;
-import ui.*;
 import world.*;
 
-public class Thing implements HasImage {
+public class Thing implements HasImage, Serializable {
+	
+	private transient static int idCounter = 0;
+	public final int id = idCounter++;
 
 	private Faction faction;
 	private double maxHealth;
 	private double health;
 	private boolean isDead;
-	private int timeLastDamageTaken = -1000;
+	private transient int timeLastDamageTaken = -1000;
 	private Tile tile;
-	private boolean isSelected;
+	private transient boolean isSelected;
 	
-	private HasImage hasImage;
-//	private LinkedList<Hitsplat> hitsplats = new LinkedList<Hitsplat>();
-	private Hitsplat[] hitsplats = new Hitsplat[4];
-	
-	private String name;
+	private transient HasImage hasImage;
+	private transient Hitsplat[] hitsplats = new Hitsplat[4];
 	
 	public Thing(double maxHealth, HasImage hasImage, Faction faction) {
 		health = maxHealth;

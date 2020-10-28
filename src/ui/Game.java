@@ -256,6 +256,8 @@ public class Game {
 			addResources();
 		}
 		world.clearDeadAndAddNewThings();
+		spawnCyclops();
+		meteorStrike();
 	}
 	public void spawnCyclops() {
 		LinkedList<Tile> tiles = world.getTilesRandomly();
@@ -309,9 +311,9 @@ public class Game {
 					double distanceFromCenter = Math.sqrt(i*i + j*j);
 					if(distanceFromCenter < radius) {
 						Tile tile = world.get(new TileLoc(building.getTile().getLocation().x+i, building.getTile().getLocation().y+j));
-						if(tile != null && tile.getIsTerritory() == World.NO_FACTION) {
-							tile.setTerritory(building.getFaction());
-							world.addToTerritory(tile, building.getFaction());
+						if(tile != null && tile.getFaction() == World.NO_FACTION) {
+							tile.setFaction(building.getFaction());
+							world.addToTerritory(tile);
 						}
 					}
 				}
@@ -606,7 +608,7 @@ public class Game {
 				Unit unit = (Unit)thing;
 				if(unit.getType().isBuilder()) {
 					for(Tile tile : Utils.getTilesInRadius(unit.getTile(), world, 4)) {
-						if(tile.getIsTerritory() != World.PLAYER_FACTION) {
+						if(tile.getFaction() != World.PLAYER_FACTION) {
 							continue;
 						}
 						Building building = buildBuilding(type, tile);

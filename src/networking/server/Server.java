@@ -141,12 +141,13 @@ public class Server {
 	}
 	
 	private void sendFullWorld() {
-		ArrayList<TileInfo> tileInfos = new ArrayList<>(gameInstance.world.getTiles().size()); 
+		ArrayList<Tile> tileInfos = new ArrayList<>(gameInstance.world.getTiles().size()); 
 		for(Tile t : gameInstance.world.getTiles()) {
-			TileInfo info = new TileInfo(t.getHeight(), t.getIsTerritory().id, t.getLocation(), t.getHumidity(), t.liquidAmount, t.liquidType, t.getTerrain());
-			tileInfos.add(info);
+//			TileInfo info = new TileInfo(t.getHeight(), t.getIsTerritory().id, t.getLocation(), t.getHumidity(), t.liquidAmount, t.liquidType, t.getTerrain());
+			tileInfos.add(t);
 		}
-		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), tileInfos.toArray(new TileInfo[0]));
+		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, tileInfos.toArray(new Tile[0]));
+		worldInfo.getThings().addAll(gameInstance.world.plants);
 		sendToAllConnections(worldInfo);
 	}
 	

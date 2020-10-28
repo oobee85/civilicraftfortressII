@@ -1,6 +1,8 @@
 package world;
 
-public class Resource {
+import java.io.*;
+
+public class Resource implements Serializable {
 
 	private ResourceType resourceType;
 	private double yieldLeft;

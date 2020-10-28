@@ -1,42 +1,39 @@
 package world;
 
 import java.awt.*;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 
 import game.*;
 import liquid.*;
-import networking.view.*;
-import ui.*;
 import utils.*;
-import wildlife.*;
 
-public class Tile {
-	private Faction isTerritory = World.NO_FACTION;
-	private boolean isSelected = false;
-	private boolean inVisionRange = false;
+public class Tile implements Serializable {
+	private volatile Faction faction = World.NO_FACTION;
+	private transient boolean isSelected = false;
+	private transient boolean inVisionRange = false;
 
 	private TileLoc location;
 	private double height;
 	private double humidity;
 
 	private Resource resource;
-	private Plant plant;
+	private transient Plant plant;
 	private Terrain terr;
-	private Building building;
-	private Building road;
+	private transient Building building;
+	private transient Building road;
 	private GroundModifier modifier;
+
+	public volatile double liquidAmount;
+	public volatile LiquidType liquidType;
 	
-	private ConcurrentLinkedQueue<Unit> units;
-	private ConcurrentLinkedQueue<Projectile> projectiles;
-	private ConcurrentLinkedQueue<Item> items;
+	private transient ConcurrentLinkedQueue<Unit> units;
+	private transient ConcurrentLinkedQueue<Projectile> projectiles;
+	private transient ConcurrentLinkedQueue<Item> items;
 	
-	public double liquidAmount;
-	public LiquidType liquidType;
-	
-	
-	private List<Tile> neighborTiles = new LinkedList<Tile>();
+	private transient List<Tile> neighborTiles = new LinkedList<Tile>();
 
 	public Tile(TileLoc location, Terrain t) {
 		this.location = location;
@@ -114,16 +111,12 @@ public class Tile {
 		getRoad().setRoadCorner(s);
 	}
 
-	public void setTerritory(Faction faction) {
-		this.isTerritory = faction;
+	public void setFaction(Faction faction) {
+		this.faction = faction;
 	}
 
-	public void setResource(ResourceType o) {
-		if(o == null ) {
-			resource = null;
-			return;
-		}
-		resource = new Resource(o);
+	public void setResource(Resource resource) {
+		this.resource = resource;
 	}
 
 	public Resource getResource() {
@@ -194,7 +187,7 @@ public class Tile {
 		if (this.getThingOfFaction(faction) != null) {
 			brightness += 1;
 		}
-		if (this.isTerritory == faction) {
+		if (this.faction == faction) {
 			brightness += 0.4;
 		}
 		if(inVisionRange == true) {
@@ -298,8 +291,8 @@ public class Tile {
 		return isSelected;
 	}
 
-	public Faction getIsTerritory() {
-		return isTerritory;
+	public Faction getFaction() {
+		return faction;
 	}
 
 	public boolean canBuild() {
