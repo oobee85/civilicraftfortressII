@@ -570,7 +570,7 @@ public class Frame extends JPanel {
 		System.err.println("Starting Game");
 		
 		int size = Integer.parseInt(mapSize.getText());
-		gameInstance.generateWorld(size, size/2, easyModeButton.isSelected());
+		gameInstance.generateWorld(size, size, easyModeButton.isSelected());
 
 		Dimension RESOURCE_BUTTON_SIZE = new Dimension(80, 30);
 		Dimension RESEARCH_BUTTON_SIZE = new Dimension(125, 35);
