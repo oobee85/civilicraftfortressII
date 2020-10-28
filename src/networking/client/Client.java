@@ -1,8 +1,11 @@
 package networking.client;
 
+import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
+import javax.swing.Timer;
 
 import game.*;
 import networking.*;
@@ -17,6 +20,7 @@ public class Client {
 	private ClientGUI clientGUI;
 
 	private Game gameInstance;
+	private volatile Object updatedTerrain = new Object();
 
 	public Client() {
 		
@@ -52,8 +56,12 @@ public class Client {
 	private void worldInfoUpdate(WorldInfo worldInfo) {
 		if(gameInstance.world == null) {
 			gameInstance.initializeWorld(worldInfo.getWidth(), worldInfo.getHeight());
+			clientGUI.worldReceived();
 		}
 		gameInstance.world.updateTiles(worldInfo.getTileInfos());
+		synchronized (updatedTerrain) {
+			updatedTerrain.notify();
+		}
 		clientGUI.repaint();
 	}
 	
@@ -96,5 +104,30 @@ public class Client {
 			public void selectedBuilding(Building building, boolean selected) {}
 		});
 		clientGUI.setGameInstance(gameInstance);
+
+		Timer repaintingThread = new Timer(30, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				clientGUI.repaint();
+			}
+		});
+		repaintingThread.start();
+		Thread terrainImageThread = new Thread(() -> {
+			while (true) {
+				try {
+					synchronized (updatedTerrain) {
+						updatedTerrain.wait();
+					}
+					clientGUI.updateTerrainImages();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					if(e1 instanceof InterruptedException) {
+						break;
+					}
+				}
+			}
+		});
+		terrainImageThread.start();
+	
 	}
 }

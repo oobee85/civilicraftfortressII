@@ -23,7 +23,7 @@ public class GameView extends JPanel {
 	private static final Image RALLY_POINT_IMAGE = Utils.loadImage("resources/Images/interfaces/queuelocation.png");
 	private static final Image TARGET_IMAGE = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
 	private static final Image FLAG = Utils.loadImage("resources/Images/interfaces/flag.png");
-	private static final Image BUILD_ICON = Utils.loadImage("resources/Images/interfaces/building.PNG");
+	private static final Image BUILD_ICON = Utils.loadImage("resources/Images/interfaces/building.png");
 	private static final Image HARVEST_ICON = Utils.loadImage("resources/Images/interfaces/harvest.png");
 	private static final Image GUARD_ICON = Utils.loadImage("resources/Images/interfaces/guard.png");
 	private static final Image AUTO_BUILD_ICON = Utils.loadImage("resources/Images/interfaces/autobuild.png");

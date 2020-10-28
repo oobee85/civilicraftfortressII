@@ -11,9 +11,11 @@ import networking.message.*;
 import networking.server.*;
 import ui.*;
 
-public class ClientGUI extends JPanel {
+public class ClientGUI {
 	
 	private Client client;
+	
+	private JPanel mainPanel;
 	
 	private JPanel topPanel;
 	
@@ -22,16 +24,20 @@ public class ClientGUI extends JPanel {
 //	private JPanel connectionInfo;
 	private JPanel lobbyInfo;
 	private JTextField nameTextField;
+	
+	private JButton makeWorldButton;
+	private JButton startGameButton;
 
 	private GameView gameView;
 	
 	public ClientGUI() {
+		mainPanel = new JPanel();
 
-		this.setLayout(new BorderLayout());
+		mainPanel.setLayout(new BorderLayout());
 		
 		topPanel = new JPanel();
 		topPanel.setLayout(new BorderLayout());
-		this.add(topPanel, BorderLayout.NORTH);
+		mainPanel.add(topPanel, BorderLayout.NORTH);
 		
 		connectPanel = new JPanel();
 		connectPanel.setLayout(new BoxLayout(connectPanel, BoxLayout.X_AXIS));
@@ -59,7 +65,7 @@ public class ClientGUI extends JPanel {
 		JButton colorButton = new JButton("Pick Color");
 		colorButton.setBackground(Server.DEFAULT_PLAYER_INFO.getColor());
 		colorButton.addActionListener(e -> {
-			Color newColor = JColorChooser.showDialog(this, "Choose Color", colorButton.getBackground());
+			Color newColor = JColorChooser.showDialog(mainPanel, "Choose Color", colorButton.getBackground());
 			if(newColor != null) {
 				colorButton.setBackground(newColor);
 			}
@@ -78,11 +84,18 @@ public class ClientGUI extends JPanel {
 		});
 		myinfoPanel.add(disconnectButton);
 		
-		JButton makeWorldButton = new JButton("Make World");
+		makeWorldButton = new JButton("Make World");
 		makeWorldButton.addActionListener(e -> {
 			client.sendMessage(new ClientMessage(ClientMessageType.MAKE_WORLD, null));
 		});
 		myinfoPanel.add(makeWorldButton);
+
+		startGameButton = new JButton("Start Game");
+		startGameButton.addActionListener(e -> {
+			client.sendMessage(new ClientMessage(ClientMessageType.START_GAME, null));
+		});
+		myinfoPanel.add(startGameButton);
+		startGameButton.setEnabled(false);
 		
 		lobbyInfo = new JPanel();
 		lobbyInfo.setLayout(new BoxLayout(lobbyInfo, BoxLayout.X_AXIS));
@@ -100,13 +113,17 @@ public class ClientGUI extends JPanel {
 		lobbyInfo.repaint();
 	}
 	
+	public void worldReceived() {
+		startGameButton.setEnabled(true);
+	}
+	
 	public void connected(JPanel connectionInfo) {
 //		this.connectionInfo = connectionInfo;
 		topPanel.remove(connectPanel);
 //		myinfoPanel.add(connectionInfo);
 		topPanel.add(myinfoPanel, BorderLayout.NORTH);
-		this.revalidate();
-		this.repaint();
+		mainPanel.revalidate();
+		mainPanel.repaint();
 	}
 	
 	public void disconnected() {
@@ -114,8 +131,8 @@ public class ClientGUI extends JPanel {
 //		connectionInfo = null;
 		topPanel.remove(myinfoPanel);
 		topPanel.add(connectPanel, BorderLayout.NORTH);
-		this.revalidate();
-		this.repaint();
+		mainPanel.revalidate();
+		mainPanel.repaint();
 		
 	}
 	
@@ -125,12 +142,25 @@ public class ClientGUI extends JPanel {
 	
 	public void setGameInstance(Game instance) {
 		if(gameView != null) {
-			this.remove(gameView);
+			mainPanel.remove(gameView);
 		}
 		gameView = new GameView(instance);
-		this.add(gameView, BorderLayout.CENTER);
-		revalidate();
-		repaint();
+		mainPanel.add(gameView, BorderLayout.CENTER);
+		mainPanel.revalidate();
+		mainPanel.repaint();
+	}
+	public void updateTerrainImages() {
+		if(gameView != null) {
+			gameView.updateTerrainImages();
+		}
+	}
+	
+	public void repaint() {
+		mainPanel.repaint();
+	}
+	
+	public JPanel getMainPanel() {
+		return mainPanel;
 	}
 
 }

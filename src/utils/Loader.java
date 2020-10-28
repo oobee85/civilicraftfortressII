@@ -14,8 +14,10 @@ import world.*;
 public class Loader {
 	private static String readFile(String filename) {
 		String researchCosts = "";
-		URL path = Utils.class.getClassLoader().getResource(filename);
-		try (BufferedReader br = new BufferedReader(new FileReader(path.getPath()))) {
+//		URL path = Utils.class.getClassLoader().getResource(filename);
+		BufferedReader br = new BufferedReader(new InputStreamReader(Utils.class.getClassLoader().getResourceAsStream(filename)));
+		try {
+//		try (BufferedReader br = new BufferedReader(new FileReader(path.getPath()))) {
 			StringBuilder builder = new StringBuilder();
 			String line;
 			while((line = br.readLine()) != null) {

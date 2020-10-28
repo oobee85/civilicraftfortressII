@@ -17,13 +17,14 @@ public class Server {
 	public static final int PORT = 25565;
 	public static final PlayerInfo DEFAULT_PLAYER_INFO = new PlayerInfo("Default", Color.LIGHT_GRAY);
 	
-	
 	private ConcurrentHashMap<Connection, Boolean> connections = new ConcurrentHashMap<>();
 	private volatile boolean stop = false;
 	private Thread thread;
 	
 	private ServerGUI gui;
-	
+
+	public static final int MILLISECONDS_PER_TICK = 100;
+	private boolean isFastForwarding = false;
 	private Game gameInstance;
 
 	public Server() {
@@ -122,7 +123,21 @@ public class Server {
 		});
 		gameInstance.generateWorld(128, 128, false);
 		gui.setGameInstance(gameInstance);
-		sendFullWorld();
+		startWorldNetworkingUpdateThread();
+	}
+	
+	private void startWorldNetworkingUpdateThread() {
+		Thread worldNetworkingUpdateThread = new Thread(() -> {
+			try {
+				while(true) {
+					sendFullWorld();
+					Thread.sleep(MILLISECONDS_PER_TICK*10);
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
+		worldNetworkingUpdateThread.start();
 	}
 	
 	private void sendFullWorld() {
@@ -133,6 +148,35 @@ public class Server {
 		}
 		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), tileInfos.toArray(new TileInfo[0]));
 		sendToAllConnections(worldInfo);
+	}
+	
+	private void startGame() {
+		Thread gameLoopThread = new Thread(() -> {
+			while (true) {
+				try {
+					long start = System.currentTimeMillis();
+					gameInstance.gameTick();
+					long elapsed = System.currentTimeMillis() - start;
+					long sleeptime = MILLISECONDS_PER_TICK - elapsed;
+					if(sleeptime > 0 && !isFastForwarding) {
+						Thread.sleep(sleeptime);
+					}
+				}
+				catch(Exception e) {
+					try (FileWriter fw = new FileWriter("ERROR_LOG.txt", true);
+							BufferedWriter bw = new BufferedWriter(fw);
+							PrintWriter out = new PrintWriter(bw)) {
+						e.printStackTrace(out);
+					} catch (IOException ee) {
+					}
+					e.printStackTrace();
+					if(e instanceof InterruptedException) {
+						break;
+					}
+				}
+			}
+		});
+		gameLoopThread.start();
 	}
 	
 	public void startProcessing(Connection connection) {
@@ -149,6 +193,9 @@ public class Server {
 						}
 						else if(clientMessage.getType() == ClientMessageType.MAKE_WORLD) {
 							makeWorld();
+						}
+						else if(clientMessage.getType() == ClientMessageType.START_GAME) {
+							startGame();
 						}
 					}
 				}

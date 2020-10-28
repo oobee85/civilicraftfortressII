@@ -59,22 +59,27 @@ public final class Utils {
 	}
 
 	public static final Image getDefaultSkin() {
-		Image temp = new BufferedImage(50, 50, BufferedImage.TYPE_3BYTE_BGR);
-		Graphics g = temp.getGraphics();
-		g.drawLine(0, 0, 50, 50);
+		BufferedImage temp = new BufferedImage(64, 64, BufferedImage.TYPE_3BYTE_BGR);
+		Graphics2D g = (Graphics2D)temp.getGraphics();
+		g.setColor(Color.magenta);
+		g.fillRect(0, 0, temp.getWidth(), temp.getHeight());
+		g.setColor(Color.red);
+		g.setStroke(new BasicStroke(5));
+		g.drawLine(0, 0, temp.getWidth(), temp.getHeight());
+		g.drawLine(temp.getWidth(), 0, 0, temp.getHeight());
 		g.dispose();
 		return temp;
 	}
 
 	public static final ImageIcon loadImageIcon(String filename) {
-		URL a = Utils.class.getClassLoader().getResource(filename);
+		URL a = Loader.class.getClassLoader().getResource(filename);
 		if (a != null) {
 			return new ImageIcon(a);
 		}
 		else {
 			System.err.println("FAILED TO LOAD FILE " + filename);
+			return new ImageIcon(getDefaultSkin());
 		}
-		return null;
 	}
 	
 	public static final Image loadImage(String filename) {
