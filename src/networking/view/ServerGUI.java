@@ -39,6 +39,7 @@ public class ServerGUI extends JPanel {
 		}
 		gameView = new GameView(instance);
 		this.add(gameView, BorderLayout.CENTER);
+		revalidate();
 		repaint();
 	}
 	

@@ -38,9 +38,9 @@ public class Animal extends Unit {
 	@Override
 	public void planActions(World world) {
 		chooseWhatToEat(world.units);
-		if(wantsToAttack() && getTarget() == null && Game.ticks >= nextTimeToChooseTarget) {
+		if(wantsToAttack() && getTarget() == null && World.ticks >= nextTimeToChooseTarget) {
 			chooseWhatToAttack(world.units, world.buildings);
-			nextTimeToChooseTarget = Game.ticks + TARGETING_COOLDOWN;
+			nextTimeToChooseTarget = World.ticks + TARGETING_COOLDOWN;
 		}
 		chooseWhereToMove(world);
 	}
@@ -120,7 +120,7 @@ public class Animal extends Unit {
 			}
 		}
 		// Migrate according to the season
-		if(getType().isMigratory() && Game.ticks > migratingUntil && Math.random() < 0.1) {
+		if(getType().isMigratory() && World.ticks > migratingUntil && Math.random() < 0.1) {
 			double season = Season.getSeason4();
 			Tile migrationTarget = null;
 			// heading into winter
@@ -133,7 +133,7 @@ public class Animal extends Unit {
 			}
 			if(migrationTarget != null) {
 //				System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + migrationTarget);
-				migratingUntil = Game.ticks + Season.SEASON_DURATION/2;
+				migratingUntil = World.ticks + Season.SEASON_DURATION/2;
 				queuePlannedAction(new PlannedAction(migrationTarget));
 			}
 		}

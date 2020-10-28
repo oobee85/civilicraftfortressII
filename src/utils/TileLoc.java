@@ -1,6 +1,8 @@
 package utils;
 
-public class TileLoc {
+import java.io.*;
+
+public class TileLoc implements Serializable {
 	public final int x, y;
 	public TileLoc(int x, int y) {
 		this.x = x;
@@ -27,5 +29,11 @@ public class TileLoc {
 	}
 	public double euclideanDistance(TileLoc other) {
 		return Math.sqrt((this.x - other.x)*(this.x - other.x) + (this.y - other.y)*(this.y - other.y));
+	}
+	public int getX() {
+		return x;
+	}
+	public int getY() {
+		return y;
 	}
 }

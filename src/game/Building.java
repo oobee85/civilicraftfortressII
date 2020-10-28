@@ -43,7 +43,7 @@ public class Building extends Thing {
 		updateInProgressUnit();
 		timeToHarvest --;
 		
-		if(Game.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
+		if(World.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			Tile tile = getTile();
 			int tileDamage = (int)tile.computeTileDamage(this);
 			if (tileDamage != 0) {

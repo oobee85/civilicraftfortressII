@@ -9,6 +9,7 @@ import java.util.stream.*;
 
 import game.*;
 import liquid.*;
+import networking.message.*;
 import ui.*;
 import utils.*;
 import wildlife.*;
@@ -17,12 +18,16 @@ public class World {
 
 	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 10;
 	public static final double TERRAIN_SNOW_LEVEL = 1;
-//	public static final double DESERT_HUMIDITY = 0.001;
 	public static final double DESERT_HUMIDITY = 2;
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
 	public static final int TRANSITION_PERIOD = 100;
 	private static final double CHANCE_TO_SWITCH_TERRAIN = 0.05;
+	
+	private static final double BUSH_RARITY = 0.005;
+	private static final double WATER_PLANT_RARITY = 0.05;
+	private static final double FOREST_DENSITY = 0.3;
+	
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
 	
@@ -60,18 +65,46 @@ public class World {
 	public LinkedList<Projectile> newProjectiles = new LinkedList<Projectile>();
 	public LinkedList<GroundModifier> groundModifiers = new LinkedList<>();
 	private LinkedList<GroundModifier> newGroundModifiers = new LinkedList<>();
-	
-	
-	private double bushRarity = 0.005;
-	private double waterPlantRarity = 0.05;
-	private double forestDensity = 0.3;
 
 	public TileLoc volcano;
 	public int numCutTrees = 10;
+	public static int nights = 0;
+	public static int days = 1;
+	public static int ticks;
 	
-	public World() {
+	public World(int width, int height) {
+		this.width = width;
+		this.height = height;
 		tileList = new LinkedList<>();
 		tileListRandom = new LinkedList<>();
+		tiles = new Tile[width][height];
+		liquidSimulationPhases.clear();
+		for(int i = 0; i < NUM_LIQUID_SIMULATION_PHASES; i++) {
+			liquidSimulationPhases.add(new ArrayList<>());
+		}
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				tiles[i][j] = new Tile(new TileLoc(i, j), Terrain.DIRT);
+				tileList.add(tiles[i][j]);
+				tileListRandom.add(tiles[i][j]);
+				
+				// This one only has 5 phases
+//				int phase = (i + 5 - (2*j)%5) % 5;
+				// but this one has fewer cache invalidations
+				int phase = 3*(i%3) + j%3;
+				liquidSimulationPhases.get(phase).add(tiles[i][j]);
+			}
+		}
+
+		for(Tile tile : getTiles()) {
+			tile.setNeighbors(getNeighbors(tile));
+		}
+	}
+	public void updateTiles(LinkedList<TileInfo> tileInfos) {
+		System.out.println("updating " + tileInfos.size() + " tiles");
+		for(TileInfo info : tileInfos) {
+			
+		}
 	}
 	public int getTerritorySize() {
 		return territory.size();
@@ -356,7 +389,7 @@ public class World {
 	}
 	public void updateTerrainChange(World world) {
 		for(Tile tile : getTiles()) {
-			tile.updateHumidity(Game.ticks);
+			tile.updateHumidity(World.ticks);
 			
 			//spreads desert tiles
 			if(tile.getTerrain().isPlantable(tile.getTerrain()) && tile.getHumidity() <= DESERT_HUMIDITY) {
@@ -657,8 +690,8 @@ public class World {
 		newProjectiles.clear();
 		projectiles = projectilesNew;
 		
-		if(Game.ticks % 200 == 0) {
-			System.out.println("Tick " + Game.ticks +
+		if(World.ticks % 200 == 0) {
+			System.out.println("Tick " + World.ticks +
 					" \tunits: " 				+ units.size() + 
 					" \tbuildings: " 		+ buildings.size() + 
 					" \tplannedBuildings: " + plannedBuildings.size() + 
@@ -718,7 +751,7 @@ public class World {
 	public void genPlants() {
 		for(Tile tile : getTiles()) {
 			//generates land plants
-			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < bushRarity) {
+			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < BUSH_RARITY) {
 				double o = Math.random();
 				if(o < PlantType.BERRY.getRarity()) {
 					Plant p = new Plant(PlantType.BERRY, tile);
@@ -728,7 +761,7 @@ public class World {
 			}
 			//tile.liquidType.WATER &&
 			//generates water plants
-			if( Math.random() < waterPlantRarity) {
+			if( Math.random() < WATER_PLANT_RARITY) {
 				double o = Math.random();
 				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()  && o < PlantType.CATTAIL.getRarity()) {
 					Plant p = new Plant(PlantType.CATTAIL, tile);
@@ -743,7 +776,7 @@ public class World {
 	public void makeForest() {
 		
 		for(Tile t : tileListRandom) {
-			double tempDensity = forestDensity;
+			double tempDensity = FOREST_DENSITY;
 			if(t.getTerrain() == Terrain.DIRT) {
 				tempDensity /= 2;
 			}
@@ -781,36 +814,10 @@ public class World {
 		return tiles;
 	}
 	
-	public void generateWorld(int size) {
-		liquidSimulationPhases.clear();
-		for(int i = 0; i < NUM_LIQUID_SIMULATION_PHASES; i++) {
-			liquidSimulationPhases.add(new ArrayList<>());
-		}
-		width = size;
-		height = size;
-		tiles = new Tile[width][height];
+	public void generateWorld() {
 		int smoothingRadius = (int) (Math.sqrt((width + height)/2)/2);
-		
 		double[][] heightMap = Generation.generateHeightMap(smoothingRadius, width, height);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
-				tiles[i][j] = Tile.makeTile(new TileLoc(i, j), Terrain.DIRT);
-				tileList.add(tiles[i][j]);
-				tileListRandom.add(tiles[i][j]);
-				
-				// This one only has 5 phases
-//				int phase = (i + 5 - (2*j)%5) % 5;
-				// but this one has fewer cache invalidations
-				int phase = 3*(i%3) + j%3;
-				liquidSimulationPhases.get(phase).add(tiles[i][j]);
-			}
-		}
-
-		for(Tile tile : getTiles()) {
-			tile.setNeighbors(getNeighbors(tile));
-		}
-
 		volcano = Generation.makeVolcano(this, heightMap);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 
@@ -946,7 +953,7 @@ public class World {
 	}
 
 	public int ticksUntilDay() {
-		int currentDayOffset = Game.ticks%(DAY_DURATION + NIGHT_DURATION);
+		int currentDayOffset = World.ticks%(DAY_DURATION + NIGHT_DURATION);
 		int skipAmount = (DAY_DURATION + NIGHT_DURATION - TRANSITION_PERIOD) - currentDayOffset;
 		if(skipAmount < 0) {
 			skipAmount += DAY_DURATION + NIGHT_DURATION;
@@ -958,7 +965,7 @@ public class World {
 		return getDaylight() < 0.4;
 	}
 	public static int getCurrentDayOffset() {
-		return (Game.ticks + TRANSITION_PERIOD)%(DAY_DURATION + NIGHT_DURATION);
+		return (World.ticks + TRANSITION_PERIOD)%(DAY_DURATION + NIGHT_DURATION);
 	}
 	public static double getDaylight() {
 		if(Game.DISABLE_NIGHT) {

@@ -10,11 +10,11 @@ public class Season {
 	public static double[] winter;
 	public static double[] summer;
 	public static double getSeason2() {
-		int season =  (Game.ticks + SEASON_DURATION*1/2)%(SEASON_DURATION*2);
+		int season =  (World.ticks + SEASON_DURATION*1/2)%(SEASON_DURATION*2);
 		return Math.abs(SEASON_DURATION - season) / (double)SEASON_DURATION;
 	}
 	public static double getSeason4() {
-		return (Game.ticks + SEASON_DURATION*1/2)%(SEASON_DURATION*2) / (double)SEASON_DURATION;
+		return (World.ticks + SEASON_DURATION*1/2)%(SEASON_DURATION*2) / (double)SEASON_DURATION;
 	}
 
 	private static final double SNOWY_POLES_RATIO = 0.04;

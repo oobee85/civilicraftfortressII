@@ -21,17 +21,12 @@ public class Game {
 	public static final ArrayList<ResearchType> researchTypeList = new ArrayList<>();
 	public static final HashMap<String, ResearchType> researchTypeMap = new HashMap<>();
 
+	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
+	public static boolean DISABLE_NIGHT = false;
 	
 	private GUIController guiController;
 
-	public static int ticks;
-	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
-	public static boolean DISABLE_NIGHT = false;
-	public static int days = 1;
-	public static int nights = 0;
-	
 	public World world;
-	
 	
 	public Game(GUIController guiController) {
 		this.guiController = guiController;
@@ -57,9 +52,7 @@ public class Game {
 	}
 	
 	public void weatherEvents() {
-
-		
-		if(days > 10 && Math.random() < 0.00001) {
+		if(World.days > 10 && Math.random() < 0.00001) {
 			meteorStrike();
 		}
 		
@@ -83,17 +76,17 @@ public class Game {
 		return guiController;
 	}
 	public int getDays() {
-		return days;
+		return World.days;
 	}
 	public int getNights() {
-		return nights;
+		return World.nights;
 	}
 	public void gameTick() {
 		// Do all the game events like unit movement, time passing, building things, growing, etc
 		// happens once every 100ms
-		ticks++;
+		World.ticks++;
 		
-		if(ticks%20 == 0) {
+		if(World.ticks%20 == 0) {
 			updateTerritory();
 		}
 		
@@ -105,19 +98,19 @@ public class Game {
 		buildingTick();
 		unitTick();
 		world.doProjectileUpdates();
-		if(ticks%World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
+		if(World.ticks%World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			world.updatePlantDamage();
 		}
 		groundModifierTick();
 		
 		
-		if(ticks % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
+		if(World.ticks % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
 			dayEvents();
-			days ++;
+			World.days ++;
 		}
-		if((ticks + World.DAY_DURATION) % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
+		if((World.ticks + World.DAY_DURATION) % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
 			nightEvents();
-			nights ++;
+			World.nights ++;
 		}
 		weatherEvents();
 		// GUI updates
@@ -138,57 +131,57 @@ public class Game {
 	}
 	private void dayEvents() {
 		//all the forced spawns
-		if(days % 5 == 0) {
-			for(int i = 0; i < days/5; i++) {
+		if(World.days % 5 == 0) {
+			for(int i = 0; i < World.days/5; i++) {
 				world.spawnLavaGolem();
 				world.spawnIceGiant();
 			}
-			System.out.println(days/5 + " lava & ice giants");
+			System.out.println(World.days/5 + " lava & ice giants");
 			
 		}
-		if(days % 20 == 0) {
+		if(World.days % 20 == 0) {
 			meteorStrike();
 		}
-		if(days % 8 == 0) {
-			for(int i = 0; i < days/8; i++) {
+		if(World.days % 8 == 0) {
+			for(int i = 0; i < World.days/8; i++) {
 				world.spawnOgre();
 			}
-			System.out.println(days/8 + " ogres");
+			System.out.println(World.days/8 + " ogres");
 			
 		}
-		if(days % 10 == 0) {
-			for(int i = 0; i < days/10; i++) {
+		if(World.days % 10 == 0) {
+			for(int i = 0; i < World.days/10; i++) {
 				world.spawnSkeletonArmy();
 			}
-			System.out.println(days/10 + " skeletons");
+			System.out.println(World.days/10 + " skeletons");
 		}
-		if(days % 20 == 0) {
+		if(World.days % 20 == 0) {
 			spawnCyclops();
 			System.out.println("cyclops");
 		}
-		if(days % 15 == 0) {
+		if(World.days % 15 == 0) {
 			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), World.NO_FACTION);
 			System.out.println("parasite");
 		}
 		
 		
-		if(days >= 10) {
-			int number = (int)(Math.random() / Season.FREEZING_TEMPURATURE * days/10);
+		if(World.days >= 10) {
+			int number = (int)(Math.random() / Season.FREEZING_TEMPURATURE * World.days/10);
 			for(int i = 0; i < number; i++) {
 				world.spawnIceGiant();
 			}
 			System.out.println(number + " ice giants");
 		}
-		if(days >= 5) {
-			int number = (int)(Math.random()*days/4);
+		if(World.days >= 5) {
+			int number = (int)(Math.random()*World.days/4);
 			for(int i = 0; i < number; i++) {
 				world.spawnEnt();
 			}
 			System.out.println(number + " ents");
 			
 		}
-		if(days >= 1) {
-			int number = (int)(Season.MELTING_TEMPURATURE + Math.random()*days);
+		if(World.days >= 1) {
+			int number = (int)(Season.MELTING_TEMPURATURE + Math.random()*World.days);
 			makeAnimal(world.getTilesRandomly().getFirst(), Game.unitTypeMap.get("FLAMELET"), number);
 			System.out.println(number + " flamelets");
 		}
@@ -202,7 +195,7 @@ public class Game {
 //		}
 	}
 	private void nightEvents() {
-		if(days >= 10) {
+		if(World.days >= 10) {
 			if(Math.random() > 0.5) {
 				world.spawnWerewolf();
 			}
@@ -250,10 +243,14 @@ public class Game {
 			world.spawnAnimal(type, tiles.remove(0), World.NO_FACTION);
 		}
 	}
-	public void generateWorld(int size, boolean easymode) {
-		world = new World();
+	
+	public void initializeWorld(int width, int height) {
+		world = new World(width, height);
+	}
+	public void generateWorld(int width, int height, boolean easymode) {
+		initializeWorld(width, height);
 		Attack.world = world;
-		world.generateWorld(size);
+		world.generateWorld();
 		makeRoads(easymode);
 		if(easymode) {
 			addResources();
@@ -609,7 +606,7 @@ public class Game {
 				Unit unit = (Unit)thing;
 				if(unit.getType().isBuilder()) {
 					for(Tile tile : Utils.getTilesInRadius(unit.getTile(), world, 4)) {
-						if(world.territory.get(tile) != World.PLAYER_FACTION) {
+						if(tile.getIsTerritory() != World.PLAYER_FACTION) {
 							continue;
 						}
 						Building building = buildBuilding(type, tile);

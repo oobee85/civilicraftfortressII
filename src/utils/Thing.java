@@ -62,7 +62,7 @@ public class Thing implements HasImage {
 		boolean before = isDead();
 		health -= damage;
 		if(damage != 0) {
-			timeLastDamageTaken = Game.ticks;
+			timeLastDamageTaken = World.ticks;
 			getFaction().gotAttacked(getTile());
 		}
 		addHitsplat((int)(Math.ceil(damage)));
@@ -79,7 +79,7 @@ public class Thing implements HasImage {
 		int finalHealing = (int)tempHealing;
 		health += finalHealing;
 		if(finalHealing != 0) {
-			timeLastDamageTaken = Game.ticks;
+			timeLastDamageTaken = World.ticks;
 		}
 		if(hitsplat == true && finalHealing > 2) {
 			addHitsplat(-finalHealing);

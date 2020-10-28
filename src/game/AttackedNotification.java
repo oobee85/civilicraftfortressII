@@ -10,11 +10,11 @@ public class AttackedNotification {
 	public final Tile tile;
 
 	public AttackedNotification(Tile tile) {
-		this.expires = Game.ticks + DURATION;
+		this.expires = World.ticks + DURATION;
 		this.tile = tile;
 	}
 	public boolean isExpired() {
-		return Game.ticks >= expires;
+		return World.ticks >= expires;
 	}
 	
 }

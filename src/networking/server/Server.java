@@ -18,7 +18,7 @@ public class Server {
 	public static final PlayerInfo DEFAULT_PLAYER_INFO = new PlayerInfo("Default", Color.LIGHT_GRAY);
 	
 	
-	private ConcurrentHashMap<Connection<ServerMessage, ClientMessage>, Boolean> connections = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Connection, Boolean> connections = new ConcurrentHashMap<>();
 	private volatile boolean stop = false;
 	private Thread thread;
 	
@@ -63,7 +63,7 @@ public class Server {
 						e.printStackTrace();
 					}
 				}
-				for(Connection<ServerMessage, ClientMessage> connection : connections.keySet()) {
+				for(Connection connection : connections.keySet()) {
 					try {
 						connection.close();
 						System.out.println("Closed client socket");
@@ -78,7 +78,7 @@ public class Server {
 	}
 	
 	private void addNewConnection(Socket socket) {
-		Connection<ServerMessage, ClientMessage> connection = new Connection<>(socket);
+		Connection connection = new Connection(socket);
 		connection.setDisconnectCallback(() -> {
 			gui.lostConnection(connection.getPanel());
 			connections.remove(connection);
@@ -90,44 +90,66 @@ public class Server {
 		updatedLobbyList();
 	}
 	
-	private void updatedLobbyList() {
-		ArrayList<PlayerInfo> infos = new ArrayList<>();
-		for (Connection<ServerMessage, ClientMessage> connection : connections.keySet()) {
-			infos.add(connection.getPlayerInfo());
-		}
-		PlayerInfo[] namesArray = infos.toArray(new PlayerInfo[0]);
-		LobbyListMessage message = new LobbyListMessage(namesArray);
-		for (Connection<ServerMessage, ClientMessage> connection : connections.keySet()) {
+	private void sendToAllConnections(Object message) {
+		for (Connection connection : connections.keySet()) {
 			connection.sendMessage(message);
 		}
 	}
 	
-	public void startProcessing(Connection<ServerMessage, ClientMessage> connection) {
+	private void updatedLobbyList() {
+		ArrayList<PlayerInfo> infos = new ArrayList<>();
+		for (Connection connection : connections.keySet()) {
+			infos.add(connection.getPlayerInfo());
+		}
+		PlayerInfo[] namesArray = infos.toArray(new PlayerInfo[0]);
+		LobbyListMessage message = new LobbyListMessage(namesArray);
+		sendToAllConnections(message);
+	}
+	
+	private void makeWorld() {
+		System.out.println("Making world");
+		gameInstance = new Game(new GUIController() {
+			@Override
+			public void updateGUI() {}
+			@Override
+			public void toggleTileView() {}
+			@Override
+			public void selectedUnit(Unit unit, boolean selected) {}
+			@Override
+			public void selectedSpawnUnit(boolean selected) {}
+			@Override
+			public void selectedBuilding(Building building, boolean selected) {}
+		});
+		gameInstance.generateWorld(128, 128, false);
+		gui.setGameInstance(gameInstance);
+		sendFullWorld();
+	}
+	
+	private void sendFullWorld() {
+		ArrayList<TileInfo> tileInfos = new ArrayList<>(gameInstance.world.getTiles().size()); 
+		for(Tile t : gameInstance.world.getTiles()) {
+			TileInfo info = new TileInfo(t.getHeight(), t.getIsTerritory().id, t.getLocation(), t.getHumidity(), t.liquidAmount, t.liquidType);
+			tileInfos.add(info);
+		}
+		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), tileInfos.toArray(new TileInfo[0]));
+		sendToAllConnections(worldInfo);
+	}
+	
+	public void startProcessing(Connection connection) {
 		Thread thread = new Thread(() -> {
 			try {
 				while(true) {
-					ClientMessage message = connection.getMessage();
+					Object message = connection.getMessage();
 					System.out.println("received " + message + " from " + connection);
-					if(message.getType() == ClientMessageType.INFO) {
-						connection.setPlayerInfo(message.getPlayerInfo());
-						updatedLobbyList();
-					}
-					else if(message.getType() == ClientMessageType.MAKE_WORLD) {
-						System.out.println("Making world");
-						gameInstance = new Game(new GUIController() {
-							@Override
-							public void updateGUI() {}
-							@Override
-							public void toggleTileView() {}
-							@Override
-							public void selectedUnit(Unit unit, boolean selected) {}
-							@Override
-							public void selectedSpawnUnit(boolean selected) {}
-							@Override
-							public void selectedBuilding(Building building, boolean selected) {}
-						});
-						gameInstance.generateWorld(128, false);
-						gui.setGameInstance(gameInstance);
+					if(message instanceof ClientMessage) {
+						ClientMessage clientMessage = (ClientMessage)message;
+						if(clientMessage.getType() == ClientMessageType.INFO) {
+							connection.setPlayerInfo(clientMessage.getPlayerInfo());
+							updatedLobbyList();
+						}
+						else if(clientMessage.getType() == ClientMessageType.MAKE_WORLD) {
+							makeWorld();
+						}
 					}
 				}
 			} catch (InterruptedException e) {

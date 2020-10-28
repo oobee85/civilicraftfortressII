@@ -9,21 +9,29 @@ import networking.*;
 import networking.client.*;
 import networking.message.*;
 import networking.server.*;
+import ui.*;
 
 public class ClientGUI extends JPanel {
 	
 	private Client client;
 	
+	private JPanel topPanel;
+	
 	private JPanel connectPanel;
 	private JPanel myinfoPanel;
 //	private JPanel connectionInfo;
 	private JPanel lobbyInfo;
-	
-	private JTextField messageTextField;
+	private JTextField nameTextField;
+
+	private GameView gameView;
 	
 	public ClientGUI() {
 
 		this.setLayout(new BorderLayout());
+		
+		topPanel = new JPanel();
+		topPanel.setLayout(new BorderLayout());
+		this.add(topPanel, BorderLayout.NORTH);
 		
 		connectPanel = new JPanel();
 		connectPanel.setLayout(new BoxLayout(connectPanel, BoxLayout.X_AXIS));
@@ -40,13 +48,13 @@ public class ClientGUI extends JPanel {
 			}
 		});
 		connectPanel.add(startButton);
-		this.add(connectPanel, BorderLayout.NORTH);
+		topPanel.add(connectPanel, BorderLayout.NORTH);
 		
 		myinfoPanel = new JPanel();
 		myinfoPanel.setLayout(new BoxLayout(myinfoPanel, BoxLayout.X_AXIS));
 
-		messageTextField = new JTextField(Server.DEFAULT_PLAYER_INFO.getName(), 16);
-		myinfoPanel.add(messageTextField);
+		nameTextField = new JTextField(Server.DEFAULT_PLAYER_INFO.getName(), 16);
+		myinfoPanel.add(nameTextField);
 
 		JButton colorButton = new JButton("Pick Color");
 		colorButton.setBackground(Server.DEFAULT_PLAYER_INFO.getColor());
@@ -60,7 +68,7 @@ public class ClientGUI extends JPanel {
 		
 		JButton updateInfoButton = new JButton("Update Info");
 		updateInfoButton.addActionListener(e -> {
-			client.sendMessage(new ClientMessage(ClientMessageType.INFO, new PlayerInfo(messageTextField.getText(), colorButton.getBackground())));
+			client.sendMessage(new ClientMessage(ClientMessageType.INFO, new PlayerInfo(nameTextField.getText(), colorButton.getBackground())));
 		});
 		myinfoPanel.add(updateInfoButton);
 
@@ -77,8 +85,8 @@ public class ClientGUI extends JPanel {
 		myinfoPanel.add(makeWorldButton);
 		
 		lobbyInfo = new JPanel();
-		lobbyInfo.setLayout(new BoxLayout(lobbyInfo, BoxLayout.Y_AXIS));
-		this.add(lobbyInfo, BorderLayout.CENTER);
+		lobbyInfo.setLayout(new BoxLayout(lobbyInfo, BoxLayout.X_AXIS));
+		topPanel.add(lobbyInfo, BorderLayout.CENTER);
 	}
 	
 	public void updatedLobbyList(PlayerInfo[] lobbyList) {
@@ -94,9 +102,9 @@ public class ClientGUI extends JPanel {
 	
 	public void connected(JPanel connectionInfo) {
 //		this.connectionInfo = connectionInfo;
-		this.remove(connectPanel);
+		topPanel.remove(connectPanel);
 //		myinfoPanel.add(connectionInfo);
-		this.add(myinfoPanel, BorderLayout.NORTH);
+		topPanel.add(myinfoPanel, BorderLayout.NORTH);
 		this.revalidate();
 		this.repaint();
 	}
@@ -104,8 +112,8 @@ public class ClientGUI extends JPanel {
 	public void disconnected() {
 //		myinfoPanel.remove(connectionInfo);
 //		connectionInfo = null;
-		this.remove(myinfoPanel);
-		this.add(connectPanel, BorderLayout.NORTH);
+		topPanel.remove(myinfoPanel);
+		topPanel.add(connectPanel, BorderLayout.NORTH);
 		this.revalidate();
 		this.repaint();
 		
@@ -113,6 +121,16 @@ public class ClientGUI extends JPanel {
 	
 	public void setClient(Client client) {
 		this.client = client;
+	}
+	
+	public void setGameInstance(Game instance) {
+		if(gameView != null) {
+			this.remove(gameView);
+		}
+		gameView = new GameView(instance);
+		this.add(gameView, BorderLayout.CENTER);
+		revalidate();
+		repaint();
 	}
 
 }

@@ -2,21 +2,26 @@ package networking.client;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
+import game.*;
 import networking.*;
 import networking.message.*;
 import networking.server.*;
 import networking.view.*;
+import ui.*;
 
 public class Client {
 	
-	private Connection<ClientMessage, ServerMessage> connection;
+	private Connection connection;
 	private ClientGUI clientGUI;
+
+	private Game gameInstance;
 
 	public Client() {
 		
 	}
-	public void sendMessage(ClientMessage message) {
+	public void sendMessage(Object message) {
 		connection.sendMessage(message);
 	}
 	
@@ -24,7 +29,7 @@ public class Client {
 		Socket socket = null;
 		try {
 			socket = new Socket(ip, Server.PORT);
-			connection = new Connection<>(socket);
+			connection = new Connection(socket);
 			connection.setDisconnectCallback(() -> {
 				clientGUI.disconnected();
 				System.out.println("reached callback");
@@ -44,15 +49,27 @@ public class Client {
 		}
 	}
 	
+	private void worldInfoUpdate(WorldInfo worldInfo) {
+		if(gameInstance.world == null) {
+			gameInstance.initializeWorld(worldInfo.getWidth(), worldInfo.getHeight());
+		}
+	}
+	
 	public void startReceiving() {
 		Thread thread = new Thread(() -> {
 			try {
 				while(true) {
-					ServerMessage message = connection.getMessage();
+					Object message = connection.getMessage();
 					System.out.println("received message " + message);
-					if(message.getServerMessageType() == ServerMessageType.LOBBY) {
-						LobbyListMessage lobbyListMessage = (LobbyListMessage) message;
-						clientGUI.updatedLobbyList(lobbyListMessage.getLobbyList());
+					if(message instanceof ServerMessage) {
+						ServerMessage serverMessage = (ServerMessage)message;
+						if(serverMessage.getServerMessageType() == ServerMessageType.LOBBY) {
+							LobbyListMessage lobbyListMessage = (LobbyListMessage) serverMessage;
+							clientGUI.updatedLobbyList(lobbyListMessage.getLobbyList());
+						}
+					}
+					else if(message instanceof WorldInfo) {
+						worldInfoUpdate((WorldInfo)message);
 					}
 				}
 			} catch (InterruptedException e) {

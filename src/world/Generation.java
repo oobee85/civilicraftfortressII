@@ -18,7 +18,7 @@ public class Generation {
 		LinkedList<double[][]> noises = new LinkedList<>();
 		
 		int power = 1;
-		while(power < width && power < height) {
+		while(power < width || power < height) {
 			power *= 2;
 		}
 		
@@ -116,8 +116,8 @@ public class Generation {
 		int x = 0;
 		int y = 0; 
 		double highest = -1000;
-		for(int i = 0; i < heightMap.length; i++) {
-			for(int j = 0; j < heightMap.length; j++) {
+		for(int i = 0; i < world.getWidth(); i++) {
+			for(int j = 0; j < world.getHeight(); j++) {
 				if(heightMap[i][j] > highest) {
 					highest = heightMap[i][j];
 					x = i;

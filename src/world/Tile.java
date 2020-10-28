@@ -38,7 +38,7 @@ public class Tile {
 	
 	private List<Tile> neighborTiles = new LinkedList<Tile>();
 
-	private Tile(TileLoc location, Terrain t) {
+	public Tile(TileLoc location, Terrain t) {
 		this.location = location;
 		terr = t;
 		liquidType = LiquidType.WATER;
@@ -47,10 +47,6 @@ public class Tile {
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
 		items = new ConcurrentLinkedQueue<Item>();
 		this.humidity = 1;
-	}
-
-	public static Tile makeTile(TileLoc location, Terrain t) {
-		return new Tile(location, t);
 	}
 	public double getTempurature() {
 		double season = Season.getSeason2();

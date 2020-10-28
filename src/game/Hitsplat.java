@@ -1,6 +1,6 @@
 package game;
 
-import ui.Game;
+import world.*;
 
 public class Hitsplat {
 
@@ -9,7 +9,7 @@ public class Hitsplat {
 	private int square;
 	
 	public Hitsplat(double damage, int square) {
-		maxDuration = Game.ticks + 8;
+		maxDuration = World.ticks + 8;
 		this.damage = damage;
 		this.square = square;
 		
@@ -18,7 +18,7 @@ public class Hitsplat {
 		return maxDuration;
 	}
 	public boolean isDead() {
-		if(Game.ticks >= maxDuration) {
+		if(World.ticks >= maxDuration) {
 			return true;
 		}
 		return false;

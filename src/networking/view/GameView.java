@@ -919,7 +919,7 @@ public class GameView extends JPanel {
 		if( tileSize <= 30) {
 			return;
 		}
-		if(Game.ticks - thing.getTimeLastDamageTaken() < 20 || thing.getTile().getLocation().equals(hoveredTile)) {
+		if(World.ticks - thing.getTimeLastDamageTaken() < 20 || thing.getTile().getLocation().equals(hoveredTile)) {
 			int x = thing.getTile().getLocation().x * tileSize + 1;
 			int y = thing.getTile().getLocation().y * tileSize + 1;
 			int w = tileSize - 1;

@@ -570,7 +570,7 @@ public class Frame extends JPanel {
 		System.err.println("Starting Game");
 		
 		int size = Integer.parseInt(mapSize.getText());
-		gameInstance.generateWorld(size, easyModeButton.isSelected());
+		gameInstance.generateWorld(size, size/2, easyModeButton.isSelected());
 
 		Dimension RESOURCE_BUTTON_SIZE = new Dimension(80, 30);
 		Dimension RESEARCH_BUTTON_SIZE = new Dimension(125, 35);
@@ -1153,7 +1153,7 @@ public class Frame extends JPanel {
 					long start = System.currentTimeMillis();
 					gameInstance.gameTick();
 					long elapsed = System.currentTimeMillis() - start;
-					if(Game.ticks % 10 == 0) {
+					if(World.ticks % 10 == 0) {
 						frame.setTitle(TITLE + " " + elapsed);
 					}
 					long sleeptime = MILLISECONDS_PER_TICK - elapsed;

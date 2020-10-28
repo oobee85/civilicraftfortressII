@@ -212,7 +212,7 @@ public class Unit extends Thing {
 			resetTimeToHeal();
 		}
 		// Take environment damage every 5 ticks
-		if (Game.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
+		if (World.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			int tileDamage = (int) getTile().computeTileDamage(this);
 			if (tileDamage != 0) {
 				this.takeDamage(tileDamage);
@@ -223,7 +223,7 @@ public class Unit extends Thing {
 			ticksToCost = (int) (ticksForFoodCost/2);
 		}
 		
-		if (Game.ticks % ticksToCost == 0 && getFaction().usesItems()) {
+		if (World.ticks % ticksToCost == 0 && getFaction().usesItems()) {
 			if (getFaction().canAfford(ItemType.FOOD, 1)) {
 				getFaction().payCost(ItemType.FOOD, 1);
 				starving = 0;

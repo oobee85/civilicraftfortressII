@@ -10,7 +10,7 @@ import networking.callbacks.*;
 import networking.server.*;
 import networking.view.*;
 
-public class Connection<SEND, RECEIVE> {
+public class Connection {
 
 	private Socket socket;
 	private ObjectOutputStream output;
@@ -22,8 +22,8 @@ public class Connection<SEND, RECEIVE> {
 	
 	private PlayerInfo playerInfo = Server.DEFAULT_PLAYER_INFO;
 
-	private LinkedBlockingQueue<SEND> messagesToSend = new LinkedBlockingQueue<SEND>();
-	private LinkedBlockingQueue<RECEIVE> receivedMessages = new LinkedBlockingQueue<RECEIVE>();
+	private LinkedBlockingQueue<Object> messagesToSend = new LinkedBlockingQueue<Object>();
+	private LinkedBlockingQueue<Object> receivedMessages = new LinkedBlockingQueue<Object>();
 	public Connection(Socket socket) {
 		this.socket = socket;
 		try {
@@ -55,7 +55,7 @@ public class Connection<SEND, RECEIVE> {
 		return playerInfo;
 	}
 	
-	public void sendMessage(SEND message) {
+	public void sendMessage(Object message) {
 		messagesToSend.add(message);
 	}
 	
@@ -63,16 +63,15 @@ public class Connection<SEND, RECEIVE> {
 		return panel;
 	}
 	
-	public RECEIVE getMessage() throws InterruptedException {
+	public Object getMessage() throws InterruptedException {
 		return receivedMessages.take();
 	}
 
 	private void startInputThread() {
-		@SuppressWarnings("unchecked")
 		Thread thread = new Thread(() -> {
-			RECEIVE message;
+			Object message;
 			try {
-				while((message = (RECEIVE)input.readObject()) != null) {
+				while((message = input.readObject()) != null) {
 					receivedMessages.add(message);
 					System.err.println("received message " + message);
 				}
@@ -91,7 +90,7 @@ public class Connection<SEND, RECEIVE> {
 	}
 	private void startOutputThread() {
 		Thread thread = new Thread(() -> {
-			SEND message;
+			Object message;
 			try {
 				while(true) {
 					message = messagesToSend.take();

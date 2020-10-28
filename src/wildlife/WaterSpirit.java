@@ -21,7 +21,7 @@ public class WaterSpirit extends Animal {
 	@Override
 	public void updateState() {
 		super.updateState();
-		if(Game.ticks % 20 == 0) {
+		if(World.ticks % 20 == 0) {
 			if(getTile().liquidType == LiquidType.DRY) {
 				getTile().liquidType = LiquidType.WATER;
 			}
