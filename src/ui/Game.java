@@ -653,7 +653,11 @@ public class Game {
 	
 	private void groundModifierTick() {
 		for(GroundModifier modifier : world.groundModifiers) {
+			if(modifier.getType() == GroundModifierType.RAIN || modifier.getType() == GroundModifierType.SNOW) {
+				world.updateRain(modifier);
+			}
 			if(modifier.updateTime()) {
+				
 //				if(modifier.getType() == GroundModifierType.SNOW) {
 //					Tile tile = modifier.getTile();
 //					if(tile.liquidType != LiquidType.WATER) {

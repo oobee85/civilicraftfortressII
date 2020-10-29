@@ -11,6 +11,8 @@ import utils.Utils;
 
 public enum GroundModifierType implements HasImage{
 	FIRE(new String[] { "resources/Images/ground_modifiers/fire.gif" }, 1, 0.5, new Color[] {new Color(255, 145, 0)}),
+	RAIN(new String[] { "resources/Images/ground_modifiers/cloud.png" }, 0, 0),
+	SNOW(new String[] { "resources/Images/ground_modifiers/snow.png" }, 0, 0),
 //	SNOW(new String[] { "resources/Images/liquid/snow128.png" }, 1, 0),
 	;
 

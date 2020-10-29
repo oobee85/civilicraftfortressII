@@ -160,6 +160,24 @@ public class World {
 		}
 	}
 	
+	public void updateRain(GroundModifier modifier) {
+		if(modifier.getType() == GroundModifierType.RAIN) {
+			Tile tile = modifier.getTile();
+			if(tile.liquidType != LiquidType.WATER && tile.liquidAmount > 0) {
+				tile.liquidAmount /= 10;
+			}
+			tile.liquidType = LiquidType.WATER;
+			tile.liquidAmount += 0.0001;
+		}
+		if(modifier.getType() == GroundModifierType.SNOW) {
+			Tile tile = modifier.getTile();
+			if(tile.liquidType != LiquidType.SNOW && tile.liquidAmount > 0) {
+				tile.liquidAmount /= 10;
+			}
+			tile.liquidType = LiquidType.SNOW;
+			tile.liquidAmount += 0.001;
+		}
+	}
 	public void rain() {
 		
 		//makes it so that it doesnt spawn the center of rain in deserts or on the volcano
@@ -178,17 +196,24 @@ public class World {
 			}
 			double temperature = t.getTempurature();
 			if(temperature < Season.FREEZING_TEMPURATURE) {
-				if(t.liquidType == LiquidType.DRY) {
-					t.liquidType = LiquidType.SNOW;
-				}
-				t.liquidAmount += 0.1;
-				
-			}
-			else {
-				if(t.isCold() == false) {
-					t.liquidType = LiquidType.WATER;
-				}
-				t.liquidAmount += 0.005;
+				GroundModifier snow = new GroundModifier(GroundModifierType.SNOW, t, 50 + (int)(Math.random()*10));
+				groundModifiers.add(snow);
+				t.setModifier(snow);
+//				System.out.println(t.getLocation());
+//				if(t.liquidType == LiquidType.DRY) {
+//					t.liquidType = LiquidType.SNOW;
+//				}
+//				t.liquidAmount += 0.1;
+//				
+			}else {
+				GroundModifier rain = new GroundModifier(GroundModifierType.RAIN, t, 50 + (int)(Math.random()*10));
+				groundModifiers.add(rain);
+				t.setModifier(rain);
+//				System.out.println(t.getLocation());
+//				if(t.isCold() == false) {
+//					t.liquidType = LiquidType.WATER;
+//				}
+//				t.liquidAmount += 0.005;
 			}
 		}
 //		System.out.println("Raining at " + rainTile + "with radius " + radius);
