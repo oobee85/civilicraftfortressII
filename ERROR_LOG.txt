@@ -1,0 +1,14 @@
+java.lang.ArrayIndexOutOfBoundsException: Index 595 out of bounds for length 595
+	at java.base/java.util.LinkedList.toArray(LinkedList.java:1057)
+	at java.base/java.util.LinkedList.addAll(LinkedList.java:412)
+	at java.base/java.util.LinkedList.addAll(LinkedList.java:391)
+	at world.World.clearDeadAndAddNewThings(World.java:584)
+	at ui.Game.gameTick(Game.java:145)
+	at ui.Frame.lambda$27(Frame.java:1368)
+	at java.base/java.lang.Thread.run(Thread.java:830)
+java.lang.NullPointerException
+	at game.Unit.aggro(Unit.java:294)
+	at world.World.doProjectileUpdates(World.java:576)
+	at ui.Game.gameTick(Game.java:100)
+	at ui.Frame.lambda$26(Frame.java:1154)
+	at java.base/java.lang.Thread.run(Thread.java:830)

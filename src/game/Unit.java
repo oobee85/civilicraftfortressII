@@ -291,6 +291,9 @@ public class Unit extends Thing {
 	}
 
 	public void aggro(Unit attacker) {
+		if(attacker == null) {
+			return;
+		}
 		if (this.getFaction() != attacker.getFaction() && getTarget() != attacker && isIdle()) {
 			this.queuePlannedAction(new PlannedAction(attacker));
 		}

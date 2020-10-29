@@ -368,19 +368,22 @@ public class World {
 					if(t.getTerrain() != Terrain.ROCK && t.getTerrain() != Terrain.VOLCANO) {
 //						tile.setTerrain(Terrain.BURNED_GROUND);
 					}
-					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
-					addGroundModifier(fire);
-					t.setModifier(fire);
-					if(t.getHasBuilding() == true) {
-						t.getBuilding().takeDamage(damage);
-					}
-					for(Unit unit : t.getUnits()) {
-						unit.takeDamage(damage);
-					}
-					if(t.getPlant() != null) {
-						t.getPlant().takeDamage(damage);
-					}
-					t.liquidAmount = 0;
+//					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
+//					addGroundModifier(fire);
+//					t.setModifier(fire);
+					Projectile wave = new Projectile(ProjectileType.METEOR_WAVE, tile, t, null);
+					tile.addProjectile(wave);
+					projectiles.add(wave);
+//					if(t.getHasBuilding() == true) {
+//						t.getBuilding().takeDamage(damage);
+//					}
+//					for(Unit unit : t.getUnits()) {
+//						unit.takeDamage(damage);
+//					}
+//					if(t.getPlant() != null) {
+//						t.getPlant().takeDamage(damage);
+//					}
+//					t.liquidAmount = 0;
 				}
 		}
 	}
@@ -571,6 +574,9 @@ public class World {
 					for(Unit unit : projectile.getTile().getUnits()) {
 						unit.takeDamage(projectile.getType().getDamage());
 						unit.aggro(projectile.getSource());
+					}
+					if(projectile.getTile().getPlant() != null) {
+						projectile.getTile().getPlant().takeDamage(projectile.getType().getDamage());
 					}
 					if(projectile.getTile().getHasBuilding() == true) {
 						projectile.getTile().getBuilding().takeDamage(projectile.getType().getDamage());
