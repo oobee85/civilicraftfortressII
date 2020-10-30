@@ -31,14 +31,13 @@ public class CommandMessage implements Externalizable {
 	public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
 		command = CommandType.values()[input.readInt()];
 		thingID = input.readInt();
-		target = new TileLoc();
-		target.readExternal(input);
+		target = Serializer.readTileLoc(input);
 	}
 	@Override
 	public void writeExternal(ObjectOutput output) throws IOException {
 		output.writeInt(command.ordinal());
 		output.writeInt(thingID);
-		target.writeExternal(output);
+		Serializer.write(output, target);
 	}
 	
 	@Override
