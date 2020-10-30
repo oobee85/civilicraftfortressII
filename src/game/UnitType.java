@@ -1,6 +1,7 @@
 package game;
 import java.awt.Color;
 import java.awt.Image;
+import java.io.*;
 import java.util.*;
 
 import javax.swing.ImageIcon;
@@ -8,18 +9,18 @@ import javax.swing.ImageIcon;
 import utils.*;
 import utils.Loader.*;
 
-public class UnitType implements HasImage {
+public class UnitType implements HasImage, Serializable {
 	
 	private final String name;
-	private final MipMap mipmap;
-	private final CombatStats combatStats;
-	private final HashSet<String> attributes;
-	private final HashMap <ItemType, Integer> cost;
-	private final String researchRequirement;
-	private final LinkedList<Item> deadItem;
-	private final ProjectileType projectileType;
-	private final TargetInfo[] targetingInfoStrings;
-	private final ArrayList<TargetingInfo> targetingInfo = new ArrayList<>();
+	private transient final MipMap mipmap;
+	private transient final CombatStats combatStats;
+	private transient final HashSet<String> attributes;
+	private transient final HashMap <ItemType, Integer> cost;
+	private transient final String researchRequirement;
+	private transient final LinkedList<Item> deadItem;
+	private transient final ProjectileType projectileType;
+	private transient final TargetInfo[] targetingInfoStrings;
+	private transient final ArrayList<TargetingInfo> targetingInfo = new ArrayList<>();
 
 	public UnitType(String name, String image, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, ProjectileType projectileType, TargetInfo[] targeting) {
 		this.name = name;

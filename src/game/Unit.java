@@ -1,33 +1,33 @@
 package game;
 
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
 import pathfinding.*;
-import ui.*;
 import utils.*;
 import world.*;
 
-public class Unit extends Thing {
+public class Unit extends Thing implements Serializable {
 	
 	private UnitType unitType;
-	private double timeToMove;
-	private double timeToAttack;
-	private double timeToHeal;
+	private transient double timeToMove;
+	private transient double timeToAttack;
+	private transient double timeToHeal;
 	private int remainingEffort;
-	private boolean isIdle;
-	private int starving;
+	private transient boolean isIdle;
+	private transient int starving;
 	private CombatStats combatStats;
-	private LinkedList<Tile> currentPath;
+	private transient LinkedList<Tile> currentPath;
 	
-	public ConcurrentLinkedQueue<PlannedAction> actionQueue = new ConcurrentLinkedQueue<>();
-	private PlannedAction passiveAction = PlannedAction.NOTHING;
+	public transient ConcurrentLinkedQueue<PlannedAction> actionQueue = new ConcurrentLinkedQueue<>();
+	private transient PlannedAction passiveAction = PlannedAction.NOTHING;
 	
-	private LinkedList<Attack> attacks;
-	private boolean isHarvesting;
-	private double timeToHarvest;
-	private double baseTimeToHarvest = 10;
-	private int ticksForFoodCost = 60;
+	private transient LinkedList<Attack> attacks;
+	private transient boolean isHarvesting;
+	private transient double timeToHarvest;
+	private transient double baseTimeToHarvest = 10;
+	private transient int ticksForFoodCost = 60;
 
 	public Unit(UnitType unitType, Tile tile, Faction faction) {
 		super(unitType.getCombatStats().getHealth(), unitType, faction, tile);

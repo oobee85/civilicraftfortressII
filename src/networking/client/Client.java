@@ -109,9 +109,30 @@ public class Client {
 				newBuilding.getTile().setBuilding(newBuilding);
 			}
 		}
+		else if(update instanceof Unit) {
+			Unit unitUpdate = (Unit)update;
+			Unit newUnit = new Unit(
+					Game.unitTypeMap.get(unitUpdate.getType().name()), 
+					gameInstance.world.get(unitUpdate.getTile().getLocation()), 
+					World.factions[unitUpdate.getFaction().id]);
+			things.put(update.id, newUnit);
+			gameInstance.world.newUnits.add(newUnit);
+			if(newUnit.getTile() != null) {
+				newUnit.getTile().addUnit(newUnit);
+			}
+		}
 	}
 	
 	private void updateThing(Thing existing, Thing update) {
+		existing.setFaction(World.factions[update.getFaction().id]);
+		existing.setMaxHealth(update.getMaxHealth());
+		existing.setHealth(update.getHealth());
+		existing.setDead(update.isDead());
+		Tile movedFrom = null;
+		if(existing.getTile() != null && !existing.getTile().equals(update.getTile())) {
+			movedFrom = existing.getTile();
+		}
+		existing.setTile(gameInstance.world.get(update.getTile().getLocation()));
 		if(existing instanceof Plant) {
 			Plant existingPlant = (Plant)existing;
 			Plant plantUpdate = (Plant)update;
@@ -125,11 +146,17 @@ public class Client {
 			existingBuilding.setCulture(buildingUpdate.getCulture());
 			existingBuilding.setPlanned(buildingUpdate.isPlanned());
 		}
-		existing.setFaction(update.getFaction());
-		existing.setMaxHealth(update.getMaxHealth());
-		existing.setHealth(update.getHealth());
-		existing.setDead(update.isDead());
-		existing.setTile(gameInstance.world.get(update.getTile().getLocation()));
+		else if(update instanceof Unit) {
+			Unit existingUnit = (Unit)existing;
+			Unit unitUpdate = (Unit)update;
+			existingUnit.setType(Game.unitTypeMap.get(unitUpdate.getType().name()));
+			existingUnit.setRemainingEffort(unitUpdate.getRemainingEffort());
+			existingUnit.setCombatStats(unitUpdate.getCombatStats());
+			if(movedFrom != null) {
+				movedFrom.removeUnit(existingUnit);
+				existingUnit.getTile().addUnit(existingUnit);
+			}
+		}
 		if(existing.isDead()) {
 			things.remove(update.id);
 		}

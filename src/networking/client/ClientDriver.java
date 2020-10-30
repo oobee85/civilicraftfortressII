@@ -14,7 +14,7 @@ public class ClientDriver {
 	
 	public ClientDriver() {
 		frame = new JFrame("Grid Client");
-		frame.setSize(700, 700);
+		frame.setSize(800, 800);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(clientGUI.getMainPanel());
 		

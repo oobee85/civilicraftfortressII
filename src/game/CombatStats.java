@@ -1,8 +1,9 @@
 package game;
 
+import java.io.*;
 import java.util.*;
 
-public class CombatStats {
+public class CombatStats implements Serializable {
 
 	private int health;
 	private int attack;
@@ -11,8 +12,8 @@ public class CombatStats {
 	private int attackSpeed;
 	private int ticksToBuild;
 	private int ticksToHeal;
-	private ArrayList<Integer> stats = new ArrayList<Integer>();
-	private LinkedList<String> strings = new LinkedList<String>();
+	private transient ArrayList<Integer> stats = new ArrayList<Integer>();
+	private transient LinkedList<String> strings = new LinkedList<String>();
 	
 	/**
 	 * @param health

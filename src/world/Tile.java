@@ -440,4 +440,11 @@ public class Tile implements Serializable {
 	public String toString() {
 		return location.toString();
 	}
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Tile) {
+			return getLocation().equals(((Tile)obj).getLocation());
+		}
+		return false;
+	}
 }
