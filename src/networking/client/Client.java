@@ -13,6 +13,7 @@ import networking.message.*;
 import networking.server.*;
 import networking.view.*;
 import ui.*;
+import ui.infopanels.*;
 import utils.*;
 import world.*;
 
@@ -199,6 +200,23 @@ public class Client {
 			public void selectedSpawnUnit(boolean selected) {}
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {}
+			@Override
+			public void changedFaction(Faction faction) {}
+			@Override
+			public void pushInfoPanel(InfoPanel infoPanel) {
+			}
+			@Override
+			public void popInfoPanel() {
+			}
+			@Override
+			public void pressedSelectedUnitPortrait(Unit unit) {
+			}
+			@Override
+			public void switchInfoPanel(InfoPanel infoPanel) {
+			}
+			@Override
+			public void tryToCraftItem(ItemType type, int amount) {
+			}
 		});
 		clientGUI.setGameInstance(gameInstance);
 

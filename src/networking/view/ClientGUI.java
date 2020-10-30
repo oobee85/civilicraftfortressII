@@ -5,7 +5,6 @@ import java.net.*;
 
 import javax.swing.*;
 
-import networking.*;
 import networking.client.*;
 import networking.message.*;
 import networking.server.*;

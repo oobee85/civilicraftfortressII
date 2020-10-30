@@ -8,9 +8,7 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
-import pathfinding.Pathfinding;
 import utils.*;
-import world.Terrain;
 import world.Tile;
 
 public class Projectile implements HasImage {

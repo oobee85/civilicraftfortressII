@@ -11,6 +11,7 @@ import networking.*;
 import networking.message.*;
 import networking.view.*;
 import ui.*;
+import ui.infopanels.*;
 import world.*;
 
 public class Server {
@@ -120,6 +121,23 @@ public class Server {
 			public void selectedSpawnUnit(boolean selected) {}
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {}
+			@Override
+			public void changedFaction(Faction faction) {}
+			@Override
+			public void pushInfoPanel(InfoPanel infoPanel) {
+			}
+			@Override
+			public void popInfoPanel() {
+			}
+			@Override
+			public void pressedSelectedUnitPortrait(Unit unit) {
+			}
+			@Override
+			public void switchInfoPanel(InfoPanel infoPanel) {
+			}
+			@Override
+			public void tryToCraftItem(ItemType type, int amount) {
+			}
 		});
 		gameInstance.generateWorld(128, 128, false);
 		gui.setGameInstance(gameInstance);
@@ -150,6 +168,7 @@ public class Server {
 		worldInfo.getThings().addAll(gameInstance.world.plants);
 		worldInfo.getThings().addAll(gameInstance.world.buildings);
 		worldInfo.getThings().addAll(gameInstance.world.units);
+		
 		sendToAllConnections(worldInfo);
 	}
 	

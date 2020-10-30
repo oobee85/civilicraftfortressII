@@ -50,12 +50,11 @@ public class GameView extends JPanel {
 	private boolean controlDown = false;
 
 	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
-
+	
 	private LeftClickAction leftClickAction = LeftClickAction.NONE;
 	private HasImage selectedThingToSpawn;
 	private boolean summonPlayerControlled = true;
 	private BuildingType selectedBuildingToPlan;
-	
 	
 	public GameView(Game game) {
 		this.game = game;

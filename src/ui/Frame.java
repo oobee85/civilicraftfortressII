@@ -5,7 +5,6 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.Map.*;
-import java.util.concurrent.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -31,23 +30,23 @@ public class Frame extends JPanel {
 	public static final Dimension BUILD_UNIT_BUTTON_SIZE = new Dimension(170, 35);
 
 	private static final int TAB_ICON_SIZE = 25;
-	private ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon MAKE_UNIT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/barracks.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon HELLFORGE_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("HELLFORGE").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon SHADOW_WORD_DEATH = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/soyouhavechosendeath.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon SPAWN_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/spawn_tab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon MAKE_UNIT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/barracks.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon HELLFORGE_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("HELLFORGE").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon SHADOW_WORD_DEATH = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/soyouhavechosendeath.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon SPAWN_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/spawn_tab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 
-	private ImageIcon COLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/collapsed.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon UNCOLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/uncollapsed.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private ImageIcon FAST_FORWARD_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/fastforward.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-	private ImageIcon RAIN_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/rain.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-	private ImageIcon ERUPTION_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/erupt.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-	private ImageIcon CHANGE_FACTION_ICON = Utils.resizeImageIcon(Game.unitTypeMap.get("CYCLOPS").getImageIcon(DEBUG_BUTTON_SIZE.height-5), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-	private ImageIcon NIGHT_DISABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_disabled.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-	private ImageIcon NIGHT_ENABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_enabled.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-	private ImageIcon METEOR_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/meteor.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private static final ImageIcon COLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/collapsed.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon UNCOLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/uncollapsed.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon FAST_FORWARD_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/fastforward.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private static final ImageIcon RAIN_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/rain.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private static final ImageIcon ERUPTION_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/erupt.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private static final ImageIcon CHANGE_FACTION_ICON = Utils.resizeImageIcon(Game.unitTypeMap.get("CYCLOPS").getImageIcon(DEBUG_BUTTON_SIZE.height-5), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private static final ImageIcon NIGHT_DISABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_disabled.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private static final ImageIcon NIGHT_ENABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_enabled.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private static final ImageIcon METEOR_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/meteor.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 
 	private static final Image MOON_IMAGE = Utils.loadImage("resources/Images/interfaces/moon.png");
 	private static final Image SUN_IMAGE = Utils.loadImage("resources/Images/interfaces/sun.png");
@@ -56,10 +55,9 @@ public class Frame extends JPanel {
 	private JToggleButton easyModeButton;
 	private JFrame frame;
 	private JPanel mainMenuPanel;
-	private volatile boolean readyToStart;
 	private GameView gamepanel;
-	private JPanel selectedUnitsPanel;
-	private JPanel resourcePanel2;
+	private GameViewOverlay gamepanelOverlay;
+	private GUIController guiController;
 	private JPanel minimapPanel;
 	private JPanel infoPanel;
 	private LinkedList<JPanel> infoPanelStack = new LinkedList<>();
@@ -74,8 +72,6 @@ public class Frame extends JPanel {
 	private JTabbedPane tabbedPane;
 	private JPanel guiSplitter;
 	private JPanel resourcePanel;
-	private JButton[] resourceIndicators = new JButton[ItemType.values().length];
-	private boolean[] resourceIndicatorsAdded = new boolean[ItemType.values().length];
 	private HashMap<JButton, ResearchType> researchButtons = new HashMap<>();
 	private JButton[] buildingButtons;
 	private class Pair {
@@ -89,8 +85,6 @@ public class Frame extends JPanel {
 	private LinkedList<Pair> unitButtons = new LinkedList<>();
 	private JButton[] craftButtons = new JButton[ItemType.values().length];
 	private JButton[] statButtons = new JButton[7];
-	
-	private HashMap<Thing, JButton> selectedButtons = new HashMap<>();
 	
 	private JTextField mapSize;
 	private int WIDTH;
@@ -121,7 +115,27 @@ public class Frame extends JPanel {
 		WIDTH = HEIGHT + GUIWIDTH;
 		frame.setSize(WIDTH, HEIGHT);
 		frame.setLocationRelativeTo(null);
-		GUIController guiController = new GUIController() {
+		guiController = new GUIController() {
+			@Override
+			public void pushInfoPanel(InfoPanel infoPanel) {
+				Frame.this.pushInfoPanel(infoPanel);
+			}
+			@Override
+			public void popInfoPanel() {
+				Frame.this.popInfoPanel();
+			}
+			@Override
+			public void switchInfoPanel(InfoPanel infoPanel) {
+				Frame.this.switchInfoPanel(infoPanel);
+			}
+			@Override
+			public void pressedSelectedUnitPortrait(Unit unit) {
+				gamepanel.pressedSelectedUnitPortrait(unit);
+			}
+			@Override
+			public void tryToCraftItem(ItemType type, int amount) {
+				gameInstance.craftItem(type, amount);
+			}
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {
 				if (building.getType() == Game.buildingTypeMap.get("BARRACKS")) {
@@ -152,13 +166,8 @@ public class Frame extends JPanel {
 
 			@Override
 			public void selectedUnit(Unit unit, boolean selected) {
+				gamepanelOverlay.selectedUnit(unit, selected);
 				if(selected) {
-					if(!selectedButtons.containsKey(unit)) {
-						JButton button = setupUnitButton(unit);
-						selectedButtons.put(unit, button);
-						selectedUnitsPanel.add(button);
-						gamepanel.revalidate();
-					}
 					UnitInfoPanel infoPanel = new UnitInfoPanel(unit);
 					switchInfoPanel(infoPanel);
 					SwingUtilities.invokeLater(() -> {
@@ -168,13 +177,6 @@ public class Frame extends JPanel {
 						infoPanel.addButton("SetHarvesting").addActionListener(e -> gamepanel.setHarvesting());
 						infoPanel.addButton("Guard").addActionListener(e -> gamepanel.toggleGuarding());
 					});
-				}
-				else {
-					if(selectedButtons.containsKey(unit)) {
-						JButton button = selectedButtons.remove(unit);
-						selectedUnitsPanel.remove(button);
-						gamepanel.revalidate();
-					}
 				}
 				if(unit.getType().isBuilder()) {
 					manageBuildingTab(selected);
@@ -192,18 +194,15 @@ public class Frame extends JPanel {
 			public void toggleTileView() {
 				tileView.setVisible(!tileView.isVisible());
 			}
+			
+			@Override
+			public void changedFaction(Faction faction) {
+				gamepanelOverlay.changeFaction(faction);
+			}
 
 			@Override
 			public void updateGUI() {
-				for (int i = 0; i < ItemType.values().length; i++) {
-					int amount = World.PLAYER_FACTION.getItemAmount(ItemType.values()[i]);
-					resourceIndicators[i].setText("" + amount);
-					if(amount > 0 && !resourceIndicatorsAdded[i]) {
-						resourceIndicatorsAdded[i] = true;
-						resourcePanel2.add(resourceIndicators[i]);
-						gamepanel.revalidate();
-					}
-				}
+				gamepanelOverlay.updateItems();
 				boolean hasResearchLab = World.PLAYER_FACTION.hasResearchLab(gameInstance.world);
 				for(Entry<JButton, ResearchType> entry : researchButtons.entrySet()) {
 					JButton button = entry.getKey();
@@ -287,32 +286,6 @@ public class Frame extends JPanel {
 		});
 	}
 	
-	private JButton setupUnitButton(Unit unit) {
-		KButton button = new KButton(null, Utils.resizeImageIcon(unit.getImageIcon(10), 30, 30)) {
-			@Override
-			public void paintComponent(Graphics g) {
-				super.paintComponent(g);
-				GameView.drawHealthBar2(g, unit, 0, getHeight() - 6, getWidth(), 6, 1, unit.getHealth()/unit.getMaxHealth());
-			}
-		};
-		button.setMargin(KUIConstants.zeroMargin);
-		button.setHorizontalAlignment(SwingConstants.CENTER);
-		KUIConstants.setComponentAttributes(button, null);
-		button.addActionListener(e -> {
-			gamepanel.pressedSelectedUnitPortrait(unit);
-		});
-		button.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				pushInfoPanel(new UnitInfoPanel(unit));
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				popInfoPanel();
-			}
-		});
-		return button;
-	}
 	
 	private void menu() {
 		frame.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -327,15 +300,12 @@ public class Frame extends JPanel {
 		start.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if(readyToStart) {
-					start.setEnabled(false);
-					readyToStart = false;
-					repaint();
-					Thread thread = new Thread(() -> {
-						runGame();
-					});
-					thread.start();
-				}
+				start.setEnabled(false);
+				repaint();
+				Thread thread = new Thread(() -> {
+					runGame();
+				});
+				thread.start();
 			}
 		});
 		start.setEnabled(false);
@@ -350,26 +320,15 @@ public class Frame extends JPanel {
 		frame.add(mainMenuPanel, BorderLayout.CENTER);
 		frame.setVisible(true);
 		frame.requestFocusInWindow();
-		readyToStart = true;
 		start.setEnabled(true);
 	}
 
 	private void setupGamePanel() {
 		gamepanel = new GameView(gameInstance);
-		
-		resourcePanel2 = new JPanel();
-		resourcePanel2.setLayout(new BoxLayout(resourcePanel2, BoxLayout.Y_AXIS));
-		resourcePanel2.setOpaque(false);
-		JPanel filler = new JPanel();
-		filler.setLayout(new BorderLayout());
-		filler.setOpaque(false);
-		selectedUnitsPanel = new JPanel();
-		selectedUnitsPanel.setOpaque(false);
+		gamepanelOverlay = new GameViewOverlay(guiController);
+		gamepanelOverlay.changeFaction(World.PLAYER_FACTION);
 		gamepanel.setLayout(new BorderLayout());
-		gamepanel.add(resourcePanel2, BorderLayout.WEST);
-		gamepanel.add(filler, BorderLayout.CENTER);
-		filler.add(selectedUnitsPanel, BorderLayout.SOUTH);
-
+		gamepanel.add(gamepanelOverlay, BorderLayout.CENTER);
 	}
 
 	/** 
@@ -572,10 +531,8 @@ public class Frame extends JPanel {
 		int size = Integer.parseInt(mapSize.getText());
 		gameInstance.generateWorld(size, size, easyModeButton.isSelected());
 
-		Dimension RESOURCE_BUTTON_SIZE = new Dimension(80, 30);
 		Dimension RESEARCH_BUTTON_SIZE = new Dimension(125, 35);
 		int BUILDING_ICON_SIZE = 25;
-		int RESOURCE_ICON_SIZE = 25;
 
 		
 		workerMenu = new JPanel();
@@ -809,37 +766,6 @@ public class Frame extends JPanel {
 //		buttons = populateUnitTypeUI(barracksView, BUILDING_ICON_SIZE);
 //		Collections.addAll(unitButtons, buttons);
 
-		for (int i = 0; i < ItemType.values().length; i++) {
-			ItemType type = ItemType.values()[i];
-			KButton button = KUIConstants.setupButton("",
-					Utils.resizeImageIcon(type.getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE),
-					RESOURCE_BUTTON_SIZE);
-			button.setEnabled(false);
-			if(type.getCost() != null) {
-				button.addActionListener(e -> {
-					int amount = 1;
-					if((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
-						amount = 10;
-					}
-					gameInstance.craftItem(type, amount);
-				});
-			}
-			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new ItemTypeInfoPanel(type));
-			});
-			button.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					pushInfoPanel(new ItemTypeInfoPanel(type));
-				}
-				@Override
-				public void mouseExited(MouseEvent e) {
-					popInfoPanel();
-				}
-			});
-			resourceIndicators[i] = button;
-		}
-
 		JPanel buttonPanel = new JPanel();
 
 		JToggleButton showHeightMap = KUIConstants.setupToggleButton("Show Height Map", null, DEBUG_BUTTON_SIZE);
@@ -940,7 +866,11 @@ public class Frame extends JPanel {
 		setPlayerFaction.addActionListener(e -> {
 			int choice = JOptionPane.showOptionDialog(null, "Choose faction", "Choose faction", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, World.factions, World.NO_FACTION);
 			if(choice >= 0 && choice < World.factions.length) {
-				World.PLAYER_FACTION = World.factions[choice];
+				if(World.PLAYER_FACTION != World.factions[choice]) {
+					gamepanel.deselectEverything();
+					World.PLAYER_FACTION = World.factions[choice];
+					guiController.changedFaction(World.PLAYER_FACTION);
+				}
 			}
 		});
 

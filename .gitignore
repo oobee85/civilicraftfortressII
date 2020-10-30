@@ -4,3 +4,4 @@ bin/
 .settings/
 *.jar
 profiling/
+ERROR_LOG.txt
