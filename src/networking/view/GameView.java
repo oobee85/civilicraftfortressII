@@ -34,6 +34,7 @@ public class GameView extends JPanel {
 	private static final Font DAMAGE_FONT = new Font("Comic Sans MS", Font.BOLD, 14);
 	
 	private GUIController guiController;
+	private CommandInterface commandInterface;
 
 	private volatile BufferedImage terrainImage;
 	private volatile BufferedImage minimapImage;
@@ -56,9 +57,10 @@ public class GameView extends JPanel {
 	private boolean summonPlayerControlled = true;
 	private BuildingType selectedBuildingToPlan;
 	
-	public GameView(Game game) {
+	public GameView(Game game, CommandInterface commandInterface) {
 		this.game = game;
 		this.guiController = game.getGUIController();
+		this.commandInterface = commandInterface;
 		this.setBackground(Color.black);
 		viewOffset = new Position(0, 0);
 		addMouseWheelListener(new MouseWheelListener() {
@@ -279,7 +281,7 @@ public class GameView extends JPanel {
 
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Building) {
-				((Building) thing).setSpawnLocation(targetTile);
+				commandInterface.setBuildingRallyPoint((Building) thing, targetTile);
 			}
 			else if(thing instanceof Unit) {
 				Unit unit = (Unit) thing;
@@ -446,8 +448,8 @@ public class GameView extends JPanel {
 	
 	public void centerViewOn(Tile tile, int zoom, int panelWidth, int panelHeight) {
 		tileSize = zoom;
-		viewOffset.x = (tile.getLocation().x - panelWidth/2/tileSize) * tileSize + tileSize/2;
-		viewOffset.y = (tile.getLocation().y - panelHeight/2/tileSize) * tileSize;
+		viewOffset.x = (tile.getLocation().x() - panelWidth/2/tileSize) * tileSize + tileSize/2;
+		viewOffset.y = (tile.getLocation().y() - panelHeight/2/tileSize) * tileSize;
 		repaint();
 	}
 
@@ -583,8 +585,8 @@ public class GameView extends JPanel {
 			
 			for(Projectile p : game.world.projectiles) {
 				int extra = (int) (tileSize * p.getExtraSize());
-				g.drawImage(p.getShadow(0), p.getTile().getLocation().x * tileSize, p.getTile().getLocation().y * tileSize, tileSize, tileSize, null);
-				g.drawImage(p.getImage(0), p.getTile().getLocation().x * tileSize - extra/2, p.getTile().getLocation().y * tileSize - p.getHeight() - extra/2, tileSize + extra, tileSize + extra, null);
+				g.drawImage(p.getShadow(0), p.getTile().getLocation().x() * tileSize, p.getTile().getLocation().y() * tileSize, tileSize, tileSize, null);
+				g.drawImage(p.getImage(0), p.getTile().getLocation().x() * tileSize - extra/2, p.getTile().getLocation().y() * tileSize - p.getHeight() - extra/2, tileSize + extra, tileSize + extra, null);
 			}
 			
 			for(Thing thing : selectedThings) {
@@ -595,7 +597,7 @@ public class GameView extends JPanel {
 				Stroke currentStroke = g2d.getStroke();
 				int strokeWidth = tileSize/12;
 				g2d.setStroke(new BasicStroke(strokeWidth));
-				g.drawOval(thing.getTile().getLocation().x * tileSize + strokeWidth/2, thing.getTile().getLocation().y * tileSize + strokeWidth/2, tileSize-1 - strokeWidth, tileSize-1 - strokeWidth);
+				g.drawOval(thing.getTile().getLocation().x() * tileSize + strokeWidth/2, thing.getTile().getLocation().y() * tileSize + strokeWidth/2, tileSize-1 - strokeWidth, tileSize-1 - strokeWidth);
 				g2d.setStroke(currentStroke);
 //				Utils.setTransparency(g, 1f);
 
@@ -603,7 +605,7 @@ public class GameView extends JPanel {
 				if(thing instanceof Building) {
 					Building building = (Building) thing;
 					if(building.getSpawnLocation() != building.getTile()) {
-						g.drawImage(RALLY_POINT_IMAGE, building.getSpawnLocation().getLocation().x * tileSize, building.getSpawnLocation().getLocation().y * tileSize, tileSize, tileSize, null);
+						g.drawImage(RALLY_POINT_IMAGE, building.getSpawnLocation().getLocation().x() * tileSize, building.getSpawnLocation().getLocation().y() * tileSize, tileSize, tileSize, null);
 					}
 				}
 				
@@ -621,8 +623,8 @@ public class GameView extends JPanel {
 						TileLoc prev = unit.getTile().getLocation();
 						for(Tile t : path) {
 							if(prev != null) {
-								g.drawLine(prev.x * tileSize + tileSize/2, prev.y * tileSize + tileSize/2, 
-										t.getLocation().x * tileSize + tileSize/2, t.getLocation().y * tileSize + tileSize/2);
+								g.drawLine(prev.x() * tileSize + tileSize/2, prev.y() * tileSize + tileSize/2, 
+										t.getLocation().x() * tileSize + tileSize/2, t.getLocation().y() * tileSize + tileSize/2);
 							}
 							prev = t.getLocation();
 						}
@@ -630,7 +632,7 @@ public class GameView extends JPanel {
 					// draw destination flags
 					for(PlannedAction plan : unit.actionQueue) {
 						Tile targetTile = plan.targetTile == null ? plan.target.getTile() : plan.targetTile;
-						g.drawImage(FLAG, targetTile.getLocation().x * tileSize, targetTile.getLocation().y * tileSize, tileSize, tileSize, null);
+						g.drawImage(FLAG, targetTile.getLocation().x() * tileSize, targetTile.getLocation().y() * tileSize, tileSize, tileSize, null);
 					}
 					int range = unit.getType().getCombatStats().getAttackRadius();
 					if(range == 1) {
@@ -642,8 +644,8 @@ public class GameView extends JPanel {
 							Tile t = game.world.get(new TileLoc(i, j));
 							if (t == null)
 								continue;
-							int x = t.getLocation().x * tileSize;
-							int y = t.getLocation().y * tileSize;
+							int x = t.getLocation().x() * tileSize;
+							int y = t.getLocation().y() * tileSize;
 							int w = tileSize;
 							int h = tileSize;
 
@@ -655,20 +657,20 @@ public class GameView extends JPanel {
 									if (tile.getLocation().distanceTo(unit.getTile().getLocation()) > range) {
 										TileLoc tileLoc = tile.getLocation();
 
-										if (tileLoc.x == t.getLocation().x) {
-											if (tileLoc.y < t.getLocation().y) {
+										if (tileLoc.x() == t.getLocation().x()) {
+											if (tileLoc.y() < t.getLocation().y()) {
 												g.fillRect(x, y, w, 5);
 											}
-											if (tileLoc.y > t.getLocation().y) {
+											if (tileLoc.y() > t.getLocation().y()) {
 												g.fillRect(x, y + h - 5, w, 5);
 											}
 
 										}
-										if (tileLoc.y == t.getLocation().y) {
-											if (tileLoc.x < t.getLocation().x) {
+										if (tileLoc.y() == t.getLocation().y()) {
+											if (tileLoc.x() < t.getLocation().x()) {
 												g.fillRect(x, y, 5, h);
 											}
-											if (tileLoc.x > t.getLocation().x) {
+											if (tileLoc.x() > t.getLocation().x()) {
 												g.fillRect(x + w - 5, y, 5, h);
 											}
 										}
@@ -693,8 +695,8 @@ public class GameView extends JPanel {
 				visited.put(unit.getTile(), count+1);
 					
 				//draws a square for every player unit on the tile
-				int xx = unit.getTile().getLocation().x * tileSize + offset;
-				int yy = unit.getTile().getLocation().y * tileSize + (indicatorSize + offset)*count + offset;
+				int xx = unit.getTile().getLocation().x() * tileSize + offset;
+				int yy = unit.getTile().getLocation().y() * tileSize + (indicatorSize + offset)*count + offset;
 				g.setColor(unit.getFaction().color);
 				g.fillRect(xx, yy, indicatorSize, indicatorSize);
 				g.setColor(Color.BLACK);
@@ -721,14 +723,14 @@ public class GameView extends JPanel {
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
 				BufferedImage bI = Utils.toBufferedImage(selectedBuildingToPlan.getImage(tileSize));
-				g2d.drawImage(bI, hoveredTile.x * tileSize, hoveredTile.y * tileSize, tileSize, tileSize , null);
+				g2d.drawImage(bI, hoveredTile.x() * tileSize, hoveredTile.y() * tileSize, tileSize, tileSize , null);
 				Utils.setTransparency(g, 1f);
 			}
 			if (leftClickAction == LeftClickAction.SPAWN_THING) {
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
 				BufferedImage bI = Utils.toBufferedImage(selectedThingToSpawn.getImage(tileSize));
-				g2d.drawImage(bI, hoveredTile.x * tileSize, hoveredTile.y * tileSize, tileSize, tileSize , null);
+				g2d.drawImage(bI, hoveredTile.x() * tileSize, hoveredTile.y() * tileSize, tileSize, tileSize , null);
 				Utils.setTransparency(g, 1f);
 			}
 			
@@ -778,14 +780,14 @@ public class GameView extends JPanel {
 				drawTarget(g, hoveredTile);
 			}
 			g.setColor(new Color(0, 0, 0, 64));
-			g.drawRect(hoveredTile.x * tileSize, hoveredTile.y * tileSize, tileSize-1, tileSize-1);
-			g.drawRect(hoveredTile.x * tileSize + 1, hoveredTile.y * tileSize + 1, tileSize - 3, tileSize - 3);
+			g.drawRect(hoveredTile.x() * tileSize, hoveredTile.y() * tileSize, tileSize-1, tileSize-1);
+			g.drawRect(hoveredTile.x() * tileSize + 1, hoveredTile.y() * tileSize + 1, tileSize - 3, tileSize - 3);
 		}
 	}
 
 	public void drawTile(Graphics g, Tile theTile, double lowest, double highest) {
-		int column = theTile.getLocation().x;
-		int row = theTile.getLocation().y;
+		int column = theTile.getLocation().x();
+		int row = theTile.getLocation().y();
 		int drawx = column * tileSize;
 		int drawy = (int) (row * tileSize);
 		int draww = tileSize;
@@ -813,20 +815,20 @@ public class GameView extends JPanel {
 					if(tile.getFaction() != theTile.getFaction()) {
 						TileLoc tileLoc = tile.getLocation();
 						
-						if(tileLoc.x == theTile.getLocation().x ) {
-							if(tileLoc.y < theTile.getLocation().y) {
+						if(tileLoc.x() == theTile.getLocation().x() ) {
+							if(tileLoc.y() < theTile.getLocation().y()) {
 								g.fillRect(drawx, drawy, draww, 10); 
 							}
-							if(tileLoc.y > theTile.getLocation().y) {
+							if(tileLoc.y() > theTile.getLocation().y()) {
 								g.fillRect(drawx, drawy + drawh - 10, draww, 10); 
 							}
 							
 						}
-						if(tileLoc.y == theTile.getLocation().y ) {
-							if(tileLoc.x < theTile.getLocation().x) {
+						if(tileLoc.y() == theTile.getLocation().y() ) {
+							if(tileLoc.x() < theTile.getLocation().x()) {
 								g.fillRect(drawx, drawy, 10, drawh); 
 							}
-							if(tileLoc.x > theTile.getLocation().x) {
+							if(tileLoc.x() > theTile.getLocation().x()) {
 								g.fillRect(drawx + draww - 10, drawy, 10, drawh); 
 							}
 						}
@@ -910,8 +912,8 @@ public class GameView extends JPanel {
 	}
 
 	public void drawTarget(Graphics g, TileLoc tileLoc) {
-		int x = (int) ((tileLoc.x * tileSize + tileSize*1/10) );
-		int y = (int) ((tileLoc.y * tileSize + tileSize*1/10) );
+		int x = (int) ((tileLoc.x() * tileSize + tileSize*1/10) );
+		int y = (int) ((tileLoc.y() * tileSize + tileSize*1/10) );
 		int w = (int) (tileSize*8/10);
 		int hi = (int)(tileSize*8/10);
 		g.drawImage(TARGET_IMAGE, x, y, w, hi, null);
@@ -922,8 +924,8 @@ public class GameView extends JPanel {
 			return;
 		}
 		if(World.ticks - thing.getTimeLastDamageTaken() < 20 || thing.getTile().getLocation().equals(hoveredTile)) {
-			int x = thing.getTile().getLocation().x * tileSize + 1;
-			int y = thing.getTile().getLocation().y * tileSize + 1;
+			int x = thing.getTile().getLocation().x() * tileSize + 1;
+			int y = thing.getTile().getLocation().y() * tileSize + 1;
 			int w = tileSize - 1;
 			int h = tileSize / 4 - 1;
 			drawHealthBar2(g, thing, x, y, w, h, 2, thing.getHealth() / thing.getMaxHealth());
@@ -957,20 +959,20 @@ public class GameView extends JPanel {
 			double damage = hitsplats[m].getDamage();
 			int i = hitsplats[m].getSquare();
 			
-			int x = (int) ((thing.getTile().getLocation().x * tileSize) );
-			int y = (int) ((thing.getTile().getLocation().y * tileSize) );
+			int x = (int) ((thing.getTile().getLocation().x() * tileSize) );
+			int y = (int) ((thing.getTile().getLocation().y() * tileSize) );
 			
 			if(i == 1) {
-				x = (int) ((thing.getTile().getLocation().x * tileSize) + tileSize*0.5);
-				y = (int) ((thing.getTile().getLocation().y * tileSize) + tileSize*0.5);
+				x = (int) ((thing.getTile().getLocation().x() * tileSize) + tileSize*0.5);
+				y = (int) ((thing.getTile().getLocation().y() * tileSize) + tileSize*0.5);
 			}
 			if(i == 2) {
-				x = (int) ((thing.getTile().getLocation().x * tileSize) + tileSize*0.5);
-				y = (int) ((thing.getTile().getLocation().y * tileSize) );
+				x = (int) ((thing.getTile().getLocation().x() * tileSize) + tileSize*0.5);
+				y = (int) ((thing.getTile().getLocation().y() * tileSize) );
 			}
 			if( i == 3) {
-				x = (int) ((thing.getTile().getLocation().x * tileSize) );
-				y = (int) ((thing.getTile().getLocation().y * tileSize) + tileSize*0.5);
+				x = (int) ((thing.getTile().getLocation().x() * tileSize) );
+				y = (int) ((thing.getTile().getLocation().y() * tileSize) + tileSize*0.5);
 			}
 			
 			String text = String.format("%.0f", damage);

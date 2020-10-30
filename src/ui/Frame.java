@@ -64,7 +64,6 @@ public class Frame extends JPanel {
 	private JPanel makeUnitView;
 	private JPanel blacksmithView;
 	private JPanel hellforgeView;
-	private JPanel tileView;
 	private JPanel workerMenu;
 	private JPanel spawnMenu;
 	private JPanel researchView;
@@ -188,11 +187,6 @@ public class Frame extends JPanel {
 			public void selectedSpawnUnit(boolean selected) {
 				manageSpawnTab(selected);
 				frame.repaint();
-			}
-
-			@Override
-			public void toggleTileView() {
-				tileView.setVisible(!tileView.isVisible());
 			}
 			
 			@Override
@@ -324,7 +318,13 @@ public class Frame extends JPanel {
 	}
 
 	private void setupGamePanel() {
-		gamepanel = new GameView(gameInstance);
+		CommandInterface commandInterface = new CommandInterface() {
+			@Override
+			public void setBuildingRallyPoint(Building building, Tile rallyPoint) {
+				building.setRallyPoint(rallyPoint);
+			}
+		};
+		gamepanel = new GameView(gameInstance, commandInterface);
 		gamepanelOverlay = new GameViewOverlay(guiController);
 		gamepanelOverlay.changeFaction(World.PLAYER_FACTION);
 		gamepanel.setLayout(new BorderLayout());

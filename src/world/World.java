@@ -10,6 +10,7 @@ import java.util.stream.*;
 import game.*;
 import liquid.*;
 import networking.message.*;
+import networking.server.*;
 import ui.*;
 import utils.*;
 import wildlife.*;
@@ -148,10 +149,10 @@ public class World {
 	}
 	
 	public Tile get(TileLoc loc) {
-		if(loc.x < 0 || loc.x >= tiles.length || loc.y < 0 || loc.y >= tiles[0].length) {
+		if(loc.x() < 0 || loc.x() >= tiles.length || loc.y() < 0 || loc.y() >= tiles[0].length) {
 			return null;
 		}
-		return tiles[loc.x][loc.y];
+		return tiles[loc.x()][loc.y()];
 	}
 
 	public void drought() {
@@ -245,7 +246,7 @@ public class World {
 		Unit wolf = wolves.get((int)(Math.random()*wolves.size()));
 		wolf.setDead(true);
 		Tile t = wolf.getTile();
-		System.out.println("Werewolf at: "+t.getLocation().x+ ", "+ t.getLocation().y);
+		System.out.println("Werewolf at: "+t);
 		spawnAnimal(Game.unitTypeMap.get("WEREWOLF"), t, World.NO_FACTION);
 	}
 	
@@ -341,7 +342,7 @@ public class World {
 		Tile t = this.getTilesRandomly().getFirst();
 		
 		int radius = (int) (Math.random()*20 + 5);
-		System.out.println("meteor at: "+t.getLocation().x+ ", "+ t.getLocation().y);
+		System.out.println("meteor at: "+t.getLocation().x()+ ", "+ t.getLocation().y());
 		spawnExplosionCircle(t, radius, 10000);
 		int rockRadius = radius/5;
 		spawnRock(t, rockRadius);
@@ -349,10 +350,10 @@ public class World {
 	public void spawnRock(Tile tile, int radius) {
 		int numTiles = 0;
 		for(Tile t : this.getTiles()) {
-			int i =  t.getLocation().x;
-			int j =  t.getLocation().y;
-			int dx = i - tile.getLocation().x;
-			int dy = j - tile.getLocation().y;
+			int i =  t.getLocation().x();
+			int j =  t.getLocation().y();
+			int dx = i - tile.getLocation().x();
+			int dy = j - tile.getLocation().y();
 			double distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
 			
 			if (distanceFromCenter < radius) {
@@ -367,8 +368,8 @@ public class World {
 	public HashSet<Tile> getNeighborsInRadius(Tile tile, int radius) {
 		HashSet<Tile> neighbors = new HashSet<>();
 		TileLoc tileLoc = tile.getLocation();
-		int x = tileLoc.x;
-		int y = tileLoc.y;
+		int x = tileLoc.x();
+		int y = tileLoc.y();
 		for(int i = Math.max(x - radius, 0) ; i <= x + radius && i < tiles.length ; i ++) {
 			for(int j = Math.max(y - radius, 0) ; j <= y + radius && j < tiles[i].length ; j ++) {
 				if(Math.abs(i - x) + Math.abs(j - y) >= radius) {
@@ -383,10 +384,10 @@ public class World {
 	public void spawnExplosionCircle(Tile tile, int radius, int damage) {
 
 		for(Tile t : this.getTiles()) {
-			int i =  t.getLocation().x;
-			int j =  t.getLocation().y;
-			int dx = i - tile.getLocation().x;
-			int dy = j - tile.getLocation().y;
+			int i =  t.getLocation().x();
+			int j =  t.getLocation().y();
+			int dx = i - tile.getLocation().x();
+			int dy = j - tile.getLocation().y();
 			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
 				
 				if(distanceFromCenter < radius) {
@@ -656,6 +657,7 @@ public class World {
 		for (Unit unit : units) {
 			if (unit.isDead() == true) {
 				unit.getTile().removeUnit(unit);
+				ThingMapper.removed(unit);
 			} else {
 				unitsNew.add(unit);
 			}
@@ -687,13 +689,14 @@ public class World {
 		for(Building plannedBuilding : plannedBuildings) {
 			if(plannedBuilding.getRemainingEffort() < plannedBuilding.getType().getBuildingEffort()) {
 				buildingsNew.add(plannedBuilding);
-			}else {
+			} else {
 				plannedBuildingsNew.add(plannedBuilding);
 			}
 		}
 		plannedBuildings = plannedBuildingsNew;
 		for (Building building : buildings) {
 			if (building.isDead() == true) {
+				ThingMapper.removed(building);
 				if(building == building.getTile().getRoad()) {
 					building.getTile().setRoad(null);
 				}
@@ -714,6 +717,7 @@ public class World {
 		LinkedList<Plant> plantsCopy = new LinkedList<Plant>();
 		for(Plant plant : plants) {
 			if(plant.isDead() == true) {
+				ThingMapper.removed(plant);
 				plant.getTile().setHasPlant(null);
 			} else {
 				plantsCopy.add(plant);
@@ -837,12 +841,12 @@ public class World {
 	}
 	
 	public List<Tile> getNeighbors(Tile tile) {
-		int x = tile.getLocation().x;
-		int y = tile.getLocation().y;
-		int minX = Math.max(0, tile.getLocation().x - 1);
-		int maxX = Math.min(this.getWidth()-1, tile.getLocation().x + 1);
-		int minY = Math.max(0, tile.getLocation().y-1);
-		int maxY = Math.min(this.getHeight()-1, tile.getLocation().y + 1);
+		int x = tile.getLocation().x();
+		int y = tile.getLocation().y();
+		int minX = Math.max(0, tile.getLocation().x() - 1);
+		int maxX = Math.min(this.getWidth()-1, tile.getLocation().x() + 1);
+		int minY = Math.max(0, tile.getLocation().y()-1);
+		int maxY = Math.min(this.getHeight()-1, tile.getLocation().y() + 1);
 
 		LinkedList<Tile> tiles = new LinkedList<>();
 		for(int i = minX; i <= maxX; i++) {
@@ -868,7 +872,7 @@ public class World {
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 
 		for(Tile tile : getTiles()) {
-			tile.setHeight(heightMap[tile.getLocation().x][tile.getLocation().y]);
+			tile.setHeight(heightMap[tile.getLocation().x()][tile.getLocation().y()]);
 		}
 
 		LinkedList<Tile> tiles = getTilesRandomly();
@@ -979,12 +983,12 @@ public class World {
 			minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);
 			terrainColor = Utils.blendColors(terrainColor, Color.black, brighnessModifier + tilebrightness);
 
-			minimapImage.setRGB(tile.getLocation().x, tile.getLocation().y, minimapColor.getRGB());
-			terrainImage.setRGB(tile.getLocation().x, tile.getLocation().y, terrainColor.getRGB());
+			minimapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), minimapColor.getRGB());
+			terrainImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), terrainColor.getRGB());
 		}
 		for(AttackedNotification notification : World.PLAYER_FACTION.getAttackedNotifications()) {
-			minimapImage.setRGB(notification.tile.getLocation().x, notification.tile.getLocation().y, Color.red.getRGB());
-			terrainImage.setRGB(notification.tile.getLocation().x, notification.tile.getLocation().y, Color.red.getRGB());
+			minimapImage.setRGB(notification.tile.getLocation().x(), notification.tile.getLocation().y(), Color.red.getRGB());
+			terrainImage.setRGB(notification.tile.getLocation().x(), notification.tile.getLocation().y(), Color.red.getRGB());
 		}
 		minimapGraphics.dispose();
 		terrainGraphics.dispose();
@@ -993,7 +997,7 @@ public class World {
 		for(Tile tile : getTiles() ) {
 			int r = Math.max(Math.min((int)(255*tile.getHeight()), 255), 0);
 			Color c = new Color(r, 0, 255-r);
-			heightMapImage.setRGB(tile.getLocation().x, tile.getLocation().y, c.getRGB());
+			heightMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 		}
 		return new BufferedImage[] { terrainImage, minimapImage, heightMapImage};
 	}

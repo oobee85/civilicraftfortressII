@@ -5,10 +5,12 @@ import java.net.*;
 
 import javax.swing.*;
 
+import game.*;
 import networking.client.*;
 import networking.message.*;
 import networking.server.*;
 import ui.*;
+import world.*;
 
 public class ClientGUI {
 	
@@ -28,6 +30,7 @@ public class ClientGUI {
 	private JButton startGameButton;
 
 	private GameView gameView;
+	private GameViewOverlay gameViewOverlay;
 	
 	public ClientGUI() {
 		mainPanel = new JPanel();
@@ -139,11 +142,15 @@ public class ClientGUI {
 		this.client = client;
 	}
 	
-	public void setGameInstance(Game instance) {
+	public void setGameInstance(Game instance, CommandInterface commandInterface) {
 		if(gameView != null) {
 			mainPanel.remove(gameView);
 		}
-		gameView = new GameView(instance);
+		gameView = new GameView(instance, commandInterface);
+		gameViewOverlay = new GameViewOverlay(instance.getGUIController());
+		gameViewOverlay.changeFaction(World.PLAYER_FACTION);
+		gameView.setLayout(new BorderLayout());
+		gameView.add(gameViewOverlay, BorderLayout.CENTER);
 		mainPanel.add(gameView, BorderLayout.CENTER);
 		mainPanel.revalidate();
 		mainPanel.repaint();
@@ -160,6 +167,10 @@ public class ClientGUI {
 	
 	public JPanel getMainPanel() {
 		return mainPanel;
+	}
+	
+	public GameViewOverlay getGameViewOverlay() {
+		return gameViewOverlay;
 	}
 
 }

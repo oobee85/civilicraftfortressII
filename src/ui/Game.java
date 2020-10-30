@@ -263,16 +263,16 @@ public class Game {
 		LinkedList<Tile> tiles = world.getTilesRandomly();
 		Tile tile = tiles.peek();
 		for(Tile t : tiles) {
-			if(t.getTerrain() == Terrain.ROCK && t.getLocation().x > 3 && t.getLocation().y > 3 && t.getLocation().x < world.getWidth()-3 && t.getLocation().y < world.getHeight()-3) {
+			if(t.getTerrain() == Terrain.ROCK && t.getLocation().x() > 3 && t.getLocation().y() > 3 && t.getLocation().x() < world.getWidth()-3 && t.getLocation().y() < world.getHeight()-3) {
 				tile = t;
 				break;
 			}
 		}
-		summonThing(world.get(new TileLoc(tile.getLocation().x, tile.getLocation().y)), Game.buildingTypeMap.get("WATCHTOWER"), World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x-1, tile.getLocation().y-1)), Game.buildingTypeMap.get("GRANARY"), World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x+1, tile.getLocation().y-1)), Game.buildingTypeMap.get("BARRACKS"), World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x+1, tile.getLocation().y+1)), Game.buildingTypeMap.get("WINDMILL"), World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x-1, tile.getLocation().y+1)), Game.buildingTypeMap.get("MINE"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y())), Game.buildingTypeMap.get("WATCHTOWER"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("GRANARY"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("BARRACKS"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("WINDMILL"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("MINE"), World.CYCLOPS_FACTION);
 		
 		//makes the walls
 		for(int i = 0; i < 6; i++) {
@@ -280,18 +280,18 @@ public class Game {
 			if(i == 3) {
 				type = Game.buildingTypeMap.get("GATE_WOOD");
 			}
-			Tile wall = world.get(new TileLoc(tile.getLocation().x-3 + i, tile.getLocation().y-3));
+			Tile wall = world.get(new TileLoc(tile.getLocation().x()-3 + i, tile.getLocation().y()-3));
 			summonThing(wall, type, World.CYCLOPS_FACTION);
-			wall = world.get(new TileLoc(tile.getLocation().x+3, tile.getLocation().y-3 + i));
+			wall = world.get(new TileLoc(tile.getLocation().x()+3, tile.getLocation().y()-3 + i));
 			summonThing(wall, type, World.CYCLOPS_FACTION);
-			wall = world.get(new TileLoc(tile.getLocation().x+3 - i, tile.getLocation().y+3));
+			wall = world.get(new TileLoc(tile.getLocation().x()+3 - i, tile.getLocation().y()+3));
 			summonThing(wall, type, World.CYCLOPS_FACTION);
-			wall = world.get(new TileLoc(tile.getLocation().x-3, tile.getLocation().y+3 - i));
+			wall = world.get(new TileLoc(tile.getLocation().x()-3, tile.getLocation().y()+3 - i));
 			summonThing(wall, type, World.CYCLOPS_FACTION);
 		}
 		for(int i = -1; i < 2; i ++) {
 			for(int j = -1; j < 2; j ++) {
-				Tile temp = world.get(new TileLoc(tile.getLocation().x + i, tile.getLocation().y + j));
+				Tile temp = world.get(new TileLoc(tile.getLocation().x() + i, tile.getLocation().y() + j));
 				Animal cyclops = world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp, World.CYCLOPS_FACTION);
 				cyclops.setPassiveAction(PlannedAction.GUARD);
 			}
@@ -310,7 +310,7 @@ public class Game {
 				for (int j = -r; j <= r; j++) {
 					double distanceFromCenter = Math.sqrt(i*i + j*j);
 					if(distanceFromCenter < radius) {
-						Tile tile = world.get(new TileLoc(building.getTile().getLocation().x+i, building.getTile().getLocation().y+j));
+						Tile tile = world.get(new TileLoc(building.getTile().getLocation().x()+i, building.getTile().getLocation().y()+j));
 						if(tile != null && tile.getFaction() == World.NO_FACTION) {
 							tile.setFaction(building.getFaction());
 							world.addToTerritory(tile);

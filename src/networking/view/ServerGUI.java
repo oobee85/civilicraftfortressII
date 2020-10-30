@@ -5,8 +5,10 @@ import java.util.*;
 
 import javax.swing.*;
 
+import game.*;
 import networking.server.*;
 import ui.*;
+import world.*;
 
 public class ServerGUI extends JPanel {
 
@@ -37,7 +39,11 @@ public class ServerGUI extends JPanel {
 		if(gameView != null) {
 			this.remove(gameView);
 		}
-		gameView = new GameView(instance);
+		gameView = new GameView(instance, new CommandInterface() {
+			@Override
+			public void setBuildingRallyPoint(Building building, Tile rallyPoint) {
+			}
+		});
 		this.add(gameView, BorderLayout.CENTER);
 		revalidate();
 		repaint();

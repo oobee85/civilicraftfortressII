@@ -12,6 +12,7 @@ import networking.message.*;
 import networking.view.*;
 import ui.*;
 import ui.infopanels.*;
+import utils.*;
 import world.*;
 
 public class Server {
@@ -114,8 +115,6 @@ public class Server {
 			@Override
 			public void updateGUI() {}
 			@Override
-			public void toggleTileView() {}
-			@Override
 			public void selectedUnit(Unit unit, boolean selected) {}
 			@Override
 			public void selectedSpawnUnit(boolean selected) {}
@@ -172,6 +171,17 @@ public class Server {
 		sendToAllConnections(worldInfo);
 	}
 	
+	private void handleCommand(CommandMessage message) {
+		System.out.println(message);
+		Thing thing = ThingMapper.get(message.getThingID());
+		// TODO check if the player is in control of this thing before proceeding
+		if(message.getCommand() == CommandType.SET_RALLY_POINT) {
+			if(thing instanceof Building) {
+				((Building)thing).setRallyPoint(gameInstance.world.get(message.getTargetLocation()));
+			}
+		}
+	}
+	
 	private void startGame() {
 		Thread gameLoopThread = new Thread(() -> {
 			while (true) {
@@ -219,6 +229,10 @@ public class Server {
 						else if(clientMessage.getType() == ClientMessageType.START_GAME) {
 							startGame();
 						}
+					}
+					else if(message instanceof CommandMessage) {
+						CommandMessage commandMessage = (CommandMessage)message;
+						handleCommand(commandMessage);
 					}
 				}
 			} catch (InterruptedException e) {

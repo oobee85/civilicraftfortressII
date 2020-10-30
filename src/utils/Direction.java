@@ -21,16 +21,16 @@ public enum Direction {
 	}
 	
 	public static Direction getDirection(TileLoc from, TileLoc to) {
-		if(to.y - from.y == 1) {
+		if(to.y() - from.y() == 1) {
 			return SOUTH;
 		}
-		else if(from.y - to.y == 1) {
+		else if(from.y() - to.y() == 1) {
 			return NORTH;
 		}
-		else if(to.x - from.x == 1) {
+		else if(to.x() - from.x() == 1) {
 			return EAST;
 		}
-		else if(from.x - to.x == 1) {
+		else if(from.x() - to.x() == 1) {
 			return WEST;
 		}
 		return null;

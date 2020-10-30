@@ -145,7 +145,7 @@ public class Building extends Thing implements Serializable {
 	public Tile getSpawnLocation() {
 		return spawnLocation;
 	}
-	public void setSpawnLocation(Tile tile) {
+	public void setRallyPoint(Tile tile) {
 		spawnLocation = tile;
 	}
 	public void setBuildingUnit(Unit buildingUnit) {

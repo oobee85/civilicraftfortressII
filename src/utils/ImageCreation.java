@@ -51,8 +51,8 @@ public class ImageCreation {
 			for(Direction dir : arr) {
 				filename += dir;
 				TileLoc delta = dir.getDelta();
-				g.drawImage(roadtile, centerx + delta.x*width, centery + delta.y*width, null);
-				g.drawImage(roadtile, centerx + delta.x*width*3/2, centery + delta.y*width*3/2, null);
+				g.drawImage(roadtile, centerx + delta.x()*width, centery + delta.y()*width, null);
+				g.drawImage(roadtile, centerx + delta.x()*width*3/2, centery + delta.y()*width*3/2, null);
 			}
 			g.dispose();
 			roadImages.put(filename, target);

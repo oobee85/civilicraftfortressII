@@ -7,12 +7,13 @@ import java.util.List;
 import javax.swing.*;
 
 import game.*;
+import networking.server.*;
 import world.*;
 
 public class Thing implements HasImage, Serializable {
 	
 	private transient static int idCounter = 0;
-	public final int id = idCounter++;
+	private int id;
 
 	private Faction faction;
 	private double maxHealth;
@@ -30,10 +31,19 @@ public class Thing implements HasImage, Serializable {
 		this.maxHealth = maxHealth;
 		this.hasImage = hasImage;
 		this.faction = faction;
+		this.id = idCounter++;
+		ThingMapper.created(this);
 	}
 	public Thing(double maxHealth, HasImage hasImage, Faction faction, Tile tile) {
 		this(maxHealth, hasImage, faction);
 		this.tile = tile;
+	}
+	
+	public int id() {
+		return id;
+	}
+	public void setID(int id) {
+		this.id = id;
 	}
 	
 	public void setImage(HasImage hasImage) {

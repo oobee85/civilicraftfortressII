@@ -23,10 +23,17 @@ public class Client {
 	private ClientGUI clientGUI;
 
 	private Game gameInstance;
+	private CommandInterface commandInterface;
 	private volatile Object updatedTerrain = new Object();
 
 	public Client() {
-		
+		commandInterface = new CommandInterface() {
+			@Override
+			public void setBuildingRallyPoint(Building building, Tile rallyPoint) {
+				sendMessage(new CommandMessage(building.id(), CommandType.SET_RALLY_POINT, rallyPoint.getLocation()));
+				building.setRallyPoint(rallyPoint);
+			}
+		};
 	}
 	public void sendMessage(Object message) {
 		connection.sendMessage(message);
@@ -77,10 +84,10 @@ public class Client {
 		World.ticks = worldInfo.getTick();
 		gameInstance.world.updateTiles(worldInfo.getTileInfos());
 		for(Thing update : worldInfo.getThings()) {
-			if(!things.containsKey(update.id)) {
+			if(!things.containsKey(update.id())) {
 				createThing(update);
 			}
-			updateThing(things.get(update.id), update);
+			updateThing(things.get(update.id()), update);
 		}
 		synchronized (updatedTerrain) {
 			updatedTerrain.notify();
@@ -88,10 +95,12 @@ public class Client {
 		clientGUI.repaint();
 	}
 	private void createThing(Thing update) {
+		Thing newThing = null;
 		if(update instanceof Plant) {
 			Plant plantUpdate = (Plant)update;
 			Plant newPlant = new Plant(plantUpdate.getPlantType(), gameInstance.world.get(plantUpdate.getTile().getLocation()));
-			things.put(update.id, newPlant);
+			newThing = newPlant;
+			things.put(update.id(), newPlant);
 			newPlant.getTile().setHasPlant(newPlant);
 			gameInstance.world.newPlants.add(newPlant);
 		}
@@ -101,7 +110,8 @@ public class Client {
 					Game.buildingTypeMap.get(buildingUpdate.getType().name()), 
 					gameInstance.world.get(buildingUpdate.getTile().getLocation()), 
 					World.factions[buildingUpdate.getFaction().id]);
-			things.put(update.id, newBuilding);
+			newThing = newBuilding;
+			things.put(update.id(), newBuilding);
 			gameInstance.world.newBuildings.add(newBuilding);
 			if(newBuilding.getType().isRoad()) {
 				newBuilding.getTile().setRoad(newBuilding);
@@ -116,11 +126,15 @@ public class Client {
 					Game.unitTypeMap.get(unitUpdate.getType().name()), 
 					gameInstance.world.get(unitUpdate.getTile().getLocation()), 
 					World.factions[unitUpdate.getFaction().id]);
-			things.put(update.id, newUnit);
+			newThing = newUnit;
+			things.put(update.id(), newUnit);
 			gameInstance.world.newUnits.add(newUnit);
 			if(newUnit.getTile() != null) {
 				newUnit.getTile().addUnit(newUnit);
 			}
+		}
+		if(newThing != null) {
+			newThing.setID(update.id());
 		}
 	}
 	
@@ -159,7 +173,7 @@ public class Client {
 			}
 		}
 		if(existing.isDead()) {
-			things.remove(update.id);
+			things.remove(update.id());
 		}
 	}
 	
@@ -191,34 +205,33 @@ public class Client {
 		this.clientGUI = clientGUI;
 		gameInstance = new Game(new GUIController() {
 			@Override
-			public void updateGUI() {}
+			public void updateGUI() {
+				clientGUI.getGameViewOverlay().updateItems();
+			}
 			@Override
-			public void toggleTileView() {}
-			@Override
-			public void selectedUnit(Unit unit, boolean selected) {}
+			public void selectedUnit(Unit unit, boolean selected) {
+				clientGUI.getGameViewOverlay().selectedUnit(unit, selected);
+			}
 			@Override
 			public void selectedSpawnUnit(boolean selected) {}
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {}
 			@Override
-			public void changedFaction(Faction faction) {}
-			@Override
-			public void pushInfoPanel(InfoPanel infoPanel) {
+			public void changedFaction(Faction faction) {
+				clientGUI.getGameViewOverlay().changeFaction(faction);
 			}
 			@Override
-			public void popInfoPanel() {
-			}
+			public void pushInfoPanel(InfoPanel infoPanel) {}
 			@Override
-			public void pressedSelectedUnitPortrait(Unit unit) {
-			}
+			public void popInfoPanel() {}
 			@Override
-			public void switchInfoPanel(InfoPanel infoPanel) {
-			}
+			public void pressedSelectedUnitPortrait(Unit unit) {}
 			@Override
-			public void tryToCraftItem(ItemType type, int amount) {
-			}
+			public void switchInfoPanel(InfoPanel infoPanel) {}
+			@Override
+			public void tryToCraftItem(ItemType type, int amount) {}
 		});
-		clientGUI.setGameInstance(gameInstance);
+		clientGUI.setGameInstance(gameInstance, commandInterface);
 
 		Timer repaintingThread = new Timer(30, new ActionListener() {
 			@Override

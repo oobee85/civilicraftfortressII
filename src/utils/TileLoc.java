@@ -2,8 +2,12 @@ package utils;
 
 import java.io.*;
 
-public class TileLoc implements Serializable {
-	public final int x, y;
+public class TileLoc implements Externalizable {
+	private int x, y;
+	/** Used only by serialization */
+	public TileLoc() {
+		
+	}
 	public TileLoc(int x, int y) {
 		this.x = x;
 		this.y = y;
@@ -30,10 +34,20 @@ public class TileLoc implements Serializable {
 	public double euclideanDistance(TileLoc other) {
 		return Math.sqrt((this.x - other.x)*(this.x - other.x) + (this.y - other.y)*(this.y - other.y));
 	}
-	public int getX() {
+	public int x() {
 		return x;
 	}
-	public int getY() {
+	public int y() {
 		return y;
+	}
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		x = in.readInt();
+		y = in.readInt();
+	}
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeInt(x);
+		out.writeInt(y);
 	}
 }

@@ -275,10 +275,10 @@ public final class Utils {
 	public static List<Tile> getTilesInRadius(Tile tile, World world, double radius) {
 		int maxr = (int) Math.ceil(radius);
 		TileLoc center = tile.getLocation();
-		int mini = (int) Math.max(0, center.x-maxr);
-		int maxi = (int) Math.min(world.getWidth()-1, center.x+maxr);
-		int minj = (int) Math.max(0, center.y-maxr);
-		int maxj = (int) Math.min(world.getHeight()-1, center.y+maxr);
+		int mini = (int) Math.max(0, center.x()-maxr);
+		int maxi = (int) Math.min(world.getWidth()-1, center.x()+maxr);
+		int minj = (int) Math.max(0, center.y()-maxr);
+		int maxj = (int) Math.min(world.getHeight()-1, center.y()+maxr);
 		LinkedList<Tile> tiles = new LinkedList<>();
 		for(int i = mini; i <= maxi; i++) {
 			for(int j = minj; j <= maxj; j++) {

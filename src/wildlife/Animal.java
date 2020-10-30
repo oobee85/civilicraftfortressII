@@ -124,12 +124,12 @@ public class Animal extends Unit {
 			double season = Season.getSeason4();
 			Tile migrationTarget = null;
 			// heading into winter
-			if(season > 0.4 && season < 0.8 && getTile().getLocation().y < world.getHeight()/2) {
-				migrationTarget = world.get(new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y + (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4)));
+			if(season > 0.4 && season < 0.8 && getTile().getLocation().y() < world.getHeight()/2) {
+				migrationTarget = world.get(new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y() + (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4)));
 			}
 			// heading into summer
-			else if(season > 1.4 && season < 1.8 && getTile().getLocation().y > world.getHeight()/2) {
-				migrationTarget = world.get(new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y - (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4)));
+			else if(season > 1.4 && season < 1.8 && getTile().getLocation().y() > world.getHeight()/2) {
+				migrationTarget = world.get(new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y() - (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4)));
 			}
 			if(migrationTarget != null) {
 //				System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + migrationTarget);

@@ -44,8 +44,8 @@ public class Liquid {
 //			System.out.println("Total " + LiquidType.values()[i].name() + ": " + totals[i]);
 //		}
 		for(Tile tile : world.getTiles()) {
-			liquidAmountsTemp[tile.getLocation().x][tile.getLocation().y] = world.get(tile.getLocation()).liquidAmount;
-			liquidTypesTemp[tile.getLocation().x][tile.getLocation().y] = world.get(tile.getLocation()).liquidType;
+			liquidAmountsTemp[tile.getLocation().x()][tile.getLocation().y()] = world.get(tile.getLocation()).liquidAmount;
+			liquidTypesTemp[tile.getLocation().x()][tile.getLocation().y()] = world.get(tile.getLocation()).liquidType;
 		}
 //		for(int x = 0; x < world.getWidth(); x++) {
 //			for(int y = 0; y < world.getHeight(); y++) {
@@ -87,8 +87,8 @@ public class Liquid {
 		}
 
 		for(Tile tile : world.getTiles()) {
-			int x = tile.getLocation().x;
-			int y = tile.getLocation().y;
+			int x = tile.getLocation().x();
+			int y = tile.getLocation().y();
 			tile.liquidAmount = Math.max(liquidAmountsTemp[x][y] * 0.9999 - 0.00001, 0);
 			if(tile.liquidAmount == 0) {
 				tile.liquidType = LiquidType.DRY;
@@ -116,8 +116,8 @@ public class Liquid {
 	}
 	private static void propogate(Tile tile, World world) {
 		TileLoc current = tile.getLocation();
-		int x = current.x;
-		int y = current.y;
+		int x = current.x();
+		int y = current.y();
 		
 		double tempurature = tile.getTempurature();
 		if(tempurature > Season.MELTING_TEMPURATURE) {
@@ -141,7 +141,7 @@ public class Liquid {
 		
 		for(Tile otherTile : tile.getNeighbors()) {
 			TileLoc other = otherTile.getLocation();
-			LiquidType otype = liquidTypesTemp[other.x][other.y];
+			LiquidType otype = liquidTypesTemp[other.x()][other.y()];
 			if(otype.viscosity == 0) {
 				continue;
 			}
@@ -179,7 +179,7 @@ public class Liquid {
 						liquidTypesTemp[x][y] = otype;
 					}
 					
-					liquidAmountsTemp[other.x][other.y] -= change;
+					liquidAmountsTemp[other.x()][other.y()] -= change;
 					world.get(other).liquidAmount -= change;
 				}
 				else {
@@ -206,7 +206,7 @@ public class Liquid {
 							liquidTypesTemp[x][y] = otype;
 						}
 						
-						liquidAmountsTemp[other.x][other.y] -= change;
+						liquidAmountsTemp[other.x()][other.y()] -= change;
 						world.get(other).liquidAmount -= change;
 					}
 				}

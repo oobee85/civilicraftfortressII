@@ -51,11 +51,11 @@ public class Attack {
 		
 		if(unit.readyToAttack()) {
 			
-			if(targetTile.getLocation().x == unit.getTile().getLocation().x) {
+			if(targetTile.getLocation().x() == unit.getTile().getLocation().x()) {
 				
 				for(int x = -1; x < 2; x++) {
-					TileLoc tileLoc = new TileLoc(targetTile.getLocation().x + x, targetTile.getLocation().y);
-					TileLoc tl = new TileLoc(unit.getTile().getLocation().x + x, unit.getTile().getLocation().y);
+					TileLoc tileLoc = new TileLoc(targetTile.getLocation().x() + x, targetTile.getLocation().y());
+					TileLoc tl = new TileLoc(unit.getTile().getLocation().x() + x, unit.getTile().getLocation().y());
 					
 					Projectile p = new Projectile(attack.projectileType, world.get(tl), world.get(tileLoc), unit);
 					p.setDamageBuff(Game.combatBuffs.getAttack());
@@ -65,10 +65,10 @@ public class Attack {
 				
 				
 			}
-			if(targetTile.getLocation().y == unit.getTile().getLocation().y) {
+			if(targetTile.getLocation().y() == unit.getTile().getLocation().y()) {
 				for(int y = -1; y < 2; y++) {
-					TileLoc tileLoc = new TileLoc(targetTile.getLocation().x, targetTile.getLocation().y + y);
-					TileLoc tl = new TileLoc(unit.getTile().getLocation().x, unit.getTile().getLocation().y + y);
+					TileLoc tileLoc = new TileLoc(targetTile.getLocation().x(), targetTile.getLocation().y() + y);
+					TileLoc tl = new TileLoc(unit.getTile().getLocation().x(), unit.getTile().getLocation().y() + y);
 					
 					Projectile p = new Projectile(attack.projectileType, world.get(tl), world.get(tileLoc), unit);
 					p.setDamageBuff(Game.combatBuffs.getAttack());

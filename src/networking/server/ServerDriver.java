@@ -34,6 +34,7 @@ public class ServerDriver {
 	}
 
 	public static void main(String[] args) {
+		ThingMapper.ACTIVE = true;
 		ServerDriver driver = new ServerDriver();
 		driver.start();
 	}
