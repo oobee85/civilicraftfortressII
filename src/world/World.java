@@ -64,9 +64,11 @@ public class World {
 	public LinkedList<Building> plannedBuildings = new LinkedList<Building>();
 	public LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
 	public LinkedList<Projectile> newProjectiles = new LinkedList<Projectile>();
-	public LinkedList<GroundModifier> groundModifiers = new LinkedList<>();
-	private LinkedList<GroundModifier> newGroundModifiers = new LinkedList<>();
-
+	public LinkedList<GroundModifier> groundModifiers = new LinkedList<GroundModifier>();
+	public LinkedList<GroundModifier> newGroundModifiers = new LinkedList<GroundModifier>();
+	public LinkedList<WeatherEvent> weatherEvents = new LinkedList<WeatherEvent>();
+	public LinkedList<WeatherEvent> newWeatherEvents = new LinkedList<WeatherEvent>();
+	
 	public TileLoc volcano;
 	public int numCutTrees = 10;
 	public static int nights = 0;
@@ -161,24 +163,25 @@ public class World {
 		}
 	}
 	
-	public void updateRain(GroundModifier modifier) {
-		if(modifier.getType() == GroundModifierType.RAIN) {
-			Tile tile = modifier.getTile();
-			if(tile.liquidType != LiquidType.WATER && tile.liquidAmount > 0) {
-				tile.liquidAmount /= 10;
-			}
-			tile.liquidType = LiquidType.WATER;
-			tile.liquidAmount += 0.0001;
-		}
-		if(modifier.getType() == GroundModifierType.SNOW) {
-			Tile tile = modifier.getTile();
-			if(tile.liquidType != LiquidType.SNOW && tile.liquidAmount > 0) {
-				tile.liquidAmount /= 10;
-			}
-			tile.liquidType = LiquidType.SNOW;
-			tile.liquidAmount += 0.001;
-		}
-	}
+//	public void updateRain(GroundModifier modifier) {
+//		
+//		if(modifier.getType() == GroundModifierType.RAIN) {
+//			Tile tile = modifier.getTile();
+//			if(tile.liquidType != LiquidType.WATER && tile.liquidAmount > 0) {
+//				tile.liquidAmount /= 10;
+//			}
+//			tile.liquidType = LiquidType.WATER;
+//			tile.liquidAmount += 0.0002;
+//		}
+//		if(modifier.getType() == GroundModifierType.SNOW) {
+//			Tile tile = modifier.getTile();
+//			if(tile.liquidType != LiquidType.SNOW && tile.liquidAmount > 0) {
+//				tile.liquidAmount /= 10;
+//			}
+//			tile.liquidType = LiquidType.SNOW;
+//			tile.liquidAmount += 0.001;
+//		}
+//	}
 	public void rain() {
 		
 		//makes it so that it doesnt spawn the center of rain in deserts or on the volcano
@@ -190,34 +193,19 @@ public class World {
 		int radius = (int) (Math.random()*20 + 10);
 		
 		List<Tile> rainTiles = Utils.getTilesInRadius(rainTile, this, radius);
+		TileLoc destination = getTilesRandomly().peek().getLocation();
+		int dx = destination.x() - rainTile.getLocation().x();
+		int dy = destination.y() - rainTile.getLocation().y();
 		
 		for(Tile t : rainTiles) {
-			if(t.liquidType == LiquidType.LAVA) {
-				continue;
-			}
+			TileLoc target = new TileLoc(t.getLocation().x() + dx, t.getLocation().y() + dy);
+			Tile targetTile = get(target);
+			
 			double temperature = t.getTempurature();
-			if(temperature < Season.FREEZING_TEMPURATURE) {
-				GroundModifier snow = new GroundModifier(GroundModifierType.SNOW, t, 50 + (int)(Math.random()*10));
-				groundModifiers.add(snow);
-				t.setModifier(snow);
-//				System.out.println(t.getLocation());
-//				if(t.liquidType == LiquidType.DRY) {
-//					t.liquidType = LiquidType.SNOW;
-//				}
-//				t.liquidAmount += 0.1;
-//				
-			}else {
-				GroundModifier rain = new GroundModifier(GroundModifierType.RAIN, t, 50 + (int)(Math.random()*10));
-				groundModifiers.add(rain);
-				t.setModifier(rain);
-//				System.out.println(t.getLocation());
-//				if(t.isCold() == false) {
-//					t.liquidType = LiquidType.WATER;
-//				}
-//				t.liquidAmount += 0.005;
-			}
+			WeatherEvent weather = new WeatherEvent(t, targetTile, t.getLocation().distanceTo(target) + (int)(Math.random()*50), 0.00002, LiquidType.WATER);;
+			newWeatherEvents.add(weather);
+			t.setWeather(weather);
 		}
-//		System.out.println("Raining at " + rainTile + "with radius " + radius);
 	}
 	
 	public void eruptVolcano() {
@@ -419,7 +407,7 @@ public class World {
 			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
 			addGroundModifier(fire);
 			t.setModifier(fire);
-			if(t.getHasBuilding() == true) {
+			if(t.hasBuilding() == true) {
 				t.getBuilding().takeDamage(damage);
 			}
 			for(Unit unit : t.getUnits()) {
@@ -576,6 +564,42 @@ public class World {
 
 		}
 	}
+	public void doWeatherUpdate() {
+//		if(modifier.getType() == GroundModifierType.RAIN) {
+//			Tile tile = modifier.getTile();
+//			if(tile.liquidType != LiquidType.WATER && tile.liquidAmount > 0) {
+//				tile.liquidAmount /= 10;
+//			}
+//			tile.liquidType = LiquidType.WATER;
+//			tile.liquidAmount += 0.0002;
+//		}
+//		if(modifier.getType() == GroundModifierType.SNOW) {
+//			Tile tile = modifier.getTile();
+//			if(tile.liquidType != LiquidType.SNOW && tile.liquidAmount > 0) {
+//				tile.liquidAmount /= 10;
+//			}
+//			tile.liquidType = LiquidType.SNOW;
+//			tile.liquidAmount += 0.001;
+//		}
+		for(WeatherEvent weather : weatherEvents) {
+			weather.tick();
+			Tile tile = weather.getTile();
+//			if(tile.liquidType != weather.getLiquidType() && tile.liquidAmount > 0) {
+//				tile.liquidAmount /= 10;
+//			}
+			tile.liquidType = weather.getLiquidType();
+			tile.liquidAmount += weather.getStrength();
+//			tile.liquidType = LiquidType.WATER;
+//			tile.liquidAmount += 10;
+			
+			if(weather.getTargetTile() == null) {
+				continue;
+			}
+			if (weather.readyToMove()) {
+				weather.moveToTarget();
+			}
+		}
+	}
 	
 	public void doProjectileUpdates() {
 
@@ -604,7 +628,7 @@ public class World {
 					if(projectile.getTile().getPlant() != null) {
 						projectile.getTile().getPlant().takeDamage(projectile.getType().getDamage());
 					}
-					if(projectile.getTile().getHasBuilding() == true) {
+					if(projectile.getTile().hasBuilding() == true) {
 						projectile.getTile().getBuilding().takeDamage(projectile.getType().getDamage());
 					}
 				}
@@ -680,8 +704,23 @@ public class World {
 			groundModifiersNew.addAll(newGroundModifiers);
 			newGroundModifiers.clear();
 		}
-		
 		groundModifiers = groundModifiersNew;
+		
+		//WEATHER
+		LinkedList<WeatherEvent> weatherEventsNew = new LinkedList<WeatherEvent>();
+		for (WeatherEvent weather : weatherEvents) {
+			Tile tile = weather.getTile();
+			if(weather.isDead() == false) {
+				weatherEventsNew.add(weather);
+			} else {
+				tile.setWeather(null);
+			}
+		}
+		synchronized (weatherEvents) {
+			weatherEventsNew.addAll(newWeatherEvents);
+			newWeatherEvents.clear();
+		}
+		weatherEvents = weatherEventsNew;
 		
 		// BUILDINGS
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
@@ -967,7 +1006,7 @@ public class World {
 				terrainColor = tile.getPlant().getColor(0);
 				minimapColor = tile.getPlant().getColor(0);
 			}
-			if(tile.getHasBuilding()) {
+			if(tile.hasBuilding()) {
 				terrainColor = tile.getBuilding().getColor(0);
 				minimapColor = tile.getBuilding().getColor(0);
 			}

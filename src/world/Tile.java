@@ -25,7 +25,8 @@ public class Tile implements Serializable {
 	private transient Building building;
 	private transient Building road;
 	private GroundModifier modifier;
-
+	private WeatherEvent weather;
+	
 	public volatile double liquidAmount;
 	public volatile LiquidType liquidType;
 	
@@ -76,7 +77,19 @@ public class Tile implements Serializable {
 			humidity = 20;
 		}
 	}
-
+	
+	public void setWeather(WeatherEvent weatherEvent) {
+		weather = weatherEvent;
+	}
+	public void removeWeather() {
+		weather = null;
+	}
+	public WeatherEvent getWeather() {
+		return weather;
+	}
+	public boolean hasWeather() {
+		return weather != null;
+	}
 	public void setRoad(Building road) {
 		this.road = road;
 		turnRoad();
@@ -271,7 +284,7 @@ public class Tile implements Serializable {
 		return road;
 	}
 
-	public boolean getHasBuilding() {
+	public boolean hasBuilding() {
 		return building != null;
 	}
 
@@ -319,7 +332,7 @@ public class Tile implements Serializable {
 		if(u.getType().isFlying()) {
 			return false;
 		}
-		if(getHasBuilding() == false) {
+		if(hasBuilding() == false) {
 			return false;
 		}
 		if(building.isPlanned() == true) {

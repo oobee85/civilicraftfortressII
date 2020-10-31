@@ -588,7 +588,9 @@ public class GameView extends JPanel {
 				g.drawImage(p.getShadow(0), p.getTile().getLocation().x() * tileSize, p.getTile().getLocation().y() * tileSize, tileSize, tileSize, null);
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x() * tileSize - extra/2, p.getTile().getLocation().y() * tileSize - p.getHeight() - extra/2, tileSize + extra, tileSize + extra, null);
 			}
-			
+			for(WeatherEvent w : game.world.weatherEvents) {
+				g.drawImage(w.getImage(0), w.getTile().getLocation().x() * tileSize, w.getTile().getLocation().y() * tileSize, tileSize, tileSize, null);
+			}
 			for(Thing thing : selectedThings) {
 				// draw selection circle
 				g.setColor(Utils.getTransparentColor(World.PLAYER_FACTION.color, 150));
@@ -765,7 +767,7 @@ public class GameView extends JPanel {
 							if(tile.getPlant() != null) {
 								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getPlant().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize);
 							}
-							if(tile.getHasBuilding()) {
+							if(tile.hasBuilding()) {
 								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getBuilding().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize);
 							}
 							if(tile.getRoad() != null) {

@@ -112,6 +112,7 @@ public class Game {
 			nightEvents();
 			World.nights ++;
 		}
+		world.doWeatherUpdate();
 		weatherEvents();
 		// GUI updates
 		world.updateTerrainChange(world);
@@ -485,7 +486,7 @@ public class Game {
 			if(thing instanceof BuildingType) {
 				BuildingType type = (BuildingType)thing;
 				if (current.canBuild() == true 
-						&& !current.getHasBuilding()
+						&& !current.hasBuilding()
 						&& current.liquidAmount < current.liquidType.getMinimumDamageAmount()
 						&& (current.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"))) {
 					Building s = new Building(type, current, World.PLAYER_FACTION);
@@ -653,9 +654,9 @@ public class Game {
 	
 	private void groundModifierTick() {
 		for(GroundModifier modifier : world.groundModifiers) {
-			if(modifier.getType() == GroundModifierType.RAIN || modifier.getType() == GroundModifierType.SNOW) {
-				world.updateRain(modifier);
-			}
+//			if(modifier.getType() == GroundModifierType.RAIN || modifier.getType() == GroundModifierType.SNOW) {
+//				world.updateRain(modifier);
+//			}
 			if(modifier.updateTime()) {
 				
 //				if(modifier.getType() == GroundModifierType.SNOW) {
@@ -674,7 +675,7 @@ public class Game {
 		if(bt.isRoad() && tile.getRoad() != null) {
 			return false;
 		}
-		if (!bt.isRoad() && tile.getHasBuilding()) {
+		if (!bt.isRoad() && tile.hasBuilding()) {
 			return false;
 		}
 		if(!World.PLAYER_FACTION.canAfford(bt.getCost())) {
