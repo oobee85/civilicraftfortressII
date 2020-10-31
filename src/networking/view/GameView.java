@@ -175,9 +175,6 @@ public class GameView extends JPanel {
 			}
 		}
 	}
-	public void tryToBuildUnit(UnitType u) {
-		game.tryToBuildUnit(selectedThings, u);
-	}
 	public void toggleAutoBuild() {
 		game.toggleAutoBuild(selectedThings);
 	}
@@ -318,6 +315,19 @@ public class GameView extends JPanel {
 					}
 					else {
 						commandInterface.moveTo(unit, targetTile, !shiftDown);
+					}
+				}
+			}
+		}
+	}
+	
+	public void tryToBuildUnit(UnitType u) {
+		for(Thing thing : selectedThings) {
+			if(thing instanceof Building ) {
+				Building building = (Building)thing;
+				for(String ut : building.getType().unitsCanBuild()) {
+					if(u == Game.unitTypeMap.get(ut)) {
+						commandInterface.produceUnit(building, u);
 					}
 				}
 			}

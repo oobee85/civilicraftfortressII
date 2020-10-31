@@ -14,7 +14,7 @@ public class Building extends Thing implements Serializable {
 	
 	private BuildingType buildingType;
 	private double remainingEffort;
-	private transient LinkedList<Unit> buildingUnitList = new LinkedList<Unit>();
+	private transient LinkedList<Unit> producingUnitList = new LinkedList<Unit>();
 	private double culture;
 	public transient static double CULTURE_AREA_MULTIPLIER = 0.1;
 	private transient Tile spawnLocation;
@@ -55,8 +55,8 @@ public class Building extends Thing implements Serializable {
 		}
 		
 		// building builds units
-		if(!getBuildingUnit().isEmpty() && getBuildingUnit().peek().isBuilt() == true) {
-			Unit unit = getBuildingUnit().remove();
+		if(!getProducingUnit().isEmpty() && getProducingUnit().peek().isBuilt() == true) {
+			Unit unit = getProducingUnit().remove();
 			unit.queuePlannedAction(new PlannedAction(getSpawnLocation()));
 			getTile().addUnit(unit);
 			world.newUnits.add(unit);
@@ -148,12 +148,12 @@ public class Building extends Thing implements Serializable {
 	public void setRallyPoint(Tile tile) {
 		spawnLocation = tile;
 	}
-	public void setProducingUnit(Unit buildingUnit) {
-		this.buildingUnitList.add(buildingUnit);
+	public void setProducingUnit(Unit producingUnit) {
+		this.producingUnitList.add(producingUnit);
 	}
 	private void updateInProgressUnit() {
-		if (buildingUnitList.peek() != null) {
-			buildingUnitList.peek().expendEffort(1);
+		if (producingUnitList.peek() != null) {
+			producingUnitList.peek().expendEffort(1);
 		}
 	}
 	public void updateCulture() {
@@ -162,8 +162,8 @@ public class Building extends Thing implements Serializable {
 		}
 	}
 	
-	public LinkedList<Unit> getBuildingUnit() {
-		return buildingUnitList;
+	public LinkedList<Unit> getProducingUnit() {
+		return producingUnitList;
 	}
 	public double getCulture() {
 		return culture;

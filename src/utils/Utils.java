@@ -352,6 +352,17 @@ public final class Utils {
 			public void craftItem(Faction faction, ItemType itemType) {
 				faction.craftItem(itemType, 1, game.world.buildings);
 			}
+			@Override
+			public void produceUnit(Building building, UnitType unitType) {
+				if(building.getFaction().canAfford(unitType.getCost())) {
+					Unit unit = new Unit(unitType, building.getTile(), building.getFaction());
+					if (building.getTile().isBlocked(unit)) {
+						return;
+					}
+					building.getFaction().payCost(unitType.getCost());
+					building.setProducingUnit(unit);
+				}
+			}
 		};
 	}
 }

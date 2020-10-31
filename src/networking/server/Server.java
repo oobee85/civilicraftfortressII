@@ -241,6 +241,14 @@ public class Server {
 				}
 			}
 		}
+		else if(message.getCommand() == CommandType.PRODUCE_UNIT) {
+			if(thing instanceof Building) {
+				UnitType unitType = Game.unitTypeMap.get(message.getType());
+				if(unitType != null) {
+					gui.getCommandInterface().produceUnit((Building)thing, unitType);
+				}
+			}
+		}
 	}
 	
 	private void startGame() {

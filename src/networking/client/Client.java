@@ -98,6 +98,11 @@ public class Client {
 				sendMessage(CommandMessage.makeCraftItemCommand(faction.id, itemType.name()));
 				localCommands.craftItem(faction, itemType);
 			}
+			@Override
+			public void produceUnit(Building building, UnitType unitType) {
+				sendMessage(CommandMessage.makeProduceUnitCommand(building.id(), unitType.name()));
+				localCommands.produceUnit(building, unitType);
+			}
 		};
 	}
 	public void sendMessage(Object message) {

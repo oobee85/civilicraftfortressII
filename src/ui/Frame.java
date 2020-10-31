@@ -133,7 +133,7 @@ public class Frame extends JPanel {
 			}
 			@Override
 			public void tryToCraftItem(ItemType type, int amount) {
-				World.PLAYER_FACTION.craftItem(type, amount, gameInstance.world.buildings);
+				gamepanel.getCommandInterface().craftItem(World.PLAYER_FACTION, type);
 			}
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {

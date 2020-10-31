@@ -13,4 +13,5 @@ public interface CommandInterface {
 	public void stop(Unit unit);
 	public void research(Faction faction, ResearchType researchType);
 	public void craftItem(Faction faction, ItemType itemType);
+	public void produceUnit(Building building, UnitType unitType);
 }

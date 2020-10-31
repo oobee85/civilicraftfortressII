@@ -81,6 +81,14 @@ public class CommandMessage implements Externalizable {
 		msg.type = itemType;
 		return msg;
 	}
+	public static CommandMessage makeProduceUnitCommand(int thingID, String unitType) {
+		CommandMessage msg = new CommandMessage();
+		msg.command = CommandType.PRODUCE_UNIT;
+		msg.thingID = thingID;
+		msg.type = unitType;
+		return msg;
+	}
+	
 
 	public CommandType getCommand() {
 		return command;

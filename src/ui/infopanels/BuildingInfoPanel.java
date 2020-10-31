@@ -29,27 +29,27 @@ public class BuildingInfoPanel extends InfoPanel {
 		}
 		
 		
-		if(showing.getBuildingUnit().peek() != null) {
+		if(showing.getProducingUnit().peek() != null) {
 			y += lineHeight/2;
 			int x = getImageSize();
 			int progressBarHeight = 30;
 			int buffer = 1;
 			int imageSize = progressBarHeight - 2*buffer;
-			g.drawImage(showing.getBuildingUnit().peek().getImage(imageSize), x + buffer, y + buffer, imageSize, imageSize, null);
+			g.drawImage(showing.getProducingUnit().peek().getImage(imageSize), x + buffer, y + buffer, imageSize, imageSize, null);
 			
 			
-			int totalEffort = showing.getBuildingUnit().peek().getType().getCombatStats().getTicksToBuild();
-			int expendedEffort = totalEffort - showing.getBuildingUnit().peek().getRemainingEffort();
+			int totalEffort = showing.getProducingUnit().peek().getType().getCombatStats().getTicksToBuild();
+			int expendedEffort = totalEffort - showing.getProducingUnit().peek().getRemainingEffort();
 			double completedRatio = 1.0 * expendedEffort / totalEffort;
-			String progressString = String.format("%s %d/%d", showing.getBuildingUnit().peek(), expendedEffort, totalEffort);
+			String progressString = String.format("%s %d/%d", showing.getProducingUnit().peek(), expendedEffort, totalEffort);
 			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progressString, x + progressBarHeight, y, getWidth() - x - progressBarHeight - 10, progressBarHeight);
 			
 			y += progressBarHeight;
 			int offset = 0;
 			boolean first = true;
-			if(showing.getBuildingUnit().size() > 1) {
+			if(showing.getProducingUnit().size() > 1) {
 				y += lineHeight/4;
-				for(Unit unit : showing.getBuildingUnit()) {
+				for(Unit unit : showing.getProducingUnit()) {
 					if(first) {
 						first = false;
 						continue;

@@ -655,21 +655,6 @@ public class Game {
 		return null;
 	}
 	
-	public void tryToBuildUnit(ConcurrentLinkedQueue<Thing> selectedThings, UnitType u) {
-		System.out.println("Trying to build " + u.name());
-		for(Thing thing : selectedThings) {
-			if(selectedThings != null && thing instanceof Building ) {
-				Building building = (Building)thing;
-				for(String ut : building.getType().unitsCanBuild()) {
-					System.out.println("Can build " + ut);
-					if(u == Game.unitTypeMap.get(ut)) {
-						buildUnit(u, thing.getTile());
-					}
-				}
-				
-			}
-		}
-	}
 	
 	private void buildUnit(UnitType u, Tile tile) {
 		System.out.println("building " + u);
