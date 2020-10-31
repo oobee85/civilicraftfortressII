@@ -27,7 +27,35 @@ public class Client {
 	private volatile Object updatedTerrain = new Object();
 
 	public Client() {
-		CommandInterface localCommands = Utils.makeFunctionalCommandInterface();
+		gameInstance = new Game(new GUIController() {
+			@Override
+			public void updateGUI() {
+				clientGUI.getGameViewOverlay().updateItems();
+			}
+			@Override
+			public void selectedUnit(Unit unit, boolean selected) {
+				clientGUI.getGameViewOverlay().selectedUnit(unit, selected);
+			}
+			@Override
+			public void selectedSpawnUnit(boolean selected) {}
+			@Override
+			public void selectedBuilding(Building building, boolean selected) {}
+			@Override
+			public void changedFaction(Faction faction) {
+				clientGUI.getGameViewOverlay().changeFaction(faction);
+			}
+			@Override
+			public void pushInfoPanel(InfoPanel infoPanel) {}
+			@Override
+			public void popInfoPanel() {}
+			@Override
+			public void pressedSelectedUnitPortrait(Unit unit) {}
+			@Override
+			public void switchInfoPanel(InfoPanel infoPanel) {}
+			@Override
+			public void tryToCraftItem(ItemType type, int amount) {}
+		});
+		CommandInterface localCommands = Utils.makeFunctionalCommandInterface(gameInstance);
 		commandInterface = new CommandInterface() {
 			@Override
 			public void setBuildingRallyPoint(Building building, Tile rallyPoint) {
@@ -35,14 +63,25 @@ public class Client {
 				localCommands.setBuildingRallyPoint(building, rallyPoint);
 			}
 			@Override
-			public void setTargetTile(Unit unit, Tile target, boolean clearQueue) {
+			public void moveTo(Unit unit, Tile target, boolean clearQueue) {
 				sendMessage(CommandMessage.makeMoveToCommand(unit.id(), target.getLocation(), clearQueue));
-				localCommands.setTargetTile(unit, target, clearQueue);
+				localCommands.moveTo(unit, target, clearQueue);
 			}
 			@Override
 			public void attackThing(Unit unit, Thing target, boolean clearQueue) {
 				sendMessage(CommandMessage.makeAttackThingCommand(unit.id(), target.id(), clearQueue));
 				localCommands.attackThing(unit, target, clearQueue);
+			}
+			@Override
+			public void buildThing(Unit unit, Thing target, boolean clearQueue) {
+				sendMessage(CommandMessage.makeBuildTargetCommand(unit.id(), target.id(), clearQueue));
+				localCommands.buildThing(unit, target, clearQueue);
+			}
+			@Override
+			public Building planBuilding(Unit unit, Tile target, boolean clearQueue, BuildingType buildingType) {
+				sendMessage(CommandMessage.makePlanBuildingCommand(unit.id(), target.getLocation(), clearQueue, buildingType.name()));
+				localCommands.moveTo(unit, target, clearQueue);
+				return null;
 			}
 		};
 	}
@@ -214,34 +253,6 @@ public class Client {
 	
 	public void setGUI(ClientGUI clientGUI) {
 		this.clientGUI = clientGUI;
-		gameInstance = new Game(new GUIController() {
-			@Override
-			public void updateGUI() {
-				clientGUI.getGameViewOverlay().updateItems();
-			}
-			@Override
-			public void selectedUnit(Unit unit, boolean selected) {
-				clientGUI.getGameViewOverlay().selectedUnit(unit, selected);
-			}
-			@Override
-			public void selectedSpawnUnit(boolean selected) {}
-			@Override
-			public void selectedBuilding(Building building, boolean selected) {}
-			@Override
-			public void changedFaction(Faction faction) {
-				clientGUI.getGameViewOverlay().changeFaction(faction);
-			}
-			@Override
-			public void pushInfoPanel(InfoPanel infoPanel) {}
-			@Override
-			public void popInfoPanel() {}
-			@Override
-			public void pressedSelectedUnitPortrait(Unit unit) {}
-			@Override
-			public void switchInfoPanel(InfoPanel infoPanel) {}
-			@Override
-			public void tryToCraftItem(ItemType type, int amount) {}
-		});
 		clientGUI.setGameInstance(gameInstance, commandInterface);
 
 		Timer repaintingThread = new Timer(30, new ActionListener() {

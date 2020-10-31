@@ -10,6 +10,8 @@ import networking.client.*;
 import networking.message.*;
 import networking.server.*;
 import ui.*;
+import ui.Frame;
+import utils.*;
 import world.*;
 
 public class ClientGUI {
@@ -25,6 +27,7 @@ public class ClientGUI {
 //	private JPanel connectionInfo;
 	private JPanel lobbyInfo;
 	private JTextField nameTextField;
+	private Color selectedColor = Server.DEFAULT_PLAYER_INFO.getColor();
 	
 	private JButton makeWorldButton;
 	private JButton startGameButton;
@@ -34,20 +37,22 @@ public class ClientGUI {
 	
 	public ClientGUI() {
 		mainPanel = new JPanel();
-
 		mainPanel.setLayout(new BorderLayout());
+		mainPanel.setFocusable(false);
 		
 		topPanel = new JPanel();
 		topPanel.setLayout(new BorderLayout());
+		topPanel.setFocusable(false);
 		mainPanel.add(topPanel, BorderLayout.NORTH);
 		
 		connectPanel = new JPanel();
+		connectPanel.setFocusable(false);
 		connectPanel.setLayout(new BoxLayout(connectPanel, BoxLayout.X_AXIS));
 		
 		JTextField ipTextField = new JTextField("localhost", 12);
 		connectPanel.add(ipTextField);
 
-		JButton startButton = new JButton("Connect");
+		KButton startButton = KUIConstants.setupButton("Connect", null, null);
 		startButton.addActionListener(e -> {
 			try {
 				client.connectToServer(InetAddress.getByName(ipTextField.getText()));
@@ -59,47 +64,55 @@ public class ClientGUI {
 		topPanel.add(connectPanel, BorderLayout.NORTH);
 		
 		myinfoPanel = new JPanel();
+		myinfoPanel.setFocusable(false);
 		myinfoPanel.setLayout(new BoxLayout(myinfoPanel, BoxLayout.X_AXIS));
 
 		nameTextField = new JTextField(Server.DEFAULT_PLAYER_INFO.getName(), 16);
 		myinfoPanel.add(nameTextField);
 
-		JButton colorButton = new JButton("Pick Color");
-		colorButton.setBackground(Server.DEFAULT_PLAYER_INFO.getColor());
+		KButton colorButton = KUIConstants.setupButton("Pick Color", null, null);
+		colorButton.setBorder(BorderFactory.createLineBorder(selectedColor, 10));
 		colorButton.addActionListener(e -> {
 			Color newColor = JColorChooser.showDialog(mainPanel, "Choose Color", colorButton.getBackground());
 			if(newColor != null) {
-				colorButton.setBackground(newColor);
+				selectedColor = newColor;
+				colorButton.setBorder(BorderFactory.createLineBorder(selectedColor, 10));
 			}
+			resetFocus();
 		});
 		myinfoPanel.add(colorButton);
-		
-		JButton updateInfoButton = new JButton("Update Info");
+
+		KButton updateInfoButton = KUIConstants.setupButton("Update Info", null, null);
 		updateInfoButton.addActionListener(e -> {
-			client.sendMessage(new ClientMessage(ClientMessageType.INFO, new PlayerInfo(nameTextField.getText(), colorButton.getBackground())));
+			client.sendMessage(new ClientMessage(ClientMessageType.INFO, new PlayerInfo(nameTextField.getText(), selectedColor)));
+			resetFocus();
 		});
 		myinfoPanel.add(updateInfoButton);
 
-		JButton disconnectButton = new JButton("Disconnect");
+		KButton disconnectButton = KUIConstants.setupButton("Disconnect", null, null);
 		disconnectButton.addActionListener(e -> {
 			client.disconnect();
+			resetFocus();
 		});
 		myinfoPanel.add(disconnectButton);
-		
-		makeWorldButton = new JButton("Make World");
+
+		makeWorldButton = KUIConstants.setupButton("Make World", null, null);
 		makeWorldButton.addActionListener(e -> {
 			client.sendMessage(new ClientMessage(ClientMessageType.MAKE_WORLD, null));
+			resetFocus();
 		});
 		myinfoPanel.add(makeWorldButton);
 
-		startGameButton = new JButton("Start Game");
+		startGameButton = KUIConstants.setupButton("Start Game", null, null);
 		startGameButton.addActionListener(e -> {
 			client.sendMessage(new ClientMessage(ClientMessageType.START_GAME, null));
+			resetFocus();
 		});
 		myinfoPanel.add(startGameButton);
 		startGameButton.setEnabled(false);
 		
 		lobbyInfo = new JPanel();
+		lobbyInfo.setFocusable(false);
 		lobbyInfo.setLayout(new BoxLayout(lobbyInfo, BoxLayout.X_AXIS));
 		topPanel.add(lobbyInfo, BorderLayout.CENTER);
 	}
@@ -142,11 +155,17 @@ public class ClientGUI {
 		this.client = client;
 	}
 	
+	private void resetFocus() {
+		if(gameView != null) {
+			gameView.requestFocus();
+		}
+	}
 	public void setGameInstance(Game instance, CommandInterface commandInterface) {
 		if(gameView != null) {
 			mainPanel.remove(gameView);
 		}
 		gameView = new GameView(instance, commandInterface);
+		gameView.requestFocus();
 		gameViewOverlay = new GameViewOverlay(instance.getGUIController());
 		gameViewOverlay.changeFaction(World.PLAYER_FACTION);
 		gameView.setLayout(new BorderLayout());

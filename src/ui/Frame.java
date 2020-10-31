@@ -318,7 +318,7 @@ public class Frame extends JPanel {
 	}
 
 	private void setupGamePanel() {
-		gamepanel = new GameView(gameInstance, Utils.makeFunctionalCommandInterface());
+		gamepanel = new GameView(gameInstance, Utils.makeFunctionalCommandInterface(gameInstance));
 		gamepanelOverlay = new GameViewOverlay(guiController);
 		gamepanelOverlay.changeFaction(World.PLAYER_FACTION);
 		gamepanel.setLayout(new BorderLayout());

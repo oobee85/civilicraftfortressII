@@ -603,24 +603,6 @@ public class Game {
 			}
 		}
 	}
-	public void workerRoad(ConcurrentLinkedQueue<Thing> selectedThings, BuildingType type) {
-		for(Thing thing : selectedThings) {
-			if(thing instanceof Unit) {
-				Unit unit = (Unit)thing;
-				if(unit.getType().isBuilder()) {
-					for(Tile tile : Utils.getTilesInRadius(unit.getTile(), world, 4)) {
-						if(tile.getFaction() != World.PLAYER_FACTION) {
-							continue;
-						}
-						Building building = buildBuilding(type, tile);
-						if(building != null) {
-							unit.queuePlannedAction(new PlannedAction(building, true));
-						}
-					}
-				}
-			}
-		}
-	}
 	public void explode(Thing thing) {
 		if(thing == null) {
 			return;
@@ -653,14 +635,14 @@ public class Game {
 	}
 	
 
-	private boolean canBuild(BuildingType bt, Tile tile) {
+	private boolean canBuild(Unit unit, BuildingType bt, Tile tile) {
 		if(bt.isRoad() && tile.getRoad() != null) {
 			return false;
 		}
 		if (!bt.isRoad() && tile.hasBuilding()) {
 			return false;
 		}
-		if(!World.PLAYER_FACTION.canAfford(bt.getCost())) {
+		if(!unit.getFaction().canAfford(bt.getCost())) {
 			return false;
 		}
 		if (bt == Game.buildingTypeMap.get("IRRIGATION") && tile.canPlant() == false) {
@@ -670,10 +652,10 @@ public class Game {
 
 	}
 
-	public Building buildBuilding(BuildingType bt, Tile tile) {
-		if(canBuild(bt, tile) == true) {
-			World.PLAYER_FACTION.payCost(bt.getCost());
-			Building building = new Building(bt, tile, World.PLAYER_FACTION);
+	public Building planBuilding(Unit unit, BuildingType bt, Tile tile) {
+		if(canBuild(unit, bt, tile) == true) {
+			unit.getFaction().payCost(bt.getCost());
+			Building building = new Building(bt, tile, unit.getFaction());
 			world.plannedBuildings.add(building);
 			building.setPlanned(true);
 			building.setHealth(1);
@@ -684,6 +666,16 @@ public class Game {
 				tile.setBuilding(building);
 			}
 			return building;
+		}
+		else if(bt.isRoad() && tile.getRoad() != null) {
+			if(bt == tile.getRoad().getType()) {
+				return tile.getRoad();
+			}
+		}
+		else if(!bt.isRoad() && tile.getBuilding() != null) {
+			if(bt == tile.getBuilding().getType()) {
+				return tile.getBuilding();
+			}
 		}
 		return null;
 	}

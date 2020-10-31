@@ -25,7 +25,7 @@ public class Tile implements Serializable {
 	private transient Building building;
 	private transient Building road;
 	private GroundModifier modifier;
-	private WeatherEvent weather;
+	private transient WeatherEvent weather;
 	
 	public volatile double liquidAmount;
 	public volatile LiquidType liquidType;

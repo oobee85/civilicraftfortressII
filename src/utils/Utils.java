@@ -302,14 +302,14 @@ public final class Utils {
 		return rand / tries;
 	}
 	
-	public static CommandInterface makeFunctionalCommandInterface() {
+	public static CommandInterface makeFunctionalCommandInterface(Game game) {
 		return new CommandInterface() {
 			@Override
 			public void setBuildingRallyPoint(Building building, Tile rallyPoint) {
 				building.setRallyPoint(rallyPoint);
 			}
 			@Override
-			public void setTargetTile(Unit unit, Tile target, boolean clearQueue) {
+			public void moveTo(Unit unit, Tile target, boolean clearQueue) {
 				if(clearQueue) {
 					unit.clearPlannedActions();
 				}
@@ -321,6 +321,24 @@ public final class Utils {
 					unit.clearPlannedActions();
 				}
 				unit.queuePlannedAction(new PlannedAction(target));
+			}
+			@Override
+			public void buildThing(Unit unit, Thing target, boolean clearQueue) {
+				unit.queuePlannedAction(new PlannedAction(target, true));
+			}
+			@Override
+			public Building planBuilding(Unit unit, Tile target, boolean clearQueue, BuildingType buildingType) {
+				if(clearQueue) {
+					unit.clearPlannedActions();
+				}
+				if(unit.getType().isBuilder()) {
+					Building plannedBuilding = game.planBuilding(unit, buildingType, target);
+					if(plannedBuilding != null) {
+						unit.queuePlannedAction(new PlannedAction(plannedBuilding, true));
+					}
+					return plannedBuilding;
+				}
+				return null;
 			}
 		};
 	}

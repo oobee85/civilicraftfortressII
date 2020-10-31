@@ -43,6 +43,24 @@ public class CommandMessage implements Externalizable {
 		msg.clearQueue = clearQueue;
 		return msg;
 	}
+	public static CommandMessage makeBuildTargetCommand(int thingID, int targetID, boolean clearQueue) {
+		CommandMessage msg = new CommandMessage();
+		msg.command = CommandType.BUILD_THING;
+		msg.thingID = thingID;
+		msg.targetID = targetID;
+		msg.clearQueue = clearQueue;
+		return msg;
+	}
+	public static CommandMessage makePlanBuildingCommand(int thingID, TileLoc target, boolean clearQueue, String buildingType) {
+		CommandMessage msg = new CommandMessage();
+		msg.command = CommandType.PLAN_BUILDING;
+		msg.thingID = thingID;
+		msg.targetX = target.x();
+		msg.targetY = target.y();
+		msg.clearQueue = clearQueue;
+		msg.type = buildingType;
+		return msg;
+	}
 
 	public CommandType getCommand() {
 		return command;

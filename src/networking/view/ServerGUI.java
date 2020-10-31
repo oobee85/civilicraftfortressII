@@ -5,11 +5,8 @@ import java.util.*;
 
 import javax.swing.*;
 
-import game.*;
-import networking.server.*;
 import ui.*;
 import utils.*;
-import world.*;
 
 public class ServerGUI extends JPanel {
 
@@ -41,7 +38,7 @@ public class ServerGUI extends JPanel {
 		if(gameView != null) {
 			this.remove(gameView);
 		}
-		commandInterface = Utils.makeFunctionalCommandInterface();
+		commandInterface = Utils.makeFunctionalCommandInterface(instance);
 		gameView = new GameView(instance, commandInterface);
 		this.add(gameView, BorderLayout.CENTER);
 		revalidate();

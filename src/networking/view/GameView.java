@@ -162,6 +162,9 @@ public class GameView extends JPanel {
 				else if (e.getKeyCode() == KeyEvent.VK_S) {
 					game.unitStop(selectedThings);
 				}
+				else if(e.getKeyCode() == KeyEvent.VK_M) {
+					setBuildingToPlan(Game.buildingTypeMap.get("MINE"));
+				}
 			}
 		});
 	}
@@ -178,7 +181,7 @@ public class GameView extends JPanel {
 		game.toggleGuarding(selectedThings);
 	}
 	public void workerRoad(BuildingType type) {
-		game.workerRoad(selectedThings, type);
+		workerRoad(selectedThings, type);
 	}
 	
 	public void setDrawDebugStrings(boolean enabled) {
@@ -206,23 +209,18 @@ public class GameView extends JPanel {
 		}
 		//planning building
 		else if (leftClickAction == LeftClickAction.PLAN_BUILDING) {
-			Building plannedBuilding = game.buildBuilding(selectedBuildingToPlan, tile);
+			Building plannedBuilding = null;
+			for(Thing thing : selectedThings) {
+				if(thing instanceof Unit) {
+					Unit unit = (Unit) thing;
+					plannedBuilding = commandInterface.planBuilding(unit, tile, !shiftDown, selectedBuildingToPlan);
+				}
+			}
 			if(plannedBuilding != null) {
 				if(plannedBuilding.getFaction() == World.PLAYER_FACTION) {
 					HashSet<Tile> buildingVision = game.world.getNeighborsInRadius(plannedBuilding.getTile(), plannedBuilding.getType().getVisionRadius());
 					for(Tile invision : buildingVision) {
 						invision.setInVisionRange(true);
-					}
-				}
-				for(Thing thing : selectedThings) {
-					if(thing instanceof Unit) {
-						Unit unit = (Unit) thing;
-						if(!shiftDown) {
-							unit.clearPlannedActions();
-						}
-						if(unit.getType().isBuilder()) {
-							unit.queuePlannedAction(new PlannedAction(plannedBuilding, true));
-						}
 					}
 				}
 			}
@@ -291,10 +289,10 @@ public class GameView extends JPanel {
 						targetBuilding = targetTile.getRoad();
 					}
 					if(targetBuilding != null && (targetBuilding.getFaction() == unit.getFaction() || targetBuilding.getType().isRoad()) && !targetBuilding.isBuilt()) {
-						unit.queuePlannedAction(new PlannedAction(targetBuilding, true));
+						commandInterface.buildThing(unit, targetBuilding, !shiftDown);
 					}
 					else {
-						commandInterface.setTargetTile(unit, targetTile, !shiftDown);
+						commandInterface.moveTo(unit, targetTile, !shiftDown);
 					}
 				}
 				else {
@@ -315,7 +313,27 @@ public class GameView extends JPanel {
 						commandInterface.attackThing(unit, targetThing, !shiftDown);
 					}
 					else {
-						commandInterface.setTargetTile(unit, targetTile, !shiftDown);
+						commandInterface.moveTo(unit, targetTile, !shiftDown);
+					}
+				}
+			}
+		}
+	}
+	
+	public void workerRoad(ConcurrentLinkedQueue<Thing> selectedThings, BuildingType type) {
+		for(Thing thing : selectedThings) {
+			if(thing instanceof Unit) {
+				Unit unit = (Unit)thing;
+				if(unit.getType().isBuilder()) {
+					for(Tile tile : Utils.getTilesInRadius(unit.getTile(), game.world, 4)) {
+						if(tile.getFaction() != unit.getFaction()) {
+							continue;
+						}
+						commandInterface.planBuilding(unit, tile, false, selectedBuildingToPlan);
+//						Building building = planBuilding(unit, type, tile);
+//						if(building != null) {
+//							unit.queuePlannedAction(new PlannedAction(building, true));
+//						}
 					}
 				}
 			}

@@ -30,13 +30,17 @@ public class GameViewOverlay extends JPanel {
 	public GameViewOverlay(GUIController guiController) {
 		this.guiController = guiController;
 		this.setOpaque(false);
+		this.setFocusable(false);
 		resourcePanel2 = new JPanel();
+		resourcePanel2.setFocusable(false);
 		resourcePanel2.setLayout(new BoxLayout(resourcePanel2, BoxLayout.Y_AXIS));
 		resourcePanel2.setOpaque(false);
 		JPanel filler = new JPanel();
+		filler.setFocusable(false);
 		filler.setLayout(new BorderLayout());
 		filler.setOpaque(false);
 		selectedUnitsPanel = new JPanel();
+		selectedUnitsPanel.setFocusable(false);
 		selectedUnitsPanel.setOpaque(false);
 		this.setLayout(new BorderLayout());
 		this.add(resourcePanel2, BorderLayout.WEST);
