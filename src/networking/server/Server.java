@@ -257,6 +257,7 @@ public class Server {
 				try {
 					long start = System.currentTimeMillis();
 					gameInstance.gameTick();
+					gameInstance.getGUIController().updateGUI();
 					long elapsed = System.currentTimeMillis() - start;
 					long sleeptime = MILLISECONDS_PER_TICK - elapsed;
 					if(sleeptime > 0 && !isFastForwarding) {

@@ -62,10 +62,11 @@ public class KUIConstants {
 		return b;
 	}
 	public static JTextField setupTextField(String text, Dimension size) {
-		JTextField b = new JTextField(text, 6);
+		JTextField b = new JTextField(text, 20);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
 		setComponentAttributes(b, size);
 		b.setOpaque(true);
+		b.setFocusable(true);
 		return b;
 	}
 
@@ -83,8 +84,10 @@ public class KUIConstants {
 		c.setFont(KUIConstants.buttonFont);
 		c.setBorder(massiveBorder);
 		c.setFocusable(false);
-		if (size != null)
+		if (size != null) {
 			c.setPreferredSize(size);
+			c.setMaximumSize(size);
+		}
 	}
 	
 

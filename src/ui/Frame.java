@@ -318,7 +318,8 @@ public class Frame extends JPanel {
 	}
 
 	private void setupGamePanel() {
-		gamepanel = new GameView(gameInstance, Utils.makeFunctionalCommandInterface(gameInstance));
+		gamepanel = new GameView(gameInstance);
+		gamepanel.setCommandInterface(Utils.makeFunctionalCommandInterface(gameInstance));
 		gamepanelOverlay = new GameViewOverlay(guiController);
 		gamepanelOverlay.changeFaction(World.PLAYER_FACTION);
 		gamepanel.setLayout(new BorderLayout());
@@ -1076,6 +1077,7 @@ public class Frame extends JPanel {
 				try {
 					long start = System.currentTimeMillis();
 					gameInstance.gameTick();
+					guiController.updateGUI();
 					long elapsed = System.currentTimeMillis() - start;
 					if(World.ticks % 10 == 0) {
 						frame.setTitle(TITLE + " " + elapsed);

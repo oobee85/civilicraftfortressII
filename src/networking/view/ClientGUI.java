@@ -16,13 +16,18 @@ import world.*;
 
 public class ClientGUI {
 	
+	private static final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(200, 40);
+	
 	private Client client;
 	
-	private JPanel mainPanel;
+	private JPanel rootPanel;
+	
+	private JPanel mainMenuPanel;
+	private JPanel ingamePanel;
 	
 	private JPanel topPanel;
+	private JPanel sidePanel;
 	
-	private JPanel connectPanel;
 	private JPanel myinfoPanel;
 //	private JPanel connectionInfo;
 	private JPanel lobbyInfo;
@@ -36,23 +41,37 @@ public class ClientGUI {
 	private GameViewOverlay gameViewOverlay;
 	
 	public ClientGUI() {
-		mainPanel = new JPanel();
-		mainPanel.setLayout(new BorderLayout());
-		mainPanel.setFocusable(false);
+		rootPanel = new JPanel();
+		rootPanel.setLayout(new BorderLayout());
+		rootPanel.setFocusable(false);
+		
+		mainMenuPanel = new JPanel();
+		mainMenuPanel.setLayout(new BoxLayout(mainMenuPanel, BoxLayout.Y_AXIS));
+		mainMenuPanel.setFocusable(false);
+		
+		ingamePanel = new JPanel();
+		ingamePanel.setLayout(new BorderLayout());
+		ingamePanel.setFocusable(false);
+
 		
 		topPanel = new JPanel();
 		topPanel.setLayout(new BorderLayout());
 		topPanel.setFocusable(false);
-		mainPanel.add(topPanel, BorderLayout.NORTH);
 		
-		connectPanel = new JPanel();
-		connectPanel.setFocusable(false);
-		connectPanel.setLayout(new BoxLayout(connectPanel, BoxLayout.X_AXIS));
+		sidePanel = new JPanel();
+		sidePanel.setLayout(new BorderLayout());
+		sidePanel.setFocusable(false);
 		
-		JTextField ipTextField = new JTextField("localhost", 12);
-		connectPanel.add(ipTextField);
 
-		KButton startButton = KUIConstants.setupButton("Connect", null, null);
+		KButton singlePlayer = KUIConstants.setupButton("Single Player", null, MAIN_MENU_BUTTON_SIZE);
+		singlePlayer.addActionListener(e -> {
+			client.setupSinglePlayer();
+		});
+		singlePlayer.setAlignmentX(Component.CENTER_ALIGNMENT);
+		JTextField ipTextField = KUIConstants.setupTextField("localhost", MAIN_MENU_BUTTON_SIZE);
+		ipTextField.setAlignmentX(Component.CENTER_ALIGNMENT);
+		KButton startButton = KUIConstants.setupButton("Multiplayer", null, MAIN_MENU_BUTTON_SIZE);
+		startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		startButton.addActionListener(e -> {
 			try {
 				client.connectToServer(InetAddress.getByName(ipTextField.getText()));
@@ -60,20 +79,30 @@ public class ClientGUI {
 				e1.printStackTrace();
 			}
 		});
-		connectPanel.add(startButton);
-		topPanel.add(connectPanel, BorderLayout.NORTH);
+
+		int padding = 20;
+		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		mainMenuPanel.add(singlePlayer);
+		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding*2)));
+		mainMenuPanel.add(ipTextField);
+		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding/2)));
+		mainMenuPanel.add(startButton);
+		mainMenuPanel.add(Box.createVerticalGlue());
+
+		rootPanel.add(mainMenuPanel, BorderLayout.CENTER);
 		
 		myinfoPanel = new JPanel();
 		myinfoPanel.setFocusable(false);
 		myinfoPanel.setLayout(new BoxLayout(myinfoPanel, BoxLayout.X_AXIS));
 
-		nameTextField = new JTextField(Server.DEFAULT_PLAYER_INFO.getName(), 16);
+		nameTextField = KUIConstants.setupTextField(Server.DEFAULT_PLAYER_INFO.getName(), null);
+		nameTextField.setMaximumSize(new Dimension(120, 999));
 		myinfoPanel.add(nameTextField);
 
 		KButton colorButton = KUIConstants.setupButton("Pick Color", null, null);
 		colorButton.setBorder(BorderFactory.createLineBorder(selectedColor, 10));
 		colorButton.addActionListener(e -> {
-			Color newColor = JColorChooser.showDialog(mainPanel, "Choose Color", colorButton.getBackground());
+			Color newColor = JColorChooser.showDialog(rootPanel, "Choose Color", colorButton.getBackground());
 			if(newColor != null) {
 				selectedColor = newColor;
 				colorButton.setBorder(BorderFactory.createLineBorder(selectedColor, 10));
@@ -89,6 +118,7 @@ public class ClientGUI {
 		});
 		myinfoPanel.add(updateInfoButton);
 
+		myinfoPanel.add(Box.createHorizontalGlue());
 		KButton disconnectButton = KUIConstants.setupButton("Disconnect", null, null);
 		disconnectButton.addActionListener(e -> {
 			client.disconnect();
@@ -132,23 +162,30 @@ public class ClientGUI {
 		startGameButton.setEnabled(true);
 	}
 	
+	public void startedSinglePlayer() {
+		rootPanel.remove(mainMenuPanel);
+		rootPanel.add(ingamePanel);
+		gameView.requestFocus();
+		rootPanel.revalidate();
+		rootPanel.repaint();
+	}
 	public void connected(JPanel connectionInfo) {
-//		this.connectionInfo = connectionInfo;
-		topPanel.remove(connectPanel);
-//		myinfoPanel.add(connectionInfo);
+		rootPanel.remove(mainMenuPanel);
+		rootPanel.add(ingamePanel);
+		ingamePanel.add(topPanel, BorderLayout.NORTH);
 		topPanel.add(myinfoPanel, BorderLayout.NORTH);
-		mainPanel.revalidate();
-		mainPanel.repaint();
+		gameView.requestFocus();
+		rootPanel.revalidate();
+		rootPanel.repaint();
 	}
 	
 	public void disconnected() {
-//		myinfoPanel.remove(connectionInfo);
-//		connectionInfo = null;
+		rootPanel.remove(ingamePanel);
+		rootPanel.add(mainMenuPanel);
+		ingamePanel.add(topPanel, BorderLayout.NORTH);
 		topPanel.remove(myinfoPanel);
-		topPanel.add(connectPanel, BorderLayout.NORTH);
-		mainPanel.revalidate();
-		mainPanel.repaint();
-		
+		rootPanel.revalidate();
+		rootPanel.repaint();
 	}
 	
 	public void setClient(Client client) {
@@ -160,19 +197,19 @@ public class ClientGUI {
 			gameView.requestFocus();
 		}
 	}
-	public void setGameInstance(Game instance, CommandInterface commandInterface) {
+	public void setGameInstance(Game instance) {
 		if(gameView != null) {
-			mainPanel.remove(gameView);
+			ingamePanel.remove(gameView);
 		}
-		gameView = new GameView(instance, commandInterface);
+		gameView = new GameView(instance);
 		gameView.requestFocus();
 		gameViewOverlay = new GameViewOverlay(instance.getGUIController());
 		gameViewOverlay.changeFaction(World.PLAYER_FACTION);
 		gameView.setLayout(new BorderLayout());
 		gameView.add(gameViewOverlay, BorderLayout.CENTER);
-		mainPanel.add(gameView, BorderLayout.CENTER);
-		mainPanel.revalidate();
-		mainPanel.repaint();
+		ingamePanel.add(gameView, BorderLayout.CENTER);
+		rootPanel.revalidate();
+		rootPanel.repaint();
 	}
 	public void updateTerrainImages() {
 		if(gameView != null) {
@@ -181,15 +218,18 @@ public class ClientGUI {
 	}
 	
 	public void repaint() {
-		mainPanel.repaint();
+		rootPanel.repaint();
 	}
 	
 	public JPanel getMainPanel() {
-		return mainPanel;
+		return rootPanel;
 	}
 	
 	public GameViewOverlay getGameViewOverlay() {
 		return gameViewOverlay;
+	}
+	public GameView getGameView() {
+		return gameView;
 	}
 
 }

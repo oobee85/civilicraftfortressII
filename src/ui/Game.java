@@ -115,7 +115,6 @@ public class Game {
 		weatherEvents();
 		// GUI updates
 		world.updateTerrainChange(world);
-		guiController.updateGUI();
 	}
 	private void makeAnimal(Tile tile, UnitType unitType, int number) {
 		for(Tile t: Utils.getTilesInRadius(tile, world, Math.max(1, (int)(Math.sqrt(number))-2))) {

@@ -1,10 +1,12 @@
 package networking.client;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import javax.swing.*;
 import javax.swing.Timer;
 
 import game.*;
@@ -13,6 +15,7 @@ import networking.message.*;
 import networking.server.*;
 import networking.view.*;
 import ui.*;
+import ui.Frame;
 import ui.infopanels.*;
 import utils.*;
 import world.*;
@@ -23,8 +26,10 @@ public class Client {
 	private ClientGUI clientGUI;
 
 	private Game gameInstance;
-	private CommandInterface commandInterface;
+	private CommandInterface localCommands;
+	private CommandInterface networkingCommands;
 	private volatile Object updatedTerrain = new Object();
+	private HashMap<Integer, Thing> things = new HashMap<>();
 
 	public Client() {
 		gameInstance = new Game(new GUIController() {
@@ -55,8 +60,8 @@ public class Client {
 			@Override
 			public void tryToCraftItem(ItemType type, int amount) {}
 		});
-		CommandInterface localCommands = Utils.makeFunctionalCommandInterface(gameInstance);
-		commandInterface = new CommandInterface() {
+		localCommands = Utils.makeFunctionalCommandInterface(gameInstance);
+		networkingCommands = new CommandInterface() {
 			@Override
 			public void setBuildingRallyPoint(Building building, Tile rallyPoint) {
 				sendMessage(CommandMessage.makeSetRallyPointCommand(building.id(), rallyPoint.getLocation()));
@@ -105,6 +110,52 @@ public class Client {
 			}
 		};
 	}
+	public void setupSinglePlayer() {
+		clientGUI.getGameView().setCommandInterface(localCommands);
+		gameInstance.generateWorld(128, 128, false);
+
+		Thread gameLoopThread = new Thread(() -> {
+			while (true) {
+				try {
+					long start = System.currentTimeMillis();
+					gameInstance.gameTick();
+					gameInstance.getGUIController().updateGUI();
+					long elapsed = System.currentTimeMillis() - start;
+					long sleeptime = Frame.MILLISECONDS_PER_TICK - elapsed;
+					if(sleeptime > 0 /*&& !isFastForwarding*/) {
+						Thread.sleep(sleeptime);
+					}
+				}
+				catch(Exception e) {
+					try (FileWriter fw = new FileWriter("ERROR_LOG.txt", true);
+							BufferedWriter bw = new BufferedWriter(fw);
+							PrintWriter out = new PrintWriter(bw)) {
+						e.printStackTrace(out);
+					} catch (IOException ee) {
+					}
+					e.printStackTrace();
+					if(e instanceof InterruptedException) {
+						break;
+					}
+				}
+			}
+		});
+		SwingUtilities.invokeLater(() -> {
+			clientGUI.startedSinglePlayer();
+//			frame.remove(mainMenuPanel);
+//			mainMenuPanel = null;
+			
+//			frame.getContentPane().add(gamepanel, BorderLayout.CENTER);
+//			frame.getContentPane().add(guiSplitter, BorderLayout.EAST);
+//			frame.pack();
+//			
+//			gamepanel.centerViewOn(gameInstance.world.buildings.getLast().getTile(), 50, gamepanel.getWidth(), gamepanel.getHeight());
+//			gamepanel.requestFocusInWindow();
+//			gamepanel.requestFocus();
+			clientGUI.repaint();
+			gameLoopThread.start();
+		});
+	}
 	public void sendMessage(Object message) {
 		connection.sendMessage(message);
 	}
@@ -119,6 +170,7 @@ public class Client {
 				System.out.println("reached callback");
 			});
 			clientGUI.connected(connection.getPanel());
+			clientGUI.getGameView().setCommandInterface(networkingCommands);
 			startReceiving();
 			
 		} catch (IOException e) {
@@ -132,8 +184,6 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-	
-	private HashMap<Integer, Thing> things = new HashMap<>();
 	
 	private void worldInfoUpdate(WorldInfo worldInfo) {
 		if(gameInstance.world == null) {
@@ -273,11 +323,12 @@ public class Client {
 	
 	public void setGUI(ClientGUI clientGUI) {
 		this.clientGUI = clientGUI;
-		clientGUI.setGameInstance(gameInstance, commandInterface);
+		clientGUI.setGameInstance(gameInstance);
 
 		Timer repaintingThread = new Timer(30, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.getGUIController().updateGUI();
 				clientGUI.repaint();
 			}
 		});

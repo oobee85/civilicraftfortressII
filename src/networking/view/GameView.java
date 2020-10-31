@@ -17,7 +17,7 @@ import world.*;
 
 public class GameView extends JPanel {
 
-	public static final int FAST_MODE_TILE_SIZE = 1;
+	public static final int FAST_MODE_TILE_SIZE = 10;
 	public static final int NUM_DEBUG_DIGITS = 3;
 
 	private static final Image RALLY_POINT_IMAGE = Utils.loadImage("resources/Images/interfaces/queuelocation.png");
@@ -57,10 +57,9 @@ public class GameView extends JPanel {
 	private boolean summonPlayerControlled = true;
 	private BuildingType selectedBuildingToPlan;
 	
-	public GameView(Game game, CommandInterface commandInterface) {
+	public GameView(Game game) {
 		this.game = game;
 		this.guiController = game.getGUIController();
-		this.commandInterface = commandInterface;
 		this.setBackground(Color.black);
 		viewOffset = new Position(0, 0);
 		addMouseWheelListener(new MouseWheelListener() {
@@ -1048,5 +1047,9 @@ public class GameView extends JPanel {
 	
 	public CommandInterface getCommandInterface() {
 		return commandInterface;
+	}
+	
+	public void setCommandInterface(CommandInterface commandInterface) {
+		this.commandInterface = commandInterface;
 	}
 }
