@@ -225,6 +225,14 @@ public class Server {
 				gui.getCommandInterface().stop((Unit)thing);
 			}
 		}
+		else if(message.getCommand() == CommandType.RESEARCH) {
+			if(message.getFaction() >= 0 && message.getFaction() < World.factions.length) {
+				ResearchType researchType = Game.researchTypeMap.get(message.getType());
+				if(researchType != null) {
+					gui.getCommandInterface().research(World.factions[message.getFaction()], researchType);
+				}
+			}
+		}
 	}
 	
 	private void startGame() {

@@ -88,6 +88,11 @@ public class Client {
 				sendMessage(CommandMessage.makeStopCommand(unit.id()));
 				localCommands.stop(unit);
 			}
+			@Override
+			public void research(Faction faction, ResearchType researchType) {
+				sendMessage(CommandMessage.makeResearchCommand(faction.id, researchType.name()));
+				localCommands.research(faction, researchType);
+			}
 		};
 	}
 	public void sendMessage(Object message) {

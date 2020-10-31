@@ -13,7 +13,6 @@ public class ServerGUI extends JPanel {
 //	private Server server;
 	private JLabel info;
 	private GameView gameView;
-	private CommandInterface commandInterface;
 	private JPanel connectionPanelBar;
 	private HashSet<JPanel> connectionPanels = new HashSet<>();
 	
@@ -38,8 +37,7 @@ public class ServerGUI extends JPanel {
 		if(gameView != null) {
 			this.remove(gameView);
 		}
-		commandInterface = Utils.makeFunctionalCommandInterface(instance);
-		gameView = new GameView(instance, commandInterface);
+		gameView = new GameView(instance, Utils.makeFunctionalCommandInterface(instance));
 		this.add(gameView, BorderLayout.CENTER);
 		revalidate();
 		repaint();
@@ -68,7 +66,7 @@ public class ServerGUI extends JPanel {
 	}
 	
 	public CommandInterface getCommandInterface() {
-		return commandInterface;
+		return gameView.getCommandInterface();
 	}
 	
 //	public void setServer(Server server) {

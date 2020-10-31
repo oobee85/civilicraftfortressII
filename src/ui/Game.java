@@ -537,10 +537,6 @@ public class Game {
 			}
 		}
 	}
-
-	public void setResearchTarget(ResearchType researchType) {
-		World.PLAYER_FACTION.setResearchTarget(researchType);
-	}
 	
 	public Thing summonThing(Tile tile, HasImage thingType, Faction faction) {
 		

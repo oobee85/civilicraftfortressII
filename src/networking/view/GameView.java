@@ -1038,4 +1038,8 @@ public class GameView extends JPanel {
 	public ConcurrentLinkedQueue<Thing> getSelectedThings() {
 		return selectedThings;
 	}
+	
+	public CommandInterface getCommandInterface() {
+		return commandInterface;
+	}
 }

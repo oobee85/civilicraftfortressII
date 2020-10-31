@@ -344,6 +344,10 @@ public final class Utils {
 			public void stop(Unit unit) {
 				unit.clearPlannedActions();
 			}
+			@Override
+			public void research(Faction faction, ResearchType researchType) {
+				faction.setResearchTarget(researchType);
+			}
 		};
 	}
 }

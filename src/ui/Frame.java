@@ -926,7 +926,7 @@ public class Frame extends JPanel {
 					Utils.resizeImageIcon(researchType.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.setEnabled(false);
 			button.addActionListener(e -> {
-				gameInstance.setResearchTarget(researchType);
+				gamepanel.getCommandInterface().research(World.PLAYER_FACTION, researchType);
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
