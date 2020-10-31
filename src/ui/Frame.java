@@ -318,13 +318,7 @@ public class Frame extends JPanel {
 	}
 
 	private void setupGamePanel() {
-		CommandInterface commandInterface = new CommandInterface() {
-			@Override
-			public void setBuildingRallyPoint(Building building, Tile rallyPoint) {
-				building.setRallyPoint(rallyPoint);
-			}
-		};
-		gamepanel = new GameView(gameInstance, commandInterface);
+		gamepanel = new GameView(gameInstance, Utils.makeFunctionalCommandInterface());
 		gamepanelOverlay = new GameViewOverlay(guiController);
 		gamepanelOverlay.changeFaction(World.PLAYER_FACTION);
 		gamepanel.setLayout(new BorderLayout());

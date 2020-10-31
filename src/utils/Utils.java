@@ -10,6 +10,7 @@ import javax.swing.*;
 
 import game.*;
 import liquid.*;
+import ui.*;
 import world.*;
 
 public final class Utils {
@@ -299,5 +300,28 @@ public final class Utils {
 			rand += Math.random();
 		}
 		return rand / tries;
+	}
+	
+	public static CommandInterface makeFunctionalCommandInterface() {
+		return new CommandInterface() {
+			@Override
+			public void setBuildingRallyPoint(Building building, Tile rallyPoint) {
+				building.setRallyPoint(rallyPoint);
+			}
+			@Override
+			public void setTargetTile(Unit unit, Tile target, boolean clearQueue) {
+				if(clearQueue) {
+					unit.clearPlannedActions();
+				}
+				unit.queuePlannedAction(new PlannedAction(target));
+			}
+			@Override
+			public void attackThing(Unit unit, Thing target, boolean clearQueue) {
+				if(clearQueue) {
+					unit.clearPlannedActions();
+				}
+				unit.queuePlannedAction(new PlannedAction(target));
+			}
+		};
 	}
 }

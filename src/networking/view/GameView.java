@@ -260,10 +260,7 @@ public class GameView extends JPanel {
 					targetThing = tile.getRoad();
 				}
 				if(targetThing != null) {
-					if(!shiftEnabled) {
-						unit.clearPlannedActions();
-					}
-					unit.queuePlannedAction(new PlannedAction(targetThing));
+					commandInterface.attackThing(unit, targetThing, !shiftEnabled);
 				}
 			}
 		}
@@ -297,7 +294,7 @@ public class GameView extends JPanel {
 						unit.queuePlannedAction(new PlannedAction(targetBuilding, true));
 					}
 					else {
-						unit.queuePlannedAction(new PlannedAction(targetTile));
+						commandInterface.setTargetTile(unit, targetTile, !shiftDown);
 					}
 				}
 				else {
@@ -315,10 +312,10 @@ public class GameView extends JPanel {
 						targetThing = targetTile.getBuilding();
 					}
 					if(targetThing != null) {
-						unit.queuePlannedAction(new PlannedAction(targetThing));
+						commandInterface.attackThing(unit, targetThing, !shiftDown);
 					}
 					else {
-						unit.queuePlannedAction(new PlannedAction(targetTile));
+						commandInterface.setTargetTile(unit, targetTile, !shiftDown);
 					}
 				}
 			}

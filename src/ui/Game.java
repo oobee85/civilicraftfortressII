@@ -466,6 +466,7 @@ public class Game {
 		LinkedList<HasImage> thingsToPlace = new LinkedList<>();
 		thingsToPlace.add(Game.buildingTypeMap.get("CASTLE"));
 		thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
+		thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
 		if(easymode) {
 			thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
 			thingsToPlace.add(Game.buildingTypeMap.get("WORKSHOP"));

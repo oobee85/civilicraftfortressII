@@ -177,7 +177,20 @@ public class Server {
 		// TODO check if the player is in control of this thing before proceeding
 		if(message.getCommand() == CommandType.SET_RALLY_POINT) {
 			if(thing instanceof Building) {
-				((Building)thing).setRallyPoint(gameInstance.world.get(message.getTargetLocation()));
+				gui.getCommandInterface().setBuildingRallyPoint((Building)thing, gameInstance.world.get(message.getTargetLocation()));
+			}
+		}
+		else if(message.getCommand() == CommandType.MOVE_TO) {
+			if(thing instanceof Unit) {
+				gui.getCommandInterface().setTargetTile((Unit)thing, gameInstance.world.get(message.getTargetLocation()), message.getClearQueue());
+			}
+		}
+		else if(message.getCommand() == CommandType.ATTACK_THING) {
+			if(thing instanceof Unit) {
+				Thing target = ThingMapper.get(message.getTargetID());
+				if(target != null) {
+					gui.getCommandInterface().attackThing((Unit)thing, target, message.getClearQueue());
+				}
 			}
 		}
 	}

@@ -27,11 +27,22 @@ public class Client {
 	private volatile Object updatedTerrain = new Object();
 
 	public Client() {
+		CommandInterface localCommands = Utils.makeFunctionalCommandInterface();
 		commandInterface = new CommandInterface() {
 			@Override
 			public void setBuildingRallyPoint(Building building, Tile rallyPoint) {
-				sendMessage(new CommandMessage(building.id(), CommandType.SET_RALLY_POINT, rallyPoint.getLocation()));
-				building.setRallyPoint(rallyPoint);
+				sendMessage(CommandMessage.makeSetRallyPointCommand(building.id(), rallyPoint.getLocation()));
+				localCommands.setBuildingRallyPoint(building, rallyPoint);
+			}
+			@Override
+			public void setTargetTile(Unit unit, Tile target, boolean clearQueue) {
+				sendMessage(CommandMessage.makeMoveToCommand(unit.id(), target.getLocation(), clearQueue));
+				localCommands.setTargetTile(unit, target, clearQueue);
+			}
+			@Override
+			public void attackThing(Unit unit, Thing target, boolean clearQueue) {
+				sendMessage(CommandMessage.makeAttackThingCommand(unit.id(), target.id(), clearQueue));
+				localCommands.attackThing(unit, target, clearQueue);
 			}
 		};
 	}

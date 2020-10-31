@@ -8,6 +8,7 @@ import javax.swing.*;
 import game.*;
 import networking.server.*;
 import ui.*;
+import utils.*;
 import world.*;
 
 public class ServerGUI extends JPanel {
@@ -15,6 +16,7 @@ public class ServerGUI extends JPanel {
 //	private Server server;
 	private JLabel info;
 	private GameView gameView;
+	private CommandInterface commandInterface;
 	private JPanel connectionPanelBar;
 	private HashSet<JPanel> connectionPanels = new HashSet<>();
 	
@@ -39,11 +41,8 @@ public class ServerGUI extends JPanel {
 		if(gameView != null) {
 			this.remove(gameView);
 		}
-		gameView = new GameView(instance, new CommandInterface() {
-			@Override
-			public void setBuildingRallyPoint(Building building, Tile rallyPoint) {
-			}
-		});
+		commandInterface = Utils.makeFunctionalCommandInterface();
+		gameView = new GameView(instance, commandInterface);
 		this.add(gameView, BorderLayout.CENTER);
 		revalidate();
 		repaint();
@@ -69,6 +68,10 @@ public class ServerGUI extends JPanel {
 	
 	public void updateInfo(String info) {
 		this.info.setText(info);
+	}
+	
+	public CommandInterface getCommandInterface() {
+		return commandInterface;
 	}
 	
 //	public void setServer(Server server) {
