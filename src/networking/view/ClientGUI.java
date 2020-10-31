@@ -53,7 +53,6 @@ public class ClientGUI {
 		ingamePanel.setLayout(new BorderLayout());
 		ingamePanel.setFocusable(false);
 
-		
 		topPanel = new JPanel();
 		topPanel.setLayout(new BorderLayout());
 		topPanel.setFocusable(false);
@@ -61,6 +60,11 @@ public class ClientGUI {
 		sidePanel = new JPanel();
 		sidePanel.setLayout(new BorderLayout());
 		sidePanel.setFocusable(false);
+//		sidePanel.setPreferredSize(new Dimension(Frame.GUIWIDTH, 0));
+
+		ingamePanel.add(topPanel, BorderLayout.NORTH);
+		ingamePanel.add(sidePanel, BorderLayout.EAST);
+		
 		
 
 		KButton singlePlayer = KUIConstants.setupButton("Single Player", null, MAIN_MENU_BUTTON_SIZE);
@@ -172,7 +176,6 @@ public class ClientGUI {
 	public void connected(JPanel connectionInfo) {
 		rootPanel.remove(mainMenuPanel);
 		rootPanel.add(ingamePanel);
-		ingamePanel.add(topPanel, BorderLayout.NORTH);
 		topPanel.add(myinfoPanel, BorderLayout.NORTH);
 		gameView.requestFocus();
 		rootPanel.revalidate();
@@ -182,7 +185,6 @@ public class ClientGUI {
 	public void disconnected() {
 		rootPanel.remove(ingamePanel);
 		rootPanel.add(mainMenuPanel);
-		ingamePanel.add(topPanel, BorderLayout.NORTH);
 		topPanel.remove(myinfoPanel);
 		rootPanel.revalidate();
 		rootPanel.repaint();
@@ -202,12 +204,15 @@ public class ClientGUI {
 			ingamePanel.remove(gameView);
 		}
 		gameView = new GameView(instance);
+		MinimapView minimapView = new MinimapView(gameView);
+		minimapView.setPreferredSize(new Dimension(Frame.GUIWIDTH, Frame.GUIWIDTH));
 		gameView.requestFocus();
 		gameViewOverlay = new GameViewOverlay(instance.getGUIController());
 		gameViewOverlay.changeFaction(World.PLAYER_FACTION);
 		gameView.setLayout(new BorderLayout());
 		gameView.add(gameViewOverlay, BorderLayout.CENTER);
 		ingamePanel.add(gameView, BorderLayout.CENTER);
+		sidePanel.add(minimapView, BorderLayout.NORTH);
 		rootPanel.revalidate();
 		rootPanel.repaint();
 	}

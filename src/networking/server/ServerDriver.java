@@ -12,7 +12,7 @@ public class ServerDriver {
 	ServerGUI serverGUI = new ServerGUI();
 	Server server = new Server();
 	public ServerDriver() {
-		frame = new JFrame("Grid Server");
+		frame = new JFrame("civilicraftfortressIII Server");
 		frame.setSize(500, 500);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(serverGUI);

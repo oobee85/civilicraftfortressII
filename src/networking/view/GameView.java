@@ -1025,20 +1025,22 @@ public class GameView extends JPanel {
 		}
 	}
 	
-	public void drawMinimap(Graphics g, int x, int y, int w, int h, int panelWidth, int panelHeight) {
+	public void drawMinimap(Graphics g, int x, int y, int w, int h) {
 		if(showHeightMap) {
 			g.drawImage(heightMapImage, x, y, w, h, null);
 		}
 		else {
 			g.drawImage(minimapImage, x, y, w, h, null);
 		}
-		Position offsetTile = getTileAtPixel(viewOffset);
-		int boxx = (int) (offsetTile.x * w / game.world.getWidth() / 2);
-		int boxy = (int) (offsetTile.y * h / game.world.getHeight() / 2);
-		int boxw = (int) (panelWidth * w / tileSize / game.world.getWidth());
-		int boxh = (int) (panelHeight * h / tileSize / game.world.getHeight());
-		g.setColor(Color.yellow);
-		g.drawRect(x + boxx, y + boxy, boxw, boxh);
+		if(game.world != null) { 
+			Position offsetTile = getTileAtPixel(viewOffset);
+			int boxx = (int) (offsetTile.x * w / game.world.getWidth() / 2);
+			int boxy = (int) (offsetTile.y * h / game.world.getHeight() / 2);
+			int boxw = (int) (getWidth() * w / tileSize / game.world.getWidth());
+			int boxh = (int) (getHeight() * h / tileSize / game.world.getHeight());
+			g.setColor(Color.yellow);
+			g.drawRect(x + boxx, y + boxy, boxw, boxh);
+		}
 	}
 
 	public ConcurrentLinkedQueue<Thing> getSelectedThings() {
@@ -1051,5 +1053,9 @@ public class GameView extends JPanel {
 	
 	public void setCommandInterface(CommandInterface commandInterface) {
 		this.commandInterface = commandInterface;
+	}
+	
+	public Game getGameInstance() {
+		return game;
 	}
 }

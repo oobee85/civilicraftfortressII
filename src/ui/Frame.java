@@ -18,7 +18,6 @@ import world.*;
 public class Frame extends JPanel {
 	public static final Color BACKGROUND_COLOR = new Color(200, 200, 200);
 	public static final int GUIWIDTH = 350;
-	public static final int MINIMAPBORDERWIDTH = 40;
 	
 	public static final int MILLISECONDS_PER_TICK = 100;
 	private static final String TITLE = "civilicraftfortressII";
@@ -47,9 +46,6 @@ public class Frame extends JPanel {
 	private static final ImageIcon NIGHT_DISABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_disabled.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon NIGHT_ENABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_enabled.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon METEOR_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/meteor.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-
-	private static final Image MOON_IMAGE = Utils.loadImage("resources/Images/interfaces/moon.png");
-	private static final Image SUN_IMAGE = Utils.loadImage("resources/Images/interfaces/sun.png");
 	
 	private Timer repaintingThread;
 	private JToggleButton easyModeButton;
@@ -350,97 +346,6 @@ public class Frame extends JPanel {
 			newInfo.setOpaque(false);
 			infoPanel.add(newInfo, BorderLayout.CENTER);
 			infoPanel.validate();
-		});
-	}
-
-	private void setupMinimapPanel() {
-		minimapPanel = new JPanel() {
-			private void drawSunMoon(Graphics g) {
-				int padding = 5;
-				g.setFont(KUIConstants.infoFontSmaller);
-				String dayCounter = "Day: " + gameInstance.getDays() + "   Night: " + gameInstance.getNights();
-				Color temp = g.getColor();
-				g.setColor(Color.white);
-				g.drawString(dayCounter, padding-1, g.getFont().getSize() + padding-1 );
-				g.setColor(Color.black);
-				g.drawString(dayCounter, padding, g.getFont().getSize() + padding );
-				g.setColor(temp);
-				
-				int offset = World.getCurrentDayOffset() + World.TRANSITION_PERIOD;
-				int pathwidth = getWidth() - Frame.MINIMAPBORDERWIDTH;
-				int pathheight = getHeight() - Frame.MINIMAPBORDERWIDTH;
-				int totallength = 2*pathwidth + 2*pathheight;
-				offset = totallength*offset / (World.DAY_DURATION + World.NIGHT_DURATION);
-				int imagesize = Frame.MINIMAPBORDERWIDTH - padding*2;
-				if(offset < pathheight) {
-					g.drawImage(SUN_IMAGE, padding, padding + pathheight - offset, imagesize, imagesize, null);
-					g.drawImage(MOON_IMAGE, padding + pathwidth, padding + offset, imagesize, imagesize, null);
-				}
-				else {
-					offset -= pathheight;
-					if(offset < pathwidth) {
-						g.drawImage(SUN_IMAGE, padding + offset, padding, imagesize, imagesize, null);
-						g.drawImage(MOON_IMAGE, padding + pathwidth - offset, padding + pathheight, imagesize, imagesize, null);
-					}
-					else {
-						offset -= pathwidth;
-						if(offset < pathheight) {
-							g.drawImage(SUN_IMAGE, padding + pathwidth, padding + offset, imagesize, imagesize, null);
-							g.drawImage(MOON_IMAGE, padding, padding + pathheight - offset, imagesize, imagesize, null);
-						}
-						else {
-							offset -= pathheight;
-							if(offset < pathwidth) {
-								g.drawImage(SUN_IMAGE, padding + pathwidth - offset, padding + pathheight, imagesize, imagesize, null);
-								g.drawImage(MOON_IMAGE, padding + offset, padding, imagesize, imagesize, null);
-							}
-							else {
-								offset -= pathwidth;
-								if(offset < pathheight) {
-									g.drawImage(SUN_IMAGE, padding, padding + pathheight - offset, imagesize, imagesize, null);
-									g.drawImage(MOON_IMAGE, padding + pathwidth, padding + offset, imagesize, imagesize, null);
-								}
-							}
-						}
-					}
-				}
-			}
-			@Override
-			public void paintComponent(Graphics g) {
-				super.paintComponent(g);
-				g.setColor(gameInstance.getBackgroundColor());
-				g.fillRect(0, 0, getWidth(), getHeight());
-				drawSunMoon(g);
-				g.fillRect(0, getHeight()*4/5, getWidth(), getHeight() - getHeight()*4/5);
-				g.setColor(Color.black);
-				g.drawRect(0, 0, getWidth(), getHeight());
-				gamepanel.drawMinimap(g, MINIMAPBORDERWIDTH, MINIMAPBORDERWIDTH,
-						minimapPanel.getWidth() - 2 * MINIMAPBORDERWIDTH,
-						minimapPanel.getHeight() - 2 * MINIMAPBORDERWIDTH, gamepanel.getWidth(), gamepanel.getHeight());
-			}
-		};
-		minimapPanel.addMouseListener(new MouseAdapter() {
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				double ratiox = ((double) e.getX() - MINIMAPBORDERWIDTH)
-						/ (minimapPanel.getWidth() - 2 * MINIMAPBORDERWIDTH);
-				double ratioy = ((double) e.getY() - MINIMAPBORDERWIDTH)
-						/ (minimapPanel.getHeight() - 2 * MINIMAPBORDERWIDTH);
-				gamepanel.moveViewTo(ratiox, ratioy, gamepanel.getWidth(), gamepanel.getHeight());
-				frame.repaint();
-			}
-		});
-		minimapPanel.addMouseMotionListener(new MouseMotionAdapter() {
-			@Override
-			public void mouseDragged(MouseEvent e) {
-				double ratiox = ((double) e.getX() - MINIMAPBORDERWIDTH)
-						/ (minimapPanel.getWidth() - 2 * MINIMAPBORDERWIDTH);
-				double ratioy = ((double) e.getY() - MINIMAPBORDERWIDTH)
-						/ (minimapPanel.getHeight() - 2 * MINIMAPBORDERWIDTH);
-				gamepanel.moveViewTo(ratiox, ratioy, gamepanel.getWidth(), gamepanel.getHeight());
-				frame.repaint();
-			}
 		});
 	}
 
@@ -976,8 +881,8 @@ public class Frame extends JPanel {
 			statButtons[i] = button;
 			statView.add(statButtons[i]);
 		}
-		
-		setupMinimapPanel();
+
+		minimapPanel = new MinimapView(gamepanel);
 
 		tabbedPane = new JTabbedPane();
 		tabbedPane.setFocusable(false);

@@ -1,9 +1,12 @@
 package networking.client;
 
+import java.awt.*;
+
 import javax.swing.*;
 
 import networking.view.*;
 import ui.*;
+import ui.Frame;
 import utils.*;
 
 public class ClientDriver {
@@ -13,8 +16,13 @@ public class ClientDriver {
 	private ClientGUI clientGUI = new ClientGUI();
 	
 	public ClientDriver() {
-		frame = new JFrame("Grid Client");
-		frame.setSize(800, 800);
+		frame = new JFrame("civilicraftfortressIII");
+		int HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
+		HEIGHT = Math.min(HEIGHT, 1080);
+		HEIGHT = HEIGHT * 8 / 9;
+		int WIDTH = HEIGHT + Frame.GUIWIDTH;
+		frame.setSize(WIDTH, HEIGHT);
+		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(clientGUI.getMainPanel());
 		
