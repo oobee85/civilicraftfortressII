@@ -101,7 +101,6 @@ public class Game {
 		if(World.ticks%World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			world.updatePlantDamage();
 		}
-		groundModifierTick();
 		
 		
 		if(World.ticks % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
@@ -652,24 +651,6 @@ public class Game {
 		}
 	}
 	
-	private void groundModifierTick() {
-		for(GroundModifier modifier : world.groundModifiers) {
-//			if(modifier.getType() == GroundModifierType.RAIN || modifier.getType() == GroundModifierType.SNOW) {
-//				world.updateRain(modifier);
-//			}
-			if(modifier.updateTime()) {
-				
-//				if(modifier.getType() == GroundModifierType.SNOW) {
-//					Tile tile = modifier.getTile();
-//					if(tile.liquidType != LiquidType.WATER) {
-//						tile.liquidType = LiquidType.WATER;
-//						tile.liquidAmount = 0;
-//					} 
-//					tile.liquidAmount += 0.01;
-//				}
-			}
-		}
-	}
 
 	private boolean canBuild(BuildingType bt, Tile tile) {
 		if(bt.isRoad() && tile.getRoad() != null) {

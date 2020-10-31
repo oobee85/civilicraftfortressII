@@ -163,25 +163,6 @@ public class World {
 		}
 	}
 	
-//	public void updateRain(GroundModifier modifier) {
-//		
-//		if(modifier.getType() == GroundModifierType.RAIN) {
-//			Tile tile = modifier.getTile();
-//			if(tile.liquidType != LiquidType.WATER && tile.liquidAmount > 0) {
-//				tile.liquidAmount /= 10;
-//			}
-//			tile.liquidType = LiquidType.WATER;
-//			tile.liquidAmount += 0.0002;
-//		}
-//		if(modifier.getType() == GroundModifierType.SNOW) {
-//			Tile tile = modifier.getTile();
-//			if(tile.liquidType != LiquidType.SNOW && tile.liquidAmount > 0) {
-//				tile.liquidAmount /= 10;
-//			}
-//			tile.liquidType = LiquidType.SNOW;
-//			tile.liquidAmount += 0.001;
-//		}
-//	}
 	public void rain() {
 		
 		//makes it so that it doesnt spawn the center of rain in deserts or on the volcano
@@ -202,7 +183,7 @@ public class World {
 			Tile targetTile = get(target);
 			
 			double temperature = t.getTempurature();
-			WeatherEvent weather = new WeatherEvent(t, targetTile, t.getLocation().distanceTo(target) + (int)(Math.random()*50), 0.00002, LiquidType.WATER);;
+			WeatherEvent weather = new WeatherEvent(t, targetTile, t.getLocation().distanceTo(target)*2 + (int)(Math.random()*50), 0.00002, LiquidType.WATER);;
 			newWeatherEvents.add(weather);
 			t.setWeather(weather);
 		}
@@ -379,25 +360,9 @@ public class World {
 			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
 				
 				if(distanceFromCenter < radius) {
-					if(t.getTerrain() != Terrain.ROCK && t.getTerrain() != Terrain.VOLCANO) {
-//						tile.setTerrain(Terrain.BURNED_GROUND);
-					}
-//					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
-//					addGroundModifier(fire);
-//					t.setModifier(fire);
 					Projectile wave = new Projectile(ProjectileType.METEOR_WAVE, tile, t, null);
 					tile.addProjectile(wave);
 					projectiles.add(wave);
-//					if(t.getHasBuilding() == true) {
-//						t.getBuilding().takeDamage(damage);
-//					}
-//					for(Unit unit : t.getUnits()) {
-//						unit.takeDamage(damage);
-//					}
-//					if(t.getPlant() != null) {
-//						t.getPlant().takeDamage(damage);
-//					}
-//					t.liquidAmount = 0;
 				}
 		}
 	}
@@ -565,32 +530,17 @@ public class World {
 		}
 	}
 	public void doWeatherUpdate() {
-//		if(modifier.getType() == GroundModifierType.RAIN) {
-//			Tile tile = modifier.getTile();
-//			if(tile.liquidType != LiquidType.WATER && tile.liquidAmount > 0) {
-//				tile.liquidAmount /= 10;
-//			}
-//			tile.liquidType = LiquidType.WATER;
-//			tile.liquidAmount += 0.0002;
-//		}
-//		if(modifier.getType() == GroundModifierType.SNOW) {
-//			Tile tile = modifier.getTile();
-//			if(tile.liquidType != LiquidType.SNOW && tile.liquidAmount > 0) {
-//				tile.liquidAmount /= 10;
-//			}
-//			tile.liquidType = LiquidType.SNOW;
-//			tile.liquidAmount += 0.001;
-//		}
 		for(WeatherEvent weather : weatherEvents) {
 			weather.tick();
 			Tile tile = weather.getTile();
-//			if(tile.liquidType != weather.getLiquidType() && tile.liquidAmount > 0) {
-//				tile.liquidAmount /= 10;
-//			}
+			if(tile.liquidType == LiquidType.LAVA) {
+				continue;
+			}
+			if(tile.liquidType != weather.getLiquidType() && tile.liquidAmount > 0.005) {
+				tile.liquidAmount /= 5;
+			}
 			tile.liquidType = weather.getLiquidType();
 			tile.liquidAmount += weather.getStrength();
-//			tile.liquidType = LiquidType.WATER;
-//			tile.liquidAmount += 10;
 			
 			if(weather.getTargetTile() == null) {
 				continue;

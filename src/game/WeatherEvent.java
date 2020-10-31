@@ -38,6 +38,9 @@ public class WeatherEvent implements HasImage{
 		this.isCold = false;
 		
 	}
+	public int getSpeed() {
+		return speed;
+	}
 	public double getStrength() {
 		return strength;
 	}
@@ -48,6 +51,7 @@ public class WeatherEvent implements HasImage{
 		if(timeToMove > 0) {
 			timeToMove -= 1;
 		}
+		
 		isCold = tile.isCold();
 		if(isCold == true) {
 			this.hasImage = WeatherEventType.SNOW;
