@@ -340,6 +340,10 @@ public final class Utils {
 				}
 				return null;
 			}
+			@Override
+			public void stop(Unit unit) {
+				unit.clearPlannedActions();
+			}
 		};
 	}
 }

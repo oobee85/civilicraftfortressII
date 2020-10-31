@@ -220,6 +220,11 @@ public class Server {
 				}
 			}
 		}
+		else if(message.getCommand() == CommandType.STOP) {
+			if(thing instanceof Unit) {
+				gui.getCommandInterface().stop((Unit)thing);
+			}
+		}
 	}
 	
 	private void startGame() {

@@ -83,6 +83,11 @@ public class Client {
 				localCommands.moveTo(unit, target, clearQueue);
 				return null;
 			}
+			@Override
+			public void stop(Unit unit) {
+				sendMessage(CommandMessage.makeStopCommand(unit.id()));
+				localCommands.stop(unit);
+			}
 		};
 	}
 	public void sendMessage(Object message) {

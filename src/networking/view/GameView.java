@@ -160,13 +160,20 @@ public class GameView extends JPanel {
 					deselectEverything();
 				}
 				else if (e.getKeyCode() == KeyEvent.VK_S) {
-					game.unitStop(selectedThings);
+					unitStop();
 				}
 				else if(e.getKeyCode() == KeyEvent.VK_M) {
 					setBuildingToPlan(Game.buildingTypeMap.get("MINE"));
 				}
 			}
 		});
+	}
+	public void unitStop() {
+		for (Thing thing : selectedThings) {
+			if (thing instanceof Unit) {
+				commandInterface.stop((Unit)thing);
+			}
+		}
 	}
 	public void tryToBuildUnit(UnitType u) {
 		game.tryToBuildUnit(selectedThings, u);

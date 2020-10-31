@@ -614,14 +614,6 @@ public class Game {
 		guiController.selectedSpawnUnit(show);
 	}
 	
-	public void unitStop(ConcurrentLinkedQueue<Thing> selectedThings) {
-		for (Thing thing : selectedThings) {
-			if (thing instanceof Unit) {
-				((Unit) thing).clearPlannedActions();
-			}
-		}
-	}
-	
 	private void unitTick() {
 		Iterator<Unit> it = world.units.descendingIterator();
 		while(it.hasNext()) {

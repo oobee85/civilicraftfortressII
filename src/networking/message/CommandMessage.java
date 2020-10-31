@@ -61,6 +61,12 @@ public class CommandMessage implements Externalizable {
 		msg.type = buildingType;
 		return msg;
 	}
+	public static CommandMessage makeStopCommand(int thingID) {
+		CommandMessage msg = new CommandMessage();
+		msg.command = CommandType.STOP;
+		msg.thingID = thingID;
+		return msg;
+	}
 
 	public CommandType getCommand() {
 		return command;

@@ -10,4 +10,5 @@ public interface CommandInterface {
 	public void attackThing(Unit unit, Thing target, boolean clearQueue);
 	public void buildThing(Unit unit, Thing target, boolean clearQueue);
 	public Building planBuilding(Unit unit, Tile target, boolean clearQueue, BuildingType buildingType);
+	public void stop(Unit unit);
 }
