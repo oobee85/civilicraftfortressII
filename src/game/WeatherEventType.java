@@ -11,14 +11,21 @@ import utils.Utils;
 
 public enum WeatherEventType implements HasImage{
 
-	RAIN("resources/Images/ground_modifiers/rain.png"),
-	SNOW("resources/Images/ground_modifiers/snow.png"),
+	RAIN("resources/Images/weather/rain.png", 4),
+	SNOW("resources/Images/weather/snow.png", 4),
+	WIND("resources/Images/weather/wind.png", 4),
+	HAIL("resources/Images/weather/hail.png", 4),
 	;
 	
 	private MipMap mipmap;
+	private int speed;
 	
-	WeatherEventType(String s){
+	WeatherEventType(String s, int speed){
 		mipmap = new MipMap(s);
+		this.speed = speed;
+	}
+	public int getSpeed() {
+		return speed;
 	}
 	
 	@Override

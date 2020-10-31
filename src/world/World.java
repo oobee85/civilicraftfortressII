@@ -183,7 +183,7 @@ public class World {
 			Tile targetTile = get(target);
 			
 			double temperature = t.getTempurature();
-			WeatherEvent weather = new WeatherEvent(t, targetTile, t.getLocation().distanceTo(target)*2 + (int)(Math.random()*50), 0.00002, LiquidType.WATER);;
+			WeatherEvent weather = new WeatherEvent(t, targetTile, t.getLocation().distanceTo(target)*WeatherEventType.RAIN.getSpeed() + (int)(Math.random()*50), 0.00002, LiquidType.WATER);;
 			newWeatherEvents.add(weather);
 			t.setWeather(weather);
 		}
@@ -351,7 +351,7 @@ public class World {
 
 	}
 	public void spawnExplosionCircle(Tile tile, int radius, int damage) {
-
+		
 		for(Tile t : this.getTiles()) {
 			int i =  t.getLocation().x();
 			int j =  t.getLocation().y();
@@ -561,25 +561,25 @@ public class World {
 			if (projectile.readyToMove()) {
 				projectile.moveToTarget();
 				if(projectile.getType().getGroundModifierType() != null) {
-					GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), (int)projectile.getType().getDamage()/5);
+					GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), (int)projectile.getDamage()/5);
 					projectile.getTile().setModifier(gm);
 					addGroundModifier(gm);
 				}
 			}
 			if(projectile.reachedTarget()) {
 				if(projectile.getType().isExplosive()) {
-					spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getType().getDamage());
+					spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getDamage());
 				} 
 				else {
 					for(Unit unit : projectile.getTile().getUnits()) {
-						unit.takeDamage(projectile.getType().getDamage());
+						unit.takeDamage(projectile.getDamage());
 						unit.aggro(projectile.getSource());
 					}
 					if(projectile.getTile().getPlant() != null) {
-						projectile.getTile().getPlant().takeDamage(projectile.getType().getDamage());
+						projectile.getTile().getPlant().takeDamage(projectile.getDamage());
 					}
 					if(projectile.getTile().hasBuilding() == true) {
-						projectile.getTile().getBuilding().takeDamage(projectile.getType().getDamage());
+						projectile.getTile().getBuilding().takeDamage(projectile.getDamage());
 					}
 				}
 			}

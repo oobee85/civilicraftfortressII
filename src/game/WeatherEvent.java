@@ -20,7 +20,7 @@ public class WeatherEvent implements HasImage{
 	private Tile targetTile;
 	private int duration;
 	private double timeToMove;
-	private int speed = 2;
+	private int speed;
 	private HasImage hasImage;
 	private LiquidType liquidType;
 	private MipMap mipmap;
@@ -36,6 +36,7 @@ public class WeatherEvent implements HasImage{
 		this.liquidType = liquidType;
 		this.hasImage = WeatherEventType.RAIN;
 		this.isCold = false;
+		this.speed = WeatherEventType.RAIN.getSpeed();
 		
 	}
 	public int getSpeed() {

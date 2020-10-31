@@ -3,7 +3,7 @@
 	{
 		"image":"resources/Images/buildings/stone_road.png",
 		"vision":0,
-		"movespeed":4,
+		"movespeed":10,
 		"cost":{"STONE":10},
 		"culture":0,
 		"name":"STONE_ROAD",
@@ -14,7 +14,7 @@
 	{
 		"image":"resources/Images/buildings/brick_road.png",
 		"vision":0,
-		"movespeed":20,
+		"movespeed":100,
 		"cost":{"STONE":100},
 		"culture":0,
 		"name":"BRICK_ROAD",

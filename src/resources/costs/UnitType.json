@@ -10,7 +10,7 @@
 	{
 		"image":"resources/Images/units/warrior.png",
 		"cost":{"WOOD":50,"FOOD":50},
-		"stats":{"movespeed":15,"attackspeed":30,"attack":10,"buildtime":50,"range":1,"health":100,"healspeed":50},
+		"stats":{"movespeed":20,"attackspeed":30,"attack":10,"buildtime":100,"range":1,"health":100,"healspeed":50},
 		"name":"WARRIOR",
 		"attributes":["hostile"],
 		"targeting":[{"type":"game.Unit"}]

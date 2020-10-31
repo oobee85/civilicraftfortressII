@@ -58,7 +58,7 @@ public class Game {
 		
 
 		// rain event
-		if(Math.random() < 0.008) {
+		if(Math.random() < 0.004) {
 			world.rain();
 		}
 		if(Math.random() < 0.01) {

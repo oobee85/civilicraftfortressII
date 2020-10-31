@@ -21,7 +21,7 @@ public class Projectile implements HasImage {
 	
 	private int damageBuff;
 	private Unit source;
-	
+	private int damage;
 	private int totalDistance;
 	public int currentHeight = 0;
 	
@@ -33,9 +33,13 @@ public class Projectile implements HasImage {
 		this.damageBuff = 0;
 		this.source = source;
 		this.timeToMove = type.getSpeed();
+		this.damage = type.getDamage();
 		totalDistance = tile.getLocation().distanceTo(targetTile.getLocation());
 	}
 	
+	public int getDamage() {
+		return damage;
+	}
 	public int getHeight() {
 		return currentHeight;
 	}
