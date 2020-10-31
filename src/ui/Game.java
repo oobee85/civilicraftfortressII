@@ -525,19 +525,6 @@ public class Game {
 		}
 	}
 	
-	public void craftItem(ItemType type, int amount) {
-		BuildingType requiredBuilding = Game.buildingTypeMap.get(type.getBuilding());
-		for(Building building : world.buildings) {
-			if(building.getType() == requiredBuilding && building.getFaction() == World.PLAYER_FACTION) {
-				for(int i = 0; i < amount && World.PLAYER_FACTION.canAfford(type.getCost()); i++) {
-					World.PLAYER_FACTION.payCost(type.getCost());
-					World.PLAYER_FACTION.addItem(type, 1);
-				}
-				return;
-			}
-		}
-	}
-	
 	public Thing summonThing(Tile tile, HasImage thingType, Faction faction) {
 		
 		if(thingType instanceof UnitType) {
@@ -693,7 +680,7 @@ public class Game {
 				return;
 			}
 			World.PLAYER_FACTION.payCost(u.getCost());
-			tile.getBuilding().setBuildingUnit(unit);
+			tile.getBuilding().setProducingUnit(unit);
 			System.out.println("built " + u);
 		}
 	}

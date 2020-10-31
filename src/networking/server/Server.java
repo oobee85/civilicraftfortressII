@@ -233,6 +233,14 @@ public class Server {
 				}
 			}
 		}
+		else if(message.getCommand() == CommandType.CRAFT_ITEM) {
+			if(message.getFaction() >= 0 && message.getFaction() < World.factions.length) {
+				ItemType itemType = ItemType.valueOf(message.getType());
+				if(itemType != null) {
+					gui.getCommandInterface().craftItem(World.factions[message.getFaction()], itemType);
+				}
+			}
+		}
 	}
 	
 	private void startGame() {

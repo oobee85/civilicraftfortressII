@@ -187,9 +187,6 @@ public class GameView extends JPanel {
 	public void toggleGuarding() {
 		game.toggleGuarding(selectedThings);
 	}
-	public void workerRoad(BuildingType type) {
-		workerRoad(selectedThings, type);
-	}
 	
 	public void setDrawDebugStrings(boolean enabled) {
 		drawDebugStrings = enabled;
@@ -327,7 +324,7 @@ public class GameView extends JPanel {
 		}
 	}
 	
-	public void workerRoad(ConcurrentLinkedQueue<Thing> selectedThings, BuildingType type) {
+	public void workerRoad(BuildingType type) {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;

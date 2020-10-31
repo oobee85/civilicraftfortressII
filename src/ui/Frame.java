@@ -133,7 +133,7 @@ public class Frame extends JPanel {
 			}
 			@Override
 			public void tryToCraftItem(ItemType type, int amount) {
-				gameInstance.craftItem(type, amount);
+				World.PLAYER_FACTION.craftItem(type, amount, gameInstance.world.buildings);
 			}
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {
@@ -698,7 +698,7 @@ public class Frame extends JPanel {
 				if((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
 					amount = 10;
 				}
-				gameInstance.craftItem(type, amount);
+				World.PLAYER_FACTION.craftItem(type, amount, gameInstance.world.buildings);
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ItemTypeInfoPanel(type));
@@ -736,7 +736,7 @@ public class Frame extends JPanel {
 				if((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
 					amount = 10;
 				}
-				gameInstance.craftItem(type, amount);
+				World.PLAYER_FACTION.craftItem(type, amount, gameInstance.world.buildings);
 			});
 			button.addRightClickActionListener(e -> {
 				switchInfoPanel(new ItemTypeInfoPanel(type));

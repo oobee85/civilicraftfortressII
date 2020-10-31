@@ -348,6 +348,10 @@ public final class Utils {
 			public void research(Faction faction, ResearchType researchType) {
 				faction.setResearchTarget(researchType);
 			}
+			@Override
+			public void craftItem(Faction faction, ItemType itemType) {
+				faction.craftItem(itemType, 1, game.world.buildings);
+			}
 		};
 	}
 }

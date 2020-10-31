@@ -93,6 +93,11 @@ public class Client {
 				sendMessage(CommandMessage.makeResearchCommand(faction.id, researchType.name()));
 				localCommands.research(faction, researchType);
 			}
+			@Override
+			public void craftItem(Faction faction, ItemType itemType) {
+				sendMessage(CommandMessage.makeCraftItemCommand(faction.id, itemType.name()));
+				localCommands.craftItem(faction, itemType);
+			}
 		};
 	}
 	public void sendMessage(Object message) {

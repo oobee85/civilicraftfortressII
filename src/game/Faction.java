@@ -149,6 +149,19 @@ public class Faction implements Serializable {
 		attacked = attackedNew;
 	}
 	
+	public void craftItem(ItemType type, int amount, LinkedList<Building> buildings) {
+		BuildingType requiredBuilding = Game.buildingTypeMap.get(type.getBuilding());
+		for(Building building : buildings) {
+			if(building.getType() == requiredBuilding && building.getFaction() == this) {
+				for(int i = 0; i < amount && canAfford(type.getCost()); i++) {
+					payCost(type.getCost());
+					addItem(type, 1);
+				}
+				return;
+			}
+		}
+	}
+	
 	public boolean usesItems() {
 		return usesItems;
 	}

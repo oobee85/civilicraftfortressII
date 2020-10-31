@@ -70,7 +70,15 @@ public class CommandMessage implements Externalizable {
 	public static CommandMessage makeResearchCommand(int factionID, String researchType) {
 		CommandMessage msg = new CommandMessage();
 		msg.command = CommandType.RESEARCH;
+		msg.faction = factionID;
 		msg.type = researchType;
+		return msg;
+	}
+	public static CommandMessage makeCraftItemCommand(int factionID, String itemType) {
+		CommandMessage msg = new CommandMessage();
+		msg.command = CommandType.CRAFT_ITEM;
+		msg.faction = factionID;
+		msg.type = itemType;
 		return msg;
 	}
 
