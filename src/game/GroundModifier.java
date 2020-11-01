@@ -43,6 +43,16 @@ public class GroundModifier implements Serializable {
 	public Tile getTile() {
 		return tile;
 	}
-	
-	
+	public boolean isCold() {
+//		if(gmt == GroundModifierType.SNOW) {
+//			return true;
+//		}
+		return false;
+	}
+	public boolean isHot() {
+		if(type == GroundModifierType.FIRE) {
+			return true;
+		}
+		return false;
+	}
 }

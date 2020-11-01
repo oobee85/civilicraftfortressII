@@ -101,7 +101,7 @@ public class Liquid {
 				if(tile.getTerrain().isPlantable(tile.getTerrain())) {
 					tile.setTerrain(Terrain.BURNED_GROUND);
 				}
-				if(tile.getModifier() != null && tile.getModifier().getType().isCold(tile.getModifier().getType())) {
+				if(tile.getModifier() != null && tile.getModifier().isCold()) {
 					tile.getModifier().finish();
 				}
 			}

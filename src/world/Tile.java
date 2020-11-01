@@ -62,19 +62,23 @@ public class Tile implements Serializable {
 	}
 	public void updateHumidity(int currentTick) {
 		if(liquidType == LiquidType.WATER || liquidType == LiquidType.ICE ||  liquidType == LiquidType.SNOW) {
-			humidity += 2/(humidity + liquidAmount);
-			
+			if(liquidAmount > 0) {
+				humidity += Math.sqrt(liquidAmount);
+			}
+		}
+		if(modifier != null && modifier.isHot()) {
+			humidity -= 1;
 		}
 		if(liquidType == LiquidType.LAVA) {
 			humidity = 0;
 		}
 		
-		humidity -= 0.01;
+		humidity *= 0.99;
 		if(humidity < 0) {
 			humidity = 0;
 		}
-		if(humidity > 20) {
-			humidity = 20;
+		if(humidity > 100) {
+			humidity = 100;
 		}
 	}
 	

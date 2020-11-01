@@ -19,7 +19,7 @@ public class World {
 
 	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 10;
 	public static final double TERRAIN_SNOW_LEVEL = 1;
-	public static final double DESERT_HUMIDITY = 2;
+	public static final double DESERT_HUMIDITY = 1;
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
 	public static final int TRANSITION_PERIOD = 100;
@@ -430,6 +430,12 @@ public class World {
 				}
 				
 			}
+//			if(tile.checkTerrain(Terrain.GRASS) && tile.getHumidity() < DESERT_HUMIDITY) {
+//				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+//					tile.setTerrain(Terrain.DIRT);
+//				}
+//				
+//			}
 			
 			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA 
 //					&& (tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.FIRE)

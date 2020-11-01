@@ -38,12 +38,7 @@ public enum GroundModifierType implements HasImage{
 	public double getBrightness() {
 		return brightness;
 	}
-	public boolean isCold(GroundModifierType gmt) {
-//		if(gmt == GroundModifierType.SNOW) {
-//			return true;
-//		}
-		return false;
-	}
+	
 
 	@Override
 	public Image getImage(int size) {
