@@ -53,7 +53,6 @@ public class Frame extends JPanel {
 	private InfoPanelView infoPanelView;
 	private ProduceUnitView makeUnitView;
 	private JPanel blacksmithView;
-	private JPanel hellforgeView;
 	private WorkerView workerMenu;
 	private JPanel spawnMenu;
 	private ResearchView researchView;
@@ -69,7 +68,6 @@ public class Frame extends JPanel {
 	private int WORKER_TAB;
 	private int RESEARCH_TAB;
 	private int BLACKSMITH_TAB;
-	private int HELLFORGE_TAB;
 	private int DEBUG_TAB;
 	private int MAKE_UNIT_TAB;
 	private int SPAWN_TAB;
@@ -131,7 +129,8 @@ public class Frame extends JPanel {
 					manageBlacksmithTab(selected);
 				}
 				if (building.getType() == Game.buildingTypeMap.get("HELLFORGE")) {
-					manageHellforgeTab(selected);
+//					manageHellforgeTab(selected);
+					manageBlacksmithTab(selected);
 				}
 				if (building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
 					manageResearchLabTab(selected);
@@ -181,16 +180,22 @@ public class Frame extends JPanel {
 				researchView.updateButtons(gameInstance.world);
 				workerMenu.updateButtons();
 				makeUnitView.updateButtons();
+
+				boolean blacksmithSelected = World.PLAYER_FACTION.isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("BLACKSMITH"));
+				boolean hellforgeSelected = World.PLAYER_FACTION.isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("HELLFORGE"));
 				for (int i = 0; i < ItemType.values().length; i++) {
 					ItemType type = ItemType.values()[i];
 					if (type.getCost() == null) {
 						continue;
 					}
 					JButton button = craftButtons[i];
-					if (World.PLAYER_FACTION.areRequirementsMet(type)) {
+					if(World.PLAYER_FACTION.areRequirementsMet(type)
+							&& (Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("BLACKSMITH") && blacksmithSelected)
+							|| (Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("HELLFORGE") && hellforgeSelected)) {
 						button.setEnabled(true);
 						button.setVisible(true);
-					} else {
+					}
+					else {
 						button.setEnabled(false);
 						button.setVisible(false);
 					}
@@ -285,14 +290,6 @@ public class Frame extends JPanel {
 			tabbedPane.setSelectedIndex(BLACKSMITH_TAB);
 		}
 		tabbedPane.setEnabledAt(BLACKSMITH_TAB, enabled);
-	}
-	private void manageHellforgeTab(boolean enabled) {
-		if (enabled == false && tabbedPane.getSelectedIndex() == HELLFORGE_TAB) {
-			tabbedPane.setSelectedIndex(0);
-		} else if (enabled == true) {
-			tabbedPane.setSelectedIndex(HELLFORGE_TAB);
-		}
-		tabbedPane.setEnabledAt(HELLFORGE_TAB, enabled);
 	}
 	
 	private void manageResearchLabTab(boolean enabled) {
@@ -405,9 +402,9 @@ public class Frame extends JPanel {
 			if (type.getCost() == null) {
 				continue;
 			}
-			if(Game.buildingTypeMap.get(type.getBuilding()) != blacksmithType) {
-				continue;
-			}
+//			if(Game.buildingTypeMap.get(type.getBuilding()) != blacksmithType) {
+//				continue;
+//			}
 			KButton button = KUIConstants.setupButton(type.toString(),
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
 					BUILDING_BUTTON_SIZE);
@@ -436,48 +433,6 @@ public class Frame extends JPanel {
 			blacksmithView.add(button);
 		}
 		
-		hellforgeView = new JPanel();
-		BuildingType hellforgeType = Game.buildingTypeMap.get("HELLFORGE");
-		for (int i = 0; i < ItemType.values().length; i++) {
-			final ItemType type = ItemType.values()[i];
-			if (type.getCost() == null) {
-				continue;
-			}
-			if(Game.buildingTypeMap.get(type.getBuilding()) != hellforgeType) {
-				continue;
-			}
-			KButton button = KUIConstants.setupButton(type.toString(),
-					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
-					BUILDING_BUTTON_SIZE);
-			button.setEnabled(false);
-			button.addActionListener(e -> {
-				int amount = 1;
-				if((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
-					amount = 10;
-				}
-				World.PLAYER_FACTION.craftItem(type, amount, gameInstance.world.buildings);
-			});
-			button.addRightClickActionListener(e -> {
-				infoPanelView.switchInfoPanel(new ItemTypeInfoPanel(type));
-			});
-			button.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					infoPanelView.pushInfoPanel(new ItemTypeInfoPanel(type));
-				}
-				@Override
-				public void mouseExited(MouseEvent e) {
-					infoPanelView.popInfoPanel();
-				}
-			});
-
-			craftButtons[i] = button;
-			hellforgeView.add(button);
-		}
-
-//		barracksView = new JPanel();
-//		buttons = populateUnitTypeUI(barracksView, BUILDING_ICON_SIZE);
-//		Collections.addAll(unitButtons, buttons);
 
 		JPanel buttonPanel = new JPanel();
 
@@ -681,10 +636,7 @@ public class Frame extends JPanel {
 		tabbedPane.insertTab(null, MAKE_UNIT_TAB_ICON, makeUnitView.getRootPanel(), "Make units from castles, barracks, or workshops", MAKE_UNIT_TAB);
 
 		BLACKSMITH_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, blacksmithView, "Craft items up to mithril", BLACKSMITH_TAB);
-
-		HELLFORGE_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab(null,HELLFORGE_TAB_ICON, hellforgeView, "Craft items adamantite and above", HELLFORGE_TAB);
+		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, blacksmithView, "Craft items", BLACKSMITH_TAB);
 		
 		SPAWN_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab(null, SPAWN_TAB_ICON, spawnMenu, "Summon units for testing", SPAWN_TAB);
@@ -697,7 +649,6 @@ public class Frame extends JPanel {
 		// disable building tab after setting all of the tabs up
 		manageBuildingTab(false);
 		manageBlacksmithTab(false);
-		manageHellforgeTab(false);
 		manageResearchLabTab(false);
 		manageMakeUnitTab(false);
 		manageSpawnTab(true);
