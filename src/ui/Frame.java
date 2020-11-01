@@ -55,7 +55,7 @@ public class Frame extends JPanel {
 	private ProduceUnitView makeUnitView;
 	private CraftingView blacksmithView;
 	private WorkerView workerMenu;
-	private JPanel spawnMenu;
+	private SpawnUnitsView spawnMenu;
 	private ResearchView researchView;
 	private JTabbedPane tabbedPane;
 	private JPanel guiSplitter;
@@ -322,64 +322,7 @@ public class Frame extends JPanel {
 		}
 
 		workerMenu = new WorkerView(gamepanel);
-		
-		spawnMenu = new JPanel();
-		for (int i = 0; i < Game.unitTypeList.size(); i++) {
-			UnitType type = Game.unitTypeList.get(i);
-			KButton button = KUIConstants.setupButton(null,
-					Utils.resizeImageIcon(type.getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width), (int)(SPAWN_BUTTON_SIZE.height)),
-					SPAWN_BUTTON_SIZE);
-			button.setBorder(KUIConstants.tinyBorder);
-			button.addActionListener(e -> {
-				gamepanel.setThingToSpawn(type);
-			});
-			button.addRightClickActionListener(e -> {
-				infoPanelView.switchInfoPanel(new UnitTypeInfoPanel(type, gamepanel.getFaction()));
-			});
-			button.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					infoPanelView.pushInfoPanel(new UnitTypeInfoPanel(type, gamepanel.getFaction()));
-				}
-				@Override
-				public void mouseExited(MouseEvent e) {
-					infoPanelView.popInfoPanel();
-				}
-			});
-			spawnMenu.add(button);
-		}
-		for (int i = 0; i < Game.buildingTypeList.size(); i++) {
-			BuildingType type = Game.buildingTypeList.get(i);
-			KButton button = KUIConstants.setupButton(null,
-					Utils.resizeImageIcon(type.getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width), (int)(SPAWN_BUTTON_SIZE.height)),
-					SPAWN_BUTTON_SIZE);
-			button.setBorder(KUIConstants.tinyBorder);
-			button.addActionListener(e -> {
-				gamepanel.setThingToSpawn(type);
-			});
-			button.addRightClickActionListener(e -> {
-				infoPanelView.switchInfoPanel(new BuildingTypeInfoPanel(type, gamepanel.getFaction()));
-			});
-			button.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					infoPanelView.pushInfoPanel(new BuildingTypeInfoPanel(type, gamepanel.getFaction()));
-				}
-				@Override
-				public void mouseExited(MouseEvent e) {
-					infoPanelView.popInfoPanel();
-				}
-			});
-//			buildingButtons[i] = button;
-			spawnMenu.add(button);
-		}
-		JToggleButton toggle = KUIConstants.setupToggleButton("Non-playerControlled", null, DEBUG_BUTTON_SIZE);
-		toggle.addActionListener(e -> {
-			toggle.setText(!toggle.isSelected() ? "Non-playerControlled" : "playerControlled");
-			gamepanel.setSummonPlayerControlled(!toggle.isSelected());
-		});
-		spawnMenu.add(toggle);
-		
+		spawnMenu = new SpawnUnitsView(gamepanel);
 		makeUnitView = new ProduceUnitView(gamepanel);
 		blacksmithView = new CraftingView(gamepanel);
 		
@@ -562,7 +505,7 @@ public class Frame extends JPanel {
 		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, blacksmithView.getRootPanel(), "Craft items", BLACKSMITH_TAB);
 		
 		SPAWN_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab(null, SPAWN_TAB_ICON, spawnMenu, "Summon units for testing", SPAWN_TAB);
+		tabbedPane.insertTab(null, SPAWN_TAB_ICON, spawnMenu.getRootPanel(), "Summon units for testing", SPAWN_TAB);
 
 		DEBUG_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab(null,

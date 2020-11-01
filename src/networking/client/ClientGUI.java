@@ -21,7 +21,8 @@ public class ClientGUI {
 	private static final ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon PRODUCE_UNIT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/barracks.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	
+	private static final ImageIcon SPAWN_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/spawn_tab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+
 	private static final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(200, 40);
 
 	
@@ -52,10 +53,12 @@ public class ClientGUI {
 	private int WORKER_TAB;
 	private int PRODUCE_UNIT_TAB;
 	private int CRAFTING_TAB;
+	private int SPAWN_UNITS_TAB;
 	private ResearchView researchView;
 	private WorkerView workerView;
 	private ProduceUnitView produceUnitView;
 	private CraftingView craftingView;
+	private SpawnUnitsView spawnUnitsView;
 	
 	public ClientGUI() {
 		rootPanel = new JPanel();
@@ -259,6 +262,10 @@ public class ClientGUI {
 		craftingView = new CraftingView(gameView);
 		CRAFTING_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, craftingView.getRootPanel(), "Craft items", CRAFTING_TAB);
+		
+		spawnUnitsView = new SpawnUnitsView(gameView);
+		SPAWN_UNITS_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab(null, SPAWN_TAB_ICON, spawnUnitsView.getRootPanel(), "Summon units for testing", SPAWN_UNITS_TAB);
 		
 		
 		// disable building tab after setting all of the tabs up
