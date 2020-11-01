@@ -29,6 +29,8 @@ public class Client {
 	private CommandInterface networkingCommands;
 	private volatile Object updatedTerrain = new Object();
 	private HashMap<Integer, Thing> things = new HashMap<>();
+	
+	private volatile boolean isFastForwarding;
 
 	public Client() {
 		gameInstance = new Game(new GUIController() {
@@ -95,6 +97,10 @@ public class Client {
 			@Override
 			public void research(ResearchType researchType) {
 				clientGUI.getGameView().getCommandInterface().research(clientGUI.getGameView().getFaction(), researchType);
+			}
+			@Override
+			public void setFastForwarding(boolean enabled) {
+				isFastForwarding = enabled;
 			}
 		});
 		localCommands = Utils.makeFunctionalCommandInterface(gameInstance);
@@ -168,7 +174,7 @@ public class Client {
 					}
 					long elapsed = System.currentTimeMillis() - start;
 					long sleeptime = Frame.MILLISECONDS_PER_TICK - elapsed;
-					if(sleeptime > 0 /*&& !isFastForwarding*/) {
+					if(sleeptime > 0 && !isFastForwarding) {
 						Thread.sleep(sleeptime);
 					}
 				}

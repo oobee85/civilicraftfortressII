@@ -32,19 +32,11 @@ public class Frame extends JPanel {
 	private static final int TAB_ICON_SIZE = 25;
 	private static final ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon MAKE_UNIT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/barracks.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private static final ImageIcon HELLFORGE_TAB_ICON = Utils.resizeImageIcon(Game.buildingTypeMap.get("HELLFORGE").getImageIcon(0), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private static final ImageIcon SHADOW_WORD_DEATH = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/soyouhavechosendeath.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon SPAWN_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/spawn_tab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-
-	private static final ImageIcon FAST_FORWARD_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/fastforward.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-	private static final ImageIcon RAIN_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/rain.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-	private static final ImageIcon ERUPTION_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/erupt.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-	private static final ImageIcon CHANGE_FACTION_ICON = Utils.resizeImageIcon(Game.unitTypeMap.get("CYCLOPS").getImageIcon(DEBUG_BUTTON_SIZE.height-5), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-	private static final ImageIcon NIGHT_DISABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_disabled.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-	private static final ImageIcon NIGHT_ENABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_enabled.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-	private static final ImageIcon METEOR_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/meteor.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private static final ImageIcon DEBUG_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	
 	
 	private JFrame frame;
 	private JPanel mainMenuPanel;
@@ -59,7 +51,6 @@ public class Frame extends JPanel {
 	private ResearchView researchView;
 	private JTabbedPane tabbedPane;
 	private JPanel guiSplitter;
-	private JPanel resourcePanel;
 	private JToggleButton easyModeButton;
 	
 	private JTextField mapSize;
@@ -183,6 +174,10 @@ public class Frame extends JPanel {
 				blacksmithView.updateButtons();
 
 				frame.repaint();
+			}
+			@Override
+			public void setFastForwarding(boolean enabled) {
+				isFastForwarding = true;
 			}
 
 		};
@@ -326,164 +321,7 @@ public class Frame extends JPanel {
 		makeUnitView = new ProduceUnitView(gamepanel);
 		blacksmithView = new CraftingView(gamepanel);
 		
-		JPanel buttonPanel = new JPanel();
-
-		JToggleButton showHeightMap = KUIConstants.setupToggleButton("Show Height Map", null, DEBUG_BUTTON_SIZE);
-		showHeightMap.addActionListener(e -> {
-			showHeightMap.setText(showHeightMap.isSelected() ? "Hide Height Map" : "Show Height Map");
-			gamepanel.setShowHeightMap(showHeightMap.isSelected());
-		});
-
-		JToggleButton flipTable = KUIConstants.setupToggleButton("Flip Table", null, DEBUG_BUTTON_SIZE);
-		flipTable.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.flipTable();
-				flipTable.setText(flipTable.isSelected() ? "Unflip Table" : "Flip Table");
-			}
-		});
-
-		JToggleButton spawnUnit = KUIConstants.setupToggleButton("Enable Spawn Unit", null, DEBUG_BUTTON_SIZE);
-		spawnUnit.addActionListener(e -> {
-			spawnUnit.setText(spawnUnit.isSelected() ? "Disable Spawn Unit" : "Enable Spawn Unit");
-			gameInstance.spawnUnit(spawnUnit.isSelected());
-		});
-
-		JButton eruptVolcano = KUIConstants.setupButton("Erupt Volcano", ERUPTION_ICON, DEBUG_BUTTON_SIZE);
-		eruptVolcano.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.eruptVolcano();
-			}
-		});
-		
-		JButton addResources = KUIConstants.setupButton("Give Resources", null, DEBUG_BUTTON_SIZE);
-		addResources.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.addResources(gamepanel.getFaction());
-			}
-		});
-
-		JButton makeItRain = KUIConstants.setupButton("Rain", RAIN_ICON, DEBUG_BUTTON_SIZE);
-		makeItRain.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.world.rain();
-				gameInstance.world.grow();
-			
-			}
-		});
-
-		JButton makeItDry = KUIConstants.setupButton("Drought", null, DEBUG_BUTTON_SIZE);
-		makeItDry.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.world.drought();
-			}
-		});
-
-		JToggleButton fastForward = KUIConstants.setupToggleButton("Fast Forward", FAST_FORWARD_ICON, DEBUG_BUTTON_SIZE);
-		fastForward.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				isFastForwarding = fastForward.isSelected();
-				fastForward.setText(fastForward.isSelected() ? "Stop Fast Forward" : "Fast Forward");
-			}
-		});
-
-		JButton researchEverything = KUIConstants.setupButton("Research All", RESEARCH_TAB_ICON, DEBUG_BUTTON_SIZE);
-		researchEverything.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.researchEverything(gamepanel.getFaction());
-				buttonPanel.remove(researchEverything);
-			}
-		});
-		JButton shadowWordDeath = KUIConstants.setupButton("Shadow Word: Death", SHADOW_WORD_DEATH, LONG_BUTTON_SIZE);
-		shadowWordDeath.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.shadowWordDeath(100);
-			}
-		});
-
-		JButton meteor = KUIConstants.setupButton("Meteor", METEOR_ICON, DEBUG_BUTTON_SIZE);
-		meteor.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.meteorStrike();
-			}
-		});
-		JButton unitEvents = KUIConstants.setupButton("Unit Events", null, DEBUG_BUTTON_SIZE);
-		unitEvents.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.shadowWordDeath(1);
-			}
-		});
-		JButton setPlayerFaction = KUIConstants.setupButton("Change Faction", CHANGE_FACTION_ICON, DEBUG_BUTTON_SIZE);
-		setPlayerFaction.addActionListener(e -> {
-			int choice = JOptionPane.showOptionDialog(null, "Choose faction", "Choose faction", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, gameInstance.world.getFactions().toArray(), gameInstance.world.getFactions().get(0));
-			if(choice >= 0 && choice < gameInstance.world.getFactions().size()) {
-				if(gamepanel.getFaction() != gameInstance.world.getFactions().get(choice)) {
-					gamepanel.deselectEverything();
-					gamepanel.setFaction(gameInstance.world.getFactions().get(choice));
-					guiController.changedFaction(gameInstance.world.getFactions().get(choice));
-				}
-			}
-		});
-
-		JToggleButton debug = KUIConstants.setupToggleButton(gamepanel.getDrawDebugStrings() ? "Leave Matrix" : "Matrix", null, DEBUG_BUTTON_SIZE);
-		debug.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				gamepanel.setDrawDebugStrings(debug.isSelected());
-				debug.setText(gamepanel.getDrawDebugStrings() ? "Leave Matrix" : "Matrix");
-			}
-		});
-		JToggleButton toggleNight = KUIConstants.setupToggleButton(Game.DISABLE_NIGHT ? "Night Disabled" : "Night Enabled", NIGHT_ENABLED_ICON,
-				DEBUG_BUTTON_SIZE);
-		toggleNight.setSelected(true);
-		toggleNight.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Game.DISABLE_NIGHT = !toggleNight.isSelected();
-				toggleNight.setText(Game.DISABLE_NIGHT ? "Night Disabled" : "Night Enabled");
-				toggleNight.setIcon(Game.DISABLE_NIGHT ? NIGHT_DISABLED_ICON : NIGHT_ENABLED_ICON);
-			}
-		});
-
-		JButton exit = KUIConstants.setupButton("Exit", null, DEBUG_BUTTON_SIZE);
-		exit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				exitGame();
-			}
-		});
-
-		resourcePanel = new JPanel();
-		int RESOURCE_PANEL_WIDTH = 100;
-		resourcePanel.setPreferredSize(new Dimension(RESOURCE_PANEL_WIDTH, 1000));
-//		resourcePanel.setLayout(new BoxLayout(resourcePanel, BoxLayout.Y_AXIS));
-		buttonPanel.setPreferredSize(new Dimension(GUIWIDTH - RESOURCE_PANEL_WIDTH, 1000));
-
-		buttonPanel.add(showHeightMap);
-		buttonPanel.add(flipTable);
-		buttonPanel.add(spawnUnit);
-		buttonPanel.add(makeItRain);
-		buttonPanel.add(makeItDry);
-		buttonPanel.add(fastForward);
-		buttonPanel.add(eruptVolcano);
-		buttonPanel.add(meteor);
-		buttonPanel.add(unitEvents);
-		buttonPanel.add(debug);
-		buttonPanel.add(toggleNight);
-		buttonPanel.add(addResources);
-		buttonPanel.add(setPlayerFaction);
-		buttonPanel.add(researchEverything);
-		buttonPanel.add(exit);
-		buttonPanel.add(shadowWordDeath);
+		DebugView buttonPanel = new DebugView(gamepanel);
 
 		researchView = new ResearchView(gamepanel);
 		MinimapView minimapPanel = new MinimapView(gamepanel);
@@ -508,9 +346,7 @@ public class Frame extends JPanel {
 		tabbedPane.insertTab(null, SPAWN_TAB_ICON, spawnMenu.getRootPanel(), "Summon units for testing", SPAWN_TAB);
 
 		DEBUG_TAB = tabbedPane.getTabCount();
-		tabbedPane.addTab(null,
-				Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE),
-				buttonPanel, "Various testing functions");
+		tabbedPane.addTab(null, DEBUG_TAB_ICON, buttonPanel.getRootPanel(), "Various testing functions");
 
 		// disable building tab after setting all of the tabs up
 		manageBuildingTab(false);
@@ -607,9 +443,5 @@ public class Frame extends JPanel {
 		SwingUtilities.invokeLater(() -> {
 			switchToGame();
 		});
-	}
-
-	public void exitGame() {
-		System.exit(0);
 	}
 }

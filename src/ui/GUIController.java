@@ -17,4 +17,6 @@ public interface GUIController {
 	public void pressedSelectedUnitPortrait(Unit unit);
 	public void tryToCraftItem(ItemType type, int amount);
 	public void research(ResearchType researchType);
+
+	public void setFastForwarding(boolean enabled);
 }

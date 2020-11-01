@@ -123,22 +123,19 @@ public class Server {
 			@Override
 			public void changedFaction(Faction faction) {}
 			@Override
-			public void pushInfoPanel(InfoPanel infoPanel) {
-			}
+			public void pushInfoPanel(InfoPanel infoPanel) { }
 			@Override
-			public void popInfoPanel() {
-			}
+			public void popInfoPanel() { }
 			@Override
-			public void pressedSelectedUnitPortrait(Unit unit) {
-			}
+			public void pressedSelectedUnitPortrait(Unit unit) { }
 			@Override
-			public void switchInfoPanel(InfoPanel infoPanel) {
-			}
+			public void switchInfoPanel(InfoPanel infoPanel) { }
 			@Override
-			public void tryToCraftItem(ItemType type, int amount) {
-			}
+			public void tryToCraftItem(ItemType type, int amount) { }
 			@Override
 			public void research(ResearchType researchType) { }
+			@Override
+			public void setFastForwarding(boolean enabled) { }
 		});
 		LinkedList<PlayerInfo> players = new LinkedList<>();
 		for (Connection connection : connections.keySet()) {
