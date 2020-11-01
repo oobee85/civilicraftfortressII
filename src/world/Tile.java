@@ -328,6 +328,12 @@ public class Tile implements Serializable {
 		}
 		return false;
 	}
+	public boolean coldTemp() {
+		if(this.getTempurature() < Season.FREEZING_TEMPURATURE * 1.1) {
+			return true;
+		}
+		return false;
+	}
 	public boolean canOre() {
 		return terr.isOreable(terr);
 	}

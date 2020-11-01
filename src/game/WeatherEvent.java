@@ -52,8 +52,10 @@ public class WeatherEvent implements HasImage{
 		if(timeToMove > 0) {
 			timeToMove -= 1;
 		}
-		
-		isCold = tile.isCold();
+		updateColdness();
+	}
+	private void updateColdness() {
+		isCold = tile.coldTemp();
 		if(isCold == true) {
 			this.hasImage = WeatherEventType.SNOW;
 			liquidType = LiquidType.SNOW;
@@ -69,6 +71,7 @@ public class WeatherEvent implements HasImage{
 		getTile().removeWeather();
 		t.setWeather(this);
 		this.setTile(t);
+		updateColdness();
 	}
 	public void moveToTarget() {
 		if(!readyToMove()) {
