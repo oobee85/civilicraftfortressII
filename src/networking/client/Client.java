@@ -1,6 +1,5 @@
 package networking.client;
 
-import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
@@ -13,9 +12,7 @@ import game.*;
 import networking.*;
 import networking.message.*;
 import networking.server.*;
-import networking.view.*;
 import ui.*;
-import ui.Frame;
 import ui.infopanels.*;
 import utils.*;
 import world.*;
@@ -36,10 +33,11 @@ public class Client {
 			@Override
 			public void updateGUI() {
 				clientGUI.getGameViewOverlay().updateItems();
+				clientGUI.getWorkerView().updateButtons();
 				if(gameInstance.world != null) {
 					clientGUI.getResearchView().updateButtons(gameInstance.world);
+					clientGUI.getProduceUnitView().updateButtons();
 				}
-				clientGUI.getWorkerView().updateButtons();
 			}
 			@Override
 			public void selectedUnit(Unit unit, boolean selected) {
@@ -52,7 +50,17 @@ public class Client {
 			@Override
 			public void selectedSpawnUnit(boolean selected) {}
 			@Override
-			public void selectedBuilding(Building building, boolean selected) {}
+			public void selectedBuilding(Building building, boolean selected) {
+				if (building.getType() == Game.buildingTypeMap.get("BARRACKS")) {
+					clientGUI.manageProduceUnitTab(selected);
+				}
+				if (building.getType() == Game.buildingTypeMap.get("CASTLE")) {
+					clientGUI.manageProduceUnitTab(selected);
+				}
+				if (building.getType() == Game.buildingTypeMap.get("WORKSHOP")) {
+					clientGUI.manageProduceUnitTab(selected);
+				}
+			}
 			@Override
 			public void changedFaction(Faction faction) {
 				clientGUI.getGameViewOverlay().changeFaction(faction);

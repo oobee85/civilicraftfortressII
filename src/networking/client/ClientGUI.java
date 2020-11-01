@@ -19,6 +19,7 @@ public class ClientGUI {
 	private static final int TAB_ICON_SIZE = 25;
 	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon PRODUCE_UNIT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/barracks.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	
 	private static final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(200, 40);
 
@@ -48,8 +49,10 @@ public class ClientGUI {
 	private JTabbedPane tabbedPane;
 	private int RESEARCH_TAB;
 	private int WORKER_TAB;
+	private int PRODUCE_UNIT_TAB;
 	private ResearchView researchView;
 	private WorkerView workerView;
+	private ProduceUnitView produceUnitView;
 	
 	public ClientGUI() {
 		rootPanel = new JPanel();
@@ -247,12 +250,16 @@ public class ClientGUI {
 		WORKER_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab(null, WORKER_TAB_ICON, workerView.getRootPanel(), "Build buildings with workers", WORKER_TAB);
 
+		produceUnitView = new ProduceUnitView(gameView);
+		PRODUCE_UNIT_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab(null, PRODUCE_UNIT_TAB_ICON, produceUnitView.getRootPanel(), "Make units from castles, barracks, or workshops", PRODUCE_UNIT_TAB);
+
 		// disable building tab after setting all of the tabs up
 		manageBuildingTab(false);
+		manageProduceUnitTab(false);
 //		manageBlacksmithTab(false);
 //		manageHellforgeTab(false);
 //		manageResearchLabTab(false);
-//		manageMakeUnitTab(false);
 //		manageSpawnTab(true);
 		
 		rootPanel.revalidate();
@@ -289,6 +296,10 @@ public class ClientGUI {
 	public WorkerView getWorkerView() {
 		return workerView;
 	}
+	
+	public ProduceUnitView getProduceUnitView() {
+		return produceUnitView;
+	}
 
 	public void manageBuildingTab(boolean enabled) {
 		if (enabled == false && tabbedPane.getSelectedIndex() == WORKER_TAB) {
@@ -297,6 +308,25 @@ public class ClientGUI {
 			tabbedPane.setSelectedIndex(WORKER_TAB);
 		}
 		tabbedPane.setEnabledAt(WORKER_TAB, enabled);
+	}
+	
+	public void manageProduceUnitTab(boolean enabled) {
+		if(enabled) {
+			tabbedPane.setEnabledAt(PRODUCE_UNIT_TAB, enabled);
+			tabbedPane.setSelectedIndex(PRODUCE_UNIT_TAB);
+		}
+		else {
+			if(gameView.getGameInstance().world != null) {
+				if(!(World.PLAYER_FACTION.isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("CASTLE"))
+						|| World.PLAYER_FACTION.isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("BARRACKS"))
+						|| World.PLAYER_FACTION.isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("WORKSHOP")))) {
+					if(tabbedPane.getSelectedIndex() == PRODUCE_UNIT_TAB) {
+						tabbedPane.setSelectedIndex(0);
+					}
+				}
+			}
+			tabbedPane.setEnabledAt(PRODUCE_UNIT_TAB, false);
+		}
 	}
 
 }
