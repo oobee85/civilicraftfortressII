@@ -246,6 +246,14 @@ public class ClientGUI {
 		workerView = new WorkerView(gameView);
 		WORKER_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab(null, WORKER_TAB_ICON, workerView.getRootPanel(), "Build buildings with workers", WORKER_TAB);
+
+		// disable building tab after setting all of the tabs up
+		manageBuildingTab(false);
+//		manageBlacksmithTab(false);
+//		manageHellforgeTab(false);
+//		manageResearchLabTab(false);
+//		manageMakeUnitTab(false);
+//		manageSpawnTab(true);
 		
 		rootPanel.revalidate();
 		rootPanel.repaint();
@@ -280,6 +288,15 @@ public class ClientGUI {
 	
 	public WorkerView getWorkerView() {
 		return workerView;
+	}
+
+	public void manageBuildingTab(boolean enabled) {
+		if (enabled == false && tabbedPane.getSelectedIndex() == WORKER_TAB) {
+			tabbedPane.setSelectedIndex(0);
+		} else if (enabled == true) {
+			tabbedPane.setSelectedIndex(WORKER_TAB);
+		}
+		tabbedPane.setEnabledAt(WORKER_TAB, enabled);
 	}
 
 }

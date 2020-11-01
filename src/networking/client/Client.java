@@ -44,6 +44,10 @@ public class Client {
 			@Override
 			public void selectedUnit(Unit unit, boolean selected) {
 				clientGUI.getGameViewOverlay().selectedUnit(unit, selected);
+
+				if(unit.getType().isBuilder()) {
+					clientGUI.manageBuildingTab(selected);
+				}
 			}
 			@Override
 			public void selectedSpawnUnit(boolean selected) {}
