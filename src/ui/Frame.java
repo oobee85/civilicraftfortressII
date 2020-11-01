@@ -47,7 +47,6 @@ public class Frame extends JPanel {
 	private static final ImageIcon NIGHT_ENABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_enabled.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon METEOR_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/meteor.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	
-	private Timer repaintingThread;
 	private JToggleButton easyModeButton;
 	private JFrame frame;
 	private JPanel mainMenuPanel;
@@ -55,8 +54,7 @@ public class Frame extends JPanel {
 	private GameViewOverlay gamepanelOverlay;
 	private GUIController guiController;
 	private JPanel minimapPanel;
-	private JPanel infoPanel;
-	private LinkedList<JPanel> infoPanelStack = new LinkedList<>();
+	private InfoPanelView infoPanelView;
 	private JPanel makeUnitView;
 	private JPanel blacksmithView;
 	private JPanel hellforgeView;
@@ -94,6 +92,7 @@ public class Frame extends JPanel {
 	private int MAKE_UNIT_TAB;
 	private int SPAWN_TAB;
 
+	private Timer repaintingThread;
 	private Thread gameLoopThread;
 	private Thread terrainImageThread;
 	private boolean isFastForwarding = false;
@@ -113,15 +112,15 @@ public class Frame extends JPanel {
 		guiController = new GUIController() {
 			@Override
 			public void pushInfoPanel(InfoPanel infoPanel) {
-				Frame.this.pushInfoPanel(infoPanel);
+				infoPanelView.pushInfoPanel(infoPanel);
 			}
 			@Override
 			public void popInfoPanel() {
-				Frame.this.popInfoPanel();
+				infoPanelView.popInfoPanel();
 			}
 			@Override
 			public void switchInfoPanel(InfoPanel infoPanel) {
-				Frame.this.switchInfoPanel(infoPanel);
+				infoPanelView.switchInfoPanel(infoPanel);
 			}
 			@Override
 			public void pressedSelectedUnitPortrait(Unit unit) {
@@ -322,32 +321,6 @@ public class Frame extends JPanel {
 		gamepanel.add(gamepanelOverlay, BorderLayout.CENTER);
 	}
 
-	/** 
-	 * clears infoPanelStack
-	 */
-	private void switchInfoPanel(JPanel newInfo) {
-		infoPanelStack.clear();
-		pushInfoPanel(newInfo);
-	}
-	private void pushInfoPanel(JPanel newInfo) {
-		infoPanelStack.addFirst(newInfo);
-		setInfoPanel(newInfo);
-	}
-	private void popInfoPanel() {
-		if(infoPanelStack.size() > 1) {
-			infoPanelStack.removeFirst();
-		}
-		JPanel newInfo = infoPanelStack.getFirst();
-		setInfoPanel(newInfo);
-	}
-	private void setInfoPanel(JPanel newInfo) {
-		SwingUtilities.invokeLater(() -> {
-			infoPanel.removeAll();
-			newInfo.setOpaque(false);
-			infoPanel.add(newInfo, BorderLayout.CENTER);
-			infoPanel.validate();
-		});
-	}
 
 	private void manageBuildingTab(boolean enabled) {
 		if (enabled == false && tabbedPane.getSelectedIndex() == WORKER_TAB) {
@@ -448,16 +421,16 @@ public class Frame extends JPanel {
 				gamepanel.setBuildingToPlan(type);
 			});
 			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new BuildingTypeInfoPanel(type));
+				infoPanelView.switchInfoPanel(new BuildingTypeInfoPanel(type));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					pushInfoPanel(new BuildingTypeInfoPanel(type));
+					infoPanelView.pushInfoPanel(new BuildingTypeInfoPanel(type));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
-					popInfoPanel();
+					infoPanelView.popInfoPanel();
 				}
 			});
 			buildingButtons[i] = button;
@@ -535,16 +508,16 @@ public class Frame extends JPanel {
 				gamepanel.setThingToSpawn(type);
 			});
 			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new UnitTypeInfoPanel(type));
+				infoPanelView.switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					pushInfoPanel(new UnitTypeInfoPanel(type));
+					infoPanelView.pushInfoPanel(new UnitTypeInfoPanel(type));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
-					popInfoPanel();
+					infoPanelView.popInfoPanel();
 				}
 			});
 			spawnMenu.add(button);
@@ -559,16 +532,16 @@ public class Frame extends JPanel {
 				gamepanel.setThingToSpawn(type);
 			});
 			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new BuildingTypeInfoPanel(type));
+				infoPanelView.switchInfoPanel(new BuildingTypeInfoPanel(type));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					pushInfoPanel(new BuildingTypeInfoPanel(type));
+					infoPanelView.pushInfoPanel(new BuildingTypeInfoPanel(type));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
-					popInfoPanel();
+					infoPanelView.popInfoPanel();
 				}
 			});
 //			buildingButtons[i] = button;
@@ -607,16 +580,16 @@ public class Frame extends JPanel {
 				World.PLAYER_FACTION.craftItem(type, amount, gameInstance.world.buildings);
 			});
 			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new ItemTypeInfoPanel(type));
+				infoPanelView.switchInfoPanel(new ItemTypeInfoPanel(type));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					pushInfoPanel(new ItemTypeInfoPanel(type));
+					infoPanelView.pushInfoPanel(new ItemTypeInfoPanel(type));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
-					popInfoPanel();
+					infoPanelView.popInfoPanel();
 				}
 			});
 			craftButtons[i] = button;
@@ -645,16 +618,16 @@ public class Frame extends JPanel {
 				World.PLAYER_FACTION.craftItem(type, amount, gameInstance.world.buildings);
 			});
 			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new ItemTypeInfoPanel(type));
+				infoPanelView.switchInfoPanel(new ItemTypeInfoPanel(type));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					pushInfoPanel(new ItemTypeInfoPanel(type));
+					infoPanelView.pushInfoPanel(new ItemTypeInfoPanel(type));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
-					popInfoPanel();
+					infoPanelView.popInfoPanel();
 				}
 			});
 
@@ -835,16 +808,16 @@ public class Frame extends JPanel {
 				gamepanel.getCommandInterface().research(World.PLAYER_FACTION, researchType);
 			});
 			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
+				infoPanelView.switchInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					pushInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
+					infoPanelView.pushInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
-					popInfoPanel();
+					infoPanelView.popInfoPanel();
 				}
 			});
 			researchButtons.put(button, researchType);
@@ -866,16 +839,16 @@ public class Frame extends JPanel {
 				gameInstance.addCombatBuff(cs);
 			});
 			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new CombatStatInfoPanel(combatBuffs));
+				infoPanelView.switchInfoPanel(new CombatStatInfoPanel(combatBuffs));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					pushInfoPanel(new CombatStatInfoPanel(combatBuffs));
+					infoPanelView.pushInfoPanel(new CombatStatInfoPanel(combatBuffs));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
-					popInfoPanel();
+					infoPanelView.popInfoPanel();
 				}
 			});
 			statButtons[i] = button;
@@ -933,12 +906,12 @@ public class Frame extends JPanel {
 		minimapPanel.setPreferredSize(new Dimension(GUIWIDTH, GUIWIDTH));
 		guiSplitter.add(minimapPanel, BorderLayout.NORTH);
 
-		infoPanel = new JPanel();
-		infoPanel.setLayout(new BorderLayout());
-		infoPanel.setBackground(gameInstance.getBackgroundColor());
-		infoPanel.setPreferredSize(new Dimension(GUIWIDTH, (int) (GUIWIDTH / 2.5)));
-		infoPanel.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-		guiSplitter.add(infoPanel, BorderLayout.SOUTH);
+		
+		infoPanelView = new InfoPanelView();
+		JPanel infoPanelViewRoot = infoPanelView.getRootPanel();
+		infoPanelViewRoot.setBackground(gameInstance.getBackgroundColor());
+		infoPanelViewRoot.setPreferredSize(new Dimension(GUIWIDTH, (int) (GUIWIDTH / 2.5)));
+		guiSplitter.add(infoPanelViewRoot, BorderLayout.SOUTH);
 		
 		
 		
@@ -1022,16 +995,16 @@ public class Frame extends JPanel {
 				gamepanel.tryToBuildUnit(type);
 			});
 			button.addRightClickActionListener(e -> {
-				switchInfoPanel(new UnitTypeInfoPanel(type));
+				infoPanelView.switchInfoPanel(new UnitTypeInfoPanel(type));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					pushInfoPanel(new UnitTypeInfoPanel(type));
+					infoPanelView.pushInfoPanel(new UnitTypeInfoPanel(type));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
-					popInfoPanel();
+					infoPanelView.popInfoPanel();
 				}
 			});
 			pairs[i] = new Pair(button, type);

@@ -1,10 +1,11 @@
-package networking.view;
+package networking.server;
 
 import java.awt.*;
 import java.util.*;
 
 import javax.swing.*;
 
+import networking.view.*;
 import ui.*;
 import utils.*;
 

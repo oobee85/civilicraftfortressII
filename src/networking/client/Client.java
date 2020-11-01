@@ -50,13 +50,19 @@ public class Client {
 				clientGUI.getGameViewOverlay().changeFaction(faction);
 			}
 			@Override
-			public void pushInfoPanel(InfoPanel infoPanel) {}
+			public void switchInfoPanel(InfoPanel infoPanel) {
+				clientGUI.getInfoPanelView().switchInfoPanel(infoPanel);
+			}
 			@Override
-			public void popInfoPanel() {}
+			public void pushInfoPanel(InfoPanel infoPanel) {
+				clientGUI.getInfoPanelView().pushInfoPanel(infoPanel);
+			}
+			@Override
+			public void popInfoPanel() {
+				clientGUI.getInfoPanelView().popInfoPanel();
+			}
 			@Override
 			public void pressedSelectedUnitPortrait(Unit unit) {}
-			@Override
-			public void switchInfoPanel(InfoPanel infoPanel) {}
 			@Override
 			public void tryToCraftItem(ItemType type, int amount) {}
 		});
@@ -120,6 +126,9 @@ public class Client {
 					long start = System.currentTimeMillis();
 					gameInstance.gameTick();
 					gameInstance.getGUIController().updateGUI();
+					synchronized (updatedTerrain) {
+						updatedTerrain.notify();
+					}
 					long elapsed = System.currentTimeMillis() - start;
 					long sleeptime = Frame.MILLISECONDS_PER_TICK - elapsed;
 					if(sleeptime > 0 /*&& !isFastForwarding*/) {
@@ -332,7 +341,6 @@ public class Client {
 				clientGUI.repaint();
 			}
 		});
-		repaintingThread.start();
 		Thread terrainImageThread = new Thread(() -> {
 			while (true) {
 				try {
@@ -348,6 +356,7 @@ public class Client {
 				}
 			}
 		});
+		repaintingThread.start();
 		terrainImageThread.start();
 	}
 }

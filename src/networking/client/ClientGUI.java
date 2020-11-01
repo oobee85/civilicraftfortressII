@@ -1,4 +1,4 @@
-package networking.view;
+package networking.client;
 
 import java.awt.*;
 import java.net.*;
@@ -6,9 +6,9 @@ import java.net.*;
 import javax.swing.*;
 
 import game.*;
-import networking.client.*;
 import networking.message.*;
 import networking.server.*;
+import networking.view.*;
 import ui.*;
 import ui.Frame;
 import utils.*;
@@ -28,7 +28,9 @@ public class ClientGUI {
 	private JPanel topPanel;
 	private JPanel sidePanel;
 	
-	private JPanel myinfoPanel;
+	private InfoPanelView infoPanelView;
+	
+	private JPanel playerinfoPanel;
 //	private JPanel connectionInfo;
 	private JPanel lobbyInfo;
 	private JTextField nameTextField;
@@ -65,7 +67,6 @@ public class ClientGUI {
 		ingamePanel.add(topPanel, BorderLayout.NORTH);
 		ingamePanel.add(sidePanel, BorderLayout.EAST);
 		
-		
 
 		KButton singlePlayer = KUIConstants.setupButton("Single Player", null, MAIN_MENU_BUTTON_SIZE);
 		singlePlayer.addActionListener(e -> {
@@ -95,13 +96,13 @@ public class ClientGUI {
 
 		rootPanel.add(mainMenuPanel, BorderLayout.CENTER);
 		
-		myinfoPanel = new JPanel();
-		myinfoPanel.setFocusable(false);
-		myinfoPanel.setLayout(new BoxLayout(myinfoPanel, BoxLayout.X_AXIS));
+		playerinfoPanel = new JPanel();
+		playerinfoPanel.setFocusable(false);
+		playerinfoPanel.setLayout(new BoxLayout(playerinfoPanel, BoxLayout.X_AXIS));
 
 		nameTextField = KUIConstants.setupTextField(Server.DEFAULT_PLAYER_INFO.getName(), null);
 		nameTextField.setMaximumSize(new Dimension(120, 999));
-		myinfoPanel.add(nameTextField);
+		playerinfoPanel.add(nameTextField);
 
 		KButton colorButton = KUIConstants.setupButton("Pick Color", null, null);
 		colorButton.setBorder(BorderFactory.createLineBorder(selectedColor, 10));
@@ -113,36 +114,36 @@ public class ClientGUI {
 			}
 			resetFocus();
 		});
-		myinfoPanel.add(colorButton);
+		playerinfoPanel.add(colorButton);
 
 		KButton updateInfoButton = KUIConstants.setupButton("Update Info", null, null);
 		updateInfoButton.addActionListener(e -> {
 			client.sendMessage(new ClientMessage(ClientMessageType.INFO, new PlayerInfo(nameTextField.getText(), selectedColor)));
 			resetFocus();
 		});
-		myinfoPanel.add(updateInfoButton);
+		playerinfoPanel.add(updateInfoButton);
 
-		myinfoPanel.add(Box.createHorizontalGlue());
+		playerinfoPanel.add(Box.createHorizontalGlue());
 		KButton disconnectButton = KUIConstants.setupButton("Disconnect", null, null);
 		disconnectButton.addActionListener(e -> {
 			client.disconnect();
 			resetFocus();
 		});
-		myinfoPanel.add(disconnectButton);
+		playerinfoPanel.add(disconnectButton);
 
 		makeWorldButton = KUIConstants.setupButton("Make World", null, null);
 		makeWorldButton.addActionListener(e -> {
 			client.sendMessage(new ClientMessage(ClientMessageType.MAKE_WORLD, null));
 			resetFocus();
 		});
-		myinfoPanel.add(makeWorldButton);
+		playerinfoPanel.add(makeWorldButton);
 
 		startGameButton = KUIConstants.setupButton("Start Game", null, null);
 		startGameButton.addActionListener(e -> {
 			client.sendMessage(new ClientMessage(ClientMessageType.START_GAME, null));
 			resetFocus();
 		});
-		myinfoPanel.add(startGameButton);
+		playerinfoPanel.add(startGameButton);
 		startGameButton.setEnabled(false);
 		
 		lobbyInfo = new JPanel();
@@ -169,15 +170,18 @@ public class ClientGUI {
 	public void startedSinglePlayer() {
 		rootPanel.remove(mainMenuPanel);
 		rootPanel.add(ingamePanel);
-		gameView.requestFocus();
+		resetFocus();
+		
 		rootPanel.revalidate();
 		rootPanel.repaint();
 	}
 	public void connected(JPanel connectionInfo) {
 		rootPanel.remove(mainMenuPanel);
 		rootPanel.add(ingamePanel);
-		topPanel.add(myinfoPanel, BorderLayout.NORTH);
-		gameView.requestFocus();
+		resetFocus();
+		
+		topPanel.add(playerinfoPanel, BorderLayout.NORTH);
+		
 		rootPanel.revalidate();
 		rootPanel.repaint();
 	}
@@ -185,7 +189,7 @@ public class ClientGUI {
 	public void disconnected() {
 		rootPanel.remove(ingamePanel);
 		rootPanel.add(mainMenuPanel);
-		topPanel.remove(myinfoPanel);
+		topPanel.remove(playerinfoPanel);
 		rootPanel.revalidate();
 		rootPanel.repaint();
 	}
@@ -213,6 +217,14 @@ public class ClientGUI {
 		gameView.add(gameViewOverlay, BorderLayout.CENTER);
 		ingamePanel.add(gameView, BorderLayout.CENTER);
 		sidePanel.add(minimapView, BorderLayout.NORTH);
+		
+
+		infoPanelView = new InfoPanelView();
+		JPanel infoPanelViewRoot = infoPanelView.getRootPanel();
+		infoPanelViewRoot.setBackground(instance.getBackgroundColor());
+		infoPanelViewRoot.setPreferredSize(new Dimension(Frame.GUIWIDTH, (int) (Frame.GUIWIDTH / 2.5)));
+		sidePanel.add(infoPanelViewRoot, BorderLayout.SOUTH);
+		
 		rootPanel.revalidate();
 		rootPanel.repaint();
 	}
@@ -235,6 +247,9 @@ public class ClientGUI {
 	}
 	public GameView getGameView() {
 		return gameView;
+	}
+	public InfoPanelView getInfoPanelView() {
+		return infoPanelView;
 	}
 
 }
