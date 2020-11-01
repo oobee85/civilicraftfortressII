@@ -15,7 +15,8 @@ public class Thing implements HasImage, Serializable {
 	private transient static int idCounter = 0;
 	private int id;
 
-	private Faction faction;
+	private transient Faction faction;
+	private int factionID;
 	private double maxHealth;
 	private double health;
 	private boolean isDead;
@@ -30,7 +31,7 @@ public class Thing implements HasImage, Serializable {
 		health = maxHealth;
 		this.maxHealth = maxHealth;
 		this.hasImage = hasImage;
-		this.faction = faction;
+		setFaction(faction);
 		this.id = idCounter++;
 		ThingMapper.created(this);
 	}
@@ -54,8 +55,13 @@ public class Thing implements HasImage, Serializable {
 		return faction;
 	}
 	
+	public int getFactionID() {
+		return factionID;
+	}
+	
 	public void setFaction(Faction faction) {
 		this.faction = faction;
+		this.factionID = faction.id;
 	}
 
 	public void setDead(boolean state) {

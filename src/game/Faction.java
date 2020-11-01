@@ -16,8 +16,6 @@ public class Faction implements Serializable {
 			Color.orange, Color.cyan, Color.yellow};
 	private transient static int idCounter = 0;
 
-	private transient final boolean usesItems;
-	private transient final boolean isPlayer;
 	private transient final HashMap<ItemType, Item> items = new HashMap<ItemType, Item>();
 	
 	private transient HashMap<String, Research> researchMap = new HashMap<>();
@@ -28,9 +26,12 @@ public class Faction implements Serializable {
 	
 	private transient LinkedList<AttackedNotification> attacked = new LinkedList<>();
 	private transient LinkedList<AttackedNotification> newAttacked = new LinkedList<>();
+	
 	public final int id;
-	public transient final Color color;
-	public transient final String name;
+	public final Color color;
+	public final String name;
+	private final boolean usesItems;
+	private final boolean isPlayer;
 	
 	public Faction(String name, boolean isPlayer, boolean usesItems) {
 		this.id = idCounter++;

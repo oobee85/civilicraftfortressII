@@ -3,6 +3,7 @@ package networking.message;
 import java.io.*;
 import java.util.*;
 
+import game.*;
 import utils.*;
 import world.*;
 
@@ -13,12 +14,14 @@ public class WorldInfo implements Serializable {
 	private final int tick;
 	private final Tile[] tileInfos;
 	private final HashSet<Thing> things;
+	private final LinkedList<Faction> factions;
 	public WorldInfo(int width, int height, int tick, Tile[] tileInfos) {
 		this.width = width;
 		this.height = height;
 		this.tick = tick;
 		this.tileInfos = tileInfos;
 		things = new HashSet<>();
+		factions = new LinkedList<>();
 	}
 	public int getWidth() {
 		return width;
@@ -34,6 +37,9 @@ public class WorldInfo implements Serializable {
 	}
 	public HashSet<Thing> getThings() {
 		return things;
+	}
+	public LinkedList<Faction> getFactions() {
+		return factions;
 	}
 	@Override
 	public String toString() {

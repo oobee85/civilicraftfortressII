@@ -34,7 +34,7 @@ public class Client {
 		gameInstance = new Game(new GUIController() {
 			@Override
 			public void updateGUI() {
-				if(gameInstance.world != null) {
+				if(gameInstance.world != null && clientGUI.getGameView().getFaction() != World.NO_FACTION) {
 					clientGUI.getGameViewOverlay().updateItems();
 					clientGUI.getWorkerView().updateButtons();
 					clientGUI.getResearchView().updateButtons(gameInstance.world);
@@ -248,6 +248,15 @@ public class Client {
 		}
 		World.ticks = worldInfo.getTick();
 		gameInstance.world.updateTiles(worldInfo.getTileInfos());
+		
+		if(gameInstance.world.getFactions().size() < worldInfo.getFactions().size()) {
+			for(int i = gameInstance.world.getFactions().size(); i < worldInfo.getFactions().size(); i++) {
+				Faction received = worldInfo.getFactions().get(i);
+				Faction faction = new Faction(received.name, received.isPlayer(), received.usesItems(), received.color);
+				gameInstance.world.addFaction(faction);
+			}
+		}
+		
 		for(Thing update : worldInfo.getThings()) {
 			if(!things.containsKey(update.id())) {
 				createThing(update);
@@ -274,7 +283,7 @@ public class Client {
 			Building newBuilding = new Building(
 					Game.buildingTypeMap.get(buildingUpdate.getType().name()), 
 					gameInstance.world.get(buildingUpdate.getTile().getLocation()), 
-					gameInstance.world.getFactions().get(buildingUpdate.getFaction().id));
+					gameInstance.world.getFactions().get(buildingUpdate.getFactionID()));
 			newThing = newBuilding;
 			things.put(update.id(), newBuilding);
 			gameInstance.world.newBuildings.add(newBuilding);
@@ -290,7 +299,7 @@ public class Client {
 			Unit newUnit = new Unit(
 					Game.unitTypeMap.get(unitUpdate.getType().name()), 
 					gameInstance.world.get(unitUpdate.getTile().getLocation()), 
-					gameInstance.world.getFactions().get(unitUpdate.getFaction().id));
+					gameInstance.world.getFactions().get(unitUpdate.getFactionID()));
 			newThing = newUnit;
 			things.put(update.id(), newUnit);
 			gameInstance.world.newUnits.add(newUnit);
@@ -304,7 +313,7 @@ public class Client {
 	}
 	
 	private void updateThing(Thing existing, Thing update) {
-		existing.setFaction(gameInstance.world.getFactions().get(update.getFaction().id));
+		existing.setFaction(gameInstance.world.getFactions().get(update.getFactionID()));
 		existing.setMaxHealth(update.getMaxHealth());
 		existing.setHealth(update.getHealth());
 		existing.setDead(update.isDead());
@@ -357,6 +366,10 @@ public class Client {
 					}
 					else if(message instanceof WorldInfo) {
 						worldInfoUpdate((WorldInfo)message);
+					}
+					else if(message instanceof Faction) {
+						Faction faction = gameInstance.world.getFactions().get(((Faction)message).id);
+						clientGUI.getGameView().getGameInstance().getGUIController().changedFaction(faction);
 					}
 				}
 			} catch (InterruptedException e) {

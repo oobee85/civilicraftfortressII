@@ -36,13 +36,13 @@ public class ServerDriver {
 	}
 
 	public static void main(String[] args) {
-		EventQueue.invokeLater(() -> {
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-					| UnsupportedLookAndFeelException ex) {
-			}
-		});
+//		EventQueue.invokeLater(() -> {
+//			try {
+//				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+//					| UnsupportedLookAndFeelException ex) {
+//			}
+//		});
 		ThingMapper.ACTIVE = true;
 		ServerDriver driver = new ServerDriver();
 		driver.start();

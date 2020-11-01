@@ -20,7 +20,6 @@ public class Server {
 	public static final PlayerInfo DEFAULT_PLAYER_INFO = new PlayerInfo("Default", Color.LIGHT_GRAY);
 	
 	private ConcurrentHashMap<Connection, Boolean> connections = new ConcurrentHashMap<>();
-	private volatile boolean stop = false;
 	private Thread thread;
 	
 	private ServerGUI gui;
@@ -28,6 +27,8 @@ public class Server {
 	public static final int MILLISECONDS_PER_TICK = 100;
 	private boolean isFastForwarding = false;
 	private Game gameInstance;
+	private volatile boolean startedGame = false;
+	private volatile boolean madeWorld = false;
 
 	public Server() {
 		
@@ -43,14 +44,13 @@ public class Server {
 //	}
 	
 	public void startAcceptingConnections() {
-		stop = false;
 		thread = new Thread(() -> {
 			ServerSocket serverSocket = null;
 			try {
 				serverSocket = new ServerSocket(PORT);
 				System.out.println("Listening for connections on " + PORT);
 				gui.updateInfo("Listening for connections on " + InetAddress.getLocalHost().getHostAddress() + ":" + PORT);
-				while(!stop) {
+				while(true) {
 					Socket socket = serverSocket.accept();
 					addNewConnection(socket);
 				}
@@ -110,6 +110,7 @@ public class Server {
 	}
 	
 	private void makeWorld() {
+		madeWorld = true;
 		System.out.println("Making world");
 		gameInstance = new Game(new GUIController() {
 			@Override
@@ -149,6 +150,12 @@ public class Server {
 		startWorldNetworkingUpdateThread();
 	}
 	
+	private void sendWhichFaction() {
+		for (Connection connection : connections.keySet()) {
+			connection.sendMessage(gameInstance.world.getFaction(connection.getPlayerInfo().getName()));
+		}
+	}
+	
 	private void startWorldNetworkingUpdateThread() {
 		Thread worldNetworkingUpdateThread = new Thread(() -> {
 			try {
@@ -173,8 +180,9 @@ public class Server {
 		worldInfo.getThings().addAll(gameInstance.world.plants);
 		worldInfo.getThings().addAll(gameInstance.world.buildings);
 		worldInfo.getThings().addAll(gameInstance.world.units);
-		
+		worldInfo.getFactions().addAll(gameInstance.world.getFactions());
 		sendToAllConnections(worldInfo);
+		sendWhichFaction();
 	}
 	
 	private void handleCommand(CommandMessage message) {
@@ -258,6 +266,7 @@ public class Server {
 	}
 	
 	private void startGame() {
+		startedGame = true;
 		Thread gameLoopThread = new Thread(() -> {
 			while (true) {
 				try {
@@ -296,19 +305,27 @@ public class Server {
 					if(message instanceof ClientMessage) {
 						ClientMessage clientMessage = (ClientMessage)message;
 						if(clientMessage.getType() == ClientMessageType.INFO) {
-							connection.setPlayerInfo(clientMessage.getPlayerInfo());
-							updatedLobbyList();
+							if(!madeWorld) {
+								connection.setPlayerInfo(clientMessage.getPlayerInfo());
+								updatedLobbyList();
+							}
 						}
 						else if(clientMessage.getType() == ClientMessageType.MAKE_WORLD) {
-							makeWorld();
+							if(!madeWorld) {
+								makeWorld();
+							}
 						}
 						else if(clientMessage.getType() == ClientMessageType.START_GAME) {
-							startGame();
+							if(!startedGame) {
+								startGame();
+							}
 						}
 					}
 					else if(message instanceof CommandMessage) {
-						CommandMessage commandMessage = (CommandMessage)message;
-						handleCommand(commandMessage);
+						if(startedGame) {
+							CommandMessage commandMessage = (CommandMessage)message;
+							handleCommand(commandMessage);
+						}
 					}
 				}
 			} catch (InterruptedException e) {
