@@ -2,15 +2,15 @@ package world;
 
 import java.io.*;
 
-import game.ItemType;
+import game.*;
 import utils.*;
 
 public class Plant extends Thing implements Serializable {
 
 	private PlantType plantType;
 	
-	public Plant(PlantType pt, Tile t) {
-		super(pt.getHealth(), pt, World.NO_FACTION, t);
+	public Plant(PlantType pt, Tile t, Faction faction) {
+		super(pt.getHealth(), pt, faction, t);
 		plantType = pt;
 	}
 	public ItemType getItem() {

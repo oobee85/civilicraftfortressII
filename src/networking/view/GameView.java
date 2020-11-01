@@ -51,7 +51,7 @@ public class GameView extends JPanel {
 	private boolean controlDown = false;
 
 	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
-	private Faction faction = World.NO_FACTION;
+	private Faction faction = Faction.getTempFaction();
 	
 	private LeftClickAction leftClickAction = LeftClickAction.NONE;
 	private HasImage selectedThingToSpawn;
@@ -207,7 +207,7 @@ public class GameView extends JPanel {
 
 		// spawning unit or building
 		if(leftClickAction == LeftClickAction.SPAWN_THING) {
-			Thing summoned = game.summonThing(tile, selectedThingToSpawn, summonPlayerControlled ? faction : World.NO_FACTION);
+			Thing summoned = game.summonThing(tile, selectedThingToSpawn, summonPlayerControlled ? faction : game.world.getFaction(World.NO_FACTION_ID));
 			if(summoned.getFaction() == faction) {
 				if(!shiftDown) {
 					deselectEverything();
@@ -468,10 +468,12 @@ public class GameView extends JPanel {
 	}
 
 	public void updateTerrainImages() {
-		BufferedImage[] images = game.world.createTerrainImage(faction);
-		this.terrainImage = images[0];
-		this.minimapImage = images[1];
-		this.heightMapImage = images[2];
+		if(game.world != null) {
+			BufferedImage[] images = game.world.createTerrainImage(faction);
+			this.terrainImage = images[0];
+			this.minimapImage = images[1];
+			this.heightMapImage = images[2];
+		}
 	}
 	
 	public void setShowHeightMap(boolean show) {
@@ -552,10 +554,13 @@ public class GameView extends JPanel {
 	}
 
 	public void drawGame(Graphics g, int panelWidth, int panelHeight) {
+		if(game.world == null) {
+			return;
+		}
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
 		draw(g, panelWidth, panelHeight, viewOffset);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
-		if(faction.getResearchTarget() != null && !faction.getResearchTarget().isUnlocked()) {
+		if(faction != null && faction.getResearchTarget() != null && !faction.getResearchTarget().isUnlocked()) {
 			g.setFont(KUIConstants.infoFont);
 			double completedRatio = 1.0 * faction.getResearchTarget().getPointsSpent() / faction.getResearchTarget().getRequiredPoints();
 			String progress = String.format(faction.getResearchTarget() + " %d/%d", faction.getResearchTarget().getPointsSpent(), faction.getResearchTarget().getRequiredPoints());
@@ -565,9 +570,6 @@ public class GameView extends JPanel {
 	}
 	
 	public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffset) {
-		if(game.world == null) {
-			return;
-		}
 		// Try to only draw stuff that is visible on the screen
 		int lowerX = Math.max(0, viewOffset.divide(tileSize).getIntX() - 2);
 		int lowerY = Math.max(0, viewOffset.divide(tileSize).getIntY() - 2);
@@ -843,7 +845,7 @@ public class GameView extends JPanel {
 				g.drawImage(theTile.getResource().getType().getImage(imagesize), drawx, drawy, draww, drawh, null);
 			}
 			
-			if(theTile.getFaction() != World.NO_FACTION) {
+			if(theTile.getFaction() != game.world.getFaction(World.NO_FACTION_ID)) {
 //				g.setColor(Color.black);
 //				g.fillRect(x, y, w, h); 
 				g.setColor(theTile.getFaction().color);

@@ -34,7 +34,7 @@ public class Client {
 		gameInstance = new Game(new GUIController() {
 			@Override
 			public void updateGUI() {
-				if(gameInstance.world != null && clientGUI.getGameView().getFaction() != World.NO_FACTION) {
+				if(gameInstance.world != null) {
 					clientGUI.getGameViewOverlay().updateItems();
 					clientGUI.getWorkerView().updateButtons();
 					clientGUI.getResearchView().updateButtons(gameInstance.world);
@@ -74,6 +74,7 @@ public class Client {
 			public void changedFaction(Faction faction) {
 				clientGUI.getGameView().setFaction(faction);
 				clientGUI.getGameViewOverlay().changeFaction(faction);
+				System.out.println("CHANGED FACTION TO " + faction);
 			}
 			@Override
 			public void switchInfoPanel(InfoPanel infoPanel) {
@@ -247,8 +248,6 @@ public class Client {
 			cleaningThread.start();
 		}
 		World.ticks = worldInfo.getTick();
-		gameInstance.world.updateTiles(worldInfo.getTileInfos());
-		
 		if(gameInstance.world.getFactions().size() < worldInfo.getFactions().size()) {
 			for(int i = gameInstance.world.getFactions().size(); i < worldInfo.getFactions().size(); i++) {
 				Faction received = worldInfo.getFactions().get(i);
@@ -256,6 +255,7 @@ public class Client {
 				gameInstance.world.addFaction(faction);
 			}
 		}
+		gameInstance.world.updateTiles(worldInfo.getTileInfos());
 		
 		for(Thing update : worldInfo.getThings()) {
 			if(!things.containsKey(update.id())) {
@@ -272,7 +272,7 @@ public class Client {
 		Thing newThing = null;
 		if(update instanceof Plant) {
 			Plant plantUpdate = (Plant)update;
-			Plant newPlant = new Plant(plantUpdate.getPlantType(), gameInstance.world.get(plantUpdate.getTile().getLocation()));
+			Plant newPlant = new Plant(plantUpdate.getPlantType(), gameInstance.world.get(plantUpdate.getTile().getLocation()), gameInstance.world.getFaction(World.NO_FACTION_ID));
 			newThing = newPlant;
 			things.put(update.id(), newPlant);
 			newPlant.getTile().setHasPlant(newPlant);
@@ -368,7 +368,7 @@ public class Client {
 						worldInfoUpdate((WorldInfo)message);
 					}
 					else if(message instanceof Faction) {
-						Faction faction = gameInstance.world.getFactions().get(((Faction)message).id);
+						Faction faction = gameInstance.world.getFaction(((Faction)message).id);
 						clientGUI.getGameView().getGameInstance().getGUIController().changedFaction(faction);
 					}
 				}

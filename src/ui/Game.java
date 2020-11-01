@@ -111,7 +111,7 @@ public class Game {
 	private void makeAnimal(Tile tile, UnitType unitType, int number) {
 		for(Tile t: Utils.getTilesInRadius(tile, world, Math.max(1, (int)(Math.sqrt(number))-2))) {
 			if(number > 0) {
-				world.spawnAnimal(unitType, t, World.NO_FACTION);
+				world.spawnAnimal(unitType, t, world.getFaction(World.NO_FACTION_ID));
 				number --;
 			}
 			else {
@@ -151,7 +151,7 @@ public class Game {
 			System.out.println("cyclops");
 		}
 		if(World.days % 15 == 0) {
-			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), World.NO_FACTION);
+			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID));
 			System.out.println("parasite");
 		}
 		
@@ -219,7 +219,7 @@ public class Game {
 			world.spawnLavaGolem();
 			world.spawnIceGiant();
 			world.spawnSkeletonArmy();
-			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), World.NO_FACTION);
+			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID));
 			spawnCyclops();
 		}
 		for(int i = 0; i < num/2; i++) {
@@ -231,7 +231,7 @@ public class Game {
 	public void spawnEverything() {
 		List<Tile> tiles = world.getTilesRandomly();
 		for(UnitType type : Game.unitTypeList) {
-			world.spawnAnimal(type, tiles.remove(0), World.NO_FACTION);
+			world.spawnAnimal(type, tiles.remove(0), world.getFaction(World.NO_FACTION_ID));
 		}
 	}
 	
@@ -240,6 +240,18 @@ public class Game {
 	}
 	public void generateWorld(int width, int height, boolean easymode, List<PlayerInfo> players) {
 		initializeWorld(width, height);
+
+		Faction NO_FACTION = new Faction("NONE", false, false);
+		world.addFaction(NO_FACTION);
+		
+		Faction CYCLOPS_FACTION = new Faction("CYCLOPS", false, true);
+		CYCLOPS_FACTION.addItem(ItemType.FOOD, 50);
+		world.addFaction(CYCLOPS_FACTION);
+		
+		Faction UNDEAD_FACTION = new Faction("UNDEAD", false, true);
+		UNDEAD_FACTION.addItem(ItemType.FOOD, 999999);
+		world.addFaction(UNDEAD_FACTION);
+		
 		Attack.world = world;
 		world.generateWorld();
 		makeRoads(easymode);
@@ -257,11 +269,11 @@ public class Game {
 				break;
 			}
 		}
-		summonThing(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y())), Game.buildingTypeMap.get("WATCHTOWER"), World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("GRANARY"), World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("BARRACKS"), World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("WINDMILL"), World.CYCLOPS_FACTION);
-		summonThing(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("MINE"), World.CYCLOPS_FACTION);
+		summonThing(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y())), Game.buildingTypeMap.get("WATCHTOWER"), world.getFaction(World.CYCLOPS_FACTION_ID));
+		summonThing(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("GRANARY"), world.getFaction(World.CYCLOPS_FACTION_ID));
+		summonThing(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("BARRACKS"), world.getFaction(World.CYCLOPS_FACTION_ID));
+		summonThing(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("WINDMILL"), world.getFaction(World.CYCLOPS_FACTION_ID));
+		summonThing(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("MINE"), world.getFaction(World.CYCLOPS_FACTION_ID));
 		
 		//makes the walls
 		for(int i = 0; i < 6; i++) {
@@ -270,18 +282,18 @@ public class Game {
 				type = Game.buildingTypeMap.get("GATE_WOOD");
 			}
 			Tile wall = world.get(new TileLoc(tile.getLocation().x()-3 + i, tile.getLocation().y()-3));
-			summonThing(wall, type, World.CYCLOPS_FACTION);
+			summonThing(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
 			wall = world.get(new TileLoc(tile.getLocation().x()+3, tile.getLocation().y()-3 + i));
-			summonThing(wall, type, World.CYCLOPS_FACTION);
+			summonThing(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
 			wall = world.get(new TileLoc(tile.getLocation().x()+3 - i, tile.getLocation().y()+3));
-			summonThing(wall, type, World.CYCLOPS_FACTION);
+			summonThing(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
 			wall = world.get(new TileLoc(tile.getLocation().x()-3, tile.getLocation().y()+3 - i));
-			summonThing(wall, type, World.CYCLOPS_FACTION);
+			summonThing(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
 		}
 		for(int i = -1; i < 2; i ++) {
 			for(int j = -1; j < 2; j ++) {
 				Tile temp = world.get(new TileLoc(tile.getLocation().x() + i, tile.getLocation().y() + j));
-				Animal cyclops = world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp, World.CYCLOPS_FACTION);
+				Animal cyclops = world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp, world.getFaction(World.CYCLOPS_FACTION_ID));
 				cyclops.setPassiveAction(PlannedAction.GUARD);
 			}
 			
@@ -300,7 +312,7 @@ public class Game {
 					double distanceFromCenter = Math.sqrt(i*i + j*j);
 					if(distanceFromCenter < radius) {
 						Tile tile = world.get(new TileLoc(building.getTile().getLocation().x()+i, building.getTile().getLocation().y()+j));
-						if(tile != null && tile.getFaction() == World.NO_FACTION) {
+						if(tile != null && tile.getFaction() == world.getFaction(World.NO_FACTION_ID)) {
 							tile.setFaction(building.getFaction());
 							world.addToTerritory(tile);
 						}
@@ -420,7 +432,7 @@ public class Game {
 		if(selectedPath != null) {
 			for(Tile t : selectedPath.getTiles()) {
 				if(t != null) {
-					Building road = new Building(Game.buildingTypeMap.get("STONE_ROAD"), t, World.NO_FACTION);
+					Building road = new Building(Game.buildingTypeMap.get("STONE_ROAD"), t, world.getFaction(World.NO_FACTION_ID));
 					road.setRemainingEffort(0);
 					t.setRoad(road);
 					world.newBuildings.add(road);
@@ -453,7 +465,6 @@ public class Game {
 		int index = 0;
 		for(PlayerInfo player : players) {
 			Faction newFaction = new Faction(player.getName(), true, true, player.getColor());
-			newFaction.setupResearch();
 			newFaction.addItem(ItemType.WOOD, 200);
 			newFaction.addItem(ItemType.STONE, 200);
 			newFaction.addItem(ItemType.FOOD, 200);

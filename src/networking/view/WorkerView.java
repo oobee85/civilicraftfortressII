@@ -133,15 +133,15 @@ public class WorkerView {
 	}
 	
 	public void updateButtons() {
-		for (int i = 0; i < Game.buildingTypeList.size(); i++) {
-			BuildingType type = Game.buildingTypeList.get(i);
-			JButton button = buildingButtons[i];
-			if (gameView.getFaction().areRequirementsMet(type)) {
-				button.setEnabled(true);
-//				button.setVisible(true);
-			} else {
-				button.setEnabled(false);
-//				button.setVisible(false);
+		if(gameView.getFaction() != null) {
+			for (int i = 0; i < Game.buildingTypeList.size(); i++) {
+				BuildingType type = Game.buildingTypeList.get(i);
+				JButton button = buildingButtons[i];
+				if (gameView.getFaction().areRequirementsMet(type)) {
+					button.setEnabled(true);
+				} else {
+					button.setEnabled(false);
+				}
 			}
 		}
 	}

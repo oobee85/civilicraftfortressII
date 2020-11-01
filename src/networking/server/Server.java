@@ -9,7 +9,6 @@ import java.util.concurrent.*;
 import game.*;
 import networking.*;
 import networking.message.*;
-import networking.view.*;
 import ui.*;
 import ui.infopanels.*;
 import utils.*;
@@ -17,7 +16,7 @@ import world.*;
 
 public class Server {
 	public static final int PORT = 25565;
-	public static final PlayerInfo DEFAULT_PLAYER_INFO = new PlayerInfo("Default", Color.LIGHT_GRAY);
+	public static final PlayerInfo DEFAULT_PLAYER_INFO = new PlayerInfo("Player", Color.red);
 	
 	private ConcurrentHashMap<Connection, Boolean> connections = new ConcurrentHashMap<>();
 	private Thread thread;

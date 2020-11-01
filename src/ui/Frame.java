@@ -481,7 +481,7 @@ public class Frame extends JPanel {
 		});
 		JButton setPlayerFaction = KUIConstants.setupButton("Change Faction", CHANGE_FACTION_ICON, DEBUG_BUTTON_SIZE);
 		setPlayerFaction.addActionListener(e -> {
-			int choice = JOptionPane.showOptionDialog(null, "Choose faction", "Choose faction", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, gameInstance.world.getFactions().toArray(), World.NO_FACTION);
+			int choice = JOptionPane.showOptionDialog(null, "Choose faction", "Choose faction", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, gameInstance.world.getFactions().toArray(), gameInstance.world.getFactions().get(0));
 			if(choice >= 0 && choice < gameInstance.world.getFactions().size()) {
 				if(gamepanel.getFaction() != gameInstance.world.getFactions().get(choice)) {
 					gamepanel.deselectEverything();

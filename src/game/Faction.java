@@ -39,6 +39,7 @@ public class Faction implements Serializable {
 		this.name = name;
 		this.usesItems = usesItems;
 		this.isPlayer = isPlayer;
+		setupResearch();
 	}
 	public Faction(String name, boolean isPlayer, boolean usesItems, Color color) {
 		this.id = idCounter++;
@@ -46,8 +47,17 @@ public class Faction implements Serializable {
 		this.name = name;
 		this.usesItems = usesItems;
 		this.isPlayer = isPlayer;
+		setupResearch();
+	}
+	public static Faction getTempFaction() {
+		Faction temp = new Faction("temp", false, false);
+		idCounter--;
+		return temp;
 	}
 	
+	public boolean isNeutral() {
+		return id == 0;
+	}
 	public boolean isPlayer() {
 		return isPlayer;
 	}

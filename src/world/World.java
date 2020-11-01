@@ -39,15 +39,23 @@ public class World {
 	public volatile ConcurrentHashMap<Tile, Faction> territory = new ConcurrentHashMap<>();
 	private int width;
 	private int height;
-
 	
-	public static final Faction NO_FACTION = new Faction("NONE", false, false);
-	public static final Faction CYCLOPS_FACTION = new Faction("CYCLOPS", false, true);
-	public static final Faction UNDEAD_FACTION = new Faction("UNDEAD", false, true);
-	private ArrayList<Faction> factions = new ArrayList<>(Arrays.asList(new Faction[] {NO_FACTION, CYCLOPS_FACTION, UNDEAD_FACTION}));
+	public static final int NO_FACTION_ID = 0;
+	public static final int CYCLOPS_FACTION_ID = 1;
+	public static final int UNDEAD_FACTION_ID = 2;
+	
+	private ArrayList<Faction> factions = new ArrayList<>();
 	public Faction getFaction(String name) {
 		for(Faction faction : factions) {
 			if(faction.name.equals(name)) {
+				return faction;
+			}
+		}
+		return null;
+	}
+	public Faction getFaction(int id) {
+		for(Faction faction : factions) {
+			if(faction.id == id) {
 				return faction;
 			}
 		}
@@ -106,12 +114,6 @@ public class World {
 		for(Tile tile : getTiles()) {
 			tile.setNeighbors(getNeighbors(tile));
 		}
-
-		for(Faction f : factions) {
-			f.setupResearch();
-		}
-		World.CYCLOPS_FACTION.addItem(ItemType.FOOD, 50);
-		World.UNDEAD_FACTION.addItem(ItemType.FOOD, 999999);
 	}
 	public void updateTiles(Tile[] tileInfos) {
 		System.out.println("updating " + tileInfos.length + " tiles");
@@ -120,7 +122,7 @@ public class World {
 			if(tile == null) {
 				System.out.println("Tried to update null tile at " + info.getLocation());
 			}
-			if(tile.getFaction().id != info.getFaction().id) {
+			if(tile.getFaction() == null || tile.getFaction().id != info.getFaction().id) {
 				tile.setFaction(factions.get(info.getFaction().id));
 				addToTerritory(tile);
 			}
@@ -210,7 +212,7 @@ public class World {
 	public void spawnOgre() {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.ROCK ).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("OGRE"), tile.get(), World.NO_FACTION);
+			spawnAnimal(Game.unitTypeMap.get("OGRE"), tile.get(), getFaction(NO_FACTION_ID));
 		}
 	}
 	
@@ -226,7 +228,7 @@ public class World {
 		wolf.setDead(true);
 		Tile t = wolf.getTile();
 		System.out.println("Werewolf at: "+t);
-		spawnAnimal(Game.unitTypeMap.get("WEREWOLF"), t, World.NO_FACTION);
+		spawnAnimal(Game.unitTypeMap.get("WEREWOLF"), t, getFaction(NO_FACTION_ID));
 	}
 	
 	public void spawnLavaGolem() {
@@ -235,26 +237,26 @@ public class World {
 				.filter(e -> e.getTerrain() == Terrain.VOLCANO )
 				.findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("LAVAGOLEM"), tile.get(), World.NO_FACTION);
+			spawnAnimal(Game.unitTypeMap.get("LAVAGOLEM"), tile.get(), getFaction(NO_FACTION_ID));
 		}
 	}
 	
 	public void spawnEnt() {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.GRASS ).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("ENT"), tile.get(), World.NO_FACTION);
+			spawnAnimal(Game.unitTypeMap.get("ENT"), tile.get(), getFaction(NO_FACTION_ID));
 		}
 	}
 	public void spawnIceGiant() {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getModifier() != null && e.liquidType == LiquidType.SNOW).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("ICE_GIANT"), tile.get(), World.NO_FACTION);
+			spawnAnimal(Game.unitTypeMap.get("ICE_GIANT"), tile.get(), getFaction(NO_FACTION_ID));
 		}
 	}
 	public void spawnDragon() {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.VOLCANO ).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("DRAGON"), tile.get(), World.NO_FACTION);
+			spawnAnimal(Game.unitTypeMap.get("DRAGON"), tile.get(), getFaction(NO_FACTION_ID));
 		}
 	}
 	
@@ -263,9 +265,9 @@ public class World {
 		if(potential.isPresent()) {
 			Tile t = potential.get();
 			for(Tile tile : t.getNeighbors()) {
-				spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, World.UNDEAD_FACTION);
-				spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, World.UNDEAD_FACTION);
-				spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, World.UNDEAD_FACTION);
+				for(int i = 0; i < 3; i++) {
+					spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, getFaction(UNDEAD_FACTION_ID));
+				}
 			}
 		}
 	}
@@ -310,7 +312,7 @@ public class World {
 		if(animalType.isAquatic() == false && world.get(loc).liquidAmount > world.get(loc).liquidType.getMinimumDamageAmount()/2 ) {
 			return;
 		}
-		Animal animal = new Animal(animalType, world.get(loc), World.NO_FACTION);
+		Animal animal = new Animal(animalType, world.get(loc), getFaction(NO_FACTION_ID));
 		animal.setTile(world.get(loc));
 		newUnits.add(animal);
 		world.get(loc).addUnit(animal);
@@ -505,7 +507,7 @@ public class World {
 					
 					for(Tile tile : plant.getTile().getNeighbors()) {
 						if(tile.getPlant() == null && tile.canPlant()) {
-							tile.setHasPlant(new Plant(PlantType.FOREST1, tile));
+							tile.setHasPlant(new Plant(PlantType.FOREST1, tile, getFaction(NO_FACTION_ID)));
 							newPlants.add(tile.getPlant());
 							break;
 						}
@@ -530,14 +532,14 @@ public class World {
 			}
 			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(Math.random() < 0.01) {
-					Plant plant = new Plant(PlantType.CATTAIL, tile);
+					Plant plant = new Plant(PlantType.CATTAIL, tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(plant);
 					newPlants.add(plant);
 				}
 			}
 			if(tile.liquidType != null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 				if (Math.random() < 0.001) {
-					tile.setHasPlant(new Plant(PlantType.BERRY, tile));
+					tile.setHasPlant(new Plant(PlantType.BERRY, tile, getFaction(NO_FACTION_ID)));
 					newPlants.add(tile.getPlant());
 				}
 			}
@@ -809,7 +811,7 @@ public class World {
 			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < BUSH_RARITY) {
 				double o = Math.random();
 				if(o < PlantType.BERRY.getRarity()) {
-					Plant p = new Plant(PlantType.BERRY, tile);
+					Plant p = new Plant(PlantType.BERRY, tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(p);
 					newPlants.add(tile.getPlant());
 				}
@@ -819,7 +821,7 @@ public class World {
 			if( Math.random() < WATER_PLANT_RARITY) {
 				double o = Math.random();
 				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()  && o < PlantType.CATTAIL.getRarity()) {
-					Plant p = new Plant(PlantType.CATTAIL, tile);
+					Plant p = new Plant(PlantType.CATTAIL, tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(p);
 					newPlants.add(tile.getPlant());
 				}
@@ -837,7 +839,7 @@ public class World {
 			}
 			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < t.liquidType.getMinimumDamageAmount() / 2)
 				if (Math.random() < tempDensity) {
-					Plant plant = new Plant(PlantType.FOREST1, t);
+					Plant plant = new Plant(PlantType.FOREST1, t, getFaction(NO_FACTION_ID));
 					t.setHasPlant(plant);
 					newPlants.add(plant);
 				}
@@ -877,6 +879,7 @@ public class World {
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 
 		for(Tile tile : getTiles()) {
+			tile.setFaction(getFaction(NO_FACTION_ID));
 			tile.setHeight(heightMap[tile.getLocation().x()][tile.getLocation().y()]);
 		}
 
@@ -980,7 +983,7 @@ public class World {
 				minimapColor = tile.getModifier().getType().getColor(0);
 				terrainColor = Utils.blendColors(tile.getModifier().getType().getColor(0), terrainColor, 0.9);
 			}
-			if(tile.getFaction() != World.NO_FACTION) {
+			if(tile.getFaction() != getFaction(NO_FACTION_ID)) {
 				minimapColor = Utils.blendColors(tile.getFaction().color, minimapColor, 0.3);
 				terrainColor = Utils.blendColors(tile.getFaction().color, terrainColor, 0.3);
 			}

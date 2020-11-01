@@ -16,7 +16,7 @@ public class TargetingInfo {
 	
 	private boolean doesFactionSatify(Faction animalFaction, Faction potentialTargetFaction) {
 		if(potentialTargetFaction.name.equals(faction) || 
-				(faction == null && (animalFaction == World.NO_FACTION || animalFaction != potentialTargetFaction))) {
+				(faction == null && (animalFaction.isNeutral() || animalFaction != potentialTargetFaction))) {
 			return true;
 		}
 		return false;

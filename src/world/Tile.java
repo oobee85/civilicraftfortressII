@@ -11,7 +11,7 @@ import liquid.*;
 import utils.*;
 
 public class Tile implements Serializable {
-	private volatile Faction faction = World.NO_FACTION;
+	private volatile Faction faction;
 	private transient boolean isSelected = false;
 	private transient boolean inVisionRange = false;
 
