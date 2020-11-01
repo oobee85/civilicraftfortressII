@@ -53,19 +53,17 @@ public class Frame extends JPanel {
 	private GameView gamepanel;
 	private GameViewOverlay gamepanelOverlay;
 	private GUIController guiController;
-	private JPanel minimapPanel;
 	private InfoPanelView infoPanelView;
 	private JPanel makeUnitView;
 	private JPanel blacksmithView;
 	private JPanel hellforgeView;
 	private JPanel workerMenu;
 	private JPanel spawnMenu;
-	private JPanel researchView;
+	private ResearchView researchView;
 	private JPanel statView;
 	private JTabbedPane tabbedPane;
 	private JPanel guiSplitter;
 	private JPanel resourcePanel;
-	private HashMap<JButton, ResearchType> researchButtons = new HashMap<>();
 	private JButton[] buildingButtons;
 	private class Pair {
 		public final JButton button;
@@ -80,8 +78,6 @@ public class Frame extends JPanel {
 	private JButton[] statButtons = new JButton[7];
 	
 	private JTextField mapSize;
-	private int WIDTH;
-	private int HEIGHT;
 	private Game gameInstance;
 
 	private int WORKER_TAB;
@@ -103,11 +99,11 @@ public class Frame extends JPanel {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setIconImage(Utils.loadImage("resources/Images/logo.png"));
 
-		HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
-		HEIGHT = Math.min(HEIGHT, 1080);
-		HEIGHT = HEIGHT * 8 / 9;
-		WIDTH = HEIGHT + GUIWIDTH;
-		frame.setSize(WIDTH, HEIGHT);
+		int height = Toolkit.getDefaultToolkit().getScreenSize().height;
+		height = Math.min(height, 1080);
+		height = height * 8 / 9;
+		int width = height + GUIWIDTH;
+		frame.setSize(width, height);
 		frame.setLocationRelativeTo(null);
 		guiController = new GUIController() {
 			@Override
@@ -129,6 +125,10 @@ public class Frame extends JPanel {
 			@Override
 			public void tryToCraftItem(ItemType type, int amount) {
 				gamepanel.getCommandInterface().craftItem(World.PLAYER_FACTION, type);
+			}
+			@Override
+			public void research(ResearchType researchType) {
+				gamepanel.getCommandInterface().research(World.PLAYER_FACTION, researchType);
 			}
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {
@@ -192,28 +192,7 @@ public class Frame extends JPanel {
 			@Override
 			public void updateGUI() {
 				gamepanelOverlay.updateItems();
-				boolean hasResearchLab = World.PLAYER_FACTION.hasResearchLab(gameInstance.world);
-				for(Entry<JButton, ResearchType> entry : researchButtons.entrySet()) {
-					JButton button = entry.getKey();
-					Research research = World.PLAYER_FACTION.getResearch(entry.getValue());
-					ResearchRequirement req = research.getRequirement();
-					if (research.isUnlocked()) {
-						button.setEnabled(false);
-						button.setVisible(true);
-					} else if(research.getTier() > 1 && !hasResearchLab) {
-						button.setEnabled(false);
-						button.setVisible(false);
-					} else if (req.areRequirementsMet()) {
-						button.setEnabled(true);
-						button.setVisible(true);
-					} else if (req.areSecondLayerRequirementsMet()) {
-						button.setEnabled(false);
-						button.setVisible(true);
-					} else {
-						button.setEnabled(false);
-						button.setVisible(false);
-					}
-				}
+				researchView.updateButtons(gameInstance.world);
 				for (int i = 0; i < Game.buildingTypeList.size(); i++) {
 					BuildingType type = Game.buildingTypeList.get(i);
 					JButton button = buildingButtons[i];
@@ -277,7 +256,6 @@ public class Frame extends JPanel {
 	
 	
 	private void menu() {
-		frame.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		mainMenuPanel = new JPanel();
 		
 		easyModeButton = KUIConstants.setupToggleButton("Enable Easy Mode", null, BUILDING_BUTTON_SIZE);
@@ -387,7 +365,7 @@ public class Frame extends JPanel {
 		
 		frame.getContentPane().add(gamepanel, BorderLayout.CENTER);
 		frame.getContentPane().add(guiSplitter, BorderLayout.EAST);
-		frame.pack();
+//		frame.pack();
 		
 		gamepanel.centerViewOn(gameInstance.world.buildings.getLast().getTile(), 50, gamepanel.getWidth(), gamepanel.getHeight());
 		gamepanel.requestFocusInWindow();
@@ -798,31 +776,32 @@ public class Frame extends JPanel {
 		buttonPanel.add(exit);
 		buttonPanel.add(shadowWordDeath);
 
-		researchView = new JPanel();
-		for (int i = 0; i < Game.researchTypeList.size(); i++) {
-			ResearchType researchType = Game.researchTypeList.get(i);
-			KButton button = KUIConstants.setupButton(researchType.toString(),
-					Utils.resizeImageIcon(researchType.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
-			button.setEnabled(false);
-			button.addActionListener(e -> {
-				gamepanel.getCommandInterface().research(World.PLAYER_FACTION, researchType);
-			});
-			button.addRightClickActionListener(e -> {
-				infoPanelView.switchInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
-			});
-			button.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					infoPanelView.pushInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
-				}
-				@Override
-				public void mouseExited(MouseEvent e) {
-					infoPanelView.popInfoPanel();
-				}
-			});
-			researchButtons.put(button, researchType);
-			researchView.add(button);
-		}
+		researchView = new ResearchView(guiController);
+//		researchView = new JPanel();
+//		for (int i = 0; i < Game.researchTypeList.size(); i++) {
+//			ResearchType researchType = Game.researchTypeList.get(i);
+//			KButton button = KUIConstants.setupButton(researchType.toString(),
+//					Utils.resizeImageIcon(researchType.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
+//			button.setEnabled(false);
+//			button.addActionListener(e -> {
+//				gamepanel.getCommandInterface().research(World.PLAYER_FACTION, researchType);
+//			});
+//			button.addRightClickActionListener(e -> {
+//				infoPanelView.switchInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
+//			});
+//			button.addMouseListener(new MouseAdapter() {
+//				@Override
+//				public void mouseEntered(MouseEvent e) {
+//					infoPanelView.pushInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
+//				}
+//				@Override
+//				public void mouseExited(MouseEvent e) {
+//					infoPanelView.popInfoPanel();
+//				}
+//			});
+//			researchButtons.put(button, researchType);
+//			researchView.add(button);
+//		}
 		statView = new JPanel();
 		for (int i = 0; i < gameInstance.getCombatBuffs().getStats().size(); i++) {
 			CombatStats combatBuffs = gameInstance.getCombatBuffs();
@@ -855,14 +834,14 @@ public class Frame extends JPanel {
 			statView.add(statButtons[i]);
 		}
 
-		minimapPanel = new MinimapView(gamepanel);
+		MinimapView minimapPanel = new MinimapView(gamepanel);
 
 		tabbedPane = new JTabbedPane();
 		tabbedPane.setFocusable(false);
 		tabbedPane.setFont(KUIConstants.buttonFontSmall);
 
 		RESEARCH_TAB = tabbedPane.getTabCount();
-		tabbedPane.addTab(null, RESEARCH_TAB_ICON, researchView, "Research new technologies");
+		tabbedPane.addTab(null, RESEARCH_TAB_ICON, researchView.getRootPanel(), "Research new technologies");
 		
 		WORKER_TAB = tabbedPane.getTabCount();
 		JScrollPane scrollPane = new JScrollPane(workerMenu, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

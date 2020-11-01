@@ -15,8 +15,12 @@ import utils.*;
 import world.*;
 
 public class ClientGUI {
+
+	private static final int TAB_ICON_SIZE = 25;
+	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	
 	private static final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(200, 40);
+
 	
 	private Client client;
 	
@@ -28,10 +32,7 @@ public class ClientGUI {
 	private JPanel topPanel;
 	private JPanel sidePanel;
 	
-	private InfoPanelView infoPanelView;
-	
 	private JPanel playerinfoPanel;
-//	private JPanel connectionInfo;
 	private JPanel lobbyInfo;
 	private JTextField nameTextField;
 	private Color selectedColor = Server.DEFAULT_PLAYER_INFO.getColor();
@@ -41,6 +42,11 @@ public class ClientGUI {
 
 	private GameView gameView;
 	private GameViewOverlay gameViewOverlay;
+	private InfoPanelView infoPanelView;
+
+	private JTabbedPane tabbedPane;
+	private int RESEARCH_TAB;
+	private ResearchView researchView;
 	
 	public ClientGUI() {
 		rootPanel = new JPanel();
@@ -62,7 +68,7 @@ public class ClientGUI {
 		sidePanel = new JPanel();
 		sidePanel.setLayout(new BorderLayout());
 		sidePanel.setFocusable(false);
-//		sidePanel.setPreferredSize(new Dimension(Frame.GUIWIDTH, 0));
+		sidePanel.setPreferredSize(new Dimension(Frame.GUIWIDTH, 0));
 
 		ingamePanel.add(topPanel, BorderLayout.NORTH);
 		ingamePanel.add(sidePanel, BorderLayout.EAST);
@@ -225,6 +231,15 @@ public class ClientGUI {
 		infoPanelViewRoot.setPreferredSize(new Dimension(Frame.GUIWIDTH, (int) (Frame.GUIWIDTH / 2.5)));
 		sidePanel.add(infoPanelViewRoot, BorderLayout.SOUTH);
 		
+		tabbedPane = new JTabbedPane();
+		tabbedPane.setFocusable(false);
+		tabbedPane.setFont(KUIConstants.buttonFontSmall);
+		sidePanel.add(tabbedPane, BorderLayout.CENTER);
+		
+		researchView = new ResearchView(gameView.getGameInstance().getGUIController());
+		RESEARCH_TAB = tabbedPane.getTabCount();
+		tabbedPane.addTab(null, RESEARCH_TAB_ICON, researchView.getRootPanel(), "Research new technologies");
+		
 		rootPanel.revalidate();
 		rootPanel.repaint();
 	}
@@ -250,6 +265,10 @@ public class ClientGUI {
 	}
 	public InfoPanelView getInfoPanelView() {
 		return infoPanelView;
+	}
+	
+	public ResearchView getResearchView() {
+		return researchView;
 	}
 
 }

@@ -137,6 +137,8 @@ public class Server {
 			@Override
 			public void tryToCraftItem(ItemType type, int amount) {
 			}
+			@Override
+			public void research(ResearchType researchType) { }
 		});
 		gameInstance.generateWorld(128, 128, false);
 		gui.setGameInstance(gameInstance);

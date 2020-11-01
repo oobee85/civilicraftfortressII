@@ -36,6 +36,9 @@ public class Client {
 			@Override
 			public void updateGUI() {
 				clientGUI.getGameViewOverlay().updateItems();
+				if(gameInstance.world != null) {
+					clientGUI.getResearchView().updateButtons(gameInstance.world);
+				}
 			}
 			@Override
 			public void selectedUnit(Unit unit, boolean selected) {
@@ -65,6 +68,10 @@ public class Client {
 			public void pressedSelectedUnitPortrait(Unit unit) {}
 			@Override
 			public void tryToCraftItem(ItemType type, int amount) {}
+			@Override
+			public void research(ResearchType researchType) {
+				clientGUI.getGameView().getCommandInterface().research(World.PLAYER_FACTION, researchType);
+			}
 		});
 		localCommands = Utils.makeFunctionalCommandInterface(gameInstance);
 		networkingCommands = new CommandInterface() {

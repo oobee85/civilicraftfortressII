@@ -16,4 +16,5 @@ public interface GUIController {
 	public void switchInfoPanel(InfoPanel infoPanel);
 	public void pressedSelectedUnitPortrait(Unit unit);
 	public void tryToCraftItem(ItemType type, int amount);
+	public void research(ResearchType researchType);
 }

@@ -4,7 +4,6 @@ import java.awt.*;
 
 import javax.swing.*;
 
-import networking.view.*;
 import ui.*;
 import ui.Frame;
 import utils.*;
@@ -17,11 +16,11 @@ public class ClientDriver {
 	
 	public ClientDriver() {
 		frame = new JFrame("civilicraftfortressIII");
-		int HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
-		HEIGHT = Math.min(HEIGHT, 1080);
-		HEIGHT = HEIGHT * 8 / 9;
-		int WIDTH = HEIGHT + Frame.GUIWIDTH;
-		frame.setSize(WIDTH, HEIGHT);
+		int height = Toolkit.getDefaultToolkit().getScreenSize().height;
+		height = Math.min(height, 1080);
+		height = height * 8 / 9;
+		int width = height + Frame.GUIWIDTH;
+		frame.setSize(width, height);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(clientGUI.getMainPanel());
