@@ -4,6 +4,7 @@ import java.awt.image.*;
 import java.io.*;
 
 import javax.imageio.*;
+import javax.swing.*;
 
 import utils.*;
 
@@ -79,7 +80,14 @@ public class Driver {
 //		resizeImage("roadtile.png", "newroadtile.png", 16, 16);
 //		ImageCreation.createRoadImages("roadtile.png");
 //		Loader.writeUnitTypes();
-		
+
+		EventQueue.invokeLater(() -> {
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+					| UnsupportedLookAndFeelException ex) {
+			}
+		});
 		new Frame();
 	}
 

@@ -18,6 +18,7 @@ public class ClientGUI {
 
 	private static final int TAB_ICON_SIZE = 25;
 	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	
 	private static final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(200, 40);
 
@@ -46,7 +47,9 @@ public class ClientGUI {
 
 	private JTabbedPane tabbedPane;
 	private int RESEARCH_TAB;
+	private int WORKER_TAB;
 	private ResearchView researchView;
+	private WorkerView workerView;
 	
 	public ClientGUI() {
 		rootPanel = new JPanel();
@@ -239,6 +242,10 @@ public class ClientGUI {
 		researchView = new ResearchView(gameView.getGameInstance().getGUIController());
 		RESEARCH_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab(null, RESEARCH_TAB_ICON, researchView.getRootPanel(), "Research new technologies");
+
+		workerView = new WorkerView(gameView);
+		WORKER_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab(null, WORKER_TAB_ICON, workerView.getRootPanel(), "Build buildings with workers", WORKER_TAB);
 		
 		rootPanel.revalidate();
 		rootPanel.repaint();
@@ -269,6 +276,10 @@ public class ClientGUI {
 	
 	public ResearchView getResearchView() {
 		return researchView;
+	}
+	
+	public WorkerView getWorkerView() {
+		return workerView;
 	}
 
 }

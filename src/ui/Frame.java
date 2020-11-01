@@ -37,8 +37,6 @@ public class Frame extends JPanel {
 	private static final ImageIcon SHADOW_WORD_DEATH = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/soyouhavechosendeath.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon SPAWN_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/spawn_tab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 
-	private static final ImageIcon COLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/collapsed.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private static final ImageIcon UNCOLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/uncollapsed.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon FAST_FORWARD_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/fastforward.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon RAIN_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/rain.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon ERUPTION_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/erupt.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
@@ -57,14 +55,13 @@ public class Frame extends JPanel {
 	private JPanel makeUnitView;
 	private JPanel blacksmithView;
 	private JPanel hellforgeView;
-	private JPanel workerMenu;
+	private WorkerView workerMenu;
 	private JPanel spawnMenu;
 	private ResearchView researchView;
 	private JPanel statView;
 	private JTabbedPane tabbedPane;
 	private JPanel guiSplitter;
 	private JPanel resourcePanel;
-	private JButton[] buildingButtons;
 	private class Pair {
 		public final JButton button;
 		public final UnitType unitType;
@@ -193,17 +190,7 @@ public class Frame extends JPanel {
 			public void updateGUI() {
 				gamepanelOverlay.updateItems();
 				researchView.updateButtons(gameInstance.world);
-				for (int i = 0; i < Game.buildingTypeList.size(); i++) {
-					BuildingType type = Game.buildingTypeList.get(i);
-					JButton button = buildingButtons[i];
-					if (World.PLAYER_FACTION.areRequirementsMet(type)) {
-						button.setEnabled(true);
-//						button.setVisible(true);
-					} else {
-						button.setEnabled(false);
-//						button.setVisible(false);
-					}
-				}
+				workerMenu.updateButtons();
 				boolean castleSelected = World.PLAYER_FACTION.isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("CASTLE"));
 				boolean barracksSelected = World.PLAYER_FACTION.isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("BARRACKS"));
 				boolean workshopSelected = World.PLAYER_FACTION.isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("WORKSHOP"));
@@ -241,16 +228,8 @@ public class Frame extends JPanel {
 		};
 		gameInstance = new Game(guiController);
 
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-					menu();
-				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-						| UnsupportedLookAndFeelException ex) {
-				}
-			}
+		EventQueue.invokeLater(() -> {
+			menu();
 		});
 	}
 	
@@ -385,95 +364,7 @@ public class Frame extends JPanel {
 		Dimension RESEARCH_BUTTON_SIZE = new Dimension(125, 35);
 		int BUILDING_ICON_SIZE = 25;
 
-		
-		workerMenu = new JPanel();
-		workerMenu.setLayout(new GridBagLayout());
-		buildingButtons = new JButton[Game.buildingTypeList.size()];
-		
-		for (int i = 0; i < Game.buildingTypeList.size(); i++) {
-			BuildingType type = Game.buildingTypeList.get(i);
-			KButton button = KUIConstants.setupButton(type.toString(),
-					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
-					BUILDING_BUTTON_SIZE);
-			button.addActionListener(e -> {
-				gamepanel.setBuildingToPlan(type);
-			});
-			button.addRightClickActionListener(e -> {
-				infoPanelView.switchInfoPanel(new BuildingTypeInfoPanel(type));
-			});
-			button.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					infoPanelView.pushInfoPanel(new BuildingTypeInfoPanel(type));
-				}
-				@Override
-				public void mouseExited(MouseEvent e) {
-					infoPanelView.popInfoPanel();
-				}
-			});
-			buildingButtons[i] = button;
-		}
-		
-		KToggleButton toggleButton = KUIConstants.setupToggleButton("Walls/Gates", UNCOLLAPSED_ICON, new Dimension(BUILDING_BUTTON_SIZE.width*2, BUILD_UNIT_BUTTON_SIZE.height));
-		toggleButton.setSelected(true);
-		toggleButton.addActionListener(e -> {
-			for (int i = 0; i < Game.buildingTypeList.size(); i++) {
-				if(Game.buildingTypeList.get(i).blocksMovement()) {
-					buildingButtons[i].setVisible(toggleButton.isSelected());
-				}
-			}
-			toggleButton.setIcon(toggleButton.isSelected() ? UNCOLLAPSED_ICON : COLLAPSED_ICON);
-		});
-		KToggleButton toggleButton2 = KUIConstants.setupToggleButton("Other", UNCOLLAPSED_ICON, new Dimension(BUILDING_BUTTON_SIZE.width*2, BUILD_UNIT_BUTTON_SIZE.height));
-		toggleButton2.setSelected(true);
-		toggleButton2.addActionListener(e -> {
-			for (int i = 0; i < Game.buildingTypeList.size(); i++) {
-				if(!(Game.buildingTypeList.get(i).blocksMovement())) {
-					buildingButtons[i].setVisible(toggleButton2.isSelected());
-				}
-			}
-			toggleButton2.setIcon(toggleButton2.isSelected() ? UNCOLLAPSED_ICON : COLLAPSED_ICON);
-		});
-		
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0; c.gridy = 0; c.weightx = 1; c.gridwidth = 2;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		workerMenu.add(toggleButton, c);
-		c = new GridBagConstraints();
-		c.gridx = 0; c.gridy = 4; c.weightx = 1; c.gridwidth = 2;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		workerMenu.add(toggleButton2, c);
-		int index1 = 0;
-		int index2 = 0;
-		for (int i = 0; i < Game.buildingTypeList.size(); i++) {
-			if(Game.buildingTypeList.get(i).isGate() || Game.buildingTypeList.get(i).blocksMovement()) {
-				c = new GridBagConstraints();
-				c.gridx = index1/3;
-				c.gridy = index1%3 + 1;
-				c.gridwidth = 1;
-				c.weightx = 0.5;
-				c.fill = GridBagConstraints.HORIZONTAL;
-				workerMenu.add(buildingButtons[i], c);
-				index1++;
-			}
-			else {
-				c = new GridBagConstraints();
-				c.gridx = index2%2;
-				c.gridy = index2/2 + 5;
-				c.gridwidth = 1;
-				c.weightx = 0.5;
-				c.fill = GridBagConstraints.HORIZONTAL;
-				workerMenu.add(buildingButtons[i], c);
-				index2++;
-			}
-		}
-		c = new GridBagConstraints();
-		c.gridy = Game.buildingTypeList.size()/2 + 3; 
-		c.gridx = 0; c.gridwidth = 2; c.weightx = 1; c.weighty = 1;
-		c.fill = GridBagConstraints.BOTH;
-		JPanel p = new JPanel();
-		p.setOpaque(false);
-		workerMenu.add(p, c);
+		workerMenu = new WorkerView(gamepanel);
 		
 		spawnMenu = new JPanel();
 		for (int i = 0; i < Game.unitTypeList.size(); i++) {
@@ -844,10 +735,7 @@ public class Frame extends JPanel {
 		tabbedPane.addTab(null, RESEARCH_TAB_ICON, researchView.getRootPanel(), "Research new technologies");
 		
 		WORKER_TAB = tabbedPane.getTabCount();
-		JScrollPane scrollPane = new JScrollPane(workerMenu, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-		workerMenu.setPreferredSize(new Dimension(GUIWIDTH, BUILDING_BUTTON_SIZE.height * (Game.buildingTypeList.size()/2 + 4)));
-		tabbedPane.insertTab(null, WORKER_TAB_ICON, scrollPane, "Build buildings with workers", WORKER_TAB);
+		tabbedPane.insertTab(null, WORKER_TAB_ICON, workerMenu.getRootPanel(), "Build buildings with workers", WORKER_TAB);
 
 		MAKE_UNIT_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab(null, MAKE_UNIT_TAB_ICON, makeUnitView, "Make units from castles, barracks, or workshops", MAKE_UNIT_TAB);

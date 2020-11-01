@@ -41,6 +41,13 @@ public class ClientDriver {
 	}
 
 	public static void main(String[] args) {
+		EventQueue.invokeLater(() -> {
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+					| UnsupportedLookAndFeelException ex) {
+			}
+		});
 		ClientDriver driver = new ClientDriver();
 		driver.start();
 	}

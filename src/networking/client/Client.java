@@ -39,6 +39,7 @@ public class Client {
 				if(gameInstance.world != null) {
 					clientGUI.getResearchView().updateButtons(gameInstance.world);
 				}
+				clientGUI.getWorkerView().updateButtons();
 			}
 			@Override
 			public void selectedUnit(Unit unit, boolean selected) {
