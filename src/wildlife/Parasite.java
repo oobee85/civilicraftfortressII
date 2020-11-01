@@ -21,7 +21,7 @@ public class Parasite extends Animal {
 	public void updateState() {
 		super.updateState();
 		if(getTarget() != null) {
-			if(getTarget().isDead() || getTarget().getFaction() != World.PLAYER_FACTION) {
+			if(getTarget().isDead() || !getTarget().getFaction().isPlayer()) {
 				clearPlannedActions();
 			}
 		}

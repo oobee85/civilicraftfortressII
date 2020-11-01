@@ -140,7 +140,11 @@ public class Server {
 			@Override
 			public void research(ResearchType researchType) { }
 		});
-		gameInstance.generateWorld(128, 128, false);
+		LinkedList<PlayerInfo> players = new LinkedList<>();
+		for (Connection connection : connections.keySet()) {
+			players.add(connection.getPlayerInfo());
+		}
+		gameInstance.generateWorld(128, 128, false, players);
 		gui.setGameInstance(gameInstance);
 		startWorldNetworkingUpdateThread();
 	}
@@ -228,18 +232,18 @@ public class Server {
 			}
 		}
 		else if(message.getCommand() == CommandType.RESEARCH) {
-			if(message.getFaction() >= 0 && message.getFaction() < World.factions.length) {
+			if(message.getFaction() >= 0 && message.getFaction() < gameInstance.world.getFactions().size()) {
 				ResearchType researchType = Game.researchTypeMap.get(message.getType());
 				if(researchType != null) {
-					gui.getCommandInterface().research(World.factions[message.getFaction()], researchType);
+					gui.getCommandInterface().research(gameInstance.world.getFactions().get(message.getFaction()), researchType);
 				}
 			}
 		}
 		else if(message.getCommand() == CommandType.CRAFT_ITEM) {
-			if(message.getFaction() >= 0 && message.getFaction() < World.factions.length) {
+			if(message.getFaction() >= 0 && message.getFaction() < gameInstance.world.getFactions().size()) {
 				ItemType itemType = ItemType.valueOf(message.getType());
 				if(itemType != null) {
-					gui.getCommandInterface().craftItem(World.factions[message.getFaction()], itemType);
+					gui.getCommandInterface().craftItem(gameInstance.world.getFactions().get(message.getFaction()), itemType);
 				}
 			}
 		}

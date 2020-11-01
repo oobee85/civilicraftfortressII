@@ -18,15 +18,15 @@ public class ResearchView {
 	private static final int RESEARCH_ICON_SIZE = 25;
 
 	private JPanel rootPanel;
-	private GUIController guiInterface;
+	private GameView gameView;
 
 	private HashMap<JButton, ResearchType> researchButtons = new HashMap<>();
 	
-	public ResearchView(GUIController guiInterface) {
+	public ResearchView(GameView gameView) {
 		rootPanel = new JPanel();
 		rootPanel.setFocusable(false);
 		
-		this.guiInterface = guiInterface;
+		this.gameView = gameView;
 		setup();
 	}
 	private void setup() {
@@ -36,19 +36,19 @@ public class ResearchView {
 					Utils.resizeImageIcon(researchType.getImageIcon(0), RESEARCH_ICON_SIZE, RESEARCH_ICON_SIZE), null);
 			button.setEnabled(false);
 			button.addActionListener(e -> {
-				guiInterface.research(researchType);
+				gameView.getGameInstance().getGUIController().research(researchType);
 			});
 			button.addRightClickActionListener(e -> {
-				guiInterface.switchInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
+				gameView.getGameInstance().getGUIController().switchInfoPanel(new ResearchInfoPanel(gameView.getFaction().getResearch(researchType), gameView.getFaction()));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					guiInterface.pushInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
+					gameView.getGameInstance().getGUIController().pushInfoPanel(new ResearchInfoPanel(gameView.getFaction().getResearch(researchType), gameView.getFaction()));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
-					guiInterface.popInfoPanel();
+					gameView.getGameInstance().getGUIController().popInfoPanel();
 				}
 			});
 			researchButtons.put(button, researchType);
@@ -57,10 +57,10 @@ public class ResearchView {
 	}
 	
 	public void updateButtons(World world) {
-		boolean hasResearchLab = World.PLAYER_FACTION.hasResearchLab(world);
+		boolean hasResearchLab = gameView.getFaction().hasResearchLab(world);
 		for(Entry<JButton, ResearchType> entry : researchButtons.entrySet()) {
 			JButton button = entry.getKey();
-			Research research = World.PLAYER_FACTION.getResearch(entry.getValue());
+			Research research = gameView.getFaction().getResearch(entry.getValue());
 			ResearchRequirement req = research.getRequirement();
 			if (research.isUnlocked()) {
 				button.setEnabled(false);

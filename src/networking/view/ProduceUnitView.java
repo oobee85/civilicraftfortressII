@@ -45,12 +45,12 @@ public class ProduceUnitView {
 				gameView.tryToBuildUnit(type);
 			});
 			button.addRightClickActionListener(e -> {
-				gameView.getGameInstance().getGUIController().switchInfoPanel(new UnitTypeInfoPanel(type));
+				gameView.getGameInstance().getGUIController().switchInfoPanel(new UnitTypeInfoPanel(type, gameView.getFaction()));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					gameView.getGameInstance().getGUIController().pushInfoPanel(new UnitTypeInfoPanel(type));
+					gameView.getGameInstance().getGUIController().pushInfoPanel(new UnitTypeInfoPanel(type, gameView.getFaction()));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
@@ -64,14 +64,14 @@ public class ProduceUnitView {
 	}
 	
 	public void updateButtons() {
-		boolean castleSelected = World.PLAYER_FACTION.isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("CASTLE"));
-		boolean barracksSelected = World.PLAYER_FACTION.isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("BARRACKS"));
-		boolean workshopSelected = World.PLAYER_FACTION.isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("WORKSHOP"));
+		boolean castleSelected = gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("CASTLE"));
+		boolean barracksSelected = gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("BARRACKS"));
+		boolean workshopSelected = gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("WORKSHOP"));
 		for(Pair pair : unitButtons) {
 			if((castleSelected && Game.buildingTypeMap.get("CASTLE").unitsCanBuildSet().contains(pair.unitType)) 
 					|| (barracksSelected && Game.buildingTypeMap.get("BARRACKS").unitsCanBuildSet().contains(pair.unitType))
 					|| (workshopSelected && Game.buildingTypeMap.get("WORKSHOP").unitsCanBuildSet().contains(pair.unitType))) {
-				if (World.PLAYER_FACTION.areRequirementsMet(pair.unitType)) {
+				if (gameView.getFaction().areRequirementsMet(pair.unitType)) {
 					pair.button.setEnabled(true);
 					pair.button.setVisible(true);
 					continue;

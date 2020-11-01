@@ -227,7 +227,6 @@ public class ClientGUI {
 		minimapView.setPreferredSize(new Dimension(Frame.GUIWIDTH, Frame.GUIWIDTH));
 		gameView.requestFocus();
 		gameViewOverlay = new GameViewOverlay(instance.getGUIController());
-		gameViewOverlay.changeFaction(World.PLAYER_FACTION);
 		gameView.setLayout(new BorderLayout());
 		gameView.add(gameViewOverlay, BorderLayout.CENTER);
 		ingamePanel.add(gameView, BorderLayout.CENTER);
@@ -245,7 +244,7 @@ public class ClientGUI {
 		tabbedPane.setFont(KUIConstants.buttonFontSmall);
 		sidePanel.add(tabbedPane, BorderLayout.CENTER);
 		
-		researchView = new ResearchView(gameView.getGameInstance().getGUIController());
+		researchView = new ResearchView(gameView);
 		RESEARCH_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab(null, RESEARCH_TAB_ICON, researchView.getRootPanel(), "Research new technologies");
 
@@ -327,9 +326,9 @@ public class ClientGUI {
 		}
 		else {
 			if(gameView.getGameInstance().world != null) {
-				if(!(World.PLAYER_FACTION.isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("CASTLE"))
-						|| World.PLAYER_FACTION.isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("BARRACKS"))
-						|| World.PLAYER_FACTION.isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("WORKSHOP")))) {
+				if(!(gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("CASTLE"))
+						|| gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("BARRACKS"))
+						|| gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("WORKSHOP")))) {
 					if(tabbedPane.getSelectedIndex() == PRODUCE_UNIT_TAB) {
 						tabbedPane.setSelectedIndex(0);
 					}

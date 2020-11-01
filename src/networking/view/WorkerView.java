@@ -55,12 +55,12 @@ public class WorkerView {
 				gameView.setBuildingToPlan(type);
 			});
 			button.addRightClickActionListener(e -> {
-				gameView.getGameInstance().getGUIController().switchInfoPanel(new BuildingTypeInfoPanel(type));
+				gameView.getGameInstance().getGUIController().switchInfoPanel(new BuildingTypeInfoPanel(type, gameView.getFaction()));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					gameView.getGameInstance().getGUIController().pushInfoPanel(new BuildingTypeInfoPanel(type));
+					gameView.getGameInstance().getGUIController().pushInfoPanel(new BuildingTypeInfoPanel(type, gameView.getFaction()));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
@@ -136,7 +136,7 @@ public class WorkerView {
 		for (int i = 0; i < Game.buildingTypeList.size(); i++) {
 			BuildingType type = Game.buildingTypeList.get(i);
 			JButton button = buildingButtons[i];
-			if (World.PLAYER_FACTION.areRequirementsMet(type)) {
+			if (gameView.getFaction().areRequirementsMet(type)) {
 				button.setEnabled(true);
 //				button.setVisible(true);
 			} else {

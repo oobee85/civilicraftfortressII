@@ -41,12 +41,11 @@ public class World {
 	private int height;
 
 	
-	public static final Faction NO_FACTION = new Faction("NONE", false);
-	public static Faction PLAYER_FACTION = new Faction("PLAYER", true);
-	public static final Faction CYCLOPS_FACTION = new Faction("CYCLOPS", true);
-	public static final Faction UNDEAD_FACTION = new Faction("UNDEAD", true);
-	public static final Faction[] factions = new Faction[] {NO_FACTION, PLAYER_FACTION, CYCLOPS_FACTION, UNDEAD_FACTION};
-	public static Faction getFaction(String name) {
+	public static final Faction NO_FACTION = new Faction("NONE", false, false);
+	public static final Faction CYCLOPS_FACTION = new Faction("CYCLOPS", false, true);
+	public static final Faction UNDEAD_FACTION = new Faction("UNDEAD", false, true);
+	private ArrayList<Faction> factions = new ArrayList<>(Arrays.asList(new Faction[] {NO_FACTION, CYCLOPS_FACTION, UNDEAD_FACTION}));
+	public Faction getFaction(String name) {
 		for(Faction faction : factions) {
 			if(faction.name.equals(name)) {
 				return faction;
@@ -54,7 +53,12 @@ public class World {
 		}
 		return null;
 	}
-	
+	public void addFaction(Faction faction) {
+		factions.add(faction);
+	}
+	public ArrayList<Faction> getFactions() {
+		return factions;
+	}
 	public LinkedList<Plant> plants = new LinkedList<Plant>();
 	public LinkedList<Plant> newPlants = new LinkedList<Plant>();
 	public LinkedList<Unit> units = new LinkedList<Unit>();
@@ -102,6 +106,12 @@ public class World {
 		for(Tile tile : getTiles()) {
 			tile.setNeighbors(getNeighbors(tile));
 		}
+
+		for(Faction f : factions) {
+			f.setupResearch();
+		}
+		World.CYCLOPS_FACTION.addItem(ItemType.FOOD, 50);
+		World.UNDEAD_FACTION.addItem(ItemType.FOOD, 999999);
 	}
 	public void updateTiles(Tile[] tileInfos) {
 		System.out.println("updating " + tileInfos.length + " tiles");
@@ -111,7 +121,7 @@ public class World {
 				System.out.println("Tried to update null tile at " + info.getLocation());
 			}
 			if(tile.getFaction().id != info.getFaction().id) {
-				tile.setFaction(factions[info.getFaction().id]);
+				tile.setFaction(factions.get(info.getFaction().id));
 				addToTerritory(tile);
 			}
 			tile.setHeight(info.getHeight());
@@ -917,7 +927,7 @@ public class World {
 	}
 	
 
-	public BufferedImage[] createTerrainImage() {
+	public BufferedImage[] createTerrainImage(Faction faction) {
 		double brighnessModifier = getDaylight();
 		HashMap<Terrain, Color> terrainColors = new HashMap<>();
 		for(Terrain t : Terrain.values()) {
@@ -974,14 +984,14 @@ public class World {
 				minimapColor = Utils.blendColors(tile.getFaction().color, minimapColor, 0.3);
 				terrainColor = Utils.blendColors(tile.getFaction().color, terrainColor, 0.3);
 			}
-			double tilebrightness = tile.getBrightness(World.PLAYER_FACTION);
+			double tilebrightness = tile.getBrightness(faction);
 			minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);
 			terrainColor = Utils.blendColors(terrainColor, Color.black, brighnessModifier + tilebrightness);
 
 			minimapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), minimapColor.getRGB());
 			terrainImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), terrainColor.getRGB());
 		}
-		for(AttackedNotification notification : World.PLAYER_FACTION.getAttackedNotifications()) {
+		for(AttackedNotification notification : faction.getAttackedNotifications()) {
 			minimapImage.setRGB(notification.tile.getLocation().x(), notification.tile.getLocation().y(), Color.red.getRGB());
 			terrainImage.setRGB(notification.tile.getLocation().x(), notification.tile.getLocation().y(), Color.red.getRGB());
 		}

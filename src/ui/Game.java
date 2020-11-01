@@ -6,6 +6,7 @@ import java.util.*;
 
 import game.*;
 import liquid.*;
+import networking.server.*;
 import utils.*;
 import wildlife.*;
 import world.*;
@@ -32,15 +33,6 @@ public class Game {
 		this.guiController = guiController;
 		
 		Loader.doTargetingMappings();
-		for(Faction f : World.factions) {
-			f.setupResearch();
-		}
-		
-		World.PLAYER_FACTION.addItem(ItemType.WOOD, 200);
-		World.PLAYER_FACTION.addItem(ItemType.STONE, 200);
-		World.PLAYER_FACTION.addItem(ItemType.FOOD, 200);
-		World.CYCLOPS_FACTION.addItem(ItemType.FOOD, 50);
-		World.UNDEAD_FACTION.addItem(ItemType.FOOD, 999999);
 		
 //		resources.get(ItemType.IRON_ORE).addAmount(200);
 //		resources.get(ItemType.COPPER_ORE).addAmount(200);
@@ -206,9 +198,9 @@ public class Game {
 	public CombatStats getCombatBuffs() {
 		return combatBuffs;
 	}
-	public void addResources() {
+	public void addResources(Faction faction) {
 		for(ItemType itemType : ItemType.values()) {
-			World.PLAYER_FACTION.addItem(itemType, 1000);
+			faction.addItem(itemType, 1000);
 		}
 		
 	}
@@ -246,17 +238,15 @@ public class Game {
 	public void initializeWorld(int width, int height) {
 		world = new World(width, height);
 	}
-	public void generateWorld(int width, int height, boolean easymode) {
+	public void generateWorld(int width, int height, boolean easymode, List<PlayerInfo> players) {
 		initializeWorld(width, height);
 		Attack.world = world;
 		world.generateWorld();
 		makeRoads(easymode);
-		if(easymode) {
-			addResources();
-		}
 		world.clearDeadAndAddNewThings();
 		spawnCyclops();
 		meteorStrike();
+		makeStartingCastleAndUnits(easymode, players);
 	}
 	public void spawnCyclops() {
 		LinkedList<Tile> tiles = world.getTilesRandomly();
@@ -458,62 +448,71 @@ public class Game {
 		makeRoadBetween(world.get(new TileLoc(world.getWidth()-1, 0)), world.get(new TileLoc(0, world.getHeight()-1)));
 		makeRoadBetween(world.get(new TileLoc(0, 0)), world.get(new TileLoc(world.getWidth()-1, world.getHeight()-1)));
 		makeRoadBetween(highestTile, lowestTile);
-		
-		makeStartingCastleAndUnits(easymode);
 	}
-	private void makeStartingCastleAndUnits(boolean easymode) {
-		LinkedList<HasImage> thingsToPlace = new LinkedList<>();
-		thingsToPlace.add(Game.buildingTypeMap.get("CASTLE"));
-		thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
-		thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
-		if(easymode || true) {
-			thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
-			thingsToPlace.add(Game.buildingTypeMap.get("WORKSHOP"));
-			thingsToPlace.add(Game.buildingTypeMap.get("BLACKSMITH"));
-		}
-		
-		HashSet<Tile> visited = new HashSet<>();
-		LinkedList<Tile> tovisit = new LinkedList<>();
-		
-		Tile middle = world.get(new TileLoc(world.getWidth()/2, world.getHeight()/2));
-		tovisit.add(middle);
-		visited.add(middle);
-		
-		while(!thingsToPlace.isEmpty()) {
-			Tile current = tovisit.removeFirst();
-			HasImage thing = thingsToPlace.getFirst();
-			if(thing instanceof BuildingType) {
-				BuildingType type = (BuildingType)thing;
-				if (current.canBuild() == true 
-						&& !current.hasBuilding()
-						&& current.liquidAmount < current.liquidType.getMinimumDamageAmount()
-						&& (current.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"))) {
-					Building s = new Building(type, current, World.PLAYER_FACTION);
-					current.setBuilding(s);
-					world.newBuildings.add(s);
-					s.setRemainingEffort(0);
-					thing = null;
-				}
-			}
-			else if(thing instanceof UnitType) {
-				if (current.liquidAmount < current.liquidType.getMinimumDamageAmount()) {
-					summonThing(current, thing, World.PLAYER_FACTION);
-					thing = null;
-				}
-			}
-			if(thing == null) {
-				tovisit.clear();
-				visited.clear();
-				visited.add(current);
-				thingsToPlace.remove();
-			}
+	private void makeStartingCastleAndUnits(boolean easymode, List<PlayerInfo> players) {
+		int index = 0;
+		for(PlayerInfo player : players) {
+			Faction newFaction = new Faction(player.getName(), true, true, player.getColor());
+			newFaction.setupResearch();
+			newFaction.addItem(ItemType.WOOD, 200);
+			newFaction.addItem(ItemType.STONE, 200);
+			newFaction.addItem(ItemType.FOOD, 200);
+			world.addFaction(newFaction);
 			
-			for(Tile neighbor : current.getNeighbors()) {
-				if(!visited.contains(neighbor)) {
-					visited.add(neighbor);
-					tovisit.add(neighbor);
+			LinkedList<HasImage> thingsToPlace = new LinkedList<>();
+			thingsToPlace.add(Game.buildingTypeMap.get("CASTLE"));
+			thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
+			thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
+			if(easymode || true) {
+				thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
+				thingsToPlace.add(Game.buildingTypeMap.get("WORKSHOP"));
+				thingsToPlace.add(Game.buildingTypeMap.get("BLACKSMITH"));
+				addResources(newFaction);
+			}
+			Tile spawnTile = world.get(new TileLoc(world.getWidth()/2 + index*40 - players.size()*40/2, world.getHeight()/2));
+			HashSet<Tile> visited = new HashSet<>();
+			LinkedList<Tile> tovisit = new LinkedList<>();
+			
+			tovisit.add(spawnTile);
+			visited.add(spawnTile);
+			
+			while(!thingsToPlace.isEmpty()) {
+				Tile current = tovisit.removeFirst();
+				HasImage thing = thingsToPlace.getFirst();
+				if(thing instanceof BuildingType) {
+					BuildingType type = (BuildingType)thing;
+					if (current.canBuild() == true 
+							&& !current.hasBuilding()
+							&& current.liquidAmount < current.liquidType.getMinimumDamageAmount()
+							&& (current.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"))) {
+						Building s = new Building(type, current, newFaction);
+						current.setBuilding(s);
+						world.newBuildings.add(s);
+						s.setRemainingEffort(0);
+						thing = null;
+					}
+				}
+				else if(thing instanceof UnitType) {
+					if (current.liquidAmount < current.liquidType.getMinimumDamageAmount()) {
+						summonThing(current, thing, newFaction);
+						thing = null;
+					}
+				}
+				if(thing == null) {
+					tovisit.clear();
+					visited.clear();
+					visited.add(current);
+					thingsToPlace.remove();
+				}
+				
+				for(Tile neighbor : current.getNeighbors()) {
+					if(!visited.contains(neighbor)) {
+						visited.add(neighbor);
+						tovisit.add(neighbor);
+					}
 				}
 			}
+			index++;
 		}
 	}
 	
@@ -528,7 +527,7 @@ public class Game {
 		
 		if(thingType instanceof UnitType) {
 			UnitType unitType = (UnitType)thingType;
-			if(faction == World.PLAYER_FACTION) {
+			if(faction.isPlayer()) {
 				Unit unit = new Unit(unitType, tile, faction);
 				world.newUnits.add(unit);
 				tile.addUnit(unit);
@@ -655,15 +654,15 @@ public class Game {
 	}
 	
 	
-	private void buildUnit(UnitType u, Tile tile) {
+	private void buildUnit(UnitType u, Tile tile, Faction faction) {
 		System.out.println("building " + u);
-		if(World.PLAYER_FACTION.canAfford(u.getCost())) {
+		if(faction.canAfford(u.getCost())) {
 			System.out.println("can afford " + u);
-			Unit unit = new Unit(u, tile, World.PLAYER_FACTION);
+			Unit unit = new Unit(u, tile, faction);
 			if (tile.isBlocked(unit)) {
 				return;
 			}
-			World.PLAYER_FACTION.payCost(u.getCost());
+			faction.payCost(u.getCost());
 			tile.getBuilding().setProducingUnit(unit);
 			System.out.println("built " + u);
 		}
@@ -675,8 +674,8 @@ public class Game {
 		return new Color(c, c, c);
 	}
 	
-	public void researchEverything() {
-		World.PLAYER_FACTION.researchEverything();
+	public void researchEverything(Faction faction) {
+		faction.researchEverything();
 		guiController.updateGUI();
 	}
 }

@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.Timer;
 
 import game.*;
+import networking.server.*;
 import networking.view.*;
 import ui.infopanels.*;
 import utils.*;
@@ -107,11 +108,11 @@ public class Frame extends JPanel {
 			}
 			@Override
 			public void tryToCraftItem(ItemType type, int amount) {
-				gamepanel.getCommandInterface().craftItem(World.PLAYER_FACTION, type);
+				gamepanel.getCommandInterface().craftItem(gamepanel.getFaction(), type);
 			}
 			@Override
 			public void research(ResearchType researchType) {
-				gamepanel.getCommandInterface().research(World.PLAYER_FACTION, researchType);
+				gamepanel.getCommandInterface().research(gamepanel.getFaction(), researchType);
 			}
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {
@@ -170,6 +171,7 @@ public class Frame extends JPanel {
 			@Override
 			public void changedFaction(Faction faction) {
 				gamepanelOverlay.changeFaction(faction);
+				gamepanel.setFaction(faction);
 			}
 
 			@Override
@@ -231,7 +233,6 @@ public class Frame extends JPanel {
 		gamepanel = new GameView(gameInstance);
 		gamepanel.setCommandInterface(Utils.makeFunctionalCommandInterface(gameInstance));
 		gamepanelOverlay = new GameViewOverlay(guiController);
-		gamepanelOverlay.changeFaction(World.PLAYER_FACTION);
 		gamepanel.setLayout(new BorderLayout());
 		gamepanel.add(gamepanelOverlay, BorderLayout.CENTER);
 	}
@@ -252,9 +253,11 @@ public class Frame extends JPanel {
 			tabbedPane.setSelectedIndex(MAKE_UNIT_TAB);
 		}
 		else {
-			if(!(World.PLAYER_FACTION.isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("CASTLE"))
-					|| World.PLAYER_FACTION.isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("BARRACKS"))
-					|| World.PLAYER_FACTION.isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("WORKSHOP")))) {
+			System.out.println(gamepanel);
+			System.out.println(gamepanel.getFaction());
+			if(!(gamepanel.getFaction().isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("CASTLE"))
+					|| gamepanel.getFaction().isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("BARRACKS"))
+					|| gamepanel.getFaction().isBuildingSelected(gameInstance.world, Game.buildingTypeMap.get("WORKSHOP")))) {
 				if(tabbedPane.getSelectedIndex() == MAKE_UNIT_TAB) {
 					tabbedPane.setSelectedIndex(0);
 				}
@@ -309,10 +312,14 @@ public class Frame extends JPanel {
 		System.err.println("Starting Game");
 		
 		int size = Integer.parseInt(mapSize.getText());
-		gameInstance.generateWorld(size, size, easyModeButton.isSelected());
-
-		Dimension RESEARCH_BUTTON_SIZE = new Dimension(125, 35);
-		int BUILDING_ICON_SIZE = 25;
+		
+		gameInstance.generateWorld(size, size, easyModeButton.isSelected(), Arrays.asList(new PlayerInfo("Player", Color.pink)));
+		for(Faction f : gameInstance.world.getFactions()) {
+			if(f.isPlayer()) {
+				guiController.changedFaction(f);
+				break;
+			}
+		}
 
 		workerMenu = new WorkerView(gamepanel);
 		
@@ -327,12 +334,12 @@ public class Frame extends JPanel {
 				gamepanel.setThingToSpawn(type);
 			});
 			button.addRightClickActionListener(e -> {
-				infoPanelView.switchInfoPanel(new UnitTypeInfoPanel(type));
+				infoPanelView.switchInfoPanel(new UnitTypeInfoPanel(type, gamepanel.getFaction()));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					infoPanelView.pushInfoPanel(new UnitTypeInfoPanel(type));
+					infoPanelView.pushInfoPanel(new UnitTypeInfoPanel(type, gamepanel.getFaction()));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
@@ -351,12 +358,12 @@ public class Frame extends JPanel {
 				gamepanel.setThingToSpawn(type);
 			});
 			button.addRightClickActionListener(e -> {
-				infoPanelView.switchInfoPanel(new BuildingTypeInfoPanel(type));
+				infoPanelView.switchInfoPanel(new BuildingTypeInfoPanel(type, gamepanel.getFaction()));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					infoPanelView.pushInfoPanel(new BuildingTypeInfoPanel(type));
+					infoPanelView.pushInfoPanel(new BuildingTypeInfoPanel(type, gamepanel.getFaction()));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
@@ -411,7 +418,7 @@ public class Frame extends JPanel {
 		addResources.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.addResources();
+				gameInstance.addResources(gamepanel.getFaction());
 			}
 		});
 
@@ -446,7 +453,7 @@ public class Frame extends JPanel {
 		researchEverything.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.researchEverything();
+				gameInstance.researchEverything(gamepanel.getFaction());
 				buttonPanel.remove(researchEverything);
 			}
 		});
@@ -474,12 +481,12 @@ public class Frame extends JPanel {
 		});
 		JButton setPlayerFaction = KUIConstants.setupButton("Change Faction", CHANGE_FACTION_ICON, DEBUG_BUTTON_SIZE);
 		setPlayerFaction.addActionListener(e -> {
-			int choice = JOptionPane.showOptionDialog(null, "Choose faction", "Choose faction", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, World.factions, World.NO_FACTION);
-			if(choice >= 0 && choice < World.factions.length) {
-				if(World.PLAYER_FACTION != World.factions[choice]) {
+			int choice = JOptionPane.showOptionDialog(null, "Choose faction", "Choose faction", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, gameInstance.world.getFactions().toArray(), World.NO_FACTION);
+			if(choice >= 0 && choice < gameInstance.world.getFactions().size()) {
+				if(gamepanel.getFaction() != gameInstance.world.getFactions().get(choice)) {
 					gamepanel.deselectEverything();
-					World.PLAYER_FACTION = World.factions[choice];
-					guiController.changedFaction(World.PLAYER_FACTION);
+					gamepanel.setFaction(gameInstance.world.getFactions().get(choice));
+					guiController.changedFaction(gameInstance.world.getFactions().get(choice));
 				}
 			}
 		});
@@ -535,33 +542,7 @@ public class Frame extends JPanel {
 		buttonPanel.add(exit);
 		buttonPanel.add(shadowWordDeath);
 
-		researchView = new ResearchView(guiController);
-//		researchView = new JPanel();
-//		for (int i = 0; i < Game.researchTypeList.size(); i++) {
-//			ResearchType researchType = Game.researchTypeList.get(i);
-//			KButton button = KUIConstants.setupButton(researchType.toString(),
-//					Utils.resizeImageIcon(researchType.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
-//			button.setEnabled(false);
-//			button.addActionListener(e -> {
-//				gamepanel.getCommandInterface().research(World.PLAYER_FACTION, researchType);
-//			});
-//			button.addRightClickActionListener(e -> {
-//				infoPanelView.switchInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
-//			});
-//			button.addMouseListener(new MouseAdapter() {
-//				@Override
-//				public void mouseEntered(MouseEvent e) {
-//					infoPanelView.pushInfoPanel(new ResearchInfoPanel(World.PLAYER_FACTION.getResearch(researchType)));
-//				}
-//				@Override
-//				public void mouseExited(MouseEvent e) {
-//					infoPanelView.popInfoPanel();
-//				}
-//			});
-//			researchButtons.put(button, researchType);
-//			researchView.add(button);
-//		}
-
+		researchView = new ResearchView(gamepanel);
 		MinimapView minimapPanel = new MinimapView(gamepanel);
 
 		tabbedPane = new JTabbedPane();

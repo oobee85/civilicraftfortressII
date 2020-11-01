@@ -19,10 +19,12 @@ public class UnitTypeInfoPanel extends InfoPanel {
 	
 	
 	UnitType showing;
+	private Faction faction;
 
-	public UnitTypeInfoPanel(UnitType showing) {
+	public UnitTypeInfoPanel(UnitType showing, Faction faction) {
 		super(showing.toString(), showing.getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
+		this.faction = faction;
 	}
 	
 	public static void drawCombatStats(Graphics g, CombatStats stats, int x, int y) {
@@ -50,7 +52,7 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		g.drawString(stats.getHealth() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
 	}
 	
-	public static void drawCosts(Graphics g, HashMap<ItemType, Integer> costs, int x, int y) {
+	public static void drawCosts(Graphics g, HashMap<ItemType, Integer> costs, int x, int y, Faction faction) {
 		g.setFont(KUIConstants.combatStatsFont);
 		int fontSize = g.getFont().getSize();
 		int iconSize = 16;
@@ -58,7 +60,7 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		
 		for(Entry<ItemType, Integer> entry : costs.entrySet()) {
 			g.drawImage(entry.getKey().getImage(iconSize), x, y, iconSize, iconSize, null);
-			int currentAmount = World.PLAYER_FACTION.getItemAmount(entry.getKey());
+			int currentAmount = faction.getItemAmount(entry.getKey());
 			String str = currentAmount + "/" + entry.getValue() + " " + entry.getKey().toString();
 			g.setColor(currentAmount >= entry.getValue() ? Color.black : Color.red);
 			g.drawString(str, x + iconSize + gap + 1, y + iconSize/2 + fontSize/3);
@@ -83,7 +85,7 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		}
 
 		if(showing.getCost() != null) {
-			drawCosts(g, showing.getCost(), x, y + 6);
+			drawCosts(g, showing.getCost(), x, y + 6, faction);
 		}
 		drawCombatStats(g, showing.getCombatStats(), getWidth() - 80, 4);
 	}

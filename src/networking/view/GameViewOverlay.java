@@ -68,12 +68,12 @@ public class GameViewOverlay extends JPanel {
 				});
 			}
 			button.addRightClickActionListener(e -> {
-				guiController.switchInfoPanel(new ItemTypeInfoPanel(type));
+				guiController.switchInfoPanel(new ItemTypeInfoPanel(type, faction));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					guiController.pushInfoPanel(new ItemTypeInfoPanel(type));
+					guiController.pushInfoPanel(new ItemTypeInfoPanel(type, faction));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {

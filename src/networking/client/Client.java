@@ -1,5 +1,6 @@
 package networking.client;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
@@ -13,6 +14,7 @@ import networking.*;
 import networking.message.*;
 import networking.server.*;
 import ui.*;
+import ui.Frame;
 import ui.infopanels.*;
 import utils.*;
 import world.*;
@@ -32,9 +34,9 @@ public class Client {
 		gameInstance = new Game(new GUIController() {
 			@Override
 			public void updateGUI() {
-				clientGUI.getGameViewOverlay().updateItems();
-				clientGUI.getWorkerView().updateButtons();
 				if(gameInstance.world != null) {
+					clientGUI.getGameViewOverlay().updateItems();
+					clientGUI.getWorkerView().updateButtons();
 					clientGUI.getResearchView().updateButtons(gameInstance.world);
 					clientGUI.getProduceUnitView().updateButtons();
 					clientGUI.getCraftingView().updateButtons();
@@ -70,6 +72,7 @@ public class Client {
 			}
 			@Override
 			public void changedFaction(Faction faction) {
+				clientGUI.getGameView().setFaction(faction);
 				clientGUI.getGameViewOverlay().changeFaction(faction);
 			}
 			@Override
@@ -90,7 +93,7 @@ public class Client {
 			public void tryToCraftItem(ItemType type, int amount) {}
 			@Override
 			public void research(ResearchType researchType) {
-				clientGUI.getGameView().getCommandInterface().research(World.PLAYER_FACTION, researchType);
+				clientGUI.getGameView().getCommandInterface().research(clientGUI.getGameView().getFaction(), researchType);
 			}
 		});
 		localCommands = Utils.makeFunctionalCommandInterface(gameInstance);
@@ -145,7 +148,13 @@ public class Client {
 	}
 	public void setupSinglePlayer() {
 		clientGUI.getGameView().setCommandInterface(localCommands);
-		gameInstance.generateWorld(128, 128, false);
+		gameInstance.generateWorld(128, 128, false, Arrays.asList(new PlayerInfo("Player", Color.pink)));
+		for(Faction f : gameInstance.world.getFactions()) {
+			if(f.isPlayer()) {
+				gameInstance.getGUIController().changedFaction(f);
+				break;
+			}
+		}
 
 		Thread gameLoopThread = new Thread(() -> {
 			while (true) {
@@ -265,7 +274,7 @@ public class Client {
 			Building newBuilding = new Building(
 					Game.buildingTypeMap.get(buildingUpdate.getType().name()), 
 					gameInstance.world.get(buildingUpdate.getTile().getLocation()), 
-					World.factions[buildingUpdate.getFaction().id]);
+					gameInstance.world.getFactions().get(buildingUpdate.getFaction().id));
 			newThing = newBuilding;
 			things.put(update.id(), newBuilding);
 			gameInstance.world.newBuildings.add(newBuilding);
@@ -281,7 +290,7 @@ public class Client {
 			Unit newUnit = new Unit(
 					Game.unitTypeMap.get(unitUpdate.getType().name()), 
 					gameInstance.world.get(unitUpdate.getTile().getLocation()), 
-					World.factions[unitUpdate.getFaction().id]);
+					gameInstance.world.getFactions().get(unitUpdate.getFaction().id));
 			newThing = newUnit;
 			things.put(update.id(), newUnit);
 			gameInstance.world.newUnits.add(newUnit);
@@ -295,7 +304,7 @@ public class Client {
 	}
 	
 	private void updateThing(Thing existing, Thing update) {
-		existing.setFaction(World.factions[update.getFaction().id]);
+		existing.setFaction(gameInstance.world.getFactions().get(update.getFaction().id));
 		existing.setMaxHealth(update.getMaxHealth());
 		existing.setHealth(update.getHealth());
 		existing.setDead(update.isDead());

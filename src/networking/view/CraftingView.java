@@ -42,15 +42,15 @@ public class CraftingView {
 				if((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
 					amount = 10;
 				}
-				World.PLAYER_FACTION.craftItem(type, amount, gameView.getGameInstance().world.buildings);
+				gameView.getFaction().craftItem(type, amount, gameView.getGameInstance().world.buildings);
 			});
 			button.addRightClickActionListener(e -> {
-				gameView.getGameInstance().getGUIController().switchInfoPanel(new ItemTypeInfoPanel(type));
+				gameView.getGameInstance().getGUIController().switchInfoPanel(new ItemTypeInfoPanel(type, gameView.getFaction()));
 			});
 			button.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					gameView.getGameInstance().getGUIController().pushInfoPanel(new ItemTypeInfoPanel(type));
+					gameView.getGameInstance().getGUIController().pushInfoPanel(new ItemTypeInfoPanel(type, gameView.getFaction()));
 				}
 				@Override
 				public void mouseExited(MouseEvent e) {
@@ -63,15 +63,15 @@ public class CraftingView {
 	}
 	
 	public void updateButtons() {
-		boolean blacksmithSelected = World.PLAYER_FACTION.isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("BLACKSMITH"));
-		boolean hellforgeSelected = World.PLAYER_FACTION.isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("HELLFORGE"));
+		boolean blacksmithSelected = gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("BLACKSMITH"));
+		boolean hellforgeSelected = gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("HELLFORGE"));
 		for (int i = 0; i < ItemType.values().length; i++) {
 			ItemType type = ItemType.values()[i];
 			if (type.getCost() == null) {
 				continue;
 			}
 			JButton button = craftButtons[i];
-			if(World.PLAYER_FACTION.areRequirementsMet(type)
+			if(gameView.getFaction().areRequirementsMet(type)
 					&& (Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("BLACKSMITH") && blacksmithSelected)
 					|| (Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("HELLFORGE") && hellforgeSelected)) {
 				button.setEnabled(true);

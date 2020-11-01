@@ -12,11 +12,12 @@ import world.*;
 public class Faction implements Serializable {
 	
 	private transient static final Color[] factionColors = new Color[] { 
-			Color.lightGray, Color.pink, Color.blue, Color.green.darker(), 
+			Color.lightGray, Color.blue, Color.green.darker(), Color.pink, 
 			Color.orange, Color.cyan, Color.yellow};
 	private transient static int idCounter = 0;
 
 	private transient final boolean usesItems;
+	private transient final boolean isPlayer;
 	private transient final HashMap<ItemType, Item> items = new HashMap<ItemType, Item>();
 	
 	private transient HashMap<String, Research> researchMap = new HashMap<>();
@@ -31,11 +32,23 @@ public class Faction implements Serializable {
 	public transient final Color color;
 	public transient final String name;
 	
-	public Faction(String name, boolean usesItems) {
+	public Faction(String name, boolean isPlayer, boolean usesItems) {
 		this.id = idCounter++;
 		this.color = id < factionColors.length ? factionColors[id] : factionColors[0];
 		this.name = name;
 		this.usesItems = usesItems;
+		this.isPlayer = isPlayer;
+	}
+	public Faction(String name, boolean isPlayer, boolean usesItems, Color color) {
+		this.id = idCounter++;
+		this.color = color;
+		this.name = name;
+		this.usesItems = usesItems;
+		this.isPlayer = isPlayer;
+	}
+	
+	public boolean isPlayer() {
+		return isPlayer;
 	}
 
 	public boolean isBuildingSelected(World world, BuildingType type) {

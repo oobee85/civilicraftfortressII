@@ -51,6 +51,7 @@ public class GameView extends JPanel {
 	private boolean controlDown = false;
 
 	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
+	private Faction faction = World.NO_FACTION;
 	
 	private LeftClickAction leftClickAction = LeftClickAction.NONE;
 	private HasImage selectedThingToSpawn;
@@ -167,6 +168,13 @@ public class GameView extends JPanel {
 			}
 		});
 	}
+	public void setFaction(Faction faction) {
+		System.out.println("setting faction to " + faction);
+		this.faction = faction;
+	}
+	public Faction getFaction() {
+		return faction;
+	}
 	public void unitStop() {
 		for (Thing thing : selectedThings) {
 			if (thing instanceof Unit) {
@@ -199,8 +207,8 @@ public class GameView extends JPanel {
 
 		// spawning unit or building
 		if(leftClickAction == LeftClickAction.SPAWN_THING) {
-			Thing summoned = game.summonThing(tile, selectedThingToSpawn, summonPlayerControlled ? World.PLAYER_FACTION : World.NO_FACTION);
-			if(summoned.getFaction() == World.PLAYER_FACTION) {
+			Thing summoned = game.summonThing(tile, selectedThingToSpawn, summonPlayerControlled ? faction : World.NO_FACTION);
+			if(summoned.getFaction() == faction) {
 				if(!shiftDown) {
 					deselectEverything();
 				}
@@ -217,7 +225,7 @@ public class GameView extends JPanel {
 				}
 			}
 			if(plannedBuilding != null) {
-				if(plannedBuilding.getFaction() == World.PLAYER_FACTION) {
+				if(plannedBuilding.getFaction() == faction) {
 					HashSet<Tile> buildingVision = game.world.getNeighborsInRadius(plannedBuilding.getTile(), plannedBuilding.getType().getVisionRadius());
 					for(Tile invision : buildingVision) {
 						invision.setInVisionRange(true);
@@ -369,7 +377,7 @@ public class GameView extends JPanel {
 
 	public void selectAllUnits() {
 		for(Unit unit : game.world.units) {
-			if(unit.getFaction() == World.PLAYER_FACTION) {
+			if(unit.getFaction() == faction) {
 				selectThing(unit);
 			}
 		}
@@ -384,13 +392,13 @@ public class GameView extends JPanel {
 		
 		//selects the building on the tile
 		Building building = tile.getBuilding();
-		if(building != null && building.getFaction() == World.PLAYER_FACTION && tile.getUnitOfFaction(World.PLAYER_FACTION) == null) {
+		if(building != null && building.getFaction() == faction && tile.getUnitOfFaction(faction) == null) {
 			selectThing(building);
 		}
 		//goes through all the units on the tile and checks if they are selected
 		for(Unit candidate : tile.getUnits()) {
 			// clicking on tile w/o shift i.e only selects top unit
-			if (candidate.getFaction() == World.PLAYER_FACTION) {
+			if (candidate.getFaction() == faction) {
 				selectThing(candidate);
 				//shift enabled -> selects whole stack
 				//shift disabled -> selects top unit
@@ -460,7 +468,7 @@ public class GameView extends JPanel {
 	}
 
 	public void updateTerrainImages() {
-		BufferedImage[] images = game.world.createTerrainImage();
+		BufferedImage[] images = game.world.createTerrainImage(faction);
 		this.terrainImage = images[0];
 		this.minimapImage = images[1];
 		this.heightMapImage = images[2];
@@ -547,10 +555,10 @@ public class GameView extends JPanel {
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
 		draw(g, panelWidth, panelHeight, viewOffset);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
-		if(World.PLAYER_FACTION.getResearchTarget() != null && !World.PLAYER_FACTION.getResearchTarget().isUnlocked()) {
+		if(faction.getResearchTarget() != null && !faction.getResearchTarget().isUnlocked()) {
 			g.setFont(KUIConstants.infoFont);
-			double completedRatio = 1.0 * World.PLAYER_FACTION.getResearchTarget().getPointsSpent() / World.PLAYER_FACTION.getResearchTarget().getRequiredPoints();
-			String progress = String.format(World.PLAYER_FACTION.getResearchTarget() + " %d/%d", World.PLAYER_FACTION.getResearchTarget().getPointsSpent(), World.PLAYER_FACTION.getResearchTarget().getRequiredPoints());
+			double completedRatio = 1.0 * faction.getResearchTarget().getPointsSpent() / faction.getResearchTarget().getRequiredPoints();
+			String progress = String.format(faction.getResearchTarget() + " %d/%d", faction.getResearchTarget().getPointsSpent(), faction.getResearchTarget().getRequiredPoints());
 			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress, panelWidth - panelWidth/3 - 4, 4, panelWidth/3, 30);
 		}
 		Toolkit.getDefaultToolkit().sync();
@@ -621,7 +629,7 @@ public class GameView extends JPanel {
 			}
 			for(Thing thing : selectedThings) {
 				// draw selection circle
-				g.setColor(Utils.getTransparentColor(World.PLAYER_FACTION.color, 150));
+				g.setColor(Utils.getTransparentColor(faction.color, 150));
 //				Utils.setTransparency(g, 0.8f);
 				Graphics2D g2d = (Graphics2D)g;
 				Stroke currentStroke = g2d.getStroke();
@@ -741,7 +749,7 @@ public class GameView extends JPanel {
 						Tile tile = game.world.get(new TileLoc(i, j));
 						if(tile == null)
 							continue;
-						double brightness = World.getDaylight() + tile.getBrightness(World.PLAYER_FACTION);
+						double brightness = World.getDaylight() + tile.getBrightness(faction);
 						brightness = Math.max(Math.min(brightness, 1), 0);
 						g.setColor(new Color(0, 0, 0, (int)(255 * (1 - brightness))));
 						g.fillRect(i * tileSize, j * tileSize, tileSize, tileSize);

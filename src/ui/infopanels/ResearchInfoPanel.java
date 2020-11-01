@@ -8,10 +8,12 @@ import ui.*;
 public class ResearchInfoPanel extends InfoPanel {
 	
 	Research showing;
+	private Faction faction;
 
-	public ResearchInfoPanel(Research showing) {
+	public ResearchInfoPanel(Research showing, Faction faction) {
 		super(showing.toString(), showing.type.getImage(70), 70);
 		this.showing = showing;
+		this.faction = faction;
 	}
 	
 	@Override
@@ -50,7 +52,7 @@ public class ResearchInfoPanel extends InfoPanel {
 			}
 		}
 		y += offset/2;
-		UnitTypeInfoPanel.drawCosts(g, showing.getCost(), x, y);
+		UnitTypeInfoPanel.drawCosts(g, showing.getCost(), x, y, faction);
 
 		g.setFont(KUIConstants.infoFont);
 		double completedRatio = 1.0 * showing.getPointsSpent() / showing.getRequiredPoints();
