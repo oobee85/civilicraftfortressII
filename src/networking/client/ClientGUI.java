@@ -20,6 +20,7 @@ public class ClientGUI {
 	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon PRODUCE_UNIT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/barracks.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	
 	private static final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(200, 40);
 
@@ -50,9 +51,11 @@ public class ClientGUI {
 	private int RESEARCH_TAB;
 	private int WORKER_TAB;
 	private int PRODUCE_UNIT_TAB;
+	private int CRAFTING_TAB;
 	private ResearchView researchView;
 	private WorkerView workerView;
 	private ProduceUnitView produceUnitView;
+	private CraftingView craftingView;
 	
 	public ClientGUI() {
 		rootPanel = new JPanel();
@@ -254,12 +257,15 @@ public class ClientGUI {
 		PRODUCE_UNIT_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab(null, PRODUCE_UNIT_TAB_ICON, produceUnitView.getRootPanel(), "Make units from castles, barracks, or workshops", PRODUCE_UNIT_TAB);
 
+		craftingView = new CraftingView(gameView);
+		CRAFTING_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, craftingView.getRootPanel(), "Craft items", CRAFTING_TAB);
+		
+		
 		// disable building tab after setting all of the tabs up
 		manageBuildingTab(false);
 		manageProduceUnitTab(false);
-//		manageBlacksmithTab(false);
-//		manageHellforgeTab(false);
-//		manageResearchLabTab(false);
+		manageBlacksmithTab(false);
 //		manageSpawnTab(true);
 		
 		rootPanel.revalidate();
@@ -300,6 +306,10 @@ public class ClientGUI {
 	public ProduceUnitView getProduceUnitView() {
 		return produceUnitView;
 	}
+	
+	public CraftingView getCraftingView() {
+		return craftingView;
+	}
 
 	public void manageBuildingTab(boolean enabled) {
 		if (enabled == false && tabbedPane.getSelectedIndex() == WORKER_TAB) {
@@ -327,6 +337,15 @@ public class ClientGUI {
 			}
 			tabbedPane.setEnabledAt(PRODUCE_UNIT_TAB, false);
 		}
+	}
+
+	public void manageBlacksmithTab(boolean enabled) {
+		if (enabled == false && tabbedPane.getSelectedIndex() == CRAFTING_TAB) {
+			tabbedPane.setSelectedIndex(0);
+		} else if (enabled == true) {
+			tabbedPane.setSelectedIndex(CRAFTING_TAB);
+		}
+		tabbedPane.setEnabledAt(CRAFTING_TAB, enabled);
 	}
 
 }

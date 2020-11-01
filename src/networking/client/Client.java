@@ -37,6 +37,7 @@ public class Client {
 				if(gameInstance.world != null) {
 					clientGUI.getResearchView().updateButtons(gameInstance.world);
 					clientGUI.getProduceUnitView().updateButtons();
+					clientGUI.getCraftingView().updateButtons();
 				}
 			}
 			@Override
@@ -59,6 +60,12 @@ public class Client {
 				}
 				if (building.getType() == Game.buildingTypeMap.get("WORKSHOP")) {
 					clientGUI.manageProduceUnitTab(selected);
+				}
+				if (building.getType() == Game.buildingTypeMap.get("BLACKSMITH")) {
+					clientGUI.manageBlacksmithTab(selected);
+				}
+				if (building.getType() == Game.buildingTypeMap.get("HELLFORGE")) {
+					clientGUI.manageBlacksmithTab(selected);
 				}
 			}
 			@Override
