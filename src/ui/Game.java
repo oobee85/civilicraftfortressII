@@ -73,6 +73,19 @@ public class Game {
 	public int getNights() {
 		return World.nights;
 	}
+	public void simulatedGameTick() {
+		// Do the things that can be simulated client-side for smoother game play
+		World.ticks++;
+		if(World.ticks%20 == 0) {
+			updateTerritory();
+		}
+//		Liquid.propogate(world);
+		// Remove dead things
+		world.clearDeadAndAddNewThings();
+
+//		buildingTick();
+//		unitTick();
+	}
 	public void gameTick() {
 		// Do all the game events like unit movement, time passing, building things, growing, etc
 		// happens once every 100ms
@@ -93,7 +106,6 @@ public class Game {
 		if(World.ticks%World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			world.updatePlantDamage();
 		}
-		
 		
 		if(World.ticks % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
 			dayEvents();

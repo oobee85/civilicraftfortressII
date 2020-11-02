@@ -180,35 +180,6 @@ public class Client {
 			}
 		}
 
-		Thread gameLoopThread = new Thread(() -> {
-			while (true) {
-				try {
-					long start = System.currentTimeMillis();
-					gameInstance.gameTick();
-					gameInstance.getGUIController().updateGUI();
-					synchronized (updatedTerrain) {
-						updatedTerrain.notify();
-					}
-					long elapsed = System.currentTimeMillis() - start;
-					long sleeptime = Server.MILLISECONDS_PER_TICK - elapsed;
-					if(sleeptime > 0 && !isFastForwarding) {
-						Thread.sleep(sleeptime);
-					}
-				}
-				catch(Exception e) {
-					try (FileWriter fw = new FileWriter("ERROR_LOG.txt", true);
-							BufferedWriter bw = new BufferedWriter(fw);
-							PrintWriter out = new PrintWriter(bw)) {
-						e.printStackTrace(out);
-					} catch (IOException ee) {
-					}
-					e.printStackTrace();
-					if(e instanceof InterruptedException) {
-						break;
-					}
-				}
-			}
-		});
 		SwingUtilities.invokeLater(() -> {
 			clientGUI.startedSinglePlayer();
 //			frame.remove(mainMenuPanel);
@@ -222,7 +193,7 @@ public class Client {
 //			gamepanel.requestFocusInWindow();
 //			gamepanel.requestFocus();
 			clientGUI.repaint();
-			gameLoopThread.start();
+			startLocalGameLoopThread(false);
 		});
 	}
 	public void sendMessage(Object message) {
@@ -254,21 +225,50 @@ public class Client {
 		}
 	}
 	
+	private void startLocalGameLoopThread(boolean simulated) {
+		Thread gameLoopThread = new Thread(() -> {
+			while (true) {
+				try {
+					long start = System.currentTimeMillis();
+					if(simulated) {
+						gameInstance.simulatedGameTick();
+					}
+					else {
+						gameInstance.gameTick();
+					}
+					gameInstance.getGUIController().updateGUI();
+					synchronized (updatedTerrain) {
+						updatedTerrain.notify();
+					}
+					long elapsed = System.currentTimeMillis() - start;
+					long sleeptime = Server.MILLISECONDS_PER_TICK - elapsed;
+					if(sleeptime > 0 && !isFastForwarding) {
+						Thread.sleep(sleeptime);
+					}
+				}
+				catch(Exception e) {
+					try (FileWriter fw = new FileWriter("ERROR_LOG.txt", true);
+							BufferedWriter bw = new BufferedWriter(fw);
+							PrintWriter out = new PrintWriter(bw)) {
+						e.printStackTrace(out);
+					} catch (IOException ee) {
+					}
+					e.printStackTrace();
+					if(e instanceof InterruptedException) {
+						break;
+					}
+				}
+			}
+		});
+		gameLoopThread.start();
+	}
+	
 	private void worldInfoUpdate(WorldInfo worldInfo) {
+		boolean firstUpdate = false;
 		if(gameInstance.world == null) {
 			gameInstance.initializeWorld(worldInfo.getWidth(), worldInfo.getHeight());
 			clientGUI.worldReceived();
-			Thread cleaningThread = new Thread(() -> {
-				try {
-					while (true) {
-						gameInstance.world.clearDeadAndAddNewThings();
-						Thread.sleep(Server.MILLISECONDS_PER_TICK);
-					}
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			});
-			cleaningThread.start();
+			firstUpdate = true;
 		}
 		if(gameInstance.world.getFactions().size() < worldInfo.getFactions().size()) {
 			for(int i = gameInstance.world.getFactions().size(); i < worldInfo.getFactions().size(); i++) {
@@ -288,6 +288,9 @@ public class Client {
 		}
 		synchronized (updatedTerrain) {
 			updatedTerrain.notify();
+		}
+		if(firstUpdate) {
+			startLocalGameLoopThread(true);
 		}
 		clientGUI.repaint();
 	}
