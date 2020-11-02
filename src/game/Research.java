@@ -1,24 +1,34 @@
 package game;
 
-import java.awt.*;
+import java.io.*;
 import java.util.*;
 
-import javax.swing.*;
-
+import ui.*;
 import utils.*;
 
-public class Research {
+public class Research implements Externalizable{
 	
 	public static final String DEFAULT_RESEARCH_IMAGE_PATH = "resources/Images/interfaces/tech.png";
 	
-	public final ResearchType type;
+	private ResearchType type;
 	
 	private int researchPointsSpent = 0;
-	private boolean isUnlocked = false;
-	private boolean payedFor = false;
+	private boolean isCompleted = false;
+	private boolean isPayedFor = false;
+	
 	private ResearchRequirement req = new ResearchRequirement();
 	
+	public Research() {
+		
+	}
 	public Research(ResearchType type) {
+		this.type = type;
+	}
+	
+	public ResearchType type() {
+		return type;
+	}
+	public void setType(ResearchType type) {
 		this.type = type;
 	}
 
@@ -43,21 +53,29 @@ public class Research {
 	}
 	
 	public boolean isPayedFor() {
-		return payedFor;
+		return isPayedFor;
 	}
 	public void setPayedFor(boolean payedFor) {
-		this.payedFor = payedFor;
+		this.isPayedFor = payedFor;
 	}
 	
-	public boolean isUnlocked() {
-		return isUnlocked;
+	public boolean isCompleted() {
+		return isCompleted;
+	}
+	
+	public void setCompleted(boolean completed) {
+		this.isCompleted = completed;
+	}
+	
+	public void setResearchPointsSpend(int point) {
+		researchPointsSpent = point;
 	}
 	
 	public void spendResearch(int points) {
-		if(!isUnlocked()) {
+		if(!isCompleted()) {
 			researchPointsSpent += points;
 			if(researchPointsSpent >= type.requiredResearchPoints) {
-				isUnlocked = true;
+				isCompleted = true;
 				researchPointsSpent = type.requiredResearchPoints;
 			}
 		}
@@ -70,6 +88,22 @@ public class Research {
 	@Override
 	public String toString() {
 		return Utils.getName(this);
+	}	
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		type = Game.researchTypeMap.get(in.readUTF());
+		researchPointsSpent = in.readInt();
+		isCompleted = in.readBoolean();
+		isPayedFor = in.readBoolean();
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeUTF(type.name());
+		out.writeInt(researchPointsSpent);
+		out.writeBoolean(isCompleted);
+		out.writeBoolean(isPayedFor);
 	}
 	
 }

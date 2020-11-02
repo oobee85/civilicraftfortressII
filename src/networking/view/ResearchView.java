@@ -61,7 +61,7 @@ public class ResearchView {
 			JButton button = entry.getKey();
 			Research research = gameView.getFaction().getResearch(entry.getValue());
 			ResearchRequirement req = research.getRequirement();
-			if (research.isUnlocked()) {
+			if (research.isCompleted()) {
 				button.setEnabled(false);
 				button.setVisible(true);
 			} else if(research.getTier() > 1 && !hasResearchLab) {

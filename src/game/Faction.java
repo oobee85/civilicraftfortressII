@@ -15,14 +15,16 @@ public class Faction implements Serializable {
 			Color.lightGray, Color.blue, Color.green.darker(), Color.pink, 
 			Color.orange, Color.cyan, Color.yellow};
 	private transient static int idCounter = 0;
+	
+	private transient HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
+	private transient HashMap<UnitType, ResearchRequirement> unitResearchRequirements = new HashMap<>();
+	private transient HashMap<ItemType, ResearchRequirement> craftResearchRequirements = new HashMap<>();
+	
 
 	private transient final HashMap<ItemType, Item> items = new HashMap<ItemType, Item>();
 	
 	private transient HashMap<String, Research> researchMap = new HashMap<>();
-	private transient HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
-	private transient HashMap<UnitType, ResearchRequirement> unitResearchRequirements = new HashMap<>();
-	private transient HashMap<ItemType, ResearchRequirement> craftResearchRequirements = new HashMap<>();
-	private transient Research researchTarget;
+	private Research researchTarget;
 	
 	private transient LinkedList<AttackedNotification> attacked = new LinkedList<>();
 	private transient LinkedList<AttackedNotification> newAttacked = new LinkedList<>();
@@ -130,7 +132,7 @@ public class Faction implements Serializable {
 			researchMap.put(researchType.name, research);
 		}
 		for(Research research : researchMap.values()) {
-			for(String required : research.type.researchRequirements) {
+			for(String required : research.type().researchRequirements) {
 				research.getRequirement().addRequirement(researchMap.get(required));
 				System.out.println(research + " require  " + required);
 			}

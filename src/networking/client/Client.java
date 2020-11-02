@@ -357,6 +357,26 @@ public class Client {
 		}
 	}
 	
+	private void factionUpdate(Faction factionUpdate) {
+		Faction faction = gameInstance.world.getFaction(factionUpdate.id);
+		
+		Research targetUpdate = factionUpdate.getResearchTarget();
+		if(targetUpdate != null) {
+			Research potentialTarget = faction.getResearch(factionUpdate.getResearchTarget().type());
+			potentialTarget.setType(targetUpdate.type());
+			potentialTarget.setPayedFor(targetUpdate.isPayedFor());
+			potentialTarget.setCompleted(targetUpdate.isCompleted());
+			potentialTarget.setResearchPointsSpend(targetUpdate.getPointsSpent());
+			if(faction.getResearchTarget() != potentialTarget) {
+				faction.setResearchTarget(potentialTarget.type());
+			}
+		}
+		
+		if(clientGUI.getGameView().getFaction() != faction) {
+			clientGUI.getGameView().getGameInstance().getGUIController().changedFaction(faction);
+		}
+	}
+	
 	public void startReceiving() {
 		Thread thread = new Thread(() -> {
 			try {
@@ -374,8 +394,7 @@ public class Client {
 						worldInfoUpdate((WorldInfo)message);
 					}
 					else if(message instanceof Faction) {
-						Faction faction = gameInstance.world.getFaction(((Faction)message).id);
-						clientGUI.getGameView().getGameInstance().getGUIController().changedFaction(faction);
+						factionUpdate((Faction)message);
 					}
 				}
 			} catch (InterruptedException e) {

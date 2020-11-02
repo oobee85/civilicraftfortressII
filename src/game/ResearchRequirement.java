@@ -14,7 +14,7 @@ public class ResearchRequirement {
 	
 	public boolean areRequirementsMet() {
 		for(Research r : requirements) {
-			if(!r.isUnlocked())
+			if(!r.isCompleted())
 				return false;
 		}
 		return true;

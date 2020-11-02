@@ -560,7 +560,7 @@ public class GameView extends JPanel {
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
 		draw(g, panelWidth, panelHeight, viewOffset);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
-		if(faction != null && faction.getResearchTarget() != null && !faction.getResearchTarget().isUnlocked()) {
+		if(faction != null && faction.getResearchTarget() != null && !faction.getResearchTarget().isCompleted()) {
 			g.setFont(KUIConstants.infoFont);
 			double completedRatio = 1.0 * faction.getResearchTarget().getPointsSpent() / faction.getResearchTarget().getRequiredPoints();
 			String progress = String.format(faction.getResearchTarget() + " %d/%d", faction.getResearchTarget().getPointsSpent(), faction.getResearchTarget().getRequiredPoints());

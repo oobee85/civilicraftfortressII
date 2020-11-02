@@ -11,7 +11,7 @@ public class ResearchInfoPanel extends InfoPanel {
 	private Faction faction;
 
 	public ResearchInfoPanel(Research showing, Faction faction) {
-		super(showing.toString(), showing.type.getImage(70), 70);
+		super(showing.toString(), showing.type().getImage(70), 70);
 		this.showing = showing;
 		this.faction = faction;
 	}
@@ -37,7 +37,7 @@ public class ResearchInfoPanel extends InfoPanel {
 			g.drawLine(x + xoffset - 10, y, x + xoffset - 10, y + offset*showing.getRequirement().getRequirements().size() - offset/4);
 			
 			for(Research req : showing.getRequirement().getRequirements()) {
-				if(req.isUnlocked()) {
+				if(req.isCompleted()) {
 					g.setColor(Color.black);
 				}
 				else if(req.getRequirement().areRequirementsMet()) {
