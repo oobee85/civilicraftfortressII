@@ -47,13 +47,21 @@ public class Client {
 			@Override
 			public void selectedUnit(Unit unit, boolean selected) {
 				clientGUI.getGameViewOverlay().selectedUnit(unit, selected);
-
 				if(unit.getType().isBuilder()) {
 					clientGUI.manageBuildingTab(selected);
 				}
+				if(selected) {
+					UnitInfoPanel infoPanel = new UnitInfoPanel(unit);
+					switchInfoPanel(infoPanel);
+					SwingUtilities.invokeLater(() -> {
+						infoPanel.addButton("Explode").addActionListener(e -> gameInstance.explode(unit));
+						infoPanel.addButton("MakeRoads").addActionListener(e -> clientGUI.getGameView().workerRoad(Game.buildingTypeMap.get("STONE_ROAD")));
+						infoPanel.addButton("AutoBuild").addActionListener(e -> clientGUI.getGameView().toggleAutoBuild());
+						infoPanel.addButton("SetHarvesting").addActionListener(e -> clientGUI.getGameView().setHarvesting());
+						infoPanel.addButton("Guard").addActionListener(e -> clientGUI.getGameView().toggleGuarding());
+					});
+				}
 			}
-			@Override
-			public void selectedSpawnUnit(boolean selected) {}
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {
 				if (building.getType() == Game.buildingTypeMap.get("BARRACKS")) {
@@ -71,6 +79,11 @@ public class Client {
 				if (building.getType() == Game.buildingTypeMap.get("HELLFORGE")) {
 					clientGUI.manageBlacksmithTab(selected);
 				}
+				InfoPanel infoPanel = new BuildingInfoPanel(building);
+				switchInfoPanel(infoPanel);
+				SwingUtilities.invokeLater(() -> {
+					infoPanel.addButton("Explode").addActionListener(e -> gameInstance.explode(building));
+				});
 			}
 			@Override
 			public void changedFaction(Faction faction) {
@@ -91,9 +104,13 @@ public class Client {
 				clientGUI.getInfoPanelView().popInfoPanel();
 			}
 			@Override
-			public void pressedSelectedUnitPortrait(Unit unit) {}
+			public void pressedSelectedUnitPortrait(Unit unit) {
+				clientGUI.getGameView().pressedSelectedUnitPortrait(unit);
+			}
 			@Override
-			public void tryToCraftItem(ItemType type, int amount) {}
+			public void tryToCraftItem(ItemType type, int amount) {
+				clientGUI.getGameView().getCommandInterface().craftItem(clientGUI.getGameView().getFaction(), type);
+			}
 			@Override
 			public void research(ResearchType researchType) {
 				clientGUI.getGameView().getCommandInterface().research(clientGUI.getGameView().getFaction(), researchType);
@@ -138,12 +155,12 @@ public class Client {
 			}
 			@Override
 			public void research(Faction faction, ResearchType researchType) {
-				sendMessage(CommandMessage.makeResearchCommand(faction.id, researchType.name()));
+				sendMessage(CommandMessage.makeResearchCommand(faction.id(), researchType.name()));
 				localCommands.research(faction, researchType);
 			}
 			@Override
 			public void craftItem(Faction faction, ItemType itemType) {
-				sendMessage(CommandMessage.makeCraftItemCommand(faction.id, itemType.name()));
+				sendMessage(CommandMessage.makeCraftItemCommand(faction.id(), itemType.name()));
 				localCommands.craftItem(faction, itemType);
 			}
 			@Override
@@ -257,7 +274,7 @@ public class Client {
 		if(gameInstance.world.getFactions().size() < worldInfo.getFactions().size()) {
 			for(int i = gameInstance.world.getFactions().size(); i < worldInfo.getFactions().size(); i++) {
 				Faction received = worldInfo.getFactions().get(i);
-				Faction faction = new Faction(received.name, received.isPlayer(), received.usesItems(), received.color);
+				Faction faction = new Faction(received.name(), received.isPlayer(), received.usesItems(), received.color());
 				gameInstance.world.addFaction(faction);
 			}
 		}
@@ -358,7 +375,7 @@ public class Client {
 	}
 	
 	private void factionUpdate(Faction factionUpdate) {
-		Faction faction = gameInstance.world.getFaction(factionUpdate.id);
+		Faction faction = gameInstance.world.getFaction(factionUpdate.id());
 		
 		Research targetUpdate = factionUpdate.getResearchTarget();
 		if(targetUpdate != null) {
@@ -370,6 +387,11 @@ public class Client {
 			if(faction.getResearchTarget() != potentialTarget) {
 				faction.setResearchTarget(potentialTarget.type());
 			}
+		}
+		
+		Item[] itemsUpdate = factionUpdate.getItems();
+		for(Item itemUpdate : itemsUpdate) {
+			faction.setAmount(itemUpdate.getType(), itemUpdate.getAmount());
 		}
 		
 		if(clientGUI.getGameView().getFaction() != faction) {

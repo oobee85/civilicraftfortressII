@@ -278,7 +278,6 @@ public class ClientGUI {
 		manageBuildingTab(false);
 		manageProduceUnitTab(false);
 		manageBlacksmithTab(false);
-//		manageSpawnTab(true);
 		
 		rootPanel.revalidate();
 		rootPanel.repaint();

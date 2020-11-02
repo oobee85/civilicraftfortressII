@@ -9,7 +9,7 @@ import ui.*;
 import utils.*;
 import world.*;
 
-public class Faction implements Serializable {
+public class Faction implements Externalizable {
 	
 	private transient static final Color[] factionColors = new Color[] { 
 			Color.lightGray, Color.blue, Color.green.darker(), Color.pink, 
@@ -21,7 +21,7 @@ public class Faction implements Serializable {
 	private transient HashMap<ItemType, ResearchRequirement> craftResearchRequirements = new HashMap<>();
 	
 
-	private transient final HashMap<ItemType, Item> items = new HashMap<ItemType, Item>();
+	private Item[] items = new Item[ItemType.values().length];
 	
 	private transient HashMap<String, Research> researchMap = new HashMap<>();
 	private Research researchTarget;
@@ -29,19 +29,52 @@ public class Faction implements Serializable {
 	private transient LinkedList<AttackedNotification> attacked = new LinkedList<>();
 	private transient LinkedList<AttackedNotification> newAttacked = new LinkedList<>();
 	
-	public final int id;
-	public final Color color;
-	public final String name;
-	private final boolean usesItems;
-	private final boolean isPlayer;
+	private int id;
+	private Color color;
+	private String name;
+	private boolean usesItems;
+	private boolean isPlayer;
+	
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		id = in.readInt();
+		color = (Color)in.readObject();
+		name = in.readUTF();
+		usesItems = in.readBoolean();
+		isPlayer = in.readBoolean();
+		researchTarget = (Research)in.readObject();
+		items = (Item[])in.readObject();
+	}
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeInt(id);
+		out.writeObject(color);
+		out.writeUTF(name);
+		out.writeBoolean(usesItems);
+		out.writeBoolean(isPlayer);
+		out.writeObject(researchTarget);
+		out.writeObject(items);
+	}
+	public Item[] getItems() {
+		return items;
+	}
+	public int id() {
+		return id;
+	}
+	public Color color() {
+		return color;
+	}
+	public String name() {
+		return name;
+	}
+	
+	public Faction() {
+		initializeItems();
+	}
 	
 	public Faction(String name, boolean isPlayer, boolean usesItems) {
-		this.id = idCounter++;
-		this.color = id < factionColors.length ? factionColors[id] : factionColors[0];
-		this.name = name;
-		this.usesItems = usesItems;
-		this.isPlayer = isPlayer;
-		setupResearch();
+		this(name, isPlayer, usesItems, idCounter < factionColors.length ? factionColors[idCounter] : factionColors[0]);
 	}
 	public Faction(String name, boolean isPlayer, boolean usesItems, Color color) {
 		this.id = idCounter++;
@@ -50,6 +83,12 @@ public class Faction implements Serializable {
 		this.usesItems = usesItems;
 		this.isPlayer = isPlayer;
 		setupResearch();
+		initializeItems();
+	}
+	private void initializeItems() {
+		for(ItemType itemType : ItemType.values()) {
+			items[itemType.ordinal()] = new Item(0, itemType);
+		}
 	}
 	public static Faction getTempFaction() {
 		Faction temp = new Faction("temp", false, false);
@@ -200,24 +239,33 @@ public class Faction implements Serializable {
 	
 	public int getItemAmount(ItemType type) {
 		if(usesItems) {
-			return items.containsKey(type) ? items.get(type).getAmount() : 0;
+			return items[type.ordinal()] != null ? items[type.ordinal()].getAmount() : 0;
 		}
 		return 0;
 	}
 	
 	public void addItem(ItemType type, int quantity) {
 		if(usesItems) {
-			if(!items.containsKey(type)) {
-				items.put(type, new Item(0, type));
+			if(items[type.ordinal()] == null) {
+				items[type.ordinal()] = new Item(0, type);
 			}
-			items.get(type).addAmount(quantity);
+			items[type.ordinal()].addAmount(quantity);
+		}
+	}
+	
+	public void setAmount(ItemType type, int amount) {
+		if(usesItems) {
+			if(items[type.ordinal()] == null) {
+				items[type.ordinal()] = new Item(0, type);
+			}
+			items[type.ordinal()].addAmount(amount - items[type.ordinal()].getAmount());
 		}
 	}
 	
 	public boolean canAfford(HashMap<ItemType, Integer> cost) {
 		if(usesItems) {
 			for (Entry<ItemType, Integer> entry : cost.entrySet()) {
-				if(!items.containsKey(entry.getKey()) || items.get(entry.getKey()).getAmount() < entry.getValue()) {
+				if(items[entry.getKey().ordinal()] == null || items[entry.getKey().ordinal()].getAmount() < entry.getValue()) {
 					return false;
 				}
 			}
@@ -225,19 +273,19 @@ public class Faction implements Serializable {
 		return true;
 	}
 	public boolean canAfford(ItemType type, int quantity) {
-		return !usesItems || (items.containsKey(type) && items.get(type).getAmount() >= quantity);
+		return !usesItems || (items[type.ordinal()] != null && items[type.ordinal()].getAmount() >= quantity);
 	}
 	
 	public void payCost(HashMap<ItemType, Integer> cost) {
 		if(usesItems) {
 			for (Entry<ItemType, Integer> entry : cost.entrySet()) {
-				items.get(entry.getKey()).addAmount(-entry.getValue());
+				items[entry.getKey().ordinal()].addAmount(-entry.getValue());
 			}
 		}
 	}
 	public void payCost(ItemType type, int quantity) {
 		if(usesItems) {
-			items.get(type).addAmount(-quantity);
+			items[type.ordinal()].addAmount(-quantity);
 		}
 	}
 	

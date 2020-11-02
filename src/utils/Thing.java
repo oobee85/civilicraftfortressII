@@ -61,7 +61,7 @@ public class Thing implements HasImage, Serializable {
 	
 	public void setFaction(Faction faction) {
 		this.faction = faction;
-		this.factionID = faction.id;
+		this.factionID = faction.id();
 	}
 
 	public void setDead(boolean state) {

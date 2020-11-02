@@ -4,7 +4,6 @@ import java.util.*;
 
 import game.*;
 import wildlife.*;
-import world.*;
 
 public class TargetingInfo {
 	public final Object type;
@@ -15,7 +14,7 @@ public class TargetingInfo {
 	}
 	
 	private boolean doesFactionSatify(Faction animalFaction, Faction potentialTargetFaction) {
-		if(potentialTargetFaction.name.equals(faction) || 
+		if(potentialTargetFaction.name().equals(faction) || 
 				(faction == null && (animalFaction.isNeutral() || animalFaction != potentialTargetFaction))) {
 			return true;
 		}

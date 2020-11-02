@@ -8,7 +8,6 @@ public interface GUIController {
 	public void selectedBuilding(Building building, boolean selected);
 	public void selectedUnit(Unit unit, boolean selected);
 	public void updateGUI();
-	public void selectedSpawnUnit(boolean selected);
 	public void changedFaction(Faction faction);
 
 	public void pushInfoPanel(InfoPanel infoPanel);

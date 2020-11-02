@@ -47,7 +47,7 @@ public class World {
 	private ArrayList<Faction> factions = new ArrayList<>();
 	public Faction getFaction(String name) {
 		for(Faction faction : factions) {
-			if(faction.name.equals(name)) {
+			if(faction.name().equals(name)) {
 				return faction;
 			}
 		}
@@ -55,7 +55,7 @@ public class World {
 	}
 	public Faction getFaction(int id) {
 		for(Faction faction : factions) {
-			if(faction.id == id) {
+			if(faction.id() == id) {
 				return faction;
 			}
 		}
@@ -122,8 +122,8 @@ public class World {
 			if(tile == null) {
 				System.out.println("Tried to update null tile at " + info.getLocation());
 			}
-			if(tile.getFaction() == null || tile.getFaction().id != info.getFaction().id) {
-				tile.setFaction(factions.get(info.getFaction().id));
+			if(tile.getFaction() == null || tile.getFaction().id() != info.getFaction().id()) {
+				tile.setFaction(factions.get(info.getFaction().id()));
 				addToTerritory(tile);
 			}
 			tile.setHeight(info.getHeight());
@@ -984,8 +984,8 @@ public class World {
 				terrainColor = Utils.blendColors(tile.getModifier().getType().getColor(0), terrainColor, 0.9);
 			}
 			if(tile.getFaction() != getFaction(NO_FACTION_ID)) {
-				minimapColor = Utils.blendColors(tile.getFaction().color, minimapColor, 0.3);
-				terrainColor = Utils.blendColors(tile.getFaction().color, terrainColor, 0.3);
+				minimapColor = Utils.blendColors(tile.getFaction().color(), minimapColor, 0.3);
+				terrainColor = Utils.blendColors(tile.getFaction().color(), terrainColor, 0.3);
 			}
 			double tilebrightness = tile.getBrightness(faction);
 			minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);

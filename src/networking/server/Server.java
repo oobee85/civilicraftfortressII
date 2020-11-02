@@ -117,8 +117,6 @@ public class Server {
 			@Override
 			public void selectedUnit(Unit unit, boolean selected) {}
 			@Override
-			public void selectedSpawnUnit(boolean selected) {}
-			@Override
 			public void selectedBuilding(Building building, boolean selected) {}
 			@Override
 			public void changedFaction(Faction faction) {}

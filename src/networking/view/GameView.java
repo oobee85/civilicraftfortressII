@@ -350,11 +350,7 @@ public class GameView extends JPanel {
 						if(tile.getFaction() != unit.getFaction()) {
 							continue;
 						}
-						commandInterface.planBuilding(unit, tile, false, selectedBuildingToPlan);
-//						Building building = planBuilding(unit, type, tile);
-//						if(building != null) {
-//							unit.queuePlannedAction(new PlannedAction(building, true));
-//						}
+						commandInterface.planBuilding(unit, tile, false, type);
 					}
 				}
 			}
@@ -631,7 +627,7 @@ public class GameView extends JPanel {
 			}
 			for(Thing thing : selectedThings) {
 				// draw selection circle
-				g.setColor(Utils.getTransparentColor(faction.color, 150));
+				g.setColor(Utils.getTransparentColor(faction.color(), 150));
 //				Utils.setTransparency(g, 0.8f);
 				Graphics2D g2d = (Graphics2D)g;
 				Stroke currentStroke = g2d.getStroke();
@@ -737,7 +733,7 @@ public class GameView extends JPanel {
 				//draws a square for every player unit on the tile
 				int xx = unit.getTile().getLocation().x() * tileSize + offset;
 				int yy = unit.getTile().getLocation().y() * tileSize + (indicatorSize + offset)*count + offset;
-				g.setColor(unit.getFaction().color);
+				g.setColor(unit.getFaction().color());
 				g.fillRect(xx, yy, indicatorSize, indicatorSize);
 				g.setColor(Color.BLACK);
 				g.drawRect(xx, yy, indicatorSize, indicatorSize);
@@ -848,7 +844,7 @@ public class GameView extends JPanel {
 			if(theTile.getFaction() != game.world.getFaction(World.NO_FACTION_ID)) {
 //				g.setColor(Color.black);
 //				g.fillRect(x, y, w, h); 
-				g.setColor(theTile.getFaction().color);
+				g.setColor(theTile.getFaction().color());
 				
 				Utils.setTransparency(g, 0.5f);
 				for(Tile tile : theTile.getNeighbors()) {

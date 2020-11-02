@@ -601,10 +601,6 @@ public class Game {
 		}
 		world.spawnExplosion(thing.getTile(), 1, 10000);
 	}
-
-	public void spawnUnit(boolean show) {
-		guiController.selectedSpawnUnit(show);
-	}
 	
 	private void unitTick() {
 		Iterator<Unit> it = world.units.descendingIterator();

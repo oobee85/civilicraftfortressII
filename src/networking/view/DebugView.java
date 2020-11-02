@@ -52,12 +52,6 @@ public class DebugView {
 			}
 		});
 
-		JToggleButton spawnUnit = KUIConstants.setupToggleButton("Enable Spawn Unit", null, DEBUG_BUTTON_SIZE);
-		spawnUnit.addActionListener(e -> {
-			spawnUnit.setText(spawnUnit.isSelected() ? "Disable Spawn Unit" : "Enable Spawn Unit");
-			gameView.getGameInstance().spawnUnit(spawnUnit.isSelected());
-		});
-
 		JButton eruptVolcano = KUIConstants.setupButton("Erupt Volcano", ERUPTION_ICON, DEBUG_BUTTON_SIZE);
 		eruptVolcano.addActionListener(new ActionListener() {
 			@Override
@@ -173,7 +167,6 @@ public class DebugView {
 
 		rootPanel.add(showHeightMap);
 		rootPanel.add(flipTable);
-		rootPanel.add(spawnUnit);
 		rootPanel.add(makeItRain);
 		rootPanel.add(makeItDry);
 		rootPanel.add(fastForward);
