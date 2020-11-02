@@ -226,6 +226,7 @@ public class Client {
 	}
 	
 	private void startLocalGameLoopThread(boolean simulated) {
+		long millisPerTick = simulated ? Server.MILLISECONDS_PER_TICK*11/10 : Server.MILLISECONDS_PER_TICK;
 		Thread gameLoopThread = new Thread(() -> {
 			while (true) {
 				try {
@@ -241,7 +242,7 @@ public class Client {
 						updatedTerrain.notify();
 					}
 					long elapsed = System.currentTimeMillis() - start;
-					long sleeptime = Server.MILLISECONDS_PER_TICK - elapsed;
+					long sleeptime = millisPerTick - elapsed;
 					if(sleeptime > 0 && !isFastForwarding) {
 						Thread.sleep(sleeptime);
 					}

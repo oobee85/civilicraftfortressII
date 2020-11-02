@@ -27,7 +27,7 @@ public class ServerGUI extends JPanel {
 		connectionPanelBar = new JPanel();
 		connectionPanelBar.setLayout(new BoxLayout(connectionPanelBar, BoxLayout.X_AXIS));
 		
-		info = new JLabel("info");
+		info = new JLabel("Failed to start ServerSocket");
 		
 		topPanel.add(info, BorderLayout.NORTH);
 		topPanel.add(connectionPanelBar, BorderLayout.CENTER);

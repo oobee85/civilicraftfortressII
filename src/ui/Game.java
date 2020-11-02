@@ -79,7 +79,7 @@ public class Game {
 		if(World.ticks%20 == 0) {
 			updateTerritory();
 		}
-//		Liquid.propogate(world);
+		Liquid.propogate(world);
 		// Remove dead things
 		world.clearDeadAndAddNewThings();
 
@@ -249,6 +249,7 @@ public class Game {
 	
 	public void initializeWorld(int width, int height) {
 		world = new World(width, height);
+		Season.makeSeasonArrays(height);
 	}
 	public void generateWorld(int width, int height, boolean easymode, List<PlayerInfo> players) {
 		initializeWorld(width, height);

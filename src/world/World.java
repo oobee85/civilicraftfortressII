@@ -911,7 +911,6 @@ public class World {
 			}
 		}
 
-		Season.makeSeasonArrays(getHeight());
 		int numTiles = width*height;
 		Generation.makeLake(numTiles * 1.0/100, this);
 		Generation.makeLake(numTiles * 1.0/200, this);
