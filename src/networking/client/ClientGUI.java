@@ -10,11 +10,12 @@ import networking.message.*;
 import networking.server.*;
 import networking.view.*;
 import ui.*;
-import ui.Frame;
 import utils.*;
 import world.*;
 
 public class ClientGUI {
+	
+	public static final int GUIWIDTH = 350;
 
 	private static final int TAB_ICON_SIZE = 25;
 	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
@@ -81,7 +82,7 @@ public class ClientGUI {
 		sidePanel = new JPanel();
 		sidePanel.setLayout(new BorderLayout());
 		sidePanel.setFocusable(false);
-		sidePanel.setPreferredSize(new Dimension(Frame.GUIWIDTH, 0));
+		sidePanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, 0));
 
 		ingamePanel.add(topPanel, BorderLayout.NORTH);
 		ingamePanel.add(sidePanel, BorderLayout.EAST);
@@ -228,7 +229,7 @@ public class ClientGUI {
 		}
 		gameView = new GameView(instance);
 		MinimapView minimapView = new MinimapView(gameView);
-		minimapView.setPreferredSize(new Dimension(Frame.GUIWIDTH, Frame.GUIWIDTH));
+		minimapView.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, ClientGUI.GUIWIDTH));
 		gameView.requestFocus();
 		gameViewOverlay = new GameViewOverlay(instance.getGUIController());
 		gameView.setLayout(new BorderLayout());
@@ -240,7 +241,7 @@ public class ClientGUI {
 		infoPanelView = new InfoPanelView();
 		JPanel infoPanelViewRoot = infoPanelView.getRootPanel();
 		infoPanelViewRoot.setBackground(instance.getBackgroundColor());
-		infoPanelViewRoot.setPreferredSize(new Dimension(Frame.GUIWIDTH, (int) (Frame.GUIWIDTH / 2.5)));
+		infoPanelViewRoot.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, (int) (ClientGUI.GUIWIDTH / 2.5)));
 		sidePanel.add(infoPanelViewRoot, BorderLayout.SOUTH);
 		
 		tabbedPane = new JTabbedPane();

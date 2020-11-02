@@ -7,7 +7,6 @@ import javax.swing.*;
 
 import game.*;
 import ui.*;
-import ui.Frame.*;
 import ui.infopanels.*;
 import utils.*;
 import world.*;

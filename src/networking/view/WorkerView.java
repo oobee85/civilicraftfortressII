@@ -6,8 +6,8 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import game.*;
+import networking.client.*;
 import ui.*;
-import ui.Frame;
 import ui.infopanels.*;
 import utils.*;
 import world.*;
@@ -37,7 +37,7 @@ public class WorkerView {
 		
 		JScrollPane scrollPane = new JScrollPane(buttonPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-		buttonPanel.setPreferredSize(new Dimension(Frame.GUIWIDTH, BUILDING_BUTTON_SIZE.height * (Game.buildingTypeList.size()/2 + 4)));
+		buttonPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, BUILDING_BUTTON_SIZE.height * (Game.buildingTypeList.size()/2 + 4)));
 		
 		rootPanel.add(scrollPane);
 		setupButtons();

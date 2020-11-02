@@ -14,12 +14,12 @@ import networking.*;
 import networking.message.*;
 import networking.server.*;
 import ui.*;
-import ui.Frame;
 import ui.infopanels.*;
 import utils.*;
 import world.*;
 
 public class Client {
+
 	
 	private Connection connection;
 	private ClientGUI clientGUI;
@@ -173,7 +173,7 @@ public class Client {
 						updatedTerrain.notify();
 					}
 					long elapsed = System.currentTimeMillis() - start;
-					long sleeptime = Frame.MILLISECONDS_PER_TICK - elapsed;
+					long sleeptime = Server.MILLISECONDS_PER_TICK - elapsed;
 					if(sleeptime > 0 && !isFastForwarding) {
 						Thread.sleep(sleeptime);
 					}

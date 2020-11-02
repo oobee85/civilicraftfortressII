@@ -474,7 +474,7 @@ public class Game {
 			thingsToPlace.add(Game.buildingTypeMap.get("CASTLE"));
 			thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 			thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
-			if(easymode || true) {
+			if(easymode) {
 				thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
 				thingsToPlace.add(Game.buildingTypeMap.get("WORKSHOP"));
 				thingsToPlace.add(Game.buildingTypeMap.get("BLACKSMITH"));

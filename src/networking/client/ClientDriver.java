@@ -5,7 +5,6 @@ import java.awt.*;
 import javax.swing.*;
 
 import ui.*;
-import ui.Frame;
 import utils.*;
 
 public class ClientDriver {
@@ -19,7 +18,7 @@ public class ClientDriver {
 		int height = Toolkit.getDefaultToolkit().getScreenSize().height;
 		height = Math.min(height, 1080);
 		height = height * 8 / 9;
-		int width = height + Frame.GUIWIDTH;
+		int width = height + ClientGUI.GUIWIDTH;
 		frame.setSize(width, height);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

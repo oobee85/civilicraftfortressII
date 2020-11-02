@@ -6,7 +6,6 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import ui.*;
-import ui.Frame;
 import utils.*;
 import world.*;
 
