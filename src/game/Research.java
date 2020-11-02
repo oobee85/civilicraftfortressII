@@ -15,6 +15,7 @@ public class Research {
 	
 	private int researchPointsSpent = 0;
 	private boolean isUnlocked = false;
+	private boolean payedFor = false;
 	private ResearchRequirement req = new ResearchRequirement();
 	
 	public Research(ResearchType type) {
@@ -39,6 +40,13 @@ public class Research {
 	
 	public int getPointsSpent() {
 		return researchPointsSpent;
+	}
+	
+	public boolean isPayedFor() {
+		return payedFor;
+	}
+	public void setPayedFor(boolean payedFor) {
+		this.payedFor = payedFor;
 	}
 	
 	public boolean isUnlocked() {

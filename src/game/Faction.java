@@ -112,10 +112,16 @@ public class Faction implements Serializable {
 		if(!research.getRequirement().areRequirementsMet()) {
 			return;
 		}
-		if(canAfford(research.getCost())) {
-			payCost(research.getCost());
-			researchTarget = research;
+		if(!research.isPayedFor()) {
+			if(canAfford(research.getCost())) {
+				payCost(research.getCost());
+				research.setPayedFor(true);
+			}
+			else {
+				return;
+			}
 		}
+		researchTarget = research;
 	}
 	
 	public void setupResearch() {
