@@ -8,28 +8,28 @@ import utils.*;
 
 public enum LiquidType implements HasImage {
 		DRY(new String[] {"resources/Images/liquid/lavaanim32.gif"}, 
-				0, 1000, 1000, 5, 0.08, 0, false),
+				0f, 1000f, 1000f, 5f, 0.08f, 0f, false),
 		WATER(new String[] {"resources/Images/liquid/watermoving.gif"}, 
-				0.2, 0.0001, 0.001, 10, 0.08, 0, true, new Color[] {new Color(50, 70, 250)}),
+				0.2f, 0.0001f, 0.001f, 10f, 0.08f, 0f, true, new Color[] {new Color(50, 70, 250)}),
 		LAVA(new String[] {"resources/Images/liquid/lava16.png", "resources/Images/liquid/lavaanim32.gif"}, 
-				0.1, 0.0005, 0.01, 100, 0.001, 10, false),
+				0.1f, 0.0005f, 0.01f, 100f, 0.001f, 10f, false),
 		ICE(new String[] {"resources/Images/liquid/ice.png"}, 
-				0, 1000, 1000, 20, 0.05, 0, true),
+				0f, 1000f, 1000f, 20f, 0.05f, 0f, true),
 		SNOW(new String[] {"resources/Images/liquid/snow128.png"}, 
-				1, 0.05, 0.1, 20, 0.05, 0, true),
+				1f, 0.05f, 0.1f, 20f, 0.05f, 0f, true),
 		;
 	
-	double viscosity;
-	double selfSurfaceTension;
-	double surfaceTension;
-	double damage;
-	double minimumDamageAmount;
-	double brightness;
+	float viscosity;
+	float selfSurfaceTension;
+	float surfaceTension;
+	float damage;
+	float minimumDamageAmount;
+	float brightness;
 	boolean isWater;
 	
 	private MipMap mipmap;
 
-	LiquidType(String[] s, double viscosity, double selfSurfaceTension, double surfaceTension, double damage, double minimumDamageAmount, double brightness, boolean isWater) {
+	LiquidType(String[] s, float viscosity, float selfSurfaceTension, float surfaceTension, float damage, float minimumDamageAmount, float brightness, boolean isWater) {
 		this.viscosity = viscosity;
 		this.selfSurfaceTension = selfSurfaceTension;
 		this.surfaceTension = surfaceTension;
@@ -39,7 +39,7 @@ public enum LiquidType implements HasImage {
 		this.isWater = isWater;
 		this.mipmap = new MipMap(s);
 	}
-	LiquidType(String[] s, double viscosity, double selfSurfaceTension, double surfaceTension, double damage, double minimumDamageAmount, double brightness, boolean isWater, Color[] colors) {
+	LiquidType(String[] s, float viscosity, float selfSurfaceTension, float surfaceTension, float damage, float minimumDamageAmount, float brightness, boolean isWater, Color[] colors) {
 		this(s, viscosity, selfSurfaceTension, surfaceTension, damage, minimumDamageAmount, brightness, isWater);
 		this.mipmap = new MipMap(s, colors);
 	}

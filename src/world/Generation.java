@@ -14,8 +14,8 @@ public class Generation {
 	
 	public static final int OREMULTIPLIER = 16384;
 	
-	public static double[][] generateHeightMap(int smoothingRadius, int width, int height) {
-		LinkedList<double[][]> noises = new LinkedList<>();
+	public static float[][] generateHeightMap(int smoothingRadius, int width, int height) {
+		LinkedList<float[][]> noises = new LinkedList<>();
 		
 		int power = 1;
 		while(power < width || power < height) {
@@ -24,32 +24,32 @@ public class Generation {
 		
 
 		for (int octave = 2; octave <= power; octave *= 2) {
-			double[][] noise1 = new double[octave][octave];
+			float[][] noise1 = new float[octave][octave];
 			for (int i = 0; i < noise1.length; i++) {
 				for (int j = 0; j < noise1[0].length; j++) {
-					noise1[i][j] = Utils.getRandomNormal(5);
+					noise1[i][j] = (float) Utils.getRandomNormal(5);
 				}
 			}
 			noises.add(noise1);
 		}
 
-		double[][] combinedNoise = new double[power][power];
+		float[][] combinedNoise = new float[power][power];
 		for (int i = 0; i < power; i++) {
 			for (int j = 0; j < power; j++) {
 				double rand = 0;
 				int divider = power;
 				double multiplier = 1;
-				for (double[][] noise : noises) {
+				for (float[][] noise : noises) {
 					divider /= 2;
 					multiplier /= 1.4;
 					rand += multiplier * noise[i / divider][j / divider];
 				}
-				combinedNoise[i][j] = rand;
+				combinedNoise[i][j] = (float) rand;
 			}
 		}
 
-		double[][] heightMap = Utils.smoothingFilter(combinedNoise, smoothingRadius, 100);
-		double[][] croppedHeightMap = new double[width][height];
+		float[][] heightMap = Utils.smoothingFilter(combinedNoise, smoothingRadius, 100);
+		float[][] croppedHeightMap = new float[width][height];
 		int croppedWidth = (power - width)/2;
 		int croppedHeight = (power - height)/2;
 		for (int i = 0; i < width; i++) {
@@ -112,10 +112,10 @@ public class Generation {
 		return new TileLoc(x0, y0);
 	}
 	
-	public static TileLoc makeVolcano(World world, double[][] heightMap) {
+	public static TileLoc makeVolcano(World world, float[][] heightMap) {
 		int x = 0;
 		int y = 0; 
-		double highest = -1000;
+		float highest = -1000;
 		for(int i = 0; i < world.getWidth(); i++) {
 			for(int j = 0; j < world.getHeight(); j++) {
 				if(heightMap[i][j] > highest) {
@@ -125,20 +125,20 @@ public class Generation {
 				}
 			}
 		}
-		double lavaRadius = 5;
-		double volcanoRadius = 10;
-		double mountainRadius = 20;
-		double mountainEdgeRadius = 23;
+		float lavaRadius = 5;
+		float volcanoRadius = 10;
+		float mountainRadius = 20;
+		float mountainEdgeRadius = 23;
 		
 		for(Tile tile : world.getTiles()) {
 			int i =  tile.getLocation().x();
 			int j =  tile.getLocation().y();
 			int dx = i - x;
 			int dy = j - y;
-			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
+			float distanceFromCenter = (float) Math.sqrt(dx*dx + dy*dy);
 			if(distanceFromCenter < mountainEdgeRadius) {
 				
-				double height = 1 - (lavaRadius - distanceFromCenter)/lavaRadius/2;
+				float height = 1 - (lavaRadius - distanceFromCenter)/lavaRadius/2;
 				if(distanceFromCenter > lavaRadius) {
 					height = 1 - (distanceFromCenter - lavaRadius)/mountainEdgeRadius;
 				}
@@ -147,7 +147,7 @@ public class Generation {
 				if(distanceFromCenter < lavaRadius) {
 					tile.setTerrain(Terrain.VOLCANO);
 					tile.liquidType = LiquidType.LAVA;
-					tile.liquidAmount = 0.2;
+					tile.liquidAmount = 0.2f;
 				}else if(distanceFromCenter < volcanoRadius) {
 					tile.setTerrain(Terrain.VOLCANO);
 				}

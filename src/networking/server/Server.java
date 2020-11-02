@@ -164,6 +164,33 @@ public class Server {
 		worldNetworkingUpdateThread.start();
 	}
 	
+	private void saveToFile(WorldInfo worldInfo, String filename) {
+		try(ObjectOutputStream objOut = new ObjectOutputStream(new FileOutputStream(filename))) {
+			objOut.writeObject(worldInfo);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	private void saveToFileExperiment() {
+		ArrayList<Tile> tileInfos = new ArrayList<>(gameInstance.world.getTiles().size()); 
+		for(Tile t : gameInstance.world.getTiles()) {
+			tileInfos.add(t);
+		}
+		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, tileInfos.toArray(new Tile[0]));
+		saveToFile(worldInfo, "tiles.ser");
+		worldInfo.getThings().addAll(gameInstance.world.plants);
+		saveToFile(worldInfo, "tiles_plants.ser");
+		worldInfo.getThings().addAll(gameInstance.world.buildings);
+		saveToFile(worldInfo, "tiles_plants_buildings.ser");
+		worldInfo.getThings().addAll(gameInstance.world.units);
+		saveToFile(worldInfo, "tiles_plants_buildings_units.ser");
+		worldInfo.getFactions().addAll(gameInstance.world.getFactions());
+		saveToFile(worldInfo, "tiles_plants_buildings_units_factions.ser");
+		System.exit(0);
+	}
+	
 	private void sendFullWorld() {
 		ArrayList<Tile> tileInfos = new ArrayList<>(gameInstance.world.getTiles().size()); 
 		for(Tile t : gameInstance.world.getTiles()) {
@@ -177,6 +204,7 @@ public class Server {
 		worldInfo.getFactions().addAll(gameInstance.world.getFactions());
 		sendToAllConnections(worldInfo);
 		sendWhichFaction();
+//		saveToFileExperiment();
 	}
 	
 	private void handleCommand(CommandMessage message) {

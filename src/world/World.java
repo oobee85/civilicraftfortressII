@@ -873,7 +873,7 @@ public class World {
 	
 	public void generateWorld() {
 		int smoothingRadius = (int) (Math.sqrt((width + height)/2)/2);
-		double[][] heightMap = Generation.generateHeightMap(smoothingRadius, width, height);
+		float[][] heightMap = Generation.generateHeightMap(smoothingRadius, width, height);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		volcano = Generation.makeVolcano(this, heightMap);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);

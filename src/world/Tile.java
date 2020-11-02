@@ -10,25 +10,27 @@ import game.*;
 import liquid.*;
 import utils.*;
 
-public class Tile implements Serializable {
+public class Tile implements Externalizable {
+
+	private TileLoc location;
+	private float height;
+	private float humidity;
+
+	public volatile float liquidAmount;
+	public volatile LiquidType liquidType;
+	
 	private volatile Faction faction;
 	private transient boolean isSelected = false;
 	private transient boolean inVisionRange = false;
 
-	private TileLoc location;
-	private double height;
-	private double humidity;
-
 	private Resource resource;
-	private transient Plant plant;
 	private Terrain terr;
+	private GroundModifier modifier;
+	
+	private transient Plant plant;
 	private transient Building building;
 	private transient Building road;
-	private GroundModifier modifier;
 	private transient WeatherEvent weather;
-	
-	public volatile double liquidAmount;
-	public volatile LiquidType liquidType;
 	
 	private transient ConcurrentLinkedQueue<Unit> units;
 	private transient ConcurrentLinkedQueue<Projectile> projectiles;
@@ -36,6 +38,46 @@ public class Tile implements Serializable {
 	
 	private transient List<Tile> neighborTiles = new LinkedList<Tile>();
 
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+
+		height = in.readFloat();
+		humidity = in.readFloat();
+		liquidAmount = in.readFloat();
+		
+		int x = in.readShort();
+		int y = in.readShort();
+		location = new TileLoc(x, y);
+
+		liquidType = LiquidType.values()[in.readByte()];
+		terr = Terrain.values()[in.readByte()];
+		faction = new Faction();
+		faction.setID(in.readByte());
+		
+		resource = (Resource)in.readObject();
+		modifier = (GroundModifier)in.readObject();
+	}
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeFloat(height);
+		out.writeFloat(humidity);
+		out.writeFloat(liquidAmount);
+		
+		out.writeShort(location.x());
+		out.writeShort(location.y());
+
+		out.writeByte(liquidType.ordinal());
+		out.writeByte(terr.ordinal());
+		out.writeByte(faction.id());
+		
+		out.writeObject(resource);
+		out.writeObject(modifier);
+	}
+	
+	public Tile() {
+		
+	}
+	
 	public Tile(TileLoc location, Terrain t) {
 		this.location = location;
 		terr = t;
@@ -46,18 +88,18 @@ public class Tile implements Serializable {
 		items = new ConcurrentLinkedQueue<Item>();
 		this.humidity = 1;
 	}
-	public double getTempurature() {
-		double season = Season.getSeason2();
-		double seasonTemp = 1 - ((1 - season) * Season.winter[getLocation().y()] + season*Season.summer[getLocation().y()]);
-		double heightTemp = 1 - height;
+	public float getTempurature() {
+		float season = Season.getSeason2();
+		float seasonTemp = 1 - ((1 - season) * Season.winter[getLocation().y()] + season*Season.summer[getLocation().y()]);
+		float heightTemp = 1 - height;
 		heightTemp = heightTemp*heightTemp;
-		double nightMultiplier = World.isNightTime() ? 0.9 : 1;
+		float nightMultiplier = World.isNightTime() ? 0.9f : 1f;
 		return (seasonTemp + heightTemp)*nightMultiplier/2;
 	}
-	public double getHumidity() {
+	public float getHumidity() {
 		return humidity;
 	}
-	public void setHumidity(double humidity) {
+	public void setHumidity(float humidity) {
 		this.humidity = humidity;
 	}
 	public void updateHumidity(int currentTick) {
@@ -429,14 +471,14 @@ public class Tile implements Serializable {
 		return location;
 	}
 
-	public void setHeight(double newheight) {
+	public void setHeight(float newheight) {
 		height = newheight;
 		if (height > 1) {
 			height = 1;
 		}
 	}
 
-	public double getHeight() {
+	public float getHeight() {
 		return height;
 	}
 	public boolean hasWall() {

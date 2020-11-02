@@ -62,6 +62,9 @@ public class Faction implements Externalizable {
 	public int id() {
 		return id;
 	}
+	public void setID(int id) {
+		this.id = id;
+	}
 	public Color color() {
 		return color;
 	}

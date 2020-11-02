@@ -11,11 +11,11 @@ import world.*;
 
 public class Liquid {
 	
-	public static final double MINIMUM_LIQUID_THRESHOLD = 0.001;
+	public static final float MINIMUM_LIQUID_THRESHOLD = 0.001f;
 	
-	private static final double FRICTION_RATIO = 0.99;
+	private static final float FRICTION_RATIO = 0.99f;
 	
-	private static double[][] liquidAmountsTemp;
+	private static float[][] liquidAmountsTemp;
 	private static LiquidType[][] liquidTypesTemp;
 	
 	private static final boolean MULTITHREADED = true;
@@ -24,13 +24,13 @@ public class Liquid {
 	
 	public static void propogate(World world) {
 		if(liquidAmountsTemp == null || liquidAmountsTemp.length != world.getWidth() || liquidAmountsTemp[0].length != world.getHeight()) {
-			liquidAmountsTemp = new double[world.getWidth()][world.getHeight()];
+			liquidAmountsTemp = new float[world.getWidth()][world.getHeight()];
 		}
 		if(liquidTypesTemp == null || liquidTypesTemp.length != world.getWidth() || liquidTypesTemp[0].length != world.getHeight()) {
 			liquidTypesTemp = new LiquidType[world.getWidth()][world.getHeight()];
 		}
 		
-//		double[] totals = new double[LiquidType.values().length];
+//		float[] totals = new float[LiquidType.values().length];
 //		for(int x = 0; x < world.length; x++) {
 //			for(int y = 0; y < world.length; y++) {
 //				for(int i = 0; i < totals.length; i++) {
@@ -89,7 +89,7 @@ public class Liquid {
 		for(Tile tile : world.getTiles()) {
 			int x = tile.getLocation().x();
 			int y = tile.getLocation().y();
-			tile.liquidAmount = Math.max(liquidAmountsTemp[x][y] * 0.9999 - 0.00001, 0);
+			tile.liquidAmount = Math.max(liquidAmountsTemp[x][y] * 0.9999f - 0.00001f, 0);
 			if(tile.liquidAmount == 0) {
 				tile.liquidType = LiquidType.DRY;
 			}
@@ -119,7 +119,7 @@ public class Liquid {
 		int x = current.x();
 		int y = current.y();
 		
-		double tempurature = tile.getTempurature();
+		float tempurature = tile.getTempurature();
 		if(tempurature > Season.MELTING_TEMPURATURE) {
 			if(tile.liquidType == LiquidType.ICE) {
 				tile.liquidType = LiquidType.WATER;
@@ -145,19 +145,19 @@ public class Liquid {
 			if(otype.viscosity == 0) {
 				continue;
 			}
-			double myh = tile.getHeight();
+			float myh = tile.getHeight();
 			if(tile.hasWall() == true) {
 				myh += 0.1;
 			}
-			double myv = liquidAmountsTemp[x][y];
+			float myv = liquidAmountsTemp[x][y];
 			LiquidType mytype = liquidTypesTemp[x][y];
 			
-			double oh = otherTile.getHeight();
-			double ov = world.get(other).liquidAmount;
+			float oh = otherTile.getHeight();
+			float ov = world.get(other).liquidAmount;
 			
 			if(myh + myv < oh + ov) {
-				double delta = (oh + ov) - (myh + myv);
-				double change = delta/2 * otype.viscosity;
+				float delta = (oh + ov) - (myh + myv);
+				float change = delta/2 * otype.viscosity;
 				
 				if(ov - change < 0) {
 					change = ov;
@@ -169,8 +169,8 @@ public class Liquid {
 					// disabled erosion due to making it hard to parallelize
 					// could probably fix by making height variable in Tile volatile
 //					if(myh < oh) {
-//						double deltah = oh - myh;
-//						double changeh = deltah/2 * Math.min(change* FRICTION_RATIO, 1);
+//						float deltah = oh - myh;
+//						float changeh = deltah/2 * Math.min(change* FRICTION_RATIO, 1);
 //						world.get(current).setHeight(world.get(current).getHeight() + changeh);
 //						world.get(other).setHeight(world.get(other).getHeight() - changeh);
 //					}
@@ -189,8 +189,8 @@ public class Liquid {
 						if(change < otype.surfaceTension) { 
 							change = 0;
 						}
-						double combined = change;
-						double extra = 0;
+						float combined = change;
+						float extra = 0;
 						if(myv - change < 0) {
 							combined = myv;
 							extra = change - combined;

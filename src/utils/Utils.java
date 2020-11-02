@@ -257,9 +257,9 @@ public final class Utils {
 	}
 	
 
-	public static void normalize(double[][] data) {
-		double minValue = data[0][0];
-		double maxValue = data[0][0];
+	public static void normalize(float[][] data) {
+		float minValue = data[0][0];
+		float maxValue = data[0][0];
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < data[0].length; j++) {
 				minValue = data[i][j] < minValue ? data[i][j] : minValue;
@@ -281,14 +281,14 @@ public final class Utils {
 	 * @param c	lower = sharper, higher = smoother
 	 * @return
 	 */
-	public static double[][] smoothingFilter(double[][] data, double radius, double c) {
-		ArrayList<Future<double[]>> tasks = new ArrayList<>(data.length);
+	public static float[][] smoothingFilter(float[][] data, double radius, double c) {
+		ArrayList<Future<float[]>> tasks = new ArrayList<>(data.length);
 		// apply smoothing filter
 		// each thread applies smoothing for 1 row
 		for (int i = 0; i < data.length; i++) {
 			final int myI = i;
-			Future<double[]> future = executorService.submit(() -> {
-				double[] myRow = new double[data[0].length];
+			Future<float[]> future = executorService.submit(() -> {
+				float[] myRow = new float[data[0].length];
 				for (int j = 0; j < data[0].length; j++) {
 					int mini = (int) Math.max(0, myI-radius);
 					int maxi = (int) Math.min(data.length-1, myI+radius);
@@ -310,10 +310,10 @@ public final class Utils {
 			tasks.add(future);
 		}
 		// combine the results from all the threads
-		double[][] smoothed = new double[data.length][];
+		float[][] smoothed = new float[data.length][];
 		try {
 			for (int i = 0; i < data.length; i++) {
-				Future<double[]> task = tasks.get(i);
+				Future<float[]> task = tasks.get(i);
 				smoothed[i] = task.get();
 			}
 		} catch (InterruptedException e) {

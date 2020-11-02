@@ -270,7 +270,6 @@ public class Client {
 			});
 			cleaningThread.start();
 		}
-		World.ticks = worldInfo.getTick();
 		if(gameInstance.world.getFactions().size() < worldInfo.getFactions().size()) {
 			for(int i = gameInstance.world.getFactions().size(); i < worldInfo.getFactions().size(); i++) {
 				Faction received = worldInfo.getFactions().get(i);
@@ -278,6 +277,7 @@ public class Client {
 				gameInstance.world.addFaction(faction);
 			}
 		}
+		World.ticks = worldInfo.getTick();
 		gameInstance.world.updateTiles(worldInfo.getTileInfos());
 		
 		for(Thing update : worldInfo.getThings()) {
