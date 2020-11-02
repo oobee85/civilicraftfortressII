@@ -36,12 +36,6 @@ public class Server {
 		this.gui = serverGUI;
 	}
 	
-//	public void sendMessage(String message) {
-//		for(Connection connection : connections) {
-//			connection.sendMessage(message);
-//		}
-//	}
-	
 	public void startAcceptingConnections() {
 		thread = new Thread(() -> {
 			ServerSocket serverSocket = null;

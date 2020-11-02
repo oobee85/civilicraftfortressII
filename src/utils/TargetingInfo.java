@@ -14,8 +14,13 @@ public class TargetingInfo {
 	}
 	
 	private boolean doesFactionSatify(Faction animalFaction, Faction potentialTargetFaction) {
-		if(potentialTargetFaction.name().equals(faction) || 
-				(faction == null && (animalFaction.isNeutral() || animalFaction != potentialTargetFaction))) {
+		if(faction == null && (animalFaction.isNeutral() || animalFaction != potentialTargetFaction)) {
+			return true;
+		}
+		if("PLAYER".equals(faction) && potentialTargetFaction.isPlayer()) {
+			return true;
+		}
+		if(potentialTargetFaction.name().equals(faction)) {
 			return true;
 		}
 		return false;
