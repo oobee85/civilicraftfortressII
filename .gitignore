@@ -5,3 +5,5 @@ bin/
 *.jar
 profiling/
 ERROR_LOG.txt
+*.ser
+ser/

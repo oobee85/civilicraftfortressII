@@ -1,7 +1,5 @@
 package wildlife;
 
-import java.util.*;
-
 import game.*;
 import ui.*;
 import utils.Thing;
@@ -9,7 +7,7 @@ import world.*;
 
 public class Werewolf extends Animal {
 
-	boolean transformed = false;
+	transient boolean transformed = false;
 	
 	public Werewolf(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("WEREWOLF"), tile, faction);

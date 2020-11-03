@@ -271,8 +271,8 @@ public class Game {
 		world.generateWorld();
 		makeRoads(easymode);
 		world.clearDeadAndAddNewThings();
-		spawnCyclops();
-		meteorStrike();
+//		spawnCyclops();
+//		meteorStrike();
 		makeStartingCastleAndUnits(easymode, players);
 	}
 	public void spawnCyclops() {
@@ -477,6 +477,7 @@ public class Game {
 		makeRoadBetween(highestTile, lowestTile);
 	}
 	private void makeStartingCastleAndUnits(boolean easymode, List<PlayerInfo> players) {
+		double spacePerPlayer = (double)world.getWidth()/players.size();
 		int index = 0;
 		for(PlayerInfo player : players) {
 			Faction newFaction = new Faction(player.getName(), true, true, player.getColor());
@@ -495,7 +496,7 @@ public class Game {
 				thingsToPlace.add(Game.buildingTypeMap.get("BLACKSMITH"));
 				addResources(newFaction);
 			}
-			Tile spawnTile = world.get(new TileLoc(world.getWidth()/2 + index*40 - players.size()*40/2, world.getHeight()/2));
+			Tile spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), world.getHeight()/2));
 			HashSet<Tile> visited = new HashSet<>();
 			LinkedList<Tile> tovisit = new LinkedList<>();
 			

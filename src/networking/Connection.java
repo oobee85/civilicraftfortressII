@@ -73,7 +73,6 @@ public class Connection {
 			try {
 				while((message = input.readObject()) != null) {
 					receivedMessages.add(message);
-					System.err.println("received message " + message);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

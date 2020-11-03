@@ -9,8 +9,8 @@ import world.*;
 
 public class Parasite extends Animal {
 	
-	private boolean transformed;
-	private Tile volcano;
+	private transient boolean transformed;
+	private transient Tile volcano;
 
 	public Parasite(Tile tile, Faction faction, Tile volcano) {
 		super(Game.unitTypeMap.get("PARASITE"), tile, faction);

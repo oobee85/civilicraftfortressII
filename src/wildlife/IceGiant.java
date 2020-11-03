@@ -1,11 +1,8 @@
 package wildlife;
 
-import java.util.*;
-
 import game.*;
 import liquid.LiquidType;
 import ui.*;
-import utils.Thing;
 import world.*;
 
 public class IceGiant extends Animal {

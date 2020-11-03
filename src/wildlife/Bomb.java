@@ -1,14 +1,12 @@
 package wildlife;
 
-import java.util.*;
-
 import game.*;
 import ui.*;
 import utils.*;
 import world.*;
 
 public class Bomb extends Animal {
-	private World world;
+	private transient World world;
 	public Bomb(Tile tile, Faction faction, World world) {
 		super(Game.unitTypeMap.get("BOMB"), tile, faction);
 		this.world = world;

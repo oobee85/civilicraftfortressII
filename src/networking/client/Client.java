@@ -418,7 +418,7 @@ public class Client {
 			try {
 				while(true) {
 					Object message = connection.getMessage();
-					System.err.println("processing message " + message);
+					System.out.println("processing message " + message);
 					if(message instanceof ServerMessage) {
 						ServerMessage serverMessage = (ServerMessage)message;
 						if(serverMessage.getServerMessageType() == ServerMessageType.LOBBY) {

@@ -83,7 +83,6 @@ public class World {
 		}
 	}
 	public void updateTiles(Tile[] tileInfos) {
-		System.out.println("updating " + tileInfos.length + " tiles");
 		for(Tile info : tileInfos) {
 			Tile tile = get(info.getLocation());
 			if(tile == null) {

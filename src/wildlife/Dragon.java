@@ -4,14 +4,13 @@ import java.util.*;
 
 import game.*;
 import ui.*;
-import utils.Thing;
 import world.*;
 
 public class Dragon extends Animal {
 	
-	private Tile home;
-	private int timeToFireball;
-	private int timeToHunt;
+	private transient Tile home;
+	private transient int timeToFireball;
+	private transient int timeToHunt;
 	
 	public Dragon(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("DRAGON"), tile, faction);
