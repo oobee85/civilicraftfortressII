@@ -42,12 +42,16 @@ public class TileLoc implements Externalizable {
 	}
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-		x = in.readInt();
-		y = in.readInt();
+		x = in.readShort();
+		y = in.readShort();
 	}
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeInt(x);
-		out.writeInt(y);
+		out.writeShort(x);
+		out.writeShort(y);
+	}
+	
+	public static TileLoc readFromExternal(ObjectInput in) throws IOException {
+		return new TileLoc(in.readShort(), in.readShort());
 	}
 }

@@ -197,6 +197,7 @@ public class Server {
 		worldInfo.getThings().addAll(gameInstance.world.getUnits());
 		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
 		worldInfo.getFactions().addAll(gameInstance.world.getFactions());
+		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
 		sendToAllConnections(worldInfo);
 		sendWhichFaction();
 //		saveToFileExperiment();

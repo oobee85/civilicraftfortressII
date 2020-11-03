@@ -2,16 +2,18 @@ package game;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.io.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.ImageIcon;
 
+import ui.*;
 import utils.*;
-import world.Tile;
+import world.*;
 
-public class Projectile implements HasImage {
+public class Projectile implements HasImage, Externalizable {
 
 	private ProjectileType type;
 	private Tile targetTile;
@@ -19,18 +21,37 @@ public class Projectile implements HasImage {
 	private Tile tile;
 	private HasImage hasImage;
 	
-	private int damageBuff;
 	private Unit source;
 	private int damage;
 	private int totalDistance;
 	public int currentHeight = 0;
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		type = ProjectileType.valueOf(in.readUTF());
+		targetTile = new Tile(TileLoc.readFromExternal(in), Terrain.DIRT);
+		tile = new Tile(TileLoc.readFromExternal(in), Terrain.DIRT);
+		damage = in.readInt();
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeUTF(type.name());
+		targetTile.getLocation().writeExternal(out);
+		tile.getLocation().writeExternal(out);
+		out.writeInt(damage);
+	}
+	
+	/** used by Externalizable interface */
+	public Projectile() {
+		
+	}
 	
 	public Projectile(ProjectileType type, Tile tile, Tile targetTile, Unit source) {
 		this.type = type;
 		this.tile = tile;
 		this.hasImage = type;
 		this.targetTile = targetTile;
-		this.damageBuff = 0;
 		this.source = source;
 		this.timeToMove = type.getSpeed();
 		this.damage = type.getDamage();
@@ -52,10 +73,6 @@ public class Projectile implements HasImage {
 	
 	public Unit getSource() {
 		return source;
-	}
-	
-	public void setDamageBuff(int damageBuff) {
-		this.damageBuff = damageBuff;
 	}
 	
 	public void tick() {

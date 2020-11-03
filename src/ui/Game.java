@@ -85,6 +85,8 @@ public class Game {
 
 //		buildingTick();
 //		unitTick();
+
+		world.doProjectileUpdates();
 	}
 	public void gameTick() {
 		// Do all the game events like unit movement, time passing, building things, growing, etc
@@ -487,6 +489,8 @@ public class Game {
 			thingsToPlace.add(Game.buildingTypeMap.get("CASTLE"));
 			thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 			thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
+			thingsToPlace.add(Game.unitTypeMap.get("CATAPULT"));
+			thingsToPlace.add(Game.unitTypeMap.get("TREBUCHET"));
 			if(easymode) {
 				thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
 				thingsToPlace.add(Game.buildingTypeMap.get("WORKSHOP"));

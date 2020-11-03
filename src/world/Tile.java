@@ -45,9 +45,7 @@ public class Tile implements Externalizable {
 		humidity = in.readFloat();
 		liquidAmount = in.readFloat();
 		
-		int x = in.readShort();
-		int y = in.readShort();
-		location = new TileLoc(x, y);
+		location = TileLoc.readFromExternal(in);
 
 		liquidType = LiquidType.values()[in.readByte()];
 		terr = Terrain.values()[in.readByte()];
@@ -63,8 +61,7 @@ public class Tile implements Externalizable {
 		out.writeFloat(humidity);
 		out.writeFloat(liquidAmount);
 		
-		out.writeShort(location.x());
-		out.writeShort(location.y());
+		location.writeExternal(out);
 
 		out.writeByte(liquidType.ordinal());
 		out.writeByte(terr.ordinal());

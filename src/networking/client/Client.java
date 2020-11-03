@@ -226,7 +226,7 @@ public class Client {
 	}
 	
 	private void startLocalGameLoopThread(boolean simulated) {
-		long millisPerTick = simulated ? Server.MILLISECONDS_PER_TICK*11/10 : Server.MILLISECONDS_PER_TICK;
+		final long millisPerTick = Server.MILLISECONDS_PER_TICK + (simulated ? 1 : 0);
 		Thread gameLoopThread = new Thread(() -> {
 			while (true) {
 				try {
@@ -238,6 +238,7 @@ public class Client {
 						gameInstance.gameTick();
 					}
 					gameInstance.world.getData().clearDeadThings();
+					gameInstance.world.getData().clearProjectilesToSend();
 					gameInstance.getGUIController().updateGUI();
 					synchronized (updatedTerrain) {
 						updatedTerrain.notify();
@@ -288,6 +289,14 @@ public class Client {
 			}
 			updateThing(things.get(update.id()), update);
 		}
+		for(Projectile projectileMessage : worldInfo.getProjectiles()) {
+			Projectile newProjectile = new Projectile(
+					projectileMessage.getType(), 
+					gameInstance.world.get(projectileMessage.getTile().getLocation()), 
+					gameInstance.world.get(projectileMessage.getTargetTile().getLocation()), 
+					null);
+			gameInstance.world.getData().addProjectile(newProjectile);
+		}
 		synchronized (updatedTerrain) {
 			updatedTerrain.notify();
 		}
@@ -297,16 +306,13 @@ public class Client {
 		clientGUI.repaint();
 	}
 	private void createThing(Thing update) {
-		if(update.isDead()) {
-			return;
-		}
 		Thing newThing = null;
 		if(update instanceof Plant) {
 			Plant plantUpdate = (Plant)update;
 			Plant newPlant = new Plant(plantUpdate.getPlantType(), gameInstance.world.get(plantUpdate.getTile().getLocation()), gameInstance.world.getFaction(World.NO_FACTION_ID));
 			newThing = newPlant;
-			things.put(update.id(), newPlant);
 			newPlant.getTile().setHasPlant(newPlant);
+			things.put(update.id(), newPlant);
 			gameInstance.world.addPlant(newPlant);
 		}
 		else if(update instanceof Building) {
@@ -316,14 +322,14 @@ public class Client {
 					gameInstance.world.get(buildingUpdate.getTile().getLocation()), 
 					gameInstance.world.getFactions().get(buildingUpdate.getFactionID()));
 			newThing = newBuilding;
-			things.put(update.id(), newBuilding);
-			gameInstance.world.addBuilding(newBuilding);
 			if(newBuilding.getType().isRoad()) {
 				newBuilding.getTile().setRoad(newBuilding);
 			}
 			else {
 				newBuilding.getTile().setBuilding(newBuilding);
 			}
+			things.put(update.id(), newBuilding);
+			gameInstance.world.addBuilding(newBuilding);
 		}
 		else if(update instanceof Unit) {
 			Unit unitUpdate = (Unit)update;
@@ -332,11 +338,11 @@ public class Client {
 					gameInstance.world.get(unitUpdate.getTile().getLocation()), 
 					gameInstance.world.getFactions().get(unitUpdate.getFactionID()));
 			newThing = newUnit;
-			things.put(update.id(), newUnit);
-			gameInstance.world.addUnit(newUnit);
 			if(newUnit.getTile() != null) {
 				newUnit.getTile().addUnit(newUnit);
 			}
+			things.put(update.id(), newUnit);
+			gameInstance.world.addUnit(newUnit);
 		}
 		if(newThing != null) {
 			newThing.setID(update.id());

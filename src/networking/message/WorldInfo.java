@@ -15,6 +15,7 @@ public class WorldInfo implements Serializable {
 	private final Tile[] tileInfos;
 	private final HashSet<Thing> things;
 	private final LinkedList<Faction> factions;
+	private final LinkedList<Projectile> projectiles;
 	public WorldInfo(int width, int height, int tick, Tile[] tileInfos) {
 		this.width = width;
 		this.height = height;
@@ -22,6 +23,7 @@ public class WorldInfo implements Serializable {
 		this.tileInfos = tileInfos;
 		things = new HashSet<>();
 		factions = new LinkedList<>();
+		projectiles = new LinkedList<>();
 	}
 	public int getWidth() {
 		return width;
@@ -41,8 +43,11 @@ public class WorldInfo implements Serializable {
 	public LinkedList<Faction> getFactions() {
 		return factions;
 	}
+	public LinkedList<Projectile> getProjectiles() {
+		return projectiles;
+	}
 	@Override
 	public String toString() {
-		return "WorldInfo (" + width + "," + height + ") " + tileInfos.length + " tile updates";
+		return "WorldInfo (" + width + "," + height + ") " + tileInfos.length + " tiles, " + things.size() + " things, " + factions.size() + " factions, " + projectiles.size() + " projectiles";
 	}
 }

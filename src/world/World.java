@@ -175,12 +175,6 @@ public class World {
 	public void addUnit(Unit newUnit) {
 		worldData.newUnits.add(newUnit);
 	}
-	public void addProjectile(Projectile newProjectile) {
-		worldData.newProjectiles.add(newProjectile);
-	}
-	public LinkedList<Projectile> getProjectiles() {
-		return worldData.projectiles;
-	}
 	public LinkedList<WeatherEvent> getWeatherEvents() {
 		return worldData.weatherEvents;
 	}
@@ -399,7 +393,7 @@ public class World {
 				if(distanceFromCenter < radius) {
 					Projectile wave = new Projectile(ProjectileType.METEOR_WAVE, tile, t, null);
 					tile.addProjectile(wave);
-					worldData.newProjectiles.add(wave);
+					worldData.addProjectile(wave);
 				}
 		}
 	}
@@ -596,7 +590,7 @@ public class World {
 	
 	public void doProjectileUpdates() {
 
-		for(Projectile projectile : worldData.projectiles) {
+		for(Projectile projectile : worldData.getProjectiles()) {
 			projectile.tick();
 			if(projectile.getTargetTile() == null) {
 				continue;
@@ -732,19 +726,8 @@ public class World {
 		plantsCopy.addAll(worldData.newPlants);
 		worldData.newPlants.clear();
 		worldData.plants = plantsCopy;
-
-		// PROJECTILES
-		LinkedList<Projectile> projectilesNew = new LinkedList<Projectile>();
-		for(Projectile projectile : worldData.projectiles) {
-			if(projectile.reachedTarget()) {
-				projectile.getTile().removeProjectile(projectile);
-			} else {
-				projectilesNew.add(projectile);
-			}
-		}
-		projectilesNew.addAll(worldData.newProjectiles);
-		worldData.newProjectiles.clear();
-		worldData.projectiles = projectilesNew;
+		
+		worldData.filterDeadProjectiles();
 		
 		if(World.ticks % 200 == 0) {
 			System.out.println("Tick " + World.ticks +
@@ -753,7 +736,7 @@ public class World {
 					" \tplannedBuildings: " + worldData.plannedBuildings.size() + 
 					" \tplants: " 			+ worldData.plants.size() + 
 					" \tgroundModifiers: " 	+ worldData.groundModifiers.size() + 
-					" \tprojectiles: " 		+ worldData.projectiles.size());
+					" \tprojectiles: " 		+ worldData.getProjectiles().size());
 		}
 	}
 	

@@ -617,7 +617,7 @@ public class GameView extends JPanel {
 				drawHitsplat(g, unit);
 			}
 			
-			for(Projectile p : game.world.getProjectiles()) {
+			for(Projectile p : game.world.getData().getProjectiles()) {
 				int extra = (int) (tileSize * p.getExtraSize());
 				g.drawImage(p.getShadow(0), p.getTile().getLocation().x() * tileSize, p.getTile().getLocation().y() * tileSize, tileSize, tileSize, null);
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x() * tileSize - extra/2, p.getTile().getLocation().y() * tileSize - p.getHeight() - extra/2, tileSize + extra, tileSize + extra, null);
