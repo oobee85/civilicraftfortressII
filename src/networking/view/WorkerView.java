@@ -52,7 +52,9 @@ public class WorkerView {
 					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
 					BUILDING_BUTTON_SIZE);
 			button.addActionListener(e -> {
-				gameView.setBuildingToPlan(type);
+				if(button.getEnabled()) {
+					gameView.setBuildingToPlan(type);
+				}
 			});
 			button.addRightClickActionListener(e -> {
 				gameView.getGameInstance().getGUIController().switchInfoPanel(new BuildingTypeInfoPanel(type, gameView.getFaction()));
