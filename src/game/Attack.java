@@ -41,7 +41,7 @@ public class Attack {
 		if(unit.readyToAttack() && !target.isDead()) {
 			Projectile p = new Projectile(attack.projectileType, unit.getTile(), target.getTile(), unit);
 			p.setDamageBuff(Game.combatBuffs.getAttack());
-			world.newProjectiles.add(p);
+			world.addProjectile(p);
 			unit.getTile().addProjectile(p);
 			unit.resetTimeToAttack();
 		}
@@ -59,7 +59,7 @@ public class Attack {
 					
 					Projectile p = new Projectile(attack.projectileType, world.get(tl), world.get(tileLoc), unit);
 					p.setDamageBuff(Game.combatBuffs.getAttack());
-					world.newProjectiles.add(p);
+					world.addProjectile(p);
 					unit.getTile().addProjectile(p);
 				}
 				
@@ -72,7 +72,7 @@ public class Attack {
 					
 					Projectile p = new Projectile(attack.projectileType, world.get(tl), world.get(tileLoc), unit);
 					p.setDamageBuff(Game.combatBuffs.getAttack());
-					world.newProjectiles.add(p);
+					world.addProjectile(p);
 					unit.getTile().addProjectile(p);
 				}
 			}

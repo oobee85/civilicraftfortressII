@@ -107,7 +107,7 @@ public class Faction implements Externalizable {
 	}
 
 	public boolean isBuildingSelected(World world, BuildingType type) {
-		for(Building building : world.buildings) {
+		for(Building building : world.getBuildings()) {
 			if(building.getIsSelected() && building.getFaction() == this && building.getType() == type) {
 				return true;
 			}
@@ -117,7 +117,7 @@ public class Faction implements Externalizable {
 	}
 	
 	public boolean hasResearchLab(World world) {
-		for(Building building : world.buildings) {
+		for(Building building : world.getBuildings()) {
 			if(building.getFaction() == this && building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
 				return true;
 			}

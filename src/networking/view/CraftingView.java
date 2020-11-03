@@ -42,7 +42,7 @@ public class CraftingView {
 				if((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
 					amount = 10;
 				}
-				gameView.getFaction().craftItem(type, amount, gameView.getGameInstance().world.buildings);
+				gameView.getFaction().craftItem(type, amount, gameView.getGameInstance().world.getBuildings());
 			});
 			button.addRightClickActionListener(e -> {
 				gameView.getGameInstance().getGUIController().switchInfoPanel(new ItemTypeInfoPanel(type, gameView.getFaction()));

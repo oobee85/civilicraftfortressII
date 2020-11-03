@@ -372,7 +372,7 @@ public class GameView extends JPanel {
 	}
 
 	public void selectAllUnits() {
-		for(Unit unit : game.world.units) {
+		for(Unit unit : game.world.getUnits()) {
 			if(unit.getFaction() == faction) {
 				selectThing(unit);
 			}
@@ -604,25 +604,25 @@ public class GameView extends JPanel {
 				}
 			}
 			
-			for(Building building : game.world.buildings) {
+			for(Building building : game.world.getBuildings()) {
 				drawHealthBar(g, building);
 				drawHitsplat(g, building);
 			}
-			for(Plant plant : game.world.plants) {
+			for(Plant plant : game.world.getPlants()) {
 				drawHealthBar(g, plant);
 				drawHitsplat(g, plant);
 			}
-			for(Unit unit : game.world.units) {
+			for(Unit unit : game.world.getUnits()) {
 				drawHealthBar(g, unit);
 				drawHitsplat(g, unit);
 			}
 			
-			for(Projectile p : game.world.projectiles) {
+			for(Projectile p : game.world.getProjectiles()) {
 				int extra = (int) (tileSize * p.getExtraSize());
 				g.drawImage(p.getShadow(0), p.getTile().getLocation().x() * tileSize, p.getTile().getLocation().y() * tileSize, tileSize, tileSize, null);
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x() * tileSize - extra/2, p.getTile().getLocation().y() * tileSize - p.getHeight() - extra/2, tileSize + extra, tileSize + extra, null);
 			}
-			for(WeatherEvent w : game.world.weatherEvents) {
+			for(WeatherEvent w : game.world.getWeatherEvents()) {
 				g.drawImage(w.getImage(0), w.getTile().getLocation().x() * tileSize, w.getTile().getLocation().y() * tileSize, tileSize, tileSize, null);
 			}
 			for(Thing thing : selectedThings) {
@@ -723,7 +723,7 @@ public class GameView extends JPanel {
 			int indicatorSize = tileSize/12;
 			int offset = 4;
 			HashMap<Tile, Integer> visited = new HashMap<>();
-			for(Unit unit : game.world.units) {
+			for(Unit unit : game.world.getUnits()) {
 				int count = 0;
 				if(visited.containsKey(unit.getTile())) {
 					count = visited.get(unit.getTile());

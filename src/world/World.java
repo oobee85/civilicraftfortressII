@@ -43,43 +43,9 @@ public class World {
 	public static final int NO_FACTION_ID = 0;
 	public static final int CYCLOPS_FACTION_ID = 1;
 	public static final int UNDEAD_FACTION_ID = 2;
-	
 	private ArrayList<Faction> factions = new ArrayList<>();
-	public Faction getFaction(String name) {
-		for(Faction faction : factions) {
-			if(faction.name().equals(name)) {
-				return faction;
-			}
-		}
-		return null;
-	}
-	public Faction getFaction(int id) {
-		for(Faction faction : factions) {
-			if(faction.id() == id) {
-				return faction;
-			}
-		}
-		return null;
-	}
-	public void addFaction(Faction faction) {
-		factions.add(faction);
-	}
-	public ArrayList<Faction> getFactions() {
-		return factions;
-	}
-	public LinkedList<Plant> plants = new LinkedList<Plant>();
-	public LinkedList<Plant> newPlants = new LinkedList<Plant>();
-	public LinkedList<Unit> units = new LinkedList<Unit>();
-	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
-	public LinkedList<Building> buildings = new LinkedList<Building>();
-	public LinkedList<Building> newBuildings = new LinkedList<Building>();
-	public LinkedList<Building> plannedBuildings = new LinkedList<Building>();
-	public LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
-	public LinkedList<Projectile> newProjectiles = new LinkedList<Projectile>();
-	public LinkedList<GroundModifier> groundModifiers = new LinkedList<GroundModifier>();
-	public LinkedList<GroundModifier> newGroundModifiers = new LinkedList<GroundModifier>();
-	public LinkedList<WeatherEvent> weatherEvents = new LinkedList<WeatherEvent>();
-	public LinkedList<WeatherEvent> newWeatherEvents = new LinkedList<WeatherEvent>();
+	
+	private WorldData worldData;
 	
 	public TileLoc volcano;
 	public int numCutTrees = 10;
@@ -88,6 +54,7 @@ public class World {
 	public static int ticks;
 	
 	public World(int width, int height) {
+		worldData = new WorldData();
 		this.width = width;
 		this.height = height;
 		tileList = new LinkedList<>();
@@ -136,6 +103,30 @@ public class World {
 			tile.liquidType = info.liquidType;
 		}
 	}
+
+	public Faction getFaction(String name) {
+		for(Faction faction : factions) {
+			if(faction.name().equals(name)) {
+				return faction;
+			}
+		}
+		return null;
+	}
+	public Faction getFaction(int id) {
+		for(Faction faction : factions) {
+			if(faction.id() == id) {
+				return faction;
+			}
+		}
+		return null;
+	}
+	public void addFaction(Faction faction) {
+		factions.add(faction);
+	}
+	public ArrayList<Faction> getFactions() {
+		return factions;
+	}
+	
 	public int getTerritorySize() {
 		return territory.size();
 	}
@@ -168,6 +159,40 @@ public class World {
 		}
 		return tiles[loc.x()][loc.y()];
 	}
+	
+	public LinkedList<Building> getPlannedBuildings() {
+		return worldData.plannedBuildings;
+	}
+	public LinkedList<Building> getBuildings() {
+		return worldData.buildings;
+	}
+	public void addBuilding(Building newBuilding) {
+		worldData.newBuildings.add(newBuilding);
+	}
+	public LinkedList<Unit> getUnits() {
+		return worldData.units;
+	}
+	public void addUnit(Unit newUnit) {
+		worldData.newUnits.add(newUnit);
+	}
+	public void addProjectile(Projectile newProjectile) {
+		worldData.newProjectiles.add(newProjectile);
+	}
+	public LinkedList<Projectile> getProjectiles() {
+		return worldData.projectiles;
+	}
+	public LinkedList<WeatherEvent> getWeatherEvents() {
+		return worldData.weatherEvents;
+	}
+	public void addPlant(Plant newPlant) {
+		worldData.newPlants.add(newPlant);
+	}
+	public LinkedList<Plant> getPlants() {
+		return worldData.plants;
+	}
+	public WorldData getData() {
+		return worldData;
+	}
 
 	public void drought() {
 		for(Tile tile : getTiles()) {
@@ -196,7 +221,7 @@ public class World {
 			
 			double temperature = t.getTempurature();
 			WeatherEvent weather = new WeatherEvent(t, targetTile, t.getLocation().distanceTo(target)*WeatherEventType.RAIN.getSpeed() + (int)(Math.random()*50), 0.00002, LiquidType.WATER);;
-			newWeatherEvents.add(weather);
+			worldData.newWeatherEvents.add(weather);
 			t.setWeather(weather);
 		}
 	}
@@ -217,7 +242,7 @@ public class World {
 	}
 	
 	public void spawnWerewolf() {
-		List<Unit> wolves = units
+		List<Unit> wolves = worldData.units
 				.stream()
 				.filter(e -> e.getType() == Game.unitTypeMap.get("WOLF"))
 				.collect(Collectors.toList());
@@ -274,7 +299,7 @@ public class World {
 	public Animal spawnAnimal(UnitType type, Tile tile, Faction faction) {
 		Animal animal = makeAnimal(type, tile, faction);
 		tile.addUnit(animal);
-		newUnits.add(animal);
+		worldData.newUnits.add(animal);
 		return animal;
 	}
 
@@ -314,7 +339,7 @@ public class World {
 		}
 		Animal animal = new Animal(animalType, world.get(loc), getFaction(NO_FACTION_ID));
 		animal.setTile(world.get(loc));
-		newUnits.add(animal);
+		worldData.newUnits.add(animal);
 		world.get(loc).addUnit(animal);
 	}
 	
@@ -374,7 +399,7 @@ public class World {
 				if(distanceFromCenter < radius) {
 					Projectile wave = new Projectile(ProjectileType.METEOR_WAVE, tile, t, null);
 					tile.addProjectile(wave);
-					projectiles.add(wave);
+					worldData.newProjectiles.add(wave);
 				}
 		}
 	}
@@ -494,10 +519,10 @@ public class World {
 	
 	private void spreadForest() {
 		
-		if(plants.size() >= 3000) {
+		if(worldData.plants.size() >= 3000) {
 			return;
 		}
-		for(Plant plant : plants) {
+		for(Plant plant : worldData.plants) {
 			
 			if(plant.getTile().isCold() == true) {
 				continue;
@@ -508,7 +533,7 @@ public class World {
 					for(Tile tile : plant.getTile().getNeighbors()) {
 						if(tile.getPlant() == null && tile.canPlant()) {
 							tile.setHasPlant(new Plant(PlantType.FOREST1, tile, getFaction(NO_FACTION_ID)));
-							newPlants.add(tile.getPlant());
+							worldData.newPlants.add(tile.getPlant());
 							break;
 						}
 					}
@@ -534,13 +559,13 @@ public class World {
 				if(Math.random() < 0.01) {
 					Plant plant = new Plant(PlantType.CATTAIL, tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(plant);
-					newPlants.add(plant);
+					worldData.newPlants.add(plant);
 				}
 			}
 			if(tile.liquidType != null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 				if (Math.random() < 0.001) {
 					tile.setHasPlant(new Plant(PlantType.BERRY, tile, getFaction(NO_FACTION_ID)));
-					newPlants.add(tile.getPlant());
+					worldData.newPlants.add(tile.getPlant());
 				}
 			}
 			
@@ -548,7 +573,7 @@ public class World {
 		}
 	}
 	public void doWeatherUpdate() {
-		for(WeatherEvent weather : weatherEvents) {
+		for(WeatherEvent weather : worldData.weatherEvents) {
 			weather.tick();
 			Tile tile = weather.getTile();
 			if(tile.liquidType == LiquidType.LAVA) {
@@ -571,7 +596,7 @@ public class World {
 	
 	public void doProjectileUpdates() {
 
-		for(Projectile projectile : projectiles) {
+		for(Projectile projectile : worldData.projectiles) {
 			projectile.tick();
 			if(projectile.getTargetTile() == null) {
 				continue;
@@ -603,40 +628,11 @@ public class World {
 			}
 		}
 	}
-
-	public void updateUnitColdDamage() {
-		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
-		
-		for (Unit unit : units) {
-			Tile tile = unit.getTile();
-			int tileDamage = 0;
-			
-			if (tileDamage != 0) {
-				unit.takeDamage(tileDamage);
-			}
-			if (unit.isDead() == true) {
-				tile.removeUnit(unit);
-			} else {
-				unitsNew.add(unit);
-			}
-
-		}
-		for (Unit unit : newUnits) {
-			unitsNew.add(unit);
-			unit.getTile().addUnit(unit);
-			
-		}
-		newUnits.clear();
-		units = unitsNew;
-	}
 	
 	public void addGroundModifier(GroundModifier gm) {
-
-		synchronized (newGroundModifiers) {
-
-			newGroundModifiers.add(gm);
+		synchronized (worldData.newGroundModifiers) {
+			worldData.newGroundModifiers.add(gm);
 		}
-		
 	}
 	public void clearDeadAndAddNewThings() {
 		// FACTIONS
@@ -646,21 +642,22 @@ public class World {
 		
 		// UNITS
 		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
-		for (Unit unit : units) {
+		for (Unit unit : worldData.units) {
 			if (unit.isDead() == true) {
 				unit.getTile().removeUnit(unit);
 				ThingMapper.removed(unit);
+				worldData.addDeadThing(unit);
 			} else {
 				unitsNew.add(unit);
 			}
 		}
-		unitsNew.addAll(newUnits);
-		newUnits.clear();
-		units = unitsNew;
+		unitsNew.addAll(worldData.newUnits);
+		worldData.newUnits.clear();
+		worldData.units = unitsNew;
 		
 		// GROUND MODIFIERS
 		LinkedList<GroundModifier> groundModifiersNew = new LinkedList<GroundModifier>();
-		for(GroundModifier modifier : groundModifiers) {
+		for(GroundModifier modifier : worldData.groundModifiers) {
 			Tile tile = modifier.getTile();
 			if(modifier.isDead() == false) {
 				groundModifiersNew.add(modifier);
@@ -668,15 +665,15 @@ public class World {
 				tile.setModifier(null);
 			}
 		}
-		synchronized (newGroundModifiers) {
-			groundModifiersNew.addAll(newGroundModifiers);
-			newGroundModifiers.clear();
+		synchronized (worldData.newGroundModifiers) {
+			groundModifiersNew.addAll(worldData.newGroundModifiers);
+			worldData.newGroundModifiers.clear();
 		}
-		groundModifiers = groundModifiersNew;
+		worldData.groundModifiers = groundModifiersNew;
 		
 		//WEATHER
 		LinkedList<WeatherEvent> weatherEventsNew = new LinkedList<WeatherEvent>();
-		for (WeatherEvent weather : weatherEvents) {
+		for (WeatherEvent weather : worldData.weatherEvents) {
 			Tile tile = weather.getTile();
 			if(weather.isDead() == false) {
 				weatherEventsNew.add(weather);
@@ -684,24 +681,24 @@ public class World {
 				tile.setWeather(null);
 			}
 		}
-		synchronized (weatherEvents) {
-			weatherEventsNew.addAll(newWeatherEvents);
-			newWeatherEvents.clear();
+		synchronized (worldData.weatherEvents) {
+			weatherEventsNew.addAll(worldData.newWeatherEvents);
+			worldData.newWeatherEvents.clear();
 		}
-		weatherEvents = weatherEventsNew;
+		worldData.weatherEvents = weatherEventsNew;
 		
 		// BUILDINGS
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
 		LinkedList<Building> plannedBuildingsNew = new LinkedList<Building>();
-		for(Building plannedBuilding : plannedBuildings) {
+		for(Building plannedBuilding : worldData.plannedBuildings) {
 			if(plannedBuilding.getRemainingEffort() < plannedBuilding.getType().getBuildingEffort()) {
 				buildingsNew.add(plannedBuilding);
 			} else {
 				plannedBuildingsNew.add(plannedBuilding);
 			}
 		}
-		plannedBuildings = plannedBuildingsNew;
-		for (Building building : buildings) {
+		worldData.plannedBuildings = plannedBuildingsNew;
+		for (Building building : worldData.buildings) {
 			if (building.isDead() == true) {
 				ThingMapper.removed(building);
 				if(building == building.getTile().getRoad()) {
@@ -710,56 +707,58 @@ public class World {
 				else {
 					building.getTile().setBuilding(null);
 				}
+				worldData.addDeadThing(building);
 			} else {
 				buildingsNew.add(building);
 			}
 			
 		}
-		buildingsNew.addAll(newBuildings);
-		newBuildings.clear();
-		buildings = buildingsNew;
+		buildingsNew.addAll(worldData.newBuildings);
+		worldData.newBuildings.clear();
+		worldData.buildings = buildingsNew;
 
 	
 		// PLANTS
 		LinkedList<Plant> plantsCopy = new LinkedList<Plant>();
-		for(Plant plant : plants) {
+		for(Plant plant : worldData.plants) {
 			if(plant.isDead() == true) {
 				ThingMapper.removed(plant);
 				plant.getTile().setHasPlant(null);
+				worldData.addDeadThing(plant);
 			} else {
 				plantsCopy.add(plant);
 			}
 		}
-		plantsCopy.addAll(newPlants);
-		newPlants.clear();
-		plants = plantsCopy;
+		plantsCopy.addAll(worldData.newPlants);
+		worldData.newPlants.clear();
+		worldData.plants = plantsCopy;
 
 		// PROJECTILES
 		LinkedList<Projectile> projectilesNew = new LinkedList<Projectile>();
-		for(Projectile projectile : projectiles) {
+		for(Projectile projectile : worldData.projectiles) {
 			if(projectile.reachedTarget()) {
 				projectile.getTile().removeProjectile(projectile);
 			} else {
 				projectilesNew.add(projectile);
 			}
 		}
-		projectilesNew.addAll(newProjectiles);
-		newProjectiles.clear();
-		projectiles = projectilesNew;
+		projectilesNew.addAll(worldData.newProjectiles);
+		worldData.newProjectiles.clear();
+		worldData.projectiles = projectilesNew;
 		
 		if(World.ticks % 200 == 0) {
 			System.out.println("Tick " + World.ticks +
-					" \tunits: " 				+ units.size() + 
-					" \tbuildings: " 		+ buildings.size() + 
-					" \tplannedBuildings: " + plannedBuildings.size() + 
-					" \tplants: " 		+ plants.size() + 
-					" \tgroundModifiers: " 	+ groundModifiers.size() + 
-					" \tprojectiles: " 		+ projectiles.size());
+					" \tunits: " 			+ worldData.units.size() + 
+					" \tbuildings: " 		+ worldData.buildings.size() + 
+					" \tplannedBuildings: " + worldData.plannedBuildings.size() + 
+					" \tplants: " 			+ worldData.plants.size() + 
+					" \tgroundModifiers: " 	+ worldData.groundModifiers.size() + 
+					" \tprojectiles: " 		+ worldData.projectiles.size());
 		}
 	}
 	
 	public void updatePlantDamage() {
-		for(Plant plant : plants) {
+		for(Plant plant : worldData.plants) {
 			Tile tile = plant.getTile();
 			
 //			if(tile.isCold()) {
@@ -813,7 +812,7 @@ public class World {
 				if(o < PlantType.BERRY.getRarity()) {
 					Plant p = new Plant(PlantType.BERRY, tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(p);
-					newPlants.add(tile.getPlant());
+					worldData.newPlants.add(tile.getPlant());
 				}
 			}
 			//tile.liquidType.WATER &&
@@ -823,7 +822,7 @@ public class World {
 				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()  && o < PlantType.CATTAIL.getRarity()) {
 					Plant p = new Plant(PlantType.CATTAIL, tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(p);
-					newPlants.add(tile.getPlant());
+					worldData.newPlants.add(tile.getPlant());
 				}
 			}
 		}
@@ -841,7 +840,7 @@ public class World {
 				if (Math.random() < tempDensity) {
 					Plant plant = new Plant(PlantType.FOREST1, t, getFaction(NO_FACTION_ID));
 					t.setHasPlant(plant);
-					newPlants.add(plant);
+					worldData.newPlants.add(plant);
 				}
 		}
 		

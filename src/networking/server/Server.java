@@ -174,11 +174,11 @@ public class Server {
 		}
 		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, tileInfos.toArray(new Tile[0]));
 		saveToFile(worldInfo, "tiles.ser");
-		worldInfo.getThings().addAll(gameInstance.world.plants);
+		worldInfo.getThings().addAll(gameInstance.world.getPlants());
 		saveToFile(worldInfo, "tiles_plants.ser");
-		worldInfo.getThings().addAll(gameInstance.world.buildings);
+		worldInfo.getThings().addAll(gameInstance.world.getBuildings());
 		saveToFile(worldInfo, "tiles_plants_buildings.ser");
-		worldInfo.getThings().addAll(gameInstance.world.units);
+		worldInfo.getThings().addAll(gameInstance.world.getUnits());
 		saveToFile(worldInfo, "tiles_plants_buildings_units.ser");
 		worldInfo.getFactions().addAll(gameInstance.world.getFactions());
 		saveToFile(worldInfo, "tiles_plants_buildings_units_factions.ser");
@@ -192,9 +192,10 @@ public class Server {
 			tileInfos.add(t);
 		}
 		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, tileInfos.toArray(new Tile[0]));
-		worldInfo.getThings().addAll(gameInstance.world.plants);
-		worldInfo.getThings().addAll(gameInstance.world.buildings);
-		worldInfo.getThings().addAll(gameInstance.world.units);
+		worldInfo.getThings().addAll(gameInstance.world.getPlants());
+		worldInfo.getThings().addAll(gameInstance.world.getBuildings());
+		worldInfo.getThings().addAll(gameInstance.world.getUnits());
+		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
 		worldInfo.getFactions().addAll(gameInstance.world.getFactions());
 		sendToAllConnections(worldInfo);
 		sendWhichFaction();

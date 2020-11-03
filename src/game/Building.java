@@ -59,7 +59,7 @@ public class Building extends Thing implements Serializable {
 			Unit unit = getProducingUnit().remove();
 			unit.queuePlannedAction(new PlannedAction(getSpawnLocation()));
 			getTile().addUnit(unit);
-			world.newUnits.add(unit);
+			world.addUnit(unit);
 		}
 		
 		if(!readyToHarvest() ) {

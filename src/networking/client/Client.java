@@ -237,6 +237,7 @@ public class Client {
 					else {
 						gameInstance.gameTick();
 					}
+					gameInstance.world.getData().clearDeadThings();
 					gameInstance.getGUIController().updateGUI();
 					synchronized (updatedTerrain) {
 						updatedTerrain.notify();
@@ -296,6 +297,9 @@ public class Client {
 		clientGUI.repaint();
 	}
 	private void createThing(Thing update) {
+		if(update.isDead()) {
+			return;
+		}
 		Thing newThing = null;
 		if(update instanceof Plant) {
 			Plant plantUpdate = (Plant)update;
@@ -303,7 +307,7 @@ public class Client {
 			newThing = newPlant;
 			things.put(update.id(), newPlant);
 			newPlant.getTile().setHasPlant(newPlant);
-			gameInstance.world.newPlants.add(newPlant);
+			gameInstance.world.addPlant(newPlant);
 		}
 		else if(update instanceof Building) {
 			Building buildingUpdate = (Building)update;
@@ -313,7 +317,7 @@ public class Client {
 					gameInstance.world.getFactions().get(buildingUpdate.getFactionID()));
 			newThing = newBuilding;
 			things.put(update.id(), newBuilding);
-			gameInstance.world.newBuildings.add(newBuilding);
+			gameInstance.world.addBuilding(newBuilding);
 			if(newBuilding.getType().isRoad()) {
 				newBuilding.getTile().setRoad(newBuilding);
 			}
@@ -329,7 +333,7 @@ public class Client {
 					gameInstance.world.getFactions().get(unitUpdate.getFactionID()));
 			newThing = newUnit;
 			things.put(update.id(), newUnit);
-			gameInstance.world.newUnits.add(newUnit);
+			gameInstance.world.addUnit(newUnit);
 			if(newUnit.getTile() != null) {
 				newUnit.getTile().addUnit(newUnit);
 			}

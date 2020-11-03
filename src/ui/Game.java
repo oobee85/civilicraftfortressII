@@ -315,7 +315,7 @@ public class Game {
 
 	public void buildingTick() {
 		
-		for(Building building : world.buildings) {
+		for(Building building : world.getBuildings()) {
 			double culture = building.getCulture();
 			double area = culture * Building.CULTURE_AREA_MULTIPLIER;
 			double radius = Math.sqrt(area);
@@ -448,7 +448,7 @@ public class Game {
 					Building road = new Building(Game.buildingTypeMap.get("STONE_ROAD"), t, world.getFaction(World.NO_FACTION_ID));
 					road.setRemainingEffort(0);
 					t.setRoad(road);
-					world.newBuildings.add(road);
+					world.addBuilding(road);
 				}
 			}
 		}
@@ -509,10 +509,10 @@ public class Game {
 							&& !current.hasBuilding()
 							&& current.liquidAmount < current.liquidType.getMinimumDamageAmount()
 							&& (current.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"))) {
-						Building s = new Building(type, current, newFaction);
-						current.setBuilding(s);
-						world.newBuildings.add(s);
-						s.setRemainingEffort(0);
+						Building building = new Building(type, current, newFaction);
+						current.setBuilding(building);
+						world.addBuilding(building);
+						building.setRemainingEffort(0);
 						thing = null;
 					}
 				}
@@ -542,7 +542,7 @@ public class Game {
 	
 	
 	private void updateTerritory() {
-		for(Building building : world.buildings) {
+		for(Building building : world.getBuildings()) {
 			building.updateCulture();
 		}
 	}
@@ -553,7 +553,7 @@ public class Game {
 			UnitType unitType = (UnitType)thingType;
 			if(faction.isPlayer()) {
 				Unit unit = new Unit(unitType, tile, faction);
-				world.newUnits.add(unit);
+				world.addUnit(unit);
 				tile.addUnit(unit);
 				unit.setTimeToAttack(0);
 				return unit;
@@ -568,7 +568,7 @@ public class Game {
 			}
 			Building building = new Building(buildingType, tile, faction);
 			building.setRemainingEffort(0);
-			world.newBuildings.add(building);
+			world.addBuilding(building);
 			if(buildingType.isRoad()) {
 				tile.setRoad(building);
 			}
@@ -616,9 +616,7 @@ public class Game {
 	}
 	
 	private void unitTick() {
-		Iterator<Unit> it = world.units.descendingIterator();
-		while(it.hasNext()) {
-			Unit unit = it.next();
+		for(Unit unit : world.getUnits()) {
 			unit.updateState();
 			unit.planActions(world);
 			unit.doMovement();
@@ -626,7 +624,6 @@ public class Game {
 			unit.doPassiveThings(world);
 		}
 	}
-	
 
 	private boolean canBuild(Unit unit, BuildingType bt, Tile tile) {
 		if(bt.isRoad() && tile.getRoad() != null) {
@@ -649,7 +646,7 @@ public class Game {
 		if(canBuild(unit, bt, tile) == true) {
 			unit.getFaction().payCost(bt.getCost());
 			Building building = new Building(bt, tile, unit.getFaction());
-			world.plannedBuildings.add(building);
+			world.addBuilding(building);
 			building.setPlanned(true);
 			building.setHealth(1);
 			if(bt.isRoad()) {
@@ -671,21 +668,6 @@ public class Game {
 			}
 		}
 		return null;
-	}
-	
-	
-	private void buildUnit(UnitType u, Tile tile, Faction faction) {
-		System.out.println("building " + u);
-		if(faction.canAfford(u.getCost())) {
-			System.out.println("can afford " + u);
-			Unit unit = new Unit(u, tile, faction);
-			if (tile.isBlocked(unit)) {
-				return;
-			}
-			faction.payCost(u.getCost());
-			tile.getBuilding().setProducingUnit(unit);
-			System.out.println("built " + u);
-		}
 	}
 	
 	public Color getBackgroundColor() {

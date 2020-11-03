@@ -327,7 +327,7 @@ public class Unit extends Thing implements Serializable {
 	public void planActions(World world) {
 		// Workers deciding whether to move toward something to build
 		if (unitType.isBuilder() && isIdle() && passiveAction == PlannedAction.BUILD && getTile().getFaction() == getFaction()) {
-			Building building = getBuildingToBuild(world.buildings, world.plannedBuildings);
+			Building building = getBuildingToBuild(world.getBuildings(), world.getPlannedBuildings());
 			if (building != null && building.getTile().getFaction() == getFaction()) {
 				queuePlannedAction(new PlannedAction(building, true));
 			}
