@@ -13,13 +13,13 @@ public class WorldData {
 	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
 	public LinkedList<Building> buildings = new LinkedList<Building>();
 	public LinkedList<Building> newBuildings = new LinkedList<Building>();
-	public LinkedList<Building> plannedBuildings = new LinkedList<Building>();
 	
 	private LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
 	private LinkedList<Projectile> newProjectiles = new LinkedList<Projectile>();
 	
-	public LinkedList<GroundModifier> groundModifiers = new LinkedList<GroundModifier>();
-	public LinkedList<GroundModifier> newGroundModifiers = new LinkedList<GroundModifier>();
+	private LinkedList<GroundModifier> groundModifiers = new LinkedList<GroundModifier>();
+	private LinkedList<GroundModifier> newGroundModifiers = new LinkedList<GroundModifier>();
+	
 	public LinkedList<WeatherEvent> weatherEvents = new LinkedList<WeatherEvent>();
 	public LinkedList<WeatherEvent> newWeatherEvents = new LinkedList<WeatherEvent>();
 	
@@ -62,6 +62,29 @@ public class WorldData {
 		}
 		return copy;
 	}
+
+	public void addGroundModifier(GroundModifier gm) {
+		synchronized (newGroundModifiers) {
+			newGroundModifiers.add(gm);
+		}
+	}
+	
+	public void filterDeadGroundModifiers() {
+		LinkedList<GroundModifier> groundModifiersNew = new LinkedList<GroundModifier>();
+		for(GroundModifier modifier : groundModifiers) {
+			Tile tile = modifier.getTile();
+			if(modifier.isDead() == false) {
+				groundModifiersNew.add(modifier);
+			} else {
+				tile.setModifier(null);
+			}
+		}
+		synchronized (newGroundModifiers) {
+			groundModifiersNew.addAll(newGroundModifiers);
+			newGroundModifiers.clear();
+		}
+		groundModifiers = groundModifiersNew;
+	}
 	
 	public void addDeadThing(Thing deadThing) {
 		synchronized (deadThings) {
@@ -75,5 +98,14 @@ public class WorldData {
 			deadThings.clear();
 		}
 		return copy;
+	}
+	
+	@Override
+	public String toString() {
+		return 	"units: " 				+ units.size() + 
+				" \tbuildings: " 		+ buildings.size() + 
+				" \tplants: " 			+ plants.size() + 
+				" \tgroundModifiers: " 	+ groundModifiers.size() + 
+				" \tprojectiles: " 		+ getProjectiles().size();
 	}
 }

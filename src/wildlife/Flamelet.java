@@ -1,7 +1,5 @@
 package wildlife;
 
-import java.util.*;
-
 import game.*;
 import ui.*;
 import world.*;
@@ -28,7 +26,7 @@ public class Flamelet extends Animal {
 	
 	private void makeFlame(World world) {
 		getTile().setModifier(new GroundModifier(GroundModifierType.FIRE, this.getTile(), 30));
-		world.addGroundModifier(getTile().getModifier());
+		world.getData().addGroundModifier(getTile().getModifier());
 	}
 	
 }

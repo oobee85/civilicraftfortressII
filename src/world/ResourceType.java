@@ -24,7 +24,7 @@ public enum ResourceType implements HasImage {
 	
 	
 	private MipMap mipmap;
-    private double remainingEffort;
+    private int remainingEffort;
     private double numVeins;
     private boolean isRare;
     private ItemType itemType;
@@ -32,7 +32,7 @@ public enum ResourceType implements HasImage {
     private double timeToHarvest;
     private int veinSize;
     
-	ResourceType(double y, String[] s, double numVeins, int veinSize, boolean rare, ItemType itemType, boolean isOre, double timeToHarvest){
+	ResourceType(int y, String[] s, double numVeins, int veinSize, boolean rare, ItemType itemType, boolean isOre, double timeToHarvest){
 		remainingEffort = y;
 		this.numVeins = numVeins;
 		this.isRare = rare;
@@ -55,7 +55,7 @@ public enum ResourceType implements HasImage {
 	public double getTimeToHarvest() {
 		return timeToHarvest;
 	}
-	public double getRemainingEffort() {
+	public int getRemainingEffort() {
 		return remainingEffort;
 	}
 	public double getNumVeins() {

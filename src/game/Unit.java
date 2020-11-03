@@ -309,25 +309,26 @@ public class Unit extends Thing implements Serializable {
 		return null;
 	}
 
-	private Building getBuildingToBuild(LinkedList<Building> buildings, LinkedList<Building> plannedBuildings) {
+	private Building getBuildingToBuild(LinkedList<Building> buildings) {
 		if (buildings.isEmpty()) {
 			return null;
 		}
+		Building firstNotStartedBuilding = null;
 		for (Building building : buildings) {
-			if (building.isBuilt() == false) {
+			if (building.isBuilt() == false && building.isStarted()) {
 				return building;
 			}
+			else if(!building.isStarted()) {
+				firstNotStartedBuilding = building;
+			}
 		}
-		for (Building pBuilding : plannedBuildings) {
-			return pBuilding;
-		}
-		return null;
+		return firstNotStartedBuilding;
 	}
 
 	public void planActions(World world) {
 		// Workers deciding whether to move toward something to build
 		if (unitType.isBuilder() && isIdle() && passiveAction == PlannedAction.BUILD && getTile().getFaction() == getFaction()) {
-			Building building = getBuildingToBuild(world.getBuildings(), world.getPlannedBuildings());
+			Building building = getBuildingToBuild(world.getBuildings());
 			if (building != null && building.getTile().getFaction() == getFaction()) {
 				queuePlannedAction(new PlannedAction(building, true));
 			}

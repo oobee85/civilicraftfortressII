@@ -177,6 +177,9 @@ public class Building extends Thing implements Serializable {
 			remainingEffort = 0;
 		}
 	}
+	public boolean isStarted() {
+		return getRemainingEffort() < getType().getBuildingEffort();
+	}
 	public double getRemainingEffort() {
 		return remainingEffort;
 	}

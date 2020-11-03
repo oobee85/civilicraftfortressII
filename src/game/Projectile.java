@@ -28,7 +28,7 @@ public class Projectile implements HasImage, Externalizable {
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-		type = ProjectileType.valueOf(in.readUTF());
+		type = ProjectileType.values()[in.readByte()];
 		targetTile = new Tile(TileLoc.readFromExternal(in), Terrain.DIRT);
 		tile = new Tile(TileLoc.readFromExternal(in), Terrain.DIRT);
 		damage = in.readInt();
@@ -36,7 +36,7 @@ public class Projectile implements HasImage, Externalizable {
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeUTF(type.name());
+		out.writeByte(type.ordinal());
 		targetTile.getLocation().writeExternal(out);
 		tile.getLocation().writeExternal(out);
 		out.writeInt(damage);

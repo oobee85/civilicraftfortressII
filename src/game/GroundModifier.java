@@ -4,12 +4,28 @@ import java.io.*;
 
 import world.*;
 
-public class GroundModifier implements Serializable {
+public class GroundModifier implements Externalizable {
 
 	private GroundModifierType type;
-	private transient int aliveUntil;
-	private transient int duration;
-	private transient Tile tile;
+	private int aliveUntil;
+	private int duration;
+	private Tile tile;
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		type = GroundModifierType.values()[in.readByte()];
+		aliveUntil = in.readInt();
+	}
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeByte(type.ordinal());
+		out.writeInt(aliveUntil);
+	}
+	
+	/** Used by Externalizable interface */
+	public GroundModifier() {
+		
+	}
 	
 	public GroundModifier(GroundModifierType type, Tile tile, int duration) {
 		this.type = type;
@@ -29,9 +45,6 @@ public class GroundModifier implements Serializable {
 	}
 	public int timeLeft() {
 		return aliveUntil - World.ticks;
-	}
-	public boolean updateTime() {
-		return isDead();
 	}
 	public void addDuration(int duration) {
 		aliveUntil += duration;

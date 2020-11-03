@@ -10,7 +10,7 @@ public class CommandMessage implements Externalizable {
 	private int thingID;
 	private int targetX;
 	private int targetY;
-	private int targetID;
+	private int targetID = -1;
 	private int faction;
 	private String type = "";
 	private boolean clearQueue;
@@ -136,6 +136,6 @@ public class CommandMessage implements Externalizable {
 	
 	@Override
 	public String toString() {
-		return command.name() + " " + thingID + " " + getTargetLocation();
+		return command.name() + " " + thingID + " " + getTargetLocation() + " " + targetID;
 	}
 }

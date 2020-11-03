@@ -160,9 +160,6 @@ public class World {
 		return tiles[loc.x()][loc.y()];
 	}
 	
-	public LinkedList<Building> getPlannedBuildings() {
-		return worldData.plannedBuildings;
-	}
 	public LinkedList<Building> getBuildings() {
 		return worldData.buildings;
 	}
@@ -401,7 +398,7 @@ public class World {
 	
 		for(Tile t : getNeighborsInRadius(tile, radius)) {
 			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
-			addGroundModifier(fire);
+			worldData.addGroundModifier(fire);
 			t.setModifier(fire);
 			if(t.hasBuilding() == true) {
 				t.getBuilding().takeDamage(damage);
@@ -600,7 +597,7 @@ public class World {
 				if(projectile.getType().getGroundModifierType() != null) {
 					GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), (int)projectile.getDamage()/5);
 					projectile.getTile().setModifier(gm);
-					addGroundModifier(gm);
+					worldData.addGroundModifier(gm);
 				}
 			}
 			if(projectile.reachedTarget()) {
@@ -623,11 +620,6 @@ public class World {
 		}
 	}
 	
-	public void addGroundModifier(GroundModifier gm) {
-		synchronized (worldData.newGroundModifiers) {
-			worldData.newGroundModifiers.add(gm);
-		}
-	}
 	public void clearDeadAndAddNewThings() {
 		// FACTIONS
 		for(Faction f : factions) {
@@ -648,22 +640,8 @@ public class World {
 		unitsNew.addAll(worldData.newUnits);
 		worldData.newUnits.clear();
 		worldData.units = unitsNew;
-		
-		// GROUND MODIFIERS
-		LinkedList<GroundModifier> groundModifiersNew = new LinkedList<GroundModifier>();
-		for(GroundModifier modifier : worldData.groundModifiers) {
-			Tile tile = modifier.getTile();
-			if(modifier.isDead() == false) {
-				groundModifiersNew.add(modifier);
-			} else {
-				tile.setModifier(null);
-			}
-		}
-		synchronized (worldData.newGroundModifiers) {
-			groundModifiersNew.addAll(worldData.newGroundModifiers);
-			worldData.newGroundModifiers.clear();
-		}
-		worldData.groundModifiers = groundModifiersNew;
+
+		worldData.filterDeadGroundModifiers();
 		
 		//WEATHER
 		LinkedList<WeatherEvent> weatherEventsNew = new LinkedList<WeatherEvent>();
@@ -683,15 +661,6 @@ public class World {
 		
 		// BUILDINGS
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
-		LinkedList<Building> plannedBuildingsNew = new LinkedList<Building>();
-		for(Building plannedBuilding : worldData.plannedBuildings) {
-			if(plannedBuilding.getRemainingEffort() < plannedBuilding.getType().getBuildingEffort()) {
-				buildingsNew.add(plannedBuilding);
-			} else {
-				plannedBuildingsNew.add(plannedBuilding);
-			}
-		}
-		worldData.plannedBuildings = plannedBuildingsNew;
 		for (Building building : worldData.buildings) {
 			if (building.isDead() == true) {
 				ThingMapper.removed(building);
@@ -729,14 +698,8 @@ public class World {
 		
 		worldData.filterDeadProjectiles();
 		
-		if(World.ticks % 200 == 0) {
-			System.out.println("Tick " + World.ticks +
-					" \tunits: " 			+ worldData.units.size() + 
-					" \tbuildings: " 		+ worldData.buildings.size() + 
-					" \tplannedBuildings: " + worldData.plannedBuildings.size() + 
-					" \tplants: " 			+ worldData.plants.size() + 
-					" \tgroundModifiers: " 	+ worldData.groundModifiers.size() + 
-					" \tprojectiles: " 		+ worldData.getProjectiles().size());
+		if(World.ticks % 200 == 1) {
+			System.out.println("Tick " + World.ticks + ", " + worldData.toString());
 		}
 	}
 	
