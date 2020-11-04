@@ -309,7 +309,10 @@ public class Client {
 		Thing newThing = null;
 		if(update instanceof Plant) {
 			Plant plantUpdate = (Plant)update;
-			Plant newPlant = new Plant(plantUpdate.getPlantType(), gameInstance.world.get(plantUpdate.getTile().getLocation()), gameInstance.world.getFaction(World.NO_FACTION_ID));
+			Plant newPlant = new Plant(
+					plantUpdate.getPlantType(), 
+					gameInstance.world.get(plantUpdate.getTile().getLocation()), 
+					gameInstance.world.getFaction(World.NO_FACTION_ID));
 			newThing = newPlant;
 			newPlant.getTile().setHasPlant(newPlant);
 			things.put(update.id(), newPlant);
