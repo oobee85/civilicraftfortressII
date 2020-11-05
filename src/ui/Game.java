@@ -582,6 +582,15 @@ public class Game {
 		}
 		return null;
 	}
+	
+	public void raiseTerrain(Tile center, int radius) {
+		HashSet<Tile> tiles = world.getNeighborsInRadius(center, radius);
+		for(Tile t: tiles) {
+			double distance = t.getLocation().distanceTo(center.getLocation());
+			float height = (float) (t.getHeight() + (radius - distance) / (radius) * 0.1);
+			t.setHeight(height);
+		}
+	}
 
 	public void toggleAutoBuild(ConcurrentLinkedQueue<Thing> selectedThings) {
 		for(Thing thing : selectedThings) {

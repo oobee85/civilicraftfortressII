@@ -18,7 +18,7 @@
 	{
 		"image":"resources/Images/units/spearman.png",
 		"cost":{"BRONZE_SWORD":1,"FOOD":50},
-		"stats":{"movespeed":15,"attackspeed":30,"attack":20,"buildtime":200,"range":1,"health":400,"healspeed":50},
+		"stats":{"movespeed":15,"attackspeed":30,"attack":20,"buildtime":200,"range":1,"health":300,"healspeed":50},
 		"name":"SPEARMAN",
 		"attributes":["hostile"],
 		"research":"BRONZE_WORKING",

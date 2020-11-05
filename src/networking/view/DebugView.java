@@ -94,6 +94,13 @@ public class DebugView {
 				fastForward.setText(fastForward.isSelected() ? "Stop Fast Forward" : "Fast Forward");
 			}
 		});
+		JButton raiseHeight = KUIConstants.setupButton("Raise terrain", RESEARCH_TAB_ICON, DEBUG_BUTTON_SIZE);
+		raiseHeight.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameView.setRaisingTerrain(true);
+			}
+		});
 
 		JButton researchEverything = KUIConstants.setupButton("Research All", RESEARCH_TAB_ICON, DEBUG_BUTTON_SIZE);
 		researchEverything.addActionListener(new ActionListener() {
@@ -178,6 +185,7 @@ public class DebugView {
 		rootPanel.add(addResources);
 		rootPanel.add(setPlayerFaction);
 		rootPanel.add(researchEverything);
+		rootPanel.add(raiseHeight);
 		rootPanel.add(exit);
 		rootPanel.add(shadowWordDeath);
 	}

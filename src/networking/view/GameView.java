@@ -204,7 +204,10 @@ public class GameView extends JPanel {
 		if(tile == null) {
 			return;
 		}
-
+		if(leftClickAction == LeftClickAction.RAISE_TERRAIN) {
+			game.raiseTerrain(tile, 5);
+		}
+		
 		// spawning unit or building
 		if(leftClickAction == LeftClickAction.SPAWN_THING) {
 			Thing summoned = game.summonThing(tile, selectedThingToSpawn, summonPlayerControlled ? faction : game.world.getFaction(World.NO_FACTION_ID));
@@ -360,6 +363,10 @@ public class GameView extends JPanel {
 	public void setThingToSpawn(HasImage thingType) {
 		leftClickAction = LeftClickAction.SPAWN_THING;
 		selectedThingToSpawn = thingType;
+	}
+	
+	public void setRaisingTerrain(boolean raising) {
+		leftClickAction = LeftClickAction.RAISE_TERRAIN;
 	}
 	
 	public void setSummonPlayerControlled(boolean playerControlled) {

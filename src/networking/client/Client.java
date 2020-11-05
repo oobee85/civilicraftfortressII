@@ -31,6 +31,7 @@ public class Client {
 	private HashMap<Integer, Thing> things = new HashMap<>();
 	
 	private volatile boolean isFastForwarding;
+	private volatile boolean isRaiseTerrain;
 
 	public Client() {
 		gameInstance = new Game(new GUIController() {
@@ -118,6 +119,10 @@ public class Client {
 			@Override
 			public void setFastForwarding(boolean enabled) {
 				isFastForwarding = enabled;
+			}
+			@Override
+			public void setRaiseTerrain(boolean enabled) {
+				isRaiseTerrain = enabled;
 			}
 		});
 		localCommands = Utils.makeFunctionalCommandInterface(gameInstance);

@@ -128,6 +128,8 @@ public class Server {
 			public void research(ResearchType researchType) { }
 			@Override
 			public void setFastForwarding(boolean enabled) { }
+			@Override
+			public void setRaiseTerrain(boolean enabled) { }
 		});
 		LinkedList<PlayerInfo> players = new LinkedList<>();
 		for (Connection connection : connections.keySet()) {

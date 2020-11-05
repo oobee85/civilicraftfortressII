@@ -218,7 +218,7 @@ public class World {
 	
 	public void eruptVolcano() {
 		System.out.println("eruption");
-		this.get(volcano).liquidAmount += 500;
+		this.get(volcano).liquidAmount += 200;
 		
 //		world[volcano].liquidType = LiquidType.WATER;
 //		world[volcano].liquidAmount += 200;
