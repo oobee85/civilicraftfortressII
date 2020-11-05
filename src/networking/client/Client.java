@@ -173,6 +173,11 @@ public class Client {
 				sendMessage(CommandMessage.makeProduceUnitCommand(building.id(), unitType.name()));
 				localCommands.produceUnit(building, unitType);
 			}
+			@Override
+			public void setGuarding(Unit unit, boolean enabled) {
+				sendMessage(CommandMessage.makeSetGuardingCommand(unit.id(), enabled));
+				localCommands.setGuarding(unit, enabled);
+			}
 		};
 	}
 	public void setupSinglePlayer() {

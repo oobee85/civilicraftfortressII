@@ -291,6 +291,11 @@ public class Server {
 				}
 			}
 		}
+		else if(message.getCommand() == CommandType.SET_GUARDING) {
+			if(thing instanceof Unit) {
+				gui.getCommandInterface().setGuarding((Unit)thing, message.getClearQueue());
+			}
+		}
 	}
 	
 	private void startGame() {

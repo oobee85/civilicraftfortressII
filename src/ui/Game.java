@@ -490,6 +490,8 @@ public class Game {
 			thingsToPlace.add(Game.buildingTypeMap.get("CASTLE"));
 			thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 			thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
+//			thingsToPlace.add(Game.unitTypeMap.get("HORSE_ARCHER"));
+//			thingsToPlace.add(Game.unitTypeMap.get("KNIGHT"));
 			if(easymode) {
 				thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
 				thingsToPlace.add(Game.buildingTypeMap.get("WORKSHOP"));
@@ -599,14 +601,6 @@ public class Game {
 				if(unit.getType().isBuilder()) {
 					unit.setAutoBuild(!unit.getAutoBuild());
 				}
-			}
-		}
-	}
-	public void toggleGuarding(ConcurrentLinkedQueue<Thing> selectedThings) {
-		for(Thing thing : selectedThings) {
-			if(thing instanceof Unit) {
-				Unit unit = (Unit)thing;
-				unit.setGuarding(!unit.isGuarding());
 			}
 		}
 	}

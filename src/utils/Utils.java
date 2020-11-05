@@ -423,6 +423,10 @@ public final class Utils {
 					building.setProducingUnit(unit);
 				}
 			}
+			@Override
+			public void setGuarding(Unit unit, boolean enabled) {
+				unit.setGuarding(enabled);
+			}
 		};
 	}
 }

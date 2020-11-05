@@ -88,6 +88,13 @@ public class CommandMessage implements Externalizable {
 		msg.type = unitType;
 		return msg;
 	}
+	public static CommandMessage makeSetGuardingCommand(int thingID, boolean enabled) {
+		CommandMessage msg = new CommandMessage();
+		msg.command = CommandType.SET_GUARDING;
+		msg.thingID = thingID;
+		msg.clearQueue = enabled;
+		return msg;
+	}
 	
 
 	public CommandType getCommand() {

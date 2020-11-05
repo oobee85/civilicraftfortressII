@@ -189,7 +189,13 @@ public class GameView extends JPanel {
 		game.setHarvesting(selectedThings);
 	}
 	public void toggleGuarding() {
-		game.toggleGuarding(selectedThings);
+		for(Thing thing : selectedThings) {
+			if(thing instanceof Unit) {
+				Unit unit = (Unit)thing;
+				commandInterface.setGuarding(unit, !unit.isGuarding());
+//				unit.setGuarding(!unit.isGuarding());
+			}
+		}
 	}
 	
 	public void setDrawDebugStrings(boolean enabled) {
