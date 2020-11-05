@@ -14,13 +14,16 @@ public class Building extends Thing implements Serializable {
 	
 	private BuildingType buildingType;
 	private double remainingEffort;
-	private transient LinkedList<Unit> producingUnitList = new LinkedList<Unit>();
+	private LinkedList<Unit> producingUnitList = new LinkedList<Unit>();
 	private double culture;
 	public transient static double CULTURE_AREA_MULTIPLIER = 0.1;
 	private transient Tile spawnLocation;
 	private transient double timeToHarvest;
 	private transient double baseTimeToHarvest = 20;
 	private boolean isPlanned;
+
+	private int remainingEffortToProduceUnit;
+	private transient Unit currentProducingUnit;
 	
 	public Building(BuildingType buildingType, Tile tile, Faction faction) {
 		super(buildingType.getHealth(), buildingType, faction, tile);
@@ -29,8 +32,6 @@ public class Building extends Thing implements Serializable {
 		this.spawnLocation = tile;
 		this.timeToHarvest = baseTimeToHarvest;
 		this.isPlanned = false;
-		
-		
 	}
 	public void setPlanned(boolean planned) {
 		isPlanned = planned;
@@ -55,11 +56,12 @@ public class Building extends Thing implements Serializable {
 		}
 		
 		// building builds units
-		if(!getProducingUnit().isEmpty() && getProducingUnit().peek().isBuilt() == true) {
+		if(remainingEffortToProduceUnit <= 0 && currentProducingUnit != null) {
 			Unit unit = getProducingUnit().remove();
 			unit.queuePlannedAction(new PlannedAction(getSpawnLocation()));
 			getTile().addUnit(unit);
 			world.addUnit(unit);
+			currentProducingUnit = null;
 		}
 		
 		if(!readyToHarvest() ) {
@@ -152,10 +154,27 @@ public class Building extends Thing implements Serializable {
 		this.producingUnitList.add(producingUnit);
 	}
 	private void updateInProgressUnit() {
-		if (producingUnitList.peek() != null) {
-			producingUnitList.peek().expendEffort(1);
+		if(!isBuilt()) {
+			return;
+		}
+		if(currentProducingUnit == null && !producingUnitList.isEmpty()) {
+			currentProducingUnit = producingUnitList.peek();
+			remainingEffortToProduceUnit = currentProducingUnit.getType().getCombatStats().getTicksToBuild();
+		}
+		if (currentProducingUnit != null) {
+			remainingEffortToProduceUnit -= 1;
+			if (remainingEffortToProduceUnit < 0) {
+				remainingEffortToProduceUnit = 0;
+			}
 		}
 	}
+	public int getRemainingEffortToProduceUnit() {
+		return remainingEffortToProduceUnit;
+	}
+	public void setRemainingEffortToProduceUnit(int remainingEffortToProduceUnit) {
+		this.remainingEffortToProduceUnit = remainingEffortToProduceUnit;
+	}
+	
 	public void updateCulture() {
 		if(isBuilt()) {
 			culture += buildingType.getCultureRate();

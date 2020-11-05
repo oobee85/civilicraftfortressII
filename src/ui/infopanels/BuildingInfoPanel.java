@@ -39,7 +39,7 @@ public class BuildingInfoPanel extends InfoPanel {
 			
 			
 			int totalEffort = showing.getProducingUnit().peek().getType().getCombatStats().getTicksToBuild();
-			int expendedEffort = totalEffort - showing.getProducingUnit().peek().getRemainingEffort();
+			int expendedEffort = totalEffort - showing.getRemainingEffortToProduceUnit();
 			double completedRatio = 1.0 * expendedEffort / totalEffort;
 			String progressString = String.format("%s %d/%d", showing.getProducingUnit().peek(), expendedEffort, totalEffort);
 			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progressString, x + progressBarHeight, y, getWidth() - x - progressBarHeight - 10, progressBarHeight);

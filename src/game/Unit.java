@@ -15,7 +15,6 @@ public class Unit extends Thing implements Serializable {
 	private transient double timeToMove;
 	private transient double timeToAttack;
 	private transient double timeToHeal;
-	private int remainingEffort;
 	private transient boolean isIdle;
 	private transient int starving;
 	private CombatStats combatStats;
@@ -35,7 +34,6 @@ public class Unit extends Thing implements Serializable {
 		this.unitType = unitType;
 		this.combatStats = unitType.getCombatStats();
 		this.timeToAttack = unitType.getCombatStats().getAttackSpeed();
-		this.remainingEffort = unitType.getCombatStats().getTicksToBuild();
 		this.timeToHeal = unitType.getCombatStats().getHealSpeed();
 		this.isIdle = false;
 
@@ -93,31 +91,12 @@ public class Unit extends Thing implements Serializable {
 		attacks.add(a);
 	}
 
-	public void expendEffort(int effort) {
-		remainingEffort -= effort;
-		if (remainingEffort < 0) {
-			remainingEffort = 0;
-		}
-	}
-
 	public CombatStats getCombatStats() {
 		return combatStats;
 	}
 
 	public void setCombatStats(CombatStats cm) {
 		combatStats = cm;
-	}
-
-	public int getRemainingEffort() {
-		return remainingEffort;
-	}
-
-	public void setRemainingEffort(int effort) {
-		remainingEffort = effort;
-	}
-
-	public boolean isBuilt() {
-		return remainingEffort <= 0;
 	}
 
 	public void setPassiveAction(PlannedAction action) {

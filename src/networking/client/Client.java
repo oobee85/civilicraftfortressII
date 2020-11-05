@@ -379,12 +379,17 @@ public class Client {
 			existingBuilding.setRemainingEffort(buildingUpdate.getRemainingEffort());
 			existingBuilding.setCulture(buildingUpdate.getCulture());
 			existingBuilding.setPlanned(buildingUpdate.isPlanned());
+			existingBuilding.setRemainingEffortToProduceUnit(buildingUpdate.getRemainingEffortToProduceUnit());
+			existingBuilding.getProducingUnit().clear();
+			for(Unit u : buildingUpdate.getProducingUnit()) {
+				u.setType(Game.unitTypeMap.get(u.getType().name()));
+			}
+			existingBuilding.getProducingUnit().addAll(buildingUpdate.getProducingUnit());
 		}
 		else if(update instanceof Unit) {
 			Unit existingUnit = (Unit)existing;
 			Unit unitUpdate = (Unit)update;
 			existingUnit.setType(Game.unitTypeMap.get(unitUpdate.getType().name()));
-			existingUnit.setRemainingEffort(unitUpdate.getRemainingEffort());
 			existingUnit.setCombatStats(unitUpdate.getCombatStats());
 			if(movedFrom != null) {
 				movedFrom.removeUnit(existingUnit);
