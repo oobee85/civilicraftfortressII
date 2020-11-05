@@ -670,10 +670,14 @@ public class World {
 			if (building.isDead() == true) {
 				ThingMapper.removed(building);
 				if(building == building.getTile().getRoad()) {
-					building.getTile().setRoad(null);
+					if(building.getTile().getRoad() == building) {
+						building.getTile().setRoad(null);
+					}
 				}
 				else {
-					building.getTile().setBuilding(null);
+					if(building.getTile().getBuilding() == building) {
+						building.getTile().setBuilding(null);
+					}
 				}
 				worldData.addDeadThing(building);
 			} else {

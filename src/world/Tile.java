@@ -260,9 +260,9 @@ public class Tile implements Externalizable {
 	
 	public double getBrightness(Faction faction) {
 		double brightness = this.getBrightnessNonRecursive(faction);
-		for (Tile tile : getNeighbors()) {
-			brightness += tile.getBrightnessNonRecursive(faction);
-		}
+//		for (Tile tile : getNeighbors()) {
+//			brightness += tile.getBrightnessNonRecursive(faction);
+//		}
 		if(inVisionRange == true) {
 			brightness += 1;
 		}
