@@ -3,14 +3,15 @@ package world;
 import java.util.*;
 
 import game.*;
+import networking.server.*;
 import utils.*;
 
 public class WorldData {
 
 	public LinkedList<Plant> plants = new LinkedList<Plant>();
 	public LinkedList<Plant> newPlants = new LinkedList<Plant>();
-	public LinkedList<Unit> units = new LinkedList<Unit>();
-	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
+	private LinkedList<Unit> units = new LinkedList<Unit>();
+	private LinkedList<Unit> newUnits = new LinkedList<Unit>();
 	public LinkedList<Building> buildings = new LinkedList<Building>();
 	public LinkedList<Building> newBuildings = new LinkedList<Building>();
 	
@@ -27,6 +28,32 @@ public class WorldData {
 	private LinkedList<Projectile> projectilesToSend = new LinkedList<>();
 	private LinkedList<Thing> deadThings = new LinkedList<>();
 
+	public void addUnit(Unit unit) {
+		synchronized(newUnits) {
+			newUnits.add(unit);
+		}
+	}
+	public LinkedList<Unit> getUnits() {
+		return units;
+	}
+	public void filterDeadUnits() {
+		// UNITS
+		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
+		for (Unit unit : units) {
+			if (unit.isDead() == true) {
+				unit.getTile().removeUnit(unit);
+				ThingMapper.removed(unit);
+				addDeadThing(unit);
+			} else {
+				unitsNew.add(unit);
+			}
+		}
+		synchronized(newUnits) {
+			unitsNew.addAll(newUnits);
+			newUnits.clear();
+		}
+		units = unitsNew;
+	}
 	public void addProjectile(Projectile newProjectile) {
 		synchronized(newProjectiles) {
 			newProjectiles.add(newProjectile);

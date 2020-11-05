@@ -166,10 +166,10 @@ public class World {
 		worldData.newBuildings.add(newBuilding);
 	}
 	public LinkedList<Unit> getUnits() {
-		return worldData.units;
+		return worldData.getUnits();
 	}
 	public void addUnit(Unit newUnit) {
-		worldData.newUnits.add(newUnit);
+		worldData.addUnit(newUnit);
 	}
 	public LinkedList<WeatherEvent> getWeatherEvents() {
 		return worldData.weatherEvents;
@@ -232,7 +232,7 @@ public class World {
 	}
 	
 	public void spawnWerewolf() {
-		List<Unit> wolves = worldData.units
+		List<Unit> wolves = worldData.getUnits()
 				.stream()
 				.filter(e -> e.getType() == Game.unitTypeMap.get("WOLF"))
 				.collect(Collectors.toList());
@@ -289,7 +289,7 @@ public class World {
 	public Animal spawnAnimal(UnitType type, Tile tile, Faction faction) {
 		Animal animal = makeAnimal(type, tile, faction);
 		tile.addUnit(animal);
-		worldData.newUnits.add(animal);
+		worldData.addUnit(animal);
 		return animal;
 	}
 
@@ -329,7 +329,7 @@ public class World {
 		}
 		Animal animal = new Animal(animalType, world.get(loc), getFaction(NO_FACTION_ID));
 		animal.setTile(world.get(loc));
-		worldData.newUnits.add(animal);
+		worldData.addUnit(animal);
 		world.get(loc).addUnit(animal);
 	}
 	
@@ -631,21 +631,7 @@ public class World {
 			f.clearExpiredAttackedNotifications();
 		}
 		
-		// UNITS
-		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
-		for (Unit unit : worldData.units) {
-			if (unit.isDead() == true) {
-				unit.getTile().removeUnit(unit);
-				ThingMapper.removed(unit);
-				worldData.addDeadThing(unit);
-			} else {
-				unitsNew.add(unit);
-			}
-		}
-		unitsNew.addAll(worldData.newUnits);
-		worldData.newUnits.clear();
-		worldData.units = unitsNew;
-
+		worldData.filterDeadUnits();
 		worldData.filterDeadGroundModifiers();
 		
 		//WEATHER
