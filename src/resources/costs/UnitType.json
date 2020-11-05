@@ -18,7 +18,7 @@
 	{
 		"image":"resources/Images/units/spearman.png",
 		"cost":{"BRONZE_SWORD":1,"FOOD":50},
-		"stats":{"movespeed":15,"attackspeed":30,"attack":20,"buildtime":200,"range":1,"health":300,"healspeed":50},
+		"stats":{"movespeed":15,"attackspeed":30,"attack":30,"buildtime":150,"range":1,"health":300,"healspeed":50},
 		"name":"SPEARMAN",
 		"attributes":["hostile"],
 		"research":"BRONZE_WORKING",
@@ -37,7 +37,7 @@
 	{
 		"image":"resources/Images/units/swordsman.png",
 		"cost":{"IRON_SWORD":1,"FOOD":100},
-		"stats":{"movespeed":15,"attackspeed":20,"attack":20,"buildtime":150,"range":1,"health":300,"healspeed":50},
+		"stats":{"movespeed":15,"attackspeed":20,"attack":40,"buildtime":200,"range":1,"health":300,"healspeed":50},
 		"name":"SWORDSMAN",
 		"attributes":["hostile"],
 		"research":"IRON_WORKING",
@@ -46,7 +46,7 @@
 	{
 		"image":"resources/Images/units/longbowman.png",
 		"cost":{"MITHRIL_BAR":5,"FOOD":200},
-		"stats":{"movespeed":15,"attackspeed":30,"attack":0,"buildtime":200,"range":6,"health":200,"healspeed":50},
+		"stats":{"movespeed":15,"attackspeed":30,"attack":0,"buildtime":400,"range":6,"health":300,"healspeed":50},
 		"name":"LONGBOWMAN",
 		"attributes":["hostile"],
 		"projectile":"ARROW_LONGBOWMAN",
@@ -55,8 +55,8 @@
 	},
 	{
 		"image":"resources/Images/units/catapult.png",
-		"cost":{"WOOD":1000,"MITHRIL_BAR":5,"STONE":250},
-		"stats":{"movespeed":50,"attackspeed":100,"attack":0,"buildtime":750,"range":10,"health":200,"healspeed":100},
+		"cost":{"WOOD":1000,"MITHRIL_BAR":5,"STONE":1000},
+		"stats":{"movespeed":50,"attackspeed":100,"attack":0,"buildtime":1000,"range":10,"health":200,"healspeed":100},
 		"name":"CATAPULT",
 		"attributes":["hostile"],
 		"projectile":"ROCK_CATAPULT",
@@ -65,8 +65,8 @@
 	},
 	{
 		"image":"resources/Images/units/trebuchet.png",
-		"cost":{"RUNITE_BAR":10,"WOOD":1000,"COAL":200,"STONE":500},
-		"stats":{"movespeed":50,"attackspeed":100,"attack":0,"buildtime":1000,"range":20,"health":200,"healspeed":100},
+		"cost":{"RUNITE_BAR":10,"WOOD":1000,"STONE":2000},
+		"stats":{"movespeed":50,"attackspeed":100,"attack":0,"buildtime":1500,"range":20,"health":200,"healspeed":100},
 		"name":"TREBUCHET",
 		"attributes":["hostile"],
 		"projectile":"FIREBALL_TREBUCHET",
@@ -75,7 +75,7 @@
 	},
 	{
 		"image":"resources/Images/units/sniper.png",
-		"cost":{"MITHRIL_SWORD":5,"ADAMANT_SWORD":5,"RUNE_SWORD":5,"TITANIUM_SWORD":5},
+		"cost":{"MITHRIL_SWORD":5,"ADAMANT_SWORD":5,"RUNE_SWORD":5,"TITANIUM_SWORD":10},
 		"stats":{"movespeed":100,"attackspeed":200,"attack":0,"buildtime":2000,"range":30,"health":20,"healspeed":50},
 		"name":"SNIPER",
 		"projectile":"BULLET",
@@ -85,7 +85,7 @@
 	},
 	{
 		"image":"resources/Images/units/horseman.png",
-		"cost":{"MITHRIL_SWORD":1,"HORSE":30,"FOOD":200},
+		"cost":{"MITHRIL_BAR":1,"HORSE":20,"FOOD":200},
 		"stats":{"movespeed":5,"attackspeed":20,"attack":40,"buildtime":300,"range":1,"health":300,"healspeed":50},
 		"name":"HORSEMAN",
 		"attributes":["hostile"],
@@ -94,8 +94,8 @@
 	},
 	{
 		"image":"resources/Images/units/knight.png",
-		"cost":{"HORSE":50,"RUNE_SWORD":1,"FOOD":300},
-		"stats":{"movespeed":10,"attackspeed":20,"attack":60,"buildtime":300,"range":1,"health":500,"healspeed":50},
+		"cost":{"HORSE":50,"RUNE_SWORD":2,"FOOD":300},
+		"stats":{"movespeed":10,"attackspeed":20,"attack":100,"buildtime":500,"range":1,"health":700,"healspeed":50},
 		"name":"KNIGHT",
 		"attributes":["hostile"],
 		"research":"CHIVALRY",
@@ -104,17 +104,17 @@
 	{
 		"image":"resources/Images/units/chariot.png",
 		"cost":{"WOOD":200,"HORSE":20,"IRON_BAR":10,"FOOD":200},
-		"stats":{"movespeed":10,"attackspeed":30,"attack":30,"buildtime":300,"range":5,"health":300,"healspeed":50},
+		"stats":{"movespeed":10,"attackspeed":30,"attack":0,"buildtime":200,"range":3,"health":300,"healspeed":50},
 		"name":"CHARIOT",
 		"attributes":["hostile"],
-		"projectile":"ARROW_ARCHER",
+		"projectile":"ARROW_CHARIOT",
 		"research":"HORSEBACK_RIDING",
 		"targeting":[{"type":"game.Unit"}]
 	},
 	{
 		"image":"resources/Images/units/horsearcher.png",
 		"cost":{"RUNITE_BAR":5,"HORSE":50,"FOOD":300},
-		"stats":{"movespeed":5,"attackspeed":20,"attack":0,"buildtime":500,"range":3,"health":300,"healspeed":50},
+		"stats":{"movespeed":5,"attackspeed":20,"attack":0,"buildtime":500,"range":3,"health":500,"healspeed":50},
 		"name":"HORSEARCHER",
 		"attributes":["hostile"],
 		"projectile":"RUNE_ARROW",
@@ -183,7 +183,7 @@
 			{"type":"game.Unit", "faction":"PLAYER"},
 			{"type":"game.Building", "faction":"PLAYER"}
 		],
-		"loot":{"IRON_BAR":1}
+		"loot":{"IRON_BAR":5}
 	},
 	{
 		"image":"resources/Images/units/roc.png",
@@ -205,7 +205,7 @@
 	},
 	{
 		"image":"resources/Images/units/ent.png",
-		"stats":{"movespeed":30,"attackspeed":50,"attack":25,"buildtime":0,"range":1,"health":1000,"healspeed":10},
+		"stats":{"movespeed":30,"attackspeed":50,"attack":25,"buildtime":0,"range":1,"health":500,"healspeed":10},
 		"name":"ENT",
 		"attributes":["hostile","coldresistant"],
 		"targeting":[
@@ -250,7 +250,7 @@
 		"targeting":[
 			{"type":"SNIPER"}
 		],
-		"loot":{"MITHRIL_ORE":10},
+		"loot":{"MITHRIL_BAR":10},
 		"projectile":"ROCK_CYCLOPS"},
 	{
 		"image":"resources/Images/units/skeleton.png",
@@ -263,7 +263,7 @@
 			{"type":"game.Unit", "faction":"CYCLOPS"},
 			{"type":"game.Building", "faction":"CYCLOPS"}
 		],
-		"loot":{"BRONZE_BAR":1}
+		"loot":{"BRONZE_BAR":2}
 	},
 	{
 		"image":"resources/Images/units/icegiant.png",

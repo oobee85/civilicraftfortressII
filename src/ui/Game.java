@@ -50,7 +50,7 @@ public class Game {
 		
 
 		// rain event
-		if(Math.random() < 0.004) {
+		if(Math.random() < 0.002) {
 			world.rain();
 		}
 		if(Math.random() < 0.01) {
@@ -59,7 +59,7 @@ public class Game {
 		
 		if(world.volcano != null) {
 			world.get(world.volcano).liquidType = LiquidType.LAVA;
-			if(Math.random() < 0.0001) {
+			if(World.days >= 10 && Math.random() < 0.0001) {
 				eruptVolcano();
 			}
 		}
@@ -135,30 +135,31 @@ public class Game {
 		
 	}
 	private void dayEvents() {
+		double day = Math.sqrt(World.days);
 		//all the forced spawns
 		if(World.days % 5 == 0) {
-			for(int i = 0; i < World.days/5; i++) {
+			for(int i = 0; i < day; i++) {
 				world.spawnLavaGolem();
 				world.spawnIceGiant();
 			}
-			System.out.println(World.days/5 + " lava & ice giants");
+			System.out.println(day + " lava & ice giants");
 			
 		}
 		if(World.days % 20 == 0) {
 			meteorStrike();
 		}
 		if(World.days % 8 == 0) {
-			for(int i = 0; i < World.days/8; i++) {
+			for(int i = 0; i < day; i++) {
 				world.spawnOgre();
 			}
-			System.out.println(World.days/8 + " ogres");
+			System.out.println(day + " ogres");
 			
 		}
 		if(World.days % 10 == 0) {
-			for(int i = 0; i < World.days/10; i++) {
+			for(int i = 0; i < day; i++) {
 				world.spawnSkeletonArmy();
 			}
-			System.out.println(World.days/10 + " skeletons");
+			System.out.println(day + " skeletons");
 		}
 		if(World.days % 20 == 0) {
 			spawnCyclops();
@@ -171,14 +172,14 @@ public class Game {
 		
 		
 		if(World.days >= 10) {
-			int number = (int)(Math.random() / Season.FREEZING_TEMPURATURE * World.days/10);
+			int number = (int)(Math.random() / Season.FREEZING_TEMPURATURE * day);
 			for(int i = 0; i < number; i++) {
 				world.spawnIceGiant();
 			}
 			System.out.println(number + " ice giants");
 		}
 		if(World.days >= 5) {
-			int number = (int)(Math.random()*World.days/4);
+			int number = (int)(Math.random()*day);
 			for(int i = 0; i < number; i++) {
 				world.spawnEnt();
 			}
@@ -186,7 +187,7 @@ public class Game {
 			
 		}
 		if(World.days >= 1) {
-			int number = (int)(Season.MELTING_TEMPURATURE + Math.random()*World.days);
+			int number = (int)(Season.MELTING_TEMPURATURE + Math.random()*day);
 			makeAnimal(world.getTilesRandomly().getFirst(), Game.unitTypeMap.get("FLAMELET"), number);
 			System.out.println(number + " flamelets");
 		}
@@ -244,8 +245,10 @@ public class Game {
 	}
 	public void spawnEverything() {
 		List<Tile> tiles = world.getTilesRandomly();
+		
+		Iterator<Tile> iterator = tiles.iterator();
 		for(UnitType type : Game.unitTypeList) {
-			world.spawnAnimal(type, tiles.remove(0), world.getFaction(World.NO_FACTION_ID));
+			world.spawnAnimal(type, iterator.next(), world.getFaction(World.NO_FACTION_ID));
 		}
 	}
 	
