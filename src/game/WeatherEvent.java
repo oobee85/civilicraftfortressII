@@ -63,7 +63,7 @@ public class WeatherEvent implements HasImage{
 		}else {
 			this.hasImage = WeatherEventType.RAIN;
 			liquidType = LiquidType.WATER;
-			strength = 0.00005;
+			strength = 0.0001;
 		}
 	}
 	

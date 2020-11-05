@@ -225,7 +225,7 @@ public class World {
 	}
 	
 	public void spawnOgre() {
-		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.ROCK ).findFirst();
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.ROCK && e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(tile.isPresent()) {
 			spawnAnimal(Game.unitTypeMap.get("OGRE"), tile.get(), getFaction(NO_FACTION_ID));
 		}
@@ -242,14 +242,14 @@ public class World {
 		Unit wolf = wolves.get((int)(Math.random()*wolves.size()));
 		wolf.setDead(true);
 		Tile t = wolf.getTile();
-		System.out.println("Werewolf at: "+t);
+//		System.out.println("Werewolf at: "+t);
 		spawnAnimal(Game.unitTypeMap.get("WEREWOLF"), t, getFaction(NO_FACTION_ID));
 	}
 	
 	public void spawnLavaGolem() {
 		Optional<Tile> tile = getTilesRandomly()
 				.stream()
-				.filter(e -> e.getTerrain() == Terrain.VOLCANO )
+				.filter(e -> e.getTerrain() == Terrain.VOLCANO && e.getFaction() == getFaction(NO_FACTION_ID))
 				.findFirst();
 		if(tile.isPresent()) {
 			spawnAnimal(Game.unitTypeMap.get("LAVAGOLEM"), tile.get(), getFaction(NO_FACTION_ID));
@@ -257,26 +257,26 @@ public class World {
 	}
 	
 	public void spawnEnt() {
-		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.GRASS ).findFirst();
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.GRASS && e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(tile.isPresent()) {
 			spawnAnimal(Game.unitTypeMap.get("ENT"), tile.get(), getFaction(NO_FACTION_ID));
 		}
 	}
 	public void spawnIceGiant() {
-		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getModifier() != null && e.liquidType == LiquidType.SNOW).findFirst();
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getModifier() != null && e.liquidType == LiquidType.SNOW && e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(tile.isPresent()) {
 			spawnAnimal(Game.unitTypeMap.get("ICE_GIANT"), tile.get(), getFaction(NO_FACTION_ID));
 		}
 	}
 	public void spawnDragon() {
-		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.VOLCANO ).findFirst();
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.VOLCANO && e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(tile.isPresent()) {
 			spawnAnimal(Game.unitTypeMap.get("DRAGON"), tile.get(), getFaction(NO_FACTION_ID));
 		}
 	}
 	
 	public void spawnSkeletonArmy() {
-		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.ROCK ).findFirst();
+		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.ROCK && e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(potential.isPresent()) {
 			Tile t = potential.get();
 			for(Tile tile : t.getNeighbors()) {
@@ -334,14 +334,18 @@ public class World {
 	}
 	
 	public void meteorStrike() {
-		
-		Tile t = this.getTilesRandomly().getFirst();
-		
-		int radius = (int) (Math.random()*20 + 5);
-		System.out.println("meteor at: "+t.getLocation().x()+ ", "+ t.getLocation().y());
-		spawnExplosionCircle(t, radius, 10000);
-		int rockRadius = radius/5;
-		spawnRock(t, rockRadius);
+
+		Optional<Tile> potential = this.getTilesRandomly().stream().filter(e -> e.getFaction() == getFaction(NO_FACTION_ID))
+				.findFirst();
+		if (potential.isPresent()) {
+			Tile t = potential.get();
+
+			int radius = (int) (Math.random() * 20 + 5);
+			System.out.println("meteor at: " + t.getLocation().x() + ", " + t.getLocation().y());
+			spawnExplosionCircle(t, radius, 10000);
+			int rockRadius = radius / 5;
+			spawnRock(t, rockRadius);
+		}
 	}
 	public void spawnRock(Tile tile, int radius) {
 		int numTiles = 0;
@@ -566,21 +570,23 @@ public class World {
 		for(WeatherEvent weather : worldData.weatherEvents) {
 			weather.tick();
 			Tile tile = weather.getTile();
-			if(tile.liquidType == LiquidType.LAVA) {
-				continue;
-			}
-			if(tile.liquidType != weather.getLiquidType() && tile.liquidAmount > 0.005) {
-				tile.liquidAmount /= 5;
-			}
-			tile.liquidType = weather.getLiquidType();
-			tile.liquidAmount += weather.getStrength();
-			
 			if(weather.getTargetTile() == null) {
 				continue;
 			}
 			if (weather.readyToMove()) {
 				weather.moveToTarget();
 			}
+			
+			if(tile.liquidType == LiquidType.LAVA) {
+				continue;
+			}
+			if(tile.liquidType != weather.getLiquidType() && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()/2) {
+				continue;
+			}
+			tile.liquidType = weather.getLiquidType();
+			tile.liquidAmount += weather.getStrength();
+			
+			
 		}
 	}
 	
