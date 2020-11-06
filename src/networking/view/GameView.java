@@ -213,9 +213,12 @@ public class GameView extends JPanel {
 		if(leftClickAction == LeftClickAction.RAISE_TERRAIN) {
 			game.raiseTerrain(tile, 5);
 		}
+		else if(leftClickAction == LeftClickAction.SET_TERRITORY) {
+			game.setTerritory(tile, 5, faction);
+		}
 		
 		// spawning unit or building
-		if(leftClickAction == LeftClickAction.SPAWN_THING) {
+		else if(leftClickAction == LeftClickAction.SPAWN_THING) {
 			Thing summoned = game.summonThing(tile, selectedThingToSpawn, summonPlayerControlled ? faction : game.world.getFaction(World.NO_FACTION_ID));
 			if(summoned.getFaction() == faction) {
 				if(!shiftDown) {
@@ -373,6 +376,9 @@ public class GameView extends JPanel {
 	
 	public void setRaisingTerrain(boolean raising) {
 		leftClickAction = LeftClickAction.RAISE_TERRAIN;
+	}
+	public void setSetTerritory(boolean setting) {
+		leftClickAction = LeftClickAction.SET_TERRITORY;
 	}
 	
 	public void setSummonPlayerControlled(boolean playerControlled) {

@@ -6,7 +6,6 @@ import ui.*;
 import world.*;
 
 public class IceGiant extends Animal {
-	private static int TIME_UNTIL_ATTACK = 0;
 	
 	public IceGiant(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("ICE_GIANT"), tile, faction);

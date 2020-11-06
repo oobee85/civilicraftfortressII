@@ -208,6 +208,10 @@ public class Loader {
 			UnitType unitType = new UnitType(name, image, combatStats, attributes, researchReq, cost, items, projectile, targeting);
 			unitTypeMap.put(name, unitType);
 			unitTypeList.add(unitType);
+
+			if(unitType.isDelayedInvasion()) {
+				System.out.println(unitType + " has delayed invasion");
+			}
 		}
 	}
 	
@@ -322,20 +326,23 @@ public class Loader {
 		for(UnitType type : Game.unitTypeList) {
 			if(type.getTargetingInfoStrings() != null) {
 				for(TargetInfo targetingInfo : type.getTargetingInfoStrings()) {
+					Object targetType = null;
 					if(Game.unitTypeMap.containsKey(targetingInfo.type)) {
-						type.getTargetingInfo().add(new TargetingInfo(Game.unitTypeMap.get(targetingInfo.type), targetingInfo.faction));
-						continue;
+						targetType = Game.unitTypeMap.get(targetingInfo.type);
 					}
 					else if(Game.buildingTypeMap.containsKey(targetingInfo.type)) {
-						type.getTargetingInfo().add(new TargetingInfo(Game.buildingTypeMap.get(targetingInfo.type), targetingInfo.faction));
-						continue;
+						targetType = Game.buildingTypeMap.get(targetingInfo.type);
 					}
-					try {
-						Class<?> cls = Class.forName(targetingInfo.type);
-						type.getTargetingInfo().add(new TargetingInfo(cls, targetingInfo.faction));
-						continue;
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
+					else {
+						try {
+							Class<?> cls = Class.forName(targetingInfo.type);
+							targetType = cls;
+						} catch (ClassNotFoundException e) {
+							e.printStackTrace();
+						}
+					}
+					if(targetType != null) {
+						type.getTargetingInfo().add(new TargetingInfo(targetType, targetingInfo.faction));
 					}
 				}
 			}

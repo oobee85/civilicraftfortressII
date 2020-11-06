@@ -625,6 +625,13 @@ public class Game {
 			t.setHeight(height);
 		}
 	}
+	public void setTerritory(Tile center, int radius, Faction faction) {
+		HashSet<Tile> tiles = world.getNeighborsInRadius(center, radius);
+		for(Tile t: tiles) {
+			t.setFaction(faction);
+			world.addToTerritory(t);
+		}
+	}
 
 	public void toggleAutoBuild(ConcurrentLinkedQueue<Thing> selectedThings) {
 		for(Thing thing : selectedThings) {

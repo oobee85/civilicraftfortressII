@@ -207,7 +207,7 @@
 		"image":"resources/Images/units/ent.png",
 		"stats":{"movespeed":30,"attackspeed":50,"attack":25,"buildtime":0,"range":1,"health":500,"healspeed":10},
 		"name":"ENT",
-		"attributes":["hostile","coldresistant"],
+		"attributes":["hostile","coldresistant","delayedinvasion"],
 		"targeting":[
 			{"type":"SAWMILL"}, 
 			{"type":"game.Unit", "faction":"PLAYER"}, 
@@ -229,7 +229,7 @@
 		"image":"resources/Images/units/lavagolem.png",
 		"stats":{"movespeed":30,"attackspeed":50,"attack":150,"buildtime":0,"range":1,"health":1000,"healspeed":10},
 		"name":"LAVAGOLEM",
-		"attributes":["hostile","fireresistant"],
+		"attributes":["hostile","fireresistant","delayedinvasion"],
 		"targeting":[
 			{"type":"MINE"}
 		],
@@ -269,7 +269,7 @@
 		"image":"resources/Images/units/icegiant.png",
 		"stats":{"movespeed":30,"attackspeed":20,"attack":60,"buildtime":0,"range":1,"health":800,"healspeed":10},
 		"name":"ICE_GIANT",
-		"attributes":["hostile","coldresistant"],
+		"attributes":["hostile","coldresistant","delayedinvasion"],
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"}
 		],

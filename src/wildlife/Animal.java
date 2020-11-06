@@ -3,7 +3,6 @@ package wildlife;
 import java.util.*;
 
 import game.*;
-import liquid.*;
 import ui.*;
 import utils.*;
 import world.*;
@@ -13,13 +12,23 @@ public class Animal extends Unit {
 	
 	private int migratingUntil;
 	private int nextTimeToChooseTarget;
+	private int whenToInvade;
 	
 	public Animal(UnitType type, Tile tile, Faction faction) {
 		super(type, tile, faction);
+		
+		if(type.isDelayedInvasion()) {
+			whenToInvade = World.ticks + 2000;
+		}
 	}
 	
 	public boolean getHasHome() {
 		return false;
+	}
+
+	@Override
+	public boolean readyToInvade() {
+		return World.ticks > whenToInvade;
 	}
 	
 	@Override

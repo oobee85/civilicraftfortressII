@@ -101,6 +101,13 @@ public class DebugView {
 				gameView.setRaisingTerrain(true);
 			}
 		});
+		JButton setTerritoryButton = KUIConstants.setupButton("Set Territory", null, DEBUG_BUTTON_SIZE);
+		setTerritoryButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameView.setSetTerritory(true);
+			}
+		});
 
 		JButton researchEverything = KUIConstants.setupButton("Research All", RESEARCH_TAB_ICON, DEBUG_BUTTON_SIZE);
 		researchEverything.addActionListener(new ActionListener() {
@@ -188,6 +195,7 @@ public class DebugView {
 		rootPanel.add(raiseHeight);
 		rootPanel.add(exit);
 		rootPanel.add(shadowWordDeath);
+		rootPanel.add(setTerritoryButton);
 	}
 	
 	public JPanel getRootPanel() {
