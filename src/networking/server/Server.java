@@ -194,7 +194,7 @@ public class Server {
 		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
 		sendToAllConnections(worldInfo);
 		sendWhichFaction();
-		saveToFile(worldInfo, "ser/everything_" + World.ticks + ".ser");
+//		saveToFile(worldInfo, "ser/everything_" + World.ticks + ".ser");
 	}
 
 	private void sendUnits() {
@@ -204,7 +204,7 @@ public class Server {
 		worldInfo.addHitsplats(gameInstance.world.getData());
 		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
 		sendToAllConnections(worldInfo);
-		saveToFile(worldInfo, "ser/units_" + World.ticks + ".ser");
+//		saveToFile(worldInfo, "ser/units_" + World.ticks + ".ser");
 	}
 	
 	private void sendProjectilesAndDeadThings() {
@@ -213,7 +213,7 @@ public class Server {
 		worldInfo.addHitsplats(gameInstance.world.getData());
 		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
 		sendToAllConnections(worldInfo);
-		saveToFile(worldInfo, "ser/projectiles_" + World.ticks + ".ser");
+//		saveToFile(worldInfo, "ser/projectiles_" + World.ticks + ".ser");
 	}
 	
 	private void handleCommand(CommandMessage message) {
