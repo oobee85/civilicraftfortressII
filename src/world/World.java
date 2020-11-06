@@ -27,7 +27,7 @@ public class World {
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
-	private static final double FOREST_DENSITY = 0.3;
+	private static final double FOREST_DENSITY = 0.4;
 	
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
@@ -492,7 +492,7 @@ public class World {
 		}
 
 	}
-	public void updateTerrainChange(World world) {
+	public void updateTerrainChange() {
 		for(Tile tile : getTiles()) {
 			tile.updateHumidity(World.ticks);
 			
@@ -559,7 +559,7 @@ public class World {
 			if(tile.checkTerrain(Terrain.DIRT)) {
 				boolean adjacentGrass = false;
 				boolean adjacentWater = false;
-				for(Tile neighbor : Utils.getNeighbors(tile, world)) {
+				for(Tile neighbor : Utils.getNeighbors(tile, this)) {
 					if(neighbor.checkTerrain(Terrain.GRASS)) {
 						adjacentGrass = true;
 					}
@@ -936,8 +936,10 @@ public class World {
 		System.out.println("Simulating water for 100 iterations");
 		for(int i = 0; i < 100; i++) {
 			Liquid.propogate(this);
+			updateTerrainChange();
 		}
-
+		
+		
 		Generation.generateResources(this);
 		this.genPlants();
 		this.makeForest();
