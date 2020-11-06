@@ -274,6 +274,30 @@ public class Client {
 			}
 		});
 		gameLoopThread.start();
+		if(simulated) {
+			Thread fixGhostsThread = new Thread(() -> {
+				while (true) {
+					try {
+						long start = System.currentTimeMillis();
+						long elapsed = System.currentTimeMillis() - start;
+						Thread.sleep(5000);
+					}
+					catch(Exception e) {
+						try (FileWriter fw = new FileWriter("ERROR_LOG.txt", true);
+								BufferedWriter bw = new BufferedWriter(fw);
+								PrintWriter out = new PrintWriter(bw)) {
+							e.printStackTrace(out);
+						} catch (IOException ee) {
+						}
+						e.printStackTrace();
+						if(e instanceof InterruptedException) {
+							break;
+						}
+					}
+				}
+			});
+//			fixGhostsThread.start();
+		}
 	}
 	
 	private void worldInfoUpdate(WorldInfo worldInfo) {

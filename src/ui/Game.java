@@ -86,7 +86,7 @@ public class Game {
 //		buildingTick();
 //		unitTick();
 
-		world.doProjectileUpdates();
+		world.doProjectileUpdates(true);
 	}
 	public void gameTick() {
 		// Do all the game events like unit movement, time passing, building things, growing, etc
@@ -104,7 +104,7 @@ public class Game {
 		
 		buildingTick();
 		unitTick();
-		world.doProjectileUpdates();
+		world.doProjectileUpdates(false);
 		if(World.ticks%World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			world.updatePlantDamage();
 		}

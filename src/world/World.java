@@ -667,7 +667,7 @@ public class World {
 		}
 	}
 	
-	public void doProjectileUpdates() {
+	public void doProjectileUpdates(boolean simulated) {
 
 		for(Projectile projectile : worldData.getProjectiles()) {
 			projectile.tick();
@@ -682,7 +682,7 @@ public class World {
 					worldData.addGroundModifier(gm);
 				}
 			}
-			if(projectile.reachedTarget()) {
+			if(!simulated && projectile.reachedTarget()) {
 				if(projectile.getType().isExplosive()) {
 					spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getDamage());
 				} 
