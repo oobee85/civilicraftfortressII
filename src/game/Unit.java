@@ -160,13 +160,19 @@ public class Unit extends Thing implements Serializable {
 		}
 		if (currentPath != null && !currentPath.isEmpty()) {
 			Tile targetTile = currentPath.getFirst();
-			boolean success = this.moveTo(targetTile);
-			if (success) {
-				currentPath.removeFirst();
+			if(readyToInvade() || (targetTile.getFaction().id() == World.NO_FACTION_ID && targetTile.getFaction().id() == getFactionID())) {
+				boolean success = this.moveTo(targetTile);
+				if (success) {
+					currentPath.removeFirst();
+				}
+				return success;
 			}
-			return success;
 		}
 		return false;
+	}
+	
+	public boolean readyToInvade() {
+		return true;
 	}
 
 	public LinkedList<Tile> getCurrentPath() {
@@ -316,6 +322,9 @@ public class Unit extends Thing implements Serializable {
 	}
 
 	public void doMovement() {
+		if(actionQueue.isEmpty()) {
+			return;
+		}
 		if(readyToMove()) {
 			Tile targetTile = null; 
 			Thing targetThing = null;
@@ -360,9 +369,7 @@ public class Unit extends Thing implements Serializable {
 					attacked = true;
 				}
 				else {
-					if(World.ticks > plan.whenToAtack) {
-						attacked = attack(plan.target);
-					}
+					attacked = attack(plan.target);
 				}
 			}
 		}

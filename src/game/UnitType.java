@@ -84,6 +84,9 @@ public class UnitType implements HasImage, Serializable {
 	public boolean isBuilder() {
 		return attributes.contains("builder");
 	}
+	public boolean isDelayedInvasion() {
+		return attributes.contains("delayedinvasion");
+	}
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;
 	}

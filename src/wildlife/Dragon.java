@@ -63,22 +63,6 @@ public class Dragon extends Animal {
 		return readyToHunt();
 	}
 	
-	public void moveAroundTarget() {
-		if(this.getTarget() == null) {
-			return;
-		}
-		if(!this.readyToMove()) {
-			return;
-		}
-		Tile t = this.getTarget().getTile();
-		if(t == null) {
-			return;
-		}
-		Tile target = this.getTile();
-		target = t.getNeighbors().get((int) (Math.random()*t.getNeighbors().size()));
-		this.moveTowards(target);
-	}
-	
 	@Override 
 	public List<String> getDebugStrings(){
 		List<String> strings = super.getDebugStrings();
