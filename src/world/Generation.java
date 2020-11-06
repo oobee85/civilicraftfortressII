@@ -344,7 +344,7 @@ public class Generation {
 				world.makeAnimal(Game.unitTypeMap.get("WOLF"), world, loc);
 			}
 		}
-		world.spawnDragon();
+		world.spawnDragon(null);
 	}
 	
 }

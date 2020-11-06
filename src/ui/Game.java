@@ -26,7 +26,7 @@ public class Game {
 	public static boolean DISABLE_NIGHT = false;
 	
 	private GUIController guiController;
-
+	public static final int howFarAwayStuffSpawn = 50;
 	public World world;
 	
 	public Game(GUIController guiController) {
@@ -125,7 +125,7 @@ public class Game {
 	private void makeAnimal(Tile tile, UnitType unitType, int number) {
 		for(Tile t: Utils.getTilesInRadius(tile, world, Math.max(1, (int)(Math.sqrt(number))-2))) {
 			if(number > 0) {
-				world.spawnAnimal(unitType, t, world.getFaction(World.NO_FACTION_ID));
+				world.spawnAnimal(unitType, t, world.getFaction(World.NO_FACTION_ID), null);
 				number --;
 			}
 			else {
@@ -137,63 +137,91 @@ public class Game {
 	private void dayEvents() {
 		double day = Math.sqrt(World.days);
 		//all the forced spawns
-		if(World.days % 5 == 0) {
-			for(int i = 0; i < day; i++) {
-				world.spawnLavaGolem();
-				world.spawnIceGiant();
+//		if(World.days % 5 == 0) {
+//			for(int i = 0; i < day; i++) {
+//				world.spawnLavaGolem();
+//				world.spawnIceGiant();
+//			}
+//			System.out.println(day + " lava & ice giants");
+//			
+//		}
+//		if(World.days % 20 == 0) {
+//			meteorStrike();
+//		}
+//		if(World.days % 8 == 0) {
+//			for(int i = 0; i < day; i++) {
+//				world.spawnOgre();
+//			}
+//			System.out.println(day + " ogres");
+//			
+//		}
+//		if(World.days % 10 == 0) {
+//			for(int i = 0; i < day; i++) {
+//				world.spawnSkeletonArmy();
+//			}
+//			System.out.println(day + " skeletons");
+//		}
+//		if(World.days % 20 == 0) {
+//			spawnCyclops();
+//			System.out.println("cyclops");
+//		}
+//		if(World.days % 15 == 0) {
+//			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID));
+//			System.out.println("parasite");
+//		}
+		Tile targetTile = world.getTilesRandomly().peek();
+		
+		for(Faction faction: world.getFactions()) {
+			if(faction.getDifficulty() <= 0) {
+				continue;
 			}
-			System.out.println(day + " lava & ice giants");
+
+			LinkedList<Tile> factionTiles = new LinkedList<Tile>();
+			for (Tile t : world.borderTerritory.keySet()) {
+				if(t.getFaction() == faction) {
+					factionTiles.add(t);
+				}
+			}
+			if(factionTiles.isEmpty() == false) {
+				targetTile = factionTiles.get((int)(Math.random()*factionTiles.size()));
+			}
+			
 			
 		}
-		if(World.days % 20 == 0) {
-			meteorStrike();
-		}
-		if(World.days % 8 == 0) {
-			for(int i = 0; i < day; i++) {
-				world.spawnOgre();
-			}
-			System.out.println(day + " ogres");
-			
-		}
-		if(World.days % 10 == 0) {
-			for(int i = 0; i < day; i++) {
-				world.spawnSkeletonArmy();
-			}
-			System.out.println(day + " skeletons");
-		}
-		if(World.days % 20 == 0) {
-			spawnCyclops();
-			System.out.println("cyclops");
-		}
-		if(World.days % 15 == 0) {
-			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID));
-			System.out.println("parasite");
-		}
 		
-		
+		//random spawns
 		if(World.days >= 10) {
 			int number = (int)(Math.random() / Season.FREEZING_TEMPURATURE * day);
 			for(int i = 0; i < number; i++) {
-				world.spawnIceGiant();
+				world.spawnIceGiant(targetTile);
 			}
 			System.out.println(number + " ice giants");
 		}
 		if(World.days >= 5) {
 			int number = (int)(Math.random()*day);
 			for(int i = 0; i < number; i++) {
-				world.spawnEnt();
+				world.spawnEnt(targetTile);
 			}
 			System.out.println(number + " ents");
 			
 		}
+		Tile spawnTile = targetTile;
+		for(Tile t: world.getTilesRandomly()) {
+			if(t.getLocation().distanceTo(targetTile.getLocation()) < howFarAwayStuffSpawn 
+					&& t.getFaction() == world.getFaction(world.NO_FACTION_ID)) {
+				spawnTile = t;
+			}
+			
+		}
+		
 		if(World.days >= 1) {
 			int number = (int)(Season.MELTING_TEMPURATURE + Math.random()*day);
-			makeAnimal(world.getTilesRandomly().getFirst(), Game.unitTypeMap.get("FLAMELET"), number);
+			makeAnimal(spawnTile, Game.unitTypeMap.get("FLAMELET"), number);
 			System.out.println(number + " flamelets");
 		}
 		
 		if(Math.random() < 0.2) {
-			makeAnimal(world.getTilesRandomly().getFirst(), Game.unitTypeMap.get("WATER_SPIRIT"), 4);
+			makeAnimal(spawnTile, Game.unitTypeMap.get("WATER_SPIRIT"), 4);
 			System.out.println(4 + " water spirits");
 		}
 //		if(ticks >= 3000 && Math.random() < 0.0005) {
@@ -203,7 +231,7 @@ public class Game {
 	private void nightEvents() {
 		if(World.days >= 10) {
 			if(Math.random() > 0.5) {
-				world.spawnWerewolf();
+				world.spawnWerewolf(null);
 			}
 		}
 	}
@@ -227,14 +255,14 @@ public class Game {
 	}
 	public void shadowWordDeath(int num){
 		for(int i = 0; i < num; i++) {
-			world.spawnOgre();
-			world.spawnDragon();
-			world.spawnWerewolf();
-			world.spawnEnt();
-			world.spawnLavaGolem();
-			world.spawnIceGiant();
-			world.spawnSkeletonArmy();
-			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID));
+			world.spawnOgre(null);
+			world.spawnDragon(null);
+			world.spawnWerewolf(null);
+			world.spawnEnt(null);
+			world.spawnLavaGolem(null);
+			world.spawnIceGiant(null);
+			world.spawnSkeletonArmy(null);
+			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID), null);
 			spawnCyclops();
 		}
 		for(int i = 0; i < num/2; i++) {
@@ -248,7 +276,7 @@ public class Game {
 		
 		Iterator<Tile> iterator = tiles.iterator();
 		for(UnitType type : Game.unitTypeList) {
-			world.spawnAnimal(type, iterator.next(), world.getFaction(World.NO_FACTION_ID));
+			world.spawnAnimal(type, iterator.next(), world.getFaction(World.NO_FACTION_ID), null);
 		}
 	}
 	
@@ -311,7 +339,7 @@ public class Game {
 		for(int i = -1; i < 2; i ++) {
 			for(int j = -1; j < 2; j ++) {
 				Tile temp = world.get(new TileLoc(tile.getLocation().x() + i, tile.getLocation().y() + j));
-				Animal cyclops = world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp, world.getFaction(World.CYCLOPS_FACTION_ID));
+				Animal cyclops = world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp, world.getFaction(World.CYCLOPS_FACTION_ID), null);
 				cyclops.setPassiveAction(PlannedAction.GUARD);
 			}
 			
@@ -567,7 +595,7 @@ public class Game {
 				unit.setTimeToAttack(0);
 				return unit;
 			} else {
-				return world.spawnAnimal(unitType, tile, faction);
+				return world.spawnAnimal(unitType, tile, faction, null);
 			}
 		}
 		else if(thingType instanceof BuildingType) {

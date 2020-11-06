@@ -390,6 +390,9 @@ public class Tile implements Externalizable {
 		if(this.countUnitsOfFaction(u.getFaction()) != this.getUnits().size()) {
 			return true;
 		}
+//		if(this.getBuilding().getFaction() != u.getFaction()) {
+//			return true;
+//		}
 		BuildingType bt = building.getType();
 		if(bt.blocksMovement()) {
 			if(bt.isGate() && u.getFaction() == building.getFaction()) {

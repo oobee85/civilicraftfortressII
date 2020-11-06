@@ -34,6 +34,7 @@ public class Faction implements Externalizable {
 	private String name;
 	private boolean usesItems;
 	private boolean isPlayer;
+	private double environmentalDifficulty = 1;
 	
 
 	@Override
@@ -55,6 +56,12 @@ public class Faction implements Externalizable {
 		out.writeBoolean(isPlayer);
 		out.writeObject(researchTarget);
 		out.writeObject(items);
+	}
+	public void raiseDifficultyBy(double add) {
+		environmentalDifficulty += add; 
+	}
+	public double getDifficulty() {
+		return environmentalDifficulty;
 	}
 	public Item[] getItems() {
 		return items;

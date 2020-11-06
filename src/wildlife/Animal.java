@@ -10,7 +10,7 @@ import world.*;
 
 public class Animal extends Unit {
 	private static final int TARGETING_COOLDOWN = 10;
-	
+	private static final int TIME_UNTIL_ATTACK = 500;
 	private int migratingUntil;
 	private int nextTimeToChooseTarget;
 	

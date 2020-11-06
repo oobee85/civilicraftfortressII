@@ -143,9 +143,9 @@ public class World {
 			
 			int numFail = 0;
 			for(Tile neighbor: tile.getNeighbors()) {
-				System.out.println("testing neighbors");
+//				System.out.println("testing neighbors");
 				if(neighbor.getFaction() != tile.getFaction()) {
-					System.out.println("adding border");
+//					System.out.println("adding border");
 					addToBorderTerritory(tile);
 					break;
 				}else {
@@ -154,7 +154,7 @@ public class World {
 				
 			}
 			if(numFail == 4) {
-				System.out.println("removing border");
+//				System.out.println("removing border");
 				borderTerritory.remove(tile);
 			}
 			
@@ -256,14 +256,17 @@ public class World {
 //		world[volcano].liquidAmount += 200;
 	}
 	
-	public void spawnOgre() {
-		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.ROCK && e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+	public void spawnOgre(Tile target) {
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> 
+//		e.getTerrain() == Terrain.ROCK 
+		e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
+		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("OGRE"), tile.get(), getFaction(NO_FACTION_ID));
+			spawnAnimal(Game.unitTypeMap.get("OGRE"), tile.get(), getFaction(NO_FACTION_ID), target);
 		}
 	}
 	
-	public void spawnWerewolf() {
+	public void spawnWerewolf(Tile target) {
 		List<Unit> wolves = worldData.getUnits()
 				.stream()
 				.filter(e -> e.getType() == Game.unitTypeMap.get("WOLF"))
@@ -275,53 +278,69 @@ public class World {
 		wolf.setDead(true);
 		Tile t = wolf.getTile();
 //		System.out.println("Werewolf at: "+t);
-		spawnAnimal(Game.unitTypeMap.get("WEREWOLF"), t, getFaction(NO_FACTION_ID));
+		spawnAnimal(Game.unitTypeMap.get("WEREWOLF"), t, getFaction(NO_FACTION_ID), target);
 	}
 	
-	public void spawnLavaGolem() {
+	public void spawnLavaGolem(Tile target) {
 		Optional<Tile> tile = getTilesRandomly()
 				.stream()
-				.filter(e -> e.getTerrain() == Terrain.VOLCANO && e.getFaction() == getFaction(NO_FACTION_ID))
+				.filter(e -> 
+//				e.getTerrain() == Terrain.VOLCANO 
+				e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
+				&& e.getFaction() == getFaction(NO_FACTION_ID))
 				.findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("LAVAGOLEM"), tile.get(), getFaction(NO_FACTION_ID));
+			spawnAnimal(Game.unitTypeMap.get("LAVAGOLEM"), tile.get(), getFaction(NO_FACTION_ID), target);
 		}
 	}
 	
-	public void spawnEnt() {
-		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.GRASS && e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+	public void spawnEnt(Tile target) {
+		Optional<Tile> tile = getTilesRandomly().stream().filter(
+				e -> e.getTerrain() == Terrain.GRASS 
+				&& e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn 
+				&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("ENT"), tile.get(), getFaction(NO_FACTION_ID));
+			spawnAnimal(Game.unitTypeMap.get("ENT"), tile.get(), getFaction(NO_FACTION_ID), target);
 		}
 	}
-	public void spawnIceGiant() {
-		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getModifier() != null && e.liquidType == LiquidType.SNOW && e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+	public void spawnIceGiant(Tile target) {
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> 
+//		e.liquidType == LiquidType.SNOW
+		e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
+		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("ICE_GIANT"), tile.get(), getFaction(NO_FACTION_ID));
+			spawnAnimal(Game.unitTypeMap.get("ICE_GIANT"), tile.get(), getFaction(NO_FACTION_ID), target);
 		}
 	}
-	public void spawnDragon() {
-		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.VOLCANO && e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+	public void spawnDragon(Tile target) {
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> 
+		e.getTerrain() == Terrain.VOLCANO 
+		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(Game.unitTypeMap.get("DRAGON"), tile.get(), getFaction(NO_FACTION_ID));
+			spawnAnimal(Game.unitTypeMap.get("DRAGON"), tile.get(), getFaction(NO_FACTION_ID), target);
 		}
 	}
 	
-	public void spawnSkeletonArmy() {
-		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.ROCK && e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+	public void spawnSkeletonArmy(Tile target) {
+		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
+		e.getTerrain() == Terrain.ROCK 
+		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(potential.isPresent()) {
 			Tile t = potential.get();
 			for(Tile tile : t.getNeighbors()) {
 				for(int i = 0; i < 3; i++) {
-					spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, getFaction(UNDEAD_FACTION_ID));
+					spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, getFaction(UNDEAD_FACTION_ID), target);
 				}
 			}
 		}
 	}
-	public Animal spawnAnimal(UnitType type, Tile tile, Faction faction) {
+	public Animal spawnAnimal(UnitType type, Tile tile, Faction faction, Tile target) {
 		Animal animal = makeAnimal(type, tile, faction);
 		tile.addUnit(animal);
 		worldData.addUnit(animal);
+		if(target != null) {
+			animal.queuePlannedAction(new PlannedAction(target));
+		}
 		return animal;
 	}
 
