@@ -37,6 +37,7 @@ public class World {
 	private Tile[][] tiles;
 	
 	public volatile ConcurrentHashMap<Tile, Faction> territory = new ConcurrentHashMap<>();
+	public volatile ConcurrentHashMap<Tile, Faction> borderTerritory = new ConcurrentHashMap<>();
 	private int width;
 	private int height;
 	
@@ -91,6 +92,7 @@ public class World {
 			if(tile.getFaction() == null || tile.getFaction().id() != info.getFaction().id()) {
 				tile.setFaction(factions.get(info.getFaction().id()));
 				addToTerritory(tile);
+				updateBorderTiles();
 			}
 			tile.setHeight(info.getHeight());
 			tile.setHumidity(info.getHumidity());
@@ -132,6 +134,36 @@ public class World {
 	public void addToTerritory(Tile tile) {
 		if(!territory.contains(tile)) {
 			territory.put(tile, tile.getFaction());
+		}
+		
+	}
+	public void updateBorderTiles() {
+		
+		for(Tile tile : territory.keySet()) {
+			
+			int numFail = 0;
+			for(Tile neighbor: tile.getNeighbors()) {
+				System.out.println("testing neighbors");
+				if(neighbor.getFaction() != tile.getFaction()) {
+					System.out.println("adding border");
+					addToBorderTerritory(tile);
+					break;
+				}else {
+					numFail ++;
+				}
+				
+			}
+			if(numFail == 4) {
+				System.out.println("removing border");
+				borderTerritory.remove(tile);
+			}
+			
+		}
+	}
+	
+	public void addToBorderTerritory(Tile tile) {
+		if(!borderTerritory.contains(tile)) {
+			borderTerritory.put(tile, tile.getFaction());
 		}
 	}
 	public int getWidth() {

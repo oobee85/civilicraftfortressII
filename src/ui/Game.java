@@ -333,6 +333,7 @@ public class Game {
 						if(tile != null && tile.getFaction() == world.getFaction(World.NO_FACTION_ID)) {
 							tile.setFaction(building.getFaction());
 							world.addToTerritory(tile);
+							world.updateBorderTiles();
 						}
 					}
 				}

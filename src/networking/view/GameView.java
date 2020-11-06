@@ -886,6 +886,11 @@ public class GameView extends JPanel {
 				}
 				Utils.setTransparency(g, 1);
 			}
+//			if(game.world.borderTerritory.containsKey(theTile)) {
+//				Utils.setTransparency(g, 1);
+//				g.setColor(Color.BLACK);
+//				g.fillRect(drawx, drawy, draww, drawh); 
+//			}
 			if (theTile.getRoad() != null) {
 				drawBuilding(theTile.getRoad(), g, drawx, drawy, draww, drawh);
 			}
