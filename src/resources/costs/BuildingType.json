@@ -100,7 +100,7 @@
 	{
 		"image":"resources/Images/buildings/granary.png",
 		"vision":1,
-		"cost":{"WOOD":200},
+		"cost":{"WOOD":200, "BRONZE_BAR":1},
 		"culture":0.25,
 		"name":"GRANARY",
 		"health":250,
@@ -109,7 +109,7 @@
 	{
 		"image":"resources/Images/buildings/ancientwindmill.png",
 		"vision":1,
-		"cost":{"WOOD":500, "IRON_BAR":10},
+		"cost":{"WOOD":500, "IRON_BAR":5},
 		"culture":0.5,
 		"name":"WINDMILL",
 		"health":500,

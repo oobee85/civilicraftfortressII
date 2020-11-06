@@ -27,7 +27,7 @@ public class Unit extends Thing implements Serializable {
 	private transient boolean isHarvesting;
 	private transient double timeToHarvest;
 	private transient double baseTimeToHarvest = 10;
-	private transient int ticksForFoodCost = 40;
+	private transient int ticksForFoodCost = 80;
 	
 	public Unit(UnitType unitType, Tile tile, Faction faction) {
 		super(unitType.getCombatStats().getHealth(), unitType, faction, tile);
