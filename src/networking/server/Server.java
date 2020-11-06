@@ -151,7 +151,7 @@ public class Server {
 			try {
 				int iteration = 0;
 				while(true) {
-					if(iteration % 15 == 0) {
+					if(iteration % 20 == 0) {
 						sendFullWorld();
 					}
 					else if(iteration % 4 == 0) {
@@ -200,6 +200,7 @@ public class Server {
 		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, new Tile[0]);
 		worldInfo.getThings().addAll(gameInstance.world.getUnits());
 		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
+		worldInfo.addHitsplats(gameInstance.world.getData());
 		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
 		sendToAllConnections(worldInfo);
 //		saveToFile(worldInfo, "ser/units_" + World.ticks + ".ser");
@@ -208,6 +209,7 @@ public class Server {
 	private void sendProjectilesAndDeadThings() {
 		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, new Tile[0]);
 		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
+		worldInfo.addHitsplats(gameInstance.world.getData());
 		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
 		sendToAllConnections(worldInfo);
 //		saveToFile(worldInfo, "ser/projectiles_" + World.ticks + ".ser");

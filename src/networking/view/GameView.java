@@ -863,7 +863,7 @@ public class GameView extends JPanel {
 				g.drawImage(theTile.getResource().getType().getImage(imagesize), drawx, drawy, draww, drawh, null);
 			}
 			
-			if(theTile.getFaction() != game.world.getFaction(World.NO_FACTION_ID)) {
+			if(theTile.getFaction() != null && theTile.getFaction() != game.world.getFaction(World.NO_FACTION_ID)) {
 //				g.setColor(Color.black);
 //				g.fillRect(x, y, w, h); 
 				g.setColor(theTile.getFaction().color());

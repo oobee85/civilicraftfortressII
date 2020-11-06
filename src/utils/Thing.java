@@ -104,7 +104,9 @@ public class Thing implements HasImage, Serializable {
 	private void addHitsplat(int damage) {
 		int oldest = 0;
 		Hitsplat oldestHitsplat = hitsplats[0];
-		for(int i = 0; i < hitsplats.length; i++) {
+		int offset = (int)(Math.random()*hitsplats.length);
+		for(int ii = 0; ii < hitsplats.length; ii++) {
+			int i = (ii+offset) % hitsplats.length;
 			Hitsplat current = hitsplats[i];
 			if(current == null) {
 				oldest = i;
@@ -116,7 +118,7 @@ public class Thing implements HasImage, Serializable {
 				oldestHitsplat = current;
 			}
 		}
-		Hitsplat hit = new Hitsplat(damage, oldest);
+		Hitsplat hit = new Hitsplat(damage, oldest, this);
 		hitsplats[oldest] = hit;
 	}
 	public double getHealth() {

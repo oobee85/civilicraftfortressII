@@ -307,6 +307,12 @@ public class Client {
 					null);
 			gameInstance.world.getData().addProjectile(newProjectile);
 		}
+		for(Hitsplat hitsplat : worldInfo.getHitsplats()) {
+			Thing thing = things.get(hitsplat.getThingID());
+			if(thing != null) {
+				thing.getHitsplatList()[hitsplat.getSquare()] = hitsplat;
+			}
+		}
 		synchronized (updatedTerrain) {
 			updatedTerrain.notify();
 		}
@@ -436,7 +442,7 @@ public class Client {
 			try {
 				while(true) {
 					Object message = connection.getMessage();
-					System.out.println("processing message " + message);
+					System.err.println("processing message " + message);
 					if(message instanceof ServerMessage) {
 						ServerMessage serverMessage = (ServerMessage)message;
 						if(serverMessage.getServerMessageType() == ServerMessageType.LOBBY) {
