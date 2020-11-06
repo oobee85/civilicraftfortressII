@@ -311,6 +311,7 @@ public class Client {
 			Thing thing = things.get(hitsplat.getThingID());
 			if(thing != null) {
 				thing.getHitsplatList()[hitsplat.getSquare()] = hitsplat;
+				thing.takeFakeDamage();
 			}
 		}
 		synchronized (updatedTerrain) {

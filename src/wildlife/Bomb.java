@@ -13,7 +13,7 @@ public class Bomb extends Animal {
 	}
 	
 	@Override
-	public boolean takeDamage(double damage) {
+	public boolean takeDamage(int damage) {
 		if(!isDead()) {
 			super.takeDamage(damage);
 			world.spawnExplosion(getTile(), 5, 500);

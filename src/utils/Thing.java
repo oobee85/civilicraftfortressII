@@ -74,7 +74,7 @@ public class Thing implements HasImage, Serializable {
 	/**
 	 * @return true if this is lethal damage, false otherwise
 	 */
-	public boolean takeDamage(double damage) {
+	public boolean takeDamage(int damage) {
 		boolean before = isDead();
 		health -= damage;
 		if(damage != 0) {
@@ -84,6 +84,10 @@ public class Thing implements HasImage, Serializable {
 		addHitsplat((int)(Math.ceil(damage)));
 		// Return true if isDead changed from false to true.
 		return !before && isDead();
+	}
+	
+	public void takeFakeDamage() {
+		timeLastDamageTaken = World.ticks;
 	}
 	
 	public void heal(double healing, boolean hitsplat) {

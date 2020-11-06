@@ -229,7 +229,7 @@ public class Unit extends Thing implements Serializable {
 	}
 
 	@Override
-	public boolean takeDamage(double damage) {
+	public boolean takeDamage(int damage) {
 		boolean lethal = super.takeDamage(damage);
 		if (lethal) {
 			for (Item item : getType().getDeadItem()) {
