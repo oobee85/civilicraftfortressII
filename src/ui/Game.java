@@ -26,7 +26,7 @@ public class Game {
 	public static boolean DISABLE_NIGHT = false;
 	
 	private GUIController guiController;
-	public static final int howFarAwayStuffSpawn = 50;
+	public static final int howFarAwayStuffSpawn = 30;
 	public World world;
 	
 	public Game(GUIController guiController) {

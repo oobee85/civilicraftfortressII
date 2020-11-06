@@ -7,6 +7,7 @@ public class PlannedAction {
 	public static final PlannedAction NOTHING = new PlannedAction(null, false);
 	public static final PlannedAction GUARD = new PlannedAction(null, false);
 	public static final PlannedAction BUILD = new PlannedAction(null, false);
+	public static final PlannedAction WAITTOATTACK = new PlannedAction(null, false);
 	
 	
 	public final Tile targetTile;
@@ -26,6 +27,11 @@ public class PlannedAction {
 		this.targetTile = null;
 		this.target = target;
 		this.build = build;
+	}
+	public PlannedAction(Tile target, int time) {
+		this.targetTile = target;
+		this.target = null;
+		this.build = false;
 	}
 	
 	public Tile getTile() {

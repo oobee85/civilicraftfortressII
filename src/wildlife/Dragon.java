@@ -11,6 +11,7 @@ public class Dragon extends Animal {
 	private transient Tile home;
 	private transient int timeToFireball;
 	private transient int timeToHunt;
+	private static int TIME_UNTIL_ATTACK = 0;
 	
 	public Dragon(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("DRAGON"), tile, faction);

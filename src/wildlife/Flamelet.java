@@ -6,6 +6,7 @@ import world.*;
 
 public class Flamelet extends Animal {
 
+	private static int TIME_UNTIL_ATTACK = 0;
 	public Flamelet(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("FLAMELET"), tile, faction);
 	}

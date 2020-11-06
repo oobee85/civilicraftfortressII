@@ -277,7 +277,7 @@
 	},
 	{
 		"image":"resources/Images/units/flamelet.png",
-		"stats":{"movespeed":25,"attackspeed":1000,"attack":0,"buildtime":0,"range":0,"health":1,"healspeed":50},
+		"stats":{"movespeed":25,"attackspeed":1000,"attack":0,"buildtime":0,"range":0,"health":50,"healspeed":50},
 		"name":"FLAMELET",
 		"attributes":["hostile","fireresistant"],
 		"targeting":[
@@ -288,7 +288,7 @@
 	},
 	{
 		"image":"resources/Images/units/waterspirit.png",
-		"stats":{"movespeed":25,"attackspeed":1000,"attack":0,"buildtime":0,"range":0,"health":1,"healspeed":50},
+		"stats":{"movespeed":25,"attackspeed":1000,"attack":0,"buildtime":0,"range":0,"health":50,"healspeed":50},
 		"name":"WATER_SPIRIT",
 		"attributes":["migratory"]
 	},
@@ -304,13 +304,13 @@
 	},
 	{
 		"image":"resources/Images/units/firefly.png",
-		"stats":{"movespeed":25,"attackspeed":1000,"attack":0,"buildtime":0,"range":1,"health":1,"healspeed":50},
+		"stats":{"movespeed":25,"attackspeed":1000,"attack":0,"buildtime":0,"range":1,"health":50,"healspeed":50},
 		"name":"FIREFLY",
 		"attributes":["flying"]
 	},
 	{
 		"image":"resources/Images/units/bomb.png",
-		"stats":{"movespeed":25,"attackspeed":10,"attack":1,"buildtime":0,"range":0,"health":1,"healspeed":50},
+		"stats":{"movespeed":25,"attackspeed":10,"attack":1,"buildtime":0,"range":0,"health":50,"healspeed":50},
 		"name":"BOMB",
 		"attributes":["hostile"],
 		"targeting":[
