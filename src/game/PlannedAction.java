@@ -13,25 +13,30 @@ public class PlannedAction {
 	public final Tile targetTile;
 	public final Thing target;
 	public final boolean build;
+	public final int whenToAtack;
 	public PlannedAction(Tile targetTile) {
 		this.targetTile = targetTile;
 		this.target = null;
 		this.build = false;
+		this.whenToAtack = 0;
 	}
 	public PlannedAction(Thing target) {
 		this.targetTile = null;
 		this.target = target;
 		this.build = false;
+		this.whenToAtack = 0;
 	}
 	public PlannedAction(Thing target, boolean build) {
 		this.targetTile = null;
 		this.target = target;
 		this.build = build;
+		this.whenToAtack = 0;
 	}
 	public PlannedAction(Tile target, int time) {
 		this.targetTile = target;
 		this.target = null;
 		this.build = false;
+		this.whenToAtack = time;
 	}
 	
 	public Tile getTile() {

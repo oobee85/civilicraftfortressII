@@ -360,7 +360,9 @@ public class Unit extends Thing implements Serializable {
 					attacked = true;
 				}
 				else {
-					attacked = attack(plan.target);
+					if(World.ticks > plan.whenToAtack) {
+						attacked = attack(plan.target);
+					}
 				}
 			}
 		}
