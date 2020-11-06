@@ -30,4 +30,16 @@ public class Flamelet extends Animal {
 		world.getData().addGroundModifier(getTile().getModifier());
 	}
 	
+	@Override
+	public void updateState() {
+		super.updateState();
+		TIME_UNTIL_ATTACK --;
+	}
+	@Override
+	public boolean wantsToAttack() {
+		if(TIME_UNTIL_ATTACK <= 0) {
+			return true;
+		}
+		return false;
+	}
 }

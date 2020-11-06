@@ -28,4 +28,16 @@ public class IceGiant extends Animal {
 //		getTile().setModifier(new GroundModifier(GroundModifierType.SNOW, getTile(), 500));
 //		world.addGroundModifier(getTile().getModifier());
 	}
+	@Override
+	public void updateState() {
+		super.updateState();
+		TIME_UNTIL_ATTACK --;
+	}
+	@Override
+	public boolean wantsToAttack() {
+		if(TIME_UNTIL_ATTACK <= 0) {
+			return true;
+		}
+		return false;
+	}
 }

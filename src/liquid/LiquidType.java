@@ -7,13 +7,13 @@ import javax.swing.*;
 import utils.*;
 
 public enum LiquidType implements HasImage {
-		DRY(new String[] {"resources/Images/liquid/lavaanim32.gif"}, 
+		DRY(new String[] {"resources/Images/liquid/lavaanim32.gif"},
 				0f, 1000f, 1000f, 5f, 0.08f, 0f, false),
 		WATER(new String[] {"resources/Images/liquid/watermoving.gif"}, 
 				0.2f, 0.0001f, 0.001f, 10f, 0.08f, 0f, true, new Color[] {new Color(50, 70, 250)}),
-		LAVA(new String[] {"resources/Images/liquid/lava16.png", "resources/Images/liquid/lavaanim32.gif"}, 
+		LAVA(new String[] {"resources/Images/liquid/lava16.png", "resources/Images/liquid/lavaanim32.gif"},
 				0.1f, 0.0005f, 0.01f, 100f, 0.001f, 10f, false),
-		ICE(new String[] {"resources/Images/liquid/ice.png"}, 
+		ICE(new String[] {"resources/Images/liquid/ice.png"},
 				0f, 1000f, 1000f, 20f, 0.05f, 0f, true),
 		SNOW(new String[] {"resources/Images/liquid/snow128.png"}, 
 				1f, 0.05f, 0.1f, 20f, 0.05f, 0f, true),
