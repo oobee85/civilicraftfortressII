@@ -27,7 +27,7 @@ public class Unit extends Thing implements Serializable {
 	private transient boolean isHarvesting;
 	private transient double timeToHarvest;
 	private transient double baseTimeToHarvest = 10;
-	private transient int ticksForFoodCost = 60;
+	private transient int ticksForFoodCost = 50;
 	
 	public Unit(UnitType unitType, Tile tile, Faction faction) {
 		super(unitType.getCombatStats().getHealth(), unitType, faction, tile);
@@ -210,8 +210,8 @@ public class Unit extends Thing implements Serializable {
 		}
 		
 		if (World.ticks % ticksToCost == 0 && getFaction().usesItems()) {
-			if (getFaction().canAfford(ItemType.FOOD, 1)) {
-				getFaction().payCost(ItemType.FOOD, 1);
+			if (getFaction().canAfford(ItemType.FOOD, 2)) {
+				getFaction().payCost(ItemType.FOOD, 2);
 				starving = 0;
 			} else {
 				starving++;

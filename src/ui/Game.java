@@ -136,75 +136,25 @@ public class Game {
 	}
 	private void dayEvents() {
 		double day = Math.sqrt(World.days);
-		//all the forced spawns
-//		if(World.days % 5 == 0) {
-//			for(int i = 0; i < day; i++) {
-//				world.spawnLavaGolem();
-//				world.spawnIceGiant();
-//			}
-//			System.out.println(day + " lava & ice giants");
-//			
-//		}
-//		if(World.days % 20 == 0) {
-//			meteorStrike();
-//		}
-//		if(World.days % 8 == 0) {
-//			for(int i = 0; i < day; i++) {
-//				world.spawnOgre();
-//			}
-//			System.out.println(day + " ogres");
-//			
-//		}
-//		if(World.days % 10 == 0) {
-//			for(int i = 0; i < day; i++) {
-//				world.spawnSkeletonArmy();
-//			}
-//			System.out.println(day + " skeletons");
-//		}
-//		if(World.days % 20 == 0) {
-//			spawnCyclops();
-//			System.out.println("cyclops");
-//		}
-//		if(World.days % 15 == 0) {
-//			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID));
-//			System.out.println("parasite");
-//		}
 		Tile targetTile = world.getTilesRandomly().peek();
-		
-		for(Faction faction: world.getFactions()) {
-			if(faction.getDifficulty() <= 0) {
+
+		for (Faction faction : world.getFactions()) {
+			if (faction.getDifficulty() <= 0) {
 				continue;
 			}
 
 			LinkedList<Tile> factionTiles = new LinkedList<Tile>();
-			for (Tile t : world.borderTerritory.keySet()) {
-				if(t.getFaction() == faction) {
+			for (Tile t : world.territory.keySet()) {
+				if (t.getFaction() == faction) {
 					factionTiles.add(t);
 				}
 			}
-			if(factionTiles.isEmpty() == false) {
-				targetTile = factionTiles.get((int)(Math.random()*factionTiles.size()));
+			if (factionTiles.isEmpty() == false) {
+				targetTile = factionTiles.get((int) (Math.random() * factionTiles.size()));
 			}
-			
-			
+
 		}
 		
-		//random spawns
-		if(World.days >= 10) {
-			int number = (int)(Math.random() / Season.FREEZING_TEMPURATURE * day);
-			for(int i = 0; i < number; i++) {
-				world.spawnIceGiant(targetTile);
-			}
-			System.out.println(number + " ice giants");
-		}
-		if(World.days >= 5) {
-			int number = (int)(Math.random()*day);
-			for(int i = 0; i < number; i++) {
-				world.spawnEnt(targetTile);
-			}
-			System.out.println(number + " ents");
-			
-		}
 		Tile spawnTile = targetTile;
 		for(Tile t: world.getTilesRandomly()) {
 			if(t.getLocation().distanceTo(targetTile.getLocation()) < howFarAwayStuffSpawn 
@@ -213,8 +163,75 @@ public class Game {
 			}
 			
 		}
+		//all the forced spawns
+		if(World.days % 5 == 0) {
+			for(int i = 0; i < day; i++) {
+				world.spawnLavaGolem(targetTile);
+				world.spawnIceGiant(targetTile);
+			}
+			System.out.println(day + " lava & ice giants");
+			
+		}
+		if(World.days % 20 == 0) {
+			meteorStrike();
+		}
+		if(World.days % 8 == 0) {
+			for(int i = 0; i < day; i++) {
+				world.spawnOgre(targetTile);
+			}
+			System.out.println(day + " ogres");
+			
+		}
+		if(World.days % 10 == 0) {
+			for(int i = 0; i < day; i++) {
+				world.spawnSkeletonArmy(targetTile);
+			}
+			System.out.println(day + " skeletons");
+		}
+		if(World.days % 20 == 0) {
+			spawnCyclops();
+			System.out.println("cyclops");
+		}
+		if(World.days % 15 == 0) {
+			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID), null);
+			System.out.println("parasite");
+		}
 		
-		if(World.days >= 1) {
+		
+		//random spawns
+		if(World.days >= 10 && Math.random() > 0.2) {
+			int number = (int)(Math.random() * Season.FREEZING_TEMPURATURE * day);
+			for(int i = 0; i < number; i++) {
+				world.spawnIceGiant(targetTile);
+			}
+			System.out.println(number + " ice giants");
+		}
+		if(World.days >= 10 && Math.random() > 0.2) {
+			int number = (int)(Math.random() * Season.FREEZING_TEMPURATURE * day);
+			for(int i = 0; i < number; i++) {
+				world.spawnStoneGolem(targetTile);
+			}
+			System.out.println(number + " stone golem");
+		}
+		if(World.days >= 10 && Math.random() > 0.2) {
+			int number = (int)(Math.random() * day/2);
+			for(int i = 0; i < number; i++) {
+				world.spawnRoc(targetTile);
+			}
+			System.out.println(number + " roc");
+		}
+		
+		if(World.days >= 5 && Math.random() > 0.2) {
+			int number = (int)(Math.random()*day/2);
+			for(int i = 0; i < number; i++) {
+				world.spawnEnt(targetTile);
+			}
+			System.out.println(number + " ents");
+			
+		}
+		
+		
+		if(World.days >= 1 && Math.random() > 0.5) {
 			int number = (int)(Season.MELTING_TEMPURATURE + Math.random()*day);
 			makeAnimal(spawnTile, Game.unitTypeMap.get("FLAMELET"), number);
 			System.out.println(number + " flamelets");
@@ -229,10 +246,18 @@ public class Game {
 //		}
 	}
 	private void nightEvents() {
+		double day = Math.sqrt(World.days);
 		if(World.days >= 10) {
 			if(Math.random() > 0.5) {
 				world.spawnWerewolf(null);
 			}
+		}
+		if(World.days >= 10) {
+			int number = (int)(Math.random() * Season.FREEZING_TEMPURATURE * day);
+			for(int i = 0; i < number; i++) {
+				world.spawnVampire(null);
+			}
+			System.out.println(number + " vampire");
 		}
 	}
 	public void addCombatBuff(CombatStats cs) {
@@ -254,14 +279,18 @@ public class Game {
 		world.meteorStrike();
 	}
 	public void shadowWordDeath(int num){
+		Tile t = world.getTilesRandomly().getFirst();
 		for(int i = 0; i < num; i++) {
-			world.spawnOgre(null);
-			world.spawnDragon(null);
-			world.spawnWerewolf(null);
-			world.spawnEnt(null);
-			world.spawnLavaGolem(null);
-			world.spawnIceGiant(null);
-			world.spawnSkeletonArmy(null);
+			world.spawnOgre(t);
+			world.spawnDragon(t);
+			world.spawnWerewolf(t);
+			world.spawnEnt(t);
+			world.spawnLavaGolem(t);
+			world.spawnIceGiant(t);
+			world.spawnSkeletonArmy(t);
+			world.spawnStoneGolem(t);
+			world.spawnRoc(t);
+			world.spawnVampire(t);
 			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID), null);
 			spawnCyclops();
 		}
@@ -361,7 +390,7 @@ public class Game {
 						if(tile != null && tile.getFaction() == world.getFaction(World.NO_FACTION_ID)) {
 							tile.setFaction(building.getFaction());
 							world.addToTerritory(tile);
-							world.updateBorderTiles();
+//							world.updateBorderTiles();
 						}
 					}
 				}

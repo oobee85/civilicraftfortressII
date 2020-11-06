@@ -26,7 +26,7 @@
 	},
 	{
 		"image":"resources/Images/units/archer.png",
-		"cost":{"BRONZE_BAR":1,"FOOD":100},
+		"cost":{"BRONZE_BAR":2,"FOOD":100},
 		"stats":{"movespeed":15,"attackspeed":30,"attack":0,"buildtime":100,"range":3,"health":200,"healspeed":50},
 		"name":"ARCHER",
 		"attributes":["hostile"],
@@ -176,7 +176,7 @@
 		"projectile":"FIREBALL_DRAGON"},
 	{
 		"image":"resources/Images/units/vampire.png",
-		"stats":{"movespeed":15,"attackspeed":40,"attack":20,"buildtime":0,"range":1,"health":200,"healspeed":1},
+		"stats":{"movespeed":15,"attackspeed":20,"attack":20,"buildtime":0,"range":1,"health":200,"healspeed":1},
 		"name":"VAMPIRE",
 		"attributes":["flying","hostile","lifesteal"],
 		"targeting":[

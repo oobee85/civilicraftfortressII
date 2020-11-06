@@ -22,7 +22,7 @@ public enum ProjectileType implements HasImage {
 		FIREBALL_TREBUCHET(600, 3, "resources/Images/projectiles/fireball.png", 2, 5, null),
 		
 		ROCK_CYCLOPS(80, 3, "resources/Images/itemicons/rock.png", 1, 2, null),
-		ROCK_STONE_GOLEM(200, 5, "resources/Images/itemicons/rock.png", 2, 3, null),
+		ROCK_STONE_GOLEM(200, 5, "resources/Images/itemicons/rock.png", 1, 3, null),
 		FIREBALL_DRAGON(100, 3, "resources/Images/projectiles/fireball2.png", 2, 3, null),
 		BULLET(1000, 0, "resources/Images/projectiles/bullet.png", 1, 1, null),
 		FIREWAVE(200, 6, "resources/Images/ground_modifiers/fire.gif", 1, 3, GroundModifierType.FIRE),
