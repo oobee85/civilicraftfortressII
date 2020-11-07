@@ -12,7 +12,7 @@ public interface CommandInterface {
 	public Building planBuilding(Unit unit, Tile target, boolean clearQueue, BuildingType buildingType);
 	public void stop(Unit unit);
 	public void research(Faction faction, ResearchType researchType);
-	public void craftItem(Faction faction, ItemType itemType);
+	public void craftItem(Faction faction, ItemType itemType, int amount);
 	public void produceUnit(Building building, UnitType unitType);
 	
 	public void setGuarding(Unit unit, boolean enabled);

@@ -552,12 +552,15 @@ public class Game {
 			newFaction.addItem(ItemType.WOOD, 200);
 			newFaction.addItem(ItemType.STONE, 200);
 			newFaction.addItem(ItemType.FOOD, 200);
+			newFaction.addItem(ItemType.COPPER_ORE, 200);
+			newFaction.addItem(ItemType.SILVER_ORE, 200);
 			world.addFaction(newFaction);
 			
 			LinkedList<HasImage> thingsToPlace = new LinkedList<>();
 			thingsToPlace.add(Game.buildingTypeMap.get("CASTLE"));
 			thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 			thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
+			thingsToPlace.add(Game.buildingTypeMap.get("BLACKSMITH"));
 //			thingsToPlace.add(Game.unitTypeMap.get("HORSE_ARCHER"));
 //			thingsToPlace.add(Game.unitTypeMap.get("KNIGHT"));
 			if(easymode) {

@@ -110,7 +110,7 @@ public class Client {
 			}
 			@Override
 			public void tryToCraftItem(ItemType type, int amount) {
-				clientGUI.getGameView().getCommandInterface().craftItem(clientGUI.getGameView().getFaction(), type);
+				clientGUI.getGameView().getCommandInterface().craftItem(clientGUI.getGameView().getFaction(), type, amount);
 			}
 			@Override
 			public void research(ResearchType researchType) {
@@ -164,9 +164,9 @@ public class Client {
 				localCommands.research(faction, researchType);
 			}
 			@Override
-			public void craftItem(Faction faction, ItemType itemType) {
-				sendMessage(CommandMessage.makeCraftItemCommand(faction.id(), itemType.name()));
-				localCommands.craftItem(faction, itemType);
+			public void craftItem(Faction faction, ItemType itemType, int amount) {
+				sendMessage(CommandMessage.makeCraftItemCommand(faction.id(), itemType.name(), amount));
+				localCommands.craftItem(faction, itemType, amount);
 			}
 			@Override
 			public void produceUnit(Building building, UnitType unitType) {

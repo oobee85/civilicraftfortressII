@@ -285,7 +285,7 @@ public class Server {
 			if(message.getFaction() >= 0 && message.getFaction() < gameInstance.world.getFactions().size()) {
 				ItemType itemType = ItemType.valueOf(message.getType());
 				if(itemType != null) {
-					gui.getCommandInterface().craftItem(gameInstance.world.getFactions().get(message.getFaction()), itemType);
+					gui.getCommandInterface().craftItem(gameInstance.world.getFactions().get(message.getFaction()), itemType, message.getAmount());
 				}
 			}
 		}

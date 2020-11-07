@@ -14,6 +14,7 @@ public class CommandMessage implements Externalizable {
 	private int faction;
 	private String type = "";
 	private boolean clearQueue;
+	private int amount;
 	/** Used only by serialization */
 	public CommandMessage() {
 	}
@@ -74,11 +75,12 @@ public class CommandMessage implements Externalizable {
 		msg.type = researchType;
 		return msg;
 	}
-	public static CommandMessage makeCraftItemCommand(int factionID, String itemType) {
+	public static CommandMessage makeCraftItemCommand(int factionID, String itemType, int amount) {
 		CommandMessage msg = new CommandMessage();
 		msg.command = CommandType.CRAFT_ITEM;
 		msg.faction = factionID;
 		msg.type = itemType;
+		msg.amount = amount;
 		return msg;
 	}
 	public static CommandMessage makeProduceUnitCommand(int thingID, String unitType) {
@@ -118,6 +120,9 @@ public class CommandMessage implements Externalizable {
 	public String getType() {
 		return type;
 	}
+	public int getAmount() {
+		return amount;
+	}
 	@Override
 	public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
 		command = CommandType.values()[input.readInt()];
@@ -126,6 +131,7 @@ public class CommandMessage implements Externalizable {
 		targetY = input.readInt();
 		targetID = input.readInt();
 		faction = input.readInt();
+		amount = input.readInt();
 		type = input.readUTF();
 		clearQueue = input.readBoolean();
 	}
@@ -137,6 +143,7 @@ public class CommandMessage implements Externalizable {
 		output.writeInt(targetY);
 		output.writeInt(targetID);
 		output.writeInt(faction);
+		output.writeInt(amount);
 		output.writeUTF(type);
 		output.writeBoolean(clearQueue);
 	}
