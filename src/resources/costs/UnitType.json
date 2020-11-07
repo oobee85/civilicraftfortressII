@@ -339,6 +339,6 @@
 		"attributes":["fireresistant","hostile","coldresistant"],
 		"projectile":"ROCK_STONE_GOLEM",
 		"loot":{"STONE":1000}
-	},
+	}
 ]
 }
