@@ -338,6 +338,14 @@ public class World {
 			spawnAnimal(Game.unitTypeMap.get("ROC"), t, getFaction(CYCLOPS_FACTION_ID), target);
 		}
 	}
+	public void spawnTermite(Tile target) {
+		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
+		e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+		if(potential.isPresent()) {
+			Tile t = potential.get();
+			spawnAnimal(Game.unitTypeMap.get("TERMITE"), t, getFaction(NO_FACTION_ID), target);
+		}
+	}
 	public void spawnVampire(Tile target) {
 		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
 		e.getTerrain() == Terrain.ROCK 

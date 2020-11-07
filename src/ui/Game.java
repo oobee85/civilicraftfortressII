@@ -206,8 +206,9 @@ public class Game {
 			}
 			System.out.println(number + " ice giants");
 		}
-		if(World.days >= 10 && Math.random() > 0.2) {
-			int number = (int)(Math.random() * Season.FREEZING_TEMPURATURE * day);
+		if(World.days >= 10 && Math.random() > 0.1) {
+			int number = (int)(Math.random() * Season.FREEZING_TEMPURATURE * day/2);
+			number = 1;
 			for(int i = 0; i < number; i++) {
 				world.spawnStoneGolem(targetTile);
 			}
@@ -232,9 +233,9 @@ public class Game {
 		if(World.days >= 20 && Math.random() > 0.2) {
 			int number = (int)(Math.random() * day/2);
 			for(int i = 0; i < number; i++) {
-				world.spawnRoc(targetTile);
+				world.spawnTermite(targetTile);
 			}
-			System.out.println(number + " roc");
+			System.out.println(number + " termite");
 		}
 		
 		if(World.days >= 1 && Math.random() > 0.5) {
