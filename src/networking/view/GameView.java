@@ -49,6 +49,7 @@ public class GameView extends JPanel {
 	private TileLoc hoveredTile = new TileLoc(-1,-1);
 	private int tileSize = 9;
 	private boolean controlDown = false;
+	private boolean shiftDown = false;
 
 	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
 	private Faction faction = Faction.getTempFaction();
@@ -84,7 +85,7 @@ public class GameView extends JPanel {
 				int dx = previousMouse.x - currentMouse.x;
 				int dy = previousMouse.y - currentMouse.y;
 				// Only drag if moved mouse at least 3 pixels away
-				if(Math.abs(dx) + Math.abs(dy) >= 3) {
+				if(draggingMouse || Math.abs(dx) + Math.abs(dy) >= 5) {
 					draggingMouse = true;
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						shiftView(dx, dy);
@@ -100,10 +101,10 @@ public class GameView extends JPanel {
 				Point currentMouse = e.getPoint();
 				if(!draggingMouse) {
 					if (SwingUtilities.isRightMouseButton(e)) {
-						rightClick(getTileAtPixel(currentMouse), e.isShiftDown());
+						rightClick(getTileAtPixel(currentMouse), shiftDown);
 					}
 					else if (SwingUtilities.isLeftMouseButton(e)) {
-						leftClick(getTileAtPixel(currentMouse), e.isShiftDown());
+						leftClick(getTileAtPixel(currentMouse), shiftDown);
 					}
 				}
 				draggingMouse = false;
@@ -141,12 +142,18 @@ public class GameView extends JPanel {
 				if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
 					controlDown = false;
 				}
+				else if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+					shiftDown = false;
+				}
 			}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
 					controlDown = true;
+				}
+				else if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+					shiftDown = true;
 				}
 				else if(e.getKeyCode() == KeyEvent.VK_A) {
 					if(e.isControlDown()) {
