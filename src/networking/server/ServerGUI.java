@@ -40,6 +40,7 @@ public class ServerGUI extends JPanel {
 		}
 		gameView = new GameView(instance);
 		gameView.setCommandInterface(Utils.makeFunctionalCommandInterface(instance));
+		gameView.requestFocus();
 		this.add(gameView, BorderLayout.CENTER);
 		revalidate();
 		repaint();
