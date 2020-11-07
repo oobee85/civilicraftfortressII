@@ -31,7 +31,7 @@ public class WorldInfo implements Serializable {
 	}
 	public void addHitsplats(WorldData worldData) {
 		LinkedList<Hitsplat> toadd = new LinkedList<>();
-		for(Thing thing : worldData.plants) {
+		for(Thing thing : worldData.getPlants()) {
 			for(Hitsplat hitsplat : thing.getHitsplatList()) {
 				if(hitsplat == null || sentHitsplats.contains(hitsplat) || hitsplat.isDead()) {
 					continue;
@@ -40,7 +40,7 @@ public class WorldInfo implements Serializable {
 				sentHitsplats.add(hitsplat);
 			}
 		}
-		for(Thing thing : worldData.buildings) {
+		for(Thing thing : worldData.getBuildings()) {
 			for(Hitsplat hitsplat : thing.getHitsplatList()) {
 				if(hitsplat == null || sentHitsplats.contains(hitsplat) || hitsplat.isDead()) {
 					continue;

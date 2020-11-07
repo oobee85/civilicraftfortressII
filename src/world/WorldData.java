@@ -8,12 +8,12 @@ import utils.*;
 
 public class WorldData {
 
-	public LinkedList<Plant> plants = new LinkedList<Plant>();
-	public LinkedList<Plant> newPlants = new LinkedList<Plant>();
+	private LinkedList<Plant> plants = new LinkedList<Plant>();
+	private LinkedList<Plant> newPlants = new LinkedList<Plant>();
 	private LinkedList<Unit> units = new LinkedList<Unit>();
 	private LinkedList<Unit> newUnits = new LinkedList<Unit>();
-	public LinkedList<Building> buildings = new LinkedList<Building>();
-	public LinkedList<Building> newBuildings = new LinkedList<Building>();
+	private LinkedList<Building> buildings = new LinkedList<Building>();
+	private LinkedList<Building> newBuildings = new LinkedList<Building>();
 	
 	private LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
 	private LinkedList<Projectile> newProjectiles = new LinkedList<Projectile>();
@@ -21,13 +21,98 @@ public class WorldData {
 	private LinkedList<GroundModifier> groundModifiers = new LinkedList<GroundModifier>();
 	private LinkedList<GroundModifier> newGroundModifiers = new LinkedList<GroundModifier>();
 	
-	public LinkedList<WeatherEvent> weatherEvents = new LinkedList<WeatherEvent>();
-	public LinkedList<WeatherEvent> newWeatherEvents = new LinkedList<WeatherEvent>();
+	private LinkedList<WeatherEvent> weatherEvents = new LinkedList<WeatherEvent>();
+	private LinkedList<WeatherEvent> newWeatherEvents = new LinkedList<WeatherEvent>();
 	
 	// Stuff server keeps track of to send to clients
 	private LinkedList<Projectile> projectilesToSend = new LinkedList<>();
 	private LinkedList<Thing> deadThings = new LinkedList<>();
 
+	public void addWeatherEvent(WeatherEvent newEvent) {
+		synchronized (newWeatherEvents) {
+			newWeatherEvents.add(newEvent);
+		}
+	}
+	public LinkedList<WeatherEvent> getWeatherEvents() {
+		return weatherEvents;
+	}
+	public void filterDeadWeatherEvents() {
+		LinkedList<WeatherEvent> weatherEventsNew = new LinkedList<WeatherEvent>();
+		for (WeatherEvent weather : weatherEvents) {
+			Tile tile = weather.getTile();
+			if(weather.isDead() == false) {
+				weatherEventsNew.add(weather);
+			} else {
+				tile.setWeather(null);
+			}
+		}
+		synchronized (newWeatherEvents) {
+			weatherEventsNew.addAll(newWeatherEvents);
+			newWeatherEvents.clear();
+		}
+		weatherEvents = weatherEventsNew;
+	}
+	public void addBuilding(Building newBuilding) {
+		synchronized(newBuildings) {
+			newBuildings.add(newBuilding);
+		}
+	}
+	public LinkedList<Building> getBuildings() {
+		return buildings;
+	}
+	public void filterDeadBuildings() {
+		LinkedList<Building> buildingsNew = new LinkedList<Building>();
+		for (Building building : buildings) {
+			if (building.isDead() == true) {
+				ThingMapper.removed(building);
+				if(building == building.getTile().getRoad()) {
+					if(building.getTile().getRoad() == building) {
+						building.getTile().setRoad(null);
+					}
+				}
+				else {
+					if(building.getTile().getBuilding() == building) {
+						building.getTile().setBuilding(null);
+					}
+				}
+				addDeadThing(building);
+			} else {
+				buildingsNew.add(building);
+			}
+			
+		}
+		synchronized(newBuildings) {
+			buildingsNew.addAll(newBuildings);
+			newBuildings.clear();
+		}
+		buildings = buildingsNew;
+	}
+	public void addPlant(Plant newPlant) {
+		synchronized(newPlants) {
+			newPlants.add(newPlant);
+		}
+	}
+	public LinkedList<Plant> getPlants() {
+		return plants;
+	}
+	public void filterDeadPlants() {
+		LinkedList<Plant> plantsCopy = new LinkedList<Plant>();
+		for(Plant plant : plants) {
+			if(plant.isDead() == true) {
+				ThingMapper.removed(plant);
+				plant.getTile().setHasPlant(null);
+				addDeadThing(plant);
+			} else {
+				plantsCopy.add(plant);
+			}
+		}
+		synchronized(newPlants) {
+			plantsCopy.addAll(newPlants);
+			newPlants.clear();
+		}
+		plants = plantsCopy;
+	}
+	
 	public void addUnit(Unit unit) {
 		synchronized(newUnits) {
 			newUnits.add(unit);
