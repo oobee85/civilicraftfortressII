@@ -7,3 +7,4 @@ profiling/
 ERROR_LOG.txt
 *.ser
 ser/
+lootlist.txt
