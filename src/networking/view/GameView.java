@@ -165,6 +165,15 @@ public class GameView extends JPanel {
 				else if(e.getKeyCode() == KeyEvent.VK_M) {
 					setBuildingToPlan(Game.buildingTypeMap.get("MINE"));
 				}
+				else if(e.getKeyCode() == KeyEvent.VK_I) {
+					setBuildingToPlan(Game.buildingTypeMap.get("IRRIGATION"));
+				}
+				else if(e.getKeyCode() == KeyEvent.VK_W) {
+					setBuildingToPlan(Game.buildingTypeMap.get("SAWMILL"));
+				}
+				else if(e.getKeyCode() == KeyEvent.VK_B) {
+					setBuildingToPlan(Game.buildingTypeMap.get("BARRACKS"));
+				}
 			}
 		});
 	}

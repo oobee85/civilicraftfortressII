@@ -143,7 +143,10 @@ public class Server {
 	
 	private void sendWhichFaction() {
 		for (Connection connection : connections.keySet()) {
-			connection.sendMessage(gameInstance.world.getFaction(connection.getPlayerInfo().getName()));
+			Faction f = gameInstance.world.getFaction(connection.getPlayerInfo().getName());
+			if(f != null) {
+				connection.sendMessage(f);
+			}
 		}
 	}
 	
@@ -341,10 +344,8 @@ public class Server {
 					if(message instanceof ClientMessage) {
 						ClientMessage clientMessage = (ClientMessage)message;
 						if(clientMessage.getType() == ClientMessageType.INFO) {
-							if(!madeWorld) {
-								connection.setPlayerInfo(clientMessage.getPlayerInfo());
-								updatedLobbyList();
-							}
+							connection.setPlayerInfo(clientMessage.getPlayerInfo());
+							updatedLobbyList();
 						}
 						else if(clientMessage.getType() == ClientMessageType.MAKE_WORLD) {
 							if(!madeWorld) {
