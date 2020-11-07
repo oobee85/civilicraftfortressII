@@ -20,23 +20,23 @@ public class Tile implements Externalizable {
 	public volatile LiquidType liquidType;
 	
 	private volatile Faction faction;
-	private transient boolean isSelected = false;
-	private transient boolean inVisionRange = false;
+	private boolean isSelected = false;
+	private boolean inVisionRange = false;
 
 	private Resource resource;
 	private Terrain terr;
 	private GroundModifier modifier;
 	
-	private transient Plant plant;
-	private transient Building building;
-	private transient Building road;
-	private transient WeatherEvent weather;
+	private Plant plant;
+	private Building building;
+	private Building road;
+	private WeatherEvent weather;
 	
-	private transient ConcurrentLinkedQueue<Unit> units;
-	private transient ConcurrentLinkedQueue<Projectile> projectiles;
-	private transient ConcurrentLinkedQueue<Item> items;
+	private ConcurrentLinkedQueue<Unit> units;
+	private ConcurrentLinkedQueue<Projectile> projectiles;
+	private ConcurrentLinkedQueue<Item> items;
 	
-	private transient List<Tile> neighborTiles = new LinkedList<Tile>();
+	private List<Tile> neighborTiles = new LinkedList<Tile>();
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
