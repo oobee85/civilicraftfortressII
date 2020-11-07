@@ -494,6 +494,10 @@ public class World {
 	}
 	public void updateTerrainChange() {
 		for(Tile tile : getTiles()) {
+			
+			if(tile.getResource() != null) {
+				tile.getResource().tick(World.ticks);
+			}
 			tile.updateHumidity(World.ticks);
 			
 			//spreads desert tiles

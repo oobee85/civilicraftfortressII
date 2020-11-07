@@ -76,13 +76,11 @@ public class Building extends Thing implements Serializable {
 			resetTimeToHarvest();
 		}
 		if(getType() == Game.buildingTypeMap.get("MINE")) {
-			if(getTile().getResource() != null && getTile().getResource().getType().isOre() == true) {
+			if(getTile().getResource() != null && getTile().getResource().getType().isOre() == true && getTile().getResource().hasYield()) {
 				getFaction().addItem(getTile().getResource().getType().getItemType(), 1);
 				getTile().getResource().harvest(1);
 //				getTile().setHeight(getTile().getHeight() - 0.001);
-				if(getTile().getResource().getYield() <= 0) {
-					getTile().setResource(null);
-				}
+				
 				resetTimeToHarvest();
 			}
 			if(getTile().getTerrain() == Terrain.ROCK && getTile().getResource() == null) {

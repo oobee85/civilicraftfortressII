@@ -809,6 +809,10 @@ public class GameView extends JPanel {
 							strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
 							strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getHumidity()));
 							strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTempurature()));
+							if(tile.getResource() != null) {
+								strings.add(String.format("ORE" + "=%d", tile.getResource().getYield()));
+							}
+							
 							
 							if(tile.liquidType != LiquidType.DRY) {
 								strings.add(String.format(tile.liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount));

@@ -6,6 +6,7 @@ public class Resource implements Externalizable {
 
 	private ResourceType resourceType;
 	private int yieldLeft;
+	private int tickNextRegen;
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
@@ -21,6 +22,18 @@ public class Resource implements Externalizable {
 	/** Used by Externalizable interface */
 	public Resource() {}
 	
+	public void tick(int ticks) {
+		if(ticks >= tickNextRegen) {
+			yieldLeft ++;
+			resetTimeToRegen(ticks);
+		}
+	}
+	public boolean hasYield() {
+		return yieldLeft > 0;
+	}
+	public void resetTimeToRegen(int tick) {
+		tickNextRegen = (int) (tick + resourceType.getTimeToHarvest()*100);
+	}
 	public Resource(ResourceType resourceType) {
 		this.resourceType = resourceType;
 		this.yieldLeft = resourceType.getRemainingEffort();
@@ -30,9 +43,6 @@ public class Resource implements Externalizable {
 	}
 	public void harvest(int harvestAmount) {
 		yieldLeft -= harvestAmount;
-	}
-	public boolean isHarvested() {
-		return yieldLeft <= 0;
 	}
 	public ResourceType getType() {
 		return resourceType;
