@@ -229,7 +229,13 @@ public class Game {
 			System.out.println(number + " ents");
 			
 		}
-		
+		if(World.days >= 20 && Math.random() > 0.2) {
+			int number = (int)(Math.random() * day/2);
+			for(int i = 0; i < number; i++) {
+				world.spawnRoc(targetTile);
+			}
+			System.out.println(number + " roc");
+		}
 		
 		if(World.days >= 1 && Math.random() > 0.5) {
 			int number = (int)(Season.MELTING_TEMPURATURE + Math.random()*day);
