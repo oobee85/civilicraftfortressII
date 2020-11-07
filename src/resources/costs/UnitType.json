@@ -168,7 +168,7 @@
 		"stats":{"movespeed":5,"attackspeed":30,"attack":50,"buildtime":0,"range":4,"health":2000,"healspeed":10},
 		"name":"DRAGON",
 		"attributes":["flying","hostile","fireresistant","coldresistant"],
-		"loot":{"RUNITE_ORE":10},
+		"loot":{"RUNITE_BAR":20, "TITANIUM_BAR":10},
 		"targeting":[
 			{"type":"game.Unit"},
 			{"type":"game.Building"}
@@ -186,13 +186,13 @@
 	},
 	{
 		"image":"resources/Images/units/roc.png",
-		"stats":{"movespeed":10,"attackspeed":25,"attack":50,"buildtime":0,"range":1,"health":500,"healspeed":10},
+		"stats":{"movespeed":10,"attackspeed":40,"attack":40,"buildtime":0,"range":1,"health":300,"healspeed":10},
 		"name":"ROC",
 		"targeting":[ 
 			{"type":"game.Building", "faction":"PLAYER"}
 		],
 		"attributes":["flying","hostile","coldresistant"],
-		"loot":{"ADAMANTITE_ORE":5}
+		"loot":{"ADAMANTITE_ORE":10}
 	},
 	{
 		"image":"resources/Images/units/ogre.png",
@@ -215,7 +215,7 @@
 			{"type":"game.Unit", "faction":"PLAYER"}, 
 			{"type":"game.Building", "faction":"PLAYER"}
 		],
-		"loot":{"WOOD":500}
+		"loot":{"WOOD":1000}
 	},
 	{
 		"image":"resources/Images/units/werewolf.png",
@@ -225,7 +225,7 @@
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"}
 		],
-		"loot":{"IRON_BAR":5}
+		"loot":{"MITHRIL_BAR":5}
 	},
 	{
 		"image":"resources/Images/units/lavagolem.png",
@@ -235,7 +235,7 @@
 		"targeting":[
 			{"type":"MINE"}
 		],
-		"loot":{"MITHRIL_ORE":50, "COAL":100}
+		"loot":{"COAL":500, "MITHRIL_ORE":10, "IRON_ORE":10, "ADAMANTITE_ORE":10}
 	},
 	{
 		"image":"resources/Images/units/wolf.png",
@@ -252,7 +252,7 @@
 		"targeting":[
 			{"type":"SNIPER"}
 		],
-		"loot":{"IRON_BAR":10},
+		"loot":{"ADAMANTITE_BAR":10},
 		"projectile":"ROCK_CYCLOPS"},
 	{
 		"image":"resources/Images/units/skeleton.png",
@@ -275,7 +275,7 @@
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"}
 		],
-		"loot":{"ADAMANTITE_BAR":1, "MITHRIL_BAR":1}
+		"loot":{"IRON_SWORD":2, "MITHRIL_BAR":5}
 	},
 	{
 		"image":"resources/Images/units/flamelet.png",
