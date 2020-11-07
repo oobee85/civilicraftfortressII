@@ -180,7 +180,7 @@
 		"name":"VAMPIRE",
 		"attributes":["flying","hostile","lifesteal"],
 		"targeting":[
-			{"type":"game.Unit", "faction":"PLAYER"},
+			{"type":"game.Unit", "faction":"PLAYER"}
 		],
 		"loot":{"IRON_BAR":5}
 	},

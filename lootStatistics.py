@@ -15,19 +15,13 @@ def computePower(unit):
     power = float(effectiveHealth) * stats['attack'] / attackspeed
     return power
 
-def barChart(x, labels, xaxistitle, yaxistitle, title=''):
-    x, labels = zip(*sorted(zip(x, labels)))
-
-    plt.style.use('ggplot')
+def barChart(x, labels, label='', offset=0, width=0.5, left=None):
     x_pos = [i for i, _ in enumerate(labels)]
-    plt.barh(x_pos, x, color='green')
-    plt.xlabel(xaxistitle)
-    plt.ylabel(yaxistitle)
-    plt.title(title)
-
-    plt.yticks(x_pos, labels)
-
-    plt.show()
+    x_pos = [x+offset for x in x_pos]
+    if left is None:
+        plt.barh(x_pos, x, width, label=label)
+    else:
+        plt.barh(x_pos, x, width, label=label, left=left)
 
 
 units = readFile("./src/resources/costs/UnitType.json")
@@ -62,4 +56,23 @@ for asdf in units:
     print(str(asdf['name']) + ': ' + str(power))
 
 
-barChart([computePower(asdf) for asdf in units], [asdf['name'] for asdf in units], 'power', 'unit', 'ehp * damage / attspeed')
+plt.style.use('ggplot')
+
+labels = [asdf['name'] for asdf in units]
+powerlevels = [computePower(asdf) for asdf in units]
+healths = [asdf['stats']['health'] for asdf in units]
+powerlevels, healths, labels = zip(*sorted(zip(powerlevels, healths, labels)))
+
+barChart(powerlevels, labels, label='power', width=0.9)
+# barChart(healths, labels, label='health', width=0.9, left=powerlevels)
+
+plt.xlabel('power')
+plt.ylabel('unit')
+plt.title('ehp * damage / attspeed')
+
+x_pos = [i for i, _ in enumerate(labels)]
+plt.yticks(x_pos, labels)
+
+plt.legend(loc='best')
+
+plt.show()
