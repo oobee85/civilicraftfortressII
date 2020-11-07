@@ -299,7 +299,7 @@ public class Client {
 //			fixGhostsThread.start();
 		}
 	}
-	
+	private boolean tilesReceived;
 	private void worldInfoUpdate(WorldInfo worldInfo) {
 		boolean firstUpdate = false;
 		if(gameInstance.world == null) {
@@ -316,6 +316,12 @@ public class Client {
 		}
 		World.ticks = worldInfo.getTick();
 		gameInstance.world.updateTiles(worldInfo.getTileInfos());
+		if(worldInfo.getTileInfos().length > 0) {
+			tilesReceived = true;
+		}
+		if(!tilesReceived) {
+			return;
+		}
 		
 		for(Thing update : worldInfo.getThings()) {
 			if(!things.containsKey(update.id())) {
