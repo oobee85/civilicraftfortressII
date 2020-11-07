@@ -254,7 +254,7 @@
 		"projectile":"ROCK_CYCLOPS"},
 	{
 		"image":"resources/Images/units/skeleton.png",
-		"stats":{"movespeed":20,"attackspeed":20,"attack":20,"buildtime":0,"range":1,"health":300,"healspeed":50},
+		"stats":{"movespeed":20,"attackspeed":20,"attack":10,"buildtime":0,"range":1,"health":300,"healspeed":50},
 		"name":"SKELETON",
 		"attributes":["hostile","coldresistant"],
 		"targeting":[

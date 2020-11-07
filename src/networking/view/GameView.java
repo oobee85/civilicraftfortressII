@@ -206,6 +206,9 @@ public class GameView extends JPanel {
 	}
 
 	public void leftClick(Position tilepos, boolean shiftDown) {
+		if(game.world == null) {
+			return;
+		}
 		Tile tile = game.world.get(new TileLoc(tilepos.getIntX(), tilepos.getIntY()));
 		if(tile == null) {
 			return;
