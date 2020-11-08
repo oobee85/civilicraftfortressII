@@ -13,7 +13,7 @@
 		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":50},
 		"name":"WARRIOR",
 		"attackstyles":[
-			{"damage":5, "cooldown":30, "range":10, "minrange":6, "projectile":"ARROW_ARCHER"},
+			{"damage":5, "cooldown":30, "range":10, "minrange":6, "projectile":"ARROW"},
 			{"damage":10, "cooldown":30, "range":1, "lifesteal":true}
 		],
 		"attributes":["hostile"],
@@ -38,9 +38,8 @@
 		"name":"ARCHER",
 		"attributes":["hostile"],
 		"attackstyles":[
-			{"damage":15, "cooldown":30, "range":3, "minrange":1, "projectile":"ARROW_ARCHER"}
+			{"damage":15, "cooldown":30, "range":3, "minrange":1, "projectile":"ARROW"}
 		],
-		"projectile":"ARROW_ARCHER",
 		"research":"WARRIOR_CODE",
 		"targeting":[{"type":"game.Unit"}]
 	},
@@ -62,10 +61,9 @@
 		"stats":{"movespeed":15,"buildtime":400,"health":300,"healspeed":50},
 		"name":"LONGBOWMAN",
 		"attackstyles":[
-			{"damage":60, "cooldown":30, "range":6, "minrange":2, "projectile":"ARROW_LONGBOWMAN"}
+			{"damage":60, "cooldown":30, "range":6, "minrange":2, "projectile":"ARROW"}
 		],
 		"attributes":["hostile"],
-		"projectile":"ARROW_LONGBOWMAN",
 		"research":"ENGINEERING",
 		"targeting":[{"type":"game.Unit"}]
 	},
@@ -78,7 +76,6 @@
 			{"damage":300, "cooldown":100, "range":10, "minrange":3, "projectile":"ROCK_CATAPULT"}
 		],
 		"attributes":["hostile"],
-		"projectile":"ROCK_CATAPULT",
 		"research":"MATHEMATICS",
 		"targeting":[{"type":"game.Unit"}]
 	},
@@ -91,7 +88,6 @@
 			{"damage":600, "cooldown":100, "range":20, "minrange":5, "projectile":"FIREBALL_TREBUCHET"}
 		],
 		"attributes":["hostile"],
-		"projectile":"FIREBALL_TREBUCHET",
 		"research":"MONARCHY",
 		"targeting":[{"type":"game.Unit"}]
 	},
@@ -103,7 +99,6 @@
 		"attackstyles":[
 			{"damage":1000, "cooldown":200, "range":30, "minrange":1}
 		],
-		"projectile":"BULLET",
 		"attributes":["hostile"],
 		"research":"MONARCHY",
 		"targeting":[{"type":"game.Unit"}]
@@ -138,10 +133,9 @@
 		"stats":{"movespeed":10,"buildtime":200,"health":300,"healspeed":50},
 		"name":"CHARIOT",
 		"attackstyles":[
-			{"damage":30, "cooldown":30, "range":3, "minrange":2, "projectile":"ARROW_CHARIOT"}
+			{"damage":30, "cooldown":30, "range":3, "minrange":2, "projectile":"ARROW"}
 		],
 		"attributes":["hostile"],
-		"projectile":"ARROW_CHARIOT",
 		"research":"HORSEBACK_RIDING",
 		"targeting":[{"type":"game.Unit"}]
 	},
@@ -154,7 +148,6 @@
 			{"damage":100, "cooldown":20, "range":3, "minrange":1, "projectile":"RUNE_ARROW"}
 		],
 		"attributes":["hostile"],
-		"projectile":"RUNE_ARROW",
 		"research":"CHIVALRY",
 		"targeting":[{"type":"game.Unit"}]
 	},
@@ -232,7 +225,7 @@
 			{"type":"game.Unit"},
 			{"type":"game.Building"}
 		],
-		"projectile":"FIREBALL_DRAGON"},
+	},
 	{
 		"image":"resources/Images/units/vampire.png",
 		"stats":{"movespeed":15,"buildtime":0,"health":200,"healspeed":1},
@@ -336,8 +329,8 @@
 		"targeting":[
 			{"type":"SNIPER"}
 		],
-		"loot":{"ADAMANTITE_BAR":10},
-		"projectile":"ROCK_CYCLOPS"},
+		"loot":{"ADAMANTITE_BAR":10}
+	},
 	{
 		"image":"resources/Images/units/skeleton.png",
 		"stats":{"movespeed":20,"buildtime":0,"health":300,"healspeed":50},
@@ -439,7 +432,6 @@
 		"attackstyles":[
 			{"damage":2000, "cooldown":0, "range":100}
 		],
-		"projectile":"BULLET",
 		"attributes":["flying","fireresistant","coldresistant"],
 		"targeting":[{"type":"game.Unit"}]
 	},
@@ -459,7 +451,6 @@
 			{"type":"game.Building", "faction":"PLAYER"},
 			{"type":"game.Building", "faction":"CYCLOPS"}
 		],
-		"projectile":"ROCK_STONE_GOLEM",
 		"loot":{"STONE":1000}
 	},
 	{
