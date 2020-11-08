@@ -81,6 +81,16 @@ public class Game {
 		}
 		Liquid.propogate(world);
 		// Remove dead things
+		for(Unit unit : world.getUnits()) {
+			if(unit.isDead()) {
+				for (Item item : unit.getType().getDeadItem()) {
+					unit.getTile().addItem(item);
+				}
+			}
+			else {
+				unit.getTile().getItems().clear();
+			}
+		}
 		world.clearDeadAndAddNewThings();
 
 //		buildingTick();
@@ -559,9 +569,9 @@ public class Game {
 			LinkedList<HasImage> thingsToPlace = new LinkedList<>();
 			thingsToPlace.add(Game.buildingTypeMap.get("CASTLE"));
 			thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
-			thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
-			thingsToPlace.add(Game.buildingTypeMap.get("BLACKSMITH"));
-//			thingsToPlace.add(Game.unitTypeMap.get("HORSE_ARCHER"));
+//			thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
+//			thingsToPlace.add(Game.buildingTypeMap.get("BLACKSMITH"));
+//			thingsToPlace.add(Game.unitTypeMap.get("HORSEARCHER"));
 //			thingsToPlace.add(Game.unitTypeMap.get("KNIGHT"));
 			if(easymode) {
 				thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
