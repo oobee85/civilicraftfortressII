@@ -36,7 +36,7 @@ public class ClientDriver {
 		Loader.loadResearchType(Game.researchTypeMap, Game.researchTypeList);
 		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
 		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);
-		Loader.doMakingUnitMappings();
+		Loader.doMappings();
 	}
 
 	public static void main(String[] args) {

@@ -1,6 +1,7 @@
 package ui.infopanels;
 
 import java.awt.*;
+import java.util.*;
 
 import game.*;
 import ui.*;
@@ -53,6 +54,19 @@ public class ResearchInfoPanel extends InfoPanel {
 		}
 		y += offset/2;
 		UnitTypeInfoPanel.drawCosts(g, showing.getCost(), x, y, faction);
+
+		if(!showing.type().unlocks.isEmpty()) {
+			g.setColor(Color.black);
+			y = getHeight() - progressBarHeight + offset/2;
+			x = getWidth() - 115;
+			ListIterator<String> listIterator = showing.type().unlocks.listIterator(showing.type().unlocks.size());
+			while(listIterator.hasPrevious()) {
+				g.drawString(listIterator.previous(), x, y -= offset);
+			}
+			g.drawString("unlocks:", x-5, y -= offset);
+			g.drawLine(x-5, y+2, x + 80, y+2);
+		}
+		
 
 		g.setFont(KUIConstants.infoFont);
 		double completedRatio = 1.0 * showing.getPointsSpent() / showing.getRequiredPoints();

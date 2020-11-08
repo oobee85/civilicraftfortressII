@@ -1,6 +1,7 @@
 {
 "buildingtypes":[
 	{
+		"info":"Increases movement speed",
 		"image":"resources/Images/buildings/stone_road.png",
 		"vision":0,
 		"movespeed":20,
@@ -12,6 +13,8 @@
 		"attributes":["road"],
 		"research":"WHEEL"},
 	{
+		"info":"Increases movement speed more",
+		"info":"Blocks movement",
 		"image":"resources/Images/buildings/brick_road.png",
 		"vision":0,
 		"movespeed":1000,
@@ -23,6 +26,7 @@
 		"attributes":["road"],
 		"research":"MONARCHY"},
 	{
+		"info":"Blocks movement",
 		"image":"resources/Images/buildings/wall_wood.png",
 		"vision":0,
 		"cost":{"WOOD":100},
@@ -32,6 +36,7 @@
 		"effort":100,
 		"attributes":["blocksmovement"]},
 	{
+		"info":"Blocks movement",
 		"image":"resources/Images/buildings/wall_stone.png",
 		"vision":1,
 		"cost":{"WOOD":200, "STONE":200},
@@ -42,6 +47,7 @@
 		"attributes":["blocksmovement"],
 		"research":"MASONRY"},
 	{
+		"info":"Blocks movement",
 		"image":"resources/Images/buildings/wall_brick.png",
 		"vision":1,
 		"cost":{"STONE":400, "ADAMANTITE_BAR":1},
@@ -52,6 +58,7 @@
 		"attributes":["blocksmovement"],
 		"research":"ENGINEERING"},
 	{
+		"info":"Blocks movement except for own faction",
 		"image":"resources/Images/buildings/gate_wood.png",
 		"vision":1,
 		"cost":{"WOOD":200, "IRON_BAR":5, "STONE":200},
@@ -62,6 +69,7 @@
 		"attributes":["blocksmovement", "gate"],
 		"research":"MASONRY"},
 	{
+		"info":"Blocks movement except for own faction",
 		"image":"resources/Images/buildings/gate_stone.png",
 		"vision":1,
 		"cost":{"WOOD":400, "MITHRIL_BAR":5, "STONE":400},
@@ -72,6 +80,7 @@
 		"attributes":["blocksmovement", "gate"],
 		"research":"ENGINEERING"},
 	{
+		"info":"Blocks movement except for own faction",
 		"image":"resources/Images/buildings/gate_brick.png",
 		"vision":1,
 		"cost":{"WOOD":1000, "STONE":1000, "ADAMANTITE_BAR":5},
@@ -82,6 +91,7 @@
 		"attributes":["blocksmovement", "gate"],
 		"research":"MONARCHY"},
 	{
+		"info":"Harvests stone or ores",
 		"image":"resources/Images/buildings/mine256.png",
 		"vision":1,
 		"cost":{"WOOD":50},
@@ -90,6 +100,7 @@
 		"health":100,
 		"effort":100},
 	{
+		"info":"Produces food (more with water)",
 		"image":"resources/Images/buildings/irrigation.png",
 		"vision":1,
 		"cost":{"WOOD":50},
@@ -98,6 +109,7 @@
 		"health":50,
 		"effort":100},
 	{
+		"info":"Produces food",
 		"image":"resources/Images/buildings/granary.png",
 		"vision":1,
 		"cost":{"WOOD":200, "BRONZE_BAR":1},
@@ -107,6 +119,7 @@
 		"effort":250,
 		"research":"WHEEL"},
 	{
+		"info":"Produces food",
 		"image":"resources/Images/buildings/ancientwindmill.png",
 		"vision":1,
 		"cost":{"WOOD":500, "IRON_BAR":5},
@@ -116,6 +129,7 @@
 		"effort":500,
 		"research":"MATHEMATICS"},
 	{
+		"info":"Harvests wood",
 		"image":"resources/Images/buildings/sawmill.png",
 		"vision":2,
 		"cost":{"WOOD":50, "STONE":25},
@@ -124,6 +138,7 @@
 		"health":250,
 		"effort":250},
 	{
+		"info":"Trap a horse to breed horses",
 		"image":"resources/Images/buildings/farm.png",
 		"vision":1,
 		"cost":{"BRONZE_BAR":5, "WOOD":500},
@@ -133,6 +148,7 @@
 		"effort":250,
 		"research":"FARMING"},
 	{
+		"info":"Provides vision",
 		"image":"resources/Images/buildings/watchtower.png",
 		"vision":10,
 		"cost":{"WOOD":1000, "MITHRIL_BAR":5},
@@ -142,6 +158,7 @@
 		"effort":250,
 		"research":"MYSTICISM"},
 	{
+		"info":"Produces workers",
 		"image":"resources/Images/buildings/castle256.png",
 		"vision":5,
 		"cost":{"WOOD":1000, "STONE":1000},
@@ -152,6 +169,7 @@
 		"effort":1000,
 		"research":"MASONRY"},
 	{
+		"info":"Produces basic combat units",
 		"image":"resources/Images/buildings/barracks256.png",
 		"vision":1,
 		"cost":{"WOOD":300, "STONE":150},
@@ -162,6 +180,7 @@
 		"effort":250,
 		"research":"WARRIOR_CODE"},
 	{
+		"info":"Produces advanced combat units",
 		"image":"resources/Images/buildings/workshop.png",
 		"vision":1,
 		"cost":{"WOOD":500, "IRON_BAR":10, "STONE":500},
@@ -172,6 +191,7 @@
 		"effort":500,
 		"research":"MATHEMATICS"},
 	{
+		"info":"Crafts items up to mithril",
 		"image":"resources/Images/buildings/blacksmith.png",
 		"vision":1,
 		"cost":{"WOOD":100, "STONE":100},
@@ -181,6 +201,7 @@
 		"effort":250,
 		"research":"BRONZE_WORKING"},
 	{
+		"info":"Unlocks researches after iron working",
 		"image":"resources/Images/buildings/research.png",
 		"vision":1,
 		"cost":{"WOOD":200, "IRON_BAR":5, "STONE":200},
@@ -190,6 +211,7 @@
 		"effort":250,
 		"research":"IRON_WORKING"},
 	{
+		"info":"Crafts items above adamant",
 		"image":"resources/Images/buildings/hellforge.png",
 		"vision":1,
 		"cost":{"MITHRIL_BAR":20, "STONE":1000},

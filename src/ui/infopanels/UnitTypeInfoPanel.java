@@ -29,6 +29,7 @@ public class UnitTypeInfoPanel extends InfoPanel {
 	
 	public static void drawCombatStats(Graphics g, CombatStats stats, int x, int y) {
 		g.setFont(KUIConstants.combatStatsFont);
+		g.setColor(Color.black);
 		int fontSize = g.getFont().getSize();
 		int iconSize = 20;
 		int gap = 2;
@@ -65,7 +66,6 @@ public class UnitTypeInfoPanel extends InfoPanel {
 			g.setColor(currentAmount >= entry.getValue() ? Color.black : Color.red);
 			g.drawString(str, x + iconSize + gap + 1, y + iconSize/2 + fontSize/3);
 			y += iconSize + gap;
-			g.setColor(Color.black);
 		}
 	}
 	

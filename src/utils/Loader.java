@@ -21,7 +21,7 @@ public class Loader {
 			StringBuilder builder = new StringBuilder();
 			String line;
 			while((line = br.readLine()) != null) {
-				line = line.replaceAll("\\s+","");
+//				line = line.replaceAll("\\s+","");
 				builder.append(line + "\n");
 			}
 			researchCosts = builder.toString();
@@ -53,12 +53,16 @@ public class Loader {
 			String image = buildingTypeObject.getString("image");
 
 			double culture = buildingTypeObject.getDouble("culture");
-			double health = buildingTypeObject.getDouble("health");
+			int health = buildingTypeObject.getInt("health");
 			int vision = buildingTypeObject.getInt("vision");
 			double effort = buildingTypeObject.getDouble("effort");
 			double movespeed = 1;
 			if(buildingTypeObject.has("movespeed")) {
 				movespeed = buildingTypeObject.getDouble("movespeed");
+			}
+			String info = "";
+			if(buildingTypeObject.has("info")) {
+				info = buildingTypeObject.getString("info");
 			}
 			
 			HashSet<String> attributes = new HashSet<>();
@@ -87,7 +91,7 @@ public class Loader {
 				cost = loadItemTypeMap(buildingTypeObject.getJSONObject("cost"));
 			}
 			
-			BuildingType buildingType = new BuildingType(name, health, effort, image, culture, vision, researchReq, cost, buildsunits, movespeed, attributes);
+			BuildingType buildingType = new BuildingType(name, info, health, effort, image, culture, vision, researchReq, cost, buildsunits, movespeed, attributes);
 			buildingTypeMap.put(name, buildingType);
 			buildingTypeList.add(buildingType);
 		}
@@ -315,10 +319,28 @@ public class Loader {
 		}
 	}
 	
-	public static void doMakingUnitMappings() {
+	public static void doMappings() {
 		for(BuildingType type : Game.buildingTypeList) {
 			for(String unittypestring : type.unitsCanBuild()) {
 				type.unitsCanBuildSet().add(Game.unitTypeMap.get(unittypestring));
+			}
+		}
+		for(ResearchType type : Game.researchTypeList) {
+			for(String req : type.researchRequirements) {
+				ResearchType researchReq = Game.researchTypeMap.get(req);
+				researchReq.unlocks.add(Utils.getNiceName(type.name));
+			}
+		}
+		for(BuildingType type : Game.buildingTypeList) {
+			if(type.getResearchRequirement() != null) {
+				ResearchType researchReq = Game.researchTypeMap.get(type.getResearchRequirement());
+				researchReq.unlocks.add(Utils.getNiceName(type.name()));
+			}
+		}
+		for(UnitType type : Game.unitTypeList) {
+			if(type.getResearchRequirement() != null) {
+				ResearchType researchReq = Game.researchTypeMap.get(type.getResearchRequirement());
+				researchReq.unlocks.add(Utils.getNiceName(type.name()));
 			}
 		}
 	}

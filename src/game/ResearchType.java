@@ -17,6 +17,7 @@ public class ResearchType implements HasImage {
 	public final int requiredResearchPoints;
 	public final int tier;
 	public final HashMap<ItemType, Integer> cost;
+	public final LinkedList<String> unlocks;
 	
 	public ResearchType(String name, String image, LinkedList<String> researchRequirements, int requiredResearchPoints, int tier, HashMap<ItemType, Integer> cost) {
 		this.name = name;
@@ -25,6 +26,7 @@ public class ResearchType implements HasImage {
 		this.requiredResearchPoints = requiredResearchPoints;
 		this.tier = tier;
 		this.cost = cost;
+		this.unlocks = new LinkedList<>();
 	}
 	
 	public String name() {

@@ -10,7 +10,8 @@ import utils.*;
 public class BuildingType implements HasImage, Serializable {
 
 	private final String name;
-	private transient final double health;
+	private final String info;
+	private transient final int health;
 	private transient final MipMap mipmap;
 	private transient final double moveSpeedEnhancement;
 	private transient final int visionRadius;
@@ -24,9 +25,10 @@ public class BuildingType implements HasImage, Serializable {
 	
 	private transient HashMap<String, Image> roadImages;
 	
-	public BuildingType(String name, double hp, double buildingEffort, String s, double cultureRate, int visionRadius, 
+	public BuildingType(String name, String info, int hp, double buildingEffort, String s, double cultureRate, int visionRadius, 
 			String requirement, HashMap <ItemType, Integer> resourcesNeeded, String[] canBuild, double moveSpeedEnhancement, HashSet<String> attributes) {
 		this.name = name;
+		this.info = info;
 		mipmap = new MipMap(s);
 		this.researchRequirement = requirement;
 		this.health = hp;
@@ -99,7 +101,7 @@ public class BuildingType implements HasImage, Serializable {
 	public double getBuildingEffort() {
 		return buildingEffort;
 	}
-	public double getHealth() {
+	public int getHealth() {
 		return health;
 	}
 	public int getVisionRadius() {
@@ -121,5 +123,8 @@ public class BuildingType implements HasImage, Serializable {
 	
 	public String name() {
 		return name;
+	}
+	public String info() {
+		return info;
 	}
 }

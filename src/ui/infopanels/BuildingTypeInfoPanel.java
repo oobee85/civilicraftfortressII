@@ -25,5 +25,15 @@ public class BuildingTypeInfoPanel extends InfoPanel {
 		if(showing.getCost() != null) {
 			UnitTypeInfoPanel.drawCosts(g, showing.getCost(), getImageSize(), y + 6, faction);
 		}
+		
+		int offset = g.getFont().getSize();
+		int bottomY = getHeight() - offset/2;
+		g.setColor(Color.black);
+		String statsString = showing.getHealth() + " health";
+		if(showing.getCultureRate() > 0) {
+			statsString += "    " + showing.getCultureRate() + " culture";
+		}
+		g.drawString(statsString, getImageSize(), bottomY - offset);
+		g.drawString(showing.info(), getImageSize(), bottomY);
 	}
 }
