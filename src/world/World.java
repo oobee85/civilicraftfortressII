@@ -476,7 +476,7 @@ public class World {
 			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
 				
 				if(distanceFromCenter < radius) {
-					Projectile wave = new Projectile(ProjectileType.METEOR_WAVE, tile, t, null);
+					Projectile wave = new Projectile(ProjectileType.METEOR_WAVE, tile, t, null, 5000);
 					tile.addProjectile(wave);
 					worldData.addProjectile(wave);
 				}

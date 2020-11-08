@@ -32,16 +32,16 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		int fontSize = g.getFont().getSize();
 		int iconSize = 20;
 		int gap = 2;
-		g.drawImage(attackImage, x, y, iconSize, iconSize, null);
-		g.drawString(stats.getAttack() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
-		
-		y += iconSize + gap;
-		g.drawImage(attackspeedImage, x, y, iconSize, iconSize, null);
-		g.drawString(stats.getAttackSpeed() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
-
-		y += iconSize + gap;
-		g.drawImage(visionImage, x, y, iconSize, iconSize, null);
-		g.drawString(stats.getAttackRadius() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
+//		g.drawImage(attackImage, x, y, iconSize, iconSize, null);
+//		g.drawString(stats.getAttack() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
+//		
+//		y += iconSize + gap;
+//		g.drawImage(attackspeedImage, x, y, iconSize, iconSize, null);
+//		g.drawString(stats.getAttackSpeed() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
+//
+//		y += iconSize + gap;
+//		g.drawImage(visionImage, x, y, iconSize, iconSize, null);
+//		g.drawString(stats.getAttackRadius() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
 
 		y += iconSize + gap;
 		g.drawImage(movespeedImage, x, y, iconSize, iconSize, null);

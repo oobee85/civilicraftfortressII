@@ -5,7 +5,6 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import pathfinding.*;
-import ui.*;
 import utils.*;
 import world.*;
 
@@ -23,7 +22,6 @@ public class Unit extends Thing implements Serializable {
 	public transient ConcurrentLinkedQueue<PlannedAction> actionQueue = new ConcurrentLinkedQueue<>();
 	private transient PlannedAction passiveAction = PlannedAction.NOTHING;
 	
-	private transient LinkedList<Attack> attacks;
 	private transient boolean isHarvesting;
 	private transient double timeToHarvest;
 	private transient double baseTimeToHarvest = 10;
@@ -33,25 +31,8 @@ public class Unit extends Thing implements Serializable {
 		super(unitType.getCombatStats().getHealth(), unitType, faction, tile);
 		this.unitType = unitType;
 		this.combatStats = unitType.getCombatStats();
-		this.timeToAttack = unitType.getCombatStats().getAttackSpeed();
 		this.timeToHeal = unitType.getCombatStats().getHealSpeed();
 		this.isIdle = false;
-
-		attacks = new LinkedList<>();
-		// projectile attacks
-		if (unitType.getProjectileType() != null) {
-			if(unitType.getProjectileType().getSpeed() != 0) {
-				addAttackType(new Attack(unitType.getCombatStats().getAttackRadius(), unitType.getProjectileType(),
-						unitType.getCombatStats().getAttackSpeed()));
-			}
-			else {
-				addAttackType(new Attack(unitType.getCombatStats().getAttackRadius(), unitType.getProjectileType().getDamage(), unitType.getCombatStats().getAttackSpeed()));
-			}
-		}
-		// melee attacks
-		if (unitType.getCombatStats().getAttack() > 0) {
-			addAttackType(new Attack(1, unitType.getCombatStats().getAttack(), unitType.getCombatStats().getAttackSpeed()));
-		}
 	}
 	
 	public boolean readyToHarvest() {
@@ -87,9 +68,9 @@ public class Unit extends Thing implements Serializable {
 		this.setImage(this.getType());
 	}
 
-	public void addAttackType(Attack a) {
-		attacks.add(a);
-	}
+//	public void addAttackType(Attack a) {
+//		attacks.add(a);
+//	}
 
 	public CombatStats getCombatStats() {
 		return combatStats;
@@ -238,12 +219,20 @@ public class Unit extends Thing implements Serializable {
 		}
 		return lethal;
 	}
+	
+	public int getMaxRange() {
+		int maxRange = 1;
+		for(AttackStyle style : getType().getAttackStyles()) {
+			maxRange = Math.max(maxRange, style.getRange());
+		}
+		return maxRange;
+	}
 
 	public boolean inRange(Thing other) {
 		if (other == null) {
 			return false;
 		}
-		return !(this.getTile().getLocation().distanceTo(other.getTile().getLocation()) > combatStats.getAttackRadius()
+		return !(this.getTile().getLocation().distanceTo(other.getTile().getLocation()) > getMaxRange()
 				&& this.getTile() != other.getTile());
 	}
 
@@ -253,24 +242,24 @@ public class Unit extends Thing implements Serializable {
 	 * @return true if attacked, false otherwise
 	 */
 	public boolean attack(Thing target) {
-		Attack attack = chooseAttack(target);
-		if(attack != null) {
+		AttackStyle style = chooseAttack(target);
+		if(style != null) {
 			// actually do the attack
-			if(attack.projectileType == null) {
+			if(style.getProjectile() == null) {
 				double initialHP = target.getHealth();
-				target.takeDamage(attack.damage);
+				target.takeDamage(style.getDamage());
 				double damageDealt = initialHP - (target.getHealth() < 0 ? 0 : target.getHealth());
-				if (unitType.hasLifeSteal() && !(target instanceof Building)) {
+				if (style.isLifesteal() && !(target instanceof Building)) {
 					this.heal(damageDealt, true);
 				}
-				resetTimeToAttack();
 				if (target instanceof Unit) {
 					((Unit) target).aggro(this);
 				}
 			}
 			else {
-				Attack.shoot(this, target, attack);
+				Attack.shoot(this, target, style);
 			}
+			resetTimeToAttack(style.getCooldown());
 			return true;
 		}
 		return false;
@@ -285,13 +274,18 @@ public class Unit extends Thing implements Serializable {
 		}
 	}
 
-	public Attack chooseAttack(Thing target) {
+	public AttackStyle chooseAttack(Thing target) {
 		int distance = this.getTile().getLocation().distanceTo(target.getTile().getLocation());
-		for (Attack a : attacks) {
-			if (distance <= a.range && (a.projectileType == null || distance >= a.projectileType.getMinimumRange())) {
-				return a;
+		for(AttackStyle style : getType().getAttackStyles()) {
+			if (distance <= style.getRange() && distance >= style.getMinRange()) {
+				return style;
 			}
 		}
+//		for (Attack a : attacks) {
+//			if (distance <= a.range && (a.projectileType == null || distance >= a.projectileType.getMinimumRange())) {
+//				return a;
+//			}
+//		}
 		return null;
 	}
 
@@ -374,7 +368,7 @@ public class Unit extends Thing implements Serializable {
 			}
 		}
 		if (!attacked && isGuarding()) {
-			HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getType().getCombatStats().getAttackRadius());
+			HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getMaxRange());
 			for (Tile tile : inrange) {
 				if (tile.getFaction() == getFaction()) {
 					for (Unit unit : tile.getUnits()) {
@@ -419,8 +413,8 @@ public class Unit extends Thing implements Serializable {
 			}
 		}
 	}
-	public void resetTimeToAttack() {
-		timeToAttack = combatStats.getAttackSpeed();
+	public void resetTimeToAttack(int cooldown) {
+		timeToAttack = cooldown;
 	}
 
 	public Thing getTarget() {
@@ -468,10 +462,6 @@ public class Unit extends Thing implements Serializable {
 
 	public boolean isIdle() {
 		return isIdle;
-	}
-
-	public boolean isRanged() {
-		return unitType.isRanged();
 	}
 
 	@Override

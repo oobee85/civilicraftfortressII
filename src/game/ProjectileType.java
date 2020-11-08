@@ -14,34 +14,30 @@ import utils.Utils;
 public enum ProjectileType implements HasImage {
 
 
-		ARROW_LONGBOWMAN(60, 2, "resources/Images/projectiles/arrow.png", 1, 2, null),
-		ARROW_CHARIOT(30, 2, "resources/Images/projectiles/arrow.png", 1, 2, null),
-		ARROW_ARCHER(15, 2, "resources/Images/projectiles/arrow.png", 1, 1, null),
-		RUNE_ARROW(100, 2, "resources/Images/projectiles/rune_arrow.png", 1, 1, null),
-		ROCK_CATAPULT(300, 3, "resources/Images/itemicons/rock.png", 1, 3, null),
-		FIREBALL_TREBUCHET(600, 3, "resources/Images/projectiles/fireball.png", 2, 5, null),
+		ARROW_LONGBOWMAN(2, "resources/Images/projectiles/arrow.png", 1, null),
+		ARROW_CHARIOT(2, "resources/Images/projectiles/arrow.png", 1, null),
+		ARROW_ARCHER(2, "resources/Images/projectiles/arrow.png", 1, null),
+		RUNE_ARROW(2, "resources/Images/projectiles/rune_arrow.png", 1, null),
+		ROCK_CATAPULT(3, "resources/Images/itemicons/rock.png", 1, null),
+		FIREBALL_TREBUCHET(3, "resources/Images/projectiles/fireball.png", 2, null),
 		
-		ROCK_CYCLOPS(80, 3, "resources/Images/itemicons/rock.png", 1, 2, null),
-		ROCK_STONE_GOLEM(200, 5, "resources/Images/itemicons/rock.png", 1, 3, null),
-		FIREBALL_DRAGON(100, 3, "resources/Images/projectiles/fireball2.png", 2, 3, null),
-		BULLET(1000, 0, "resources/Images/projectiles/bullet.png", 1, 1, null),
-		FIREWAVE(200, 6, "resources/Images/ground_modifiers/fire.gif", 1, 3, GroundModifierType.FIRE),
-		METEOR_WAVE(5000, 4, "resources/Images/ground_modifiers/fire.gif", 1, 1, GroundModifierType.FIRE),
+		ROCK_CYCLOPS(3, "resources/Images/itemicons/rock.png", 1, null),
+		ROCK_STONE_GOLEM(5, "resources/Images/itemicons/rock.png", 1, null),
+		FIREBALL_DRAGON(3, "resources/Images/projectiles/fireball2.png", 2, null),
+		BULLET(0, "resources/Images/projectiles/bullet.png", 1, null),
+		FIREWAVE(6, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE),
+		METEOR_WAVE(4, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE),
 	;
 	
 	private MipMap mipmap;
-	private int damage;
 	private double speed;
 	private int radius;
-	private int minimumRange;
 	private GroundModifierType groundModifierType;
 	
-	ProjectileType(int damage, double speed, String s, int radius, int minimumRange, GroundModifierType groundModifierType){
+	ProjectileType(double speed, String s, int radius, GroundModifierType groundModifierType){
 		mipmap = new MipMap(s);
-		this.damage = damage;
 		this.speed = speed;
 		this.radius = radius;
-		this.minimumRange = minimumRange;
 		this.groundModifierType = groundModifierType;
 	}
 	public GroundModifierType getGroundModifierType() {
@@ -51,14 +47,8 @@ public enum ProjectileType implements HasImage {
 	public boolean isExplosive() {
 		return (radius > 1);
 	}
-	public int getDamage() {
-		return damage;
-	}
 	public int getRadius() {
 		return radius;
-	}
-	public int getMinimumRange() {
-		return minimumRange;
 	}
 	public double getSpeed() {
 		return speed;

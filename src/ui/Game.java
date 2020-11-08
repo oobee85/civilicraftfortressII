@@ -13,7 +13,7 @@ import world.*;
 
 public class Game {
 	
-	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0, 0, 0, 0);
+	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0);
 
 	public static final ArrayList<UnitType> unitTypeList = new ArrayList<>();
 	public static final HashMap<String, UnitType> unitTypeMap = new HashMap<>();

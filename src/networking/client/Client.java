@@ -334,7 +334,8 @@ public class Client {
 					projectileMessage.getType(), 
 					gameInstance.world.get(projectileMessage.getTile().getLocation()), 
 					gameInstance.world.get(projectileMessage.getTargetTile().getLocation()), 
-					null);
+					null, 
+					projectileMessage.getDamage());
 			gameInstance.world.getData().addProjectile(newProjectile);
 		}
 		for(Hitsplat hitsplat : worldInfo.getHitsplats()) {

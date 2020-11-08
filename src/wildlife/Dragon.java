@@ -9,14 +9,11 @@ import world.*;
 public class Dragon extends Animal {
 	
 	private transient Tile home;
-	private transient int timeToFireball;
 	private transient int timeToHunt;
-	private static int TIME_UNTIL_ATTACK = 0;
 	
 	public Dragon(Tile tile, Faction faction) {
 		super(Game.unitTypeMap.get("DRAGON"), tile, faction);
 		this.home = tile;
-		resetTimeToFireball();
 		resetTimeToHunt();
 	}
 	
@@ -30,22 +27,13 @@ public class Dragon extends Animal {
 	@Override
 	public void updateState() {
 		super.updateState();
-		if(timeToFireball > 0) {
-			timeToFireball --;
-		}
 		if(timeToHunt > 0) {
 			timeToHunt --;
 		}
 		
 	}
-	public void resetTimeToFireball() {
-		timeToFireball = getType().getCombatStats().getAttackSpeed()*10;
-	}
 	public void resetTimeToHunt() {
 		timeToHunt = getType().getCombatStats().getMoveSpeed()*100;
-	}
-	public boolean readyToFireball() {
-		return timeToFireball <= 0;
 	}
 	public boolean readyToHunt() {
 		return timeToHunt <= 0;

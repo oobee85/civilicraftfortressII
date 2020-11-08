@@ -711,50 +711,49 @@ public class GameView extends JPanel {
 						Tile targetTile = plan.targetTile == null ? plan.target.getTile() : plan.targetTile;
 						g.drawImage(FLAG, targetTile.getLocation().x() * tileSize, targetTile.getLocation().y() * tileSize, tileSize, tileSize, null);
 					}
-					int range = unit.getType().getCombatStats().getAttackRadius();
-					if(range == 1) {
-						range = -1;
-					}
-					// draws the attack range for units
-					for (int i = lowerX; i < upperX; i++) {
-						for (int j = lowerY; j < upperY; j++) {
-							Tile t = game.world.get(new TileLoc(i, j));
-							if (t == null)
-								continue;
-							int x = t.getLocation().x() * tileSize;
-							int y = t.getLocation().y() * tileSize;
-							int w = tileSize;
-							int h = tileSize;
-
-							if (t.getLocation().distanceTo(unit.getTile().getLocation()) <= range) {
-								g.setColor(Color.BLACK);
-								Utils.setTransparency(g, 0.3f);
-
-								for (Tile tile : t.getNeighbors()) {
-									if (tile.getLocation().distanceTo(unit.getTile().getLocation()) > range) {
-										TileLoc tileLoc = tile.getLocation();
-
-										if (tileLoc.x() == t.getLocation().x()) {
-											if (tileLoc.y() < t.getLocation().y()) {
-												g.fillRect(x, y, w, 5);
+					int range = unit.getMaxRange();
+					if(range > 1) {
+						// draws the attack range for units
+						for (int i = lowerX; i < upperX; i++) {
+							for (int j = lowerY; j < upperY; j++) {
+								Tile t = game.world.get(new TileLoc(i, j));
+								if (t == null)
+									continue;
+								int x = t.getLocation().x() * tileSize;
+								int y = t.getLocation().y() * tileSize;
+								int w = tileSize;
+								int h = tileSize;
+	
+								if (t.getLocation().distanceTo(unit.getTile().getLocation()) <= range) {
+									g.setColor(Color.BLACK);
+									Utils.setTransparency(g, 0.3f);
+	
+									for (Tile tile : t.getNeighbors()) {
+										if (tile.getLocation().distanceTo(unit.getTile().getLocation()) > range) {
+											TileLoc tileLoc = tile.getLocation();
+	
+											if (tileLoc.x() == t.getLocation().x()) {
+												if (tileLoc.y() < t.getLocation().y()) {
+													g.fillRect(x, y, w, 5);
+												}
+												if (tileLoc.y() > t.getLocation().y()) {
+													g.fillRect(x, y + h - 5, w, 5);
+												}
+	
 											}
-											if (tileLoc.y() > t.getLocation().y()) {
-												g.fillRect(x, y + h - 5, w, 5);
+											if (tileLoc.y() == t.getLocation().y()) {
+												if (tileLoc.x() < t.getLocation().x()) {
+													g.fillRect(x, y, 5, h);
+												}
+												if (tileLoc.x() > t.getLocation().x()) {
+													g.fillRect(x + w - 5, y, 5, h);
+												}
 											}
-
+	
 										}
-										if (tileLoc.y() == t.getLocation().y()) {
-											if (tileLoc.x() < t.getLocation().x()) {
-												g.fillRect(x, y, 5, h);
-											}
-											if (tileLoc.x() > t.getLocation().x()) {
-												g.fillRect(x + w - 5, y, 5, h);
-											}
-										}
-
 									}
+									Utils.setTransparency(g, 1);
 								}
-								Utils.setTransparency(g, 1);
 							}
 						}
 					}

@@ -47,14 +47,14 @@ public class Projectile implements HasImage, Externalizable {
 		
 	}
 	
-	public Projectile(ProjectileType type, Tile tile, Tile targetTile, Unit source) {
+	public Projectile(ProjectileType type, Tile tile, Tile targetTile, Unit source, int damage) {
 		this.type = type;
 		this.tile = tile;
 		this.hasImage = type;
 		this.targetTile = targetTile;
 		this.source = source;
 		this.timeToMove = type.getSpeed();
-		this.damage = type.getDamage();
+		this.damage = damage;
 		totalDistance = tile.getLocation().distanceTo(targetTile.getLocation());
 	}
 	

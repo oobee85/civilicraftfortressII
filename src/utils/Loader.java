@@ -158,14 +158,11 @@ public class Loader {
 			String image = unitTypeObject.getString("image");
 			
 			JSONObject statsObject = unitTypeObject.getJSONObject("stats");
-			int attack = statsObject.getInt("attack");
-			int range = statsObject.getInt("range");
-			int attackspeed = statsObject.getInt("attackspeed");
 			int healspeed = statsObject.getInt("healspeed");
 			int health = statsObject.getInt("health");
 			int movespeed = statsObject.getInt("movespeed");
 			int buildtime = statsObject.getInt("buildtime");
-			CombatStats combatStats = new CombatStats(health, attack, movespeed, range, attackspeed, buildtime, healspeed);
+			CombatStats combatStats = new CombatStats(health, movespeed, buildtime, healspeed);
 			
 			HashSet<String> attributes = new HashSet<>();;
 			if(unitTypeObject.has("attributes")) {
@@ -192,10 +189,6 @@ public class Loader {
 					items.add(new Item(entry.getValue(), entry.getKey()));
 				}
 			}
-			ProjectileType projectile = null;
-			if(unitTypeObject.has("projectile")) {
-				projectile = ProjectileType.valueOf(unitTypeObject.getString("projectile"));
-			}
 			TargetInfo[] targeting = null;
 			if(unitTypeObject.has("targeting")) {
 				JSONArray targetingList = unitTypeObject.getJSONArray("targeting");
@@ -204,8 +197,15 @@ public class Loader {
 					targeting[j] = parseTargetInfoFromJSON(targetingList.getJSONObject(j));
 				}
 			}
+			LinkedList<AttackStyle> attackStyles = new LinkedList<>();
+			if(unitTypeObject.has("attackstyles")) {
+				JSONArray attackStyleList = unitTypeObject.getJSONArray("attackstyles");
+				for(int j = 0; j < attackStyleList.length(); j++) {
+					attackStyles.add(parseAttackStyleFromJSON(attackStyleList.getJSONObject(j)));
+				}
+			}
 			
-			UnitType unitType = new UnitType(name, image, combatStats, attributes, researchReq, cost, items, projectile, targeting);
+			UnitType unitType = new UnitType(name, image, combatStats, attributes, researchReq, cost, items, targeting, attackStyles);
 			unitTypeMap.put(name, unitType);
 			unitTypeList.add(unitType);
 
@@ -355,6 +355,25 @@ public class Loader {
 			this.type = type;
 			this.faction = faction;
 		}
+	}
+	
+	private static AttackStyle parseAttackStyleFromJSON(JSONObject obj) {
+		int damage = obj.getInt("damage");
+		int range = obj.getInt("range");
+		int cooldown = obj.getInt("cooldown");
+		int minRange = 0;
+		if(obj.has("minrange")) {
+			minRange = obj.getInt("minrange");
+		}
+		boolean lifesteal = false;
+		if(obj.has("lifesteal")) {
+			lifesteal = obj.getBoolean("lifesteal");
+		}
+		ProjectileType projectile = null;
+		if(obj.has("projectile")) {
+			projectile = ProjectileType.valueOf(obj.getString("projectile"));
+		}
+		return new AttackStyle(damage, range, minRange, lifesteal, cooldown, projectile);
 	}
 	
 	private static TargetInfo parseTargetInfoFromJSON(JSONObject obj) {

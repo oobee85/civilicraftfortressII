@@ -18,11 +18,11 @@ public class UnitType implements HasImage, Serializable {
 	private transient final HashMap <ItemType, Integer> cost;
 	private transient final String researchRequirement;
 	private transient final LinkedList<Item> deadItem;
-	private transient final ProjectileType projectileType;
 	private transient final TargetInfo[] targetingInfoStrings;
 	private transient final ArrayList<TargetingInfo> targetingInfo = new ArrayList<>();
+	private transient final LinkedList<AttackStyle> attackStyles;
 
-	public UnitType(String name, String image, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, ProjectileType projectileType, TargetInfo[] targeting) {
+	public UnitType(String name, String image, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles) {
 		this.name = name;
 		this.mipmap = new MipMap(image);
 		this.combatStats = cs;
@@ -30,8 +30,11 @@ public class UnitType implements HasImage, Serializable {
 		this.cost = resourcesNeeded;
 		this.researchRequirement = researchNeeded;
 		this.deadItem = deadItem;
-		this.projectileType = projectileType;
 		this.targetingInfoStrings = targeting;
+		this.attackStyles = attackStyles;
+	}
+	public LinkedList<AttackStyle> getAttackStyles() {
+		return attackStyles;
 	}
 	public TargetInfo[] getTargetingInfoStrings() {
 		return targetingInfoStrings;
@@ -44,9 +47,6 @@ public class UnitType implements HasImage, Serializable {
 	}
 	public String getResearchRequirement() {
 		return researchRequirement;
-	}
-	public ProjectileType getProjectileType() {
-		return projectileType;
 	}
 	public CombatStats getCombatStats() {
 		return combatStats;
@@ -77,9 +77,6 @@ public class UnitType implements HasImage, Serializable {
 	}
 	public boolean isMigratory() {
 		return attributes.contains("migratory");
-	}
-	public boolean isRanged() {
-		return this.getCombatStats().getAttackRadius() > 1;
 	}
 	public boolean isBuilder() {
 		return attributes.contains("builder");
