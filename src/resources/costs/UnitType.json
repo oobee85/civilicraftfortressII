@@ -73,7 +73,7 @@
 		"stats":{"movespeed":50,"buildtime":1000,"health":200,"healspeed":100},
 		"name":"CATAPULT",
 		"attackstyles":[
-			{"damage":300, "cooldown":100, "range":10, "minrange":3, "projectile":"ROCK_CATAPULT"}
+			{"damage":300, "cooldown":100, "range":10, "minrange":3, "projectile":"ROCK"}
 		],
 		"attributes":["hostile"],
 		"research":"MATHEMATICS",
@@ -322,7 +322,7 @@
 		"stats":{"movespeed":30,"buildtime":0,"health":500,"healspeed":10},
 		"name":"CYCLOPS",
 		"attackstyles":[
-			{"damage":80, "cooldown":40, "range":6, "minrange":2, "projectile":"ROCK_CYCLOPS"},
+			{"damage":80, "cooldown":40, "range":6, "minrange":2, "projectile":"ROCK"},
 			{"damage":40, "cooldown":40, "range":1}
 		],
 		"attributes":["hostile"],

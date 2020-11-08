@@ -657,11 +657,10 @@ public class GameView extends JPanel {
 			
 			for(Projectile p : game.world.getData().getProjectiles()) {
 				int extra = (int) (tileSize * p.getExtraSize());
+				double ratio = 0.5*p.getHeight() / p.getMaxHeight();
+				int shadowOffset = (int) (tileSize*ratio/2);
+				g.drawImage(p.getShadow(0), p.getTile().getLocation().x() * tileSize + shadowOffset, p.getTile().getLocation().y() * tileSize + shadowOffset, tileSize - shadowOffset*2, tileSize - shadowOffset*2, null);
 				g.drawImage(p.getImage(0), p.getTile().getLocation().x() * tileSize - extra/2, p.getTile().getLocation().y() * tileSize - p.getHeight() - extra/2, tileSize + extra, tileSize + extra, null);
-				if(tileSize - extra/3 < 0) {
-					extra = tileSize;
-				}
-				g.drawImage(p.getShadow(0), p.getTile().getLocation().x() * tileSize + extra/3, p.getTile().getLocation().y() * tileSize + extra/3, tileSize - extra/3, tileSize - extra/3, null);
 			}
 			for(WeatherEvent w : game.world.getWeatherEvents()) {
 				g.drawImage(w.getImage(0), w.getTile().getLocation().x() * tileSize, w.getTile().getLocation().y() * tileSize, tileSize, tileSize, null);

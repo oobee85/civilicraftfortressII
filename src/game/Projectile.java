@@ -64,6 +64,9 @@ public class Projectile implements HasImage, Externalizable {
 	public int getHeight() {
 		return currentHeight;
 	}
+	public int getMaxHeight() {
+		return (int) (totalDistance*totalDistance*type.getSpeed()/4);
+	}
 	
 	public double getExtraSize() {
 		int div = (int) (7 - getType().getSpeed());
