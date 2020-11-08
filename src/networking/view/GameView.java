@@ -324,7 +324,7 @@ public class GameView extends JPanel {
 				}
 				if(unit.getType().isBuilder()) {
 					Building targetBuilding = targetTile.getBuilding();
-					if(targetBuilding == null) {
+					if(targetBuilding == null || targetBuilding.isBuilt()) {
 						targetBuilding = targetTile.getRoad();
 					}
 					if(targetBuilding != null && (targetBuilding.getFaction() == unit.getFaction() || targetBuilding.getType().isRoad()) && !targetBuilding.isBuilt()) {
