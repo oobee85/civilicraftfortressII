@@ -13,8 +13,7 @@
 		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":50},
 		"name":"WARRIOR",
 		"attackstyles":[
-			{"damage":5, "cooldown":30, "range":10, "minrange":6, "projectile":"ARROW"},
-			{"damage":10, "cooldown":30, "range":1, "lifesteal":true}
+			{"damage":10, "cooldown":30, "range":1}
 		],
 		"attributes":["hostile"],
 		"targeting":[{"type":"game.Unit"}]
