@@ -328,7 +328,7 @@ public class GameView extends JPanel {
 						targetBuilding = targetTile.getRoad();
 					}
 					if(targetBuilding != null && (targetBuilding.getFaction() == unit.getFaction() || targetBuilding.getType().isRoad()) && !targetBuilding.isBuilt()) {
-						commandInterface.buildThing(unit, targetBuilding, !shiftDown);
+						commandInterface.buildThing(unit, targetBuilding.getTile(), targetBuilding.getType().isRoad(), !shiftDown);
 					}
 					else {
 						commandInterface.moveTo(unit, targetTile, !shiftDown);

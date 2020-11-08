@@ -247,22 +247,30 @@ public class Server {
 				}
 			}
 		}
-		else if(message.getCommand() == CommandType.BUILD_THING) {
+		else if(message.getCommand() == CommandType.BUILD_ROAD) {
 			if(thing instanceof Unit) {
-				Thing target = ThingMapper.get(message.getTargetID());
-				if(target != null) {
-					gui.getCommandInterface().buildThing((Unit)thing, target, message.getClearQueue());
+				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
+				if(targetTile != null) {
+					gui.getCommandInterface().buildThing((Unit)thing, targetTile, true, message.getClearQueue());
+				}
+			}
+		}
+		else if(message.getCommand() == CommandType.BUILD_BUILDING) {
+			if(thing instanceof Unit) {
+				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
+				if(targetTile != null) {
+					gui.getCommandInterface().buildThing((Unit)thing, targetTile, false, message.getClearQueue());
 				}
 			}
 		}
 		else if(message.getCommand() == CommandType.PLAN_BUILDING) {
 			if(thing instanceof Unit) {
 				Thing target = ThingMapper.get(message.getTargetID());
-				if(target != null) {
-					gui.getCommandInterface().buildThing((Unit)thing, target, message.getClearQueue());
-				}
 				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
 				BuildingType buildingType = Game.buildingTypeMap.get(message.getType());
+				if(target != null) {
+					gui.getCommandInterface().buildThing((Unit)thing, target.getTile(), buildingType.isRoad(), message.getClearQueue());
+				}
 				if(targetTile != null) {
 					gui.getCommandInterface().planBuilding((Unit)thing, targetTile, message.getClearQueue(), buildingType);
 				}

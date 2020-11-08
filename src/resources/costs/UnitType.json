@@ -4,6 +4,9 @@
 		"image":"resources/Images/units/worker.png",
 		"cost":{"FOOD":10},
 		"stats":{"movespeed":15,"buildtime":30,"health":100,"healspeed":50},
+		"attackstyles":[
+			{"damage":1, "cooldown":60, "range":1}
+		],
 		"name":"WORKER",
 		"attributes":["builder"]
 	},

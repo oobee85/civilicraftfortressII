@@ -14,7 +14,6 @@
 		"research":"WHEEL"},
 	{
 		"info":"Increases movement speed more",
-		"info":"Blocks movement",
 		"image":"resources/Images/buildings/brick_road.png",
 		"vision":0,
 		"movespeed":1000,

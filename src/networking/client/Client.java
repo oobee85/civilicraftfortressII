@@ -143,9 +143,14 @@ public class Client {
 				localCommands.attackThing(unit, target, clearQueue);
 			}
 			@Override
-			public void buildThing(Unit unit, Thing target, boolean clearQueue) {
-				sendMessage(CommandMessage.makeBuildTargetCommand(unit.id(), target.id(), clearQueue));
-				localCommands.buildThing(unit, target, clearQueue);
+			public void buildThing(Unit unit, Tile target, boolean isRoad, boolean clearQueue) {
+				if(isRoad) {
+					sendMessage(CommandMessage.makeBuildRoadCommand(unit.id(), target.getLocation(), clearQueue));
+				}
+				else {
+					sendMessage(CommandMessage.makeBuildBuildingCommand(unit.id(), target.getLocation(), clearQueue));
+				}
+				localCommands.buildThing(unit, target, isRoad, clearQueue);
 			}
 			@Override
 			public Building planBuilding(Unit unit, Tile target, boolean clearQueue, BuildingType buildingType) {

@@ -383,8 +383,11 @@ public final class Utils {
 				unit.queuePlannedAction(new PlannedAction(target));
 			}
 			@Override
-			public void buildThing(Unit unit, Thing target, boolean clearQueue) {
-				unit.queuePlannedAction(new PlannedAction(target, true));
+			public void buildThing(Unit unit, Tile target, boolean isRoad, boolean clearQueue) {
+				if(clearQueue) {
+					unit.clearPlannedActions();
+				}
+				unit.queuePlannedAction(new PlannedAction(target, isRoad));
 			}
 			@Override
 			public Building planBuilding(Unit unit, Tile target, boolean clearQueue, BuildingType buildingType) {
@@ -394,7 +397,7 @@ public final class Utils {
 				if(unit.getType().isBuilder()) {
 					Building plannedBuilding = game.planBuilding(unit, buildingType, target);
 					if(plannedBuilding != null) {
-						unit.queuePlannedAction(new PlannedAction(plannedBuilding, true));
+						unit.queuePlannedAction(new PlannedAction(target, buildingType.isRoad()));
 					}
 					return plannedBuilding;
 				}

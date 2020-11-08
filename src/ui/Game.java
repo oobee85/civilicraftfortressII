@@ -89,6 +89,12 @@ public class Game {
 			}
 			else {
 				unit.getTile().getItems().clear();
+				PlannedAction plan = unit.actionQueue.peek();
+				if(plan != null) {
+					if(plan.isDone(unit.getTile())) {
+						unit.actionQueue.poll();
+					}
+				}
 			}
 		}
 		world.clearDeadAndAddNewThings();

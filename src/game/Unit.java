@@ -95,6 +95,9 @@ public class Unit extends Thing implements Serializable {
 	public void queuePlannedAction(PlannedAction plan) {
 		actionQueue.add(plan);
 	}
+	public void clearCompletedPlannedActions() {
+		
+	}
 
 	public UnitType getUnitType() {
 		return unitType;
@@ -232,8 +235,10 @@ public class Unit extends Thing implements Serializable {
 		if (other == null) {
 			return false;
 		}
-		return !(this.getTile().getLocation().distanceTo(other.getTile().getLocation()) > getMaxRange()
-				&& this.getTile() != other.getTile());
+		return inRange(other.getTile());
+	}
+	public boolean inRange(Tile tile) {
+		return this.getTile().getLocation().distanceTo(tile.getLocation()) <= getMaxRange();
 	}
 
 	/**
@@ -281,11 +286,6 @@ public class Unit extends Thing implements Serializable {
 				return style;
 			}
 		}
-//		for (Attack a : attacks) {
-//			if (distance <= a.range && (a.projectileType == null || distance >= a.projectileType.getMinimumRange())) {
-//				return a;
-//			}
-//		}
 		return null;
 	}
 
@@ -310,7 +310,7 @@ public class Unit extends Thing implements Serializable {
 		if (unitType.isBuilder() && isIdle() && passiveAction == PlannedAction.BUILD && getTile().getFaction() == getFaction()) {
 			Building building = getBuildingToBuild(world.getBuildings());
 			if (building != null && building.getTile().getFaction() == getFaction()) {
-				queuePlannedAction(new PlannedAction(building, true));
+				queuePlannedAction(new PlannedAction(building.getTile(), building.getType().isRoad()));
 			}
 		}
 	}
@@ -320,21 +320,23 @@ public class Unit extends Thing implements Serializable {
 			return;
 		}
 		if(readyToMove()) {
-			Tile targetTile = null; 
-			Thing targetThing = null;
+			PlannedAction plan = null;
 			while(!actionQueue.isEmpty()) {
-				PlannedAction plan = actionQueue.peek();
+				plan = actionQueue.peek();
 				if(plan.isDone(getTile())) {
+					plan = null;
 					actionQueue.poll();
 					continue;
 				}
-				targetThing = plan.target;
-				targetTile = plan.getTile();
 				break;
 			}
-			boolean alreadyInRange = targetThing != null && this.inRange(targetThing);
-			if(targetTile != null && !alreadyInRange) {
-				moveTowards(targetTile);
+			if(plan == null) {
+				return;
+			}
+			boolean alreadyInRangeToAttack = plan.target != null && this.inRange(plan.target);
+			boolean alreadyInRangeToBuild = plan.isBuildAction() && this.inRange(plan.getTile());
+			if(plan.getTile() != null && !alreadyInRangeToAttack && !alreadyInRangeToBuild) {
+				moveTowards(plan.getTile());
 				// can't reach target
 				if(currentPath == null) {
 					actionQueue.poll();
@@ -357,15 +359,31 @@ public class Unit extends Thing implements Serializable {
 		}
 		if(!actionQueue.isEmpty()) {
 			PlannedAction plan = actionQueue.peek();
-			if(plan.target != null) {
-				if(plan.isBuildAction() && unitType.isBuilder() && inRange(plan.target)) {
-					boolean finished = buildBuilding((Building)plan.target);
+			if(plan.isBuildAction() && unitType.isBuilder() && inRange(plan.targetTile)) {
+				Building tobuild = null;
+				if(plan.isBuildRoadAction()) {
+					tobuild = plan.getTile().getRoad();
+				}
+				else if(plan.isBuildBuildingAction()) {
+					tobuild = plan.getTile().getBuilding();
+				}
+				if(tobuild != null) {
+					boolean finished = buildBuilding(tobuild);
 					attacked = true;
 				}
-				else {
-					attacked = attack(plan.target);
-				}
 			}
+			else if(plan.target != null) {
+				attacked = attack(plan.target);
+			}
+//			if(plan.target != null) {
+//				if(plan.isBuildAction() && unitType.isBuilder() && inRange(plan.target)) {
+//					boolean finished = buildBuilding((Building)plan.target);
+//					attacked = true;
+//				}
+//				else {
+//					attacked = attack(plan.target);
+//				}
+//			}
 		}
 		if (!attacked && isGuarding()) {
 			HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getMaxRange());
