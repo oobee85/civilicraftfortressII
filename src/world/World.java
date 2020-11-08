@@ -688,7 +688,7 @@ public class World {
 			if (projectile.readyToMove()) {
 				projectile.moveToTarget();
 				if(projectile.getType().getGroundModifierType() != null) {
-					GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), (int)projectile.getDamage()/5);
+					GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), projectile.getType().getGroundModifierDuration());
 					projectile.getTile().setModifier(gm);
 					worldData.addGroundModifier(gm);
 				}

@@ -13,31 +13,38 @@ import utils.Utils;
 
 public enum ProjectileType implements HasImage {
 
-		ARROW(2, "resources/Images/projectiles/arrow.png", 1, null),
-		RUNE_ARROW(2, "resources/Images/projectiles/rune_arrow.png", 1, null),
-		ROCK(3, "resources/Images/itemicons/rock.png", 1, null),
-		FIREBALL_TREBUCHET(3, "resources/Images/projectiles/fireball.png", 2, null),
+		ARROW(2, "resources/Images/projectiles/arrow.png", 1, null, 0),
+		RUNE_ARROW(2, "resources/Images/projectiles/rune_arrow.png", 1, null, 0),
+		ROCK(3, "resources/Images/itemicons/rock.png", 1, null, 0),
+		FIREBALL_TREBUCHET(3, "resources/Images/projectiles/fireball.png", 2, null, 0),
 		
-		ROCK_STONE_GOLEM(5, "resources/Images/itemicons/rock.png", 1, null),
-		FIREBALL_DRAGON(3, "resources/Images/projectiles/fireball2.png", 2, null),
-		BULLET(0, "resources/Images/projectiles/bullet.png", 1, null),
-		FIREWAVE(6, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE),
-		METEOR_WAVE(4, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE),
+		ROCK_STONE_GOLEM(5, "resources/Images/itemicons/rock.png", 1, null, 0),
+		FIREBALL_DRAGON(3, "resources/Images/projectiles/fireball2.png", 2, null, 0),
+		BULLET(0, "resources/Images/projectiles/bullet.png", 1, null, 0),
+		FIREWAVE(6, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 1000),
+		METEOR_WAVE(4, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 1000),
+		
+		FIREBREATH(3, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 10),
 	;
 	
 	private MipMap mipmap;
 	private double speed;
 	private int radius;
 	private GroundModifierType groundModifierType;
+	private int groundModifierDuration;
 	
-	ProjectileType(double speed, String s, int radius, GroundModifierType groundModifierType){
+	ProjectileType(double speed, String s, int radius, GroundModifierType groundModifierType, int groundModifierDuration){
 		mipmap = new MipMap(s);
 		this.speed = speed;
 		this.radius = radius;
 		this.groundModifierType = groundModifierType;
+		this.groundModifierDuration = groundModifierDuration;
 	}
 	public GroundModifierType getGroundModifierType() {
 		return groundModifierType;
+	}
+	public int getGroundModifierDuration() {
+		return groundModifierDuration;
 	}
 
 	public boolean isExplosive() {

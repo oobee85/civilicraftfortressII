@@ -216,7 +216,7 @@
 		"stats":{"movespeed":5,"buildtime":0,"health":2000,"healspeed":10},
 		"name":"DRAGON",
 		"attackstyles":[
-			{"damage":100, "cooldown":30, "range":4, "minrange":2, "projectile":"FIREBALL_DRAGON"},
+			{"damage":120, "cooldown":30, "range":4, "minrange":1, "projectile":"FIREBREATH"},
 			{"damage":50, "cooldown":30, "range":1}
 		],
 		"attributes":["flying","hostile","fireresistant","coldresistant"],
@@ -365,7 +365,7 @@
 		"stats":{"movespeed":25,"buildtime":0,"health":50,"healspeed":50},
 		"name":"FLAMELET",
 		"attackstyles":[
-			{"damage":0, "cooldown":1000, "range":0}
+			{"damage":1, "cooldown":30, "range":1, "projectile":"FIREBREATH"}
 		],
 		"attributes":["hostile","fireresistant"],
 		"targeting":[
