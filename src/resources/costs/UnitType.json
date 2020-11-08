@@ -232,7 +232,7 @@
 		"attackstyles":[
 			{"damage":20, "cooldown":20, "range":1, "lifesteal":true}
 		],
-		"attributes":["flying","hostile","lifesteal"],
+		"attributes":["flying","hostile"],
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"}
 		],

@@ -72,9 +72,6 @@ public class UnitType implements HasImage, Serializable {
 	public boolean isFireResist() {
 		return attributes.contains("fireresistant");
 	}
-	public boolean hasLifeSteal() {
-		return attributes.contains("lifesteal");
-	}
 	public boolean isMigratory() {
 		return attributes.contains("migratory");
 	}
