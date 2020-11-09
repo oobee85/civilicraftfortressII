@@ -246,12 +246,19 @@ public class Game {
 			System.out.println(number + " ents");
 			
 		}
-		if(World.days >= 20 && Math.random() > 0.2) {
-			int number = (int)(Math.random() * day/2);
+		if(World.days >= 5 && Math.random() > 0.5) {
+			int number = (int)(Math.random() * day);
 			for(int i = 0; i < number; i++) {
 				world.spawnTermite(targetTile);
 			}
 			System.out.println(number + " termite");
+		}
+		if(World.days >= 5 && Math.random() > 0.5) {
+			int number = (int)(Math.random() * day);
+			for(int i = 0; i < number; i++) {
+				world.spawnBomb(targetTile);
+			}
+			System.out.println(number + " bomb");
 		}
 		
 		if(World.days >= 1 && Math.random() > 0.5) {
@@ -314,7 +321,8 @@ public class Game {
 			world.spawnStoneGolem(t);
 			world.spawnRoc(t);
 			world.spawnVampire(t);
-			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID), null);
+			world.spawnBomb(t);
+//			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID), null);
 			spawnCyclops();
 		}
 		for(int i = 0; i < num/2; i++) {
@@ -328,6 +336,9 @@ public class Game {
 		
 		Iterator<Tile> iterator = tiles.iterator();
 		for(UnitType type : Game.unitTypeList) {
+			if(type.name() == "TWIG") {
+				continue;
+			}
 			world.spawnAnimal(type, iterator.next(), world.getFaction(World.NO_FACTION_ID), null);
 		}
 	}

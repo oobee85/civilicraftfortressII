@@ -323,6 +323,7 @@ public class World {
 	public void spawnStoneGolem(Tile target) {
 		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
 		e.getTerrain() == Terrain.ROCK 
+		&& e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
 		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(potential.isPresent()) {
 			Tile t = potential.get();
@@ -332,6 +333,7 @@ public class World {
 	public void spawnRoc(Tile target) {
 		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
 		e.getTerrain() == Terrain.ROCK 
+		&& e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
 		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(potential.isPresent()) {
 			Tile t = potential.get();
@@ -340,15 +342,26 @@ public class World {
 	}
 	public void spawnTermite(Tile target) {
 		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
-		e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+		e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
+		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(potential.isPresent()) {
 			Tile t = potential.get();
 			spawnAnimal(Game.unitTypeMap.get("TERMITE"), t, getFaction(NO_FACTION_ID), target);
 		}
 	}
+	public void spawnBomb(Tile target) {
+		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
+		e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
+		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+		if(potential.isPresent()) {
+			Tile t = potential.get();
+			spawnAnimal(Game.unitTypeMap.get("BOMB"), t, getFaction(NO_FACTION_ID), target);
+		}
+	}
 	public void spawnVampire(Tile target) {
 		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
 		e.getTerrain() == Terrain.ROCK 
+		&& e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
 		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(potential.isPresent()) {
 			Tile t = potential.get();
