@@ -138,11 +138,14 @@ public class Generation {
 			float distanceFromCenter = (float) Math.sqrt(dx*dx + dy*dy);
 			if(distanceFromCenter < mountainEdgeRadius) {
 				
-				float height = 1 - (lavaRadius - distanceFromCenter)/lavaRadius/2;
+				float height = 1 - 0.2f*(lavaRadius - distanceFromCenter)/lavaRadius;
 				if(distanceFromCenter > lavaRadius) {
 					height = 1 - (distanceFromCenter - lavaRadius)/mountainEdgeRadius;
+					heightMap[i][j] = Math.max(height, heightMap[i][j]);
 				}
-				heightMap[i][j] = Math.max(height, heightMap[i][j]);
+				else {
+					heightMap[i][j] = height;
+				}
 				
 				if(distanceFromCenter < lavaRadius) {
 					tile.setTerrain(Terrain.VOLCANO);
