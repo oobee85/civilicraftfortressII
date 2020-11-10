@@ -747,26 +747,7 @@ public class GameView extends JPanel {
 	
 									for (Tile tile : t.getNeighbors()) {
 										if (tile.getLocation().distanceTo(unit.getTile().getLocation()) > range) {
-											TileLoc tileLoc = tile.getLocation();
-	
-											if (tileLoc.x() == t.getLocation().x()) {
-												if (tileLoc.y() < t.getLocation().y()) {
-													g.fillRect(drawAt.x, drawAt.y, w, 5);
-												}
-												if (tileLoc.y() > t.getLocation().y()) {
-													g.fillRect(drawAt.x, drawAt.y + h - 5, w, 5);
-												}
-	
-											}
-											if (tileLoc.y() == t.getLocation().y()) {
-												if (tileLoc.x() < t.getLocation().x()) {
-													g.fillRect(drawAt.x, drawAt.y, 5, h);
-												}
-												if (tileLoc.x() > t.getLocation().x()) {
-													g.fillRect(drawAt.x + w - 5, drawAt.y, 5, h);
-												}
-											}
-	
+											drawBorderBetween(g, t.getLocation(), tile.getLocation());
 										}
 									}
 									Utils.setTransparency(g, 1);
@@ -918,26 +899,7 @@ public class GameView extends JPanel {
 				Utils.setTransparency(g, 0.5f);
 				for(Tile tile : theTile.getNeighbors()) {
 					if(tile.getFaction() != theTile.getFaction()) {
-						TileLoc tileLoc = tile.getLocation();
-						
-						if(tileLoc.x() == theTile.getLocation().x() ) {
-							if(tileLoc.y() < theTile.getLocation().y()) {
-								g.fillRect(drawAt.x, drawAt.y, draww, 10); 
-							}
-							if(tileLoc.y() > theTile.getLocation().y()) {
-								g.fillRect(drawAt.x, drawAt.y + drawh - 10, draww, 10); 
-							}
-							
-						}
-						if(tileLoc.y() == theTile.getLocation().y() ) {
-							if(tileLoc.x() < theTile.getLocation().x()) {
-								g.fillRect(drawAt.x, drawAt.y, 10, drawh); 
-							}
-							if(tileLoc.x() > theTile.getLocation().x()) {
-								g.fillRect(drawAt.x + draww - 10, drawAt.y, 10, drawh); 
-							}
-						}
-						
+						drawBorderBetween(g, theTile.getLocation(), tile.getLocation());
 					}
 				}
 				Utils.setTransparency(g, 1);
@@ -1102,6 +1064,55 @@ public class GameView extends JPanel {
 			g.setColor(Color.WHITE);
 			g.drawString(text, x + splatWidth/2 - width/2, (int) (y+fontSize*1.5));
 		}
+	}
+	
+	private void drawBorderBetween(Graphics g, TileLoc one, TileLoc two) {
+		Point drawAt = getDrawingCoords(one);
+		if (one.x() == two.x()) {
+			if (one.y() > two.y()) {
+				g.fillRect(drawAt.x, drawAt.y, tileSize, 5);
+			}
+			if (one.y() < two.y()) {
+				g.fillRect(drawAt.x, drawAt.y + tileSize - 5, tileSize, 5);
+			}
+		}
+		else {
+			if(one.y() > two.y()) {
+				int yoffset = (one.x()%2) * tileSize/2;
+				if (one.x() < two.x()) {
+					g.fillRect(drawAt.x + tileSize - 5, drawAt.y + yoffset, 5, tileSize/2);
+				}
+				else if (one.x() > two.x()) {
+					g.fillRect(drawAt.x, drawAt.y + yoffset, 5, tileSize/2);
+				}
+			}
+			else if(one.y() < two.y()) {
+				int yoffset = (one.x()%2) * tileSize/2;
+				if (one.x() < two.x()) {
+					g.fillRect(drawAt.x + tileSize - 5, drawAt.y + yoffset, 5, tileSize/2);
+				}
+				else if (one.x() > two.x()) {
+					g.fillRect(drawAt.x, drawAt.y + yoffset, 5, tileSize/2);
+				}
+			}
+			else {
+				int yoffset = (1 - one.x()%2) * tileSize/2;
+				if (one.x() < two.x()) {
+					g.fillRect(drawAt.x + tileSize - 5, drawAt.y + yoffset, 5, tileSize/2);
+				}
+				else if (one.x() > two.x()) {
+					g.fillRect(drawAt.x, drawAt.y + yoffset, 5, tileSize/2);
+				}
+			}
+		}
+//		if (one.y() == two.y()) {
+//			if (one.x() < two.x()) {
+//				g.fillRect(drawAt.x, drawAt.y, 5, tileSize);
+//			}
+//			if (one.x() > two.x()) {
+//				g.fillRect(drawAt.x + tileSize - 5, drawAt.y, 5, tileSize);
+//			}
+//		}
 	}
 	
 	public void drawMinimap(Graphics g, int x, int y, int w, int h) {

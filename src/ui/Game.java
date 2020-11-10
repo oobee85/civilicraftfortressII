@@ -412,14 +412,16 @@ public class Game {
 	public void buildingTick() {
 		
 		for(Building building : world.getBuildings()) {
+			TileLoc loc = building.getTile().getLocation();
 			double culture = building.getCulture();
 			double area = culture * Building.CULTURE_AREA_MULTIPLIER;
 			double radius = Math.sqrt(area);
 			int r = (int)Math.ceil(radius);
 			for (int i = -r; i <= r; i++) {
 				for (int j = -r; j <= r; j++) {
-					double distanceFromCenter = Math.sqrt(i*i + j*j);
-					if(distanceFromCenter < radius) {
+					int distance = loc.distanceTo(new TileLoc(loc.x() + i, loc.y() + j));
+//					double distanceFromCenter = Math.sqrt(i*i + j*j);
+					if(distance < radius) {
 						Tile tile = world.get(new TileLoc(building.getTile().getLocation().x()+i, building.getTile().getLocation().y()+j));
 						if(tile != null && tile.getFaction() == world.getFaction(World.NO_FACTION_ID)) {
 							tile.setFaction(building.getFaction());
