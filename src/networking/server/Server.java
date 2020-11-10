@@ -164,8 +164,11 @@ public class Server {
 					else {
 						sendProjectilesAndDeadThings();
 					}
+					if(iteration % 100 == 0) {
+						System.out.println("skipped sends: " + skippedCount + "/" + (skippedCount + sentCount));
+					}
 					iteration++;
-					iteration = iteration % 10;
+					iteration = iteration % 100;
 					Thread.sleep(MILLISECONDS_PER_TICK);
 				}
 			} catch (InterruptedException e) {
@@ -210,13 +213,23 @@ public class Server {
 //		saveToFile(worldInfo, "ser/units_" + World.ticks + ".ser");
 	}
 	
+	private int skippedCount;
+	private int sentCount;
 	private void sendProjectilesAndDeadThings() {
 		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, new Tile[0]);
 		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
 		worldInfo.addHitsplats(gameInstance.world.getData());
 		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
-		sendToAllConnections(worldInfo);
-//		saveToFile(worldInfo, "ser/projectiles_" + World.ticks + ".ser");
+		if(worldInfo.getThings().isEmpty() 
+				&& worldInfo.getHitsplats().isEmpty()
+				&& worldInfo.getProjectiles().isEmpty()) {
+			skippedCount++;
+		}
+		else {
+			sentCount++;
+			sendToAllConnections(worldInfo);
+	//		saveToFile(worldInfo, "ser/projectiles_" + World.ticks + ".ser");
+		}
 	}
 	
 	private void handleCommand(CommandMessage message) {
@@ -321,6 +334,9 @@ public class Server {
 					gameInstance.gameTick();
 					gameInstance.getGUIController().updateGUI();
 					long elapsed = System.currentTimeMillis() - start;
+					if(World.ticks % 200 == 1) {
+						System.out.println("time elapsed for tick: " + elapsed + "ms");
+					}
 					long sleeptime = MILLISECONDS_PER_TICK - elapsed;
 					if(sleeptime > 0 && !isFastForwarding) {
 						Thread.sleep(sleeptime);

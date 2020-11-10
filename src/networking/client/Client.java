@@ -55,7 +55,7 @@ public class Client {
 					UnitInfoPanel infoPanel = new UnitInfoPanel(unit);
 					switchInfoPanel(infoPanel);
 					SwingUtilities.invokeLater(() -> {
-						infoPanel.addButton("Explode").addActionListener(e -> gameInstance.explode(unit));
+						infoPanel.addExplodeButton().addActionListener(e -> gameInstance.explode(unit));
 						infoPanel.addButton("MakeRoads").addActionListener(e -> clientGUI.getGameView().workerRoad(Game.buildingTypeMap.get("STONE_ROAD")));
 						infoPanel.addButton("AutoBuild").addActionListener(e -> clientGUI.getGameView().toggleAutoBuild());
 						infoPanel.addButton("SetHarvesting").addActionListener(e -> clientGUI.getGameView().setHarvesting());
@@ -83,7 +83,8 @@ public class Client {
 				InfoPanel infoPanel = new BuildingInfoPanel(building);
 				switchInfoPanel(infoPanel);
 				SwingUtilities.invokeLater(() -> {
-					infoPanel.addButton("Explode").addActionListener(e -> gameInstance.explode(building));
+					infoPanel.addExplodeButton().addActionListener(e -> gameInstance.explode(building));
+//					infoPanel.addButton("Explode")
 				});
 			}
 			@Override

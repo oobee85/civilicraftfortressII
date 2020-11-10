@@ -27,30 +27,32 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		this.faction = faction;
 	}
 	
-	public static void drawCombatStats(Graphics g, CombatStats stats, int x, int y) {
+	public static void drawCombatStats(Graphics g, UnitType unitType, int x, int y) {
+		CombatStats stats = unitType.getCombatStats();
 		g.setFont(KUIConstants.combatStatsFont);
 		g.setColor(Color.black);
 		int fontSize = g.getFont().getSize();
 		int iconSize = 20;
 		int gap = 2;
-//		g.drawImage(attackImage, x, y, iconSize, iconSize, null);
-//		g.drawString(stats.getAttack() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
-//		
-//		y += iconSize + gap;
-//		g.drawImage(attackspeedImage, x, y, iconSize, iconSize, null);
-//		g.drawString(stats.getAttackSpeed() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
-//
-//		y += iconSize + gap;
-//		g.drawImage(visionImage, x, y, iconSize, iconSize, null);
-//		g.drawString(stats.getAttackRadius() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
-
-		y += iconSize + gap;
+		int xoffset = (int) (iconSize*2.2);
+		
 		g.drawImage(movespeedImage, x, y, iconSize, iconSize, null);
 		g.drawString(stats.getMoveSpeed() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
 		
-		y += iconSize + gap;
-		g.drawImage(healthImage, x, y, iconSize, iconSize, null);
-		g.drawString(stats.getHealth() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
+//		y += iconSize + gap;
+		g.drawImage(healthImage, x + xoffset, y, iconSize, iconSize, null);
+		g.drawString(stats.getHealth() + "", x + iconSize + gap + xoffset, y + iconSize/2 + fontSize/3);
+
+		for(AttackStyle style : unitType.getAttackStyles()) {
+			y += iconSize + gap;
+			g.drawImage(attackImage, x, y, iconSize, iconSize, null);
+			g.drawString(style.getDamage() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
+			y += iconSize + gap;
+			g.drawImage(visionImage, x , y, iconSize, iconSize, null);
+			g.drawString(style.getRange() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
+			g.drawImage(attackspeedImage, x + xoffset, y, iconSize, iconSize, null);
+			g.drawString(style.getCooldown() + "", x + iconSize + gap + xoffset, y + iconSize/2 + fontSize/3);
+		}
 	}
 	
 	public static void drawCosts(Graphics g, HashMap<ItemType, Integer> costs, int x, int y, Faction faction) {
@@ -87,6 +89,6 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		if(showing.getCost() != null) {
 			drawCosts(g, showing.getCost(), x, y + 6, faction);
 		}
-		drawCombatStats(g, showing.getCombatStats(), getWidth() - 80, 4);
+		drawCombatStats(g, showing, getWidth() - 95, 4);
 	}
 }
