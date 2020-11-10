@@ -576,7 +576,9 @@ public class GameView extends JPanel {
 		return tile;
 	}
 	public Position getTileAtPixel(Point pixel) {
-		return new Position((pixel.x + viewOffset.x)/tileSize, (pixel.y + viewOffset.y)/tileSize);
+		int column = (int) ((pixel.x + viewOffset.x)/tileSize);
+		int row = (int)((pixel.y + viewOffset.y - (column%2)*tileSize/2)/tileSize);
+		return new Position(column, row);
 	}
 	public Position getPixelForTile(Position tile) {
 		return tile.multiply(tileSize).subtract(viewOffset);
@@ -684,7 +686,8 @@ public class GameView extends JPanel {
 				Stroke currentStroke = g2d.getStroke();
 				int strokeWidth = tileSize/12;
 				g2d.setStroke(new BasicStroke(strokeWidth));
-				g.drawOval(thing.getTile().getLocation().x() * tileSize + strokeWidth/2, thing.getTile().getLocation().y() * tileSize + strokeWidth/2, tileSize-1 - strokeWidth, tileSize-1 - strokeWidth);
+				Point drawAt = getDrawingCoords(thing.getTile().getLocation());
+				g.drawOval(drawAt.x + strokeWidth/2, drawAt.y + strokeWidth/2, tileSize-1 - strokeWidth, tileSize-1 - strokeWidth);
 				g2d.setStroke(currentStroke);
 //				Utils.setTransparency(g, 1f);
 
@@ -692,7 +695,8 @@ public class GameView extends JPanel {
 				if(thing instanceof Building) {
 					Building building = (Building) thing;
 					if(building.getSpawnLocation() != building.getTile()) {
-						g.drawImage(RALLY_POINT_IMAGE, building.getSpawnLocation().getLocation().x() * tileSize, building.getSpawnLocation().getLocation().y() * tileSize, tileSize, tileSize, null);
+						drawAt = getDrawingCoords(building.getSpawnLocation().getLocation());
+						g.drawImage(RALLY_POINT_IMAGE, drawAt.x, drawAt.y, tileSize, tileSize, null);
 					}
 				}
 				
@@ -708,18 +712,22 @@ public class GameView extends JPanel {
 					if(path != null) {
 						g.setColor(Color.green);
 						TileLoc prev = unit.getTile().getLocation();
+						Point prevDrawAt = getDrawingCoords(prev);
 						for(Tile t : path) {
+							drawAt = getDrawingCoords(t.getLocation());
 							if(prev != null) {
-								g.drawLine(prev.x() * tileSize + tileSize/2, prev.y() * tileSize + tileSize/2, 
-										t.getLocation().x() * tileSize + tileSize/2, t.getLocation().y() * tileSize + tileSize/2);
+								g.drawLine(prevDrawAt.x + tileSize/2, prevDrawAt.y + tileSize/2, 
+										drawAt.x + tileSize/2, drawAt.y + tileSize/2);
 							}
 							prev = t.getLocation();
+							prevDrawAt = drawAt;
 						}
 					}
 					// draw destination flags
 					for(PlannedAction plan : unit.actionQueue) {
 						Tile targetTile = plan.targetTile == null ? plan.target.getTile() : plan.targetTile;
-						g.drawImage(FLAG, targetTile.getLocation().x() * tileSize, targetTile.getLocation().y() * tileSize, tileSize, tileSize, null);
+						drawAt = getDrawingCoords(targetTile.getLocation());
+						g.drawImage(FLAG, drawAt.x, drawAt.y, tileSize, tileSize, null);
 					}
 					int range = unit.getMaxRange();
 					if(range > 1) {
@@ -729,8 +737,7 @@ public class GameView extends JPanel {
 								Tile t = game.world.get(new TileLoc(i, j));
 								if (t == null)
 									continue;
-								int x = t.getLocation().x() * tileSize;
-								int y = t.getLocation().y() * tileSize;
+								drawAt = getDrawingCoords(t.getLocation());
 								int w = tileSize;
 								int h = tileSize;
 	
@@ -744,19 +751,19 @@ public class GameView extends JPanel {
 	
 											if (tileLoc.x() == t.getLocation().x()) {
 												if (tileLoc.y() < t.getLocation().y()) {
-													g.fillRect(x, y, w, 5);
+													g.fillRect(drawAt.x, drawAt.y, w, 5);
 												}
 												if (tileLoc.y() > t.getLocation().y()) {
-													g.fillRect(x, y + h - 5, w, 5);
+													g.fillRect(drawAt.x, drawAt.y + h - 5, w, 5);
 												}
 	
 											}
 											if (tileLoc.y() == t.getLocation().y()) {
 												if (tileLoc.x() < t.getLocation().x()) {
-													g.fillRect(x, y, 5, h);
+													g.fillRect(drawAt.x, drawAt.y, 5, h);
 												}
 												if (tileLoc.x() > t.getLocation().x()) {
-													g.fillRect(x + w - 5, y, 5, h);
+													g.fillRect(drawAt.x + w - 5, drawAt.y, 5, h);
 												}
 											}
 	
@@ -781,8 +788,9 @@ public class GameView extends JPanel {
 				visited.put(unit.getTile(), count+1);
 					
 				//draws a square for every player unit on the tile
-				int xx = unit.getTile().getLocation().x() * tileSize + offset;
-				int yy = unit.getTile().getLocation().y() * tileSize + (indicatorSize + offset)*count + offset;
+				Point drawAt = getDrawingCoords(unit.getTile().getLocation());
+				int xx = drawAt.x + offset;
+				int yy = drawAt.y + (indicatorSize + offset)*count + offset;
 				g.setColor(unit.getFaction().color());
 				g.fillRect(xx, yy, indicatorSize, indicatorSize);
 				g.setColor(Color.BLACK);
@@ -800,7 +808,8 @@ public class GameView extends JPanel {
 						double brightness = World.getDaylight() + tile.getBrightness(faction);
 						brightness = Math.max(Math.min(brightness, 1), 0);
 						g.setColor(new Color(0, 0, 0, (int)(255 * (1 - brightness))));
-						g.fillRect(i * tileSize, j * tileSize, tileSize, tileSize);
+						Point drawAt = getDrawingCoords(tile.getLocation());
+						g.fillRect(drawAt.x, drawAt.y, tileSize, tileSize);
 					}
 				}
 			}
@@ -809,14 +818,16 @@ public class GameView extends JPanel {
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
 				BufferedImage bI = Utils.toBufferedImage(selectedBuildingToPlan.getImage(tileSize));
-				g2d.drawImage(bI, hoveredTile.x() * tileSize, hoveredTile.y() * tileSize, tileSize, tileSize , null);
+				Point drawAt = getDrawingCoords(hoveredTile);
+				g2d.drawImage(bI, drawAt.x, drawAt.y, tileSize, tileSize , null);
 				Utils.setTransparency(g, 1f);
 			}
 			if (leftClickAction == LeftClickAction.SPAWN_THING) {
 				Utils.setTransparency(g, 0.5f);
 				Graphics2D g2d = (Graphics2D)g;
 				BufferedImage bI = Utils.toBufferedImage(selectedThingToSpawn.getImage(tileSize));
-				g2d.drawImage(bI, hoveredTile.x() * tileSize, hoveredTile.y() * tileSize, tileSize, tileSize , null);
+				Point drawAt = getDrawingCoords(hoveredTile);
+				g2d.drawImage(bI, drawAt.x, drawAt.y, tileSize, tileSize , null);
 				Utils.setTransparency(g, 1f);
 			}
 			
@@ -869,30 +880,34 @@ public class GameView extends JPanel {
 			if(leftClickAction == LeftClickAction.ATTACK) {
 				drawTarget(g, hoveredTile);
 			}
+			Point drawAt = getDrawingCoords(hoveredTile);
 			g.setColor(new Color(0, 0, 0, 64));
-			g.drawRect(hoveredTile.x() * tileSize, hoveredTile.y() * tileSize, tileSize-1, tileSize-1);
-			g.drawRect(hoveredTile.x() * tileSize + 1, hoveredTile.y() * tileSize + 1, tileSize - 3, tileSize - 3);
+			g.drawRect(drawAt.x, drawAt.y, tileSize-1, tileSize-1);
+			g.drawRect(drawAt.x + 1, drawAt.y + 1, tileSize - 3, tileSize - 3);
 		}
+	}
+	
+	public Point getDrawingCoords(TileLoc tileLoc) {
+		int x = tileLoc.x() * tileSize;
+		int y = tileLoc.y() * tileSize + (tileLoc.x()%2)*tileSize/2;
+		return new Point(x, y);
 	}
 
 	public void drawTile(Graphics g, Tile theTile, double lowest, double highest) {
-		int column = theTile.getLocation().x();
-		int row = theTile.getLocation().y();
-		int drawx = column * tileSize;
-		int drawy = (int) (row * tileSize);
+		Point drawAt = getDrawingCoords(theTile.getLocation());
 		int draww = tileSize;
 		int drawh = tileSize;
 		int imagesize = draww < drawh ? draww : drawh;
 		
 		if(showHeightMap) {
-			theTile.drawHeightMap(g, (game.world.get(new TileLoc(column, row)).getHeight() - lowest) / (highest - lowest), tileSize);
+			theTile.drawHeightMap(g, (theTile.getHeight() - lowest) / (highest - lowest), tileSize);
 		}
 		else {
-			g.drawImage(theTile.getTerrain().getImage(imagesize), drawx, drawy, draww, drawh, null);
+			g.drawImage(theTile.getTerrain().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh, null);
 //			t.drawEntities(g, currentMode);
 			
 			if(theTile.getResource() != null) {
-				g.drawImage(theTile.getResource().getType().getImage(imagesize), drawx, drawy, draww, drawh, null);
+				g.drawImage(theTile.getResource().getType().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh, null);
 			}
 			
 			if(theTile.getFaction() != null && theTile.getFaction() != game.world.getFaction(World.NO_FACTION_ID)) {
@@ -907,19 +922,19 @@ public class GameView extends JPanel {
 						
 						if(tileLoc.x() == theTile.getLocation().x() ) {
 							if(tileLoc.y() < theTile.getLocation().y()) {
-								g.fillRect(drawx, drawy, draww, 10); 
+								g.fillRect(drawAt.x, drawAt.y, draww, 10); 
 							}
 							if(tileLoc.y() > theTile.getLocation().y()) {
-								g.fillRect(drawx, drawy + drawh - 10, draww, 10); 
+								g.fillRect(drawAt.x, drawAt.y + drawh - 10, draww, 10); 
 							}
 							
 						}
 						if(tileLoc.y() == theTile.getLocation().y() ) {
 							if(tileLoc.x() < theTile.getLocation().x()) {
-								g.fillRect(drawx, drawy, 10, drawh); 
+								g.fillRect(drawAt.x, drawAt.y, 10, drawh); 
 							}
 							if(tileLoc.x() > theTile.getLocation().x()) {
-								g.fillRect(drawx + draww - 10, drawy, 10, drawh); 
+								g.fillRect(drawAt.x + draww - 10, drawAt.y, 10, drawh); 
 							}
 						}
 						
@@ -930,10 +945,10 @@ public class GameView extends JPanel {
 //			if(game.world.borderTerritory.containsKey(theTile)) {
 //				Utils.setTransparency(g, 1);
 //				g.setColor(Color.BLACK);
-//				g.fillRect(drawx, drawy, draww, drawh); 
+//				g.fillRect(drawAt.x, drawAt.y, draww, drawh); 
 //			}
 			if (theTile.getRoad() != null) {
-				drawBuilding(theTile.getRoad(), g, drawx, drawy, draww, drawh);
+				drawBuilding(theTile.getRoad(), g, drawAt.x, drawAt.y, draww, drawh);
 			}
 			
 			if(theTile.liquidType != LiquidType.DRY) {
@@ -941,45 +956,45 @@ public class GameView extends JPanel {
 //				 transparency liquids
 				Utils.setTransparency(g, alpha);
 				g.setColor(theTile.liquidType.getColor(imagesize));
-				g.fillRect(drawx, drawy, draww, drawh);
+				g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 				Utils.setTransparency(g, 1);
 				
 				int imageSize = (int) Math.min(Math.max(draww*theTile.liquidAmount / 0.2, 1), draww);
 				g.setColor(theTile.liquidType.getColor(imagesize));
-				g.fillRect(drawx + draww/2 - imageSize/2, drawy + drawh/2 - imageSize/2, imageSize, imageSize);
-				g.drawImage(theTile.liquidType.getImage(imagesize), drawx + draww/2 - imageSize/2, drawy + draww/2 - imageSize/2, imageSize, imageSize, null);
+				g.fillRect(drawAt.x + draww/2 - imageSize/2, drawAt.y + drawh/2 - imageSize/2, imageSize, imageSize);
+				g.drawImage(theTile.liquidType.getImage(imagesize), drawAt.x + draww/2 - imageSize/2, drawAt.y + draww/2 - imageSize/2, imageSize, imageSize, null);
 			}
 			
 			if(theTile.getModifier() != null) {
 				Utils.setTransparency(g, 0.9);
-				g.drawImage(theTile.getModifier().getType().getImage(imagesize), drawx, drawy, draww, drawh, null);
+				g.drawImage(theTile.getModifier().getType().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh, null);
 				Utils.setTransparency(g, 1);
 			}
 			
 			if (!theTile.getItems().isEmpty()) {
 				for (Item item : theTile.getItems()) {
-					g.drawImage(item.getType().getImage(imagesize), drawx + tileSize/4,
-							drawy + tileSize/4, tileSize/2, tileSize/2, null);
+					g.drawImage(item.getType().getImage(imagesize), drawAt.x + tileSize/4,
+							drawAt.y + tileSize/4, tileSize/2, tileSize/2, null);
 				}
 			}
 			if(theTile.getPlant() != null) {
 				Plant p = theTile.getPlant();
-				g.drawImage(p.getImage(tileSize), drawx, drawy, draww, drawh, null);
+				g.drawImage(p.getImage(tileSize), drawAt.x, drawAt.y, draww, drawh, null);
 			}
 			
 			if(theTile.getBuilding() != null) {
-				drawBuilding(theTile.getBuilding(), g, drawx, drawy, draww, drawh);
+				drawBuilding(theTile.getBuilding(), g, drawAt.x, drawAt.y, draww, drawh);
 			}
 			for(Unit unit : theTile.getUnits()) {
-				g.drawImage(unit.getImage(tileSize), drawx, drawy, draww, drawh, null);
+				g.drawImage(unit.getImage(tileSize), drawAt.x, drawAt.y, draww, drawh, null);
 				if(unit.getIsHarvesting() == true) {
-					g.drawImage(HARVEST_ICON, drawx+draww/4, drawy+drawh/4, draww/2, drawh/2, null);
+					g.drawImage(HARVEST_ICON, drawAt.x+draww/4, drawAt.y+drawh/4, draww/2, drawh/2, null);
 				}
 				if(unit.isGuarding() == true) {
-					g.drawImage(GUARD_ICON, drawx+draww/4, drawy+drawh/4, draww/2, drawh/2, null);
+					g.drawImage(GUARD_ICON, drawAt.x+draww/4, drawAt.y+drawh/4, draww/2, drawh/2, null);
 				}
 				if(unit.getAutoBuild() == true) {
-					g.drawImage(AUTO_BUILD_ICON, drawx+draww/4, drawy+drawh/4, draww/2, drawh/2, null);
+					g.drawImage(AUTO_BUILD_ICON, drawAt.x+draww/4, drawAt.y+drawh/4, draww/2, drawh/2, null);
 				}
 			}
 		}
@@ -1007,11 +1022,10 @@ public class GameView extends JPanel {
 	}
 
 	public void drawTarget(Graphics g, TileLoc tileLoc) {
-		int x = (int) ((tileLoc.x() * tileSize + tileSize*1/10) );
-		int y = (int) ((tileLoc.y() * tileSize + tileSize*1/10) );
+		Point drawAt = getDrawingCoords(tileLoc);
 		int w = (int) (tileSize*8/10);
 		int hi = (int)(tileSize*8/10);
-		g.drawImage(TARGET_IMAGE, x, y, w, hi, null);
+		g.drawImage(TARGET_IMAGE, drawAt.x + tileSize*1/10, drawAt.y + tileSize*1/10, w, hi, null);
 	}
 	
 	public void drawHealthBar(Graphics g, Thing thing) {
@@ -1019,11 +1033,10 @@ public class GameView extends JPanel {
 			return;
 		}
 		if(World.ticks - thing.getTimeLastDamageTaken() < 20 || thing.getTile().getLocation().equals(hoveredTile)) {
-			int x = thing.getTile().getLocation().x() * tileSize + 1;
-			int y = thing.getTile().getLocation().y() * tileSize + 1;
+			Point drawAt = getDrawingCoords(thing.getTile().getLocation());
 			int w = tileSize - 1;
 			int h = tileSize / 4 - 1;
-			drawHealthBar2(g, thing, x, y, w, h, 2, thing.getHealth() / thing.getMaxHealth());
+			drawHealthBar2(g, thing, drawAt.x + 1, drawAt.y + 1, w, h, 2, thing.getHealth() / thing.getMaxHealth());
 		}
 	}
 	
@@ -1041,6 +1054,7 @@ public class GameView extends JPanel {
 	
 	public void drawHitsplat(Graphics g, Thing thing) {
 
+		Point drawAt = getDrawingCoords(thing.getTile().getLocation());
 		int splatWidth = (int) (tileSize*.5);
 		int splatHeight = (int) (tileSize*.5);
 		
@@ -1054,20 +1068,20 @@ public class GameView extends JPanel {
 			double damage = hitsplats[m].getDamage();
 			int i = hitsplats[m].getSquare();
 			
-			int x = (int) ((thing.getTile().getLocation().x() * tileSize) );
-			int y = (int) ((thing.getTile().getLocation().y() * tileSize) );
+			int x = (int) ((drawAt.x) );
+			int y = (int) ((drawAt.y) );
 			
 			if(i == 1) {
-				x = (int) ((thing.getTile().getLocation().x() * tileSize) + tileSize*0.5);
-				y = (int) ((thing.getTile().getLocation().y() * tileSize) + tileSize*0.5);
+				x = (int) ((drawAt.x) + tileSize*0.5);
+				y = (int) ((drawAt.y) + tileSize*0.5);
 			}
 			if(i == 2) {
-				x = (int) ((thing.getTile().getLocation().x() * tileSize) + tileSize*0.5);
-				y = (int) ((thing.getTile().getLocation().y() * tileSize) );
+				x = (int) ((drawAt.x) + tileSize*0.5);
+				y = (int) ((drawAt.y) );
 			}
 			if( i == 3) {
-				x = (int) ((thing.getTile().getLocation().x() * tileSize) );
-				y = (int) ((thing.getTile().getLocation().y() * tileSize) + tileSize*0.5);
+				x = (int) ((drawAt.x) );
+				y = (int) ((drawAt.y) + tileSize*0.5);
 			}
 			
 			String text = String.format("%.0f", damage);

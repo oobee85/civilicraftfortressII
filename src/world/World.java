@@ -470,7 +470,7 @@ public class World {
 		int y = tileLoc.y();
 		for(int i = Math.max(x - radius, 0) ; i <= x + radius && i < tiles.length ; i ++) {
 			for(int j = Math.max(y - radius, 0) ; j <= y + radius && j < tiles[i].length ; j ++) {
-				if(Math.abs(i - x) + Math.abs(j - y) >= radius) {
+				if(tileLoc.distanceTo(new TileLoc(i, j)) >= radius) {
 					continue;
 				}
 				neighbors.add(tiles[i][j]);
@@ -836,23 +836,43 @@ public class World {
 	public List<Tile> getNeighbors(Tile tile) {
 		int x = tile.getLocation().x();
 		int y = tile.getLocation().y();
-		int minX = Math.max(0, tile.getLocation().x() - 1);
-		int maxX = Math.min(this.getWidth()-1, tile.getLocation().x() + 1);
-		int minY = Math.max(0, tile.getLocation().y()-1);
-		int maxY = Math.min(this.getHeight()-1, tile.getLocation().y() + 1);
+//		int minX = Math.max(0, tile.getLocation().x() - 1);
+//		int maxX = Math.min(this.getWidth()-1, tile.getLocation().x() + 1);
+//		int minY = Math.max(0, tile.getLocation().y()-1);
+//		int maxY = Math.min(this.getHeight()-1, tile.getLocation().y() + 1);
 
+		LinkedList<TileLoc> possibleNeighbors = new LinkedList<>();
+		possibleNeighbors.add(new TileLoc(x - 1, y));
+		possibleNeighbors.add(new TileLoc(x + 1, y));
+		possibleNeighbors.add(new TileLoc(x, y - 1));
+		possibleNeighbors.add(new TileLoc(x, y + 1));
+//		possibleNeighbors.add(new TileLoc(x + 1, y + 1));
+		if(x%2 == 1) {
+			possibleNeighbors.add(new TileLoc(x - 1, y + 1));
+			possibleNeighbors.add(new TileLoc(x + 1, y + 1));
+		}
+		else {
+			possibleNeighbors.add(new TileLoc(x - 1, y - 1));
+			possibleNeighbors.add(new TileLoc(x + 1, y - 1));
+		}
 		LinkedList<Tile> tiles = new LinkedList<>();
-		for(int i = minX; i <= maxX; i++) {
-			for(int j = minY; j <= maxY; j++) {
-				if(i == x || j == y) {
-					if(i != x || j != y) {
-						if(this.get(new TileLoc(i, j)) != null) {
-							tiles.add(this.get(new TileLoc(i, j)));
-						}
-					}
-				}
+		for(TileLoc possible : possibleNeighbors) {
+			Tile t = this.get(possible);
+			if(t != null) {
+				tiles.add(t);
 			}
 		}
+//		for(int i = minX; i <= maxX; i++) {
+//			for(int j = minY; j <= maxY; j++) {
+//				if(i == x || j == y) {
+//					if(i != x || j != y) {
+//						if(this.get(new TileLoc(i, j)) != null) {
+//							tiles.add(this.get(new TileLoc(i, j)));
+//						}
+//					}
+//				}
+//			}
+//		}
 		Collections.shuffle(tiles); 
 		return tiles;
 	}

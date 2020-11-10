@@ -28,8 +28,28 @@ public class TileLoc implements Externalizable {
 	}
 	
 	public int distanceTo(TileLoc other) {
-		return Math.abs(this.x - other.x) + Math.abs(this.y - other.y);
-//		return Math.sqrt((this.x - other.x)*(this.x - other.x) + (this.y - other.y)*(this.y - other.y));
+		int deltax = Math.abs(this.x - other.x);
+		int deltay = Math.abs(this.y - other.y);
+		int ytoler = (deltax + 1) / 2;
+		if(this.x % 2 == 0) {
+			if(other.y > this.y) {
+				ytoler = deltax / 2;
+			}
+			else {
+				ytoler = (deltax + 1) / 2;
+			}
+		}
+		else {
+			if(other.y > this.y) {
+				ytoler = (deltax + 1) / 2;
+			}
+			else {
+				ytoler = deltax / 2;
+			}
+		}
+		int extraY = deltay - ytoler;
+		extraY = extraY < 0 ? 0 : extraY;
+		return deltax + extraY;
 	}
 	public double euclideanDistance(TileLoc other) {
 		return Math.sqrt((this.x - other.x)*(this.x - other.x) + (this.y - other.y)*(this.y - other.y));
