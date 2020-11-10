@@ -169,6 +169,9 @@ public class GameView extends JPanel {
 				else if (e.getKeyCode() == KeyEvent.VK_S) {
 					unitStop();
 				}
+				else if(e.getKeyCode() == KeyEvent.VK_G) {
+					toggleGuarding();
+				}
 				else if(e.getKeyCode() == KeyEvent.VK_M) {
 					setBuildingToPlan(Game.buildingTypeMap.get("MINE"));
 				}
@@ -176,7 +179,7 @@ public class GameView extends JPanel {
 					setBuildingToPlan(Game.buildingTypeMap.get("IRRIGATION"));
 				}
 				else if(e.getKeyCode() == KeyEvent.VK_W) {
-					setBuildingToPlan(Game.buildingTypeMap.get("SAWMILL"));
+					setBuildingToPlan(Game.buildingTypeMap.get("WALL_WOOD"));
 				}
 				else if(e.getKeyCode() == KeyEvent.VK_B) {
 					setBuildingToPlan(Game.buildingTypeMap.get("BARRACKS"));
@@ -205,11 +208,19 @@ public class GameView extends JPanel {
 		game.setHarvesting(selectedThings);
 	}
 	public void toggleGuarding() {
+		boolean foundNotGuarding = false;
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;
-				commandInterface.setGuarding(unit, !unit.isGuarding());
-//				unit.setGuarding(!unit.isGuarding());
+				if(!unit.isGuarding()) {
+					foundNotGuarding = true;
+				}
+			}
+		}
+		for(Thing thing : selectedThings) {
+			if(thing instanceof Unit) {
+				Unit unit = (Unit)thing;
+				commandInterface.setGuarding(unit, foundNotGuarding);
 			}
 		}
 	}
