@@ -385,20 +385,38 @@ public class Game {
 		summonThing(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("MINE"), world.getFaction(World.CYCLOPS_FACTION_ID));
 		
 		//makes the walls
-		for(int i = 0; i < 6; i++) {
+		for(int i = 0; i < 5; i++) {
+			BuildingType type = Game.buildingTypeMap.get("WALL_WOOD");
+			if(i == 2) {
+				type = Game.buildingTypeMap.get("GATE_WOOD");
+			}
+			Tile wall;
+			wall = world.get(new TileLoc(tile.getLocation().x()+3, tile.getLocation().y()-2 + i));
+			summonThing(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
+			wall = world.get(new TileLoc(tile.getLocation().x()-3, tile.getLocation().y()-2 + i));
+			summonThing(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
+		}
+		for(int i = 1; i < 6; i++) {
 			BuildingType type = Game.buildingTypeMap.get("WALL_WOOD");
 			if(i == 3) {
 				type = Game.buildingTypeMap.get("GATE_WOOD");
 			}
-			Tile wall = world.get(new TileLoc(tile.getLocation().x()-3 + i, tile.getLocation().y()-3));
+			Tile wall;
+			int yoffset = i;
+			if(i > 3) {
+				yoffset = (6 - yoffset);
+			}
+			yoffset += tile.getLocation().x()%2;
+			yoffset /= 2;
+			
+			wall = world.get(new TileLoc(tile.getLocation().x()-3 + i, tile.getLocation().y()-2 - yoffset));
 			summonThing(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
-			wall = world.get(new TileLoc(tile.getLocation().x()+3, tile.getLocation().y()-3 + i));
-			summonThing(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
-			wall = world.get(new TileLoc(tile.getLocation().x()+3 - i, tile.getLocation().y()+3));
-			summonThing(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
-			wall = world.get(new TileLoc(tile.getLocation().x()-3, tile.getLocation().y()+3 - i));
+
+			yoffset = yoffset + (tile.getLocation().x() + i)%2 - 2 - (tile.getLocation().x()%2);
+			wall = world.get(new TileLoc(tile.getLocation().x()-3 + i, tile.getLocation().y()+4 + yoffset));
 			summonThing(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
 		}
+		
 		for(int i = -1; i < 2; i ++) {
 			for(int j = -1; j < 2; j ++) {
 				Tile temp = world.get(new TileLoc(tile.getLocation().x() + i, tile.getLocation().y() + j));
