@@ -438,8 +438,9 @@ public class World {
 		if (potential.isPresent()) {
 			Tile t = potential.get();
 
-			int radius = (int) (Math.random() * 20 + 5);
+			int radius = (int) (Utils.getRandomNormal(2) * 30 + 5);
 			System.out.println("meteor at: " + t.getLocation().x() + ", " + t.getLocation().y());
+			;
 			spawnExplosionCircle(t, radius, 10000);
 			int rockRadius = radius / 5;
 			spawnRock(t, rockRadius);
@@ -480,19 +481,33 @@ public class World {
 
 	}
 	public void spawnExplosionCircle(Tile tile, int radius, int damage) {
+//		int radius = 35;
+		float amplitude = (float)(radius)/100;
 		
-		for(Tile t : this.getTiles()) {
-			int i =  t.getLocation().x();
-			int j =  t.getLocation().y();
-			int dx = i - tile.getLocation().x();
-			int dy = j - tile.getLocation().y();
-			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
+		for(Tile t : Utils.getTilesInRadius(tile, this, 2*radius)) {
+			
+			double distanceFromCenter = t.getLocation().euclideanDistance(tile.getLocation());
+			
+			float delta = 0f;
+			double cos = -Math.cos( (distanceFromCenter*(20f/radius)) / (2*Math.PI));
+			
+			if (distanceFromCenter < radius) {
+				Projectile wave = new Projectile(ProjectileType.METEOR_WAVE, tile, t, null, 5000);
+				tile.addProjectile(wave);
+				worldData.addProjectile(wave);
 				
-				if(distanceFromCenter < radius) {
-					Projectile wave = new Projectile(ProjectileType.METEOR_WAVE, tile, t, null, 5000);
-					tile.addProjectile(wave);
-					worldData.addProjectile(wave);
+				delta = (float)(amplitude*cos - 0.5*amplitude);
+				
+			}
+			if (distanceFromCenter >= radius && distanceFromCenter < 2*radius) {
+				delta = (float)(amplitude*cos - 0.5*amplitude);
+				if(delta < 0) {
+					delta = 0f;
 				}
+			}
+			if(delta != 0) {
+				t.setHeight(t.getHeight() + delta);
+			}
 		}
 	}
 	public void spawnExplosion(Tile tile, int radius, int damage) {
