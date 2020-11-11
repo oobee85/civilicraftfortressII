@@ -23,8 +23,7 @@ public class World {
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
 	public static final int TRANSITION_PERIOD = 100;
-//	private static final double CHANCE_TO_SWITCH_TERRAIN = 0.05;
-	private static final double CHANCE_TO_SWITCH_TERRAIN = 1;
+	private static final double CHANCE_TO_SWITCH_TERRAIN = 0.05;
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
