@@ -27,6 +27,6 @@ public class UnitInfoPanel extends InfoPanel {
 		String hpstring =  String.format("%d/%d",(int)showing.getHealth(), (int)showing.getCombatStats().getHealth());
 		KUIConstants.drawProgressBar(g, Color.green, Color.red, Color.black, showing.getHealth()/showing.getCombatStats().getHealth(), hpstring, 0, getHeight()-hpbarHeight, getWidth() - 85, hpbarHeight);
 
-		UnitTypeInfoPanel.drawCombatStats(g, showing.getType(), getWidth() - 95, 4);
+		UnitTypeInfoPanel.drawCombatStats(g, showing.getType(), getWidth() - 100, 4);
 	}
 }

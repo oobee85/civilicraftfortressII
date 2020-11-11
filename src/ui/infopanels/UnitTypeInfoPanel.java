@@ -34,7 +34,7 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		int fontSize = g.getFont().getSize();
 		int iconSize = 20;
 		int gap = 2;
-		int xoffset = (int) (iconSize*2.2);
+		int xoffset = (int) (iconSize*2.5);
 		
 		g.drawImage(movespeedImage, x, y, iconSize, iconSize, null);
 		g.drawString(stats.getMoveSpeed() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
@@ -42,16 +42,24 @@ public class UnitTypeInfoPanel extends InfoPanel {
 //		y += iconSize + gap;
 		g.drawImage(healthImage, x + xoffset, y, iconSize, iconSize, null);
 		g.drawString(stats.getHealth() + "", x + iconSize + gap + xoffset, y + iconSize/2 + fontSize/3);
-
+		
 		for(AttackStyle style : unitType.getAttackStyles()) {
 			y += iconSize + gap;
-			g.drawImage(attackImage, x, y, iconSize, iconSize, null);
-			g.drawString(style.getDamage() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
+			g.drawRect(x, y-1, + 2*iconSize + 4*gap + xoffset, 2*(iconSize + gap));
+			
+			g.drawImage(attackspeedImage, x , y, iconSize, iconSize, null);
+			g.drawString(style.getCooldown() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
+			
+			g.drawImage(attackImage, x + xoffset, y, iconSize, iconSize, null);
+			g.drawString(style.getDamage() + "", x + iconSize + gap + xoffset, y + iconSize/2 + fontSize/3);
+
 			y += iconSize + gap;
-			g.drawImage(visionImage, x , y, iconSize, iconSize, null);
-			g.drawString(style.getRange() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
-			g.drawImage(attackspeedImage, x + xoffset, y, iconSize, iconSize, null);
-			g.drawString(style.getCooldown() + "", x + iconSize + gap + xoffset, y + iconSize/2 + fontSize/3);
+			g.drawImage(visionImage, x, y, iconSize, iconSize, null);
+			String rangeStr = style.getRange() + "";
+			if(style.getMinRange() > 0) {
+				rangeStr = style.getMinRange() +"-" + rangeStr;
+			}
+			g.drawString(rangeStr, x + iconSize + gap, y + iconSize/2 + fontSize/3);
 		}
 	}
 	
@@ -89,6 +97,6 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		if(showing.getCost() != null) {
 			drawCosts(g, showing.getCost(), x, y + 6, faction);
 		}
-		drawCombatStats(g, showing, getWidth() - 95, 4);
+		drawCombatStats(g, showing, getWidth() - 100, 4);
 	}
 }
