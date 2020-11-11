@@ -19,6 +19,9 @@ public class Flamelet extends Animal {
 				this.getTile().getModifier().finish();
 				makeFlame(world);
 			}
+			else {
+				this.getTile().getModifier().addDuration(30);
+			}
 		}
 		else {
 			makeFlame(world);

@@ -47,9 +47,15 @@ public class PlannedAction {
 	
 	public boolean isDone(Tile currentPosition) {
 		if(build == BUILDING) {
+			if(targetTile.getBuilding() == null) {
+				return true;
+			}
 			return (targetTile.getBuilding().isDead() || targetTile.getBuilding().isBuilt());
 		}
 		if(build == ROAD) {
+			if(targetTile.getRoad() == null) {
+				return true;
+			}
 			return (targetTile.getRoad().isDead() || targetTile.getRoad().isBuilt());
 		}
 		if(target != null) {

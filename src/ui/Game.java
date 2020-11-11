@@ -148,10 +148,9 @@ public class Game {
 				break;
 			}
 		}
-		
 	}
-	private void dayEvents() {
-		double day = Math.sqrt(World.days);
+	
+	private Tile getTargetTileForSpawns() {
 		Tile targetTile = world.getTilesRandomly().peek();
 
 		for (Faction faction : world.getFactions()) {
@@ -168,17 +167,13 @@ public class Game {
 			if (factionTiles.isEmpty() == false) {
 				targetTile = factionTiles.get((int) (Math.random() * factionTiles.size()));
 			}
-
 		}
+		return targetTile;
+	}
+	private void dayEvents() {
+		double day = Math.sqrt(World.days);
+		Tile targetTile = getTargetTileForSpawns();
 		
-		Tile spawnTile = targetTile;
-		for(Tile t: world.getTilesRandomly()) {
-			if(t.getLocation().distanceTo(targetTile.getLocation()) < howFarAwayStuffSpawn 
-					&& t.getFaction() == world.getFaction(world.NO_FACTION_ID)) {
-				spawnTile = t;
-			}
-			
-		}
 		//all the forced spawns
 		if(World.days % 5 == 0) {
 			for(int i = 0; i < day; i++) {
@@ -260,7 +255,14 @@ public class Game {
 			}
 			System.out.println(number + " bomb");
 		}
-		
+
+		Tile spawnTile = targetTile;
+		for(Tile t: world.getTilesRandomly()) {
+			if(t.getLocation().distanceTo(targetTile.getLocation()) < howFarAwayStuffSpawn 
+					&& t.getFaction() == world.getFaction(World.NO_FACTION_ID)) {
+				spawnTile = t;
+			}
+		}
 		if(World.days >= 1 && Math.random() > 0.5) {
 			int number = (int)(Season.MELTING_TEMPURATURE + Math.random()*day);
 			makeAnimal(spawnTile, Game.unitTypeMap.get("FLAMELET"), number);
@@ -277,15 +279,16 @@ public class Game {
 	}
 	private void nightEvents() {
 		double day = Math.sqrt(World.days);
+		Tile targetTile = getTargetTileForSpawns();
 		if(World.days >= 10) {
 			if(Math.random() > 0.5) {
-				world.spawnWerewolf(null);
+				world.spawnWerewolf(targetTile);
 			}
 		}
 		if(World.days >= 10) {
 			int number = (int)(Math.random() * Season.FREEZING_TEMPURATURE * day);
 			for(int i = 0; i < number; i++) {
-				world.spawnVampire(null);
+				world.spawnVampire(targetTile);
 			}
 			System.out.println(number + " vampire");
 		}
@@ -599,8 +602,6 @@ public class Game {
 			newFaction.addItem(ItemType.WOOD, 200);
 			newFaction.addItem(ItemType.STONE, 200);
 			newFaction.addItem(ItemType.FOOD, 200);
-			newFaction.addItem(ItemType.COPPER_ORE, 200);
-			newFaction.addItem(ItemType.SILVER_ORE, 200);
 			world.addFaction(newFaction);
 			
 			LinkedList<HasImage> thingsToPlace = new LinkedList<>();

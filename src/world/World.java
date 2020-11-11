@@ -23,7 +23,8 @@ public class World {
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
 	public static final int TRANSITION_PERIOD = 100;
-	private static final double CHANCE_TO_SWITCH_TERRAIN = 0.05;
+//	private static final double CHANCE_TO_SWITCH_TERRAIN = 0.05;
+	private static final double CHANCE_TO_SWITCH_TERRAIN = 1;
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
@@ -360,9 +361,9 @@ public class World {
 	}
 	public void spawnVampire(Tile target) {
 		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
-		e.getTerrain() == Terrain.ROCK 
-		&& e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
-		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+				e.getTerrain() == Terrain.ROCK 
+				&& e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
+				&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(potential.isPresent()) {
 			Tile t = potential.get();
 			spawnAnimal(Game.unitTypeMap.get("VAMPIRE"), t, getFaction(UNDEAD_FACTION_ID), target);
@@ -546,17 +547,15 @@ public class World {
 						failTiles ++;
 					}
 				}
-				//if one neighbor fails, make the tile dirt
-				if(failTiles == 1) {
-					if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+					//if one neighbor fails, make the tile dirt
+					if(failTiles == 1) {
 						tile.setTerrain(Terrain.DIRT);
-					}
-				//if all neighbors are eligible for desert, convert tile to desert
-				}else if(failTiles == 0){
-					if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+					} 
+					//if all neighbors are eligible for desert, convert tile to desert
+					else if(failTiles < 1) {
 						tile.setTerrain(Terrain.SAND);
 					}
-					
 				}
 			//turns the tile back into dirt if its above desert humidity
 			}else if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY) {
@@ -716,9 +715,22 @@ public class World {
 			if (projectile.readyToMove()) {
 				projectile.moveToTarget();
 				if(projectile.getType().getGroundModifierType() != null) {
-					GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), projectile.getType().getGroundModifierDuration());
-					projectile.getTile().setModifier(gm);
-					worldData.addGroundModifier(gm);
+					if(projectile.getTile().getModifier() != null) {
+						if(projectile.getTile().getModifier().getType() != projectile.getType().getGroundModifierType()) {
+							projectile.getTile().getModifier().finish();
+							GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), projectile.getType().getGroundModifierDuration());
+							projectile.getTile().setModifier(gm);
+							worldData.addGroundModifier(gm);
+						}
+						else {
+							projectile.getTile().getModifier().addDuration(projectile.getType().getGroundModifierDuration());
+						}
+					}
+					else {
+						GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), projectile.getType().getGroundModifierDuration());
+						projectile.getTile().setModifier(gm);
+						worldData.addGroundModifier(gm);
+					}
 				}
 			}
 			if(!simulated && projectile.reachedTarget()) {

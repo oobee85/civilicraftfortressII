@@ -102,17 +102,17 @@ public class Tile implements Externalizable {
 	public void updateHumidity(int currentTick) {
 		if(liquidType == LiquidType.WATER || liquidType == LiquidType.ICE ||  liquidType == LiquidType.SNOW) {
 			if(liquidAmount > 0) {
-				humidity += Math.sqrt(liquidAmount);
+				humidity += Math.sqrt(Math.sqrt(liquidAmount)); // sqrt(0.01) -> 0.1
 			}
 		}
 		if(modifier != null && modifier.isHot()) {
 			humidity -= 1;
 		}
 		if(liquidType == LiquidType.LAVA) {
-			humidity = 0;
+			humidity -= liquidAmount*10;
 		}
 		
-		humidity *= 0.99;
+		humidity *= 0.995;
 		if(humidity < 0) {
 			humidity = 0;
 		}
