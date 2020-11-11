@@ -822,6 +822,7 @@ public class GameView extends JPanel {
 					for (int i = lowerX; i < upperX; i++) {
 						for (int j = lowerY; j < upperY; j++) {
 							Tile tile = game.world.get(new TileLoc(i, j));
+							Point drawAt = getDrawingCoords(tile.getLocation());
 							List<String> strings = new LinkedList<String>();
 							strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
 							strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getHumidity()));
@@ -839,19 +840,19 @@ public class GameView extends JPanel {
 							if(tile.getModifier() != null) {
 								strings.add("GM=" + tile.getModifier().timeLeft());
 							}
-							rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, strings, rows[i-lowerX][j-lowerY], fontsize, tileSize);
+							rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, strings, rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
 							
 							for(Unit unit : tile.getUnits()) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, unit.getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize);
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, unit.getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
 							}
 							if(tile.getPlant() != null) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getPlant().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize);
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getPlant().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
 							}
 							if(tile.hasBuilding()) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getBuilding().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize);
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getBuilding().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
 							}
 							if(tile.getRoad() != null) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getRoad().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize);
+								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getRoad().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
 								
 							}
 						}

@@ -303,9 +303,9 @@ public class Tile implements Externalizable {
 		g.fillRect(location.x() * tileSize, location.y() * tileSize, tileSize, tileSize);
 	}
 
-	public int drawDebugStrings(Graphics g, List<String> strings, int row, int fontsize, int tileSize) {
-		int x = location.x() * tileSize + 2;
-		int y = location.y() * tileSize + fontsize / 2;
+	public int drawDebugStrings(Graphics g, List<String> strings, int row, int fontsize, int tileSize, Point drawAt) {
+		int x = drawAt.x + 2;
+		int y = drawAt.y + fontsize / 2;
 		int maxWidth = 0;
 		for (String s : strings) {
 			int stringWidth = g.getFontMetrics().stringWidth(s)+2;
