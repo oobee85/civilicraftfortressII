@@ -1,13 +1,11 @@
 package utils;
 import java.awt.*;
 import java.awt.image.*;
-import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 
-import javax.imageio.*;
 import javax.swing.*;
 
 import game.*;
@@ -16,9 +14,6 @@ import ui.*;
 import world.*;
 
 public final class Utils {
-	
-	public static final String[] DIRECTION_STRINGS = new String[] {"north", "east", "south", "west"};
-	public static final String ALL_DIRECTIONS = DIRECTION_STRINGS[0] + DIRECTION_STRINGS[1] + DIRECTION_STRINGS[2] + DIRECTION_STRINGS[3];
 	
 	public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	

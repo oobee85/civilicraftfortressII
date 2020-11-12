@@ -63,7 +63,7 @@ public class BuildingType implements HasImage, Serializable {
 	@Override
 	public Image getImage(int size) {
 		if(isRoad()) {
-			return roadImages.get(Utils.ALL_DIRECTIONS);
+			return roadImages.get(Direction.ALL_DIRECTIONS);
 		}
 		else {
 			return mipmap.getImage(size);
@@ -81,7 +81,7 @@ public class BuildingType implements HasImage, Serializable {
 	@Override
 	public ImageIcon getImageIcon(int size) {
 		if(isRoad()) {
-			return new ImageIcon(roadImages.get(Utils.ALL_DIRECTIONS));
+			return new ImageIcon(roadImages.get(Direction.ALL_DIRECTIONS));
 		}
 		else {
 			return mipmap.getImageIcon(size);
