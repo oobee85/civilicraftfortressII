@@ -245,7 +245,7 @@ public class Client {
 	}
 	
 	private void startLocalGameLoopThread(boolean simulated) {
-		final long millisPerTick = Server.MILLISECONDS_PER_TICK + (simulated ? 1 : 0);
+		final long millisPerTick = Server.MILLISECONDS_PER_TICK;
 		Thread gameLoopThread = new Thread(() -> {
 			while (true) {
 				try {
@@ -258,7 +258,6 @@ public class Client {
 					}
 					gameInstance.world.getData().clearDeadThings();
 					gameInstance.world.getData().clearProjectilesToSend();
-					gameInstance.getGUIController().updateGUI();
 					synchronized (updatedTerrain) {
 						updatedTerrain.notify();
 					}

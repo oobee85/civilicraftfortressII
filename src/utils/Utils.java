@@ -142,6 +142,56 @@ public final class Utils {
 		return new ImageIcon(image);
 	}
 	
+	public static ImageIcon highlightFilter(ImageIcon icon, Color color) {
+		BufferedImage image = toBufferedImage(icon.getImage());
+		Color blank = new Color(0, 0, 0, 0);
+		for(int x = 0; x < image.getWidth(); x++) {
+			for(int y = 0; y < image.getHeight(); y++) {
+				Color c = new Color(image.getRGB(x, y), true);
+				if(c.getAlpha() > 0.1) {
+					image.setRGB(x, y, color.getRGB());
+				}
+				else {
+					image.setRGB(x, y, blank.getRGB());
+				}
+			}
+		}
+		int numLayers = Math.max(1, Math.min(3, image.getWidth()*image.getHeight()/900));
+		for(int i = 0; i < numLayers; i++) {
+			BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+			for(int x = 0; x < image.getWidth(); x++) {
+				for(int y = 0; y < image.getHeight(); y++) {
+					boolean activeNeighbor = (image.getRGB(x, y) == color.getRGB());
+					if(x-1 >= 0 && y >= 0 && x-1 < image.getWidth() && y < image.getHeight()) {
+						if(image.getRGB(x-1, y) == color.getRGB()) {
+							activeNeighbor = true;
+						}
+					}
+					if(x+1 >= 0 && y >= 0 && x+1 < image.getWidth() && y < image.getHeight()) {
+						if(image.getRGB(x+1, y) == color.getRGB()) {
+							activeNeighbor = true;
+						}
+					}
+					if(x >= 0 && y-1 >= 0 && x < image.getWidth() && y-1 < image.getHeight()) {
+						if(image.getRGB(x, y-1) == color.getRGB()) {
+							activeNeighbor = true;
+						}
+					}
+					if(x >= 0 && y+1 >= 0 && x < image.getWidth() && y+1 < image.getHeight()) {
+						if(image.getRGB(x, y+1) == color.getRGB()) {
+							activeNeighbor = true;
+						}
+					}
+					if(activeNeighbor) {
+						newImage.setRGB(x, y, color.getRGB());
+					}
+				}
+			}
+			image = newImage;
+		}
+		return new ImageIcon(image);
+	}
+	
 	public static Color getAverageColor(BufferedImage image) {
 		float sumr = 0;
 		float sumg = 0;

@@ -250,7 +250,7 @@ public class GameView extends JPanel {
 		// spawning unit or building
 		else if(leftClickAction == LeftClickAction.SPAWN_THING) {
 			Thing summoned = game.summonThing(tile, selectedThingToSpawn, summonPlayerControlled ? faction : game.world.getFaction(World.NO_FACTION_ID));
-			if(summoned.getFaction() == faction) {
+			if(summoned != null && summoned.getFaction() == faction) {
 				if(!shiftDown) {
 					deselectEverything();
 				}
@@ -946,9 +946,15 @@ public class GameView extends JPanel {
 			}
 			
 			if(theTile.getBuilding() != null) {
+				if(theTile.getBuilding().getIsSelected()) {
+					g.drawImage(theTile.getBuilding().getHighlight(tileSize), drawAt.x, drawAt.y, draww, drawh, null);
+				}
 				drawBuilding(theTile.getBuilding(), g, drawAt.x, drawAt.y, draww, drawh);
 			}
 			for(Unit unit : theTile.getUnits()) {
+				if(unit.getIsSelected()) {
+					g.drawImage(unit.getHighlight(tileSize), drawAt.x, drawAt.y, draww, drawh, null);
+				}
 				g.drawImage(unit.getImage(tileSize), drawAt.x, drawAt.y, draww, drawh, null);
 				if(unit.getIsHarvesting() == true) {
 					g.drawImage(HARVEST_ICON, drawAt.x+draww/4, drawAt.y+drawh/4, draww/2, drawh/2, null);

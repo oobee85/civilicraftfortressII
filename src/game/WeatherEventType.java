@@ -36,6 +36,10 @@ public enum WeatherEventType implements HasImage{
 	public Image getShadow(int size) {
 		return mipmap.getShadow(size);
 	}
+	@Override
+	public Image getHighlight(int size) {
+		return mipmap.getHighlight(size);
+	}
 
 	@Override
 	public ImageIcon getImageIcon(int size) {

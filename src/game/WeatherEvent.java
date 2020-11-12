@@ -144,6 +144,10 @@ public class WeatherEvent implements HasImage{
 		return null;
 	}
 	@Override
+	public Image getHighlight(int size) {
+		return mipmap.getHighlight(size);
+	}
+	@Override
 	public ImageIcon getImageIcon(int size) {
 		return hasImage.getImageIcon(size);
 	}

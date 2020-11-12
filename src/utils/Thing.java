@@ -196,6 +196,10 @@ public class Thing implements HasImage, Serializable {
 		return hasImage.getShadow(size);
 	}
 	@Override
+	public Image getHighlight(int size) {
+		return hasImage.getHighlight(size);
+	}
+	@Override
 	public ImageIcon getImageIcon(int size) {
 		return hasImage.getImageIcon(size);
 	}

@@ -672,7 +672,9 @@ public class Game {
 	}
 	
 	public Thing summonThing(Tile tile, HasImage thingType, Faction faction) {
-		
+		if(tile == null) {
+			return null;
+		}
 		if(thingType instanceof UnitType) {
 			UnitType unitType = (UnitType)thingType;
 			if(faction.isPlayer()) {

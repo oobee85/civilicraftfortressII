@@ -146,6 +146,10 @@ public class Projectile implements HasImage, Externalizable {
 	public Image getShadow(int size) {
 		return hasImage.getShadow(size);
 	}
+	@Override
+	public Image getHighlight(int size) {
+		return hasImage.getHighlight(size);
+	}
 	public ImageIcon getImageIcon(int size) {
 		return hasImage.getImageIcon(size);
 	}

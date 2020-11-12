@@ -62,6 +62,10 @@ public enum LiquidType implements HasImage {
 		return mipmap.getShadow(size);
 	}
 	@Override
+	public Image getHighlight(int size) {
+		return mipmap.getHighlight(size);
+	}
+	@Override
 	public ImageIcon getImageIcon(int size) {
 		return mipmap.getImageIcon(size);
 	}
