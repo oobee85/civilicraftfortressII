@@ -22,7 +22,7 @@ public class Game {
 	public static final ArrayList<ResearchType> researchTypeList = new ArrayList<>();
 	public static final HashMap<String, ResearchType> researchTypeMap = new HashMap<>();
 
-	public static boolean USE_BIDIRECTIONAL_A_STAR = false;
+	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
 	public static boolean DISABLE_NIGHT = false;
 	
 	private GUIController guiController;
