@@ -217,14 +217,17 @@ public class Client {
 	}
 	
 	public void connectToServer(InetAddress ip) {
+		System.out.println("Connecting to " + ip);
 		Socket socket = null;
 		try {
 			socket = new Socket(ip, Server.PORT);
 			connection = new Connection(socket);
+			System.out.println("Connected to " + ip);
 			connection.setDisconnectCallback(() -> {
 				clientGUI.disconnected();
 				System.out.println("reached callback");
 			});
+			sendMessage(new ClientMessage(ClientMessageType.INFO, clientGUI.getPlayerInfo()));
 			clientGUI.connected(connection.getPanel());
 			clientGUI.getGameView().setCommandInterface(networkingCommands);
 			startReceiving();

@@ -11,23 +11,23 @@ import world.*;
 
 public class Faction implements Externalizable {
 	
-	private transient static final Color[] factionColors = new Color[] { 
+	private static final Color[] factionColors = new Color[] { 
 			Color.lightGray, Color.blue, Color.green.darker(), Color.pink, 
 			Color.orange, Color.cyan, Color.yellow};
-	private transient static int idCounter = 0;
+	private static int idCounter = 0;
 	
-	private transient HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
-	private transient HashMap<UnitType, ResearchRequirement> unitResearchRequirements = new HashMap<>();
-	private transient HashMap<ItemType, ResearchRequirement> craftResearchRequirements = new HashMap<>();
+	private HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
+	private HashMap<UnitType, ResearchRequirement> unitResearchRequirements = new HashMap<>();
+	private HashMap<ItemType, ResearchRequirement> craftResearchRequirements = new HashMap<>();
 	
 
 	private Item[] items = new Item[ItemType.values().length];
 	
-	private transient HashMap<String, Research> researchMap = new HashMap<>();
+	private HashMap<String, Research> researchMap = new HashMap<>();
 	private Research researchTarget;
 	
-	private transient LinkedList<AttackedNotification> attacked = new LinkedList<>();
-	private transient LinkedList<AttackedNotification> newAttacked = new LinkedList<>();
+	private LinkedList<AttackedNotification> attacked = new LinkedList<>();
+	private LinkedList<AttackedNotification> newAttacked = new LinkedList<>();
 	
 	private int id;
 	private Color color;

@@ -15,6 +15,8 @@ import world.*;
 
 public class ClientGUI {
 	
+	private static final String AZURE_SERVER_IP = "nickciv2.westus.cloudapp.azure.com";
+	
 	public static final int GUIWIDTH = 350;
 
 	private static final int TAB_ICON_SIZE = 25;
@@ -26,6 +28,7 @@ public class ClientGUI {
 	private static final ImageIcon DEBUG_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	
 	private static final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(200, 40);
+	private static final Dimension CONNECTION_MENU_BUTTON_SIZE = new Dimension(120, 30);
 
 	
 	private Client client;
@@ -38,7 +41,7 @@ public class ClientGUI {
 	private JPanel topPanel;
 	private JPanel sidePanel;
 	
-	private JPanel playerinfoPanel;
+	private JPanel connectionControlsPanel;
 	private JPanel lobbyInfo;
 	private JTextField nameTextField;
 	private Color selectedColor = Server.DEFAULT_PLAYER_INFO.getColor();
@@ -95,36 +98,24 @@ public class ClientGUI {
 		singlePlayer.setAlignmentX(Component.CENTER_ALIGNMENT);
 		JTextField ipTextField = KUIConstants.setupTextField("localhost", MAIN_MENU_BUTTON_SIZE);
 		ipTextField.setAlignmentX(Component.CENTER_ALIGNMENT);
-		KButton startButton = KUIConstants.setupButton("Multiplayer", null, MAIN_MENU_BUTTON_SIZE);
+		KButton startButton = KUIConstants.setupButton("Custom IP", null, MAIN_MENU_BUTTON_SIZE);
 		startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		startButton.addActionListener(e -> {
-			try {
-				client.connectToServer(InetAddress.getByName(ipTextField.getText()));
-			} catch (UnknownHostException e1) {
-				e1.printStackTrace();
-			}
+			connectToServer(ipTextField.getText());
+		});
+		KButton startLocalHostButton = KUIConstants.setupButton("localhost", null, MAIN_MENU_BUTTON_SIZE);
+		startLocalHostButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		startLocalHostButton.addActionListener(e -> {
+			connectToServer("localhost");
+		});
+		KButton startAzureButton = KUIConstants.setupButton("Azure Server", null, MAIN_MENU_BUTTON_SIZE);
+		startAzureButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		startAzureButton.addActionListener(e -> {
+			connectToServer(AZURE_SERVER_IP);
 		});
 
-		int padding = 20;
-		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
-		mainMenuPanel.add(singlePlayer);
-		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding*2)));
-		mainMenuPanel.add(ipTextField);
-		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding/2)));
-		mainMenuPanel.add(startButton);
-		mainMenuPanel.add(Box.createVerticalGlue());
-
-		rootPanel.add(mainMenuPanel, BorderLayout.CENTER);
-		
-		playerinfoPanel = new JPanel();
-		playerinfoPanel.setFocusable(false);
-		playerinfoPanel.setLayout(new BoxLayout(playerinfoPanel, BoxLayout.X_AXIS));
-
-		nameTextField = KUIConstants.setupTextField(Server.DEFAULT_PLAYER_INFO.getName(), null);
-		nameTextField.setMaximumSize(new Dimension(120, 999));
-		playerinfoPanel.add(nameTextField);
-
-		KButton colorButton = KUIConstants.setupButton("Pick Color", null, null);
+		nameTextField = KUIConstants.setupTextField(Server.DEFAULT_PLAYER_INFO.getName(), new Dimension(MAIN_MENU_BUTTON_SIZE.width - MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height));
+		KButton colorButton = KUIConstants.setupButton("", null, new Dimension(MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height));
 		colorButton.setBorder(BorderFactory.createLineBorder(selectedColor, 10));
 		colorButton.addActionListener(e -> {
 			Color newColor = JColorChooser.showDialog(rootPanel, "Choose Color", colorButton.getBackground());
@@ -134,53 +125,91 @@ public class ClientGUI {
 			}
 			resetFocus();
 		});
-		playerinfoPanel.add(colorButton);
 
-		KButton updateInfoButton = KUIConstants.setupButton("Update Info", null, null);
-		updateInfoButton.addActionListener(e -> {
-			client.sendMessage(new ClientMessage(ClientMessageType.INFO, new PlayerInfo(nameTextField.getText(), selectedColor)));
-			resetFocus();
-		});
-		playerinfoPanel.add(updateInfoButton);
+		JPanel playerInfoPanel = new JPanel();
+		playerInfoPanel.setFocusable(false);
+		playerInfoPanel.setLayout(new BoxLayout(playerInfoPanel, BoxLayout.X_AXIS));
+		playerInfoPanel.add(nameTextField);
+		playerInfoPanel.add(colorButton);
+		
+		
 
-		playerinfoPanel.add(Box.createHorizontalGlue());
-		KButton disconnectButton = KUIConstants.setupButton("Disconnect", null, null);
+		int padding = 20;
+		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		mainMenuPanel.add(singlePlayer);
+		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding*4)));
+
+		mainMenuPanel.add(playerInfoPanel);
+		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		mainMenuPanel.add(startLocalHostButton);
+		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		mainMenuPanel.add(startAzureButton);
+		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		mainMenuPanel.add(ipTextField);
+		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, 0)));
+		mainMenuPanel.add(startButton);
+		mainMenuPanel.add(Box.createVerticalGlue());
+
+		rootPanel.add(mainMenuPanel, BorderLayout.CENTER);
+		
+		connectionControlsPanel = new JPanel();
+		connectionControlsPanel.setFocusable(false);
+		connectionControlsPanel.setLayout(new BoxLayout(connectionControlsPanel, BoxLayout.X_AXIS));
+
+		lobbyInfo = new JPanel();
+		lobbyInfo.setFocusable(false);
+		lobbyInfo.setLayout(new BoxLayout(lobbyInfo, BoxLayout.X_AXIS));
+		connectionControlsPanel.add(lobbyInfo);
+		
+		
+		connectionControlsPanel.add(Box.createHorizontalGlue());
+		KButton disconnectButton = KUIConstants.setupButton("Disconnect", null, CONNECTION_MENU_BUTTON_SIZE);
 		disconnectButton.addActionListener(e -> {
 			client.disconnect();
 			resetFocus();
 		});
-		playerinfoPanel.add(disconnectButton);
+		connectionControlsPanel.add(disconnectButton);
 
-		makeWorldButton = KUIConstants.setupButton("Make World", null, null);
+		makeWorldButton = KUIConstants.setupButton("Make World", null, CONNECTION_MENU_BUTTON_SIZE);
 		makeWorldButton.addActionListener(e -> {
 			client.sendMessage(new ClientMessage(ClientMessageType.MAKE_WORLD, null));
 			resetFocus();
 		});
-		playerinfoPanel.add(makeWorldButton);
+		connectionControlsPanel.add(makeWorldButton);
 
-		startGameButton = KUIConstants.setupButton("Start Game", null, null);
+		startGameButton = KUIConstants.setupButton("Start Game", null, CONNECTION_MENU_BUTTON_SIZE);
 		startGameButton.addActionListener(e -> {
 			client.sendMessage(new ClientMessage(ClientMessageType.START_GAME, null));
 			resetFocus();
 		});
-		playerinfoPanel.add(startGameButton);
+		connectionControlsPanel.add(startGameButton);
 		startGameButton.setEnabled(false);
 		
-		lobbyInfo = new JPanel();
-		lobbyInfo.setFocusable(false);
-		lobbyInfo.setLayout(new BoxLayout(lobbyInfo, BoxLayout.X_AXIS));
-		topPanel.add(lobbyInfo, BorderLayout.CENTER);
+//		topPanel.add(lobbyInfo, BorderLayout.CENTER);
+	}
+	
+	private void connectToServer(String ip) {
+		try {
+			client.connectToServer(InetAddress.getByName(ip));
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
+		}
 	}
 	
 	public void updatedLobbyList(PlayerInfo[] lobbyList) {
 		lobbyInfo.removeAll();
 		for(PlayerInfo info : lobbyList) {
-			JLabel playerLabel = new JLabel(info.getName());
+			JLabel playerLabel = new JLabel(info.getName(), SwingConstants.CENTER);
+			playerLabel.setPreferredSize(new Dimension(CONNECTION_MENU_BUTTON_SIZE.height*3, CONNECTION_MENU_BUTTON_SIZE.height));
 			playerLabel.setBorder(BorderFactory.createLineBorder(info.getColor(), 4, true));
 			lobbyInfo.add(playerLabel);
 		}
 		lobbyInfo.revalidate();
 		lobbyInfo.repaint();
+	}
+	
+	public PlayerInfo getPlayerInfo() {
+		return new PlayerInfo(nameTextField.getText(), selectedColor);
 	}
 	
 	public void worldReceived() {
@@ -196,11 +225,12 @@ public class ClientGUI {
 		rootPanel.repaint();
 	}
 	public void connected(JPanel connectionInfo) {
+		
 		rootPanel.remove(mainMenuPanel);
 		rootPanel.add(ingamePanel);
 		resetFocus();
 		
-		topPanel.add(playerinfoPanel, BorderLayout.NORTH);
+		topPanel.add(connectionControlsPanel, BorderLayout.NORTH);
 		
 		rootPanel.revalidate();
 		rootPanel.repaint();
@@ -209,7 +239,7 @@ public class ClientGUI {
 	public void disconnected() {
 		rootPanel.remove(ingamePanel);
 		rootPanel.add(mainMenuPanel);
-		topPanel.remove(playerinfoPanel);
+		topPanel.remove(connectionControlsPanel);
 		rootPanel.revalidate();
 		rootPanel.repaint();
 	}

@@ -37,7 +37,6 @@ public class World {
 	private Tile[][] tiles;
 	
 	public volatile ConcurrentHashMap<Tile, Faction> territory = new ConcurrentHashMap<>();
-//	public volatile ConcurrentHashMap<Tile, Faction> borderTerritory = new ConcurrentHashMap<>();
 	private int width;
 	private int height;
 	
