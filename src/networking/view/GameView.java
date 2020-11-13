@@ -921,92 +921,96 @@ public class GameView extends JPanel {
 				}
 			}
 			
-			if (leftClickAction == LeftClickAction.PLAN_BUILDING) {
-				Utils.setTransparency(g, 0.5f);
-				Graphics2D g2d = (Graphics2D)g;
-				BufferedImage bI = Utils.toBufferedImage(selectedBuildingToPlan.getImage(tileSize));
-				Point drawAt = getDrawingCoords(hoveredTile);
-				g2d.drawImage(bI, drawAt.x, drawAt.y, tileSize, tileSize , null);
-				Utils.setTransparency(g, 1f);
-			}
-			if (leftClickAction == LeftClickAction.SPAWN_THING) {
-				Utils.setTransparency(g, 0.5f);
-				Graphics2D g2d = (Graphics2D)g;
-				BufferedImage bI = Utils.toBufferedImage(selectedThingToSpawn.getImage(tileSize));
-				Point drawAt = getDrawingCoords(hoveredTile);
-				g2d.drawImage(bI, drawAt.x, drawAt.y, tileSize, tileSize , null);
-				Utils.setTransparency(g, 1f);
-			}
+			drawPlannedThing((Graphics2D)g);
 			
 			if(drawDebugStrings) {
 				if(tileSize >= 36) {
-					int[][] rows = new int[upperX - lowerX][upperY - lowerY];
-					int fontsize = tileSize/4;
-					fontsize = Math.min(fontsize, 13);
-					Font font = new Font("Consolas", Font.PLAIN, fontsize);
-					g.setFont(font);
-					for (int i = lowerX; i < upperX; i++) {
-						for (int j = lowerY; j < upperY; j++) {
-							Tile tile = game.world.get(new TileLoc(i, j));
-							Point drawAt = getDrawingCoords(tile.getLocation());
-							List<String> strings = new LinkedList<String>();
-							strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
-							strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getHumidity()));
-							strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTempurature()));
-							if(tile.getResource() != null) {
-								strings.add(String.format("ORE" + "=%d", tile.getResource().getYield()));
-							}
-							
-							
-							if(tile.liquidType != LiquidType.DRY) {
-								strings.add(String.format(tile.liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount));
-							}
-							
-							
-							if(tile.getModifier() != null) {
-								strings.add("GM=" + tile.getModifier().timeLeft());
-							}
-							rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, strings, rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
-							
-							for(Unit unit : tile.getUnits()) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, unit.getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
-							}
-							if(tile.getPlant() != null) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getPlant().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
-							}
-							if(tile.hasBuilding()) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getBuilding().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
-							}
-							if(tile.getRoad() != null) {
-								rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getRoad().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
-								
-							}
-						}
-					}
+					drawDebugStrings(g, lowerX, lowerY, upperX, upperY);
 				}
 			}
 			if(leftClickAction == LeftClickAction.ATTACK) {
 				drawTarget(g, hoveredTile);
 			}
-			int strokeWidth = tileSize/10;
-			strokeWidth = strokeWidth < 1 ? 1 : strokeWidth;
-			Graphics2D g2d = (Graphics2D)g;
-			Stroke stroke = g2d.getStroke();
-			g2d.setStroke(new BasicStroke(strokeWidth));
-			g.setColor(new Color(0, 0, 0, 64));
-			if(mousePressLocation != null && leftMouseDown) {
-				Position[] box = normalizeRectangle(boxSelect[0], boxSelect[1]);
-				for(Tile tile : getTilesBetween(box[0], box[1])) {
-					Point drawAt = getDrawingCoords(tile.getLocation());
-					g.drawRect(drawAt.x + strokeWidth/2, drawAt.y + strokeWidth/2, tileSize-strokeWidth, tileSize-strokeWidth);
+			drawHoveredTiles((Graphics2D) g);
+		}
+	}
+	private void drawPlannedThing(Graphics2D g) {
+		BufferedImage bI = null;
+		if (leftClickAction == LeftClickAction.PLAN_BUILDING) {
+			bI = Utils.toBufferedImage(selectedBuildingToPlan.getImage(tileSize));
+		}
+		else if (leftClickAction == LeftClickAction.SPAWN_THING) {
+			bI = Utils.toBufferedImage(selectedThingToSpawn.getImage(tileSize));
+		}
+		if(bI != null) {
+			Utils.setTransparency(g, 0.5f);
+			Point drawAt = getDrawingCoords(hoveredTile);
+			g.drawImage(bI, drawAt.x, drawAt.y, tileSize, tileSize , null);
+			Utils.setTransparency(g, 1f);
+		}
+	}
+	
+	private void drawDebugStrings(Graphics g, int lowerX, int lowerY, int upperX, int upperY) {
+		int[][] rows = new int[upperX - lowerX][upperY - lowerY];
+		int fontsize = tileSize/4;
+		fontsize = Math.min(fontsize, 13);
+		Font font = new Font("Consolas", Font.PLAIN, fontsize);
+		g.setFont(font);
+		for (int i = lowerX; i < upperX; i++) {
+			for (int j = lowerY; j < upperY; j++) {
+				Tile tile = game.world.get(new TileLoc(i, j));
+				Point drawAt = getDrawingCoords(tile.getLocation());
+				List<String> strings = new LinkedList<String>();
+				strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
+				strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getHumidity()));
+				strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTempurature()));
+				if(tile.getResource() != null) {
+					strings.add(String.format("ORE" + "=%d", tile.getResource().getYield()));
+				}
+				
+				if(tile.liquidType != LiquidType.DRY) {
+					strings.add(String.format(tile.liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f", tile.liquidAmount));
+				}
+				
+				if(tile.getModifier() != null) {
+					strings.add("GM=" + tile.getModifier().timeLeft());
+				}
+				rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, strings, rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
+				
+				for(Unit unit : tile.getUnits()) {
+					rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, unit.getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
+				}
+				if(tile.getPlant() != null) {
+					rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getPlant().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
+				}
+				if(tile.hasBuilding()) {
+					rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getBuilding().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
+				}
+				if(tile.getRoad() != null) {
+					rows[i-lowerX][j-lowerY] = tile.drawDebugStrings(g, tile.getRoad().getDebugStrings(), rows[i-lowerX][j-lowerY], fontsize, tileSize, drawAt);
 				}
 			}
-			else {
-				Point drawAt = getDrawingCoords(hoveredTile);
+		}
+	}
+	
+	private void drawHoveredTiles(Graphics2D g) {
+		int strokeWidth = tileSize/10;
+		strokeWidth = strokeWidth < 1 ? 1 : strokeWidth;
+		Stroke stroke = g.getStroke();
+		g.setStroke(new BasicStroke(strokeWidth));
+		g.setColor(new Color(0, 0, 0, 64));
+		if(mousePressLocation != null && leftMouseDown) {
+			Position[] box = normalizeRectangle(boxSelect[0], boxSelect[1]);
+			for(Tile tile : getTilesBetween(box[0], box[1])) {
+				Point drawAt = getDrawingCoords(tile.getLocation());
 				g.drawRect(drawAt.x + strokeWidth/2, drawAt.y + strokeWidth/2, tileSize-strokeWidth, tileSize-strokeWidth);
 			}
-			g2d.setStroke(stroke);
 		}
+		else {
+			Point drawAt = getDrawingCoords(hoveredTile);
+			g.drawRect(drawAt.x + strokeWidth/2, drawAt.y + strokeWidth/2, tileSize-strokeWidth, tileSize-strokeWidth);
+		}
+		g.setStroke(stroke);
 	}
 	
 	public Point getDrawingCoords(TileLoc tileLoc) {
