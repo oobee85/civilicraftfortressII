@@ -13,6 +13,7 @@ import game.*;
 import networking.*;
 import networking.message.*;
 import networking.server.*;
+import networking.view.*;
 import ui.*;
 import ui.infopanels.*;
 import utils.*;
@@ -262,6 +263,7 @@ public class Client {
 						updatedTerrain.notify();
 					}
 					long elapsed = System.currentTimeMillis() - start;
+					clientGUI.getGameView().previousTickTime = elapsed;
 					if(World.ticks % 200 == 1) {
 						System.out.println("time elapsed for tick: " + elapsed + "ms");
 					}
@@ -285,30 +287,6 @@ public class Client {
 			}
 		});
 		gameLoopThread.start();
-		if(simulated) {
-			Thread fixGhostsThread = new Thread(() -> {
-				while (true) {
-					try {
-						long start = System.currentTimeMillis();
-						long elapsed = System.currentTimeMillis() - start;
-						Thread.sleep(5000);
-					}
-					catch(Exception e) {
-						try (FileWriter fw = new FileWriter("ERROR_LOG.txt", true);
-								BufferedWriter bw = new BufferedWriter(fw);
-								PrintWriter out = new PrintWriter(bw)) {
-							e.printStackTrace(out);
-						} catch (IOException ee) {
-						}
-						e.printStackTrace();
-						if(e instanceof InterruptedException) {
-							break;
-						}
-					}
-				}
-			});
-//			fixGhostsThread.start();
-		}
 	}
 	private boolean tilesReceived;
 	private void worldInfoUpdate(WorldInfo worldInfo) {

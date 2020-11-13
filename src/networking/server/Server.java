@@ -1,10 +1,13 @@
 package networking.server;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
+
+import javax.swing.Timer;
 
 import game.*;
 import networking.*;
@@ -139,6 +142,30 @@ public class Server {
 		gameInstance.generateWorld(128, 128, false, players);
 		gui.setGameInstance(gameInstance);
 		startWorldNetworkingUpdateThread();
+
+		Game.DISABLE_NIGHT = true;
+		Timer repaintingThread = new Timer(500, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameInstance.getGUIController().updateGUI();
+				gui.repaint();
+			}
+		});
+		Thread terrainImageThread = new Thread(() -> {
+			while (true) {
+				try {
+					gui.updateTerrainImages();
+					Thread.sleep(500);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					if(e1 instanceof InterruptedException) {
+						break;
+					}
+				}
+			}
+		});
+		repaintingThread.start();
+		terrainImageThread.start();
 	}
 	
 	private void sendWhichFaction() {
@@ -334,6 +361,7 @@ public class Server {
 					gameInstance.gameTick();
 					gameInstance.getGUIController().updateGUI();
 					long elapsed = System.currentTimeMillis() - start;
+					gui.getGameView().previousTickTime = elapsed;
 					if(World.ticks % 200 == 1) {
 						System.out.println("time elapsed for tick: " + elapsed + "ms");
 					}

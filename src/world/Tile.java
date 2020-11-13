@@ -275,6 +275,17 @@ public class Tile implements Externalizable {
 	public void setModifier(GroundModifier gm) {
 		modifier = gm;
 	}
+	public void replaceOrAddDurationModifier(GroundModifierType type, int duration, WorldData worldData) {
+		if(getModifier() != null) {
+			if(getModifier().getType() == type) {
+				this.getModifier().addDuration(duration);
+				return;
+			}
+		}
+		GroundModifier gm = new GroundModifier(type, this, duration);
+		this.setModifier(gm);
+		worldData.addGroundModifier(gm);
+	}
 
 	public void addUnit(Unit u) {
 		units.add(u);

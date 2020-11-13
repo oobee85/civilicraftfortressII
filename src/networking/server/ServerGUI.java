@@ -46,6 +46,15 @@ public class ServerGUI extends JPanel {
 		repaint();
 	}
 	
+	public void updateTerrainImages() {
+		if(gameView != null) {
+			gameView.updateTerrainImages();
+		}
+	}
+	public GameView getGameView() {
+		return gameView;
+	}
+	
 	public void addedConnection(JPanel panel) {
 		if(!connectionPanels.contains(panel)) {
 			connectionPanels.add(panel);

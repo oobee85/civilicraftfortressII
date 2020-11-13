@@ -512,9 +512,15 @@ public class World {
 	public void spawnExplosion(Tile tile, int radius, int damage) {
 	
 		for(Tile t : getNeighborsInRadius(tile, radius)) {
-			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
-			worldData.addGroundModifier(fire);
-			t.setModifier(fire);
+
+			t.replaceOrAddDurationModifier(
+					GroundModifierType.FIRE, 
+					10 + (int)(Math.random()*damage/5),
+					worldData);
+			
+//			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
+//			worldData.addGroundModifier(fire);
+//			t.setModifier(fire);
 			if(t.hasBuilding() == true) {
 				t.getBuilding().takeDamage(damage);
 			}
@@ -713,22 +719,26 @@ public class World {
 			if (projectile.readyToMove()) {
 				projectile.moveToTarget();
 				if(projectile.getType().getGroundModifierType() != null) {
-					if(projectile.getTile().getModifier() != null) {
-						if(projectile.getTile().getModifier().getType() != projectile.getType().getGroundModifierType()) {
-							projectile.getTile().getModifier().finish();
-							GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), projectile.getType().getGroundModifierDuration());
-							projectile.getTile().setModifier(gm);
-							worldData.addGroundModifier(gm);
-						}
-						else {
-							projectile.getTile().getModifier().addDuration(projectile.getType().getGroundModifierDuration());
-						}
-					}
-					else {
-						GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), projectile.getType().getGroundModifierDuration());
-						projectile.getTile().setModifier(gm);
-						worldData.addGroundModifier(gm);
-					}
+//					if(projectile.getTile().getModifier() != null) {
+//						if(projectile.getTile().getModifier().getType() != projectile.getType().getGroundModifierType()) {
+//							projectile.getTile().getModifier().finish();
+//							GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), projectile.getType().getGroundModifierDuration());
+//							projectile.getTile().setModifier(gm);
+//							worldData.addGroundModifier(gm);
+//						}
+//						else {
+//							projectile.getTile().getModifier().addDuration(projectile.getType().getGroundModifierDuration());
+//						}
+//					}
+//					else {
+//						GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), projectile.getType().getGroundModifierDuration());
+//						projectile.getTile().setModifier(gm);
+//						worldData.addGroundModifier(gm);
+//					}
+					projectile.getTile().replaceOrAddDurationModifier(
+							projectile.getType().getGroundModifierType(), 
+							projectile.getType().getGroundModifierDuration(),
+							worldData);
 				}
 			}
 			if(!simulated && projectile.reachedTarget()) {
@@ -982,8 +992,8 @@ public class World {
 			Color average = new Color(sumr/totalNumPixels, sumg/totalNumPixels, sumb/totalNumPixels);
 			terrainColors.put(t, average);
 		}
-		BufferedImage terrainImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_3BYTE_BGR);
-		BufferedImage minimapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_3BYTE_BGR);
+		BufferedImage terrainImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage minimapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 
 		Graphics minimapGraphics = minimapImage.getGraphics();
 		Graphics terrainGraphics = terrainImage.getGraphics();
@@ -1033,7 +1043,7 @@ public class World {
 		minimapGraphics.dispose();
 		terrainGraphics.dispose();
 		
-		BufferedImage heightMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_3BYTE_BGR);
+		BufferedImage heightMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 		for(Tile tile : getTiles() ) {
 			int r = Math.max(Math.min((int)(255*tile.getHeight()), 255), 0);
 			Color c = new Color(r, 0, 255-r);

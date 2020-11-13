@@ -65,6 +65,8 @@ public class GameView extends JPanel {
 	private boolean summonPlayerControlled = true;
 	private BuildingType selectedBuildingToPlan;
 	
+	public long previousTickTime;
+	
 	public GameView(Game game) {
 		this.game = game;
 		this.guiController = game.getGUIController();
@@ -267,42 +269,12 @@ public class GameView extends JPanel {
 	}
 
 	private List<Tile> getTilesBetween(Position topLeft, Position botRight) {
-		int topEvenY;
-		int topOddY;
-		int botEvenY;
-		int botOddY;
-		if(topLeft.getIntX() % 2 == 0) {
-			topEvenY = (int) topLeft.y;
-			topOddY = (int) (topLeft.y - 0.5);
-		}
-		else {
-			topEvenY = (int) (topLeft.y);
-			topOddY = (int) (topLeft.y - 0.5);
-		}
-		if(botRight.getIntX() % 2 == 0) {
-			botEvenY = (int) (botRight.y);
-			botOddY = (int) (botRight.y - 0.5);
-		}
-		else {
-			botEvenY = (int) (botRight.y);
-			botOddY = (int) (botRight.y - 0.5);
-		}
-//		double remainder = botRight.y - (int)botRight.y;
-//		if(remainder < 0.5) {
-//			botEvenY -= 1;
-//		}
-//		else {
-//			
-//		}
-		int maxY = Math.max(botEvenY, botOddY);
-		int minY = Math.min(topEvenY, topOddY);
-		System.out.println("topLeft " + topLeft);
-		System.out.println("botRight " + botRight);
-		
-		int mini = topLeft.getIntX();
-		int maxi = botRight.getIntX();
+		int topEvenY = (int) topLeft.y;
+		int topOddY = (int) (topLeft.y - 0.5);
+		int botEvenY = (int) (botRight.y);
+		int botOddY = (int) (botRight.y - 0.5);
 		LinkedList<Tile> tiles = new LinkedList<>();
-		for(int i = mini; i <= maxi; i++) {
+		for(int i = topLeft.getIntX(); i <= botRight.getIntX(); i++) {
 			int minj = i % 2 == 0 ? topEvenY : topOddY;
 			int maxj = i % 2 == 0 ? botEvenY : botOddY;
 			for(int j = minj; j <= maxj; j++) {
@@ -719,8 +691,10 @@ public class GameView extends JPanel {
 
 	public void drawGame(Graphics g, int panelWidth, int panelHeight) {
 		if(game.world == null) {
+			g.drawString("No World to display", 20, 20);
 			return;
 		}
+		long startTime = System.currentTimeMillis();
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
 		draw(g, panelWidth, panelHeight, viewOffset);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
@@ -739,6 +713,19 @@ public class GameView extends JPanel {
 			String progress = String.format(faction.getResearchTarget() + " %d/%d", faction.getResearchTarget().getPointsSpent(), faction.getResearchTarget().getRequiredPoints());
 			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress, panelWidth - panelWidth/3 - 4, 4, panelWidth/3, 30);
 		}
+		long endTime = System.currentTimeMillis();
+		long deltaTime = endTime - startTime;
+		g.setFont(KUIConstants.infoFont);
+		int x = 10;
+		int y = getHeight() - 5;
+		g.setColor(Color.green);
+		g.drawString("FPS:" + deltaTime, x, y);
+		g.drawString("TICK:" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
+		x += 1;
+		y += 1;
+		g.setColor(Color.green.darker());
+		g.drawString("FPS:" + deltaTime, x, y);
+		g.drawString("TICK:" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
 		Toolkit.getDefaultToolkit().sync();
 	}
 	
@@ -780,6 +767,10 @@ public class GameView extends JPanel {
 					drawTile(g, tile, lowest, highest);
 				}
 			}
+
+			drawHoveredTiles((Graphics2D) g);
+			drawPlannedThing((Graphics2D)g);
+			drawSelectedThings((Graphics2D)g, lowerX, lowerY, upperX, upperY);
 			
 			for(Building building : game.world.getBuildings()) {
 				drawHealthBar(g, building);
@@ -804,86 +795,7 @@ public class GameView extends JPanel {
 			for(WeatherEvent w : game.world.getWeatherEvents()) {
 				g.drawImage(w.getImage(0), w.getTile().getLocation().x() * tileSize, w.getTile().getLocation().y() * tileSize, tileSize, tileSize, null);
 			}
-			for(Thing thing : selectedThings) {
-				// draw selection circle
-				g.setColor(Utils.getTransparentColor(faction.color(), 150));
-//				Utils.setTransparency(g, 0.8f);
-				Graphics2D g2d = (Graphics2D)g;
-				Stroke currentStroke = g2d.getStroke();
-				int strokeWidth = tileSize/12;
-				g2d.setStroke(new BasicStroke(strokeWidth));
-				Point drawAt = getDrawingCoords(thing.getTile().getLocation());
-				g.drawOval(drawAt.x + strokeWidth/2, drawAt.y + strokeWidth/2, tileSize-1 - strokeWidth, tileSize-1 - strokeWidth);
-				g2d.setStroke(currentStroke);
-//				Utils.setTransparency(g, 1f);
-
-				// draw spawn location for buildings
-				if(thing instanceof Building) {
-					Building building = (Building) thing;
-					if(building.getSpawnLocation() != building.getTile()) {
-						drawAt = getDrawingCoords(building.getSpawnLocation().getLocation());
-						g.drawImage(RALLY_POINT_IMAGE, drawAt.x, drawAt.y, tileSize, tileSize, null);
-					}
-				}
-				
-				if (thing instanceof Unit) {
-					Unit unit = (Unit) thing;
-					// draw attacking target
-					Thing target = unit.getTarget();
-					if(target != null) {
-						drawTarget(g, target.getTile().getLocation());
-					}
-					// draw path 
-					LinkedList<Tile> path = unit.getCurrentPath();
-					if(path != null) {
-						g.setColor(Color.green);
-						TileLoc prev = unit.getTile().getLocation();
-						Point prevDrawAt = getDrawingCoords(prev);
-						for(Tile t : path) {
-							drawAt = getDrawingCoords(t.getLocation());
-							if(prev != null) {
-								g.drawLine(prevDrawAt.x + tileSize/2, prevDrawAt.y + tileSize/2, 
-										drawAt.x + tileSize/2, drawAt.y + tileSize/2);
-							}
-							prev = t.getLocation();
-							prevDrawAt = drawAt;
-						}
-					}
-					// draw destination flags
-					for(PlannedAction plan : unit.actionQueue) {
-						Tile targetTile = plan.targetTile == null ? plan.target.getTile() : plan.targetTile;
-						drawAt = getDrawingCoords(targetTile.getLocation());
-						g.drawImage(FLAG, drawAt.x, drawAt.y, tileSize, tileSize, null);
-					}
-					int range = unit.getMaxRange();
-					if(range > 1) {
-						// draws the attack range for units
-						for (int i = lowerX; i < upperX; i++) {
-							for (int j = lowerY; j < upperY; j++) {
-								Tile t = game.world.get(new TileLoc(i, j));
-								if (t == null)
-									continue;
-								drawAt = getDrawingCoords(t.getLocation());
-								int w = tileSize;
-								int h = tileSize;
-	
-								if (t.getLocation().distanceTo(unit.getTile().getLocation()) <= range) {
-									g.setColor(Color.BLACK);
-									Utils.setTransparency(g, 0.3f);
-	
-									for (Tile tile : t.getNeighbors()) {
-										if (tile.getLocation().distanceTo(unit.getTile().getLocation()) > range) {
-											drawBorderBetween(g, t.getLocation(), tile.getLocation());
-										}
-									}
-									Utils.setTransparency(g, 1);
-								}
-							}
-						}
-					}
-				}
-			}
-
+			
 			int indicatorSize = tileSize/12;
 			int offset = 4;
 			HashMap<Tile, Integer> visited = new HashMap<>();
@@ -905,7 +817,6 @@ public class GameView extends JPanel {
 				count++;
 			}
 			
-			
 			if(!showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
@@ -921,8 +832,6 @@ public class GameView extends JPanel {
 				}
 			}
 			
-			drawPlannedThing((Graphics2D)g);
-			
 			if(drawDebugStrings) {
 				if(tileSize >= 36) {
 					drawDebugStrings(g, lowerX, lowerY, upperX, upperY);
@@ -931,7 +840,87 @@ public class GameView extends JPanel {
 			if(leftClickAction == LeftClickAction.ATTACK) {
 				drawTarget(g, hoveredTile);
 			}
-			drawHoveredTiles((Graphics2D) g);
+		}
+	}
+	
+	private void drawSelectedThings(Graphics2D g, int lowerX, int lowerY, int upperX, int upperY) {
+		for(Thing thing : selectedThings) {
+			// draw selection circle
+			g.setColor(Utils.getTransparentColor(faction.color(), 150));
+//			Utils.setTransparency(g, 0.8f);
+			Stroke currentStroke = g.getStroke();
+			int strokeWidth = tileSize/12;
+			g.setStroke(new BasicStroke(strokeWidth));
+			Point drawAt = getDrawingCoords(thing.getTile().getLocation());
+			g.drawOval(drawAt.x + strokeWidth/2, drawAt.y + strokeWidth/2, tileSize-1 - strokeWidth, tileSize-1 - strokeWidth);
+			g.setStroke(currentStroke);
+//			Utils.setTransparency(g, 1f);
+
+			// draw spawn location for buildings
+			if(thing instanceof Building) {
+				Building building = (Building) thing;
+				if(building.getSpawnLocation() != building.getTile()) {
+					drawAt = getDrawingCoords(building.getSpawnLocation().getLocation());
+					g.drawImage(RALLY_POINT_IMAGE, drawAt.x, drawAt.y, tileSize, tileSize, null);
+				}
+			}
+			
+			if (thing instanceof Unit) {
+				Unit unit = (Unit) thing;
+				// draw attacking target
+				Thing target = unit.getTarget();
+				if(target != null) {
+					drawTarget(g, target.getTile().getLocation());
+				}
+				// draw path 
+				LinkedList<Tile> path = unit.getCurrentPath();
+				if(path != null) {
+					g.setColor(Color.green);
+					TileLoc prev = unit.getTile().getLocation();
+					Point prevDrawAt = getDrawingCoords(prev);
+					for(Tile t : path) {
+						drawAt = getDrawingCoords(t.getLocation());
+						if(prev != null) {
+							g.drawLine(prevDrawAt.x + tileSize/2, prevDrawAt.y + tileSize/2, 
+									drawAt.x + tileSize/2, drawAt.y + tileSize/2);
+						}
+						prev = t.getLocation();
+						prevDrawAt = drawAt;
+					}
+				}
+				// draw destination flags
+				for(PlannedAction plan : unit.actionQueue) {
+					Tile targetTile = plan.targetTile == null ? plan.target.getTile() : plan.targetTile;
+					drawAt = getDrawingCoords(targetTile.getLocation());
+					g.drawImage(FLAG, drawAt.x, drawAt.y, tileSize, tileSize, null);
+				}
+				int range = unit.getMaxRange();
+				if(range > 1) {
+					// draws the attack range for units
+					for (int i = lowerX; i < upperX; i++) {
+						for (int j = lowerY; j < upperY; j++) {
+							Tile t = game.world.get(new TileLoc(i, j));
+							if (t == null)
+								continue;
+							drawAt = getDrawingCoords(t.getLocation());
+							int w = tileSize;
+							int h = tileSize;
+
+							if (t.getLocation().distanceTo(unit.getTile().getLocation()) <= range) {
+								g.setColor(Color.BLACK);
+								Utils.setTransparency(g, 0.3f);
+
+								for (Tile tile : t.getNeighbors()) {
+									if (tile.getLocation().distanceTo(unit.getTile().getLocation()) > range) {
+										drawBorderBetween(g, t.getLocation(), tile.getLocation());
+									}
+								}
+								Utils.setTransparency(g, 1);
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 	private void drawPlannedThing(Graphics2D g) {
