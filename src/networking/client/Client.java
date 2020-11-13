@@ -189,7 +189,7 @@ public class Client {
 	}
 	public void setupSinglePlayer() {
 		clientGUI.getGameView().setCommandInterface(localCommands);
-		gameInstance.generateWorld(128, 128, false, Arrays.asList(new PlayerInfo("Player", Color.pink)));
+		gameInstance.generateWorld(128, 128, false, Arrays.asList(clientGUI.getPlayerInfo()));
 		for(Faction f : gameInstance.world.getFactions()) {
 			if(f.isPlayer()) {
 				gameInstance.getGUIController().changedFaction(f);

@@ -134,19 +134,19 @@ public class ClientGUI {
 		
 		
 
-		int padding = 20;
-		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
-		mainMenuPanel.add(singlePlayer);
-		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding*4)));
-
+		int padding = 30;
+		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding*5)));
 		mainMenuPanel.add(playerInfoPanel);
 		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		
+		mainMenuPanel.add(singlePlayer);
+		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+
 		mainMenuPanel.add(startLocalHostButton);
 		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
 		mainMenuPanel.add(startAzureButton);
 		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
 		mainMenuPanel.add(ipTextField);
-		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, 0)));
 		mainMenuPanel.add(startButton);
 		mainMenuPanel.add(Box.createVerticalGlue());
 

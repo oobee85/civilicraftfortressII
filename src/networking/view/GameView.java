@@ -1213,52 +1213,45 @@ public class GameView extends JPanel {
 	}
 	
 	private void drawBorderBetween(Graphics g, TileLoc one, TileLoc two) {
+		int width = tileSize / 8;
 		Point drawAt = getDrawingCoords(one);
 		if (one.x() == two.x()) {
 			if (one.y() > two.y()) {
-				g.fillRect(drawAt.x, drawAt.y, tileSize, 5);
+				g.fillRect(drawAt.x, drawAt.y, tileSize, width);
 			}
 			if (one.y() < two.y()) {
-				g.fillRect(drawAt.x, drawAt.y + tileSize - 5, tileSize, 5);
+				g.fillRect(drawAt.x, drawAt.y + tileSize - width, tileSize, width);
 			}
 		}
 		else {
 			if(one.y() > two.y()) {
 				int yoffset = (one.x()%2) * tileSize/2;
 				if (one.x() < two.x()) {
-					g.fillRect(drawAt.x + tileSize - 5, drawAt.y + yoffset, 5, tileSize/2);
+					g.fillRect(drawAt.x + tileSize - width, drawAt.y + yoffset, width, tileSize/2);
 				}
 				else if (one.x() > two.x()) {
-					g.fillRect(drawAt.x, drawAt.y + yoffset, 5, tileSize/2);
+					g.fillRect(drawAt.x, drawAt.y + yoffset, width, tileSize/2);
 				}
 			}
 			else if(one.y() < two.y()) {
 				int yoffset = (one.x()%2) * tileSize/2;
 				if (one.x() < two.x()) {
-					g.fillRect(drawAt.x + tileSize - 5, drawAt.y + yoffset, 5, tileSize/2);
+					g.fillRect(drawAt.x + tileSize - width, drawAt.y + yoffset, width, tileSize/2);
 				}
 				else if (one.x() > two.x()) {
-					g.fillRect(drawAt.x, drawAt.y + yoffset, 5, tileSize/2);
+					g.fillRect(drawAt.x, drawAt.y + yoffset, width, tileSize/2);
 				}
 			}
 			else {
 				int yoffset = (1 - one.x()%2) * tileSize/2;
 				if (one.x() < two.x()) {
-					g.fillRect(drawAt.x + tileSize - 5, drawAt.y + yoffset, 5, tileSize/2);
+					g.fillRect(drawAt.x + tileSize - width, drawAt.y + yoffset, width, tileSize/2);
 				}
 				else if (one.x() > two.x()) {
-					g.fillRect(drawAt.x, drawAt.y + yoffset, 5, tileSize/2);
+					g.fillRect(drawAt.x, drawAt.y + yoffset, width, tileSize/2);
 				}
 			}
 		}
-//		if (one.y() == two.y()) {
-//			if (one.x() < two.x()) {
-//				g.fillRect(drawAt.x, drawAt.y, 5, tileSize);
-//			}
-//			if (one.x() > two.x()) {
-//				g.fillRect(drawAt.x + tileSize - 5, drawAt.y, 5, tileSize);
-//			}
-//		}
 	}
 	
 	public void drawMinimap(Graphics g, int x, int y, int w, int h) {

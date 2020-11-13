@@ -193,9 +193,9 @@ public class DebugView {
 		rootPanel.add(setPlayerFaction);
 		rootPanel.add(researchEverything);
 		rootPanel.add(raiseHeight);
+		rootPanel.add(setTerritoryButton);
 		rootPanel.add(exit);
 		rootPanel.add(shadowWordDeath);
-		rootPanel.add(setTerritoryButton);
 	}
 	
 	public JPanel getRootPanel() {
