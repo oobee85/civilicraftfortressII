@@ -75,7 +75,7 @@ public class ClientGUI {
 		rootPanel.setFocusable(false);
 		
 		mainMenuPanel = new JPanel();
-		mainMenuPanel.setLayout(new BoxLayout(mainMenuPanel, BoxLayout.Y_AXIS));
+		mainMenuPanel.setLayout(new BorderLayout());
 		mainMenuPanel.setFocusable(false);
 		mainMenuPanel.setBackground(Color.black);
 		
@@ -104,13 +104,13 @@ public class ClientGUI {
 		singlePlayer.setAlignmentX(Component.CENTER_ALIGNMENT);
 		JTextField ipTextField = KUIConstants.setupTextField("localhost", MAIN_MENU_BUTTON_SIZE);
 		ipTextField.setAlignmentX(Component.CENTER_ALIGNMENT);
-		KButton startButton = KUIConstants.setupButton("Connect To Custom IP", null, MAIN_MENU_BUTTON_SIZE);
+		KButton startButton = KUIConstants.setupButton("Custom IP", LAN_ICON, MAIN_MENU_BUTTON_SIZE);
 		startButton.setHorizontalAlignment(SwingConstants.CENTER);
 		startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		startButton.addActionListener(e -> {
 			connectToServer(ipTextField.getText());
 		});
-		KButton startLocalHostButton = KUIConstants.setupButton("LAN", LAN_ICON, MAIN_MENU_BUTTON_SIZE);
+		KButton startLocalHostButton = KUIConstants.setupButton("Local Host", null, MAIN_MENU_BUTTON_SIZE);
 		startLocalHostButton.setHorizontalAlignment(SwingConstants.CENTER);
 		startLocalHostButton.setToolTipText("localhost");
 		startLocalHostButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -147,22 +147,30 @@ public class ClientGUI {
 		playerInfoPanel.add(colorButton);
 		
 		
+		JPanel menuButtonPanel = new JPanel();
+		menuButtonPanel.setOpaque(false);
+		menuButtonPanel.setLayout(new BoxLayout(menuButtonPanel, BoxLayout.Y_AXIS));
+		menuButtonPanel.setFocusable(false);
 
 		int padding = 30;
-		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding*5)));
-		mainMenuPanel.add(playerInfoPanel);
-		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding*5)));
+		menuButtonPanel.add(playerInfoPanel);
+		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		menuButtonPanel.add(singlePlayer);
+		if(Game.DEBUG) {
+			menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+			menuButtonPanel.add(startLocalHostButton);
+		}
+		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		menuButtonPanel.add(startAzureButton);
+		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		menuButtonPanel.add(ipTextField);
+		menuButtonPanel.add(startButton);
+		menuButtonPanel.add(Box.createVerticalGlue());
 		
-		mainMenuPanel.add(singlePlayer);
-		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
-
-		mainMenuPanel.add(startLocalHostButton);
-		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
-		mainMenuPanel.add(startAzureButton);
-		mainMenuPanel.add(Box.createRigidArea(new Dimension(0, padding)));
-		mainMenuPanel.add(ipTextField);
-		mainMenuPanel.add(startButton);
-		mainMenuPanel.add(Box.createVerticalGlue());
+		mainMenuPanel.add(menuButtonPanel, BorderLayout.CENTER);
+		JPanel mainMenuImagePanel = new MainMenuImageView();
+		mainMenuPanel.add(mainMenuImagePanel, BorderLayout.SOUTH);
 
 		rootPanel.add(mainMenuPanel, BorderLayout.CENTER);
 		

@@ -40,6 +40,14 @@ public class ClientDriver {
 	}
 
 	public static void main(String[] args) {
+		for(int i = 0; i < args.length; i++) {
+			System.out.println(args[i]);
+		}
+		if(args.length >= 1) {
+			if(args[0].equals("debug")) {
+				Game.DEBUG = true;
+			}
+		}
 		EventQueue.invokeLater(() -> {
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
