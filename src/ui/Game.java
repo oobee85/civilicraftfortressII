@@ -13,6 +13,8 @@ import world.*;
 
 public class Game {
 	
+	public static boolean DEBUG = false;
+	
 	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0);
 
 	public static final ArrayList<UnitType> unitTypeList = new ArrayList<>();

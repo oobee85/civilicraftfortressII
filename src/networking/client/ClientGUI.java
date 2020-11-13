@@ -30,6 +30,10 @@ public class ClientGUI {
 	private static final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(200, 40);
 	private static final Dimension CONNECTION_MENU_BUTTON_SIZE = new Dimension(120, 30);
 
+	private static final ImageIcon AZURE_LOGO = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/azurelogo.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
+	private static final ImageIcon LAN_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/lan_icon.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
+	private static final ImageIcon SINGLE_PLAYER_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/single_player_icon.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
+	
 	
 	private Client client;
 	
@@ -73,6 +77,7 @@ public class ClientGUI {
 		mainMenuPanel = new JPanel();
 		mainMenuPanel.setLayout(new BoxLayout(mainMenuPanel, BoxLayout.Y_AXIS));
 		mainMenuPanel.setFocusable(false);
+		mainMenuPanel.setBackground(Color.black);
 		
 		ingamePanel = new JPanel();
 		ingamePanel.setLayout(new BorderLayout());
@@ -91,31 +96,40 @@ public class ClientGUI {
 		ingamePanel.add(sidePanel, BorderLayout.EAST);
 		
 
-		KButton singlePlayer = KUIConstants.setupButton("Single Player", null, MAIN_MENU_BUTTON_SIZE);
+		KButton singlePlayer = KUIConstants.setupButton("Single Player", SINGLE_PLAYER_ICON, MAIN_MENU_BUTTON_SIZE);
+		singlePlayer.setHorizontalAlignment(SwingConstants.CENTER);
 		singlePlayer.addActionListener(e -> {
 			client.setupSinglePlayer();
 		});
 		singlePlayer.setAlignmentX(Component.CENTER_ALIGNMENT);
 		JTextField ipTextField = KUIConstants.setupTextField("localhost", MAIN_MENU_BUTTON_SIZE);
 		ipTextField.setAlignmentX(Component.CENTER_ALIGNMENT);
-		KButton startButton = KUIConstants.setupButton("Custom IP", null, MAIN_MENU_BUTTON_SIZE);
+		KButton startButton = KUIConstants.setupButton("Connect To Custom IP", null, MAIN_MENU_BUTTON_SIZE);
+		startButton.setHorizontalAlignment(SwingConstants.CENTER);
 		startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		startButton.addActionListener(e -> {
 			connectToServer(ipTextField.getText());
 		});
-		KButton startLocalHostButton = KUIConstants.setupButton("localhost", null, MAIN_MENU_BUTTON_SIZE);
+		KButton startLocalHostButton = KUIConstants.setupButton("LAN", LAN_ICON, MAIN_MENU_BUTTON_SIZE);
+		startLocalHostButton.setHorizontalAlignment(SwingConstants.CENTER);
+		startLocalHostButton.setToolTipText("localhost");
 		startLocalHostButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		startLocalHostButton.addActionListener(e -> {
 			connectToServer("localhost");
 		});
-		KButton startAzureButton = KUIConstants.setupButton("Azure Server", null, MAIN_MENU_BUTTON_SIZE);
+		KButton startAzureButton = KUIConstants.setupButton("Azure Server", AZURE_LOGO, MAIN_MENU_BUTTON_SIZE);
+		startAzureButton.setHorizontalAlignment(SwingConstants.CENTER);
+		startAzureButton.setToolTipText(AZURE_SERVER_IP);
 		startAzureButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		startAzureButton.addActionListener(e -> {
 			connectToServer(AZURE_SERVER_IP);
 		});
-
-		nameTextField = KUIConstants.setupTextField(Server.DEFAULT_PLAYER_INFO.getName(), new Dimension(MAIN_MENU_BUTTON_SIZE.width - MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height));
-		KButton colorButton = KUIConstants.setupButton("", null, new Dimension(MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height));
+		
+		Dimension colorButtonSize = new Dimension(MAIN_MENU_BUTTON_SIZE.height + 8, MAIN_MENU_BUTTON_SIZE.height);
+		nameTextField = KUIConstants.setupTextField(Server.DEFAULT_PLAYER_INFO.getName(), new Dimension(MAIN_MENU_BUTTON_SIZE.width - colorButtonSize.width, MAIN_MENU_BUTTON_SIZE.height));
+		nameTextField.setToolTipText("Choose your faction's name");
+		KButton colorButton = KUIConstants.setupButton("", null, colorButtonSize);
+		colorButton.setToolTipText("Choose your faction's color");
 		colorButton.setBorder(BorderFactory.createLineBorder(selectedColor, 10));
 		colorButton.addActionListener(e -> {
 			Color newColor = JColorChooser.showDialog(rootPanel, "Choose Color", colorButton.getBackground());

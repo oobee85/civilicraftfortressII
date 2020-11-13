@@ -47,7 +47,7 @@ public class GameView extends JPanel {
 	private boolean draggingMouse = false;
 	private boolean drawDebugStrings = false;
 	private TileLoc hoveredTile = new TileLoc(-1,-1);
-	private int tileSize = 9;
+	private int tileSize = 15;
 	private boolean leftMouseDown = false;
 	private boolean middleMouseDown = false;
 	
