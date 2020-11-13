@@ -1022,7 +1022,7 @@ public class World {
 			double tilebrightness = tile.getBrightness(faction);
 			minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);
 			terrainColor = Utils.blendColors(terrainColor, Color.black, brighnessModifier + tilebrightness);
-
+			
 			minimapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), minimapColor.getRGB());
 			terrainImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), terrainColor.getRGB());
 		}
@@ -1039,7 +1039,10 @@ public class World {
 			Color c = new Color(r, 0, 255-r);
 			heightMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 		}
-		return new BufferedImage[] { terrainImage, minimapImage, heightMapImage};
+		return new BufferedImage[] { 
+				ImageCreation.convertToHexagonal(terrainImage), 
+				ImageCreation.convertToHexagonal(minimapImage), 
+				ImageCreation.convertToHexagonal(heightMapImage)};
 	}
 
 	public int ticksUntilDay() {

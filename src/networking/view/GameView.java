@@ -1029,7 +1029,10 @@ public class GameView extends JPanel {
 		int imagesize = draww < drawh ? draww : drawh;
 		
 		if(showHeightMap) {
-			theTile.drawHeightMap(g, (theTile.getHeight() - lowest) / (highest - lowest), tileSize);
+			float heightRatio = (float) ((theTile.getHeight() - lowest) / (highest - lowest));
+			int r = Math.max(Math.min((int) (255 * heightRatio), 255), 0);
+			g.setColor(new Color(r, 0, 255 - r));
+			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 		}
 		else {
 			g.drawImage(theTile.getTerrain().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh, null);

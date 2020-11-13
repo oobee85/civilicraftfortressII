@@ -58,4 +58,15 @@ public class ImageCreation {
 		}
 		return roadImages;
 	}
+	
+	public static BufferedImage convertToHexagonal(BufferedImage image) {
+		BufferedImage hex = new BufferedImage(image.getWidth()*2, image.getHeight()*2 + 1, image.getType());
+		Graphics2D g = hex.createGraphics();
+		for(int x = 0; x < image.getWidth(); x++) {
+			int yoffset = x%2;
+			g.drawImage(image, x*2, yoffset, (x+1)*2, hex.getHeight() - 1 + yoffset, x, 0, x + 1, image.getHeight(), null);
+		}
+		g.dispose();
+		return hex;
+	}
 }
