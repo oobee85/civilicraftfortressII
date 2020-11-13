@@ -48,6 +48,12 @@ public class GameView extends JPanel {
 	private boolean drawDebugStrings = false;
 	private TileLoc hoveredTile = new TileLoc(-1,-1);
 	private int tileSize = 9;
+	private boolean leftMouseDown = false;
+	private boolean middleMouseDown = false;
+	
+	private Point mousePressLocation = null;
+	private Position[] boxSelect = new Position[2];
+	private boolean rightMouseDown = false;
 	private boolean controlDown = false;
 	private boolean shiftDown = false;
 
@@ -75,7 +81,6 @@ public class GameView extends JPanel {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				mouseOver(getTileAtPixel(e.getPoint()));
-				repaint();
 				previousMouse = e.getPoint();
 			}
 
@@ -87,8 +92,11 @@ public class GameView extends JPanel {
 				// Only drag if moved mouse at least 3 pixels away
 				if(draggingMouse || Math.abs(dx) + Math.abs(dy) >= 5) {
 					draggingMouse = true;
-					if (SwingUtilities.isLeftMouseButton(e)) {
+					if (rightMouseDown || middleMouseDown) {
 						shiftView(dx, dy);
+					}
+					if(leftMouseDown) {
+						boxSelect[1] = getWorldCoordOfPixel(currentMouse);
 					}
 					mouseOver(getTileAtPixel(currentMouse));
 					previousMouse = currentMouse;
@@ -108,12 +116,38 @@ public class GameView extends JPanel {
 					}
 				}
 				draggingMouse = false;
-				previousMouse = e.getPoint();
+				previousMouse = currentMouse;
+				if(SwingUtilities.isLeftMouseButton(e)) {
+					boxSelect[0] = getWorldCoordOfPixel(mousePressLocation);
+					boxSelect[1] = getWorldCoordOfPixel(currentMouse);
+					boxSelect = normalizeRectangle(boxSelect[0], boxSelect[1]);
+					selectInBox(boxSelect[0], boxSelect[1], shiftDown);
+					mousePressLocation = null;
+					leftMouseDown = false;
+				}
+				else if(SwingUtilities.isRightMouseButton(e)) {
+					rightMouseDown = false;
+				}
+				else if(SwingUtilities.isMiddleMouseButton(e)) {
+					middleMouseDown = false;
+				}
 			}
 
 			@Override
 			public void mousePressed(MouseEvent e) {
 				previousMouse = e.getPoint();
+				if(SwingUtilities.isLeftMouseButton(e)) {
+					leftMouseDown = true;
+					mousePressLocation = e.getPoint();
+					boxSelect[0] = getWorldCoordOfPixel(mousePressLocation);
+					boxSelect[1] = boxSelect[0];
+				}
+				else if(SwingUtilities.isRightMouseButton(e)) {
+					rightMouseDown = true;
+				}
+				else if(SwingUtilities.isMiddleMouseButton(e)) {
+					middleMouseDown = true;
+				}
 			}
 
 			@Override
@@ -232,6 +266,68 @@ public class GameView extends JPanel {
 		return drawDebugStrings;
 	}
 
+	private List<Tile> getTilesBetween(Position topLeft, Position botRight) {
+		int topEvenY;
+		int topOddY;
+		int botEvenY;
+		int botOddY;
+		if(topLeft.getIntX() % 2 == 0) {
+			topEvenY = (int) topLeft.y;
+			topOddY = (int) (topLeft.y - 0.5);
+		}
+		else {
+			topEvenY = (int) (topLeft.y);
+			topOddY = (int) (topLeft.y - 0.5);
+		}
+		if(botRight.getIntX() % 2 == 0) {
+			botEvenY = (int) (botRight.y);
+			botOddY = (int) (botRight.y - 0.5);
+		}
+		else {
+			botEvenY = (int) (botRight.y);
+			botOddY = (int) (botRight.y - 0.5);
+		}
+//		double remainder = botRight.y - (int)botRight.y;
+//		if(remainder < 0.5) {
+//			botEvenY -= 1;
+//		}
+//		else {
+//			
+//		}
+		int maxY = Math.max(botEvenY, botOddY);
+		int minY = Math.min(topEvenY, topOddY);
+		System.out.println("topLeft " + topLeft);
+		System.out.println("botRight " + botRight);
+		
+		int mini = topLeft.getIntX();
+		int maxi = botRight.getIntX();
+		LinkedList<Tile> tiles = new LinkedList<>();
+		for(int i = mini; i <= maxi; i++) {
+			int minj = i % 2 == 0 ? topEvenY : topOddY;
+			int maxj = i % 2 == 0 ? botEvenY : botOddY;
+			for(int j = minj; j <= maxj; j++) {
+				TileLoc otherLoc = new TileLoc(i, j);
+				Tile otherTile = game.world.get(otherLoc);
+				if(otherTile != null) {
+					tiles.add(otherTile);
+				}
+			}
+		}
+		return tiles;
+	}
+	
+	public void selectInBox(Position topLeft, Position botRight, boolean shiftDown) {
+		if(game.world == null) {
+			return;
+		}
+		Tile topLeftTile = game.world.get(new TileLoc(topLeft.getIntX(), topLeft.getIntY()));
+		Tile botRightTile = game.world.get(new TileLoc(botRight.getIntX(), botRight.getIntY()));
+		if(topLeftTile == null || botRightTile == null) {
+			return;
+		}
+		toggleSelectionForTiles(getTilesBetween(topLeft, botRight), shiftDown, controlDown);
+	}
+
 	public void leftClick(Position tilepos, boolean shiftDown) {
 		if(game.world == null) {
 			return;
@@ -281,7 +377,7 @@ public class GameView extends JPanel {
 		}
 		//select units on tile
 		else {
-			toggleSelectionOnTile(tile, shiftDown, controlDown);
+			toggleSelectionForTiles(Arrays.asList(tile), shiftDown, controlDown);
 		}
 		
 		if(!shiftDown) {
@@ -428,27 +524,28 @@ public class GameView extends JPanel {
 		}
 	}
 	
-	public void toggleSelectionOnTile(Tile tile, boolean shiftEnabled, boolean controlEnabled) {
+	public void toggleSelectionForTiles(List<Tile> tiles, boolean shiftEnabled, boolean controlEnabled) {
 		
 		//deselects everything if shift or control isnt enabled
 		if (shiftEnabled == false && !controlEnabled) {
 			deselectEverything();
 		}
-		
-		//selects the building on the tile
-		Building building = tile.getBuilding();
-		if(building != null && building.getFaction() == faction && tile.getUnitOfFaction(faction) == null) {
-			selectThing(building);
-		}
-		//goes through all the units on the tile and checks if they are selected
-		for(Unit candidate : tile.getUnits()) {
-			// clicking on tile w/o shift i.e only selects top unit
-			if (candidate.getFaction() == faction) {
-				selectThing(candidate);
-				//shift enabled -> selects whole stack
-				//shift disabled -> selects top unit
-				if (!shiftEnabled) {
-					break;
+		for(Tile tile : tiles) {
+			//selects the building on the tile
+			Building building = tile.getBuilding();
+			if(building != null && building.getFaction() == faction && tile.getUnitOfFaction(faction) == null) {
+				selectThing(building);
+			}
+			//goes through all the units on the tile and checks if they are selected
+			for(Unit candidate : tile.getUnits()) {
+				// clicking on tile w/o shift i.e only selects top unit
+				if (candidate.getFaction() == faction) {
+					selectThing(candidate);
+					//shift enabled -> selects whole stack
+					//shift disabled -> selects top unit
+					if (!shiftEnabled) {
+						break;
+					}
 				}
 			}
 		}
@@ -549,7 +646,7 @@ public class GameView extends JPanel {
 	
 	public void zoomViewTo(int newTileSize, int mx, int my) {
 		if (newTileSize > 0) {
-			Position tile = getTileAtPixel(new Position(mx, my));
+			Position tile = getWorldCoordOfPixel(new Position(mx, my));
 			tileSize = newTileSize;
 			Position focalPoint = tile.multiply(tileSize).subtract(viewOffset);
 			viewOffset.x -= mx - focalPoint.x;
@@ -571,9 +668,14 @@ public class GameView extends JPanel {
 		repaint();
 	}
 	
-	public Position getTileAtPixel(Position pixel) {
+	public Position getWorldCoordOfPixel(Position pixel) {
 		Position tile = pixel.add(viewOffset).divide(tileSize);
 		return tile;
+	}
+	public Position getWorldCoordOfPixel(Point pixel) {
+		double column = ((pixel.x + viewOffset.x)/tileSize);
+		double row = ((pixel.y + viewOffset.y)/tileSize);
+		return new Position(column, row);
 	}
 	public Position getTileAtPixel(Point pixel) {
 		int column = (int) ((pixel.x + viewOffset.x)/tileSize);
@@ -600,6 +702,21 @@ public class GameView extends JPanel {
 		g.drawRect(-1, 0, getWidth() + 1, getHeight());
 	}
 
+	private static Position[] normalizeRectangle(Position one, Position two) {
+		double x = Math.min(one.x, two.x);
+		double y = Math.min(one.y, two.y);
+		double width = Math.abs(one.x - two.x);
+		double height = Math.abs(one.y - two.y);
+		return new Position[] {new Position(x, y), new Position(x + width, y + height)};
+	}
+	private static Rectangle normalizeRectangle(Point one, Point two) {
+		int x = Math.min(one.x, two.x);
+		int y = Math.min(one.y, two.y);
+		int width = Math.abs(one.x - two.x);
+		int height = Math.abs(one.y - two.y);
+		return new Rectangle(x, y, width, height);
+	}
+
 	public void drawGame(Graphics g, int panelWidth, int panelHeight) {
 		if(game.world == null) {
 			return;
@@ -607,6 +724,15 @@ public class GameView extends JPanel {
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
 		draw(g, panelWidth, panelHeight, viewOffset);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
+		if(mousePressLocation != null) {
+			Rectangle selectionRectangle = normalizeRectangle(mousePressLocation, previousMouse);
+			Graphics2D g2d = (Graphics2D)g;
+			g2d.setColor(Color.white);
+			Stroke stroke = g2d.getStroke();
+			g2d.setStroke(new BasicStroke(3));
+			g2d.drawRect(selectionRectangle.x, selectionRectangle.y, selectionRectangle.width, selectionRectangle.height);
+			g2d.setStroke(stroke);
+		}
 		if(faction != null && faction.getResearchTarget() != null && !faction.getResearchTarget().isCompleted()) {
 			g.setFont(KUIConstants.infoFont);
 			double completedRatio = 1.0 * faction.getResearchTarget().getPointsSpent() / faction.getResearchTarget().getRequiredPoints();
@@ -862,10 +988,24 @@ public class GameView extends JPanel {
 			if(leftClickAction == LeftClickAction.ATTACK) {
 				drawTarget(g, hoveredTile);
 			}
-			Point drawAt = getDrawingCoords(hoveredTile);
+			int strokeWidth = tileSize/10;
+			strokeWidth = strokeWidth < 1 ? 1 : strokeWidth;
+			Graphics2D g2d = (Graphics2D)g;
+			Stroke stroke = g2d.getStroke();
+			g2d.setStroke(new BasicStroke(strokeWidth));
 			g.setColor(new Color(0, 0, 0, 64));
-			g.drawRect(drawAt.x, drawAt.y, tileSize-1, tileSize-1);
-			g.drawRect(drawAt.x + 1, drawAt.y + 1, tileSize - 3, tileSize - 3);
+			if(mousePressLocation != null && leftMouseDown) {
+				Position[] box = normalizeRectangle(boxSelect[0], boxSelect[1]);
+				for(Tile tile : getTilesBetween(box[0], box[1])) {
+					Point drawAt = getDrawingCoords(tile.getLocation());
+					g.drawRect(drawAt.x + strokeWidth/2, drawAt.y + strokeWidth/2, tileSize-strokeWidth, tileSize-strokeWidth);
+				}
+			}
+			else {
+				Point drawAt = getDrawingCoords(hoveredTile);
+				g.drawRect(drawAt.x + strokeWidth/2, drawAt.y + strokeWidth/2, tileSize-strokeWidth, tileSize-strokeWidth);
+			}
+			g2d.setStroke(stroke);
 		}
 	}
 	
@@ -873,6 +1013,9 @@ public class GameView extends JPanel {
 		int x = tileLoc.x() * tileSize;
 		int y = tileLoc.y() * tileSize + (tileLoc.x()%2)*tileSize/2;
 		return new Point(x, y);
+	}
+	public double getOddDrawingOffset() {
+		return tileSize/2;
 	}
 
 	public void drawTile(Graphics g, Tile theTile, double lowest, double highest) {
@@ -1130,7 +1273,7 @@ public class GameView extends JPanel {
 			g.drawImage(minimapImage, x, y, w, h, null);
 		}
 		if(game.world != null) { 
-			Position offsetTile = getTileAtPixel(viewOffset);
+			Position offsetTile = getWorldCoordOfPixel(viewOffset);
 			int boxx = (int) (offsetTile.x * w / game.world.getWidth() / 2);
 			int boxy = (int) (offsetTile.y * h / game.world.getHeight() / 2);
 			int boxw = (int) (getWidth() * w / tileSize / game.world.getWidth());
