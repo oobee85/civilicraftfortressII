@@ -512,7 +512,7 @@ public class GameView extends JPanel {
 					selectedAUnit = true;
 					//shift enabled -> selects whole stack
 					//shift disabled -> selects top unit
-					if (!shiftEnabled) {
+					if (!shiftEnabled && tiles.size() == 1) {
 						break;
 					}
 				}
