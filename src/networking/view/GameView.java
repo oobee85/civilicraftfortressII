@@ -770,7 +770,7 @@ public class GameView extends JPanel {
 					Tile tile = game.world.get(new TileLoc(i, j));
 					if(tile == null)
 						continue;
-					drawTile(g, tile, lowest, highest);
+					drawTile((Graphics2D) g, tile, lowest, highest);
 				}
 			}
 
@@ -1017,7 +1017,7 @@ public class GameView extends JPanel {
 		return tileSize/2;
 	}
 
-	public void drawTile(Graphics g, Tile theTile, double lowest, double highest) {
+	public void drawTile(Graphics2D g, Tile theTile, double lowest, double highest) {
 		Point drawAt = getDrawingCoords(theTile.getLocation());
 		int draww = tileSize;
 		int drawh = tileSize;
@@ -1038,17 +1038,12 @@ public class GameView extends JPanel {
 			}
 			
 			if(theTile.getFaction() != null && theTile.getFaction() != game.world.getFaction(World.NO_FACTION_ID)) {
-//				g.setColor(Color.black);
-//				g.fillRect(x, y, w, h); 
-				g.setColor(theTile.getFaction().color());
-				
-				Utils.setTransparency(g, 0.5f);
+				g.setColor(theTile.getFaction().borderColor());
 				for(Tile tile : theTile.getNeighbors()) {
 					if(tile.getFaction() != theTile.getFaction()) {
 						drawBorderBetween(g, theTile.getLocation(), tile.getLocation());
 					}
 				}
-				Utils.setTransparency(g, 1);
 			}
 //			if(game.world.borderTerritory.containsKey(theTile)) {
 //				Utils.setTransparency(g, 1);
@@ -1218,7 +1213,7 @@ public class GameView extends JPanel {
 		}
 	}
 	
-	private void drawBorderBetween(Graphics g, TileLoc one, TileLoc two) {
+	private void drawBorderBetween(Graphics2D g, TileLoc one, TileLoc two) {
 		int width = tileSize / 8;
 		Point drawAt = getDrawingCoords(one);
 		if (one.x() == two.x()) {
