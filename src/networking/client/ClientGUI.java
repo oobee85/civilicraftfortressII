@@ -317,14 +317,15 @@ public class ClientGUI {
 		CRAFTING_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, craftingView.getRootPanel(), "Craft items", CRAFTING_TAB);
 		
-		SpawnUnitsView spawnUnitsView = new SpawnUnitsView(gameView);
-		SPAWN_UNITS_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab(null, SPAWN_TAB_ICON, spawnUnitsView.getRootPanel(), "Summon units for testing", SPAWN_UNITS_TAB);
-
-		DebugView debugView = new DebugView(gameView);
-		DEBUG_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab(null, DEBUG_TAB_ICON, debugView.getRootPanel(), "Various testing functions", DEBUG_TAB);
-		
+		if(Game.DEBUG) {
+			SpawnUnitsView spawnUnitsView = new SpawnUnitsView(gameView);
+			SPAWN_UNITS_TAB = tabbedPane.getTabCount();
+			tabbedPane.insertTab(null, SPAWN_TAB_ICON, spawnUnitsView.getRootPanel(), "Summon units for testing", SPAWN_UNITS_TAB);
+			
+			DebugView debugView = new DebugView(gameView);
+			DEBUG_TAB = tabbedPane.getTabCount();
+			tabbedPane.insertTab(null, DEBUG_TAB_ICON, debugView.getRootPanel(), "Various testing functions", DEBUG_TAB);
+		}
 		
 		// disable building tab after setting all of the tabs up
 		manageBuildingTab(false);
