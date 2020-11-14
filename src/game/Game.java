@@ -335,9 +335,82 @@ public class Game {
 		for(int i = 0; i < num/2; i++) {
 			spawnEverything();
 		}
-		
+	}
+
+	public void shadowWordPain(int num){
+		Faction undead = world.getFaction(World.UNDEAD_FACTION_ID);
+		Faction cyclops = world.getFaction(World.CYCLOPS_FACTION_ID);
+//		for(int i = 0; i < 40; i++) {
+//			world.spawnDragon(null);
+//		}
+		for(int x = 0; x < world.getWidth(); x++) {
+			Tile tile;
+			tile = world.get(new TileLoc(x, 0));
+			world.spawnAnimal(Game.unitTypeMap.get("STONE_GOLEM"), tile, undead, null);
+			world.spawnAnimal(Game.unitTypeMap.get("TERMITE"), tile, undead, null);
+			tile = world.get(new TileLoc(x, 1));
+			world.spawnAnimal(Game.unitTypeMap.get("VAMPIRE"), tile, undead, null);
+			tile = world.get(new TileLoc(x, 2));
+			world.spawnAnimal(Game.unitTypeMap.get("ICE_GIANT"), tile, undead, null);
+			for(int y = 0; y < 3; y++) {
+				tile = world.get(new TileLoc(x, y + 3));
+				world.spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, undead, null);
+			}
+			
+			tile = world.get(new TileLoc(x, world.getHeight() - 2));
+			world.spawnAnimal(Game.unitTypeMap.get("ROC"), tile, cyclops, null);
+			tile = world.get(new TileLoc(x, 5));
+			world.spawnAnimal(Game.unitTypeMap.get("HORSEARCHER"), tile, undead, null);
+			tile = world.get(new TileLoc(x, 6));
+			world.spawnAnimal(Game.unitTypeMap.get("KNIGHT"), tile, undead, null);
+			tile = world.get(new TileLoc(x, 7));
+			world.spawnAnimal(Game.unitTypeMap.get("CATAPULT"), tile, undead, null);
+			tile = world.get(new TileLoc(x, 8));
+			world.spawnAnimal(Game.unitTypeMap.get("LONGBOWMAN"), tile, undead, null);
+			tile = world.get(new TileLoc(x, 9));
+			world.spawnAnimal(Game.unitTypeMap.get("ARCHER"), tile, undead, null);
+		}
+		for(int x = 0; x < world.getWidth(); x++) {
+			Tile tile;
+			if(x > 4 && x < world.getWidth() - 3) {
+				if(x % 6 == 0) {
+					tile = world.get(new TileLoc(x, world.getHeight() - 16));
+					spawnCyclops(tile);
+					world.spawnAnimal(Game.unitTypeMap.get("OGRE"), tile, cyclops, null);
+					world.spawnAnimal(Game.unitTypeMap.get("TREBUCHET"), tile, cyclops, null);
+				}
+			}
+		}
+		for(int x = 0; x < world.getWidth(); x++) {
+			Tile tile;
+			if(x > 4 && x < world.getWidth() - 3) {
+				if(x % 6 == 3) {
+					tile = world.get(new TileLoc(x, world.getHeight() - 10));
+					spawnCyclops(tile);
+					world.spawnAnimal(Game.unitTypeMap.get("OGRE"), tile, cyclops, null);
+					world.spawnAnimal(Game.unitTypeMap.get("TREBUCHET"), tile, cyclops, null);
+				}
+			}
+		}
+		for(int x = 0; x < world.getWidth(); x++) {
+			Tile tile;
+			if(x > 4 && x < world.getWidth() - 3) {
+				if(x % 6 == 0) {
+					tile = world.get(new TileLoc(x, world.getHeight() - 5));
+					spawnCyclops(tile);
+					world.spawnAnimal(Game.unitTypeMap.get("OGRE"), tile, cyclops, null);
+					world.spawnAnimal(Game.unitTypeMap.get("TREBUCHET"), tile, cyclops, null);
+				}
+			}
+		}
+		int y = world.getHeight() - 18;
+		for(int x = 0; x < 5; x++) {
+			summonThing(world.get(new TileLoc(x, y)), Game.buildingTypeMap.get("WALL_WOOD"), cyclops);
+			summonThing(world.get(new TileLoc(world.getWidth() - x, y)), Game.buildingTypeMap.get("WALL_WOOD"), cyclops);
+		}
 		
 	}
+	
 	public void spawnEverything() {
 		List<Tile> tiles = world.getTilesRandomly();
 		
@@ -385,6 +458,9 @@ public class Game {
 				break;
 			}
 		}
+		spawnCyclops(tile);
+	}
+	public void spawnCyclops(Tile tile) {
 		summonThing(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y())), Game.buildingTypeMap.get("WATCHTOWER"), world.getFaction(World.CYCLOPS_FACTION_ID));
 		summonThing(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("GRANARY"), world.getFaction(World.CYCLOPS_FACTION_ID));
 		summonThing(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("BARRACKS"), world.getFaction(World.CYCLOPS_FACTION_ID));
@@ -427,6 +503,9 @@ public class Game {
 		for(int i = -1; i < 2; i ++) {
 			for(int j = -1; j < 2; j ++) {
 				Tile temp = world.get(new TileLoc(tile.getLocation().x() + i, tile.getLocation().y() + j));
+				if(temp == null) {
+					continue;
+				}
 				Animal cyclops = world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp, world.getFaction(World.CYCLOPS_FACTION_ID), null);
 				cyclops.setPassiveAction(PlannedAction.GUARD);
 			}

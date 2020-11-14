@@ -313,8 +313,8 @@ public class World {
 	}
 	public void spawnDragon(Tile target) {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> 
-		e.getTerrain() == Terrain.VOLCANO 
-		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+					e.getTerrain() == Terrain.VOLCANO 
+					&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(tile.isPresent()) {
 			spawnAnimal(Game.unitTypeMap.get("DRAGON"), tile.get(), getFaction(NO_FACTION_ID), target);
 		}

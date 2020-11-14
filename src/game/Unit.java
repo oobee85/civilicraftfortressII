@@ -144,7 +144,7 @@ public class Unit extends Thing implements Serializable {
 		}
 		if (currentPath != null && !currentPath.isEmpty()) {
 			Tile targetTile = currentPath.getFirst();
-			if(readyToInvade() || (targetTile.getFaction().id() == World.NO_FACTION_ID && targetTile.getFaction().id() == getFactionID())) {
+			if(readyToInvade() || (targetTile.getFaction().id() == World.NO_FACTION_ID || targetTile.getFaction().id() == getFactionID())) {
 				boolean success = this.moveTo(targetTile);
 				if (success) {
 					currentPath.removeFirst();

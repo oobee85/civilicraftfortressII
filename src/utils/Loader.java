@@ -349,11 +349,16 @@ public class Loader {
 			if(type.getTargetingInfoStrings() != null) {
 				for(TargetInfo targetingInfo : type.getTargetingInfoStrings()) {
 					Object targetType = null;
+					boolean isWall = false;
 					if(Game.unitTypeMap.containsKey(targetingInfo.type)) {
 						targetType = Game.unitTypeMap.get(targetingInfo.type);
 					}
 					else if(Game.buildingTypeMap.containsKey(targetingInfo.type)) {
 						targetType = Game.buildingTypeMap.get(targetingInfo.type);
+					}
+					else if(targetingInfo.type.equals("WALL")) {
+						targetType = Building.class;
+						isWall = true;
 					}
 					else {
 						try {
@@ -364,7 +369,7 @@ public class Loader {
 						}
 					}
 					if(targetType != null) {
-						type.getTargetingInfo().add(new TargetingInfo(targetType, targetingInfo.faction));
+						type.getTargetingInfo().add(new TargetingInfo(targetType, targetingInfo.faction, isWall));
 					}
 				}
 			}

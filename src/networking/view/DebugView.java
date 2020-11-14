@@ -22,6 +22,7 @@ public class DebugView {
 	private static final ImageIcon NIGHT_ENABLED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/night_enabled.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon METEOR_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/meteor.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon SHADOW_WORD_DEATH = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/soyouhavechosendeath.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private static final ImageIcon SHADOW_WORD_PAIN = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/shadowwordpain.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	
 	
@@ -125,6 +126,13 @@ public class DebugView {
 				gameView.getGameInstance().shadowWordDeath(100);
 			}
 		});
+		JButton shadowWordPain = KUIConstants.setupButton("Shadow Word: Pain", SHADOW_WORD_PAIN, LONG_BUTTON_SIZE);
+		shadowWordPain.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameView.getGameInstance().shadowWordPain(1);
+			}
+		});
 
 		JButton meteor = KUIConstants.setupButton("Meteor", METEOR_ICON, DEBUG_BUTTON_SIZE);
 		meteor.addActionListener(new ActionListener() {
@@ -197,6 +205,7 @@ public class DebugView {
 		rootPanel.add(setTerritoryButton);
 		rootPanel.add(exit);
 		rootPanel.add(shadowWordDeath);
+		rootPanel.add(shadowWordPain);
 	}
 	
 	public JPanel getRootPanel() {

@@ -7,10 +7,15 @@ import wildlife.*;
 
 public class TargetingInfo {
 	public final Object type;
+	public final boolean isWall;
 	public final String faction;
 	public TargetingInfo(Object type, String faction) {
+		this(type, faction, false);
+	}
+	public TargetingInfo(Object type, String faction, boolean isWall) {
 		this.type = type;
 		this.faction = faction;
+		this.isWall = isWall;
 	}
 	
 	private boolean doesFactionSatify(Faction animalFaction, Faction potentialTargetFaction) {
@@ -36,9 +41,9 @@ public class TargetingInfo {
 				if((targetUnitType != null && potentialTarget.getType() != targetUnitType) || potentialTarget == animal) {
 					continue;
 				}
-				if(doesFactionSatify(animal.getFaction(), potentialTarget.getFaction()) && Math.random() < 0.3) {
+				if(doesFactionSatify(animal.getFaction(), potentialTarget.getFaction())) {
 					target = potentialTarget;
-					if(Math.random() < 0.2) {
+					if(Math.random() < 0.05) {
 						break;
 					}
 				}
@@ -55,9 +60,12 @@ public class TargetingInfo {
 				if(targetBuildingType != null && potentialTarget.getType() != targetBuildingType) {
 					continue;
 				}
-				if(doesFactionSatify(animal.getFaction(), potentialTarget.getFaction()) && Math.random() < 0.3) {
+				if(isWall && !potentialTarget.getType().blocksMovement()) {
+					continue;
+				}
+				if(doesFactionSatify(animal.getFaction(), potentialTarget.getFaction())) {
 					target = potentialTarget;
-					if(Math.random() < 0.2) {
+					if(Math.random() < 0.05) {
 						break;
 					}
 				}

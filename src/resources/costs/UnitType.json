@@ -237,7 +237,8 @@
 		],
 		"attributes":["flying","hostile"],
 		"targeting":[
-			{"type":"game.Unit", "faction":"PLAYER"}
+			{"type":"game.Unit", "faction":"PLAYER"},
+			{"type":"game.Unit"}
 		],
 		"loot":{"IRON_BAR":5}
 	},
@@ -249,7 +250,8 @@
 			{"damage":40, "cooldown":40, "range":1}
 		],
 		"targeting":[ 
-			{"type":"game.Building", "faction":"PLAYER"}
+			{"type":"game.Building", "faction":"PLAYER"},
+			{"type":"game.Unit"}
 		],
 		"attributes":["flying","hostile","coldresistant"],
 		"loot":{"ADAMANTITE_ORE":10}
@@ -358,7 +360,8 @@
 		],
 		"attributes":["hostile","coldresistant","delayedinvasion"],
 		"targeting":[
-			{"type":"game.Unit", "faction":"PLAYER"}
+			{"type":"game.Unit", "faction":"PLAYER"},
+			{"type":"game.Unit"}
 		],
 		"loot":{"IRON_SWORD":2, "MITHRIL_BAR":5}
 	},
@@ -463,14 +466,8 @@
 			{"damage":20, "cooldown":5, "range":1}
 		],
 		"targeting":[
-			{"type":"GATE_WOOD"},
-			{"type":"WALL_WOOD"},
-			{"type":"GATE_STONE"},
-			{"type":"WALL_STONE"},
-			{"type":"GATE_BRICK"},
-			{"type":"WALL_BRICK"},
-			{"type":"game.Building", "faction":"PLAYER"},
-			{"type":"game.Building", "faction":"CYCLOPS"}
+			{"type":"WALL"},
+			{"type":"game.Building"}
 		],
 		"attributes":["hostile"],
 		"loot":{"WOOD":100}
