@@ -6,8 +6,8 @@ import game.*;
 import ui.*;
 
 public class BuildingTypeInfoPanel extends InfoPanel {
-	
-	BuildingType showing;
+	 
+	private BuildingType showing;
 	private Faction faction;
 
 	public BuildingTypeInfoPanel(BuildingType showing, Faction faction) {

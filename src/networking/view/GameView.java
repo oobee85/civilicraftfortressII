@@ -502,22 +502,28 @@ public class GameView extends JPanel {
 		if (shiftEnabled == false && !controlEnabled) {
 			deselectEverything();
 		}
+		boolean selectedAUnit = false;
 		for(Tile tile : tiles) {
-			//selects the building on the tile
-			Building building = tile.getBuilding();
-			if(building != null && building.getFaction() == faction && tile.getUnitOfFaction(faction) == null) {
-				selectThing(building);
-			}
 			//goes through all the units on the tile and checks if they are selected
 			for(Unit candidate : tile.getUnits()) {
 				// clicking on tile w/o shift i.e only selects top unit
 				if (candidate.getFaction() == faction) {
 					selectThing(candidate);
+					selectedAUnit = true;
 					//shift enabled -> selects whole stack
 					//shift disabled -> selects top unit
 					if (!shiftEnabled) {
 						break;
 					}
+				}
+			}
+		}
+		if(!selectedAUnit) {
+			for(Tile tile : tiles) {
+				//selects the building on the tile
+				Building building = tile.getBuilding();
+				if(building != null && building.getFaction() == faction && tile.getUnitOfFaction(faction) == null) {
+					selectThing(building);
 				}
 			}
 		}
