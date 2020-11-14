@@ -8,7 +8,7 @@ import java.util.concurrent.*;
 import java.util.stream.*;
 
 import game.*;
-import liquid.*;
+import game.liquid.*;
 import networking.message.*;
 import networking.server.*;
 import ui.*;

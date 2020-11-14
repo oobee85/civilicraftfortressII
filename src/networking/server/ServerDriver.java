@@ -2,6 +2,7 @@ package networking.server;
 
 import javax.swing.*;
 
+import game.*;
 import ui.*;
 import utils.*;
 

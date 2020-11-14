@@ -1,11 +1,9 @@
-package liquid;
+package game.liquid;
 
 import java.util.*;
 import java.util.concurrent.*;
 
-import game.GroundModifier;
-import game.GroundModifierType;
-import ui.Game;
+import game.*;
 import utils.*;
 import world.*;
 

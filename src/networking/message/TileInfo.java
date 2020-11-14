@@ -2,7 +2,7 @@ package networking.message;
 
 import java.io.*;
 
-import liquid.*;
+import game.liquid.*;
 import utils.*;
 import world.*;
 

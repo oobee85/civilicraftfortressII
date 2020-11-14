@@ -1,12 +1,14 @@
-package ui;
+package game;
 import java.awt.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import game.liquid.*;
+
 import java.util.*;
 
-import game.*;
-import liquid.*;
 import networking.server.*;
+import ui.*;
 import utils.*;
 import wildlife.*;
 import world.*;

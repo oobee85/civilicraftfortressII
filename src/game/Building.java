@@ -5,8 +5,7 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 
-import liquid.*;
-import ui.Game;
+import game.liquid.*;
 import utils.*;
 import world.*;
 

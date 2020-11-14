@@ -1,4 +1,4 @@
-package pathfinding;
+package game.pathfinding;
 
 import world.*;
 

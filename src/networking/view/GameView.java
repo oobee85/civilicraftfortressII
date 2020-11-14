@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 import javax.swing.*;
 
 import game.*;
-import liquid.*;
+import game.liquid.*;
 import ui.*;
 import utils.*;
 import world.*;

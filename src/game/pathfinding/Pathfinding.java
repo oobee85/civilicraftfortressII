@@ -1,4 +1,4 @@
-package pathfinding;
+package game.pathfinding;
 
 import java.util.*;
 

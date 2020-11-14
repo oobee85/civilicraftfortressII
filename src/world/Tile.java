@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import game.*;
-import liquid.*;
+import game.liquid.*;
 import utils.*;
 
 public class Tile implements Externalizable {

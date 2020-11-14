@@ -1,7 +1,7 @@
 package wildlife;
 
 import game.*;
-import liquid.LiquidType;
+import game.liquid.*;
 import ui.*;
 import world.*;
 

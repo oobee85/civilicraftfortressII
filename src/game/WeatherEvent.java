@@ -5,7 +5,7 @@ import java.awt.Image;
 
 import javax.swing.ImageIcon;
 
-import liquid.LiquidType;
+import game.liquid.*;
 import utils.HasImage;
 import utils.MipMap;
 import world.Tile;

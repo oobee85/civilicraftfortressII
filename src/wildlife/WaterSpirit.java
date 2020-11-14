@@ -3,7 +3,7 @@ package wildlife;
 import java.util.*;
 
 import game.*;
-import liquid.*;
+import game.liquid.*;
 import ui.*;
 import world.*;
 

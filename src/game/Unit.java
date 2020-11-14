@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import pathfinding.*;
+import game.pathfinding.*;
 import utils.*;
 import world.*;
 

@@ -5,6 +5,7 @@ import java.util.*;
 
 import javax.swing.*;
 
+import game.*;
 import networking.view.*;
 import ui.*;
 import utils.*;

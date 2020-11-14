@@ -1,4 +1,4 @@
-package liquid;
+package game.liquid;
 
 import java.awt.*;
 
