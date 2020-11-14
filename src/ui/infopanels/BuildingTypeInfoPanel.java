@@ -3,6 +3,7 @@ package ui.infopanels;
 import java.awt.*;
 
 import game.*;
+import ui.*;
 
 public class BuildingTypeInfoPanel extends InfoPanel {
 	
@@ -21,7 +22,16 @@ public class BuildingTypeInfoPanel extends InfoPanel {
 		if(showing == null) {
 			return;
 		}
-
+		
+		if(showing.getResearchRequirement() != null) {
+			g.setFont(KUIConstants.combatStatsFont);
+			ResearchType req = Game.researchTypeMap.get(showing.getResearchRequirement());
+			g.setColor(Color.black);
+			if(!faction.getResearch(req).isCompleted()) {
+				g.setColor(Color.red);
+			}
+			g.drawString(req.toString(), getImageSize(), y += g.getFont().getSize());
+		}
 		if(showing.getCost() != null) {
 			UnitTypeInfoPanel.drawCosts(g, showing.getCost(), getImageSize(), y + 6, faction);
 		}
