@@ -292,11 +292,6 @@ public class GameView extends JPanel {
 		if(game.world == null) {
 			return;
 		}
-		Tile topLeftTile = game.world.get(new TileLoc(topLeft.getIntX(), topLeft.getIntY()));
-		Tile botRightTile = game.world.get(new TileLoc(botRight.getIntX(), botRight.getIntY()));
-		if(topLeftTile == null || botRightTile == null) {
-			return;
-		}
 		toggleSelectionForTiles(getTilesBetween(topLeft, botRight), shiftDown, controlDown);
 	}
 
