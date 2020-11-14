@@ -442,7 +442,7 @@ public class GameView extends JPanel {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Building ) {
 				Building building = (Building)thing;
-				for(String ut : building.getType().unitsCanBuild()) {
+				for(String ut : building.getType().unitsCanProduce()) {
 					if(u == Game.unitTypeMap.get(ut)) {
 						commandInterface.produceUnit(building, u);
 					}

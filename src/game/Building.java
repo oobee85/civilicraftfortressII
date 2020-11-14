@@ -146,7 +146,9 @@ public class Building extends Thing implements Serializable {
 		return spawnLocation;
 	}
 	public void setRallyPoint(Tile tile) {
-		spawnLocation = tile;
+		if(buildingType.unitsCanProduce().length > 0) {
+			spawnLocation = tile;
+		}
 	}
 	public void setProducingUnit(Unit producingUnit) {
 		this.producingUnitList.add(producingUnit);

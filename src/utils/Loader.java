@@ -321,8 +321,8 @@ public class Loader {
 	
 	public static void doMappings() {
 		for(BuildingType type : Game.buildingTypeList) {
-			for(String unittypestring : type.unitsCanBuild()) {
-				type.unitsCanBuildSet().add(Game.unitTypeMap.get(unittypestring));
+			for(String unittypestring : type.unitsCanProduce()) {
+				type.unitsCanProduceSet().add(Game.unitTypeMap.get(unittypestring));
 			}
 		}
 		for(ResearchType type : Game.researchTypeList) {

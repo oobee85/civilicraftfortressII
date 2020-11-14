@@ -20,13 +20,13 @@ public class BuildingType implements HasImage, Serializable {
 	private transient final double buildingEffort;
 	private transient final HashMap <ItemType, Integer> cost;
 	private transient final HashSet<String> attributes;
-	private transient final String[] canBuild;
-	private transient final HashSet<UnitType> canBuildSet = new HashSet<>();
+	private transient final String[] canProduce;
+	private transient final HashSet<UnitType> canProduceSet = new HashSet<>();
 	
 	private transient HashMap<String, Image> roadImages;
 	
 	public BuildingType(String name, String info, int hp, double buildingEffort, String s, double cultureRate, int visionRadius, 
-			String requirement, HashMap <ItemType, Integer> resourcesNeeded, String[] canBuild, double moveSpeedEnhancement, HashSet<String> attributes) {
+			String requirement, HashMap <ItemType, Integer> resourcesNeeded, String[] canProduce, double moveSpeedEnhancement, HashSet<String> attributes) {
 		this.name = name;
 		this.info = info;
 		mipmap = new MipMap(s);
@@ -37,18 +37,18 @@ public class BuildingType implements HasImage, Serializable {
 		this.buildingEffort = buildingEffort;
 		this.cost = resourcesNeeded;
 		this.visionRadius = visionRadius;
-		this.canBuild = canBuild;
+		this.canProduce = canProduce;
 		this.attributes = attributes;
 		
 		if(isRoad()) {
 			roadImages = ImageCreation.createRoadImages(s);
 		}
 	}
-	public HashSet<UnitType> unitsCanBuildSet() {
-		return canBuildSet;
+	public HashSet<UnitType> unitsCanProduceSet() {
+		return canProduceSet;
 	}
-	public String[] unitsCanBuild(){
-		return canBuild;
+	public String[] unitsCanProduce(){
+		return canProduce;
 	}
 	public String getResearchRequirement() {
 		return researchRequirement;
