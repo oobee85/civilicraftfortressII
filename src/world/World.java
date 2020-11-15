@@ -786,7 +786,7 @@ public class World {
 //			if(tile.isCold()) {
 //				plant.takeDamage(1);
 //			}
-			if (plant.isAquatic()) {
+			if (plant.isAquatic() && tile.liquidType == LiquidType.WATER) {
 				if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 
 					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
@@ -797,7 +797,6 @@ public class World {
 					}
 				}
 			} else {
-			
 				int totalDamage = 0;
 				double modifierDamage = 0;
 				
