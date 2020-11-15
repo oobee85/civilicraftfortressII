@@ -39,11 +39,13 @@ public class GameView extends JPanel {
 	private volatile BufferedImage terrainImage;
 	private volatile BufferedImage minimapImage;
 	private volatile BufferedImage heightMapImage;
+	private volatile BufferedImage humidityMapImage;
 	
 	private Game game;
 	private Position viewOffset;
 	private Point previousMouse;
 	private boolean showHeightMap = false;
+	private boolean showHumidityMap = false;
 	private boolean draggingMouse = false;
 	private boolean drawDebugStrings = false;
 	private TileLoc hoveredTile = new TileLoc(-1,-1);
@@ -593,11 +595,15 @@ public class GameView extends JPanel {
 			this.terrainImage = images[0];
 			this.minimapImage = images[1];
 			this.heightMapImage = images[2];
+			this.humidityMapImage = images[3];
 		}
 	}
 	
 	public void setShowHeightMap(boolean show) {
 		this.showHeightMap = show;
+	}
+	public void setShowHumidityMap(boolean show) {
+		this.showHumidityMap = show;
 	}
 
 	public void mouseOver(Position tilepos) {
@@ -746,23 +752,45 @@ public class GameView extends JPanel {
 			if(showHeightMap) {
 				g.drawImage(heightMapImage, 0, 0, tileSize*game.world.getWidth(), tileSize*game.world.getHeight(), null);
 			}
+			else if(showHumidityMap) {
+				g.drawImage(humidityMapImage, 0, 0, tileSize*game.world.getWidth(), tileSize*game.world.getHeight(), null);
+			}
 			else {
 				g.drawImage(terrainImage, 0, 0, tileSize*game.world.getWidth(), tileSize*game.world.getHeight(), null);
 			}
 		}
 		else {
-			double highest = 0;
-			double lowest = 1;
+			double highHeight = 0;
+			double lowHeight = 1;
+			double highHumidity = 20;
+			double lowHumidity = 0;
 			if(showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
-						if(tile == null)
+						if(tile == null) {
 							continue;
-						highest = Math.max(highest, tile.getHeight());
-						lowest = Math.min(lowest, tile.getHeight());
+						}
+						highHeight = Math.max(highHeight, tile.getHeight());
+						lowHeight = Math.min(lowHeight, tile.getHeight());
+						
+						
 					}
 				}
+			}
+			else if(showHumidityMap) {
+				for (int i = lowerX; i < upperX; i++) {
+					for (int j = lowerY; j < upperY; j++) {
+						Tile tile = game.world.get(new TileLoc(i, j));
+						if(tile == null) {
+							continue;
+						}
+						highHumidity = Math.max(highHumidity, tile.getHumidity());
+						lowHumidity = Math.min(lowHumidity, tile.getHumidity());
+						
+					}
+				}
+				
 			}
 			
 			for (int i = lowerX; i < upperX; i++) {
@@ -770,7 +798,7 @@ public class GameView extends JPanel {
 					Tile tile = game.world.get(new TileLoc(i, j));
 					if(tile == null)
 						continue;
-					drawTile(g, tile, lowest, highest);
+					drawTile(g, tile, lowHeight, highHeight, lowHumidity, highHumidity);
 				}
 			}
 
@@ -823,7 +851,7 @@ public class GameView extends JPanel {
 				count++;
 			}
 			
-			if(!showHeightMap) {
+			if(!showHeightMap && !showHumidityMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
@@ -1017,16 +1045,24 @@ public class GameView extends JPanel {
 		return tileSize/2;
 	}
 
-	public void drawTile(Graphics g, Tile theTile, double lowest, double highest) {
+	public void drawTile(Graphics g, Tile theTile, double lowHeight, double highHeight, double lowHumidity, double highHumidity) {
 		Point drawAt = getDrawingCoords(theTile.getLocation());
 		int draww = tileSize;
 		int drawh = tileSize;
 		int imagesize = draww < drawh ? draww : drawh;
 		
 		if(showHeightMap) {
-			float heightRatio = (float) ((theTile.getHeight() - lowest) / (highest - lowest));
+			float heightRatio = (float) ((theTile.getHeight() - lowHeight) / (highHeight - lowHeight));
 			int r = Math.max(Math.min((int) (255 * heightRatio), 255), 0);
 			g.setColor(new Color(r, 0, 255 - r));
+			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
+		}
+		else if(showHumidityMap) {
+			float humidityRatio = (float) ((theTile.getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
+			float insidePara = ((humidityRatio - 0.5f)*1.74f);
+			float almostRatio = (insidePara*insidePara*insidePara*insidePara*insidePara + 0.5f);
+			int r = Math.max(Math.min((int) (255 * almostRatio), 255), 0);
+			g.setColor(new Color(255 - r, 0, r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 		}
 		else {
@@ -1263,6 +1299,9 @@ public class GameView extends JPanel {
 	public void drawMinimap(Graphics g, int x, int y, int w, int h) {
 		if(showHeightMap) {
 			g.drawImage(heightMapImage, x, y, w, h, null);
+		}
+		else if(showHumidityMap) {
+			g.drawImage(humidityMapImage, x, y, w, h, null);
 		}
 		else {
 			g.drawImage(minimapImage, x, y, w, h, null);

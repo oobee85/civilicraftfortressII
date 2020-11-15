@@ -547,7 +547,7 @@ public class World {
 				
 				for(Tile t : tile.getNeighbors()) {
 					//count how many neighbors is a failed tile
-					if(t.getHumidity() > DESERT_HUMIDITY + 0.01 || t.getTerrain() == Terrain.GRASS) {
+					if(t.getHumidity() > DESERT_HUMIDITY + 0.01 || t.getTerrain() == Terrain.GRASS || t.getTerrain() == Terrain.ROCK) {
 						failTiles ++;
 					}
 				}
@@ -565,6 +565,20 @@ public class World {
 			}else if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY) {
 				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
 					tile.setTerrain(Terrain.DIRT);
+				}
+			}
+			
+			if(tile.getTerrain() == Terrain.SAND) {
+				int numFailTiles = 0;
+				for(Tile t : tile.getNeighbors()) {
+					if(t.getTerrain() != Terrain.SAND) {
+						numFailTiles ++;
+					}
+				}
+				if(numFailTiles > 3) {
+					if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+						tile.setTerrain(Terrain.DIRT);
+					}
 				}
 			}
 			//turns grass into dirt if the tile has a cold liquid
@@ -1049,10 +1063,29 @@ public class World {
 			Color c = new Color(r, 0, 255-r);
 			heightMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 		}
+		BufferedImage humidityMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
+		
+		double highHumidity = Double.MIN_VALUE;
+		double lowHumidity = Double.MAX_VALUE;
+		for(Tile tile : getTiles() ) {
+			highHumidity = Math.max(highHumidity, tile.getHumidity());
+			lowHumidity = Math.min(lowHumidity, tile.getHumidity());
+		}
+		
+		for(Tile tile : getTiles() ) {
+			float humidityRatio = (float) ((tile.getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
+			float insidePara = ((humidityRatio - 0.5f)*1.74f);
+			float almostRatio = (insidePara*insidePara*insidePara*insidePara*insidePara + 0.5f);
+			int r = Math.max(Math.min((int)(255*almostRatio), 255), 0);
+			Color c = new Color(255 - r, 0, r);
+			humidityMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
+		}
 		return new BufferedImage[] { 
 				ImageCreation.convertToHexagonal(terrainImage), 
 				ImageCreation.convertToHexagonal(minimapImage), 
-				ImageCreation.convertToHexagonal(heightMapImage)};
+				ImageCreation.convertToHexagonal(heightMapImage),
+				ImageCreation.convertToHexagonal(humidityMapImage) };
+		
 	}
 
 	public int ticksUntilDay() {

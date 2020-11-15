@@ -113,11 +113,14 @@ public class Tile implements Externalizable {
 		}
 		
 		humidity *= 0.995;
+		if(terr == Terrain.GRASS) {
+			humidity *= 1.004;
+		}
 		if(humidity < 0) {
 			humidity = 0;
 		}
-		if(humidity > 100) {
-			humidity = 100;
+		if(humidity > 20) {
+			humidity = 20;
 		}
 	}
 	
@@ -308,11 +311,11 @@ public class Tile implements Externalizable {
 		items.clear();
 	}
 
-	public void drawHeightMap(Graphics g, double height, int tileSize) {
-		int r = Math.max(Math.min((int) (255 * height), 255), 0);
-		g.setColor(new Color(r, 0, 255 - r));
-		g.fillRect(location.x() * tileSize, location.y() * tileSize, tileSize, tileSize);
-	}
+//	public void drawHeightMap(Graphics g, double height, int tileSize) {
+//		int r = Math.max(Math.min((int) (255 * height), 255), 0);
+//		g.setColor(new Color(r, 0, 255 - r));
+//		g.fillRect(location.x() * tileSize, location.y() * tileSize, tileSize, tileSize);
+//	}
 
 	public int drawDebugStrings(Graphics g, List<String> strings, int row, int fontsize, int tileSize, Point drawAt) {
 		int x = drawAt.x + 2;

@@ -44,6 +44,12 @@ public class DebugView {
 			showHeightMap.setText(showHeightMap.isSelected() ? "Hide Height Map" : "Show Height Map");
 			gameView.setShowHeightMap(showHeightMap.isSelected());
 		});
+		
+		JToggleButton showHumidityMap = KUIConstants.setupToggleButton("Show Humidity Map", null, DEBUG_BUTTON_SIZE);
+		showHumidityMap.addActionListener(e -> {
+			showHumidityMap.setText(showHumidityMap.isSelected() ? "Hide Humidity Map" : "Show Humidity Map");
+			gameView.setShowHumidityMap(showHumidityMap.isSelected());
+		});
 
 		JToggleButton flipTable = KUIConstants.setupToggleButton("Flip Table", null, DEBUG_BUTTON_SIZE);
 		flipTable.addActionListener(new ActionListener() {
@@ -189,6 +195,7 @@ public class DebugView {
 		});
 
 		rootPanel.add(showHeightMap);
+		rootPanel.add(showHumidityMap);
 		rootPanel.add(flipTable);
 		rootPanel.add(makeItRain);
 		rootPanel.add(makeItDry);

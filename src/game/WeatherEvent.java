@@ -59,11 +59,11 @@ public class WeatherEvent implements HasImage{
 		if(isCold == true) {
 			this.hasImage = WeatherEventType.SNOW;
 			liquidType = LiquidType.SNOW;
-			strength = 0.0002;
+			strength = 0.0003;
 		}else {
 			this.hasImage = WeatherEventType.RAIN;
 			liquidType = LiquidType.WATER;
-			strength = 0.0001;
+			strength = 0.0002;
 		}
 	}
 	
@@ -104,9 +104,6 @@ public class WeatherEvent implements HasImage{
 	public void resetTimeToMove() {
 		timeToMove = speed;
 	}
-	public void refreshDuration() {
-		this.aliveUntil = World.ticks + duration;
-	}
 	
 	public boolean isDead() {
 		return World.ticks >= aliveUntil;
@@ -114,16 +111,7 @@ public class WeatherEvent implements HasImage{
 	public int timeLeft() {
 		return aliveUntil - World.ticks;
 	}
-	public boolean updateTime() {
-		return isDead();
-	}
-	public void addDuration(int duration) {
-		aliveUntil += duration;
-	}
 	
-	public void finish() {
-		aliveUntil = World.ticks;
-	}
 	public Tile getTile() {
 		return tile;
 	}
