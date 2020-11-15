@@ -75,16 +75,18 @@ public class Building extends Thing implements Serializable {
 			resetTimeToHarvest();
 		}
 		if(getType() == Game.buildingTypeMap.get("MINE")) {
-			if(getTile().getResource() != null && getTile().getResource().getType().isOre() == true && getTile().getResource().hasYield()) {
-				getFaction().addItem(getTile().getResource().getType().getItemType(), 1);
-				getTile().getResource().harvest(1);
-//				getTile().setHeight(getTile().getHeight() - 0.001);
-				
-				resetTimeToHarvest();
+			if(getTile().getResource() != null && getFaction().areRequirementsMet(getTile().getResource().getType())) {
+				if(getTile().getResource().getType().isOre() && getTile().getResource().hasYield()) {
+					getFaction().addItem(getTile().getResource().getType().getItemType(), 1);
+					getTile().getResource().harvest(1);
+					resetTimeToHarvest();
+				}
 			}
-			if(getTile().getTerrain() == Terrain.ROCK && getTile().getResource() == null) {
-				getFaction().addItem(ItemType.STONE, 1);
-				resetTimeToHarvest();
+			else {
+				if(getTile().getTerrain() == Terrain.ROCK) {
+					getFaction().addItem(ItemType.STONE, 1);
+					resetTimeToHarvest();
+				}
 			}
 		}
 		if(getType() == Game.buildingTypeMap.get("IRRIGATION") && getTile().canPlant() == true) {

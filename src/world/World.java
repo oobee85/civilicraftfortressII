@@ -1014,7 +1014,7 @@ public class World {
 		for(Tile tile : this.getTiles()) {
 			Color minimapColor = terrainColors.get(tile.getTerrain());
 			Color terrainColor = terrainColors.get(tile.getTerrain());
-			if(tile.getResource() != null) {
+			if(tile.getResource() != null && faction.areRequirementsMet(tile.getResource().getType())) {
 				terrainColor = tile.getResource().getType().getColor(0);
 				minimapColor = tile.getResource().getType().getColor(0);
 			}

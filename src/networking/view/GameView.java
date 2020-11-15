@@ -294,11 +294,6 @@ public class GameView extends JPanel {
 		if(game.world == null) {
 			return;
 		}
-		Tile topLeftTile = game.world.get(new TileLoc(topLeft.getIntX(), topLeft.getIntY()));
-		Tile botRightTile = game.world.get(new TileLoc(botRight.getIntX(), botRight.getIntY()));
-		if(topLeftTile == null || botRightTile == null) {
-			return;
-		}
 		toggleSelectionForTiles(getTilesBetween(topLeft, botRight), shiftDown, controlDown);
 	}
 
@@ -731,13 +726,13 @@ public class GameView extends JPanel {
 		int x = 10;
 		int y = getHeight() - 5;
 		g.setColor(Color.green);
-		g.drawString("FPS:" + deltaTime, x, y);
-		g.drawString("TICK:" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
+		g.drawString("DRAW(ms):" + deltaTime, x, y);
+		g.drawString("TICK(ms):" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
 		x += 1;
 		y += 1;
-		g.setColor(Color.green.darker());
-		g.drawString("FPS:" + deltaTime, x, y);
-		g.drawString("TICK:" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
+		g.setColor(Color.black);
+		g.drawString("DRAW(ms):" + deltaTime, x, y);
+		g.drawString("TICK(ms):" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
 		Toolkit.getDefaultToolkit().sync();
 	}
 	
@@ -796,9 +791,10 @@ public class GameView extends JPanel {
 			for (int i = lowerX; i < upperX; i++) {
 				for (int j = lowerY; j < upperY; j++) {
 					Tile tile = game.world.get(new TileLoc(i, j));
-					if(tile == null)
+					if(tile == null) {
 						continue;
-					drawTile(g, tile, lowHeight, highHeight, lowHumidity, highHumidity);
+					}
+					drawTile((Graphics2D) g, tile, lowHeight, highHeight, lowHumidity, highHumidity);
 				}
 			}
 
@@ -1030,8 +1026,10 @@ public class GameView extends JPanel {
 			}
 		}
 		else {
-			Point drawAt = getDrawingCoords(hoveredTile);
-			g.drawRect(drawAt.x + strokeWidth/2, drawAt.y + strokeWidth/2, tileSize-strokeWidth, tileSize-strokeWidth);
+			if(game.world.get(hoveredTile) != null) {
+				Point drawAt = getDrawingCoords(hoveredTile);
+				g.drawRect(drawAt.x + strokeWidth/2, drawAt.y + strokeWidth/2, tileSize-strokeWidth, tileSize-strokeWidth);
+			}
 		}
 		g.setStroke(stroke);
 	}
@@ -1045,7 +1043,7 @@ public class GameView extends JPanel {
 		return tileSize/2;
 	}
 
-	public void drawTile(Graphics g, Tile theTile, double lowHeight, double highHeight, double lowHumidity, double highHumidity) {
+	public void drawTile(Graphics2D g, Tile theTile, double lowHeight, double highHeight, double lowHumidity, double highHumidity) {
 		Point drawAt = getDrawingCoords(theTile.getLocation());
 		int draww = tileSize;
 		int drawh = tileSize;
@@ -1069,22 +1067,17 @@ public class GameView extends JPanel {
 			g.drawImage(theTile.getTerrain().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh, null);
 //			t.drawEntities(g, currentMode);
 			
-			if(theTile.getResource() != null) {
+			if(theTile.getResource() != null && getFaction().areRequirementsMet(theTile.getResource().getType())) {
 				g.drawImage(theTile.getResource().getType().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh, null);
 			}
 			
 			if(theTile.getFaction() != null && theTile.getFaction() != game.world.getFaction(World.NO_FACTION_ID)) {
-//				g.setColor(Color.black);
-//				g.fillRect(x, y, w, h); 
-				g.setColor(theTile.getFaction().color());
-				
-				Utils.setTransparency(g, 0.5f);
+				g.setColor(theTile.getFaction().borderColor());
 				for(Tile tile : theTile.getNeighbors()) {
 					if(tile.getFaction() != theTile.getFaction()) {
 						drawBorderBetween(g, theTile.getLocation(), tile.getLocation());
 					}
 				}
-				Utils.setTransparency(g, 1);
 			}
 //			if(game.world.borderTerritory.containsKey(theTile)) {
 //				Utils.setTransparency(g, 1);
@@ -1254,7 +1247,7 @@ public class GameView extends JPanel {
 		}
 	}
 	
-	private void drawBorderBetween(Graphics g, TileLoc one, TileLoc two) {
+	private void drawBorderBetween(Graphics2D g, TileLoc one, TileLoc two) {
 		int width = tileSize / 8;
 		Point drawAt = getDrawingCoords(one);
 		if (one.x() == two.x()) {

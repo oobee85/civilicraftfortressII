@@ -122,7 +122,6 @@ public class DebugView {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gameView.getGameInstance().researchEverything(gameView.getFaction());
-				rootPanel.remove(researchEverything);
 			}
 		});
 		JButton shadowWordDeath = KUIConstants.setupButton("Shadow Word: Death", SHADOW_WORD_DEATH, LONG_BUTTON_SIZE);

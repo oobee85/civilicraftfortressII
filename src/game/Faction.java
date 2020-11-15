@@ -18,6 +18,7 @@ public class Faction implements Externalizable {
 	private HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
 	private HashMap<UnitType, ResearchRequirement> unitResearchRequirements = new HashMap<>();
 	private HashMap<ItemType, ResearchRequirement> craftResearchRequirements = new HashMap<>();
+	private HashMap<ResourceType, ResearchRequirement> resourceResearchRequirements = new HashMap<>();
 	
 
 	private Item[] items = new Item[ItemType.values().length];
@@ -30,6 +31,7 @@ public class Faction implements Externalizable {
 	
 	private int id;
 	private Color color;
+	private Color borderColor;
 	private String name;
 	private boolean usesItems;
 	private boolean isPlayer;
@@ -39,7 +41,7 @@ public class Faction implements Externalizable {
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 		id = in.readInt();
-		color = (Color)in.readObject();
+		this.setColor((Color)in.readObject());
 		name = in.readUTF();
 		usesItems = in.readBoolean();
 		isPlayer = in.readBoolean();
@@ -55,6 +57,10 @@ public class Faction implements Externalizable {
 		out.writeBoolean(isPlayer);
 		out.writeObject(researchTarget);
 		out.writeObject(items);
+	}
+	private void setColor(Color color) {
+		this.color = color;
+		this.borderColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 100);
 	}
 	public void raiseDifficultyBy(double add) {
 		environmentalDifficulty += add; 
@@ -74,6 +80,9 @@ public class Faction implements Externalizable {
 	public Color color() {
 		return color;
 	}
+	public Color borderColor() {
+		return borderColor;
+	}
 	public String name() {
 		return name;
 	}
@@ -87,7 +96,7 @@ public class Faction implements Externalizable {
 	}
 	public Faction(String name, boolean isPlayer, boolean usesItems, Color color) {
 		this.id = idCounter++;
-		this.color = color;
+		this.setColor(color);
 		this.name = name;
 		this.usesItems = usesItems;
 		this.isPlayer = isPlayer;
@@ -144,6 +153,9 @@ public class Faction implements Externalizable {
 	}
 	public boolean areRequirementsMet(ItemType type) {
 		return craftResearchRequirements.get(type).areRequirementsMet();
+	}
+	public boolean areRequirementsMet(ResourceType type) {
+		return resourceResearchRequirements.get(type).areRequirementsMet();
 	}
 	
 	public void spendResearch(int points) {
@@ -208,6 +220,14 @@ public class Faction implements Externalizable {
 //				req.addRequirement(typesRequirement);
 //			}
 			craftResearchRequirements.put(type, req);
+		}
+		for(ResourceType type : ResourceType.values()) {
+			ResearchRequirement req = new ResearchRequirement();
+			if(type.getResearchRequirement() != null) {
+				Research typesRequirement = researchMap.get(type.getResearchRequirement());
+				req.addRequirement(typesRequirement);
+			}
+			resourceResearchRequirements.put(type, req);
 		}
 	}
 	

@@ -281,7 +281,9 @@ public class Tile implements Externalizable {
 	public void replaceOrAddDurationModifier(GroundModifierType type, int duration, WorldData worldData) {
 		if(getModifier() != null) {
 			if(getModifier().getType() == type) {
-				this.getModifier().addDuration(duration);
+				int toadd = duration - getModifier().timeLeft();
+				toadd = toadd < 0 ? 0 : toadd;
+				this.getModifier().addDuration(toadd);
 				return;
 			}
 		}
