@@ -374,8 +374,8 @@
 		],
 		"attributes":["hostile","fireresistant"],
 		"targeting":[
-			{"type":"CASTLE", "faction":"PLAYER"},
-			{"type":"game.Building", "faction":"PLAYER"}
+			{"type":"game.Building", "faction":"PLAYER"},
+			{"type":"game.Building"}
 		],
 		"loot":{"COAL":100}
 	},

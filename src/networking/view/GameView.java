@@ -720,13 +720,13 @@ public class GameView extends JPanel {
 		int x = 10;
 		int y = getHeight() - 5;
 		g.setColor(Color.green);
-		g.drawString("FPS:" + deltaTime, x, y);
-		g.drawString("TICK:" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
+		g.drawString("DRAW(ms):" + deltaTime, x, y);
+		g.drawString("TICK(ms):" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
 		x += 1;
 		y += 1;
-		g.setColor(Color.green.darker());
-		g.drawString("FPS:" + deltaTime, x, y);
-		g.drawString("TICK:" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
+		g.setColor(Color.black);
+		g.drawString("DRAW(ms):" + deltaTime, x, y);
+		g.drawString("TICK(ms):" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
 		Toolkit.getDefaultToolkit().sync();
 	}
 	
@@ -997,8 +997,10 @@ public class GameView extends JPanel {
 			}
 		}
 		else {
-			Point drawAt = getDrawingCoords(hoveredTile);
-			g.drawRect(drawAt.x + strokeWidth/2, drawAt.y + strokeWidth/2, tileSize-strokeWidth, tileSize-strokeWidth);
+			if(game.world.get(hoveredTile) != null) {
+				Point drawAt = getDrawingCoords(hoveredTile);
+				g.drawRect(drawAt.x + strokeWidth/2, drawAt.y + strokeWidth/2, tileSize-strokeWidth, tileSize-strokeWidth);
+			}
 		}
 		g.setStroke(stroke);
 	}
@@ -1028,7 +1030,7 @@ public class GameView extends JPanel {
 			g.drawImage(theTile.getTerrain().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh, null);
 //			t.drawEntities(g, currentMode);
 			
-			if(theTile.getResource() != null) {
+			if(theTile.getResource() != null && getFaction().areRequirementsMet(theTile.getResource().getType())) {
 				g.drawImage(theTile.getResource().getType().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh, null);
 			}
 			

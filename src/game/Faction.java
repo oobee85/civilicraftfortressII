@@ -18,6 +18,7 @@ public class Faction implements Externalizable {
 	private HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
 	private HashMap<UnitType, ResearchRequirement> unitResearchRequirements = new HashMap<>();
 	private HashMap<ItemType, ResearchRequirement> craftResearchRequirements = new HashMap<>();
+	private HashMap<ResourceType, ResearchRequirement> resourceResearchRequirements = new HashMap<>();
 	
 
 	private Item[] items = new Item[ItemType.values().length];
@@ -153,6 +154,9 @@ public class Faction implements Externalizable {
 	public boolean areRequirementsMet(ItemType type) {
 		return craftResearchRequirements.get(type).areRequirementsMet();
 	}
+	public boolean areRequirementsMet(ResourceType type) {
+		return resourceResearchRequirements.get(type).areRequirementsMet();
+	}
 	
 	public void spendResearch(int points) {
 		if(researchTarget != null) {
@@ -216,6 +220,14 @@ public class Faction implements Externalizable {
 //				req.addRequirement(typesRequirement);
 //			}
 			craftResearchRequirements.put(type, req);
+		}
+		for(ResourceType type : ResourceType.values()) {
+			ResearchRequirement req = new ResearchRequirement();
+			if(type.getResearchRequirement() != null) {
+				Research typesRequirement = researchMap.get(type.getResearchRequirement());
+				req.addRequirement(typesRequirement);
+			}
+			resourceResearchRequirements.put(type, req);
 		}
 	}
 	
