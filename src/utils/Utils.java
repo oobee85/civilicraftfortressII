@@ -458,7 +458,7 @@ public final class Utils {
 			}
 			@Override
 			public void craftItem(Faction faction, ItemType itemType, int amount) {
-				faction.craftItem(itemType, amount, game.world.getBuildings());
+				faction.craftItem(itemType, amount);
 			}
 			@Override
 			public void produceUnit(Building building, UnitType unitType) {

@@ -863,6 +863,7 @@ public class Game {
 		if(canBuild(unit, bt, tile) == true) {
 			unit.getFaction().payCost(bt.getCost());
 			Building building = new Building(bt, tile, unit.getFaction());
+			unit.getFaction().addBuilding(building);
 			world.addBuilding(building);
 			building.setPlanned(true);
 			building.setHealth(1);

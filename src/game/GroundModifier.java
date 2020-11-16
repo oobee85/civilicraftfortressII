@@ -46,8 +46,8 @@ public class GroundModifier implements Externalizable {
 	public int timeLeft() {
 		return aliveUntil - World.ticks;
 	}
-	public void addDuration(int duration) {
-		aliveUntil += duration;
+	public void setDuration(int duration) {
+		aliveUntil = World.ticks + duration;
 	}
 	
 	public void finish() {

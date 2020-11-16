@@ -723,16 +723,23 @@ public class GameView extends JPanel {
 		long endTime = System.currentTimeMillis();
 		long deltaTime = endTime - startTime;
 		g.setFont(KUIConstants.infoFont);
-		int x = 10;
-		int y = getHeight() - 5;
-		g.setColor(Color.green);
-		g.drawString("DRAW(ms):" + deltaTime, x, y);
-		g.drawString("TICK(ms):" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
-		x += 1;
-		y += 1;
-		g.setColor(Color.black);
-		g.drawString("DRAW(ms):" + deltaTime, x, y);
-		g.drawString("TICK(ms):" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
+		for(int i = 0; i < 2; i++) {
+			int x = 10;
+			int y = getHeight() - 5;
+			g.setColor(Color.green);
+			if(i == 1) {
+				g.setColor(Color.black);
+				x++;
+				y++;
+			}
+			g.drawString("DRAW(ms):" + deltaTime, x, y);
+			g.drawString("TICK(ms):" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
+			String fstr = "";
+			for(Faction f : game.world.getFactions()) {
+				fstr += f.name() + ":" + f.getBuildings().size() + ", ";
+			}
+			g.drawString(fstr, x + 200, y);
+		}
 		Toolkit.getDefaultToolkit().sync();
 	}
 	

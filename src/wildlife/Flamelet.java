@@ -20,7 +20,7 @@ public class Flamelet extends Animal {
 				makeFlame(world);
 			}
 			else {
-				this.getTile().getModifier().addDuration(30);
+				this.getTile().replaceOrAddDurationModifier(GroundModifierType.FIRE, 30, world.getData());
 			}
 		}
 		else {

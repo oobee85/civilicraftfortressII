@@ -29,6 +29,8 @@ public class Faction implements Externalizable {
 	private LinkedList<AttackedNotification> attacked = new LinkedList<>();
 	private LinkedList<AttackedNotification> newAttacked = new LinkedList<>();
 	
+	private HashSet<Building> buildings = new HashSet<>();
+	
 	private int id;
 	private Color color;
 	private Color borderColor;
@@ -58,6 +60,34 @@ public class Faction implements Externalizable {
 		out.writeObject(researchTarget);
 		out.writeObject(items);
 	}
+	
+	public Faction() {
+		initializeItems();
+	}
+	
+	public Faction(String name, boolean isPlayer, boolean usesItems) {
+		this(name, isPlayer, usesItems, idCounter < factionColors.length ? factionColors[idCounter] : factionColors[0]);
+	}
+	public Faction(String name, boolean isPlayer, boolean usesItems, Color color) {
+		this.id = idCounter++;
+		this.setColor(color);
+		this.name = name;
+		this.usesItems = usesItems;
+		this.isPlayer = isPlayer;
+		setupResearch();
+		initializeItems();
+	}
+	
+	public void addBuilding(Building building) {
+		buildings.add(building);
+	}
+	public void removeBuilding(Building building) {
+		buildings.remove(building);
+	}
+	public HashSet<Building> getBuildings() {
+		return buildings;
+	}
+	
 	private void setColor(Color color) {
 		this.color = color;
 		this.borderColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 100);
@@ -85,23 +115,6 @@ public class Faction implements Externalizable {
 	}
 	public String name() {
 		return name;
-	}
-	
-	public Faction() {
-		initializeItems();
-	}
-	
-	public Faction(String name, boolean isPlayer, boolean usesItems) {
-		this(name, isPlayer, usesItems, idCounter < factionColors.length ? factionColors[idCounter] : factionColors[0]);
-	}
-	public Faction(String name, boolean isPlayer, boolean usesItems, Color color) {
-		this.id = idCounter++;
-		this.setColor(color);
-		this.name = name;
-		this.usesItems = usesItems;
-		this.isPlayer = isPlayer;
-		setupResearch();
-		initializeItems();
 	}
 	private void initializeItems() {
 		for(ItemType itemType : ItemType.values()) {
@@ -249,9 +262,9 @@ public class Faction implements Externalizable {
 		attacked = attackedNew;
 	}
 	
-	public void craftItem(ItemType type, int amount, LinkedList<Building> buildings) {
+	public void craftItem(ItemType type, int amount) {
 		BuildingType requiredBuilding = Game.buildingTypeMap.get(type.getBuilding());
-		for(Building building : buildings) {
+		for(Building building : getBuildings()) {
 			if(building.getType() == requiredBuilding && building.getFaction() == this) {
 				for(int i = 0; i < amount && canAfford(type.getCost()); i++) {
 					payCost(type.getCost());

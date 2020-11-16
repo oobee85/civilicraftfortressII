@@ -56,6 +56,7 @@ public class WorldData {
 		synchronized(newBuildings) {
 			newBuildings.add(newBuilding);
 		}
+		newBuilding.getFaction().addBuilding(newBuilding);
 	}
 	public LinkedList<Building> getBuildings() {
 		return buildings;
@@ -64,6 +65,7 @@ public class WorldData {
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
 		for (Building building : buildings) {
 			if (building.isDead() == true) {
+				building.getFaction().removeBuilding(building);
 				ThingMapper.removed(building);
 				if(building == building.getTile().getRoad()) {
 					if(building.getTile().getRoad() == building) {
