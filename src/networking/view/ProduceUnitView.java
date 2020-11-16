@@ -63,9 +63,9 @@ public class ProduceUnitView {
 	}
 	
 	public void updateButtons() {
-		boolean castleSelected = gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("CASTLE"));
-		boolean barracksSelected = gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("BARRACKS"));
-		boolean workshopSelected = gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("WORKSHOP"));
+		boolean castleSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("CASTLE"));
+		boolean barracksSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("BARRACKS"));
+		boolean workshopSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("WORKSHOP"));
 		for(Pair pair : unitButtons) {
 			if((castleSelected && Game.buildingTypeMap.get("CASTLE").unitsCanProduceSet().contains(pair.unitType)) 
 					|| (barracksSelected && Game.buildingTypeMap.get("BARRACKS").unitsCanProduceSet().contains(pair.unitType))

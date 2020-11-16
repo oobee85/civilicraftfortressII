@@ -63,8 +63,8 @@ public class CraftingView {
 	}
 	
 	public void updateButtons() {
-		boolean blacksmithSelected = gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("BLACKSMITH"));
-		boolean hellforgeSelected = gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("HELLFORGE"));
+		boolean blacksmithSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("BLACKSMITH"));
+		boolean hellforgeSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("HELLFORGE"));
 		for (int i = 0; i < ItemType.values().length; i++) {
 			ItemType type = ItemType.values()[i];
 			if (type.getCost() == null) {

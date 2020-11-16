@@ -737,11 +737,13 @@ public class GameView extends JPanel {
 			}
 			g.drawString("DRAW(ms):" + deltaTime, x, y);
 			g.drawString("TICK(ms):" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
-			String fstr = "";
-			for(Faction f : game.world.getFactions()) {
-				fstr += f.name() + ":" + f.getBuildings().size() + ", ";
+			if(Game.DEBUG) {
+				String fstr = "";
+				for(Faction f : game.world.getFactions()) {
+					fstr += f.name() + ":" + f.getBuildings().size() + ", ";
+				}
+				g.drawString(fstr, x + 200, y);
 			}
-			g.drawString(fstr, x + 200, y);
 		}
 		Toolkit.getDefaultToolkit().sync();
 	}

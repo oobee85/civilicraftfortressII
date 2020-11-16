@@ -55,8 +55,8 @@ public class ResearchView {
 		}
 	}
 	
-	public void updateButtons(World world) {
-		boolean hasResearchLab = gameView.getFaction().hasResearchLab(world);
+	public void updateButtons() {
+		boolean hasResearchLab = gameView.getFaction().hasResearchLab();
 		for(Entry<JButton, ResearchType> entry : researchButtons.entrySet()) {
 			JButton button = entry.getKey();
 			Research research = gameView.getFaction().getResearch(entry.getValue());

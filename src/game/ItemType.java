@@ -24,8 +24,8 @@ public enum ItemType implements HasImage {
 	STONE ( "resources/Images/itemicons/rock.png", null),
 	COAL ( "resources/Images/itemicons/coal.png", null),
 	
-	COPPER_BAR ( "resources/Images/itemicons/copper_bar.png", 			new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,10);	put(ItemType.COAL,10); }}, "BLACKSMITH"),
-	SILVER_BAR ( "resources/Images/itemicons/silver_bar.png",  			new HashMap<ItemType, Integer>() { {put(ItemType.SILVER_ORE,10); 	put(ItemType.COAL,10);}}, "BLACKSMITH"),
+//	COPPER_BAR ( "resources/Images/itemicons/copper_bar.png", 			new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,10);	put(ItemType.COAL,10); }}, "BLACKSMITH"),
+//	SILVER_BAR ( "resources/Images/itemicons/silver_bar.png",  			new HashMap<ItemType, Integer>() { {put(ItemType.SILVER_ORE,10); 	put(ItemType.COAL,10);}}, "BLACKSMITH"),
 	BRONZE_BAR ( "resources/Images/itemicons/bronze_bar.png", 			new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,5); 	put(ItemType.SILVER_ORE, 5); }}, "BLACKSMITH"),
 	IRON_BAR ( "resources/Images/itemicons/iron_bar.png", 				new HashMap<ItemType, Integer>() { {put(ItemType.IRON_ORE,10); 		put(ItemType.COAL,15);  }}, "BLACKSMITH"),
 	MITHRIL_BAR ( "resources/Images/itemicons/mithril_bar.png",			new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_ORE,10); 	put(ItemType.COAL,20); }}, "BLACKSMITH"),

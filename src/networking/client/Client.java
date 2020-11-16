@@ -41,7 +41,7 @@ public class Client {
 				if(gameInstance.world != null) {
 					clientGUI.getGameViewOverlay().updateItems();
 					clientGUI.getWorkerView().updateButtons();
-					clientGUI.getResearchView().updateButtons(gameInstance.world);
+					clientGUI.getResearchView().updateButtons();
 					clientGUI.getProduceUnitView().updateButtons();
 					clientGUI.getCraftingView().updateButtons();
 				}

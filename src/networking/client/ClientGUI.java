@@ -391,9 +391,9 @@ public class ClientGUI {
 		}
 		else {
 			if(gameView.getGameInstance().world != null) {
-				if(!(gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("CASTLE"))
-						|| gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("BARRACKS"))
-						|| gameView.getFaction().isBuildingSelected(gameView.getGameInstance().world, Game.buildingTypeMap.get("WORKSHOP")))) {
+				if(!(gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("CASTLE"))
+						|| gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("BARRACKS"))
+						|| gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("WORKSHOP")))) {
 					if(tabbedPane.getSelectedIndex() == PRODUCE_UNIT_TAB) {
 						tabbedPane.setSelectedIndex(0);
 					}
