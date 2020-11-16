@@ -99,7 +99,7 @@ public class ClientGUI {
 		KButton singlePlayer = KUIConstants.setupButton("Single Player", SINGLE_PLAYER_ICON, MAIN_MENU_BUTTON_SIZE);
 		singlePlayer.setHorizontalAlignment(SwingConstants.CENTER);
 		singlePlayer.addActionListener(e -> {
-			client.setupSinglePlayer();
+			client.setupSinglePlayer(true);
 		});
 		singlePlayer.setAlignmentX(Component.CENTER_ALIGNMENT);
 		JTextField ipTextField = KUIConstants.setupTextField("localhost", MAIN_MENU_BUTTON_SIZE);
@@ -123,6 +123,14 @@ public class ClientGUI {
 		startAzureButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		startAzureButton.addActionListener(e -> {
 			connectToServer(AZURE_SERVER_IP);
+		});
+
+		KButton loadGameButton = KUIConstants.setupButton("Load Game", null, MAIN_MENU_BUTTON_SIZE);
+		loadGameButton.setHorizontalAlignment(SwingConstants.CENTER);
+		loadGameButton.setToolTipText("Loads game from save1.civ");
+		loadGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		loadGameButton.addActionListener(e -> {
+			client.loadGame();
 		});
 		
 		Dimension colorButtonSize = new Dimension(MAIN_MENU_BUTTON_SIZE.height + 8, MAIN_MENU_BUTTON_SIZE.height);
@@ -157,6 +165,8 @@ public class ClientGUI {
 		menuButtonPanel.add(playerInfoPanel);
 		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
 		menuButtonPanel.add(singlePlayer);
+		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		menuButtonPanel.add(loadGameButton);
 		if(Game.DEBUG) {
 			menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
 			menuButtonPanel.add(startLocalHostButton);

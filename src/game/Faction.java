@@ -208,7 +208,6 @@ public class Faction implements Externalizable {
 		for(Research research : researchMap.values()) {
 			for(String required : research.type().researchRequirements) {
 				research.getRequirement().addRequirement(researchMap.get(required));
-				System.out.println(research + " require  " + required);
 			}
 		}
 		for(BuildingType type : Game.buildingTypeList) {

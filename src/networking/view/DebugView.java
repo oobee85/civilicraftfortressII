@@ -192,6 +192,13 @@ public class DebugView {
 				System.exit(0);
 			}
 		});
+		JButton save = KUIConstants.setupButton("Save", null, DEBUG_BUTTON_SIZE);
+		save.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				gameView.getGameInstance().saveToFile();
+			}
+		});
 
 		rootPanel.add(showHeightMap);
 		rootPanel.add(showHumidityMap);
@@ -209,6 +216,7 @@ public class DebugView {
 		rootPanel.add(researchEverything);
 		rootPanel.add(raiseHeight);
 		rootPanel.add(setTerritoryButton);
+		rootPanel.add(save);
 		rootPanel.add(exit);
 		rootPanel.add(shadowWordDeath);
 		rootPanel.add(shadowWordPain);

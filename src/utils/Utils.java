@@ -1,6 +1,7 @@
 package utils;
 import java.awt.*;
 import java.awt.image.*;
+import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.List;
@@ -10,6 +11,7 @@ import javax.swing.*;
 
 import game.*;
 import game.liquid.*;
+import networking.message.*;
 import ui.*;
 import world.*;
 
@@ -367,6 +369,42 @@ public final class Utils {
 			e.printStackTrace();
 		}
 		return smoothed;
+	}
+	
+	public static WorldInfo extractWorldInfo(World world) {
+		ArrayList<Tile> tileInfos = new ArrayList<>(world.getTiles().size()); 
+		tileInfos.addAll(world.getTiles());
+		WorldInfo worldInfo = new WorldInfo(world.getWidth(), world.getHeight(), World.ticks, tileInfos.toArray(new Tile[0]));
+		worldInfo.getThings().addAll(world.getPlants());
+		worldInfo.getThings().addAll(world.getBuildings());
+		worldInfo.getThings().addAll(world.getUnits());
+		worldInfo.getThings().addAll(world.getData().clearDeadThings());
+		worldInfo.getFactions().addAll(world.getFactions());
+		worldInfo.getProjectiles().addAll(world.getData().clearProjectilesToSend());
+		return worldInfo;
+	}
+
+	public static void saveToFile(WorldInfo worldInfo, String filename, boolean append) {
+		try(ObjectOutputStream objOut = new ObjectOutputStream(new FileOutputStream(filename, append))) {
+			objOut.writeObject(worldInfo);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	public static WorldInfo loadFromFile(String filename) {
+		WorldInfo worldInfo = null;
+		try(ObjectInputStream objIn = new ObjectInputStream(new FileInputStream(filename))) {
+			worldInfo = (WorldInfo)objIn.readObject();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return worldInfo;
 	}
 
 	public static List<Tile> getNeighborsIncludingCurrent(Tile tile, World world) {

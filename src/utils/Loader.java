@@ -289,7 +289,6 @@ public class Loader {
 	public static void loadResearchType(HashMap<String, ResearchType> researchTypeMap, ArrayList<ResearchType> researchTypeList) {
 		HashMap<Research, LinkedList<String>> researchRequirements = new HashMap<>();
 		String researchCosts = readFile("resources/costs/ResearchType.json");
-		System.out.println(researchCosts);
 		JSONObject obj = new JSONObject(researchCosts);
 		JSONArray arr = obj.getJSONArray("researches");
 		for (int i = 0; i < arr.length(); i++) {

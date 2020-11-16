@@ -187,9 +187,21 @@ public class Client {
 			}
 		};
 	}
-	public void setupSinglePlayer() {
+	
+	public void loadGame() {
+		WorldInfo worldInfo = Utils.loadFromFile("save1.civ");
+		worldInfoUpdate(worldInfo);
+		for(Faction f : worldInfo.getFactions()) {
+			factionUpdate(f);
+		}
+		setupSinglePlayer(false);
+	}
+	
+	public void setupSinglePlayer(boolean createWorld) {
 		clientGUI.getGameView().setCommandInterface(localCommands);
-		gameInstance.generateWorld(128, 128, false, Arrays.asList(clientGUI.getPlayerInfo()));
+		if(createWorld) {
+			gameInstance.generateWorld(128, 128, false, Arrays.asList(clientGUI.getPlayerInfo()));
+		}
 		for(Faction f : gameInstance.world.getFactions()) {
 			if(f.isPlayer()) {
 				gameInstance.getGUIController().changedFaction(f);

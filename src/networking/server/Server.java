@@ -205,26 +205,18 @@ public class Server {
 		worldNetworkingUpdateThread.start();
 	}
 	
-	private void saveToFile(WorldInfo worldInfo, String filename) {
-		try(ObjectOutputStream objOut = new ObjectOutputStream(new FileOutputStream(filename, true))) {
-			objOut.writeObject(worldInfo);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 	
 	private void sendFullWorld() {
-		ArrayList<Tile> tileInfos = new ArrayList<>(gameInstance.world.getTiles().size()); 
-		tileInfos.addAll(gameInstance.world.getTiles());
-		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, tileInfos.toArray(new Tile[0]));
-		worldInfo.getThings().addAll(gameInstance.world.getPlants());
-		worldInfo.getThings().addAll(gameInstance.world.getBuildings());
-		worldInfo.getThings().addAll(gameInstance.world.getUnits());
-		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
-		worldInfo.getFactions().addAll(gameInstance.world.getFactions());
-		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
+//		ArrayList<Tile> tileInfos = new ArrayList<>(gameInstance.world.getTiles().size()); 
+//		tileInfos.addAll(gameInstance.world.getTiles());
+//		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, tileInfos.toArray(new Tile[0]));
+//		worldInfo.getThings().addAll(gameInstance.world.getPlants());
+//		worldInfo.getThings().addAll(gameInstance.world.getBuildings());
+//		worldInfo.getThings().addAll(gameInstance.world.getUnits());
+//		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
+//		worldInfo.getFactions().addAll(gameInstance.world.getFactions());
+//		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
+		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world);
 		sendToAllConnections(worldInfo);
 		sendWhichFaction();
 //		saveToFile(worldInfo, "ser/everything_" + World.ticks + ".ser");

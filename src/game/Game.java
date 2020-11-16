@@ -7,6 +7,7 @@ import game.liquid.*;
 
 import java.util.*;
 
+import networking.message.*;
 import networking.server.*;
 import ui.*;
 import utils.*;
@@ -45,6 +46,11 @@ public class Game {
 //		resources.get(ItemType.WOOD).addAmount(2000);
 //		resources.get(ItemType.ROCK).addAmount(2000);
 		
+	}
+	
+	public void saveToFile() {
+		WorldInfo worldInfo = Utils.extractWorldInfo(world);
+		Utils.saveToFile(worldInfo, "save1.civ", false);
 	}
 	
 	public void weatherEvents() {
