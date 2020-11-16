@@ -94,7 +94,7 @@ public class GameView extends JPanel {
 				int dx = previousMouse.x - currentMouse.x;
 				int dy = previousMouse.y - currentMouse.y;
 				// Only drag if moved mouse at least 3 pixels away
-				if(draggingMouse || Math.abs(dx) + Math.abs(dy) >= 5) {
+				if(draggingMouse || Math.abs(dx) + Math.abs(dy) >= 15) {
 					draggingMouse = true;
 					if (rightMouseDown || middleMouseDown) {
 						shiftView(dx, dy);
@@ -119,13 +119,17 @@ public class GameView extends JPanel {
 						leftClick(getTileAtPixel(currentMouse), shiftDown);
 					}
 				}
+				else {
+					if(SwingUtilities.isLeftMouseButton(e)) {
+						boxSelect[0] = getWorldCoordOfPixel(mousePressLocation);
+						boxSelect[1] = getWorldCoordOfPixel(currentMouse);
+						boxSelect = normalizeRectangle(boxSelect[0], boxSelect[1]);
+						selectInBox(boxSelect[0], boxSelect[1], shiftDown);
+					}
+				}
 				draggingMouse = false;
 				previousMouse = currentMouse;
 				if(SwingUtilities.isLeftMouseButton(e)) {
-					boxSelect[0] = getWorldCoordOfPixel(mousePressLocation);
-					boxSelect[1] = getWorldCoordOfPixel(currentMouse);
-					boxSelect = normalizeRectangle(boxSelect[0], boxSelect[1]);
-					selectInBox(boxSelect[0], boxSelect[1], shiftDown);
 					mousePressLocation = null;
 					leftMouseDown = false;
 				}
@@ -144,7 +148,6 @@ public class GameView extends JPanel {
 					leftMouseDown = true;
 					mousePressLocation = e.getPoint();
 					boxSelect[0] = getWorldCoordOfPixel(mousePressLocation);
-					boxSelect[1] = boxSelect[0];
 				}
 				else if(SwingUtilities.isRightMouseButton(e)) {
 					rightMouseDown = true;
@@ -705,7 +708,7 @@ public class GameView extends JPanel {
 		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
 		draw(g, panelWidth, panelHeight, viewOffset);
 		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
-		if(mousePressLocation != null) {
+		if(mousePressLocation != null && draggingMouse == true) {
 			Rectangle selectionRectangle = normalizeRectangle(mousePressLocation, previousMouse);
 			Graphics2D g2d = (Graphics2D)g;
 			g2d.setColor(Color.white);
@@ -1025,7 +1028,7 @@ public class GameView extends JPanel {
 		Stroke stroke = g.getStroke();
 		g.setStroke(new BasicStroke(strokeWidth));
 		g.setColor(new Color(0, 0, 0, 64));
-		if(mousePressLocation != null && leftMouseDown) {
+		if(leftMouseDown && draggingMouse && boxSelect[0] != null && boxSelect[1] != null) {
 			Position[] box = normalizeRectangle(boxSelect[0], boxSelect[1]);
 			for(Tile tile : getTilesBetween(box[0], box[1])) {
 				Point drawAt = getDrawingCoords(tile.getLocation());
