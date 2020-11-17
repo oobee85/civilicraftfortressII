@@ -547,17 +547,17 @@ public class World {
 				
 				for(Tile t : tile.getNeighbors()) {
 					//count how many neighbors is a failed tile
-					if(t.getHumidity() > DESERT_HUMIDITY + 0.01 || t.getTerrain() == Terrain.GRASS || t.getTerrain() == Terrain.ROCK) {
+					if(t.getHumidity() > DESERT_HUMIDITY || t.getTerrain() == Terrain.GRASS || t.getTerrain() == Terrain.ROCK) {
 						failTiles ++;
 					}
 				}
 				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
-					//if one neighbor fails, make the tile dirt
-					if(failTiles == 1) {
+					//if two neighbor fails, make the tile dirt
+					if(failTiles >= 2) {
 						tile.setTerrain(Terrain.DIRT);
 					} 
 					//if all neighbors are eligible for desert, convert tile to desert
-					else if(failTiles < 1) {
+					else if(failTiles < 3) {
 						tile.setTerrain(Terrain.SAND);
 					}
 				}
