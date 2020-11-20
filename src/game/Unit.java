@@ -258,7 +258,13 @@ public class Unit extends Thing implements Serializable {
 					this.heal(damageDealt, true);
 				}
 				if (target instanceof Unit) {
-					((Unit) target).aggro(this);
+//					((Unit) target).aggro(this);
+					for(Unit u: target.getTile().getUnits()) {
+						if(u.getFaction() == target.getFaction()){
+							u.aggro(this);
+						}
+					}
+						
 				}
 			}
 			else {
