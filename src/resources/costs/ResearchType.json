@@ -9,10 +9,6 @@
 		"points": 300, "tier": 1,
 		"image": "resources/Images/research/bronze_working.png"},
 	{
-		"name": "WRITING", 
-		"points": 300, "tier": 1,
-		"image": "resources/Images/research/writing.png"},
-	{
 		"name": "WHEEL", 
 		"points": 300, "tier": 1,
 		"image": "resources/Images/research/wheel.png"},
@@ -33,7 +29,7 @@
 		"name": "MATHEMATICS", 
 		"points": 600, "tier": 2,
 		"cost": {"IRON_BAR": 10}, 
-		"requirements": ["WRITING", "WHEEL"],
+		"requirements": ["BRONZE_WORKING", "WHEEL"],
 		"image": "resources/Images/research/mathematics.png"},
 	{
 		"name": "MASONRY", 
@@ -52,7 +48,7 @@
 		"name": "HORSEBACK_RIDING", 
 		"points": 1200, "tier": 3,
 		"cost": {"HORSE": 25}, 
-		"requirements": ["FARMING", "IRON_WORKING"],
+		"requirements": ["FARMING"],
 		"image": "resources/Images/research/horseback_riding.png"},
 	{
 		"name": "CURRENCY", 

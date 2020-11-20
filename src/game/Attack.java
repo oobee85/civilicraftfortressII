@@ -12,7 +12,7 @@ public class Attack {
 				return;
 			}
 		}
-		if(style.getProjectile() == ProjectileType.FIREWAVE) {
+		if(style.getProjectile() == ProjectileType.FIRE_WAVE) {
 			fireWave(unit, target, style);
 			return;
 		}

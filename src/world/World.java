@@ -440,7 +440,7 @@ public class World {
 			int radius = (int) (Utils.getRandomNormal(2) * 30 + 5);
 			System.out.println("meteor at: " + t.getLocation().x() + ", " + t.getLocation().y());
 			;
-			spawnExplosionCircle(t, radius, 10000);
+			spawnExplosionCircle(t, radius, 5000);
 			int rockRadius = radius / 5;
 			spawnRock(t, rockRadius);
 		}
@@ -491,22 +491,26 @@ public class World {
 			double cos = -Math.cos( (distanceFromCenter*(20f/radius)) / (2*Math.PI));
 			
 			if (distanceFromCenter < radius) {
-				Projectile wave = new Projectile(ProjectileType.METEOR_WAVE, tile, t, null, 5000);
+				Projectile wave = new Projectile(ProjectileType.FIRE_WAVE, tile, t, null, damage);
 				tile.addProjectile(wave);
 				worldData.addProjectile(wave);
 				
-				delta = (float)(amplitude*cos - 0.5*amplitude);
+				
 				
 			}
-			if (distanceFromCenter >= radius && distanceFromCenter < 2*radius) {
+			if(radius >= 10) {
 				delta = (float)(amplitude*cos - 0.5*amplitude);
-				if(delta < 0) {
-					delta = 0f;
+				if (distanceFromCenter >= radius && distanceFromCenter < 2*radius) {
+					delta = (float)(amplitude*cos - 0.5*amplitude);
+					if(delta < 0) {
+						delta = 0f;
+					}
+				}
+				if(delta != 0) {
+					t.setHeight(t.getHeight() + delta);
 				}
 			}
-			if(delta != 0) {
-				t.setHeight(t.getHeight() + delta);
-			}
+			
 		}
 	}
 	public void spawnExplosion(Tile tile, int radius, int damage) {
@@ -757,7 +761,12 @@ public class World {
 			}
 			if(!simulated && projectile.reachedTarget()) {
 				if(projectile.getType().isExplosive()) {
-					spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getDamage());
+					if(projectile.getType().getRadius() <= 2) {
+						spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getDamage());
+					}else {
+						spawnExplosionCircle(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getDamage());
+					}
+					
 				} 
 				else {
 					for(Unit unit : projectile.getTile().getUnits()) {

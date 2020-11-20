@@ -118,7 +118,7 @@
 		"effort":250,
 		"research":"WHEEL"},
 	{
-		"info":"Produces food",
+		"info":"Produces lots of food",
 		"image":"resources/Images/buildings/ancientwindmill.png",
 		"vision":1,
 		"cost":{"WOOD":500, "IRON_BAR":5},
@@ -183,7 +183,7 @@
 		"image":"resources/Images/buildings/workshop.png",
 		"vision":1,
 		"cost":{"WOOD":500, "IRON_BAR":10, "STONE":500},
-		"buildsunits":["LONGBOWMAN","CATAPULT","TREBUCHET", "SNIPER"],
+		"buildsunits":["LONGBOWMAN","CATAPULT","TREBUCHET", "SNIPER", "WIZARD"],
 		"culture":0.5,
 		"name":"WORKSHOP",
 		"health":500,

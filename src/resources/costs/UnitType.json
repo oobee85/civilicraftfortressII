@@ -471,6 +471,22 @@
 		],
 		"attributes":["hostile"],
 		"loot":{"WOOD":100}
+	},
+	{
+		"image":"resources/Images/units/wizard.png",
+		"stats":{"movespeed":20,"buildtime":1000,"health":200,"healspeed":50},
+		"cost":{"FOOD":200, "GOLD_BAR": 25},
+		"name":"WIZARD",
+		"attackstyles":[
+			{"damage":100, "cooldown":50, "range":5, "minrange":1, "projectile":"WIZARD_BALL"},
+			
+		],
+		"research":"MYSTICISM",
+		"targeting":[
+			{"type":"game.Building"},
+			{"type":"game.Unit"}
+		],
+		"attributes":["hostile"],
 	}
 ]
 }

@@ -21,9 +21,9 @@ public enum ProjectileType implements HasImage {
 		ROCK_STONE_GOLEM(5, "resources/Images/itemicons/rock.png", 1, null, 0),
 		FIREBALL_DRAGON(3, "resources/Images/projectiles/fireball2.png", 2, null, 0),
 		BULLET(0, "resources/Images/projectiles/bullet.png", 1, null, 0),
-		FIREWAVE(6, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 1000),
+		FIRE_WAVE(6, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 100),
 		METEOR_WAVE(4, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 1000),
-		
+		WIZARD_BALL(2, "resources/Images/projectiles/fireball2.png", 4, null, 100),
 		FIREBREATH(3, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 10),
 	;
 	
