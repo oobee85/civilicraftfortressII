@@ -101,7 +101,7 @@ public class Thing implements HasImage, Serializable {
 		if(finalHealing != 0) {
 			timeLastDamageTaken = World.ticks;
 		}
-		if(hitsplat == true && finalHealing > 2) {
+		if(hitsplat == true && finalHealing > 0) {
 			addHitsplat(-finalHealing);
 		}
 	}

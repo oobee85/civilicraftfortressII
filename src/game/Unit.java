@@ -436,6 +436,21 @@ public class Unit extends Thing implements Serializable {
 				}
 			}
 		}
+		if (getType().isHealer()) {
+			if(!readyToHarvest()) {
+				return;
+			}
+			//priest healing
+			for(Tile t: this.getTile().getNeighbors()) {
+				for(Unit u: t.getUnits()) {
+					if(u.getFaction() == this.getFaction()) {
+						u.heal(1, true);
+						
+					}
+				}
+			}
+			resetTimeToHarvest();
+		}
 	}
 	public void resetTimeToAttack(int cooldown) {
 		timeToAttack = cooldown;
