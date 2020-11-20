@@ -142,6 +142,51 @@
 		"targeting":[{"type":"game.Unit"}]
 	},
 	{
+		"image":"resources/Images/units/wizard.png",
+		"stats":{"movespeed":20,"buildtime":1000,"health":200,"healspeed":50},
+		"cost":{"FOOD":200, "GOLD_BAR": 25},
+		"name":"WIZARD",
+		"attackstyles":[
+			{"damage":100, "cooldown":50, "range":5, "minrange":1, "projectile":"WIZARD_BALL"},
+			
+		],
+		"research":"MYSTICISM",
+		"targeting":[
+			{"type":"game.Building"},
+			{"type":"game.Unit"}
+		],
+		"attributes":["hostile"],
+	},
+	{
+		"image":"resources/Images/units/griffin.png",
+		"stats":{"movespeed":15,"buildtime":500,"health":500,"healspeed":50},
+		"cost":{"FOOD":1000},
+		"name":"GRIFFIN",
+		"attackstyles":[
+			{"damage":60, "cooldown":30, "range":1}
+		],
+		"research":"MYSTICISM",
+		"targeting":[
+			{"type":"game.Building"},
+			{"type":"game.Unit"}
+		],
+		"attributes":["hostile", "flying", "coldresistant"],
+	},
+	{
+		"image":"resources/Images/units/priest.png",
+		"stats":{"movespeed":25,"buildtime":500,"health":100,"healspeed":50},
+		"cost":{"FOOD":200, "GOLD_BAR": 10},
+		"name":"PRIEST",
+		"attackstyles":[
+	
+		],
+		"research":"MYSTICISM",
+		"targeting":[
+			
+		],
+		"attributes":["healer"],
+	},
+	{
 		"image":"resources/Images/units/horsearcher.png",
 		"cost":{"RUNITE_BAR":5,"HORSE":50,"FOOD":300},
 		"stats":{"movespeed":5,"buildtime":500,"health":500,"healspeed":50},
@@ -471,22 +516,7 @@
 		],
 		"attributes":["hostile"],
 		"loot":{"WOOD":100}
-	},
-	{
-		"image":"resources/Images/units/wizard.png",
-		"stats":{"movespeed":20,"buildtime":1000,"health":200,"healspeed":50},
-		"cost":{"FOOD":200, "GOLD_BAR": 25},
-		"name":"WIZARD",
-		"attackstyles":[
-			{"damage":100, "cooldown":50, "range":5, "minrange":1, "projectile":"WIZARD_BALL"},
-			
-		],
-		"research":"MYSTICISM",
-		"targeting":[
-			{"type":"game.Building"},
-			{"type":"game.Unit"}
-		],
-		"attributes":["hostile"],
 	}
+	
 ]
 }

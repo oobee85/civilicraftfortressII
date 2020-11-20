@@ -321,7 +321,7 @@ public class ClientGUI {
 
 		produceUnitView = new ProduceUnitView(gameView);
 		PRODUCE_UNIT_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab(null, PRODUCE_UNIT_TAB_ICON, produceUnitView.getRootPanel(), "Make units from castles, barracks, or workshops", PRODUCE_UNIT_TAB);
+		tabbedPane.insertTab(null, PRODUCE_UNIT_TAB_ICON, produceUnitView.getRootPanel(), "Make units from castles, barracks, workshops, or stables", PRODUCE_UNIT_TAB);
 
 		craftingView = new CraftingView(gameView);
 		CRAFTING_TAB = tabbedPane.getTabCount();
@@ -403,6 +403,7 @@ public class ClientGUI {
 			if(gameView.getGameInstance().world != null) {
 				if(!(gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("CASTLE"))
 						|| gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("BARRACKS"))
+						|| gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("STABLES"))
 						|| gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("WORKSHOP")))) {
 					if(tabbedPane.getSelectedIndex() == PRODUCE_UNIT_TAB) {
 						tabbedPane.setSelectedIndex(0);

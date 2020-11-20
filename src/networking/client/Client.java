@@ -69,6 +69,9 @@ public class Client {
 				if (building.getType() == Game.buildingTypeMap.get("BARRACKS")) {
 					clientGUI.manageProduceUnitTab(selected);
 				}
+				if (building.getType() == Game.buildingTypeMap.get("STABLES")) {
+					clientGUI.manageProduceUnitTab(selected);
+				}
 				if (building.getType() == Game.buildingTypeMap.get("CASTLE")) {
 					clientGUI.manageProduceUnitTab(selected);
 				}
