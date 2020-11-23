@@ -260,13 +260,13 @@
 	},
 	{
 		"image":"resources/Images/units/dragon.png",
-		"stats":{"movespeed":5,"buildtime":0,"health":2000,"healspeed":10},
+		"stats":{"movespeed":5,"buildtime":0,"health":3000,"healspeed":10},
 		"name":"DRAGON",
 		"attackstyles":[
 			{"damage":120, "cooldown":30, "range":4, "minrange":1, "projectile":"FIREBREATH"},
 			{"damage":50, "cooldown":30, "range":1}
 		],
-		"attributes":["flying","hostile","fireresistant","coldresistant"],
+		"attributes":["flying","hostile","fireresistant","coldresistant","cleave"],
 		"loot":{"RUNITE_BAR":20, "TITANIUM_BAR":10},
 		"targeting":[
 			{"type":"game.Unit"},
@@ -275,7 +275,7 @@
 	},
 	{
 		"image":"resources/Images/units/vampire.png",
-		"stats":{"movespeed":15,"buildtime":0,"health":200,"healspeed":1},
+		"stats":{"movespeed":15,"buildtime":0,"health":300,"healspeed":1},
 		"name":"VAMPIRE",
 		"attackstyles":[
 			{"damage":20, "cooldown":20, "range":1, "lifesteal":true}
@@ -289,7 +289,7 @@
 	},
 	{
 		"image":"resources/Images/units/roc.png",
-		"stats":{"movespeed":10,"buildtime":0,"health":300,"healspeed":10},
+		"stats":{"movespeed":10,"buildtime":0,"health":400,"healspeed":10},
 		"name":"ROC",
 		"attackstyles":[
 			{"damage":40, "cooldown":40, "range":1}
@@ -303,12 +303,12 @@
 	},
 	{
 		"image":"resources/Images/units/ogre.png",
-		"stats":{"movespeed":30,"buildtime":0,"health":500,"healspeed":5},
+		"stats":{"movespeed":30,"buildtime":0,"health":750,"healspeed":5},
 		"name":"OGRE",
 		"attackstyles":[
 			{"damage":40, "cooldown":40, "range":1}
 		],
-		"attributes":["hostile","delayedinvasion"],
+		"attributes":["hostile","delayedinvasion","cleave"],
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"}, 
 			{"type":"game.Building", "faction":"PLAYER"}
@@ -320,7 +320,7 @@
 		"stats":{"movespeed":30,"buildtime":0,"health":500,"healspeed":10},
 		"name":"ENT",
 		"attackstyles":[
-			{"damage":25, "cooldown":50, "range":1}
+			{"damage":50, "cooldown":50, "range":1}
 		],
 		"attributes":["hostile","coldresistant","delayedinvasion"],
 		"targeting":[
@@ -403,7 +403,7 @@
 		"attackstyles":[
 			{"damage":60, "cooldown":20, "range":1}
 		],
-		"attributes":["hostile","coldresistant","delayedinvasion"],
+		"attributes":["hostile","coldresistant","delayedinvasion","cleave"],
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"},
 			{"type":"game.Unit"}
