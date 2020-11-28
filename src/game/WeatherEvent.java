@@ -2,37 +2,53 @@ package game;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.io.*;
 
 import javax.swing.ImageIcon;
 
 import game.liquid.*;
-import utils.HasImage;
-import utils.MipMap;
-import world.Tile;
-import world.World;
+import utils.*;
+import world.*;
 
-public class WeatherEvent implements HasImage{
+public class WeatherEvent implements HasImage, Externalizable {
 
 	
 	private double strength;
 	private int aliveUntil;
 	private Tile tile;
 	private Tile targetTile;
-	private int duration;
 	private double timeToMove;
 	private int speed;
 	private HasImage hasImage;
 	private LiquidType liquidType;
 	private MipMap mipmap;
 	private boolean isCold;
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		tile = new Tile(TileLoc.readFromExternal(in), Terrain.DIRT);
+		targetTile = new Tile(TileLoc.readFromExternal(in), Terrain.DIRT);
+		aliveUntil = in.readInt();
+		strength = in.readDouble();
+		liquidType = LiquidType.values()[in.readByte()];
+	}
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		tile.getLocation().writeExternal(out);
+		targetTile.getLocation().writeExternal(out);
+		out.writeInt(aliveUntil);
+		out.writeDouble(strength);
+		out.writeByte(liquidType.ordinal());
+	}
 	
+	/** used only by externalizable interface */
+	public WeatherEvent() { }
 	
 	public WeatherEvent(Tile tile, Tile targetTile, int duration, double strength, LiquidType liquidType) {
 		this.targetTile = targetTile;
 		this.tile = tile;
 		this.aliveUntil = World.ticks + duration;
 		this.strength = strength;
-		this.duration = duration;
 		this.liquidType = liquidType;
 		this.hasImage = WeatherEventType.RAIN;
 		this.isCold = false;

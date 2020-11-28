@@ -26,6 +26,7 @@ public class WorldData {
 	
 	// Stuff server keeps track of to send to clients
 	private LinkedList<Projectile> projectilesToSend = new LinkedList<>();
+	private LinkedList<WeatherEvent> weatherEventsToSend = new LinkedList<>();
 	private LinkedList<Thing> deadThings = new LinkedList<>();
 
 	public void addWeatherEvent(WeatherEvent newEvent) {
@@ -47,6 +48,9 @@ public class WorldData {
 			}
 		}
 		synchronized (newWeatherEvents) {
+			synchronized(weatherEventsToSend) {
+				weatherEventsToSend.addAll(newWeatherEvents);
+			}
 			weatherEventsNew.addAll(newWeatherEvents);
 			newWeatherEvents.clear();
 		}
@@ -177,6 +181,15 @@ public class WorldData {
 		return copy;
 	}
 
+	public LinkedList<WeatherEvent> clearWeatherEventsToSend() {
+		LinkedList<WeatherEvent> copy = new LinkedList<>();
+		synchronized (weatherEventsToSend) {
+			copy.addAll(weatherEventsToSend);
+			weatherEventsToSend.clear();
+		}
+		return copy;
+	}
+
 	public void addGroundModifier(GroundModifier gm) {
 		synchronized (newGroundModifiers) {
 			newGroundModifiers.add(gm);
@@ -220,6 +233,7 @@ public class WorldData {
 				" \tbuildings: " 		+ buildings.size() + 
 				" \tplants: " 			+ plants.size() + 
 				" \tgroundModifiers: " 	+ groundModifiers.size() + 
-				" \tprojectiles: " 		+ getProjectiles().size();
+				" \tprojectiles: " 		+ getProjectiles().size() +
+				" \tweatherEvents: "	+ getWeatherEvents().size();
 	}
 }

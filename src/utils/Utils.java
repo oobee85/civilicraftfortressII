@@ -381,6 +381,7 @@ public final class Utils {
 		worldInfo.getThings().addAll(world.getData().clearDeadThings());
 		worldInfo.getFactions().addAll(world.getFactions());
 		worldInfo.getProjectiles().addAll(world.getData().clearProjectilesToSend());
+		worldInfo.getWeatherEvents().addAll(world.getData().clearWeatherEventsToSend());
 		return worldInfo;
 	}
 

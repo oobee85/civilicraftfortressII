@@ -19,6 +19,7 @@ public class WorldInfo implements Serializable {
 	private final LinkedList<Faction> factions;
 	private final LinkedList<Projectile> projectiles;
 	private final LinkedList<Hitsplat> hitsplats;
+	private final LinkedList<WeatherEvent> weatherEvents;
 	public WorldInfo(int width, int height, int tick, Tile[] tileInfos) {
 		this.width = width;
 		this.height = height;
@@ -28,6 +29,7 @@ public class WorldInfo implements Serializable {
 		factions = new LinkedList<>();
 		projectiles = new LinkedList<>();
 		hitsplats = new LinkedList<>();
+		weatherEvents = new LinkedList<>();
 	}
 	public void addHitsplats(WorldData worldData) {
 		LinkedList<Hitsplat> toadd = new LinkedList<>();
@@ -95,6 +97,9 @@ public class WorldInfo implements Serializable {
 	}
 	public LinkedList<Projectile> getProjectiles() {
 		return projectiles;
+	}
+	public LinkedList<WeatherEvent> getWeatherEvents() {
+		return weatherEvents;
 	}
 	@Override
 	public String toString() {

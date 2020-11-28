@@ -113,6 +113,7 @@ public class Game {
 //		unitTick();
 
 		world.doProjectileUpdates(true);
+		world.doWeatherUpdate();
 	}
 	public void gameTick() {
 		// Do all the game events like unit movement, time passing, building things, growing, etc

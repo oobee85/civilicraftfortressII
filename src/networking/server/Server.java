@@ -185,7 +185,7 @@ public class Server {
 					if(iteration % 20 == 0) {
 						sendFullWorld();
 					}
-					else if(iteration % 4 == 0) {
+					else if(iteration % 3 == 0) {
 						sendUnits();
 					}
 					else {

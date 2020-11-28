@@ -81,7 +81,7 @@ public class Thing implements HasImage, Serializable {
 			timeLastDamageTaken = World.ticks;
 			getFaction().gotAttacked(getTile());
 		}
-		addHitsplat((int)(Math.ceil(damage)));
+		addHitsplat(damage);
 		// Return true if isDead changed from false to true.
 		return !before && isDead();
 	}
@@ -160,14 +160,6 @@ public class Thing implements HasImage, Serializable {
 			}
 		}
 		return false;
-	}
-	public double getHitsplatDamage() {
-		for(int i = 0; i < hitsplats.length; i++) {
-			if(hitsplats[i] != null) {
-				return hitsplats[i].getDamage();
-			}
-		}
-		return 0;
 	}
 	public Hitsplat[] getHitsplatList() {
 		return hitsplats;

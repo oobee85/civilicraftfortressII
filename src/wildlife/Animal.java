@@ -30,16 +30,6 @@ public class Animal extends Unit {
 	public boolean readyToInvade() {
 		return World.ticks > whenToInvade;
 	}
-	
-	@Override
-	public void updateState() {
-		super.updateState();
-		if(getHealth() < super.getType().getCombatStats().getHealth() && readyToHeal()) {
-			heal(1, false);
-			resetTimeToHeal();
-		}
-		
-	}
 
 	public boolean wantsToEat() {
 		return getType().getTargetingInfo().isEmpty() && Math.random() < 0.005;

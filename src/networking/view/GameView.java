@@ -1243,12 +1243,12 @@ public class GameView extends JPanel {
 
 			if(damage > 0) {
 				g.drawImage(RED_HITSPLAT, x, y, splatWidth, splatHeight, null);
-			}else if(damage == 0){
+			}else if(damage == 0) {
 				g.drawImage(BLUE_HITSPLAT, x, y, splatWidth, splatHeight, null);
 			}
 			else if(damage < 0) {
 				g.drawImage(GREEN_HITSPLAT, x, y, splatWidth, splatHeight, null);
-				text = String.format("%.0f", -thing.getHitsplatDamage());
+				text = String.format("%.0f", -damage);
 			}
 			
 			int fontSize = tileSize/4;

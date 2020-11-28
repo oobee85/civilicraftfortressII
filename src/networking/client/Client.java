@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.Timer;
 
 import game.*;
+import game.liquid.*;
 import networking.*;
 import networking.message.*;
 import networking.server.*;
@@ -341,6 +342,15 @@ public class Client {
 					null, 
 					projectileMessage.getDamage());
 			gameInstance.world.getData().addProjectile(newProjectile);
+		}
+		for(WeatherEvent weatherMessage : worldInfo.getWeatherEvents()) {
+			WeatherEvent newWeatherEvent = new WeatherEvent(
+					gameInstance.world.get(weatherMessage.getTile().getLocation()), 
+					gameInstance.world.get(weatherMessage.getTargetTile().getLocation()),
+					weatherMessage.timeLeft(),
+					weatherMessage.getStrength(),
+					weatherMessage.getLiquidType());
+			gameInstance.world.getData().addWeatherEvent(newWeatherEvent);
 		}
 		for(Hitsplat hitsplat : worldInfo.getHitsplats()) {
 			Thing thing = things.get(hitsplat.getThingID());

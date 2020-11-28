@@ -51,7 +51,7 @@ public class World {
 	public int numCutTrees = 10;
 	public static int nights = 0;
 	public static int days = 1;
-	public static int ticks;
+	public static volatile int ticks;
 	
 	public World(int width, int height) {
 		worldData = new WorldData();
@@ -239,7 +239,9 @@ public class World {
 		for(Tile t : rainTiles) {
 			TileLoc target = new TileLoc(t.getLocation().x() + dx, t.getLocation().y() + dy);
 			Tile targetTile = get(target);
-			
+			if(targetTile == null) {
+				continue;
+			}
 			double temperature = t.getTempurature();
 			WeatherEvent weather = new WeatherEvent(t, targetTile, t.getLocation().distanceTo(target)*WeatherEventType.RAIN.getSpeed() + (int)(Math.random()*50), 0.00002, LiquidType.WATER);;
 			t.setWeather(weather);

@@ -9,7 +9,7 @@ import utils.*;
 import world.*;
 
 public class Unit extends Thing implements Serializable {
-	
+	private static final long serialVersionUID = 1L;
 	private UnitType unitType;
 	private transient double timeToMove;
 	private transient double timeToAttack;
@@ -437,9 +437,9 @@ public class Unit extends Thing implements Serializable {
 			}
 		}
 		if (getType().isHealer()) {
-			if(!readyToHarvest()) {
-				return;
-			}
+//			if(!readyToHarvest()) {
+//				return;
+//			}
 			//priest healing
 			for(Tile t: this.getTile().getNeighbors()) {
 				for(Unit u: t.getUnits()) {
