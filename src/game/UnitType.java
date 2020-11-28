@@ -81,6 +81,9 @@ public class UnitType implements HasImage, Serializable {
 	public boolean isHealer() {
 		return attributes.contains("healer");
 	}
+	public boolean hasCleave() {
+		return attributes.contains("cleave");
+	}
 	public boolean isDelayedInvasion() {
 		return attributes.contains("delayedinvasion");
 	}

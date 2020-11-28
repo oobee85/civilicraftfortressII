@@ -252,18 +252,34 @@ public class Unit extends Thing implements Serializable {
 			// actually do the attack
 			if(style.getProjectile() == null) {
 				double initialHP = target.getHealth();
-				target.takeDamage(style.getDamage());
+				//does cleave damage
+				if(this.getType().hasCleave()) {
+					for(Unit unit : target.getTile().getUnits()) {
+						unit.takeDamage(style.getDamage());
+					}
+				}else {
+					target.takeDamage(style.getDamage());
+				}
+				
 				double damageDealt = initialHP - (target.getHealth() < 0 ? 0 : target.getHealth());
 				if (style.isLifesteal() && !(target instanceof Building)) {
 					this.heal(damageDealt, true);
 				}
 				if (target instanceof Unit) {
 //					((Unit) target).aggro(this);
-					for(Unit u: target.getTile().getUnits()) {
-						if(u.getFaction() == target.getFaction()){
-							u.aggro(this);
+					//does cleave retaliation
+					if(this.getType().hasCleave()) {
+						for(Unit unit : target.getTile().getUnits()) {
+							if(unit.getFaction() != this.getFaction()) {
+								unit.aggro(this);
+							}
 						}
 					}
+//					for(Unit u: target.getTile().getUnits()) {
+//						if(u.getFaction() == target.getFaction()){
+//							u.aggro(this);
+//						}
+//					}
 						
 				}
 			}

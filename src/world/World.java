@@ -493,7 +493,11 @@ public class World {
 			double cos = -Math.cos( (distanceFromCenter*(20f/radius)) / (2*Math.PI));
 			
 			if (distanceFromCenter < radius) {
-				Projectile wave = new Projectile(ProjectileType.FIRE_WAVE, tile, t, null, damage);
+				Projectile wave = new Projectile(ProjectileType.METEOR_WAVE, tile, t, null, damage);
+				if(damage < 500) {
+					wave = new Projectile(ProjectileType.FIRE_WAVE, tile, t, null, damage);
+				}
+				
 				tile.addProjectile(wave);
 				worldData.addProjectile(wave);
 				
