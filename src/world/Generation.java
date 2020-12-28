@@ -14,43 +14,62 @@ public class Generation {
 	
 	public static final int OREMULTIPLIER = 16384;
 	
+	// From https://en.wikipedia.org/wiki/Perlin_noise
+	
+	private static final float noise(double x, double y) {
+		return (float) Utils.getRandomNormalF(5);
+	}
+	
 	public static float[][] generateHeightMap(int smoothingRadius, int width, int height) {
-		LinkedList<float[][]> noises = new LinkedList<>();
-		
+//		LinkedList<float[][]> noises = new LinkedList<>();
+//		
+//		float[][] heightmap = new float[width][height];
+//		for (int y = 0; y < height; y++) {
+//			for (int x = 0; x < width; x++) {
+//				double nx = x / width - 0.5, ny = y / height - 0.5;
+//				heightmap[y][x] = 
+//						1f * noise(1 * nx, 1 * ny) 
+//						+ 0.5f * noise(2 * nx, 2 * ny)
+//						+ 0.25f * noise(4 * nx, 4 * ny);
+//			}
+//		}
+//		
+//		
+//		
+//		
 		int power = 1;
 		while(power < width || power < height) {
 			power *= 2;
 		}
+//
+//		for (int octave = 2; octave <= power; octave *= 2) {
+//			float[][] noise1 = new float[octave][octave];
+//			for (int i = 0; i < noise1.length; i++) {
+//				for (int j = 0; j < noise1[0].length; j++) {
+//					noise1[i][j] = noise(i, j);
+//				}
+//			}
+//			noises.add(noise1);
+//		}
+//
+//		float[][] combinedNoise = new float[power][power];
+//		for (int i = 0; i < power; i++) {
+//			for (int j = 0; j < power; j++) {
+//				double rand = 0;
+//				int divider = power;
+//				double multiplier = 1;
+//				for (float[][] noise : noises) {
+//					divider /= 2;
+//					multiplier /= 1.4;
+//					rand += multiplier * noise[i / divider][j / divider];
+//				}
+//				combinedNoise[i][j] = (float) rand;
+//			}
+//		}
 		
+		float[][] combinedNoise = PerlinNoise.generateHeightMap(width, height);
 
-		for (int octave = 2; octave <= power; octave *= 2) {
-			float[][] noise1 = new float[octave][octave];
-			for (int i = 0; i < noise1.length; i++) {
-				for (int j = 0; j < noise1[0].length; j++) {
-					noise1[i][j] = (float) Utils.getRandomNormal(5);
-				}
-			}
-			noises.add(noise1);
-		}
-
-		float[][] combinedNoise = new float[power][power];
-		for (int i = 0; i < power; i++) {
-			for (int j = 0; j < power; j++) {
-				double rand = 0;
-				int divider = power;
-				double multiplier = 1;
-				for (float[][] noise : noises) {
-					divider /= 2;
-					multiplier /= 1.4;
-					rand += multiplier * noise[i / divider][j / divider];
-				}
-				combinedNoise[i][j] = (float) rand;
-			}
-		}
-
-		float[][] heightMap = Utils.smoothingFilter(combinedNoise, smoothingRadius, 100);
-		
-		
+		float[][] heightMap = combinedNoise; //Utils.smoothingFilter(combinedNoise, smoothingRadius, 100);
 		float[][] croppedHeightMap = new float[width][height];
 		int croppedWidth = (power - width)/2;
 		int croppedHeight = (power - height)/2;
@@ -110,10 +129,10 @@ public class Generation {
 				float height = 1 - 0.2f*(lavaRadius - distanceFromCenter)/lavaRadius;
 				if(distanceFromCenter > lavaRadius) {
 					height = 1 - (distanceFromCenter - lavaRadius)/mountainEdgeRadius;
-					heightMap[i][j] = Math.max(height, heightMap[i][j]);
+//					heightMap[i][j] = Math.max(height, heightMap[i][j]);
 				}
 				else {
-					heightMap[i][j] = height;
+//					heightMap[i][j] = height;
 				}
 				
 				if(distanceFromCenter < lavaRadius) {

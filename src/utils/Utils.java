@@ -313,13 +313,22 @@ public final class Utils {
 				maxValue = data[i][j] > maxValue ? data[i][j] : maxValue;
 			}
 		}
-		System.out.println("Min Terrain Gen Value: " + minValue + ", Max value: " + maxValue);
+		System.out.println("Before normalize Min Terrain Gen Value: " + minValue + ", Max value: " + maxValue);
 		// Normalize the heightMap to be between 0 and 1
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < data[0].length; j++) {
 				data[i][j] = (data[i][j] - minValue) / (maxValue - minValue);
 			}
 		}
+		minValue = data[0][0];
+		maxValue = data[0][0];
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				minValue = data[i][j] < minValue ? data[i][j] : minValue;
+				maxValue = data[i][j] > maxValue ? data[i][j] : maxValue;
+			}
+		}
+		System.out.println("After normalize Min Terrain Gen Value: " + minValue + ", Max value: " + maxValue);
 	}
 	/**
 	 * 
@@ -440,6 +449,13 @@ public final class Utils {
 	}
 	public static double getRandomNormal(int tries) {
 		double rand = 0;
+		for (int i = 0; i < tries; i++) {
+			rand += Math.random();
+		}
+		return rand / tries;
+	}
+	public static float getRandomNormalF(int tries) {
+		float rand = 0;
 		for (int i = 0; i < tries; i++) {
 			rand += Math.random();
 		}
