@@ -49,6 +49,8 @@ public class Generation {
 		}
 
 		float[][] heightMap = Utils.smoothingFilter(combinedNoise, smoothingRadius, 100);
+		
+		
 		float[][] croppedHeightMap = new float[width][height];
 		int croppedWidth = (power - width)/2;
 		int croppedHeight = (power - height)/2;
@@ -58,74 +60,36 @@ public class Generation {
 			}
 		}
 		Utils.normalize(croppedHeightMap);
-//		for (int i = 0; i < width; i++) {
-//			for (int j = 0; j < height; j++) {
-//				heightMap[i][j] *= heightMap[i][j];
-//			}
-//		}
+		int center = width/2;
+		for (int i = 0; i < width; i++) {
+			
+			for (int j = 0; j < height; j++) {
+				
+				double dif = 1.0 * Math.abs(i-center)/center;
+				croppedHeightMap[i][j] +=  (float)10 * Math.pow(dif +1, -0.1) + (float)(Math.random()*0.01);
+
+			}
+		}
+		Utils.normalize(croppedHeightMap);
 		return croppedHeightMap;
 	}
 	
-	public static TileLoc makeMountain(Tile[][] world, double[][] heightMap) {
-		
-		int x0 = (int) (Math.random() * world.length);
-		int y0 = (int) (Math.random() * world.length);
-		
-		
-		int mountainSize = 80 * world.length / 256;
-		
-		double mountLength = (0.1 + 0.9 * Math.random() ) *mountainSize;
-		double mountHeight = (0.1 + 0.9 * Math.random() )*mountainSize;
-		double mountLengthEdge = mountLength+3;
-		double mountHeightEdge = mountHeight+3;
-		
-		double snowMountLength = mountLength/4;
-		double snowMountHeight = mountHeight/4;
-		double snowMountLengthEdge = mountLength/3;
-		double snowMountHeightEdge = mountHeight/3;
-		
-		for(int i = 0; i < world.length; i++) {
-			for(int j = 0; j < world[i].length; j++) {
-				int dx = i - x0;
-				int dy = j - y0;
-				double mountain = (dx*dx)/(mountLength*mountLength) + (dy*dy)/(mountHeight*mountHeight);
-				double mountainEdge = (dx*dx)/(mountLengthEdge*mountLengthEdge) + (dy*dy)/(mountHeightEdge*mountHeightEdge);
-				
-				double snowMountain = (dx*dx)/(snowMountLength*snowMountLength) + (dy*dy)/(snowMountHeight*snowMountHeight);
-				double snowMountainEdge = (dx*dx)/(snowMountLengthEdge*snowMountLengthEdge) + (dy*dy)/(snowMountHeightEdge*snowMountHeightEdge);
-
-				double ratio = Math.sqrt(dx*dx/mountLength/mountLength + dy*dy/mountHeight/mountHeight);
-				//double ratio = dist / Math.max(mountLength, mountHeight);
-				TileLoc p = new TileLoc(i, j);
-				if(mountainEdge < 1 && Math.random()<rockEdgeRatio) {
-					world[i][j].setTerrain(Terrain.ROCK);
-					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
-				}else if(mountain < 1) {
-					world[i][j].setTerrain(Terrain.ROCK);
-					heightMap[i][j] = Math.max(1 - ratio*0.4, heightMap[i][j]);
-				}
-				
-				
-				
-				
-			}
-		}
-		return new TileLoc(x0, y0);
-	}
 	
 	public static TileLoc makeVolcano(World world, float[][] heightMap) {
 		int x = 0;
 		int y = 0; 
 		float highest = -1000;
-		for(int i = 0; i < world.getWidth(); i++) {
-			for(int j = 0; j < world.getHeight(); j++) {
-				if(heightMap[i][j] > highest) {
-					highest = heightMap[i][j];
-					x = i;
-					y = j;
-				}
-			}
-		}
+//		for(int i = 0; i < world.getWidth(); i++) {
+//			for(int j = 0; j < world.getHeight(); j++) {
+//				if(heightMap[i][j] > highest) {
+//					highest = heightMap[i][j];
+//					x = i;
+//					y = j;
+//				}
+//			}
+//		}
+		x = world.getWidth()/2;
+		y = world.getHeight()/2;
 		float lavaRadius = 5;
 		float volcanoRadius = 10;
 		float mountainRadius = 20;

@@ -4,12 +4,12 @@ import java.awt.*;
 import utils.*;
 
 public enum Terrain {
-		GRASS 		(1, 4, 0, new String[] {"resources/Images/terrain/grass16.png", "resources/Images/terrain/grass128.png", "resources/Images/terrain/grass512.png"}),
-		DIRT  		(0.5, 4, 0, new String[] {"resources/Images/terrain/dirt16.png", "resources/Images/terrain/dirt128.png", "resources/Images/terrain/dirt512.png"}),
-		VOLCANO 	(4, 12, 0.1, new String[] {"resources/Images/terrain/volcano16.png", "resources/Images/terrain/volcano128.png", "resources/Images/terrain/magma512.png"}),
-		ROCK 		(2, 8, 0, new String[] {"resources/Images/terrain/rock16.png", "resources/Images/terrain/rock128.png"}),
-		SAND 		(2, 5, 0, new String[] {"resources/Images/terrain/sand.png"}),
-		BURNED_GROUND (4, 10, 0.08, new String[] {"resources/Images/terrain/burnedground.png"}),
+		GRASS 		(1, 2, 0, new String[] {"resources/Images/terrain/grass16.png", "resources/Images/terrain/grass128.png", "resources/Images/terrain/grass512.png"}),
+		DIRT  		(0.5, 2, 0, new String[] {"resources/Images/terrain/dirt16.png", "resources/Images/terrain/dirt128.png", "resources/Images/terrain/dirt512.png"}),
+		VOLCANO 	(4, 20, 0.1, new String[] {"resources/Images/terrain/volcano16.png", "resources/Images/terrain/volcano128.png", "resources/Images/terrain/magma512.png"}),
+		ROCK 		(2, 10, 0, new String[] {"resources/Images/terrain/rock16.png", "resources/Images/terrain/rock128.png"}),
+		SAND 		(2, 8, 0, new String[] {"resources/Images/terrain/sand.png"}),
+		BURNED_GROUND (4, 5, 0.08, new String[] {"resources/Images/terrain/burnedground.png"}),
 		;
 
 	private final double movePenalty;

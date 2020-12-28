@@ -3,7 +3,7 @@
 	{
 		"image":"resources/Images/units/worker.png",
 		"cost":{"FOOD":10},
-		"stats":{"movespeed":15,"buildtime":30,"health":100,"healspeed":50},
+		"stats":{"movespeed":10,"buildtime":30,"health":100,"healspeed":50},
 		"attackstyles":[
 			{"damage":1, "cooldown":60, "range":1}
 		],
@@ -13,7 +13,7 @@
 	{
 		"image":"resources/Images/units/warrior.png",
 		"cost":{"WOOD":50,"FOOD":50},
-		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":50},
+		"stats":{"movespeed":15,"buildtime":100,"health":100,"healspeed":50},
 		"name":"WARRIOR",
 		"attackstyles":[
 			{"damage":10, "cooldown":30, "range":1}
@@ -24,7 +24,7 @@
 	{
 		"image":"resources/Images/units/spearman.png",
 		"cost":{"BRONZE_SWORD":1,"FOOD":50},
-		"stats":{"movespeed":15,"buildtime":150,"health":300,"healspeed":50},
+		"stats":{"movespeed":10,"buildtime":150,"health":300,"healspeed":50},
 		"name":"SPEARMAN",
 		"attackstyles":[
 			{"damage":30, "cooldown":30, "range":1}
@@ -48,7 +48,7 @@
 	{
 		"image":"resources/Images/units/swordsman.png",
 		"cost":{"IRON_SWORD":1,"FOOD":100},
-		"stats":{"movespeed":15,"buildtime":200,"health":300,"healspeed":50},
+		"stats":{"movespeed":10,"buildtime":200,"health":300,"healspeed":50},
 		"name":"SWORDSMAN",
 		"attackstyles":[
 			{"damage":40, "cooldown":20, "range":1}
@@ -72,7 +72,7 @@
 	{
 		"image":"resources/Images/units/catapult.png",
 		"cost":{"WOOD":1000,"MITHRIL_BAR":5,"STONE":1000},
-		"stats":{"movespeed":50,"buildtime":1000,"health":200,"healspeed":100},
+		"stats":{"movespeed":40,"buildtime":1000,"health":200,"healspeed":100},
 		"name":"CATAPULT",
 		"attackstyles":[
 			{"damage":300, "cooldown":100, "range":10, "minrange":3, "projectile":"ROCK"}
@@ -84,7 +84,7 @@
 	{
 		"image":"resources/Images/units/trebuchet.png",
 		"cost":{"RUNITE_BAR":10,"WOOD":1000,"STONE":2000},
-		"stats":{"movespeed":50,"buildtime":1500,"health":200,"healspeed":100},
+		"stats":{"movespeed":40,"buildtime":1500,"health":200,"healspeed":100},
 		"name":"TREBUCHET",
 		"attackstyles":[
 			{"damage":600, "cooldown":100, "range":20, "minrange":5, "projectile":"FIREBALL_TREBUCHET"}
@@ -120,7 +120,7 @@
 	{
 		"image":"resources/Images/units/knight.png",
 		"cost":{"HORSE":50,"RUNE_SWORD":2,"FOOD":300},
-		"stats":{"movespeed":10,"buildtime":500,"health":700,"healspeed":50},
+		"stats":{"movespeed":5,"buildtime":500,"health":700,"healspeed":50},
 		"name":"KNIGHT",
 		"attackstyles":[
 			{"damage":100, "cooldown":20, "range":1}
@@ -143,7 +143,7 @@
 	},
 	{
 		"image":"resources/Images/units/wizard.png",
-		"stats":{"movespeed":20,"buildtime":1000,"health":200,"healspeed":50},
+		"stats":{"movespeed":15,"buildtime":1000,"health":200,"healspeed":50},
 		"cost":{"FOOD":200, "GOLD_BAR": 25},
 		"name":"WIZARD",
 		"attackstyles":[
@@ -159,7 +159,7 @@
 	},
 	{
 		"image":"resources/Images/units/griffin.png",
-		"stats":{"movespeed":15,"buildtime":500,"health":500,"healspeed":50},
+		"stats":{"movespeed":10,"buildtime":500,"health":500,"healspeed":50},
 		"cost":{"FOOD":1000},
 		"name":"GRIFFIN",
 		"attackstyles":[
@@ -174,7 +174,7 @@
 	},
 	{
 		"image":"resources/Images/units/priest.png",
-		"stats":{"movespeed":25,"buildtime":500,"health":100,"healspeed":50},
+		"stats":{"movespeed":15,"buildtime":500,"health":100,"healspeed":50},
 		"cost":{"FOOD":200, "GOLD_BAR": 10},
 		"name":"PRIEST",
 		"attackstyles":[
