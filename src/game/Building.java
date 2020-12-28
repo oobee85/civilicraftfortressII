@@ -1,37 +1,36 @@
 package game;
 
-import java.util.LinkedList;
+import java.awt.*;
+import java.io.*;
+import java.util.*;
 import java.util.List;
 
-import ui.Game;
+import game.liquid.*;
 import utils.*;
-import world.Tile;
+import world.*;
 
-public class Building extends Thing {
+public class Building extends Thing implements Serializable {
 	
 	private BuildingType buildingType;
 	private double remainingEffort;
-	private LinkedList<Unit> buildingUnitList = new LinkedList<Unit>();
+	private LinkedList<Unit> producingUnitList = new LinkedList<Unit>();
 	private double culture;
-	public static double CULTURE_AREA_MULTIPLIER = 0.1;
-	private Tile spawnLocation;
-	private double timeToHarvest;
-	private double baseTimeToHarvest = 20;
-	private boolean isPlayerControlled;
+	public transient static double CULTURE_AREA_MULTIPLIER = 0.1;
+	private transient Tile spawnLocation;
+	private transient double timeToHarvest;
+	private transient double baseTimeToHarvest = 20;
 	private boolean isPlanned;
+
+	private int remainingEffortToProduceUnit;
+	private transient Unit currentProducingUnit;
 	
-	private ResearchRequirement req = new ResearchRequirement();
-	
-	public Building(BuildingType buildingType, Tile tile, boolean isPlayerControlled) {
-		super(buildingType.getHealth(), buildingType, true, tile);
+	public Building(BuildingType buildingType, Tile tile, Faction faction) {
+		super(buildingType.getHealth(), buildingType, faction, tile);
 		this.remainingEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
 		this.spawnLocation = tile;
 		this.timeToHarvest = baseTimeToHarvest;
-		this.isPlayerControlled = isPlayerControlled;
 		this.isPlanned = false;
-		
-		
 	}
 	public void setPlanned(boolean planned) {
 		isPlanned = planned;
@@ -39,22 +38,107 @@ public class Building extends Thing {
 	public boolean isPlanned() {
 		return isPlanned;
 	}
-	public void tick() {
+	public void tick(World world) {
 		updateInProgressUnit();
 		timeToHarvest --;
-//		System.out.println(timeToHarvest);
+		
+		if(World.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
+			Tile tile = getTile();
+			int tileDamage = (int)tile.computeTileDamage(this);
+			if (tileDamage != 0) {
+				this.takeDamage(tileDamage);
+			}
+		}
+
+		if(!isBuilt()) {
+			return;
+		}
+		
+		// building builds units
+		if(remainingEffortToProduceUnit <= 0 && currentProducingUnit != null) {
+			Unit unit = getProducingUnit().remove();
+			unit.queuePlannedAction(new PlannedAction(getSpawnLocation()));
+			getTile().addUnit(unit);
+			world.addUnit(unit);
+			currentProducingUnit = null;
+		}
+		
+		if(!readyToHarvest() ) {
+			return;
+		}
+		if(getType() == Game.buildingTypeMap.get("CASTLE")) {
+			getFaction().spendResearch(20);
+			resetTimeToHarvest();
+		}
+		if(getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
+			getFaction().spendResearch(20);
+			resetTimeToHarvest();
+		}
+		if(getType() == Game.buildingTypeMap.get("MINE")) {
+			if(getTile().getResource() != null && getFaction().areRequirementsMet(getTile().getResource().getType())) {
+				if(getTile().getResource().getType().isOre() && getTile().getResource().hasYield()) {
+					getFaction().addItem(getTile().getResource().getType().getItemType(), 1);
+					getTile().getResource().harvest(1);
+					resetTimeToHarvest();
+				}
+			}
+			else {
+				if(getTile().getTerrain() == Terrain.ROCK) {
+					getFaction().addItem(ItemType.STONE, 1);
+					resetTimeToHarvest();
+				}
+			}
+		}
+		if(getType() == Game.buildingTypeMap.get("IRRIGATION") && getTile().canPlant() == true) {
+			int extraFood = 0;
+			//irrigation produces extra food when placed on water
+			if(getTile().liquidType == LiquidType.WATER && getTile().liquidAmount > 0) {
+				extraFood = (int) (getTile().liquidAmount * 10 + 0.5);
+			}
+			getFaction().addItem(ItemType.FOOD, 1 + extraFood);
+			resetTimeToHarvest();
+		}
+		if(getType() == Game.buildingTypeMap.get("GRANARY")) {
+			getFaction().addItem(ItemType.FOOD, 2);
+			resetTimeToHarvest();
+		}
+		if(getType() == Game.buildingTypeMap.get("WINDMILL")) {
+			getFaction().addItem(ItemType.FOOD, 8);
+			resetTimeToHarvest();
+		}
+		if(getType() == Game.buildingTypeMap.get("SAWMILL")) {
+			HashSet<Tile> tilesToCut = new HashSet<>();
+			tilesToCut.add(getTile());
+			
+			for(Tile t : world.getNeighborsInRadius(getTile(), 3)) {
+				tilesToCut.add(t);
+			}
+			for(Tile tile : tilesToCut) {
+				if(tile.getPlant() != null && tile.getPlant().getPlantType() == PlantType.FOREST1) {
+					tile.getPlant().takeDamage(1);
+					getFaction().addItem(ItemType.WOOD, 1);
+					if(tile.getPlant().isDead() ) {
+						world.numCutTrees ++;
+					}
+				}
+			}
+			
+			resetTimeToHarvest();
+		}
+
+		if(getType() == Game.buildingTypeMap.get("FARM") && getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
+			getFaction().addItem(ItemType.HORSE, 1);
+			getFaction().addItem(ItemType.FOOD, 3);
+			resetTimeToHarvest();
+		}
 	}
 	public boolean readyToHarvest() {
-//		System.out.println("ready");
 		return timeToHarvest <= 0;
 	}
 	public void resetTimeToHarvest() {
-//		System.out.println("in reset");
 		if(this.getTile().getResource() != null) {
-//			System.out.println("reset ore");
 			timeToHarvest = this.getTile().getResource().getType().getTimeToHarvest();
 		}else {
-//			System.out.println("reset normal");
 			timeToHarvest = baseTimeToHarvest;
 		}
 		
@@ -62,38 +146,59 @@ public class Building extends Thing {
 	public Tile getSpawnLocation() {
 		return spawnLocation;
 	}
-	public void setSpawnLocation(Tile tile) {
-		spawnLocation = tile;
+	public void setRallyPoint(Tile tile) {
+		if(buildingType.unitsCanProduce().length > 0) {
+			spawnLocation = tile;
+		}
 	}
-	public void setBuildingUnit(Unit buildingUnit) {
-		this.buildingUnitList.add(buildingUnit);
+	public void setProducingUnit(Unit producingUnit) {
+		this.producingUnitList.add(producingUnit);
 	}
 	private void updateInProgressUnit() {
-		if (buildingUnitList.peek() != null) {
-			buildingUnitList.peek().expendEffort(1);
+		if(!isBuilt()) {
+			return;
+		}
+		if(currentProducingUnit == null && !producingUnitList.isEmpty()) {
+			currentProducingUnit = producingUnitList.peek();
+			remainingEffortToProduceUnit = currentProducingUnit.getType().getCombatStats().getTicksToBuild();
+		}
+		if (currentProducingUnit != null) {
+			remainingEffortToProduceUnit -= 1;
+			if (remainingEffortToProduceUnit < 0) {
+				remainingEffortToProduceUnit = 0;
+			}
 		}
 	}
-	public void updateCulture() {
-		if(isBuilt()) {
-			culture += buildingType.cultureRate;
-		}
-		
+	public int getRemainingEffortToProduceUnit() {
+		return remainingEffortToProduceUnit;
+	}
+	public void setRemainingEffortToProduceUnit(int remainingEffortToProduceUnit) {
+		this.remainingEffortToProduceUnit = remainingEffortToProduceUnit;
 	}
 	
-	public boolean getIsPlayerControlled(){
-		return isPlayerControlled;
+	public void updateCulture() {
+		if(isBuilt()) {
+			culture += buildingType.getCultureRate();
+		}
 	}
-	public LinkedList<Unit> getBuildingUnit() {
-		return buildingUnitList;
+	
+	public LinkedList<Unit> getProducingUnit() {
+		return producingUnitList;
 	}
 	public double getCulture() {
 		return culture;
+	}
+	public void setCulture(double culture) {
+		this.culture = culture;
 	}
 	public void expendEffort(double effort) {
 		remainingEffort -= effort;
 		if(remainingEffort < 0) {
 			remainingEffort = 0;
 		}
+	}
+	public boolean isStarted() {
+		return getRemainingEffort() < getType().getBuildingEffort();
 	}
 	public double getRemainingEffort() {
 		return remainingEffort;
@@ -107,9 +212,8 @@ public class Building extends Thing {
 	public BuildingType getType() {
 		return buildingType;
 	}
-	
-	public ResearchRequirement getRequirement() {
-		return req;
+	public void setType(BuildingType type) {
+		this.buildingType = type;
 	}
 	@Override
 	public List<String> getDebugStrings() {
@@ -119,6 +223,19 @@ public class Building extends Thing {
 			strings.add(String.format("work^2=%.0f", getRemainingEffort() ));
 		}
 		return strings;
+	}
+	private String roadCorner;
+	public void setRoadCorner(String s) {
+		roadCorner = s;
+	}
+	@Override
+	public Image getImage(int size) {
+		if(getType().isRoad()) {
+			return getType().getRoadImage(roadCorner);
+		}
+		else {
+			return super.getImage(size);
+		}
 	}
 	
 	@Override

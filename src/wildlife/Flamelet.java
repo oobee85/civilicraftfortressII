@@ -1,65 +1,48 @@
 package wildlife;
 
-import java.util.*;
-
 import game.*;
+import ui.*;
 import world.*;
 
 public class Flamelet extends Animal {
 
-	public Flamelet(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.FLAMELET, tile, isPlayerControlled);
-	}
-	@Override
-	public boolean isFireResistant() {
-		return true;
+	private static int TIME_UNTIL_ATTACK = 0;
+	public Flamelet(Tile tile, Faction faction) {
+		super(Game.unitTypeMap.get("FLAMELET"), tile, faction);
 	}
 	
 	@Override
-	public boolean wantsToEat() {
-		return false;
-	}
-
-	@Override
-	public boolean wantsToReproduce() {
-		return false;
-	}
-	
-	@Override
-	public void tick() {
-		super.tick();
+	public void doPassiveThings(World world) {
+		super.doPassiveThings(world);
 		if(getTile().getModifier() != null) {
 			if(getTile().getModifier().getType() != GroundModifierType.FIRE) {
 				this.getTile().getModifier().finish();
-				makeFlame();
+				makeFlame(world);
+			}
+			else {
+				this.getTile().replaceOrAddDurationModifier(GroundModifierType.FIRE, 30, world.getData());
 			}
 		}
 		else {
-			makeFlame();
+			makeFlame(world);
 		}
 	}
 	
-	private void makeFlame() {
-		getTile().setModifier(new GroundModifier(GroundModifierType.FIRE, this.getTile(), 15));
-		synchronized(World.groundModifiers) {
-			World.groundModifiers.add(getTile().getModifier());
-		}
+	private void makeFlame(World world) {
+		getTile().setModifier(new GroundModifier(GroundModifierType.FIRE, this.getTile(), 30));
+		world.getData().addGroundModifier(getTile().getModifier());
 	}
-
+	
+	@Override
+	public void updateState() {
+		super.updateState();
+		TIME_UNTIL_ATTACK --;
+	}
 	@Override
 	public boolean wantsToAttack() {
-		return true;
-	}
-	
-	@Override
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
-		if(buildings.size() > 0) {
-			setTarget(buildings.get((int)(Math.random()*buildings.size())));
-			return;
+		if(TIME_UNTIL_ATTACK <= 0) {
+			return true;
 		}
-		return;
+		return false;
 	}
-	
-	
-
 }

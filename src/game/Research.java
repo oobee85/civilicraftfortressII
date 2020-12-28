@@ -1,45 +1,47 @@
 package game;
 
-import java.awt.*;
+import java.io.*;
 import java.util.*;
 
-import javax.swing.*;
-
+import ui.*;
 import utils.*;
 
-public class Research implements HasImage {
+public class Research implements Externalizable{
 	
 	public static final String DEFAULT_RESEARCH_IMAGE_PATH = "resources/Images/interfaces/tech.png";
 	
-	private final int requiredResearchPoints;
-	private final int tier;
-	private final String name;
+	private ResearchType type;
 	
-	private int researchPointsSpent;
-	private boolean isUnlocked = false;
-	private MipMap mipmap;
-	
-	private HashMap<ItemType, Integer> cost = new HashMap<>();
+	private int researchPointsSpent = 0;
+	private boolean isCompleted = false;
+	private boolean isPayedFor = false;
 	
 	private ResearchRequirement req = new ResearchRequirement();
 	
-	public Research(String researchName, String imagePath, int points, int tier) {
-		this.name = researchName;
-		mipmap = new MipMap(imagePath);
-		requiredResearchPoints = points;
-		this.tier = tier;
+	public Research() {
+		
+	}
+	public Research(ResearchType type) {
+		this.type = type;
+	}
+	
+	public ResearchType type() {
+		return type;
+	}
+	public void setType(ResearchType type) {
+		this.type = type;
 	}
 
 	public int getTier() {
-		return tier;
+		return type.tier;
 	}
 
 	public int getRequiredPoints() {
-		return requiredResearchPoints;
+		return type.requiredResearchPoints;
 	}
 	
 	public String getName() {
-		return name;
+		return type.toString();
 	}
 	
 	public ResearchRequirement getRequirement() {
@@ -50,46 +52,58 @@ public class Research implements HasImage {
 		return researchPointsSpent;
 	}
 	
-	public boolean isUnlocked() {
-		return isUnlocked;
+	public boolean isPayedFor() {
+		return isPayedFor;
+	}
+	public void setPayedFor(boolean payedFor) {
+		this.isPayedFor = payedFor;
+	}
+	
+	public boolean isCompleted() {
+		return isCompleted;
+	}
+	
+	public void setCompleted(boolean completed) {
+		this.isCompleted = completed;
+	}
+	
+	public void setResearchPointsSpend(int point) {
+		researchPointsSpent = point;
 	}
 	
 	public void spendResearch(int points) {
-		if(!isUnlocked()) {
+		if(!isCompleted()) {
 			researchPointsSpent += points;
-			if(researchPointsSpent >= requiredResearchPoints) {
-				isUnlocked = true;
-				researchPointsSpent = requiredResearchPoints;
+			if(researchPointsSpent >= type.requiredResearchPoints) {
+				isCompleted = true;
+				researchPointsSpent = type.requiredResearchPoints;
 			}
 		}
 	}
 
 	public HashMap<ItemType, Integer> getCost(){
-		return cost;
-	}
-	
-	public void addCost(ItemType type, int quanity) {
-		if(!cost.containsKey(type)) {
-			cost.put(type, 0);
-		}
-		cost.put(type, cost.get(type) + quanity);
+		return type.cost;
 	}
 	
 	@Override
 	public String toString() {
 		return Utils.getName(this);
-	}
+	}	
+
 	@Override
-	public Image getImage(int size) {
-		return mipmap.getImage(size);
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		type = Game.researchTypeMap.get(in.readUTF());
+		researchPointsSpent = in.readInt();
+		isCompleted = in.readBoolean();
+		isPayedFor = in.readBoolean();
 	}
+
 	@Override
-	public ImageIcon getImageIcon(int size) {
-		return mipmap.getImageIcon(size);
-	}
-	@Override
-	public Color getColor(int size) {
-		return mipmap.getColor(size);
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeUTF(type.name());
+		out.writeInt(researchPointsSpent);
+		out.writeBoolean(isCompleted);
+		out.writeBoolean(isPayedFor);
 	}
 	
 }

@@ -2,18 +2,18 @@ package game;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.io.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.ImageIcon;
 
-import pathfinding.Pathfinding;
+import ui.*;
 import utils.*;
-import world.Terrain;
-import world.Tile;
+import world.*;
 
-public class Projectile implements HasImage {
+public class Projectile implements HasImage, Externalizable {
 
 	private ProjectileType type;
 	private Tile targetTile;
@@ -21,25 +21,61 @@ public class Projectile implements HasImage {
 	private Tile tile;
 	private HasImage hasImage;
 	
-	private int damageBuff;
 	private Unit source;
+	private int damage;
+	private int totalDistance;
+	public int currentHeight = 0;
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		type = ProjectileType.values()[in.readByte()];
+		targetTile = new Tile(TileLoc.readFromExternal(in), Terrain.DIRT);
+		tile = new Tile(TileLoc.readFromExternal(in), Terrain.DIRT);
+		damage = in.readInt();
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeByte(type.ordinal());
+		targetTile.getLocation().writeExternal(out);
+		tile.getLocation().writeExternal(out);
+		out.writeInt(damage);
+	}
 	
-	public Projectile(ProjectileType type, Tile tile, Tile targetTile, Unit source) {
+	/** used by Externalizable interface */
+	public Projectile() {
+		
+	}
+	
+	public Projectile(ProjectileType type, Tile tile, Tile targetTile, Unit source, int damage) {
 		this.type = type;
 		this.tile = tile;
 		this.hasImage = type;
 		this.targetTile = targetTile;
-		this.damageBuff = 0;
 		this.source = source;
 		this.timeToMove = type.getSpeed();
+		this.damage = damage;
+		totalDistance = tile.getLocation().distanceTo(targetTile.getLocation());
+	}
+	
+	public int getDamage() {
+		return damage;
+	}
+	public int getHeight() {
+		return currentHeight;
+	}
+	public int getMaxHeight() {
+		return (int) (totalDistance*totalDistance*type.getSpeed()/4);
+	}
+	
+	public double getExtraSize() {
+		int div = (int) (7 - getType().getSpeed());
+		div = div < 1 ? 1 : div;
+		return currentHeight/div/30.0;
 	}
 	
 	public Unit getSource() {
 		return source;
-	}
-	
-	public void setDamageBuff(int damageBuff) {
-		this.damageBuff = damageBuff;
 	}
 	
 	public void tick() {
@@ -61,13 +97,17 @@ public class Projectile implements HasImage {
 			return;
 		}
 		Tile nextTile = this.tile;
+		int nextDistance = nextTile.getLocation().distanceTo(this.targetTile.getLocation());
 		for(Tile t : tile.getNeighbors()) {
-			if(t.getLocation().distanceTo(this.targetTile.getLocation()) < nextTile.getLocation().distanceTo(this.targetTile.getLocation())) {
+			int dist = t.getLocation().distanceTo(this.targetTile.getLocation());
+			if(dist < nextDistance) {
 				nextTile = t;
+				nextDistance = nextTile.getLocation().distanceTo(this.targetTile.getLocation());
 			}
 		}
 		moveTo(nextTile);
 		resetTimeToMove();
+		currentHeight = (int) (nextDistance * (totalDistance - nextDistance)*type.getSpeed());
 	}
 	public boolean reachedTarget() {
 		return this.targetTile == this.tile;
@@ -102,6 +142,13 @@ public class Projectile implements HasImage {
 	}
 	public Image getImage(int size) {
 		return hasImage.getImage(size);
+	}
+	public Image getShadow(int size) {
+		return hasImage.getShadow(size);
+	}
+	@Override
+	public Image getHighlight(int size) {
+		return hasImage.getHighlight(size);
 	}
 	public ImageIcon getImageIcon(int size) {
 		return hasImage.getImageIcon(size);

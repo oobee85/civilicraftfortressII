@@ -1,28 +1,29 @@
 package world;
 
+import java.io.*;
+
+import game.*;
 import utils.*;
 
-public class Plant extends Thing {
+public class Plant extends Thing implements Serializable {
 
 	private PlantType plantType;
-	private int currentYield;
 	
-	public Plant(PlantType pt, Tile t) {
-		super(pt.getHealth(), pt, false, t);
+	public Plant(PlantType pt, Tile t, Faction faction) {
+		super(pt.getHealth(), pt, faction, t);
 		plantType = pt;
 	}
-	
-	public int getYield() {
-		return currentYield;
-	}
-	public void harvest(int h) {
-		currentYield -= h;
+	public ItemType getItem() {
+		return plantType.getItem();
 	}
 	public boolean isAquatic() {
 		return plantType.isAquatic();
 	}
 	public PlantType getPlantType() {
 		return plantType;
+	}
+	public void setPlantType(PlantType type) {
+		this.plantType = type;
 	}
 
 	@Override

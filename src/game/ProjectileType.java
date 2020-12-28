@@ -13,48 +13,45 @@ import utils.Utils;
 
 public enum ProjectileType implements HasImage {
 
-	
-		ARROW(30, 1, "resources/Images/projectiles/arrow.png", 1, 2, null),
-		ARROW_ARCHER(10, 1, "resources/Images/projectiles/arrow.png", 1, 2, null),
-		RUNE_ARROW(50, 1, "resources/Images/projectiles/rune_arrow.png", 1, 2, null),
-		ROCK_CATAPULT(200, 2, "resources/Images/itemicons/rock.png", 1, 3, null),
-		ROCK_CYCLOPS(80, 2, "resources/Images/itemicons/rock.png", 1, 2, null),
-		FIREBALL_DRAGON(100, 2, "resources/Images/projectiles/fireball2.png", 2, 3, null),
-		FIREBALL_TREBUCHET(400, 2, "resources/Images/projectiles/fireball.png", 2, 3, null),
-		FIREWAVE(200, 5, "resources/Images/ground_modifiers/fire.gif", 1, 3, GroundModifierType.FIRE),
+		ARROW(2, "resources/Images/projectiles/arrow.png", 1, null, 0),
+		RUNE_ARROW(2, "resources/Images/projectiles/rune_arrow.png", 1, null, 0),
+		ROCK(3, "resources/Images/itemicons/rock.png", 1, null, 0),
+		FIREBALL_TREBUCHET(3, "resources/Images/projectiles/fireball.png", 2, null, 0),
 		
+		ROCK_STONE_GOLEM(5, "resources/Images/itemicons/rock.png", 1, null, 0),
+		FIREBALL_DRAGON(3, "resources/Images/projectiles/fireball2.png", 2, null, 0),
+		BULLET(0, "resources/Images/projectiles/bullet.png", 1, null, 0),
+		FIRE_WAVE(6, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 100),
+		METEOR_WAVE(4, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 1000),
+		WIZARD_BALL(2, "resources/Images/projectiles/fireball2.png", 4, null, 100),
+		FIREBREATH(3, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 10),
 	;
 	
 	private MipMap mipmap;
-	private double damage;
 	private double speed;
 	private int radius;
-	private int minimumRange;
 	private GroundModifierType groundModifierType;
+	private int groundModifierDuration;
 	
-	ProjectileType(double damage, double speed, String s, int radius, int minimumRange, GroundModifierType groundModifierType){
+	ProjectileType(double speed, String s, int radius, GroundModifierType groundModifierType, int groundModifierDuration){
 		mipmap = new MipMap(s);
-		this.damage = damage;
 		this.speed = speed;
 		this.radius = radius;
-		this.minimumRange = minimumRange;
 		this.groundModifierType = groundModifierType;
+		this.groundModifierDuration = groundModifierDuration;
 	}
 	public GroundModifierType getGroundModifierType() {
 		return groundModifierType;
 	}
+	public int getGroundModifierDuration() {
+		return groundModifierDuration;
+	}
 
 	public boolean isExplosive() {
-		return radius > 1;
-	}
-	public double getDamage() {
-		return damage;
+		return (radius > 1);
 	}
 	public int getRadius() {
 		return radius;
-	}
-	public int getMinimumRange() {
-		return minimumRange;
 	}
 	public double getSpeed() {
 		return speed;
@@ -62,6 +59,14 @@ public enum ProjectileType implements HasImage {
 	@Override
 	public Image getImage(int size) {
 		return mipmap.getImage(size);
+	}
+	@Override
+	public Image getShadow(int size) {
+		return mipmap.getShadow(size);
+	}
+	@Override
+	public Image getHighlight(int size) {
+		return mipmap.getHighlight(size);
 	}
 
 	@Override

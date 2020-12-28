@@ -1,18 +1,27 @@
 package utils;
 
 public enum Direction {
-	NORTH(new TileLoc(0, -1)),
-	EAST(new TileLoc(1, 0)),
-	SOUTH(new TileLoc(0, 1)),
-	WEST(new TileLoc(-1, 0))
+	NORTH(0, -1),
+	NORTHEAST(1, 0.5),
+	SOUTHEAST(1, -0.5),
+	SOUTH(0, 1),
+	SOUTHWEST(-1, -0.5),
+	NORTHWEST(-1, 0.5)
 	;
-	private TileLoc delta;
-	private Direction(TileLoc delta) {
-		this.delta = delta;
+	public static final String ALL_DIRECTIONS = NORTH.toString() + NORTHEAST.toString() + SOUTHEAST.toString() + SOUTH.toString() + SOUTHWEST.toString() + NORTHWEST.toString();
+	
+	private double deltax;
+	private double deltay;
+	private Direction(double deltax, double deltay) {
+		this.deltax = deltax;
+		this.deltay = deltay;
 	}
 	
-	public TileLoc getDelta() {
-		return delta;
+	public double deltax() {
+		return deltax;
+	}
+	public double deltay() {
+		return deltay;
 	}
 	
 	@Override
@@ -21,17 +30,49 @@ public enum Direction {
 	}
 	
 	public static Direction getDirection(TileLoc from, TileLoc to) {
-		if(to.y - from.y == 1) {
-			return SOUTH;
+		if(from.x() == to.x()) {
+			if(to.y() - from.y() == 1) {
+				return SOUTH;
+			}
+			else if(from.y() - to.y() == 1) {
+				return NORTH;
+			}
 		}
-		else if(from.y - to.y == 1) {
-			return NORTH;
+		else if(from.x() % 2 == 0){
+			if(to.x() - from.x() == 1) {
+				if(to.y() == from.y()) {
+					return NORTHEAST;
+				}
+				else {
+					return SOUTHEAST;
+				}
+			}
+			else if(from.x() - to.x() == 1) {
+				if(to.y() == from.y()) {
+					return NORTHWEST;
+				}
+				else {
+					return SOUTHWEST;
+				}
+			}
 		}
-		else if(to.x - from.x == 1) {
-			return EAST;
-		}
-		else if(from.x - to.x == 1) {
-			return WEST;
+		else {
+			if(to.x() - from.x() == 1) {
+				if(to.y() == from.y()) {
+					return SOUTHEAST;
+				}
+				else {
+					return NORTHEAST;
+				}
+			}
+			else if(from.x() - to.x() == 1) {
+				if(to.y() == from.y()) {
+					return SOUTHWEST;
+				}
+				else {
+					return NORTHWEST;
+				}
+			}
 		}
 		return null;
 	}

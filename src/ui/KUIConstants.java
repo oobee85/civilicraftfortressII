@@ -36,6 +36,7 @@ public class KUIConstants {
 	public static final Insets zeroMargin = new Insets(0, 0, 0, 0);
 
 	public static final Border massiveBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(5, 5, 5, 5));
+	public static final Border tinyBorder = BorderFactory.createLineBorder(Color.GRAY, 1);
 	
 	public static KButton setupButton(String text, Icon icon, Dimension size) {
 		KButton b = new KButton(text, icon);
@@ -44,8 +45,8 @@ public class KUIConstants {
 		setComponentAttributes(b, size);
 		return b;
 	}
-	public static JToggleButton setupToggleButton(String text, Icon icon, Dimension size) {
-		JToggleButton b = new KToggleButton(text, icon);
+	public static KToggleButton setupToggleButton(String text, Icon icon, Dimension size) {
+		KToggleButton b = new KToggleButton(text, icon);
 		b.setMargin(zeroMargin);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
 		setComponentAttributes(b, size);
@@ -57,6 +58,15 @@ public class KUIConstants {
 		b.setText(text);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
 		setComponentAttributes(b, size);
+		b.setOpaque(true);
+		return b;
+	}
+	public static JTextField setupTextField(String text, Dimension size) {
+		JTextField b = new JTextField(text, 20);
+		b.setHorizontalAlignment(SwingConstants.LEFT);
+		setComponentAttributes(b, size);
+		b.setOpaque(true);
+		b.setFocusable(true);
 		return b;
 	}
 
@@ -74,8 +84,10 @@ public class KUIConstants {
 		c.setFont(KUIConstants.buttonFont);
 		c.setBorder(massiveBorder);
 		c.setFocusable(false);
-		if (size != null)
+		if (size != null) {
 			c.setPreferredSize(size);
+			c.setMaximumSize(size);
+		}
 	}
 	
 

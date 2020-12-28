@@ -60,6 +60,13 @@ public class KButton extends JButton {
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
+	
+	/**
+	 * not to be confused with isEnabled(). getEnabled() returns the KButton enabled status, the underlying button is always enabled.
+	 */
+	public boolean getEnabled() {
+		return enabled;
+	}
 
 	@Override
 	public void paintComponent(Graphics g) {

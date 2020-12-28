@@ -10,9 +10,10 @@ import utils.MipMap;
 import utils.Utils;
 
 public enum GroundModifierType implements HasImage{
-
-	FIRE(new String[] { "resources/Images/ground_modifiers/fire.gif" }, 1, 0.5),
-
+	FIRE(new String[] { "resources/Images/ground_modifiers/fire.gif" }, 1, 0.5, new Color[] {new Color(255, 145, 0)}),
+//	RAIN(new String[] { "resources/Images/ground_modifiers/rain.png" }, 0, 0),
+//	SNOW(new String[] { "resources/Images/ground_modifiers/snow.png" }, 0, 0),
+//	SNOW(new String[] { "resources/Images/liquid/snow128.png" }, 1, 0),
 	;
 
 	int damage;
@@ -25,6 +26,11 @@ public enum GroundModifierType implements HasImage{
 		this.damage = damage;
 		this.brightness = brightness;
 	}
+	GroundModifierType(String[] s, int damage, double brightness, Color[] colors) {
+		this.mipmap = new MipMap(s, colors);
+		this.damage = damage;
+		this.brightness = brightness;
+	}
 
 	public int getDamage() {
 		return damage;
@@ -32,10 +38,19 @@ public enum GroundModifierType implements HasImage{
 	public double getBrightness() {
 		return brightness;
 	}
+	
 
 	@Override
 	public Image getImage(int size) {
 		return mipmap.getImage(size);
+	}
+	@Override
+	public Image getShadow(int size) {
+		return mipmap.getShadow(size);
+	}
+	@Override
+	public Image getHighlight(int size) {
+		return mipmap.getHighlight(size);
 	}
 
 	@Override

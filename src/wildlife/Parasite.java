@@ -3,66 +3,86 @@ package wildlife;
 import java.util.*;
 
 import game.*;
+import ui.*;
 import utils.*;
 import world.*;
 
 public class Parasite extends Animal {
+	
+	private transient boolean transformed;
+	private transient Tile volcano;
 
-	public Parasite(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.PARASITE, tile, isPlayerControlled);
-	}
-	@Override
-	public boolean isFireResistant() {
-		return true;
+	public Parasite(Tile tile, Faction faction, Tile volcano) {
+		super(Game.unitTypeMap.get("PARASITE"), tile, faction);
+		this.volcano = volcano;
 	}
 	
 	@Override
-	public boolean wantsToEat() {
-		return false;
-	}
-
-	@Override
-	public boolean wantsToReproduce() {
-		return false;
-	}
-	
-	@Override
-	public void tick() {
-		super.tick();
+	public void updateState() {
+		super.updateState();
 		if(getTarget() != null) {
-			if(getTarget().isDead() || !getTarget().isPlayerControlled()) {
-				setTarget(null);
+			if(getTarget().isDead() || !getTarget().getFaction().isPlayer()) {
+				clearPlannedActions();
 			}
 		}
 	}
 	
 	@Override
-	public double attack(Thing other) {
-		if(inRange(other)) {
-			other.setPlayerControlled(false);
-			this.setHealth(0);
+	public boolean attack(Thing other) {
+		if(!transformed) {
+			if(other instanceof Unit && inRange(other)) {
+				Unit otherUnit = (Unit)other;
+				transform(otherUnit);
+			}
+			return true;
 		}
-		return 0;
+		else {
+			return super.attack(other);
+		}
 	}
-
-	@Override
-	public boolean wantsToAttack() {
-		return true;
+	
+	private void transform(Unit host) {
+		host.setDead(true);
+		this.setType(host.getType());
+		this.setHealth(host.getHealth());
+		this.setMaxHealth(host.getMaxHealth());
+		transformed = true;
+	}
+	
+	private void transformBack() {
+		this.setType(Game.unitTypeMap.get("PARASITE"));
+		this.setHealth(1);
+		this.setMaxHealth(1);
+		transformed = false;
 	}
 	
 	@Override
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
-		for(Unit unit : units) {
-			if(unit.isPlayerControlled()) {
-				setTarget(unit);
-				if(Math.random() < 0.2) {
-					return;
-				}
+	public boolean takeDamage(int damage) {
+		boolean lethal = super.takeDamage(damage);
+		if(transformed) {
+			if(lethal) {
+				transformBack();
+				lethal = false;
 			}
 		}
-		return;
+		return lethal;
 	}
 	
+	@Override
+	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
+		if(!transformed) {
+			super.chooseWhatToAttack(units, buildings);
+		}
+	}
 	
-
+	@Override
+	public void chooseWhereToMove(World world) {
+		if(!transformed) {
+			super.chooseWhereToMove(world);
+		}
+		else {
+			clearPlannedActions();
+			queuePlannedAction(new PlannedAction(volcano));
+		}
+	}
 }

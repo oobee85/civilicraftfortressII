@@ -1,0 +1,20 @@
+DEER drops {'FOOD': 200}
+HORSE drops {'FOOD': 200}
+PIG drops {'FOOD': 200}
+SHEEP drops {'FOOD': 200}
+COW drops {'FOOD': 200}
+FISH drops {'FOOD': 200}
+DRAGON drops {'RUNITE_ORE': 10}
+VAMPIRE drops {'IRON_BAR': 5}
+ROC drops {'ADAMANTITE_ORE': 5}
+OGRE drops {'IRON_BAR': 10}
+ENT drops {'WOOD': 500}
+WEREWOLF drops {'IRON_BAR': 5}
+LAVAGOLEM drops {'MITHRIL_ORE': 50, 'COAL': 100}
+WOLF drops {'FOOD': 300}
+CYCLOPS drops {'IRON_BAR': 10}
+SKELETON drops {'BRONZE_BAR': 2}
+ICE_GIANT drops {'ADAMANT_BAR': 1, 'MITHRIL_BAR': 1}
+FLAMELET drops {'COAL': 100}
+TRADER drops {'GOLD_ORE': 50}
+STONE_GOLEM drops {'STONE': 1000}

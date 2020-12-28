@@ -4,61 +4,167 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.*;
 import java.util.stream.*;
 
 import game.*;
-import liquid.*;
+import game.liquid.*;
+import networking.message.*;
+import networking.server.*;
 import ui.*;
 import utils.*;
 import wildlife.*;
 
 public class World {
-	
-	public static final double SNOW_LEVEL = 0.75;
+
+	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 10;
+	public static final double TERRAIN_SNOW_LEVEL = 1;
+	public static final double DESERT_HUMIDITY = 1;
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 350;
 	public static final int TRANSITION_PERIOD = 100;
-	public final boolean isNight = false;
+	private static final double CHANCE_TO_SWITCH_TERRAIN = 0.05;
+	
+	private static final double BUSH_RARITY = 0.005;
+	private static final double WATER_PLANT_RARITY = 0.05;
+	private static final double FOREST_DENSITY = 0.4;
+	
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
 	
 	private static final int NUM_LIQUID_SIMULATION_PHASES = 9;
 	private ArrayList<ArrayList<Tile>> liquidSimulationPhases = new ArrayList<>(NUM_LIQUID_SIMULATION_PHASES);
 	private Tile[][] tiles;
-	public ConcurrentLinkedQueue<Tile> territory = new ConcurrentLinkedQueue<Tile>();;
 	
+	public volatile ConcurrentHashMap<Tile, Faction> territory = new ConcurrentHashMap<>();
 	private int width;
 	private int height;
 	
-	public LinkedList<Plant> plantsLand = new LinkedList<Plant>();
-	public LinkedList<Plant> plantsAquatic = new LinkedList<Plant>();
-	public LinkedList<Unit> units = new LinkedList<Unit>();
-	public LinkedList<Building> buildings = new LinkedList<Building>();
-	public LinkedList<Building> plannedBuildings = new LinkedList<Building>();
-	public LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
+	public static final int NO_FACTION_ID = 0;
+	public static final int CYCLOPS_FACTION_ID = 1;
+	public static final int UNDEAD_FACTION_ID = 2;
+	private ArrayList<Faction> factions = new ArrayList<>();
 	
-	public HashSet<Unit> unitsInTerritory = new HashSet<Unit>();
+	private WorldData worldData;
 	
-	
-	
-	public LinkedList<Unit> newUnits = new LinkedList<Unit>();
-	
-	public static LinkedList<GroundModifier> groundModifiers = new LinkedList<>();
-	
-	private double bushRarity = 0.005;
-	private double waterPlantRarity = 0.05;
-	private double forestDensity = 0.2;
-
 	public TileLoc volcano;
+	public int numCutTrees = 10;
+	public static int nights = 0;
+	public static int days = 1;
+	public static volatile int ticks;
 	
-	public World() {
+	public World(int width, int height) {
+		worldData = new WorldData();
+		this.width = width;
+		this.height = height;
 		tileList = new LinkedList<>();
 		tileListRandom = new LinkedList<>();
+		tiles = new Tile[width][height];
+		liquidSimulationPhases.clear();
+		for(int i = 0; i < NUM_LIQUID_SIMULATION_PHASES; i++) {
+			liquidSimulationPhases.add(new ArrayList<>());
+		}
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				tiles[i][j] = new Tile(new TileLoc(i, j), Terrain.DIRT);
+				tileList.add(tiles[i][j]);
+				tileListRandom.add(tiles[i][j]);
+				
+				// This one only has 5 phases
+//				int phase = (i + 5 - (2*j)%5) % 5;
+				// but this one has fewer cache invalidations
+				int phase = 3*(i%3) + j%3;
+				liquidSimulationPhases.get(phase).add(tiles[i][j]);
+			}
+		}
+
+		for(Tile tile : getTiles()) {
+			tile.setNeighbors(getNeighbors(tile));
+		}
+	}
+	public void updateTiles(Tile[] tileInfos) {
+		for(Tile info : tileInfos) {
+			Tile tile = get(info.getLocation());
+			if(tile == null) {
+				System.out.println("Tried to update null tile at " + info.getLocation());
+			}
+			if(tile.getFaction() == null || tile.getFaction().id() != info.getFaction().id()) {
+				tile.setFaction(factions.get(info.getFaction().id()));
+				addToTerritory(tile);
+//				updateBorderTiles();
+			}
+			tile.setHeight(info.getHeight());
+			tile.setHumidity(info.getHumidity());
+			tile.setResource(info.getResource());
+
+			tile.setTerrain(info.getTerrain());
+			tile.setModifier(info.getModifier());
+			tile.liquidAmount = info.liquidAmount;
+			tile.liquidType = info.liquidType;
+		}
+	}
+
+	public Faction getFaction(String name) {
+		for(Faction faction : factions) {
+			if(faction.name().equals(name)) {
+				return faction;
+			}
+		}
+		return null;
+	}
+	public Faction getFaction(int id) {
+		for(Faction faction : factions) {
+			if(faction.id() == id) {
+				return faction;
+			}
+		}
+		return null;
+	}
+	public void addFaction(Faction faction) {
+		factions.add(faction);
+	}
+	public ArrayList<Faction> getFactions() {
+		return factions;
+	}
+	
+	public int getTerritorySize() {
+		return territory.size();
 	}
 	public void addToTerritory(Tile tile) {
-		territory.add(tile);
+		if(!territory.contains(tile)) {
+			territory.put(tile, tile.getFaction());
+		}
+		
 	}
+//	public void updateBorderTiles() {
+//		
+//		for(Tile tile : territory.keySet()) {
+//			
+//			int numFail = 0;
+//			for(Tile neighbor: tile.getNeighbors()) {
+////				System.out.println("testing neighbors");
+//				if(neighbor.getFaction() != tile.getFaction()) {
+////					System.out.println("adding border");
+//					addToBorderTerritory(tile);
+//					break;
+//				}else {
+//					numFail ++;
+//				}
+//				
+//			}
+//			if(numFail == 4) {
+////				System.out.println("removing border");
+//				borderTerritory.remove(tile);
+//			}
+//			
+//		}
+//	}
+//	
+//	public void addToBorderTerritory(Tile tile) {
+//		if(!borderTerritory.contains(tile)) {
+//			borderTerritory.put(tile, tile.getFaction());
+//		}
+//	}
 	public int getWidth() {
 		return width;
 	}
@@ -78,158 +184,295 @@ public class World {
 	}
 	
 	public Tile get(TileLoc loc) {
-		if(loc.x < 0 || loc.x >= tiles.length || loc.y < 0 || loc.y >= tiles[0].length) {
+		if(loc.x() < 0 || loc.x() >= tiles.length || loc.y() < 0 || loc.y() >= tiles[0].length) {
 			return null;
 		}
-		return tiles[loc.x][loc.y];
+		return tiles[loc.x()][loc.y()];
+	}
+	
+	public LinkedList<Building> getBuildings() {
+		return worldData.getBuildings();
+	}
+	public void addBuilding(Building newBuilding) {
+		worldData.addBuilding(newBuilding);
+	}
+	public LinkedList<Unit> getUnits() {
+		return worldData.getUnits();
+	}
+	public void addUnit(Unit newUnit) {
+		worldData.addUnit(newUnit);
+	}
+	public LinkedList<WeatherEvent> getWeatherEvents() {
+		return worldData.getWeatherEvents();
+	}
+	public void addPlant(Plant newPlant) {
+		worldData.addPlant(newPlant);
+	}
+	public LinkedList<Plant> getPlants() {
+		return worldData.getPlants();
+	}
+	public WorldData getData() {
+		return worldData;
 	}
 
-	public LinkedList<Unit> getHostileUnitsInTerritory(){
-		
-		return unitsInTerritory.stream()
-				.filter(e -> e.getType().isHostile() && e.isPlayerControlled() == false).collect(Collectors.toCollection(LinkedList::new));
-		
-	}
 	public void drought() {
 		for(Tile tile : getTiles()) {
 			tile.liquidAmount = 0;
 		}
 	}
+	
 	public void rain() {
-		System.out.println("raining");
-		for(Tile tile : getTiles()) {
-			if(tile.getTerrain() != Terrain.SNOW && tile.getTerrain() != Terrain.ROCK) {
+		
+		//makes it so that it doesnt spawn the center of rain in deserts or on the volcano
+		Tile rainTile = this.getTilesRandomly().peek();
+		while(rainTile.getTerrain() == Terrain.SAND || rainTile.getTerrain() == Terrain.VOLCANO) {
+			rainTile = this.getTilesRandomly().peek();
+		}
+		
+		int radius = (int) (Math.random()*20 + 10);
+		
+		List<Tile> rainTiles = Utils.getTilesInRadius(rainTile, this, radius);
+		TileLoc destination = getTilesRandomly().peek().getLocation();
+		int dx = destination.x() - rainTile.getLocation().x();
+		int dy = destination.y() - rainTile.getLocation().y();
+		
+		for(Tile t : rainTiles) {
+			TileLoc target = new TileLoc(t.getLocation().x() + dx, t.getLocation().y() + dy);
+			Tile targetTile = get(target);
+			if(targetTile == null) {
 				continue;
 			}
-			if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.DRY) {
-				tile.liquidType = LiquidType.WATER;
-				tile.liquidAmount += 0.001;
-			}
+			double temperature = t.getTempurature();
+			WeatherEvent weather = new WeatherEvent(t, targetTile, t.getLocation().distanceTo(target)*WeatherEventType.RAIN.getSpeed() + (int)(Math.random()*50), 0.00002, LiquidType.WATER);;
+			t.setWeather(weather);
+			worldData.addWeatherEvent(weather);
 		}
 	}
+	
 	public void eruptVolcano() {
 		System.out.println("eruption");
-		this.get(volcano).liquidAmount += 500;
+		this.get(volcano).liquidAmount += 200;
 		
 //		world[volcano].liquidType = LiquidType.WATER;
 //		world[volcano].liquidAmount += 200;
 	}
-	public void tick() {
-		updateGroundModifiers();
-		addUnitsInTerritory();
-	}
 	
-	public void addUnitsInTerritory() {
-		HashSet<Unit> unitsInTerritoryNew = new HashSet<Unit>();
-		
-		for(Tile tile : territory) {
-			if(tile.getUnits() != null) {
-				unitsInTerritoryNew.addAll(tile.getUnits());
-			}
-			
-		}
-		unitsInTerritory = unitsInTerritoryNew;
-//		System.out.println("Units in territory"+ unitsInTerritory.size());
-	}
-	
-	public void updateGroundModifiers() {
-		LinkedList<GroundModifier> GroundModifiersNew = new LinkedList<GroundModifier>();
-		synchronized(groundModifiers) {
-			for(GroundModifier modifier : groundModifiers) {
-				Tile tile = modifier.getTile();
-				if(modifier.updateTime() == false) {
-					
-					GroundModifiersNew.add(modifier);
-				}else {
-					tile.setModifier(null);
-				}
-			}
-			groundModifiers = GroundModifiersNew;
-		}
-	}
-	
-	public void spawnOgre() {
-		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.ROCK ).findFirst();
+	public void spawnOgre(Tile target) {
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> 
+//		e.getTerrain() == Terrain.ROCK 
+		e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
+		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(UnitType.OGRE, tile.get());
+			spawnAnimal(Game.unitTypeMap.get("OGRE"), tile.get(), getFaction(NO_FACTION_ID), target);
 		}
 	}
 	
-	public void spawnWerewolf() {
-		List<Animal> wolves = Wildlife.getAnimals()
+	public void spawnWerewolf(Tile target) {
+		List<Unit> wolves = worldData.getUnits()
 				.stream()
-				.filter(e -> e.getType() == UnitType.WOLF)
+				.filter(e -> e.getType() == Game.unitTypeMap.get("WOLF"))
 				.collect(Collectors.toList());
 		if(wolves.size() == 0) {
 			return;
 		}
 		Unit wolf = wolves.get((int)(Math.random()*wolves.size()));
+		wolf.setDead(true);
 		Tile t = wolf.getTile();
-		
-		wolf.takeDamage(wolf.getHealth() + 1);
-		System.out.println("Werewolf at: "+t.getLocation().x+ ", "+ t.getLocation().y);
-		spawnAnimal(UnitType.WEREWOLF, t);
+//		System.out.println("Werewolf at: "+t);
+		spawnAnimal(Game.unitTypeMap.get("WEREWOLF"), t, getFaction(NO_FACTION_ID), target);
 	}
 	
-	public void spawnLavaGolem() {
+	public void spawnLavaGolem(Tile target) {
 		Optional<Tile> tile = getTilesRandomly()
 				.stream()
-				.filter(e -> e.getTerrain() == Terrain.VOLCANO )
+				.filter(e -> 
+//				e.getTerrain() == Terrain.VOLCANO 
+				e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
+				&& e.getFaction() == getFaction(NO_FACTION_ID))
 				.findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(UnitType.LAVAGOLEM, tile.get());
+			spawnAnimal(Game.unitTypeMap.get("LAVAGOLEM"), tile.get(), getFaction(NO_FACTION_ID), target);
 		}
 	}
 	
-	public void spawnEnt() {
-		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.GRASS ).findFirst();
+	public void spawnEnt(Tile target) {
+		Optional<Tile> tile = getTilesRandomly().stream().filter(
+				e -> e.getTerrain() == Terrain.GRASS 
+				&& e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn 
+				&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(UnitType.ENT, tile.get());
+			spawnAnimal(Game.unitTypeMap.get("ENT"), tile.get(), getFaction(NO_FACTION_ID), target);
 		}
 	}
-	public void spawnDragon() {
-		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.VOLCANO ).findFirst();
+	public void spawnIceGiant(Tile target) {
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> 
+//		e.liquidType == LiquidType.SNOW
+		e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
+		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(tile.isPresent()) {
-			spawnAnimal(UnitType.DRAGON, tile.get());
+			spawnAnimal(Game.unitTypeMap.get("ICE_GIANT"), tile.get(), getFaction(NO_FACTION_ID), target);
 		}
 	}
-	
-	public void spawnSkeletonArmy() {
-		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> e.getTerrain() == Terrain.ROCK ).findFirst();
+	public void spawnDragon(Tile target) {
+		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> 
+					e.getTerrain() == Terrain.VOLCANO 
+					&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+		if(tile.isPresent()) {
+			spawnAnimal(Game.unitTypeMap.get("DRAGON"), tile.get(), getFaction(NO_FACTION_ID), target);
+		}
+	}
+	public void spawnStoneGolem(Tile target) {
+		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
+		e.getTerrain() == Terrain.ROCK 
+		&& e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
+		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+		if(potential.isPresent()) {
+			Tile t = potential.get();
+			spawnAnimal(Game.unitTypeMap.get("STONE_GOLEM"), t, getFaction(NO_FACTION_ID), target);
+		}
+	}
+	public void spawnRoc(Tile target) {
+		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
+		e.getTerrain() == Terrain.ROCK 
+		&& e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
+		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+		if(potential.isPresent()) {
+			Tile t = potential.get();
+			spawnAnimal(Game.unitTypeMap.get("ROC"), t, getFaction(CYCLOPS_FACTION_ID), target);
+		}
+	}
+	public void spawnTermite(Tile target) {
+		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
+		e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
+		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+		if(potential.isPresent()) {
+			Tile t = potential.get();
+			spawnAnimal(Game.unitTypeMap.get("TERMITE"), t, getFaction(NO_FACTION_ID), target);
+		}
+	}
+	public void spawnBomb(Tile target) {
+		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
+		e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
+		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+		if(potential.isPresent()) {
+			Tile t = potential.get();
+			spawnAnimal(Game.unitTypeMap.get("BOMB"), t, getFaction(NO_FACTION_ID), target);
+		}
+	}
+	public void spawnVampire(Tile target) {
+		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
+				e.getTerrain() == Terrain.ROCK 
+				&& e.getLocation().distanceTo(target.getLocation()) < Game.howFarAwayStuffSpawn
+				&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
+		if(potential.isPresent()) {
+			Tile t = potential.get();
+			spawnAnimal(Game.unitTypeMap.get("VAMPIRE"), t, getFaction(UNDEAD_FACTION_ID), target);
+		}
+	}
+	public void spawnSkeletonArmy(Tile target) {
+		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
+		e.getTerrain() == Terrain.ROCK 
+		&& e.getFaction() == getFaction(NO_FACTION_ID)).findFirst();
 		if(potential.isPresent()) {
 			Tile t = potential.get();
 			for(Tile tile : t.getNeighbors()) {
-				spawnAnimal(UnitType.SKELETON, tile);
+				for(int i = 0; i < 3; i++) {
+					spawnAnimal(Game.unitTypeMap.get("SKELETON"), tile, getFaction(UNDEAD_FACTION_ID), target);
+				}
 			}
 		}
 	}
-	public void spawnAnimal(UnitType type, Tile tile) {
-		Animal animal = AnimalFactory.makeAnimal(type, tile);
+	public Animal spawnAnimal(UnitType type, Tile tile, Faction faction, Tile target) {
+		Animal animal = makeAnimal(type, tile, faction);
 		tile.addUnit(animal);
-		Wildlife.addAnimal(animal);
+		worldData.addUnit(animal);
+		if(target != null) {
+			animal.queuePlannedAction(new PlannedAction(target));
+		}
+		return animal;
+	}
+
+	public Animal makeAnimal(UnitType type, Tile tile, Faction faction) {
+		if(type == Game.unitTypeMap.get("FLAMELET")) {
+			return new Flamelet(tile, faction);
+		}
+		else if(type == Game.unitTypeMap.get("PARASITE")) {
+			return new Parasite(tile, faction, this.get(volcano));
+		}
+		else if(type == Game.unitTypeMap.get("WEREWOLF")) {
+			return new Werewolf(tile, faction);
+		}
+		else if(type == Game.unitTypeMap.get("WATER_SPIRIT")) {
+			return new WaterSpirit(tile, faction);
+		}
+		else if(type == Game.unitTypeMap.get("ENT")) {
+			return new Ent(tile, faction);
+		}
+		else if(type == Game.unitTypeMap.get("DRAGON")) {
+			return new Dragon(tile, faction);
+		}
+		else if(type == Game.unitTypeMap.get("ICE_GIANT")) {
+			return new IceGiant(tile, faction);
+		}
+		else if(type == Game.unitTypeMap.get("BOMB")) {
+			return new Bomb(tile, faction, this);
+		}
+		else {
+			return new Animal(type, tile, faction);
+		}
 	}
 	
+	public void makeAnimal(UnitType animalType, World world, TileLoc loc) {
+		if(animalType.isAquatic() == false && world.get(loc).liquidAmount > world.get(loc).liquidType.getMinimumDamageAmount()/2 ) {
+			return;
+		}
+		Animal animal = new Animal(animalType, world.get(loc), getFaction(NO_FACTION_ID));
+		animal.setTile(world.get(loc));
+		worldData.addUnit(animal);
+		world.get(loc).addUnit(animal);
+	}
 	
 	public void meteorStrike() {
-		
-		Tile t = this.getTilesRandomly().getFirst();
-		
-		int radius = (int) (Math.random()*20 + 5);
-		System.out.println("meteor at: "+t.getLocation().x+ ", "+ t.getLocation().y);
-		
-		spawnExplosionCircle(t, radius, 10000);
-		
-		
-		
+
+		Optional<Tile> potential = this.getTilesRandomly().stream().filter(e -> e.getFaction() == getFaction(NO_FACTION_ID))
+				.findFirst();
+		if (potential.isPresent()) {
+			Tile t = potential.get();
+
+			int radius = (int) (Utils.getRandomNormal(2) * 30 + 5);
+			System.out.println("meteor at: " + t.getLocation().x() + ", " + t.getLocation().y());
+			;
+			spawnExplosionCircle(t, radius, 5000);
+			int rockRadius = radius / 5;
+			spawnRock(t, rockRadius);
+		}
+	}
+	public void spawnRock(Tile tile, int radius) {
+		int numTiles = 0;
+		for(Tile t : this.getTiles()) {
+			int i =  t.getLocation().x();
+			int j =  t.getLocation().y();
+			int dx = i - tile.getLocation().x();
+			int dy = j - tile.getLocation().y();
+			double distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
+			
+			if (distanceFromCenter < radius) {
+				t.setTerrain(Terrain.VOLCANO);
+				numTiles ++;
+			}
+		}
+		int resource = (int) (Math.random()*ResourceType.values().length);
+		ResourceType resourceType = ResourceType.values()[resource];
+		Generation.makeOreVein(tile, resourceType, numTiles/2);
 	}
 	public HashSet<Tile> getNeighborsInRadius(Tile tile, int radius) {
 		HashSet<Tile> neighbors = new HashSet<>();
 		TileLoc tileLoc = tile.getLocation();
-		int x = tileLoc.x;
-		int y = tileLoc.y;
+		int x = tileLoc.x();
+		int y = tileLoc.y();
 		for(int i = Math.max(x - radius, 0) ; i <= x + radius && i < tiles.length ; i ++) {
 			for(int j = Math.max(y - radius, 0) ; j <= y + radius && j < tiles[i].length ; j ++) {
-				if(Math.abs(i - x) + Math.abs(j - y) >= radius) {
+				if(tileLoc.distanceTo(new TileLoc(i, j)) >= radius) {
 					continue;
 				}
 				neighbors.add(tiles[i][j]);
@@ -239,49 +482,56 @@ public class World {
 
 	}
 	public void spawnExplosionCircle(Tile tile, int radius, int damage) {
-
-		for(Tile t : this.getTiles()) {
-			int i =  t.getLocation().x;
-			int j =  t.getLocation().y;
-			int dx = i - tile.getLocation().x;
-			int dy = j - tile.getLocation().y;
-			double distanceFromCenter = Math.sqrt(dx*dx + dy*dy);
-				
-				if(distanceFromCenter < radius) {
-					if(t.getTerrain() != Terrain.ROCK && t.getTerrain() != Terrain.SNOW && t.getTerrain() != Terrain.VOLCANO) {
-//						tile.setTerrain(Terrain.BURNED_GROUND);
-					}
-					GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
-					synchronized(groundModifiers) {
-						groundModifiers.add(fire);
-					}
-					t.setModifier(fire);
-					if(t.getHasBuilding() == true) {
-						t.getBuilding().takeDamage(damage);
-					}
-					for(Unit unit : t.getUnits()) {
-						unit.takeDamage(damage);
-					}
-					if(t.getPlant() != null) {
-						t.getPlant().takeDamage(damage);
-					}
-					t.liquidAmount = 0;
-					
-					
+//		int radius = 35;
+		float amplitude = (float)(radius)/100;
+		
+		for(Tile t : Utils.getTilesInRadius(tile, this, 2*radius)) {
+			
+			double distanceFromCenter = t.getLocation().euclideanDistance(tile.getLocation());
+			
+			float delta = 0f;
+			double cos = -Math.cos( (distanceFromCenter*(20f/radius)) / (2*Math.PI));
+			
+			if (distanceFromCenter < radius) {
+				Projectile wave = new Projectile(ProjectileType.METEOR_WAVE, tile, t, null, damage);
+				if(damage < 500) {
+					wave = new Projectile(ProjectileType.FIRE_WAVE, tile, t, null, damage);
 				}
 				
+				tile.addProjectile(wave);
+				worldData.addProjectile(wave);
 				
+				
+				
+			}
+			if(radius >= 10) {
+				delta = (float)(amplitude*cos - 0.5*amplitude);
+				if (distanceFromCenter >= radius && distanceFromCenter < 2*radius) {
+					delta = (float)(amplitude*cos - 0.5*amplitude);
+					if(delta < 0) {
+						delta = 0f;
+					}
+				}
+				if(delta != 0) {
+					t.setHeight(t.getHeight() + delta);
+				}
+			}
+			
 		}
 	}
 	public void spawnExplosion(Tile tile, int radius, int damage) {
 	
 		for(Tile t : getNeighborsInRadius(tile, radius)) {
-			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
-			synchronized(groundModifiers) {
-				groundModifiers.add(fire);
-			}
-			t.setModifier(fire);
-			if(t.getHasBuilding() == true) {
+
+			t.replaceOrAddDurationModifier(
+					GroundModifierType.FIRE, 
+					10 + (int)(Math.random()*damage/5),
+					worldData);
+			
+//			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
+//			worldData.addGroundModifier(fire);
+//			t.setModifier(fire);
+			if(t.hasBuilding() == true) {
 				t.getBuilding().takeDamage(damage);
 			}
 			for(Unit unit : t.getUnits()) {
@@ -293,22 +543,75 @@ public class World {
 		}
 
 	}
-	public void updateTerrainChange(World world) {
+	public void updateTerrainChange() {
 		for(Tile tile : getTiles()) {
-			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+			
+			if(tile.getResource() != null) {
+				tile.getResource().tick(World.ticks);
+			}
+			tile.updateHumidity(World.ticks);
+			
+			//spreads desert tiles
+			if(tile.getTerrain().isPlantable(tile.getTerrain()) && tile.getHumidity() <= DESERT_HUMIDITY) {
+				int failTiles = 0;
 				
-				if(tile.checkTerrain(Terrain.DIRT) || tile.checkTerrain(Terrain.GRASS)) {
-					double chance = 0.001 * tile.liquidAmount * tile.liquidType.getDamage();
-					if(Math.random() < chance) {
+				for(Tile t : tile.getNeighbors()) {
+					//count how many neighbors is a failed tile
+					if(t.getHumidity() > DESERT_HUMIDITY || t.getTerrain() == Terrain.GRASS || t.getTerrain() == Terrain.ROCK) {
+						failTiles ++;
+					}
+				}
+				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+					//if two neighbor fails, make the tile dirt
+					if(failTiles >= 2) {
+						tile.setTerrain(Terrain.DIRT);
+					} 
+					//if all neighbors are eligible for desert, convert tile to desert
+					else if(failTiles < 3) {
 						tile.setTerrain(Terrain.SAND);
 					}
 				}
-			}else if(tile.checkTerrain(Terrain.SAND) && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()){
-				double chance = 0.001 * tile.liquidType.getDamage();
-				if(Math.random() < chance) {
-					tile.setTerrain(Terrain.GRASS);
+			//turns the tile back into dirt if its above desert humidity
+			}else if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY) {
+				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+					tile.setTerrain(Terrain.DIRT);
 				}
 			}
+			
+			if(tile.getTerrain() == Terrain.SAND) {
+				int numFailTiles = 0;
+				for(Tile t : tile.getNeighbors()) {
+					if(t.getTerrain() != Terrain.SAND) {
+						numFailTiles ++;
+					}
+				}
+				if(numFailTiles > 3) {
+					if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+						tile.setTerrain(Terrain.DIRT);
+					}
+				}
+			}
+			//turns grass into dirt if the tile has a cold liquid
+			if(tile.checkTerrain(Terrain.GRASS) && (tile.liquidType == LiquidType.SNOW || tile.liquidType == LiquidType.ICE) && tile.liquidAmount * tile.liquidType.getDamage() > 1) {
+				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+					tile.setTerrain(Terrain.DIRT);
+				}
+				
+			}
+			//turns tile into dirt if its very cold
+			if(tile.checkTerrain(Terrain.GRASS) && tile.isCold()) {
+				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+					tile.setTerrain(Terrain.DIRT);
+				}
+				
+			}
+//			if(tile.checkTerrain(Terrain.GRASS) && tile.getHumidity() < DESERT_HUMIDITY) {
+//				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+//					tile.setTerrain(Terrain.DIRT);
+//				}
+//				
+//			}
+			
 			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA 
 //					&& (tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.FIRE)
 					) {
@@ -323,7 +626,7 @@ public class World {
 			if(tile.checkTerrain(Terrain.DIRT)) {
 				boolean adjacentGrass = false;
 				boolean adjacentWater = false;
-				for(Tile neighbor : Utils.getNeighbors(tile, world)) {
+				for(Tile neighbor : Utils.getNeighbors(tile, this)) {
 					if(neighbor.checkTerrain(Terrain.GRASS)) {
 						adjacentGrass = true;
 					}
@@ -331,20 +634,20 @@ public class World {
 						adjacentWater = true;
 					}
 				}
-				double threshold = 0;
+				double threshold = CHANCE_TO_SWITCH_TERRAIN;
 				if(tile.liquidType == LiquidType.WATER) {
 					threshold += 0.001;
 				}
 				if(adjacentGrass) {
-					threshold += 0.005;
+					threshold += 0.01;
 				}
 				if(adjacentWater) {
-					threshold += 0.005;
+					threshold += 0.01;
 				}
 				if(adjacentGrass && adjacentWater) {
-					threshold += 0.05;
+					threshold += 0.1;
 				}
-				if(Math.random() < tile.liquidAmount*threshold) {
+				if(tile.isCold() == false && Math.random() < tile.liquidAmount*threshold*tile.getHumidity() && tile.liquidType != LiquidType.ICE) {
 					tile.setTerrain(Terrain.GRASS);
 				}
 			}
@@ -352,24 +655,38 @@ public class World {
 		
 	}
 	
+	private void spreadForest() {
+		
+		if(worldData.getPlants().size() >= 3000) {
+			return;
+		}
+		for(Plant plant : worldData.getPlants()) {
+			
+			if(plant.getTile().isCold() == true) {
+				continue;
+			}
+			if(plant.getPlantType() == PlantType.FOREST1) {
+				if(Math.random() < 0.01) {
+					for(Tile tile : plant.getTile().getNeighbors()) {
+						if(tile.getPlant() == null && tile.canPlant()) {
+							tile.setHasPlant(new Plant(PlantType.FOREST1, tile, getFaction(NO_FACTION_ID)));
+							worldData.addPlant(tile.getPlant());
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		
+	}
 	public void grow() {
-		System.out.println(plantsLand.size() + " land plants and " + plantsAquatic.size() + " aquatic plants.");
-		LinkedList<Plant> newAquatic = new LinkedList<>();
-		LinkedList<Plant> newLand = new LinkedList<>();
+		spreadForest();
 		
 		for(Tile tile : getTilesRandomly()) {
 			
-			if(tile.canPlant() == false) {
+			if(tile.canPlant() == false || tile.isCold() == true) {
 				continue;
-			}
-			
-			if(tile.getPlant() != null && tile.getPlant().getPlantType() == PlantType.FOREST1 && tile.canPlant()) {
-				for(Tile t : tile.getNeighbors()) {
-					if(Math.random() < 0.01 && t.getPlant() == null && t != tile && t.canPlant()) {
-						t.setHasPlant(new Plant(PlantType.FOREST1, t));
-						newLand.add(t.getPlant());
-					}
-				}
 			}
 			
 			if(tile.getPlant() != null) {
@@ -377,239 +694,185 @@ public class World {
 			}
 			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(Math.random() < 0.01) {
-					Plant plant = new Plant(PlantType.CATTAIL, tile);
+					Plant plant = new Plant(PlantType.CATTAIL, tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(plant);
-					newAquatic.add(plant);
+					worldData.addPlant(plant);
+				}
+			}
+			if(tile.liquidType != null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+				if (Math.random() < 0.001) {
+					tile.setHasPlant(new Plant(PlantType.BERRY, tile, getFaction(NO_FACTION_ID)));
+					worldData.addPlant(tile.getPlant());
 				}
 			}
 			
-			if (Math.random() < 0.001) {
-				tile.setHasPlant(new Plant(PlantType.BERRY, tile));
-				newLand.add(tile.getPlant());
-			}
 
 		}
-		for(Plant p : plantsAquatic) {
-			newAquatic.add(p);
-		}
-		for(Plant p : plantsLand) {
-			newLand.add(p);
-		}
-		plantsAquatic = newAquatic;
-		plantsLand = newLand;
 	}
-	
-	public void updateProjectileDealDamage() {
-		for(Projectile projectile : projectiles) {
-			if(projectile.reachedTarget() && projectile.getType().isExplosive() == false) {
-				for(Unit unit : projectile.getTile().getUnits()) {
-					unit.takeDamage(projectile.getType().getDamage());
-					unit.aggro(projectile.getSource());
-				}
-				if(projectile.getTile().getHasBuilding() == true) {
-					projectile.getTile().getBuilding().takeDamage(projectile.getType().getDamage());
-				}
-				
-				
+	public void doWeatherUpdate() {
+		for(WeatherEvent weather : worldData.getWeatherEvents()) {
+			weather.tick();
+			Tile tile = weather.getTile();
+			if(weather.getTargetTile() == null) {
+				continue;
+			}
+			if (weather.readyToMove()) {
+				weather.moveToTarget();
 			}
 			
+			if(tile.liquidType == LiquidType.LAVA) {
+				continue;
+			}
+			if(tile.liquidType != weather.getLiquidType() && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()/2) {
+				continue;
+			}
+			tile.liquidType = weather.getLiquidType();
+			tile.liquidAmount += weather.getStrength();
+			
+			
 		}
 	}
-	public void updateProjectiles() {
-		LinkedList<Projectile> projectilesNew = new LinkedList<Projectile>();
-		
-		for(Projectile projectile : projectiles) {
-			
-			if(projectile.reachedTarget()) {
+	
+	public void doProjectileUpdates(boolean simulated) {
+
+		for(Projectile projectile : worldData.getProjectiles()) {
+			projectile.tick();
+			if(projectile.getTargetTile() == null) {
+				continue;
+			}
+			if (projectile.readyToMove()) {
+				projectile.moveToTarget();
+				if(projectile.getType().getGroundModifierType() != null) {
+//					if(projectile.getTile().getModifier() != null) {
+//						if(projectile.getTile().getModifier().getType() != projectile.getType().getGroundModifierType()) {
+//							projectile.getTile().getModifier().finish();
+//							GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), projectile.getType().getGroundModifierDuration());
+//							projectile.getTile().setModifier(gm);
+//							worldData.addGroundModifier(gm);
+//						}
+//						else {
+//							projectile.getTile().getModifier().addDuration(projectile.getType().getGroundModifierDuration());
+//						}
+//					}
+//					else {
+//						GroundModifier gm = new GroundModifier(projectile.getType().getGroundModifierType(), projectile.getTile(), projectile.getType().getGroundModifierDuration());
+//						projectile.getTile().setModifier(gm);
+//						worldData.addGroundModifier(gm);
+//					}
+					projectile.getTile().replaceOrAddDurationModifier(
+							projectile.getType().getGroundModifierType(), 
+							projectile.getType().getGroundModifierDuration(),
+							worldData);
+				}
+			}
+			if(!simulated && projectile.reachedTarget()) {
 				if(projectile.getType().isExplosive()) {
-					spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getType().getDamage());
-				}
-				projectile.getTile().removeProjectile(projectile);
-				projectile.setTile(null);
-			}else {
-				projectilesNew.add(projectile);
-			}
-		}
-		projectiles = projectilesNew;
-	}
-	public void updateUnitDealDamage() {
-		for (Unit unit : units) {
-			boolean attacked = false;
-			if(unit.getTarget() != null) {
-				attacked = Attack.tryToAttack(unit, unit.getTarget());
-			}
-			if(!attacked) {
-				for(Unit enemyUnit : getHostileUnitsInTerritory()){
-					if(!unit.inRange(enemyUnit)) {
-						continue;
+					if(projectile.getType().getRadius() <= 2) {
+						spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getDamage());
+					}else {
+						spawnExplosionCircle(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getDamage());
 					}
-					Attack.tryToAttack(unit, enemyUnit);
+					
+				} 
+				else {
+					for(Unit unit : projectile.getTile().getUnits()) {
+						unit.takeDamage(projectile.getDamage());
+						unit.aggro(projectile.getSource());
+					}
+					if(projectile.getTile().getPlant() != null) {
+						projectile.getTile().getPlant().takeDamage(projectile.getDamage());
+					}
+					if(projectile.getTile().hasBuilding() == true) {
+						projectile.getTile().getBuilding().takeDamage(projectile.getDamage());
+					}
 				}
 			}
 		}
 	}
-
-	public void updateUnitColdDamage() {
-		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
-		
-		for (Unit unit : units) {
-			Tile tile = unit.getTile();
-			int tileDamage = 0;
-			if(tile.getTerrain() == Terrain.SNOW) {
-				tileDamage += 5;
-			}
-			
-			if (tileDamage != 0) {
-				unit.takeDamage(tileDamage);
-			}
-			if (unit.isDead() == true) {
-				tile.removeUnit(unit);
-			} else {
-				unitsNew.add(unit);
-			}
-
-		}
-		for (Unit unit : newUnits) {
-			unitsNew.add(unit);
-			unit.getTile().addUnit(unit);
-			
-		}
-		newUnits.clear();
-		units = unitsNew;
-	}
 	
-	public void updateUnitLiquidDamage() {
-
-		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
-
-		for (Unit unit : units) {
-			Tile tile = unit.getTile();
-			int tileDamage = tile.computeTileDamage(unit);
-			if (tileDamage != 0) {
-				unit.takeDamage(tileDamage);
-			}
-			if (unit.isDead() == true) {
-				tile.removeUnit(unit);
-			} else {
-				unitsNew.add(unit);
-			}
-
+	public void clearDeadAndAddNewThings() {
+		// FACTIONS
+		for(Faction f : factions) {
+			f.clearExpiredAttackedNotifications();
 		}
-		for (Unit unit : newUnits) {
-			unitsNew.add(unit);
-			unit.getTile().addUnit(unit);
-			
-		}
-		newUnits.clear();
-		units = unitsNew;
 		
-	}
-	
-	public void updateBuildingLiquidDamage() {
-
-		LinkedList<Building> buildingsNew = new LinkedList<Building>();
-		LinkedList<Building> plannedBuildingsNew = new LinkedList<Building>();
+		worldData.filterDeadUnits();
+		worldData.filterDeadGroundModifiers();
+		worldData.filterDeadWeatherEvents();
+		worldData.filterDeadBuildings();
+		worldData.filterDeadPlants();
+		worldData.filterDeadProjectiles();
 		
-		for (Building building : buildings) {
-			Tile tile = building.getTile();
-			int tileDamage = tile.computeTileDamage(building);
-			if (tileDamage != 0) {
-				building.takeDamage(tileDamage);
-			}
-			if (building.isDead() == true) {
-				tile.setBuilding(null);
-			} else {
-				buildingsNew.add(building);
-			}
-			
+		if(World.ticks % 200 == 1) {
+			System.out.println("Tick " + World.ticks + ", " + worldData.toString());
 		}
-		for(Building plannedBuilding : plannedBuildings) {
-			if(plannedBuilding.getRemainingEffort() < plannedBuilding.getType().getBuildingEffort()) {
-				buildingsNew.add(plannedBuilding);
-			}else {
-				plannedBuildingsNew.add(plannedBuilding);
-			}
-		}
-		newUnits.clear();
-		plannedBuildings = plannedBuildingsNew;
-		buildings = buildingsNew;
 	}
 	
 	public void updatePlantDamage() {
-		LinkedList<Plant> plantsLandNew = new LinkedList<Plant>();
-		for(Plant plant : plantsLand) {
+		for(Plant plant : worldData.getPlants()) {
 			Tile tile = plant.getTile();
 			
-			int totalDamage = 0;
-			double modifierDamage = 0;
-			
-			//adds the damage of groundmodifier
-			if(tile.getModifier() != null) {
-				modifierDamage += tile.getModifier().getType().getDamage();
-			}
-			
-			
-			if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				if(plant.isAquatic() == false || tile.liquidType != LiquidType.WATER) {
-					//adds damage of liquids
-					double liquidDamage = tile.liquidAmount * tile.liquidType.getDamage();
-					totalDamage += liquidDamage;
-				}
-			}
-			
-			totalDamage = (int) (modifierDamage+totalDamage);
-			if(totalDamage >= 1) {
-				plant.takeDamage(totalDamage);
-			}
-			if(plant.isDead() == true) {
-				tile.setHasPlant(null);
-			}else {
-				plantsLandNew.add(plant);
-			}
-		}	
-		plantsLand = plantsLandNew;
+//			if(tile.isCold()) {
+//				plant.takeDamage(1);
+//			}
+			if (plant.isAquatic() && tile.liquidType == LiquidType.WATER) {
+				if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 
-		LinkedList<Plant> plantsAquaticNew = new LinkedList<Plant>();
-		for (Plant plant : plantsAquatic) {
-			Tile tile = plant.getTile();
-			if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
-				if (plant.isAquatic() || tile.liquidType != LiquidType.WATER) {
 					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
 					double damageTaken = difInLiquids * tile.liquidType.getDamage();
-					int roundedDamage = (int) (damageTaken+1);
-					if(roundedDamage >= 1) {
+					int roundedDamage = (int) (damageTaken + 1);
+					if (roundedDamage >= 1) {
 						plant.takeDamage(roundedDamage);
 					}
 				}
-			}
-			if (plant.isDead() == true) {
-				tile.setHasPlant(null);
 			} else {
-				plantsAquaticNew.add(plant);
+				int totalDamage = 0;
+				double modifierDamage = 0;
+				
+				//adds the damage of groundmodifier
+				if(tile.getModifier() != null) {
+					modifierDamage += tile.getModifier().getType().getDamage();
+				}
+				
+				
+				if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+					if(plant.isAquatic() == false || tile.liquidType != LiquidType.WATER) {
+						//adds damage of liquids
+						double liquidDamage = tile.liquidAmount * tile.liquidType.getDamage();
+						totalDamage += liquidDamage;
+					}
+				}
+				if(tile.getTerrain().isPlantable(tile.getTerrain()) == false) {
+					totalDamage += 5;
+				}
+				
+				totalDamage = (int) (modifierDamage+totalDamage);
+				if(totalDamage >= 1) {
+					plant.takeDamage(totalDamage);
+				}
 			}
-		}
-		plantsAquatic = plantsAquaticNew;
+		}	
 	}
 
 	public void genPlants() {
 		for(Tile tile : getTiles()) {
 			//generates land plants
-			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < bushRarity) {
+			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < BUSH_RARITY) {
 				double o = Math.random();
 				if(o < PlantType.BERRY.getRarity()) {
-					Plant p = new Plant(PlantType.BERRY, tile);
+					Plant p = new Plant(PlantType.BERRY, tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(p);
-					plantsLand.add(tile.getPlant());
+					worldData.addPlant(tile.getPlant());
 				}
 			}
 			//tile.liquidType.WATER &&
 			//generates water plants
-			if( Math.random() < waterPlantRarity) {
+			if( Math.random() < WATER_PLANT_RARITY) {
 				double o = Math.random();
 				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()  && o < PlantType.CATTAIL.getRarity()) {
-					Plant p = new Plant(PlantType.CATTAIL, tile);
+					Plant p = new Plant(PlantType.CATTAIL, tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(p);
-					plantsAquatic.add(tile.getPlant());
+					worldData.addPlant(tile.getPlant());
 				}
 			}
 		}
@@ -619,88 +882,89 @@ public class World {
 	public void makeForest() {
 		
 		for(Tile t : tileListRandom) {
-			double tempDensity = forestDensity;
+			double tempDensity = FOREST_DENSITY;
 			if(t.getTerrain() == Terrain.DIRT) {
 				tempDensity /= 2;
 			}
 			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < t.liquidType.getMinimumDamageAmount() / 2)
 				if (Math.random() < tempDensity) {
-					Plant plant = new Plant(PlantType.FOREST1, t);
+					Plant plant = new Plant(PlantType.FOREST1, t, getFaction(NO_FACTION_ID));
 					t.setHasPlant(plant);
-					plantsLand.add(plant);
+					worldData.addPlant(plant);
 				}
 		}
 		
 	}
 	
 	public List<Tile> getNeighbors(Tile tile) {
-		int x = tile.getLocation().x;
-		int y = tile.getLocation().y;
-		int minX = Math.max(0, tile.getLocation().x - 1);
-		int maxX = Math.min(this.getWidth()-1, tile.getLocation().x + 1);
-		int minY = Math.max(0, tile.getLocation().y-1);
-		int maxY = Math.min(this.getHeight()-1, tile.getLocation().y + 1);
+		int x = tile.getLocation().x();
+		int y = tile.getLocation().y();
+//		int minX = Math.max(0, tile.getLocation().x() - 1);
+//		int maxX = Math.min(this.getWidth()-1, tile.getLocation().x() + 1);
+//		int minY = Math.max(0, tile.getLocation().y()-1);
+//		int maxY = Math.min(this.getHeight()-1, tile.getLocation().y() + 1);
 
+		LinkedList<TileLoc> possibleNeighbors = new LinkedList<>();
+		possibleNeighbors.add(new TileLoc(x - 1, y));
+		possibleNeighbors.add(new TileLoc(x + 1, y));
+		possibleNeighbors.add(new TileLoc(x, y - 1));
+		possibleNeighbors.add(new TileLoc(x, y + 1));
+//		possibleNeighbors.add(new TileLoc(x + 1, y + 1));
+		if(x%2 == 1) {
+			possibleNeighbors.add(new TileLoc(x - 1, y + 1));
+			possibleNeighbors.add(new TileLoc(x + 1, y + 1));
+		}
+		else {
+			possibleNeighbors.add(new TileLoc(x - 1, y - 1));
+			possibleNeighbors.add(new TileLoc(x + 1, y - 1));
+		}
 		LinkedList<Tile> tiles = new LinkedList<>();
-		for(int i = minX; i <= maxX; i++) {
-			for(int j = minY; j <= maxY; j++) {
-				if(i == x || j == y) {
-					if(i != x || j != y) {
-						if(this.get(new TileLoc(i, j)) != null) {
-							tiles.add(this.get(new TileLoc(i, j)));
-						}
-					}
-				}
+		for(TileLoc possible : possibleNeighbors) {
+			Tile t = this.get(possible);
+			if(t != null) {
+				tiles.add(t);
 			}
 		}
+//		for(int i = minX; i <= maxX; i++) {
+//			for(int j = minY; j <= maxY; j++) {
+//				if(i == x || j == y) {
+//					if(i != x || j != y) {
+//						if(this.get(new TileLoc(i, j)) != null) {
+//							tiles.add(this.get(new TileLoc(i, j)));
+//						}
+//					}
+//				}
+//			}
+//		}
 		Collections.shuffle(tiles); 
 		return tiles;
 	}
 	
-	public void generateWorld(MapType mapType, int size) {
-		liquidSimulationPhases.clear();
-		for(int i = 0; i < NUM_LIQUID_SIMULATION_PHASES; i++) {
-			liquidSimulationPhases.add(new ArrayList<>());
-		}
-		width = size;
-		height = size;
-		tiles = new Tile[width][height];
+	public void generateWorld() {
 		int smoothingRadius = (int) (Math.sqrt((width + height)/2)/2);
-		
-		double[][] heightMap = Generation.generateHeightMap(smoothingRadius, width, height);
+		float[][] heightMap = Generation.generateHeightMap(smoothingRadius, width, height);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
-				tiles[i][j] = Tile.makeTile(new TileLoc(i, j), Terrain.DIRT);
-				tileList.add(tiles[i][j]);
-				tileListRandom.add(tiles[i][j]);
-				
-				// This one only has 5 phases
-//				int phase = (i + 5 - (2*j)%5) % 5;
-				// but this one has fewer cache invalidations
-				int phase = 3*(i%3) + j%3;
-				liquidSimulationPhases.get(phase).add(tiles[i][j]);
-			}
-		}
-
-		for(Tile tile : getTiles()) {
-			tile.setNeighbors(getNeighbors(tile));
-		}
-
 		volcano = Generation.makeVolcano(this, heightMap);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 
 		for(Tile tile : getTiles()) {
-			tile.setHeight(heightMap[tile.getLocation().x][tile.getLocation().y]);
+			tile.setFaction(getFaction(NO_FACTION_ID));
+			tile.setHeight(heightMap[tile.getLocation().x()][tile.getLocation().y()]);
 		}
 
+		LinkedList<Tile> tiles = getTilesRandomly();
+		Collections.sort(tiles, new Comparator<Tile>() {
+			@Override
+			public int compare(Tile o1, Tile o2) {
+				return o1.getHeight() > o2.getHeight() ? 1 : -1;
+			}
+		});
+		double rockpercentage = 0.35;
+		double cutoff = tiles.get((int)((1-rockpercentage)*tiles.size())).getHeight();
 		for(Tile tile : getTiles()) {
 			if(tile.getTerrain() == Terrain.DIRT) {
 				Terrain t;
-				if (tile.getHeight() > SNOW_LEVEL) {
-					t = Terrain.SNOW;
-				}
-				else if (tile.getHeight() > 0.6) {
+				if (tile.getHeight() > cutoff) {
 					t = Terrain.ROCK;
 				}
 				else if (tile.getHeight() > 0.4) {
@@ -715,7 +979,7 @@ public class World {
 				tile.setTerrain(t);
 			}
 		}
-		
+
 		int numTiles = width*height;
 		Generation.makeLake(numTiles * 1.0/100, this);
 		Generation.makeLake(numTiles * 1.0/200, this);
@@ -724,16 +988,19 @@ public class World {
 		System.out.println("Simulating water for 100 iterations");
 		for(int i = 0; i < 100; i++) {
 			Liquid.propogate(this);
+			updateTerrainChange();
 		}
-
-		Generation.genResources(this);
+		
+		
+		Generation.generateResources(this);
 		this.genPlants();
 		this.makeForest();
-		Wildlife.generateWildLife(this);
+		Generation.generateWildLife(this);
 		System.out.println("Finished generating " + width + "x" + height + " world with " + tileList.size() + " tiles.");
 	}
+	
 
-	public BufferedImage[] createTerrainImage() {
+	public BufferedImage[] createTerrainImage(Faction faction) {
 		double brighnessModifier = getDaylight();
 		HashMap<Terrain, Color> terrainColors = new HashMap<>();
 		for(Terrain t : Terrain.values()) {
@@ -753,21 +1020,21 @@ public class World {
 			Color average = new Color(sumr/totalNumPixels, sumg/totalNumPixels, sumb/totalNumPixels);
 			terrainColors.put(t, average);
 		}
-		BufferedImage terrainImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_3BYTE_BGR);
-		BufferedImage minimapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_3BYTE_BGR);
+		BufferedImage terrainImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage minimapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 
 		Graphics minimapGraphics = minimapImage.getGraphics();
 		Graphics terrainGraphics = terrainImage.getGraphics();
 		for(Tile tile : this.getTiles()) {
 			Color minimapColor = terrainColors.get(tile.getTerrain());
 			Color terrainColor = terrainColors.get(tile.getTerrain());
-			if(tile.getResource() != null) {
+			if(tile.getResource() != null && faction.areRequirementsMet(tile.getResource().getType())) {
 				terrainColor = tile.getResource().getType().getColor(0);
 				minimapColor = tile.getResource().getType().getColor(0);
 			}
 			if(tile.getRoad() != null) {
-				terrainColor = Utils.roadColor;
-				minimapColor = Utils.roadColor;
+				terrainColor = tile.getRoad().getType().getColor(0);
+				minimapColor = tile.getRoad().getType().getColor(0);
 			}
 			if(tile.liquidAmount > 0) {
 				double alpha = Utils.getAlphaOfLiquid(tile.liquidAmount);
@@ -778,35 +1045,65 @@ public class World {
 				terrainColor = tile.getPlant().getColor(0);
 				minimapColor = tile.getPlant().getColor(0);
 			}
-			if(tile.getHasBuilding()) {
+			if(tile.hasBuilding()) {
 				terrainColor = tile.getBuilding().getColor(0);
 				minimapColor = tile.getBuilding().getColor(0);
 			}
-			if(tile.getIsTerritory()) {
-				minimapColor = Utils.blendColors(Game.playerColor, minimapColor, 0.3);
-				terrainColor = Utils.blendColors(Game.playerColor, terrainColor, 0.3);
+			if(tile.getModifier() != null) {
+				minimapColor = tile.getModifier().getType().getColor(0);
+				terrainColor = Utils.blendColors(tile.getModifier().getType().getColor(0), terrainColor, 0.9);
 			}
-			
-			double tilebrightness = tile.getBrightness();
+			if(tile.getFaction() != getFaction(NO_FACTION_ID)) {
+				minimapColor = Utils.blendColors(tile.getFaction().color(), minimapColor, 0.3);
+				terrainColor = Utils.blendColors(tile.getFaction().color(), terrainColor, 0.3);
+			}
+			double tilebrightness = tile.getBrightness(faction);
 			minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);
 			terrainColor = Utils.blendColors(terrainColor, Color.black, brighnessModifier + tilebrightness);
-			minimapImage.setRGB(tile.getLocation().x, tile.getLocation().y, minimapColor.getRGB());
-			terrainImage.setRGB(tile.getLocation().x, tile.getLocation().y, terrainColor.getRGB());
+			
+			minimapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), minimapColor.getRGB());
+			terrainImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), terrainColor.getRGB());
+		}
+		for(AttackedNotification notification : faction.getAttackedNotifications()) {
+			minimapImage.setRGB(notification.tile.getLocation().x(), notification.tile.getLocation().y(), Color.red.getRGB());
+			terrainImage.setRGB(notification.tile.getLocation().x(), notification.tile.getLocation().y(), Color.red.getRGB());
 		}
 		minimapGraphics.dispose();
 		terrainGraphics.dispose();
 		
-		BufferedImage heightMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_3BYTE_BGR);
+		BufferedImage heightMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 		for(Tile tile : getTiles() ) {
 			int r = Math.max(Math.min((int)(255*tile.getHeight()), 255), 0);
 			Color c = new Color(r, 0, 255-r);
-			heightMapImage.setRGB(tile.getLocation().x, tile.getLocation().y, c.getRGB());
+			heightMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 		}
-		return new BufferedImage[] { terrainImage, minimapImage, heightMapImage};
+		BufferedImage humidityMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
+		
+		double highHumidity = Double.MIN_VALUE;
+		double lowHumidity = Double.MAX_VALUE;
+		for(Tile tile : getTiles() ) {
+			highHumidity = Math.max(highHumidity, tile.getHumidity());
+			lowHumidity = Math.min(lowHumidity, tile.getHumidity());
+		}
+		
+		for(Tile tile : getTiles() ) {
+			float humidityRatio = (float) ((tile.getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
+			float insidePara = ((humidityRatio - 0.5f)*1.74f);
+			float almostRatio = (insidePara*insidePara*insidePara*insidePara*insidePara + 0.5f);
+			int r = Math.max(Math.min((int)(255*almostRatio), 255), 0);
+			Color c = new Color(255 - r, 0, r);
+			humidityMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
+		}
+		return new BufferedImage[] { 
+				ImageCreation.convertToHexagonal(terrainImage), 
+				ImageCreation.convertToHexagonal(minimapImage), 
+				ImageCreation.convertToHexagonal(heightMapImage),
+				ImageCreation.convertToHexagonal(humidityMapImage) };
+		
 	}
 
 	public int ticksUntilDay() {
-		int currentDayOffset = Game.ticks%(DAY_DURATION + NIGHT_DURATION);
+		int currentDayOffset = World.ticks%(DAY_DURATION + NIGHT_DURATION);
 		int skipAmount = (DAY_DURATION + NIGHT_DURATION - TRANSITION_PERIOD) - currentDayOffset;
 		if(skipAmount < 0) {
 			skipAmount += DAY_DURATION + NIGHT_DURATION;
@@ -814,16 +1111,18 @@ public class World {
 		return skipAmount;
 	}
 	
-	public boolean isNightTime() {
-		return getDaylight() < 0.2;
+	public static boolean isNightTime() {
+		return getDaylight() < 0.4;
 	}
-	
-	public double getDaylight() {
+	public static int getCurrentDayOffset() {
+		return (World.ticks + TRANSITION_PERIOD)%(DAY_DURATION + NIGHT_DURATION);
+	}
+	public static double getDaylight() {
 		if(Game.DISABLE_NIGHT) {
 			return 1;
 		}
-		int currentDayOffset = (Game.ticks + TRANSITION_PERIOD)%(DAY_DURATION + NIGHT_DURATION);
 		double ratio = 1;
+		int currentDayOffset = getCurrentDayOffset();
 		if(currentDayOffset < TRANSITION_PERIOD) {
 			ratio = 0.5 + 0.5*currentDayOffset/TRANSITION_PERIOD;
 		}

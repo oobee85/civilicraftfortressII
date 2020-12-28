@@ -7,6 +7,7 @@ import java.util.Map.*;
 import game.*;
 import ui.*;
 import utils.*;
+import world.*;
 
 public class UnitTypeInfoPanel extends InfoPanel {
 
@@ -18,38 +19,51 @@ public class UnitTypeInfoPanel extends InfoPanel {
 	
 	
 	UnitType showing;
+	private Faction faction;
 
-	public UnitTypeInfoPanel(UnitType showing) {
+	public UnitTypeInfoPanel(UnitType showing, Faction faction) {
 		super(showing.toString(), showing.getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
+		this.faction = faction;
 	}
 	
-	public static void drawCombatStats(Graphics g, CombatStats stats, int x, int y) {
+	public static void drawCombatStats(Graphics g, UnitType unitType, int x, int y) {
+		CombatStats stats = unitType.getCombatStats();
 		g.setFont(KUIConstants.combatStatsFont);
+		g.setColor(Color.black);
 		int fontSize = g.getFont().getSize();
 		int iconSize = 20;
 		int gap = 2;
-		g.drawImage(attackImage, x, y, iconSize, iconSize, null);
-		g.drawString(stats.getAttack() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
+		int xoffset = (int) (iconSize*2.5);
 		
-		y += iconSize + gap;
-		g.drawImage(attackspeedImage, x, y, iconSize, iconSize, null);
-		g.drawString(stats.getAttackSpeed() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
-
-		y += iconSize + gap;
-		g.drawImage(visionImage, x, y, iconSize, iconSize, null);
-		g.drawString(stats.getAttackRadius() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
-
-		y += iconSize + gap;
 		g.drawImage(movespeedImage, x, y, iconSize, iconSize, null);
 		g.drawString(stats.getMoveSpeed() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
 		
-		y += iconSize + gap;
-		g.drawImage(healthImage, x, y, iconSize, iconSize, null);
-		g.drawString(stats.getHealth() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
+//		y += iconSize + gap;
+		g.drawImage(healthImage, x + xoffset, y, iconSize, iconSize, null);
+		g.drawString(stats.getHealth() + "", x + iconSize + gap + xoffset, y + iconSize/2 + fontSize/3);
+		
+		for(AttackStyle style : unitType.getAttackStyles()) {
+			y += iconSize + gap;
+			g.drawRect(x, y-1, + 2*iconSize + 4*gap + xoffset, 2*(iconSize + gap));
+			
+			g.drawImage(attackspeedImage, x , y, iconSize, iconSize, null);
+			g.drawString(style.getCooldown() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
+			
+			g.drawImage(attackImage, x + xoffset, y, iconSize, iconSize, null);
+			g.drawString(style.getDamage() + "", x + iconSize + gap + xoffset, y + iconSize/2 + fontSize/3);
+
+			y += iconSize + gap;
+			g.drawImage(visionImage, x, y, iconSize, iconSize, null);
+			String rangeStr = style.getRange() + "";
+			if(style.getMinRange() > 0) {
+				rangeStr = style.getMinRange() +"-" + rangeStr;
+			}
+			g.drawString(rangeStr, x + iconSize + gap, y + iconSize/2 + fontSize/3);
+		}
 	}
 	
-	public static void drawCosts(Graphics g, HashMap<ItemType, Integer> costs, int x, int y) {
+	public static void drawCosts(Graphics g, HashMap<ItemType, Integer> costs, int x, int y, Faction faction) {
 		g.setFont(KUIConstants.combatStatsFont);
 		int fontSize = g.getFont().getSize();
 		int iconSize = 16;
@@ -57,7 +71,9 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		
 		for(Entry<ItemType, Integer> entry : costs.entrySet()) {
 			g.drawImage(entry.getKey().getImage(iconSize), x, y, iconSize, iconSize, null);
-			String str = entry.getValue() + " " + entry.getKey().toString();
+			int currentAmount = faction.getItemAmount(entry.getKey());
+			String str = currentAmount + "/" + entry.getValue() + " " + entry.getKey().toString();
+			g.setColor(currentAmount >= entry.getValue() ? Color.black : Color.red);
 			g.drawString(str, x + iconSize + gap + 1, y + iconSize/2 + fontSize/3);
 			y += iconSize + gap;
 		}
@@ -75,12 +91,12 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		g.setFont(KUIConstants.infoFontSmaller);
 		int offset = g.getFont().getSize();
 		if(showing.getResearchRequirement() != null) {
-			g.drawString(showing.getResearchRequirement().toString(), x, y += offset);
+			g.drawString(Game.researchTypeMap.get(showing.getResearchRequirement()).toString(), x, y += offset);
 		}
 
 		if(showing.getCost() != null) {
-			drawCosts(g, showing.getCost(), x, y + 6);
+			drawCosts(g, showing.getCost(), x, y + 6, faction);
 		}
-		drawCombatStats(g, showing.getCombatStats(), getWidth() - 80, 4);
+		drawCombatStats(g, showing, getWidth() - 100, 4);
 	}
 }

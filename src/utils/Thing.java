@@ -1,75 +1,93 @@
 package utils;
 import java.awt.*;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
 
 import game.*;
-import ui.*;
+import networking.server.*;
 import world.*;
 
-public class Thing implements HasImage {
+public class Thing implements HasImage, Serializable {
+	
+	private transient static int idCounter = 0;
+	private int id;
 
-	private boolean isPlayerControlled;
+	private transient Faction faction;
+	private int factionID;
 	private double maxHealth;
 	private double health;
-	private int timeLastDamageTaken = -1000;
+	private boolean isDead;
+	private transient int timeLastDamageTaken = -1000;
 	private Tile tile;
-	private Tile targetTile;
-	private boolean isSelected;
+	private transient boolean isSelected;
 	
-	private HasImage hasImage;
-	private boolean sideHealthBar;
-//	private LinkedList<Hitsplat> hitsplats = new LinkedList<Hitsplat>();
-	private Hitsplat[] hitsplats = new Hitsplat[4];
+	private transient HasImage hasImage;
+	private transient Hitsplat[] hitsplats = new Hitsplat[4];
 	
-	private String name;
-	
-	public Thing(double maxHealth, HasImage hasImage, boolean isPlayerControlled) {
+	public Thing(double maxHealth, HasImage hasImage, Faction faction) {
 		health = maxHealth;
 		this.maxHealth = maxHealth;
 		this.hasImage = hasImage;
-		this.isPlayerControlled = isPlayerControlled;
-		sideHealthBar = false;
-		if(hasImage instanceof UnitType) {
-			UnitType t = (UnitType)hasImage;
-			if(t == UnitType.ARCHER || t == UnitType.HORSEMAN || t == UnitType.SWORDSMAN || t == UnitType.SPEARMAN || t == UnitType.WORKER) {
-				sideHealthBar = true;
-			}
-		}
+		setFaction(faction);
+		this.id = idCounter++;
+		ThingMapper.created(this);
 	}
-	public Thing(double maxHealth, HasImage hasImage, boolean isPlayerControlled, Tile tile) {
-		this(maxHealth, hasImage, isPlayerControlled);
+	public Thing(double maxHealth, HasImage hasImage, Faction faction, Tile tile) {
+		this(maxHealth, hasImage, faction);
 		this.tile = tile;
 	}
 	
-	
-	public boolean isPlayerControlled() {
-		return isPlayerControlled;
+	public int id() {
+		return id;
+	}
+	public void setID(int id) {
+		this.id = id;
 	}
 	
-	public void setPlayerControlled(boolean pc) {
-		this.isPlayerControlled = pc;
+	public void setImage(HasImage hasImage) {
+		this.hasImage = hasImage;
 	}
 	
-	public boolean isFireResistant() {
-		return false;
+	public Faction getFaction() {
+		return faction;
 	}
 	
-	public boolean isSideHealthBar() {
-		return sideHealthBar;
+	public int getFactionID() {
+		return factionID;
+	}
+	
+	public void setFaction(Faction faction) {
+		this.faction = faction;
+		this.factionID = faction.id();
 	}
 
-	public boolean isDead() {
-		return health <= 0;
+	public void setDead(boolean state) {
+		isDead = state;
 	}
-	public void takeDamage(double damage) {
+	
+	public boolean isDead() {
+		return health <= 0 || isDead;
+	}
+	/**
+	 * @return true if this is lethal damage, false otherwise
+	 */
+	public boolean takeDamage(int damage) {
+		boolean before = isDead();
 		health -= damage;
 		if(damage != 0) {
-			timeLastDamageTaken = Game.ticks;
+			timeLastDamageTaken = World.ticks;
+			getFaction().gotAttacked(getTile());
 		}
-		addHitsplat((int)(Math.ceil(damage)));
+		addHitsplat(damage);
+		// Return true if isDead changed from false to true.
+		return !before && isDead();
+	}
+	
+	public void takeFakeDamage() {
+		timeLastDamageTaken = World.ticks;
 	}
 	
 	public void heal(double healing, boolean hitsplat) {
@@ -81,22 +99,30 @@ public class Thing implements HasImage {
 		int finalHealing = (int)tempHealing;
 		health += finalHealing;
 		if(finalHealing != 0) {
-			timeLastDamageTaken = Game.ticks;
+			timeLastDamageTaken = World.ticks;
 		}
-		if(hitsplat == true && finalHealing > 2) {
+		if(hitsplat == true && finalHealing > 0) {
 			addHitsplat(-finalHealing);
 		}
 	}
 	private void addHitsplat(int damage) {
 		int oldest = 0;
-		for(int i = 0; i < hitsplats.length; i++) {
-			if(hitsplats[i] == null) {
+		Hitsplat oldestHitsplat = hitsplats[0];
+		int offset = (int)(Math.random()*hitsplats.length);
+		for(int ii = 0; ii < hitsplats.length; ii++) {
+			int i = (ii+offset) % hitsplats.length;
+			Hitsplat current = hitsplats[i];
+			if(current == null) {
 				oldest = i;
+				oldestHitsplat = current;
 				break;
 			}
-			oldest = hitsplats[i].getMaxDuration() < hitsplats[oldest].getMaxDuration() ? i : oldest;
+			if(oldestHitsplat == null || current.getMaxDuration() < oldestHitsplat.getMaxDuration() ) {
+				oldest = i;
+				oldestHitsplat = current;
+			}
 		}
-		Hitsplat hit = new Hitsplat(damage, oldest);
+		Hitsplat hit = new Hitsplat(damage, oldest, this);
 		hitsplats[oldest] = hit;
 	}
 	public double getHealth() {
@@ -104,6 +130,12 @@ public class Thing implements HasImage {
 	}
 	public double getMaxHealth() {
 		return maxHealth;
+	}
+	public void setMaxHealth(double maxHealth) {
+		this.maxHealth = maxHealth;
+		if(health > maxHealth) {
+			health = maxHealth;
+		}
 	}
 	public void setHealth(double hp) {
 		health = hp;
@@ -129,14 +161,6 @@ public class Thing implements HasImage {
 		}
 		return false;
 	}
-	public double getHitsplatDamage() {
-		for(int i = 0; i < hitsplats.length; i++) {
-			if(hitsplats[i] != null) {
-				return hitsplats[i].getDamage();
-			}
-		}
-		return 0;
-	}
 	public Hitsplat[] getHitsplatList() {
 		return hitsplats;
 	}
@@ -149,26 +173,23 @@ public class Thing implements HasImage {
 	
 	public void setTile(Tile tile) {
 		this.tile = tile;
-		if(targetTile == getTile() ) {
-			targetTile = null;
-		}
 	}
 	
 	public Tile getTile() {
 		return tile;
 	}
 	
-	public Tile getTargetTile() {
-		return targetTile;
-	}
-	public void setTargetTile(Tile t) {
-		if(t != getTile()) {
-			targetTile = t;
-		}
-	}
 	@Override
 	public Image getImage(int size) {
 		return hasImage.getImage(size);
+	}
+	@Override
+	public Image getShadow(int size) {
+		return hasImage.getShadow(size);
+	}
+	@Override
+	public Image getHighlight(int size) {
+		return hasImage.getHighlight(size);
 	}
 	@Override
 	public ImageIcon getImageIcon(int size) {

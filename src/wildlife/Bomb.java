@@ -1,45 +1,35 @@
 package wildlife;
 
-import java.util.*;
-
 import game.*;
+import ui.*;
+import utils.*;
 import world.*;
 
 public class Bomb extends Animal {
-
-	public Bomb(Tile tile, boolean isPlayerControlled) {
-		super(UnitType.BOMB, tile, isPlayerControlled);
+	private transient World world;
+	public Bomb(Tile tile, Faction faction, World world) {
+		super(Game.unitTypeMap.get("BOMB"), tile, faction);
+		this.world = world;
 	}
 	
 	@Override
-	public boolean wantsToEat() {
-		return false;
-	}
-
-	@Override
-	public boolean wantsToReproduce() {
-		return false;
-	}
-	
-	@Override
-	public void tick() {
-		super.tick();
-	}
-
-	@Override
-	public boolean wantsToAttack() {
+	public boolean takeDamage(int damage) {
+		if(!isDead()) {
+			super.takeDamage(damage);
+			world.spawnExplosion(getTile(), 5, 500);
+			this.setDead(true);
+		}
 		return true;
 	}
 	
 	@Override
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
-		if(buildings.size() > 0) {
-			setTarget(buildings.get((int)(Math.random()*buildings.size())));
-			return;
+	public boolean attack(Thing target) {
+		if(target.getTile().getLocation().distanceTo(getTile().getLocation()) == 0) {
+			takeDamage(1);
+			return true;
 		}
-		return;
+		return false;
+	
 	}
-	
-	
 
 }

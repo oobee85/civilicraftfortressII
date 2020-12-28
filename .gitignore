@@ -4,3 +4,8 @@ bin/
 .settings/
 *.jar
 profiling/
+ERROR_LOG.txt
+*.ser
+ser/
+lootStatistics.txt
+*.civ

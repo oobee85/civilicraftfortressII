@@ -9,12 +9,13 @@ import utils.*;
 
 public class InfoPanel extends JPanel {
 	
+	private static final Icon EXPLODE_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/units/bomb.png"), 18, 18);
 	public static final int DEFAULT_IMAGE_SIZE = 100;
 	
 	private int imageSize = DEFAULT_IMAGE_SIZE;
 	private String name;
 	private Image image;
-	
+	private int numButtons;
 	protected int y;
 
 	public InfoPanel(String name, Image image, int imageSize) {
@@ -32,13 +33,23 @@ public class InfoPanel extends JPanel {
 	}
 	
 	public JButton addButton(String text) {
-		Dimension size = new Dimension(60, 20);
+		Dimension size = new Dimension(80, 20);
 		JButton button = KUIConstants.setupButton(text, null, size);
 		button.setFont(KUIConstants.buttonFontMini);
 		this.setLayout(null);
 		this.add(button);
-		System.out.println(this.getWidth());
-		button.setBounds(this.getWidth() - size.width, this.getHeight()-size.height, size.width, size.height);
+		button.setBounds(DEFAULT_IMAGE_SIZE + 2, size.height*numButtons + 26, size.width, size.height);
+		numButtons ++;
+		return button;
+	}
+	
+	public JButton addExplodeButton() {
+		Dimension size = new Dimension(28, 28);
+		JButton button = KUIConstants.setupButton("", EXPLODE_ICON, size);
+		button.setFont(KUIConstants.buttonFontMini);
+		this.setLayout(null);
+		this.add(button);
+		button.setBounds(0, 0, size.width, size.height);
 		return button;
 	}
 	

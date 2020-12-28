@@ -3,171 +3,195 @@ package wildlife;
 import java.util.*;
 
 import game.*;
-import liquid.*;
 import ui.*;
 import utils.*;
 import world.*;
 
 public class Animal extends Unit {
+	private static final int TARGETING_COOLDOWN = 10;
 	
-	public static final int MAX_ENERGY = 100;
+	private int migratingUntil;
+	private int nextTimeToChooseTarget;
+	private int whenToInvade;
 	
-	
-	private double energy;
-	private double drive;
-	private Thing foodTarget;
-	private Tile resourceTarget;
-	
-	public Animal(UnitType type, Tile tile, boolean isPlayerControlled) {
-		super(type, tile, isPlayerControlled);
-		energy = MAX_ENERGY;
-		drive = 0;
+	public Animal(UnitType type, Tile tile, Faction faction) {
+		super(type, tile, faction);
+		
+		if(type.isDelayedInvasion()) {
+			whenToInvade = World.ticks + 2000;
+		}
 	}
+	
 	public boolean getHasHome() {
 		return false;
 	}
-	
+
 	@Override
-	public List<String> getDebugStrings() {
-		List<String> strings = super.getDebugStrings();
-		strings.add(String.format("EN=%.1f", getEnergy()));
-		return strings;
-	}
-	
-	public void climb(double height) {
-		if(height > 0) {
-			energy -= height;
-		}
-	}
-	
-	public void loseEnergy() {
-		energy -= 0.005;
-		if(getHealth() < super.getType().getCombatStats().getHealth() && readyToHeal()) {
-			energy -= 1.0;
-			heal(1, false);
-			resetTimeToHeal();
-		}
-		if(energy < MAX_ENERGY/20) {
-			takeDamage(0.05);
-		}
-	}
-	
-	public void reproduced() {
-		drive = 0;
-	}
-	
-	public boolean wantsToReproduce() {
-		return Math.random() < drive - 0.2;
-	}
-	public double getDrive() {
-		return drive;
-	}
-	
-	public boolean isDead() {
-		return super.isDead() || energy <= 0;
+	public boolean readyToInvade() {
+		return World.ticks > whenToInvade;
 	}
 
 	public boolean wantsToEat() {
-		return Math.random()*1000 > energy + 10;
-	}
-	public void eat(double damage) {
-		energy += damage;
-		drive += 0.01;
+		return getType().getTargetingInfo().isEmpty() && Math.random() < 0.005;
 	}
 	
-	public void chooseWhatToEat(LinkedList<Unit> units, LinkedList<Animal> animals) {
-		if(foodTarget != null) {
+	@Override
+	public void planActions(World world) {
+		chooseWhatToEat(world.getUnits());
+		if(wantsToAttack() && getTarget() == null && World.ticks >= nextTimeToChooseTarget) {
+			chooseWhatToAttack(world.getUnits(), world.getBuildings());
+			nextTimeToChooseTarget = World.ticks + TARGETING_COOLDOWN;
+		}
+		chooseWhereToMove(world);
+	}
+	
+	@Override
+	public void doPassiveThings(World world) {
+	}
+	
+	private int computeHerd(Tile tile) {
+		int herd = 0;
+		for(Tile t : tile.getNeighbors()) {
+			for(Unit u : t.getUnits()) {
+				if(u != this && u.getUnitType() == this.getUnitType()) {
+					herd+=10;
+				}
+			}
+		}
+		for(Unit u : tile.getUnits()) {
+			if(u == this) {
+				continue;
+			}
+			if(u.getUnitType() == this.getUnitType()) {
+				herd-=5;
+			}
+			else {
+				herd -= 1;
+			}
+		}
+		return herd;
+	}
+	
+	public void chooseWhereToMove(World world) {
+		// everything below only if idle
+		if(!isIdle()) {
+			return;
+		}
+		// Try to avoid danger
+		Tile best = getTile();
+		double currentDanger = computeDanger(best);
+		double bestDanger = currentDanger;
+		for(Tile t : getTile().getNeighbors()) {
+			if(t.isBlocked(this)) {
+				continue;
+			}
+			double danger = computeDanger(t);
+			if(danger < bestDanger) {
+				best = t;
+				bestDanger = danger;
+			}
+		}
+		if(bestDanger < currentDanger && currentDanger >= 0.9) {
+			if(best != getTile()) {
+				queuePlannedAction(new PlannedAction(best));
+			}
+			return;
+		}
+		// Try to stay next to same species
+		if(Math.random() < 0.1) {
+			Tile bestHerd = getTile();
+			int currentHerdAmount = computeHerd(bestHerd); 
+			int bestHerdAmount = currentHerdAmount; 
+			for(Tile t : getTile().getNeighbors()) {
+				if(t.isBlocked(this)) {
+					continue;
+				}
+				int herdAmount = computeHerd(t); 
+				if(herdAmount > bestHerdAmount) {
+					bestHerd = t;
+					bestHerdAmount = herdAmount;
+				}
+			}
+			if(bestHerdAmount > currentHerdAmount && computeDanger(bestHerd) < 1) {
+				if(bestHerd != getTile()) {
+					queuePlannedAction(new PlannedAction(bestHerd));
+					return;
+				}
+			}
+		}
+		// Migrate according to the season
+		if(getType().isMigratory() && World.ticks > migratingUntil && Math.random() < 0.1) {
+			double season = Season.getSeason4();
+			Tile migrationTarget = null;
+			// heading into winter
+			if(season > 0.4 && season < 0.8 && getTile().getLocation().y() < world.getHeight()/2) {
+				migrationTarget = world.get(new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y() + (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4)));
+			}
+			// heading into summer
+			else if(season > 1.4 && season < 1.8 && getTile().getLocation().y() > world.getHeight()/2) {
+				migrationTarget = world.get(new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y() - (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4)));
+			}
+			if(migrationTarget != null) {
+//				System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + migrationTarget);
+				migratingUntil = World.ticks + Season.SEASON_DURATION/2;
+				queuePlannedAction(new PlannedAction(migrationTarget));
+			}
+		}
+	}
+
+	private void chooseWhatToEat(LinkedList<Unit> units) {
+		if(!wantsToEat()) {
 			return;
 		}
 		if(getType().isHostile() == true) {
-			Unit iveGotYouInMySights;
-			if(Math.random() < 0.01 && units.isEmpty() == false) {
-				int pickUnit = (int) (units.size()*Math.random());
-				iveGotYouInMySights = units.get(pickUnit);
-			}else {
-				int pickAnimal = (int) (animals.size()*Math.random());
-				iveGotYouInMySights = animals.get(pickAnimal);
+			Unit iveGotYouInMySights = null;
+			if(!units.isEmpty()) {
+				iveGotYouInMySights = units.get((int) (units.size()*Math.random()));
 			}
-			
 			if(iveGotYouInMySights != this) {
-				foodTarget = iveGotYouInMySights;
+				clearPlannedActions();
+				queuePlannedAction(new PlannedAction(iveGotYouInMySights));
 			}
 		}
 		else {
-			if(!getType().isHostile() && getTile().getPlant() != null) {
-				if(readyToAttack()) {
-					foodTarget = getTile().getPlant();
+			if(getTile().getPlant() != null) {
+				queuePlannedAction(new PlannedAction(getTile().getPlant()));
+			}
+			else {
+				for(Tile neighbor : getTile().getNeighbors()) {
+					if(neighbor.getPlant() != null) {
+						queuePlannedAction(new PlannedAction(neighbor.getPlant()));
+					}
 				}
 			}
 		}
 	}
 	
-	/**
-	 * Moves toward the target and tries to eat it.
-	 */
-	public void imOnTheHunt(World world) {
-		if(resourceTarget != null) {
-			if(getTile() != resourceTarget) {
-				moveTowards(resourceTarget);
-			}
-//			if(getTile() == resourceTarget) {
-//				if(resourceTarget.getResource() == null || resourceTarget.getResource().getYield() <= 0 || resourceTarget.getResource().getType() != ResourceType.DEAD_ANIMAL) {
-//					resourceTarget = null;
-//				}
-//				else {
-//					resourceTarget.getResource().harvest(1);
-//					eat(1);
-//					if(resourceTarget.getResource().getYield() <= 0) {
-//						resourceTarget.setResource(null);
-//						resourceTarget = null;
-//					}
-//				}
-//			}
-			return;
+	@Override
+	public boolean readyToMove() {
+		if(getTile().getBuilding() != null && getTile().getBuilding().getType() == Game.buildingTypeMap.get("FARM")) {
+			return false;
 		}
-		if(foodTarget != null) {
-			if(this.getTile().getLocation().distanceTo(foodTarget.getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
-				moveTowards(foodTarget.getTile());
-			}
-			if(inRange(foodTarget)) {
-				double damageDealt = attack(foodTarget);
-				if(damageDealt > 0) {
-					eat(damageDealt);
-				}
-				if(foodTarget.isDead()) {
-					resourceTarget = foodTarget.getTile();
-					foodTarget = null;
-				}
-			}
-			return;
-		}
-		if(getTarget() != null) {
-			if(this.getTile().getLocation().distanceTo(getTarget().getTile().getLocation()) > getType().getCombatStats().getAttackRadius()) {
-				this.moveTowards(getTarget().getTile());
-			}
-			Attack.tryToAttack(this, getTarget());
-			if(getTarget().isDead()) {
-				setTarget(null);
-			}
-			return;
-		}
+		return super.readyToMove();
 	}
 	
 	public boolean wantsToAttack() {
-		return false;
+		return !getType().getTargetingInfo().isEmpty();
 	}
 	
-	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Animal> animals, LinkedList<Building> buildings) {
-		return;
+	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
+		for(TargetingInfo targetType : getType().getTargetingInfo()) {
+			Thing target = targetType.getValidTargetFor(this, units, buildings);
+			if(target != null) {
+				clearPlannedActions();
+				queuePlannedAction(new PlannedAction(target));
+				return;
+			}
+		}
 	}
 	
 	public double getMoveChance() {
 		return getType().getCombatStats().getMoveSpeed()*0.02 
-				+ 0.2*(1 - energy/MAX_ENERGY) 
 				+ 0.8*(1 - getHealth()/super.getType().getCombatStats().getHealth());
-	}
-	
-	public double getEnergy() {
-		return energy;
 	}
 }

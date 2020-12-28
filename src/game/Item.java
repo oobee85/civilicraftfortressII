@@ -1,22 +1,19 @@
 package game;
 
-import utils.*;
+import java.io.*;
 
-public class Item extends Quantity {
+public class Item implements Externalizable {
 
+	private volatile int amount;
 	private ItemType itemType;
-	private boolean isUnlocked = false;
+	
+	public Item() {
+		
+	}
 	
 	public Item(int amount, ItemType itemType) {
-		super(amount);
+		this.amount = amount;
 		this.itemType = itemType;
-	}
-	
-	public boolean isUnlocked() {
-		return isUnlocked;
-	}
-	public void setUnlocked(boolean unlock) {
-		isUnlocked = unlock;
 	}
 
 	public ItemType getType() {
@@ -26,6 +23,24 @@ public class Item extends Quantity {
 	@Override
 	public String toString() {
 		return itemType.toString();
+	}
+	public int getAmount() {
+		return amount;
+	}
+	public void addAmount(int i) {
+		amount += i;
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		itemType = ItemType.valueOf(in.readUTF());
+		amount = in.readInt();
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeUTF(itemType.name());
+		out.writeInt(amount);
 	}
 
 }

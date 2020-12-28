@@ -10,56 +10,63 @@ import javax.imageio.*;
 
 public class ImageCreation {
 	
+	private static void getAllDirectionCombinationsHelper(List<Direction[]> list, Direction[] sofar, int startingIndex) {
+		for (int l = startingIndex; l < Direction.values().length; l++) {
+			Direction d = Direction.values()[l];
+			Direction[] newcombo = Arrays.copyOf(sofar, sofar.length+1);
+			newcombo[newcombo.length-1] = d;
+			list.add(newcombo);
+			getAllDirectionCombinationsHelper(list, newcombo, l+1);
+		}
+	}
+	
 	public static List<Direction[]> getAllDirectionCombinations() {
 		List<Direction[]> result = new LinkedList<Direction[]>();
-		for (int i = 0; i < Direction.values().length; i++) {
-			Direction a = Direction.values()[i];
-			result.add(new Direction[] {a});
-			for (int j = i + 1; j < Direction.values().length; j++) {
-				Direction b = Direction.values()[j];
-				result.add(new Direction[] {a, b});
-				for (int k = j + 1; k < Direction.values().length; k++) {
-					Direction c = Direction.values()[k];
-					result.add(new Direction[] {a, b, c});
-					for (int l = k + 1; l < Direction.values().length; l++) {
-						Direction d = Direction.values()[l];
-						result.add(new Direction[] {a, b, c, d});
-					}
-				}
-			}
-		}
+		getAllDirectionCombinationsHelper(result, new Direction[0], 0);
 		return result;
 	}
 	
-	public static void createRoadImages(String roadtilefile) {
-		try {
-			BufferedImage roadtile = ImageIO.read(new File(roadtilefile));
-			int width = roadtile.getWidth();
-			int height = roadtile.getHeight();
+	public static HashMap<String, Image> createRoadImages(String roadtilefile) {
+		HashMap<String, Image> roadImages = new HashMap<String, Image>();
+		BufferedImage roadtile = Utils.toBufferedImage(Utils.loadImage(roadtilefile));
+		int width = roadtile.getWidth();
+		int height = roadtile.getHeight();
 
-			int centerx = width*3/2;
-			int centery = height*3/2;
-			int roadimagewidth = width * 4;
-			int roadimageheight = height*4;
-			
-			for(Direction[] arr : getAllDirectionCombinations()) {
-				BufferedImage target = new BufferedImage(roadimagewidth, roadimageheight, BufferedImage.TYPE_INT_ARGB);
-				Graphics2D g = target.createGraphics();
-				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-				g.drawImage(roadtile, centerx, centery, null);
-				String filename = "road_";
-				for(Direction dir : arr) {
-					filename += dir;
-					TileLoc delta = dir.getDelta();
-					g.drawImage(roadtile, centerx + delta.x*width, centery + delta.y*width, null);
-					g.drawImage(roadtile, centerx + delta.x*width*3/2, centery + delta.y*width*3/2, null);
+		int centerx = width*3/2;
+		int centery = height*3/2;
+		int roadimagewidth = width * 4;
+		int roadimageheight = height*4;
+		
+		for(Direction[] arr : getAllDirectionCombinations()) {
+			BufferedImage target = new BufferedImage(roadimagewidth, roadimageheight, BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g = target.createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+			String filename = "";
+			for(Direction dir : arr) {
+				filename += dir;
+				double deltax = dir.deltax();
+				double deltay = dir.deltay();
+				for(int i = 0; i < 10; i++) {
+					g.drawImage(roadtile, (int)(centerx + deltax*width*i/4), (int)(centery + deltay*width*i/4), null);
 				}
-				filename += ".png";
-				g.dispose();
-				ImageIO.write(target, "png", new File(filename));
+				g.drawImage(roadtile, (int)(centerx + deltax*width), (int)(centery + deltay*width), null);
+				g.drawImage(roadtile, (int)(centerx + deltax*width*3/2), (int)(centery + deltay*width*3/2), null);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			g.drawImage(roadtile, centerx, centery, null);
+			g.dispose();
+			roadImages.put(filename, target);
 		}
+		return roadImages;
+	}
+	
+	public static BufferedImage convertToHexagonal(BufferedImage image) {
+		BufferedImage hex = new BufferedImage(image.getWidth()*2, image.getHeight()*2 + 1, image.getType());
+		Graphics2D g = hex.createGraphics();
+		for(int x = 0; x < image.getWidth(); x++) {
+			int yoffset = x%2;
+			g.drawImage(image, x*2, yoffset, (x+1)*2, hex.getHeight() - 1 + yoffset, x, 0, x + 1, image.getHeight(), null);
+		}
+		g.dispose();
+		return hex;
 	}
 }
