@@ -137,11 +137,11 @@ public class Game {
 		}
 		
 		if(World.ticks % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
-			dayEvents();
+//			dayEvents();
 			World.days ++;
 		}
 		if((World.ticks + World.DAY_DURATION) % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
-			nightEvents();
+//			nightEvents();
 			World.nights ++;
 		}
 		world.doWeatherUpdate();

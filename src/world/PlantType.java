@@ -12,7 +12,7 @@ public enum PlantType implements HasImage {
 	BERRY ( new String[] {"resources/Images/plants/berry16.png", "resources/Images/plants/berry128.png"} , 1.0, 50, false, ItemType.FOOD),
 	BERRY_DEPLETED ( new String[] {"resources/Images/plants/berry_depleted16.png", "resources/Images/plants/berry_depleted128.png"} , 0.2, 1, false, null),
 	CATTAIL ( new String[] {"resources/Images/plants/cattail32.png"} , 1.0, 50, true, ItemType.FOOD),
-	FOREST1 ( new String[] {"resources/Images/plants/tree1.png"}, 1, 100, false, ItemType.WOOD),
+	FOREST1 ( new String[] {"resources/Images/plants/tree1.png"}, 1, 500, false, ItemType.WOOD),
 //	FOREST2 ( new String[] {"resources/Images/plants/tree2.png"}, 1, 50)
 	;
 	

@@ -71,6 +71,7 @@ public class Generation {
 		int x0 = (int) (Math.random() * world.length);
 		int y0 = (int) (Math.random() * world.length);
 		
+		
 		int mountainSize = 80 * world.length / 256;
 		
 		double mountLength = (0.1 + 0.9 * Math.random() ) *mountainSize;
