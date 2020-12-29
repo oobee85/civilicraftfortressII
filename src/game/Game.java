@@ -147,7 +147,7 @@ public class Game {
 		world.doWeatherUpdate();
 		weatherEvents();
 		// GUI updates
-		world.updateTerrainChange();
+		world.updateTerrainChange(false);
 	}
 	private void makeAnimal(Tile tile, UnitType unitType, int number) {
 		for(Tile t: Utils.getTilesInRadius(tile, world, Math.max(1, (int)(Math.sqrt(number))-2))) {

@@ -71,7 +71,7 @@ public class WeatherEvent implements HasImage, Externalizable {
 		updateColdness();
 	}
 	private void updateColdness() {
-		isCold = tile.coldTemp();
+		isCold = tile.airTemperature();
 		if(isCold == true) {
 			this.hasImage = WeatherEventType.SNOW;
 			liquidType = LiquidType.SNOW;

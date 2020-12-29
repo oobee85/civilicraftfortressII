@@ -543,74 +543,95 @@ public class World {
 		}
 
 	}
-	public void updateTerrainChange() {
+	
+	public void updateDesertChange(Tile tile, boolean start) {
+		int failTiles = 0;
+		int numDesertNeighbors = 0;
+		
+		//if it doesnt roll chance to change terrain, return
+		if(Math.random() >= CHANCE_TO_SWITCH_TERRAIN) {
+			return;
+		}
+		
+		for(Tile t : tile.getNeighbors()) {
+			
+			//counts the tiles are too humid to be desert
+			if(t.getHumidity() > DESERT_HUMIDITY) {
+				failTiles ++;
+			}
+			//counts up how many neighbors are desert
+			if(t.getTerrain() == Terrain.SAND) {
+				numDesertNeighbors ++;
+			}
+		}
+//		
+//		
+
+		// changes terrain if it isnt in the humidity range of the terrain type
+		Terrain terrain = tile.getTerrain();
+		//if the humidity is less than the minimum terrain humidity
+		if (tile.getHumidity() < terrain.getMinMax().x) {
+			if (terrain == Terrain.GRASS) {
+				tile.setTerrain(Terrain.DIRT);
+			}
+			
+			//start variable indicates if the function was called when map was made
+			//when start == true, we allow desert to be generated anywhere possible
+			if (start == true) {
+				
+				//if there is only 1 ineligible desert tile, the dirt turns to sand
+				if (terrain == Terrain.DIRT && failTiles < 2) {
+					tile.setTerrain(Terrain.SAND);
+				}
+			//when start == false, we only allow desert to spread if nearby other desert tiles
+			}else if (start == false) {
+				if (terrain == Terrain.DIRT && failTiles < 2 && numDesertNeighbors >= 2) {
+					tile.setTerrain(Terrain.SAND);
+				}
+			}
+		}
+		
+		//if the humidity is more than the max terrain humidity
+		if (tile.getHumidity() > terrain.getMinMax().y ) {
+			if (terrain == Terrain.DIRT && tile.canGrow()) {
+				tile.setTerrain(Terrain.GRASS);
+				
+			//if there are too many failed tiles to support desert
+			} else if(terrain == Terrain.SAND && failTiles >= 2) {
+				tile.setTerrain(Terrain.DIRT);
+			}
+		}
+		
+		//if there arent enough desert neighbors
+		if(terrain == Terrain.SAND && numDesertNeighbors < 2) {
+			tile.setTerrain(Terrain.DIRT);
+		}
+		
+		
+		
+		
+		
+	}
+	public void updateTerrainChange(boolean start) {
 		for(Tile tile : getTiles()) {
+			
 			
 			if(tile.getResource() != null) {
 				tile.getResource().tick(World.ticks);
 			}
 			tile.updateHumidity(World.ticks);
 			
-			//spreads desert tiles
-			if(tile.getTerrain().isPlantable(tile.getTerrain()) && tile.getHumidity() <= DESERT_HUMIDITY) {
-				int failTiles = 0;
-				
-				for(Tile t : tile.getNeighbors()) {
-					//count how many neighbors is a failed tile
-					if(t.getHumidity() > DESERT_HUMIDITY || t.getTerrain() == Terrain.GRASS || t.getTerrain() == Terrain.ROCK) {
-						failTiles ++;
-					}
-				}
-				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
-					//if two neighbor fails, make the tile dirt
-					if(failTiles >= 2) {
-						tile.setTerrain(Terrain.DIRT);
-					} 
-					//if all neighbors are eligible for desert, convert tile to desert
-					else if(failTiles < 3) {
-						tile.setTerrain(Terrain.SAND);
-					}
-				}
-			//turns the tile back into dirt if its above desert humidity
-			}else if(tile.getTerrain() == Terrain.SAND && tile.getHumidity() > DESERT_HUMIDITY) {
-				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
-					tile.setTerrain(Terrain.DIRT);
-				}
-			}
+			updateDesertChange(tile, start);
 			
-			if(tile.getTerrain() == Terrain.SAND) {
-				int numFailTiles = 0;
-				for(Tile t : tile.getNeighbors()) {
-					if(t.getTerrain() != Terrain.SAND) {
-						numFailTiles ++;
-					}
-				}
-				if(numFailTiles > 3) {
-					if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
-						tile.setTerrain(Terrain.DIRT);
-					}
-				}
-			}
-			//turns grass into dirt if the tile has a cold liquid
-			if(tile.checkTerrain(Terrain.GRASS) && (tile.liquidType == LiquidType.SNOW || tile.liquidType == LiquidType.ICE) && tile.liquidAmount * tile.liquidType.getDamage() > 1) {
+			
+			
+			
+			//turns grass to dirt if tile has a cold liquid || the temperature is cold
+			if(tile.checkTerrain(Terrain.GRASS) && tile.isCold() && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
 					tile.setTerrain(Terrain.DIRT);
 				}
-				
 			}
-			//turns tile into dirt if its very cold
-			if(tile.checkTerrain(Terrain.GRASS) && tile.isCold()) {
-				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
-					tile.setTerrain(Terrain.DIRT);
-				}
-				
-			}
-//			if(tile.checkTerrain(Terrain.GRASS) && tile.getHumidity() < DESERT_HUMIDITY) {
-//				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
-//					tile.setTerrain(Terrain.DIRT);
-//				}
-//				
-//			}
 			
 			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA 
 //					&& (tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.FIRE)
@@ -666,7 +687,7 @@ public class World {
 				continue;
 			}
 			if(plant.getPlantType() == PlantType.FOREST1) {
-				if(Math.random() < 0.01) {
+				if(Math.random() < 0.05) {
 					for(Tile tile : plant.getTile().getNeighbors()) {
 						if(tile.getPlant() == null && tile.canPlant()) {
 							tile.setHasPlant(new Plant(PlantType.FOREST1, tile, getFaction(NO_FACTION_ID)));
@@ -988,7 +1009,7 @@ public class World {
 		System.out.println("Simulating water for 100 iterations");
 		for(int i = 0; i < 100; i++) {
 			Liquid.propogate(this);
-			updateTerrainChange();
+			updateTerrainChange(true);
 		}
 		
 		

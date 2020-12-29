@@ -380,13 +380,19 @@ public class Tile implements Externalizable {
 		if(liquidType == LiquidType.ICE || liquidType == LiquidType.SNOW) {
 			return true;
 		}
-		if(this.getTempurature() < Season.FREEZING_TEMPURATURE * 1.1) {
-			return true;
-		}
-		return false;
+		return airTemperature();
 	}
-	public boolean coldTemp() {
-		if(this.getTempurature() < Season.FREEZING_TEMPURATURE * 1.1) {
+	public boolean canGrow() {
+		if(isCold()) {
+			return false;
+		}
+		if(liquidType == LiquidType.LAVA) {
+			return false;
+		}
+		return true;
+	}
+	public boolean airTemperature() {
+		if(this.getTempurature() < Season.FREEZING_TEMPURATURE) {
 			return true;
 		}
 		return false;
