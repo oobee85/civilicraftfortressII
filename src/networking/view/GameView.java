@@ -905,9 +905,11 @@ public class GameView extends JPanel {
 					drawAt = getDrawingCoords(building.getSpawnLocation().getLocation());
 					g.drawImage(RALLY_POINT_IMAGE, drawAt.x, drawAt.y, tileSize, tileSize, null);
 				}
+				
+				
 				int range = building.getType().getVisionRadius();
 				if(range > 1) {
-					// draws the attack range for units
+					// draws the range for buildings
 					for (int i = lowerX; i < upperX; i++) {
 						for (int j = lowerY; j < upperY; j++) {
 							Tile t = game.world.get(new TileLoc(i, j));

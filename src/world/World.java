@@ -547,14 +547,15 @@ public class World {
 	public void updateDesertChange(Tile tile, boolean start) {
 		int failTiles = 0;
 		int numDesertNeighbors = 0;
+		int numGrassNeighbor = 0;
+		boolean grassNeighbor = false;
 		
 		//if it doesnt roll chance to change terrain, return
-		if(Math.random() >= CHANCE_TO_SWITCH_TERRAIN) {
+		if(Math.random() >= CHANCE_TO_SWITCH_TERRAIN && start == false) {
 			return;
 		}
 		
 		for(Tile t : tile.getNeighbors()) {
-			
 			//counts the tiles are too humid to be desert
 			if(t.getHumidity() > DESERT_HUMIDITY) {
 				failTiles ++;
@@ -562,6 +563,9 @@ public class World {
 			//counts up how many neighbors are desert
 			if(t.getTerrain() == Terrain.SAND) {
 				numDesertNeighbors ++;
+			}
+			if(t.getTerrain() == Terrain.GRASS) {
+				numGrassNeighbor ++;
 			}
 		}
 //		
@@ -585,7 +589,7 @@ public class World {
 				}
 			//when start == false, we only allow desert to spread if nearby other desert tiles
 			}else if (start == false) {
-				if (terrain == Terrain.DIRT && failTiles < 2 && numDesertNeighbors >= 2) {
+				if (terrain == Terrain.DIRT && failTiles < 2 && numDesertNeighbors >= 2 && numGrassNeighbor == 0) {
 					tile.setTerrain(Terrain.SAND);
 				}
 			}
@@ -593,7 +597,7 @@ public class World {
 		
 		//if the humidity is more than the max terrain humidity
 		if (tile.getHumidity() > terrain.getMinMax().y ) {
-			if (terrain == Terrain.DIRT && tile.canGrow()) {
+			if (terrain == Terrain.DIRT && tile.canGrow() && numGrassNeighbor >= 2) {
 				tile.setTerrain(Terrain.GRASS);
 				
 			//if there are too many failed tiles to support desert
@@ -607,8 +611,10 @@ public class World {
 			tile.setTerrain(Terrain.DIRT);
 		}
 		
-		
-		
+		//if there is a neighbor that is grass
+		if(terrain == Terrain.SAND && grassNeighbor == true) {
+			tile.setTerrain(Terrain.DIRT);
+		}
 		
 		
 	}
@@ -633,12 +639,7 @@ public class World {
 				}
 			}
 			
-			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA 
-//					&& (tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.FIRE)
-					) {
-//				if(tile.getModifier() != null && tile.getModifier().getType() == GroundModifierType.FIRE) {
-//					return;
-//				}
+			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA) {
 				double chance = 0.05;
 				if(Math.random() < chance) {
 					tile.setTerrain(Terrain.DIRT);
@@ -687,7 +688,7 @@ public class World {
 				continue;
 			}
 			if(plant.getPlantType() == PlantType.FOREST1) {
-				if(Math.random() < 0.05) {
+				if(Math.random() < 0.02) {
 					for(Tile tile : plant.getTile().getNeighbors()) {
 						if(tile.getPlant() == null && tile.canPlant()) {
 							tile.setHasPlant(new Plant(PlantType.FOREST1, tile, getFaction(NO_FACTION_ID)));
@@ -980,7 +981,7 @@ public class World {
 				return o1.getHeight() > o2.getHeight() ? 1 : -1;
 			}
 		});
-		double rockpercentage = 0.35;
+		double rockpercentage = 0.30;
 		double cutoff = tiles.get((int)((1-rockpercentage)*tiles.size())).getHeight();
 		for(Tile tile : getTiles()) {
 			if(tile.getTerrain() == Terrain.DIRT) {

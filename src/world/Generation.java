@@ -60,13 +60,17 @@ public class Generation {
 			}
 		}
 		Utils.normalize(croppedHeightMap);
-		int center = width/2;
+		int xcenter = width/2;
+		int ycenter = height/2;
 		for (int i = 0; i < width; i++) {
 			
 			for (int j = 0; j < height; j++) {
 				
-				double dif = 1.0 * Math.abs(i-center)/center;
-				croppedHeightMap[i][j] +=  (float)10 * Math.pow(dif +1, -0.1) + (float)(Math.random()*0.01);
+				double xdif = 1.0 * Math.abs(i-xcenter)/xcenter;
+				croppedHeightMap[i][j] +=  (float)10 * Math.pow(xdif +1, -0.1) + (float)(Math.random()*0.01);
+				
+				double ydif = 1.0 * Math.abs(j-ycenter)/ycenter;
+				croppedHeightMap[i][j] +=  (float)5 * Math.pow(ydif +1, -0.1) + (float)(Math.random()*0.01);
 
 			}
 		}
