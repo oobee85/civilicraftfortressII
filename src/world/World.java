@@ -597,7 +597,7 @@ public class World {
 		
 		//if the humidity is more than the max terrain humidity
 		if (tile.getHumidity() > terrain.getMinMax().y ) {
-			if (terrain == Terrain.DIRT && tile.canGrow() && numGrassNeighbor >= 2) {
+			if (terrain == Terrain.DIRT && tile.canGrow() && numGrassNeighbor >= 3) {
 				tile.setTerrain(Terrain.GRASS);
 				
 			//if there are too many failed tiles to support desert
@@ -669,7 +669,7 @@ public class World {
 				if(adjacentGrass && adjacentWater) {
 					threshold += 0.1;
 				}
-				if(tile.isCold() == false && Math.random() < tile.liquidAmount*threshold*tile.getHumidity() && tile.liquidType != LiquidType.ICE) {
+				if(tile.canGrow() && Math.random() < tile.liquidAmount*threshold*tile.getHumidity() && tile.liquidType != LiquidType.ICE) {
 					tile.setTerrain(Terrain.GRASS);
 				}
 			}
@@ -687,7 +687,7 @@ public class World {
 			if(plant.getTile().isCold() == true) {
 				continue;
 			}
-			if(plant.getPlantType() == PlantType.FOREST1) {
+			if(plant.getType() == PlantType.FOREST1) {
 				if(Math.random() < 0.02) {
 					for(Tile tile : plant.getTile().getNeighbors()) {
 						if(tile.getPlant() == null && tile.canPlant()) {
@@ -706,14 +706,23 @@ public class World {
 		spreadForest();
 		
 		for(Tile tile : getTilesRandomly()) {
+			if(tile.getPlant() != null) {
+				continue;
+			}
 			
+			if(tile.getTerrain() == Terrain.SAND) {
+				if(Math.random() < 0.001) {
+					Plant plant = new Plant(PlantType.CACTUS, tile, getFaction(NO_FACTION_ID));
+					tile.setHasPlant(plant);
+					worldData.addPlant(plant);
+				}
+			}
 			if(tile.canPlant() == false || tile.isCold() == true) {
 				continue;
 			}
 			
-			if(tile.getPlant() != null) {
-				continue;
-			}
+			
+			
 			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(Math.random() < 0.01) {
 					Plant plant = new Plant(PlantType.CATTAIL, tile, getFaction(NO_FACTION_ID));
@@ -864,20 +873,32 @@ public class World {
 						totalDamage += liquidDamage;
 					}
 				}
-				if(tile.getTerrain().isPlantable(tile.getTerrain()) == false) {
+				if(tile.getTerrain().isPlantable(tile.getTerrain()) == false && plant.getType().isDesertResistant() == false) {
 					totalDamage += 5;
 				}
 				
+				if(tile.getTerrain() == Terrain.GRASS && plant.getType().isDesertResistant() == true) {
+					totalDamage += 5;
+				}
 				totalDamage = (int) (modifierDamage+totalDamage);
 				if(totalDamage >= 1) {
 					plant.takeDamage(totalDamage);
 				}
 			}
+			
 		}	
 	}
 
 	public void genPlants() {
 		for(Tile tile : getTiles()) {
+			//generates cactus
+			if(tile.getTerrain() == Terrain.SAND) {
+				if(Math.random() < 0.01) {
+					Plant plant = new Plant(PlantType.CACTUS, tile, getFaction(NO_FACTION_ID));
+					tile.setHasPlant(plant);
+					worldData.addPlant(plant);
+				}
+			}
 			//generates land plants
 			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < BUSH_RARITY) {
 				double o = Math.random();

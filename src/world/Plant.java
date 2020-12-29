@@ -19,7 +19,7 @@ public class Plant extends Thing implements Serializable {
 	public boolean isAquatic() {
 		return plantType.isAquatic();
 	}
-	public PlantType getPlantType() {
+	public PlantType getType() {
 		return plantType;
 	}
 	public void setPlantType(PlantType type) {

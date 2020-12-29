@@ -372,7 +372,7 @@ public class Client {
 		if(update instanceof Plant) {
 			Plant plantUpdate = (Plant)update;
 			Plant newPlant = new Plant(
-					plantUpdate.getPlantType(), 
+					plantUpdate.getType(), 
 					gameInstance.world.get(plantUpdate.getTile().getLocation()), 
 					gameInstance.world.getFaction(World.NO_FACTION_ID));
 			newThing = newPlant;
@@ -427,7 +427,7 @@ public class Client {
 		if(existing instanceof Plant) {
 			Plant existingPlant = (Plant)existing;
 			Plant plantUpdate = (Plant)update;
-			existingPlant.setPlantType(plantUpdate.getPlantType());
+			existingPlant.setPlantType(plantUpdate.getType());
 		}
 		else if(update instanceof Building) {
 			Building existingBuilding = (Building)existing;
