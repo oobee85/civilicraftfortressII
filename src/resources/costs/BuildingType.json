@@ -99,6 +99,15 @@
 		"health":100,
 		"effort":100},
 	{
+		"info":"Workers can mine from here",
+		"image":"resources/Images/buildings/quarry.png",
+		"vision":5,
+		"cost":{"WOOD":100},
+		"culture":0.5,
+		"name":"QUARRY",
+		"health":300,
+		"effort":200},
+	{
 		"info":"Produces food (more with water)",
 		"image":"resources/Images/buildings/irrigation.png",
 		"vision":1,
@@ -130,7 +139,7 @@
 	{
 		"info":"Harvests wood",
 		"image":"resources/Images/buildings/sawmill.png",
-		"vision":2,
+		"vision":5,
 		"cost":{"WOOD":50, "STONE":25},
 		"culture":0,
 		"name":"SAWMILL",

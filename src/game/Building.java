@@ -110,7 +110,7 @@ public class Building extends Thing implements Serializable {
 			HashSet<Tile> tilesToCut = new HashSet<>();
 			tilesToCut.add(getTile());
 			
-			for(Tile t : world.getNeighborsInRadius(getTile(), 3)) {
+			for(Tile t : world.getNeighborsInRadius(getTile(), getType().getVisionRadius())) {
 				tilesToCut.add(t);
 			}
 			for(Tile tile : tilesToCut) {

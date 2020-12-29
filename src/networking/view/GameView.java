@@ -905,6 +905,32 @@ public class GameView extends JPanel {
 					drawAt = getDrawingCoords(building.getSpawnLocation().getLocation());
 					g.drawImage(RALLY_POINT_IMAGE, drawAt.x, drawAt.y, tileSize, tileSize, null);
 				}
+				int range = building.getType().getVisionRadius();
+				if(range > 1) {
+					// draws the attack range for units
+					for (int i = lowerX; i < upperX; i++) {
+						for (int j = lowerY; j < upperY; j++) {
+							Tile t = game.world.get(new TileLoc(i, j));
+							if (t == null)
+								continue;
+							drawAt = getDrawingCoords(t.getLocation());
+							int w = tileSize;
+							int h = tileSize;
+
+							if (t.getLocation().distanceTo(building.getTile().getLocation()) <= range) {
+								g.setColor(Color.BLACK);
+								Utils.setTransparency(g, 0.3f);
+
+								for (Tile tile : t.getNeighbors()) {
+									if (tile.getLocation().distanceTo(building.getTile().getLocation()) > range) {
+										drawBorderBetween(g, t.getLocation(), tile.getLocation());
+									}
+								}
+								Utils.setTransparency(g, 1);
+							}
+						}
+					}
+				}
 			}
 			
 			if (thing instanceof Unit) {
