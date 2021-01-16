@@ -24,6 +24,8 @@ public class Game {
 	public static final HashMap<String, UnitType> unitTypeMap = new HashMap<>();
 	public static final ArrayList<BuildingType> buildingTypeList = new ArrayList<>();
 	public static final HashMap<String, BuildingType> buildingTypeMap = new HashMap<>();
+	public static final ArrayList<PlantType> plantTypeList = new ArrayList<>();
+	public static final HashMap<String, PlantType> plantTypeMap = new HashMap<>();
 	public static final ArrayList<ResearchType> researchTypeList = new ArrayList<>();
 	public static final HashMap<String, ResearchType> researchTypeMap = new HashMap<>();
 
@@ -787,6 +789,16 @@ public class Game {
 			}
 			return building;
 		}
+		else if(thingType instanceof PlantType) {
+			PlantType plantType = (PlantType)thingType;
+			if(tile.getPlant() != null) {
+				tile.getPlant().setDead(true);
+			}
+			Plant plant = new Plant(plantType, tile, faction);
+			world.addPlant(plant);
+			tile.setHasPlant(plant);
+			return plant;
+		}
 		return null;
 	}
 	
@@ -821,7 +833,7 @@ public class Game {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;
 				if(unit.getType().isBuilder()) {
-					unit.setHarvesting(!unit.getIsHarvesting());
+//					unit.setHarvesting(!unit.getIsHarvesting());
 				}
 			}
 		}

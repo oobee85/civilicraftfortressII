@@ -324,6 +324,14 @@ public class GameView extends JPanel {
 				}
 				selectThing(summoned);
 			}
+			if(selectedThingToSpawn instanceof Plant) {
+				if(!shiftDown) {
+					deselectEverything();
+				}
+				summoned = game.summonThing(tile, selectedThingToSpawn, game.world.getFaction(World.NO_FACTION_ID));
+				
+				selectThing(summoned);
+			}
 		}
 		//planning building
 		else if (leftClickAction == LeftClickAction.PLAN_BUILDING) {
@@ -409,9 +417,14 @@ public class GameView extends JPanel {
 					if(targetBuilding != null && (targetBuilding.getFaction() == unit.getFaction() || targetBuilding.getType().isRoad()) && !targetBuilding.isBuilt()) {
 						commandInterface.buildThing(unit, targetBuilding.getTile(), targetBuilding.getType().isRoad(), !shiftDown);
 					}
+					else if(targetTile.getPlant() != null && targetTile.getPlant().isDead() == false) {
+						commandInterface.harvestThing(unit, targetTile.getPlant(), !shiftDown);
+					}
 					else {
 						commandInterface.moveTo(unit, targetTile, !shiftDown);
 					}
+					
+					
 				}
 				else {
 					Thing targetThing = null;
@@ -538,6 +551,9 @@ public class GameView extends JPanel {
 		else if(thing instanceof Building) {
 			guiController.selectedBuilding((Building)thing, true);
 		}
+		else if(thing instanceof Plant) {
+			guiController.selectedPlant((Plant)thing, true);
+		}
 	}
 	
 	public void deselectEverything() {
@@ -550,6 +566,9 @@ public class GameView extends JPanel {
 				}
 				if (thing instanceof Building) {
 					guiController.selectedBuilding((Building) thing, false);
+				}
+				if (thing instanceof Plant) {
+					guiController.selectedPlant((Plant) thing, false);
 				}
 
 			}
@@ -1170,9 +1189,6 @@ public class GameView extends JPanel {
 					g.drawImage(unit.getHighlight(tileSize), drawAt.x, drawAt.y, draww, drawh, null);
 				}
 				g.drawImage(unit.getImage(tileSize), drawAt.x, drawAt.y, draww, drawh, null);
-				if(unit.getIsHarvesting() == true) {
-					g.drawImage(HARVEST_ICON, drawAt.x+draww/4, drawAt.y+drawh/4, draww/2, drawh/2, null);
-				}
 				if(unit.isGuarding() == true) {
 					g.drawImage(GUARD_ICON, drawAt.x+draww/4, drawAt.y+drawh/4, draww/2, drawh/2, null);
 				}

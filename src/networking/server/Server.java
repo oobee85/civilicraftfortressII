@@ -117,6 +117,8 @@ public class Server {
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {}
 			@Override
+			public void selectedPlant(Plant plant, boolean selected) {}
+			@Override
 			public void changedFaction(Faction faction) {}
 			@Override
 			public void pushInfoPanel(InfoPanel infoPanel) { }

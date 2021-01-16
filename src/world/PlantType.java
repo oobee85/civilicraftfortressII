@@ -1,6 +1,7 @@
 package world;
 
 import java.awt.*;
+import java.util.HashMap;
 
 import javax.swing.*;
 
@@ -10,7 +11,7 @@ import utils.*;
 public enum PlantType implements HasImage {
 	
 	BERRY ( new String[] {"resources/Images/plants/berry16.png"}, false, 1.0, 50, false, ItemType.FOOD),
-	BERRY_DEPLETED ( new String[] {"resources/Images/plants/berry_depleted16.png"},false, 0.2, 1, false, null),
+	BERRY_DEPLETED ( new String[] {"resources/Images/plants/berry_depleted16.png"},false, 0.2, 1, false, ItemType.RUNITE_BAR),
 	CATTAIL ( new String[] {"resources/Images/plants/cattail32.png"},false, 1.0, 50, true, ItemType.FOOD),
 	FOREST1 ( new String[] {"resources/Images/plants/tree1.png"},false, 1, 500, false, ItemType.WOOD),
 	CACTUS ( new String[] {"resources/Images/plants/cactus.png"},true, 1, 50, false, ItemType.FOOD),
@@ -73,7 +74,10 @@ public enum PlantType implements HasImage {
 	public boolean isAquatic() {
 		return aquatic;
 	}
-
+	
+	public HashMap<ItemType, Integer> getCost(){
+		return null;
+	}
 	@Override
 	public String toString() {
 		return Utils.getName(this);

@@ -8,13 +8,15 @@ public class PlannedAction {
 	public static final PlannedAction GUARD = new PlannedAction(null, false);
 	public static final PlannedAction BUILD = new PlannedAction(null, false);
 	
-	private static final int NOT_BUILD = 0;
-	private static final int BUILDING = 1;
-	private static final int ROAD = 2;
+	public static final int NOT_BUILD = 0;
+	public static final int BUILDING = 1;
+	public static final int ROAD = 2;
+	public static final int HARVEST = 3;
 	
 	public final Tile targetTile;
 	public final Thing target;
 	public final int build;
+	
 	public PlannedAction(Tile targetTile) {
 		this.targetTile = targetTile;
 		this.target = null;
@@ -30,13 +32,21 @@ public class PlannedAction {
 		this.target = null;
 		this.build = isRoad ? ROAD : BUILDING;
 	}
+	public PlannedAction(Thing target, int type) {
+		this.targetTile = null;
+		this.target = target;
+		this.build = type;
+	}
 	
 	public Tile getTile() {
 		return target == null ? targetTile : target.getTile();
 	}
 	
 	public boolean isBuildAction() {
-		return targetTile != null && build != NOT_BUILD;
+		return targetTile != null && (build == ROAD || build == BUILDING);
+	}
+	public boolean isHarvestAction() {
+		return build == HARVEST;
 	}
 	public boolean isBuildRoadAction() {
 		return build == ROAD;

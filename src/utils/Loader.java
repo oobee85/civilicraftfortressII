@@ -324,6 +324,9 @@ public class Loader {
 				type.unitsCanProduceSet().add(Game.unitTypeMap.get(unittypestring));
 			}
 		}
+		for(PlantType type : PlantType.values()) {
+			Game.plantTypeList.add(type);
+		}
 		for(ResearchType type : Game.researchTypeList) {
 			for(String req : type.researchRequirements) {
 				ResearchType researchReq = Game.researchTypeMap.get(req);

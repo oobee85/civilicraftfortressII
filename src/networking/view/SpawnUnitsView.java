@@ -9,6 +9,7 @@ import game.*;
 import ui.*;
 import ui.infopanels.*;
 import utils.*;
+import world.PlantType;
 
 public class SpawnUnitsView {
 	
@@ -73,6 +74,30 @@ public class SpawnUnitsView {
 				}
 			});
 //			buildingButtons[i] = button;
+			rootPanel.add(button);
+		}
+		for (int i = 0; i < Game.plantTypeList.size(); i++) {
+			PlantType type = Game.plantTypeList.get(i);
+			KButton button = KUIConstants.setupButton(null,
+					Utils.resizeImageIcon(type.getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width), (int)(SPAWN_BUTTON_SIZE.height)),
+					SPAWN_BUTTON_SIZE);
+			button.setBorder(KUIConstants.tinyBorder);
+			button.addActionListener(e -> {
+				gameView.setThingToSpawn(type);
+			});
+			button.addRightClickActionListener(e -> {
+				gameView.getGameInstance().getGUIController().switchInfoPanel(new PlantTypeInfoPanel(type));
+			});
+			button.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					gameView.getGameInstance().getGUIController().pushInfoPanel(new PlantTypeInfoPanel(type));
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					gameView.getGameInstance().getGUIController().popInfoPanel();
+				}
+			});
 			rootPanel.add(button);
 		}
 		JToggleButton toggle = KUIConstants.setupToggleButton("Non-playerControlled", null, null);

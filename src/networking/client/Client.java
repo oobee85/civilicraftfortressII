@@ -66,6 +66,10 @@ public class Client {
 				}
 			}
 			@Override
+			public void selectedPlant(Plant plant, boolean selected) {
+				
+			}
+			@Override
 			public void selectedBuilding(Building building, boolean selected) {
 				if (building.getType() == Game.buildingTypeMap.get("BARRACKS")) {
 					clientGUI.manageProduceUnitTab(selected);
@@ -165,6 +169,11 @@ public class Client {
 				return null;
 			}
 			@Override
+			public void harvestThing(Unit unit, Thing target, boolean clearQueue) {
+				sendMessage(CommandMessage.makeHarvestThingCommand(unit.id(), target.id(), clearQueue));
+				localCommands.harvestThing(unit, target, clearQueue);
+			}
+			@Override
 			public void stop(Unit unit) {
 				sendMessage(CommandMessage.makeStopCommand(unit.id()));
 				localCommands.stop(unit);
@@ -189,6 +198,7 @@ public class Client {
 				sendMessage(CommandMessage.makeSetGuardingCommand(unit.id(), enabled));
 				localCommands.setGuarding(unit, enabled);
 			}
+			
 		};
 	}
 	

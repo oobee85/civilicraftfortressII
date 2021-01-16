@@ -25,7 +25,7 @@ public class Plant extends Thing implements Serializable {
 	public void setPlantType(PlantType type) {
 		this.plantType = type;
 	}
-
+	
 	@Override
 	public String toString() {
 		return plantType.toString();

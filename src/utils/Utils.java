@@ -474,6 +474,13 @@ public final class Utils {
 				unit.queuePlannedAction(new PlannedAction(target, isRoad));
 			}
 			@Override
+			public void harvestThing(Unit unit, Thing target, boolean clearQueue) {
+				if(clearQueue) {
+					unit.clearPlannedActions();
+				}
+				unit.queuePlannedAction(new PlannedAction(target, PlannedAction.HARVEST));
+			}
+			@Override
 			public Building planBuilding(Unit unit, Tile target, boolean clearQueue, BuildingType buildingType) {
 				if(clearQueue) {
 					unit.clearPlannedActions();

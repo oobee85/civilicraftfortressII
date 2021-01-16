@@ -97,6 +97,9 @@ public class BuildingType implements HasImage, Serializable {
 	public boolean isGate() {
 		return attributes.contains("gate");
 	}
+	public boolean isColony() {
+		return attributes.contains("colony");
+	}
 	
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;

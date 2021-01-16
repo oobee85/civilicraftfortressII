@@ -106,7 +106,9 @@
 		"culture":0.5,
 		"name":"QUARRY",
 		"health":300,
+		"attributes":["colony"],
 		"effort":200},
+		
 	{
 		"info":"Produces food (more with water)",
 		"image":"resources/Images/buildings/irrigation.png",
@@ -143,6 +145,7 @@
 		"cost":{"WOOD":50, "STONE":25},
 		"culture":0,
 		"name":"SAWMILL",
+		"attributes":["colony"],
 		"health":250,
 		"effort":250},
 	{

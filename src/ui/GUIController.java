@@ -7,6 +7,7 @@ import world.*;
 public interface GUIController {
 	public void selectedBuilding(Building building, boolean selected);
 	public void selectedUnit(Unit unit, boolean selected);
+	public void selectedPlant(Plant plant, boolean selected);
 	public void updateGUI();
 	public void changedFaction(Faction faction);
 

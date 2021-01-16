@@ -25,7 +25,7 @@ public class Unit extends Thing implements Serializable {
 	private transient boolean isHarvesting;
 	private transient double timeToHarvest;
 	private transient double baseTimeToHarvest = 10;
-	private transient int ticksForFoodCost = 80;
+	private transient int ticksForFoodCost = 50;
 	
 	public Unit(UnitType unitType, Tile tile, Faction faction) {
 		super(unitType.getCombatStats().getHealth(), unitType, faction, tile);
@@ -56,12 +56,6 @@ public class Unit extends Thing implements Serializable {
 		return passiveAction == PlannedAction.GUARD;
 	}
 	
-	public void setHarvesting(boolean harvesting) {
-		isHarvesting = harvesting;
-	}
-	public boolean getIsHarvesting() {
-		return isHarvesting;
-	}
 
 	public void setType(UnitType type) {
 		this.unitType = type;
@@ -242,8 +236,8 @@ public class Unit extends Thing implements Serializable {
 	}
 
 	/**
-	 * this function does not check the attack range or if unit is ready to attack
-	 * 
+	 * this function does not check if unit is ready to attack
+	 * does check attack range via chooseAttack()
 	 * @return true if attacked, false otherwise
 	 */
 	public boolean attack(Thing target) {
@@ -300,7 +294,21 @@ public class Unit extends Thing implements Serializable {
 			this.queuePlannedAction(new PlannedAction(attacker));
 		}
 	}
-
+	
+	public void doHarvest(Plant plant) {
+		if(readyToHarvest()) {
+			plant.takeDamage(1);
+			this.getFaction().addItem(plant.getItem(), 1);
+			this.resetTimeToHarvest();
+		}
+		
+	}
+	
+	/**
+	 * selects first attack style that satisfies minimum and maximum range requirements
+	 * @param target
+	 * @return
+	 */
 	public AttackStyle chooseAttack(Thing target) {
 		int distance = this.getTile().getLocation().distanceTo(target.getTile().getLocation());
 		for(AttackStyle style : getType().getAttackStyles()) {
@@ -393,10 +401,17 @@ public class Unit extends Thing implements Serializable {
 					boolean finished = buildBuilding(tobuild);
 					attacked = true;
 				}
+				
+			}
+			else if(plan.isHarvestAction() && unitType.isBuilder() && inRange(plan.target)) {
+				this.doHarvest((Plant)plan.target);
+				
 			}
 			else if(plan.target != null) {
-				attacked = attack(plan.target);
+				attacked = attack(plan.target);	
+				
 			}
+			
 //			if(plan.target != null) {
 //				if(plan.isBuildAction() && unitType.isBuilder() && inRange(plan.target)) {
 //					boolean finished = buildBuilding((Building)plan.target);
@@ -437,6 +452,18 @@ public class Unit extends Thing implements Serializable {
 			building.setPlanned(false);
 		}
 		return building.isBuilt();
+	}
+	
+	private void harvestPlant(Plant plant) {
+		if(readyToHarvest() && this.getTile().getPlant() != null) {
+			ItemType itemType = this.getTile().getPlant().getItem();
+			if(itemType != null) {
+				getFaction().addItem(itemType, 1);
+				this.getTile().getPlant().takeDamage(1);
+				resetTimeToHarvest();
+			}
+		}
+		
 	}
 
 	public void doPassiveThings(World world) {
