@@ -24,7 +24,9 @@ public class Unit extends Thing implements Serializable {
 	
 	private transient boolean isHarvesting;
 	private transient double timeToHarvest;
-	private transient double baseTimeToHarvest = 10;
+	private transient Item item;
+	private transient int maxItemAmount = 5;
+	private transient double baseTimeToHarvest = 5;
 	private transient int ticksForFoodCost = 50;
 	
 	public Unit(UnitType unitType, Tile tile, Faction faction) {
@@ -56,7 +58,16 @@ public class Unit extends Thing implements Serializable {
 		return passiveAction == PlannedAction.GUARD;
 	}
 	
-
+	public boolean addItem(Item item) {
+		if(this.item == null || this.item.getType() != item.getType()) {
+			this.item = item;
+		}
+		if(this.item.getAmount() >= this.maxItemAmount) {
+			return true;
+		}
+		this.item.addAmount(item.getAmount());
+		return false;
+	}
 	public void setType(UnitType type) {
 		this.unitType = type;
 		this.setImage(this.getType());
@@ -294,14 +305,35 @@ public class Unit extends Thing implements Serializable {
 			this.queuePlannedAction(new PlannedAction(attacker));
 		}
 	}
+	public Building getNearestBuildingToDeliver() {
+		Building bestBuilding = (Building) this.getFaction().getBuildings().toArray()[0];
+		for(Building building: this.getFaction().getBuildings()) {
+			if(building.getType().isColony() && this.getTile().getLocation().distanceTo(building.getTile().getLocation()) < 
+					this.getTile().getLocation().distanceTo(bestBuilding.getTile().getLocation())) {
+				bestBuilding = building;
+			}
+				
+		}
+		return bestBuilding;
+	}
 	
-	public void doHarvest(Plant plant) {
+	public void doHarvest(Plant plant, PlannedAction action) {
 		if(readyToHarvest()) {
 			plant.takeDamage(1);
-			this.getFaction().addItem(plant.getItem(), 1);
+			boolean isFull = this.addItem(new Item(1, plant.getItem()));
 			this.resetTimeToHarvest();
+			if(isFull) {
+				Building building = getNearestBuildingToDeliver();
+				action.setDone(true);
+				this.queuePlannedAction(new PlannedAction(building, PlannedAction.DELIVER));
+			}
 		}
 		
+	}
+	public void doDelivery(PlannedAction action) {
+		this.getFaction().addItem(this.item.getType(), this.item.getAmount());
+		this.item.addAmount(-this.item.getAmount());
+		action.setDone(true);
 	}
 	
 	/**
@@ -404,7 +436,11 @@ public class Unit extends Thing implements Serializable {
 				
 			}
 			else if(plan.isHarvestAction() && unitType.isBuilder() && inRange(plan.target)) {
-				this.doHarvest((Plant)plan.target);
+				this.doHarvest((Plant)plan.target, plan);
+				
+			}
+			else if(plan.isDeliverAction() && unitType.isBuilder() && inRange(plan.target)) {
+				this.doDelivery(plan);
 				
 			}
 			else if(plan.target != null) {

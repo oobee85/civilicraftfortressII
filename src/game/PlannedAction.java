@@ -12,10 +12,12 @@ public class PlannedAction {
 	public static final int BUILDING = 1;
 	public static final int ROAD = 2;
 	public static final int HARVEST = 3;
+	public static final int DELIVER = 4;
 	
 	public final Tile targetTile;
 	public final Thing target;
 	public final int build;
+	private boolean forceDone;
 	
 	public PlannedAction(Tile targetTile) {
 		this.targetTile = targetTile;
@@ -41,12 +43,17 @@ public class PlannedAction {
 	public Tile getTile() {
 		return target == null ? targetTile : target.getTile();
 	}
-	
+	public void setDone(boolean done) {
+		forceDone = done;
+	}
 	public boolean isBuildAction() {
 		return targetTile != null && (build == ROAD || build == BUILDING);
 	}
 	public boolean isHarvestAction() {
 		return build == HARVEST;
+	}
+	public boolean isDeliverAction() {
+		return build == DELIVER;
 	}
 	public boolean isBuildRoadAction() {
 		return build == ROAD;
@@ -56,6 +63,9 @@ public class PlannedAction {
 	}
 	
 	public boolean isDone(Tile currentPosition) {
+		if(forceDone == true) {
+			return true;
+		}
 		if(build == BUILDING) {
 			if(targetTile.getBuilding() == null) {
 				return true;

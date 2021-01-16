@@ -187,6 +187,7 @@
 		"buildsunits":["WORKER", "PRIEST"],
 		"culture":1,
 		"name":"CASTLE",
+		"attributes":["colony"],
 		"health":1000,
 		"effort":1000,
 		"research":"MASONRY"},
