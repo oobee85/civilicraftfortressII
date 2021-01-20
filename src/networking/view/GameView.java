@@ -389,7 +389,21 @@ public class GameView extends JPanel {
 			}
 		}
 	}
-
+//	public void getPlantsToHarvest(Unit unit, Plant previous) {
+//		Plant closestPlant = game.world.getPlants().peek();
+//		for(Plant plant: game.world.getPlants()) {
+//			if(plant.getType() == previous.getType() && plant.isDead() == false && unit.getTile().getLocation().distanceTo(plant.getTile().getLocation()) < 
+//					unit.getTile().getLocation().distanceTo(closestPlant.getTile().getLocation())) {
+//				closestPlant = plant;
+//			}
+//		}
+//		Tile tile = closestPlant.getTile();
+//		if(tile != previous.getTile() && closestPlant.isDead() == false && closestPlant.getType() == previous.getType()) {
+//			commandInterface.harvestThing(unit, closestPlant, !shiftDown);
+//		}
+//		
+//	}
+	
 	public void rightClick(Position tilepos, boolean shiftDown) {
 		Tile targetTile = game.world.get(new TileLoc(tilepos.getIntX(), tilepos.getIntY()));
 		if(targetTile == null) {

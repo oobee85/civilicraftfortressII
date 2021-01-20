@@ -903,9 +903,10 @@ public class World {
 			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < BUSH_RARITY) {
 				double o = Math.random();
 				if(o < PlantType.BERRY.getRarity()) {
-					Plant p = new Plant(PlantType.BERRY, tile, getFaction(NO_FACTION_ID));
-					tile.setHasPlant(p);
-					worldData.addPlant(tile.getPlant());
+					makePlantVein(tile, PlantType.BERRY, 6);
+//					Plant p = new Plant(PlantType.BERRY, tile, getFaction(NO_FACTION_ID));
+//					tile.setHasPlant(p);
+//					worldData.addPlant(tile.getPlant());
 				}
 			}
 			//tile.liquidType.WATER &&
@@ -920,7 +921,45 @@ public class World {
 			}
 		}
 	}
+	public void makePlantVein(Tile t, PlantType type, int veinSize) {
+		HashMap<Tile, Double> visited = new HashMap<>();
 
+		PriorityQueue<Tile> search = new PriorityQueue<>((x, y) -> {
+			double distancex = visited.get(x);
+			double distancey = visited.get(y);
+			if (distancey < distancex) {
+				return 1;
+			} else if (distancey > distancex) {
+				return -1;
+			} else {
+				return 0;
+			}
+		});
+		visited.put(t, 0.0);
+		search.add(t);
+
+		while (veinSize > 0 && !search.isEmpty()) {
+			Tile potential = search.poll();
+
+			for (Tile ti : potential.getNeighbors()) {
+				if (visited.containsKey(ti)) {
+					continue;
+				}
+				visited.put(ti, ti.getLocation().distanceTo(t.getLocation()) + Math.random() * 10);
+				search.add(ti);
+			}
+			
+			// if plant can live on the tile
+			if ((potential.canPlant() || type.isDesertResistant()) && potential.getPlant() == null) {
+				
+				Plant plant = new Plant(type, potential, getFaction(NO_FACTION_ID));
+				potential.setHasPlant(plant);
+				worldData.addPlant(plant);
+				veinSize--;
+			}
+		}
+
+	}
 
 	public void makeForest() {
 		
@@ -931,6 +970,7 @@ public class World {
 			}
 			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < t.liquidType.getMinimumDamageAmount() / 2)
 				if (Math.random() < tempDensity) {
+					
 					Plant plant = new Plant(PlantType.FOREST1, t, getFaction(NO_FACTION_ID));
 					t.setHasPlant(plant);
 					worldData.addPlant(plant);

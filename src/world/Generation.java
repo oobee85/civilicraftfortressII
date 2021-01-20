@@ -154,6 +154,8 @@ public class Generation {
 			}
 		}
 	}
+
+	
 	public static void makeOreVein(Tile t, ResourceType resource, int veinSize) {
 		HashMap<Tile, Double> visited = new HashMap<>();
 		
