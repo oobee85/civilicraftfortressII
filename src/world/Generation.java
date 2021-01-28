@@ -26,9 +26,7 @@ public class Generation {
 			power *= 2;
 		}
 		
-		float[][] combinedNoise = PerlinNoise.generateHeightMap(width, height);
-
-		float[][] heightMap = combinedNoise; //Utils.smoothingFilter(combinedNoise, smoothingRadius, 100);
+		float[][] heightMap = PerlinNoise.generateHeightMap(width, height);
 		float[][] croppedHeightMap = new float[width][height];
 		int croppedWidth = (power - width)/2;
 		int croppedHeight = (power - height)/2;
@@ -38,40 +36,11 @@ public class Generation {
 			}
 		}
 		Utils.normalize(croppedHeightMap);
-		return croppedHeightMap;
-	}
-	
-	public static TileLoc makeMountain(Tile[][] world, double[][] heightMap) {
-		
-		int x0 = (int) (Math.random() * world.length);
-		int y0 = (int) (Math.random() * world.length);
-		
-		
-		int mountainSize = 80 * world.length / 256;
-		
-		double mountLength = (0.1 + 0.9 * Math.random() ) *mountainSize;
-		double mountHeight = (0.1 + 0.9 * Math.random() )*mountainSize;
-		double mountLengthEdge = mountLength+3;
-		double mountHeightEdge = mountHeight+3;
-		
-		double snowMountLength = mountLength/4;
-		double snowMountHeight = mountHeight/4;
-		double snowMountLengthEdge = mountLength/3;
-		double snowMountHeightEdge = mountHeight/3;
-		
-		for(int i = 0; i < world.length; i++) {
-			for(int j = 0; j < world[i].length; j++) {
-				int dx = i - x0;
-				int dy = j - y0;
-				double mountain = (dx*dx)/(mountLength*mountLength) + (dy*dy)/(mountHeight*mountHeight);
-				double mountainEdge = (dx*dx)/(mountLengthEdge*mountLengthEdge) + (dy*dy)/(mountHeightEdge*mountHeightEdge);
-				
-				double xdif = 1.0 * Math.abs(i-xcenter)/xcenter;
-				croppedHeightMap[i][j] +=  (float)10 * Math.pow(xdif +1, -0.1) + (float)(Math.random()*0.01);
-				
-				double ydif = 1.0 * Math.abs(j-ycenter)/ycenter;
-				croppedHeightMap[i][j] +=  (float)5 * Math.pow(ydif +1, -0.1) + (float)(Math.random()*0.01);
-
+		int center = width/2;
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				double dif = 1.0 * Math.abs(i-center)/center;
+				croppedHeightMap[i][j] +=  (float)10 * Math.pow(dif +1, -0.1) + (float)(Math.random()*0.01);
 			}
 		}
 		Utils.normalize(croppedHeightMap);
