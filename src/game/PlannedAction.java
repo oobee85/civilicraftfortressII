@@ -4,40 +4,44 @@ import utils.*;
 import world.*;
 
 public class PlannedAction {
+	
 	public static final PlannedAction NOTHING = new PlannedAction(null, false);
 	public static final PlannedAction GUARD = new PlannedAction(null, false);
 	public static final PlannedAction BUILD = new PlannedAction(null, false);
 	
-	public static final int NOT_BUILD = 0;
-	public static final int BUILDING = 1;
-	public static final int ROAD = 2;
+	public static final int NO_TYPE = 0;
+	public static final int BUILD_BUILDING = 1;
+	public static final int BUILD_ROAD = 2;
 	public static final int HARVEST = 3;
 	public static final int DELIVER = 4;
 	
 	public final Tile targetTile;
 	public final Thing target;
-	public final int build;
+	public final int type;
 	private boolean forceDone;
+	
+	// for stuff like harvesting
+	private PlannedAction followup;
 	
 	public PlannedAction(Tile targetTile) {
 		this.targetTile = targetTile;
 		this.target = null;
-		this.build = NOT_BUILD;
+		this.type = NO_TYPE;
 	}
 	public PlannedAction(Thing target) {
 		this.targetTile = null;
 		this.target = target;
-		this.build = NOT_BUILD;
+		this.type = NO_TYPE;
 	}
 	public PlannedAction(Tile targetTile, boolean isRoad) {
 		this.targetTile = targetTile;
 		this.target = null;
-		this.build = isRoad ? ROAD : BUILDING;
+		this.type = isRoad ? BUILD_ROAD : BUILD_BUILDING;
 	}
 	public PlannedAction(Thing target, int type) {
 		this.targetTile = null;
 		this.target = target;
-		this.build = type;
+		this.type = type;
 	}
 	
 	public Tile getTile() {
@@ -47,32 +51,32 @@ public class PlannedAction {
 		forceDone = done;
 	}
 	public boolean isBuildAction() {
-		return targetTile != null && (build == ROAD || build == BUILDING);
+		return targetTile != null && (type == BUILD_ROAD || type == BUILD_BUILDING);
 	}
 	public boolean isHarvestAction() {
-		return build == HARVEST;
+		return type == HARVEST;
 	}
 	public boolean isDeliverAction() {
-		return build == DELIVER;
+		return type == DELIVER;
 	}
 	public boolean isBuildRoadAction() {
-		return build == ROAD;
+		return type == BUILD_ROAD;
 	}
 	public boolean isBuildBuildingAction() {
-		return build == BUILDING;
+		return type == BUILD_BUILDING;
 	}
 	
 	public boolean isDone(Tile currentPosition) {
 		if(forceDone == true) {
 			return true;
 		}
-		if(build == BUILDING) {
+		if(type == BUILD_BUILDING) {
 			if(targetTile.getBuilding() == null) {
 				return true;
 			}
 			return (targetTile.getBuilding().isDead() || targetTile.getBuilding().isBuilt());
 		}
-		if(build == ROAD) {
+		if(type == BUILD_ROAD) {
 			if(targetTile.getRoad() == null) {
 				return true;
 			}
