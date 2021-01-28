@@ -11,12 +11,12 @@ import utils.*;
 
 public class PerlinNoise {
 	
-	private static final double interpolate2(double a0, double a1, double w) {
+	private static final double linearInterpolate(double a0, double a1, double w) {
 		if (0.0 > w) return a0;
 		if (1.0 < w) return a1;
 		return (a1 - a0) * w + a0;
 	}
-	private static final double interpolate(double a0, double a1, double w) {
+	private static final double cubicInterpolate(double a0, double a1, double w) {
 		if (0.0 > w) return a0;
 		if (1.0 < w) return a1;
 //		return (a1 - a0) * w + a0;
@@ -61,35 +61,40 @@ public class PerlinNoise {
 
 		n0 = dotGridGradient(x0, y0, x, y);
 		n1 = dotGridGradient(x1, y0, x, y);
-		ix0 = interpolate(n0, n1, sx);
+		ix0 = cubicInterpolate(n0, n1, sx);
 
 		n0 = dotGridGradient(x0, y1, x, y);
 		n1 = dotGridGradient(x1, y1, x, y);
-		ix1 = interpolate(n0, n1, sx);
+		ix1 = cubicInterpolate(n0, n1, sx);
 
-		value = interpolate(ix0, ix1, sy);
+		value = cubicInterpolate(ix0, ix1, sy);
 		return value;
 	}
 	
 	public static float[][] generateHeightMap(int width, int height) {
 		
-		int numoctaves = 8;
+		int numoctaves = 7;
 		double amplitude = 0.5;
 		int frequency = 1;
 		float[][] heightmap = new float[height][width];
+//		LinkedList<float[][]> maps = new LinkedList<>();
 		for(int octave = 0; octave < numoctaves; octave++) {
-//			if(octave > 4) {
-				for (int y = 0; y < height; y++) {
-					for (int x = 0; x < width; x++) {
-						double nx = 1.0*x / width + 1;
-						double ny = 1.0*y / height;
-						heightmap[y][x] += (float)(amplitude * perlin( frequency*nx, frequency*ny));
-					}
+			float[][] temp = new float[height][width];
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					double nx = 1.0*x / width + 1;
+					double ny = 1.0*y / height;
+					float value = (float)(amplitude * perlin( frequency*nx, frequency*ny));
+					temp[y][x] = value;
+					heightmap[y][x] += value;
 				}
-//			}
+			}
+//			Utils.normalize(temp);
+//			maps.add(temp);
 			frequency *= 2;
 			amplitude *= 0.7;
 		}
+		
 		Utils.normalize(heightmap);
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -97,11 +102,13 @@ public class PerlinNoise {
 			}
 		}
 		Utils.normalize(heightmap);
-		saveImage(heightmap);
+//		saveImage(heightmap, "map.png");
+//		maps.add(heightmap);
+//		saveImageChain(maps, "octaves.png");
 		return heightmap;
 	}
 	
-	private static final void saveImage(float[][] map) {
+	private static final void saveImage(float[][] map, String filename) {
 		BufferedImage image = new BufferedImage(map.length, map[0].length, BufferedImage.TYPE_BYTE_GRAY);
 		for(int y = 0; y < map.length; y++) {
 			for(int x = 0; x < map[y].length; x++) {
@@ -110,7 +117,27 @@ public class PerlinNoise {
 			}
 		}
 		try {
-			ImageIO.write(image, "png", new File("map.png"));
+			ImageIO.write(image, "png", new File(filename));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	private static final void saveImageChain(LinkedList<float[][]> maps, String filename) {
+		BufferedImage image = new BufferedImage(maps.getFirst().length, maps.getFirst()[0].length * maps.size(), BufferedImage.TYPE_BYTE_GRAY);
+		
+		int mapindex = 0;
+		for(float[][] map : maps) {
+			for(int y = 0; y < map.length; y++) {
+				for(int x = 0; x < map[y].length; x++) {
+					int value = (int) (map[y][x]*255);
+					image.setRGB(y, x + map[y].length*mapindex, new Color(value, value, value).getRGB());
+				}
+			}
+			mapindex++;
+		}
+		
+		try {
+			ImageIO.write(image, "png", new File(filename));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

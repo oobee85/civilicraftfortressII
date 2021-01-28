@@ -21,51 +21,10 @@ public class Generation {
 	}
 	
 	public static float[][] generateHeightMap(int smoothingRadius, int width, int height) {
-//		LinkedList<float[][]> noises = new LinkedList<>();
-//		
-//		float[][] heightmap = new float[width][height];
-//		for (int y = 0; y < height; y++) {
-//			for (int x = 0; x < width; x++) {
-//				double nx = x / width - 0.5, ny = y / height - 0.5;
-//				heightmap[y][x] = 
-//						1f * noise(1 * nx, 1 * ny) 
-//						+ 0.5f * noise(2 * nx, 2 * ny)
-//						+ 0.25f * noise(4 * nx, 4 * ny);
-//			}
-//		}
-//		
-//		
-//		
-//		
 		int power = 1;
 		while(power < width || power < height) {
 			power *= 2;
 		}
-//
-//		for (int octave = 2; octave <= power; octave *= 2) {
-//			float[][] noise1 = new float[octave][octave];
-//			for (int i = 0; i < noise1.length; i++) {
-//				for (int j = 0; j < noise1[0].length; j++) {
-//					noise1[i][j] = noise(i, j);
-//				}
-//			}
-//			noises.add(noise1);
-//		}
-//
-//		float[][] combinedNoise = new float[power][power];
-//		for (int i = 0; i < power; i++) {
-//			for (int j = 0; j < power; j++) {
-//				double rand = 0;
-//				int divider = power;
-//				double multiplier = 1;
-//				for (float[][] noise : noises) {
-//					divider /= 2;
-//					multiplier /= 1.4;
-//					rand += multiplier * noise[i / divider][j / divider];
-//				}
-//				combinedNoise[i][j] = (float) rand;
-//			}
-//		}
 		
 		float[][] combinedNoise = PerlinNoise.generateHeightMap(width, height);
 
@@ -79,11 +38,33 @@ public class Generation {
 			}
 		}
 		Utils.normalize(croppedHeightMap);
-		int xcenter = width/2;
-		int ycenter = height/2;
-		for (int i = 0; i < width; i++) {
-			
-			for (int j = 0; j < height; j++) {
+		return croppedHeightMap;
+	}
+	
+	public static TileLoc makeMountain(Tile[][] world, double[][] heightMap) {
+		
+		int x0 = (int) (Math.random() * world.length);
+		int y0 = (int) (Math.random() * world.length);
+		
+		
+		int mountainSize = 80 * world.length / 256;
+		
+		double mountLength = (0.1 + 0.9 * Math.random() ) *mountainSize;
+		double mountHeight = (0.1 + 0.9 * Math.random() )*mountainSize;
+		double mountLengthEdge = mountLength+3;
+		double mountHeightEdge = mountHeight+3;
+		
+		double snowMountLength = mountLength/4;
+		double snowMountHeight = mountHeight/4;
+		double snowMountLengthEdge = mountLength/3;
+		double snowMountHeightEdge = mountHeight/3;
+		
+		for(int i = 0; i < world.length; i++) {
+			for(int j = 0; j < world[i].length; j++) {
+				int dx = i - x0;
+				int dy = j - y0;
+				double mountain = (dx*dx)/(mountLength*mountLength) + (dy*dy)/(mountHeight*mountHeight);
+				double mountainEdge = (dx*dx)/(mountLengthEdge*mountLengthEdge) + (dy*dy)/(mountHeightEdge*mountHeightEdge);
 				
 				double xdif = 1.0 * Math.abs(i-xcenter)/xcenter;
 				croppedHeightMap[i][j] +=  (float)10 * Math.pow(xdif +1, -0.1) + (float)(Math.random()*0.01);
