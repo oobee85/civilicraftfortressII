@@ -23,10 +23,22 @@ public class PerlinNoise {
 		return (a1 - a0) * (3.0 - w * 2.0) * w * w + a0;
 	}
 
+	public static final double mult = 2920.0 - 100 + 50*Math.random();
+	
+	public static final double multx1 = 21942.0 - 100 + 50*Math.random();
+	public static final double multy1 = 171324.0 - 100 + 50*Math.random();
+	public static final double multz1 = 8912.0 - 100 + 50*Math.random();
+
+	public static final double multx2 = 23157.0 - 100 + 50*Math.random();
+	public static final double multy2 = 217832.0 - 100 + 50*Math.random();
+	public static final double multz2 = 9758.0 - 100 + 50*Math.random();
+
+	
+	
 	// From https://en.wikipedia.org/wiki/Perlin_noise
 	private static final Vec2 randomGradient(int ix, int iy) {
 		// Random float. No precomputed gradients mean this works for any number of grid coordinates
-		double random = 2920 * Math.sin(ix * 21942.0 + iy * 171324.0 + 8912.0) * Math.cos(ix * 23157.0 * iy * 217832.0 + 9758.0);
+		double random = mult * Math.sin(ix * multx1 + iy * multy1 + multz1) * Math.cos(ix * multx2 * iy * multy2 + multz2);
 		return new Vec2(Math.cos(random), Math.sin(random));
 	}
 	
