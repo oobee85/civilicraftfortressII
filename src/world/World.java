@@ -27,7 +27,7 @@ public class World {
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
-	private static final double FOREST_DENSITY = 0.1;
+	private static final double FOREST_DENSITY = 0.01;
 	
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
@@ -948,7 +948,14 @@ public class World {
 				visited.put(ti, ti.getLocation().distanceTo(t.getLocation()) + Math.random() * 10);
 				search.add(ti);
 			}
-			
+			if(type == PlantType.FOREST1) {
+				if ((potential.canPlant() || type.isDesertResistant()) && potential.getPlant() == null && potential.getTerrain() != Terrain.DIRT) {
+					Plant plant = new Plant(type, potential, getFaction(NO_FACTION_ID));
+					potential.setHasPlant(plant);
+					worldData.addPlant(plant);
+					veinSize--;
+				}
+			}else
 			// if plant can live on the tile
 			if ((potential.canPlant() || type.isDesertResistant()) && potential.getPlant() == null) {
 				
@@ -970,10 +977,10 @@ public class World {
 			}
 			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < t.liquidType.getMinimumDamageAmount() / 2)
 				if (Math.random() < tempDensity) {
-					
-					Plant plant = new Plant(PlantType.FOREST1, t, getFaction(NO_FACTION_ID));
-					t.setHasPlant(plant);
-					worldData.addPlant(plant);
+					makePlantVein(t, PlantType.FOREST1, 30);
+//					Plant plant = new Plant(PlantType.FOREST1, t, getFaction(NO_FACTION_ID));
+//					t.setHasPlant(plant);
+//					worldData.addPlant(plant);
 				}
 		}
 		
