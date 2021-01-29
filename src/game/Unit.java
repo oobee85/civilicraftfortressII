@@ -25,8 +25,8 @@ public class Unit extends Thing implements Serializable {
 	private transient boolean isHarvesting;
 	private transient double timeToHarvest;
 	private transient Item item;
-	private transient int maxItemAmount = 5;
-	private transient double baseTimeToHarvest = 5;
+	private transient int maxItemAmount = 20;
+	private transient double baseTimeToHarvest = 10;
 	private transient int ticksForFoodCost = 50;
 	
 	public Unit(UnitType unitType, Tile tile, Faction faction) {
