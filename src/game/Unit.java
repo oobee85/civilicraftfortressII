@@ -316,6 +316,14 @@ public class Unit extends Thing implements Serializable {
 		}
 		return bestBuilding;
 	}
+	public Plant getNearestPlantToHarvest(Tile oldTile, PlantType type) {
+		for(Tile tile: oldTile.getNeighbors()) {
+			if(tile.getPlant() != null && tile.getPlant().getType() == type) {
+				return tile.getPlant();
+			}
+		}
+		return null;
+	}
 	
 	public void doHarvest(Plant plant, PlannedAction action) {
 		if(readyToHarvest()) {
@@ -323,9 +331,7 @@ public class Unit extends Thing implements Serializable {
 			boolean isFull = this.addItem(new Item(1, plant.getItem()));
 			this.resetTimeToHarvest();
 			if(isFull) {
-				Building building = getNearestBuildingToDeliver();
 				action.setDone(true);
-				this.queuePlannedAction(new PlannedAction(building, PlannedAction.DELIVER));
 			}
 		}
 		
@@ -386,8 +392,9 @@ public class Unit extends Thing implements Serializable {
 			while(!actionQueue.isEmpty()) {
 				plan = actionQueue.peek();
 				if(plan.isDone(getTile())) {
-					plan = null;
 					actionQueue.poll();
+					onFinishedAction(plan);
+					plan = null;
 					continue;
 				}
 				break;
@@ -414,6 +421,7 @@ public class Unit extends Thing implements Serializable {
 			PlannedAction plan = actionQueue.peek();
 			if(plan.isDone(getTile())) {
 				actionQueue.poll();
+				onFinishedAction(plan);
 			}
 		}
 		if(!readyToAttack()) {
@@ -474,6 +482,32 @@ public class Unit extends Thing implements Serializable {
 			}
 		}
 		return attacked;
+	}
+	
+	private void onFinishedAction(PlannedAction finished) {
+		//harvesting
+		if(finished.isHarvestAction()) {
+			Building building = getNearestBuildingToDeliver();
+			this.queuePlannedAction(new PlannedAction(building, PlannedAction.DELIVER, new PlannedAction(finished.target, PlannedAction.HARVEST)));
+	
+		}else if(finished.isDeliverAction()) {
+			PlannedAction followup = finished.getFollowUp();
+			//delivery
+			if(followup.target instanceof Plant) {
+				Plant oldTarget = (Plant)followup.target;
+				if(oldTarget.isDead()) {
+					Plant newTarget = getNearestPlantToHarvest(followup.getTile(), oldTarget.getType());
+					if(newTarget != null) {
+						followup = new PlannedAction(newTarget, PlannedAction.HARVEST);
+					}
+				}
+			}
+			
+			this.queuePlannedAction(followup);
+		}
+			
+			
+		
 	}
 	
 	/**

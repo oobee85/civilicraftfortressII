@@ -43,7 +43,15 @@ public class PlannedAction {
 		this.target = target;
 		this.type = type;
 	}
-	
+	public PlannedAction(Thing target, int type, PlannedAction followup) {
+		this.targetTile = null;
+		this.target = target;
+		this.type = type;
+		this.followup = followup;
+	}
+	public PlannedAction getFollowUp() {
+		return this.followup;
+	}
 	public Tile getTile() {
 		return target == null ? targetTile : target.getTile();
 	}
