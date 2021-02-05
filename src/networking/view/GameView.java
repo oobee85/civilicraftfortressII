@@ -425,10 +425,13 @@ public class GameView extends JPanel {
 				}
 				if(unit.getType().isBuilder()) {
 					Building targetBuilding = targetTile.getBuilding();
-					if(targetBuilding == null || targetBuilding.isBuilt()) {
+					if(targetBuilding == null ) {
 						targetBuilding = targetTile.getRoad();
 					}
-					if(targetBuilding != null && (targetBuilding.getFaction() == unit.getFaction() || targetBuilding.getType().isRoad()) && !targetBuilding.isBuilt()) {
+					if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()  && targetBuilding.isBuilt() && targetBuilding.getType().isHarvestable()) {
+						commandInterface.harvestThing(unit, targetBuilding, !shiftDown);
+					}
+					else if(targetBuilding != null && (targetBuilding.getFaction() == unit.getFaction() || targetBuilding.getType().isRoad()) && !targetBuilding.isBuilt()) {
 						commandInterface.buildThing(unit, targetBuilding.getTile(), targetBuilding.getType().isRoad(), !shiftDown);
 					}
 					else if(targetTile.getPlant() != null && targetTile.getPlant().isDead() == false) {

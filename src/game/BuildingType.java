@@ -100,6 +100,9 @@ public class BuildingType implements HasImage, Serializable {
 	public boolean isColony() {
 		return attributes.contains("colony");
 	}
+	public boolean isHarvestable() {
+		return attributes.contains("harvestable");
+	}
 	
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;

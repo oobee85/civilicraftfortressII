@@ -90,12 +90,13 @@
 		"attributes":["blocksmovement", "gate"],
 		"research":"MONARCHY"},
 	{
-		"info":"Harvests stone or ores",
+		"info":"Harvests stone",
 		"image":"resources/Images/buildings/mine256.png",
 		"vision":1,
 		"cost":{"WOOD":50},
 		"culture":0,
 		"name":"MINE",
+		"attributes":["harvestable"],
 		"health":100,
 		"effort":100},
 	{
@@ -110,13 +111,14 @@
 		"effort":200},
 		
 	{
-		"info":"Produces food (more with water)",
+		"info":"Workers can produce food here",
 		"image":"resources/Images/buildings/irrigation.png",
 		"vision":1,
 		"cost":{"WOOD":50},
 		"culture":0,
 		"name":"IRRIGATION",
-		"health":50,
+		"attributes":["harvestable"],
+		"health":100,
 		"effort":100},
 	{
 		"info":"Produces food",

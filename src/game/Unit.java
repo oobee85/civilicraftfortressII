@@ -40,8 +40,8 @@ public class Unit extends Thing implements Serializable {
 	public boolean readyToHarvest() {
 		return timeToHarvest <= 0;
 	}
-	public void resetTimeToHarvest() {
-		timeToHarvest = baseTimeToHarvest;
+	public void resetTimeToHarvest(double multiplier) {
+		timeToHarvest = baseTimeToHarvest*multiplier;
 		
 	}
 	public void setAutoBuild(boolean auto) {
@@ -325,11 +325,32 @@ public class Unit extends Thing implements Serializable {
 		return null;
 	}
 	
+	public void doHarvestBuilding(Building building, PlannedAction action) {
+		if(readyToHarvest()) {
+			boolean isFull = false;
+			if(building.getType().name().equals("IRRIGATION")) {
+				building.takeDamage(1);
+				isFull = this.addItem(new Item(1, ItemType.FOOD));
+				this.resetTimeToHarvest(1);
+			}else if(building.getType().name().equals("MINE")) {
+				isFull = this.addItem(new Item(1, ItemType.STONE));
+				this.resetTimeToHarvest(2);
+			}
+				
+			
+			if(isFull) {
+				System.out.println("done");
+				action.setDone(true);
+			}
+		}
+		
+	}
+	
 	public void doHarvest(Plant plant, PlannedAction action) {
 		if(readyToHarvest()) {
 			plant.takeDamage(1);
 			boolean isFull = this.addItem(new Item(1, plant.getItem()));
-			this.resetTimeToHarvest();
+			this.resetTimeToHarvest(1);
 			if(isFull) {
 				action.setDone(true);
 			}
@@ -443,7 +464,11 @@ public class Unit extends Thing implements Serializable {
 				}
 				
 			}
-			else if(plan.isHarvestAction() && unitType.isBuilder() && inRange(plan.target)) {
+			else if(plan.isHarvestAction() && unitType.isBuilder() && inRange(plan.target) && plan.target instanceof Building) {
+				this.doHarvestBuilding((Building)plan.target, plan);
+				
+			}
+			else if(plan.isHarvestAction() && unitType.isBuilder() && inRange(plan.target) && plan.target instanceof Plant) {
 				this.doHarvest((Plant)plan.target, plan);
 				
 			}
@@ -501,6 +526,14 @@ public class Unit extends Thing implements Serializable {
 						followup = new PlannedAction(newTarget, PlannedAction.HARVEST);
 					}
 				}
+			}else if(followup.target instanceof Building) {
+				Building oldTarget = (Building)followup.target;
+				if(oldTarget.isDead()) {
+//					Plant newTarget = getNearestPlantToHarvest(followup.getTile(), oldTarget.getType());
+//					if(newTarget != null) {
+//						followup = new PlannedAction(newTarget, PlannedAction.HARVEST);
+//					}
+				}
 			}
 			
 			this.queuePlannedAction(followup);
@@ -524,17 +557,6 @@ public class Unit extends Thing implements Serializable {
 		return building.isBuilt();
 	}
 	
-	private void harvestPlant(Plant plant) {
-		if(readyToHarvest() && this.getTile().getPlant() != null) {
-			ItemType itemType = this.getTile().getPlant().getItem();
-			if(itemType != null) {
-				getFaction().addItem(itemType, 1);
-				this.getTile().getPlant().takeDamage(1);
-				resetTimeToHarvest();
-			}
-		}
-		
-	}
 
 	public void doPassiveThings(World world) {
 		// Workers building stuff
@@ -545,7 +567,7 @@ public class Unit extends Thing implements Serializable {
 				if(itemType != null) {
 					getFaction().addItem(itemType, 1);
 					this.getTile().getPlant().takeDamage(1);
-					resetTimeToHarvest();
+					resetTimeToHarvest(1);
 				}
 			}
 		}
@@ -562,7 +584,7 @@ public class Unit extends Thing implements Serializable {
 					}
 				}
 			}
-			resetTimeToHarvest();
+			resetTimeToHarvest(1);
 		}
 	}
 	public void resetTimeToAttack(int cooldown) {

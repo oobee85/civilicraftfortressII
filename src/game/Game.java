@@ -718,7 +718,7 @@ public class Game {
 					if (current.canBuild() == true 
 							&& !current.hasBuilding()
 							&& current.liquidAmount < current.liquidType.getMinimumDamageAmount()
-							&& current.getLocation().distanceTo(world.volcano) > 40
+							&& current.getLocation().distanceTo(world.volcano) > 30
 							&& (current.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"))) {
 						Building building = new Building(type, current, newFaction);
 						current.setBuilding(building);
