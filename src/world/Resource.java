@@ -7,6 +7,7 @@ public class Resource implements Externalizable {
 	private ResourceType resourceType;
 	private int yieldLeft;
 	private int tickNextRegen;
+	private Tile tile;
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
@@ -34,9 +35,13 @@ public class Resource implements Externalizable {
 	public void resetTimeToRegen(int tick) {
 		tickNextRegen = (int) (tick + resourceType.getTimeToHarvest()*100);
 	}
-	public Resource(ResourceType resourceType) {
+	public Resource(ResourceType resourceType, Tile t) {
 		this.resourceType = resourceType;
 		this.yieldLeft = resourceType.getRemainingEffort();
+		this.tile = t;
+	}
+	public Tile getTile() {
+		return tile;
 	}
 	public int getYield() {
 		return yieldLeft;

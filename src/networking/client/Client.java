@@ -60,7 +60,6 @@ public class Client {
 						infoPanel.addExplodeButton().addActionListener(e -> gameInstance.explode(unit));
 						infoPanel.addButton("MakeRoads").addActionListener(e -> clientGUI.getGameView().workerRoad(Game.buildingTypeMap.get("STONE_ROAD")));
 						infoPanel.addButton("AutoBuild").addActionListener(e -> clientGUI.getGameView().toggleAutoBuild());
-						infoPanel.addButton("SetHarvesting").addActionListener(e -> clientGUI.getGameView().setHarvesting());
 						infoPanel.addButton("Guard").addActionListener(e -> clientGUI.getGameView().toggleGuarding());
 					});
 				}

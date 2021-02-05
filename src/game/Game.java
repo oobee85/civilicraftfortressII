@@ -829,16 +829,6 @@ public class Game {
 			}
 		}
 	}
-	public void setHarvesting(ConcurrentLinkedQueue<Thing> selectedThings) {
-		for(Thing thing : selectedThings) {
-			if(thing instanceof Unit) {
-				Unit unit = (Unit)thing;
-				if(unit.getType().isBuilder()) {
-//					unit.setHarvesting(!unit.getIsHarvesting());
-				}
-			}
-		}
-	}
 	public void explode(Thing thing) {
 		if(thing == null) {
 			return;

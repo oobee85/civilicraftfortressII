@@ -333,13 +333,13 @@ public class Unit extends Thing implements Serializable {
 				isFull = this.addItem(new Item(1, ItemType.FOOD));
 				this.resetTimeToHarvest(1);
 			}else if(building.getType().name().equals("MINE")) {
+				building.takeDamage(1);
 				isFull = this.addItem(new Item(1, ItemType.STONE));
-				this.resetTimeToHarvest(2);
+				this.resetTimeToHarvest(1);
 			}
 				
 			
 			if(isFull) {
-				System.out.println("done");
 				action.setDone(true);
 			}
 		}

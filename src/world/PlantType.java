@@ -2,9 +2,11 @@ package world;
 
 import java.awt.*;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import javax.swing.*;
 
+import game.Item;
 import game.ItemType;
 import utils.*;
 
@@ -14,7 +16,7 @@ public enum PlantType implements HasImage {
 	BERRY_DEPLETED ( new String[] {"resources/Images/plants/berry_depleted16.png"},false, 0.2, 1, false, ItemType.RUNITE_BAR),
 	CATTAIL ( new String[] {"resources/Images/plants/cattail32.png"},false, 1.0, 50, true, ItemType.FOOD),
 	FOREST1 ( new String[] {"resources/Images/plants/tree1.png"},false, 1, 100, false, ItemType.WOOD),
-	CACTUS ( new String[] {"resources/Images/plants/cactus.png"},true, 1, 50, false, ItemType.FOOD),
+	CACTUS ( new String[] {"resources/Images/plants/cactus.png"},true, 1, 100, false, ItemType.FOOD),
 //	FOREST2 ( new String[] {"resources/Images/plants/tree2.png"}, 1, 50)
 	;
 	
@@ -26,7 +28,7 @@ public enum PlantType implements HasImage {
     private boolean desertResistant;
     
 	PlantType( String[] s, boolean desertResistant, double rare, double health, boolean aquatic, ItemType itemType){
-		rarity = rare;
+		this.rarity = rare;
 		this.health = health;
 		this.aquatic = aquatic;
 		mipmap = new MipMap(s);

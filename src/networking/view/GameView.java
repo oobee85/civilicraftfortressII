@@ -245,9 +245,6 @@ public class GameView extends JPanel {
 	public void toggleAutoBuild() {
 		game.toggleAutoBuild(selectedThings);
 	}
-	public void setHarvesting() {
-		game.setHarvesting(selectedThings);
-	}
 	public void toggleGuarding() {
 		boolean foundNotGuarding = false;
 		for(Thing thing : selectedThings) {
@@ -425,7 +422,10 @@ public class GameView extends JPanel {
 				}
 				if(unit.getType().isBuilder()) {
 					Building targetBuilding = targetTile.getBuilding();
-					if(targetBuilding == null ) {
+					if(targetTile.getResource() != null) {
+						
+					}
+					if(targetBuilding == null) {
 						targetBuilding = targetTile.getRoad();
 					}
 					if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()  && targetBuilding.isBuilt() && targetBuilding.getType().isHarvestable()) {
