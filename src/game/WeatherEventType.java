@@ -11,9 +11,9 @@ import utils.Utils;
 
 public enum WeatherEventType implements HasImage{
 
-	RAIN("resources/Images/weather/rain.png", 4),
+	RAIN("resources/Images/weather/rain.gif", 4),
 	SNOW("resources/Images/weather/snow.gif", 4),
-	WIND("resources/Images/weather/wind.png", 4),
+//	WIND("resources/Images/weather/wind.png", 4),
 	HAIL("resources/Images/weather/hail.png", 4),
 	;
 	
