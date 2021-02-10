@@ -212,9 +212,10 @@ public class Unit extends Thing implements Serializable {
 		}
 
 		// If on tile with an item, take the item
-		if (getFaction().usesItems()) {
+		if (getFaction().usesItems() && this.getType().isBuilder()) {
 			for (Item item : getTile().getItems()) {
-				getFaction().addItem(item.getType(), item.getAmount());
+				this.addItem(item);
+//				getFaction().addItem(item.getType(), item.getAmount());
 			}
 			getTile().clearItems();
 		}
@@ -584,6 +585,18 @@ public class Unit extends Thing implements Serializable {
 					this.getTile().getPlant().takeDamage(1);
 					resetTimeToHarvest(1);
 				}
+			}
+			Building building = this.getTile().getBuilding();
+			if(building != null && building.getType().isColony()) {
+				for(Item item: this.getInventory().getItems()) {
+					if(item != null) {
+//						building.getInventory().addItem(item);
+						this.getFaction().addItem(item.getType(), item.getAmount());
+						item.addAmount(-item.getAmount());
+					}
+					
+				}
+				
 			}
 		}
 		if (getType().isHealer()) {
