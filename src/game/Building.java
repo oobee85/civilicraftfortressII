@@ -24,6 +24,8 @@ public class Building extends Thing implements Serializable {
 	private int remainingEffortToProduceUnit;
 	private transient Unit currentProducingUnit;
 	
+	private Inventory inventory;
+	
 	public Building(BuildingType buildingType, Tile tile, Faction faction) {
 		super(buildingType.getHealth(), buildingType, faction, tile);
 		this.remainingEffort = buildingType.getBuildingEffort();
@@ -31,12 +33,16 @@ public class Building extends Thing implements Serializable {
 		this.spawnLocation = tile;
 		this.timeToHarvest = baseTimeToHarvest;
 		this.isPlanned = false;
+		this.inventory = new Inventory();
 	}
 	public void setPlanned(boolean planned) {
 		isPlanned = planned;
 	}
 	public boolean isPlanned() {
 		return isPlanned;
+	}
+	public Inventory getInventory() {
+		return inventory;
 	}
 	public void tick(World world) {
 		updateInProgressUnit();

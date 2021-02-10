@@ -24,10 +24,11 @@ public class Unit extends Thing implements Serializable {
 	
 	private transient boolean isHarvesting;
 	private transient double timeToHarvest;
-	private transient Item item;
 	private transient int maxItemAmount = 20;
 	private transient double baseTimeToHarvest = 10;
 	private transient int ticksForFoodCost = 50;
+	
+	private Inventory inventory;
 	
 	public Unit(UnitType unitType, Tile tile, Faction faction) {
 		super(unitType.getCombatStats().getHealth(), unitType, faction, tile);
@@ -35,6 +36,7 @@ public class Unit extends Thing implements Serializable {
 		this.combatStats = unitType.getCombatStats();
 		this.timeToHeal = unitType.getCombatStats().getHealSpeed();
 		this.isIdle = false;
+		this.inventory = new Inventory();
 	}
 	
 	public boolean readyToHarvest() {
@@ -58,14 +60,12 @@ public class Unit extends Thing implements Serializable {
 		return passiveAction == PlannedAction.GUARD;
 	}
 	
+	public Inventory getInventory() {
+		return inventory;
+	}
+	
 	public boolean addItem(Item item) {
-		if(this.item == null || this.item.getType() != item.getType()) {
-			this.item = item;
-		}
-		if(this.item.getAmount() >= this.maxItemAmount) {
-			return true;
-		}
-		this.item.addAmount(item.getAmount());
+		this.inventory.addItem(item);
 		return false;
 	}
 	public void setType(UnitType type) {
@@ -365,8 +365,10 @@ public class Unit extends Thing implements Serializable {
 		
 	}
 	public void doDelivery(PlannedAction action) {
-		this.getFaction().addItem(this.item.getType(), this.item.getAmount());
-		this.item.addAmount(-this.item.getAmount());
+		for(Item item: inventory.getItems()) {
+			this.getFaction().addItem(item.getType(), item.getAmount());
+			item.addAmount(-item.getAmount());
+		}
 		action.setDone(true);
 	}
 	

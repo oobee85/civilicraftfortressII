@@ -594,7 +594,9 @@ public class World {
 				}
 			}
 		}
-		
+		if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= 0.05) {
+			return;
+		}
 		//if the humidity is more than the max terrain humidity
 		if (tile.getHumidity() > terrain.getMinMax().y ) {
 			if (terrain == Terrain.DIRT && tile.canGrow() && numGrassNeighbor >= 3) {
@@ -639,10 +641,9 @@ public class World {
 				}
 			}
 			
-			if(tile.checkTerrain(Terrain.BURNED_GROUND) && tile.liquidType != LiquidType.LAVA) {
-				double chance = 0.05;
-				if(Math.random() < chance) {
-					tile.setTerrain(Terrain.DIRT);
+			if(tile.liquidType == LiquidType.LAVA &&(tile.getTerrain() == Terrain.GRASS || tile.getTerrain() == Terrain.DIRT) && tile.liquidAmount >= 0.05) {
+				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+					tile.setTerrain(Terrain.SAND);
 				}
 			}
 			if(tile.checkTerrain(Terrain.DIRT)) {

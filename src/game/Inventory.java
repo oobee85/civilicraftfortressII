@@ -15,11 +15,11 @@ public class Inventory {
 		return items[type.ordinal()] != null ? items[type.ordinal()].getAmount() : 0;
 	}
 	
-	public void addItem(ItemType type, int quantity) {
-		if(items[type.ordinal()] == null) {
-			items[type.ordinal()] = new Item(0, type);
+	public void addItem(Item item) {
+		if(items[item.getType().ordinal()] == null) {
+			items[item.getType().ordinal()] = item;
 		}
-		items[type.ordinal()].addAmount(quantity);
+		items[item.getType().ordinal()].addAmount(item.getAmount());
 	
 	}
 	
