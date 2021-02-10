@@ -22,8 +22,9 @@ public class BuildingType implements HasImage, Serializable {
 	private transient final HashSet<String> attributes;
 	private transient final String[] canProduce;
 	private transient final HashSet<UnitType> canProduceSet = new HashSet<>();
-	
 	private transient HashMap<String, Image> roadImages;
+	
+	private Inventory inventory;
 	
 	public BuildingType(String name, String info, int hp, double buildingEffort, String s, double cultureRate, int visionRadius, 
 			String requirement, HashMap <ItemType, Integer> resourcesNeeded, String[] canProduce, double moveSpeedEnhancement, HashSet<String> attributes) {
@@ -56,6 +57,8 @@ public class BuildingType implements HasImage, Serializable {
 	public double getCultureRate() {
 		return cultureRate;
 	}
+	
+	
 
 	public Image getRoadImage(String roadCorner) {
 		return roadImages.get(roadCorner);

@@ -22,6 +22,7 @@ public class Faction implements Externalizable {
 	
 
 	private Item[] items = new Item[ItemType.values().length];
+	private Inventory inventory;
 	
 	private HashMap<String, Research> researchMap = new HashMap<>();
 	private Research researchTarget;
