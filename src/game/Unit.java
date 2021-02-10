@@ -66,6 +66,9 @@ public class Unit extends Thing implements Serializable {
 	
 	public boolean addItem(Item item) {
 		this.inventory.addItem(item);
+		if(this.inventory.getItemAmount(item.getType()) >= this.maxItemAmount) {
+			return true;
+		}
 		return false;
 	}
 	public void setType(UnitType type) {
@@ -366,8 +369,11 @@ public class Unit extends Thing implements Serializable {
 	}
 	public void doDelivery(PlannedAction action) {
 		for(Item item: inventory.getItems()) {
-			this.getFaction().addItem(item.getType(), item.getAmount());
-			item.addAmount(-item.getAmount());
+			if(item != null) {
+				this.getFaction().addItem(item.getType(), item.getAmount());
+				item.addAmount(-item.getAmount());
+			}
+			
 		}
 		action.setDone(true);
 	}
