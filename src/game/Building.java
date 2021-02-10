@@ -83,28 +83,28 @@ public class Building extends Thing implements Serializable {
 			resetTimeToHarvest();
 		}
 		if(getType() == Game.buildingTypeMap.get("SAWMILL")) {
-			HashSet<Tile> tilesToCut = new HashSet<>();
-			tilesToCut.add(getTile());
-			
-			for(Tile t : world.getNeighborsInRadius(getTile(), getType().getVisionRadius())) {
-				tilesToCut.add(t);
-			}
-			for(Tile tile : tilesToCut) {
-				if(tile.getPlant() != null && tile.getPlant().getType() == PlantType.FOREST1) {
-					tile.getPlant().takeDamage(1);
-					getFaction().addItem(ItemType.WOOD, 1);
-					if(tile.getPlant().isDead() ) {
-						world.numCutTrees ++;
-					}
-				}
-			}
-			
-			resetTimeToHarvest();
+//			HashSet<Tile> tilesToCut = new HashSet<>();
+//			tilesToCut.add(getTile());
+//			
+//			for(Tile t : world.getNeighborsInRadius(getTile(), getType().getVisionRadius())) {
+//				tilesToCut.add(t);
+//			}
+//			for(Tile tile : tilesToCut) {
+//				if(tile.getPlant() != null && tile.getPlant().getType() == PlantType.FOREST1) {
+//					tile.getPlant().takeDamage(1);
+//					getFaction().addItem(ItemType.WOOD, 1);
+//					if(tile.getPlant().isDead() ) {
+//						world.numCutTrees ++;
+//					}
+//				}
+//			}
+//			
+//			resetTimeToHarvest();
 		}
 
 		if(getType() == Game.buildingTypeMap.get("FARM") && getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
 			getFaction().addItem(ItemType.HORSE, 1);
-			getFaction().addItem(ItemType.FOOD, 3);
+			getFaction().addItem(ItemType.FOOD, 1);
 			resetTimeToHarvest();
 		}
 	}
