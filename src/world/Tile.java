@@ -18,7 +18,7 @@ public class Tile implements Externalizable {
 
 	public volatile float liquidAmount;
 	public volatile LiquidType liquidType;
-	
+
 	private volatile Faction faction;
 	private boolean isSelected = false;
 	private boolean inVisionRange = false;
@@ -26,17 +26,17 @@ public class Tile implements Externalizable {
 	private Resource resource;
 	private Terrain terr;
 	private GroundModifier modifier;
-	
+
 	private Plant plant;
 	private Building building;
 	private Building road;
 	private WeatherEvent weather;
 	private Air air;
-	
+
 	private ConcurrentLinkedQueue<Unit> units;
 	private ConcurrentLinkedQueue<Projectile> projectiles;
 	private ConcurrentLinkedQueue<Item> items;
-	
+
 	private List<Tile> neighborTiles = new LinkedList<Tile>();
 
 	@Override
@@ -45,39 +45,40 @@ public class Tile implements Externalizable {
 		height = in.readFloat();
 		humidity = in.readFloat();
 		air.setHumidity(humidity);
-		air.setTemperature(this.getTempurature());
+		air.setTemperature(this.getTemperature());
 		liquidAmount = in.readFloat();
-		
+
 		location = TileLoc.readFromExternal(in);
 
 		liquidType = LiquidType.values()[in.readByte()];
 		terr = Terrain.values()[in.readByte()];
 		faction = new Faction();
 		faction.setID(in.readByte());
-		
-		resource = (Resource)in.readObject();
-		modifier = (GroundModifier)in.readObject();
+
+		resource = (Resource) in.readObject();
+		modifier = (GroundModifier) in.readObject();
 	}
+
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
 		out.writeFloat(height);
 		out.writeFloat(humidity);
 		out.writeFloat(liquidAmount);
-		
+
 		location.writeExternal(out);
 
 		out.writeByte(liquidType.ordinal());
 		out.writeByte(terr.ordinal());
 		out.writeByte(faction.id());
-		
+
 		out.writeObject(resource);
 		out.writeObject(modifier);
 	}
-	
+
 	public Tile() {
-		
+
 	}
-	
+
 	public Tile(TileLoc location, Terrain t) {
 		this.location = location;
 		terr = t;
@@ -87,119 +88,140 @@ public class Tile implements Externalizable {
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
 		items = new ConcurrentLinkedQueue<Item>();
 		this.humidity = 1;
+		air = new Air();
 	}
-	public float getTempurature() {
+
+	public float getTemp() {
+
+		return 0;
+	}
+
+	public float getTemperature() {
 		float season = Season.getSeason2();
-		float seasonTemp = 1 - ((1 - season) * Season.winter[getLocation().y()] + season*Season.summer[getLocation().y()]);
-		float heightTemp = 1 - height;
-		heightTemp = heightTemp*heightTemp;
-		float nightMultiplier = World.isNightTime() ? 0.9f : 1f;
-		return (seasonTemp + heightTemp)*nightMultiplier/2;
+		float seasonTemp = Season.winter[getLocation().y()] + season * Season.summer[getLocation().y()];
+//		float seasonTemp = 1 - ((1 - season) * Season.winter[getLocation().y()] + season*Season.summer[getLocation().y()]);
+//		float heightTemp = 1 - height;
+//		heightTemp = heightTemp*heightTemp;
+//		float nightMultiplier = World.isNightTime() ? 0.9f : 1f;
+//		return (seasonTemp + heightTemp)*nightMultiplier/2;
+		return season;
 	}
+
 	public float getHumidity() {
 		return humidity;
 	}
+
 	public void setHumidity(float humidity) {
 		this.humidity = humidity;
 	}
-	
+
 	public void updateEvaporation(int currentTick) {
-		if(liquidType == LiquidType.LAVA) {
-			
-		}else {
-			
+		if (liquidType == LiquidType.LAVA) {
+
+		} else {
+
 			double rate = (23.8 * 1) / (air.getTemperature() + 459.67);
 			System.out.println(rate);
-			
+
 		}
 	}
+
 	public double getPressure() {
-		
-		double P0 = 760;  //  mmHg
-		double g = 9.80665;  //  m/s^2
-		double MMair = 0.0289644;  //  kg/mol
-		double R = 8.31432;  //  Nm/molK
-		double h0 = 0;  //  m
-		double h = this.height;  //  m
-		
-		double sub = R*air.getTemperature();
-		double power = (-g*MMair*(h-h0))/sub;
-		
+
+		double P0 = 760; // mmHg
+		double g = 9.80665; // m/s^2
+		double MMair = 0.0289644; // kg/mol
+		double R = 8.31432; // Nm/molK
+		double h0 = 0; // m
+		double h = this.height; // m
+
+		double sub = R * air.getTemperature();
+		double power = (-g * MMair * (h - h0)) / sub;
+
 		double pressure = P0 * Math.pow(Math.E, power);
-		
+
 		System.out.println("Pressure: " + pressure);
 		return pressure;
-		
+
 	}
-	
+
 	public void updateHumidity(int currentTick) {
-		air.setTemperature(this.getTempurature());
-		air.setHumidity(this.getHumidity());
-		air.setPressure(0);
-		if(liquidType == LiquidType.WATER || liquidType == LiquidType.ICE ||  liquidType == LiquidType.SNOW) {
-			if(liquidAmount > 0) {
+
+		if (currentTick != 0) {
+			air.setTemperature(this.getTemperature());
+			air.setHumidity(this.getHumidity());
+			air.setPressure(0);
+		}
+
+		if (liquidType == LiquidType.WATER || liquidType == LiquidType.ICE || liquidType == LiquidType.SNOW) {
+			if (liquidAmount > 0) {
 				humidity += Math.sqrt(Math.sqrt(liquidAmount)); // sqrt(0.01) -> 0.1
 			}
 		}
-		if(modifier != null && modifier.isHot()) {
+		if (modifier != null && modifier.isHot()) {
 			humidity -= 1;
 		}
-		if(liquidType == LiquidType.LAVA) {
-			humidity -= liquidAmount*10;
+		if (liquidType == LiquidType.LAVA) {
+			humidity -= liquidAmount * 10;
 		}
-		
+
 		humidity *= 0.995;
-		if(terr == Terrain.GRASS) {
+		if (terr == Terrain.GRASS) {
 			humidity *= 1.004;
 		}
-		if(humidity < 0) {
+		if (humidity < 0) {
 			humidity = 0;
 		}
-		if(humidity > 20) {
+		if (humidity > 20) {
 			humidity = 20;
 		}
 	}
-	
+
 	public void setWeather(WeatherEvent weatherEvent) {
 		weather = weatherEvent;
 	}
+
 	public void removeWeather() {
 		weather = null;
 	}
+
 	public WeatherEvent getWeather() {
 		return weather;
 	}
+
 	public boolean hasWeather() {
 		return weather != null;
 	}
+
 	public void setRoad(Building road) {
 		this.road = road;
 		turnRoad();
-		for(Tile neighbor : getNeighbors()) {
+		for (Tile neighbor : getNeighbors()) {
 			neighbor.turnRoad();
 		}
 	}
+
 	private void turnRoad() {
-		if(getRoad() == null) {
+		if (getRoad() == null) {
 			return;
 		}
 		Set<Direction> directions = new HashSet<>();
 		TileLoc loc = getLocation();
-		for(Tile t : getNeighbors()) {
-			if(t.getRoad() == null)
+		for (Tile t : getNeighbors()) {
+			if (t.getRoad() == null)
 				continue;
 			Direction d = Direction.getDirection(loc, t.getLocation());
-			if(d != null)
+			if (d != null)
 				directions.add(d);
 		}
 		String s = "";
-		for(Direction d : Direction.values()) {
-			if(directions.contains(d)) {
+		for (Direction d : Direction.values()) {
+			if (directions.contains(d)) {
 				s += d;
 			}
 		}
-		if(s.equals("")) {
-			for(Direction d : Direction.values()) {
+		if (s.equals("")) {
+			for (Direction d : Direction.values()) {
 				s += d;
 			}
 		}
@@ -217,6 +239,7 @@ public class Tile implements Externalizable {
 	public Resource getResource() {
 		return resource;
 	}
+
 	public GroundModifier getModifier() {
 		return modifier;
 	}
@@ -233,10 +256,11 @@ public class Tile implements Externalizable {
 		}
 		return null;
 	}
+
 	public int countUnitsOfFaction(Faction faction) {
 		int x = 0;
-		for(Unit unit : units) {
-			if(unit.getFaction() == faction) {
+		for (Unit unit : units) {
+			if (unit.getFaction() == faction) {
 				x++;
 			}
 		}
@@ -258,9 +282,11 @@ public class Tile implements Externalizable {
 	public ConcurrentLinkedQueue<Unit> getUnits() {
 		return units;
 	}
+
 	public ConcurrentLinkedQueue<Projectile> getProjectiles() {
 		return projectiles;
 	}
+
 	public ConcurrentLinkedQueue<Item> getItems() {
 		return items;
 	}
@@ -273,6 +299,7 @@ public class Tile implements Externalizable {
 		}
 		return false;
 	}
+
 	public void setInVisionRange(boolean inRange) {
 		this.inVisionRange = inRange;
 	}
@@ -285,24 +312,23 @@ public class Tile implements Externalizable {
 		if (this.faction == faction) {
 			brightness += 0.4;
 		}
-		if(inVisionRange == true) {
+		if (inVisionRange == true) {
 			brightness += 1;
 		}
 		brightness += getTerrain().getBrightness();
 		brightness += liquidAmount * liquidType.getBrightness();
-		if(modifier != null) {
+		if (modifier != null) {
 			brightness += getModifier().getType().getBrightness();
 		}
 		return brightness;
 	}
 
-	
 	public double getBrightness(Faction faction) {
 		double brightness = this.getBrightnessNonRecursive(faction);
 //		for (Tile tile : getNeighbors()) {
 //			brightness += tile.getBrightnessNonRecursive(faction);
 //		}
-		if(inVisionRange == true) {
+		if (inVisionRange == true) {
 			brightness += 1;
 		}
 		return brightness;
@@ -311,13 +337,15 @@ public class Tile implements Externalizable {
 	public void setBuilding(Building b) {
 		building = b;
 	}
+
 	public void setModifier(GroundModifier gm) {
 		modifier = gm;
 	}
+
 	public void replaceOrAddDurationModifier(GroundModifierType type, int duration, WorldData worldData) {
-		if(getModifier() != null) {
-			if(getModifier().getType() == type) {
-				if(getModifier().timeLeft() < duration) {
+		if (getModifier() != null) {
+			if (getModifier().getType() == type) {
+				if (getModifier().timeLeft() < duration) {
 					this.getModifier().setDuration(duration);
 				}
 				int toadd = duration - getModifier().timeLeft();
@@ -337,16 +365,19 @@ public class Tile implements Externalizable {
 	public void removeUnit(Unit u) {
 		units.remove(u);
 	}
-	
+
 	public void addProjectile(Projectile p) {
 		projectiles.add(p);
 	}
+
 	public void removeProjectile(Projectile p) {
 		projectiles.remove(p);
 	}
+
 	public void addItem(Item i) {
 		items.add(i);
 	}
+
 	public void clearItems() {
 		items.clear();
 	}
@@ -362,7 +393,7 @@ public class Tile implements Externalizable {
 		int y = drawAt.y + fontsize / 2;
 		int maxWidth = 0;
 		for (String s : strings) {
-			int stringWidth = g.getFontMetrics().stringWidth(s)+2;
+			int stringWidth = g.getFontMetrics().stringWidth(s) + 2;
 			maxWidth = maxWidth > stringWidth ? maxWidth : stringWidth;
 		}
 		g.setColor(Color.black);
@@ -375,7 +406,6 @@ public class Tile implements Externalizable {
 		row += 1;
 		return row;
 	}
-
 
 	public Building getRoad() {
 		return road;
@@ -412,104 +442,105 @@ public class Tile implements Externalizable {
 	public boolean canPlant() {
 		return terr.isPlantable(terr);
 	}
+
 	public boolean isCold() {
-		if(liquidType == LiquidType.ICE || liquidType == LiquidType.SNOW) {
+		if (liquidType == LiquidType.ICE || liquidType == LiquidType.SNOW) {
 			return true;
 		}
 		return airTemperature();
 	}
+
 	public boolean canGrow() {
-		if(isCold()) {
+		if (isCold()) {
 			return false;
 		}
-		if(liquidType == LiquidType.LAVA) {
+		if (liquidType == LiquidType.LAVA) {
 			return false;
 		}
 		return true;
 	}
+
 	public boolean airTemperature() {
-		if(this.getTempurature() < Season.FREEZING_TEMPURATURE) {
+		if (this.getTemperature() < Season.FREEZING_TEMPURATURE) {
 			return true;
 		}
 		return false;
 	}
+
 	public boolean canOre() {
 		return terr.isOreable(terr);
 	}
 
 	public boolean isBlocked(Unit u) {
-		if(u.getType().isFlying()) {
+		if (u.getType().isFlying()) {
 			return false;
 		}
-		if(hasBuilding() == false) {
+		if (hasBuilding() == false) {
 			return false;
 		}
-		if(building.isPlanned() == true) {
+		if (building.isPlanned() == true) {
 			return false;
 		}
-		if(this.countUnitsOfFaction(u.getFaction()) != this.getUnits().size()) {
+		if (this.countUnitsOfFaction(u.getFaction()) != this.getUnits().size()) {
 			return true;
 		}
 //		if(this.getBuilding().getFaction() != u.getFaction()) {
 //			return true;
 //		}
 		BuildingType bt = building.getType();
-		if(bt.blocksMovement()) {
-			if(bt.isGate() && u.getFaction() == building.getFaction()) {
+		if (bt.blocksMovement()) {
+			if (bt.isGate() && u.getFaction() == building.getFaction()) {
 				return false;
 			}
 			return true;
 		}
 		return false;
 	}
-	
+
 	public double computeTileDamage(Thing thing) {
 		boolean flying = false;
 		boolean aquatic = false;
 		boolean fireResistant = false;
 		boolean coldResistant = false;
-		
-		if(thing instanceof Unit) {
-			Unit unit = (Unit)thing;
+
+		if (thing instanceof Unit) {
+			Unit unit = (Unit) thing;
 			flying = unit.getType().isFlying();
 			aquatic = unit.getType().isAquatic();
 			fireResistant = unit.getType().isFireResist();
 			coldResistant = unit.getType().isColdResist();
 		}
-		if(thing instanceof Building) {
+		if (thing instanceof Building) {
 			coldResistant = true;
 		}
-		
+
 		double damage = 0;
-		if(flying) {
-			
-		}
-		else {
-			if(aquatic) {
-				if(liquidAmount < LiquidType.WATER.getMinimumDamageAmount()) {
-					
+		if (flying) {
+
+		} else {
+			if (aquatic) {
+				if (liquidAmount < LiquidType.WATER.getMinimumDamageAmount()) {
+
 //					damage += (LiquidType.WATER.getMinimumDamageAmount() - liquidAmount) * LiquidType.WATER.getDamage();
 					damage += 1;
-				}else if(liquidType == LiquidType.LAVA && !fireResistant){
+				} else if (liquidType == LiquidType.LAVA && !fireResistant) {
 					damage += liquidAmount * liquidType.getDamage();
 				}
-			}
-			else {
-				if(liquidAmount > liquidType.getMinimumDamageAmount()) {
-					if(liquidType != LiquidType.LAVA || !fireResistant) {
+			} else {
+				if (liquidAmount > liquidType.getMinimumDamageAmount()) {
+					if (liquidType != LiquidType.LAVA || !fireResistant) {
 						damage += liquidAmount * liquidType.getDamage();
 					}
-					
+
 				}
 			}
-			if(modifier != null) {
-				if(modifier.getType() == GroundModifierType.FIRE && fireResistant) {
+			if (modifier != null) {
+				if (modifier.getType() == GroundModifierType.FIRE && fireResistant) {
 					// resisted environment damage
-				} 
-				else {
-					damage += modifier.getType().getDamage() + modifier.timeLeft()*0.0001;
+				} else {
+					damage += modifier.getType().getDamage() + modifier.timeLeft() * 0.0001;
 				}
-				
+
 			}
 		}
 		return damage;
@@ -533,27 +564,29 @@ public class Tile implements Externalizable {
 
 	public void setHeight(float newheight) {
 		height = newheight;
-		if (height > 1) {
-			height = 1;
+		if (height > 1000) {
+			height = 1000;
 		}
 	}
 
 	public float getHeight() {
 		return height;
 	}
+
 	public boolean hasWall() {
-		if(building == null) {
+		if (building == null) {
 			return false;
 		}
-		if(building.isPlanned() == true) {
+		if (building.isPlanned() == true) {
 			return false;
 		}
 		BuildingType buildingType = building.getType();
-		if(buildingType.blocksMovement()) {
+		if (buildingType.blocksMovement()) {
 			return true;
 		}
 		return false;
 	}
+
 	public void setNeighbors(List<Tile> tiles) {
 		neighborTiles = tiles;
 	}
@@ -561,14 +594,16 @@ public class Tile implements Externalizable {
 	public List<Tile> getNeighbors() {
 		return neighborTiles;
 	}
+
 	@Override
 	public String toString() {
 		return location.toString();
 	}
+
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof Tile) {
-			return getLocation().equals(((Tile)obj).getLocation());
+		if (obj instanceof Tile) {
+			return getLocation().equals(((Tile) obj).getLocation());
 		}
 		return false;
 	}

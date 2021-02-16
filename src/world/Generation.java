@@ -9,9 +9,6 @@ import utils.*;
 
 public class Generation {
 	
-	private static final double snowEdgeRatio = 0.5;
-	private static final double rockEdgeRatio = 0.7;
-	
 	public static final int OREMULTIPLIER = 16384;
 	
 	// From https://en.wikipedia.org/wiki/Perlin_noise
@@ -35,15 +32,15 @@ public class Generation {
 				croppedHeightMap[i][j] = heightMap[i + croppedWidth][j + croppedHeight];
 			}
 		}
-		Utils.normalize(croppedHeightMap);
+		Utils.normalize(croppedHeightMap, 0, 1000);
 		int center = width/2;
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				double dif = 1.0 * Math.abs(i-center)/center;
-				croppedHeightMap[i][j] +=  (float)10 * Math.pow(dif +1, -0.1) + (float)(Math.random()*0.01);
+				double dif = 10 * Math.abs(i-center)/center;
+				croppedHeightMap[i][j] +=  (float)1000 * Math.pow(dif +1, -0.1) + (float)(Math.random());
 			}
 		}
-		Utils.normalize(croppedHeightMap);
+		Utils.normalize(croppedHeightMap, 0, 1000);
 		return croppedHeightMap;
 	}
 	
@@ -217,8 +214,8 @@ public class Generation {
 			TileLoc next = queue.poll();
 			int i = next.x();
 			int j = next.y();
-			world.get(next).liquidAmount += 0.02;
-			volume -= 0.02;
+			world.get(next).liquidAmount += 2;
+			volume -= 2;
 			// Add adjacent tiles to the queue
 			for(Tile t : world.get(next).getNeighbors()) {
 				if(!visited[t.getLocation().x()][t.getLocation().y()]) {

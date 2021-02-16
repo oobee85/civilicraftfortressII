@@ -105,11 +105,11 @@ public class Liquid {
 					tile.getModifier().finish();
 				}
 			}
-			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= 0.001) {
-				tile.liquidAmount -= 0.00001;
+			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= 0.1) {
+				tile.liquidAmount -= 0.001;
 			}
-			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount <= 0.001) {
-				tile.liquidAmount -= 0.00001;
+			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount <= 0.1) {
+				tile.liquidAmount -= 0.001;
 			}
 		}
 		//Utils.normalize(heightMap);
@@ -119,7 +119,7 @@ public class Liquid {
 		int x = current.x();
 		int y = current.y();
 		
-		float tempurature = tile.getTempurature();
+		float tempurature = tile.getTemperature();
 		if(tempurature > Season.MELTING_TEMPURATURE) {
 			if(tile.liquidType == LiquidType.ICE) {
 				tile.liquidType = LiquidType.WATER;
@@ -147,7 +147,7 @@ public class Liquid {
 			}
 			float myh = tile.getHeight();
 			if(tile.hasWall() == true) {
-				myh += 0.1;
+				myh += 10;
 			}
 			float myv = liquidAmountsTemp[x][y];
 			LiquidType mytype = liquidTypesTemp[x][y];

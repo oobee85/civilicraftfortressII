@@ -799,8 +799,8 @@ public class GameView extends JPanel {
 						null);
 			}
 		} else {
-			double highHeight = 0;
-			double lowHeight = 1;
+			double highHeight = Double.MIN_VALUE;
+			double lowHeight = Double.MAX_VALUE;
 			double highHumidity = 20;
 			double lowHumidity = 0;
 			if (showHeightMap) {
@@ -1059,7 +1059,7 @@ public class GameView extends JPanel {
 				List<String> strings = new LinkedList<String>();
 				strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
 				strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getHumidity()));
-				strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTempurature()));
+				strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTemperature()));
 				if (tile.getResource() != null) {
 					strings.add(String.format("ORE" + "=%d", tile.getResource().getYield()));
 				}
@@ -1181,7 +1181,7 @@ public class GameView extends JPanel {
 				g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 				Utils.setTransparency(g, 1);
 
-				int imageSize = (int) Math.min(Math.max(draww * theTile.liquidAmount / 0.2, 1), draww);
+				int imageSize = (int) Math.min(Math.max(draww * theTile.liquidAmount / 20, 1), draww);
 				g.setColor(theTile.liquidType.getColor(imagesize));
 				g.fillRect(drawAt.x + draww / 2 - imageSize / 2, drawAt.y + drawh / 2 - imageSize / 2, imageSize,
 						imageSize);

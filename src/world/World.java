@@ -21,7 +21,7 @@ public class World {
 	public static final double TERRAIN_SNOW_LEVEL = 1;
 	public static final double DESERT_HUMIDITY = 1;
 	public static final int DAY_DURATION = 500;
-	public static final int NIGHT_DURATION = 350;
+	public static final int NIGHT_DURATION = 500;
 	public static final int TRANSITION_PERIOD = 100;
 	private static final double CHANCE_TO_SWITCH_TERRAIN = 0.05;
 	
@@ -242,7 +242,7 @@ public class World {
 			if(targetTile == null) {
 				continue;
 			}
-			double temperature = t.getTempurature();
+			double temperature = t.getTemperature();
 			WeatherEvent weather = new WeatherEvent(t, targetTile, t.getLocation().distanceTo(target)*WeatherEventType.RAIN.getSpeed() + (int)(Math.random()*50), 0.00002, LiquidType.WATER);;
 			t.setWeather(weather);
 			worldData.addWeatherEvent(weather);
@@ -251,7 +251,7 @@ public class World {
 	
 	public void eruptVolcano() {
 		System.out.println("eruption");
-		this.get(volcano).liquidAmount += 200;
+		this.get(volcano).liquidAmount += 200000;
 		
 //		world[volcano].liquidType = LiquidType.WATER;
 //		world[volcano].liquidAmount += 200;
@@ -1058,7 +1058,7 @@ public class World {
 				if (tile.getHeight() > cutoff) {
 					t = Terrain.ROCK;
 				}
-				else if (tile.getHeight() > 0.4) {
+				else if (tile.getHeight() > 400) {
 					t = Terrain.DIRT;
 				}
 				else {
@@ -1072,10 +1072,10 @@ public class World {
 		}
 
 		int numTiles = width*height;
-		Generation.makeLake(numTiles * 1.0/100, this);
-		Generation.makeLake(numTiles * 1.0/200, this);
-		Generation.makeLake(numTiles * 1.0/400, this);
-		Generation.makeLake(numTiles * 1.0/800, this);
+//		Generation.makeLake(numTiles * 1, this);
+//		Generation.makeLake(numTiles * 2, this);
+//		Generation.makeLake(numTiles * 4, this);
+		Generation.makeLake(numTiles * 8, this);
 		System.out.println("Simulating water for 100 iterations");
 		for(int i = 0; i < 100; i++) {
 			Liquid.propogate(this);
@@ -1162,9 +1162,18 @@ public class World {
 		minimapGraphics.dispose();
 		terrainGraphics.dispose();
 		
+		
+		double highHeight = Double.MIN_VALUE;
+		double lowHeight = Double.MAX_VALUE;
+		for(Tile tile : getTiles() ) {
+			highHeight = Math.max(highHeight, tile.getHeight());
+			lowHeight = Math.min(lowHeight, tile.getHeight());
+		}
+		
 		BufferedImage heightMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 		for(Tile tile : getTiles() ) {
-			int r = Math.max(Math.min((int)(255*tile.getHeight()), 255), 0);
+			float heightRatio = (float) ((tile.getHeight() - lowHeight) / (highHeight - lowHeight));
+			int r = Math.max(Math.min((int)(255*heightRatio), 255), 0);
 			Color c = new Color(r, 0, 255-r);
 			heightMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 		}

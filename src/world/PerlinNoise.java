@@ -104,16 +104,16 @@ public class PerlinNoise {
 //			Utils.normalize(temp);
 //			maps.add(temp);
 			frequency *= 2;
-			amplitude *= 0.7;
+			amplitude *= 0.5;
 		}
 		
-		Utils.normalize(heightmap);
+		Utils.normalize(heightmap, 0, 1000);
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				heightmap[y][x] = (float) Math.pow(heightmap[y][x], 0.5);
+//				heightmap[y][x] = (float) Math.pow(heightmap[y][x], 0.5);
 			}
 		}
-		Utils.normalize(heightmap);
+		Utils.normalize(heightmap, 0, 1000);
 //		saveImage(heightmap, "map.png");
 //		maps.add(heightmap);
 //		saveImageChain(maps, "octaves.png");

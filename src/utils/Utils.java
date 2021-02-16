@@ -298,13 +298,15 @@ public final class Utils {
 	
 	public static double getAlphaOfLiquid(double amount) {
 		// 1 units of fluid is opaque, linearly becoming transparent at 0 units of fluid.
-		double alpha = Math.max(Math.min(amount*12 - 0.2, 1), 0);
-		return alpha*alpha;
+		double alpha = Math.max(Math.min(amount*0.05 - 0.1, 1), 0);
+		return alpha;
 		//return 1 - (1 - alpha) * (1 - alpha);
 	}
 	
 
-	public static void normalize(float[][] data) {
+	public static void normalize(float[][] data, float upper, float inner) {
+		
+		
 		float minValue = data[0][0];
 		float maxValue = data[0][0];
 		for (int i = 0; i < data.length; i++) {
@@ -318,6 +320,8 @@ public final class Utils {
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < data[0].length; j++) {
 				data[i][j] = (data[i][j] - minValue) / (maxValue - minValue);
+//				data[i][j] = data[i][j] * upper;
+				data[i][j] = data[i][j] * (upper-inner) + inner;
 			}
 		}
 		minValue = data[0][0];
