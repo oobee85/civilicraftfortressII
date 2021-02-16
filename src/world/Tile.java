@@ -31,6 +31,7 @@ public class Tile implements Externalizable {
 	private Building building;
 	private Building road;
 	private WeatherEvent weather;
+	private Air air;
 	
 	private ConcurrentLinkedQueue<Unit> units;
 	private ConcurrentLinkedQueue<Projectile> projectiles;
@@ -43,6 +44,8 @@ public class Tile implements Externalizable {
 
 		height = in.readFloat();
 		humidity = in.readFloat();
+		air.setHumidity(humidity);
+		air.setTemperature(this.getTempurature());
 		liquidAmount = in.readFloat();
 		
 		location = TileLoc.readFromExternal(in);
@@ -99,7 +102,40 @@ public class Tile implements Externalizable {
 	public void setHumidity(float humidity) {
 		this.humidity = humidity;
 	}
+	
+	public void updateEvaporation(int currentTick) {
+		if(liquidType == LiquidType.LAVA) {
+			
+		}else {
+			
+			double rate = (23.8 * 1) / (air.getTemperature() + 459.67);
+			System.out.println(rate);
+			
+		}
+	}
+	public double getPressure() {
+		
+		double P0 = 760;  //  mmHg
+		double g = 9.80665;  //  m/s^2
+		double MMair = 0.0289644;  //  kg/mol
+		double R = 8.31432;  //  Nm/molK
+		double h0 = 0;  //  m
+		double h = this.height;  //  m
+		
+		double sub = R*air.getTemperature();
+		double power = (-g*MMair*(h-h0))/sub;
+		
+		double pressure = P0 * Math.pow(Math.E, power);
+		
+		System.out.println("Pressure: " + pressure);
+		return pressure;
+		
+	}
+	
 	public void updateHumidity(int currentTick) {
+		air.setTemperature(this.getTempurature());
+		air.setHumidity(this.getHumidity());
+		air.setPressure(0);
 		if(liquidType == LiquidType.WATER || liquidType == LiquidType.ICE ||  liquidType == LiquidType.SNOW) {
 			if(liquidAmount > 0) {
 				humidity += Math.sqrt(Math.sqrt(liquidAmount)); // sqrt(0.01) -> 0.1

@@ -16,6 +16,7 @@ public class Liquid {
 	private static float[][] liquidAmountsTemp;
 	private static LiquidType[][] liquidTypesTemp;
 	
+	
 	private static final boolean MULTITHREADED = true;
 	
 	// idea: create constant arraylist of positions, initialize it once, then every time simply use a random permutation to access all elements randomly.
