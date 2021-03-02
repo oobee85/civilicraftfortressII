@@ -60,14 +60,16 @@ public class Game {
 			meteorStrike();
 		}
 		
-
+		
+		world.rains();
+		
 		// rain event
-		if(Math.random() < 0.002) {
-			world.rain();
-		}
-		if(Math.random() < 0.01) {
-			world.grow();
-		}
+//		if(Math.random() < 0.002) {
+//			world.rain();
+//		}
+//		if(Math.random() < 0.01) {
+//			world.grow();
+//		}
 		
 		if(world.volcano != null) {
 			world.get(world.volcano).liquidType = LiquidType.LAVA;

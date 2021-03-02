@@ -44,8 +44,8 @@ public class Tile implements Externalizable {
 
 		height = in.readFloat();
 		humidity = in.readFloat();
-		air.setHumidity(humidity);
-		air.setTemperature(this.getTemperature());
+//		air.setHumidity(humidity);
+//		air.setTemperature(this.getTemperature());
 		liquidAmount = in.readFloat();
 
 		location = TileLoc.readFromExternal(in);
@@ -88,13 +88,9 @@ public class Tile implements Externalizable {
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
 		items = new ConcurrentLinkedQueue<Item>();
 		this.humidity = 1;
-		air = new Air();
+		air = new Air(this.height);
 	}
 
-	public float getTemp() {
-
-		return 0;
-	}
 
 	public float getTemperature() {
 		float season = Season.getSeason2();
@@ -112,7 +108,7 @@ public class Tile implements Externalizable {
 	}
 
 	public void setHumidity(float humidity) {
-		this.humidity = humidity;
+//		this.humidity = humidity;
 	}
 
 	public void updateEvaporation(int currentTick) {
@@ -126,54 +122,62 @@ public class Tile implements Externalizable {
 		}
 	}
 
-	public double getPressure() {
-
-		double P0 = 760; // mmHg
-		double g = 9.80665; // m/s^2
-		double MMair = 0.0289644; // kg/mol
-		double R = 8.31432; // Nm/molK
-		double h0 = 0; // m
-		double h = this.height; // m
-
-		double sub = R * air.getTemperature();
-		double power = (-g * MMair * (h - h0)) / sub;
-
-		double pressure = P0 * Math.pow(Math.E, power);
-
-		System.out.println("Pressure: " + pressure);
-		return pressure;
-
+	
+	public Air getAir() {
+		return air;
 	}
-
-	public void updateHumidity(int currentTick) {
-
-		if (currentTick != 0) {
-			air.setTemperature(this.getTemperature());
-			air.setHumidity(this.getHumidity());
-			air.setPressure(0);
+	
+	public boolean checkWeatherEvent() {
+		if(air.canRain() == true) {
+			return true;
 		}
+		return false;
+	}
+	
+	public void updateAir() {
+		air.setTemperature(this.getTemperature());
+		double evaporation = this.getEvaporation();
+		air.addHumidity(evaporation);
+		
+		air.updatePressure();
+		checkWeatherEvent();
+	}
+	
+	public double getEvaporation() {
+		double evaporation = 0.0;
+		if(this.liquidType == LiquidType.WATER && this.getTemperature() > 0) {
+			evaporation = ( 0.01*this.getTemperature() ) / this.liquidAmount;
+//			liquidAmount -= evaporation;
+		}
+		
+//		System.out.println("Evaporation: "+ evaporation);
+		return evaporation;
+		
+	}
+	
+	public void updateHumidity(int currentTick) {
 
 		if (liquidType == LiquidType.WATER || liquidType == LiquidType.ICE || liquidType == LiquidType.SNOW) {
 			if (liquidAmount > 0) {
-				humidity += Math.sqrt(Math.sqrt(liquidAmount)); // sqrt(0.01) -> 0.1
+//				humidity += Math.sqrt(Math.sqrt(liquidAmount)); // sqrt(0.01) -> 0.1
 			}
 		}
 		if (modifier != null && modifier.isHot()) {
-			humidity -= 1;
+//			humidity -= 1;
 		}
 		if (liquidType == LiquidType.LAVA) {
-			humidity -= liquidAmount * 10;
+//			humidity -= liquidAmount * 10;
 		}
 
-		humidity *= 0.995;
+//		humidity *= 0.995;
 		if (terr == Terrain.GRASS) {
-			humidity *= 1.004;
+//			humidity *= 1.004;
 		}
 		if (humidity < 0) {
-			humidity = 0;
+//			humidity = 0;
 		}
 		if (humidity > 20) {
-			humidity = 20;
+//			humidity = 20;
 		}
 	}
 
@@ -461,7 +465,8 @@ public class Tile implements Externalizable {
 	}
 
 	public boolean airTemperature() {
-		if (this.getTemperature() < Season.FREEZING_TEMPURATURE) {
+		double temp = this.air.getTemperature();
+		if (temp < Season.FREEZING_TEMPURATURE) {
 			return true;
 		}
 		return false;

@@ -822,8 +822,8 @@ public class GameView extends JPanel {
 						if (tile == null) {
 							continue;
 						}
-						highHumidity = Math.max(highHumidity, tile.getHumidity());
-						lowHumidity = Math.min(lowHumidity, tile.getHumidity());
+						highHumidity = Math.max(highHumidity, tile.getAir().getHumidity());
+						lowHumidity = Math.min(lowHumidity, tile.getAir().getHumidity());
 
 					}
 				}
@@ -1058,8 +1058,13 @@ public class GameView extends JPanel {
 				Point drawAt = getDrawingCoords(tile.getLocation());
 				List<String> strings = new LinkedList<String>();
 				strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
-				strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getHumidity()));
-				strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTemperature()));
+				strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getHumidity()));
+				strings.add(String.format("TEM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getTemperature()));
+				strings.add(String.format("PRE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getPressure()));
+				strings.add(String.format("RH" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getRelativeHumidity()));
+				strings.add(String.format("DEW" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getDewPoint()));
+				strings.add(String.format("EVA" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEvaporation()));
+//				strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTemperature()));
 				if (tile.getResource() != null) {
 					strings.add(String.format("ORE" + "=%d", tile.getResource().getYield()));
 				}
@@ -1141,7 +1146,7 @@ public class GameView extends JPanel {
 			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 		} else if (showHumidityMap) {
-			float humidityRatio = (float) ((theTile.getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
+			float humidityRatio = (float) ((theTile.getAir().getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
 			float insidePara = ((humidityRatio - 0.5f) * 1.74f);
 			float almostRatio = (insidePara * insidePara * insidePara * insidePara * insidePara + 0.5f);
 			int r = Math.max(Math.min((int) (255 * almostRatio), 255), 0);

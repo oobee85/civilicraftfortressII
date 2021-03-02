@@ -101,7 +101,10 @@ public class World {
 			tile.setModifier(info.getModifier());
 			tile.liquidAmount = info.liquidAmount;
 			tile.liquidType = info.liquidType;
+			
+			
 		}
+		System.out.println("updating tiles");
 	}
 
 	public Faction getFaction(String name) {
@@ -221,6 +224,18 @@ public class World {
 		}
 	}
 	
+	
+	public void rains() {
+		for(Tile tile : tileList) {
+			tile.updateAir();
+			boolean canRain = tile.checkWeatherEvent();
+			if(canRain == true && tile.getWeather() == null) {
+				WeatherEvent weather = new WeatherEvent(tile, tile, tile.getLocation().distanceTo(tile.getLocation())*WeatherEventType.RAIN.getSpeed() + (int)(Math.random()*50), 0.00002, LiquidType.WATER);;
+				tile.setWeather(weather);
+				worldData.addWeatherEvent(weather);
+			}
+		}
+	}
 	public void rain() {
 		
 		//makes it so that it doesnt spawn the center of rain in deserts or on the volcano
