@@ -135,7 +135,7 @@ public class Tile implements Externalizable {
 	
 	public double getEvaporation() {
 		double evaporation = 0.0;
-		if(this.liquidType == LiquidType.WATER && this.getTemperature() > 0) {
+		if(this.liquidType == LiquidType.WATER && this.getTemperature() > 0 && this.getAir().isSaturated() == false) {
 			evaporation = ( 0.01*this.getTemperature()*this.liquidAmount ) /10;
 //			liquidAmount -= evaporation;
 		}

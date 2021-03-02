@@ -14,14 +14,16 @@ public class Air {
 	
 	public Air(double height, double temp) {
 		this.maxHumidity = 1.0;
-		this.maxVolume = 10;
 		this.height = height;
 		this.temperature = temp;
+		this.maxVolume = 0;
 		this.canRain = false;
 		this.volume = 0;
-		this.humidity = 0.1;
+		this.humidity = 0.0;
 		this.pressure = 760;
-		
+		this.updateMaxVolume();
+		this.updateHumidity();
+		this.updatePressure();
 	}
 	
 	public void setTemperature(double temp) {
@@ -39,15 +41,19 @@ public class Air {
 	public double getPressure() {
 		return pressure;
 	}
-	public boolean addVolume(double add) {
+	public void addVolume(double add) {
 		if(volume + add >= maxVolume) {
 			canRain = true;
-			return true;
 		}else {
 			canRain = false;
 			this.volume += add;
-			return false;
 		}
+	}
+	public boolean isSaturated() {
+		if(volume >= maxVolume) {
+			return true;
+		}
+		return false;
 	}
 	public void updateMaxVolume() {
 		maxVolume = 2*this.temperature;
