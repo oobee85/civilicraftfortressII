@@ -5,27 +5,34 @@ public class Air {
 	private double humidity;
 	private double temperature;
 	private double pressure;
-	private double maxHumidity;
 	private double height;
+	private double volume;
+	
+	private double maxHumidity;
+	private double maxLiquid;
 	private boolean canRain;
 	
-	public Air(double height) {
+	public Air(double height, double temp) {
 		this.maxHumidity = 1.0;
+		this.maxLiquid = 10;
 		this.height = height;
+		this.temperature = temp;
 		this.canRain = false;
-	}
-	
-	
-	public void update() {
+		this.volume = 0;
+		this.humidity = 0.1;
+		this.pressure = 760;
 		
 	}
+	
 	public void setHumidity(double hum) {
 		this.humidity = hum;
 	}
 	public void setTemperature(double temp) {
 		this.temperature = temp;
 	}
-	
+	public double getVolume() {
+		return volume;
+	}
 	public double getHumidity() {
 		return humidity;
 	}
@@ -35,6 +42,12 @@ public class Air {
 	public double getPressure() {
 		return pressure;
 	}
+	public void addVolume(double add) {
+		this.volume += add;
+		if(volume >= maxLiquid) {
+			canRain = true;
+		}
+	}
 	
 	public void addHumidity(double added) {
 		this.humidity += added;
@@ -43,6 +56,7 @@ public class Air {
 		}else {
 			canRain = false;
 		}
+		
 	}
 	public void updatePressure() {
 

@@ -356,7 +356,7 @@ public class Client {
 			WeatherEvent newWeatherEvent = new WeatherEvent(
 					gameInstance.world.get(weatherMessage.getTile().getLocation()), 
 					gameInstance.world.get(weatherMessage.getTargetTile().getLocation()),
-					weatherMessage.timeLeft(),
+//					weatherMessage.timeLeft(),
 					weatherMessage.getStrength(),
 					weatherMessage.getLiquidType());
 			gameInstance.world.getData().addWeatherEvent(newWeatherEvent);

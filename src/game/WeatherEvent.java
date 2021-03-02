@@ -28,7 +28,7 @@ public class WeatherEvent implements HasImage, Externalizable {
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 		tile = new Tile(TileLoc.readFromExternal(in), Terrain.DIRT);
 		targetTile = new Tile(TileLoc.readFromExternal(in), Terrain.DIRT);
-		aliveUntil = in.readInt();
+//		aliveUntil = in.readInt();
 		strength = in.readDouble();
 		liquidType = LiquidType.values()[in.readByte()];
 	}
@@ -36,7 +36,7 @@ public class WeatherEvent implements HasImage, Externalizable {
 	public void writeExternal(ObjectOutput out) throws IOException {
 		tile.getLocation().writeExternal(out);
 		targetTile.getLocation().writeExternal(out);
-		out.writeInt(aliveUntil);
+//		out.writeInt(aliveUntil);
 		out.writeDouble(strength);
 		out.writeByte(liquidType.ordinal());
 	}
@@ -44,10 +44,10 @@ public class WeatherEvent implements HasImage, Externalizable {
 	/** used only by externalizable interface */
 	public WeatherEvent() { }
 	
-	public WeatherEvent(Tile tile, Tile targetTile, int duration, double strength, LiquidType liquidType) {
+	public WeatherEvent(Tile tile, Tile targetTile, double strength, LiquidType liquidType) {
 		this.targetTile = targetTile;
 		this.tile = tile;
-		this.aliveUntil = World.ticks + duration;
+//		this.aliveUntil = World.ticks + duration;
 		this.strength = strength;
 		this.liquidType = liquidType;
 		this.hasImage = WeatherEventType.RAIN;
@@ -61,6 +61,9 @@ public class WeatherEvent implements HasImage, Externalizable {
 	public double getStrength() {
 		return strength;
 	}
+	public void addStrength(double added) {
+		strength += added;
+	}
 	public LiquidType getLiquidType() {
 		return liquidType;
 	}
@@ -71,16 +74,16 @@ public class WeatherEvent implements HasImage, Externalizable {
 		updateColdness();
 	}
 	private void updateColdness() {
-		isCold = tile.airTemperature();
-		if(isCold == true) {
-			this.hasImage = WeatherEventType.SNOW;
-			liquidType = LiquidType.SNOW;
-			strength = 0.0003;
-		}else {
-			this.hasImage = WeatherEventType.RAIN;
-			liquidType = LiquidType.WATER;
-			strength = 0.0002;
-		}
+//		isCold = tile.airTemperature();
+//		if(isCold == true) {
+//			this.hasImage = WeatherEventType.SNOW;
+//			liquidType = LiquidType.SNOW;
+//			strength = 0.0003;
+//		}else {
+//			this.hasImage = WeatherEventType.RAIN;
+//			liquidType = LiquidType.WATER;
+//			strength = 0.0002;
+//		}
 	}
 	
 	private void moveTo(Tile t) {
@@ -122,7 +125,8 @@ public class WeatherEvent implements HasImage, Externalizable {
 	}
 	
 	public boolean isDead() {
-		return World.ticks >= aliveUntil;
+		return strength <= 0;
+//		return World.ticks >= aliveUntil;
 	}
 	public int timeLeft() {
 		return aliveUntil - World.ticks;

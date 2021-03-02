@@ -23,7 +23,7 @@ public class World {
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 500;
 	public static final int TRANSITION_PERIOD = 100;
-	private static final double CHANCE_TO_SWITCH_TERRAIN = 0.05;
+	private static final double CHANCE_TO_SWITCH_TERRAIN = 5;
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
@@ -230,9 +230,10 @@ public class World {
 			tile.updateAir();
 			boolean canRain = tile.checkWeatherEvent();
 			if(canRain == true && tile.getWeather() == null) {
-				WeatherEvent weather = new WeatherEvent(tile, tile, tile.getLocation().distanceTo(tile.getLocation())*WeatherEventType.RAIN.getSpeed() + (int)(Math.random()*50), 0.00002, LiquidType.WATER);;
+				WeatherEvent weather = new WeatherEvent(tile, tile, tile.getAir().getVolume(), LiquidType.WATER);;
 				tile.setWeather(weather);
 				worldData.addWeatherEvent(weather);
+				weather.addStrength(tile.getAir().getVolume());
 			}
 		}
 	}
@@ -258,9 +259,9 @@ public class World {
 				continue;
 			}
 			double temperature = t.getTemperature();
-			WeatherEvent weather = new WeatherEvent(t, targetTile, t.getLocation().distanceTo(target)*WeatherEventType.RAIN.getSpeed() + (int)(Math.random()*50), 0.00002, LiquidType.WATER);;
-			t.setWeather(weather);
-			worldData.addWeatherEvent(weather);
+//			WeatherEvent weather = new WeatherEvent(t, targetTile, t.getLocation().distanceTo(target)*WeatherEventType.RAIN.getSpeed() + (int)(Math.random()*50), 0.00002, LiquidType.WATER);;
+//			t.setWeather(weather);
+//			worldData.addWeatherEvent(weather);
 		}
 	}
 	
@@ -652,13 +653,13 @@ public class World {
 			//turns grass to dirt if tile has a cold liquid || the temperature is cold
 			if(tile.checkTerrain(Terrain.GRASS) && tile.isCold() && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
-					tile.setTerrain(Terrain.DIRT);
+//					tile.setTerrain(Terrain.DIRT);
 				}
 			}
 			
 			if(tile.liquidType == LiquidType.LAVA &&(tile.getTerrain() == Terrain.GRASS || tile.getTerrain() == Terrain.DIRT) && tile.liquidAmount >= 0.05) {
 				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
-					tile.setTerrain(Terrain.SAND);
+//					tile.setTerrain(Terrain.SAND);
 				}
 			}
 			if(tile.checkTerrain(Terrain.DIRT)) {
@@ -686,7 +687,7 @@ public class World {
 					threshold += 0.1;
 				}
 				if(tile.canGrow() && Math.random() < tile.liquidAmount*threshold*tile.getHumidity() && tile.liquidType != LiquidType.ICE) {
-					tile.setTerrain(Terrain.GRASS);
+//					tile.setTerrain(Terrain.GRASS);
 				}
 			}
 		}
@@ -774,7 +775,9 @@ public class World {
 				continue;
 			}
 			tile.liquidType = weather.getLiquidType();
-			tile.liquidAmount += weather.getStrength();
+			tile.liquidAmount += 0.1;
+			weather.addStrength(-0.1);
+			tile.getAir().addVolume(-0.1);
 			
 			
 		}

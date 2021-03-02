@@ -105,12 +105,14 @@ public class Liquid {
 					tile.getModifier().finish();
 				}
 			}
-			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= 0.1) {
-				tile.liquidAmount -= 0.001;
+			
+			double evaporation = tile.getEvaporation();
+			if(tile.liquidAmount - evaporation >= 0) {
+				tile.liquidAmount -= evaporation;
+				tile.getAir().addVolume(evaporation);
+				tile.getAir().addHumidity(evaporation);
 			}
-			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount <= 0.1) {
-				tile.liquidAmount -= 0.001;
-			}
+			
 		}
 		//Utils.normalize(heightMap);
 	}

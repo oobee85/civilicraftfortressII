@@ -88,7 +88,7 @@ public class Tile implements Externalizable {
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
 		items = new ConcurrentLinkedQueue<Item>();
 		this.humidity = 1;
-		air = new Air(this.height);
+		air = new Air(this.height, 0);
 	}
 
 
@@ -110,18 +110,6 @@ public class Tile implements Externalizable {
 	public void setHumidity(float humidity) {
 //		this.humidity = humidity;
 	}
-
-	public void updateEvaporation(int currentTick) {
-		if (liquidType == LiquidType.LAVA) {
-
-		} else {
-
-			double rate = (23.8 * 1) / (air.getTemperature() + 459.67);
-			System.out.println(rate);
-
-		}
-	}
-
 	
 	public Air getAir() {
 		return air;
@@ -136,9 +124,9 @@ public class Tile implements Externalizable {
 	
 	public void updateAir() {
 		air.setTemperature(this.getTemperature());
-		double evaporation = this.getEvaporation();
-		air.addHumidity(evaporation);
-		
+		if(air.getHumidity() > 0.01) {
+			air.addHumidity(-0.01);
+		}
 		air.updatePressure();
 		checkWeatherEvent();
 	}
@@ -146,7 +134,7 @@ public class Tile implements Externalizable {
 	public double getEvaporation() {
 		double evaporation = 0.0;
 		if(this.liquidType == LiquidType.WATER && this.getTemperature() > 0) {
-			evaporation = ( 0.01*this.getTemperature() ) / this.liquidAmount;
+			evaporation = ( 0.01*this.getTemperature()*this.liquidAmount ) /10;
 //			liquidAmount -= evaporation;
 		}
 		
