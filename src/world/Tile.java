@@ -124,9 +124,11 @@ public class Tile implements Externalizable {
 	
 	public void updateAir() {
 		air.setTemperature(this.getTemperature());
-		if(air.getHumidity() > 0.01) {
-			air.addHumidity(-0.01);
-		}
+//		if(air.getHumidity() > 0.01) {
+//			air.addHumidity(-0.01);
+//		}
+		air.updateMaxVolume();
+		air.updateHumidity();
 		air.updatePressure();
 		checkWeatherEvent();
 	}

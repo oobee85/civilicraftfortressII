@@ -108,9 +108,11 @@ public class Liquid {
 			
 			double evaporation = tile.getEvaporation();
 			if(tile.liquidAmount - evaporation >= 0) {
-				tile.liquidAmount -= evaporation;
-				tile.getAir().addVolume(evaporation);
-				tile.getAir().addHumidity(evaporation);
+				boolean saturated = tile.getAir().addVolume(evaporation);
+				if(saturated == false) {
+					tile.liquidAmount -= evaporation;
+				}
+//				tile.getAir().addHumidity(evaporation);
 			}
 			
 		}
