@@ -226,8 +226,7 @@ public class World {
 	
 	
 	public void rains() {
-		for(Tile tile : tileList) {
-			tile.updateAir();
+		for(Tile tile : getTiles()) {
 			boolean canRain = tile.checkWeatherEvent();
 			if(canRain == true && tile.getWeather() == null) {
 				WeatherEvent weather = new WeatherEvent(tile, tile, tile.getAir().getVolume(), LiquidType.WATER);;
@@ -636,7 +635,27 @@ public class World {
 		
 		
 	}
+	public void updateAirStuff() {
+		for(Tile tile : getTiles()) {
+			tile.updateAir();
+		}
+			
+	}
+	public void updateEnergy() {
+		for(Tile tile : getTiles()) {
+			double energy = Season.getEnergySeason();
+			if(tile.getWeather() != null) {
+				energy -= 2;
+			}
+			double altChange = tile.getHeight()/500;
+			energy -= altChange;
+			
+			tile.addEnergy(energy);
+		}
+	}
 	public void updateTerrainChange(boolean start) {
+		updateAirStuff();
+		updateEnergy();
 		for(Tile tile : getTiles()) {
 			
 			
@@ -650,46 +669,46 @@ public class World {
 			
 			
 			
-			//turns grass to dirt if tile has a cold liquid || the temperature is cold
-			if(tile.checkTerrain(Terrain.GRASS) && tile.isCold() && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
-//					tile.setTerrain(Terrain.DIRT);
-				}
-			}
-			
-			if(tile.liquidType == LiquidType.LAVA &&(tile.getTerrain() == Terrain.GRASS || tile.getTerrain() == Terrain.DIRT) && tile.liquidAmount >= 0.05) {
-				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
-//					tile.setTerrain(Terrain.SAND);
-				}
-			}
-			if(tile.checkTerrain(Terrain.DIRT)) {
-				boolean adjacentGrass = false;
-				boolean adjacentWater = false;
-				for(Tile neighbor : Utils.getNeighbors(tile, this)) {
-					if(neighbor.checkTerrain(Terrain.GRASS)) {
-						adjacentGrass = true;
-					}
-					if(neighbor.liquidType == LiquidType.WATER) {
-						adjacentWater = true;
-					}
-				}
-				double threshold = CHANCE_TO_SWITCH_TERRAIN;
-				if(tile.liquidType == LiquidType.WATER) {
-					threshold += 0.001;
-				}
-				if(adjacentGrass) {
-					threshold += 0.01;
-				}
-				if(adjacentWater) {
-					threshold += 0.01;
-				}
-				if(adjacentGrass && adjacentWater) {
-					threshold += 0.1;
-				}
-				if(tile.canGrow() && Math.random() < tile.liquidAmount*threshold*tile.getHumidity() && tile.liquidType != LiquidType.ICE) {
-//					tile.setTerrain(Terrain.GRASS);
-				}
-			}
+//			//turns grass to dirt if tile has a cold liquid || the temperature is cold
+//			if(tile.checkTerrain(Terrain.GRASS) && tile.isCold() && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+//				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+////					tile.setTerrain(Terrain.DIRT);
+//				}
+//			}
+//			
+//			if(tile.liquidType == LiquidType.LAVA &&(tile.getTerrain() == Terrain.GRASS || tile.getTerrain() == Terrain.DIRT) && tile.liquidAmount >= 0.05) {
+//				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+////					tile.setTerrain(Terrain.SAND);
+//				}
+//			}
+//			if(tile.checkTerrain(Terrain.DIRT)) {
+//				boolean adjacentGrass = false;
+//				boolean adjacentWater = false;
+//				for(Tile neighbor : Utils.getNeighbors(tile, this)) {
+//					if(neighbor.checkTerrain(Terrain.GRASS)) {
+//						adjacentGrass = true;
+//					}
+//					if(neighbor.liquidType == LiquidType.WATER) {
+//						adjacentWater = true;
+//					}
+//				}
+//				double threshold = CHANCE_TO_SWITCH_TERRAIN;
+//				if(tile.liquidType == LiquidType.WATER) {
+//					threshold += 0.001;
+//				}
+//				if(adjacentGrass) {
+//					threshold += 0.01;
+//				}
+//				if(adjacentWater) {
+//					threshold += 0.01;
+//				}
+//				if(adjacentGrass && adjacentWater) {
+//					threshold += 0.1;
+//				}
+//				if(tile.canGrow() && Math.random() < tile.liquidAmount*threshold*tile.getHumidity() && tile.liquidType != LiquidType.ICE) {
+////					tile.setTerrain(Terrain.GRASS);
+//				}
+//			}
 		}
 		
 	}

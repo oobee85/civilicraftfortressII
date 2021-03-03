@@ -121,7 +121,7 @@ public class Animal extends Unit {
 		}
 		// Migrate according to the season
 		if(getType().isMigratory() && World.ticks > migratingUntil && Math.random() < 0.1) {
-			double season = Season.getSeason4();
+			double season = Season.getSeason4migration();
 			Tile migrationTarget = null;
 			// heading into winter
 			if(season > 0.4 && season < 0.8 && getTile().getLocation().y() < world.getHeight()/2) {

@@ -15,6 +15,7 @@ public class Tile implements Externalizable {
 	private TileLoc location;
 	private float height;
 	private float humidity;
+	private double energy;
 
 	public volatile float liquidAmount;
 	public volatile LiquidType liquidType;
@@ -32,6 +33,7 @@ public class Tile implements Externalizable {
 	private Building road;
 	private WeatherEvent weather;
 	private Air air;
+	
 
 	private ConcurrentLinkedQueue<Unit> units;
 	private ConcurrentLinkedQueue<Projectile> projectiles;
@@ -88,13 +90,16 @@ public class Tile implements Externalizable {
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
 		items = new ConcurrentLinkedQueue<Item>();
 		this.humidity = 1;
+		this.energy = 1000;
 		air = new Air(this.height, 0);
 	}
 
 
 	public float getTemperature() {
 		float season = Season.getSeason2();
-		float seasonTemp = Season.winter[getLocation().y()] + season * Season.summer[getLocation().y()];
+//		float seasonTemp = Season.winter[getLocation().y()] + season * Season.summer[getLocation().y()];
+		
+		
 //		float seasonTemp = 1 - ((1 - season) * Season.winter[getLocation().y()] + season*Season.summer[getLocation().y()]);
 //		float heightTemp = 1 - height;
 //		heightTemp = heightTemp*heightTemp;
@@ -102,7 +107,15 @@ public class Tile implements Externalizable {
 //		return (seasonTemp + heightTemp)*nightMultiplier/2;
 		return season;
 	}
-
+	
+	
+	public double getEnergy() {
+		return energy;
+	}
+	public void addEnergy(double added) {
+		this.energy += added;
+	}
+	
 	public float getHumidity() {
 		return humidity;
 	}
@@ -124,11 +137,9 @@ public class Tile implements Externalizable {
 	
 	public void updateAir() {
 		air.setTemperature(this.getTemperature());
-//		if(air.getHumidity() > 0.01) {
-//			air.addHumidity(-0.01);
-//		}
 		air.updateMaxVolume();
 		air.updateHumidity();
+		air.updateHeight(this.height);
 		air.updatePressure();
 		checkWeatherEvent();
 	}

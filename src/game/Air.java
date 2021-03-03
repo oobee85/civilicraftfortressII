@@ -16,14 +16,13 @@ public class Air {
 		this.maxHumidity = 1.0;
 		this.height = height;
 		this.temperature = temp;
-		this.maxVolume = 0;
+		this.maxVolume = 10;
 		this.canRain = false;
 		this.volume = 0;
 		this.humidity = 0.0;
 		this.pressure = 760;
 		this.updateMaxVolume();
 		this.updateHumidity();
-		this.updatePressure();
 	}
 	
 	public void setTemperature(double temp) {
@@ -31,6 +30,9 @@ public class Air {
 	}
 	public double getVolume() {
 		return volume;
+	}
+	public double getMaxVolume() {
+		return maxVolume;
 	}
 	public double getHumidity() {
 		return humidity;
@@ -50,16 +52,29 @@ public class Air {
 		}
 	}
 	public boolean isSaturated() {
-		if(volume >= maxVolume) {
+		if(humidity >= 1) {
 			return true;
 		}
 		return false;
 	}
+	public void updateHeight(double height) {
+		this.height = height;
+	}
 	public void updateMaxVolume() {
-		maxVolume = 2*this.temperature;
+		if(temperature > 0) {
+			maxVolume = 2*this.temperature;
+		}else {
+			maxVolume = 0;
+		}
+		
 	}
 	public void updateHumidity() {
-		humidity = volume / maxVolume;
+		if(maxVolume > 0) {
+			humidity = volume / maxVolume;
+		}else {
+			humidity = 0;
+		}
+		
 	}
 	public void addHumidity(double added) {
 		this.humidity += added;
@@ -71,19 +86,25 @@ public class Air {
 		
 	}
 	public void updatePressure() {
-
+		
+		
 		double P0 = 760; // mmHg
 		double g = 9.80665; // m/s^2
 		double MMair = 0.0289644; // kg/mol
 		double R = 8.31432; // Nm/molK
-		double h0 = 0; // m
+		double h0 = 100; // m
 		double h = this.height; // m
-
-		double sub = R * getTemperature();
-		double power = (-g * MMair * (h - h0)) / sub;
-
+		double boltz = 1.380649e-23;
+		double temp = 0;
+		
+//		double sub = boltz * temp;
+		
+		
+		
+		double sub = R * (getTemperature()+6);
+		double power = (-g * MMair * (h - 100)) / sub;
 		double pressure = P0 * Math.pow(Math.E, power);
-
+		
 //		System.out.println("Pressure: " + pressure);
 		this.pressure = pressure;
 

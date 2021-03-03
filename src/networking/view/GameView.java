@@ -863,16 +863,20 @@ public class GameView extends JPanel {
 				int extra = (int) (tileSize * p.getExtraSize());
 				double ratio = 0.5 * p.getHeight() / p.getMaxHeight();
 				int shadowOffset = (int) (tileSize * ratio / 2);
-				g.drawImage(p.getShadow(0), p.getTile().getLocation().x() * tileSize + shadowOffset,
-						p.getTile().getLocation().y() * tileSize + shadowOffset, tileSize - shadowOffset * 2,
+				Point drawAt = getDrawingCoords(p.getTile().getLocation());
+				
+				g.drawImage(p.getShadow(0), drawAt.x + shadowOffset,
+						drawAt.y + shadowOffset, tileSize - shadowOffset * 2,
 						tileSize - shadowOffset * 2, null);
-				g.drawImage(p.getImage(0), p.getTile().getLocation().x() * tileSize - extra / 2,
-						p.getTile().getLocation().y() * tileSize - p.getHeight() - extra / 2, tileSize + extra,
+				g.drawImage(p.getImage(0), drawAt.x - extra / 2,
+						drawAt.y - p.getHeight() - extra / 2, tileSize + extra,
 						tileSize + extra, null);
 			}
 			for (WeatherEvent w : game.world.getWeatherEvents()) {
-				g.drawImage(w.getImage(0), w.getTile().getLocation().x() * tileSize,
-						w.getTile().getLocation().y() * tileSize, tileSize, tileSize, null);
+				
+				Point drawAt = getDrawingCoords(w.getTile().getLocation());
+				g.drawImage(w.getImage(0), drawAt.x ,
+						drawAt.y, tileSize, tileSize, null);
 			}
 
 			int indicatorSize = tileSize / 12;
@@ -1047,6 +1051,9 @@ public class GameView extends JPanel {
 	}
 
 	private void drawDebugStrings(Graphics g, int lowerX, int lowerY, int upperX, int upperY) {
+		if(upperX - lowerX <= 0 || upperY - lowerY <= 0) {
+			return;
+		}
 		int[][] rows = new int[upperX - lowerX][upperY - lowerY];
 		int fontsize = tileSize / 4;
 		fontsize = Math.min(fontsize, 13);
@@ -1064,6 +1071,9 @@ public class GameView extends JPanel {
 				strings.add(String.format("RH" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getRelativeHumidity()));
 				strings.add(String.format("DEW" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getDewPoint()));
 				strings.add(String.format("EVA" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEvaporation()));
+				strings.add(String.format("VOL" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getVolume()));
+				strings.add(String.format("MV" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getMaxVolume()));
+				strings.add(String.format("ENE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEnergy()));
 //				strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTemperature()));
 				if (tile.getResource() != null) {
 					strings.add(String.format("ORE" + "=%d", tile.getResource().getYield()));
