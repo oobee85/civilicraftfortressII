@@ -1,5 +1,7 @@
 package game;
 
+import world.World;
+
 public class Air {
 
 	private double humidity;
@@ -92,17 +94,17 @@ public class Air {
 		double g = 9.80665; // m/s^2
 		double MMair = 0.0289644; // kg/mol
 		double R = 8.31432; // Nm/molK
-		double h0 = 100; // m
+		double h0 = 200; // m sealevel
 		double h = this.height; // m
 		double boltz = 1.380649e-23;
-		double temp = 0;
+		double temp = getTemperature();
 		
 //		double sub = boltz * temp;
 		
 		
 		
-		double sub = R * (getTemperature()+6);
-		double power = (-g * MMair * (h - 100)) / sub;
+		double sub = R * (temp + Math.abs(World.minTemp));
+		double power = (-g * MMair * (h - h0)) / sub;
 		double pressure = P0 * Math.pow(Math.E, power);
 		
 //		System.out.println("Pressure: " + pressure);

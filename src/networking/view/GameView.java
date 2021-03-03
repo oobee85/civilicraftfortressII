@@ -40,12 +40,16 @@ public class GameView extends JPanel {
 	private volatile BufferedImage minimapImage;
 	private volatile BufferedImage heightMapImage;
 	private volatile BufferedImage humidityMapImage;
+	private volatile BufferedImage pressureMapImage;
+	private volatile BufferedImage temperatureMapImage;
 
 	private Game game;
 	private Position viewOffset;
 	private Point previousMouse;
 	private boolean showHeightMap = false;
 	private boolean showHumidityMap = false;
+	private boolean showPressureMap = false;
+	private boolean showTemperatureMap = false;
 	private boolean draggingMouse = false;
 	private boolean drawDebugStrings = false;
 	private TileLoc hoveredTile = new TileLoc(-1, -1);
@@ -616,13 +620,20 @@ public class GameView extends JPanel {
 			this.minimapImage = images[1];
 			this.heightMapImage = images[2];
 			this.humidityMapImage = images[3];
+			this.pressureMapImage = images[4];
+			this.temperatureMapImage = images[5];
 		}
 	}
 
 	public void setShowHeightMap(boolean show) {
 		this.showHeightMap = show;
 	}
-
+	public void setShowPressureMap(boolean show) {
+		this.showPressureMap = show;
+	}
+	public void setShowTemperatureMap(boolean show) {
+		this.showTemperatureMap = show;
+	}
 	public void setShowHumidityMap(boolean show) {
 		this.showHumidityMap = show;
 	}
@@ -791,6 +802,12 @@ public class GameView extends JPanel {
 			if (showHeightMap) {
 				g.drawImage(heightMapImage, 0, 0, tileSize * game.world.getWidth(), tileSize * game.world.getHeight(),
 						null);
+			}else if (showPressureMap) {
+				g.drawImage(pressureMapImage, 0, 0, tileSize * game.world.getWidth(), tileSize * game.world.getHeight(),
+						null);
+			}else if (showTemperatureMap) {
+				g.drawImage(temperatureMapImage, 0, 0, tileSize * game.world.getWidth(), tileSize * game.world.getHeight(),
+						null);
 			} else if (showHumidityMap) {
 				g.drawImage(humidityMapImage, 0, 0, tileSize * game.world.getWidth(), tileSize * game.world.getHeight(),
 						null);
@@ -801,6 +818,10 @@ public class GameView extends JPanel {
 		} else {
 			double highHeight = Double.MIN_VALUE;
 			double lowHeight = Double.MAX_VALUE;
+			double highPressure = Double.MIN_VALUE;
+			double lowPressure = Double.MAX_VALUE;
+			double highTemp = World.minTemp;
+			double lowTemp = World.maxTemp;
 			double highHumidity = 20;
 			double lowHumidity = 0;
 			if (showHeightMap) {
@@ -815,7 +836,31 @@ public class GameView extends JPanel {
 
 					}
 				}
-			} else if (showHumidityMap) {
+			}else if (showPressureMap) {
+				for (int i = lowerX; i < upperX; i++) {
+					for (int j = lowerY; j < upperY; j++) {
+						Tile tile = game.world.get(new TileLoc(i, j));
+						if (tile == null) {
+							continue;
+						}
+						highPressure = Math.max(highPressure, tile.getAir().getPressure());
+						lowPressure = Math.min(lowPressure, tile.getAir().getPressure());
+
+					}
+				}
+			}else if (showTemperatureMap) {
+				for (int i = lowerX; i < upperX; i++) {
+					for (int j = lowerY; j < upperY; j++) {
+						Tile tile = game.world.get(new TileLoc(i, j));
+						if (tile == null) {
+							continue;
+						}
+						highTemp = Math.max(highTemp, tile.getTemperature());
+						lowTemp = Math.min(lowTemp, tile.getTemperature());
+
+					}
+				}
+			}else if (showHumidityMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
@@ -836,7 +881,7 @@ public class GameView extends JPanel {
 					if (tile == null) {
 						continue;
 					}
-					drawTile((Graphics2D) g, tile, lowHeight, highHeight, lowHumidity, highHumidity);
+					drawTile((Graphics2D) g, tile, lowHeight, highHeight, lowHumidity, highHumidity, lowPressure, highPressure, lowTemp, highTemp);
 				}
 			}
 
@@ -900,7 +945,7 @@ public class GameView extends JPanel {
 				count++;
 			}
 
-			if (!showHeightMap && !showHumidityMap) {
+			if (!showHeightMap && !showHumidityMap && !showPressureMap && !showTemperatureMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
@@ -1144,7 +1189,7 @@ public class GameView extends JPanel {
 	}
 
 	public void drawTile(Graphics2D g, Tile theTile, double lowHeight, double highHeight, double lowHumidity,
-			double highHumidity) {
+			double highHumidity, double lowPressure, double highPressure, double lowTemp, double highTemp) {
 		Point drawAt = getDrawingCoords(theTile.getLocation());
 		int draww = tileSize;
 		int drawh = tileSize;
@@ -1155,7 +1200,17 @@ public class GameView extends JPanel {
 			int r = Math.max(Math.min((int) (255 * heightRatio), 255), 0);
 			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-		} else if (showHumidityMap) {
+		}else if (showPressureMap) {
+			float pressureRatio = (float) ((theTile.getAir().getPressure() - lowPressure) / (highPressure - lowPressure));
+			int r = Math.max(Math.min((int) (255 * pressureRatio), 255), 0);
+			g.setColor(new Color(r, 0, 255 - r));
+			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
+		}else if (showTemperatureMap) {
+			float tempRatio = (float) ((theTile.getTemperature() - lowTemp) / (highTemp - lowTemp));
+			int r = Math.max(Math.min((int) (255 * tempRatio), 255), 0);
+			g.setColor(new Color(255 - r, 0, r));
+			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
+		}else if (showHumidityMap) {
 			float humidityRatio = (float) ((theTile.getAir().getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
 			float insidePara = ((humidityRatio - 0.5f) * 1.74f);
 			float almostRatio = (insidePara * insidePara * insidePara * insidePara * insidePara + 0.5f);
@@ -1415,6 +1470,10 @@ public class GameView extends JPanel {
 	public void drawMinimap(Graphics g, int x, int y, int w, int h) {
 		if (showHeightMap) {
 			g.drawImage(heightMapImage, x, y, w, h, null);
+		}else if (showPressureMap) {
+			g.drawImage(pressureMapImage, x, y, w, h, null);
+		}else if (showTemperatureMap) {
+			g.drawImage(temperatureMapImage, x, y, w, h, null);
 		} else if (showHumidityMap) {
 			g.drawImage(humidityMapImage, x, y, w, h, null);
 		} else {

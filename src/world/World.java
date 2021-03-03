@@ -24,6 +24,8 @@ public class World {
 	public static final int NIGHT_DURATION = 500;
 	public static final int TRANSITION_PERIOD = 100;
 	private static final double CHANCE_TO_SWITCH_TERRAIN = 5;
+	public static final int minTemp = -30;
+	public static final int maxTemp = 200;
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
@@ -1214,6 +1216,37 @@ public class World {
 			Color c = new Color(r, 0, 255-r);
 			heightMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 		}
+		
+		double highPressure = Double.MIN_VALUE;
+		double lowPressure = Double.MAX_VALUE;
+		for(Tile tile : getTiles() ) {
+			highPressure = Math.max(highPressure, tile.getAir().getPressure());
+			lowPressure = Math.min(lowPressure, tile.getAir().getPressure());
+		}
+		
+		BufferedImage pressureMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
+		for(Tile tile : getTiles() ) {
+			float pressureRatio = (float) ((tile.getAir().getPressure() - lowPressure) / (highPressure - lowPressure));
+			int r = Math.max(Math.min((int)(255*pressureRatio), 255), 0);
+			Color c = new Color(r, 0, 255-r);
+			pressureMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
+		}
+		
+		double highTemperature = minTemp;
+		double lowTemperature = maxTemp;
+		for(Tile tile : getTiles() ) {
+			highTemperature = Math.max(highTemperature, tile.getTemperature());
+			lowTemperature = Math.min(lowTemperature, tile.getTemperature());
+		}
+		
+		BufferedImage temperatureMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
+		for(Tile tile : getTiles() ) {
+			float temperatureRatio = (float) ((tile.getTemperature() - lowTemperature) / (highTemperature - lowTemperature));
+			int r = Math.max(Math.min((int)(255*temperatureRatio), 255), 0);
+			Color c = new Color(255-r, 0, r);
+			temperatureMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
+		}
+		
 		BufferedImage humidityMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 		
 		double highHumidity = Double.MIN_VALUE;
@@ -1235,7 +1268,10 @@ public class World {
 				ImageCreation.convertToHexagonal(terrainImage), 
 				ImageCreation.convertToHexagonal(minimapImage), 
 				ImageCreation.convertToHexagonal(heightMapImage),
-				ImageCreation.convertToHexagonal(humidityMapImage) };
+				ImageCreation.convertToHexagonal(humidityMapImage), 
+				ImageCreation.convertToHexagonal(pressureMapImage),
+				ImageCreation.convertToHexagonal(temperatureMapImage),
+				};
 		
 	}
 
