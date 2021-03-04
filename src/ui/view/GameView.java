@@ -64,9 +64,7 @@ public class GameView {
 	public GameView(Game game, boolean useOpenGL) {
 		state = new GameViewState();
 		if(useOpenGL) {
-			GLDrawer gldrawer = new GLDrawer(game, state);
-			drawingCanvas = gldrawer.getDrawingCanvas();
-			drawer = gldrawer;
+			drawer = new GLDrawer(game, state);
 			panel = new JPanel() {
 				@Override
 				public void paintComponent(Graphics g) {
@@ -77,19 +75,12 @@ public class GameView {
 			};
 		}
 		else {
-			VanillaDrawer vanillaDrawer = new VanillaDrawer(game, state);
-			drawingCanvas = new JPanel() {
-				@Override
-				public void paintComponent(Graphics g) {
-					super.paintComponent(g);
-					vanillaDrawer.paint(g, panel.getWidth(), panel.getHeight());
-				}
-			};
-			drawer = vanillaDrawer;
+			drawer = new VanillaDrawer(game, state);
 			panel = new JPanel();
 		}
-		panel.setLayout(new BorderLayout());
+		drawingCanvas = drawer.getDrawingCanvas();
 		drawingCanvas.setFocusable(false);
+		panel.setLayout(new BorderLayout());
 		panel.add(drawingCanvas, BorderLayout.CENTER);
 		this.game = game;
 		this.guiController = game.getGUIController();

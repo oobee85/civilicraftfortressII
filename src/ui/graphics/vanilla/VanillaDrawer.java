@@ -5,6 +5,8 @@ import java.awt.image.*;
 import java.util.*;
 import java.util.List;
 
+import javax.swing.*;
+
 import game.*;
 import game.liquid.*;
 import ui.*;
@@ -40,20 +42,30 @@ public class VanillaDrawer implements Drawer {
 
 	private final Game game;
 	private GameViewState state;
-	private int lastPanelWidth, lastPanelHeight;
+	private JPanel canvas;
 	
 	public VanillaDrawer(Game game, GameViewState state) {
 		super();
 		this.game = game;
 		this.state = state;
+		canvas = new JPanel() {
+			private static final long serialVersionUID = 1L;
+			@Override
+			public void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				drawStuff(g);
+			}
+		};
+	}
+	
+	public Component getDrawingCanvas() {
+		return canvas;
 	}
 
-	public void paint(Graphics g, int jpanelwidth, int jpanelheight) {
+	private void drawStuff(Graphics g) {
 		if (game == null) {
 			return;
 		}
-		lastPanelWidth = jpanelwidth;
-		lastPanelHeight = jpanelheight;
 		
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
@@ -61,10 +73,10 @@ public class VanillaDrawer implements Drawer {
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 				RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 		g.setColor(game.getBackgroundColor());
-		g.fillRect(0, 0, lastPanelWidth, lastPanelHeight);
+		g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		drawGame(g);
 		g.setColor(Color.black);
-		g.drawRect(-1, 0, lastPanelWidth + 1, lastPanelHeight);
+		g.drawRect(-1, 0, canvas.getWidth() + 1, canvas.getHeight());
 	}
 	
 	private void drawGame(Graphics g) {
@@ -74,7 +86,7 @@ public class VanillaDrawer implements Drawer {
 		}
 		long startTime = System.currentTimeMillis();
 		g.translate(-state.viewOffset.getIntX(), -state.viewOffset.getIntY());
-		draw(g, lastPanelWidth, lastPanelHeight);
+		draw(g, canvas.getWidth(), canvas.getHeight());
 		g.translate(state.viewOffset.getIntX(), state.viewOffset.getIntY());
 		if (state.mousePressLocation != null && state.draggingMouse == true) {
 			Rectangle selectionRectangle = normalizeRectangle(state.mousePressLocation, state.previousMouse);
@@ -93,14 +105,14 @@ public class VanillaDrawer implements Drawer {
 			String progress = String.format(state.faction.getResearchTarget() + " %d/%d",
 					state.faction.getResearchTarget().getPointsSpent(), state.faction.getResearchTarget().getRequiredPoints());
 			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress,
-					lastPanelWidth - lastPanelWidth / 3 - 4, 4, lastPanelWidth / 3, 30);
+					canvas.getWidth() - canvas.getWidth() / 3 - 4, 4, canvas.getWidth() / 3, 30);
 		}
 		long endTime = System.currentTimeMillis();
 		long deltaTime = endTime - startTime;
 		g.setFont(KUIConstants.infoFont);
 		for (int i = 0; i < 2; i++) {
 			int x = 10;
-			int y = lastPanelHeight - 5;
+			int y = canvas.getHeight() - 5;
 			g.setColor(Color.green);
 			if (i == 1) {
 				g.setColor(Color.black);
@@ -808,7 +820,7 @@ public class VanillaDrawer implements Drawer {
 		}
 		Position offsetTile = Utils.getWorldCoordOfPixel(new Position(0, 0), state.viewOffset, state.tileSize);
 		Position offsetTilePlusCanvas = Utils.getWorldCoordOfPixel(
-				new Position(lastPanelWidth, lastPanelHeight), state.viewOffset, state.tileSize);
+				new Position(canvas.getWidth(), canvas.getHeight()), state.viewOffset, state.tileSize);
 		return new Position[] {
 				offsetTile,
 				new Position(offsetTile.x, offsetTilePlusCanvas.y),
