@@ -19,6 +19,22 @@ public final class Utils {
 	
 	public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	
+
+	public static String loadFileAsString(String path) {
+		StringBuilder result = new StringBuilder();
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(Utils.class.getResourceAsStream(path)))) {
+			String line = "";
+			while((line = reader.readLine()) != null) {
+				result.append(line).append("\n");
+			}
+		}
+		catch (IOException e) {
+			System.err.println("ERROR: Failed to read file at " + path);
+			e.printStackTrace();
+		}
+		return result.toString();
+	}
+	
 	public static String getName(Object o) {
 		// TODO use map to record these so I can just lookup
 		String rawName = "";

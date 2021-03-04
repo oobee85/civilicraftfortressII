@@ -37,12 +37,12 @@ public class ServerGUI extends JPanel {
 	
 	public void setGameInstance(Game instance) {
 		if(gameView != null) {
-			this.remove(gameView);
+			this.remove(gameView.getPanel());
 		}
 		gameView = new GameView(instance);
 		gameView.setCommandInterface(Utils.makeFunctionalCommandInterface(instance));
 		gameView.requestFocus();
-		this.add(gameView, BorderLayout.CENTER);
+		this.add(gameView.getPanel(), BorderLayout.CENTER);
 		revalidate();
 		repaint();
 	}

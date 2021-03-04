@@ -15,7 +15,7 @@ import ui.*;
 import utils.*;
 import world.*;
 
-public class GameView extends JPanel {
+public class GameView {
 
 	public static final int FAST_MODE_TILE_SIZE = 10;
 	public static final int NUM_DEBUG_DIGITS = 3;
@@ -72,20 +72,29 @@ public class GameView extends JPanel {
 	private BuildingType selectedBuildingToPlan;
 
 	public long previousTickTime;
+	
+	private final JPanel panel;
 
 	public GameView(Game game) {
+		panel = new JPanel() {
+			@Override
+			public void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				GameView.this.paintComponent(g);
+			}
+		};
 		this.game = game;
 		this.guiController = game.getGUIController();
-		this.setBackground(Color.black);
+		panel.setBackground(Color.black);
 		viewOffset = new Position(0, 0);
-		addMouseWheelListener(new MouseWheelListener() {
+		panel.addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				// +1 is in -1 is out
 				zoomView(e.getWheelRotation(), e.getPoint().x, e.getPoint().y);
 			}
 		});
-		addMouseMotionListener(new MouseMotionListener() {
+		panel.addMouseMotionListener(new MouseMotionListener() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				mouseOver(getTileAtPixel(e.getPoint()));
@@ -111,7 +120,7 @@ public class GameView extends JPanel {
 				}
 			}
 		});
-		addMouseListener(new MouseListener() {
+		panel.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				Point currentMouse = e.getPoint();
@@ -171,7 +180,7 @@ public class GameView extends JPanel {
 			}
 		});
 
-		addKeyListener(new KeyListener() {
+		panel.addKeyListener(new KeyListener() {
 			@Override
 			public void keyTyped(KeyEvent e) {
 			}
@@ -646,7 +655,7 @@ public class GameView extends JPanel {
 		tileSize = zoom;
 		viewOffset.x = (tile.getLocation().x() - panelWidth / 2 / tileSize) * tileSize + tileSize / 2;
 		viewOffset.y = (tile.getLocation().y() - panelHeight / 2 / tileSize) * tileSize;
-		repaint();
+		panel.repaint();
 	}
 
 	public void zoomView(int scroll, int mx, int my) {
@@ -667,20 +676,20 @@ public class GameView extends JPanel {
 			viewOffset.x -= mx - focalPoint.x;
 			viewOffset.y -= my - focalPoint.y;
 		}
-		repaint();
+		panel.repaint();
 	}
 
 	public void shiftView(int dx, int dy) {
 		viewOffset.x += dx;
 		viewOffset.y += dy;
-		repaint();
+		panel.repaint();
 	}
 
 	public void moveViewTo(double ratiox, double ratioy, int panelWidth, int panelHeight) {
 		Position tile = new Position(ratiox * game.world.getWidth(), ratioy * game.world.getHeight());
 		Position pixel = tile.multiply(tileSize).subtract(new Position(panelWidth / 2, panelHeight / 2));
 		viewOffset = pixel;
-		repaint();
+		panel.repaint();
 	}
 
 	public Position getWorldCoordOfPixel(Position pixel) {
@@ -704,9 +713,7 @@ public class GameView extends JPanel {
 		return tile.multiply(tileSize).subtract(viewOffset);
 	}
 
-	@Override
 	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
 		if (game == null) {
 			return;
 		}
@@ -716,10 +723,10 @@ public class GameView extends JPanel {
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 				RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 		g.setColor(game.getBackgroundColor());
-		g.fillRect(0, 0, getWidth(), getHeight());
-		drawGame(g, getWidth(), getHeight());
+		g.fillRect(0, 0, panel.getWidth(), panel.getHeight());
+		drawGame(g, panel.getWidth(), panel.getHeight());
 		g.setColor(Color.black);
-		g.drawRect(-1, 0, getWidth() + 1, getHeight());
+		g.drawRect(-1, 0, panel.getWidth() + 1, panel.getHeight());
 	}
 
 	private static Position[] normalizeRectangle(Position one, Position two) {
@@ -771,7 +778,7 @@ public class GameView extends JPanel {
 		g.setFont(KUIConstants.infoFont);
 		for (int i = 0; i < 2; i++) {
 			int x = 10;
-			int y = getHeight() - 5;
+			int y = panel.getHeight() - 5;
 			g.setColor(Color.green);
 			if (i == 1) {
 				g.setColor(Color.black);
@@ -1483,8 +1490,8 @@ public class GameView extends JPanel {
 			Position offsetTile = getWorldCoordOfPixel(viewOffset);
 			int boxx = (int) (offsetTile.x * w / game.world.getWidth() / 2);
 			int boxy = (int) (offsetTile.y * h / game.world.getHeight() / 2);
-			int boxw = (int) (getWidth() * w / tileSize / game.world.getWidth());
-			int boxh = (int) (getHeight() * h / tileSize / game.world.getHeight());
+			int boxw = (int) (panel.getWidth() * w / tileSize / game.world.getWidth());
+			int boxh = (int) (panel.getHeight() * h / tileSize / game.world.getHeight());
 			g.setColor(Color.yellow);
 			g.drawRect(x + boxx, y + boxy, boxw, boxh);
 		}
@@ -1504,5 +1511,19 @@ public class GameView extends JPanel {
 
 	public Game getGameInstance() {
 		return game;
+	}
+	
+	public int getWidth() {
+		return panel.getWidth();
+	}
+	public int getHeight() {
+		return panel.getHeight();
+	}
+	public JPanel getPanel() {
+		return panel;
+	}
+	
+	public void requestFocus() {
+		panel.requestFocus();
 	}
 }

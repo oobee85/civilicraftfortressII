@@ -286,16 +286,16 @@ public class ClientGUI {
 	}
 	public void setGameInstance(Game instance) {
 		if(gameView != null) {
-			ingamePanel.remove(gameView);
+			ingamePanel.remove(gameView.getPanel());
 		}
 		gameView = new GameView(instance);
 		MinimapView minimapView = new MinimapView(gameView);
 		minimapView.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, ClientGUI.GUIWIDTH));
 		gameView.requestFocus();
 		gameViewOverlay = new GameViewOverlay(instance.getGUIController());
-		gameView.setLayout(new BorderLayout());
-		gameView.add(gameViewOverlay, BorderLayout.CENTER);
-		ingamePanel.add(gameView, BorderLayout.CENTER);
+		gameView.getPanel().setLayout(new BorderLayout());
+		gameView.getPanel().add(gameViewOverlay, BorderLayout.CENTER);
+		ingamePanel.add(gameView.getPanel(), BorderLayout.CENTER);
 		sidePanel.add(minimapView, BorderLayout.NORTH);
 		
 
