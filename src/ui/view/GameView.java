@@ -234,7 +234,7 @@ public class GameView {
 		return faction;
 	}
 
-	public void unitStop() {
+	private void unitStop() {
 		for (Thing thing : selectedThings) {
 			if (thing instanceof Unit) {
 				commandInterface.stop((Unit) thing);
@@ -292,14 +292,14 @@ public class GameView {
 		return tiles;
 	}
 
-	public void selectInBox(Position topLeft, Position botRight, boolean shiftDown) {
+	private void selectInBox(Position topLeft, Position botRight, boolean shiftDown) {
 		if (game.world == null) {
 			return;
 		}
 		toggleSelectionForTiles(getTilesBetween(topLeft, botRight), shiftDown, controlDown);
 	}
 
-	public void leftClick(Position tilepos, boolean shiftDown) {
+	private void leftClick(Position tilepos, boolean shiftDown) {
 		if (game.world == null) {
 			return;
 		}
@@ -365,7 +365,7 @@ public class GameView {
 		}
 	}
 
-	public void attackCommand(ConcurrentLinkedQueue<Thing> selectedThings, Tile tile, boolean shiftEnabled,
+	private void attackCommand(ConcurrentLinkedQueue<Thing> selectedThings, Tile tile, boolean shiftEnabled,
 			boolean forceAttack) {
 		for (Thing thing : selectedThings) {
 			if (thing instanceof Unit) {
@@ -390,22 +390,8 @@ public class GameView {
 			}
 		}
 	}
-//	public void getPlantsToHarvest(Unit unit, Plant previous) {
-//		Plant closestPlant = game.world.getPlants().peek();
-//		for(Plant plant: game.world.getPlants()) {
-//			if(plant.getType() == previous.getType() && plant.isDead() == false && unit.getTile().getLocation().distanceTo(plant.getTile().getLocation()) < 
-//					unit.getTile().getLocation().distanceTo(closestPlant.getTile().getLocation())) {
-//				closestPlant = plant;
-//			}
-//		}
-//		Tile tile = closestPlant.getTile();
-//		if(tile != previous.getTile() && closestPlant.isDead() == false && closestPlant.getType() == previous.getType()) {
-//			commandInterface.harvestThing(unit, closestPlant, !shiftDown);
-//		}
-//		
-//	}
 
-	public void rightClick(Position tilepos, boolean shiftDown) {
+	private void rightClick(Position tilepos, boolean shiftDown) {
 		Tile targetTile = game.world.get(new TileLoc(tilepos.getIntX(), tilepos.getIntY()));
 		if (targetTile == null) {
 			return;
@@ -520,7 +506,7 @@ public class GameView {
 		selectedBuildingToPlan = buildingType;
 	}
 
-	public void selectAllUnits() {
+	private void selectAllUnits() {
 		for (Unit unit : game.world.getUnits()) {
 			if (unit.getFaction() == faction) {
 				selectThing(unit);
@@ -528,7 +514,7 @@ public class GameView {
 		}
 	}
 
-	public void toggleSelectionForTiles(List<Tile> tiles, boolean shiftEnabled, boolean controlEnabled) {
+	private void toggleSelectionForTiles(List<Tile> tiles, boolean shiftEnabled, boolean controlEnabled) {
 
 		// deselects everything if shift or control isnt enabled
 		if (shiftEnabled == false && !controlEnabled) {
@@ -561,7 +547,7 @@ public class GameView {
 		}
 	}
 
-	public void selectThing(Thing thing) {
+	private void selectThing(Thing thing) {
 		thing.setIsSelected(true);
 		selectedThings.add(thing);
 		if (thing instanceof Unit) {
@@ -603,7 +589,7 @@ public class GameView {
 		}
 	}
 
-	public void deselectOneThing(Thing deselect) {
+	private void deselectOneThing(Thing deselect) {
 		selectedThings.remove(deselect);
 		deselect.setIsSelected(false);
 		if (deselect instanceof Unit) {
@@ -611,7 +597,7 @@ public class GameView {
 		}
 	}
 
-	public void deselectOtherThings(Thing keep) {
+	private void deselectOtherThings(Thing keep) {
 		for (Thing thing : selectedThings) {
 			thing.setIsSelected(false);
 			if (thing instanceof Unit) {
@@ -647,18 +633,11 @@ public class GameView {
 		this.showHumidityMap = show;
 	}
 
-	public void mouseOver(Position tilepos) {
+	private void mouseOver(Position tilepos) {
 		hoveredTile = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
 	}
 
-	public void centerViewOn(Tile tile, int zoom, int panelWidth, int panelHeight) {
-		tileSize = zoom;
-		viewOffset.x = (tile.getLocation().x() - panelWidth / 2 / tileSize) * tileSize + tileSize / 2;
-		viewOffset.y = (tile.getLocation().y() - panelHeight / 2 / tileSize) * tileSize;
-		panel.repaint();
-	}
-
-	public void zoomView(int scroll, int mx, int my) {
+	private void zoomView(int scroll, int mx, int my) {
 		int newTileSize;
 		if (scroll > 0) {
 			newTileSize = (int) ((tileSize - 1) * 0.95);
@@ -668,7 +647,7 @@ public class GameView {
 		zoomViewTo(newTileSize, mx, my);
 	}
 
-	public void zoomViewTo(int newTileSize, int mx, int my) {
+	private void zoomViewTo(int newTileSize, int mx, int my) {
 		if (newTileSize > 0) {
 			Position tile = getWorldCoordOfPixel(new Position(mx, my));
 			tileSize = newTileSize;
@@ -679,7 +658,7 @@ public class GameView {
 		panel.repaint();
 	}
 
-	public void shiftView(int dx, int dy) {
+	private void shiftView(int dx, int dy) {
 		viewOffset.x += dx;
 		viewOffset.y += dy;
 		panel.repaint();
@@ -692,28 +671,24 @@ public class GameView {
 		panel.repaint();
 	}
 
-	public Position getWorldCoordOfPixel(Position pixel) {
+	private Position getWorldCoordOfPixel(Position pixel) {
 		Position tile = pixel.add(viewOffset).divide(tileSize);
 		return tile;
 	}
 
-	public Position getWorldCoordOfPixel(Point pixel) {
+	private Position getWorldCoordOfPixel(Point pixel) {
 		double column = ((pixel.x + viewOffset.x) / tileSize);
 		double row = ((pixel.y + viewOffset.y) / tileSize);
 		return new Position(column, row);
 	}
 
-	public Position getTileAtPixel(Point pixel) {
+	private Position getTileAtPixel(Point pixel) {
 		int column = (int) ((pixel.x + viewOffset.x) / tileSize);
 		int row = (int) ((pixel.y + viewOffset.y - (column % 2) * tileSize / 2) / tileSize);
 		return new Position(column, row);
 	}
 
-	public Position getPixelForTile(Position tile) {
-		return tile.multiply(tileSize).subtract(viewOffset);
-	}
-
-	protected void paintComponent(Graphics g) {
+	private void paintComponent(Graphics g) {
 		if (game == null) {
 			return;
 		}
@@ -745,7 +720,7 @@ public class GameView {
 		return new Rectangle(x, y, width, height);
 	}
 
-	public void drawGame(Graphics g, int panelWidth, int panelHeight) {
+	private void drawGame(Graphics g, int panelWidth, int panelHeight) {
 		if (game.world == null) {
 			g.drawString("No World to display", 20, 20);
 			return;
@@ -798,7 +773,7 @@ public class GameView {
 		Toolkit.getDefaultToolkit().sync();
 	}
 
-	public void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffset) {
+	private void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffset) {
 		// Try to only draw stuff that is visible on the screen
 		int lowerX = Math.max(0, viewOffset.divide(tileSize).getIntX() - 2);
 		int lowerY = Math.max(0, viewOffset.divide(tileSize).getIntY() - 2);
@@ -1009,9 +984,6 @@ public class GameView {
 							if (t == null)
 								continue;
 							drawAt = getDrawingCoords(t.getLocation());
-							int w = tileSize;
-							int h = tileSize;
-
 							if (t.getLocation().distanceTo(building.getTile().getLocation()) <= range) {
 								g.setColor(Color.BLACK);
 								Utils.setTransparency(g, 0.3f);
@@ -1066,9 +1038,6 @@ public class GameView {
 							if (t == null)
 								continue;
 							drawAt = getDrawingCoords(t.getLocation());
-							int w = tileSize;
-							int h = tileSize;
-
 							if (t.getLocation().distanceTo(unit.getTile().getLocation()) <= range) {
 								g.setColor(Color.BLACK);
 								Utils.setTransparency(g, 0.3f);
@@ -1185,17 +1154,13 @@ public class GameView {
 		g.setStroke(stroke);
 	}
 
-	public Point getDrawingCoords(TileLoc tileLoc) {
+	private Point getDrawingCoords(TileLoc tileLoc) {
 		int x = tileLoc.x() * tileSize;
 		int y = tileLoc.y() * tileSize + (tileLoc.x() % 2) * tileSize / 2;
 		return new Point(x, y);
 	}
 
-	public double getOddDrawingOffset() {
-		return tileSize / 2;
-	}
-
-	public void drawTile(Graphics2D g, Tile theTile, double lowHeight, double highHeight, double lowHumidity,
+	private void drawTile(Graphics2D g, Tile theTile, double lowHeight, double highHeight, double lowHumidity,
 			double highHumidity, double lowPressure, double highPressure, double lowTemp, double highTemp) {
 		Point drawAt = getDrawingCoords(theTile.getLocation());
 		int draww = tileSize;
@@ -1306,7 +1271,7 @@ public class GameView {
 		}
 	}
 
-	public void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh) {
+	private void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh) {
 
 		BufferedImage bI = Utils.toBufferedImage(building.getImage(0));
 		if (building.isBuilt() == false) {
@@ -1327,19 +1292,17 @@ public class GameView {
 		}
 	}
 
-	public void drawTarget(Graphics g, TileLoc tileLoc) {
+	private void drawTarget(Graphics g, TileLoc tileLoc) {
 		Point drawAt = getDrawingCoords(tileLoc);
 		int w = (int) (tileSize * 8 / 10);
 		int hi = (int) (tileSize * 8 / 10);
 		g.drawImage(TARGET_IMAGE, drawAt.x + tileSize * 1 / 10, drawAt.y + tileSize * 1 / 10, w, hi, null);
 	}
 
-	public void drawInventory(Graphics g, Unit unit, Building building) {
+	private void drawInventory(Graphics g, Unit unit, Building building) {
 		if (tileSize <= 30) {
 			return;
 		}
-		int w = tileSize;
-		int h = tileSize;
 		int numDrawn = 0;
 		if (building != null) {
 			Point drawAt = getDrawingCoords(building.getTile().getLocation());
@@ -1362,7 +1325,7 @@ public class GameView {
 
 	}
 
-	public void drawHealthBar(Graphics g, Thing thing) {
+	private void drawHealthBar(Graphics g, Thing thing) {
 		if (tileSize <= 30) {
 			return;
 		}
@@ -1387,7 +1350,7 @@ public class GameView {
 		g.fillRect(x + thickness, y + thickness, greenBarWidth, h - thickness * 2);
 	}
 
-	public void drawHitsplat(Graphics g, Thing thing) {
+	private void drawHitsplat(Graphics g, Thing thing) {
 
 		Point drawAt = getDrawingCoords(thing.getTile().getLocation());
 		int splatWidth = (int) (tileSize * .5);
@@ -1495,10 +1458,6 @@ public class GameView {
 			g.setColor(Color.yellow);
 			g.drawRect(x + boxx, y + boxy, boxw, boxh);
 		}
-	}
-
-	public ConcurrentLinkedQueue<Thing> getSelectedThings() {
-		return selectedThings;
 	}
 
 	public CommandInterface getCommandInterface() {
