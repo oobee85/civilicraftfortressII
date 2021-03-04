@@ -12,11 +12,11 @@ import utils.Utils;
 public class CombatStatInfoPanel extends InfoPanel{
 
 	private CombatStats showing;
-	private static final Image attackImage = Utils.loadImage("resources/Images/interfaces/attack.png");
-	private static final Image attackspeedImage = Utils.loadImage("resources/Images/interfaces/attackspeed.png");
-	private static final Image visionImage = Utils.loadImage("resources/Images/interfaces/vision.png");
-	private static final Image movespeedImage = Utils.loadImage("resources/Images/interfaces/movespeed.png");
-	private static final Image healthImage = Utils.loadImage("resources/Images/interfaces/redhitsplat.png");
+	private static final Image attackImage = Utils.loadImage("Images/interfaces/attack.png");
+	private static final Image attackspeedImage = Utils.loadImage("Images/interfaces/attackspeed.png");
+	private static final Image visionImage = Utils.loadImage("Images/interfaces/vision.png");
+	private static final Image movespeedImage = Utils.loadImage("Images/interfaces/movespeed.png");
+	private static final Image healthImage = Utils.loadImage("Images/interfaces/redhitsplat.png");
 	
 	public CombatStatInfoPanel(CombatStats showing) {
 		super(showing.toString(), attackImage);

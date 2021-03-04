@@ -3,7 +3,7 @@
 	{
 		"name":"STONE_ROAD",
 		"info":"Increases movement speed",
-		"image":"resources/Images/buildings/stone_road.png",
+		"image":"Images/buildings/stone_road.png",
 		"vision":0,
 		"movespeed":20,
 		"cost":{"STONE":10},
@@ -15,7 +15,7 @@
 	{
 		"name":"BRICK_ROAD",
 		"info":"Increases movement speed more",
-		"image":"resources/Images/buildings/brick_road.png",
+		"image":"Images/buildings/brick_road.png",
 		"vision":0,
 		"movespeed":1000,
 		"cost":{"STONE":100},
@@ -27,7 +27,7 @@
 	{
 		"name":"WALL_WOOD",
 		"info":"Blocks movement",
-		"image":"resources/Images/buildings/wall_wood.png",
+		"image":"Images/buildings/wall_wood.png",
 		"vision":0,
 		"cost":{"WOOD":50},
 		"culture":0.25,
@@ -37,7 +37,7 @@
 	{
 		"name":"WALL_STONE",
 		"info":"Blocks movement",
-		"image":"resources/Images/buildings/wall_stone.png",
+		"image":"Images/buildings/wall_stone.png",
 		"vision":1,
 		"cost":{"WOOD":200, "STONE":200},
 		"culture":0.25,
@@ -48,7 +48,7 @@
 	{
 		"name":"WALL_BRICK",
 		"info":"Blocks movement",
-		"image":"resources/Images/buildings/wall_brick.png",
+		"image":"Images/buildings/wall_brick.png",
 		"vision":1,
 		"cost":{"STONE":400, "ADAMANTITE_BAR":1},
 		"culture":0.25,
@@ -59,7 +59,7 @@
 	{
 		"name":"GATE_WOOD",
 		"info":"Blocks movement except for own faction",
-		"image":"resources/Images/buildings/gate_wood.png",
+		"image":"Images/buildings/gate_wood.png",
 		"vision":1,
 		"cost":{"WOOD":200, "IRON_BAR":5, "STONE":200},
 		"culture":0.5,
@@ -70,7 +70,7 @@
 	{
 		"name":"GATE_STONE",
 		"info":"Blocks movement except for own faction",
-		"image":"resources/Images/buildings/gate_stone.png",
+		"image":"Images/buildings/gate_stone.png",
 		"vision":1,
 		"cost":{"WOOD":400, "MITHRIL_BAR":5, "STONE":400},
 		"culture":0.5,
@@ -81,7 +81,7 @@
 	{
 		"name":"GATE_BRICK",
 		"info":"Blocks movement except for own faction",
-		"image":"resources/Images/buildings/gate_brick.png",
+		"image":"Images/buildings/gate_brick.png",
 		"vision":1,
 		"cost":{"WOOD":1000, "STONE":1000, "ADAMANTITE_BAR":5},
 		"culture":0.5,
@@ -92,7 +92,7 @@
 	{
 		"name":"MINE",
 		"info":"Workers mine stone from here",
-		"image":"resources/Images/buildings/mine256.png",
+		"image":"Images/buildings/mine256.png",
 		"vision":1,
 		"cost":{"WOOD":50},
 		"culture":0,
@@ -102,7 +102,7 @@
 	{
 		"name":"QUARRY",
 		"info":"Workers can mine ores from here",
-		"image":"resources/Images/buildings/quarry.png",
+		"image":"Images/buildings/quarry.png",
 		"vision":5,
 		"cost":{"WOOD":100, "STONE":50},
 		"culture":0.5,
@@ -113,7 +113,7 @@
 	{
 		"name":"IRRIGATION",
 		"info":"Workers harvest food from here",
-		"image":"resources/Images/buildings/irrigation.png",
+		"image":"Images/buildings/irrigation.png",
 		"vision":1,
 		"cost":{"WOOD":50},
 		"culture":0,
@@ -123,7 +123,7 @@
 	{
 		"name":"GRANARY",
 		"info":"Increases unit supply",
-		"image":"resources/Images/buildings/granary.png",
+		"image":"Images/buildings/granary.png",
 		"vision":1,
 		"cost":{"WOOD":200, "BRONZE_BAR":1},
 		"culture":0.25,
@@ -134,7 +134,7 @@
 	{
 		"name":"WINDMILL",
 		"info":"Produces lots of food",
-		"image":"resources/Images/buildings/ancientwindmill.png",
+		"image":"Images/buildings/ancientwindmill.png",
 		"vision":1,
 		"cost":{"WOOD":500, "IRON_BAR":5},
 		"culture":0.5,
@@ -144,7 +144,7 @@
 	{
 		"name":"SAWMILL",
 		"info":"Workers harvest wood from here",
-		"image":"resources/Images/buildings/sawmill.png",
+		"image":"Images/buildings/sawmill.png",
 		"vision":5,
 		"cost":{"WOOD":100, "STONE":50},
 		"culture":0,
@@ -154,7 +154,7 @@
 	{
 		"name":"FARM",
 		"info":"Trap a horse to breed horses",
-		"image":"resources/Images/buildings/farm.png",
+		"image":"Images/buildings/farm.png",
 		"vision":1,
 		"cost":{"BRONZE_BAR":5, "WOOD":500},
 		"culture":0.5,
@@ -164,7 +164,7 @@
 	{
 		"name":"STABLES",
 		"info":"Build horse units",
-		"image":"resources/Images/buildings/stables.png",
+		"image":"Images/buildings/stables.png",
 		"vision":1,
 		"cost":{"IRON_BAR":5, "WOOD":200},
 		"culture":0.5,
@@ -175,7 +175,7 @@
 	{
 		"name":"WATCHTOWER",
 		"info":"Provides vision",
-		"image":"resources/Images/buildings/watchtower.png",
+		"image":"Images/buildings/watchtower.png",
 		"vision":10,
 		"cost":{"WOOD":1000, "MITHRIL_BAR":5},
 		"culture":0.25,
@@ -185,7 +185,7 @@
 	{
 		"name":"CASTLE",
 		"info":"Produces workers",
-		"image":"resources/Images/buildings/castle256.png",
+		"image":"Images/buildings/castle256.png",
 		"vision":5,
 		"cost":{"WOOD":500, "STONE":500},
 		"buildsunits":["WORKER", "PRIEST"],
@@ -197,7 +197,7 @@
 	{
 		"name":"BARRACKS",
 		"info":"Produces basic combat units",
-		"image":"resources/Images/buildings/barracks256.png",
+		"image":"Images/buildings/barracks256.png",
 		"vision":1,
 		"cost":{"WOOD":300, "STONE":150},
 		"buildsunits":["WARRIOR","ARCHER","SPEARMAN","SWORDSMAN"],
@@ -208,7 +208,7 @@
 	{
 		"name":"WORKSHOP",
 		"info":"Produces advanced combat units",
-		"image":"resources/Images/buildings/workshop.png",
+		"image":"Images/buildings/workshop.png",
 		"vision":1,
 		"cost":{"WOOD":500, "IRON_BAR":10, "STONE":500},
 		"buildsunits":["LONGBOWMAN","CATAPULT","TREBUCHET", "SNIPER", "WIZARD"],
@@ -219,7 +219,7 @@
 	{
 		"name":"BLACKSMITH",
 		"info":"Crafts items up to mithril",
-		"image":"resources/Images/buildings/blacksmith.png",
+		"image":"Images/buildings/blacksmith.png",
 		"vision":1,
 		"cost":{"WOOD":100, "STONE":100},
 		"culture":0.5,
@@ -229,7 +229,7 @@
 	{
 		"name":"RESEARCH_LAB",
 		"info":"Unlocks researches after iron working",
-		"image":"resources/Images/buildings/research.png",
+		"image":"Images/buildings/research.png",
 		"vision":1,
 		"cost":{"WOOD":200, "IRON_BAR":5, "STONE":200},
 		"culture":0.5,
@@ -239,7 +239,7 @@
 	{
 		"name":"HELLFORGE",
 		"info":"Crafts items above adamant",
-		"image":"resources/Images/buildings/hellforge.png",
+		"image":"Images/buildings/hellforge.png",
 		"vision":1,
 		"cost":{"MITHRIL_BAR":20, "STONE":1000},
 		"culture":0.5,

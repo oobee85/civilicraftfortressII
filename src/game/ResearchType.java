@@ -9,7 +9,7 @@ import utils.*;
 
 public class ResearchType implements HasImage {
 
-	public static final String DEFAULT_RESEARCH_IMAGE_PATH = "resources/Images/interfaces/tech.png";
+	public static final String DEFAULT_RESEARCH_IMAGE_PATH = "Images/interfaces/tech.png";
 
 	public final String name;
 	public final MipMap mipmap;

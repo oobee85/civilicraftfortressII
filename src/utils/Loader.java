@@ -42,7 +42,7 @@ public class Loader {
 	
 	public static void loadBuildingType(HashMap<String, BuildingType> buildingTypeMap, ArrayList<BuildingType> buildingTypeList) {
 
-		String buildingTypeString = readFile("resources/costs/BuildingType.json");
+		String buildingTypeString = readFile("costs/BuildingType.json");
 //		System.out.println("Loaded :" + buildingTypeString);
 		JSONObject obj = new JSONObject(buildingTypeString);
 		JSONArray arr = obj.getJSONArray("buildingtypes");
@@ -151,7 +151,7 @@ public class Loader {
 //		}
 	}
 	public static void loadUnitType(HashMap<String, UnitType> unitTypeMap, ArrayList<UnitType> unitTypeList) {
-		String unitTypeString = readFile("resources/costs/UnitType.json");
+		String unitTypeString = readFile("costs/UnitType.json");
 //		System.out.println("Loaded :" + unitTypeString);
 		JSONObject obj = new JSONObject(unitTypeString);
 		JSONArray arr = obj.getJSONArray("unittypes");
@@ -288,7 +288,7 @@ public class Loader {
 	
 	public static void loadResearchType(HashMap<String, ResearchType> researchTypeMap, ArrayList<ResearchType> researchTypeList) {
 		HashMap<Research, LinkedList<String>> researchRequirements = new HashMap<>();
-		String researchCosts = readFile("resources/costs/ResearchType.json");
+		String researchCosts = readFile("costs/ResearchType.json");
 		JSONObject obj = new JSONObject(researchCosts);
 		JSONArray arr = obj.getJSONArray("researches");
 		for (int i = 0; i < arr.length(); i++) {

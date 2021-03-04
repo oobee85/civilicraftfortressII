@@ -23,6 +23,7 @@ public class ClientDriver {
 		frame.setSize(width, height);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setIconImage(Utils.loadImageIcon("Images/logo.png").getImage());
 		frame.add(clientGUI.getMainPanel());
 		
 		clientGUI.setClient(client);

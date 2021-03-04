@@ -13,18 +13,18 @@ import utils.Utils;
 
 public enum ProjectileType implements HasImage {
 
-		ARROW(2, "resources/Images/projectiles/arrow.png", 1, null, 0),
-		RUNE_ARROW(2, "resources/Images/projectiles/rune_arrow.png", 1, null, 0),
-		ROCK(3, "resources/Images/itemicons/rock.png", 1, null, 0),
-		FIREBALL_TREBUCHET(3, "resources/Images/projectiles/fireball.png", 2, null, 0),
+		ARROW(2, "Images/projectiles/arrow.png", 1, null, 0),
+		RUNE_ARROW(2, "Images/projectiles/rune_arrow.png", 1, null, 0),
+		ROCK(3, "Images/itemicons/rock.png", 1, null, 0),
+		FIREBALL_TREBUCHET(3, "Images/projectiles/fireball.png", 2, null, 0),
 		
-		ROCK_STONE_GOLEM(5, "resources/Images/itemicons/rock.png", 1, null, 0),
-		FIREBALL_DRAGON(3, "resources/Images/projectiles/fireball2.png", 2, null, 0),
-		BULLET(0, "resources/Images/projectiles/bullet.png", 1, null, 0),
-		FIRE_WAVE(6, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 100),
-		METEOR_WAVE(4, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 1000),
-		WIZARD_BALL(2, "resources/Images/projectiles/fireball2.png", 4, null, 100),
-		FIREBREATH(3, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 10),
+		ROCK_STONE_GOLEM(5, "Images/itemicons/rock.png", 1, null, 0),
+		FIREBALL_DRAGON(3, "Images/projectiles/fireball2.png", 2, null, 0),
+		BULLET(0, "Images/projectiles/bullet.png", 1, null, 0),
+		FIRE_WAVE(6, "Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 100),
+		METEOR_WAVE(4, "Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 1000),
+		WIZARD_BALL(2, "Images/projectiles/fireball2.png", 4, null, 100),
+		FIREBREATH(3, "Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 10),
 	;
 	
 	private MipMap mipmap;

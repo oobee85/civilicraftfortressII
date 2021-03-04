@@ -9,7 +9,7 @@ import utils.*;
 
 public class InfoPanel extends JPanel {
 	
-	private static final Icon EXPLODE_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/units/bomb.png"), 18, 18);
+	private static final Icon EXPLODE_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/units/bomb.png"), 18, 18);
 	public static final int DEFAULT_IMAGE_SIZE = 100;
 	
 	private int imageSize = DEFAULT_IMAGE_SIZE;

@@ -20,19 +20,19 @@ public class ClientGUI {
 	public static final int GUIWIDTH = 350;
 
 	private static final int TAB_ICON_SIZE = 25;
-	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private static final ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private static final ImageIcon PRODUCE_UNIT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/barracks.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private static final ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private static final ImageIcon SPAWN_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/spawn_tab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private static final ImageIcon DEBUG_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/tech.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/building.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon PRODUCE_UNIT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/barracks.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/crafting.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon SPAWN_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/spawn_tab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon DEBUG_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/debugtab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	
 	private static final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(200, 40);
 	private static final Dimension CONNECTION_MENU_BUTTON_SIZE = new Dimension(120, 30);
 
-	private static final ImageIcon AZURE_LOGO = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/azurelogo.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
-	private static final ImageIcon LAN_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/lan_icon.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
-	private static final ImageIcon SINGLE_PLAYER_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/single_player_icon.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
+	private static final ImageIcon AZURE_LOGO = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/azurelogo.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
+	private static final ImageIcon LAN_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/lan_icon.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
+	private static final ImageIcon SINGLE_PLAYER_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/single_player_icon.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
 	
 	
 	private Client client;

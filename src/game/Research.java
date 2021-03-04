@@ -8,7 +8,7 @@ import utils.*;
 
 public class Research implements Externalizable{
 	
-	public static final String DEFAULT_RESEARCH_IMAGE_PATH = "resources/Images/interfaces/tech.png";
+	public static final String DEFAULT_RESEARCH_IMAGE_PATH = "Images/interfaces/tech.png";
 	
 	private ResearchType type;
 	

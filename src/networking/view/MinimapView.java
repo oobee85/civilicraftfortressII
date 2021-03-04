@@ -12,8 +12,8 @@ import world.*;
 
 public class MinimapView extends JPanel {
 
-	private static final Image MOON_IMAGE = Utils.loadImage("resources/Images/interfaces/moon.png");
-	private static final Image SUN_IMAGE = Utils.loadImage("resources/Images/interfaces/sun.png");
+	private static final Image MOON_IMAGE = Utils.loadImage("Images/interfaces/moon.png");
+	private static final Image SUN_IMAGE = Utils.loadImage("Images/interfaces/sun.png");
 
 	public static final int MINIMAPBORDERWIDTH = 40;
 

@@ -3,83 +3,83 @@
 	{	
 		"name": "WARRIOR_CODE", 
 		"points": 300, "tier": 1,
-		"image": "resources/Images/research/warrior_code.png"},
+		"image": "Images/research/warrior_code.png"},
 	{	
 		"name": "BRONZE_WORKING", 
 		"points": 300, "tier": 1,
-		"image": "resources/Images/research/bronze_working.png"},
+		"image": "Images/research/bronze_working.png"},
 	{
 		"name": "WHEEL", 
 		"points": 300, "tier": 1,
-		"image": "resources/Images/research/wheel.png"},
+		"image": "Images/research/wheel.png"},
 	{
 		"name": "IRON_WORKING", 
 		"points": 600, "tier": 1,
 		"cost": {"BRONZE_SWORD": 2}, 
 		"requirements": ["WARRIOR_CODE", "BRONZE_WORKING"],
-		"image": "resources/Images/research/iron_working.png"},
+		"image": "Images/research/iron_working.png"},
 		
 	{
 		"name": "FARMING",
 		"points": 600, "tier": 2,
 		"cost": {"BRONZE_BAR": 10}, 
 		"requirements": ["BRONZE_WORKING"],
-		"image": "resources/Images/research/farming.png"},
+		"image": "Images/research/farming.png"},
 	{
 		"name": "MATHEMATICS", 
 		"points": 600, "tier": 2,
 		"cost": {"IRON_BAR": 10}, 
 		"requirements": ["BRONZE_WORKING", "WHEEL"],
-		"image": "resources/Images/research/mathematics.png"},
+		"image": "Images/research/mathematics.png"},
 	{
 		"name": "MASONRY", 
 		"points": 600, "tier": 2,
 		"cost": {"STONE": 500}, 
 		"requirements": ["WHEEL"],
-		"image": "resources/Images/research/masonry.png"},
+		"image": "Images/research/masonry.png"},
 	
 	{
 		"name": "ARMORING", 
 		"points": 1200, "tier": 3,
 		"cost": {"IRON_SWORD": 2}, 
 		"requirements": ["IRON_WORKING"],
-		"image": "resources/Images/research/armoring.png"},
+		"image": "Images/research/armoring.png"},
 	{
 		"name": "HORSEBACK_RIDING", 
 		"points": 1200, "tier": 3,
 		"cost": {"HORSE": 25}, 
 		"requirements": ["FARMING"],
-		"image": "resources/Images/research/horseback_riding.png"},
+		"image": "Images/research/horseback_riding.png"},
 	{
 		"name": "CURRENCY", 
 		"points": 1200, "tier": 3,
 		"cost": {"FOOD": 100}, 
 		"requirements": ["FARMING", "MATHEMATICS"],
-		"image": "resources/Images/itemicons/gold.png"},
+		"image": "Images/itemicons/gold.png"},
 	{
 		"name": "ENGINEERING", 
 		"points": 1200, "tier": 3,
 		"cost": {"MITHRIL_BAR": 10}, 
 		"requirements": ["MASONRY", "MATHEMATICS"],
-		"image": "resources/Images/research/engineering.png"},
+		"image": "Images/research/engineering.png"},
 	{
 		"name": "MYSTICISM", 
 		"points": 1200, "tier": 3,
 		"cost": {"STONE": 1000}, 
 		"requirements": ["MASONRY"],
-		"image": "resources/Images/research/mysticism.png"},
+		"image": "Images/research/mysticism.png"},
 	
 	{
 		"name": "CHIVALRY", 
 		"points": 1800, "tier": 3,
 		"cost": {"ADAMANTITE_BAR": 20}, 
 		"requirements": ["ARMORING", "HORSEBACK_RIDING"],
-		"image": "resources/Images/research/chivalry.png"},
+		"image": "Images/research/chivalry.png"},
 	{
 		"name": "MONARCHY", 
 		"points": 1800, "tier": 3,
 		"cost": {"ADAMANTITE_BAR": 20}, 
 		"requirements": ["ENGINEERING", "CURRENCY", "MYSTICISM"],
-		"image": "resources/Images/research/monarchy.png"}
+		"image": "Images/research/monarchy.png"}
 ]
 }

@@ -20,16 +20,16 @@ public class GameView extends JPanel {
 	public static final int FAST_MODE_TILE_SIZE = 10;
 	public static final int NUM_DEBUG_DIGITS = 3;
 
-	private static final Image RALLY_POINT_IMAGE = Utils.loadImage("resources/Images/interfaces/queuelocation.png");
-	private static final Image TARGET_IMAGE = Utils.loadImage("resources/Images/interfaces/ivegotyouinmysights.png");
-	private static final Image FLAG = Utils.loadImage("resources/Images/interfaces/flag.png");
-	private static final Image BUILD_ICON = Utils.loadImage("resources/Images/interfaces/building.png");
-	private static final Image HARVEST_ICON = Utils.loadImage("resources/Images/interfaces/harvest.png");
-	private static final Image GUARD_ICON = Utils.loadImage("resources/Images/interfaces/guard.png");
-	private static final Image AUTO_BUILD_ICON = Utils.loadImage("resources/Images/interfaces/autobuild.png");
-	private static final Image RED_HITSPLAT = Utils.loadImage("resources/Images/interfaces/redhitsplat.png");
-	private static final Image BLUE_HITSPLAT = Utils.loadImage("resources/Images/interfaces/bluehitsplat.png");
-	private static final Image GREEN_HITSPLAT = Utils.loadImage("resources/Images/interfaces/greenhitsplat.png");
+	private static final Image RALLY_POINT_IMAGE = Utils.loadImage("Images/interfaces/queuelocation.png");
+	private static final Image TARGET_IMAGE = Utils.loadImage("Images/interfaces/ivegotyouinmysights.png");
+	private static final Image FLAG = Utils.loadImage("Images/interfaces/flag.png");
+	private static final Image BUILD_ICON = Utils.loadImage("Images/interfaces/building.png");
+	private static final Image HARVEST_ICON = Utils.loadImage("Images/interfaces/harvest.png");
+	private static final Image GUARD_ICON = Utils.loadImage("Images/interfaces/guard.png");
+	private static final Image AUTO_BUILD_ICON = Utils.loadImage("Images/interfaces/autobuild.png");
+	private static final Image RED_HITSPLAT = Utils.loadImage("Images/interfaces/redhitsplat.png");
+	private static final Image BLUE_HITSPLAT = Utils.loadImage("Images/interfaces/bluehitsplat.png");
+	private static final Image GREEN_HITSPLAT = Utils.loadImage("Images/interfaces/greenhitsplat.png");
 
 	private static final Font DAMAGE_FONT = new Font("Comic Sans MS", Font.BOLD, 14);
 

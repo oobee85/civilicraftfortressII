@@ -7,7 +7,7 @@ import utils.Utils;
 
 public enum UpgradeType {
 
-	WARRIOR_CODE (100, "resources/Images/buildings/wall_wood.png", new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.HORSE,10);}}),
+	WARRIOR_CODE (100, "Images/buildings/wall_wood.png", new HashMap<ItemType, Integer>() { {put(ItemType.FOOD,50); put(ItemType.HORSE,10);}}),
 	;
 	
 	private MipMap mipmap;
