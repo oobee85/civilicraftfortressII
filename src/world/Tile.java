@@ -16,6 +16,7 @@ public class Tile implements Externalizable {
 	private float height;
 	private float humidity;
 	private double energy;
+	private double temperature;
 
 	public volatile float liquidAmount;
 	public volatile LiquidType liquidType;
@@ -90,7 +91,7 @@ public class Tile implements Externalizable {
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
 		items = new ConcurrentLinkedQueue<Item>();
 		this.humidity = 1;
-		this.energy = 5000;
+		this.energy = 1000;
 		air = new Air(this.height, 0);
 	}
 
@@ -108,7 +109,9 @@ public class Tile implements Externalizable {
 		return season;
 	}
 	
-	
+	public void setTemperature(double temp) {
+		
+	}
 	public double getEnergy() {
 		return energy;
 	}
@@ -130,7 +133,7 @@ public class Tile implements Externalizable {
 	
 	
 	public void updateAir() {
-		air.setTemperature(this.getTemperature());
+//		air.setTemperature(this.getTemperature());
 		air.updateMaxVolume();
 		air.updateHumidity();
 		air.updateHeight(this.height);

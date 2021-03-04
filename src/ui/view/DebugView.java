@@ -52,7 +52,7 @@ public class DebugView {
 		JToggleButton showTemperatureMap = KUIConstants.setupToggleButton("Show Temperature Map", null, DEBUG_BUTTON_SIZE);
 		showTemperatureMap.addActionListener(e -> {
 			showTemperatureMap.setText(showTemperatureMap.isSelected() ? "Hide Temperature Map" : "Show Temperature Map");
-			gameView.setShowHeightMap(showTemperatureMap.isSelected());
+			gameView.setShowTemperatureMap(showTemperatureMap.isSelected());
 		});
 		
 		JToggleButton showHumidityMap = KUIConstants.setupToggleButton("Show Humidity Map", null, DEBUG_BUTTON_SIZE);

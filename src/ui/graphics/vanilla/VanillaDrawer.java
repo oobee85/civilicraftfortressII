@@ -196,8 +196,8 @@ public class VanillaDrawer implements Drawer {
 						if (tile == null) {
 							continue;
 						}
-						highTemp = Math.max(highTemp, tile.getTemperature());
-						lowTemp = Math.min(lowTemp, tile.getTemperature());
+						highTemp = Math.max(highTemp, tile.getAir().getTemperature());
+						lowTemp = Math.min(lowTemp, tile.getAir().getTemperature());
 
 					}
 				}
@@ -537,9 +537,9 @@ public class VanillaDrawer implements Drawer {
 			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 		}else if (state.showTemperatureMap) {
-			float tempRatio = (float) ((theTile.getTemperature() - lowTemp) / (highTemp - lowTemp));
+			float tempRatio = (float) ((theTile.getAir().getTemperature() - lowTemp) / (highTemp - lowTemp));
 			int r = Math.max(Math.min((int) (255 * tempRatio), 255), 0);
-			g.setColor(new Color(255 - r, 0, r));
+			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 		}else if (state.showHumidityMap) {
 			float humidityRatio = (float) ((theTile.getAir().getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
