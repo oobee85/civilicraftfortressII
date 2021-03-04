@@ -6,8 +6,8 @@ import java.util.*;
 import javax.swing.*;
 
 import game.*;
-import networking.view.*;
 import ui.*;
+import ui.view.*;
 import utils.*;
 
 public class ServerGUI extends JPanel {

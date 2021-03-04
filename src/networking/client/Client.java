@@ -1,6 +1,5 @@
 package networking.client;
 
-import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
@@ -10,11 +9,9 @@ import javax.swing.*;
 import javax.swing.Timer;
 
 import game.*;
-import game.liquid.*;
 import networking.*;
 import networking.message.*;
 import networking.server.*;
-import networking.view.*;
 import ui.*;
 import ui.infopanels.*;
 import utils.*;

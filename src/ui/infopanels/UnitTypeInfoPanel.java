@@ -7,7 +7,6 @@ import java.util.Map.*;
 import game.*;
 import ui.*;
 import utils.*;
-import world.*;
 
 public class UnitTypeInfoPanel extends InfoPanel {
 

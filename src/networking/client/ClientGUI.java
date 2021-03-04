@@ -8,10 +8,9 @@ import javax.swing.*;
 import game.*;
 import networking.message.*;
 import networking.server.*;
-import networking.view.*;
 import ui.*;
+import ui.view.*;
 import utils.*;
-import world.*;
 
 public class ClientGUI {
 	

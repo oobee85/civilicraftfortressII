@@ -8,7 +8,7 @@ import javax.swing.*;
 
 import networking.callbacks.*;
 import networking.server.*;
-import networking.view.*;
+import ui.view.*;
 
 public class Connection {
 

@@ -1,4 +1,4 @@
-package networking.view;
+package ui.view;
 
 import java.awt.*;
 import java.util.*;
