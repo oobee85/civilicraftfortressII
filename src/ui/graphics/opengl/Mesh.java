@@ -1,4 +1,4 @@
-package ui.glgraphics;
+package ui.graphics.opengl;
 
 import java.nio.*;
 

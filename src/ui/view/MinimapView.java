@@ -100,9 +100,30 @@ public class MinimapView extends JPanel {
 		if (gameView.getDrawDebugStrings()) {
 			drawMatrix(g);
 		}
-		gameView.getDrawer().drawMinimap(g, MINIMAPBORDERWIDTH, MINIMAPBORDERWIDTH, 
-				getWidth() - 2 * MINIMAPBORDERWIDTH,
-				getHeight() - 2 * MINIMAPBORDERWIDTH);
+
+		int x = MINIMAPBORDERWIDTH;
+		int y = MINIMAPBORDERWIDTH;
+		int w = getWidth() - 2 * MINIMAPBORDERWIDTH;
+		int h = getHeight() - 2 * MINIMAPBORDERWIDTH;
+		g.drawImage(gameView.getDrawer().getImageToDrawMinimap(), x, y, w, h, null);
+		drawViewFrustrum(g, x, y, w, h);
+	}
+	
+	private void drawViewFrustrum(Graphics g, int x, int y, int w, int h) {
+		Position[] viewBounds = gameView.getDrawer().getVisibleTileBounds();
+		if(viewBounds != null) {
+			int[][] viewFrustomPixels = new int[viewBounds.length][2];
+			for(int i = 0; i < viewBounds.length; i++) {
+				viewFrustomPixels[i][0] = (int) (viewBounds[i].x * w / gameView.getGameInstance().world.getWidth());
+				viewFrustomPixels[i][1] = (int) (viewBounds[i].y * h / gameView.getGameInstance().world.getHeight());
+			}
+			g.setColor(Color.yellow);
+			for(int i = 0; i < viewBounds.length; i++) {
+				int iplus = (i+1) % viewBounds.length;
+				g.drawLine( x + viewFrustomPixels[iplus][0], x + viewFrustomPixels[iplus][1], 
+							x + viewFrustomPixels[i][0], x + viewFrustomPixels[i][1]);
+			}
+		}
 	}
 	
 	private void drawMatrix(Graphics g) {

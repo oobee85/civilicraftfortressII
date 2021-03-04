@@ -1,4 +1,4 @@
-package ui.javagraphics;
+package ui.graphics.vanilla;
 
 import java.awt.*;
 import java.awt.image.*;
@@ -8,11 +8,12 @@ import java.util.List;
 import game.*;
 import game.liquid.*;
 import ui.*;
+import ui.graphics.*;
 import ui.view.GameView.*;
 import utils.*;
 import world.*;
 
-public class Drawer {
+public class VanillaDrawer implements Drawer {
 
 	private static final int FAST_MODE_TILE_SIZE = 10;
 	private static final int NUM_DEBUG_DIGITS = 3;
@@ -41,7 +42,7 @@ public class Drawer {
 	private GameViewState state;
 	private int lastPanelWidth, lastPanelHeight;
 	
-	public Drawer(Game game, GameViewState state) {
+	public VanillaDrawer(Game game, GameViewState state) {
 		super();
 		this.game = game;
 		this.state = state;
@@ -485,7 +486,7 @@ public class Drawer {
 		g.setColor(new Color(0, 0, 0, 64));
 		if (state.leftMouseDown && state.draggingMouse && state.boxSelect[0] != null && state.boxSelect[1] != null) {
 			Position[] box = Utils.normalizeRectangle(state.boxSelect[0], state.boxSelect[1]);
-			for (Tile tile : getTilesBetween(box[0], box[1])) {
+			for (Tile tile : Utils.getTilesBetween(game.world, box[0], box[1])) {
 				Point drawAt = getDrawingCoords(tile.getLocation());
 				g.drawRect(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, state.tileSize - strokeWidth,
 						state.tileSize - strokeWidth);
@@ -782,28 +783,38 @@ public class Drawer {
 			}
 		}
 	}
-
-	public void drawMinimap(Graphics g, int x, int y, int w, int h) {
+	
+	public BufferedImage getImageToDrawMinimap() {
 		if (state.showHeightMap) {
-			g.drawImage(heightMapImage, x, y, w, h, null);
-		}else if (state.showPressureMap) {
-			g.drawImage(pressureMapImage, x, y, w, h, null);
-		}else if (state.showTemperatureMap) {
-			g.drawImage(temperatureMapImage, x, y, w, h, null);
+			return heightMapImage;
+		} else if (state.showPressureMap) {
+			return pressureMapImage;
+		} else if (state.showTemperatureMap) {
+			return temperatureMapImage;
 		} else if (state.showHumidityMap) {
-			g.drawImage(humidityMapImage, x, y, w, h, null);
+			return humidityMapImage;
 		} else {
-			g.drawImage(minimapImage, x, y, w, h, null);
+			return minimapImage;
 		}
-		if (game.world != null) {
-			Position offsetTile = Utils.getWorldCoordOfPixel(state.viewOffset, state.viewOffset, state.tileSize);
-			int boxx = (int) (offsetTile.x * w / game.world.getWidth() / 2);
-			int boxy = (int) (offsetTile.y * h / game.world.getHeight() / 2);
-			int boxw = (int) (lastPanelWidth * w / state.tileSize / game.world.getWidth());
-			int boxh = (int) (lastPanelHeight * h / state.tileSize / game.world.getHeight());
-			g.setColor(Color.yellow);
-			g.drawRect(x + boxx, y + boxy, boxw, boxh);
+	}
+	
+	/**
+	 * 
+	 * @return size 4 array of positions on the map of the bounds of the tiles that are in view
+	 */
+	public Position[] getVisibleTileBounds() {
+		if (game.world == null) {
+			return null;
 		}
+		Position offsetTile = Utils.getWorldCoordOfPixel(new Position(0, 0), state.viewOffset, state.tileSize);
+		Position offsetTilePlusCanvas = Utils.getWorldCoordOfPixel(
+				new Position(lastPanelWidth, lastPanelHeight), state.viewOffset, state.tileSize);
+		return new Position[] {
+				offsetTile,
+				new Position(offsetTile.x, offsetTilePlusCanvas.y),
+				offsetTilePlusCanvas,
+				new Position(offsetTilePlusCanvas.x, offsetTile.y)
+		};
 	}
 
 	private static Rectangle normalizeRectangle(Point one, Point two) {
@@ -824,25 +835,5 @@ public class Drawer {
 			this.pressureMapImage = images[4];
 			this.temperatureMapImage = images[5];
 		}
-	}
-	
-	public List<Tile> getTilesBetween(Position topLeft, Position botRight) {
-		int topEvenY = (int) topLeft.y;
-		int topOddY = (int) (topLeft.y - 0.5);
-		int botEvenY = (int) (botRight.y);
-		int botOddY = (int) (botRight.y - 0.5);
-		LinkedList<Tile> tiles = new LinkedList<>();
-		for (int i = topLeft.getIntX(); i <= botRight.getIntX(); i++) {
-			int minj = i % 2 == 0 ? topEvenY : topOddY;
-			int maxj = i % 2 == 0 ? botEvenY : botOddY;
-			for (int j = minj; j <= maxj; j++) {
-				TileLoc otherLoc = new TileLoc(i, j);
-				Tile otherTile = game.world.get(otherLoc);
-				if (otherTile != null) {
-					tiles.add(otherTile);
-				}
-			}
-		}
-		return tiles;
 	}
 }

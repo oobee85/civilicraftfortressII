@@ -8,8 +8,8 @@ import javax.swing.*;
 
 import game.*;
 import ui.*;
+import ui.graphics.vanilla.*;
 import ui.infopanels.*;
-import ui.javagraphics.*;
 import utils.*;
 
 public class GameViewOverlay extends JPanel {
@@ -120,7 +120,7 @@ public class GameViewOverlay extends JPanel {
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				Drawer.drawHealthBar2(g, unit, 0, getHeight() - 6, getWidth(), 6, 1, unit.getHealth()/unit.getMaxHealth());
+				VanillaDrawer.drawHealthBar2(g, unit, 0, getHeight() - 6, getWidth(), 6, 1, unit.getHealth()/unit.getMaxHealth());
 			}
 		};
 		button.setMargin(KUIConstants.zeroMargin);

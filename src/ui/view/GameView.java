@@ -10,7 +10,9 @@ import javax.swing.*;
 
 import game.*;
 import ui.*;
-import ui.javagraphics.*;
+import ui.graphics.*;
+import ui.graphics.opengl.*;
+import ui.graphics.vanilla.*;
 import utils.*;
 import world.*;
 
@@ -28,6 +30,7 @@ public class GameView {
 	private boolean summonPlayerControlled = true;
 
 	private final JPanel panel;
+	private final Component drawingCanvas;
 	private final Drawer drawer;
 	private final GameViewState state;
 
@@ -58,17 +61,29 @@ public class GameView {
 		public ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
 	}
 
-	public GameView(Game game) {
+	public GameView(Game game, boolean useOpenGL) {
 		state = new GameViewState();
-		panel = new JPanel() {
-			private static final long serialVersionUID = 1L;
-			@Override
-			public void paintComponent(Graphics g) {
-				super.paintComponent(g);
-				drawer.paint(g, panel.getWidth(), panel.getHeight());
-			}
-		};
-		drawer = new Drawer(game, state);
+		panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		if(useOpenGL) {
+			GLDrawer gldrawer = new GLDrawer();
+			drawingCanvas = gldrawer.getDrawingCanvas();
+			drawer = gldrawer;
+		}
+		else {
+			VanillaDrawer vanillaDrawer = new VanillaDrawer(game, state);
+			drawingCanvas = new JPanel() {
+				private static final long serialVersionUID = 1L;
+				@Override
+				public void paintComponent(Graphics g) {
+					super.paintComponent(g);
+					vanillaDrawer.paint(g, panel.getWidth(), panel.getHeight());
+				}
+			};
+			drawer = vanillaDrawer;
+		}
+		drawingCanvas.setFocusable(false);
+		panel.add(drawingCanvas, BorderLayout.CENTER);
 		this.game = game;
 		this.guiController = game.getGUIController();
 		panel.setBackground(Color.black);
@@ -262,7 +277,7 @@ public class GameView {
 		if (game.world == null) {
 			return;
 		}
-		toggleSelectionForTiles(drawer.getTilesBetween(topLeft, botRight), shiftDown, controlDown);
+		toggleSelectionForTiles(Utils.getTilesBetween(game.world, topLeft, botRight), shiftDown, controlDown);
 	}
 
 	private void leftClick(Position tilepos, boolean shiftDown) {

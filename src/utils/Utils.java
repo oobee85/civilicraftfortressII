@@ -491,14 +491,34 @@ public final class Utils {
 	}
 
 
-	public static Position getWorldCoordOfPixel(Position pixel, Position viewOffset, int tileSize) {
-		return pixel.add(viewOffset).divide(tileSize);
+	public static Position getWorldCoordOfPixel(Position pixelOnScreen, Position viewOffset, int tileSize) {
+		return (pixelOnScreen.add(viewOffset)).divide(tileSize);
 	}
 	
-	public static Position getWorldCoordOfPixel(Point pixel, Position viewOffset, int tileSize) {
-		double column = ((pixel.x + viewOffset.x) / tileSize);
-		double row = ((pixel.y + viewOffset.y) / tileSize);
+	public static Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
+		double column = ((pixelOnScreen.x + viewOffset.x) / tileSize);
+		double row = ((pixelOnScreen.y + viewOffset.y) / tileSize);
 		return new Position(column, row);
+	}
+
+	public static List<Tile> getTilesBetween(World world, Position topLeft, Position botRight) {
+		int topEvenY = (int) topLeft.y;
+		int topOddY = (int) (topLeft.y - 0.5);
+		int botEvenY = (int) (botRight.y);
+		int botOddY = (int) (botRight.y - 0.5);
+		LinkedList<Tile> tiles = new LinkedList<>();
+		for (int i = topLeft.getIntX(); i <= botRight.getIntX(); i++) {
+			int minj = i % 2 == 0 ? topEvenY : topOddY;
+			int maxj = i % 2 == 0 ? botEvenY : botOddY;
+			for (int j = minj; j <= maxj; j++) {
+				TileLoc otherLoc = new TileLoc(i, j);
+				Tile otherTile = world.get(otherLoc);
+				if (otherTile != null) {
+					tiles.add(otherTile);
+				}
+			}
+		}
+		return tiles;
 	}
 	
 	public static CommandInterface makeFunctionalCommandInterface(Game game) {
