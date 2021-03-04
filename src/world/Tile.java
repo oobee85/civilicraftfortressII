@@ -90,7 +90,7 @@ public class Tile implements Externalizable {
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
 		items = new ConcurrentLinkedQueue<Item>();
 		this.humidity = 1;
-		this.energy = 1000;
+		this.energy = 5000;
 		air = new Air(this.height, 0);
 	}
 
@@ -128,12 +128,6 @@ public class Tile implements Externalizable {
 		return air;
 	}
 	
-	public boolean checkWeatherEvent() {
-		if(air.canRain() == true) {
-			return true;
-		}
-		return false;
-	}
 	
 	public void updateAir() {
 		air.setTemperature(this.getTemperature());
@@ -141,7 +135,6 @@ public class Tile implements Externalizable {
 		air.updateHumidity();
 		air.updateHeight(this.height);
 		air.updatePressure();
-		checkWeatherEvent();
 	}
 	
 	public double getEvaporation() {

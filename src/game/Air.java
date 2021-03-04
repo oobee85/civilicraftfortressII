@@ -45,9 +45,13 @@ public class Air {
 	public double getPressure() {
 		return pressure;
 	}
+	public void setVolume(double set) {
+		volume = set;
+	}
 	public void addVolume(double add) {
 		if(volume + add >= maxVolume) {
 			canRain = true;
+			this.volume += add;
 		}else {
 			canRain = false;
 			this.volume += add;
@@ -103,7 +107,7 @@ public class Air {
 		
 		
 		
-		double sub = R * (temp + Math.abs(World.minTemp));
+		double sub = R * (temp + Math.abs(World.MINTEMP));
 		double power = (-g * MMair * (h - h0)) / sub;
 		double pressure = P0 * Math.pow(Math.E, power);
 		

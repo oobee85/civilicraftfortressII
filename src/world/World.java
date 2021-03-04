@@ -23,9 +23,10 @@ public class World {
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 500;
 	public static final int TRANSITION_PERIOD = 100;
-	private static final double CHANCE_TO_SWITCH_TERRAIN = 5;
-	public static final int minTemp = -30;
-	public static final int maxTemp = 200;
+	private static final double CHANCE_TO_SWITCH_TERRAIN = 1;
+	public static final int MINTEMP = -30;
+	public static final int MAXTEMP = 200;
+	public static final int MAXHEIGHT = 1000;
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
@@ -229,8 +230,7 @@ public class World {
 	
 	public void rains() {
 		for(Tile tile : getTiles()) {
-			boolean canRain = tile.checkWeatherEvent();
-			if(canRain == true && tile.getWeather() == null) {
+			if(tile.getAir().canRain() == true && tile.getWeather() == null) {
 				WeatherEvent weather = new WeatherEvent(tile, tile, tile.getAir().getVolume(), LiquidType.WATER);;
 				tile.setWeather(weather);
 				worldData.addWeatherEvent(weather);
@@ -645,14 +645,29 @@ public class World {
 	}
 	public void updateEnergy() {
 		for(Tile tile : getTiles()) {
+			if(tile == null) {
+				System.out.println("null tile when updating energy");
+				continue;
+			}
+			// max = 10000
+			// min = -10000
+			double currentEnergy = tile.getEnergy();
+			
+			
 			double energy = Season.getEnergySeason();
 			if(tile.getWeather() != null) {
 				energy -= 2;
 			}
-			double altChange = tile.getHeight()/500;
+			double altChange = tile.getHeight()/MAXHEIGHT/2;
 			energy -= altChange;
 			
-			tile.addEnergy(energy);
+			double reduction = 0;
+			if(currentEnergy >= 0) {
+				reduction = -Math.sqrt(currentEnergy)/100 +1;
+			}else {
+				reduction = -Math.sqrt(-currentEnergy)/100 +1;
+			}
+			tile.addEnergy(reduction * energy);
 		}
 	}
 	public void updateTerrainChange(boolean start) {
@@ -1232,8 +1247,8 @@ public class World {
 			pressureMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 		}
 		
-		double highTemperature = minTemp;
-		double lowTemperature = maxTemp;
+		double highTemperature = MINTEMP;
+		double lowTemperature = MAXTEMP;
 		for(Tile tile : getTiles() ) {
 			highTemperature = Math.max(highTemperature, tile.getTemperature());
 			lowTemperature = Math.min(lowTemperature, tile.getTemperature());

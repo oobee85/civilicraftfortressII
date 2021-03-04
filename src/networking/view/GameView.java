@@ -820,8 +820,8 @@ public class GameView extends JPanel {
 			double lowHeight = Double.MAX_VALUE;
 			double highPressure = Double.MIN_VALUE;
 			double lowPressure = Double.MAX_VALUE;
-			double highTemp = World.minTemp;
-			double lowTemp = World.maxTemp;
+			double highTemp = World.MINTEMP;
+			double lowTemp = World.MAXTEMP;
 			double highHumidity = 20;
 			double lowHumidity = 0;
 			if (showHeightMap) {
