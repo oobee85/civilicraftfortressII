@@ -2,7 +2,6 @@ package ui.view;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
@@ -10,83 +9,70 @@ import java.util.concurrent.*;
 import javax.swing.*;
 
 import game.*;
-import game.liquid.*;
 import ui.*;
+import ui.javagraphics.*;
 import utils.*;
 import world.*;
 
 public class GameView {
 
-	public static final int FAST_MODE_TILE_SIZE = 10;
-	public static final int NUM_DEBUG_DIGITS = 3;
-
-	private static final Image RALLY_POINT_IMAGE = Utils.loadImage("Images/interfaces/queuelocation.png");
-	private static final Image TARGET_IMAGE = Utils.loadImage("Images/interfaces/ivegotyouinmysights.png");
-	private static final Image FLAG = Utils.loadImage("Images/interfaces/flag.png");
-	private static final Image BUILD_ICON = Utils.loadImage("Images/interfaces/building.png");
-	private static final Image HARVEST_ICON = Utils.loadImage("Images/interfaces/harvest.png");
-	private static final Image GUARD_ICON = Utils.loadImage("Images/interfaces/guard.png");
-	private static final Image AUTO_BUILD_ICON = Utils.loadImage("Images/interfaces/autobuild.png");
-	private static final Image RED_HITSPLAT = Utils.loadImage("Images/interfaces/redhitsplat.png");
-	private static final Image BLUE_HITSPLAT = Utils.loadImage("Images/interfaces/bluehitsplat.png");
-	private static final Image GREEN_HITSPLAT = Utils.loadImage("Images/interfaces/greenhitsplat.png");
-
-	private static final Font DAMAGE_FONT = new Font("Comic Sans MS", Font.BOLD, 14);
-
 	private GUIController guiController;
 	private CommandInterface commandInterface;
 
-	private volatile BufferedImage terrainImage;
-	private volatile BufferedImage minimapImage;
-	private volatile BufferedImage heightMapImage;
-	private volatile BufferedImage humidityMapImage;
-	private volatile BufferedImage pressureMapImage;
-	private volatile BufferedImage temperatureMapImage;
-
 	private Game game;
-	private Position viewOffset;
-	private Point previousMouse;
-	private boolean showHeightMap = false;
-	private boolean showHumidityMap = false;
-	private boolean showPressureMap = false;
-	private boolean showTemperatureMap = false;
-	private boolean draggingMouse = false;
-	private boolean drawDebugStrings = false;
-	private TileLoc hoveredTile = new TileLoc(-1, -1);
-	private int tileSize = 15;
-	private boolean leftMouseDown = false;
-	private boolean middleMouseDown = false;
 
-	private Point mousePressLocation = null;
-	private Position[] boxSelect = new Position[2];
 	private boolean rightMouseDown = false;
 	private boolean controlDown = false;
 	private boolean shiftDown = false;
 
-	private ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
-	private Faction faction = Faction.getTempFaction();
-
-	private LeftClickAction leftClickAction = LeftClickAction.NONE;
-	private HasImage selectedThingToSpawn;
 	private boolean summonPlayerControlled = true;
-	private BuildingType selectedBuildingToPlan;
 
-	public long previousTickTime;
-	
 	private final JPanel panel;
+	private final Drawer drawer;
+	private final GameViewState state;
+
+	public class GameViewState {
+		public long previousTickTime;
+		public Position viewOffset;
+		public int tileSize = 15;
+		
+		public Point mousePressLocation;
+		public Point previousMouse;
+		public boolean draggingMouse;
+		public boolean leftMouseDown = false;
+		public boolean middleMouseDown = false;
+		public TileLoc hoveredTile = new TileLoc(-1, -1);
+		public Position[] boxSelect = new Position[2];
+		public LeftClickAction leftClickAction = LeftClickAction.NONE;
+
+		public boolean drawDebugStrings;
+		public boolean showHeightMap;
+		public boolean showHumidityMap;
+		public boolean showPressureMap;
+		public boolean showTemperatureMap;
+		
+		public BuildingType selectedBuildingToPlan;
+		public HasImage selectedThingToSpawn;
+		
+		public Faction faction = Faction.getTempFaction();
+		public ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
+	}
 
 	public GameView(Game game) {
+		state = new GameViewState();
 		panel = new JPanel() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				GameView.this.paintComponent(g);
+				drawer.paint(g, panel.getWidth(), panel.getHeight());
 			}
 		};
+		drawer = new Drawer(game, state);
 		this.game = game;
 		this.guiController = game.getGUIController();
 		panel.setBackground(Color.black);
-		viewOffset = new Position(0, 0);
+		state.viewOffset = new Position(0, 0);
 		panel.addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -98,25 +84,25 @@ public class GameView {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				mouseOver(getTileAtPixel(e.getPoint()));
-				previousMouse = e.getPoint();
+				state.previousMouse = e.getPoint();
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				Point currentMouse = e.getPoint();
-				int dx = previousMouse.x - currentMouse.x;
-				int dy = previousMouse.y - currentMouse.y;
+				int dx = state.previousMouse.x - currentMouse.x;
+				int dy = state.previousMouse.y - currentMouse.y;
 				// Only drag if moved mouse at least 3 pixels away
-				if (draggingMouse || Math.abs(dx) + Math.abs(dy) >= 15) {
-					draggingMouse = true;
-					if (rightMouseDown || middleMouseDown) {
+				if (state.draggingMouse || Math.abs(dx) + Math.abs(dy) >= 15) {
+					state.draggingMouse = true;
+					if (rightMouseDown || state.middleMouseDown) {
 						shiftView(dx, dy);
 					}
-					if (leftMouseDown) {
-						boxSelect[1] = getWorldCoordOfPixel(currentMouse);
+					if (state.leftMouseDown) {
+						state.boxSelect[1] = Utils.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize);
 					}
 					mouseOver(getTileAtPixel(currentMouse));
-					previousMouse = currentMouse;
+					state.previousMouse = currentMouse;
 				}
 			}
 		});
@@ -124,7 +110,7 @@ public class GameView {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				Point currentMouse = e.getPoint();
-				if (!draggingMouse) {
+				if (!state.draggingMouse) {
 					if (SwingUtilities.isRightMouseButton(e)) {
 						rightClick(getTileAtPixel(currentMouse), shiftDown);
 					} else if (SwingUtilities.isLeftMouseButton(e)) {
@@ -132,51 +118,51 @@ public class GameView {
 					}
 				} else {
 					if (SwingUtilities.isLeftMouseButton(e)) {
-						boxSelect[0] = getWorldCoordOfPixel(mousePressLocation);
-						boxSelect[1] = getWorldCoordOfPixel(currentMouse);
-						boxSelect = normalizeRectangle(boxSelect[0], boxSelect[1]);
-						selectInBox(boxSelect[0], boxSelect[1], shiftDown);
+						state.boxSelect[0] = Utils.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.tileSize);
+						state.boxSelect[1] = Utils.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize);
+						state.boxSelect = Utils.normalizeRectangle(state.boxSelect[0], state.boxSelect[1]);
+						selectInBox(state.boxSelect[0], state.boxSelect[1], shiftDown);
 					}
 				}
-				draggingMouse = false;
-				previousMouse = currentMouse;
+				state.draggingMouse = false;
+				state.previousMouse = currentMouse;
 				if (SwingUtilities.isLeftMouseButton(e)) {
-					mousePressLocation = null;
-					leftMouseDown = false;
+					state.mousePressLocation = null;
+					state.leftMouseDown = false;
 				} else if (SwingUtilities.isRightMouseButton(e)) {
 					rightMouseDown = false;
 				} else if (SwingUtilities.isMiddleMouseButton(e)) {
-					middleMouseDown = false;
+					state.middleMouseDown = false;
 				}
 			}
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				previousMouse = e.getPoint();
+				state.previousMouse = e.getPoint();
 				if (SwingUtilities.isLeftMouseButton(e)) {
-					leftMouseDown = true;
-					mousePressLocation = e.getPoint();
-					boxSelect[0] = getWorldCoordOfPixel(mousePressLocation);
+					state.leftMouseDown = true;
+					state.mousePressLocation = e.getPoint();
+					state.boxSelect[0] = Utils.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.tileSize);
 				} else if (SwingUtilities.isRightMouseButton(e)) {
 					rightMouseDown = true;
 				} else if (SwingUtilities.isMiddleMouseButton(e)) {
-					middleMouseDown = true;
+					state.middleMouseDown = true;
 				}
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				previousMouse = e.getPoint();
+				state.previousMouse = e.getPoint();
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				previousMouse = e.getPoint();
+				state.previousMouse = e.getPoint();
 			}
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				previousMouse = e.getPoint();
+				state.previousMouse = e.getPoint();
 			}
 		});
 
@@ -204,7 +190,7 @@ public class GameView {
 					if (e.isControlDown()) {
 						selectAllUnits();
 					} else {
-						leftClickAction = LeftClickAction.ATTACK;
+						state.leftClickAction = LeftClickAction.ATTACK;
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 					deselectEverything();
@@ -227,15 +213,15 @@ public class GameView {
 
 	public void setFaction(Faction faction) {
 		System.out.println("setting faction to " + faction);
-		this.faction = faction;
+		this.state.faction = faction;
 	}
 
 	public Faction getFaction() {
-		return faction;
+		return state.faction;
 	}
 
 	private void unitStop() {
-		for (Thing thing : selectedThings) {
+		for (Thing thing : state.selectedThings) {
 			if (thing instanceof Unit) {
 				commandInterface.stop((Unit) thing);
 			}
@@ -243,12 +229,12 @@ public class GameView {
 	}
 
 	public void toggleAutoBuild() {
-		game.toggleAutoBuild(selectedThings);
+		game.toggleAutoBuild(state.selectedThings);
 	}
 
 	public void toggleGuarding() {
 		boolean foundNotGuarding = false;
-		for (Thing thing : selectedThings) {
+		for (Thing thing : state.selectedThings) {
 			if (thing instanceof Unit) {
 				Unit unit = (Unit) thing;
 				if (!unit.isGuarding()) {
@@ -256,7 +242,7 @@ public class GameView {
 				}
 			}
 		}
-		for (Thing thing : selectedThings) {
+		for (Thing thing : state.selectedThings) {
 			if (thing instanceof Unit) {
 				Unit unit = (Unit) thing;
 				commandInterface.setGuarding(unit, foundNotGuarding);
@@ -265,38 +251,18 @@ public class GameView {
 	}
 
 	public void setDrawDebugStrings(boolean enabled) {
-		drawDebugStrings = enabled;
+		state.drawDebugStrings = enabled;
 	}
 
 	public boolean getDrawDebugStrings() {
-		return drawDebugStrings;
-	}
-
-	private List<Tile> getTilesBetween(Position topLeft, Position botRight) {
-		int topEvenY = (int) topLeft.y;
-		int topOddY = (int) (topLeft.y - 0.5);
-		int botEvenY = (int) (botRight.y);
-		int botOddY = (int) (botRight.y - 0.5);
-		LinkedList<Tile> tiles = new LinkedList<>();
-		for (int i = topLeft.getIntX(); i <= botRight.getIntX(); i++) {
-			int minj = i % 2 == 0 ? topEvenY : topOddY;
-			int maxj = i % 2 == 0 ? botEvenY : botOddY;
-			for (int j = minj; j <= maxj; j++) {
-				TileLoc otherLoc = new TileLoc(i, j);
-				Tile otherTile = game.world.get(otherLoc);
-				if (otherTile != null) {
-					tiles.add(otherTile);
-				}
-			}
-		}
-		return tiles;
+		return state.drawDebugStrings;
 	}
 
 	private void selectInBox(Position topLeft, Position botRight, boolean shiftDown) {
 		if (game.world == null) {
 			return;
 		}
-		toggleSelectionForTiles(getTilesBetween(topLeft, botRight), shiftDown, controlDown);
+		toggleSelectionForTiles(drawer.getTilesBetween(topLeft, botRight), shiftDown, controlDown);
 	}
 
 	private void leftClick(Position tilepos, boolean shiftDown) {
@@ -307,42 +273,42 @@ public class GameView {
 		if (tile == null) {
 			return;
 		}
-		if (leftClickAction == LeftClickAction.RAISE_TERRAIN) {
+		if (state.leftClickAction == LeftClickAction.RAISE_TERRAIN) {
 			game.raiseTerrain(tile, 5);
-		} else if (leftClickAction == LeftClickAction.SET_TERRITORY) {
-			game.setTerritory(tile, 5, faction);
+		} else if (state.leftClickAction == LeftClickAction.SET_TERRITORY) {
+			game.setTerritory(tile, 5, state.faction);
 		}
 
 		// spawning unit or building
-		else if (leftClickAction == LeftClickAction.SPAWN_THING) {
-			Thing summoned = game.summonThing(tile, selectedThingToSpawn,
-					summonPlayerControlled ? faction : game.world.getFaction(World.NO_FACTION_ID));
-			if (summoned != null && summoned.getFaction() == faction) {
+		else if (state.leftClickAction == LeftClickAction.SPAWN_THING) {
+			Thing summoned = game.summonThing(tile, state.selectedThingToSpawn,
+					summonPlayerControlled ? state.faction : game.world.getFaction(World.NO_FACTION_ID));
+			if (summoned != null && summoned.getFaction() == state.faction) {
 				if (!shiftDown) {
 					deselectEverything();
 				}
 				selectThing(summoned);
 			}
-			if (selectedThingToSpawn instanceof Plant) {
+			if (state.selectedThingToSpawn instanceof Plant) {
 				if (!shiftDown) {
 					deselectEverything();
 				}
-				summoned = game.summonThing(tile, selectedThingToSpawn, game.world.getFaction(World.NO_FACTION_ID));
+				summoned = game.summonThing(tile, state.selectedThingToSpawn, game.world.getFaction(World.NO_FACTION_ID));
 
 				selectThing(summoned);
 			}
 		}
 		// planning building
-		else if (leftClickAction == LeftClickAction.PLAN_BUILDING) {
+		else if (state.leftClickAction == LeftClickAction.PLAN_BUILDING) {
 			Building plannedBuilding = null;
-			for (Thing thing : selectedThings) {
+			for (Thing thing : state.selectedThings) {
 				if (thing instanceof Unit) {
 					Unit unit = (Unit) thing;
-					plannedBuilding = commandInterface.planBuilding(unit, tile, !shiftDown, selectedBuildingToPlan);
+					plannedBuilding = commandInterface.planBuilding(unit, tile, !shiftDown, state.selectedBuildingToPlan);
 				}
 			}
 			if (plannedBuilding != null) {
-				if (plannedBuilding.getFaction() == faction) {
+				if (plannedBuilding.getFaction() == state.faction) {
 					HashSet<Tile> buildingVision = game.world.getNeighborsInRadius(plannedBuilding.getTile(),
 							plannedBuilding.getType().getVisionRadius());
 					for (Tile invision : buildingVision) {
@@ -352,8 +318,8 @@ public class GameView {
 			}
 		}
 		// if a-click and the tile has a building or unit
-		else if (leftClickAction == LeftClickAction.ATTACK) {
-			attackCommand(selectedThings, tile, shiftDown, true);
+		else if (state.leftClickAction == LeftClickAction.ATTACK) {
+			attackCommand(state.selectedThings, tile, shiftDown, true);
 		}
 		// select units on tile
 		else {
@@ -361,7 +327,7 @@ public class GameView {
 		}
 
 		if (!shiftDown) {
-			leftClickAction = LeftClickAction.NONE;
+			state.leftClickAction = LeftClickAction.NONE;
 		}
 	}
 
@@ -396,12 +362,12 @@ public class GameView {
 		if (targetTile == null) {
 			return;
 		}
-		if (leftClickAction != LeftClickAction.NONE) {
-			leftClickAction = LeftClickAction.NONE;
+		if (state.leftClickAction != LeftClickAction.NONE) {
+			state.leftClickAction = LeftClickAction.NONE;
 			return;
 		}
 
-		for (Thing thing : selectedThings) {
+		for (Thing thing : state.selectedThings) {
 			if (thing instanceof Building) {
 				commandInterface.setBuildingRallyPoint((Building) thing, targetTile);
 			} else if (thing instanceof Unit) {
@@ -456,7 +422,7 @@ public class GameView {
 	}
 
 	public void tryToBuildUnit(UnitType u) {
-		for (Thing thing : selectedThings) {
+		for (Thing thing : state.selectedThings) {
 			if (thing instanceof Building) {
 				Building building = (Building) thing;
 				for (String ut : building.getType().unitsCanProduce()) {
@@ -469,7 +435,7 @@ public class GameView {
 	}
 
 	public void workerRoad(BuildingType type) {
-		for (Thing thing : selectedThings) {
+		for (Thing thing : state.selectedThings) {
 			if (thing instanceof Unit) {
 				Unit unit = (Unit) thing;
 				if (unit.getType().isBuilder()) {
@@ -485,16 +451,16 @@ public class GameView {
 	}
 
 	public void setThingToSpawn(HasImage thingType) {
-		leftClickAction = LeftClickAction.SPAWN_THING;
-		selectedThingToSpawn = thingType;
+		state.leftClickAction = LeftClickAction.SPAWN_THING;
+		state.selectedThingToSpawn = thingType;
 	}
 
 	public void setRaisingTerrain(boolean raising) {
-		leftClickAction = LeftClickAction.RAISE_TERRAIN;
+		state.leftClickAction = LeftClickAction.RAISE_TERRAIN;
 	}
 
 	public void setSetTerritory(boolean setting) {
-		leftClickAction = LeftClickAction.SET_TERRITORY;
+		state.leftClickAction = LeftClickAction.SET_TERRITORY;
 	}
 
 	public void setSummonPlayerControlled(boolean playerControlled) {
@@ -502,13 +468,13 @@ public class GameView {
 	}
 
 	public void setBuildingToPlan(BuildingType buildingType) {
-		leftClickAction = LeftClickAction.PLAN_BUILDING;
-		selectedBuildingToPlan = buildingType;
+		state.leftClickAction = LeftClickAction.PLAN_BUILDING;
+		state.selectedBuildingToPlan = buildingType;
 	}
 
 	private void selectAllUnits() {
 		for (Unit unit : game.world.getUnits()) {
-			if (unit.getFaction() == faction) {
+			if (unit.getFaction() == state.faction) {
 				selectThing(unit);
 			}
 		}
@@ -525,7 +491,7 @@ public class GameView {
 			// goes through all the units on the tile and checks if they are selected
 			for (Unit candidate : tile.getUnits()) {
 				// clicking on tile w/o shift i.e only selects top unit
-				if (candidate.getFaction() == faction) {
+				if (candidate.getFaction() == state.faction) {
 					selectThing(candidate);
 					selectedAUnit = true;
 					// shift enabled -> selects whole stack
@@ -540,7 +506,7 @@ public class GameView {
 			for (Tile tile : tiles) {
 				// selects the building on the tile
 				Building building = tile.getBuilding();
-				if (building != null && building.getFaction() == faction && tile.getUnitOfFaction(faction) == null) {
+				if (building != null && building.getFaction() == state.faction && tile.getUnitOfFaction(state.faction) == null) {
 					selectThing(building);
 				}
 			}
@@ -549,7 +515,7 @@ public class GameView {
 
 	private void selectThing(Thing thing) {
 		thing.setIsSelected(true);
-		selectedThings.add(thing);
+		state.selectedThings.add(thing);
 		if (thing instanceof Unit) {
 			guiController.selectedUnit((Unit) thing, true);
 		} else if (thing instanceof Building) {
@@ -560,7 +526,7 @@ public class GameView {
 	}
 
 	public void deselectEverything() {
-		for (Thing thing : selectedThings) {
+		for (Thing thing : state.selectedThings) {
 			if (thing != null) {
 				thing.setIsSelected(false);
 
@@ -575,10 +541,10 @@ public class GameView {
 				}
 
 			}
-			selectedThings.remove(thing);
+			state.selectedThings.remove(thing);
 		}
-		selectedThings.clear();
-		leftClickAction = LeftClickAction.NONE;
+		state.selectedThings.clear();
+		state.leftClickAction = LeftClickAction.NONE;
 	}
 
 	public void pressedSelectedUnitPortrait(Unit unit) {
@@ -590,7 +556,7 @@ public class GameView {
 	}
 
 	private void deselectOneThing(Thing deselect) {
-		selectedThings.remove(deselect);
+		state.selectedThings.remove(deselect);
 		deselect.setIsSelected(false);
 		if (deselect instanceof Unit) {
 			guiController.selectedUnit((Unit) deselect, false);
@@ -598,866 +564,75 @@ public class GameView {
 	}
 
 	private void deselectOtherThings(Thing keep) {
-		for (Thing thing : selectedThings) {
+		for (Thing thing : state.selectedThings) {
 			thing.setIsSelected(false);
 			if (thing instanceof Unit) {
 				guiController.selectedUnit((Unit) thing, false);
 			}
 		}
-		selectedThings.clear();
+		state.selectedThings.clear();
 		selectThing(keep);
 	}
 
 	public void updateTerrainImages() {
-		if (game.world != null) {
-			BufferedImage[] images = game.world.createTerrainImage(faction);
-			this.terrainImage = images[0];
-			this.minimapImage = images[1];
-			this.heightMapImage = images[2];
-			this.humidityMapImage = images[3];
-			this.pressureMapImage = images[4];
-			this.temperatureMapImage = images[5];
-		}
+		drawer.updateTerrainImages();
 	}
 
 	public void setShowHeightMap(boolean show) {
-		this.showHeightMap = show;
+		state.showHeightMap = show;
 	}
 	public void setShowPressureMap(boolean show) {
-		this.showPressureMap = show;
+		state.showPressureMap = show;
 	}
 	public void setShowTemperatureMap(boolean show) {
-		this.showTemperatureMap = show;
+		state.showTemperatureMap = show;
 	}
 	public void setShowHumidityMap(boolean show) {
-		this.showHumidityMap = show;
+		state.showHumidityMap = show;
 	}
 
 	private void mouseOver(Position tilepos) {
-		hoveredTile = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
+		state.hoveredTile = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
 	}
 
 	private void zoomView(int scroll, int mx, int my) {
 		int newTileSize;
 		if (scroll > 0) {
-			newTileSize = (int) ((tileSize - 1) * 0.95);
+			newTileSize = (int) ((state.tileSize - 1) * 0.95);
 		} else {
-			newTileSize = (int) ((tileSize + 1) * 1.05);
+			newTileSize = (int) ((state.tileSize + 1) * 1.05);
 		}
 		zoomViewTo(newTileSize, mx, my);
 	}
 
 	private void zoomViewTo(int newTileSize, int mx, int my) {
 		if (newTileSize > 0) {
-			Position tile = getWorldCoordOfPixel(new Position(mx, my));
-			tileSize = newTileSize;
-			Position focalPoint = tile.multiply(tileSize).subtract(viewOffset);
-			viewOffset.x -= mx - focalPoint.x;
-			viewOffset.y -= my - focalPoint.y;
+			Position tile = Utils.getWorldCoordOfPixel(new Position(mx, my), state.viewOffset, state.tileSize);
+			state.tileSize = newTileSize;
+			Position focalPoint = tile.multiply(state.tileSize).subtract(state.viewOffset);
+			state.viewOffset.x -= mx - focalPoint.x;
+			state.viewOffset.y -= my - focalPoint.y;
 		}
 		panel.repaint();
 	}
 
 	private void shiftView(int dx, int dy) {
-		viewOffset.x += dx;
-		viewOffset.y += dy;
+		state.viewOffset.x += dx;
+		state.viewOffset.y += dy;
 		panel.repaint();
 	}
 
 	public void moveViewTo(double ratiox, double ratioy, int panelWidth, int panelHeight) {
 		Position tile = new Position(ratiox * game.world.getWidth(), ratioy * game.world.getHeight());
-		Position pixel = tile.multiply(tileSize).subtract(new Position(panelWidth / 2, panelHeight / 2));
-		viewOffset = pixel;
+		Position pixel = tile.multiply(state.tileSize).subtract(new Position(panelWidth / 2, panelHeight / 2));
+		state.viewOffset = pixel;
 		panel.repaint();
 	}
 
-	private Position getWorldCoordOfPixel(Position pixel) {
-		Position tile = pixel.add(viewOffset).divide(tileSize);
-		return tile;
-	}
-
-	private Position getWorldCoordOfPixel(Point pixel) {
-		double column = ((pixel.x + viewOffset.x) / tileSize);
-		double row = ((pixel.y + viewOffset.y) / tileSize);
-		return new Position(column, row);
-	}
-
 	private Position getTileAtPixel(Point pixel) {
-		int column = (int) ((pixel.x + viewOffset.x) / tileSize);
-		int row = (int) ((pixel.y + viewOffset.y - (column % 2) * tileSize / 2) / tileSize);
+		int column = (int) ((pixel.x + state.viewOffset.x) / state.tileSize);
+		int row = (int) ((pixel.y + state.viewOffset.y - (column % 2) * state.tileSize / 2) / state.tileSize);
 		return new Position(column, row);
-	}
-
-	private void paintComponent(Graphics g) {
-		if (game == null) {
-			return;
-		}
-		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
-				RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-				RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-		g.setColor(game.getBackgroundColor());
-		g.fillRect(0, 0, panel.getWidth(), panel.getHeight());
-		drawGame(g, panel.getWidth(), panel.getHeight());
-		g.setColor(Color.black);
-		g.drawRect(-1, 0, panel.getWidth() + 1, panel.getHeight());
-	}
-
-	private static Position[] normalizeRectangle(Position one, Position two) {
-		double x = Math.min(one.x, two.x);
-		double y = Math.min(one.y, two.y);
-		double width = Math.abs(one.x - two.x);
-		double height = Math.abs(one.y - two.y);
-		return new Position[] { new Position(x, y), new Position(x + width, y + height) };
-	}
-
-	private static Rectangle normalizeRectangle(Point one, Point two) {
-		int x = Math.min(one.x, two.x);
-		int y = Math.min(one.y, two.y);
-		int width = Math.abs(one.x - two.x);
-		int height = Math.abs(one.y - two.y);
-		return new Rectangle(x, y, width, height);
-	}
-
-	private void drawGame(Graphics g, int panelWidth, int panelHeight) {
-		if (game.world == null) {
-			g.drawString("No World to display", 20, 20);
-			return;
-		}
-		long startTime = System.currentTimeMillis();
-		g.translate(-viewOffset.getIntX(), -viewOffset.getIntY());
-		draw(g, panelWidth, panelHeight, viewOffset);
-		g.translate(viewOffset.getIntX(), viewOffset.getIntY());
-		if (mousePressLocation != null && draggingMouse == true) {
-			Rectangle selectionRectangle = normalizeRectangle(mousePressLocation, previousMouse);
-			Graphics2D g2d = (Graphics2D) g;
-			g2d.setColor(Color.white);
-			Stroke stroke = g2d.getStroke();
-			g2d.setStroke(new BasicStroke(3));
-			g2d.drawRect(selectionRectangle.x, selectionRectangle.y, selectionRectangle.width,
-					selectionRectangle.height);
-			g2d.setStroke(stroke);
-		}
-		if (faction != null && faction.getResearchTarget() != null && !faction.getResearchTarget().isCompleted()) {
-			g.setFont(KUIConstants.infoFont);
-			double completedRatio = 1.0 * faction.getResearchTarget().getPointsSpent()
-					/ faction.getResearchTarget().getRequiredPoints();
-			String progress = String.format(faction.getResearchTarget() + " %d/%d",
-					faction.getResearchTarget().getPointsSpent(), faction.getResearchTarget().getRequiredPoints());
-			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress,
-					panelWidth - panelWidth / 3 - 4, 4, panelWidth / 3, 30);
-		}
-		long endTime = System.currentTimeMillis();
-		long deltaTime = endTime - startTime;
-		g.setFont(KUIConstants.infoFont);
-		for (int i = 0; i < 2; i++) {
-			int x = 10;
-			int y = panel.getHeight() - 5;
-			g.setColor(Color.green);
-			if (i == 1) {
-				g.setColor(Color.black);
-				x++;
-				y++;
-			}
-			g.drawString("DRAW(ms):" + deltaTime, x, y);
-			g.drawString("TICK(ms):" + previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
-			if (Game.DEBUG) {
-				String fstr = "";
-				for (Faction f : game.world.getFactions()) {
-					fstr += f.name() + ":" + f.getBuildings().size() + ", ";
-				}
-				g.drawString(fstr, x + 200, y);
-			}
-		}
-		Toolkit.getDefaultToolkit().sync();
-	}
-
-	private void draw(Graphics g, int panelWidth, int panelHeight, Position viewOffset) {
-		// Try to only draw stuff that is visible on the screen
-		int lowerX = Math.max(0, viewOffset.divide(tileSize).getIntX() - 2);
-		int lowerY = Math.max(0, viewOffset.divide(tileSize).getIntY() - 2);
-		int upperX = Math.min(game.world.getWidth(), lowerX + panelWidth / tileSize + 4);
-		int upperY = Math.min(game.world.getHeight(), lowerY + panelHeight / tileSize + 4);
-
-		if (tileSize < FAST_MODE_TILE_SIZE) {
-			if (showHeightMap) {
-				g.drawImage(heightMapImage, 0, 0, tileSize * game.world.getWidth(), tileSize * game.world.getHeight(),
-						null);
-			}else if (showPressureMap) {
-				g.drawImage(pressureMapImage, 0, 0, tileSize * game.world.getWidth(), tileSize * game.world.getHeight(),
-						null);
-			}else if (showTemperatureMap) {
-				g.drawImage(temperatureMapImage, 0, 0, tileSize * game.world.getWidth(), tileSize * game.world.getHeight(),
-						null);
-			} else if (showHumidityMap) {
-				g.drawImage(humidityMapImage, 0, 0, tileSize * game.world.getWidth(), tileSize * game.world.getHeight(),
-						null);
-			} else {
-				g.drawImage(terrainImage, 0, 0, tileSize * game.world.getWidth(), tileSize * game.world.getHeight(),
-						null);
-			}
-		} else {
-			double highHeight = Double.MIN_VALUE;
-			double lowHeight = Double.MAX_VALUE;
-			double highPressure = Double.MIN_VALUE;
-			double lowPressure = Double.MAX_VALUE;
-			double highTemp = World.MINTEMP;
-			double lowTemp = World.MAXTEMP;
-			double highHumidity = 20;
-			double lowHumidity = 0;
-			if (showHeightMap) {
-				for (int i = lowerX; i < upperX; i++) {
-					for (int j = lowerY; j < upperY; j++) {
-						Tile tile = game.world.get(new TileLoc(i, j));
-						if (tile == null) {
-							continue;
-						}
-						highHeight = Math.max(highHeight, tile.getHeight());
-						lowHeight = Math.min(lowHeight, tile.getHeight());
-
-					}
-				}
-			}else if (showPressureMap) {
-				for (int i = lowerX; i < upperX; i++) {
-					for (int j = lowerY; j < upperY; j++) {
-						Tile tile = game.world.get(new TileLoc(i, j));
-						if (tile == null) {
-							continue;
-						}
-						highPressure = Math.max(highPressure, tile.getAir().getPressure());
-						lowPressure = Math.min(lowPressure, tile.getAir().getPressure());
-
-					}
-				}
-			}else if (showTemperatureMap) {
-				for (int i = lowerX; i < upperX; i++) {
-					for (int j = lowerY; j < upperY; j++) {
-						Tile tile = game.world.get(new TileLoc(i, j));
-						if (tile == null) {
-							continue;
-						}
-						highTemp = Math.max(highTemp, tile.getTemperature());
-						lowTemp = Math.min(lowTemp, tile.getTemperature());
-
-					}
-				}
-			}else if (showHumidityMap) {
-				for (int i = lowerX; i < upperX; i++) {
-					for (int j = lowerY; j < upperY; j++) {
-						Tile tile = game.world.get(new TileLoc(i, j));
-						if (tile == null) {
-							continue;
-						}
-						highHumidity = Math.max(highHumidity, tile.getAir().getHumidity());
-						lowHumidity = Math.min(lowHumidity, tile.getAir().getHumidity());
-
-					}
-				}
-
-			}
-
-			for (int i = lowerX; i < upperX; i++) {
-				for (int j = lowerY; j < upperY; j++) {
-					Tile tile = game.world.get(new TileLoc(i, j));
-					if (tile == null) {
-						continue;
-					}
-					drawTile((Graphics2D) g, tile, lowHeight, highHeight, lowHumidity, highHumidity, lowPressure, highPressure, lowTemp, highTemp);
-				}
-			}
-
-			drawHoveredTiles((Graphics2D) g);
-			drawPlannedThing((Graphics2D) g);
-			drawSelectedThings((Graphics2D) g, lowerX, lowerY, upperX, upperY);
-
-			for (Building building : game.world.getBuildings()) {
-				drawInventory(g, null, building);
-				drawHealthBar(g, building);
-				drawHitsplat(g, building);
-			}
-			for (Plant plant : game.world.getPlants()) {
-				drawHealthBar(g, plant);
-				drawHitsplat(g, plant);
-			}
-			for (Unit unit : game.world.getUnits()) {
-				drawInventory(g, unit, null);
-				drawHealthBar(g, unit);
-				drawHitsplat(g, unit);
-			}
-
-			for (Projectile p : game.world.getData().getProjectiles()) {
-				int extra = (int) (tileSize * p.getExtraSize());
-				double ratio = 0.5 * p.getHeight() / p.getMaxHeight();
-				int shadowOffset = (int) (tileSize * ratio / 2);
-				Point drawAt = getDrawingCoords(p.getTile().getLocation());
-				
-				g.drawImage(p.getShadow(0), drawAt.x + shadowOffset,
-						drawAt.y + shadowOffset, tileSize - shadowOffset * 2,
-						tileSize - shadowOffset * 2, null);
-				g.drawImage(p.getImage(0), drawAt.x - extra / 2,
-						drawAt.y - p.getHeight() - extra / 2, tileSize + extra,
-						tileSize + extra, null);
-			}
-			for (WeatherEvent w : game.world.getWeatherEvents()) {
-				
-				Point drawAt = getDrawingCoords(w.getTile().getLocation());
-				g.drawImage(w.getImage(0), drawAt.x ,
-						drawAt.y, tileSize, tileSize, null);
-			}
-
-			int indicatorSize = tileSize / 12;
-			int offset = 4;
-			HashMap<Tile, Integer> visited = new HashMap<>();
-			for (Unit unit : game.world.getUnits()) {
-				int count = 0;
-				if (visited.containsKey(unit.getTile())) {
-					count = visited.get(unit.getTile());
-				}
-				visited.put(unit.getTile(), count + 1);
-
-				// draws a square for every player unit on the tile
-				Point drawAt = getDrawingCoords(unit.getTile().getLocation());
-				int xx = drawAt.x + offset;
-				int yy = drawAt.y + (indicatorSize + offset) * count + offset;
-				g.setColor(unit.getFaction().color());
-				g.fillRect(xx, yy, indicatorSize, indicatorSize);
-				g.setColor(Color.BLACK);
-				g.drawRect(xx, yy, indicatorSize, indicatorSize);
-				count++;
-			}
-
-			if (!showHeightMap && !showHumidityMap && !showPressureMap && !showTemperatureMap) {
-				for (int i = lowerX; i < upperX; i++) {
-					for (int j = lowerY; j < upperY; j++) {
-						Tile tile = game.world.get(new TileLoc(i, j));
-						if (tile == null)
-							continue;
-						double brightness = World.getDaylight() + tile.getBrightness(faction);
-						brightness = Math.max(Math.min(brightness, 1), 0);
-						g.setColor(new Color(0, 0, 0, (int) (255 * (1 - brightness))));
-						Point drawAt = getDrawingCoords(tile.getLocation());
-						g.fillRect(drawAt.x, drawAt.y, tileSize, tileSize);
-					}
-				}
-			}
-
-			if (drawDebugStrings) {
-				if (tileSize >= 36) {
-					drawDebugStrings(g, lowerX, lowerY, upperX, upperY);
-				}
-			}
-			if (leftClickAction == LeftClickAction.ATTACK) {
-				drawTarget(g, hoveredTile);
-			}
-		}
-	}
-
-	private void drawSelectedThings(Graphics2D g, int lowerX, int lowerY, int upperX, int upperY) {
-		for (Thing thing : selectedThings) {
-			// draw selection circle
-			g.setColor(Utils.getTransparentColor(faction.color(), 150));
-//			Utils.setTransparency(g, 0.8f);
-			Stroke currentStroke = g.getStroke();
-			int strokeWidth = tileSize / 12;
-			g.setStroke(new BasicStroke(strokeWidth));
-			Point drawAt = getDrawingCoords(thing.getTile().getLocation());
-			g.drawOval(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, tileSize - 1 - strokeWidth,
-					tileSize - 1 - strokeWidth);
-			g.setStroke(currentStroke);
-//			Utils.setTransparency(g, 1f);
-
-			// draw spawn location for buildings
-			if (thing instanceof Building) {
-				Building building = (Building) thing;
-				if (building.getSpawnLocation() != building.getTile()) {
-					drawAt = getDrawingCoords(building.getSpawnLocation().getLocation());
-					g.drawImage(RALLY_POINT_IMAGE, drawAt.x, drawAt.y, tileSize, tileSize, null);
-				}
-				
-				int range = building.getType().getVisionRadius();
-				if (range > 1) {
-					// draws the range for buildings
-					for (int i = lowerX; i < upperX; i++) {
-						for (int j = lowerY; j < upperY; j++) {
-							Tile t = game.world.get(new TileLoc(i, j));
-							if (t == null)
-								continue;
-							drawAt = getDrawingCoords(t.getLocation());
-							if (t.getLocation().distanceTo(building.getTile().getLocation()) <= range) {
-								g.setColor(Color.BLACK);
-								Utils.setTransparency(g, 0.3f);
-
-								for (Tile tile : t.getNeighbors()) {
-									if (tile.getLocation().distanceTo(building.getTile().getLocation()) > range) {
-										drawBorderBetween(g, t.getLocation(), tile.getLocation());
-									}
-								}
-								Utils.setTransparency(g, 1);
-							}
-						}
-					}
-				}
-			}
-
-			if (thing instanceof Unit) {
-				Unit unit = (Unit) thing;
-				// draw attacking target
-				Thing target = unit.getTarget();
-				if (target != null) {
-					drawTarget(g, target.getTile().getLocation());
-				}
-				// draw path
-				LinkedList<Tile> path = unit.getCurrentPath();
-				if (path != null) {
-					g.setColor(Color.green);
-					TileLoc prev = unit.getTile().getLocation();
-					Point prevDrawAt = getDrawingCoords(prev);
-					for (Tile t : path) {
-						drawAt = getDrawingCoords(t.getLocation());
-						if (prev != null) {
-							g.drawLine(prevDrawAt.x + tileSize / 2, prevDrawAt.y + tileSize / 2,
-									drawAt.x + tileSize / 2, drawAt.y + tileSize / 2);
-						}
-						prev = t.getLocation();
-						prevDrawAt = drawAt;
-					}
-				}
-				// draw destination flags
-				for (PlannedAction plan : unit.actionQueue) {
-					Tile targetTile = plan.targetTile == null ? plan.target.getTile() : plan.targetTile;
-					drawAt = getDrawingCoords(targetTile.getLocation());
-					g.drawImage(FLAG, drawAt.x, drawAt.y, tileSize, tileSize, null);
-				}
-				int range = unit.getMaxRange();
-				if (range > 1) {
-					// draws the attack range for units
-					for (int i = lowerX; i < upperX; i++) {
-						for (int j = lowerY; j < upperY; j++) {
-							Tile t = game.world.get(new TileLoc(i, j));
-							if (t == null)
-								continue;
-							drawAt = getDrawingCoords(t.getLocation());
-							if (t.getLocation().distanceTo(unit.getTile().getLocation()) <= range) {
-								g.setColor(Color.BLACK);
-								Utils.setTransparency(g, 0.3f);
-
-								for (Tile tile : t.getNeighbors()) {
-									if (tile.getLocation().distanceTo(unit.getTile().getLocation()) > range) {
-										drawBorderBetween(g, t.getLocation(), tile.getLocation());
-									}
-								}
-								Utils.setTransparency(g, 1);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private void drawPlannedThing(Graphics2D g) {
-		BufferedImage bI = null;
-		if (leftClickAction == LeftClickAction.PLAN_BUILDING) {
-			bI = Utils.toBufferedImage(selectedBuildingToPlan.getImage(tileSize));
-		} else if (leftClickAction == LeftClickAction.SPAWN_THING) {
-			bI = Utils.toBufferedImage(selectedThingToSpawn.getImage(tileSize));
-		}
-		if (bI != null) {
-			Utils.setTransparency(g, 0.5f);
-			Point drawAt = getDrawingCoords(hoveredTile);
-			g.drawImage(bI, drawAt.x, drawAt.y, tileSize, tileSize, null);
-			Utils.setTransparency(g, 1f);
-		}
-	}
-
-	private void drawDebugStrings(Graphics g, int lowerX, int lowerY, int upperX, int upperY) {
-		if(upperX - lowerX <= 0 || upperY - lowerY <= 0) {
-			return;
-		}
-		int[][] rows = new int[upperX - lowerX][upperY - lowerY];
-		int fontsize = tileSize / 4;
-		fontsize = Math.min(fontsize, 13);
-		Font font = new Font("Consolas", Font.PLAIN, fontsize);
-		g.setFont(font);
-		for (int i = lowerX; i < upperX; i++) {
-			for (int j = lowerY; j < upperY; j++) {
-				Tile tile = game.world.get(new TileLoc(i, j));
-				Point drawAt = getDrawingCoords(tile.getLocation());
-				List<String> strings = new LinkedList<String>();
-				strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
-				strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getHumidity()));
-				strings.add(String.format("TEM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getTemperature()));
-				strings.add(String.format("PRE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getPressure()));
-				strings.add(String.format("RH" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getRelativeHumidity()));
-				strings.add(String.format("DEW" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getDewPoint()));
-				strings.add(String.format("EVA" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEvaporation()));
-				strings.add(String.format("VOL" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getVolume()));
-				strings.add(String.format("MV" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getMaxVolume()));
-				strings.add(String.format("ENE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEnergy()));
-//				strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTemperature()));
-				if (tile.getResource() != null) {
-					strings.add(String.format("ORE" + "=%d", tile.getResource().getYield()));
-				}
-
-				if (tile.liquidType != LiquidType.DRY) {
-					strings.add(String.format(tile.liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f",
-							tile.liquidAmount));
-				}
-
-				if (tile.getModifier() != null) {
-					strings.add("GM=" + tile.getModifier().timeLeft());
-				}
-				rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, strings, rows[i - lowerX][j - lowerY], fontsize,
-						tileSize, drawAt);
-
-				for (Unit unit : tile.getUnits()) {
-					rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, unit.getDebugStrings(),
-							rows[i - lowerX][j - lowerY], fontsize, tileSize, drawAt);
-				}
-				if (tile.getPlant() != null) {
-					rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, tile.getPlant().getDebugStrings(),
-							rows[i - lowerX][j - lowerY], fontsize, tileSize, drawAt);
-				}
-				if (tile.hasBuilding()) {
-					rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, tile.getBuilding().getDebugStrings(),
-							rows[i - lowerX][j - lowerY], fontsize, tileSize, drawAt);
-				}
-				if (tile.getRoad() != null) {
-					rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, tile.getRoad().getDebugStrings(),
-							rows[i - lowerX][j - lowerY], fontsize, tileSize, drawAt);
-				}
-			}
-		}
-	}
-
-	private void drawHoveredTiles(Graphics2D g) {
-		int strokeWidth = tileSize / 10;
-		strokeWidth = strokeWidth < 1 ? 1 : strokeWidth;
-		Stroke stroke = g.getStroke();
-		g.setStroke(new BasicStroke(strokeWidth));
-		g.setColor(new Color(0, 0, 0, 64));
-		if (leftMouseDown && draggingMouse && boxSelect[0] != null && boxSelect[1] != null) {
-			Position[] box = normalizeRectangle(boxSelect[0], boxSelect[1]);
-			for (Tile tile : getTilesBetween(box[0], box[1])) {
-				Point drawAt = getDrawingCoords(tile.getLocation());
-				g.drawRect(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, tileSize - strokeWidth,
-						tileSize - strokeWidth);
-			}
-		} else {
-			if (game.world.get(hoveredTile) != null) {
-				Point drawAt = getDrawingCoords(hoveredTile);
-				g.drawRect(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, tileSize - strokeWidth,
-						tileSize - strokeWidth);
-			}
-		}
-		g.setStroke(stroke);
-	}
-
-	private Point getDrawingCoords(TileLoc tileLoc) {
-		int x = tileLoc.x() * tileSize;
-		int y = tileLoc.y() * tileSize + (tileLoc.x() % 2) * tileSize / 2;
-		return new Point(x, y);
-	}
-
-	private void drawTile(Graphics2D g, Tile theTile, double lowHeight, double highHeight, double lowHumidity,
-			double highHumidity, double lowPressure, double highPressure, double lowTemp, double highTemp) {
-		Point drawAt = getDrawingCoords(theTile.getLocation());
-		int draww = tileSize;
-		int drawh = tileSize;
-		int imagesize = draww < drawh ? draww : drawh;
-
-		if (showHeightMap) {
-			float heightRatio = (float) ((theTile.getHeight() - lowHeight) / (highHeight - lowHeight));
-			int r = Math.max(Math.min((int) (255 * heightRatio), 255), 0);
-			g.setColor(new Color(r, 0, 255 - r));
-			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-		}else if (showPressureMap) {
-			float pressureRatio = (float) ((theTile.getAir().getPressure() - lowPressure) / (highPressure - lowPressure));
-			int r = Math.max(Math.min((int) (255 * pressureRatio), 255), 0);
-			g.setColor(new Color(r, 0, 255 - r));
-			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-		}else if (showTemperatureMap) {
-			float tempRatio = (float) ((theTile.getTemperature() - lowTemp) / (highTemp - lowTemp));
-			int r = Math.max(Math.min((int) (255 * tempRatio), 255), 0);
-			g.setColor(new Color(255 - r, 0, r));
-			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-		}else if (showHumidityMap) {
-			float humidityRatio = (float) ((theTile.getAir().getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
-			float insidePara = ((humidityRatio - 0.5f) * 1.74f);
-			float almostRatio = (insidePara * insidePara * insidePara * insidePara * insidePara + 0.5f);
-			int r = Math.max(Math.min((int) (255 * almostRatio), 255), 0);
-			g.setColor(new Color(255 - r, 0, r));
-			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-		} else {
-			g.drawImage(theTile.getTerrain().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh, null);
-//			t.drawEntities(g, currentMode);
-
-			if (theTile.getResource() != null && getFaction().areRequirementsMet(theTile.getResource().getType())) {
-				g.drawImage(theTile.getResource().getType().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh,
-						null);
-			}
-
-			if (theTile.getFaction() != null && theTile.getFaction() != game.world.getFaction(World.NO_FACTION_ID)) {
-				g.setColor(theTile.getFaction().borderColor());
-				for (Tile tile : theTile.getNeighbors()) {
-					if (tile.getFaction() != theTile.getFaction()) {
-						drawBorderBetween(g, theTile.getLocation(), tile.getLocation());
-					}
-				}
-			}
-//			if(game.world.borderTerritory.containsKey(theTile)) {
-//				Utils.setTransparency(g, 1);
-//				g.setColor(Color.BLACK);
-//				g.fillRect(drawAt.x, drawAt.y, draww, drawh); 
-//			}
-			if (theTile.getRoad() != null) {
-				drawBuilding(theTile.getRoad(), g, drawAt.x, drawAt.y, draww, drawh);
-			}
-
-			if (theTile.liquidType != LiquidType.DRY) {
-				double alpha = Utils.getAlphaOfLiquid(theTile.liquidAmount);
-//				 transparency liquids
-				Utils.setTransparency(g, alpha);
-				g.setColor(theTile.liquidType.getColor(imagesize));
-				g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-				Utils.setTransparency(g, 1);
-
-				int imageSize = (int) Math.min(Math.max(draww * theTile.liquidAmount / 20, 1), draww);
-				g.setColor(theTile.liquidType.getColor(imagesize));
-				g.fillRect(drawAt.x + draww / 2 - imageSize / 2, drawAt.y + drawh / 2 - imageSize / 2, imageSize,
-						imageSize);
-				g.drawImage(theTile.liquidType.getImage(imagesize), drawAt.x + draww / 2 - imageSize / 2,
-						drawAt.y + draww / 2 - imageSize / 2, imageSize, imageSize, null);
-			}
-
-			if (theTile.getModifier() != null) {
-				Utils.setTransparency(g, 0.9);
-				g.drawImage(theTile.getModifier().getType().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh,
-						null);
-				Utils.setTransparency(g, 1);
-			}
-
-			if (!theTile.getItems().isEmpty()) {
-				for (Item item : theTile.getItems()) {
-					g.drawImage(item.getType().getImage(imagesize), drawAt.x + tileSize / 4, drawAt.y + tileSize / 4,
-							tileSize / 2, tileSize / 2, null);
-				}
-			}
-			if (theTile.getPlant() != null) {
-				Plant p = theTile.getPlant();
-				g.drawImage(p.getImage(tileSize), drawAt.x, drawAt.y, draww, drawh, null);
-			}
-
-			if (theTile.getBuilding() != null) {
-				if (theTile.getBuilding().getIsSelected()) {
-					g.drawImage(theTile.getBuilding().getHighlight(tileSize), drawAt.x, drawAt.y, draww, drawh, null);
-				}
-				drawBuilding(theTile.getBuilding(), g, drawAt.x, drawAt.y, draww, drawh);
-			}
-			for (Unit unit : theTile.getUnits()) {
-				if (unit.getIsSelected()) {
-					g.drawImage(unit.getHighlight(tileSize), drawAt.x, drawAt.y, draww, drawh, null);
-				}
-				g.drawImage(unit.getImage(tileSize), drawAt.x, drawAt.y, draww, drawh, null);
-				if (unit.isGuarding() == true) {
-					g.drawImage(GUARD_ICON, drawAt.x + draww / 4, drawAt.y + drawh / 4, draww / 2, drawh / 2, null);
-				}
-				if (unit.getAutoBuild() == true) {
-					g.drawImage(AUTO_BUILD_ICON, drawAt.x + draww / 4, drawAt.y + drawh / 4, draww / 2, drawh / 2,
-							null);
-				}
-			}
-		}
-	}
-
-	private void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh) {
-
-		BufferedImage bI = Utils.toBufferedImage(building.getImage(0));
-		if (building.isBuilt() == false) {
-			// draws the transparent version
-			Utils.setTransparency(g, 0.5f);
-			Graphics2D g2d = (Graphics2D) g;
-			g2d.drawImage(bI, drawx, drawy, draww, drawh, null);
-			Utils.setTransparency(g, 1f);
-			// draws the partial image
-			double percentDone = 1 - building.getRemainingEffort() / building.getType().getBuildingEffort();
-			int imageRatio = Math.max(1, (int) (bI.getHeight() * percentDone));
-			int partialHeight = Math.max(1, (int) (tileSize * percentDone));
-			bI = bI.getSubimage(0, bI.getHeight() - imageRatio, bI.getWidth(), imageRatio);
-			g.drawImage(bI, drawx, drawy - partialHeight + drawh, draww, partialHeight, null);
-			g.drawImage(BUILD_ICON, drawx + tileSize / 4, drawy + tileSize / 4, draww * 3 / 4, drawh * 3 / 4, null);
-		} else {
-			g.drawImage(bI, drawx, drawy, draww, drawh, null);
-		}
-	}
-
-	private void drawTarget(Graphics g, TileLoc tileLoc) {
-		Point drawAt = getDrawingCoords(tileLoc);
-		int w = (int) (tileSize * 8 / 10);
-		int hi = (int) (tileSize * 8 / 10);
-		g.drawImage(TARGET_IMAGE, drawAt.x + tileSize * 1 / 10, drawAt.y + tileSize * 1 / 10, w, hi, null);
-	}
-
-	private void drawInventory(Graphics g, Unit unit, Building building) {
-		if (tileSize <= 30) {
-			return;
-		}
-		int numDrawn = 0;
-		if (building != null) {
-			Point drawAt = getDrawingCoords(building.getTile().getLocation());
-			for (Item item : building.getInventory().getItems()) {
-				if (item != null) {
-					g.drawImage(item.getType().getImage(tileSize/4), drawAt.x+(tileSize/4*numDrawn), drawAt.y, null);
-					numDrawn ++;
-				}
-			}
-		}
-		if (unit != null) {
-			Point drawAt = getDrawingCoords(unit.getTile().getLocation());
-			for (Item item : unit.getInventory().getItems()) {
-				if (item != null) {
-					g.drawImage(item.getType().getImage(tileSize), drawAt.x+(tileSize/4*numDrawn), drawAt.y, null);
-					numDrawn ++;
-				}
-			}
-		}
-
-	}
-
-	private void drawHealthBar(Graphics g, Thing thing) {
-		if (tileSize <= 30) {
-			return;
-		}
-		if (World.ticks - thing.getTimeLastDamageTaken() < 20 || thing.getTile().getLocation().equals(hoveredTile)) {
-			Point drawAt = getDrawingCoords(thing.getTile().getLocation());
-			int w = tileSize - 1;
-			int h = tileSize / 4 - 1;
-			drawHealthBar2(g, thing, drawAt.x + 1, drawAt.y + 1, w, h, 2, thing.getHealth() / thing.getMaxHealth());
-		}
-	}
-
-	public static void drawHealthBar2(Graphics g, Thing thing, int x, int y, int w, int h, int thickness,
-			double ratio) {
-		g.setColor(Color.BLACK);
-		g.fillRect(x, y, w, h);
-
-		g.setColor(Color.RED);
-		g.fillRect(x + thickness, y + thickness, w - thickness * 2, h - thickness * 2);
-
-		int greenBarWidth = (int) (ratio * (w - thickness * 2));
-		g.setColor(Color.GREEN);
-		g.fillRect(x + thickness, y + thickness, greenBarWidth, h - thickness * 2);
-	}
-
-	private void drawHitsplat(Graphics g, Thing thing) {
-
-		Point drawAt = getDrawingCoords(thing.getTile().getLocation());
-		int splatWidth = (int) (tileSize * .5);
-		int splatHeight = (int) (tileSize * .5);
-
-		thing.updateHitsplats();
-		Hitsplat[] hitsplats = thing.getHitsplatList();
-
-		for (int m = 0; m < hitsplats.length; m++) {
-			if (hitsplats[m] == null) {
-				continue;
-			}
-			double damage = hitsplats[m].getDamage();
-			int i = hitsplats[m].getSquare();
-
-			int x = (int) ((drawAt.x));
-			int y = (int) ((drawAt.y));
-
-			if (i == 1) {
-				x = (int) ((drawAt.x) + tileSize * 0.5);
-				y = (int) ((drawAt.y) + tileSize * 0.5);
-			}
-			if (i == 2) {
-				x = (int) ((drawAt.x) + tileSize * 0.5);
-				y = (int) ((drawAt.y));
-			}
-			if (i == 3) {
-				x = (int) ((drawAt.x));
-				y = (int) ((drawAt.y) + tileSize * 0.5);
-			}
-
-			String text = String.format("%.0f", damage);
-
-			if (damage > 0) {
-				g.drawImage(RED_HITSPLAT, x, y, splatWidth, splatHeight, null);
-			} else if (damage == 0) {
-				g.drawImage(BLUE_HITSPLAT, x, y, splatWidth, splatHeight, null);
-			} else if (damage < 0) {
-				g.drawImage(GREEN_HITSPLAT, x, y, splatWidth, splatHeight, null);
-				text = String.format("%.0f", -damage);
-			}
-
-			int fontSize = tileSize / 4;
-			g.setFont(new Font(DAMAGE_FONT.getFontName(), Font.BOLD, fontSize));
-			int width = g.getFontMetrics().stringWidth(text);
-			g.setColor(Color.WHITE);
-			g.drawString(text, x + splatWidth / 2 - width / 2, (int) (y + fontSize * 1.5));
-		}
-	}
-
-	private void drawBorderBetween(Graphics2D g, TileLoc one, TileLoc two) {
-		int width = tileSize / 8;
-		Point drawAt = getDrawingCoords(one);
-		if (one.x() == two.x()) {
-			if (one.y() > two.y()) {
-				g.fillRect(drawAt.x, drawAt.y, tileSize, width);
-			}
-			if (one.y() < two.y()) {
-				g.fillRect(drawAt.x, drawAt.y + tileSize - width, tileSize, width);
-			}
-		} else {
-			if (one.y() > two.y()) {
-				int yoffset = (one.x() % 2) * tileSize / 2;
-				if (one.x() < two.x()) {
-					g.fillRect(drawAt.x + tileSize - width, drawAt.y + yoffset, width, tileSize / 2);
-				} else if (one.x() > two.x()) {
-					g.fillRect(drawAt.x, drawAt.y + yoffset, width, tileSize / 2);
-				}
-			} else if (one.y() < two.y()) {
-				int yoffset = (one.x() % 2) * tileSize / 2;
-				if (one.x() < two.x()) {
-					g.fillRect(drawAt.x + tileSize - width, drawAt.y + yoffset, width, tileSize / 2);
-				} else if (one.x() > two.x()) {
-					g.fillRect(drawAt.x, drawAt.y + yoffset, width, tileSize / 2);
-				}
-			} else {
-				int yoffset = (1 - one.x() % 2) * tileSize / 2;
-				if (one.x() < two.x()) {
-					g.fillRect(drawAt.x + tileSize - width, drawAt.y + yoffset, width, tileSize / 2);
-				} else if (one.x() > two.x()) {
-					g.fillRect(drawAt.x, drawAt.y + yoffset, width, tileSize / 2);
-				}
-			}
-		}
-	}
-
-	public void drawMinimap(Graphics g, int x, int y, int w, int h) {
-		if (showHeightMap) {
-			g.drawImage(heightMapImage, x, y, w, h, null);
-		}else if (showPressureMap) {
-			g.drawImage(pressureMapImage, x, y, w, h, null);
-		}else if (showTemperatureMap) {
-			g.drawImage(temperatureMapImage, x, y, w, h, null);
-		} else if (showHumidityMap) {
-			g.drawImage(humidityMapImage, x, y, w, h, null);
-		} else {
-			g.drawImage(minimapImage, x, y, w, h, null);
-		}
-		if (game.world != null) {
-			Position offsetTile = getWorldCoordOfPixel(viewOffset);
-			int boxx = (int) (offsetTile.x * w / game.world.getWidth() / 2);
-			int boxy = (int) (offsetTile.y * h / game.world.getHeight() / 2);
-			int boxw = (int) (panel.getWidth() * w / tileSize / game.world.getWidth());
-			int boxh = (int) (panel.getHeight() * h / tileSize / game.world.getHeight());
-			g.setColor(Color.yellow);
-			g.drawRect(x + boxx, y + boxy, boxw, boxh);
-		}
 	}
 
 	public CommandInterface getCommandInterface() {
@@ -1484,5 +659,13 @@ public class GameView {
 	
 	public void requestFocus() {
 		panel.requestFocus();
+	}
+	
+	public Drawer getDrawer() {
+		return drawer;
+	}
+	
+	public void setPreviousTickTime(long time) {
+		state.previousTickTime = time;
 	}
 }

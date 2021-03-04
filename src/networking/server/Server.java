@@ -355,7 +355,7 @@ public class Server {
 					gameInstance.gameTick();
 					gameInstance.getGUIController().updateGUI();
 					long elapsed = System.currentTimeMillis() - start;
-					gui.getGameView().previousTickTime = elapsed;
+					gui.getGameView().setPreviousTickTime(elapsed);
 					if(World.ticks % 200 == 1) {
 						System.out.println("time elapsed for tick: " + elapsed + "ms");
 					}

@@ -1,4 +1,4 @@
-package ui.opengl.maths;
+package ui.glgraphics.maths;
 
 public class Vector3f {
 	public float x, y, z;

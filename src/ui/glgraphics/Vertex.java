@@ -1,6 +1,6 @@
-package ui.opengl.graphics;
+package ui.glgraphics;
 
-import ui.opengl.maths.*;
+import ui.glgraphics.maths.*;
 
 public class Vertex {
 

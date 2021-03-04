@@ -481,6 +481,25 @@ public final class Utils {
 		}
 		return rand / tries;
 	}
+
+	public static Position[] normalizeRectangle(Position one, Position two) {
+		double x = Math.min(one.x, two.x);
+		double y = Math.min(one.y, two.y);
+		double width = Math.abs(one.x - two.x);
+		double height = Math.abs(one.y - two.y);
+		return new Position[] { new Position(x, y), new Position(x + width, y + height) };
+	}
+
+
+	public static Position getWorldCoordOfPixel(Position pixel, Position viewOffset, int tileSize) {
+		return pixel.add(viewOffset).divide(tileSize);
+	}
+	
+	public static Position getWorldCoordOfPixel(Point pixel, Position viewOffset, int tileSize) {
+		double column = ((pixel.x + viewOffset.x) / tileSize);
+		double row = ((pixel.y + viewOffset.y) / tileSize);
+		return new Position(column, row);
+	}
 	
 	public static CommandInterface makeFunctionalCommandInterface(Game game) {
 		return new CommandInterface() {

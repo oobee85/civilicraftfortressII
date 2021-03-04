@@ -1,11 +1,11 @@
-package ui.opengl.graphics;
+package ui.glgraphics;
 
 import java.nio.*;
 import java.nio.charset.*;
 
 import com.jogamp.opengl.*;
 
-import ui.opengl.maths.*;
+import ui.glgraphics.maths.*;
 import utils.*;
 
 public class Shader {

@@ -98,23 +98,28 @@ public class MinimapView extends JPanel {
 		g.setColor(Color.black);
 		g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
 		if (gameView.getDrawDebugStrings()) {
-			g.setColor(Color.black);
-			g.fillRect(0, 0, getWidth(), getHeight());
-			g.setColor(Color.green);
-			String string = "4 8 15 16 23 42";
+			drawMatrix(g);
+		}
+		gameView.getDrawer().drawMinimap(g, MINIMAPBORDERWIDTH, MINIMAPBORDERWIDTH, 
+				getWidth() - 2 * MINIMAPBORDERWIDTH,
+				getHeight() - 2 * MINIMAPBORDERWIDTH);
+	}
+	
+	private void drawMatrix(Graphics g) {
+		g.setColor(Color.black);
+		g.fillRect(0, 0, getWidth(), getHeight());
+		g.setColor(Color.green);
+		String string = "4 8 15 16 23 42";
 
-			for (int i = 0; i < 20; i++) {
-				int xpos = (int) (Math.random() * (getWidth() / 20 + 20));
+		for (int i = 0; i < 20; i++) {
+			int xpos = (int) (Math.random() * (getWidth() / 20 + 20));
 
-				for (int j = 0; j < getHeight() * 2; j++) {
-					int offset = (int) (Math.random() * 10);
-					int character = (int) (Math.random() * string.length());
-					g.drawString("" + string.charAt(character), xpos * 20 + offset, j * 20);
+			for (int j = 0; j < getHeight() * 2; j++) {
+				int offset = (int) (Math.random() * 10);
+				int character = (int) (Math.random() * string.length());
+				g.drawString("" + string.charAt(character), xpos * 20 + offset, j * 20);
 
-				}
 			}
 		}
-		gameView.drawMinimap(g, MINIMAPBORDERWIDTH, MINIMAPBORDERWIDTH, getWidth() - 2 * MINIMAPBORDERWIDTH,
-				getHeight() - 2 * MINIMAPBORDERWIDTH);
 	}
 }

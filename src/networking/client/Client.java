@@ -285,7 +285,7 @@ public class Client {
 						updatedTerrain.notify();
 					}
 					long elapsed = System.currentTimeMillis() - start;
-					clientGUI.getGameView().previousTickTime = elapsed;
+					clientGUI.getGameView().setPreviousTickTime(elapsed);
 					if(World.ticks % 200 == 1) {
 						System.out.println("time elapsed for tick: " + elapsed + "ms");
 					}
