@@ -351,6 +351,7 @@ public class ClientGUI {
 	}
 	
 	public void repaint() {
+		rootPanel.revalidate();
 		rootPanel.repaint();
 	}
 	

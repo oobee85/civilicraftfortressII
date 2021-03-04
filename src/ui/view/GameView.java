@@ -63,17 +63,22 @@ public class GameView {
 
 	public GameView(Game game, boolean useOpenGL) {
 		state = new GameViewState();
-		panel = new JPanel();
-		panel.setLayout(new BorderLayout());
 		if(useOpenGL) {
-			GLDrawer gldrawer = new GLDrawer();
+			GLDrawer gldrawer = new GLDrawer(game, state);
 			drawingCanvas = gldrawer.getDrawingCanvas();
 			drawer = gldrawer;
+			panel = new JPanel() {
+				@Override
+				public void paintComponent(Graphics g) {
+					super.paintComponent(g);
+					// for some reason GLCanvas doesnt get repainted so do it manually here
+					drawingCanvas.paint(g);
+				}
+			};
 		}
 		else {
 			VanillaDrawer vanillaDrawer = new VanillaDrawer(game, state);
 			drawingCanvas = new JPanel() {
-				private static final long serialVersionUID = 1L;
 				@Override
 				public void paintComponent(Graphics g) {
 					super.paintComponent(g);
@@ -81,7 +86,9 @@ public class GameView {
 				}
 			};
 			drawer = vanillaDrawer;
+			panel = new JPanel();
 		}
+		panel.setLayout(new BorderLayout());
 		drawingCanvas.setFocusable(false);
 		panel.add(drawingCanvas, BorderLayout.CENTER);
 		this.game = game;
