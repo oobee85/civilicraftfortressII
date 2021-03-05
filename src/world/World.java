@@ -24,11 +24,12 @@ public class World {
 	public static final int NIGHT_DURATION = 500;
 	public static final int TRANSITION_PERIOD = 100;
 	private static final double CHANCE_TO_SWITCH_TERRAIN = 1;
-	public static final int MINTEMP = -30;
-	public static final int MAXTEMP = 200;
+	public static final int MINTEMP = -273;
+	public static final int MAXTEMP = 500;
 	public static final int MAXHEIGHT = 1000;
 	public static final int JOULESPERTILE = 1;
 	public static final double STANDARDPRESSURE = 760;
+	public static final int VOLUMEPERTILE = 100;
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
@@ -680,13 +681,27 @@ public class World {
 			if(growthMultiplier > 0 && growthMultiplier < 1) {
 //				joules *= 1-growthMultiplier;
 			}
-			double first = 100 * 0.721;
 			double energy = 100 * 0.721 * ((tile.getTemperature()) + Math.abs(World.MINTEMP));
 			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 0) {
 				System.out.println("Energy: " + energy + ", T: " + tile.getTemperature());
 			}
 //			tile.setEnergy(energy);
 //			tile.addEnergy(joules);
+		}
+	}
+	public void updateTileMoles() {
+		for(Tile tile : getTiles()) {
+			
+			Air air = tile.getAir();
+			double pressure = air.getPressure();
+			double volume = VOLUMEPERTILE;
+			double R = 8.314;
+			double temperature = tile.getAir().getTemperature();
+			
+			double moles = (pressure*volume) / R * temperature;
+			air.setMass(moles);
+			
+			
 		}
 	}
 	public void updateTileTemperature() {

@@ -9,6 +9,7 @@ public class Air {
 	private double pressure;
 	private double height;
 	private double volume;
+	private double mass;
 	
 	private double maxHumidity;
 	private double maxVolume;
@@ -90,6 +91,12 @@ public class Air {
 			canRain = false;
 		}
 		
+	}
+	public void setMass(double mass) {
+		this.mass = mass;
+	}
+	public double getMass() {
+		return mass;
 	}
 	public void updatePressure() {
 		
