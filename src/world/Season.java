@@ -6,21 +6,25 @@ public class Season {
 
 	public static final float FREEZING_TEMPURATURE = 0.33f;
 	public static final float MELTING_TEMPURATURE = 0.43f;
-	public static final int SEASON_DURATION = 1000;
+	public static final int SEASON_DURATION = 10000;
 	public static float[] winter;
 	public static float[] summer;
 	
 	public static float getSeason2() {
-		float season = (float) (15 * Math.sin(Math.PI*World.ticks/SEASON_DURATION) + 10);
+		float season = (float) (10.0 * Math.sin(Math.PI*World.ticks/SEASON_DURATION) + 10);
 		
 		
 //		int season =  (World.ticks + SEASON_DURATION*1/2)%(SEASON_DURATION*2);
 //		return Math.abs(SEASON_DURATION - season) / (float)SEASON_DURATION;
 		return season;
 	}
-	public static float getEnergySeason() {
-		float season = (float) (10*Math.sin(Math.PI*World.ticks/SEASON_DURATION));
+	public static float getSeasonEnergy() {
+		float season = (float) (1/2*Math.sin(Math.PI*World.ticks/SEASON_DURATION));
 		return season;
+	}
+	public static float getNightEnergy() {
+		float night = (float) (5 * Math.sin(Math.PI*World.ticks/World.NIGHT_DURATION));
+		return night;
 	}
 	
 	// for migration

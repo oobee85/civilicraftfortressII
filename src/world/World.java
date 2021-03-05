@@ -652,26 +652,41 @@ public class World {
 				continue;
 			}
 			
-			tile.addEnergy(-0.5);
 			double currentEnergy = tile.getEnergy();
-			double joules = JOULESPERTILE;
+			double energyLoss = currentEnergy * 0.99999;
+//			tile.setEnergy(energyLoss);
+//			tile.addEnergy(energyLoss);		//tiles have energy decay
+//			double joules = JOULESPERTILE;
 			
-			double energy = Season.getEnergySeason();
+			double joules = Season.getSeasonEnergy();
+			joules += Season.getNightEnergy();
+			
+			// less energy added depending on how dense the cloud is
 			if(tile.getWeather() != null && tile.getAir().getMaxVolume() != 0) {
 				double cloudMultiplier = 1 - tile.getWeather().getStrength()/tile.getAir().getMaxVolume();
 				if(cloudMultiplier != 0) {
 					joules *= cloudMultiplier;
 				}
 			}
+			
+			// makes there be less energy added at higher altitudes
 			double pressureMultiplier = tile.getAir().getPressure()/STANDARDPRESSURE;
 			if(pressureMultiplier != 0) {
 				joules *= pressureMultiplier;
 			}
 			
-			
-			
-			
-			tile.addEnergy(joules);
+			// makes higher energy changes less if tile is already at an extreme energy level
+			double growthMultiplier = Math.log(currentEnergy)/5;
+			if(growthMultiplier > 0 && growthMultiplier < 1) {
+//				joules *= 1-growthMultiplier;
+			}
+			double first = 100 * 0.721;
+			double energy = 100 * 0.721 * ((tile.getTemperature()) + Math.abs(World.MINTEMP));
+			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 0) {
+				System.out.println("Energy: " + energy + ", T: " + tile.getTemperature());
+			}
+//			tile.setEnergy(energy);
+//			tile.addEnergy(joules);
 		}
 	}
 	public void updateTileTemperature() {
@@ -680,7 +695,11 @@ public class World {
 				System.out.println("null tile when updating temperature");
 				continue;
 			}
-			double temperature = tile.getEnergy() / (100 * 0.721);
+			
+
+//			tile.setTemperature(tile.getTemperature()+Season.getNightEnergy());
+			
+			double temperature = tile.getTemperature();
 			tile.getAir().setTemperature(temperature);
 			
 		}
@@ -910,7 +929,7 @@ public class World {
 		worldData.filterDeadProjectiles();
 		
 		if(World.ticks % 200 == 1) {
-			System.out.println("Tick " + World.ticks + ", " + worldData.toString());
+//			System.out.println("Tick " + World.ticks + ", " + worldData.toString());
 		}
 	}
 	

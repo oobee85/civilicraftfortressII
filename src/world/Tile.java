@@ -98,6 +98,7 @@ public class Tile implements Externalizable {
 
 	public float getTemperature() {
 		float season = Season.getSeason2();
+		float night = Season.getNightEnergy();
 //		float seasonTemp = Season.winter[getLocation().y()] + season * Season.summer[getLocation().y()];
 		
 		
@@ -106,11 +107,14 @@ public class Tile implements Externalizable {
 //		heightTemp = heightTemp*heightTemp;
 //		float nightMultiplier = World.isNightTime() ? 0.9f : 1f;
 //		return (seasonTemp + heightTemp)*nightMultiplier/2;
-		return season;
+		return season+night;
 	}
 	
 	public void setTemperature(double temp) {
 		
+	}
+	public void setEnergy(double energy) {
+		this.energy = energy;
 	}
 	public double getEnergy() {
 		return energy;
