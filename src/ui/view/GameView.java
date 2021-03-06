@@ -102,6 +102,7 @@ public class GameView {
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				System.out.println("Dragged mouse");
 				Point currentMouse = e.getPoint();
 				int dx = state.previousMouse.x - currentMouse.x;
 				int dy = state.previousMouse.y - currentMouse.y;
