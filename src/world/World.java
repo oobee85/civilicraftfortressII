@@ -30,6 +30,7 @@ public class World {
 	public static final int JOULESPERTILE = 1;
 	public static final double STANDARDPRESSURE = 760;
 	public static final int VOLUMEPERTILE = 100;
+	public static final int STARTINGMASS = 10;
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
@@ -699,7 +700,7 @@ public class World {
 			massTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getMass();
 		}
 		
-		for(Tile tile: getTiles()) {
+		for(Tile tile: getTilesRandomly()) {
 			TileLoc tileLoc = tile.getLocation();
 			for(Tile otherTile : tile.getNeighbors()) {
 				TileLoc otherLoc = otherTile.getLocation();
@@ -712,13 +713,16 @@ public class World {
 				if(mypres > opress) {
 					double deltap = mypres - opress;
 					double deltam = mymass - omass;
-					double change = mymass * deltap / mypres;
+					double change = deltap / mypres;
 					
-					
-					if(massTemp[tileLoc.x()][tileLoc.y()] - 0.1 >= 0) {
-						massTemp[otherLoc.x()][otherLoc.y()] += 0.1;
-						massTemp[tileLoc.x()][tileLoc.y()] -= 0.1;
+					if(massTemp[tileLoc.x()][tileLoc.y()] - change >= 0) {
+						massTemp[otherLoc.x()][otherLoc.y()] += change;
+						massTemp[tileLoc.x()][tileLoc.y()] -= change;
 					}
+//					if(massTemp[tileLoc.x()][tileLoc.y()] - 0.1 >= 0) {
+//						massTemp[otherLoc.x()][otherLoc.y()] += 0.1;
+//						massTemp[tileLoc.x()][tileLoc.y()] -= 0.1;
+//					}
 				}
 				
 			}
@@ -728,7 +732,7 @@ public class World {
 			t.getAir().setMass(massTemp[t.getLocation().x()][t.getLocation().y()]);
 			totalMass += t.getAir().getMass();
 		}
-		System.out.println(totalMass);
+//		System.out.println(totalMass);
 	}
 	public void setTileMass() {
 		for(Tile tile : getTiles()) {
@@ -741,7 +745,7 @@ public class World {
 			
 			double moles = (pressure*volume) / R * (temperature + Math.abs(MINTEMP));
 //			air.setMass(moles);
-			air.setMass(10);
+			air.setMass(STARTINGMASS);
 			
 		}
 	}

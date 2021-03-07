@@ -115,16 +115,17 @@ public class Air {
 		
 //		double sub = boltz * temp;
 		
-		
-		
 		double sub = R * (temp + Math.abs(World.MINTEMP));
+		double standardPVNRT = World.STARTINGMASS * sub / World.VOLUMEPERTILE;
+		
 		double power = (-g * MMair * (h - h0)) / sub;
 		double pressure = P0 * Math.pow(Math.E, power);
 		
-		double other = mass * sub / 35;
-		double mix = pressure+other;
+		double other = mass * sub / World.VOLUMEPERTILE;
+		double mix = pressure+(other - standardPVNRT);
 //		System.out.println("Pressure: " + pressure);
-		this.pressure = mix/2;
+//		System.out.println("pvnrt: "+other + "atm: "+pressure);
+		this.pressure = mix;
 
 	}
 	public double getRelativeHumidity() {
