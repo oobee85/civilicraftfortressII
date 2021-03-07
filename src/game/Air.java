@@ -125,8 +125,13 @@ public class Air {
 		double mix = pressure+(other - standardPVNRT);
 //		System.out.println("Pressure: " + pressure);
 //		System.out.println("pvnrt: "+other + "atm: "+pressure);
-		this.pressure = mix;
+		this.pressure = mix ;
 
+	}
+	public double getDensity() {
+		
+		double density = this.pressure/World.STANDARDPRESSURE*World.MMAIR / (0.0821 * (getTemperature() + Math.abs(World.MINTEMP)) );
+		return density;
 	}
 	public double getRelativeHumidity() {
 		

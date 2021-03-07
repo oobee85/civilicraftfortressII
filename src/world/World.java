@@ -31,6 +31,7 @@ public class World {
 	public static final double STANDARDPRESSURE = 760;
 	public static final int VOLUMEPERTILE = 100;
 	public static final int STARTINGMASS = 10;
+	public static final int MMAIR = 10;
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
@@ -682,7 +683,7 @@ public class World {
 			if(growthMultiplier > 0 && growthMultiplier < 1) {
 //				joules *= 1-growthMultiplier;
 			}
-			double Kgair = 10 * tile.getAir().getMass();
+			double Kgair = MMAIR * tile.getAir().getMass();
 			double energy = Kgair * 0.721 * ((tile.getAir().getTemperature()) + Math.abs(World.MINTEMP));
 			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 1) {
 				System.out.println("Energy: " + energy + ", T: " + tile.getAir().getTemperature());
