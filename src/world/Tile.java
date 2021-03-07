@@ -109,10 +109,6 @@ public class Tile implements Externalizable {
 //		return (seasonTemp + heightTemp)*nightMultiplier/2;
 		return season+night;
 	}
-	
-	public void setTemperature(double temp) {
-		
-	}
 	public void setEnergy(double energy) {
 		this.energy = energy;
 	}
@@ -137,7 +133,7 @@ public class Tile implements Externalizable {
 	
 	
 	public void updateAir() {
-//		air.setTemperature(this.getTemperature());
+		air.setTemperature(this.getTemperature());
 		air.updateMaxVolume();
 		air.updateHumidity();
 		air.updateHeight(this.height);

@@ -682,10 +682,10 @@ public class World {
 			if(growthMultiplier > 0 && growthMultiplier < 1) {
 //				joules *= 1-growthMultiplier;
 			}
-			double Kgair = 29.97 * tile.getAir().getMass();
-			double energy = 100 * 0.721 * ((tile.getTemperature()) + Math.abs(World.MINTEMP));
+			double Kgair = 10 * tile.getAir().getMass();
+			double energy = Kgair * 0.721 * ((tile.getAir().getTemperature()) + Math.abs(World.MINTEMP));
 			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 1) {
-				System.out.println("Energy: " + energy + ", T: " + tile.getTemperature());
+				System.out.println("Energy: " + energy + ", T: " + tile.getAir().getTemperature());
 			}
 			tile.setEnergy(energy);
 //			tile.addEnergy(joules);
@@ -759,8 +759,8 @@ public class World {
 
 //			tile.setTemperature(tile.getTemperature()+Season.getNightEnergy());
 			
-			double temperature = tile.getTemperature();
-			tile.getAir().setTemperature(temperature);
+//			double temperature = tile.getTemperature();
+//			tile.getAir().setTemperature(temperature);
 			
 		}
 			
@@ -1232,8 +1232,8 @@ public class World {
 
 		int numTiles = width*height;
 //		Generation.makeLake(numTiles * 1, this);
-//		Generation.makeLake(numTiles * 2, this);
-//		Generation.makeLake(numTiles * 4, this);
+		Generation.makeLake(numTiles * 2, this);
+		Generation.makeLake(numTiles * 4, this);
 		Generation.makeLake(numTiles * 8, this);
 		System.out.println("Simulating water for 100 iterations");
 		for(int i = 0; i < 100; i++) {
