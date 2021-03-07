@@ -112,11 +112,11 @@ public class DebugView {
 				fastForward.setText(fastForward.isSelected() ? "Stop Fast Forward" : "Fast Forward");
 			}
 		});
-		JButton raiseHeight = KUIConstants.setupButton("Raise terrain", RESEARCH_TAB_ICON, DEBUG_BUTTON_SIZE);
+		JButton raiseHeight = KUIConstants.setupButton("SpawnWeather", RESEARCH_TAB_ICON, DEBUG_BUTTON_SIZE);
 		raiseHeight.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				gameView.setRaisingTerrain(true);
+				gameView.setWeather(true);
 			}
 		});
 		JButton setTerritoryButton = KUIConstants.setupButton("Set Territory", null, DEBUG_BUTTON_SIZE);

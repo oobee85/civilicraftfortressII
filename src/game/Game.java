@@ -804,12 +804,14 @@ public class Game {
 		return null;
 	}
 	
-	public void raiseTerrain(Tile center, int radius) {
+	public void spawnWeather(Tile center, int radius) {
 		HashSet<Tile> tiles = world.getNeighborsInRadius(center, radius);
 		for(Tile t: tiles) {
-			double distance = t.getLocation().distanceTo(center.getLocation());
-			float height = (float) (t.getHeight() + (radius - distance) / (radius) * 0.1);
-			t.setHeight(height);
+			t.liquidType = LiquidType.WATER;
+			t.liquidAmount += 5;
+//			double distance = t.getLocation().distanceTo(center.getLocation());
+//			float height = (float) (t.getHeight() + (radius - distance) / (radius) * 0.1);
+//			t.setHeight(height);
 		}
 	}
 	public void setTerritory(Tile center, int radius, Faction faction) {
