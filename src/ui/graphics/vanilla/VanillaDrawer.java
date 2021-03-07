@@ -15,7 +15,7 @@ import ui.view.GameView.*;
 import utils.*;
 import world.*;
 
-public class VanillaDrawer implements Drawer {
+public class VanillaDrawer extends Drawer {
 
 	private static final int FAST_MODE_TILE_SIZE = 10;
 	private static final int NUM_DEBUG_DIGITS = 3;
@@ -33,21 +33,10 @@ public class VanillaDrawer implements Drawer {
 	private static final Image BLUE_HITSPLAT = Utils.loadImage("Images/interfaces/bluehitsplat.png");
 	private static final Image GREEN_HITSPLAT = Utils.loadImage("Images/interfaces/greenhitsplat.png");
 	
-	private volatile BufferedImage terrainImage;
-	private volatile BufferedImage minimapImage;
-	private volatile BufferedImage heightMapImage;
-	private volatile BufferedImage humidityMapImage;
-	private volatile BufferedImage pressureMapImage;
-	private volatile BufferedImage temperatureMapImage;
-
-	private final Game game;
-	private GameViewState state;
 	private JPanel canvas;
 	
 	public VanillaDrawer(Game game, GameViewState state) {
-		super();
-		this.game = game;
-		this.state = state;
+		super(game, state);
 		canvas = new JPanel() {
 			private static final long serialVersionUID = 1L;
 			@Override
@@ -837,15 +826,4 @@ public class VanillaDrawer implements Drawer {
 		return new Rectangle(x, y, width, height);
 	}
 
-	public void updateTerrainImages() {
-		if (game.world != null) {
-			BufferedImage[] images = game.world.createTerrainImage(state.faction);
-			this.terrainImage = images[0];
-			this.minimapImage = images[1];
-			this.heightMapImage = images[2];
-			this.humidityMapImage = images[3];
-			this.pressureMapImage = images[4];
-			this.temperatureMapImage = images[5];
-		}
-	}
 }

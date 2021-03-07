@@ -1,6 +1,7 @@
 package ui.graphics.opengl;
 
 import com.jogamp.opengl.*;
+import com.jogamp.opengl.util.texture.*;
 
 import ui.graphics.opengl.maths.*;
 import world.*;
@@ -8,6 +9,7 @@ import world.*;
 public class TerrainObject extends GameObject {
 	
 	Mesh mesh;
+	Texture texture;
 	
 	public TerrainObject() {
 		super(null);
@@ -24,6 +26,13 @@ public class TerrainObject extends GameObject {
 		gl.glEnableVertexAttribArray(0);
 		gl.glEnableVertexAttribArray(1);
 		gl.glEnableVertexAttribArray(2);
+		gl.glEnableVertexAttribArray(3);
+
+		gl.glActiveTexture(GL3.GL_TEXTURE0);
+		texture.enable(gl);
+		texture.bind(gl); 
+		shader.setUniform("textureSampler", 0);
+		
 		shader.setUniform("model", getModelMatrix());
 		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, mesh.getIBO());
 		gl.glDrawElements(GL2.GL_TRIANGLES, mesh.getIndices().length, GL2.GL_UNSIGNED_INT, 0);
@@ -31,6 +40,7 @@ public class TerrainObject extends GameObject {
 		gl.glDisableVertexAttribArray(0);
 		gl.glDisableVertexAttribArray(1);
 		gl.glDisableVertexAttribArray(2);
+		gl.glDisableVertexAttribArray(3);
 		gl.glBindVertexArray(0);
 	}
 
@@ -49,11 +59,12 @@ public class TerrainObject extends GameObject {
 		for(Tile tile : world.getTiles()) {
 			coordToVertex[tile.getLocation().y()][tile.getLocation().x()] = index;
 			float y = tile.getLocation().y() + (tile.getLocation().x() % 2) * 0.5f;
-			Vector3f pos0 = new Vector3f(tile.getLocation().x() - xoffset, tile.getHeight()/10, y - zoffset);
+			Vector3f pos0 = new Vector3f(tile.getLocation().x() - xoffset, tile.getHeight()/20, y - zoffset);
 			Vector3f ca = (tile.getLocation().x() % 2 == 0) ? c0 : c1;
 			Vector3f cb = (tile.getLocation().x() % 2 == 0) ? c2 : c3;
 			Vector3f c = (tile.getLocation().y() % 2 == 0) ? ca : cb;
-			vertices[index] = new Vertex(pos0, c);
+			Vector2f textureCoord = new Vector2f((float)tile.getLocation().x()/world.getWidth(), (float)tile.getLocation().y()/world.getHeight());
+			vertices[index] = new Vertex(pos0, c, null, textureCoord);
 //			indices[index*6+0] = index*4+3;
 //			indices[index*6+1] = index*4+0;
 //			indices[index*6+2] = index*4+1;

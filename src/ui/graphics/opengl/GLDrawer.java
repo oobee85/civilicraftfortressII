@@ -2,9 +2,12 @@ package ui.graphics.opengl;
 
 import java.awt.*;
 import java.awt.image.*;
+import java.io.*;
 
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.*;
+import com.jogamp.opengl.util.texture.*;
+import com.jogamp.opengl.util.texture.awt.*;
 
 import game.*;
 import ui.graphics.*;
@@ -13,7 +16,7 @@ import ui.view.GameView.*;
 import utils.*;
 import world.*;
 
-public class GLDrawer implements Drawer, GLEventListener {
+public class GLDrawer extends Drawer implements GLEventListener {
 	private final GLCanvas glcanvas;
 	private Shader shader;
 	private Matrix4f projection;
@@ -22,14 +25,12 @@ public class GLDrawer implements Drawer, GLEventListener {
 	private Vector3f sunColor = new Vector3f();
 	private TerrainObject terrainObject;
 	
-	private final Game game;
-	private final GameViewState state;
-	
 	private final Camera camera;
+
+	int tex;
 	
 	public GLDrawer(Game game, GameViewState state) {
-		this.game = game;
-		this.state = state;
+		super(game, state);
 		camera = new Camera(new Vector3f(), 0, 90);
 		// getting the capabilities object of GL2 profile
 		final GLProfile profile = GLProfile.get(GLProfile.GL2);
@@ -43,9 +44,6 @@ public class GLDrawer implements Drawer, GLEventListener {
 	
 	public Component getDrawingCanvas() {
 		return glcanvas;
-	}
-
-	public void updateTerrainImages() {
 	}
 
 	public BufferedImage getImageToDrawMinimap() {
@@ -91,6 +89,20 @@ public class GLDrawer implements Drawer, GLEventListener {
 			terrainObject.create(gl, game.world);
 			camera.set(new Vector3f(0, 160, game.world.getHeight()/2), 0, -60);
 //			camera.set(new Vector3f(game.world.getWidth()/2, 100, game.world.getHeight()/2), 0, -90);
+			this.updateTerrainImages();
+			if(this.terrainImage  == null) {
+				System.err.println("terrain image is null");
+				System.exit(0);
+			}
+			TextureData texData = AWTTextureIO.newTextureData(gl.getGLProfile(), this.terrainImage, false);
+			
+			try {
+				terrainObject.texture = TextureIO.newTexture(texData);
+			} catch (GLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.exit(0);
+			} 
 		}
 		if(terrainObject != null) {
 //			terrainObject.rotate(Matrix4f.rotate(1, new Vector3f(0, 1, 0)));
@@ -103,7 +115,7 @@ public class GLDrawer implements Drawer, GLEventListener {
 			sunColor.set(1f, 1f, 0.95f);
 			float multiplier = (float)World.getDaylight();
 			sunColor = sunColor.multiply(new Vector3f(multiplier, multiplier*multiplier, multiplier*multiplier));
-			renderStuff(gl, shader);
+			renderStuff(gl, shader, tex);
 			terrainObject.render(gl, shader);
 		}
 		shader.unbind(gl);
@@ -111,11 +123,12 @@ public class GLDrawer implements Drawer, GLEventListener {
 		gl.glFlush();
 	}
 
-	public void renderStuff(GL3 gl, Shader shader) {
+	public void renderStuff(GL3 gl, Shader shader, int tex) {
 		shader.setUniform("projection", projection);
 		shader.setUniform("view", camera.getView());
 		shader.setUniform("sunDirection", sunDirection);
 		shader.setUniform("sunColor", sunColor);
+		
 		terrainObject.render(gl, shader);
 	}
 	

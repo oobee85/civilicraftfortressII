@@ -86,6 +86,16 @@ public class Mesh {
 		normalBuffer.put(normalData).flip();
 		nbo = storeData(normalBuffer, 2, 3);
 		
+
+		FloatBuffer textureCoordBuffer = FloatBuffer.allocate(vertices.length * 2);
+		float[] textureCoordData = new float[vertices.length * 2];
+		for(int i = 0; i < vertices.length; i++) {
+			textureCoordData[i*2    ] = vertices[i].getTextureCoord().x;
+			textureCoordData[i*2 + 1] = vertices[i].getTextureCoord().y;
+		}
+		textureCoordBuffer.put(textureCoordData).flip();
+		nbo = storeData(textureCoordBuffer, 3, 2);
+		
 		
 //		IntBuffer indicesBuffer = MemoryUtil.memAllocInt(indices.length);
 		IntBuffer indicesBuffer = IntBuffer.allocate(indices.length);
