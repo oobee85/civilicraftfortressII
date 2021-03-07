@@ -123,9 +123,6 @@ public class Game {
 		// Do all the game events like unit movement, time passing, building things, growing, etc
 		// happens once every 100ms
 		World.ticks++;
-		if(World.ticks == 1) {
-			world.updateTileMoles();
-		}
 		if(World.ticks%20 == 0) {
 			updateTerritory();
 		}

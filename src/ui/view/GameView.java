@@ -50,7 +50,7 @@ public class GameView {
 
 		public boolean drawDebugStrings;
 		public boolean showHeightMap;
-		public boolean showHumidityMap;
+		public boolean showMassMap;
 		public boolean showPressureMap;
 		public boolean showTemperatureMap;
 		
@@ -600,8 +600,8 @@ public class GameView {
 	public void setShowTemperatureMap(boolean show) {
 		state.showTemperatureMap = show;
 	}
-	public void setShowHumidityMap(boolean show) {
-		state.showHumidityMap = show;
+	public void setShowMassMap(boolean show) {
+		state.showMassMap = show;
 	}
 
 	private void mouseOver(Position tilepos) {

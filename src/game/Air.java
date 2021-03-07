@@ -98,10 +98,13 @@ public class Air {
 	public double getMass() {
 		return mass;
 	}
+	public void addMass(double mass) {
+		this.mass += mass;
+	}
 	public void updatePressure() {
 		
 		
-		double P0 = 760; // mmHg
+		double P0 = World.STANDARDPRESSURE; // mmHg
 		double g = 9.80665; // m/s^2
 		double MMair = 0.0289644; // kg/mol
 		double R = 8.31432; // Nm/molK
@@ -118,8 +121,10 @@ public class Air {
 		double power = (-g * MMair * (h - h0)) / sub;
 		double pressure = P0 * Math.pow(Math.E, power);
 		
+		double other = mass * sub / 35;
+		double mix = pressure+other;
 //		System.out.println("Pressure: " + pressure);
-		this.pressure = pressure;
+		this.pressure = mix/2;
 
 	}
 	public double getRelativeHumidity() {

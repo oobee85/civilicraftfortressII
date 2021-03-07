@@ -681,15 +681,56 @@ public class World {
 			if(growthMultiplier > 0 && growthMultiplier < 1) {
 //				joules *= 1-growthMultiplier;
 			}
+			double Kgair = 29.97 * tile.getAir().getMass();
 			double energy = 100 * 0.721 * ((tile.getTemperature()) + Math.abs(World.MINTEMP));
-			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 0) {
+			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 1) {
 				System.out.println("Energy: " + energy + ", T: " + tile.getTemperature());
 			}
-//			tile.setEnergy(energy);
+			tile.setEnergy(energy);
 //			tile.addEnergy(joules);
 		}
 	}
-	public void updateTileMoles() {
+	public void updateTileMass() {
+		double totalMass = 0;
+		double [][] pressureTemp = new double[width][height];
+		double [][] massTemp = new double[width][height];
+		for(Tile t: getTiles()) {
+			pressureTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getPressure();
+			massTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getMass();
+		}
+		
+		for(Tile tile: getTiles()) {
+			TileLoc tileLoc = tile.getLocation();
+			for(Tile otherTile : tile.getNeighbors()) {
+				TileLoc otherLoc = otherTile.getLocation();
+				double mypres = tile.getAir().getPressure();
+				double mymass = tile.getAir().getMass();
+				
+				double opress = otherTile.getAir().getPressure();
+				double omass = otherTile.getAir().getMass();
+				
+				if(mypres > opress) {
+					double deltap = mypres - opress;
+					double deltam = mymass - omass;
+					double change = mymass * deltap / mypres;
+					
+					
+					if(massTemp[tileLoc.x()][tileLoc.y()] - 0.1 >= 0) {
+						massTemp[otherLoc.x()][otherLoc.y()] += 0.1;
+						massTemp[tileLoc.x()][tileLoc.y()] -= 0.1;
+					}
+				}
+				
+			}
+		}
+		
+		for(Tile t: getTiles()) {
+			t.getAir().setMass(massTemp[t.getLocation().x()][t.getLocation().y()]);
+			totalMass += t.getAir().getMass();
+		}
+		System.out.println(totalMass);
+	}
+	public void setTileMass() {
 		for(Tile tile : getTiles()) {
 			
 			Air air = tile.getAir();
@@ -698,9 +739,9 @@ public class World {
 			double R = 8.314;
 			double temperature = tile.getAir().getTemperature();
 			
-			double moles = (pressure*volume) / R * temperature;
-			air.setMass(moles);
-			
+			double moles = (pressure*volume) / R * (temperature + Math.abs(MINTEMP));
+//			air.setMass(moles);
+			air.setMass(10);
 			
 		}
 	}
@@ -724,6 +765,12 @@ public class World {
 		updateAirStuff();
 		updateEnergy();
 		updateTileTemperature();
+		if(start == true) {
+			setTileMass();
+		}
+		if(start == false) {
+			updateTileMass();
+		}
 		for(Tile tile : getTiles()) {
 			
 			
@@ -1316,28 +1363,26 @@ public class World {
 			temperatureMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 		}
 		
-		BufferedImage humidityMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage massMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 		
-		double highHumidity = Double.MIN_VALUE;
-		double lowHumidity = Double.MAX_VALUE;
+		double highMass = Double.MIN_VALUE;
+		double lowMass = Double.MAX_VALUE;
 		for(Tile tile : getTiles() ) {
-			highHumidity = Math.max(highHumidity, tile.getHumidity());
-			lowHumidity = Math.min(lowHumidity, tile.getHumidity());
+			highMass = Math.max(highMass, tile.getAir().getMass());
+			lowMass = Math.min(lowMass, tile.getAir().getMass());
 		}
 		
 		for(Tile tile : getTiles() ) {
-			float humidityRatio = (float) ((tile.getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
-			float insidePara = ((humidityRatio - 0.5f)*1.74f);
-			float almostRatio = (insidePara*insidePara*insidePara*insidePara*insidePara + 0.5f);
-			int r = Math.max(Math.min((int)(255*almostRatio), 255), 0);
-			Color c = new Color(255 - r, 0, r);
-			humidityMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
+			float massRatio = (float) ((tile.getAir().getMass() - lowMass) / (highMass - lowMass));
+			int r = Math.max(Math.min((int)(255*massRatio), 255), 0);
+			Color c = new Color(r, 0, 255 - r);
+			massMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 		}
 		return new BufferedImage[] { 
 				ImageCreation.convertToHexagonal(terrainImage), 
 				ImageCreation.convertToHexagonal(minimapImage), 
 				ImageCreation.convertToHexagonal(heightMapImage),
-				ImageCreation.convertToHexagonal(humidityMapImage), 
+				ImageCreation.convertToHexagonal(massMapImage), 
 				ImageCreation.convertToHexagonal(pressureMapImage),
 				ImageCreation.convertToHexagonal(temperatureMapImage),
 				};

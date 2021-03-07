@@ -36,7 +36,7 @@ public class VanillaDrawer implements Drawer {
 	private volatile BufferedImage terrainImage;
 	private volatile BufferedImage minimapImage;
 	private volatile BufferedImage heightMapImage;
-	private volatile BufferedImage humidityMapImage;
+	private volatile BufferedImage massMapImage;
 	private volatile BufferedImage pressureMapImage;
 	private volatile BufferedImage temperatureMapImage;
 
@@ -149,8 +149,8 @@ public class VanillaDrawer implements Drawer {
 			}else if (state.showTemperatureMap) {
 				g.drawImage(temperatureMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
 						null);
-			} else if (state.showHumidityMap) {
-				g.drawImage(humidityMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
+			} else if (state.showMassMap) {
+				g.drawImage(massMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
 						null);
 			} else {
 				g.drawImage(terrainImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
@@ -161,10 +161,10 @@ public class VanillaDrawer implements Drawer {
 			double lowHeight = Double.MAX_VALUE;
 			double highPressure = Double.MIN_VALUE;
 			double lowPressure = Double.MAX_VALUE;
-			double highTemp = World.MINTEMP;
-			double lowTemp = World.MAXTEMP;
-			double highHumidity = 20;
-			double lowHumidity = 0;
+			double highTemp = Double.MIN_VALUE;
+			double lowTemp = Double.MAX_VALUE;
+			double highMass = Double.MIN_VALUE;
+			double lowMass = Double.MAX_VALUE;
 			if (state.showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
@@ -201,15 +201,15 @@ public class VanillaDrawer implements Drawer {
 
 					}
 				}
-			}else if (state.showHumidityMap) {
+			}else if (state.showMassMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
 						if (tile == null) {
 							continue;
 						}
-						highHumidity = Math.max(highHumidity, tile.getAir().getHumidity());
-						lowHumidity = Math.min(lowHumidity, tile.getAir().getHumidity());
+						highMass = Math.max(highMass, tile.getAir().getMass());
+						lowMass = Math.min(lowMass, tile.getAir().getMass());
 
 					}
 				}
@@ -222,7 +222,7 @@ public class VanillaDrawer implements Drawer {
 					if (tile == null) {
 						continue;
 					}
-					drawTile((Graphics2D) g, tile, lowHeight, highHeight, lowHumidity, highHumidity, lowPressure, highPressure, lowTemp, highTemp);
+					drawTile((Graphics2D) g, tile, lowHeight, highHeight, lowMass, highMass, lowPressure, highPressure, lowTemp, highTemp);
 				}
 			}
 
@@ -286,7 +286,7 @@ public class VanillaDrawer implements Drawer {
 				count++;
 			}
 
-			if (!state.showHeightMap && !state.showHumidityMap && !state.showPressureMap && !state.showTemperatureMap) {
+			if (!state.showHeightMap && !state.showMassMap && !state.showPressureMap && !state.showTemperatureMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
@@ -302,7 +302,7 @@ public class VanillaDrawer implements Drawer {
 			}
 
 			if (state.drawDebugStrings) {
-				if (state.tileSize >= 36) {
+				if (state.tileSize >= 150) {
 					drawDebugStrings(g, lowerX, lowerY, upperX, upperY);
 				}
 			}
@@ -446,7 +446,7 @@ public class VanillaDrawer implements Drawer {
 				List<String> strings = new LinkedList<String>();
 				strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
 				strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getHumidity()));
-				strings.add(String.format("TEM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getTemperature()));
+				strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getTemperature()));
 				strings.add(String.format("PRE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getPressure()));
 				strings.add(String.format("RH" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getRelativeHumidity()));
 				strings.add(String.format("DEW" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getDewPoint()));
@@ -454,7 +454,7 @@ public class VanillaDrawer implements Drawer {
 				strings.add(String.format("VOL" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getVolume()));
 				strings.add(String.format("MV" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getMaxVolume()));
 				strings.add(String.format("ENE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEnergy()));
-//				strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTemperature()));
+				strings.add(String.format("MASS" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getMass()));
 				if (tile.getResource() != null) {
 					strings.add(String.format("ORE" + "=%d", tile.getResource().getYield()));
 				}
@@ -519,8 +519,8 @@ public class VanillaDrawer implements Drawer {
 		return new Point(x, y);
 	}
 
-	private void drawTile(Graphics2D g, Tile theTile, double lowHeight, double highHeight, double lowHumidity,
-			double highHumidity, double lowPressure, double highPressure, double lowTemp, double highTemp) {
+	private void drawTile(Graphics2D g, Tile theTile, double lowHeight, double highHeight, double lowMass,
+			double highMass, double lowPressure, double highPressure, double lowTemp, double highTemp) {
 		Point drawAt = getDrawingCoords(theTile.getLocation());
 		int draww = state.tileSize;
 		int drawh = state.tileSize;
@@ -541,12 +541,10 @@ public class VanillaDrawer implements Drawer {
 			int r = Math.max(Math.min((int) (255 * tempRatio), 255), 0);
 			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-		}else if (state.showHumidityMap) {
-			float humidityRatio = (float) ((theTile.getAir().getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
-			float insidePara = ((humidityRatio - 0.5f) * 1.74f);
-			float almostRatio = (insidePara * insidePara * insidePara * insidePara * insidePara + 0.5f);
-			int r = Math.max(Math.min((int) (255 * almostRatio), 255), 0);
-			g.setColor(new Color(255 - r, 0, r));
+		}else if (state.showMassMap) {
+			float massRatio = (float) ((theTile.getAir().getMass() - lowMass) / (highMass - lowMass));
+			int r = Math.max(Math.min((int) (255 * massRatio), 255), 0);
+			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 		} else {
 			g.drawImage(theTile.getTerrain().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh, null);
@@ -803,8 +801,8 @@ public class VanillaDrawer implements Drawer {
 			return pressureMapImage;
 		} else if (state.showTemperatureMap) {
 			return temperatureMapImage;
-		} else if (state.showHumidityMap) {
-			return humidityMapImage;
+		} else if (state.showMassMap) {
+			return massMapImage;
 		} else {
 			return minimapImage;
 		}
@@ -843,7 +841,7 @@ public class VanillaDrawer implements Drawer {
 			this.terrainImage = images[0];
 			this.minimapImage = images[1];
 			this.heightMapImage = images[2];
-			this.humidityMapImage = images[3];
+			this.massMapImage = images[3];
 			this.pressureMapImage = images[4];
 			this.temperatureMapImage = images[5];
 		}
