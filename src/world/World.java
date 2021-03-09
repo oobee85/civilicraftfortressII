@@ -24,6 +24,7 @@ public class World {
 	public static final int NIGHT_DURATION = 500;
 	public static final int TRANSITION_PERIOD = 100;
 	private static final double CHANCE_TO_SWITCH_TERRAIN = 1;
+	
 	public static final int MINTEMP = -273;
 	public static final int MAXTEMP = 500;
 	public static final int MAXHEIGHT = 1000;

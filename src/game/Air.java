@@ -121,15 +121,14 @@ public class Air {
 		double power = (-g * MMair * (h - h0)) / sub;
 		double pressure = P0 * Math.pow(Math.E, power);
 		
-		double other = mass * sub / World.VOLUMEPERTILE;
-		double mix = pressure+(other - standardPVNRT);
+		double pvnrt = mass * sub / World.VOLUMEPERTILE;
+		double mix = pressure+(pvnrt - standardPVNRT);
 //		System.out.println("Pressure: " + pressure);
 //		System.out.println("pvnrt: "+other + "atm: "+pressure);
 		this.pressure = mix ;
 
 	}
 	public double getDensity() {
-		
 		double density = this.pressure/World.STANDARDPRESSURE*World.MMAIR / (0.0821 * (getTemperature() + Math.abs(World.MINTEMP)) );
 		return density;
 	}
