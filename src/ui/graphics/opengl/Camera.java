@@ -32,8 +32,13 @@ public class Camera {
 	
 	private void updateDirectionVectors() {
 		forwardFlat.set((float)Math.sin(Math.toRadians(theta)), 0, -(float)Math.cos(Math.toRadians(theta)));
-		side = forwardFlat.cross(up);
-		forward = Matrix4f.rotate(pitch, side).multiply(forwardFlat, 1f);
+		forwardFlat = forwardFlat.normalize();
+		side = forwardFlat.cross(up).normalize();
+		forward = Matrix4f.rotate(pitch, side).multiply(forwardFlat, 1f).normalize();
+	}
+	
+	public void moveForward(float distance) {
+		setPosition(this.position.add(forward.multiply(distance)));
 	}
 
 	public Vector3f getPosition() {

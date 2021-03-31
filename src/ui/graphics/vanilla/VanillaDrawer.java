@@ -818,6 +818,50 @@ public class VanillaDrawer extends Drawer {
 		};
 	}
 
+	@Override
+	public Position getTileAtPixel(Point pixel) {
+		int column = (int) ((pixel.x + state.viewOffset.x) / state.tileSize);
+		int row = (int) ((pixel.y + state.viewOffset.y - (column % 2) * state.tileSize / 2) / state.tileSize);
+		return new Position(column, row);
+	}
+
+	@Override
+	public Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
+		double column = ((pixelOnScreen.x + viewOffset.x) / tileSize);
+		double row = ((pixelOnScreen.y + viewOffset.y) / tileSize);
+		return new Position(column, row);
+	}
+
+	@Override
+	public void zoomView(int scroll, int mx, int my) {
+		int newTileSize;
+		if (scroll > 0) {
+			newTileSize = (int) ((state.tileSize - 1) * 0.95);
+		} else {
+			newTileSize = (int) ((state.tileSize + 1) * 1.05);
+		}
+		zoomViewTo(newTileSize, mx, my);
+	}
+
+	@Override
+	public void zoomViewTo(int newTileSize, int mx, int my) {
+		if (newTileSize > 0) {
+			Position tile = Utils.getWorldCoordOfPixel(new Position(mx, my), state.viewOffset, state.tileSize);
+			state.tileSize = newTileSize;
+			Position focalPoint = tile.multiply(state.tileSize).subtract(state.viewOffset);
+			state.viewOffset.x -= mx - focalPoint.x;
+			state.viewOffset.y -= my - focalPoint.y;
+		}
+		canvas.repaint();
+	}
+
+	@Override
+	public void shiftView(int dx, int dy) {
+		state.viewOffset.x += dx;
+		state.viewOffset.y += dy;
+		canvas.repaint();
+	}
+
 	private static Rectangle normalizeRectangle(Point one, Point two) {
 		int x = Math.min(one.x, two.x);
 		int y = Math.min(one.y, two.y);

@@ -45,8 +45,8 @@ public class TerrainObject extends GameObject {
 	}
 
 	private Mesh createMeshFromWorld2(World world) {
-		float xoffset = (float)world.getWidth()/2;
-		float zoffset = (float)world.getHeight()/2;
+		float xoffset = (float)(world.getWidth() + 1)/2;
+		float zoffset = (float)(world.getHeight() + 1)/2;
 		Vertex[] vertices = new Vertex[world.getTiles().size()];
 		int[][] coordToVertex = new int[world.getHeight()][world.getWidth()];
 		int numIndices = (coordToVertex.length) * (coordToVertex[0].length) * 6;
@@ -59,7 +59,7 @@ public class TerrainObject extends GameObject {
 		for(Tile tile : world.getTiles()) {
 			coordToVertex[tile.getLocation().y()][tile.getLocation().x()] = index;
 			float y = tile.getLocation().y() + (tile.getLocation().x() % 2) * 0.5f;
-			Vector3f pos0 = new Vector3f(tile.getLocation().x() - xoffset, tile.getHeight()/20, y - zoffset);
+			Vector3f pos0 = new Vector3f(tile.getLocation().x() - xoffset, tile.getHeight()/15, y - zoffset);
 			Vector3f ca = (tile.getLocation().x() % 2 == 0) ? c0 : c1;
 			Vector3f cb = (tile.getLocation().x() % 2 == 0) ? c2 : c3;
 			Vector3f c = (tile.getLocation().y() % 2 == 0) ? ca : cb;

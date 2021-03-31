@@ -1,12 +1,20 @@
 package ui.graphics.opengl;
 
 import java.nio.*;
+import java.util.*;
 
 import com.jogamp.opengl.*;
 
 import ui.graphics.opengl.maths.*;
 
 public class Mesh {
+	public static final LinkedList<Mesh> allMeshes = new LinkedList<>();
+	public static void initAllMeshes(GL3 gl) {
+		for(Mesh mesh : allMeshes) {
+			mesh.create(gl);
+		}
+	}
+	
 	
 	private GL3 gl;
 	private Vertex[] vertices;
@@ -16,6 +24,29 @@ public class Mesh {
 	public Mesh(Vertex[] vertices, int[] indices) {
 		this.vertices = vertices;
 		this.indices = indices;
+		allMeshes.add(this);
+	}
+
+	public void render(GL3 gl, Shader shader, Vector3f position, Matrix4f rotation, Vector3f scale) {
+//		GL30.glBindVertexArray(mesh.getVAO());
+		gl.glBindVertexArray(this.getVAO());
+//		GL30.glEnableVertexAttribArray(0);
+		gl.glEnableVertexAttribArray(0);
+		gl.glEnableVertexAttribArray(1);
+		gl.glEnableVertexAttribArray(2);
+		shader.setUniform("model", MeshUtils.getModelMatrix(position, rotation, scale));
+//		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, mesh.getIBO());
+		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, this.getIBO());
+//		GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getIndices().length, GL11.GL_UNSIGNED_INT, 0);
+		gl.glDrawElements(GL2.GL_TRIANGLES, this.getIndices().length, GL2.GL_UNSIGNED_INT, 0);
+//		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
+//		GL30.glDisableVertexAttribArray(0);
+		gl.glDisableVertexAttribArray(0);
+		gl.glDisableVertexAttribArray(1);
+		gl.glDisableVertexAttribArray(2);
+//		GL30.glBindVertexArray(0);
+		gl.glBindVertexArray(0);
 	}
 	
 	private void generateNormals() {

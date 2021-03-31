@@ -1,8 +1,8 @@
 package ui.graphics.opengl;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.*;
-import java.io.*;
 
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.*;
@@ -23,6 +23,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	
 	private Vector3f sunDirection = new Vector3f();
 	private Vector3f sunColor = new Vector3f();
+	
 	private TerrainObject terrainObject;
 	
 	private final Camera camera;
@@ -56,7 +57,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		GL3 gl = drawable.getGL().getGL3();
-
+		Mesh.initAllMeshes(gl);
+		
 		gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
 
 		gl.glEnable(GL2.GL_DEPTH_TEST);
@@ -87,6 +89,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		if(terrainObject == null && game.world != null) {
 			terrainObject = new TerrainObject();
 			terrainObject.create(gl, game.world);
+//			camera.set(new Vector3f(2, 10, 10), 0, -45);
 			camera.set(new Vector3f(0, 160, game.world.getHeight()/2), 0, -60);
 //			camera.set(new Vector3f(game.world.getWidth()/2, 100, game.world.getHeight()/2), 0, -90);
 			this.updateTerrainImages();
@@ -99,12 +102,25 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			try {
 				terrainObject.texture = TextureIO.newTexture(texData);
 			} catch (GLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				System.exit(0);
 			} 
 		}
 		if(terrainObject != null) {
+
+			if(this.terrainImage  != null) {
+				if(terrainObject.texture != null) {
+					terrainObject.texture.destroy(gl);
+				}
+				TextureData texData = AWTTextureIO.newTextureData(gl.getGLProfile(), this.terrainImage, false);
+				try {
+					terrainObject.texture = TextureIO.newTexture(texData);
+				} catch (GLException e) {
+					e.printStackTrace();
+					System.exit(0);
+				} 
+			}
+			
 //			terrainObject.rotate(Matrix4f.rotate(1, new Vector3f(0, 1, 0)));
 			int dayOffset = World.getCurrentDayOffset();
 			float ratio = (float)dayOffset / (World.DAY_DURATION + World.NIGHT_DURATION);
@@ -116,7 +132,6 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			float multiplier = (float)World.getDaylight();
 			sunColor = sunColor.multiply(new Vector3f(multiplier, multiplier*multiplier, multiplier*multiplier));
 			renderStuff(gl, shader, tex);
-			terrainObject.render(gl, shader);
 		}
 		shader.unbind(gl);
 		
@@ -130,6 +145,33 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("sunColor", sunColor);
 		
 		terrainObject.render(gl, shader);
+
+		float xoffset = (float)game.world.getWidth()/2;
+		float zoffset = (float)game.world.getHeight()/2;
+		for(Plant plant : game.world.getPlants()) {
+			float y = plant.getTile().getLocation().y() + (plant.getTile().getLocation().x() % 2) * 0.5f;
+			Vector3f pos = new Vector3f(
+					plant.getTile().getLocation().x() - xoffset, 
+					plant.getTile().getHeight()/15, 
+					y - zoffset);
+			plant.getMesh().render(gl, shader, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+		}
+		for(Unit unit : game.world.getUnits()) {
+			float y = unit.getTile().getLocation().y() + (unit.getTile().getLocation().x() % 2) * 0.5f;
+			Vector3f pos = new Vector3f(
+					unit.getTile().getLocation().x() - xoffset, 
+					unit.getTile().getHeight()/15, 
+					y - zoffset);
+			unit.getMesh().render(gl, shader, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+		}
+		for(Building building : game.world.getBuildings()) {
+			float y = building.getTile().getLocation().y() + (building.getTile().getLocation().x() % 2) * 0.5f;
+			Vector3f pos = new Vector3f(
+					building.getTile().getLocation().x() - xoffset, 
+					building.getTile().getHeight()/15, 
+					y - zoffset);
+			building.getMesh().render(gl, shader, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+		}
 	}
 	
 	@Override
@@ -139,5 +181,30 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	
 	private void updateBackgroundColor(GL3 gl, Color background) {
 		gl.glClearColor(background.getRed()/255f, background.getGreen()/255f, background.getBlue()/255f, 1.0f);
+	}
+	
+	@Override
+	public Position getTileAtPixel(Point pixel) {
+		return new Position(1, 1);
+	}
+
+	@Override
+	public Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
+		return new Position(1, 1);
+	}
+
+	@Override
+	public void zoomView(int scroll, int mx, int my) {
+		camera.moveForward(-4*scroll);
+	}
+
+	@Override
+	public void zoomViewTo(int newTileSize, int mx, int my) {
+	}
+
+	@Override
+	public void shiftView(int dx, int dy) {
+		float adjust = 0.5f;
+		camera.setPosition(camera.getPosition().add(new Vector3f(dx, 0, dy).multiply(adjust)));
 	}
 }

@@ -5,7 +5,6 @@ import java.awt.*;
 import javax.swing.*;
 
 import game.*;
-import ui.*;
 import utils.*;
 
 public class ClientDriver {

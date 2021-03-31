@@ -6,13 +6,16 @@ import java.util.*;
 
 import javax.swing.ImageIcon;
 
+import ui.graphics.*;
+import ui.graphics.opengl.*;
 import utils.*;
 import utils.Loader.*;
 
-public class UnitType implements HasImage, Serializable {
+public class UnitType implements HasImage, HasMesh, Serializable {
 	
 	private final String name;
 	private transient final MipMap mipmap;
+	private transient final Mesh mesh;
 	private transient final CombatStats combatStats;
 	private transient final HashSet<String> attributes;
 	private transient final HashMap <ItemType, Integer> cost;
@@ -22,9 +25,10 @@ public class UnitType implements HasImage, Serializable {
 	private transient final ArrayList<TargetingInfo> targetingInfo = new ArrayList<>();
 	private transient final LinkedList<AttackStyle> attackStyles;
 
-	public UnitType(String name, String image, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles) {
+	public UnitType(String name, String image, Mesh mesh, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles) {
 		this.name = name;
 		this.mipmap = new MipMap(image);
+		this.mesh = mesh;
 		this.combatStats = cs;
 		this.attributes = attributes;
 		this.cost = resourcesNeeded;
@@ -89,6 +93,11 @@ public class UnitType implements HasImage, Serializable {
 	}
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;
+	}
+	
+	@Override
+	public Mesh getMesh() {
+		return mesh;
 	}
 
 	@Override
