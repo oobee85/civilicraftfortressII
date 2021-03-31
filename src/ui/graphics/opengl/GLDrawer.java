@@ -23,12 +23,13 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	
 	private Vector3f sunDirection = new Vector3f();
 	private Vector3f sunColor = new Vector3f();
+	private Vector3f ambientColor = new Vector3f();
 	
 	private TerrainObject terrainObject;
 	
 	private final Camera camera;
 
-	int tex;
+	private Texture blankTexture;
 	
 	public GLDrawer(Game game, GameViewState state) {
 		super(game, state);
@@ -57,6 +58,9 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		GL3 gl = drawable.getGL().getGL3();
+		gl.glEnable(GL3.GL_CULL_FACE);
+		gl.glCullFace(GL3.GL_BACK);
+		TextureUtils.initDefaultTextures(gl);
 		Mesh.initAllMeshes(gl);
 		
 		gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
@@ -80,45 +84,27 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	@Override
 	public void display(GLAutoDrawable drawable) {
 		GL3 gl = drawable.getGL().getGL3();
-		
 		updateBackgroundColor(gl, game.getBackgroundColor());
 		gl.glClear(GL3.GL_DEPTH_BUFFER_BIT | GL3.GL_COLOR_BUFFER_BIT);
 
-		shader.bind(gl);
+		if(game.world != null) {
 		
-		if(terrainObject == null && game.world != null) {
-			terrainObject = new TerrainObject();
-			terrainObject.create(gl, game.world);
-//			camera.set(new Vector3f(2, 10, 10), 0, -45);
-			camera.set(new Vector3f(0, 160, game.world.getHeight()/2), 0, -60);
-//			camera.set(new Vector3f(game.world.getWidth()/2, 100, game.world.getHeight()/2), 0, -90);
-			this.updateTerrainImages();
-			if(this.terrainImage  == null) {
-				System.err.println("terrain image is null");
-				System.exit(0);
-			}
-			TextureData texData = AWTTextureIO.newTextureData(gl.getGLProfile(), this.terrainImage, false);
+			shader.bind(gl);
 			
-			try {
-				terrainObject.texture = TextureIO.newTexture(texData);
-			} catch (GLException e) {
-				e.printStackTrace();
-				System.exit(0);
-			} 
-		}
-		if(terrainObject != null) {
-
-			if(this.terrainImage  != null) {
+			// Initialize terrainObject
+			if(terrainObject == null) {
+				terrainObject = new TerrainObject();
+				terrainObject.create(gl, game.world);
+	//			camera.set(new Vector3f(2, 10, 10), 0, -45);
+				camera.set(new Vector3f(0, 160, game.world.getHeight()/2), 0, -60);
+	//			camera.set(new Vector3f(game.world.getWidth()/2, 100, game.world.getHeight()/2), 0, -90);
+				this.updateTerrainImages();
+			}
+			if(this.terrainImage != null) {
 				if(terrainObject.texture != null) {
 					terrainObject.texture.destroy(gl);
 				}
-				TextureData texData = AWTTextureIO.newTextureData(gl.getGLProfile(), this.terrainImage, false);
-				try {
-					terrainObject.texture = TextureIO.newTexture(texData);
-				} catch (GLException e) {
-					e.printStackTrace();
-					System.exit(0);
-				} 
+				terrainObject.texture = TextureUtils.textureFromImage(gl, this.terrainImage);
 			}
 			
 //			terrainObject.rotate(Matrix4f.rotate(1, new Vector3f(0, 1, 0)));
@@ -131,21 +117,29 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			sunColor.set(1f, 1f, 0.95f);
 			float multiplier = (float)World.getDaylight();
 			sunColor = sunColor.multiply(new Vector3f(multiplier, multiplier*multiplier, multiplier*multiplier));
-			renderStuff(gl, shader, tex);
+			if(Game.DISABLE_NIGHT) {
+				ambientColor.set(.7f, .7f, .7f);
+			}
+			else {
+				ambientColor.set(multiplier/5, multiplier/5, multiplier/5);
+			}
+			renderStuff(gl, shader);
+			shader.unbind(gl);
 		}
-		shader.unbind(gl);
 		
 		gl.glFlush();
 	}
 
-	public void renderStuff(GL3 gl, Shader shader, int tex) {
+	public void renderStuff(GL3 gl, Shader shader) {
 		shader.setUniform("projection", projection);
 		shader.setUniform("view", camera.getView());
 		shader.setUniform("sunDirection", sunDirection);
 		shader.setUniform("sunColor", sunColor);
-		
-		terrainObject.render(gl, shader);
+		shader.setUniform("ambientColor", ambientColor);
 
+		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
+//		terrainObject.render(gl, shader);
+		
 		float xoffset = (float)game.world.getWidth()/2;
 		float zoffset = (float)game.world.getHeight()/2;
 		for(Plant plant : game.world.getPlants()) {
@@ -154,7 +148,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 					plant.getTile().getLocation().x() - xoffset, 
 					plant.getTile().getHeight()/15, 
 					y - zoffset);
-			plant.getMesh().render(gl, shader, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+			plant.getMesh().render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 		for(Unit unit : game.world.getUnits()) {
 			float y = unit.getTile().getLocation().y() + (unit.getTile().getLocation().x() % 2) * 0.5f;
@@ -162,7 +156,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 					unit.getTile().getLocation().x() - xoffset, 
 					unit.getTile().getHeight()/15, 
 					y - zoffset);
-			unit.getMesh().render(gl, shader, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+			unit.getMesh().render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 		for(Building building : game.world.getBuildings()) {
 			float y = building.getTile().getLocation().y() + (building.getTile().getLocation().x() % 2) * 0.5f;
@@ -170,8 +164,9 @@ public class GLDrawer extends Drawer implements GLEventListener {
 					building.getTile().getLocation().x() - xoffset, 
 					building.getTile().getHeight()/15, 
 					y - zoffset);
-			building.getMesh().render(gl, shader, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+			building.getMesh().render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
+		TextureUtils.ERROR_TEXTURE.disable(gl);
 	}
 	
 	@Override

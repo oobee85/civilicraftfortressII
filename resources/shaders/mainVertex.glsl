@@ -11,6 +11,7 @@ uniform mat4 model;
 
 uniform vec3 sunDirection;
 uniform vec3 sunColor;
+uniform vec3 ambientColor;
 
 out vec3 passColor;
 out vec2 passTextureCoord;
@@ -25,14 +26,12 @@ void main() {
 //	gl_Position = vec4(temp, 1.0);
 //	color = vec3(gl_Position.x, gl_Position.y - gl_Position.x, gl_Position.y);
 
-	vec3 ambientLight = vec3(0.1, 0.1, 0.1);
-
 	vec3 norm = normalize(fragNormal.xyz);
 	vec3 lightDir = normalize(-sunDirection);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = diff * sunColor;
 
 	gl_Position = projection * view * fragPosition;
-	passColor = (diffuse + ambientLight);
+	passColor = (diffuse + ambientColor);
 	passTextureCoord = textureCoord;
 }

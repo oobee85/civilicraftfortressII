@@ -23,6 +23,7 @@ public class MeshUtils {
 		if(ext.equals(".obj")) {
 			String fileContents = Utils.readFile(filename);
 			ArrayList<Vector3f> vertexLocations = new ArrayList<>();
+			ArrayList<Vector2f> textureMapping = new ArrayList<>();
 			ArrayList<Integer> faces = new ArrayList<>();
 			for(String line : fileContents.split("\n")) {
 				if(line.length() == 0 || line.charAt(0) == '#') {
@@ -61,10 +62,26 @@ public class MeshUtils {
 						System.err.println("Failed to parse Integer: " + line);
 					}
 				}
+				else if(lineIndicator.equals("vt")) {
+					float u=0, v=0;
+					try {
+						u = Float.parseFloat(st.nextToken());
+						v = Float.parseFloat(st.nextToken());
+					}
+					catch(NumberFormatException e) {
+						System.err.println("Failed to parse Float: " + line);
+					}
+					textureMapping.add(new Vector2f(u, v));
+					continue;
+				}
 			}
 			Vertex[] vertices = new Vertex[vertexLocations.size()];
 			for(int i = 0; i < vertices.length; i++) {
-				vertices[i] = new Vertex(vertexLocations.get(i), new Vector3f(0, 0, 0), null, new Vector2f(0, 0));
+				Vector2f texCoord = new Vector2f(0, 0);
+				if(i < textureMapping.size()) {
+					texCoord = textureMapping.get(i);
+				}
+				vertices[i] = new Vertex(vertexLocations.get(i), new Vector3f(1, 1, 1), null, texCoord);
 			}
 			int[] facesArr = new int[faces.size()];
 			for(int i = 0; i < facesArr.length; i++) {
@@ -86,7 +103,7 @@ public class MeshUtils {
 		star = loadMeshFromFile("models/star.obj", true);
 		mushroom = loadMeshFromFile("models/mushroom.obj", true);
 		house = loadMeshFromFile("models/house.obj", true);
-		defaultUnit = star;
+		defaultUnit = cube;
 		defaultPlant = mushroom;
 		defaultBuilding = house;
 	}

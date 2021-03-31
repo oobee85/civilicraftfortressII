@@ -19,30 +19,6 @@ public class TerrainObject extends GameObject {
 		mesh = createMeshFromWorld2(world);
 		mesh.create(gl);
 	}
-	
-	@Override
-	public void render(GL3 gl, Shader shader) {
-		gl.glBindVertexArray(mesh.getVAO());
-		gl.glEnableVertexAttribArray(0);
-		gl.glEnableVertexAttribArray(1);
-		gl.glEnableVertexAttribArray(2);
-		gl.glEnableVertexAttribArray(3);
-
-		gl.glActiveTexture(GL3.GL_TEXTURE0);
-		texture.enable(gl);
-		texture.bind(gl); 
-		shader.setUniform("textureSampler", 0);
-		
-		shader.setUniform("model", getModelMatrix());
-		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, mesh.getIBO());
-		gl.glDrawElements(GL2.GL_TRIANGLES, mesh.getIndices().length, GL2.GL_UNSIGNED_INT, 0);
-		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
-		gl.glDisableVertexAttribArray(0);
-		gl.glDisableVertexAttribArray(1);
-		gl.glDisableVertexAttribArray(2);
-		gl.glDisableVertexAttribArray(3);
-		gl.glBindVertexArray(0);
-	}
 
 	private Mesh createMeshFromWorld2(World world) {
 		float xoffset = (float)(world.getWidth() + 1)/2;
