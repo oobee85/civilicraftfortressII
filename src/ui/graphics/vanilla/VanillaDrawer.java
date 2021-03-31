@@ -445,14 +445,17 @@ public class VanillaDrawer implements Drawer {
 				Point drawAt = getDrawingCoords(tile.getLocation());
 				List<String> strings = new LinkedList<String>();
 				strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
-				strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getHumidity()));
-				strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getTemperature()));
 				strings.add(String.format("PRE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getPressure()));
+				strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getTemperature()));
+				strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getHumidity()));
+				
+				strings.add(String.format("EVAP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEvaporation()));
+				strings.add(String.format("dVOL" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getVolumeChange()));
+				strings.add(String.format("VOL" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getVolume()));
+				strings.add(String.format("MVOL" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getMaxVolume()));
+				
 				strings.add(String.format("RH" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getRelativeHumidity()));
 				strings.add(String.format("DEW" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getDewPoint()));
-				strings.add(String.format("EVA" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEvaporation()));
-				strings.add(String.format("VOL" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getVolume()));
-				strings.add(String.format("MV" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getMaxVolume()));
 				strings.add(String.format("ENE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEnergy()));
 				strings.add(String.format("MASS" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getMass()));
 				if (tile.getResource() != null) {

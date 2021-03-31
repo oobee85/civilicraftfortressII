@@ -14,6 +14,7 @@ public class Air {
 	private double maxHumidity;
 	private double maxVolume;
 	private boolean canRain;
+	private double volumeChange;
 	
 	public Air(double height, double temp) {
 		this.maxHumidity = 1.0;
@@ -50,28 +51,20 @@ public class Air {
 		volume = set;
 	}
 	public void addVolume(double add) {
-		if(volume + add >= maxVolume) {
-			canRain = true;
-			this.volume += add;
-		}else {
-			canRain = false;
-			this.volume += add;
-		}
+		this.volume += add;
+		volumeChange = add;
 	}
-	public boolean isSaturated() {
-		if(humidity >= 1) {
-			return true;
-		}
-		return false;
+	public double getVolumeChange() {
+		return volumeChange;
 	}
 	public void updateHeight(double height) {
 		this.height = height;
 	}
 	public void updateMaxVolume() {
 		if(temperature > 0) {
-			maxVolume = 2*this.temperature;
+			maxVolume = this.temperature;
 		}else {
-			maxVolume = 0;
+			maxVolume = 1;
 		}
 		
 	}
@@ -192,7 +185,17 @@ public class Air {
 	
 	
 	public boolean canRain() {
-		return canRain;
+		if(this.volume >= this.maxVolume) {
+			return true;
+		}
+		if(this.humidity >= 0.9) {
+			return true;
+		}
+		return false;
 	}
+	
+	
+	
+	
 	
 }

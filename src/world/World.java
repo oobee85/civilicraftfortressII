@@ -26,7 +26,7 @@ public class World {
 	private static final double CHANCE_TO_SWITCH_TERRAIN = 1;
 	
 	public static final int MINTEMP = -273;
-	public static final int MAXTEMP = 500;
+	public static final int MAXTEMP = 1000;
 	public static final int MAXHEIGHT = 1000;
 	public static final int JOULESPERTILE = 1;
 	public static final double STANDARDPRESSURE = 760;
@@ -237,10 +237,10 @@ public class World {
 	public void rains() {
 		for(Tile tile : getTiles()) {
 			if(tile.getAir().canRain() == true && tile.getWeather() == null) {
-				WeatherEvent weather = new WeatherEvent(tile, tile, tile.getAir().getVolume(), LiquidType.WATER);;
-				tile.setWeather(weather);
-				worldData.addWeatherEvent(weather);
-				weather.addStrength(tile.getAir().getVolume());
+//				WeatherEvent weather = new WeatherEvent(tile, tile, tile.getAir().getVolume(), LiquidType.WATER);;
+//				tile.setWeather(weather);
+//				worldData.addWeatherEvent(weather);
+//				weather.addStrength(tile.getAir().getVolume());
 			}
 		}
 	}
@@ -647,52 +647,76 @@ public class World {
 		for(Tile tile : getTiles()) {
 			tile.updateAir();
 		}
+		for(Tile tile: getTilesRandomly()) {
+			TileLoc tileLoc = tile.getLocation();
+			for(Tile otherTile : tile.getNeighbors()) {
+				TileLoc otherLoc = otherTile.getLocation();
+				double mypres = tile.getAir().getPressure();
+				double mymass = tile.getAir().getMass();
+				
+				double opress = otherTile.getAir().getPressure();
+				double omass = otherTile.getAir().getMass();
+				
+				if(mypres > opress) {
+					double deltap = mypres - opress;
+					double change = deltap / mypres;
+					
+				}
+				
+			}
+		}
 			
 	}
 	public void updateEnergy() {
+		if(World.ticks % 2 == 0) {
+			return;
+		}
 		for(Tile tile : getTiles()) {
 			if(tile == null) {
 				System.out.println("null tile when updating energy");
 				continue;
 			}
-			
-			double currentEnergy = tile.getEnergy();
-			double energyLoss = currentEnergy * 0.99999;
-//			tile.setEnergy(energyLoss);
-//			tile.addEnergy(energyLoss);		//tiles have energy decay
-//			double joules = JOULESPERTILE;
-			
-			double joules = Season.getSeasonEnergy();
-			joules += Season.getNightEnergy();
-			
-			// less energy added depending on how dense the cloud is
-			if(tile.getWeather() != null && tile.getAir().getMaxVolume() != 0) {
-				double cloudMultiplier = 1 - tile.getWeather().getStrength()/tile.getAir().getMaxVolume();
-				if(cloudMultiplier != 0) {
-					joules *= cloudMultiplier;
-				}
+			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
+				double modifier = 1 - (tile.getTemperature()/MAXTEMP);
+				tile.addEnergy(tile.liquidAmount * modifier);
 			}
 			
-			// makes there be less energy added at higher altitudes
-			double pressureMultiplier = tile.getAir().getPressure()/STANDARDPRESSURE;
-			if(pressureMultiplier != 0) {
-				joules *= pressureMultiplier;
+			float seasonEnergy = Season.getRateEnergy();
+			
+			double evaporation = tile.getEvaporation();
+			seasonEnergy -= evaporation;
+			
+			double humidity = tile.getAir().getHumidity();
+			double airloss = humidity * (-2*seasonEnergy);
+//			seasonEnergy += airloss;
+			
+			
+			
+			if(tile.getAir().canRain()) {
+				tile.getAir().addVolume(-0.01);
+				tile.liquidAmount += 0.01;
+				tile.addEnergy(0.01);
 			}
 			
-			// makes higher energy changes less if tile is already at an extreme energy level
-			double growthMultiplier = Math.log(currentEnergy)/5;
-			if(growthMultiplier > 0 && growthMultiplier < 1) {
-//				joules *= 1-growthMultiplier;
-			}
-			double Kgair = MMAIR * tile.getAir().getMass();
-			double energy = Kgair * 0.721 * ((tile.getAir().getTemperature()) + Math.abs(World.MINTEMP));
+			
+			
+			
+			
+			tile.addEnergy(seasonEnergy);
+			
 			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 1) {
-				System.out.println("Energy: " + energy + ", T: " + tile.getAir().getTemperature());
+//				tile.setEnergy(21000);
+//				System.out.println(tile.getTemperature());
+				System.out.println("Energy: " + tile.getEnergy() + ", T: " + tile.getTemperature());
 			}
-			tile.setEnergy(energy);
+//			tile.setEnergy(energy);
 //			tile.addEnergy(joules);
 		}
 	}
+//	public double convertEnergyToTemp(Tile tile) {
+//		q = mcAt
+//		double temp = tile.getEnergy()
+//	}
 	public void updateTileMass() {
 		double totalMass = 0;
 		double [][] pressureTemp = new double[width][height];
@@ -751,6 +775,18 @@ public class World {
 			
 		}
 	}
+	private void setTileEnergy() {
+
+		for(Tile tile: getTiles()) {
+			double defaultEnergy = 20500;
+			double pressureMultiplier = Math.sqrt(tile.getAir().getPressure()/STANDARDPRESSURE);
+			if(pressureMultiplier != 0) {
+				defaultEnergy *= pressureMultiplier;
+			}
+			
+			tile.setEnergy(defaultEnergy);
+		}
+	}
 	public void updateTileTemperature() {
 		for(Tile tile : getTiles()) {
 			if(tile == null) {
@@ -773,6 +809,7 @@ public class World {
 		updateTileTemperature();
 		if(start == true) {
 			setTileMass();
+			setTileEnergy();
 		}
 		if(start == false) {
 			updateTileMass();
@@ -914,13 +951,14 @@ public class World {
 			if(tile.liquidType != weather.getLiquidType() && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()/2) {
 				continue;
 			}
-			if(tile.getAir().getVolume() - 0.1 <= 0) {
-				
-			}
 			tile.liquidType = weather.getLiquidType();
-			tile.liquidAmount += 0.1;
-			weather.addStrength(-0.1);
-			tile.getAir().addVolume(-0.1);
+			if(tile.getAir().canRain()) {
+				tile.getAir().addVolume(-0.05);
+				tile.liquidAmount += 0.05;
+			}
+//			tile.liquidAmount += 0.1;
+//			weather.addStrength(-0.1);
+//			tile.getAir().addVolume(-0.1);
 			
 			
 		}
