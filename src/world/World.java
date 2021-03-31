@@ -692,7 +692,10 @@ public class World {
 			
 			
 			
-			if(tile.getAir().canRain()) {
+			if(tile.getAir().canRain() && tile.liquidType != LiquidType.LAVA) {
+				if(tile.liquidType != LiquidType.ICE) {
+					tile.liquidType = LiquidType.WATER;
+				}
 				tile.getAir().addVolume(-0.01);
 				tile.liquidAmount += 0.01;
 				tile.addEnergy(0.01);
@@ -738,7 +741,7 @@ public class World {
 				double ovolume = otherTile.getAir().getVolume();
 				
 				if(mypres > opress) {
-					double deltap = 1 - opress / mypres / 4;
+					double deltap = 1 - opress / mypres;
 					double deltavol = Math.abs((myvolume - ovolume)*deltap);
 //					System.out.println(deltavol);
 					if(volumeTemp[tileLoc.x()][tileLoc.y()] - deltavol >= 0) {
