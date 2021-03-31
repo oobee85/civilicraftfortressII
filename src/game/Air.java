@@ -22,7 +22,7 @@ public class Air {
 		this.temperature = temp;
 		this.maxVolume = 10;
 		this.canRain = false;
-		this.volume = 0;
+		this.volume = 5;
 		this.humidity = 0.0;
 		this.pressure = 760;
 		this.updateMaxVolume();

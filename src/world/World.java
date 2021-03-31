@@ -720,34 +720,34 @@ public class World {
 	public void updateTileMass() {
 		double totalMass = 0;
 		double [][] pressureTemp = new double[width][height];
-		double [][] massTemp = new double[width][height];
+		double [][] volumeTemp = new double[width][height];
 		for(Tile t: getTiles()) {
 			pressureTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getPressure();
-			massTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getMass();
+			volumeTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getVolume();
 		}
 		
 		for(Tile tile: getTilesRandomly()) {
 			TileLoc tileLoc = tile.getLocation();
 			for(Tile otherTile : tile.getNeighbors()) {
 				TileLoc otherLoc = otherTile.getLocation();
+				
 				double mypres = tile.getAir().getPressure();
-				double mymass = tile.getAir().getMass();
+				double myvolume = tile.getAir().getVolume();
 				
 				double opress = otherTile.getAir().getPressure();
-				double omass = otherTile.getAir().getMass();
+				double ovolume = otherTile.getAir().getVolume();
 				
 				if(mypres > opress) {
-					double deltap = mypres - opress;
-					double deltam = mymass - omass;
-					double change = deltap / mypres;
-					
-					if(massTemp[tileLoc.x()][tileLoc.y()] - change >= 0) {
-						massTemp[otherLoc.x()][otherLoc.y()] += change;
-						massTemp[tileLoc.x()][tileLoc.y()] -= change;
+					double deltap = 1 - opress / mypres / 4;
+					double deltavol = Math.abs((myvolume - ovolume)*deltap);
+//					System.out.println(deltavol);
+					if(volumeTemp[tileLoc.x()][tileLoc.y()] - deltavol >= 0) {
+						volumeTemp[otherLoc.x()][otherLoc.y()] += deltavol;
+						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltavol;
 					}
-//					if(massTemp[tileLoc.x()][tileLoc.y()] - 0.1 >= 0) {
-//						massTemp[otherLoc.x()][otherLoc.y()] += 0.1;
-//						massTemp[tileLoc.x()][tileLoc.y()] -= 0.1;
+//					if(massTemp[tileLoc.x()][tileLoc.y()] - change >= 0) {
+//						massTemp[otherLoc.x()][otherLoc.y()] += change;
+//						massTemp[tileLoc.x()][tileLoc.y()] -= change;
 //					}
 				}
 				
@@ -755,10 +755,10 @@ public class World {
 		}
 		
 		for(Tile t: getTiles()) {
-			t.getAir().setMass(massTemp[t.getLocation().x()][t.getLocation().y()]);
-			totalMass += t.getAir().getMass();
+			t.getAir().setVolume(volumeTemp[t.getLocation().x()][t.getLocation().y()]);
+			totalMass += t.getAir().getVolume();
 		}
-//		System.out.println(totalMass);
+		System.out.println(totalMass);
 	}
 	public void setTileMass() {
 		for(Tile tile : getTiles()) {
