@@ -32,6 +32,7 @@ public class VanillaDrawer implements Drawer {
 	private static final Image RED_HITSPLAT = Utils.loadImage("Images/interfaces/redhitsplat.png");
 	private static final Image BLUE_HITSPLAT = Utils.loadImage("Images/interfaces/bluehitsplat.png");
 	private static final Image GREEN_HITSPLAT = Utils.loadImage("Images/interfaces/greenhitsplat.png");
+	private static final Image SNOW = Utils.loadImage("Images/weather/snow.png");
 	
 	private volatile BufferedImage terrainImage;
 	private volatile BufferedImage minimapImage;
@@ -544,6 +545,9 @@ public class VanillaDrawer implements Drawer {
 			int r = Math.max(Math.min((int) (255 * tempRatio), 255), 0);
 			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
+			if(theTile.getAir().getTemperature() <= World.FREEZETEMP) {
+				g.drawImage(SNOW, drawAt.x, drawAt.y, draww, drawh, null);
+			}
 		}else if (state.showHumidityMap) {
 			float humidityRatio = (float) ((theTile.getAir().getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
 			int r = Math.max(Math.min((int) (255 * humidityRatio), 255), 0);

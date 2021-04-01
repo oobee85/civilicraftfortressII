@@ -26,6 +26,7 @@ public class World {
 	private static final double CHANCE_TO_SWITCH_TERRAIN = 1;
 	
 	public static final int MINTEMP = -273;
+	public static final int FREEZETEMP = 0;
 	public static final int MAXTEMP = 1000;
 	public static final int MAXHEIGHT = 1000;
 	public static final int JOULESPERTILE = 1;
