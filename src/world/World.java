@@ -724,9 +724,11 @@ public class World {
 		double totalMass = 0;
 		double [][] pressureTemp = new double[width][height];
 		double [][] volumeTemp = new double[width][height];
+		double [][] energyTemp = new double[width][height];
 		for(Tile t: getTiles()) {
 			pressureTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getPressure();
 			volumeTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getVolume();
+			energyTemp[t.getLocation().x()][t.getLocation().y()] = t.getEnergy();
 		}
 		
 		for(Tile tile: getTilesRandomly()) {
@@ -736,9 +738,11 @@ public class World {
 				
 				double mypres = tile.getAir().getPressure();
 				double myvolume = tile.getAir().getVolume();
+				double mytemp = tile.getEnergy();
 				
 				double opress = otherTile.getAir().getPressure();
 				double ovolume = otherTile.getAir().getVolume();
+				double otemp = otherTile.getEnergy();
 				
 				if(mypres > opress) {
 					double deltap = 1 - opress / mypres;
@@ -754,11 +758,22 @@ public class World {
 //					}
 				}
 				
+				if(mytemp > otemp && mytemp != 0 && mypres > opress) {
+					double transferAmount = 1;
+					double deltae = mytemp - otemp;
+					double ratio = otemp / mytemp * Math.sqrt(deltae);
+					energyTemp[otherLoc.x()][otherLoc.y()] += ratio;
+					energyTemp[tileLoc.x()][tileLoc.y()] -= ratio;
+					
+				}
+				
+				
 			}
 		}
 		
 		for(Tile t: getTiles()) {
 			t.getAir().setVolume(volumeTemp[t.getLocation().x()][t.getLocation().y()]);
+			t.setEnergy(energyTemp[t.getLocation().x()][t.getLocation().y()]);
 			totalMass += t.getAir().getVolume();
 		}
 //		System.out.println(totalMass);
