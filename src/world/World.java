@@ -761,7 +761,7 @@ public class World {
 			t.getAir().setVolume(volumeTemp[t.getLocation().x()][t.getLocation().y()]);
 			totalMass += t.getAir().getVolume();
 		}
-		System.out.println(totalMass);
+//		System.out.println(totalMass);
 	}
 	public void setTileMass() {
 		for(Tile tile : getTiles()) {
@@ -781,7 +781,7 @@ public class World {
 	private void setTileEnergy() {
 
 		for(Tile tile: getTiles()) {
-			double defaultEnergy = 20500;
+			double defaultEnergy = 20250;
 			double pressureMultiplier = Math.sqrt(tile.getAir().getPressure()/STANDARDPRESSURE);
 			if(pressureMultiplier != 0) {
 				defaultEnergy *= pressureMultiplier;
@@ -1410,26 +1410,26 @@ public class World {
 			temperatureMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 		}
 		
-		BufferedImage massMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage humidityMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 		
-		double highMass = Double.MIN_VALUE;
-		double lowMass = Double.MAX_VALUE;
+		double highHumidity = Double.MIN_VALUE;
+		double lowHumidity = Double.MAX_VALUE;
 		for(Tile tile : getTiles() ) {
-			highMass = Math.max(highMass, tile.getAir().getMass());
-			lowMass = Math.min(lowMass, tile.getAir().getMass());
+			highHumidity = Math.max(highHumidity, tile.getAir().getHumidity());
+			lowHumidity = Math.min(lowHumidity, tile.getAir().getHumidity());
 		}
 		
 		for(Tile tile : getTiles() ) {
-			float massRatio = (float) ((tile.getAir().getMass() - lowMass) / (highMass - lowMass));
+			float massRatio = (float) ((tile.getAir().getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
 			int r = Math.max(Math.min((int)(255*massRatio), 255), 0);
 			Color c = new Color(r, 0, 255 - r);
-			massMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
+			humidityMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 		}
 		return new BufferedImage[] { 
 				ImageCreation.convertToHexagonal(terrainImage), 
 				ImageCreation.convertToHexagonal(minimapImage), 
 				ImageCreation.convertToHexagonal(heightMapImage),
-				ImageCreation.convertToHexagonal(massMapImage), 
+				ImageCreation.convertToHexagonal(humidityMapImage), 
 				ImageCreation.convertToHexagonal(pressureMapImage),
 				ImageCreation.convertToHexagonal(temperatureMapImage),
 				};

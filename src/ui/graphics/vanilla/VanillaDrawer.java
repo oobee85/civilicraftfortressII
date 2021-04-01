@@ -149,7 +149,7 @@ public class VanillaDrawer implements Drawer {
 			}else if (state.showTemperatureMap) {
 				g.drawImage(temperatureMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
 						null);
-			} else if (state.showMassMap) {
+			} else if (state.showHumidityMap) {
 				g.drawImage(massMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
 						null);
 			} else {
@@ -163,8 +163,8 @@ public class VanillaDrawer implements Drawer {
 			double lowPressure = Double.MAX_VALUE;
 			double highTemp = Double.MIN_VALUE;
 			double lowTemp = Double.MAX_VALUE;
-			double highMass = Double.MIN_VALUE;
-			double lowMass = Double.MAX_VALUE;
+			double highHumidity = Double.MIN_VALUE;
+			double lowHumidity = Double.MAX_VALUE;
 			if (state.showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
@@ -201,15 +201,15 @@ public class VanillaDrawer implements Drawer {
 
 					}
 				}
-			}else if (state.showMassMap) {
+			}else if (state.showHumidityMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
 						if (tile == null) {
 							continue;
 						}
-						highMass = Math.max(highMass, tile.getAir().getMass());
-						lowMass = Math.min(lowMass, tile.getAir().getMass());
+						highHumidity = Math.max(highHumidity, tile.getAir().getHumidity());
+						lowHumidity = Math.min(lowHumidity, tile.getAir().getHumidity());
 
 					}
 				}
@@ -222,7 +222,7 @@ public class VanillaDrawer implements Drawer {
 					if (tile == null) {
 						continue;
 					}
-					drawTile((Graphics2D) g, tile, lowHeight, highHeight, lowMass, highMass, lowPressure, highPressure, lowTemp, highTemp);
+					drawTile((Graphics2D) g, tile, lowHeight, highHeight, lowHumidity, highHumidity, lowPressure, highPressure, lowTemp, highTemp);
 				}
 			}
 
@@ -286,7 +286,7 @@ public class VanillaDrawer implements Drawer {
 				count++;
 			}
 
-			if (!state.showHeightMap && !state.showMassMap && !state.showPressureMap && !state.showTemperatureMap) {
+			if (!state.showHeightMap && !state.showHumidityMap && !state.showPressureMap && !state.showTemperatureMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
@@ -522,8 +522,8 @@ public class VanillaDrawer implements Drawer {
 		return new Point(x, y);
 	}
 
-	private void drawTile(Graphics2D g, Tile theTile, double lowHeight, double highHeight, double lowMass,
-			double highMass, double lowPressure, double highPressure, double lowTemp, double highTemp) {
+	private void drawTile(Graphics2D g, Tile theTile, double lowHeight, double highHeight, double lowHumidity,
+			double highHumidity, double lowPressure, double highPressure, double lowTemp, double highTemp) {
 		Point drawAt = getDrawingCoords(theTile.getLocation());
 		int draww = state.tileSize;
 		int drawh = state.tileSize;
@@ -544,9 +544,9 @@ public class VanillaDrawer implements Drawer {
 			int r = Math.max(Math.min((int) (255 * tempRatio), 255), 0);
 			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-		}else if (state.showMassMap) {
-			float massRatio = (float) ((theTile.getAir().getMass() - lowMass) / (highMass - lowMass));
-			int r = Math.max(Math.min((int) (255 * massRatio), 255), 0);
+		}else if (state.showHumidityMap) {
+			float humidityRatio = (float) ((theTile.getAir().getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
+			int r = Math.max(Math.min((int) (255 * humidityRatio), 255), 0);
 			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 		} else {
@@ -804,7 +804,7 @@ public class VanillaDrawer implements Drawer {
 			return pressureMapImage;
 		} else if (state.showTemperatureMap) {
 			return temperatureMapImage;
-		} else if (state.showMassMap) {
+		} else if (state.showHumidityMap) {
 			return massMapImage;
 		} else {
 			return minimapImage;
