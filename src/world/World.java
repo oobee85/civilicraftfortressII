@@ -20,6 +20,7 @@ public class World {
 	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 10;
 	public static final double TERRAIN_SNOW_LEVEL = 1;
 	public static final double DESERT_HUMIDITY = 1;
+	public static final int SEASON_DURATION = 10000;
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 500;
 	public static final int TRANSITION_PERIOD = 100;
@@ -521,7 +522,7 @@ public class World {
 				if(damage < 500) {
 					wave = new Projectile(ProjectileType.FIRE_WAVE, tile, t, null, damage);
 				}
-				
+				t.addEnergy(damage);
 				tile.addProjectile(wave);
 				worldData.addProjectile(wave);
 				
@@ -677,22 +678,38 @@ public class World {
 				System.out.println("null tile when updating energy");
 				continue;
 			}
+			
+			//adds energy for lava
 			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
 				double modifier = 1 - (tile.getTemperature()/MAXTEMP);
 				tile.addEnergy(tile.liquidAmount * modifier);
 			}
 			
+			//adds energy for ground modifiers
+			GroundModifier gm = tile.getModifier();
+			if(gm != null && gm.isHot()) {
+				double mod = gm.timeLeft() / 500;
+				tile.addEnergy(mod);
+			}
+			
 			float seasonEnergy = Season.getRateEnergy();
 			
+			
+			double heightMod = 1 - tile.getHeight() / World.MAXHEIGHT;
+//			seasonEnergy *= heightMod;
+			
+			
+			//evaporative cooling
 			double evaporation = tile.getEvaporation();
 			seasonEnergy -= evaporation;
+			
 			
 			double humidity = tile.getAir().getHumidity();
 			double airloss = humidity * (-2*seasonEnergy);
 //			seasonEnergy += airloss;
 			
 			
-			
+			//does raining
 			if(tile.getAir().canRain() && tile.liquidType != LiquidType.LAVA) {
 				if(tile.liquidType != LiquidType.ICE) {
 					tile.liquidType = LiquidType.WATER;
@@ -717,10 +734,7 @@ public class World {
 //			tile.addEnergy(joules);
 		}
 	}
-//	public double convertEnergyToTemp(Tile tile) {
-//		q = mcAt
-//		double temp = tile.getEnergy()
-//	}
+	
 	public void updateTileMass() {
 		double totalMass = 0;
 		double [][] pressureTemp = new double[width][height];
@@ -841,10 +855,12 @@ public class World {
 			}
 			tile.updateHumidity(World.ticks);
 			
-			updateDesertChange(tile, start);
+//			updateDesertChange(tile, start);
 			
 			
-			
+			if(start == true && tile.getHeight() <= 300 && tile.canPlant()) {
+				tile.setTerrain(Terrain.GRASS);
+			}
 			
 //			//turns grass to dirt if tile has a cold liquid || the temperature is cold
 //			if(tile.checkTerrain(Terrain.GRASS) && tile.isCold() && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
@@ -990,6 +1006,10 @@ public class World {
 			if(projectile.getTargetTile() == null) {
 				continue;
 			}
+//			if(projectile.getType() == ProjectileType.METEOR_WAVE) {
+//				double modifier = 1 - (projectile.getTile().getTemperature()/MAXTEMP);
+//				projectile.getTile().addEnergy(100 * modifier);
+//			}
 			if (projectile.readyToMove()) {
 				projectile.moveToTarget();
 				if(projectile.getType().getGroundModifierType() != null) {

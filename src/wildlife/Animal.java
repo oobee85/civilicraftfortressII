@@ -133,7 +133,7 @@ public class Animal extends Unit {
 			}
 			if(migrationTarget != null) {
 //				System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + migrationTarget);
-				migratingUntil = World.ticks + Season.SEASON_DURATION/2;
+				migratingUntil = World.ticks + World.SEASON_DURATION/2;
 				queuePlannedAction(new PlannedAction(migrationTarget));
 			}
 		}
