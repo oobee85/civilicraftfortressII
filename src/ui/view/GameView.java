@@ -97,7 +97,7 @@ public class GameView {
 		MouseMotionListener mouseMotionListener = new MouseMotionListener() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				mouseOver(drawer.getTileAtPixel(e.getPoint()));
+				mouseOver(drawer.getWorldCoordOfPixel(e.getPoint(), state.viewOffset, state.tileSize));
 				state.previousMouse = e.getPoint();
 			}
 
@@ -119,7 +119,7 @@ public class GameView {
 					}
 					state.previousMouse = currentMouse;
 				}
-				mouseOver(drawer.getTileAtPixel(currentMouse));
+				mouseOver(drawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize));
 			}
 		};
 		MouseListener mouseListener = new MouseListener() {
@@ -128,9 +128,9 @@ public class GameView {
 				Point currentMouse = e.getPoint();
 				if (!state.draggingMouse) {
 					if (SwingUtilities.isRightMouseButton(e)) {
-						rightClick(drawer.getTileAtPixel(currentMouse), shiftDown);
+						rightClick(drawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize), shiftDown);
 					} else if (SwingUtilities.isLeftMouseButton(e)) {
-						leftClick(drawer.getTileAtPixel(currentMouse), shiftDown);
+						leftClick(drawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize), shiftDown);
 					}
 				} else {
 					if (SwingUtilities.isLeftMouseButton(e)) {

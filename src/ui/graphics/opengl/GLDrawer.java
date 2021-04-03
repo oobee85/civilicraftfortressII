@@ -26,10 +26,9 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	private Vector3f ambientColor = new Vector3f();
 	
 	private TerrainObject terrainObject;
+	private Mesh hoveredTileBox = MeshUtils.cube;
 	
 	private final Camera camera;
-
-	private Texture blankTexture;
 	
 	public GLDrawer(Game game, GameViewState state) {
 		super(game, state);
@@ -166,7 +165,13 @@ public class GLDrawer extends Drawer implements GLEventListener {
 					y - zoffset);
 			building.getMesh().render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
-		TextureUtils.ERROR_TEXTURE.disable(gl);
+
+		float y = state.hoveredTile.y() + (state.hoveredTile.x() % 2) * 0.5f;
+		Vector3f pos = new Vector3f(
+				state.hoveredTile.x() - xoffset, 
+				game.world.get(state.hoveredTile).getHeight()/15,
+				y - zoffset);
+		hoveredTileBox.render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 	}
 	
 	@Override
@@ -177,15 +182,23 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	private void updateBackgroundColor(GL3 gl, Color background) {
 		gl.glClearColor(background.getRed()/255f, background.getGreen()/255f, background.getBlue()/255f, 1.0f);
 	}
-	
-	@Override
-	public Position getTileAtPixel(Point pixel) {
-		return new Position(1, 1);
-	}
 
 	@Override
 	public Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
-		return new Position(1, 1);
+		Vector3f onScreen = new Vector3f(pixelOnScreen.x, pixelOnScreen.y, 0);
+		// TODO need to implement Matrix.inverse();
+		// Vector3f onView = projection.inverse().multiply(onScreen, 1);
+		// Vector3f viewingRay = onView.subtract(onScreen).normalize();
+		// Vector3f intersectWithCloseCuttingPlane = viewingRay*closeDistance + cameraPos;
+		// Vector3f intersectWithFarCuttingPlane = viewingRay*farDistance + cameraPos;
+		// closeIntersectWorld = view.inverse() * intersectWithCloseCuttingPlane;
+		// farIntersectWorld = view.inverse() * intersectWithFarCuttingPlane;
+		// TODO implement ray-cast to find where closeIntersectWorld  to farIntersectWorld
+		// 		intersects with the world mesh
+		
+		// The little trick make the game vaguely playable :P
+		return new Position(game.world.getWidth() * pixelOnScreen.x / glcanvas.getWidth(), 
+				game.world.getHeight() * pixelOnScreen.y / glcanvas.getHeight());
 	}
 
 	@Override

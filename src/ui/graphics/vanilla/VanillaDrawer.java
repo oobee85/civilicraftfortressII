@@ -819,16 +819,9 @@ public class VanillaDrawer extends Drawer {
 	}
 
 	@Override
-	public Position getTileAtPixel(Point pixel) {
-		int column = (int) ((pixel.x + state.viewOffset.x) / state.tileSize);
-		int row = (int) ((pixel.y + state.viewOffset.y - (column % 2) * state.tileSize / 2) / state.tileSize);
-		return new Position(column, row);
-	}
-
-	@Override
 	public Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
 		double column = ((pixelOnScreen.x + viewOffset.x) / tileSize);
-		double row = ((pixelOnScreen.y + viewOffset.y) / tileSize);
+		int row = (int) ((pixelOnScreen.y + viewOffset.y - (column % 2) * tileSize / 2) / tileSize);
 		return new Position(column, row);
 	}
 
