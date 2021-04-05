@@ -287,7 +287,7 @@ public class Client {
 					long elapsed = System.currentTimeMillis() - start;
 					clientGUI.getGameView().setPreviousTickTime(elapsed);
 					if(World.ticks % 200 == 1) {
-						System.out.println("time elapsed for tick: " + elapsed + "ms");
+//						System.out.println("time elapsed for tick: " + elapsed + "ms");
 					}
 					long sleeptime = millisPerTick - elapsed;
 					if(sleeptime > 0 && !isFastForwarding) {

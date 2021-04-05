@@ -9,10 +9,12 @@ public class Air {
 	private double pressure;
 	private double height;
 	private double volume;
+	private double mass;
 	
 	private double maxHumidity;
 	private double maxVolume;
 	private boolean canRain;
+	private double volumeChange;
 	
 	public Air(double height, double temp) {
 		this.maxHumidity = 1.0;
@@ -20,7 +22,7 @@ public class Air {
 		this.temperature = temp;
 		this.maxVolume = 10;
 		this.canRain = false;
-		this.volume = 0;
+		this.volume = 5;
 		this.humidity = 0.0;
 		this.pressure = 760;
 		this.updateMaxVolume();
@@ -49,28 +51,20 @@ public class Air {
 		volume = set;
 	}
 	public void addVolume(double add) {
-		if(volume + add >= maxVolume) {
-			canRain = true;
-			this.volume += add;
-		}else {
-			canRain = false;
-			this.volume += add;
-		}
+		this.volume += add;
+		volumeChange = add;
 	}
-	public boolean isSaturated() {
-		if(humidity >= 1) {
-			return true;
-		}
-		return false;
+	public double getVolumeChange() {
+		return volumeChange;
 	}
 	public void updateHeight(double height) {
 		this.height = height;
 	}
 	public void updateMaxVolume() {
 		if(temperature > 0) {
-			maxVolume = 2*this.temperature;
+			maxVolume = this.temperature;
 		}else {
-			maxVolume = 0;
+			maxVolume = 1;
 		}
 		
 	}
@@ -91,10 +85,19 @@ public class Air {
 		}
 		
 	}
+	public void setMass(double mass) {
+		this.mass = mass;
+	}
+	public double getMass() {
+		return mass;
+	}
+	public void addMass(double mass) {
+		this.mass += mass;
+	}
 	public void updatePressure() {
 		
 		
-		double P0 = 760; // mmHg
+		double P0 = World.STANDARDPRESSURE; // mmHg
 		double g = 9.80665; // m/s^2
 		double MMair = 0.0289644; // kg/mol
 		double R = 8.31432; // Nm/molK
@@ -105,15 +108,22 @@ public class Air {
 		
 //		double sub = boltz * temp;
 		
-		
-		
 		double sub = R * (temp + Math.abs(World.MINTEMP));
+		double standardPVNRT = World.STARTINGMASS * sub / World.VOLUMEPERTILE;
+		
 		double power = (-g * MMair * (h - h0)) / sub;
 		double pressure = P0 * Math.pow(Math.E, power);
 		
+		double pvnrt = mass * sub / World.VOLUMEPERTILE;
+		double mix = pressure+(pvnrt - standardPVNRT);
 //		System.out.println("Pressure: " + pressure);
-		this.pressure = pressure;
+//		System.out.println("pvnrt: "+other + "atm: "+pressure);
+		this.pressure = mix ;
 
+	}
+	public double getDensity() {
+		double density = this.pressure/World.STANDARDPRESSURE*World.MMAIR / (0.0821 * (getTemperature() + Math.abs(World.MINTEMP)) );
+		return density;
 	}
 	public double getRelativeHumidity() {
 		
@@ -175,7 +185,17 @@ public class Air {
 	
 	
 	public boolean canRain() {
-		return canRain;
+		if(this.volume >= this.maxVolume) {
+			return true;
+		}
+		if(this.humidity >= 0.9) {
+			return true;
+		}
+		return false;
 	}
+	
+	
+	
+	
 	
 }

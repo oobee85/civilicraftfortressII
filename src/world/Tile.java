@@ -16,6 +16,7 @@ public class Tile implements Externalizable {
 	private float height;
 	private float humidity;
 	private double energy;
+	private double temperature;
 
 	public volatile float liquidAmount;
 	public volatile LiquidType liquidType;
@@ -90,13 +91,20 @@ public class Tile implements Externalizable {
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
 		items = new ConcurrentLinkedQueue<Item>();
 		this.humidity = 1;
-		this.energy = 5000;
+		this.energy = 20000;
 		air = new Air(this.height, 0);
 	}
 
-
-	public float getTemperature() {
-		float season = Season.getSeason2();
+	
+	public double getTemperature() {
+		double Kgair = World.MMAIR * 10 * 0.721;
+		
+		double asdf = Kgair*Math.abs(World.MINTEMP);
+		double asd = energy - asdf;
+		double asdfg = asd / Kgair;
+		return asdfg;
+//		float season = Season.getSeason2();
+//		float night = Season.getNightEnergy();
 //		float seasonTemp = Season.winter[getLocation().y()] + season * Season.summer[getLocation().y()];
 		
 		
@@ -105,10 +113,11 @@ public class Tile implements Externalizable {
 //		heightTemp = heightTemp*heightTemp;
 //		float nightMultiplier = World.isNightTime() ? 0.9f : 1f;
 //		return (seasonTemp + heightTemp)*nightMultiplier/2;
-		return season;
+//		return season+night;
 	}
-	
-	
+	public void setEnergy(double energy) {
+		this.energy = energy;
+	}
 	public double getEnergy() {
 		return energy;
 	}
@@ -139,7 +148,7 @@ public class Tile implements Externalizable {
 	
 	public double getEvaporation() {
 		double evaporation = 0.0;
-		if(this.liquidType == LiquidType.WATER && this.getTemperature() > 0 && this.getAir().isSaturated() == false) {
+		if(this.liquidType == LiquidType.WATER && this.getTemperature() > 0 && this.getAir().canRain() == false) {
 			evaporation = ( 0.01*this.getTemperature()*this.liquidAmount ) /10;
 //			liquidAmount -= evaporation;
 		}

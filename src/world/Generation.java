@@ -36,7 +36,7 @@ public class Generation {
 		int center = width/2;
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				double dif = 10 * Math.abs(i-center)/center;
+				double dif = 1 * Math.abs(i-center)/center;
 				croppedHeightMap[i][j] +=  (float)1000 * Math.pow(dif +1, -0.1) + (float)(Math.random());
 			}
 		}

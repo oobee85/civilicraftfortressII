@@ -16,6 +16,7 @@ public abstract class Drawer {
 	protected volatile BufferedImage humidityMapImage;
 	protected volatile BufferedImage pressureMapImage;
 	protected volatile BufferedImage temperatureMapImage;
+	protected volatile BufferedImage massMapImage;
 
 	protected GameViewState state;
 	protected Game game;

@@ -20,13 +20,21 @@ public class World {
 	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 10;
 	public static final double TERRAIN_SNOW_LEVEL = 1;
 	public static final double DESERT_HUMIDITY = 1;
+	public static final int SEASON_DURATION = 10000;
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 500;
 	public static final int TRANSITION_PERIOD = 100;
 	private static final double CHANCE_TO_SWITCH_TERRAIN = 1;
-	public static final int MINTEMP = -30;
-	public static final int MAXTEMP = 200;
+	
+	public static final int MINTEMP = -273;
+	public static final int FREEZETEMP = 0;
+	public static final int MAXTEMP = 1000;
 	public static final int MAXHEIGHT = 1000;
+	public static final int JOULESPERTILE = 1;
+	public static final double STANDARDPRESSURE = 760;
+	public static final int VOLUMEPERTILE = 100;
+	public static final int STARTINGMASS = 10;
+	public static final int MMAIR = 10;
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
@@ -231,10 +239,10 @@ public class World {
 	public void rains() {
 		for(Tile tile : getTiles()) {
 			if(tile.getAir().canRain() == true && tile.getWeather() == null) {
-				WeatherEvent weather = new WeatherEvent(tile, tile, tile.getAir().getVolume(), LiquidType.WATER);;
-				tile.setWeather(weather);
-				worldData.addWeatherEvent(weather);
-				weather.addStrength(tile.getAir().getVolume());
+//				WeatherEvent weather = new WeatherEvent(tile, tile, tile.getAir().getVolume(), LiquidType.WATER);;
+//				tile.setWeather(weather);
+//				worldData.addWeatherEvent(weather);
+//				weather.addStrength(tile.getAir().getVolume());
 			}
 		}
 	}
@@ -259,7 +267,7 @@ public class World {
 			if(targetTile == null) {
 				continue;
 			}
-			double temperature = t.getTemperature();
+//			double temperature = t.getTemperature();
 //			WeatherEvent weather = new WeatherEvent(t, targetTile, t.getLocation().distanceTo(target)*WeatherEventType.RAIN.getSpeed() + (int)(Math.random()*50), 0.00002, LiquidType.WATER);;
 //			t.setWeather(weather);
 //			worldData.addWeatherEvent(weather);
@@ -514,7 +522,7 @@ public class World {
 				if(damage < 500) {
 					wave = new Projectile(ProjectileType.FIRE_WAVE, tile, t, null, damage);
 				}
-				
+				t.addEnergy(damage);
 				tile.addProjectile(wave);
 				worldData.addProjectile(wave);
 				
@@ -641,38 +649,204 @@ public class World {
 		for(Tile tile : getTiles()) {
 			tile.updateAir();
 		}
+		for(Tile tile: getTilesRandomly()) {
+			TileLoc tileLoc = tile.getLocation();
+			for(Tile otherTile : tile.getNeighbors()) {
+				TileLoc otherLoc = otherTile.getLocation();
+				double mypres = tile.getAir().getPressure();
+				double mymass = tile.getAir().getMass();
+				
+				double opress = otherTile.getAir().getPressure();
+				double omass = otherTile.getAir().getMass();
+				
+				if(mypres > opress) {
+					double deltap = mypres - opress;
+					double change = deltap / mypres;
+					
+				}
+				
+			}
+		}
 			
 	}
 	public void updateEnergy() {
+		if(World.ticks % 2 == 0) {
+			return;
+		}
 		for(Tile tile : getTiles()) {
 			if(tile == null) {
 				System.out.println("null tile when updating energy");
 				continue;
 			}
-			// max = 10000
-			// min = -10000
-			double currentEnergy = tile.getEnergy();
 			
-			
-			double energy = Season.getEnergySeason();
-			if(tile.getWeather() != null) {
-				energy -= 2;
+			//adds energy for lava
+			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
+				double modifier = 1 - (tile.getTemperature()/MAXTEMP);
+				tile.addEnergy(tile.liquidAmount * modifier);
 			}
-			double altChange = tile.getHeight()/MAXHEIGHT/2;
-			energy -= altChange;
 			
-			double reduction = 0;
-			if(currentEnergy >= 0) {
-				reduction = -Math.sqrt(currentEnergy)/100 +1;
-			}else {
-				reduction = -Math.sqrt(-currentEnergy)/100 +1;
+			//adds energy for ground modifiers
+			GroundModifier gm = tile.getModifier();
+			if(gm != null && gm.isHot()) {
+				double mod = gm.timeLeft() / 500;
+				tile.addEnergy(mod);
 			}
-			tile.addEnergy(reduction * energy);
+			
+			float seasonEnergy = Season.getRateEnergy();
+			
+			
+			double heightMod = 1 - tile.getHeight() / World.MAXHEIGHT;
+//			seasonEnergy *= heightMod;
+			
+			
+			//evaporative cooling
+			double evaporation = tile.getEvaporation();
+			seasonEnergy -= evaporation;
+			
+			
+			double humidity = tile.getAir().getHumidity();
+			double airloss = humidity * (-2*seasonEnergy);
+//			seasonEnergy += airloss;
+			
+			
+			//does raining
+			if(tile.getAir().canRain() && tile.liquidType != LiquidType.LAVA) {
+				if(tile.liquidType != LiquidType.ICE) {
+					tile.liquidType = LiquidType.WATER;
+				}
+				tile.getAir().addVolume(-0.01);
+				tile.liquidAmount += 0.01;
+				tile.addEnergy(0.01);
+			}
+			
+			
+			
+			
+			
+			tile.addEnergy(seasonEnergy);
+			
+			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 1) {
+//				tile.setEnergy(21000);
+//				System.out.println(tile.getTemperature());
+				System.out.println("Energy: " + tile.getEnergy() + ", T: " + tile.getTemperature());
+			}
+//			tile.setEnergy(energy);
+//			tile.addEnergy(joules);
 		}
+	}
+	
+	public void updateTileMass() {
+		double totalMass = 0;
+		double [][] pressureTemp = new double[width][height];
+		double [][] volumeTemp = new double[width][height];
+		double [][] energyTemp = new double[width][height];
+		for(Tile t: getTiles()) {
+			pressureTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getPressure();
+			volumeTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getVolume();
+			energyTemp[t.getLocation().x()][t.getLocation().y()] = t.getEnergy();
+		}
+		
+		for(Tile tile: getTilesRandomly()) {
+			TileLoc tileLoc = tile.getLocation();
+			for(Tile otherTile : tile.getNeighbors()) {
+				TileLoc otherLoc = otherTile.getLocation();
+				
+				double mypres = tile.getAir().getPressure();
+				double myvolume = tile.getAir().getVolume();
+				double mytemp = tile.getEnergy();
+				
+				double opress = otherTile.getAir().getPressure();
+				double ovolume = otherTile.getAir().getVolume();
+				double otemp = otherTile.getEnergy();
+				
+				if(mypres > opress) {
+					double deltap = 1 - opress / mypres;
+					double deltavol = Math.abs((myvolume - ovolume)*deltap);
+//					System.out.println(deltavol);
+					if(volumeTemp[tileLoc.x()][tileLoc.y()] - deltavol >= 0) {
+						volumeTemp[otherLoc.x()][otherLoc.y()] += deltavol;
+						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltavol;
+					}
+//					if(massTemp[tileLoc.x()][tileLoc.y()] - change >= 0) {
+//						massTemp[otherLoc.x()][otherLoc.y()] += change;
+//						massTemp[tileLoc.x()][tileLoc.y()] -= change;
+//					}
+				}
+				
+				if(mytemp > otemp && mytemp != 0 && mypres > opress) {
+					double transferAmount = 1;
+					double deltae = mytemp - otemp;
+					double ratio = otemp / mytemp * Math.sqrt(deltae);
+					energyTemp[otherLoc.x()][otherLoc.y()] += ratio;
+					energyTemp[tileLoc.x()][tileLoc.y()] -= ratio;
+					
+				}
+				
+				
+			}
+		}
+		
+		for(Tile t: getTiles()) {
+			t.getAir().setVolume(volumeTemp[t.getLocation().x()][t.getLocation().y()]);
+			t.setEnergy(energyTemp[t.getLocation().x()][t.getLocation().y()]);
+			totalMass += t.getAir().getVolume();
+		}
+//		System.out.println(totalMass);
+	}
+	public void setTileMass() {
+		for(Tile tile : getTiles()) {
+			
+			Air air = tile.getAir();
+			double pressure = air.getPressure();
+			double volume = VOLUMEPERTILE;
+			double R = 8.314;
+			double temperature = tile.getAir().getTemperature();
+			
+			double moles = (pressure*volume) / R * (temperature + Math.abs(MINTEMP));
+//			air.setMass(moles);
+			air.setMass(STARTINGMASS);
+			
+		}
+	}
+	private void setTileEnergy() {
+
+		for(Tile tile: getTiles()) {
+			double defaultEnergy = 20250;
+			double pressureMultiplier = Math.sqrt(tile.getAir().getPressure()/STANDARDPRESSURE);
+			if(pressureMultiplier != 0) {
+				defaultEnergy *= pressureMultiplier;
+			}
+			
+			tile.setEnergy(defaultEnergy);
+		}
+	}
+	public void updateTileTemperature() {
+		for(Tile tile : getTiles()) {
+			if(tile == null) {
+				System.out.println("null tile when updating temperature");
+				continue;
+			}
+			
+
+//			tile.setTemperature(tile.getTemperature()+Season.getNightEnergy());
+			
+//			double temperature = tile.getTemperature();
+//			tile.getAir().setTemperature(temperature);
+			
+		}
+			
 	}
 	public void updateTerrainChange(boolean start) {
 		updateAirStuff();
 		updateEnergy();
+		updateTileTemperature();
+		if(start == true) {
+			setTileMass();
+			setTileEnergy();
+		}
+		if(start == false) {
+			updateTileMass();
+		}
 		for(Tile tile : getTiles()) {
 			
 			
@@ -681,10 +855,12 @@ public class World {
 			}
 			tile.updateHumidity(World.ticks);
 			
-			updateDesertChange(tile, start);
+//			updateDesertChange(tile, start);
 			
 			
-			
+			if(start == true && tile.getHeight() <= 300 && tile.canPlant()) {
+				tile.setTerrain(Terrain.GRASS);
+			}
 			
 //			//turns grass to dirt if tile has a cold liquid || the temperature is cold
 //			if(tile.checkTerrain(Terrain.GRASS) && tile.isCold() && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
@@ -811,9 +987,13 @@ public class World {
 				continue;
 			}
 			tile.liquidType = weather.getLiquidType();
-			tile.liquidAmount += 0.1;
-			weather.addStrength(-0.1);
-			tile.getAir().addVolume(-0.1);
+			if(tile.getAir().canRain()) {
+				tile.getAir().addVolume(-0.05);
+				tile.liquidAmount += 0.05;
+			}
+//			tile.liquidAmount += 0.1;
+//			weather.addStrength(-0.1);
+//			tile.getAir().addVolume(-0.1);
 			
 			
 		}
@@ -826,6 +1006,10 @@ public class World {
 			if(projectile.getTargetTile() == null) {
 				continue;
 			}
+//			if(projectile.getType() == ProjectileType.METEOR_WAVE) {
+//				double modifier = 1 - (projectile.getTile().getTemperature()/MAXTEMP);
+//				projectile.getTile().addEnergy(100 * modifier);
+//			}
 			if (projectile.readyToMove()) {
 				projectile.moveToTarget();
 				if(projectile.getType().getGroundModifierType() != null) {
@@ -890,7 +1074,7 @@ public class World {
 		worldData.filterDeadProjectiles();
 		
 		if(World.ticks % 200 == 1) {
-			System.out.println("Tick " + World.ticks + ", " + worldData.toString());
+//			System.out.println("Tick " + World.ticks + ", " + worldData.toString());
 		}
 	}
 	
@@ -1127,8 +1311,8 @@ public class World {
 
 		int numTiles = width*height;
 //		Generation.makeLake(numTiles * 1, this);
-//		Generation.makeLake(numTiles * 2, this);
-//		Generation.makeLake(numTiles * 4, this);
+		Generation.makeLake(numTiles * 2, this);
+		Generation.makeLake(numTiles * 4, this);
 		Generation.makeLake(numTiles * 8, this);
 		System.out.println("Simulating water for 100 iterations");
 		for(int i = 0; i < 100; i++) {
@@ -1250,15 +1434,15 @@ public class World {
 		double highTemperature = MINTEMP;
 		double lowTemperature = MAXTEMP;
 		for(Tile tile : getTiles() ) {
-			highTemperature = Math.max(highTemperature, tile.getTemperature());
-			lowTemperature = Math.min(lowTemperature, tile.getTemperature());
+			highTemperature = Math.max(highTemperature, tile.getAir().getTemperature());
+			lowTemperature = Math.min(lowTemperature, tile.getAir().getTemperature());
 		}
 		
 		BufferedImage temperatureMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 		for(Tile tile : getTiles() ) {
-			float temperatureRatio = (float) ((tile.getTemperature() - lowTemperature) / (highTemperature - lowTemperature));
+			float temperatureRatio = (float) ((tile.getAir().getTemperature() - lowTemperature) / (highTemperature - lowTemperature));
 			int r = Math.max(Math.min((int)(255*temperatureRatio), 255), 0);
-			Color c = new Color(255-r, 0, r);
+			Color c = new Color(r, 0, 255-r);
 			temperatureMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 		}
 		
@@ -1267,16 +1451,14 @@ public class World {
 		double highHumidity = Double.MIN_VALUE;
 		double lowHumidity = Double.MAX_VALUE;
 		for(Tile tile : getTiles() ) {
-			highHumidity = Math.max(highHumidity, tile.getHumidity());
-			lowHumidity = Math.min(lowHumidity, tile.getHumidity());
+			highHumidity = Math.max(highHumidity, tile.getAir().getHumidity());
+			lowHumidity = Math.min(lowHumidity, tile.getAir().getHumidity());
 		}
 		
 		for(Tile tile : getTiles() ) {
-			float humidityRatio = (float) ((tile.getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
-			float insidePara = ((humidityRatio - 0.5f)*1.74f);
-			float almostRatio = (insidePara*insidePara*insidePara*insidePara*insidePara + 0.5f);
-			int r = Math.max(Math.min((int)(255*almostRatio), 255), 0);
-			Color c = new Color(255 - r, 0, r);
+			float massRatio = (float) ((tile.getAir().getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
+			int r = Math.max(Math.min((int)(255*massRatio), 255), 0);
+			Color c = new Color(r, 0, 255 - r);
 			humidityMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 		}
 		return new BufferedImage[] { 

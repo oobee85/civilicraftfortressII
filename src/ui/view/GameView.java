@@ -30,6 +30,7 @@ public class GameView {
 	private boolean shiftDown = false;
 
 	private boolean summonPlayerControlled = true;
+	private boolean setSpawnWeather = false;
 
 	private final JPanel panel;
 	private final Drawer vanillaDrawer;
@@ -321,10 +322,10 @@ public class GameView {
 		if (tile == null) {
 			return;
 		}
-		if (state.leftClickAction == LeftClickAction.RAISE_TERRAIN) {
-			game.raiseTerrain(tile, 5);
+		if (state.leftClickAction == LeftClickAction.WEATHER) {
+			game.spawnWeather(tile, 3);
 		} else if (state.leftClickAction == LeftClickAction.SET_TERRITORY) {
-			game.setTerritory(tile, 5, state.faction);
+			game.setTerritory(tile, 2, state.faction);
 		}
 
 		// spawning unit or building
@@ -503,8 +504,8 @@ public class GameView {
 		state.selectedThingToSpawn = thingType;
 	}
 
-	public void setRaisingTerrain(boolean raising) {
-		state.leftClickAction = LeftClickAction.RAISE_TERRAIN;
+	public void setWeather(boolean raising) {
+		state.leftClickAction = LeftClickAction.WEATHER;
 	}
 
 	public void setSetTerritory(boolean setting) {
@@ -513,6 +514,9 @@ public class GameView {
 
 	public void setSummonPlayerControlled(boolean playerControlled) {
 		summonPlayerControlled = playerControlled;
+	}
+	public void setSpawnWeather(boolean weather) {
+		setSpawnWeather = weather;
 	}
 
 	public void setBuildingToPlan(BuildingType buildingType) {
@@ -635,7 +639,7 @@ public class GameView {
 	public void setShowTemperatureMap(boolean show) {
 		state.showTemperatureMap = show;
 	}
-	public void setShowHumidityMap(boolean show) {
+	public void setShowMassMap(boolean show) {
 		state.showHumidityMap = show;
 	}
 

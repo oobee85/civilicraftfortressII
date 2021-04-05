@@ -106,6 +106,12 @@ public class SpawnUnitsView {
 			gameView.setSummonPlayerControlled(!toggle.isSelected());
 		});
 		rootPanel.add(toggle);
+		JToggleButton spawnWeather = KUIConstants.setupToggleButton("Non-spawnWeather", null, null);
+		spawnWeather.addActionListener(e -> {
+			spawnWeather.setText(!spawnWeather.isSelected() ? "Non-spawnWeather" : "spawnWeather");
+			gameView.setSummonPlayerControlled(!spawnWeather.isSelected());
+		});
+		rootPanel.add(spawnWeather);
 	}
 
 	public JPanel getRootPanel() {

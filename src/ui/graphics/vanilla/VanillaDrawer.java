@@ -32,6 +32,7 @@ public class VanillaDrawer extends Drawer {
 	private static final Image RED_HITSPLAT = Utils.loadImage("Images/interfaces/redhitsplat.png");
 	private static final Image BLUE_HITSPLAT = Utils.loadImage("Images/interfaces/bluehitsplat.png");
 	private static final Image GREEN_HITSPLAT = Utils.loadImage("Images/interfaces/greenhitsplat.png");
+	private static final Image SNOW = Utils.loadImage("Images/weather/snow.png");
 	
 	private JPanel canvas;
 	
@@ -139,7 +140,7 @@ public class VanillaDrawer extends Drawer {
 				g.drawImage(temperatureMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
 						null);
 			} else if (state.showHumidityMap) {
-				g.drawImage(humidityMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
+				g.drawImage(massMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
 						null);
 			} else {
 				g.drawImage(terrainImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
@@ -150,10 +151,10 @@ public class VanillaDrawer extends Drawer {
 			double lowHeight = Double.MAX_VALUE;
 			double highPressure = Double.MIN_VALUE;
 			double lowPressure = Double.MAX_VALUE;
-			double highTemp = World.MINTEMP;
-			double lowTemp = World.MAXTEMP;
-			double highHumidity = 20;
-			double lowHumidity = 0;
+			double highTemp = Double.MIN_VALUE;
+			double lowTemp = Double.MAX_VALUE;
+			double highHumidity = Double.MIN_VALUE;
+			double lowHumidity = Double.MAX_VALUE;
 			if (state.showHeightMap) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
@@ -185,8 +186,8 @@ public class VanillaDrawer extends Drawer {
 						if (tile == null) {
 							continue;
 						}
-						highTemp = Math.max(highTemp, tile.getTemperature());
-						lowTemp = Math.min(lowTemp, tile.getTemperature());
+						highTemp = Math.max(highTemp, tile.getAir().getTemperature());
+						lowTemp = Math.min(lowTemp, tile.getAir().getTemperature());
 
 					}
 				}
@@ -291,7 +292,7 @@ public class VanillaDrawer extends Drawer {
 			}
 
 			if (state.drawDebugStrings) {
-				if (state.tileSize >= 36) {
+				if (state.tileSize >= 150) {
 					drawDebugStrings(g, lowerX, lowerY, upperX, upperY);
 				}
 			}
@@ -434,16 +435,19 @@ public class VanillaDrawer extends Drawer {
 				Point drawAt = getDrawingCoords(tile.getLocation());
 				List<String> strings = new LinkedList<String>();
 				strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
-				strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getHumidity()));
-				strings.add(String.format("TEM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getTemperature()));
 				strings.add(String.format("PRE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getPressure()));
+				strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getTemperature()));
+				strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getHumidity()));
+				
+				strings.add(String.format("EVAP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEvaporation()));
+				strings.add(String.format("dVOL" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getVolumeChange()));
+				strings.add(String.format("VOL" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getVolume()));
+				strings.add(String.format("MVOL" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getMaxVolume()));
+				
 				strings.add(String.format("RH" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getRelativeHumidity()));
 				strings.add(String.format("DEW" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getDewPoint()));
-				strings.add(String.format("EVA" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEvaporation()));
-				strings.add(String.format("VOL" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getVolume()));
-				strings.add(String.format("MV" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getMaxVolume()));
 				strings.add(String.format("ENE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEnergy()));
-//				strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTemperature()));
+				strings.add(String.format("MASS" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getMass()));
 				if (tile.getResource() != null) {
 					strings.add(String.format("ORE" + "=%d", tile.getResource().getYield()));
 				}
@@ -526,16 +530,17 @@ public class VanillaDrawer extends Drawer {
 			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 		}else if (state.showTemperatureMap) {
-			float tempRatio = (float) ((theTile.getTemperature() - lowTemp) / (highTemp - lowTemp));
+			float tempRatio = (float) ((theTile.getAir().getTemperature() - lowTemp) / (highTemp - lowTemp));
 			int r = Math.max(Math.min((int) (255 * tempRatio), 255), 0);
-			g.setColor(new Color(255 - r, 0, r));
+			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
+			if(theTile.getAir().getTemperature() <= World.FREEZETEMP) {
+				g.drawImage(SNOW, drawAt.x, drawAt.y, draww, drawh, null);
+			}
 		}else if (state.showHumidityMap) {
 			float humidityRatio = (float) ((theTile.getAir().getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
-			float insidePara = ((humidityRatio - 0.5f) * 1.74f);
-			float almostRatio = (insidePara * insidePara * insidePara * insidePara * insidePara + 0.5f);
-			int r = Math.max(Math.min((int) (255 * almostRatio), 255), 0);
-			g.setColor(new Color(255 - r, 0, r));
+			int r = Math.max(Math.min((int) (255 * humidityRatio), 255), 0);
+			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 		} else {
 			g.drawImage(theTile.getTerrain().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh, null);
@@ -793,7 +798,7 @@ public class VanillaDrawer extends Drawer {
 		} else if (state.showTemperatureMap) {
 			return temperatureMapImage;
 		} else if (state.showHumidityMap) {
-			return humidityMapImage;
+			return massMapImage;
 		} else {
 			return minimapImage;
 		}

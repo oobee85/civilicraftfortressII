@@ -126,7 +126,7 @@ public class Liquid {
 		int x = current.x();
 		int y = current.y();
 		
-		float tempurature = tile.getTemperature();
+		float tempurature = (float) tile.getTemperature();
 		if(tempurature > Season.MELTING_TEMPURATURE) {
 			if(tile.liquidType == LiquidType.ICE) {
 				tile.liquidType = LiquidType.WATER;
