@@ -134,14 +134,14 @@ public class DebugView {
 				gameView.getGameInstance().researchEverything(gameView.getFaction());
 			}
 		});
-		JButton shadowWordDeath = KUIConstants.setupButton("Shadow Word: Death", SHADOW_WORD_DEATH, LONG_BUTTON_SIZE);
+		JButton shadowWordDeath = KUIConstants.setupButton("Shadow Word: Death", SHADOW_WORD_DEATH, DEBUG_BUTTON_SIZE);
 		shadowWordDeath.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gameView.getGameInstance().shadowWordDeath(100);
 			}
 		});
-		JButton shadowWordPain = KUIConstants.setupButton("Shadow Word: Pain", SHADOW_WORD_PAIN, LONG_BUTTON_SIZE);
+		JButton shadowWordPain = KUIConstants.setupButton("Shadow Word: Pain", SHADOW_WORD_PAIN, DEBUG_BUTTON_SIZE);
 		shadowWordPain.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -195,6 +195,15 @@ public class DebugView {
 			}
 		});
 
+		JToggleButton toggleGL = KUIConstants.setupToggleButton(gameView.is3d() ? "3D" : "2D", null, DEBUG_BUTTON_SIZE);
+		toggleGL.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				gameView.switch3d();
+				toggleGL.setText(gameView.is3d() ? "3D" : "2D");
+			}
+		});
+
 		JButton exit = KUIConstants.setupButton("Exit", null, DEBUG_BUTTON_SIZE);
 		exit.addActionListener(new ActionListener() {
 			@Override
@@ -230,6 +239,7 @@ public class DebugView {
 		rootPanel.add(setTerritoryButton);
 		rootPanel.add(save);
 		rootPanel.add(exit);
+		rootPanel.add(toggleGL);
 		rootPanel.add(shadowWordDeath);
 		rootPanel.add(shadowWordPain);
 	}

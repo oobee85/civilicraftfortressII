@@ -9,29 +9,10 @@ import org.json.*;
 
 import game.*;
 import ui.*;
+import ui.graphics.opengl.*;
 import world.*;
 
 public class Loader {
-	private static String readFile(String filename) {
-		String researchCosts = "";
-//		URL path = Utils.class.getClassLoader().getResource(filename);
-		BufferedReader br = new BufferedReader(new InputStreamReader(Utils.class.getClassLoader().getResourceAsStream(filename)));
-		try {
-//		try (BufferedReader br = new BufferedReader(new FileReader(path.getPath()))) {
-			StringBuilder builder = new StringBuilder();
-			String line;
-			while((line = br.readLine()) != null) {
-//				line = line.replaceAll("\\s+","");
-				builder.append(line + "\n");
-			}
-			researchCosts = builder.toString();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return researchCosts;
-	}
 	private static HashMap<ItemType, Integer> loadItemTypeMap(JSONObject costObject) {
 		HashMap<ItemType, Integer> map = new HashMap<>();
 		for(String itemName : costObject.keySet()) {
@@ -42,7 +23,7 @@ public class Loader {
 	
 	public static void loadBuildingType(HashMap<String, BuildingType> buildingTypeMap, ArrayList<BuildingType> buildingTypeList) {
 
-		String buildingTypeString = readFile("costs/BuildingType.json");
+		String buildingTypeString = Utils.readFile("costs/BuildingType.json");
 //		System.out.println("Loaded :" + buildingTypeString);
 		JSONObject obj = new JSONObject(buildingTypeString);
 		JSONArray arr = obj.getJSONArray("buildingtypes");
@@ -91,7 +72,7 @@ public class Loader {
 				cost = loadItemTypeMap(buildingTypeObject.getJSONObject("cost"));
 			}
 			
-			BuildingType buildingType = new BuildingType(name, info, health, effort, image, culture, vision, researchReq, cost, buildsunits, movespeed, attributes);
+			BuildingType buildingType = new BuildingType(name, info, health, effort, image, MeshUtils.defaultBuilding, culture, vision, researchReq, cost, buildsunits, movespeed, attributes);
 			buildingTypeMap.put(name, buildingType);
 			buildingTypeList.add(buildingType);
 		}
@@ -151,7 +132,7 @@ public class Loader {
 //		}
 	}
 	public static void loadUnitType(HashMap<String, UnitType> unitTypeMap, ArrayList<UnitType> unitTypeList) {
-		String unitTypeString = readFile("costs/UnitType.json");
+		String unitTypeString = Utils.readFile("costs/UnitType.json");
 //		System.out.println("Loaded :" + unitTypeString);
 		JSONObject obj = new JSONObject(unitTypeString);
 		JSONArray arr = obj.getJSONArray("unittypes");
@@ -209,7 +190,7 @@ public class Loader {
 				}
 			}
 			
-			UnitType unitType = new UnitType(name, image, combatStats, attributes, researchReq, cost, items, targeting, attackStyles);
+			UnitType unitType = new UnitType(name, image, MeshUtils.defaultUnit, combatStats, attributes, researchReq, cost, items, targeting, attackStyles);
 			unitTypeMap.put(name, unitType);
 			unitTypeList.add(unitType);
 
@@ -288,7 +269,7 @@ public class Loader {
 	
 	public static void loadResearchType(HashMap<String, ResearchType> researchTypeMap, ArrayList<ResearchType> researchTypeList) {
 		HashMap<Research, LinkedList<String>> researchRequirements = new HashMap<>();
-		String researchCosts = readFile("costs/ResearchType.json");
+		String researchCosts = Utils.readFile("costs/ResearchType.json");
 		JSONObject obj = new JSONObject(researchCosts);
 		JSONArray arr = obj.getJSONArray("researches");
 		for (int i = 0; i < arr.length(); i++) {

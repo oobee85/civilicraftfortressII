@@ -15,7 +15,7 @@ import ui.view.GameView.*;
 import utils.*;
 import world.*;
 
-public class VanillaDrawer implements Drawer {
+public class VanillaDrawer extends Drawer {
 
 	private static final int FAST_MODE_TILE_SIZE = 10;
 	private static final int NUM_DEBUG_DIGITS = 3;
@@ -34,21 +34,10 @@ public class VanillaDrawer implements Drawer {
 	private static final Image GREEN_HITSPLAT = Utils.loadImage("Images/interfaces/greenhitsplat.png");
 	private static final Image SNOW = Utils.loadImage("Images/weather/snow.png");
 	
-	private volatile BufferedImage terrainImage;
-	private volatile BufferedImage minimapImage;
-	private volatile BufferedImage heightMapImage;
-	private volatile BufferedImage massMapImage;
-	private volatile BufferedImage pressureMapImage;
-	private volatile BufferedImage temperatureMapImage;
-
-	private final Game game;
-	private GameViewState state;
 	private JPanel canvas;
 	
 	public VanillaDrawer(Game game, GameViewState state) {
-		super();
-		this.game = game;
-		this.state = state;
+		super(game, state);
 		canvas = new JPanel() {
 			private static final long serialVersionUID = 1L;
 			@Override
@@ -834,6 +823,43 @@ public class VanillaDrawer implements Drawer {
 		};
 	}
 
+	@Override
+	public Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
+		double column = ((pixelOnScreen.x + viewOffset.x) / tileSize);
+		int row = (int) ((pixelOnScreen.y + viewOffset.y - (column % 2) * tileSize / 2) / tileSize);
+		return new Position(column, row);
+	}
+
+	@Override
+	public void zoomView(int scroll, int mx, int my) {
+		int newTileSize;
+		if (scroll > 0) {
+			newTileSize = (int) ((state.tileSize - 1) * 0.95);
+		} else {
+			newTileSize = (int) ((state.tileSize + 1) * 1.05);
+		}
+		zoomViewTo(newTileSize, mx, my);
+	}
+
+	@Override
+	public void zoomViewTo(int newTileSize, int mx, int my) {
+		if (newTileSize > 0) {
+			Position tile = Utils.getWorldCoordOfPixel(new Position(mx, my), state.viewOffset, state.tileSize);
+			state.tileSize = newTileSize;
+			Position focalPoint = tile.multiply(state.tileSize).subtract(state.viewOffset);
+			state.viewOffset.x -= mx - focalPoint.x;
+			state.viewOffset.y -= my - focalPoint.y;
+		}
+		canvas.repaint();
+	}
+
+	@Override
+	public void shiftView(int dx, int dy) {
+		state.viewOffset.x += dx;
+		state.viewOffset.y += dy;
+		canvas.repaint();
+	}
+
 	private static Rectangle normalizeRectangle(Point one, Point two) {
 		int x = Math.min(one.x, two.x);
 		int y = Math.min(one.y, two.y);
@@ -842,15 +868,4 @@ public class VanillaDrawer implements Drawer {
 		return new Rectangle(x, y, width, height);
 	}
 
-	public void updateTerrainImages() {
-		if (game.world != null) {
-			BufferedImage[] images = game.world.createTerrainImage(state.faction);
-			this.terrainImage = images[0];
-			this.minimapImage = images[1];
-			this.heightMapImage = images[2];
-			this.massMapImage = images[3];
-			this.pressureMapImage = images[4];
-			this.temperatureMapImage = images[5];
-		}
-	}
 }

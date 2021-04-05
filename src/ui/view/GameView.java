@@ -8,6 +8,8 @@ import java.util.concurrent.*;
 
 import javax.swing.*;
 
+import com.jogamp.common.util.RunnableExecutor.*;
+
 import game.*;
 import ui.*;
 import ui.graphics.*;
@@ -31,8 +33,12 @@ public class GameView {
 	private boolean setSpawnWeather = false;
 
 	private final JPanel panel;
-	private final Component drawingCanvas;
-	private final Drawer drawer;
+	private final Drawer vanillaDrawer;
+	private final Drawer glDrawer;
+	
+	private Drawer currentActiveDrawer;
+	private Component drawingCanvas;
+	
 	private final GameViewState state;
 
 	public class GameViewState {
@@ -64,76 +70,80 @@ public class GameView {
 
 	public GameView(Game game, boolean useOpenGL) {
 		state = new GameViewState();
-		if(useOpenGL) {
-			drawer = new GLDrawer(game, state);
-			panel = new JPanel() {
-				@Override
-				public void paintComponent(Graphics g) {
-					super.paintComponent(g);
+		glDrawer = new GLDrawer(game, state);
+		panel = new JPanel() {
+			@Override
+			public void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				if(currentActiveDrawer == glDrawer) {
 					// for some reason GLCanvas doesnt get repainted so do it manually here
 					drawingCanvas.paint(g);
 				}
-			};
-		}
-		else {
-			drawer = new VanillaDrawer(game, state);
-			panel = new JPanel();
-		}
-		drawingCanvas = drawer.getDrawingCanvas();
-		drawingCanvas.setFocusable(false);
+			}
+		};
+		vanillaDrawer = new VanillaDrawer(game, state);
+		currentActiveDrawer = vanillaDrawer;
+		
+		glDrawer.getDrawingCanvas().setFocusable(false);
+		vanillaDrawer.getDrawingCanvas().setFocusable(false);
+		drawingCanvas = currentActiveDrawer.getDrawingCanvas();
+		
 		panel.setLayout(new BorderLayout());
 		panel.add(drawingCanvas, BorderLayout.CENTER);
 		this.game = game;
 		this.guiController = game.getGUIController();
 		panel.setBackground(Color.black);
 		state.viewOffset = new Position(0, 0);
-		panel.addMouseWheelListener(new MouseWheelListener() {
+
+		MouseWheelListener mouseWheelListener = new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				// +1 is in -1 is out
-				zoomView(e.getWheelRotation(), e.getPoint().x, e.getPoint().y);
+				currentActiveDrawer.zoomView(e.getWheelRotation(), e.getPoint().x, e.getPoint().y);
 			}
-		});
-		panel.addMouseMotionListener(new MouseMotionListener() {
+		};
+		MouseMotionListener mouseMotionListener = new MouseMotionListener() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				mouseOver(getTileAtPixel(e.getPoint()));
+				mouseOver(currentActiveDrawer.getWorldCoordOfPixel(e.getPoint(), state.viewOffset, state.tileSize));
 				state.previousMouse = e.getPoint();
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				System.out.println("mosueDragged");
 				Point currentMouse = e.getPoint();
 				int dx = state.previousMouse.x - currentMouse.x;
 				int dy = state.previousMouse.y - currentMouse.y;
-				// Only drag if moved mouse at least 3 pixels away
+				System.out.println("mosueDragged " + dx + ", " + dy);
+				// Only drag if moved mouse at least 15 pixels away
 				if (state.draggingMouse || Math.abs(dx) + Math.abs(dy) >= 15) {
 					state.draggingMouse = true;
 					if (rightMouseDown || state.middleMouseDown) {
-						shiftView(dx, dy);
+						currentActiveDrawer.shiftView(dx, dy);
 					}
 					if (state.leftMouseDown) {
-						state.boxSelect[1] = Utils.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize);
+						state.boxSelect[1] = currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize);
 					}
-					mouseOver(getTileAtPixel(currentMouse));
 					state.previousMouse = currentMouse;
 				}
+				mouseOver(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize));
 			}
-		});
-		panel.addMouseListener(new MouseListener() {
+		};
+		MouseListener mouseListener = new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				Point currentMouse = e.getPoint();
 				if (!state.draggingMouse) {
 					if (SwingUtilities.isRightMouseButton(e)) {
-						rightClick(getTileAtPixel(currentMouse), shiftDown);
+						rightClick(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize), shiftDown);
 					} else if (SwingUtilities.isLeftMouseButton(e)) {
-						leftClick(getTileAtPixel(currentMouse), shiftDown);
+						leftClick(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize), shiftDown);
 					}
 				} else {
 					if (SwingUtilities.isLeftMouseButton(e)) {
-						state.boxSelect[0] = Utils.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.tileSize);
-						state.boxSelect[1] = Utils.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize);
+						state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.tileSize);
+						state.boxSelect[1] = currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize);
 						state.boxSelect = Utils.normalizeRectangle(state.boxSelect[0], state.boxSelect[1]);
 						selectInBox(state.boxSelect[0], state.boxSelect[1], shiftDown);
 					}
@@ -156,7 +166,7 @@ public class GameView {
 				if (SwingUtilities.isLeftMouseButton(e)) {
 					state.leftMouseDown = true;
 					state.mousePressLocation = e.getPoint();
-					state.boxSelect[0] = Utils.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.tileSize);
+					state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.tileSize);
 				} else if (SwingUtilities.isRightMouseButton(e)) {
 					rightMouseDown = true;
 				} else if (SwingUtilities.isMiddleMouseButton(e)) {
@@ -178,9 +188,8 @@ public class GameView {
 			public void mouseClicked(MouseEvent e) {
 				state.previousMouse = e.getPoint();
 			}
-		});
-
-		panel.addKeyListener(new KeyListener() {
+		};
+		KeyListener keyListener = new KeyListener() {
 			@Override
 			public void keyTyped(KeyEvent e) {
 			}
@@ -222,7 +231,33 @@ public class GameView {
 					setBuildingToPlan(Game.buildingTypeMap.get("BARRACKS"));
 				}
 			}
-		});
+		};
+//		if(useOpenGL) {
+			glDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
+			glDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
+			glDrawer.getDrawingCanvas().addMouseListener(mouseListener);
+//		}
+//		else {
+			vanillaDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
+			vanillaDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
+			vanillaDrawer.getDrawingCanvas().addMouseListener(mouseListener);
+//		}
+		panel.addKeyListener(keyListener);
+	}
+	
+	public void switch3d() {
+		if(is3d()) {
+			currentActiveDrawer = vanillaDrawer;
+		}
+		else {
+			currentActiveDrawer = glDrawer;
+		}
+		panel.remove(drawingCanvas);
+		drawingCanvas = currentActiveDrawer.getDrawingCanvas();
+		panel.add(drawingCanvas, BorderLayout.CENTER);
+	}
+	public boolean is3d() {
+		return currentActiveDrawer == glDrawer;
 	}
 
 	public void setFaction(Faction faction) {
@@ -592,7 +627,7 @@ public class GameView {
 	}
 
 	public void updateTerrainImages() {
-		drawer.updateTerrainImages();
+		currentActiveDrawer.updateTerrainImages();
 	}
 
 	public void setShowHeightMap(boolean show) {
@@ -612,44 +647,11 @@ public class GameView {
 		state.hoveredTile = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
 	}
 
-	private void zoomView(int scroll, int mx, int my) {
-		int newTileSize;
-		if (scroll > 0) {
-			newTileSize = (int) ((state.tileSize - 1) * 0.95);
-		} else {
-			newTileSize = (int) ((state.tileSize + 1) * 1.05);
-		}
-		zoomViewTo(newTileSize, mx, my);
-	}
-
-	private void zoomViewTo(int newTileSize, int mx, int my) {
-		if (newTileSize > 0) {
-			Position tile = Utils.getWorldCoordOfPixel(new Position(mx, my), state.viewOffset, state.tileSize);
-			state.tileSize = newTileSize;
-			Position focalPoint = tile.multiply(state.tileSize).subtract(state.viewOffset);
-			state.viewOffset.x -= mx - focalPoint.x;
-			state.viewOffset.y -= my - focalPoint.y;
-		}
-		panel.repaint();
-	}
-
-	private void shiftView(int dx, int dy) {
-		state.viewOffset.x += dx;
-		state.viewOffset.y += dy;
-		panel.repaint();
-	}
-
 	public void moveViewTo(double ratiox, double ratioy, int panelWidth, int panelHeight) {
 		Position tile = new Position(ratiox * game.world.getWidth(), ratioy * game.world.getHeight());
 		Position pixel = tile.multiply(state.tileSize).subtract(new Position(panelWidth / 2, panelHeight / 2));
 		state.viewOffset = pixel;
 		panel.repaint();
-	}
-
-	private Position getTileAtPixel(Point pixel) {
-		int column = (int) ((pixel.x + state.viewOffset.x) / state.tileSize);
-		int row = (int) ((pixel.y + state.viewOffset.y - (column % 2) * state.tileSize / 2) / state.tileSize);
-		return new Position(column, row);
 	}
 
 	public CommandInterface getCommandInterface() {
@@ -679,7 +681,7 @@ public class GameView {
 	}
 	
 	public Drawer getDrawer() {
-		return drawer;
+		return currentActiveDrawer;
 	}
 	
 	public void setPreviousTickTime(long time) {

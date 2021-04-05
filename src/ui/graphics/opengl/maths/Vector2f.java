@@ -2,7 +2,7 @@ package ui.graphics.opengl.maths;
 
 public class Vector2f {
 	
-	private float x, y;
+	public float x, y;
 
 	public Vector2f() {
 		this(0, 0);

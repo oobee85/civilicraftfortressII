@@ -108,6 +108,24 @@ public final class Utils {
 		}
 	}
 	
+	public static String readFile(String filename) {
+		String fileContents = "";
+		BufferedReader br = new BufferedReader(new InputStreamReader(Utils.class.getClassLoader().getResourceAsStream(filename)));
+		try {
+			StringBuilder builder = new StringBuilder();
+			String line;
+			while((line = br.readLine()) != null) {
+				builder.append(line + "\n");
+			}
+			fileContents = builder.toString();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return fileContents;
+	}
+	
 	public static final ImageIcon resizeImageIcon(ImageIcon icon, int width, int height) {
 		Image image = icon.getImage(); // transform it 
 		Image newimg = image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
@@ -495,11 +513,6 @@ public final class Utils {
 		return (pixelOnScreen.add(viewOffset)).divide(tileSize);
 	}
 	
-	public static Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
-		double column = ((pixelOnScreen.x + viewOffset.x) / tileSize);
-		double row = ((pixelOnScreen.y + viewOffset.y) / tileSize);
-		return new Position(column, row);
-	}
 
 	public static List<Tile> getTilesBetween(World world, Position topLeft, Position botRight) {
 		int topEvenY = (int) topLeft.y;
