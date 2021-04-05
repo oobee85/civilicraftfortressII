@@ -8,6 +8,8 @@ import java.util.concurrent.*;
 
 import javax.swing.*;
 
+import com.jogamp.common.util.RunnableExecutor.*;
+
 import game.*;
 import ui.*;
 import ui.graphics.*;
@@ -30,8 +32,12 @@ public class GameView {
 	private boolean summonPlayerControlled = true;
 
 	private final JPanel panel;
-	private final Component drawingCanvas;
-	private final Drawer drawer;
+	private final Drawer vanillaDrawer;
+	private final Drawer glDrawer;
+	
+	private Drawer currentActiveDrawer;
+	private Component drawingCanvas;
+	
 	private final GameViewState state;
 
 	public class GameViewState {
@@ -63,23 +69,24 @@ public class GameView {
 
 	public GameView(Game game, boolean useOpenGL) {
 		state = new GameViewState();
-		if(useOpenGL) {
-			drawer = new GLDrawer(game, state);
-			panel = new JPanel() {
-				@Override
-				public void paintComponent(Graphics g) {
-					super.paintComponent(g);
+		glDrawer = new GLDrawer(game, state);
+		panel = new JPanel() {
+			@Override
+			public void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				if(currentActiveDrawer == glDrawer) {
 					// for some reason GLCanvas doesnt get repainted so do it manually here
 					drawingCanvas.paint(g);
 				}
-			};
-		}
-		else {
-			drawer = new VanillaDrawer(game, state);
-			panel = new JPanel();
-		}
-		drawingCanvas = drawer.getDrawingCanvas();
-		drawingCanvas.setFocusable(false);
+			}
+		};
+		vanillaDrawer = new VanillaDrawer(game, state);
+		currentActiveDrawer = vanillaDrawer;
+		
+		glDrawer.getDrawingCanvas().setFocusable(false);
+		vanillaDrawer.getDrawingCanvas().setFocusable(false);
+		drawingCanvas = currentActiveDrawer.getDrawingCanvas();
+		
 		panel.setLayout(new BorderLayout());
 		panel.add(drawingCanvas, BorderLayout.CENTER);
 		this.game = game;
@@ -91,13 +98,13 @@ public class GameView {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				// +1 is in -1 is out
-				drawer.zoomView(e.getWheelRotation(), e.getPoint().x, e.getPoint().y);
+				currentActiveDrawer.zoomView(e.getWheelRotation(), e.getPoint().x, e.getPoint().y);
 			}
 		};
 		MouseMotionListener mouseMotionListener = new MouseMotionListener() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				mouseOver(drawer.getWorldCoordOfPixel(e.getPoint(), state.viewOffset, state.tileSize));
+				mouseOver(currentActiveDrawer.getWorldCoordOfPixel(e.getPoint(), state.viewOffset, state.tileSize));
 				state.previousMouse = e.getPoint();
 			}
 
@@ -112,14 +119,14 @@ public class GameView {
 				if (state.draggingMouse || Math.abs(dx) + Math.abs(dy) >= 15) {
 					state.draggingMouse = true;
 					if (rightMouseDown || state.middleMouseDown) {
-						drawer.shiftView(dx, dy);
+						currentActiveDrawer.shiftView(dx, dy);
 					}
 					if (state.leftMouseDown) {
-						state.boxSelect[1] = drawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize);
+						state.boxSelect[1] = currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize);
 					}
 					state.previousMouse = currentMouse;
 				}
-				mouseOver(drawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize));
+				mouseOver(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize));
 			}
 		};
 		MouseListener mouseListener = new MouseListener() {
@@ -128,14 +135,14 @@ public class GameView {
 				Point currentMouse = e.getPoint();
 				if (!state.draggingMouse) {
 					if (SwingUtilities.isRightMouseButton(e)) {
-						rightClick(drawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize), shiftDown);
+						rightClick(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize), shiftDown);
 					} else if (SwingUtilities.isLeftMouseButton(e)) {
-						leftClick(drawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize), shiftDown);
+						leftClick(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize), shiftDown);
 					}
 				} else {
 					if (SwingUtilities.isLeftMouseButton(e)) {
-						state.boxSelect[0] = drawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.tileSize);
-						state.boxSelect[1] = drawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize);
+						state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.tileSize);
+						state.boxSelect[1] = currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize);
 						state.boxSelect = Utils.normalizeRectangle(state.boxSelect[0], state.boxSelect[1]);
 						selectInBox(state.boxSelect[0], state.boxSelect[1], shiftDown);
 					}
@@ -158,7 +165,7 @@ public class GameView {
 				if (SwingUtilities.isLeftMouseButton(e)) {
 					state.leftMouseDown = true;
 					state.mousePressLocation = e.getPoint();
-					state.boxSelect[0] = drawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.tileSize);
+					state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.tileSize);
 				} else if (SwingUtilities.isRightMouseButton(e)) {
 					rightMouseDown = true;
 				} else if (SwingUtilities.isMiddleMouseButton(e)) {
@@ -224,18 +231,32 @@ public class GameView {
 				}
 			}
 		};
-		if(useOpenGL) {
-			drawingCanvas.addMouseWheelListener(mouseWheelListener);
-			drawingCanvas.addMouseMotionListener(mouseMotionListener);
-			drawingCanvas.addMouseListener(mouseListener);
+//		if(useOpenGL) {
+			glDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
+			glDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
+			glDrawer.getDrawingCanvas().addMouseListener(mouseListener);
+//		}
+//		else {
+			vanillaDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
+			vanillaDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
+			vanillaDrawer.getDrawingCanvas().addMouseListener(mouseListener);
+//		}
+		panel.addKeyListener(keyListener);
+	}
+	
+	public void switch3d() {
+		if(is3d()) {
+			currentActiveDrawer = vanillaDrawer;
 		}
 		else {
-			panel.addMouseWheelListener(mouseWheelListener);
-			panel.addMouseMotionListener(mouseMotionListener);
-			panel.addMouseListener(mouseListener);
-	
-			panel.addKeyListener(keyListener);
+			currentActiveDrawer = glDrawer;
 		}
+		panel.remove(drawingCanvas);
+		drawingCanvas = currentActiveDrawer.getDrawingCanvas();
+		panel.add(drawingCanvas, BorderLayout.CENTER);
+	}
+	public boolean is3d() {
+		return currentActiveDrawer == glDrawer;
 	}
 
 	public void setFaction(Faction faction) {
@@ -602,7 +623,7 @@ public class GameView {
 	}
 
 	public void updateTerrainImages() {
-		drawer.updateTerrainImages();
+		currentActiveDrawer.updateTerrainImages();
 	}
 
 	public void setShowHeightMap(boolean show) {
@@ -656,7 +677,7 @@ public class GameView {
 	}
 	
 	public Drawer getDrawer() {
-		return drawer;
+		return currentActiveDrawer;
 	}
 	
 	public void setPreviousTickTime(long time) {
