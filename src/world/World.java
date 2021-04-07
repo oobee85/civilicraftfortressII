@@ -29,6 +29,7 @@ public class World {
 	public static final int MINTEMP = -273;
 	public static final int BALANCETEMP = -20;
 	public static final int FREEZETEMP = 0;
+	public static final int BALANCEWATER = 5;
 	public static final int MAXTEMP = 1000;
 	public static final int MAXHEIGHT = 1000;
 	public static final int JOULESPERTILE = 1;
@@ -39,7 +40,7 @@ public class World {
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
-	private static final double FOREST_DENSITY = 0.005;
+	private static final double FOREST_DENSITY = 0.01;
 	
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
@@ -674,11 +675,18 @@ public class World {
 		if(World.ticks % 2 == 0) {
 			return;
 		}
+		double averageWater = 0;
 		double averageTemp = 0;
 		for(Tile t : getTiles()) {
 			averageTemp += t.getTemperature();
+			if(t.liquidType == LiquidType.WATER || t.liquidType == LiquidType.ICE) {
+				averageWater += t.liquidAmount;
+			}
+			averageWater += t.getAir().getVolume();
+			
 		}
 		averageTemp /= getTiles().size();
+		averageWater /= getTiles().size();;
 		for(Tile tile : getTiles()) {
 			if(tile == null) {
 				System.out.println("null tile when updating energy");
@@ -742,9 +750,15 @@ public class World {
 				if(tile.liquidType != LiquidType.ICE) {
 					tile.liquidType = LiquidType.WATER;
 				}
+				double totalAmount = tile.liquidAmount + tile.getAir().getVolume();
+				double addedMod = 1;
+				if(averageWater < BALANCEWATER) {
+					addedMod = BALANCEWATER / averageWater;
+				}
+				
 				double amount = 0.1 * vol / maxVol;
 				tile.getAir().addVolume(-amount);
-				tile.liquidAmount += amount;
+				tile.liquidAmount += amount * addedMod;
 //				seasonEnergy += 0.01;
 			}
 			
@@ -757,7 +771,7 @@ public class World {
 			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 1) {
 //				tile.setEnergy(21000);
 //				System.out.println(tile.getTemperature());
-				System.out.println("Energy: " + tile.getEnergy() + ", T: " + tile.getTemperature() + ", " + ticks + ", uT: " + averageTemp);
+				System.out.println("Energy: " + tile.getEnergy() + ", T: " + tile.getTemperature() + ", " + ticks + ", uT: " + averageTemp + ", uW: " + averageWater);
 			}
 //			tile.setEnergy(energy);
 //			tile.addEnergy(joules);
@@ -788,13 +802,13 @@ public class World {
 				double ovolume = otherTile.getAir().getVolume();
 				double otemp = otherTile.getEnergy();
 				
-				if(mypres > opress) {
+				if(mypres > opress && myvolume > ovolume) {
 					double deltap = 1 - opress / mypres;
-					double deltavol = Math.abs((myvolume - ovolume)*deltap);
+					double deltavol = Math.sqrt((myvolume - ovolume)*deltap)/2;
 //					System.out.println(deltavol);
-					if(volumeTemp[tileLoc.x()][tileLoc.y()] - deltavol >= 0) {
-//						volumeTemp[otherLoc.x()][otherLoc.y()] += deltavol;
-//						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltavol;
+					if(volumeTemp[tileLoc.x()][tileLoc.y()] - deltavol > 0) {
+						volumeTemp[otherLoc.x()][otherLoc.y()] += deltavol;
+						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltavol;
 					}
 //					if(massTemp[tileLoc.x()][tileLoc.y()] - change >= 0) {
 //						massTemp[otherLoc.x()][otherLoc.y()] += change;
@@ -802,7 +816,7 @@ public class World {
 //					}
 				}
 				
-				if(mytemp > otemp && mytemp != 0 && mypres > opress) {
+				if(mytemp > otemp && mypres > opress) {
 					double transferAmount = 1;
 					double deltae = mytemp - otemp;
 					double ratio = otemp / mytemp * Math.sqrt(deltae);
@@ -840,7 +854,7 @@ public class World {
 	private void setTileEnergy() {
 
 		for(Tile tile: getTiles()) {
-			double defaultEnergy = 20300;
+			double defaultEnergy = 20800;
 			double pressureMultiplier = tile.getAir().getPressure()/STANDARDPRESSURE;
 			if(pressureMultiplier != 0) {
 				defaultEnergy *= pressureMultiplier;
@@ -892,46 +906,50 @@ public class World {
 				tile.setTerrain(Terrain.GRASS);
 			}
 			
-//			//turns grass to dirt if tile has a cold liquid || the temperature is cold
-//			if(tile.checkTerrain(Terrain.GRASS) && tile.isCold() && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-//				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
-////					tile.setTerrain(Terrain.DIRT);
-//				}
-//			}
+			//turns grass to dirt if tile has a cold liquid || the temperature is cold
+			if(tile.checkTerrain(Terrain.GRASS) && tile.isCold() && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+					tile.setTerrain(Terrain.DIRT);
+				}
+			}
+			if(tile.checkTerrain(Terrain.GRASS) && Math.random() < CHANCE_TO_SWITCH_TERRAIN/1000) {
+				tile.setTerrain(Terrain.DIRT);
+			}
+			
 //			
 //			if(tile.liquidType == LiquidType.LAVA &&(tile.getTerrain() == Terrain.GRASS || tile.getTerrain() == Terrain.DIRT) && tile.liquidAmount >= 0.05) {
 //				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
 ////					tile.setTerrain(Terrain.SAND);
 //				}
 //			}
-//			if(tile.checkTerrain(Terrain.DIRT)) {
-//				boolean adjacentGrass = false;
-//				boolean adjacentWater = false;
-//				for(Tile neighbor : Utils.getNeighbors(tile, this)) {
-//					if(neighbor.checkTerrain(Terrain.GRASS)) {
-//						adjacentGrass = true;
-//					}
-//					if(neighbor.liquidType == LiquidType.WATER) {
-//						adjacentWater = true;
-//					}
-//				}
-//				double threshold = CHANCE_TO_SWITCH_TERRAIN;
-//				if(tile.liquidType == LiquidType.WATER) {
-//					threshold += 0.001;
-//				}
-//				if(adjacentGrass) {
-//					threshold += 0.01;
-//				}
-//				if(adjacentWater) {
-//					threshold += 0.01;
-//				}
-//				if(adjacentGrass && adjacentWater) {
-//					threshold += 0.1;
-//				}
-//				if(tile.canGrow() && Math.random() < tile.liquidAmount*threshold*tile.getHumidity() && tile.liquidType != LiquidType.ICE) {
-////					tile.setTerrain(Terrain.GRASS);
-//				}
-//			}
+			if(tile.checkTerrain(Terrain.DIRT)) {
+				boolean adjacentGrass = false;
+				boolean adjacentWater = false;
+				for(Tile neighbor : Utils.getNeighbors(tile, this)) {
+					if(neighbor.checkTerrain(Terrain.GRASS)) {
+						adjacentGrass = true;
+					}
+					if(neighbor.liquidType == LiquidType.WATER) {
+						adjacentWater = true;
+					}
+				}
+				double threshold = CHANCE_TO_SWITCH_TERRAIN;
+				if(tile.liquidType == LiquidType.WATER) {
+					threshold += 0.001;
+				}
+				if(adjacentGrass) {
+					threshold += 0.01;
+				}
+				if(adjacentWater) {
+					threshold += 0.01;
+				}
+				if(adjacentGrass && adjacentWater) {
+					threshold += 0.1;
+				}
+				if(tile.canGrow() && Math.random() < tile.liquidAmount*threshold) {
+					tile.setTerrain(Terrain.GRASS);
+				}
+			}
 		}
 		
 	}
@@ -1017,14 +1035,6 @@ public class World {
 				continue;
 			}
 			tile.liquidType = weather.getLiquidType();
-			double vol = tile.getAir().getVolume();
-			double maxVol = tile.getAir().getMaxVolume();
-			if(tile.getAir().canRain()) {
-				tile.liquidType = LiquidType.WATER;
-				double amount = 0.1 * vol / maxVol;
-				tile.getAir().addVolume(-amount);
-				tile.liquidAmount += amount;
-			}
 //			tile.liquidAmount += 0.1;
 //			weather.addStrength(-0.1);
 //			tile.getAir().addVolume(-0.1);
