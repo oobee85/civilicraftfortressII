@@ -131,12 +131,12 @@ public class Liquid {
 			if(tile.liquidType == LiquidType.ICE) {
 				tile.liquidType = LiquidType.WATER;
 				liquidTypesTemp[x][y] = LiquidType.WATER;
-				liquidAmountsTemp[x][y] /= 4;
+//				liquidAmountsTemp[x][y] /= 4;
 			}
 			if(tile.liquidType == LiquidType.SNOW) {
 				tile.liquidType = LiquidType.WATER;
 				liquidTypesTemp[x][y] = LiquidType.WATER;
-				liquidAmountsTemp[x][y] /= 4;
+//				liquidAmountsTemp[x][y] /= 4;
 			}
 		}
 		else if(tempurature < Season.FREEZING_TEMPURATURE) {

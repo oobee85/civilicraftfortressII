@@ -793,8 +793,8 @@ public class World {
 					double deltavol = Math.abs((myvolume - ovolume)*deltap);
 //					System.out.println(deltavol);
 					if(volumeTemp[tileLoc.x()][tileLoc.y()] - deltavol >= 0) {
-						volumeTemp[otherLoc.x()][otherLoc.y()] += deltavol;
-						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltavol;
+//						volumeTemp[otherLoc.x()][otherLoc.y()] += deltavol;
+//						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltavol;
 					}
 //					if(massTemp[tileLoc.x()][tileLoc.y()] - change >= 0) {
 //						massTemp[otherLoc.x()][otherLoc.y()] += change;
@@ -841,12 +841,12 @@ public class World {
 
 		for(Tile tile: getTiles()) {
 			double defaultEnergy = 20300;
-			double pressureMultiplier = Math.sqrt(tile.getAir().getPressure()/STANDARDPRESSURE);
+			double pressureMultiplier = tile.getAir().getPressure()/STANDARDPRESSURE;
 			if(pressureMultiplier != 0) {
 				defaultEnergy *= pressureMultiplier;
 			}
 			double maxVol = tile.getAir().getMaxVolume();
-			tile.getAir().setVolume(maxVol * pressureMultiplier);
+			tile.getAir().setVolume(maxVol/4);
 			tile.setEnergy(defaultEnergy);
 		}
 	}
@@ -1351,10 +1351,9 @@ public class World {
 		System.out.println("Simulating water for 100 iterations");
 		for(int i = 0; i < 100; i++) {
 			Liquid.propogate(this);
-			updateTerrainChange(true);
 		}
 		
-		
+		updateTerrainChange(true);
 		Generation.generateResources(this);
 		this.genPlants();
 		this.makeForest();

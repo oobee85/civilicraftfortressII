@@ -101,7 +101,7 @@ public class Air {
 		double g = 9.80665; // m/s^2
 		double MMair = 0.0289644; // kg/mol
 		double R = 8.31432; // Nm/molK
-		double h0 = 200; // m sealevel
+		double h0 = 100; // m sealevel
 		double h = this.height; // m
 		double boltz = 1.380649e-23;
 		double temp = getTemperature();
@@ -118,7 +118,7 @@ public class Air {
 		double mix = pressure+(pvnrt - standardPVNRT);
 //		System.out.println("Pressure: " + pressure);
 //		System.out.println("pvnrt: "+other + "atm: "+pressure);
-		this.pressure = mix ;
+		this.pressure = pressure;
 
 	}
 	public double getDensity() {
