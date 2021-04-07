@@ -8,9 +8,11 @@ import javax.swing.*;
 
 import game.*;
 import networking.server.*;
+import ui.graphics.*;
+import ui.graphics.opengl.*;
 import world.*;
 
-public class Thing implements HasImage, Serializable {
+public class Thing implements HasImage, HasMesh, Serializable {
 	
 	private transient static int idCounter = 0;
 	private int id;
@@ -25,19 +27,27 @@ public class Thing implements HasImage, Serializable {
 	private transient boolean isSelected;
 	
 	private transient HasImage hasImage;
+	private transient Mesh mesh;
+	
 	private transient Hitsplat[] hitsplats = new Hitsplat[4];
 	
-	public Thing(double maxHealth, HasImage hasImage, Faction faction) {
+	public Thing(double maxHealth, HasImage hasImage, HasMesh hasMesh, Faction faction) {
 		health = maxHealth;
 		this.maxHealth = maxHealth;
 		this.hasImage = hasImage;
+		this.mesh = hasMesh.getMesh();
 		setFaction(faction);
 		this.id = idCounter++;
 		ThingMapper.created(this);
 	}
-	public Thing(double maxHealth, HasImage hasImage, Faction faction, Tile tile) {
-		this(maxHealth, hasImage, faction);
+	public Thing(double maxHealth, HasImage hasImage, HasMesh hasMesh, Faction faction, Tile tile) {
+		this(maxHealth, hasImage, hasMesh, faction);
 		this.tile = tile;
+	}
+	
+	@Override
+	public Mesh getMesh() {
+		return mesh;
 	}
 	
 	public int id() {

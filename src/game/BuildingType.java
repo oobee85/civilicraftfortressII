@@ -5,14 +5,18 @@ import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
+
+import ui.graphics.*;
+import ui.graphics.opengl.*;
 import utils.*;
 
-public class BuildingType implements HasImage, Serializable {
+public class BuildingType implements HasImage, HasMesh, Serializable {
 
 	private final String name;
 	private final String info;
 	private transient final int health;
 	private transient final MipMap mipmap;
+	private transient final Mesh mesh;
 	private transient final double moveSpeedEnhancement;
 	private transient final int visionRadius;
 	private transient final String researchRequirement;
@@ -26,11 +30,12 @@ public class BuildingType implements HasImage, Serializable {
 	
 
 	
-	public BuildingType(String name, String info, int hp, double buildingEffort, String s, double cultureRate, int visionRadius, 
+	public BuildingType(String name, String info, int hp, double buildingEffort, String texturePath, Mesh mesh, double cultureRate, int visionRadius, 
 			String requirement, HashMap <ItemType, Integer> resourcesNeeded, String[] canProduce, double moveSpeedEnhancement, HashSet<String> attributes) {
 		this.name = name;
 		this.info = info;
-		mipmap = new MipMap(s);
+		mipmap = new MipMap(texturePath);
+		this.mesh = mesh;
 		this.researchRequirement = requirement;
 		this.health = hp;
 		this.cultureRate = cultureRate;
@@ -42,7 +47,7 @@ public class BuildingType implements HasImage, Serializable {
 		this.attributes = attributes;
 		
 		if(isRoad()) {
-			roadImages = ImageCreation.createRoadImages(s);
+			roadImages = ImageCreation.createRoadImages(texturePath);
 		}
 	}
 	public HashSet<UnitType> unitsCanProduceSet() {
@@ -62,6 +67,10 @@ public class BuildingType implements HasImage, Serializable {
 
 	public Image getRoadImage(String roadCorner) {
 		return roadImages.get(roadCorner);
+	}
+	@Override
+	public Mesh getMesh() {
+		return mesh;
 	}
 	@Override
 	public Image getImage(int size) {

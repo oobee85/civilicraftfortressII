@@ -1,15 +1,9 @@
 package utils;
 import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.List;
 
 import javax.swing.*;
 
-import utils.*;
-import world.*;
+import ui.graphics.opengl.*;
 
 public class MipMap implements HasImage {
 	
@@ -21,7 +15,6 @@ public class MipMap implements HasImage {
 	private final int[] mipmapSizes;
 	
 	private final Color[] avgColors;
-
 
 	public MipMap(String[] paths) {
 		int numFiles = paths.length;
@@ -51,7 +44,7 @@ public class MipMap implements HasImage {
 	}
 	
 	public MipMap(String path) {
-		this(new String[] { path});
+		this(new String[] {path});
 	}
 
 	@Override

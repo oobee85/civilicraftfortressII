@@ -27,7 +27,7 @@ public class Building extends Thing implements Serializable {
 	private Inventory inventory;
 	
 	public Building(BuildingType buildingType, Tile tile, Faction faction) {
-		super(buildingType.getHealth(), buildingType, faction, tile);
+		super(buildingType.getHealth(), buildingType, buildingType, faction, tile);
 		this.remainingEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
 		this.spawnLocation = tile;
