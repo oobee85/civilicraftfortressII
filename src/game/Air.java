@@ -22,7 +22,7 @@ public class Air {
 		this.temperature = temp;
 		this.maxVolume = 10;
 		this.canRain = false;
-		this.volume = 5;
+		this.volume = 0;
 		this.humidity = 0.0;
 		this.pressure = 760;
 		this.updateMaxVolume();
@@ -61,7 +61,7 @@ public class Air {
 		this.height = height;
 	}
 	public void updateMaxVolume() {
-		if(temperature > 0) {
+		if(temperature > 1) {
 			maxVolume = this.temperature;
 		}else {
 			maxVolume = 1;

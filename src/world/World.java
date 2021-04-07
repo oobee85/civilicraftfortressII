@@ -27,6 +27,7 @@ public class World {
 	private static final double CHANCE_TO_SWITCH_TERRAIN = 1;
 	
 	public static final int MINTEMP = -273;
+	public static final int BALANCETEMP = -20;
 	public static final int FREEZETEMP = 0;
 	public static final int MAXTEMP = 1000;
 	public static final int MAXHEIGHT = 1000;
@@ -38,7 +39,7 @@ public class World {
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
-	private static final double FOREST_DENSITY = 0.01;
+	private static final double FOREST_DENSITY = 0.005;
 	
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
@@ -673,6 +674,11 @@ public class World {
 		if(World.ticks % 2 == 0) {
 			return;
 		}
+		double averageTemp = 0;
+		for(Tile t : getTiles()) {
+			averageTemp += t.getTemperature();
+		}
+		averageTemp /= getTiles().size();
 		for(Tile tile : getTiles()) {
 			if(tile == null) {
 				System.out.println("null tile when updating energy");
@@ -685,11 +691,32 @@ public class World {
 				tile.addEnergy(tile.liquidAmount * modifier);
 			}
 			
+			//adds energy for water
+//			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
+//				double modifier = 1 - (tile.getTemperature()/50);
+//				tile.addEnergy(Math.log(Math.sqrt(Math.sqrt(tile.liquidAmount * modifier))));
+//			}
+			
+			//removes energy for ice
+//			if(tile.liquidType == LiquidType.ICE && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
+//				double modifier = 1 - (tile.getTemperature()/100);
+//				tile.addEnergy(-Math.log(Math.sqrt(Math.sqrt(tile.liquidAmount * modifier))));
+//			}
+			double addedEnergy = 0;
+			//removes energy for hight level
+			if(tile.getTemperature() <= 0) {
+				double modifier = 1 - (tile.getTemperature()/BALANCETEMP);
+				double heightRatio = tile.getHeight() / World.MAXHEIGHT;
+				addedEnergy += (-Math.sqrt(Math.abs(heightRatio * modifier)));
+			}
+			
+			
+			
 			//adds energy for ground modifiers
 			GroundModifier gm = tile.getModifier();
 			if(gm != null && gm.isHot()) {
 				double mod = gm.timeLeft() / 500;
-				tile.addEnergy(mod);
+				addedEnergy += (mod);
 			}
 			
 			float seasonEnergy = Season.getRateEnergy();
@@ -708,27 +735,29 @@ public class World {
 			double airloss = humidity * (-2*seasonEnergy);
 //			seasonEnergy += airloss;
 			
-			
+			double vol = tile.getAir().getVolume();
+			double maxVol = tile.getAir().getMaxVolume();
 			//does raining
 			if(tile.getAir().canRain() && tile.liquidType != LiquidType.LAVA) {
 				if(tile.liquidType != LiquidType.ICE) {
 					tile.liquidType = LiquidType.WATER;
 				}
-				tile.getAir().addVolume(-0.01);
-				tile.liquidAmount += 0.01;
-				tile.addEnergy(0.01);
+				double amount = 0.1 * vol / maxVol;
+				tile.getAir().addVolume(-amount);
+				tile.liquidAmount += amount;
+//				seasonEnergy += 0.01;
 			}
 			
 			
 			
 			
-			
 			tile.addEnergy(seasonEnergy);
+//			tile.addEnergy(addedEnergy);
 			
 			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 1) {
 //				tile.setEnergy(21000);
 //				System.out.println(tile.getTemperature());
-				System.out.println("Energy: " + tile.getEnergy() + ", T: " + tile.getTemperature());
+				System.out.println("Energy: " + tile.getEnergy() + ", T: " + tile.getTemperature() + ", " + ticks + ", uT: " + averageTemp);
 			}
 //			tile.setEnergy(energy);
 //			tile.addEnergy(joules);
@@ -811,12 +840,13 @@ public class World {
 	private void setTileEnergy() {
 
 		for(Tile tile: getTiles()) {
-			double defaultEnergy = 20250;
+			double defaultEnergy = 20300;
 			double pressureMultiplier = Math.sqrt(tile.getAir().getPressure()/STANDARDPRESSURE);
 			if(pressureMultiplier != 0) {
 				defaultEnergy *= pressureMultiplier;
 			}
-			
+			double maxVol = tile.getAir().getMaxVolume();
+			tile.getAir().setVolume(maxVol * pressureMultiplier);
 			tile.setEnergy(defaultEnergy);
 		}
 	}
@@ -840,13 +870,13 @@ public class World {
 		updateAirStuff();
 		updateEnergy();
 		updateTileTemperature();
+		updateTileMass();
 		if(start == true) {
 			setTileMass();
 			setTileEnergy();
 		}
-		if(start == false) {
-			updateTileMass();
-		}
+		
+		
 		for(Tile tile : getTiles()) {
 			
 			
@@ -987,9 +1017,13 @@ public class World {
 				continue;
 			}
 			tile.liquidType = weather.getLiquidType();
+			double vol = tile.getAir().getVolume();
+			double maxVol = tile.getAir().getMaxVolume();
 			if(tile.getAir().canRain()) {
-				tile.getAir().addVolume(-0.05);
-				tile.liquidAmount += 0.05;
+				tile.liquidType = LiquidType.WATER;
+				double amount = 0.1 * vol / maxVol;
+				tile.getAir().addVolume(-amount);
+				tile.liquidAmount += amount;
 			}
 //			tile.liquidAmount += 0.1;
 //			weather.addStrength(-0.1);

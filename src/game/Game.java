@@ -74,7 +74,7 @@ public class Game {
 		if(world.volcano != null) {
 			world.get(world.volcano).liquidType = LiquidType.LAVA;
 			if(World.days >= 10 && Math.random() < 0.0001) {
-				eruptVolcano();
+//				eruptVolcano();
 			}
 		}
 	}
