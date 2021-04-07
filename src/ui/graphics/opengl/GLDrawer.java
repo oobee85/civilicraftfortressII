@@ -147,7 +147,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 					plant.getTile().getLocation().x() - xoffset, 
 					plant.getTile().getHeight()/15, 
 					y - zoffset);
-			plant.getMesh().render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+			plant.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(plant.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 		for(Unit unit : game.world.getUnits()) {
 			float y = unit.getTile().getLocation().y() + (unit.getTile().getLocation().x() % 2) * 0.5f;
@@ -155,7 +155,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 					unit.getTile().getLocation().x() - xoffset, 
 					unit.getTile().getHeight()/15, 
 					y - zoffset);
-			unit.getMesh().render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+			unit.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(unit.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 		for(Building building : game.world.getBuildings()) {
 			float y = building.getTile().getLocation().y() + (building.getTile().getLocation().x() % 2) * 0.5f;
@@ -163,7 +163,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 					building.getTile().getLocation().x() - xoffset, 
 					building.getTile().getHeight()/15, 
 					y - zoffset);
-			building.getMesh().render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+			building.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 
 		float y = state.hoveredTile.y() + (state.hoveredTile.x() % 2) * 0.5f;
@@ -185,7 +185,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 	@Override
 	public Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
-		Vector3f onScreen = new Vector3f(pixelOnScreen.x, pixelOnScreen.y, 0);
+//		Vector3f onScreen = new Vector3f(pixelOnScreen.x, pixelOnScreen.y, 0);
 		// TODO need to implement Matrix.inverse();
 		// Vector3f onView = projection.inverse().multiply(onScreen, 1);
 		// Vector3f viewingRay = onView.subtract(onScreen).normalize();
@@ -212,7 +212,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 	@Override
 	public void shiftView(int dx, int dy) {
-		float adjust = 0.5f;
+		float adjust = 0.25f;
 		camera.setPosition(camera.getPosition().add(new Vector3f(dx, 0, dy).multiply(adjust)));
 	}
 }

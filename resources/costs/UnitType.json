@@ -2,6 +2,7 @@
 "unittypes": [
 	{
 		"image":"Images/units/worker.png",
+		"mesh":"models/star.obj",
 		"cost":{"FOOD":10},
 		"stats":{"movespeed":10,"buildtime":30,"health":100,"healspeed":50},
 		"attackstyles":[

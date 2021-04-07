@@ -72,7 +72,18 @@ public class Loader {
 				cost = loadItemTypeMap(buildingTypeObject.getJSONObject("cost"));
 			}
 			
-			BuildingType buildingType = new BuildingType(name, info, health, effort, image, MeshUtils.defaultBuilding, culture, vision, researchReq, cost, buildsunits, movespeed, attributes);
+			String textureFile = image;
+			Mesh mesh = MeshUtils.defaultBuilding;
+			if(buildingTypeObject.has("mesh")) {
+				String meshString = buildingTypeObject.getString("mesh");
+				mesh = MeshUtils.getMeshByFileName(meshString, true);
+				
+				if(buildingTypeObject.has("texture")) {
+					textureFile = buildingTypeObject.getString("texture");
+				}
+			}
+			
+			BuildingType buildingType = new BuildingType(name, info, health, effort, image, mesh, textureFile, culture, vision, researchReq, cost, buildsunits, movespeed, attributes);
 			buildingTypeMap.put(name, buildingType);
 			buildingTypeList.add(buildingType);
 		}
@@ -189,8 +200,19 @@ public class Loader {
 					attackStyles.add(parseAttackStyleFromJSON(attackStyleList.getJSONObject(j)));
 				}
 			}
+
+			String textureFile = image;
+			Mesh mesh = MeshUtils.defaultUnit;
+			if(unitTypeObject.has("mesh")) {
+				String meshString = unitTypeObject.getString("mesh");
+				mesh = MeshUtils.getMeshByFileName(meshString, true);
+				
+				if(unitTypeObject.has("texture")) {
+					textureFile = unitTypeObject.getString("texture");
+				}
+			}
 			
-			UnitType unitType = new UnitType(name, image, MeshUtils.defaultUnit, combatStats, attributes, researchReq, cost, items, targeting, attackStyles);
+			UnitType unitType = new UnitType(name, image, mesh, textureFile, combatStats, attributes, researchReq, cost, items, targeting, attackStyles);
 			unitTypeMap.put(name, unitType);
 			unitTypeList.add(unitType);
 

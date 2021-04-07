@@ -2,6 +2,7 @@
 "buildingtypes":[
 	{
 		"name":"STONE_ROAD",
+		"mesh":"models/flatcube.obj",
 		"info":"Increases movement speed",
 		"image":"Images/buildings/stone_road.png",
 		"vision":0,
@@ -14,6 +15,7 @@
 		"research":"WHEEL"},
 	{
 		"name":"BRICK_ROAD",
+		"mesh":"models/flatcube.obj",
 		"info":"Increases movement speed more",
 		"image":"Images/buildings/brick_road.png",
 		"vision":0,

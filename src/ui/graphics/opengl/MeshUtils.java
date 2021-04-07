@@ -16,9 +16,19 @@ public class MeshUtils {
 	public static final Mesh defaultUnit;
 	public static final Mesh defaultBuilding;
 	public static final Mesh defaultPlant;
-
 	
-	public static Mesh loadMeshFromFile(String filename, boolean swapYZ) {
+	private static final HashMap<String, Mesh> meshes;
+	
+	
+	public static Mesh getMeshByFileName(String filename, boolean swapYZ) {
+		if(!meshes.containsKey(filename)) {
+			Mesh mesh = loadMeshFromFile(filename, swapYZ);
+			meshes.put(filename, mesh);
+		}
+		return meshes.get(filename);
+	}
+	
+	private static Mesh loadMeshFromFile(String filename, boolean swapYZ) {
 		String ext = filename.substring(filename.length() - 4);
 		if(ext.equals(".obj")) {
 			String fileContents = Utils.readFile(filename);
@@ -99,10 +109,11 @@ public class MeshUtils {
 		return Matrix4f.multiply(Matrix4f.translate(position), Matrix4f.multiply(rotation, Matrix4f.scale(scale)));
 	}
 	static {
-		cube = loadMeshFromFile("models/cube.obj", true);
-		star = loadMeshFromFile("models/star.obj", true);
-		mushroom = loadMeshFromFile("models/mushroom.obj", true);
-		house = loadMeshFromFile("models/house.obj", true);
+		meshes = new HashMap<>();
+		cube = getMeshByFileName("models/cube.obj", true);
+		star = getMeshByFileName("models/star.obj", true);
+		mushroom = getMeshByFileName("models/mushroom.obj", true);
+		house = getMeshByFileName("models/house.obj", true);
 		defaultUnit = cube;
 		defaultPlant = mushroom;
 		defaultBuilding = house;
