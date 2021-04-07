@@ -111,11 +111,16 @@ public class GameView {
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				System.out.println("mosueDragged");
+				if(is3d()) {
+					System.out.println("mosueDragged");
+				}
+				
 				Point currentMouse = e.getPoint();
 				int dx = state.previousMouse.x - currentMouse.x;
 				int dy = state.previousMouse.y - currentMouse.y;
-				System.out.println("mosueDragged " + dx + ", " + dy);
+				if(is3d()) {
+					System.out.println("mosueDragged " + dx + ", " + dy);
+				}
 				// Only drag if moved mouse at least 15 pixels away
 				if (state.draggingMouse || Math.abs(dx) + Math.abs(dy) >= 15) {
 					state.draggingMouse = true;
