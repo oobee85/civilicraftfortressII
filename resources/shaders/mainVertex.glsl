@@ -27,7 +27,7 @@ void main() {
 //	color = vec3(gl_Position.x, gl_Position.y - gl_Position.x, gl_Position.y);
 
 	vec3 norm = normalize(fragNormal.xyz);
-	vec3 lightDir = normalize(-sunDirection);
+	vec3 lightDir = normalize(sunDirection);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = diff * sunColor;
 

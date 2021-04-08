@@ -76,7 +76,7 @@ public class Loader {
 			Mesh mesh = MeshUtils.defaultBuilding;
 			if(buildingTypeObject.has("mesh")) {
 				String meshString = buildingTypeObject.getString("mesh");
-				mesh = MeshUtils.getMeshByFileName(meshString, true);
+				mesh = MeshUtils.getMeshByFileName(meshString);
 				
 				if(buildingTypeObject.has("texture")) {
 					textureFile = buildingTypeObject.getString("texture");
@@ -205,7 +205,7 @@ public class Loader {
 			Mesh mesh = MeshUtils.defaultUnit;
 			if(unitTypeObject.has("mesh")) {
 				String meshString = unitTypeObject.getString("mesh");
-				mesh = MeshUtils.getMeshByFileName(meshString, true);
+				mesh = MeshUtils.getMeshByFileName(meshString);
 				
 				if(unitTypeObject.has("texture")) {
 					textureFile = unitTypeObject.getString("texture");

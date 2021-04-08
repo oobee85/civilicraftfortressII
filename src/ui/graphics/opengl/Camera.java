@@ -4,10 +4,10 @@ import ui.graphics.opengl.maths.*;
 
 public class Camera {
 	
-	private Vector3f up = new Vector3f(0, 1f, 0);
-	private Vector3f forwardFlat = new Vector3f(0, 0, -1f);
-	private Vector3f forward = new Vector3f(0, 0, -1f);
-	private Vector3f side = new Vector3f(-1f, 0, 0);
+	private Vector3f up = new Vector3f(0, 1, 0);
+	private Vector3f forwardFlat = new Vector3f();
+	private Vector3f forward = new Vector3f();
+	private Vector3f side = new Vector3f();
 	private float pitch = 0;
 	private float theta = 0;
 	

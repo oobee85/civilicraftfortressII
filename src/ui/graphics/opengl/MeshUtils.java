@@ -24,16 +24,16 @@ public class MeshUtils {
 	private static final HashMap<String, Mesh> meshes;
 	
 	
-	public static Mesh getMeshByFileName(String filename, boolean swapYZ) {
+	public static Mesh getMeshByFileName(String filename) {
 		if(!meshes.containsKey(filename)) {
-			Mesh mesh = loadMeshFromFile(filename, swapYZ);
+			Mesh mesh = loadMeshFromFile(filename);
 			meshes.put(filename, mesh);
 		}
 		return meshes.get(filename);
 	}
 	
 	
-	private static Mesh readObjFile(String filename, boolean swapYZ) {
+	private static Mesh readObjFile(String filename) {
 		String fileContents = Utils.readFile(filename);
 		ArrayList<Vector3f> vertexLocations = new ArrayList<>();
 		ArrayList<Vector2f> textureMapping = new ArrayList<>();
@@ -50,12 +50,7 @@ public class MeshUtils {
 					x = Float.parseFloat(st.nextToken());
 					y = Float.parseFloat(st.nextToken());
 					z = Float.parseFloat(st.nextToken());
-					if(swapYZ) {
-						vertexLocations.add(new Vector3f(x, z, y));
-					}
-					else {
-						vertexLocations.add(new Vector3f(x, y, z));
-					}
+					vertexLocations.add(new Vector3f(x, y, z));
 					continue;
 				}
 				else if(lineIndicator.equals("f")) {
@@ -177,10 +172,10 @@ public class MeshUtils {
 		return new Mesh(vertices, facesArr);
 	}
 	
-	private static Mesh loadMeshFromFile(String filename, boolean swapYZ) {
+	private static Mesh loadMeshFromFile(String filename) {
 		String ext = filename.substring(filename.length() - 4);
 		if(ext.equals(".obj")) {
-			return readObjFile(filename, swapYZ);
+			return readObjFile(filename);
 		}
 		else if(ext.equals(".ply")) {
 			return readPlyFile(filename);
@@ -196,10 +191,10 @@ public class MeshUtils {
 	}
 	static {
 		meshes = new HashMap<>();
-		cube = getMeshByFileName("models/cube.obj", true);
-		star = getMeshByFileName("models/star.obj", true);
-		mushroom = getMeshByFileName("models/mushroom.obj", true);
-		house = getMeshByFileName("models/house.obj", true);
+		cube = getMeshByFileName("models/cube.obj");
+		star = getMeshByFileName("models/star.obj");
+		mushroom = getMeshByFileName("models/mushroom.obj");
+		house = getMeshByFileName("models/house.obj");
 		defaultUnit = cube;
 		defaultPlant = mushroom;
 		defaultBuilding = house;

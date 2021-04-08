@@ -1,6 +1,7 @@
 package ui.graphics.vanilla;
 
 import java.awt.*;
+import java.awt.geom.*;
 import java.awt.image.*;
 import java.util.*;
 import java.util.List;
@@ -75,12 +76,12 @@ public class VanillaDrawer extends Drawer {
 			return;
 		}
 		long startTime = System.currentTimeMillis();
+		Graphics2D g2d = (Graphics2D)g;
 		g.translate(-state.viewOffset.getIntX(), -state.viewOffset.getIntY());
 		draw(g, canvas.getWidth(), canvas.getHeight());
 		g.translate(state.viewOffset.getIntX(), state.viewOffset.getIntY());
 		if (state.mousePressLocation != null && state.draggingMouse == true) {
 			Rectangle selectionRectangle = normalizeRectangle(state.mousePressLocation, state.previousMouse);
-			Graphics2D g2d = (Graphics2D) g;
 			g2d.setColor(Color.white);
 			Stroke stroke = g2d.getStroke();
 			g2d.setStroke(new BasicStroke(3));
@@ -787,20 +788,6 @@ public class VanillaDrawer extends Drawer {
 					g.fillRect(drawAt.x, drawAt.y + yoffset, width, state.tileSize / 2);
 				}
 			}
-		}
-	}
-	
-	public BufferedImage getImageToDrawMinimap() {
-		if (state.showHeightMap) {
-			return heightMapImage;
-		} else if (state.showPressureMap) {
-			return pressureMapImage;
-		} else if (state.showTemperatureMap) {
-			return temperatureMapImage;
-		} else if (state.showHumidityMap) {
-			return massMapImage;
-		} else {
-			return minimapImage;
 		}
 	}
 	

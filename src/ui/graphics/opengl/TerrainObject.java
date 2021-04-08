@@ -35,7 +35,7 @@ public class TerrainObject extends GameObject {
 		for(Tile tile : world.getTiles()) {
 			coordToVertex[tile.getLocation().y()][tile.getLocation().x()] = index;
 			float y = tile.getLocation().y() + (tile.getLocation().x() % 2) * 0.5f;
-			Vector3f pos0 = new Vector3f(tile.getLocation().x() - xoffset, tile.getHeight()/15, y - zoffset);
+			Vector3f pos0 = new Vector3f(tile.getLocation().x() - xoffset, y - zoffset, tile.getHeight()/15);
 			Vector3f ca = (tile.getLocation().x() % 2 == 0) ? c0 : c1;
 			Vector3f cb = (tile.getLocation().x() % 2 == 0) ? c2 : c3;
 			Vector3f c = (tile.getLocation().y() % 2 == 0) ? ca : cb;
