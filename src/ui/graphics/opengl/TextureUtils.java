@@ -24,6 +24,13 @@ public class TextureUtils {
 		return textures.get(filename);
 	}
 	
+	public static void dispose(GL3 gl) {
+		for(Texture t : textures.values()) {
+			t.destroy(gl);
+		}
+		textures.clear();
+	}
+	
 	private static Texture loadTextureFromFile(String filename, GL3 gl) {
 		BufferedImage image = Utils.toBufferedImage(Utils.loadImage(filename));
 		return textureFromImage(gl, image);

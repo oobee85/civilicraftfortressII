@@ -77,7 +77,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 	@Override
 	public void dispose(GLAutoDrawable drawable) {
-		
+		System.err.println("DISPLOSING GL");
+		TextureUtils.dispose(drawable.getGL().getGL3());
 	}
 
 	@Override
@@ -166,12 +167,14 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			building.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 
-		float y = state.hoveredTile.y() + (state.hoveredTile.x() % 2) * 0.5f;
-		Vector3f pos = new Vector3f(
-				state.hoveredTile.x() - xoffset, 
-				game.world.get(state.hoveredTile).getHeight()/15,
-				y - zoffset);
-		hoveredTileBox.render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+		if(game.world.get(state.hoveredTile) != null) {
+			float y = state.hoveredTile.y() + (state.hoveredTile.x() % 2) * 0.5f;
+			Vector3f pos = new Vector3f(
+					state.hoveredTile.x() - xoffset, 
+					game.world.get(state.hoveredTile).getHeight()/15,
+					y - zoffset);
+			hoveredTileBox.render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+		}
 	}
 	
 	@Override

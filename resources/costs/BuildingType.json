@@ -188,6 +188,7 @@
 		"name":"CASTLE",
 		"info":"Produces workers",
 		"image":"Images/buildings/castle256.png",
+		"texture":"pallet1.png",
 		"vision":5,
 		"cost":{"WOOD":500, "STONE":500},
 		"buildsunits":["WORKER", "PRIEST"],

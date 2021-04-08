@@ -1,6 +1,10 @@
 package ui.graphics.opengl;
 
+import java.io.*;
+import java.nio.*;
 import java.util.*;
+
+import org.smurn.jply.*;
 
 import ui.graphics.opengl.maths.*;
 import utils.*;
@@ -28,14 +32,14 @@ public class MeshUtils {
 		return meshes.get(filename);
 	}
 	
-	private static Mesh loadMeshFromFile(String filename, boolean swapYZ) {
-		String ext = filename.substring(filename.length() - 4);
-		if(ext.equals(".obj")) {
-			String fileContents = Utils.readFile(filename);
-			ArrayList<Vector3f> vertexLocations = new ArrayList<>();
-			ArrayList<Vector2f> textureMapping = new ArrayList<>();
-			ArrayList<Integer> faces = new ArrayList<>();
-			for(String line : fileContents.split("\n")) {
+	
+	private static Mesh readObjFile(String filename, boolean swapYZ) {
+		String fileContents = Utils.readFile(filename);
+		ArrayList<Vector3f> vertexLocations = new ArrayList<>();
+		ArrayList<Vector2f> textureMapping = new ArrayList<>();
+		ArrayList<Integer> faces = new ArrayList<>();
+		for(String line : fileContents.split("\n")) {
+			try {
 				if(line.length() == 0 || line.charAt(0) == '#') {
 					continue;
 				}
@@ -43,14 +47,9 @@ public class MeshUtils {
 				String lineIndicator = st.nextToken();
 				if(lineIndicator.equals("v")) {
 					float x=0, y=0, z=0;
-					try {
-						x = Float.parseFloat(st.nextToken());
-						y = Float.parseFloat(st.nextToken());
-						z = Float.parseFloat(st.nextToken());
-					}
-					catch(NumberFormatException e) {
-						System.err.println("Failed to parse Float: " + line);
-					}
+					x = Float.parseFloat(st.nextToken());
+					y = Float.parseFloat(st.nextToken());
+					z = Float.parseFloat(st.nextToken());
 					if(swapYZ) {
 						vertexLocations.add(new Vector3f(x, z, y));
 					}
@@ -60,44 +59,131 @@ public class MeshUtils {
 					continue;
 				}
 				else if(lineIndicator.equals("f")) {
-					try {
-						int one = Integer.parseInt(st.nextToken());
-						int two = Integer.parseInt(st.nextToken());
-						int three = Integer.parseInt(st.nextToken());
-						faces.add(three);
-						faces.add(two);
-						faces.add(one);
-					}
-					catch(NumberFormatException e) {
-						System.err.println("Failed to parse Integer: " + line);
-					}
+					// obj file faces are 1 indexed so have to -1
+					int one = Integer.parseInt(st.nextToken()) -1;
+					int two = Integer.parseInt(st.nextToken()) - 1;
+					int three = Integer.parseInt(st.nextToken()) - 1;
+					faces.add(three);
+					faces.add(two);
+					faces.add(one);
 				}
 				else if(lineIndicator.equals("vt")) {
 					float u=0, v=0;
-					try {
-						u = Float.parseFloat(st.nextToken());
-						v = Float.parseFloat(st.nextToken());
-					}
-					catch(NumberFormatException e) {
-						System.err.println("Failed to parse Float: " + line);
-					}
+					u = Float.parseFloat(st.nextToken());
+					v = Float.parseFloat(st.nextToken());
 					textureMapping.add(new Vector2f(u, v));
 					continue;
 				}
 			}
-			Vertex[] vertices = new Vertex[vertexLocations.size()];
-			for(int i = 0; i < vertices.length; i++) {
-				Vector2f texCoord = new Vector2f(0, 0);
-				if(i < textureMapping.size()) {
-					texCoord = textureMapping.get(i);
+			catch(NumberFormatException e) {
+				System.err.println("Failed to parse line \"" + line + "\" in file: " + filename);
+			}
+		}
+		return arraysToMesh(vertexLocations, textureMapping, faces);
+	}
+	
+	private static Mesh readPlyFile(String filename) {
+		ByteBuffer buffer = ByteBuffer.allocate(10);
+		buffer.clear();
+		InputStream str = Utils.class.getClassLoader().getResourceAsStream(filename);
+		if(str == null) {
+			System.err.println("ERROR INPUT STREAM WAS NULL: " + filename);
+			return cube;
+		}
+		try(PlyReader ply = new PlyReaderFile(str)) {
+			ElementReader reader;
+			ArrayList<Vector3f> vertexLocations = new ArrayList<>();
+			ArrayList<Vector2f> textureMapping = new ArrayList<>();
+			ArrayList<Integer> faces = new ArrayList<>();
+			while((reader = ply.nextElementReader()) != null) {
+				ElementType type = reader.getElementType();
+				System.out.println(type.getName());
+				
+				HashSet<String> properties = new HashSet<>();
+				for(Property p : type.getProperties()) {
+					properties.add(p.getName());
+					System.out.println(p.getName() + ": " + p.getType().toString());
 				}
-				vertices[i] = new Vertex(vertexLocations.get(i), new Vector3f(1, 1, 1), null, texCoord);
+				
+				boolean hasTextureCoords = false;
+				if(properties.contains("s")) {
+					hasTextureCoords = true;
+				}
+				if(type.getName().equals("vertex")) {
+					System.out.println("reader has " + reader.getCount() + " elements");
+					Element element;
+					while((element = reader.readElement()) != null) {
+						Vector3f loc = new Vector3f(
+								(float)element.getDouble("x"), 
+								(float)element.getDouble("y"), 
+								(float)element.getDouble("z"));
+						vertexLocations.add(loc);
+						
+						if(hasTextureCoords) {
+							Vector2f texCoord = new Vector2f(
+									(float)element.getDouble("s"), 
+									1 - (float)element.getDouble("t"));
+							
+							System.out.println("Tex coord: " + texCoord);
+							textureMapping.add(texCoord);
+						}
+						else {
+							textureMapping.add(new Vector2f());
+						}
+					}
+				}
+				else if(type.getName().equals("face")) {
+					System.out.println("reader has " + reader.getCount() + " elements");
+					Element element;
+					String elementname = type.getProperties().get(0).getName();
+					while((element = reader.readElement()) != null) {
+						int[] aface = element.getIntList(elementname);
+						if(aface.length == 4) {
+							faces.add(aface[0]);
+							faces.add(aface[1]);
+							faces.add(aface[2]);
+
+							faces.add(aface[0]);
+							faces.add(aface[2]);
+							faces.add(aface[3]);
+						}
+					}
+				}
+				reader.close();
 			}
-			int[] facesArr = new int[faces.size()];
-			for(int i = 0; i < facesArr.length; i++) {
-				facesArr[i] = faces.get(i) - 1;
+			return arraysToMesh(vertexLocations, textureMapping, faces);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return star;
+	}
+	
+	private static Mesh arraysToMesh(
+			ArrayList<Vector3f> vertexLocations, 
+			ArrayList<Vector2f> textureMapping, 
+			ArrayList<Integer> faces) {
+		Vertex[] vertices = new Vertex[vertexLocations.size()];
+		for(int i = 0; i < vertices.length; i++) {
+			Vector2f texCoord = new Vector2f(0, 0);
+			if(i < textureMapping.size()) {
+				texCoord = textureMapping.get(i);
 			}
-			return new Mesh(vertices, facesArr);
+			vertices[i] = new Vertex(vertexLocations.get(i), new Vector3f(1, 1, 1), null, texCoord);
+		}
+		int[] facesArr = new int[faces.size()];
+		for(int i = 0; i < facesArr.length; i++) {
+			facesArr[i] = faces.get(i);
+		}
+		return new Mesh(vertices, facesArr);
+	}
+	
+	private static Mesh loadMeshFromFile(String filename, boolean swapYZ) {
+		String ext = filename.substring(filename.length() - 4);
+		if(ext.equals(".obj")) {
+			return readObjFile(filename, swapYZ);
+		}
+		else if(ext.equals(".ply")) {
+			return readPlyFile(filename);
 		}
 		else {
 			System.err.println("Unknown mesh file format: " + ext);

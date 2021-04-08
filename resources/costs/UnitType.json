@@ -221,6 +221,8 @@
 	},
 	{
 		"image":"Images/units/pig.png",
+		"mesh":"models/pig.ply",
+		"texture":"textures/pallet1.png",
 		"stats":{"movespeed":30,"buildtime":0,"health":200,"healspeed":50},
 		"name":"PIG",
 		"attackstyles":[
