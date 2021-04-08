@@ -85,6 +85,12 @@ public class UnitType implements HasImage, HasMesh, Serializable {
 	public boolean isHealer() {
 		return attributes.contains("healer");
 	}
+	public boolean isCaravan() {
+		return attributes.contains("caravan");
+	}
+	public boolean isNonSelectable() {
+		return attributes.contains("nonselectable");
+	}
 	public boolean hasCleave() {
 		return attributes.contains("cleave");
 	}

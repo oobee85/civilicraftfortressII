@@ -18,6 +18,7 @@ public class Building extends Thing implements Serializable {
 	public transient static double CULTURE_AREA_MULTIPLIER = 0.1;
 	private transient Tile spawnLocation;
 	private transient double timeToHarvest;
+	private transient int maxItemAmount = 18;
 	private transient double baseTimeToHarvest = 20;
 	private boolean isPlanned;
 
@@ -43,6 +44,15 @@ public class Building extends Thing implements Serializable {
 	}
 	public Inventory getInventory() {
 		return inventory;
+	}
+	public boolean isFull() {
+		for(Item item: inventory.getItems()) {
+			if(item != null && this.inventory.getItemAmount(item.getType()) >= this.maxItemAmount) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	public void tick(World world) {
 		updateInProgressUnit();

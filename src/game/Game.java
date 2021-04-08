@@ -10,6 +10,7 @@ import java.util.*;
 import networking.message.*;
 import networking.server.*;
 import ui.*;
+import ui.view.SpawnUnitsView;
 import utils.*;
 import wildlife.*;
 import world.*;
@@ -540,9 +541,44 @@ public class Game {
 				}
 			}
 			building.tick(world);
+			if(building.isFull()) {
+//				spawnCaravan(building);
+			}
+			
 		}
 	}
-
+	private void spawnCaravan(Building building) {
+		Tile tile = building.getTile();
+		
+		for(Unit unit: tile.getUnits()) {
+			if(unit.getType().isCaravan()) {
+				return;
+			}
+		}
+		Unit caravan = (Unit) summonThing(tile, Game.unitTypeMap.get("CARAVAN"), building.getFaction());
+		
+		for(Item item: building.getInventory().getItems()) {
+			if(item != null) {
+				caravan.addItem(item);
+				item.addAmount(-item.getAmount());	
+			}
+			
+		}
+		Building castle = null;
+		for(Building potential: building.getFaction().getBuildings()) {
+			if(potential.getType().isCastle()) {
+				castle = potential;
+			}
+		}
+		if(castle != null) {
+			caravan.queuePlannedAction(new PlannedAction(castle, PlannedAction.DELIVER, null));
+		}
+		
+		
+		
+	}
+	
+	
 	public void flipTable() {
 		for(Tile tile : world.getTiles()) {
 			tile.setHeight(1 - tile.getHeight());

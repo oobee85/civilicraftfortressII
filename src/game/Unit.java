@@ -24,7 +24,7 @@ public class Unit extends Thing implements Serializable {
 	
 	private transient boolean isHarvesting;
 	private transient double timeToHarvest;
-	private transient int maxItemAmount = 20;
+	private transient int maxItemAmount;
 	private transient double baseTimeToHarvest = 10;
 	private transient int ticksForFoodCost = 50;
 	
@@ -37,6 +37,10 @@ public class Unit extends Thing implements Serializable {
 		this.timeToHeal = unitType.getCombatStats().getHealSpeed();
 		this.isIdle = false;
 		this.inventory = new Inventory();
+		this.maxItemAmount = 20;
+		if(this.getType().isCaravan()) {
+			this.maxItemAmount = 100;
+		}
 	}
 	
 	public boolean readyToHarvest() {
@@ -312,7 +316,7 @@ public class Unit extends Thing implements Serializable {
 	public Building getNearestBuildingToDeliver() {
 		Building bestBuilding = (Building) this.getFaction().getBuildings().toArray()[0];
 		for(Building building: this.getFaction().getBuildings()) {
-			if(building.getType().isColony() && this.getTile().getLocation().distanceTo(building.getTile().getLocation()) < 
+			if((building.getType().isColony() || building.getType().isCastle()) && this.getTile().getLocation().distanceTo(building.getTile().getLocation()) < 
 					this.getTile().getLocation().distanceTo(bestBuilding.getTile().getLocation())) {
 				bestBuilding = building;
 			}
@@ -368,11 +372,23 @@ public class Unit extends Thing implements Serializable {
 		}
 		
 	}
-	public void doDelivery(PlannedAction action) {
+	public void doDelivery(PlannedAction action, Thing thing) {
 		for(Item item: inventory.getItems()) {
 			if(item != null) {
-				this.getFaction().addItem(item.getType(), item.getAmount());
-				item.addAmount(-item.getAmount());
+				if(thing instanceof Building) {
+					Building building = (Building) thing;
+					//stores inventory in colony
+//					if(building.getType().isColony()) {
+//						building.getInventory().addItem(item);
+//						item.addAmount(-item.getAmount());
+//						
+//						//stores inventory in faction inventory
+//					}else if(building.getType().isCastle()) {
+						this.getFaction().addItem(item.getType(), item.getAmount());
+						item.addAmount(-item.getAmount());
+//					}
+				}
+				
 			}
 			
 		}
@@ -489,7 +505,7 @@ public class Unit extends Thing implements Serializable {
 				
 			}
 			else if(plan.isDeliverAction() && unitType.isBuilder() && inRange(plan.target)) {
-				this.doDelivery(plan);
+				this.doDelivery(plan, plan.target);
 				
 			}
 			else if(plan.target != null) {
