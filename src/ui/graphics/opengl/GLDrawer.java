@@ -56,8 +56,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		GL3 gl = drawable.getGL().getGL3();
-//		gl.glEnable(GL3.GL_CULL_FACE);
-//		gl.glCullFace(GL3.GL_BACK);
+		gl.glEnable(GL3.GL_CULL_FACE);
+		gl.glCullFace(GL3.GL_BACK);
 		TextureUtils.initDefaultTextures(gl);
 		Mesh.initAllMeshes(gl);
 		
@@ -115,7 +115,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			sunDirection = result.multiply(-1);
 			sunColor.set(1f, 1f, 0.95f);
 			float multiplier = (float)World.getDaylight();
-			sunColor = sunColor.multiply(new Vector3f(multiplier, multiplier*multiplier, multiplier*multiplier));
+//			sunColor = sunColor.multiply(new Vector3f(multiplier, multiplier*multiplier, multiplier*multiplier));
 			if(Game.DISABLE_NIGHT) {
 				ambientColor.set(.7f, .7f, .7f);
 			}
@@ -186,7 +186,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 					building.getTile().getLocation().x() - xoffset, 
 					y - zoffset, 
 					building.getTile().getHeight()/15);
-			building.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+			building.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(2, 2, 2));
 		}
 
 		if(game.world.get(state.hoveredTile) != null) {

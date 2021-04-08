@@ -59,8 +59,8 @@ public class MeshUtils {
 					int two = Integer.parseInt(st.nextToken()) - 1;
 					int three = Integer.parseInt(st.nextToken()) - 1;
 					faces.add(three);
-					faces.add(two);
 					faces.add(one);
+					faces.add(two);
 				}
 				else if(lineIndicator.equals("vt")) {
 					float u=0, v=0;
@@ -133,14 +133,10 @@ public class MeshUtils {
 					String elementname = type.getProperties().get(0).getName();
 					while((element = reader.readElement()) != null) {
 						int[] aface = element.getIntList(elementname);
-						if(aface.length == 4) {
+						for(int i = 2; i < aface.length; i++) {
 							faces.add(aface[0]);
-							faces.add(aface[1]);
-							faces.add(aface[2]);
-
-							faces.add(aface[0]);
-							faces.add(aface[2]);
-							faces.add(aface[3]);
+							faces.add(aface[i-1]);
+							faces.add(aface[i]);
 						}
 					}
 				}

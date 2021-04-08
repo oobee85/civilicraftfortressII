@@ -253,6 +253,7 @@
 	},
 	{
 		"image":"Images/units/fish2.png",
+		"mesh":"models/fish.ply",
 		"stats":{"movespeed":5,"buildtime":0,"health":10,"healspeed":50},
 		"name":"FISH",
 		"attackstyles":[
