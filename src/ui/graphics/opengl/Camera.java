@@ -4,10 +4,10 @@ import ui.graphics.opengl.maths.*;
 
 public class Camera {
 	
-	private Vector3f up = new Vector3f(0, 1f, 0);
-	private Vector3f forwardFlat = new Vector3f(0, 0, -1f);
-	private Vector3f forward = new Vector3f(0, 0, -1f);
-	private Vector3f side = new Vector3f(-1f, 0, 0);
+	private Vector3f up = new Vector3f(0, 1, 0);
+	private Vector3f forwardFlat = new Vector3f();
+	private Vector3f forward = new Vector3f();
+	private Vector3f side = new Vector3f();
 	private float pitch = 0;
 	private float theta = 0;
 	
@@ -28,6 +28,15 @@ public class Camera {
 	}
 	public void setPosition(Vector3f position) {
 		this.position = position;
+	}
+	public void shiftView(float dx, float dy) {
+		position = position.add(this.forwardFlat.multiply(dy));
+		position = position.add(this.side.multiply(dx));
+	}
+	public void rotate(float dx, float dy) {
+		theta += dx;
+		pitch += dy;
+		updateDirectionVectors();
 	}
 	
 	private void updateDirectionVectors() {

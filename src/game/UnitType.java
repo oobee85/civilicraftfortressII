@@ -16,6 +16,7 @@ public class UnitType implements HasImage, HasMesh, Serializable {
 	private final String name;
 	private transient final MipMap mipmap;
 	private transient final Mesh mesh;
+	private transient final String textureFile;
 	private transient final CombatStats combatStats;
 	private transient final HashSet<String> attributes;
 	private transient final HashMap <ItemType, Integer> cost;
@@ -25,10 +26,11 @@ public class UnitType implements HasImage, HasMesh, Serializable {
 	private transient final ArrayList<TargetingInfo> targetingInfo = new ArrayList<>();
 	private transient final LinkedList<AttackStyle> attackStyles;
 
-	public UnitType(String name, String image, Mesh mesh, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles) {
+	public UnitType(String name, String image, Mesh mesh, String textureFile, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles) {
 		this.name = name;
 		this.mipmap = new MipMap(image);
 		this.mesh = mesh;
+		this.textureFile = textureFile;
 		this.combatStats = cs;
 		this.attributes = attributes;
 		this.cost = resourcesNeeded;
@@ -104,6 +106,10 @@ public class UnitType implements HasImage, HasMesh, Serializable {
 	@Override
 	public Mesh getMesh() {
 		return mesh;
+	}
+	@Override
+	public String getTextureFile() {
+		return textureFile;
 	}
 
 	@Override

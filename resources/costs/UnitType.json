@@ -2,6 +2,7 @@
 "unittypes": [
 	{
 		"image":"Images/units/worker.png",
+		"mesh":"models/star.obj",
 		"cost":{"FOOD":10},
 		"stats":{"movespeed":10,"buildtime":30,"health":100,"healspeed":50},
 		"attackstyles":[
@@ -220,6 +221,8 @@
 	},
 	{
 		"image":"Images/units/pig.png",
+		"mesh":"models/pig.ply",
+		"texture":"textures/pallet1.png",
 		"stats":{"movespeed":30,"buildtime":0,"health":200,"healspeed":50},
 		"name":"PIG",
 		"attackstyles":[
@@ -250,6 +253,7 @@
 	},
 	{
 		"image":"Images/units/fish2.png",
+		"mesh":"models/fish.ply",
 		"stats":{"movespeed":5,"buildtime":0,"health":10,"healspeed":50},
 		"name":"FISH",
 		"attackstyles":[
@@ -426,12 +430,14 @@
 	},
 	{
 		"image":"Images/units/waterspirit.png",
+		"mesh":"models/waterspirit.ply",
 		"stats":{"movespeed":25,"buildtime":0,"health":50,"healspeed":50},
 		"name":"WATER_SPIRIT",
 		"attributes":["migratory"]
 	},
 	{
 		"image":"Images/units/parasite.png",
+		"mesh":"models/parasite.ply",
 		"stats":{"movespeed":5,"buildtime":0,"health":1,"healspeed":50},
 		"name":"PARASITE",
 		"attackstyles":[

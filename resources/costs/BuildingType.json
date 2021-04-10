@@ -2,6 +2,7 @@
 "buildingtypes":[
 	{
 		"name":"STONE_ROAD",
+		"mesh":"models/flatcube.obj",
 		"info":"Increases movement speed",
 		"image":"Images/buildings/stone_road.png",
 		"vision":0,
@@ -14,6 +15,7 @@
 		"research":"WHEEL"},
 	{
 		"name":"BRICK_ROAD",
+		"mesh":"models/flatcube.obj",
 		"info":"Increases movement speed more",
 		"image":"Images/buildings/brick_road.png",
 		"vision":0,
@@ -135,6 +137,8 @@
 		"name":"WINDMILL",
 		"info":"Produces lots of food",
 		"image":"Images/buildings/ancientwindmill.png",
+		"mesh":"models/windmill.ply",
+		"texture":"textures/pallet1.png",
 		"vision":1,
 		"cost":{"WOOD":500, "IRON_BAR":5},
 		"culture":0.5,
@@ -186,6 +190,8 @@
 		"name":"CASTLE",
 		"info":"Produces workers",
 		"image":"Images/buildings/castle256.png",
+		"mesh":"models/castle.ply",
+		"texture":"textures/pallet1.png",
 		"vision":5,
 		"cost":{"WOOD":500, "STONE":500},
 		"buildsunits":["WORKER", "PRIEST"],

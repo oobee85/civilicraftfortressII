@@ -25,8 +25,20 @@ public abstract class Drawer {
 		this.state = state;
 		this.game = game;
 	}
-	
-	public abstract BufferedImage getImageToDrawMinimap();
+
+	public BufferedImage getImageToDrawMinimap() {
+		if (state.showHeightMap) {
+			return heightMapImage;
+		} else if (state.showPressureMap) {
+			return pressureMapImage;
+		} else if (state.showTemperatureMap) {
+			return temperatureMapImage;
+		} else if (state.showHumidityMap) {
+			return massMapImage;
+		} else {
+			return minimapImage;
+		}
+	}
 	public abstract Position[] getVisibleTileBounds();
 	public abstract Component getDrawingCanvas();
 	
@@ -39,6 +51,7 @@ public abstract class Drawer {
 	 * @param dy pixels moved up-down
 	 */
 	public abstract void shiftView(int dx, int dy);
+	public abstract void rotateView(int dx, int dy);
 
 	public void updateTerrainImages() {
 		if (game.world != null) {

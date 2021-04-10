@@ -17,6 +17,7 @@ public class BuildingType implements HasImage, HasMesh, Serializable {
 	private transient final int health;
 	private transient final MipMap mipmap;
 	private transient final Mesh mesh;
+	private transient final String textureFile;
 	private transient final double moveSpeedEnhancement;
 	private transient final int visionRadius;
 	private transient final String researchRequirement;
@@ -30,12 +31,13 @@ public class BuildingType implements HasImage, HasMesh, Serializable {
 	
 
 	
-	public BuildingType(String name, String info, int hp, double buildingEffort, String texturePath, Mesh mesh, double cultureRate, int visionRadius, 
+	public BuildingType(String name, String info, int hp, double buildingEffort, String texturePath, Mesh mesh, String textureFile, double cultureRate, int visionRadius, 
 			String requirement, HashMap <ItemType, Integer> resourcesNeeded, String[] canProduce, double moveSpeedEnhancement, HashSet<String> attributes) {
 		this.name = name;
 		this.info = info;
 		mipmap = new MipMap(texturePath);
 		this.mesh = mesh;
+		this.textureFile = textureFile;
 		this.researchRequirement = requirement;
 		this.health = hp;
 		this.cultureRate = cultureRate;
@@ -71,6 +73,10 @@ public class BuildingType implements HasImage, HasMesh, Serializable {
 	@Override
 	public Mesh getMesh() {
 		return mesh;
+	}
+	@Override
+	public String getTextureFile() {
+		return textureFile;
 	}
 	@Override
 	public Image getImage(int size) {

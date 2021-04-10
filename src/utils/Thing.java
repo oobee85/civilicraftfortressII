@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.swing.*;
 
+import com.jogamp.opengl.util.texture.*;
+
 import game.*;
 import networking.server.*;
 import ui.graphics.*;
@@ -28,6 +30,7 @@ public class Thing implements HasImage, HasMesh, Serializable {
 	
 	private transient HasImage hasImage;
 	private transient Mesh mesh;
+	private transient String textureFile;
 	
 	private transient Hitsplat[] hitsplats = new Hitsplat[4];
 	
@@ -36,6 +39,7 @@ public class Thing implements HasImage, HasMesh, Serializable {
 		this.maxHealth = maxHealth;
 		this.hasImage = hasImage;
 		this.mesh = hasMesh.getMesh();
+		this.textureFile = hasMesh.getTextureFile();
 		setFaction(faction);
 		this.id = idCounter++;
 		ThingMapper.created(this);
@@ -48,6 +52,10 @@ public class Thing implements HasImage, HasMesh, Serializable {
 	@Override
 	public Mesh getMesh() {
 		return mesh;
+	}
+	@Override
+	public String getTextureFile() {
+		return textureFile;
 	}
 	
 	public int id() {

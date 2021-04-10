@@ -2,15 +2,39 @@ package ui.graphics.opengl;
 
 import java.awt.*;
 import java.awt.image.*;
+import java.util.*;
 
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.texture.*;
 import com.jogamp.opengl.util.texture.awt.*;
 
+import utils.*;
+
 public class TextureUtils {
 	
 	public static Texture BLANK_TEXTURE;
 	public static Texture ERROR_TEXTURE;
+	private static final HashMap<String, Texture> textures = new HashMap<>();
+	
+	public static Texture getTextureByFileName(String filename, GL3 gl) {
+		if(!textures.containsKey(filename)) {
+			Texture texture = loadTextureFromFile(filename, gl);
+			textures.put(filename, texture);
+		}
+		return textures.get(filename);
+	}
+	
+	public static void dispose(GL3 gl) {
+		for(Texture t : textures.values()) {
+			t.destroy(gl);
+		}
+		textures.clear();
+	}
+	
+	private static Texture loadTextureFromFile(String filename, GL3 gl) {
+		BufferedImage image = Utils.toBufferedImage(Utils.loadImage(filename));
+		return textureFromImage(gl, image);
+	}
 	
 	public static void initDefaultTextures(GL3 gl) {
 		BufferedImage blank = new BufferedImage(8, 8, BufferedImage.TYPE_3BYTE_BGR);

@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 
+import org.smurn.jply.util.*;
+
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.*;
 import com.jogamp.opengl.util.texture.*;
@@ -32,7 +34,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	
 	public GLDrawer(Game game, GameViewState state) {
 		super(game, state);
-		camera = new Camera(new Vector3f(), 0, 90);
+		camera = new Camera(new Vector3f(), 0, 0);
 		// getting the capabilities object of GL2 profile
 		final GLProfile profile = GLProfile.get(GLProfile.GL2);
 		GLCapabilities capabilities = new GLCapabilities(profile);
@@ -47,9 +49,6 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		return glcanvas;
 	}
 
-	public BufferedImage getImageToDrawMinimap() {
-		return new BufferedImage(10, 10, BufferedImage.TYPE_3BYTE_BGR);
-	}
 	public Position[] getVisibleTileBounds() {
 		return null;
 	}
@@ -65,7 +64,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
 
 		gl.glEnable(GL2.GL_DEPTH_TEST);
-		gl.glClearDepthf(10.0f);
+		gl.glClearDepthf(1);
 		updateBackgroundColor(gl, Color.black);
 		gl.glDepthFunc(GL2.GL_LEQUAL);
 		
@@ -77,7 +76,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 	@Override
 	public void dispose(GLAutoDrawable drawable) {
-		
+		System.err.println("DISPLOSING GL");
+		TextureUtils.dispose(drawable.getGL().getGL3());
 	}
 
 	@Override
@@ -94,8 +94,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			if(terrainObject == null) {
 				terrainObject = new TerrainObject();
 				terrainObject.create(gl, game.world);
-	//			camera.set(new Vector3f(2, 10, 10), 0, -45);
-				camera.set(new Vector3f(0, 160, game.world.getHeight()/2), 0, -60);
+				camera.set(new Vector3f(2, -game.world.getHeight()/2, 100), 0, 30);
+//				camera.set(new Vector3f(game.world.getWidth()/2, game.world.getHeight()/2, 500), 0, -90);
 	//			camera.set(new Vector3f(game.world.getWidth()/2, 100, game.world.getHeight()/2), 0, -90);
 				this.updateTerrainImages();
 			}
@@ -109,13 +109,13 @@ public class GLDrawer extends Drawer implements GLEventListener {
 //			terrainObject.rotate(Matrix4f.rotate(1, new Vector3f(0, 1, 0)));
 			int dayOffset = World.getCurrentDayOffset();
 			float ratio = (float)dayOffset / (World.DAY_DURATION + World.NIGHT_DURATION);
-			Matrix4f rot = Matrix4f.rotate(ratio * 360, new Vector3f(0, 0, -1));
+			Matrix4f rot = Matrix4f.rotate(ratio * 360, new Vector3f(0, 1, 0));
 			Vector3f initPosition = new Vector3f(-1, 0, 0);
 			Vector3f result = rot.multiply(initPosition, 1);
 			sunDirection = result.multiply(-1);
 			sunColor.set(1f, 1f, 0.95f);
 			float multiplier = (float)World.getDaylight();
-			sunColor = sunColor.multiply(new Vector3f(multiplier, multiplier*multiplier, multiplier*multiplier));
+//			sunColor = sunColor.multiply(new Vector3f(multiplier, multiplier*multiplier, multiplier*multiplier));
 			if(Game.DISABLE_NIGHT) {
 				ambientColor.set(.7f, .7f, .7f);
 			}
@@ -135,6 +135,29 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("sunDirection", sunDirection);
 		shader.setUniform("sunColor", sunColor);
 		shader.setUniform("ambientColor", ambientColor);
+		
+		for(int x = -5; x < 11; x++) {
+			MeshUtils.cube.render(gl, shader, 
+					TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
+					new Vector3f(x, 0, 0), 
+					Matrix4f.identity(), 
+					new Vector3f(1, 1, 1));
+		}
+		for(int y = -5; y < 11; y++) {
+			UnitType pig = Game.unitTypeMap.get("PIG");
+			pig.getMesh().render(gl, shader, 
+					TextureUtils.getTextureByFileName(pig.getTextureFile(), gl), 
+					new Vector3f(0, y, 0), 
+					Matrix4f.identity(), 
+					new Vector3f(1, 1, 1));
+		}
+		for(int z = -5; z < 11; z++) {
+			MeshUtils.star.render(gl, shader, 
+					TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
+					new Vector3f(0, 0, z), 
+					Matrix4f.identity(), 
+					new Vector3f(1, 1, 1));
+		}
 
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
 //		terrainObject.render(gl, shader);
@@ -145,33 +168,35 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			float y = plant.getTile().getLocation().y() + (plant.getTile().getLocation().x() % 2) * 0.5f;
 			Vector3f pos = new Vector3f(
 					plant.getTile().getLocation().x() - xoffset, 
-					plant.getTile().getHeight()/15, 
-					y - zoffset);
-			plant.getMesh().render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+					y - zoffset,
+					plant.getTile().getHeight()/15);
+			plant.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(plant.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 		for(Unit unit : game.world.getUnits()) {
 			float y = unit.getTile().getLocation().y() + (unit.getTile().getLocation().x() % 2) * 0.5f;
 			Vector3f pos = new Vector3f(
 					unit.getTile().getLocation().x() - xoffset, 
-					unit.getTile().getHeight()/15, 
-					y - zoffset);
-			unit.getMesh().render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+					y - zoffset, 
+					unit.getTile().getHeight()/15);
+			unit.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(unit.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 		for(Building building : game.world.getBuildings()) {
 			float y = building.getTile().getLocation().y() + (building.getTile().getLocation().x() % 2) * 0.5f;
 			Vector3f pos = new Vector3f(
 					building.getTile().getLocation().x() - xoffset, 
-					building.getTile().getHeight()/15, 
-					y - zoffset);
-			building.getMesh().render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+					y - zoffset, 
+					building.getTile().getHeight()/15);
+			building.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(2, 2, 2));
 		}
 
-		float y = state.hoveredTile.y() + (state.hoveredTile.x() % 2) * 0.5f;
-		Vector3f pos = new Vector3f(
-				state.hoveredTile.x() - xoffset, 
-				game.world.get(state.hoveredTile).getHeight()/15,
-				y - zoffset);
-		hoveredTileBox.render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+		if(game.world.get(state.hoveredTile) != null) {
+			float y = state.hoveredTile.y() + (state.hoveredTile.x() % 2) * 0.5f;
+			Vector3f pos = new Vector3f(
+					state.hoveredTile.x() - xoffset,
+					y - zoffset, 
+					game.world.get(state.hoveredTile).getHeight()/15);
+			hoveredTileBox.render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+		}
 	}
 	
 	@Override
@@ -185,7 +210,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 	@Override
 	public Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
-		Vector3f onScreen = new Vector3f(pixelOnScreen.x, pixelOnScreen.y, 0);
+//		Vector3f onScreen = new Vector3f(pixelOnScreen.x, pixelOnScreen.y, 0);
 		// TODO need to implement Matrix.inverse();
 		// Vector3f onView = projection.inverse().multiply(onScreen, 1);
 		// Vector3f viewingRay = onView.subtract(onScreen).normalize();
@@ -198,7 +223,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		
 		// The little trick make the game vaguely playable :P
 		return new Position(game.world.getWidth() * pixelOnScreen.x / glcanvas.getWidth(), 
-				game.world.getHeight() * pixelOnScreen.y / glcanvas.getHeight());
+				game.world.getHeight() * (glcanvas.getHeight() - pixelOnScreen.y) / glcanvas.getHeight());
 	}
 
 	@Override
@@ -212,7 +237,13 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 	@Override
 	public void shiftView(int dx, int dy) {
-		float adjust = 0.5f;
-		camera.setPosition(camera.getPosition().add(new Vector3f(dx, 0, dy).multiply(adjust)));
+		float adjust = 0.2f;
+		camera.shiftView(dx*adjust, dy*adjust);
+	}
+	
+	@Override
+	public void rotateView(int dx, int dy) {
+		float adjust = 0.05f;
+		camera.rotate(dx*adjust, -dy*adjust);
 	}
 }
