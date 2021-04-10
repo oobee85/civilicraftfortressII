@@ -10,6 +10,11 @@ import utils.*;
 public class Generation {
 	
 	public static final int OREMULTIPLIER = 16384;
+
+	public static final Random randy = new Random();
+	static {
+		randy.setSeed(123);
+	}
 	
 	// From https://en.wikipedia.org/wiki/Perlin_noise
 	
