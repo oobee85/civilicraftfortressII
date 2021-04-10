@@ -51,6 +51,7 @@ public abstract class Drawer {
 	 * @param dy pixels moved up-down
 	 */
 	public abstract void shiftView(int dx, int dy);
+	public abstract void rotateView(int dx, int dy);
 
 	public void updateTerrainImages() {
 		if (game.world != null) {

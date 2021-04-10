@@ -117,8 +117,11 @@ public class GameView {
 				// Only drag if moved mouse at least 10 pixels away
 				if (state.draggingMouse || Math.abs(dx) + Math.abs(dy) >= 10) {
 					state.draggingMouse = true;
-					if (rightMouseDown || state.middleMouseDown) {
+					if (rightMouseDown) {
 						currentActiveDrawer.shiftView(dx, dy);
+					}
+					else if(state.middleMouseDown) {
+						currentActiveDrawer.rotateView(dx, dy);
 					}
 					if (state.leftMouseDown) {
 						state.boxSelect[1] = currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize);

@@ -29,6 +29,15 @@ public class Camera {
 	public void setPosition(Vector3f position) {
 		this.position = position;
 	}
+	public void shiftView(float dx, float dy) {
+		position = position.add(this.forwardFlat.multiply(dy));
+		position = position.add(this.side.multiply(dx));
+	}
+	public void rotate(float dx, float dy) {
+		theta += dx;
+		pitch += dy;
+		updateDirectionVectors();
+	}
 	
 	private void updateDirectionVectors() {
 		forwardFlat.set((float)Math.sin(Math.toRadians(theta)), 0, -(float)Math.cos(Math.toRadians(theta)));

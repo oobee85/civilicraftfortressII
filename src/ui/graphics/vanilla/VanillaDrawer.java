@@ -846,6 +846,10 @@ public class VanillaDrawer extends Drawer {
 		state.viewOffset.y += dy;
 		canvas.repaint();
 	}
+	@Override
+	public void rotateView(int dx, int dy) {
+		shiftView(dx, dy);
+	}
 
 	private static Rectangle normalizeRectangle(Point one, Point two) {
 		int x = Math.min(one.x, two.x);
