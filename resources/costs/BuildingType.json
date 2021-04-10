@@ -137,6 +137,8 @@
 		"name":"WINDMILL",
 		"info":"Produces lots of food",
 		"image":"Images/buildings/ancientwindmill.png",
+		"mesh":"models/windmill.ply",
+		"texture":"textures/pallet1.png",
 		"vision":1,
 		"cost":{"WOOD":500, "IRON_BAR":5},
 		"culture":0.5,

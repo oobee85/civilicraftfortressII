@@ -15,11 +15,11 @@ import utils.*;
 public enum PlantType implements HasImage, HasMesh {
 	
 	BERRY ( new String[] {"Images/plants/berry16.png"}, 
-			MeshUtils.defaultPlant, 
+			MeshUtils.cube, 
 			"Images/plants/berry16.png",
 			false, 1.0, 100, false, ItemType.FOOD),
 	BERRY_DEPLETED ( new String[] {"Images/plants/berry_depleted16.png"},
-			MeshUtils.defaultPlant, 
+			MeshUtils.cube, 
 			"Images/plants/berry_depleted16.png",
 			false, 0.2, 1, false, ItemType.RUNITE_BAR),
 	CATTAIL ( new String[] {"Images/plants/cattail32.png"},
