@@ -118,6 +118,9 @@ public class BuildingType implements HasImage, HasMesh, Serializable {
 	public boolean isColony() {
 		return attributes.contains("colony");
 	}
+	public boolean isCastle() {
+		return attributes.contains("castle");
+	}
 	public boolean isHarvestable() {
 		return attributes.contains("harvestable");
 	}

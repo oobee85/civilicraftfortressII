@@ -234,6 +234,10 @@ public class VanillaDrawer extends Drawer {
 				drawInventory(g, unit, null);
 				drawHealthBar(g, unit);
 				drawHitsplat(g, unit);
+//				Point drawAt = getDrawingCoords(unit.getTile().getLocation());
+//				int draww = state.tileSize;
+//				int drawh = state.tileSize;
+//				drawUnit(unit, g, drawAt.x, drawAt.y, draww, drawh);
 			}
 
 			for (Projectile p : game.world.getData().getProjectiles()) {
@@ -525,21 +529,23 @@ public class VanillaDrawer extends Drawer {
 			int r = Math.max(Math.min((int) (255 * heightRatio), 255), 0);
 			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-		}else if (state.showPressureMap) {
-			float pressureRatio = (float) ((theTile.getAir().getPressure() - lowPressure) / (highPressure - lowPressure));
+		} else if (state.showPressureMap) {
+			float pressureRatio = (float) ((theTile.getAir().getPressure() - lowPressure)
+					/ (highPressure - lowPressure));
 			int r = Math.max(Math.min((int) (255 * pressureRatio), 255), 0);
 			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-		}else if (state.showTemperatureMap) {
+		} else if (state.showTemperatureMap) {
 			float tempRatio = (float) ((theTile.getAir().getTemperature() - lowTemp) / (highTemp - lowTemp));
 			int r = Math.max(Math.min((int) (255 * tempRatio), 255), 0);
 			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-			if(theTile.getAir().getTemperature() <= World.FREEZETEMP) {
+			if (theTile.getAir().getTemperature() <= World.FREEZETEMP) {
 				g.drawImage(SNOW, drawAt.x, drawAt.y, draww, drawh, null);
 			}
-		}else if (state.showHumidityMap) {
-			float humidityRatio = (float) ((theTile.getAir().getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
+		} else if (state.showHumidityMap) {
+			float humidityRatio = (float) ((theTile.getAir().getHumidity() - lowHumidity)
+					/ (highHumidity - lowHumidity));
 			int r = Math.max(Math.min((int) (255 * humidityRatio), 255), 0);
 			g.setColor(new Color(r, 0, 255 - r));
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
@@ -594,8 +600,8 @@ public class VanillaDrawer extends Drawer {
 
 			if (!theTile.getItems().isEmpty()) {
 				for (Item item : theTile.getItems()) {
-					g.drawImage(item.getType().getImage(imagesize), drawAt.x + state.tileSize / 4, drawAt.y + state.tileSize / 4,
-							state.tileSize / 2, state.tileSize / 2, null);
+					g.drawImage(item.getType().getImage(imagesize), drawAt.x + state.tileSize / 4,
+							drawAt.y + state.tileSize / 4, state.tileSize / 2, state.tileSize / 2, null);
 				}
 			}
 			if (theTile.getPlant() != null) {
@@ -605,26 +611,66 @@ public class VanillaDrawer extends Drawer {
 
 			if (theTile.getBuilding() != null) {
 				if (theTile.getBuilding().getIsSelected()) {
-					g.drawImage(theTile.getBuilding().getHighlight(state.tileSize), drawAt.x, drawAt.y, draww, drawh, null);
+					g.drawImage(theTile.getBuilding().getHighlight(state.tileSize), drawAt.x, drawAt.y, draww, drawh,
+							null);
 				}
 				drawBuilding(theTile.getBuilding(), g, drawAt.x, drawAt.y, draww, drawh);
 			}
 			for (Unit unit : theTile.getUnits()) {
-				if (unit.getIsSelected()) {
-					g.drawImage(unit.getHighlight(state.tileSize), drawAt.x, drawAt.y, draww, drawh, null);
-				}
-				g.drawImage(unit.getImage(state.tileSize), drawAt.x, drawAt.y, draww, drawh, null);
-				if (unit.isGuarding() == true) {
-					g.drawImage(GUARD_ICON, drawAt.x + draww / 4, drawAt.y + drawh / 4, draww / 2, drawh / 2, null);
-				}
-				if (unit.getAutoBuild() == true) {
-					g.drawImage(AUTO_BUILD_ICON, drawAt.x + draww / 4, drawAt.y + drawh / 4, draww / 2, drawh / 2,
-							null);
-				}
+				drawUnit(unit, g, drawAt.x, drawAt.y, draww, drawh);
 			}
 		}
+		
 	}
 
+	private void drawUnit(Unit unit, Graphics g, int drawx, int drawy, int draww, int drawh) {
+		
+//		LinkedList<Tile> path = unit.getCurrentPath();
+//		double timeLeft = unit.getTimeToMove();
+//		double timeStart = unit.getCombatStats().getMoveSpeed();
+//		double percent = 0;
+//		if(timeStart != 0) {
+//			percent = timeLeft / timeStart;
+//		}
+		
+		if (unit.getIsSelected()) {
+			g.drawImage(unit.getHighlight(state.tileSize), drawx, drawy, draww, drawh, null);
+		}
+//		if(path != null && path.peek() != null) {
+//			Tile targetTile = path.peek();
+//			int targetx = targetTile.getLocation().x();
+//			int targety = targetTile.getLocation().y();
+//			int dx = Math.abs(drawx - targetx);
+//			int dy = Math.abs(drawy - targety);
+//			if(targetx > drawx) {
+//				dx *= -1; 
+//			}
+//			if(targetx < drawx){
+//				dx *= 1; 
+//			}
+//			
+//			if(targety > drawy) {
+//				dy *= -1; 
+//			}
+//			if(targety < drawy){
+//				dy *= 1; 
+//			}
+//			g.drawImage(unit.getImage(state.tileSize), (int)(drawx + drawx - dx), (int)(drawy + drawy - dy), draww, drawh, null);
+//		}else {
+			g.drawImage(unit.getImage(state.tileSize), drawx, drawy, draww, drawh, null);
+//		}
+		
+		
+		if (unit.isGuarding() == true) {
+			g.drawImage(GUARD_ICON, drawx + draww / 4, drawy + drawh / 4, draww / 2, drawh / 2, null);
+		}
+		if (unit.getAutoBuild() == true) {
+			g.drawImage(AUTO_BUILD_ICON, drawx + draww / 4, drawy + drawh / 4, draww / 2, drawh / 2,
+					null);
+		}
+	}
+	
+	
 	private void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh) {
 
 		BufferedImage bI = Utils.toBufferedImage(building.getImage(0));

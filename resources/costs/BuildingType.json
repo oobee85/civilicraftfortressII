@@ -196,7 +196,7 @@
 		"cost":{"WOOD":500, "STONE":500},
 		"buildsunits":["WORKER", "PRIEST"],
 		"culture":1,
-		"attributes":["colony"],
+		"attributes":["castle"],
 		"health":1000,
 		"effort":1000,
 		"research":"MASONRY"},

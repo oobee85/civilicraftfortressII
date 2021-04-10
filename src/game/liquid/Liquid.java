@@ -112,7 +112,7 @@ public class Liquid {
 //			tile.getAir().setVolume(volume);
 			
 			double evaporation = tile.getEvaporation();
-			if(tile.liquidAmount - evaporation >= 0) {
+			if(evaporation > 0 && tile.liquidAmount - evaporation >= 0 && tile.getAir().canRain() == false) {
 				tile.getAir().addVolume(evaporation);
 				tile.liquidAmount -= evaporation;
 //				tile.getAir().addHumidity(evaporation);
@@ -127,19 +127,21 @@ public class Liquid {
 		int y = current.y();
 		
 		float tempurature = (float) tile.getTemperature();
-		if(tempurature > Season.MELTING_TEMPURATURE) {
+		double temperatureOffset = 0;
+		if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.ICE) {
+			temperatureOffset = tile.liquidAmount/10;
+		}
+		if(tempurature + temperatureOffset > World.FREEZETEMP) {
 			if(tile.liquidType == LiquidType.ICE) {
 				tile.liquidType = LiquidType.WATER;
 				liquidTypesTemp[x][y] = LiquidType.WATER;
-				liquidAmountsTemp[x][y] /= 4;
 			}
 			if(tile.liquidType == LiquidType.SNOW) {
 				tile.liquidType = LiquidType.WATER;
 				liquidTypesTemp[x][y] = LiquidType.WATER;
-				liquidAmountsTemp[x][y] /= 4;
 			}
 		}
-		else if(tempurature < Season.FREEZING_TEMPURATURE) {
+		else if(tempurature + temperatureOffset < World.FREEZETEMP) {
 			if(tile.liquidType == LiquidType.WATER) {
 				tile.liquidType = LiquidType.ICE;
 				liquidTypesTemp[x][y] = LiquidType.ICE;

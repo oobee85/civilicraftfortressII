@@ -22,7 +22,7 @@ public class Air {
 		this.temperature = temp;
 		this.maxVolume = 10;
 		this.canRain = false;
-		this.volume = 5;
+		this.volume = 0;
 		this.humidity = 0.0;
 		this.pressure = 760;
 		this.updateMaxVolume();
@@ -61,8 +61,8 @@ public class Air {
 		this.height = height;
 	}
 	public void updateMaxVolume() {
-		if(temperature > 0) {
-			maxVolume = this.temperature;
+		if(temperature > 2) {
+			maxVolume = this.temperature/2;
 		}else {
 			maxVolume = 1;
 		}
@@ -101,7 +101,7 @@ public class Air {
 		double g = 9.80665; // m/s^2
 		double MMair = 0.0289644; // kg/mol
 		double R = 8.31432; // Nm/molK
-		double h0 = 200; // m sealevel
+		double h0 = 100; // m sealevel
 		double h = this.height; // m
 		double boltz = 1.380649e-23;
 		double temp = getTemperature();
@@ -118,7 +118,7 @@ public class Air {
 		double mix = pressure+(pvnrt - standardPVNRT);
 //		System.out.println("Pressure: " + pressure);
 //		System.out.println("pvnrt: "+other + "atm: "+pressure);
-		this.pressure = mix ;
+		this.pressure = pressure;
 
 	}
 	public double getDensity() {
