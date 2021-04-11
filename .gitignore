@@ -3,6 +3,7 @@ bin/
 .metadata
 .settings/
 *.jar
+!jply.jar
 profiling/
 ERROR_LOG.txt
 *.ser

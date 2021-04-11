@@ -94,7 +94,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			if(terrainObject == null) {
 				terrainObject = new TerrainObject();
 				terrainObject.create(gl, game.world);
-				camera.set(new Vector3f(2, -game.world.getHeight()/2, 100), 0, 30);
+				camera.set(new Vector3f(game.world.getWidth()*2/3, -game.world.getHeight(), 0), 90, 130);
 //				camera.set(new Vector3f(game.world.getWidth()/2, game.world.getHeight()/2, 500), 0, -90);
 	//			camera.set(new Vector3f(game.world.getWidth()/2, 100, game.world.getHeight()/2), 0, -90);
 				this.updateTerrainImages();
@@ -187,6 +187,15 @@ public class GLDrawer extends Drawer implements GLEventListener {
 					y - zoffset, 
 					building.getTile().getHeight()/15);
 			building.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(2, 2, 2));
+		}
+
+		for(Projectile projectile : game.world.getData().getProjectiles()) {
+			float y = projectile.getTile().getLocation().y() + (projectile.getTile().getLocation().x() % 2) * 0.5f;
+			Vector3f pos = new Vector3f(
+					projectile.getTile().getLocation().x() - xoffset, 
+					y - zoffset, 
+					projectile.getTile().getHeight()/15 + projectile.getHeight()/15);
+			MeshUtils.star.render(gl, shader, TextureUtils.getTextureByFileName(PlantType.BERRY.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(2, 2, 2));
 		}
 
 		if(game.world.get(state.hoveredTile) != null) {
