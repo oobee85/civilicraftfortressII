@@ -12,9 +12,14 @@ import utils.*;
 public class MeshUtils {
 
 	public static final Mesh cube;
+	public static final Mesh cattail;
 	public static final Mesh star;
 	public static final Mesh mushroom;
 	public static final Mesh house;
+
+	public static final Mesh x;
+	public static final Mesh y;
+	public static final Mesh z;
 	
 
 	public static final Mesh defaultUnit;
@@ -188,9 +193,13 @@ public class MeshUtils {
 	static {
 		meshes = new HashMap<>();
 		cube = getMeshByFileName("models/cube.obj");
+		cattail = getMeshByFileName("models/cattail.ply");
 		star = getMeshByFileName("models/star.obj");
 		mushroom = getMeshByFileName("models/mushroom.obj");
 		house = getMeshByFileName("models/house.obj");
+		x = getMeshByFileName("models/x.ply");
+		y = getMeshByFileName("models/y.ply");
+		z = getMeshByFileName("models/z.ply");
 		defaultUnit = cube;
 		defaultPlant = mushroom;
 		defaultBuilding = house;

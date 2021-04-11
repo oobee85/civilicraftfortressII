@@ -94,9 +94,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			if(terrainObject == null) {
 				terrainObject = new TerrainObject();
 				terrainObject.create(gl, game.world);
-				camera.set(new Vector3f(game.world.getWidth()*2/3, -game.world.getHeight(), 0), 90, 130);
-//				camera.set(new Vector3f(game.world.getWidth()/2, game.world.getHeight()/2, 500), 0, -90);
-	//			camera.set(new Vector3f(game.world.getWidth()/2, 100, game.world.getHeight()/2), 0, -90);
+				camera.set(new Vector3f(0, -game.world.getHeight()/2, 100), 0, -45);
 				this.updateTerrainImages();
 			}
 			if(this.terrainImage != null) {
@@ -136,31 +134,39 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("sunColor", sunColor);
 		shader.setUniform("ambientColor", ambientColor);
 		
-		for(int x = -5; x < 11; x++) {
-			MeshUtils.cube.render(gl, shader, 
-					TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
-					new Vector3f(x, 0, 0), 
-					Matrix4f.identity(), 
-					new Vector3f(1, 1, 1));
-		}
-		for(int y = -5; y < 11; y++) {
-			UnitType pig = Game.unitTypeMap.get("PIG");
-			pig.getMesh().render(gl, shader, 
-					TextureUtils.getTextureByFileName(pig.getTextureFile(), gl), 
-					new Vector3f(0, y, 0), 
-					Matrix4f.identity(), 
-					new Vector3f(1, 1, 1));
-		}
-		for(int z = -5; z < 11; z++) {
-			MeshUtils.star.render(gl, shader, 
-					TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
-					new Vector3f(0, 0, z), 
-					Matrix4f.identity(), 
-					new Vector3f(1, 1, 1));
-		}
+		MeshUtils.x.render(gl, shader, 
+				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
+				new Vector3f(-20, 0, 0), 
+				Matrix4f.rotate(90, new Vector3f(0, 0, 1)), 
+				new Vector3f(.1f, .1f, .1f));
+		MeshUtils.x.render(gl, shader, 
+				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
+				new Vector3f(5, 0, 0), 
+				Matrix4f.rotate(90, new Vector3f(0, 0, 1)), 
+				new Vector3f(.1f, .1f, .1f));
+		UnitType pig = Game.unitTypeMap.get("PIG");
+		MeshUtils.y.render(gl, shader, 
+				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
+				new Vector3f(0, -20, 0), 
+				Matrix4f.identity(), 
+				new Vector3f(.1f, .1f, .1f));
+		MeshUtils.y.render(gl, shader, 
+				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
+				new Vector3f(0, 5, 0), 
+				Matrix4f.identity(), 
+				new Vector3f(.1f, .1f, .1f));
+		MeshUtils.z.render(gl, shader, 
+				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
+				new Vector3f(0, 0, -20), 
+				Matrix4f.rotate(90, new Vector3f(0, 1, 0)), 
+				new Vector3f(.1f, .1f, .1f));
+		MeshUtils.z.render(gl, shader, 
+				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
+				new Vector3f(0, 0, 5), 
+				Matrix4f.rotate(90, new Vector3f(0, 1, 0)), 
+				new Vector3f(.1f, .1f, .1f));
 
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
-//		terrainObject.render(gl, shader);
 		
 		float xoffset = (float)game.world.getWidth()/2;
 		float zoffset = (float)game.world.getHeight()/2;
@@ -237,7 +243,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 	@Override
 	public void zoomView(int scroll, int mx, int my) {
-		camera.moveForward(-4*scroll);
+		camera.zoom(-4*scroll);
 	}
 
 	@Override

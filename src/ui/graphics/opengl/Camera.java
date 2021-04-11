@@ -4,7 +4,7 @@ import ui.graphics.opengl.maths.*;
 
 public class Camera {
 	
-	private Vector3f up = new Vector3f(0, 1, 0);
+	private Vector3f up = new Vector3f(0, 0, 1);
 	private Vector3f forwardFlat = new Vector3f();
 	private Vector3f forward = new Vector3f();
 	private Vector3f side = new Vector3f();
@@ -12,7 +12,7 @@ public class Camera {
 	private float theta = 0;
 	
 	private Vector3f position;
-	private Matrix4f prerotate = Matrix4f.rotate(90, new Vector3f(1, 0, 0));
+	private Matrix4f prerotate = Matrix4f.rotate(-90, new Vector3f(1, 0, 0));
 
 	public Camera(Vector3f position, float theta, float pitch) {
 		this.position = position;
@@ -27,47 +27,38 @@ public class Camera {
 		this.pitch = pitch;
 		updateDirectionVectors();
 	}
-	public void setPosition(Vector3f position) {
-		this.position = position;
-	}
 	public void shiftView(float dx, float dy) {
-		position = position.add(this.forwardFlat.multiply(dy));
+		position = position.add(this.forwardFlat.multiply(-dy));
 		position = position.add(this.side.multiply(dx));
 	}
 	public void rotate(float dx, float dy) {
-		theta -= dx;
+		theta += dx;
 		pitch += dy;
 		updateDirectionVectors();
 	}
 	
 	private void updateDirectionVectors() {
-		forwardFlat.set((float)Math.sin(Math.toRadians(theta)), 0, -(float)Math.cos(Math.toRadians(theta)));
+		theta = theta % 360;
+		pitch = pitch % 360;
+		forwardFlat.set((float)Math.sin(Math.toRadians(theta)), (float)Math.cos(Math.toRadians(theta)), 0);
 		forwardFlat = forwardFlat.normalize();
 		side = forwardFlat.cross(up).normalize();
 		forward = Matrix4f.rotate(pitch, side).multiply(forwardFlat, 1f).normalize();
-		
-		System.out.println("position: " + position);
-		System.out.println("pitch: " + pitch);
-		System.out.println("theta: " + theta);
 	}
 	
-	public void moveForward(float distance) {
-		setPosition(this.position.add(forward.multiply(distance)));
+	public void zoom(float distance) {
+		this.position = this.position.add(up.multiply(-distance));
 	}
-
 	public Vector3f getPosition() {
 		return position;
 	}
-
 	private Matrix4f getTranslationMatrix() {
 		return Matrix4f.translate(position.multiply(-1));
 	}
 	private Matrix4f getRotationMatrix() {
-		return Matrix4f.rotate(theta, up).multiply(Matrix4f.rotate(-pitch, side));
+		return prerotate.multiply(Matrix4f.rotate(theta, up)).multiply(Matrix4f.rotate(-pitch, side));
 	}
 	public Matrix4f getView() {
-		return getRotationMatrix().multiply(getTranslationMatrix()).multiply(prerotate);
+		return getRotationMatrix().multiply(getTranslationMatrix());
 	}
-	
-	
 }
