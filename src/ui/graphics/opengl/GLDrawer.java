@@ -189,6 +189,15 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			building.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(2, 2, 2));
 		}
 
+		for(Projectile projectile : game.world.getData().getProjectiles()) {
+			float y = projectile.getTile().getLocation().y() + (projectile.getTile().getLocation().x() % 2) * 0.5f;
+			Vector3f pos = new Vector3f(
+					projectile.getTile().getLocation().x() - xoffset, 
+					y - zoffset, 
+					projectile.getTile().getHeight()/15 + projectile.getHeight()/15);
+			MeshUtils.star.render(gl, shader, TextureUtils.getTextureByFileName(PlantType.BERRY.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(2, 2, 2));
+		}
+
 		if(game.world.get(state.hoveredTile) != null) {
 			float y = state.hoveredTile.y() + (state.hoveredTile.x() % 2) * 0.5f;
 			Vector3f pos = new Vector3f(
