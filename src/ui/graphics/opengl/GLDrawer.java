@@ -94,7 +94,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			if(terrainObject == null) {
 				terrainObject = new TerrainObject();
 				terrainObject.create(gl, game.world);
-				camera.set(new Vector3f(2, -game.world.getHeight()/2, 100), 0, 30);
+				camera.set(new Vector3f(game.world.getWidth()*2/3, -game.world.getHeight(), 0), 90, 130);
 //				camera.set(new Vector3f(game.world.getWidth()/2, game.world.getHeight()/2, 500), 0, -90);
 	//			camera.set(new Vector3f(game.world.getWidth()/2, 100, game.world.getHeight()/2), 0, -90);
 				this.updateTerrainImages();
