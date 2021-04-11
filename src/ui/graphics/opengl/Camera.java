@@ -39,7 +39,7 @@ public class Camera {
 	
 	private void updateDirectionVectors() {
 		theta = theta % 360;
-		pitch = pitch % 360;
+		pitch = ((pitch + 180) % 360) - 180;
 		forwardFlat.set((float)Math.sin(Math.toRadians(theta)), (float)Math.cos(Math.toRadians(theta)), 0);
 		forwardFlat = forwardFlat.normalize();
 		side = forwardFlat.cross(up).normalize();

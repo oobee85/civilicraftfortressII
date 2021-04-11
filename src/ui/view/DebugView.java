@@ -199,7 +199,7 @@ public class DebugView {
 		toggleGL.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				gameView.switch3d();
+				gameView.switch3d(!gameView.is3d());
 				toggleGL.setText(gameView.is3d() ? "3D" : "2D");
 			}
 		});
