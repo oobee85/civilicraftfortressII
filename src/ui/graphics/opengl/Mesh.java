@@ -43,7 +43,7 @@ public class Mesh {
 		shader.setUniform("textureSampler", 0);
 		shader.setUniform("useTexture", 1f);
 		
-		shader.setUniform("model", MeshUtils.getModelMatrix(position, rotation, scale));
+		shader.setUniform("model", Matrix4f.getModelMatrix(position, rotation, scale));
 //		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, mesh.getIBO());
 		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, this.getIBO());
 //		GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getIndices().length, GL11.GL_UNSIGNED_INT, 0);

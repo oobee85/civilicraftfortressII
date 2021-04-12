@@ -51,6 +51,12 @@ public class Matrix4f {
 		return matrix;
 	}
 	
+
+	public static Matrix4f getModelMatrix(Vector3f position, Matrix4f rotation, Vector3f scale) {
+//		return Matrix4f.multiply(Matrix4f.translate(position), rotation).multiply(Matrix4f.scale(scale));
+		return Matrix4f.multiply(Matrix4f.translate(position), Matrix4f.multiply(rotation, Matrix4f.scale(scale)));
+	}
+	
 	public static Matrix4f scale(Vector3f scale) {
 		Matrix4f matrix = identity();
 		matrix.set(0, 0, scale.x);
