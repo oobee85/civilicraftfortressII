@@ -6,6 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import game.*;
+import networking.client.*;
 import ui.*;
 import utils.*;
 
@@ -26,14 +27,13 @@ public class DebugView {
 	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/tech.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	
 	
-	private JPanel rootPanel;
+	private ScrollingPanel scrollingPanel;
 	private GameView gameView;
 	
 	public DebugView(GameView gameView) {
 		this.gameView = gameView;
-		rootPanel = new JPanel();
-		rootPanel.setFocusable(false);
 		
+		scrollingPanel = new ScrollingPanel(new Dimension(ClientGUI.GUIWIDTH, 500));
 		setupButtons();
 	}
 	
@@ -219,32 +219,32 @@ public class DebugView {
 			}
 		});
 
-		rootPanel.add(showHeightMap);
-		rootPanel.add(showPressureMap);
-		rootPanel.add(showTemperatureMap);
-		rootPanel.add(showMassMap);
-		rootPanel.add(flipTable);
-		rootPanel.add(makeItRain);
-		rootPanel.add(makeItDry);
-		rootPanel.add(fastForward);
-		rootPanel.add(eruptVolcano);
-		rootPanel.add(meteor);
-		rootPanel.add(unitEvents);
-		rootPanel.add(debug);
-		rootPanel.add(toggleNight);
-		rootPanel.add(addResources);
-		rootPanel.add(setPlayerFaction);
-		rootPanel.add(researchEverything);
-		rootPanel.add(raiseHeight);
-		rootPanel.add(setTerritoryButton);
-		rootPanel.add(save);
-		rootPanel.add(exit);
-		rootPanel.add(toggleGL);
-		rootPanel.add(shadowWordDeath);
-		rootPanel.add(shadowWordPain);
+		scrollingPanel.add(showHeightMap);
+		scrollingPanel.add(showPressureMap);
+		scrollingPanel.add(showTemperatureMap);
+		scrollingPanel.add(showMassMap);
+		scrollingPanel.add(flipTable);
+		scrollingPanel.add(makeItRain);
+		scrollingPanel.add(makeItDry);
+		scrollingPanel.add(fastForward);
+		scrollingPanel.add(eruptVolcano);
+		scrollingPanel.add(meteor);
+		scrollingPanel.add(unitEvents);
+		scrollingPanel.add(debug);
+		scrollingPanel.add(toggleNight);
+		scrollingPanel.add(addResources);
+		scrollingPanel.add(setPlayerFaction);
+		scrollingPanel.add(researchEverything);
+		scrollingPanel.add(raiseHeight);
+		scrollingPanel.add(setTerritoryButton);
+		scrollingPanel.add(save);
+		scrollingPanel.add(exit);
+		scrollingPanel.add(toggleGL);
+		scrollingPanel.add(shadowWordDeath);
+		scrollingPanel.add(shadowWordPain);
 	}
 	
 	public JPanel getRootPanel() {
-		return rootPanel;
+		return scrollingPanel.getRootPanel();
 	}
 }

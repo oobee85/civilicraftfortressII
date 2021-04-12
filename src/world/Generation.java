@@ -4,7 +4,6 @@ import java.util.*;
 
 import game.*;
 import game.liquid.*;
-import ui.*;
 import utils.*;
 
 public class Generation {
