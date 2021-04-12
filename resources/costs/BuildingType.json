@@ -194,7 +194,7 @@
 		"texture":"textures/pallet1.png",
 		"vision":5,
 		"cost":{"WOOD":500, "STONE":500},
-		"buildsunits":["WORKER", "PRIEST"],
+		"buildsunits":["WORKER", "PRIEST", "CARAVAN"],
 		"culture":1,
 		"attributes":["castle"],
 		"health":1000,

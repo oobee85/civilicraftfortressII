@@ -33,6 +33,7 @@ public class Tile implements Externalizable {
 	private Building road;
 	private WeatherEvent weather;
 	private Air air;
+	private int tickLastTerrainChange;
 	
 
 	private ConcurrentLinkedQueue<Unit> units;
@@ -92,6 +93,7 @@ public class Tile implements Externalizable {
 		this.humidity = 1;
 		this.energy = 20000;
 		air = new Air(this.height, 0);
+		this.tickLastTerrainChange = -World.MIN_TIME_TO_SWITCH_TERRAIN;
 	}
 
 	
@@ -119,6 +121,12 @@ public class Tile implements Externalizable {
 	}
 	public double getEnergy() {
 		return energy;
+	}
+	public int getTickLastTerrainChange() {
+		return tickLastTerrainChange;
+	}
+	public void setTickLastTerrainChange(int tick) {
+		tickLastTerrainChange = tick;
 	}
 	public void addEnergy(double added) {
 		this.energy += added;
