@@ -62,7 +62,7 @@ public class KUIConstants {
 		return b;
 	}
 	public static JTextField setupTextField(String text, Dimension size) {
-		JTextField b = new JTextField(text, 20);
+		JTextField b = new JTextField(text);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
 		setComponentAttributes(b, size);
 		b.setOpaque(true);

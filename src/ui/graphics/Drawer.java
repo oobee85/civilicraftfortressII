@@ -16,7 +16,6 @@ public abstract class Drawer {
 	protected volatile BufferedImage humidityMapImage;
 	protected volatile BufferedImage pressureMapImage;
 	protected volatile BufferedImage temperatureMapImage;
-	protected volatile BufferedImage massMapImage;
 
 	protected GameViewState state;
 	protected Game game;
@@ -34,7 +33,7 @@ public abstract class Drawer {
 		} else if (state.showTemperatureMap) {
 			return temperatureMapImage;
 		} else if (state.showHumidityMap) {
-			return massMapImage;
+			return humidityMapImage;
 		} else {
 			return minimapImage;
 		}

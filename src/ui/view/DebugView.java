@@ -9,6 +9,7 @@ import game.*;
 import networking.client.*;
 import ui.*;
 import utils.*;
+import world.*;
 
 public class DebugView {
 
@@ -218,6 +219,22 @@ public class DebugView {
 				gameView.getGameInstance().saveToFile();
 			}
 		});
+		
+		JTextField seedTextField = KUIConstants.setupTextField(PerlinNoise.DEFAULT_SEED + "", DEBUG_BUTTON_SIZE);
+		JButton reseedButton = KUIConstants.setupButton("Reseed", null, DEBUG_BUTTON_SIZE);
+		reseedButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					long seed = Long.parseLong(seedTextField.getText());
+					gameView.getGameInstance().world.reseedTerrain(seed);
+				}
+				catch(NumberFormatException ex) {
+					
+				}
+			}
+		});
+		
 
 		scrollingPanel.add(showHeightMap);
 		scrollingPanel.add(showPressureMap);
@@ -237,11 +254,13 @@ public class DebugView {
 		scrollingPanel.add(researchEverything);
 		scrollingPanel.add(raiseHeight);
 		scrollingPanel.add(setTerritoryButton);
-		scrollingPanel.add(save);
+//		scrollingPanel.add(save); // doesnt currently work
 		scrollingPanel.add(exit);
 		scrollingPanel.add(toggleGL);
 		scrollingPanel.add(shadowWordDeath);
 		scrollingPanel.add(shadowWordPain);
+		scrollingPanel.add(seedTextField);
+		scrollingPanel.add(reseedButton);
 	}
 	
 	public JPanel getRootPanel() {
