@@ -126,6 +126,8 @@
 		"name":"GRANARY",
 		"info":"Increases unit supply",
 		"image":"Images/buildings/granary.png",
+		"mesh":"models/granary.ply",
+		"texture":"textures/stone_hay.png",
 		"vision":1,
 		"cost":{"WOOD":200, "BRONZE_BAR":1},
 		"culture":0.25,

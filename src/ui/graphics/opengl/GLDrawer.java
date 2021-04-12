@@ -28,7 +28,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	private Vector3f ambientColor = new Vector3f();
 	
 	private TerrainObject terrainObject;
-	private Mesh hoveredTileBox = MeshUtils.cube;
+	private Mesh hoveredTileBox = MeshUtils.getMeshByFileName("models/selection_cube.ply");
 	
 	private final Camera camera;
 	
