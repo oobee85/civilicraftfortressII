@@ -378,15 +378,15 @@ public class Unit extends Thing implements Serializable {
 				if(thing instanceof Building) {
 					Building building = (Building) thing;
 					//stores inventory in colony
-//					if(building.getType().isColony()) {
-//						building.getInventory().addItem(item);
-//						item.addAmount(-item.getAmount());
-//						
-//						//stores inventory in faction inventory
-//					}else if(building.getType().isCastle()) {
+					if(building.getType().isColony()) {
+						building.getInventory().addItem(item);
+						item.addAmount(-item.getAmount());
+						
+						//stores inventory in faction inventory
+					}else if(building.getType().isCastle()) {
 						this.getFaction().addItem(item.getType(), item.getAmount());
 						item.addAmount(-item.getAmount());
-//					}
+					}
 				}
 				
 			}
@@ -566,7 +566,7 @@ public class Unit extends Thing implements Serializable {
 //						followup = new PlannedAction(newTarget, PlannedAction.HARVEST);
 //					}
 				}
-			}
+			}else if(finished.isTradeAction())
 			
 			this.queuePlannedAction(followup);
 		}
