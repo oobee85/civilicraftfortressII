@@ -42,7 +42,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		// The canvas
 		glcanvas = new GLCanvas(capabilities);
 		glcanvas.addGLEventListener(this);
-		glcanvas.setSize(640, 640);
+//		glcanvas.setSize(640, 640);
 	}
 	
 	public Component getDrawingCanvas() {
