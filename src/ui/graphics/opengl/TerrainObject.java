@@ -23,8 +23,6 @@ public class TerrainObject extends GameObject {
 	}
 
 	private Mesh createMeshFromWorld2(World world) {
-		float xoffset = (float)(world.getWidth() + 1)/2;
-		float zoffset = (float)(world.getHeight() + 1)/2;
 		Vertex[] vertices = new Vertex[world.getTiles().size()];
 		int[][] coordToVertex = new int[world.getHeight()][world.getWidth()];
 		Vector3f c0 = new Vector3f(1, 1, 0);
@@ -34,16 +32,15 @@ public class TerrainObject extends GameObject {
 		int index = 0;
 		for(Tile tile : world.getTiles()) {
 			coordToVertex[tile.getLocation().y()][tile.getLocation().x()] = index;
-			float y = tile.getLocation().y() + (tile.getLocation().x() % 2) * 0.5f;
-			Vector3f pos0 = new Vector3f(tile.getLocation().x() - xoffset, y - zoffset, tile.getHeight()/15);
+			Vector3f pos0 = new Vector3f(
+					tile.getLocation().x(), 
+					tile.getLocation().y() + (tile.getLocation().x() % 2) * 0.5f, 
+					tile.getHeight()/15);
 			Vector3f ca = (tile.getLocation().x() % 2 == 0) ? c0 : c1;
 			Vector3f cb = (tile.getLocation().x() % 2 == 0) ? c2 : c3;
 			Vector3f c = (tile.getLocation().y() % 2 == 0) ? ca : cb;
 			Vector2f textureCoord = new Vector2f((float)tile.getLocation().x()/world.getWidth(), (float)tile.getLocation().y()/world.getHeight());
 			vertices[index] = new Vertex(pos0, c, null, textureCoord);
-//			indices[index*6+0] = index*4+3;
-//			indices[index*6+1] = index*4+0;
-//			indices[index*6+2] = index*4+1;
 			index++;
 		}
 		ArrayList<Integer> indicesList = new ArrayList<>();
