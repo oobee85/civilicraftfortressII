@@ -141,7 +141,7 @@ public class VanillaDrawer extends Drawer {
 				g.drawImage(temperatureMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
 						null);
 			} else if (state.showHumidityMap) {
-				g.drawImage(massMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
+				g.drawImage(humidityMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
 						null);
 			} else {
 				g.drawImage(terrainImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),

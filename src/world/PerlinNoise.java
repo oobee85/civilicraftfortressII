@@ -10,6 +10,8 @@ import javax.imageio.*;
 import utils.*;
 
 public class PerlinNoise {
+
+	public static final long DEFAULT_SEED = 1234;
 	
 	private static final double linearInterpolate(double a0, double a1, double w) {
 		if (0.0 > w) return a0;
@@ -23,17 +25,28 @@ public class PerlinNoise {
 		return (a1 - a0) * (3.0 - w * 2.0) * w * w + a0;
 	}
 	
-	public static final double mult = 2920.0 - 100 + 50*Generation.randy.nextGaussian();
+	public static double mult;
 	
-	public static final double multx1 = 21942.0 - 100 + 50*Generation.randy.nextGaussian();
-	public static final double multy1 = 171324.0 - 100 + 50*Generation.randy.nextGaussian();
-	public static final double multz1 = 8912.0 - 100 + 50*Generation.randy.nextGaussian();
+	public static double multx1;
+	public static double multy1;
+	public static double multz1;
 
-	public static final double multx2 = 23157.0 - 100 + 50*Generation.randy.nextGaussian();
-	public static final double multy2 = 217832.0 - 100 + 50*Generation.randy.nextGaussian();
-	public static final double multz2 = 9758.0 - 100 + 50*Generation.randy.nextGaussian();
+	public static double multx2;
+	public static double multy2;
+	public static double multz2;
 
-	
+	private static void reseeded(long seed) {
+		Random randy = new Random(seed);
+		mult = 2920.0 - 100 + 50*randy.nextGaussian();
+		
+		multx1 = 21942.0 - 100 + 50*randy.nextGaussian();
+		multy1 = 171324.0 - 100 + 50*randy.nextGaussian();
+		multz1 = 8912.0 - 100 + 50*randy.nextGaussian();
+
+		multx2 = 23157.0 - 100 + 50*randy.nextGaussian();
+		multy2 = 217832.0 - 100 + 50*randy.nextGaussian();
+		multz2 = 9758.0 - 100 + 50*randy.nextGaussian();
+	}
 	
 	// From https://en.wikipedia.org/wiki/Perlin_noise
 	private static final Vec2 randomGradient(int ix, int iy) {
@@ -83,7 +96,8 @@ public class PerlinNoise {
 		return value;
 	}
 	
-	public static float[][] generateHeightMap(int width, int height) {
+	public static float[][] generateHeightMap(long seed, int width, int height) {
+		reseeded(seed);
 		
 		int numoctaves = 7;
 		double amplitude = 0.5;

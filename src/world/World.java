@@ -1329,9 +1329,9 @@ public class World {
 		return tiles;
 	}
 	
-	public void generateWorld() {
+	public void reseedTerrain(long seed) {
 		int smoothingRadius = (int) (Math.sqrt((width + height)/2)/2);
-		float[][] heightMap = Generation.generateHeightMap(smoothingRadius, width, height);
+		float[][] heightMap = Generation.generateHeightMap(seed, smoothingRadius, width, height);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		volcano = Generation.makeVolcano(this, heightMap);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
@@ -1340,7 +1340,6 @@ public class World {
 			tile.setFaction(getFaction(NO_FACTION_ID));
 			tile.setHeight(heightMap[tile.getLocation().x()][tile.getLocation().y()]);
 		}
-
 		LinkedList<Tile> tiles = getTilesRandomly();
 		Collections.sort(tiles, new Comparator<Tile>() {
 			@Override
@@ -1351,23 +1350,22 @@ public class World {
 		double rockpercentage = 0.30;
 		double cutoff = tiles.get((int)((1-rockpercentage)*tiles.size())).getHeight();
 		for(Tile tile : getTiles()) {
-			if(tile.getTerrain() == Terrain.DIRT) {
-				Terrain t;
-				if (tile.getHeight() > cutoff) {
-					t = Terrain.ROCK;
-				}
-				else if (tile.getHeight() > 400) {
-					t = Terrain.DIRT;
-				}
-				else {
-					t = Terrain.GRASS;
-				}
-//				else {
-//					t = Terrain.WATER;
-//				}
-				tile.setTerrain(t);
+			Terrain t;
+			if (tile.getHeight() > cutoff) {
+				t = Terrain.ROCK;
 			}
+			else if (tile.getHeight() > 400) {
+				t = Terrain.DIRT;
+			}
+			else {
+				t = Terrain.GRASS;
+			}
+			tile.setTerrain(t);
 		}
+	}
+	
+	public void generateWorld() {
+		reseedTerrain(PerlinNoise.DEFAULT_SEED);
 
 		int numTiles = width*height;
 //		Generation.makeLake(numTiles * 1, this);

@@ -4,17 +4,11 @@ import java.util.*;
 
 import game.*;
 import game.liquid.*;
-import ui.*;
 import utils.*;
 
 public class Generation {
 	
 	public static final int OREMULTIPLIER = 16384;
-
-	public static final Random randy = new Random();
-	static {
-		randy.setSeed(1234567);
-	}
 	
 	// From https://en.wikipedia.org/wiki/Perlin_noise
 	
@@ -22,13 +16,13 @@ public class Generation {
 		return (float) Utils.getRandomNormalF(5);
 	}
 	
-	public static float[][] generateHeightMap(int smoothingRadius, int width, int height) {
+	public static float[][] generateHeightMap(long seed, int smoothingRadius, int width, int height) {
 		int power = 1;
 		while(power < width || power < height) {
 			power *= 2;
 		}
 		
-		float[][] heightMap = PerlinNoise.generateHeightMap(width, height);
+		float[][] heightMap = PerlinNoise.generateHeightMap(seed, width, height);
 		float[][] croppedHeightMap = new float[width][height];
 		int croppedWidth = (power - width)/2;
 		int croppedHeight = (power - height)/2;

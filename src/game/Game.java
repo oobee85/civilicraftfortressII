@@ -571,7 +571,7 @@ public class Game {
 			}
 		}
 		if(castle != null) {
-			caravan.queuePlannedAction(new PlannedAction(castle, PlannedAction.TRADE, null));
+			caravan.queuePlannedAction(new PlannedAction(castle, PlannedAction.TAKE, null));
 		}
 		
 		

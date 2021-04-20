@@ -18,9 +18,10 @@ public class Vector3f {
 	}
 	
 	public void set(float x, float y, float z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.x = x; this.y = y; this.z = z;
+	}
+	public void set(Vector3f other) {
+		this.x = other.x; this.y = other.y; this.z = other.z;
 	}
 	
 	public Vector3f add(Vector3f other) {
@@ -34,6 +35,10 @@ public class Vector3f {
 	}
 	public Vector3f multiply(float scalar) {
 		return new Vector3f(x * scalar, y * scalar, z * scalar);
+	}
+	/** Element-wise division */
+	public Vector3f divide(Vector3f other) {
+		return new Vector3f(x / other.x, y / other.y, z / other.z);
 	}
 	public float dot(Vector3f other) {
 		return x * other.x + y * other.y + z * other.z;
@@ -84,4 +89,13 @@ public class Vector3f {
 		return "<" + x + "," + y + "," + z + ">";
 	}
 	
+	public static Vector3f xAxis() {
+		return new Vector3f(1, 0, 0);
+	}
+	public static Vector3f yAxis() {
+		return new Vector3f(0, 1, 0);
+	}
+	public static Vector3f zAxis() {
+		return new Vector3f(0, 0, 1);
+	}
 }

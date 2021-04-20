@@ -39,7 +39,7 @@ public class ServerGUI extends JPanel {
 		if(gameView != null) {
 			this.remove(gameView.getPanel());
 		}
-		gameView = new GameView(instance, false);
+		gameView = new GameView(instance, false, new JPanel());
 		gameView.setCommandInterface(Utils.makeFunctionalCommandInterface(instance));
 		gameView.requestFocus();
 		this.add(gameView.getPanel(), BorderLayout.CENTER);

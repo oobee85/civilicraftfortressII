@@ -32,7 +32,8 @@ public class GameView {
 	private boolean summonPlayerControlled = true;
 	private boolean setSpawnWeather = false;
 
-	private final JPanel panel;
+	private final FillingLayeredPane panel;
+	private final JPanel overlayPanel;
 	private final Drawer vanillaDrawer;
 	private final Drawer glDrawer;
 	
@@ -68,10 +69,12 @@ public class GameView {
 		public ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
 	}
 
-	public GameView(Game game, boolean useOpenGL) {
+	public GameView(Game game, boolean useOpenGL, JPanel overlay) {
+		this.overlayPanel = overlay;
 		state = new GameViewState();
+		vanillaDrawer = new VanillaDrawer(game, state);
 		glDrawer = new GLDrawer(game, state);
-		panel = new JPanel() {
+		panel = new FillingLayeredPane() {
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
@@ -81,18 +84,16 @@ public class GameView {
 				}
 			}
 		};
-		vanillaDrawer = new VanillaDrawer(game, state);
-		currentActiveDrawer = vanillaDrawer;
+		panel.setLayout(new BorderLayout());
+		panel.setBackground(Color.black);
 		
 		glDrawer.getDrawingCanvas().setFocusable(false);
 		vanillaDrawer.getDrawingCanvas().setFocusable(false);
-		drawingCanvas = currentActiveDrawer.getDrawingCanvas();
+
+		switch3d(useOpenGL);
 		
-		panel.setLayout(new BorderLayout());
-		panel.add(drawingCanvas, BorderLayout.CENTER);
 		this.game = game;
 		this.guiController = game.getGUIController();
-		panel.setBackground(Color.black);
 		state.viewOffset = new Position(0, 0);
 
 		MouseWheelListener mouseWheelListener = new MouseWheelListener() {
@@ -246,16 +247,22 @@ public class GameView {
 		panel.addKeyListener(keyListener);
 	}
 	
-	public void switch3d() {
-		if(is3d()) {
-			currentActiveDrawer = vanillaDrawer;
-		}
-		else {
+	public void switch3d(boolean activate3D) {
+		if(activate3D) {
 			currentActiveDrawer = glDrawer;
 		}
-		panel.remove(drawingCanvas);
+		else {
+			currentActiveDrawer = vanillaDrawer;
+		}
+		if(drawingCanvas != null) {
+			panel.remove(drawingCanvas);
+		}
+		panel.remove(overlayPanel);
 		drawingCanvas = currentActiveDrawer.getDrawingCanvas();
-		panel.add(drawingCanvas, BorderLayout.CENTER);
+		if(!activate3D) {
+			panel.add(overlayPanel);
+		}
+		panel.add(drawingCanvas);
 	}
 	public boolean is3d() {
 		return currentActiveDrawer == glDrawer;
@@ -673,7 +680,7 @@ public class GameView {
 	public int getHeight() {
 		return panel.getHeight();
 	}
-	public JPanel getPanel() {
+	public FillingLayeredPane getPanel() {
 		return panel;
 	}
 	

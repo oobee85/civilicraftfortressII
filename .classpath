@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="json.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JOGL"/>
 	<classpathentry kind="lib" path="jply.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -5,8 +5,6 @@ import java.util.*;
 
 import javax.swing.*;
 
-import com.jogamp.opengl.util.texture.*;
-
 import game.*;
 import ui.graphics.*;
 import ui.graphics.opengl.*;
@@ -23,11 +21,11 @@ public enum PlantType implements HasImage, HasMesh {
 			"Images/plants/berry_depleted16.png",
 			false, 0.2, 1, false, ItemType.RUNITE_BAR),
 	CATTAIL ( new String[] {"Images/plants/cattail32.png"},
-			MeshUtils.defaultPlant, 
-			"Images/plants/cattail32.png",
+			MeshUtils.cattail, 
+			"textures/pallet1.png",
 			false, 1.0, 50, true, ItemType.FOOD),
 	FOREST1 ( new String[] {"Images/plants/tree1.png"},
-			MeshUtils.defaultPlant, 
+			MeshUtils.getMeshByFileName("models/square_tree.ply"), 
 			"Images/plants/tree1.png",
 			false, 1, 100, false, ItemType.WOOD),
 	CACTUS ( new String[] {"Images/plants/cactus.png"},

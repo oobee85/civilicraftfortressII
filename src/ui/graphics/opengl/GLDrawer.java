@@ -19,6 +19,11 @@ import utils.*;
 import world.*;
 
 public class GLDrawer extends Drawer implements GLEventListener {
+	
+	private static final float FOV = 70f;
+	private static final float NEAR_CLIP = 0.1f;
+	private static final float FAR_CLIP = 1000f;
+	
 	private final GLCanvas glcanvas;
 	private Shader shader;
 	private Matrix4f projection;
@@ -28,7 +33,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	private Vector3f ambientColor = new Vector3f();
 	
 	private TerrainObject terrainObject;
-	private Mesh hoveredTileBox = MeshUtils.cube;
+	private Mesh hoveredTileBox = MeshUtils.getMeshByFileName("models/selection_cube.ply");
 	
 	private final Camera camera;
 	
@@ -42,7 +47,21 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		// The canvas
 		glcanvas = new GLCanvas(capabilities);
 		glcanvas.addGLEventListener(this);
-		glcanvas.setSize(640, 640);
+		
+		glcanvas.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				updateProjectionMatrix();
+			}
+		});
+	}
+	
+	private void updateProjectionMatrix() {
+		projection = Matrix4f.projection(getAspectRatio(), FOV, NEAR_CLIP, FAR_CLIP);
+	}
+	
+	private float getAspectRatio() {
+		return (float)glcanvas.getWidth()/glcanvas.getHeight();
 	}
 	
 	public Component getDrawingCanvas() {
@@ -71,7 +90,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 		shader = new Shader("/shaders/mainVertex.glsl", "/shaders/mainFragment.glsl");
 		shader.create(gl);
-		projection = Matrix4f.projection((float)glcanvas.getWidth()/glcanvas.getHeight(), 70f, 0.1f, 1000);
+		
+		updateProjectionMatrix();
 	}
 
 	@Override
@@ -94,9 +114,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			if(terrainObject == null) {
 				terrainObject = new TerrainObject();
 				terrainObject.create(gl, game.world);
-				camera.set(new Vector3f(game.world.getWidth()*2/3, -game.world.getHeight(), 0), 90, 130);
-//				camera.set(new Vector3f(game.world.getWidth()/2, game.world.getHeight()/2, 500), 0, -90);
-	//			camera.set(new Vector3f(game.world.getWidth()/2, 100, game.world.getHeight()/2), 0, -90);
+				camera.set(new Vector3f(game.world.getWidth()/2, 0, 100), 0, -45);
 				this.updateTerrainImages();
 			}
 			if(this.terrainImage != null) {
@@ -136,55 +154,58 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("sunColor", sunColor);
 		shader.setUniform("ambientColor", ambientColor);
 		
-		for(int x = -5; x < 11; x++) {
-			MeshUtils.cube.render(gl, shader, 
-					TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
-					new Vector3f(x, 0, 0), 
-					Matrix4f.identity(), 
-					new Vector3f(1, 1, 1));
-		}
-		for(int y = -5; y < 11; y++) {
-			UnitType pig = Game.unitTypeMap.get("PIG");
-			pig.getMesh().render(gl, shader, 
-					TextureUtils.getTextureByFileName(pig.getTextureFile(), gl), 
-					new Vector3f(0, y, 0), 
-					Matrix4f.identity(), 
-					new Vector3f(1, 1, 1));
-		}
-		for(int z = -5; z < 11; z++) {
-			MeshUtils.star.render(gl, shader, 
-					TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
-					new Vector3f(0, 0, z), 
-					Matrix4f.identity(), 
-					new Vector3f(1, 1, 1));
-		}
+		MeshUtils.x.render(gl, shader, 
+				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
+				new Vector3f(-20, 0, 0), 
+				Matrix4f.rotate(90, new Vector3f(0, 0, 1)), 
+				new Vector3f(.1f, .1f, .1f));
+		MeshUtils.x.render(gl, shader, 
+				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
+				new Vector3f(5, 0, 0), 
+				Matrix4f.rotate(90, new Vector3f(0, 0, 1)), 
+				new Vector3f(.1f, .1f, .1f));
+		UnitType pig = Game.unitTypeMap.get("PIG");
+		MeshUtils.y.render(gl, shader, 
+				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
+				new Vector3f(0, -20, 0), 
+				Matrix4f.identity(), 
+				new Vector3f(.1f, .1f, .1f));
+		MeshUtils.y.render(gl, shader, 
+				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
+				new Vector3f(0, 5, 0), 
+				Matrix4f.identity(), 
+				new Vector3f(.1f, .1f, .1f));
+		MeshUtils.z.render(gl, shader, 
+				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
+				new Vector3f(0, 0, -20), 
+				Matrix4f.rotate(90, new Vector3f(0, 1, 0)), 
+				new Vector3f(.1f, .1f, .1f));
+		MeshUtils.z.render(gl, shader, 
+				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
+				new Vector3f(0, 0, 5), 
+				Matrix4f.rotate(90, new Vector3f(0, 1, 0)), 
+				new Vector3f(.1f, .1f, .1f));
 
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
-//		terrainObject.render(gl, shader);
 		
-		float xoffset = (float)game.world.getWidth()/2;
-		float zoffset = (float)game.world.getHeight()/2;
 		for(Plant plant : game.world.getPlants()) {
 			float y = plant.getTile().getLocation().y() + (plant.getTile().getLocation().x() % 2) * 0.5f;
 			Vector3f pos = new Vector3f(
-					plant.getTile().getLocation().x() - xoffset, 
-					y - zoffset,
+					plant.getTile().getLocation().x(), y,
 					plant.getTile().getHeight()/15);
 			plant.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(plant.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 		for(Unit unit : game.world.getUnits()) {
 			float y = unit.getTile().getLocation().y() + (unit.getTile().getLocation().x() % 2) * 0.5f;
 			Vector3f pos = new Vector3f(
-					unit.getTile().getLocation().x() - xoffset, 
-					y - zoffset, 
+					unit.getTile().getLocation().x(), y, 
 					unit.getTile().getHeight()/15);
 			unit.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(unit.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 		for(Building building : game.world.getBuildings()) {
 			float y = building.getTile().getLocation().y() + (building.getTile().getLocation().x() % 2) * 0.5f;
 			Vector3f pos = new Vector3f(
-					building.getTile().getLocation().x() - xoffset, 
-					y - zoffset, 
+					building.getTile().getLocation().x(), y, 
 					building.getTile().getHeight()/15);
 			building.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(2, 2, 2));
 		}
@@ -192,8 +213,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		for(Projectile projectile : game.world.getData().getProjectiles()) {
 			float y = projectile.getTile().getLocation().y() + (projectile.getTile().getLocation().x() % 2) * 0.5f;
 			Vector3f pos = new Vector3f(
-					projectile.getTile().getLocation().x() - xoffset, 
-					y - zoffset, 
+					projectile.getTile().getLocation().x(), y, 
 					projectile.getTile().getHeight()/15 + projectile.getHeight()/15);
 			MeshUtils.star.render(gl, shader, TextureUtils.getTextureByFileName(PlantType.BERRY.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(2, 2, 2));
 		}
@@ -201,8 +221,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		if(game.world.get(state.hoveredTile) != null) {
 			float y = state.hoveredTile.y() + (state.hoveredTile.x() % 2) * 0.5f;
 			Vector3f pos = new Vector3f(
-					state.hoveredTile.x() - xoffset,
-					y - zoffset, 
+					state.hoveredTile.x(), y, 
 					game.world.get(state.hoveredTile).getHeight()/15);
 			hoveredTileBox.render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
@@ -217,27 +236,51 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		gl.glClearColor(background.getRed()/255f, background.getGreen()/255f, background.getBlue()/255f, 1.0f);
 	}
 
+	public Vector3f rayCast(Vector3f start, Vector3f direction, World world) {
+		// TODO convert this to newton's method
+		Vector3f current = start;
+		Vector3f previous = current;
+		Vector3f increment = direction.multiply(4);
+		for(int i = 0; i < 250; i++) {
+			TileLoc currentTileLoc = new TileLoc((int)current.x, (int)current.y);
+			Tile currentTile = world.get(currentTileLoc);
+			if((currentTile != null && current.z*15 <= currentTile.getHeight())
+					|| (current.z < 0)) {
+//				return current.add(previous).multiply(0.5f);
+				return previous;
+			}
+			previous = current;
+			current = current.add(increment);
+		}
+		return null;
+	}
+	
 	@Override
 	public Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
-//		Vector3f onScreen = new Vector3f(pixelOnScreen.x, pixelOnScreen.y, 0);
-		// TODO need to implement Matrix.inverse();
-		// Vector3f onView = projection.inverse().multiply(onScreen, 1);
-		// Vector3f viewingRay = onView.subtract(onScreen).normalize();
-		// Vector3f intersectWithCloseCuttingPlane = viewingRay*closeDistance + cameraPos;
-		// Vector3f intersectWithFarCuttingPlane = viewingRay*farDistance + cameraPos;
-		// closeIntersectWorld = view.inverse() * intersectWithCloseCuttingPlane;
-		// farIntersectWorld = view.inverse() * intersectWithFarCuttingPlane;
-		// TODO implement ray-cast to find where closeIntersectWorld  to farIntersectWorld
-		// 		intersects with the world mesh
 		
-		// The little trick make the game vaguely playable :P
-		return new Position(game.world.getWidth() * pixelOnScreen.x / glcanvas.getWidth(), 
-				game.world.getHeight() * (glcanvas.getHeight() - pixelOnScreen.y) / glcanvas.getHeight());
+		double halfFOV = Math.toRadians(FOV/2);
+		float frustumWidth = (float) (Math.tan(halfFOV) * FAR_CLIP * 2);
+		float frustumHeight = frustumWidth / getAspectRatio();
+		
+		Vector3f onScreen = new Vector3f(pixelOnScreen.x, glcanvas.getHeight() - pixelOnScreen.y, 0);
+		
+		float x = -frustumWidth/2 + frustumWidth * onScreen.x / glcanvas.getWidth();
+		float y = -frustumHeight/2 + frustumHeight * onScreen.y / glcanvas.getHeight();
+		
+		Vector3f viewingRay = new Vector3f(x, y, -FAR_CLIP).normalize();
+		
+		Vector3f viewingRayInWorld = camera.getView().inverse().multiply(viewingRay, 0).normalize();
+
+		Vector3f intersect = rayCast(camera.getPosition(), viewingRayInWorld, game.world);
+		if(intersect == null) {
+			return new Position(-1, -1);
+		}
+		return new Position(intersect.x, intersect.y);
 	}
 
 	@Override
 	public void zoomView(int scroll, int mx, int my) {
-		camera.moveForward(-4*scroll);
+		camera.zoom(-4*scroll);
 	}
 
 	@Override
@@ -252,7 +295,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	
 	@Override
 	public void rotateView(int dx, int dy) {
-		float adjust = 0.05f;
+		float adjust = 0.1f;
 		camera.rotate(dx*adjust, -dy*adjust);
 	}
 }

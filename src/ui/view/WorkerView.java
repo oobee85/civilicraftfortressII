@@ -10,7 +10,6 @@ import networking.client.*;
 import ui.*;
 import ui.infopanels.*;
 import utils.*;
-import world.*;
 
 public class WorkerView {
 	private static final Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
@@ -19,27 +18,15 @@ public class WorkerView {
 	private static final ImageIcon COLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/collapsed.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE);
 	private static final ImageIcon UNCOLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/uncollapsed.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE);
 	
-	
-	private JPanel rootPanel;
-	private JPanel buttonPanel;
+	private ScrollingPanel scrollingPanel;
 
 	private JButton[] buildingButtons;
 	private GameView gameView;
 	
 	public WorkerView(GameView gameView) {
 		this.gameView = gameView;
-		rootPanel = new JPanel();
-		rootPanel.setFocusable(false);
-		rootPanel.setLayout(new BorderLayout());
-		
-		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new GridBagLayout());
-		
-		JScrollPane scrollPane = new JScrollPane(buttonPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-		buttonPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, BUILDING_BUTTON_SIZE.height * (Game.buildingTypeList.size()/2 + 4)));
-		
-		rootPanel.add(scrollPane);
+		scrollingPanel = new ScrollingPanel(new Dimension(ClientGUI.GUIWIDTH, BUILDING_BUTTON_SIZE.height * (Game.buildingTypeList.size()/2 + 4)));
+		scrollingPanel.setLayout(new GridBagLayout());
 		setupButtons();
 	}
 	
@@ -96,11 +83,11 @@ public class WorkerView {
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0; c.gridy = 0; c.weightx = 1; c.gridwidth = 2;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		buttonPanel.add(toggleButton, c);
+		scrollingPanel.add(toggleButton, c);
 		c = new GridBagConstraints();
 		c.gridx = 0; c.gridy = 4; c.weightx = 1; c.gridwidth = 2;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		buttonPanel.add(toggleButton2, c);
+		scrollingPanel.add(toggleButton2, c);
 		int index1 = 0;
 		int index2 = 0;
 		for (int i = 0; i < Game.buildingTypeList.size(); i++) {
@@ -111,7 +98,7 @@ public class WorkerView {
 				c.gridwidth = 1;
 				c.weightx = 0.5;
 				c.fill = GridBagConstraints.HORIZONTAL;
-				buttonPanel.add(buildingButtons[i], c);
+				scrollingPanel.add(buildingButtons[i], c);
 				index1++;
 			}
 			else {
@@ -121,7 +108,7 @@ public class WorkerView {
 				c.gridwidth = 1;
 				c.weightx = 0.5;
 				c.fill = GridBagConstraints.HORIZONTAL;
-				buttonPanel.add(buildingButtons[i], c);
+				scrollingPanel.add(buildingButtons[i], c);
 				index2++;
 			}
 		}
@@ -131,7 +118,7 @@ public class WorkerView {
 		c.fill = GridBagConstraints.BOTH;
 		JPanel p = new JPanel();
 		p.setOpaque(false);
-		buttonPanel.add(p, c);
+		scrollingPanel.add(p, c);
 	}
 	
 	public void updateButtons() {
@@ -149,6 +136,6 @@ public class WorkerView {
 	}
 	
 	public JPanel getRootPanel() {
-		return rootPanel;
+		return scrollingPanel.getRootPanel();
 	}
 }

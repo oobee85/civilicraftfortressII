@@ -72,6 +72,8 @@
 	},
 	{
 		"image":"Images/units/catapult.png",
+		"mesh":"models/catapult.ply",
+		"texture":"textures/pallet1.png",
 		"cost":{"WOOD":1000,"MITHRIL_BAR":5,"STONE":1000},
 		"stats":{"movespeed":40,"buildtime":1000,"health":200,"healspeed":100},
 		"name":"CATAPULT",

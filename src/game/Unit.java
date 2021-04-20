@@ -566,7 +566,7 @@ public class Unit extends Thing implements Serializable {
 //						followup = new PlannedAction(newTarget, PlannedAction.HARVEST);
 //					}
 				}
-			}else if(finished.isTradeAction())
+			}else if(finished.isTakeAction())
 			
 			this.queuePlannedAction(followup);
 		}
