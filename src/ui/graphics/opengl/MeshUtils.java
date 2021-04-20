@@ -52,7 +52,7 @@ public class MeshUtils {
 		
 		Vector3f range = max.subtract(min);
 		float maximumRange = Math.max(range.y, range.x);
-		float scale = 1/maximumRange;
+		float scale = 1f/maximumRange;
 		Vector3f offset = new Vector3f(-range.x*scale*0.5f, -range.y*scale*0.5f, 0);
 		for(Vertex v : mesh.getVertices()) {
 			Vector3f newPos = v.getPosition().subtract(min);
