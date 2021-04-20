@@ -106,7 +106,7 @@ public class GameViewOverlay extends JPanel {
 	public void updateItems() {
 		if(faction != null) {
 			for (int i = 0; i < ItemType.values().length; i++) {
-				int amount = faction.getItemAmount(ItemType.values()[i]);
+				int amount = faction.getInventory().getItemAmount(ItemType.values()[i]);
 				resourceIndicators[i].setText("" + amount);
 				resourceIndicators[i].setVisible(resourceIndicatorsDiscovered[i] || amount > 0);
 				if(amount > 0) {

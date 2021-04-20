@@ -310,7 +310,7 @@ public class Game {
 	}
 	public void addResources(Faction faction) {
 		for(ItemType itemType : ItemType.values()) {
-			faction.addItem(itemType, 1000);
+			faction.getInventory().addItem(itemType, 1000);
 		}
 		
 	}
@@ -439,11 +439,11 @@ public class Game {
 		world.addFaction(NO_FACTION);
 		
 		Faction CYCLOPS_FACTION = new Faction("CYCLOPS", false, true);
-		CYCLOPS_FACTION.addItem(ItemType.FOOD, 50);
+		CYCLOPS_FACTION.getInventory().addItem(ItemType.FOOD, 50);
 		world.addFaction(CYCLOPS_FACTION);
 		
 		Faction UNDEAD_FACTION = new Faction("UNDEAD", false, true);
-		UNDEAD_FACTION.addItem(ItemType.FOOD, 999999);
+		UNDEAD_FACTION.getInventory().addItem(ItemType.FOOD, 999999);
 		world.addFaction(UNDEAD_FACTION);
 		
 		Attack.world = world;
@@ -546,36 +546,6 @@ public class Game {
 			}
 			
 		}
-	}
-	private void spawnCaravan(Building building) {
-		Tile tile = building.getTile();
-		
-		for(Unit unit: tile.getUnits()) {
-			if(unit.getType().isCaravan()) {
-				return;
-			}
-		}
-		Unit caravan = (Unit) summonThing(tile, Game.unitTypeMap.get("CARAVAN"), building.getFaction());
-		
-		for(Item item: building.getInventory().getItems()) {
-			if(item != null) {
-				caravan.addItem(item);
-				item.addAmount(-item.getAmount());	
-			}
-			
-		}
-		Building castle = null;
-		for(Building potential: building.getFaction().getBuildings()) {
-			if(potential.getType().isCastle()) {
-				castle = potential;
-			}
-		}
-		if(castle != null) {
-			caravan.queuePlannedAction(new PlannedAction(castle, PlannedAction.TAKE, null));
-		}
-		
-		
-		
 	}
 	
 	
@@ -722,9 +692,9 @@ public class Game {
 		int index = 0;
 		for(PlayerInfo player : players) {
 			Faction newFaction = new Faction(player.getName(), true, true, player.getColor());
-			newFaction.addItem(ItemType.WOOD, 200);
-			newFaction.addItem(ItemType.STONE, 200);
-			newFaction.addItem(ItemType.FOOD, 200);
+			newFaction.getInventory().addItem(ItemType.WOOD, 200);
+			newFaction.getInventory().addItem(ItemType.STONE, 200);
+			newFaction.getInventory().addItem(ItemType.FOOD, 200);
 			world.addFaction(newFaction);
 			
 			LinkedList<HasImage> thingsToPlace = new LinkedList<>();

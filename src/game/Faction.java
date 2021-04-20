@@ -21,7 +21,7 @@ public class Faction implements Externalizable {
 	private HashMap<ResourceType, ResearchRequirement> resourceResearchRequirements = new HashMap<>();
 	
 
-	private Item[] items = new Item[ItemType.values().length];
+//	private Item[] items = new Item[ItemType.values().length];
 	private Inventory inventory;
 	
 	private HashMap<String, Research> researchMap = new HashMap<>();
@@ -49,7 +49,7 @@ public class Faction implements Externalizable {
 		usesItems = in.readBoolean();
 		isPlayer = in.readBoolean();
 		researchTarget = (Research)in.readObject();
-		items = (Item[])in.readObject();
+//		items = (Item[])in.readObject();
 	}
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
@@ -59,11 +59,10 @@ public class Faction implements Externalizable {
 		out.writeBoolean(usesItems);
 		out.writeBoolean(isPlayer);
 		out.writeObject(researchTarget);
-		out.writeObject(items);
+//		out.writeObject(items);
 	}
 	
 	public Faction() {
-		initializeItems();
 	}
 	
 	public Faction(String name, boolean isPlayer, boolean usesItems) {
@@ -75,8 +74,8 @@ public class Faction implements Externalizable {
 		this.name = name;
 		this.usesItems = usesItems;
 		this.isPlayer = isPlayer;
+		this.inventory = new Inventory();
 		setupResearch();
-		initializeItems();
 	}
 	
 	public void addBuilding(Building building) {
@@ -99,8 +98,8 @@ public class Faction implements Externalizable {
 	public double getDifficulty() {
 		return environmentalDifficulty;
 	}
-	public Item[] getItems() {
-		return items;
+	public Inventory getInventory() {
+		return this.inventory;
 	}
 	public int id() {
 		return id;
@@ -116,11 +115,6 @@ public class Faction implements Externalizable {
 	}
 	public String name() {
 		return name;
-	}
-	private void initializeItems() {
-		for(ItemType itemType : ItemType.values()) {
-			items[itemType.ordinal()] = new Item(0, itemType);
-		}
 	}
 	public static Faction getTempFaction() {
 		Faction temp = new Faction("temp", false, false);
@@ -269,7 +263,7 @@ public class Faction implements Externalizable {
 			if(building.getType() == requiredBuilding && building.getFaction() == this) {
 				for(int i = 0; i < amount && canAfford(type.getCost()); i++) {
 					payCost(type.getCost());
-					addItem(type, 1);
+					inventory.addItem(type, 1);
 				}
 				return;
 			}
@@ -280,35 +274,10 @@ public class Faction implements Externalizable {
 		return usesItems;
 	}
 	
-	public int getItemAmount(ItemType type) {
-		if(usesItems) {
-			return items[type.ordinal()] != null ? items[type.ordinal()].getAmount() : 0;
-		}
-		return 0;
-	}
-	
-	public void addItem(ItemType type, int quantity) {
-		if(usesItems) {
-			if(items[type.ordinal()] == null) {
-				items[type.ordinal()] = new Item(0, type);
-			}
-			items[type.ordinal()].addAmount(quantity);
-		}
-	}
-	
-	public void setAmount(ItemType type, int amount) {
-		if(usesItems) {
-			if(items[type.ordinal()] == null) {
-				items[type.ordinal()] = new Item(0, type);
-			}
-			items[type.ordinal()].addAmount(amount - items[type.ordinal()].getAmount());
-		}
-	}
-	
 	public boolean canAfford(HashMap<ItemType, Integer> cost) {
 		if(usesItems) {
 			for (Entry<ItemType, Integer> entry : cost.entrySet()) {
-				if(items[entry.getKey().ordinal()] == null || items[entry.getKey().ordinal()].getAmount() < entry.getValue()) {
+				if(this.inventory.getItemAmount(entry.getKey()) < entry.getValue()) {
 					return false;
 				}
 			}
@@ -316,19 +285,19 @@ public class Faction implements Externalizable {
 		return true;
 	}
 	public boolean canAfford(ItemType type, int quantity) {
-		return !usesItems || (items[type.ordinal()] != null && items[type.ordinal()].getAmount() >= quantity);
+		return !usesItems ||  this.inventory.getItemAmount(type) >= quantity;
 	}
 	
 	public void payCost(HashMap<ItemType, Integer> cost) {
 		if(usesItems) {
 			for (Entry<ItemType, Integer> entry : cost.entrySet()) {
-				items[entry.getKey().ordinal()].addAmount(-entry.getValue());
+				this.inventory.addItem(entry.getKey(), -entry.getValue());
 			}
 		}
 	}
 	public void payCost(ItemType type, int quantity) {
 		if(usesItems) {
-			items[type.ordinal()].addAmount(-quantity);
+			this.inventory.addItem(type, -quantity);
 		}
 	}
 	

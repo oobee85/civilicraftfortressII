@@ -482,9 +482,9 @@ public class Client {
 			}
 		}
 		
-		Item[] itemsUpdate = factionUpdate.getItems();
+		Item[] itemsUpdate = factionUpdate.getInventory().getItems();
 		for(Item itemUpdate : itemsUpdate) {
-			faction.setAmount(itemUpdate.getType(), itemUpdate.getAmount());
+			faction.getInventory().setAmount(itemUpdate.getType(), itemUpdate.getAmount());
 		}
 		
 		if(clientGUI.getGameView().getFaction() != faction) {

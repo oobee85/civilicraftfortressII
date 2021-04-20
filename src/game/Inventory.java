@@ -14,12 +14,20 @@ public class Inventory {
 	public int getItemAmount(ItemType type) {
 		return items[type.ordinal()] != null ? items[type.ordinal()].getAmount() : 0;
 	}
-	
-	public void addItem(Item item) {
-		if(items[item.getType().ordinal()] == null) {
-			items[item.getType().ordinal()] = item;
+	public void takeAll(Inventory from) {
+		for(Item item: from.getItems()) {
+			if(item != null) {
+				this.addItem(item.getType(), item.getAmount());
+				from.setAmount(item.getType(), 0);
+			}
 		}
-		items[item.getType().ordinal()].addAmount(item.getAmount());
+	}
+	
+	public void addItem(ItemType type, int amount) {
+		if(items[type.ordinal()] == null) {
+			this.setAmount(type, 0);
+		}
+		items[type.ordinal()].addAmount(amount);
 	
 	}
 	

@@ -68,9 +68,9 @@ public class Unit extends Thing implements Serializable {
 		return inventory;
 	}
 	
-	public boolean addItem(Item item) {
-		this.inventory.addItem(item);
-		if(this.inventory.getItemAmount(item.getType()) >= this.maxItemAmount) {
+	public boolean addItem(ItemType type, int amount) {
+		this.inventory.addItem(type, amount);
+		if(this.inventory.getItemAmount(type) >= this.maxItemAmount) {
 			return true;
 		}
 		return false;
@@ -218,7 +218,7 @@ public class Unit extends Thing implements Serializable {
 		// If on tile with an item, take the item
 		if (getFaction().usesItems() && this.getType().isBuilder()) {
 			for (Item item : getTile().getItems()) {
-				this.addItem(item);
+				this.addItem(item.getType(), item.getAmount());
 //				getFaction().addItem(item.getType(), item.getAmount());
 			}
 			getTile().clearItems();
@@ -338,15 +338,15 @@ public class Unit extends Thing implements Serializable {
 			boolean isFull = false;
 			if(building.getType().name().equals("IRRIGATION")) {
 				building.takeDamage(1);
-				isFull = this.addItem(new Item(1, ItemType.FOOD));
+				isFull = this.addItem(ItemType.FOOD, 1);
 				this.resetTimeToHarvest(1);
 			}else if(building.getType().name().equals("MINE")) {
 				building.takeDamage(1);
 				if(building.getTile().getResource() != null) {
-					isFull = this.addItem(new Item(1, building.getTile().getResource().getType().getItemType()));
+					isFull = this.addItem(building.getTile().getResource().getType().getItemType(), 1);
 					this.resetTimeToHarvest(building.getTile().getResource().getType().getTimeToHarvest());
 				}else {
-					isFull = this.addItem(new Item(1, ItemType.STONE));
+					isFull = this.addItem(ItemType.STONE, 1);
 					this.resetTimeToHarvest(1);
 				}
 				
@@ -364,7 +364,7 @@ public class Unit extends Thing implements Serializable {
 	public void doHarvest(Plant plant, PlannedAction action) {
 		if(readyToHarvest()) {
 			plant.takeDamage(1);
-			boolean isFull = this.addItem(new Item(1, plant.getItem()));
+			boolean isFull = this.addItem(plant.getItem(), 1);
 			this.resetTimeToHarvest(1);
 			if(isFull) {
 				action.setDone(true);
@@ -372,26 +372,25 @@ public class Unit extends Thing implements Serializable {
 		}
 		
 	}
-	public void doDelivery(PlannedAction action, Thing thing) {
-		for(Item item: inventory.getItems()) {
-			if(item != null) {
-				if(thing instanceof Building) {
-					Building building = (Building) thing;
-					//stores inventory in colony
-					if(building.getType().isColony()) {
-						building.getInventory().addItem(item);
-						item.addAmount(-item.getAmount());
-						
-						//stores inventory in faction inventory
-					}else if(building.getType().isCastle()) {
-						this.getFaction().addItem(item.getType(), item.getAmount());
-						item.addAmount(-item.getAmount());
-					}
-				}
-				
-			}
-			
+	public void doTake(PlannedAction action, Thing target) {
+		if(target instanceof Building) {
+			Building building = (Building) target;
+			this.inventory.takeAll(building.getInventory());
 		}
+	}
+	public void doDelivery(PlannedAction action, Thing target) {
+		if(target instanceof Building) {
+			Building building = (Building) target;
+			//stores inventory in colony
+			if(building.getType().isColony()) {
+				building.getInventory().takeAll(this.inventory);
+				
+				//stores inventory in faction inventory
+			}else if(building.getType().isCastle()) {
+				this.getFaction().getInventory().takeAll(this.inventory);
+			}
+		}
+		
 		action.setDone(true);
 	}
 	
@@ -508,6 +507,10 @@ public class Unit extends Thing implements Serializable {
 				this.doDelivery(plan, plan.target);
 				
 			}
+			else if(plan.isTakeAction() && unitType.isCaravan() && inRange(plan.target) && plan.target instanceof Building) {
+				this.doTake(plan, plan.target);
+				
+			}
 			else if(plan.target != null) {
 				attacked = attack(plan.target);	
 				
@@ -559,14 +562,14 @@ public class Unit extends Thing implements Serializable {
 					}
 				}
 			}else if(followup.target instanceof Building) {
-				Building oldTarget = (Building)followup.target;
-				if(oldTarget.isDead()) {
-//					Plant newTarget = getNearestPlantToHarvest(followup.getTile(), oldTarget.getType());
-//					if(newTarget != null) {
-//						followup = new PlannedAction(newTarget, PlannedAction.HARVEST);
-//					}
-				}
-			}else if(finished.isTakeAction())
+//				if followup building dead, doesnt find new target
+//				Building oldTarget = (Building)followup.target;
+//				if(oldTarget.isDead()) {
+//
+//				}
+			}else if(finished.isTakeAction()) {
+				
+			}
 			
 			this.queuePlannedAction(followup);
 		}
@@ -597,21 +600,14 @@ public class Unit extends Thing implements Serializable {
 			if(readyToHarvest() && isHarvesting == true && this.getTile().getPlant() != null) {
 				ItemType itemType = this.getTile().getPlant().getItem();
 				if(itemType != null) {
-					getFaction().addItem(itemType, 1);
+					getFaction().getInventory().addItem(itemType, 1);
 					this.getTile().getPlant().takeDamage(1);
 					resetTimeToHarvest(1);
 				}
 			}
 			Building building = this.getTile().getBuilding();
 			if(building != null && building.getType().isColony()) {
-				for(Item item: this.getInventory().getItems()) {
-					if(item != null) {
-//						building.getInventory().addItem(item);
-						this.getFaction().addItem(item.getType(), item.getAmount());
-						item.addAmount(-item.getAmount());
-					}
-					
-				}
+				this.getFaction().getInventory().takeAll(this.inventory);
 				
 			}
 		}
