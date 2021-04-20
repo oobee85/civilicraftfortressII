@@ -220,13 +220,16 @@ public class DebugView {
 			}
 		});
 		
-		JTextField seedTextField = KUIConstants.setupTextField(PerlinNoise.DEFAULT_SEED + "", DEBUG_BUTTON_SIZE);
 		JButton reseedButton = KUIConstants.setupButton("Reseed", null, DEBUG_BUTTON_SIZE);
 		reseedButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					long seed = Long.parseLong(seedTextField.getText());
+					String newSeed = JOptionPane.showInputDialog("Input seed");
+					if(newSeed == null) {
+						return;
+					}
+					long seed = Long.parseLong(newSeed);
 					gameView.getGameInstance().world.reseedTerrain(seed);
 				}
 				catch(NumberFormatException ex) {
@@ -259,7 +262,6 @@ public class DebugView {
 		scrollingPanel.add(toggleGL);
 		scrollingPanel.add(shadowWordDeath);
 		scrollingPanel.add(shadowWordPain);
-		scrollingPanel.add(seedTextField);
 		scrollingPanel.add(reseedButton);
 	}
 	
