@@ -186,6 +186,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				Matrix4f.rotate(90, new Vector3f(0, 1, 0)), 
 				new Vector3f(.1f, .1f, .1f));
 
+		shader.setUniform("isHighlight", 0f);
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
 		
 		for(Plant plant : game.world.getPlants()) {
@@ -207,7 +208,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			Vector3f pos = new Vector3f(
 					building.getTile().getLocation().x(), y, 
 					building.getTile().getHeight()/15);
-			building.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(2, 2, 2));
+			building.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1.2f, 1.2f, 1.2f));
 		}
 
 		for(Projectile projectile : game.world.getData().getProjectiles()) {
@@ -225,6 +226,15 @@ public class GLDrawer extends Drawer implements GLEventListener {
 					game.world.get(state.hoveredTile).getHeight()/15);
 			hoveredTileBox.render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
+
+		shader.setUniform("isHighlight", 1f);
+		for (Thing thing : state.selectedThings) {
+			float y = thing.getTile().getLocation().y() + (thing.getTile().getLocation().x() % 2) * 0.5f;
+			Vector3f pos = new Vector3f(
+					thing.getTile().getLocation().x(), y, 
+					thing.getTile().getHeight()/15);
+			hoveredTileBox.render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+		}
 	}
 	
 	@Override
@@ -240,8 +250,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		// TODO convert this to newton's method
 		Vector3f current = start;
 		Vector3f previous = current;
-		Vector3f increment = direction.multiply(4);
-		for(int i = 0; i < 250; i++) {
+		Vector3f increment = direction.multiply(1);
+		for(int i = 0; i < 1000; i++) {
 			TileLoc currentTileLoc = new TileLoc((int)current.x, (int)current.y);
 			Tile currentTile = world.get(currentTileLoc);
 			if((currentTile != null && current.z*15 <= currentTile.getHeight())
@@ -259,7 +269,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	public Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
 		
 		double halfFOV = Math.toRadians(FOV/2);
-		float frustumWidth = (float) (Math.tan(halfFOV) * FAR_CLIP * 2);
+		float frustumWidth = (float) (Math.tan(halfFOV) * FAR_CLIP * 2 * 0.9f);
 		float frustumHeight = frustumWidth / getAspectRatio();
 		
 		Vector3f onScreen = new Vector3f(pixelOnScreen.x, glcanvas.getHeight() - pixelOnScreen.y, 0);
