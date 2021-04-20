@@ -13,7 +13,7 @@ public class Generation {
 
 	public static final Random randy = new Random();
 	static {
-		randy.setSeed(123456);
+		randy.setSeed(1234567);
 	}
 	
 	// From https://en.wikipedia.org/wiki/Perlin_noise
