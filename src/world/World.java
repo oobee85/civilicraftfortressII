@@ -1314,6 +1314,10 @@ public class World {
 	}
 	
 	public void reseedTerrain(long seed) {
+		for(Tile tile : getTiles()) {
+			tile.setTerrain(Terrain.DIRT);
+		}
+		
 		int smoothingRadius = (int) (Math.sqrt((width + height)/2)/2);
 		float[][] heightMap = Generation.generateHeightMap(seed, smoothingRadius, width, height);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
@@ -1332,13 +1336,17 @@ public class World {
 			}
 		});
 		double rockpercentage = 0.30;
-		double cutoff = tiles.get((int)((1-rockpercentage)*tiles.size())).getHeight();
+		double rockCutoff = tiles.get((int)((1-rockpercentage)*tiles.size())).getHeight();
+		double dirtCutoff = tiles.get((int)((1-.5)*tiles.size())).getHeight();
 		for(Tile tile : getTiles()) {
+			if(tile.getTerrain() != Terrain.DIRT) {
+				continue;
+			}
 			Terrain t;
-			if (tile.getHeight() > cutoff) {
+			if (tile.getHeight() > rockCutoff) {
 				t = Terrain.ROCK;
 			}
-			else if (tile.getHeight() > 400) {
+			else if (tile.getHeight() > dirtCutoff) {
 				t = Terrain.DIRT;
 			}
 			else {
