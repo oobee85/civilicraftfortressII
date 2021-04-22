@@ -306,6 +306,6 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	@Override
 	public void rotateView(int dx, int dy) {
 		float adjust = 0.1f;
-		camera.rotate(dx*adjust, -dy*adjust);
+		camera.rotate(-dx*adjust, dy*adjust);
 	}
 }
