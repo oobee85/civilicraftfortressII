@@ -41,11 +41,17 @@ public class VanillaDrawer extends Drawer {
 	
 	private volatile BufferedImage[] buffers = new BufferedImage[3];
 	private volatile Position[] drawnAtOffset = new Position[3];
+	private volatile int[] drawnAtTileSize = new int[3];
 	private volatile int currentBuffer = 0;
 	private Semaphore nextRequested = new Semaphore(1);
 	private Semaphore numAvailable = new Semaphore(0);
 	private long drawTime;
+	
+	// must take snapshot of current tile size and view offset to draw a consistent image
+	// otherwise while player is dragging view it will change view offset 
+	// while it is drawing which causes a bunch of issues.
 	private int frozenTileSize;
+	private Position frozenViewOffset = new Position(0, 0);
 	
 	public VanillaDrawer(Game game, GameViewState state) {
 		super(game, state);
@@ -54,13 +60,24 @@ public class VanillaDrawer extends Drawer {
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
+				
+				g.setColor(game.getBackgroundColor());
+				g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+				
 				int buffer = currentBuffer;
-				g.drawImage(buffers[buffer], 0, 0, null);
-//				g.drawImage(buffers[buffer], 
-//						drawnAtOffset[buffer].getIntX() - state.viewOffset.getIntX(), 
-//						drawnAtOffset[buffer].getIntY() - state.viewOffset.getIntY(), 
-//						null);
+				if(state.tileSize == drawnAtTileSize[buffer]) {
+					g.drawImage(buffers[buffer], 
+							drawnAtOffset[buffer].getIntX() - state.viewOffset.getIntX(), 
+							drawnAtOffset[buffer].getIntY() - state.viewOffset.getIntY(), 
+							null);
+				}
+				else {
+					g.drawImage(buffers[buffer], 0, 0, null);
+				}
 				numAvailable.tryAcquire();
+
+				g.setColor(Color.black);
+				g.drawRect(-1, 0, canvas.getWidth() + 1, canvas.getHeight());
 				
 
 				g.setFont(KUIConstants.infoFont);
@@ -105,12 +122,14 @@ public class VanillaDrawer extends Drawer {
 						nextRequested.acquire();
 						int next = (currentBuffer + 1) % buffers.length;
 						Graphics2D g = buffers[next].createGraphics();
-						drawStuff(g);
+						frozenViewOffset.x = state.viewOffset.x;
+						frozenViewOffset.y = state.viewOffset.y;
+						frozenTileSize = state.tileSize;
+						drawStuff(g, buffers[next].getWidth(), buffers[next].getHeight());
 						g.dispose();
-						if(state.viewOffset != null) {
-							drawnAtOffset[next].x = state.viewOffset.x;
-							drawnAtOffset[next].y = state.viewOffset.y;
-						}
+						drawnAtOffset[next].x = frozenViewOffset.x;
+						drawnAtOffset[next].y = frozenViewOffset.y;
+						drawnAtTileSize[next] = frozenTileSize;
 						numAvailable.release();
 						currentBuffer = next;
 					}
@@ -144,7 +163,7 @@ public class VanillaDrawer extends Drawer {
 		return canvas;
 	}
 
-	private void drawStuff(Graphics g) {
+	private void drawStuff(Graphics g, int w, int h) {
 		if (game == null) {
 			return;
 		}
@@ -155,10 +174,8 @@ public class VanillaDrawer extends Drawer {
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 				RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 		g.setColor(game.getBackgroundColor());
-		g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		g.fillRect(0, 0, w, h);
 		drawGame(g);
-		g.setColor(Color.black);
-		g.drawRect(-1, 0, canvas.getWidth() + 1, canvas.getHeight());
 	}
 	
 	private void drawGame(Graphics g) {
@@ -168,12 +185,9 @@ public class VanillaDrawer extends Drawer {
 		}
 		long startTime = System.currentTimeMillis();
 		Graphics2D g2d = (Graphics2D)g;
-		int xoffset = state.viewOffset.getIntX();
-		int yoffset = state.viewOffset.getIntY();
-		frozenTileSize = state.tileSize;
-		g.translate(-xoffset, -yoffset);
+		g.translate(-frozenViewOffset.getIntX(), -frozenViewOffset.getIntY());
 		draw(g, canvas.getWidth(), canvas.getHeight());
-		g.translate(xoffset, yoffset);
+		g.translate(frozenViewOffset.getIntX(), frozenViewOffset.getIntY());
 		if (state.mousePressLocation != null && state.draggingMouse == true) {
 			Rectangle selectionRectangle = normalizeRectangle(state.mousePressLocation, state.previousMouse);
 			g2d.setColor(Color.white);

@@ -44,7 +44,7 @@ public class GameView {
 
 	public class GameViewState {
 		public long previousTickTime;
-		public volatile Position viewOffset;
+		public volatile Position viewOffset = new Position(0, 0);
 		public volatile int tileSize = 15;
 		
 		public Point mousePressLocation;
