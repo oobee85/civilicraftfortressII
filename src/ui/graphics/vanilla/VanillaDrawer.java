@@ -1,10 +1,12 @@
 package ui.graphics.vanilla;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.*;
 
 import javax.swing.*;
 
@@ -37,6 +39,14 @@ public class VanillaDrawer extends Drawer {
 	
 	private JPanel canvas;
 	
+	private volatile BufferedImage[] buffers = new BufferedImage[3];
+	private volatile Position[] drawnAtOffset = new Position[3];
+	private volatile int currentBuffer = 0;
+	private Semaphore nextRequested = new Semaphore(1);
+	private Semaphore numAvailable = new Semaphore(0);
+	private long drawTime;
+	private int frozenTileSize;
+	
 	public VanillaDrawer(Game game, GameViewState state) {
 		super(game, state);
 		canvas = new JPanel() {
@@ -44,9 +54,90 @@ public class VanillaDrawer extends Drawer {
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				drawStuff(g);
+				int buffer = currentBuffer;
+				g.drawImage(buffers[buffer], 0, 0, null);
+//				g.drawImage(buffers[buffer], 
+//						drawnAtOffset[buffer].getIntX() - state.viewOffset.getIntX(), 
+//						drawnAtOffset[buffer].getIntY() - state.viewOffset.getIntY(), 
+//						null);
+				numAvailable.tryAcquire();
+				
+
+				g.setFont(KUIConstants.infoFont);
+				for (int i = 0; i < 2; i++) {
+					int x = 10;
+					int y = canvas.getHeight() - 5;
+					g.setColor(Color.green);
+					if (i == 1) {
+						g.setColor(Color.black);
+						x++;
+						y++;
+					}
+					g.drawString("DRAW(ms):" + drawTime, x, y);
+					g.drawString("TICK(ms):" + state.previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
+					if (Game.DEBUG) {
+						String fstr = "";
+						for (Faction f : game.world.getFactions()) {
+							fstr += f.name() + ":" + f.getBuildings().size() + ", ";
+						}
+						g.drawString(fstr, x + 200, y);
+					}
+				}
+				
+				if(nextRequested.availablePermits() < 1) {
+					nextRequested.release();
+				}
 			}
 		};
+		canvas.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				resetBuffers();
+			}
+		});
+		resetBuffers();
+		Thread thread = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					while(true) {
+						nextRequested.acquire();
+						int next = (currentBuffer + 1) % buffers.length;
+						Graphics2D g = buffers[next].createGraphics();
+						drawStuff(g);
+						g.dispose();
+						if(state.viewOffset != null) {
+							drawnAtOffset[next].x = state.viewOffset.x;
+							drawnAtOffset[next].y = state.viewOffset.y;
+						}
+						numAvailable.release();
+						currentBuffer = next;
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		thread.start();
+	}
+	
+	private void resetBuffers() {
+		System.out.println("resetting buffers to " + canvas.getWidth() + ", " + canvas.getHeight());
+		for(int i = 0; i < buffers.length; i++) {
+			drawnAtOffset[i] = new Position(0, 0);
+		}
+		if(canvas.getWidth() > 0 && canvas.getHeight() > 0) {
+			for(int i = 0; i < buffers.length; i++) {
+				buffers[i] = new BufferedImage(canvas.getWidth(), canvas.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+			}
+		}
+		else {
+			for(int i = 0; i < buffers.length; i++) {
+				buffers[i] = new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+			}
+		}
 	}
 	
 	public Component getDrawingCanvas() {
@@ -77,9 +168,12 @@ public class VanillaDrawer extends Drawer {
 		}
 		long startTime = System.currentTimeMillis();
 		Graphics2D g2d = (Graphics2D)g;
-		g.translate(-state.viewOffset.getIntX(), -state.viewOffset.getIntY());
+		int xoffset = state.viewOffset.getIntX();
+		int yoffset = state.viewOffset.getIntY();
+		frozenTileSize = state.tileSize;
+		g.translate(-xoffset, -yoffset);
 		draw(g, canvas.getWidth(), canvas.getHeight());
-		g.translate(state.viewOffset.getIntX(), state.viewOffset.getIntY());
+		g.translate(xoffset, yoffset);
 		if (state.mousePressLocation != null && state.draggingMouse == true) {
 			Rectangle selectionRectangle = normalizeRectangle(state.mousePressLocation, state.previousMouse);
 			g2d.setColor(Color.white);
@@ -99,52 +193,32 @@ public class VanillaDrawer extends Drawer {
 					canvas.getWidth() - canvas.getWidth() / 3 - 4, 4, canvas.getWidth() / 3, 30);
 		}
 		long endTime = System.currentTimeMillis();
-		long deltaTime = endTime - startTime;
-		g.setFont(KUIConstants.infoFont);
-		for (int i = 0; i < 2; i++) {
-			int x = 10;
-			int y = canvas.getHeight() - 5;
-			g.setColor(Color.green);
-			if (i == 1) {
-				g.setColor(Color.black);
-				x++;
-				y++;
-			}
-			g.drawString("DRAW(ms):" + deltaTime, x, y);
-			g.drawString("TICK(ms):" + state.previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
-			if (Game.DEBUG) {
-				String fstr = "";
-				for (Faction f : game.world.getFactions()) {
-					fstr += f.name() + ":" + f.getBuildings().size() + ", ";
-				}
-				g.drawString(fstr, x + 200, y);
-			}
-		}
+		drawTime = endTime - startTime;
 		Toolkit.getDefaultToolkit().sync();
 	}
 
 	private void draw(Graphics g, int panelWidth, int panelHeight) {
 		// Try to only draw stuff that is visible on the screen
-		int lowerX = Math.max(0, state.viewOffset.divide(state.tileSize).getIntX() - 2);
-		int lowerY = Math.max(0, state.viewOffset.divide(state.tileSize).getIntY() - 2);
-		int upperX = Math.min(game.world.getWidth(), lowerX + panelWidth / state.tileSize + 4);
-		int upperY = Math.min(game.world.getHeight(), lowerY + panelHeight / state.tileSize + 4);
+		int lowerX = Math.max(0, state.viewOffset.divide(frozenTileSize).getIntX() - 2);
+		int lowerY = Math.max(0, state.viewOffset.divide(frozenTileSize).getIntY() - 2);
+		int upperX = Math.min(game.world.getWidth(), lowerX + panelWidth / frozenTileSize + 4);
+		int upperY = Math.min(game.world.getHeight(), lowerY + panelHeight / frozenTileSize + 4);
 
-		if (state.tileSize < FAST_MODE_TILE_SIZE) {
+		if (frozenTileSize < FAST_MODE_TILE_SIZE) {
 			if (state.showHeightMap) {
-				g.drawImage(heightMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
+				g.drawImage(heightMapImage, 0, 0, frozenTileSize * game.world.getWidth(), frozenTileSize * game.world.getHeight(),
 						null);
 			}else if (state.showPressureMap) {
-				g.drawImage(pressureMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
+				g.drawImage(pressureMapImage, 0, 0, frozenTileSize * game.world.getWidth(), frozenTileSize * game.world.getHeight(),
 						null);
 			}else if (state.showTemperatureMap) {
-				g.drawImage(temperatureMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
+				g.drawImage(temperatureMapImage, 0, 0, frozenTileSize * game.world.getWidth(), frozenTileSize * game.world.getHeight(),
 						null);
 			} else if (state.showHumidityMap) {
-				g.drawImage(humidityMapImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
+				g.drawImage(humidityMapImage, 0, 0, frozenTileSize * game.world.getWidth(), frozenTileSize * game.world.getHeight(),
 						null);
 			} else {
-				g.drawImage(terrainImage, 0, 0, state.tileSize * game.world.getWidth(), state.tileSize * game.world.getHeight(),
+				g.drawImage(terrainImage, 0, 0, frozenTileSize * game.world.getWidth(), frozenTileSize * game.world.getHeight(),
 						null);
 			}
 		} else {
@@ -235,32 +309,32 @@ public class VanillaDrawer extends Drawer {
 				drawHealthBar(g, unit);
 				drawHitsplat(g, unit);
 //				Point drawAt = getDrawingCoords(unit.getTile().getLocation());
-//				int draww = state.tileSize;
-//				int drawh = state.tileSize;
+//				int draww = frozenTileSize;
+//				int drawh = frozenTileSize;
 //				drawUnit(unit, g, drawAt.x, drawAt.y, draww, drawh);
 			}
 
 			for (Projectile p : game.world.getData().getProjectiles()) {
-				int extra = (int) (state.tileSize * p.getExtraSize());
+				int extra = (int) (frozenTileSize * p.getExtraSize());
 				double ratio = 0.5 * p.getHeight() / p.getMaxHeight();
-				int shadowOffset = (int) (state.tileSize * ratio / 2);
+				int shadowOffset = (int) (frozenTileSize * ratio / 2);
 				Point drawAt = getDrawingCoords(p.getTile().getLocation());
 				
 				g.drawImage(p.getShadow(0), drawAt.x + shadowOffset,
-						drawAt.y + shadowOffset, state.tileSize - shadowOffset * 2,
-						state.tileSize - shadowOffset * 2, null);
+						drawAt.y + shadowOffset, frozenTileSize - shadowOffset * 2,
+						frozenTileSize - shadowOffset * 2, null);
 				g.drawImage(p.getImage(0), drawAt.x - extra / 2,
-						drawAt.y - p.getHeight() - extra / 2, state.tileSize + extra,
-						state.tileSize + extra, null);
+						drawAt.y - p.getHeight() - extra / 2, frozenTileSize + extra,
+						frozenTileSize + extra, null);
 			}
 			for (WeatherEvent w : game.world.getWeatherEvents()) {
 				
 				Point drawAt = getDrawingCoords(w.getTile().getLocation());
 				g.drawImage(w.getImage(0), drawAt.x ,
-						drawAt.y, state.tileSize, state.tileSize, null);
+						drawAt.y, frozenTileSize, frozenTileSize, null);
 			}
 
-			int indicatorSize = state.tileSize / 12;
+			int indicatorSize = frozenTileSize / 12;
 			int offset = 4;
 			HashMap<Tile, Integer> visited = new HashMap<>();
 			for (Unit unit : game.world.getUnits()) {
@@ -291,13 +365,13 @@ public class VanillaDrawer extends Drawer {
 						brightness = Math.max(Math.min(brightness, 1), 0);
 						g.setColor(new Color(0, 0, 0, (int) (255 * (1 - brightness))));
 						Point drawAt = getDrawingCoords(tile.getLocation());
-						g.fillRect(drawAt.x, drawAt.y, state.tileSize, state.tileSize);
+						g.fillRect(drawAt.x, drawAt.y, frozenTileSize, frozenTileSize);
 					}
 				}
 			}
 
 			if (state.drawDebugStrings) {
-				if (state.tileSize >= 150) {
+				if (frozenTileSize >= 150) {
 					drawDebugStrings(g, lowerX, lowerY, upperX, upperY);
 				}
 			}
@@ -313,11 +387,11 @@ public class VanillaDrawer extends Drawer {
 			g.setColor(Utils.getTransparentColor(state.faction.color(), 150));
 //			Utils.setTransparency(g, 0.8f);
 			Stroke currentStroke = g.getStroke();
-			int strokeWidth = state.tileSize / 12;
+			int strokeWidth = frozenTileSize / 12;
 			g.setStroke(new BasicStroke(strokeWidth));
 			Point drawAt = getDrawingCoords(thing.getTile().getLocation());
-			g.drawOval(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, state.tileSize - 1 - strokeWidth,
-					state.tileSize - 1 - strokeWidth);
+			g.drawOval(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, frozenTileSize - 1 - strokeWidth,
+					frozenTileSize - 1 - strokeWidth);
 			g.setStroke(currentStroke);
 //			Utils.setTransparency(g, 1f);
 
@@ -326,7 +400,7 @@ public class VanillaDrawer extends Drawer {
 				Building building = (Building) thing;
 				if (building.getSpawnLocation() != building.getTile()) {
 					drawAt = getDrawingCoords(building.getSpawnLocation().getLocation());
-					g.drawImage(RALLY_POINT_IMAGE, drawAt.x, drawAt.y, state.tileSize, state.tileSize, null);
+					g.drawImage(RALLY_POINT_IMAGE, drawAt.x, drawAt.y, frozenTileSize, frozenTileSize, null);
 				}
 				
 				int range = building.getType().getVisionRadius();
@@ -370,8 +444,8 @@ public class VanillaDrawer extends Drawer {
 					for (Tile t : path) {
 						drawAt = getDrawingCoords(t.getLocation());
 						if (prev != null) {
-							g.drawLine(prevDrawAt.x + state.tileSize / 2, prevDrawAt.y + state.tileSize / 2,
-									drawAt.x + state.tileSize / 2, drawAt.y + state.tileSize / 2);
+							g.drawLine(prevDrawAt.x + frozenTileSize / 2, prevDrawAt.y + frozenTileSize / 2,
+									drawAt.x + frozenTileSize / 2, drawAt.y + frozenTileSize / 2);
 						}
 						prev = t.getLocation();
 						prevDrawAt = drawAt;
@@ -381,7 +455,7 @@ public class VanillaDrawer extends Drawer {
 				for (PlannedAction plan : unit.actionQueue) {
 					Tile targetTile = plan.targetTile == null ? plan.target.getTile() : plan.targetTile;
 					drawAt = getDrawingCoords(targetTile.getLocation());
-					g.drawImage(FLAG, drawAt.x, drawAt.y, state.tileSize, state.tileSize, null);
+					g.drawImage(FLAG, drawAt.x, drawAt.y, frozenTileSize, frozenTileSize, null);
 				}
 				int range = unit.getMaxRange();
 				if (range > 1) {
@@ -413,14 +487,14 @@ public class VanillaDrawer extends Drawer {
 	private void drawPlannedThing(Graphics2D g) {
 		BufferedImage bI = null;
 		if (state.leftClickAction == LeftClickAction.PLAN_BUILDING) {
-			bI = Utils.toBufferedImage(state.selectedBuildingToPlan.getImage(state.tileSize));
+			bI = Utils.toBufferedImage(state.selectedBuildingToPlan.getImage(frozenTileSize));
 		} else if (state.leftClickAction == LeftClickAction.SPAWN_THING) {
-			bI = Utils.toBufferedImage(state.selectedThingToSpawn.getImage(state.tileSize));
+			bI = Utils.toBufferedImage(state.selectedThingToSpawn.getImage(frozenTileSize));
 		}
 		if (bI != null) {
 			Utils.setTransparency(g, 0.5f);
 			Point drawAt = getDrawingCoords(state.hoveredTile);
-			g.drawImage(bI, drawAt.x, drawAt.y, state.tileSize, state.tileSize, null);
+			g.drawImage(bI, drawAt.x, drawAt.y, frozenTileSize, frozenTileSize, null);
 			Utils.setTransparency(g, 1f);
 		}
 	}
@@ -430,7 +504,7 @@ public class VanillaDrawer extends Drawer {
 			return;
 		}
 		int[][] rows = new int[upperX - lowerX][upperY - lowerY];
-		int fontsize = state.tileSize / 4;
+		int fontsize = frozenTileSize / 4;
 		fontsize = Math.min(fontsize, 13);
 		Font font = new Font("Consolas", Font.PLAIN, fontsize);
 		g.setFont(font);
@@ -466,30 +540,30 @@ public class VanillaDrawer extends Drawer {
 					strings.add("GM=" + tile.getModifier().timeLeft());
 				}
 				rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, strings, rows[i - lowerX][j - lowerY], fontsize,
-						state.tileSize, drawAt);
+						frozenTileSize, drawAt);
 
 				for (Unit unit : tile.getUnits()) {
 					rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, unit.getDebugStrings(),
-							rows[i - lowerX][j - lowerY], fontsize, state.tileSize, drawAt);
+							rows[i - lowerX][j - lowerY], fontsize, frozenTileSize, drawAt);
 				}
 				if (tile.getPlant() != null) {
 					rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, tile.getPlant().getDebugStrings(),
-							rows[i - lowerX][j - lowerY], fontsize, state.tileSize, drawAt);
+							rows[i - lowerX][j - lowerY], fontsize, frozenTileSize, drawAt);
 				}
 				if (tile.hasBuilding()) {
 					rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, tile.getBuilding().getDebugStrings(),
-							rows[i - lowerX][j - lowerY], fontsize, state.tileSize, drawAt);
+							rows[i - lowerX][j - lowerY], fontsize, frozenTileSize, drawAt);
 				}
 				if (tile.getRoad() != null) {
 					rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, tile.getRoad().getDebugStrings(),
-							rows[i - lowerX][j - lowerY], fontsize, state.tileSize, drawAt);
+							rows[i - lowerX][j - lowerY], fontsize, frozenTileSize, drawAt);
 				}
 			}
 		}
 	}
 
 	private void drawHoveredTiles(Graphics2D g) {
-		int strokeWidth = state.tileSize / 10;
+		int strokeWidth = frozenTileSize / 10;
 		strokeWidth = strokeWidth < 1 ? 1 : strokeWidth;
 		Stroke stroke = g.getStroke();
 		g.setStroke(new BasicStroke(strokeWidth));
@@ -498,30 +572,30 @@ public class VanillaDrawer extends Drawer {
 			Position[] box = Utils.normalizeRectangle(state.boxSelect[0], state.boxSelect[1]);
 			for (Tile tile : Utils.getTilesBetween(game.world, box[0], box[1])) {
 				Point drawAt = getDrawingCoords(tile.getLocation());
-				g.drawRect(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, state.tileSize - strokeWidth,
-						state.tileSize - strokeWidth);
+				g.drawRect(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, frozenTileSize - strokeWidth,
+						frozenTileSize - strokeWidth);
 			}
 		} else {
 			if (game.world.get(state.hoveredTile) != null) {
 				Point drawAt = getDrawingCoords(state.hoveredTile);
-				g.drawRect(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, state.tileSize - strokeWidth,
-						state.tileSize - strokeWidth);
+				g.drawRect(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, frozenTileSize - strokeWidth,
+						frozenTileSize - strokeWidth);
 			}
 		}
 		g.setStroke(stroke);
 	}
 
 	private Point getDrawingCoords(TileLoc tileLoc) {
-		int x = tileLoc.x() * state.tileSize;
-		int y = tileLoc.y() * state.tileSize + (tileLoc.x() % 2) * state.tileSize / 2;
+		int x = tileLoc.x() * frozenTileSize;
+		int y = tileLoc.y() * frozenTileSize + (tileLoc.x() % 2) * frozenTileSize / 2;
 		return new Point(x, y);
 	}
 
 	private void drawTile(Graphics2D g, Tile theTile, double lowHeight, double highHeight, double lowHumidity,
 			double highHumidity, double lowPressure, double highPressure, double lowTemp, double highTemp) {
 		Point drawAt = getDrawingCoords(theTile.getLocation());
-		int draww = state.tileSize;
-		int drawh = state.tileSize;
+		int draww = frozenTileSize;
+		int drawh = frozenTileSize;
 		int imagesize = draww < drawh ? draww : drawh;
 
 		if (state.showHeightMap) {
@@ -600,18 +674,18 @@ public class VanillaDrawer extends Drawer {
 
 			if (!theTile.getItems().isEmpty()) {
 				for (Item item : theTile.getItems()) {
-					g.drawImage(item.getType().getImage(imagesize), drawAt.x + state.tileSize / 4,
-							drawAt.y + state.tileSize / 4, state.tileSize / 2, state.tileSize / 2, null);
+					g.drawImage(item.getType().getImage(imagesize), drawAt.x + frozenTileSize / 4,
+							drawAt.y + frozenTileSize / 4, frozenTileSize / 2, frozenTileSize / 2, null);
 				}
 			}
 			if (theTile.getPlant() != null) {
 				Plant p = theTile.getPlant();
-				g.drawImage(p.getImage(state.tileSize), drawAt.x, drawAt.y, draww, drawh, null);
+				g.drawImage(p.getImage(frozenTileSize), drawAt.x, drawAt.y, draww, drawh, null);
 			}
 
 			if (theTile.getBuilding() != null) {
 				if (theTile.getBuilding().getIsSelected()) {
-					g.drawImage(theTile.getBuilding().getHighlight(state.tileSize), drawAt.x, drawAt.y, draww, drawh,
+					g.drawImage(theTile.getBuilding().getHighlight(frozenTileSize), drawAt.x, drawAt.y, draww, drawh,
 							null);
 				}
 				drawBuilding(theTile.getBuilding(), g, drawAt.x, drawAt.y, draww, drawh);
@@ -634,7 +708,7 @@ public class VanillaDrawer extends Drawer {
 //		}
 		
 		if (unit.getIsSelected()) {
-			g.drawImage(unit.getHighlight(state.tileSize), drawx, drawy, draww, drawh, null);
+			g.drawImage(unit.getHighlight(frozenTileSize), drawx, drawy, draww, drawh, null);
 		}
 //		if(path != null && path.peek() != null) {
 //			Tile targetTile = path.peek();
@@ -655,9 +729,9 @@ public class VanillaDrawer extends Drawer {
 //			if(targety < drawy){
 //				dy *= 1; 
 //			}
-//			g.drawImage(unit.getImage(state.tileSize), (int)(drawx + drawx - dx), (int)(drawy + drawy - dy), draww, drawh, null);
+//			g.drawImage(unit.getImage(frozenTileSize), (int)(drawx + drawx - dx), (int)(drawy + drawy - dy), draww, drawh, null);
 //		}else {
-			g.drawImage(unit.getImage(state.tileSize), drawx, drawy, draww, drawh, null);
+			g.drawImage(unit.getImage(frozenTileSize), drawx, drawy, draww, drawh, null);
 //		}
 		
 		
@@ -683,10 +757,10 @@ public class VanillaDrawer extends Drawer {
 			// draws the partial image
 			double percentDone = 1 - building.getRemainingEffort() / building.getType().getBuildingEffort();
 			int imageRatio = Math.max(1, (int) (bI.getHeight() * percentDone));
-			int partialHeight = Math.max(1, (int) (state.tileSize * percentDone));
+			int partialHeight = Math.max(1, (int) (frozenTileSize * percentDone));
 			bI = bI.getSubimage(0, bI.getHeight() - imageRatio, bI.getWidth(), imageRatio);
 			g.drawImage(bI, drawx, drawy - partialHeight + drawh, draww, partialHeight, null);
-			g.drawImage(BUILD_ICON, drawx + state.tileSize / 4, drawy + state.tileSize / 4, draww * 3 / 4, drawh * 3 / 4, null);
+			g.drawImage(BUILD_ICON, drawx + frozenTileSize / 4, drawy + frozenTileSize / 4, draww * 3 / 4, drawh * 3 / 4, null);
 		} else {
 			g.drawImage(bI, drawx, drawy, draww, drawh, null);
 		}
@@ -694,13 +768,13 @@ public class VanillaDrawer extends Drawer {
 
 	private void drawTarget(Graphics g, TileLoc tileLoc) {
 		Point drawAt = getDrawingCoords(tileLoc);
-		int w = (int) (state.tileSize * 8 / 10);
-		int hi = (int) (state.tileSize * 8 / 10);
-		g.drawImage(TARGET_IMAGE, drawAt.x + state.tileSize * 1 / 10, drawAt.y + state.tileSize * 1 / 10, w, hi, null);
+		int w = (int) (frozenTileSize * 8 / 10);
+		int hi = (int) (frozenTileSize * 8 / 10);
+		g.drawImage(TARGET_IMAGE, drawAt.x + frozenTileSize * 1 / 10, drawAt.y + frozenTileSize * 1 / 10, w, hi, null);
 	}
 
 	private void drawInventory(Graphics g, Unit unit, Building building) {
-		if (state.tileSize <= 30) {
+		if (frozenTileSize <= 30) {
 			return;
 		}
 		int numDrawn = 0;
@@ -708,7 +782,7 @@ public class VanillaDrawer extends Drawer {
 			Point drawAt = getDrawingCoords(building.getTile().getLocation());
 			for (Item item : building.getInventory().getItems()) {
 				if (item != null) {
-					g.drawImage(item.getType().getImage(state.tileSize/4), drawAt.x+(state.tileSize/4*numDrawn), drawAt.y, null);
+					g.drawImage(item.getType().getImage(frozenTileSize/4), drawAt.x+(frozenTileSize/4*numDrawn), drawAt.y, null);
 					numDrawn ++;
 				}
 			}
@@ -717,7 +791,7 @@ public class VanillaDrawer extends Drawer {
 			Point drawAt = getDrawingCoords(unit.getTile().getLocation());
 			for (Item item : unit.getInventory().getItems()) {
 				if (item != null) {
-					g.drawImage(item.getType().getImage(state.tileSize), drawAt.x+(state.tileSize/4*numDrawn), drawAt.y, null);
+					g.drawImage(item.getType().getImage(frozenTileSize), drawAt.x+(frozenTileSize/4*numDrawn), drawAt.y, null);
 					numDrawn ++;
 				}
 			}
@@ -726,13 +800,13 @@ public class VanillaDrawer extends Drawer {
 	}
 
 	private void drawHealthBar(Graphics g, Thing thing) {
-		if (state.tileSize <= 30) {
+		if (frozenTileSize <= 30) {
 			return;
 		}
 		if (World.ticks - thing.getTimeLastDamageTaken() < 20 || thing.getTile().getLocation().equals(state.hoveredTile)) {
 			Point drawAt = getDrawingCoords(thing.getTile().getLocation());
-			int w = state.tileSize - 1;
-			int h = state.tileSize / 4 - 1;
+			int w = frozenTileSize - 1;
+			int h = frozenTileSize / 4 - 1;
 			drawHealthBar2(g, thing, drawAt.x + 1, drawAt.y + 1, w, h, 2, thing.getHealth() / thing.getMaxHealth());
 		}
 	}
@@ -753,8 +827,8 @@ public class VanillaDrawer extends Drawer {
 	private void drawHitsplat(Graphics g, Thing thing) {
 
 		Point drawAt = getDrawingCoords(thing.getTile().getLocation());
-		int splatWidth = (int) (state.tileSize * .5);
-		int splatHeight = (int) (state.tileSize * .5);
+		int splatWidth = (int) (frozenTileSize * .5);
+		int splatHeight = (int) (frozenTileSize * .5);
 
 		thing.updateHitsplats();
 		Hitsplat[] hitsplats = thing.getHitsplatList();
@@ -770,16 +844,16 @@ public class VanillaDrawer extends Drawer {
 			int y = (int) ((drawAt.y));
 
 			if (i == 1) {
-				x = (int) ((drawAt.x) + state.tileSize * 0.5);
-				y = (int) ((drawAt.y) + state.tileSize * 0.5);
+				x = (int) ((drawAt.x) + frozenTileSize * 0.5);
+				y = (int) ((drawAt.y) + frozenTileSize * 0.5);
 			}
 			if (i == 2) {
-				x = (int) ((drawAt.x) + state.tileSize * 0.5);
+				x = (int) ((drawAt.x) + frozenTileSize * 0.5);
 				y = (int) ((drawAt.y));
 			}
 			if (i == 3) {
 				x = (int) ((drawAt.x));
-				y = (int) ((drawAt.y) + state.tileSize * 0.5);
+				y = (int) ((drawAt.y) + frozenTileSize * 0.5);
 			}
 
 			String text = String.format("%.0f", damage);
@@ -793,7 +867,7 @@ public class VanillaDrawer extends Drawer {
 				text = String.format("%.0f", -damage);
 			}
 
-			int fontSize = state.tileSize / 4;
+			int fontSize = frozenTileSize / 4;
 			g.setFont(new Font(DAMAGE_FONT.getFontName(), Font.BOLD, fontSize));
 			int width = g.getFontMetrics().stringWidth(text);
 			g.setColor(Color.WHITE);
@@ -802,36 +876,36 @@ public class VanillaDrawer extends Drawer {
 	}
 
 	private void drawBorderBetween(Graphics2D g, TileLoc one, TileLoc two) {
-		int width = state.tileSize / 8;
+		int width = frozenTileSize / 8;
 		Point drawAt = getDrawingCoords(one);
 		if (one.x() == two.x()) {
 			if (one.y() > two.y()) {
-				g.fillRect(drawAt.x, drawAt.y, state.tileSize, width);
+				g.fillRect(drawAt.x, drawAt.y, frozenTileSize, width);
 			}
 			if (one.y() < two.y()) {
-				g.fillRect(drawAt.x, drawAt.y + state.tileSize - width, state.tileSize, width);
+				g.fillRect(drawAt.x, drawAt.y + frozenTileSize - width, frozenTileSize, width);
 			}
 		} else {
 			if (one.y() > two.y()) {
-				int yoffset = (one.x() % 2) * state.tileSize / 2;
+				int yoffset = (one.x() % 2) * frozenTileSize / 2;
 				if (one.x() < two.x()) {
-					g.fillRect(drawAt.x + state.tileSize - width, drawAt.y + yoffset, width, state.tileSize / 2);
+					g.fillRect(drawAt.x + frozenTileSize - width, drawAt.y + yoffset, width, frozenTileSize / 2);
 				} else if (one.x() > two.x()) {
-					g.fillRect(drawAt.x, drawAt.y + yoffset, width, state.tileSize / 2);
+					g.fillRect(drawAt.x, drawAt.y + yoffset, width, frozenTileSize / 2);
 				}
 			} else if (one.y() < two.y()) {
-				int yoffset = (one.x() % 2) * state.tileSize / 2;
+				int yoffset = (one.x() % 2) * frozenTileSize / 2;
 				if (one.x() < two.x()) {
-					g.fillRect(drawAt.x + state.tileSize - width, drawAt.y + yoffset, width, state.tileSize / 2);
+					g.fillRect(drawAt.x + frozenTileSize - width, drawAt.y + yoffset, width, frozenTileSize / 2);
 				} else if (one.x() > two.x()) {
-					g.fillRect(drawAt.x, drawAt.y + yoffset, width, state.tileSize / 2);
+					g.fillRect(drawAt.x, drawAt.y + yoffset, width, frozenTileSize / 2);
 				}
 			} else {
-				int yoffset = (1 - one.x() % 2) * state.tileSize / 2;
+				int yoffset = (1 - one.x() % 2) * frozenTileSize / 2;
 				if (one.x() < two.x()) {
-					g.fillRect(drawAt.x + state.tileSize - width, drawAt.y + yoffset, width, state.tileSize / 2);
+					g.fillRect(drawAt.x + frozenTileSize - width, drawAt.y + yoffset, width, frozenTileSize / 2);
 				} else if (one.x() > two.x()) {
-					g.fillRect(drawAt.x, drawAt.y + yoffset, width, state.tileSize / 2);
+					g.fillRect(drawAt.x, drawAt.y + yoffset, width, frozenTileSize / 2);
 				}
 			}
 		}
