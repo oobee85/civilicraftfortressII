@@ -60,6 +60,9 @@ public class VanillaDrawer extends Drawer {
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
+				if(game == null) {
+					return;
+				}
 				
 				g.setColor(game.getBackgroundColor());
 				g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -79,31 +82,12 @@ public class VanillaDrawer extends Drawer {
 				g.setColor(Color.black);
 				g.drawRect(-1, 0, canvas.getWidth() + 1, canvas.getHeight());
 				
-
-				g.setFont(KUIConstants.infoFont);
-				for (int i = 0; i < 2; i++) {
-					int x = 10;
-					int y = canvas.getHeight() - 5;
-					g.setColor(Color.green);
-					if (i == 1) {
-						g.setColor(Color.black);
-						x++;
-						y++;
-					}
-					g.drawString("DRAW(ms):" + drawTime, x, y);
-					g.drawString("TICK(ms):" + state.previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
-					if (Game.DEBUG) {
-						String fstr = "";
-						for (Faction f : game.world.getFactions()) {
-							fstr += f.name() + ":" + f.getBuildings().size() + ", ";
-						}
-						g.drawString(fstr, x + 200, y);
-					}
-				}
+				drawOverlayStuff(g);
 				
 				if(nextRequested.availablePermits() < 1) {
 					nextRequested.release();
 				}
+				Toolkit.getDefaultToolkit().sync();
 			}
 		};
 		canvas.addComponentListener(new ComponentAdapter() {
@@ -143,24 +127,60 @@ public class VanillaDrawer extends Drawer {
 	}
 	
 	private void resetBuffers() {
-		System.out.println("resetting buffers to " + canvas.getWidth() + ", " + canvas.getHeight());
 		for(int i = 0; i < buffers.length; i++) {
 			drawnAtOffset[i] = new Position(0, 0);
 		}
-		if(canvas.getWidth() > 0 && canvas.getHeight() > 0) {
-			for(int i = 0; i < buffers.length; i++) {
-				buffers[i] = new BufferedImage(canvas.getWidth(), canvas.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-			}
-		}
-		else {
-			for(int i = 0; i < buffers.length; i++) {
-				buffers[i] = new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
-			}
+		int w = Math.max(1, canvas.getWidth());
+		int h = Math.max(1, canvas.getHeight());
+		for(int i = 0; i < buffers.length; i++) {
+			buffers[i] = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
 		}
 	}
 	
 	public Component getDrawingCanvas() {
 		return canvas;
+	}
+	
+	private void drawOverlayStuff(Graphics g) {
+		if (state.mousePressLocation != null && state.draggingMouse == true) {
+			Graphics2D g2d = (Graphics2D)g;
+			Rectangle selectionRectangle = normalizeRectangle(state.mousePressLocation, state.previousMouse);
+			g2d.setColor(Color.white);
+			Stroke stroke = g2d.getStroke();
+			g2d.setStroke(new BasicStroke(3));
+			g2d.drawRect(selectionRectangle.x, selectionRectangle.y, selectionRectangle.width,
+					selectionRectangle.height);
+			g2d.setStroke(stroke);
+		}
+		if (state.faction != null && state.faction.getResearchTarget() != null && !state.faction.getResearchTarget().isCompleted()) {
+			g.setFont(KUIConstants.infoFont);
+			double completedRatio = 1.0 * state.faction.getResearchTarget().getPointsSpent()
+					/ state.faction.getResearchTarget().getRequiredPoints();
+			String progress = String.format(state.faction.getResearchTarget() + " %d/%d",
+					state.faction.getResearchTarget().getPointsSpent(), state.faction.getResearchTarget().getRequiredPoints());
+			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress,
+					canvas.getWidth() - canvas.getWidth() / 3 - 4, 4, canvas.getWidth() / 3, 30);
+		}
+		g.setFont(KUIConstants.infoFont);
+		for (int i = 0; i < 2; i++) {
+			int x = 10;
+			int y = canvas.getHeight() - 5;
+			g.setColor(Color.green);
+			if (i == 1) {
+				g.setColor(Color.black);
+				x++;
+				y++;
+			}
+			g.drawString("DRAW(ms):" + drawTime, x, y);
+			g.drawString("TICK(ms):" + state.previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
+			if (Game.DEBUG) {
+				String fstr = "";
+				for (Faction f : game.world.getFactions()) {
+					fstr += f.name() + ":" + f.getBuildings().size() + ", ";
+				}
+				g.drawString(fstr, x + 200, y);
+			}
+		}
 	}
 
 	private void drawStuff(Graphics g, int w, int h) {
@@ -184,31 +204,12 @@ public class VanillaDrawer extends Drawer {
 			return;
 		}
 		long startTime = System.currentTimeMillis();
-		Graphics2D g2d = (Graphics2D)g;
 		g.translate(-frozenViewOffset.getIntX(), -frozenViewOffset.getIntY());
 		draw(g, canvas.getWidth(), canvas.getHeight());
 		g.translate(frozenViewOffset.getIntX(), frozenViewOffset.getIntY());
-		if (state.mousePressLocation != null && state.draggingMouse == true) {
-			Rectangle selectionRectangle = normalizeRectangle(state.mousePressLocation, state.previousMouse);
-			g2d.setColor(Color.white);
-			Stroke stroke = g2d.getStroke();
-			g2d.setStroke(new BasicStroke(3));
-			g2d.drawRect(selectionRectangle.x, selectionRectangle.y, selectionRectangle.width,
-					selectionRectangle.height);
-			g2d.setStroke(stroke);
-		}
-		if (state.faction != null && state.faction.getResearchTarget() != null && !state.faction.getResearchTarget().isCompleted()) {
-			g.setFont(KUIConstants.infoFont);
-			double completedRatio = 1.0 * state.faction.getResearchTarget().getPointsSpent()
-					/ state.faction.getResearchTarget().getRequiredPoints();
-			String progress = String.format(state.faction.getResearchTarget() + " %d/%d",
-					state.faction.getResearchTarget().getPointsSpent(), state.faction.getResearchTarget().getRequiredPoints());
-			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress,
-					canvas.getWidth() - canvas.getWidth() / 3 - 4, 4, canvas.getWidth() / 3, 30);
-		}
 		long endTime = System.currentTimeMillis();
 		drawTime = endTime - startTime;
-		Toolkit.getDefaultToolkit().sync();
+//		Toolkit.getDefaultToolkit().sync();
 	}
 
 	private void draw(Graphics g, int panelWidth, int panelHeight) {
