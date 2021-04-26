@@ -22,7 +22,7 @@ public class Generation {
 			power *= 2;
 		}
 		
-		float[][] heightMap = PerlinNoise.generateHeightMap(seed, width, height);
+		float[][] heightMap = PerlinNoise.generateHeightMap(seed, power, power);
 		float[][] croppedHeightMap = new float[width][height];
 		int croppedWidth = (power - width)/2;
 		int croppedHeight = (power - height)/2;
