@@ -235,6 +235,8 @@
 	},
 	{
 		"image":"Images/units/sheep.png",
+		"mesh":"models/sheep.ply",
+		"texture":"textures/pallet1.png",
 		"stats":{"movespeed":30,"buildtime":0,"health":200,"healspeed":50},
 		"name":"SHEEP",
 		"attackstyles":[

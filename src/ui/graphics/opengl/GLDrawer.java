@@ -133,12 +133,12 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			sunDirection = result.multiply(-1);
 			sunColor.set(1f, 1f, 0.95f);
 			float multiplier = (float)World.getDaylight();
-//			sunColor = sunColor.multiply(new Vector3f(multiplier, multiplier*multiplier, multiplier*multiplier));
+			sunColor = sunColor.multiply(new Vector3f(multiplier, multiplier*multiplier, multiplier*multiplier));
 			if(Game.DISABLE_NIGHT) {
 				ambientColor.set(.7f, .7f, .7f);
 			}
 			else {
-				ambientColor.set(multiplier/5, multiplier/5, multiplier/5);
+				ambientColor.set(multiplier/4, multiplier/4, multiplier/4);
 			}
 			renderStuff(gl, shader);
 			shader.unbind(gl);
