@@ -12,6 +12,7 @@ import com.jogamp.opengl.util.texture.*;
 import com.jogamp.opengl.util.texture.awt.*;
 
 import game.*;
+import game.liquid.*;
 import ui.graphics.*;
 import ui.graphics.opengl.maths.*;
 import ui.view.GameView.*;
@@ -188,6 +189,21 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("isHighlight", 0f);
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
 		
+		for(Tile tile : game.world.getTiles()) {
+			if(tile.liquidType != LiquidType.DRY) {
+				Vector3f scale;
+				float cutoff = 1f;
+				float inverseCutoff = 1 / cutoff;
+				if(tile.liquidAmount > cutoff) {
+					scale = new Vector3f(1, 1, 1);
+				}
+				else {
+					scale = new Vector3f(tile.liquidAmount*tile.liquidAmount*inverseCutoff, tile.liquidAmount*tile.liquidAmount*inverseCutoff, 1);
+				}
+				Vector3f pos = tileLocTo3dCoords(tile.getLocation(), tile.getHeight() + tile.liquidAmount);
+				terrainObject.liquid.render(gl, shader, TextureUtils.getTextureByFileName(tile.liquidType.getTextureFile(), gl), pos, Matrix4f.identity(), scale);
+			}
+		}
 		for(Plant plant : game.world.getPlants()) {
 			Vector3f pos = tileTo3dCoords(plant.getTile());
 			plant.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(plant.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
@@ -296,7 +312,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	public static Vector3f tileLocTo3dCoords(TileLoc tileLoc, float height) {
 		return new Vector3f(
 				tileLoc.x(), 
-				tileLoc.y() + (tileLoc.x() % 2) * 0.5f, 
+				(tileLoc.y() + (tileLoc.x() % 2) * 0.5f)*TerrainObject.Y_OFFSET*2, 
 				tileHeightTo3dHeight(height));
 	}
 	public static float tileHeightTo3dHeight(float height) {

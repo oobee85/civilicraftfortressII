@@ -461,6 +461,8 @@
 	},
 	{
 		"image":"Images/units/bomb.png",
+		"mesh":"models/bomb.ply",
+		"texture":"textures/pallet1.png",
 		"stats":{"movespeed":25,"buildtime":0,"health":50,"healspeed":50},
 		"name":"BOMB",
 		"attackstyles":[

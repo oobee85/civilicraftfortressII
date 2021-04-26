@@ -12,6 +12,7 @@ import utils.*;
 public class MeshUtils {
 
 	public static final Mesh cube;
+	public static final Mesh square;
 	public static final Mesh cattail;
 	public static final Mesh star;
 	public static final Mesh mushroom;
@@ -210,6 +211,7 @@ public class MeshUtils {
 	}
 	static {
 		cube = getMeshByFileName("models/cube.obj");
+		square = getMeshByFileName("models/square.obj");
 		cattail = getMeshByFileName("models/cattail.ply");
 		star = getMeshByFileName("models/star.obj");
 		mushroom = getMeshByFileName("models/mushroom.obj");
