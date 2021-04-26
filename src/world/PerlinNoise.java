@@ -11,7 +11,7 @@ import utils.*;
 
 public class PerlinNoise {
 
-	public static final long DEFAULT_SEED = 1234;
+	public static final long DEFAULT_SEED = 12234;
 	
 	private static final double linearInterpolate(double a0, double a1, double w) {
 		if (0.0 > w) return a0;

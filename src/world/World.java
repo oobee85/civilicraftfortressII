@@ -868,7 +868,7 @@ public class World {
 				defaultEnergy *= pressureMultiplier;
 			}
 			double maxVol = tile.getAir().getMaxVolume();
-			tile.getAir().setVolume(maxVol/4);
+			tile.getAir().setVolume(maxVol/1.5);
 			tile.setEnergy(defaultEnergy);
 		}
 	}
