@@ -191,17 +191,10 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		
 		for(Tile tile : game.world.getTiles()) {
 			if(tile.liquidType != LiquidType.DRY) {
-				Vector3f scale;
 				float cutoff = 1f;
-				float inverseCutoff = 1 / cutoff;
-				if(tile.liquidAmount > cutoff) {
-					scale = new Vector3f(1, 1, 1);
-				}
-				else {
-					scale = new Vector3f(tile.liquidAmount*tile.liquidAmount*inverseCutoff, tile.liquidAmount*tile.liquidAmount*inverseCutoff, 1);
-				}
+				float scale = Math.min(1, tile.liquidAmount * tile.liquidAmount / cutoff);
 				Vector3f pos = tileLocTo3dCoords(tile.getLocation(), tile.getHeight() + tile.liquidAmount);
-				terrainObject.liquid.render(gl, shader, TextureUtils.getTextureByFileName(tile.liquidType.getTextureFile(), gl), pos, Matrix4f.identity(), scale);
+				terrainObject.liquid.render(gl, shader, TextureUtils.getTextureByFileName(tile.liquidType.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, 1));
 			}
 		}
 		for(Plant plant : game.world.getPlants()) {
