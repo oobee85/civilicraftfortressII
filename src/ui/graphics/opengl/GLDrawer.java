@@ -142,7 +142,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				multiplier = Math.min(1, multiplier);
 			}
 			sunColor = sunColor.multiply(new Vector3f(multiplier, multiplier*multiplier, multiplier*multiplier));
-			float ambient = multiplier/4;
+			float ambient = multiplier/2;
 			ambientColor.set(ambient, ambient, ambient);
 			renderStuff(gl, shader);
 			shader.unbind(gl);
@@ -317,11 +317,11 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			camera.shiftView(dx*adjust, -dy*adjust);
 			Tile tile = game.world.get(coordsToTile(camera.getPosition()));
 			if(tile != null) {
-				float height = tile.getHeight() + 60;
+				float height = tile.getHeight();
 				if(tile.liquidType == LiquidType.ICE) {
 					height += tile.liquidAmount;
 				}
-				camera.getPosition().z = tileHeightTo3dHeight(height);
+				camera.getPosition().z = tileHeightTo3dHeight(height) + 4;
 			}
 			System.out.println("Camera is at " + camera.getPosition());
 		}
@@ -352,6 +352,6 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				tileHeightTo3dHeight(height));
 	}
 	public static float tileHeightTo3dHeight(float height) {
-		return height/30;
+		return height*height/20000;
 	}
 }

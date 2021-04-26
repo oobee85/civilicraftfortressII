@@ -210,7 +210,7 @@ public class Client {
 	public void setupSinglePlayer(boolean createWorld) {
 		clientGUI.getGameView().setCommandInterface(localCommands);
 		if(createWorld) {
-			gameInstance.generateWorld(160, 160, false, Arrays.asList(clientGUI.getPlayerInfo()));
+			gameInstance.generateWorld(128, 128, false, Arrays.asList(clientGUI.getPlayerInfo()));
 		}
 		for(Faction f : gameInstance.world.getFactions()) {
 			if(f.isPlayer()) {
