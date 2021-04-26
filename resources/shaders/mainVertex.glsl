@@ -28,11 +28,12 @@ void main() {
 	vec4 cameraPosition = inverse(view) * vec4(0, 0, 0, 1);
 
 	vec3 lightDir = normalize(-sunDirection);
-	float diff = max(dot(fragNormal, lightDir), 0.0);
-	vec3 diffuse = diff * sunColor;
+	float diffuseRatio = max(dot(fragNormal, lightDir), 0.0);
+	vec3 diffuseColor = diffuseRatio * sunColor;
+	vec3 highlightColor = vec3(1, 1, 0);
 
 	gl_Position = projection * view * fragPosition;
-	passColor = (diffuse + ambientColor) * (1 - isHighlight) + vec3(1, 1, 0) * isHighlight;
+	passColor = (diffuseColor + ambientColor) * (1 - isHighlight) + highlightColor * isHighlight;
 	passTextureCoord = textureCoord;
 	passUseTexture = useTexture * (1 - isHighlight);
 }
