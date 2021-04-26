@@ -164,7 +164,6 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				new Vector3f(5, 0, 0), 
 				Matrix4f.rotate(90, new Vector3f(0, 0, 1)), 
 				new Vector3f(.1f, .1f, .1f));
-		UnitType pig = Game.unitTypeMap.get("PIG");
 		MeshUtils.y.render(gl, shader, 
 				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
 				new Vector3f(0, -20, 0), 
@@ -190,49 +189,31 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
 		
 		for(Plant plant : game.world.getPlants()) {
-			float y = plant.getTile().getLocation().y() + (plant.getTile().getLocation().x() % 2) * 0.5f;
-			Vector3f pos = new Vector3f(
-					plant.getTile().getLocation().x(), y,
-					plant.getTile().getHeight()/15);
+			Vector3f pos = tileTo3dCoords(plant.getTile());
 			plant.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(plant.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 		for(Unit unit : game.world.getUnits()) {
-			float y = unit.getTile().getLocation().y() + (unit.getTile().getLocation().x() % 2) * 0.5f;
-			Vector3f pos = new Vector3f(
-					unit.getTile().getLocation().x(), y, 
-					unit.getTile().getHeight()/15);
+			Vector3f pos = tileTo3dCoords(unit.getTile());
 			unit.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(unit.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 		for(Building building : game.world.getBuildings()) {
-			float y = building.getTile().getLocation().y() + (building.getTile().getLocation().x() % 2) * 0.5f;
-			Vector3f pos = new Vector3f(
-					building.getTile().getLocation().x(), y, 
-					building.getTile().getHeight()/15);
+			Vector3f pos = tileTo3dCoords(building.getTile());
 			building.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1.2f, 1.2f, 1.2f));
 		}
 
 		for(Projectile projectile : game.world.getData().getProjectiles()) {
-			float y = projectile.getTile().getLocation().y() + (projectile.getTile().getLocation().x() % 2) * 0.5f;
-			Vector3f pos = new Vector3f(
-					projectile.getTile().getLocation().x(), y, 
-					projectile.getTile().getHeight()/15 + projectile.getHeight()/15);
+			Vector3f pos = tileTo3dCoords(projectile.getTile());
 			MeshUtils.star.render(gl, shader, TextureUtils.getTextureByFileName(PlantType.BERRY.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(2, 2, 2));
 		}
 
 		if(game.world.get(state.hoveredTile) != null) {
-			float y = state.hoveredTile.y() + (state.hoveredTile.x() % 2) * 0.5f;
-			Vector3f pos = new Vector3f(
-					state.hoveredTile.x(), y, 
-					game.world.get(state.hoveredTile).getHeight()/15);
+			Vector3f pos = tileTo3dCoords(game.world.get(state.hoveredTile));
 			hoveredTileBox.render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 
 		shader.setUniform("isHighlight", 1f);
 		for (Thing thing : state.selectedThings) {
-			float y = thing.getTile().getLocation().y() + (thing.getTile().getLocation().x() % 2) * 0.5f;
-			Vector3f pos = new Vector3f(
-					thing.getTile().getLocation().x(), y, 
-					thing.getTile().getHeight()/15);
+			Vector3f pos = tileTo3dCoords(thing.getTile());
 			hoveredTileBox.render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 	}
@@ -254,7 +235,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		for(int i = 0; i < 1000; i++) {
 			TileLoc currentTileLoc = new TileLoc((int)current.x, (int)current.y);
 			Tile currentTile = world.get(currentTileLoc);
-			if((currentTile != null && current.z*15 <= currentTile.getHeight())
+			if((currentTile != null && current.z <= tileHeightTo3dHeight(currentTile.getHeight()))
 					|| (current.z < 0)) {
 //				return current.add(previous).multiply(0.5f);
 				return previous;
@@ -307,5 +288,18 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	public void rotateView(int dx, int dy) {
 		float adjust = 0.1f;
 		camera.rotate(-dx*adjust, dy*adjust);
+	}
+
+	public static Vector3f tileTo3dCoords(Tile tile) {
+		return tileLocTo3dCoords(tile.getLocation(), tile.getHeight());
+	}
+	public static Vector3f tileLocTo3dCoords(TileLoc tileLoc, float height) {
+		return new Vector3f(
+				tileLoc.x(), 
+				tileLoc.y() + (tileLoc.x() % 2) * 0.5f, 
+				tileHeightTo3dHeight(height));
+	}
+	public static float tileHeightTo3dHeight(float height) {
+		return height/30;
 	}
 }

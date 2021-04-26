@@ -27,8 +27,14 @@ public class Vector3f {
 	public Vector3f add(Vector3f other) {
 		return new Vector3f(x + other.x, y + other.y, z + other.z);
 	}
+	public Vector3f add(float xx, float yy, float zz) {
+		return new Vector3f(x + xx, y + yy, z + zz);
+	}
 	public Vector3f subtract(Vector3f other) {
 		return new Vector3f(x - other.x, y - other.y, z - other.z);
+	}
+	public Vector3f subtract(float xx, float yy, float zz) {
+		return new Vector3f(x - xx, y - yy, z - zz);
 	}
 	public Vector3f multiply(Vector3f other) {
 		return new Vector3f(x * other.x, y * other.y, z * other.z);

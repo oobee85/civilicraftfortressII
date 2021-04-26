@@ -147,8 +147,6 @@ public class MeshUtils {
 							Vector2f texCoord = new Vector2f(
 									(float)element.getDouble("s"), 
 									1 - (float)element.getDouble("t"));
-							
-							System.out.println("Tex coord: " + texCoord);
 							textureMapping.add(texCoord);
 						}
 						else {

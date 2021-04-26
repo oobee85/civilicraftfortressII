@@ -6,6 +6,7 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.texture.*;
 
 import ui.graphics.opengl.maths.*;
+import utils.*;
 import world.*;
 
 public class TerrainObject extends GameObject {
@@ -18,10 +19,134 @@ public class TerrainObject extends GameObject {
 	}
 
 	public void create(GL3 gl, World world) {
-		mesh = createMeshFromWorld2(world);
+		mesh = createMeshFromWorld3(world);
 		mesh.create(gl);
 	}
 
+	private Mesh createMeshFromWorld3(World world) {
+		ArrayList<Vertex> vertices = new ArrayList<>();
+		ArrayList<Integer> indicesList = new ArrayList<>();
+		HashMap<Tile, ArrayList<Vertex>> tileToVertex = new HashMap<>();
+		HashMap<Vertex, Integer> vertexToIndex = new HashMap<>();
+		float radius = 0.5f;
+		float yoffset = (float) (radius * Math.sin(Math.toRadians(60)));
+		Vector3f white = new Vector3f(1, 1, 1);
+		for(Tile tile : world.getTiles()) {
+			
+			Vector2f textureCoord = new Vector2f(
+					(tile.getLocation().x() + 0.5f)/world.getWidth(), 
+					(tile.getLocation().y() + 0.5f)/world.getHeight());
+			
+			ArrayList<Vertex> verts = new ArrayList<>();
+			Vector3f center = GLDrawer.tileLocTo3dCoords(tile.getLocation(), tile.getHeight());
+
+			verts.add(new Vertex(center, white, null, textureCoord));
+			verts.add(new Vertex(center.add(-radius, 0, 0), white, null, textureCoord));
+			verts.add(new Vertex(center.add(-radius/2, -yoffset, 0), white, null, textureCoord));
+			verts.add(new Vertex(center.add(radius/2, -yoffset, 0), white, null, textureCoord));
+			verts.add(new Vertex(center.add(radius, 0, 0), white, null, textureCoord));
+			verts.add(new Vertex(center.add(radius/2, yoffset, 0), white, null, textureCoord));
+			verts.add(new Vertex(center.add(-radius/2, yoffset, 0), white, null, textureCoord));
+
+			int i = vertices.size();
+			for(int j = 0; j < verts.size(); j++) {
+				vertexToIndex.put(verts.get(j), i+j);
+			}
+			tileToVertex.put(tile, verts);
+			for(int j = 1; j <= 6; j++) {
+				indicesList.add(i);
+				indicesList.add(i+j);
+				if(j == 6) {
+					indicesList.add(i+1);
+				}
+				else {
+					indicesList.add(i+j+1);
+				}
+			}
+			for(Vertex vec : verts) {
+				vertices.add(vec);
+			}
+		}
+		for(Tile tile : world.getTiles()) {
+			int x = tile.getLocation().x();
+			int y = tile.getLocation().y();
+			Tile north = world.get(new TileLoc(x, y + 1));
+			if(north != null) {
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(tile).get(6)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(tile).get(5)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(north).get(3)));
+
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(tile).get(6)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(north).get(3)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(north).get(2)));
+			}
+
+			Tile northeast = world.get(new TileLoc(x+1, y + (x%2)));
+			if(northeast != null) {
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(tile).get(5)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(tile).get(4)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(northeast).get(2)));
+
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(tile).get(5)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(northeast).get(2)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(northeast).get(1)));
+			}
+			
+			if(north != null && northeast != null) {
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(tile).get(5)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(northeast).get(1)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(north).get(3)));
+			}
+			
+			Tile southeast = world.get(new TileLoc(x+1, y - (1 - (x%2))));
+			if(southeast != null) {
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(tile).get(4)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(tile).get(3)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(southeast).get(1)));
+
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(tile).get(4)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(southeast).get(1)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(southeast).get(6)));
+			}
+			
+			if(northeast != null && southeast != null) {
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(tile).get(4)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(southeast).get(6)));
+				indicesList.add(vertices.size());
+				vertices.add(new Vertex(tileToVertex.get(northeast).get(2)));
+			}
+		}
+		
+		int[] indices = new int[indicesList.size()];
+		for(int i = 0; i < indices.length; i++) {
+			indices[i] = indicesList.get(i);
+		}
+		Vertex[] vertexArray = vertices.toArray(new Vertex[0]);
+		return new Mesh(vertexArray, indices);
+	}
 	private Mesh createMeshFromWorld2(World world) {
 		Vertex[] vertices = new Vertex[world.getTiles().size()];
 		int[][] coordToVertex = new int[world.getHeight()][world.getWidth()];
@@ -32,10 +157,7 @@ public class TerrainObject extends GameObject {
 		int index = 0;
 		for(Tile tile : world.getTiles()) {
 			coordToVertex[tile.getLocation().y()][tile.getLocation().x()] = index;
-			Vector3f pos0 = new Vector3f(
-					tile.getLocation().x(), 
-					tile.getLocation().y() + (tile.getLocation().x() % 2) * 0.5f, 
-					tile.getHeight()/15);
+			Vector3f pos0 = GLDrawer.tileLocTo3dCoords(tile.getLocation(), tile.getHeight());
 			Vector3f ca = (tile.getLocation().x() % 2 == 0) ? c0 : c1;
 			Vector3f cb = (tile.getLocation().x() % 2 == 0) ? c2 : c3;
 			Vector3f c = (tile.getLocation().y() % 2 == 0) ? ca : cb;
