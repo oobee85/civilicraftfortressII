@@ -2,6 +2,7 @@ package ui.view;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
@@ -28,6 +29,9 @@ public class GameView {
 	private boolean rightMouseDown = false;
 	private boolean controlDown = false;
 	private boolean shiftDown = false;
+	private boolean[] pressedKeys = new boolean[KeyEvent.KEY_LAST];
+	private Thread fpsMovementThread;
+	private Robot fpsMouseRobot;
 
 	private boolean summonPlayerControlled = true;
 	private boolean setSpawnWeather = false;
@@ -46,6 +50,7 @@ public class GameView {
 		public long previousTickTime;
 		public volatile Position viewOffset = new Position(0, 0);
 		public volatile int tileSize = 15;
+		public boolean fpsMode = true;
 		
 		public Point mousePressLocation;
 		public Point previousMouse;
@@ -106,12 +111,26 @@ public class GameView {
 		MouseMotionListener mouseMotionListener = new MouseMotionListener() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				mouseOver(currentActiveDrawer.getWorldCoordOfPixel(e.getPoint(), state.viewOffset, state.tileSize));
-				state.previousMouse = e.getPoint();
+				Point currentMouse = e.getPoint();
+				
+				if(state.fpsMode && is3d()) {
+					int dx = state.previousMouse.x - currentMouse.x;
+					int dy = state.previousMouse.y - currentMouse.y;
+					currentActiveDrawer.rotateView(dx, dy);
+					currentMouse = new Point(drawingCanvas.getWidth()/2,
+							drawingCanvas.getHeight()/2);
+					fpsMouseRobot.mouseMove(drawingCanvas.getLocationOnScreen().x + currentMouse.x, 
+							drawingCanvas.getLocationOnScreen().y + currentMouse.y);
+				}
+				mouseOver(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize));
+				state.previousMouse = currentMouse;
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				if(state.fpsMode && is3d()) {
+					return;
+				}
 				Point currentMouse = e.getPoint();
 				int dx = state.previousMouse.x - currentMouse.x;
 				int dy = state.previousMouse.y - currentMouse.y;
@@ -198,6 +217,7 @@ public class GameView {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
+				pressedKeys[e.getKeyCode()] = false;
 				if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
 					controlDown = false;
 				} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
@@ -207,30 +227,40 @@ public class GameView {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
-					controlDown = true;
-				} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
-					shiftDown = true;
-				} else if (e.getKeyCode() == KeyEvent.VK_A) {
-					if (e.isControlDown()) {
-						selectAllUnits();
-					} else {
-						state.leftClickAction = LeftClickAction.ATTACK;
+				pressedKeys[e.getKeyCode()] = true;
+				if(state.fpsMode && is3d()) {
+					if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+						state.fpsMode = false;
+						glDrawer.getDrawingCanvas().setCursor(Cursor.getDefaultCursor());
+						
 					}
-				} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-					deselectEverything();
-				} else if (e.getKeyCode() == KeyEvent.VK_S) {
-					unitStop();
-				} else if (e.getKeyCode() == KeyEvent.VK_G) {
-					toggleGuarding();
-				} else if (e.getKeyCode() == KeyEvent.VK_M) {
-					setBuildingToPlan(Game.buildingTypeMap.get("MINE"));
-				} else if (e.getKeyCode() == KeyEvent.VK_I) {
-					setBuildingToPlan(Game.buildingTypeMap.get("IRRIGATION"));
-				} else if (e.getKeyCode() == KeyEvent.VK_W) {
-					setBuildingToPlan(Game.buildingTypeMap.get("WALL_WOOD"));
-				} else if (e.getKeyCode() == KeyEvent.VK_B) {
-					setBuildingToPlan(Game.buildingTypeMap.get("BARRACKS"));
+				}
+				if(!(state.fpsMode && is3d())) {
+					if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+						controlDown = true;
+					} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+						shiftDown = true;
+					} else if (e.getKeyCode() == KeyEvent.VK_A) {
+						if (e.isControlDown()) {
+							selectAllUnits();
+						} else {
+							state.leftClickAction = LeftClickAction.ATTACK;
+						}
+					} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+						deselectEverything();
+					} else if (e.getKeyCode() == KeyEvent.VK_S) {
+						unitStop();
+					} else if (e.getKeyCode() == KeyEvent.VK_G) {
+						toggleGuarding();
+					} else if (e.getKeyCode() == KeyEvent.VK_M) {
+						setBuildingToPlan(Game.buildingTypeMap.get("MINE"));
+					} else if (e.getKeyCode() == KeyEvent.VK_I) {
+						setBuildingToPlan(Game.buildingTypeMap.get("IRRIGATION"));
+					} else if (e.getKeyCode() == KeyEvent.VK_W) {
+						setBuildingToPlan(Game.buildingTypeMap.get("WALL_WOOD"));
+					} else if (e.getKeyCode() == KeyEvent.VK_B) {
+						setBuildingToPlan(Game.buildingTypeMap.get("BARRACKS"));
+					}
 				}
 			}
 		};
@@ -245,6 +275,38 @@ public class GameView {
 			vanillaDrawer.getDrawingCanvas().addMouseListener(mouseListener);
 //		}
 		panel.addKeyListener(keyListener);
+		fpsMovementThread = new Thread(() -> {
+			try {
+				fpsMouseRobot = new Robot();
+			} catch (AWTException e2) {
+				e2.printStackTrace();
+			}
+			glDrawer.getDrawingCanvas().setCursor(
+					Toolkit.getDefaultToolkit().createCustomCursor(
+							new BufferedImage( 1, 1, BufferedImage.TYPE_INT_ARGB ), new Point(0, 0), "blank cursor"));
+			try {
+				while(true) {
+					if(state.fpsMode && is3d()) {
+						if(pressedKeys[KeyEvent.VK_W]) {
+							currentActiveDrawer.shiftView(0, 1);
+						}
+						if(pressedKeys[KeyEvent.VK_S]) {
+							currentActiveDrawer.shiftView(0, -1);
+						}
+						if(pressedKeys[KeyEvent.VK_A]) {
+							currentActiveDrawer.shiftView(-1, 0);
+						}
+						if(pressedKeys[KeyEvent.VK_D]) {
+							currentActiveDrawer.shiftView(1, 0);
+						}
+					}
+					Thread.sleep(33);
+				}
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+		});
+		fpsMovementThread.start();
 	}
 	
 	public void switch3d(boolean activate3D) {

@@ -199,7 +199,13 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		}
 		for(Plant plant : game.world.getPlants()) {
 			Vector3f pos = tileTo3dCoords(plant.getTile());
-			plant.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(plant.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+			Vector3f scale = new Vector3f(1, 1, 1);
+			if(plant.getType() == PlantType.FOREST1) {
+				scale.x = scale.x * (1f + 0.15f*(plant.getTile().getLocation().x()%3) + 0.15f*(plant.getTile().getLocation().y()%5));
+				scale.y = scale.x;
+				scale.z = scale.z * (2f + 0.1f*(plant.getTile().getLocation().x()%7) + 0.1f*(plant.getTile().getLocation().y()%13));
+			}
+			plant.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(plant.getTextureFile(), gl), pos, Matrix4f.identity(), scale);
 		}
 		UnitType dragonType = Game.unitTypeMap.get("DRAGON");
 		for(Unit unit : game.world.getUnits()) {
@@ -220,7 +226,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			MeshUtils.star.render(gl, shader, TextureUtils.getTextureByFileName(PlantType.BERRY.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(2, 2, 2));
 		}
 
-		if(game.world.get(state.hoveredTile) != null) {
+		if(!state.fpsMode && game.world.get(state.hoveredTile) != null) {
 			Vector3f pos = tileTo3dCoords(game.world.get(state.hoveredTile));
 			hoveredTileBox.render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
@@ -294,8 +300,23 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 	@Override
 	public void shiftView(int dx, int dy) {
-		float adjust = 0.2f;
-		camera.shiftView(dx*adjust, dy*adjust);
+		if(state.fpsMode) {
+			float adjust = 0.6f;
+			camera.shiftView(dx*adjust, -dy*adjust);
+			Tile tile = game.world.get(coordsToTile(camera.getPosition()));
+			if(tile != null) {
+				float height = tile.getHeight() + 60;
+				if(tile.liquidType == LiquidType.ICE) {
+					height += tile.liquidAmount;
+				}
+				camera.getPosition().z = tileHeightTo3dHeight(height);
+			}
+			System.out.println("Camera is at " + camera.getPosition());
+		}
+		else {
+			float adjust = 0.2f;
+			camera.shiftView(dx*adjust, dy*adjust);
+		}
 	}
 	
 	@Override
@@ -304,6 +325,11 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		camera.rotate(-dx*adjust, dy*adjust);
 	}
 
+	public static TileLoc coordsToTile(Vector3f coords) {
+		int x = (int)(coords.x + TerrainObject.TILE_RADIUS);
+		int y = (int)((coords.y + TerrainObject.Y_OFFSET)/(TerrainObject.Y_OFFSET*2));
+		return new TileLoc(x, y);
+	}
 	public static Vector3f tileTo3dCoords(Tile tile) {
 		return tileLocTo3dCoords(tile.getLocation(), tile.getHeight());
 	}
