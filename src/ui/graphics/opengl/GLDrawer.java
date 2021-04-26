@@ -208,9 +208,14 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			Vector3f pos = tileTo3dCoords(plant.getTile());
 			plant.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(plant.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
+		UnitType dragonType = Game.unitTypeMap.get("DRAGON");
 		for(Unit unit : game.world.getUnits()) {
 			Vector3f pos = tileTo3dCoords(unit.getTile());
-			unit.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(unit.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+			Vector3f scale = new Vector3f(1, 1, 1);
+			if(unit.getType() == dragonType) {
+				scale = scale.multiply(2);
+			}
+			unit.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(unit.getTextureFile(), gl), pos, Matrix4f.identity(), scale);
 		}
 		for(Building building : game.world.getBuildings()) {
 			Vector3f pos = tileTo3dCoords(building.getTile());
