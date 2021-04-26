@@ -79,6 +79,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		gl.glEnable(GL3.GL_CULL_FACE);
 		gl.glCullFace(GL3.GL_BACK);
 		TextureUtils.initDefaultTextures(gl);
+		MeshUtils.getMeshByFileName("models/fire.ply");
 		Mesh.initAllMeshes(gl);
 		
 		gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
@@ -127,6 +128,9 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			
 //			terrainObject.rotate(Matrix4f.rotate(1, new Vector3f(0, 1, 0)));
 			int dayOffset = World.getCurrentDayOffset();
+			if(Game.DISABLE_NIGHT) {
+				dayOffset = World.DAY_DURATION/2;
+			}
 			float ratio = (float)dayOffset / (World.DAY_DURATION + World.NIGHT_DURATION);
 			Matrix4f rot = Matrix4f.rotate(ratio * 360, new Vector3f(0, 1, 0));
 			Vector3f initPosition = new Vector3f(-1, 0, 0);
@@ -134,13 +138,12 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			sunDirection = result.multiply(-1);
 			sunColor.set(1f, 1f, 0.95f);
 			float multiplier = (float)World.getDaylight();
-			sunColor = sunColor.multiply(new Vector3f(multiplier, multiplier*multiplier, multiplier*multiplier));
 			if(Game.DISABLE_NIGHT) {
-				ambientColor.set(.7f, .7f, .7f);
+				multiplier = Math.min(1, multiplier);
 			}
-			else {
-				ambientColor.set(multiplier/4, multiplier/4, multiplier/4);
-			}
+			sunColor = sunColor.multiply(new Vector3f(multiplier, multiplier*multiplier, multiplier*multiplier));
+			float ambient = multiplier/4;
+			ambientColor.set(ambient, ambient, ambient);
 			renderStuff(gl, shader);
 			shader.unbind(gl);
 		}
@@ -190,13 +193,22 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
 		
 		for(Tile tile : game.world.getTiles()) {
+			float bright = Math.min(1, (float) tile.getBrightness(state.faction));
+			Vector3f ambientColorWithBrightness = ambientColor.add(bright, bright, bright);
+			shader.setUniform("ambientColor", ambientColorWithBrightness);
 			if(tile.liquidType != LiquidType.DRY) {
 				float cutoff = 1f;
 				float scale = Math.min(1, tile.liquidAmount * tile.liquidAmount / cutoff);
 				Vector3f pos = tileLocTo3dCoords(tile.getLocation(), tile.getHeight() + tile.liquidAmount);
 				terrainObject.liquid.render(gl, shader, TextureUtils.getTextureByFileName(tile.liquidType.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, 1));
 			}
+			if(tile.getModifier() != null) {
+				Vector3f pos = tileTo3dCoords(tile);
+				float scale = 1.0f + (float)Math.random()*0.1f;
+				MeshUtils.getMeshByFileName("models/fire.ply").render(gl, shader, TextureUtils.getTextureByFileName("Images/ground_modifiers/fire.png", gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, scale));
+			}
 		}
+		shader.setUniform("ambientColor", ambientColor);
 		for(Plant plant : game.world.getPlants()) {
 			Vector3f pos = tileTo3dCoords(plant.getTile());
 			Vector3f scale = new Vector3f(1, 1, 1);
@@ -223,7 +235,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 		for(Projectile projectile : game.world.getData().getProjectiles()) {
 			Vector3f pos = tileTo3dCoords(projectile.getTile());
-			MeshUtils.star.render(gl, shader, TextureUtils.getTextureByFileName(PlantType.BERRY.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(2, 2, 2));
+			MeshUtils.getMeshByFileName("models/bomb.ply").render(gl, shader, TextureUtils.getTextureByFileName(PlantType.BERRY.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 
 		if(!state.fpsMode && game.world.get(state.hoveredTile) != null) {
