@@ -9,6 +9,13 @@ public class Vertex {
 	private Vector3f normal;
 	private Vector2f textureCoord;
 
+	public Vertex(Vertex other) {
+		this(new Vector3f(other.position), 
+				new Vector3f(other.getColor()), 
+				null,
+				new Vector2f(other.getTextureCoord()));
+	}
+	
 	public Vertex(Vector3f position, Vector3f color) {
 		this(position, color, null, null);
 	}
