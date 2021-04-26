@@ -205,6 +205,11 @@ public class DebugView {
 			}
 		});
 
+		JButton enableFirstPerson = KUIConstants.setupButton("FP Mode", null, DEBUG_BUTTON_SIZE);
+		enableFirstPerson.addActionListener(e -> {
+			gameView.switchFirstPerson(true);
+		});
+
 		JButton exit = KUIConstants.setupButton("Exit", null, DEBUG_BUTTON_SIZE);
 		exit.addActionListener(new ActionListener() {
 			@Override
@@ -260,6 +265,7 @@ public class DebugView {
 //		scrollingPanel.add(save); // doesnt currently work
 		scrollingPanel.add(exit);
 		scrollingPanel.add(toggleGL);
+		scrollingPanel.add(enableFirstPerson);
 		scrollingPanel.add(shadowWordDeath);
 		scrollingPanel.add(shadowWordPain);
 		scrollingPanel.add(reseedButton);

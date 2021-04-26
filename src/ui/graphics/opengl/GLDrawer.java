@@ -238,7 +238,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			MeshUtils.getMeshByFileName("models/bomb.ply").render(gl, shader, TextureUtils.getTextureByFileName(PlantType.BERRY.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
 
-		if(!state.fpsMode && game.world.get(state.hoveredTile) != null) {
+		if(!state.fpMode && game.world.get(state.hoveredTile) != null) {
 			Vector3f pos = tileTo3dCoords(game.world.get(state.hoveredTile));
 			hoveredTileBox.render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
@@ -312,7 +312,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 	@Override
 	public void shiftView(int dx, int dy) {
-		if(state.fpsMode) {
+		if(state.fpMode) {
 			float adjust = 0.6f;
 			camera.shiftView(dx*adjust, -dy*adjust);
 			Tile tile = game.world.get(coordsToTile(camera.getPosition()));

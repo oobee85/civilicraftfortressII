@@ -20,6 +20,9 @@ import utils.*;
 import world.*;
 
 public class GameView {
+	
+	private static final Cursor BLANK_CURSOR = Toolkit.getDefaultToolkit().createCustomCursor(
+			new BufferedImage( 1, 1, BufferedImage.TYPE_INT_ARGB ), new Point(0, 0), "blank cursor");
 
 	private GUIController guiController;
 	private CommandInterface commandInterface;
@@ -50,7 +53,7 @@ public class GameView {
 		public long previousTickTime;
 		public volatile Position viewOffset = new Position(0, 0);
 		public volatile int tileSize = 15;
-		public boolean fpsMode = true;
+		public boolean fpMode = true;
 		
 		public Point mousePressLocation;
 		public Point previousMouse;
@@ -113,7 +116,7 @@ public class GameView {
 			public void mouseMoved(MouseEvent e) {
 				Point currentMouse = e.getPoint();
 				
-				if(state.fpsMode && is3d()) {
+				if(state.fpMode && is3d()) {
 					int dx = state.previousMouse.x - currentMouse.x;
 					int dy = state.previousMouse.y - currentMouse.y;
 					currentActiveDrawer.rotateView(dx, dy);
@@ -128,7 +131,7 @@ public class GameView {
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				if(state.fpsMode && is3d()) {
+				if(isFirstPerson()) {
 					return;
 				}
 				Point currentMouse = e.getPoint();
@@ -218,6 +221,11 @@ public class GameView {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				pressedKeys[e.getKeyCode()] = false;
+				if(isFirstPerson()) {
+					if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+						switchFirstPerson(false);
+					}
+				}
 				if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
 					controlDown = false;
 				} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
@@ -228,14 +236,7 @@ public class GameView {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				pressedKeys[e.getKeyCode()] = true;
-				if(state.fpsMode && is3d()) {
-					if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-						state.fpsMode = false;
-						glDrawer.getDrawingCanvas().setCursor(Cursor.getDefaultCursor());
-						
-					}
-				}
-				if(!(state.fpsMode && is3d())) {
+				if(!isFirstPerson()) {
 					if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
 						controlDown = true;
 					} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
@@ -281,12 +282,10 @@ public class GameView {
 			} catch (AWTException e2) {
 				e2.printStackTrace();
 			}
-			glDrawer.getDrawingCanvas().setCursor(
-					Toolkit.getDefaultToolkit().createCustomCursor(
-							new BufferedImage( 1, 1, BufferedImage.TYPE_INT_ARGB ), new Point(0, 0), "blank cursor"));
+			switchFirstPerson(true);
 			try {
 				while(true) {
-					if(state.fpsMode && is3d()) {
+					if(isFirstPerson()) {
 						if(pressedKeys[KeyEvent.VK_W]) {
 							currentActiveDrawer.shiftView(0, 1);
 						}
@@ -328,6 +327,20 @@ public class GameView {
 	}
 	public boolean is3d() {
 		return currentActiveDrawer == glDrawer;
+	}
+	
+	public void switchFirstPerson(boolean enabled) {
+		state.fpMode = enabled;
+		if(state.fpMode) {
+			glDrawer.getDrawingCanvas().setCursor(BLANK_CURSOR);
+		}
+		else {
+			glDrawer.getDrawingCanvas().setCursor(Cursor.getDefaultCursor());
+		}
+	}
+	
+	public boolean isFirstPerson() {
+		return is3d() && state.fpMode;
 	}
 
 	public void setFaction(Faction faction) {
