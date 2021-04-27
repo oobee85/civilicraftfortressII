@@ -9,9 +9,11 @@ import world.*;
 
 public class Liquid {
 	
+	public static final float WALL_HEIGHT = 10;
 	public static final float MINIMUM_LIQUID_THRESHOLD = 0.001f;
 	
 	private static final float FRICTION_RATIO = 0.99f;
+	
 	
 	private static float[][] liquidAmountsTemp;
 	private static LiquidType[][] liquidTypesTemp;
@@ -156,7 +158,7 @@ public class Liquid {
 			}
 			float myh = tile.getHeight();
 			if(tile.hasWall() == true) {
-				myh += 10;
+				myh += WALL_HEIGHT;
 			}
 			float myv = liquidAmountsTemp[x][y];
 			LiquidType mytype = liquidTypesTemp[x][y];

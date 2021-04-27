@@ -221,16 +221,29 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		}
 		UnitType dragonType = Game.unitTypeMap.get("DRAGON");
 		for(Unit unit : game.world.getUnits()) {
-			Vector3f pos = tileTo3dCoords(unit.getTile());
+			float height = unit.getTile().getHeight();
+			if(unit.getUnitType().isFlying()) {
+				height = unit.getTile().getHeight() + unit.getTile().liquidAmount;
+			}
+			Vector3f pos = tileLocTo3dCoords(unit.getTile().getLocation(), height);
 			Vector3f scale = new Vector3f(1, 1, 1);
 			if(unit.getType() == dragonType) {
 				scale = scale.multiply(2);
 			}
+			if(unit.getType().isFlying()) {
+				pos.z += 3;
+			}
 			unit.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(unit.getTextureFile(), gl), pos, Matrix4f.identity(), scale);
 		}
 		for(Building building : game.world.getBuildings()) {
-			Vector3f pos = tileTo3dCoords(building.getTile());
-			building.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1.2f, 1.2f, 1.2f));
+			if(building.getType().blocksMovement()) {
+				Vector3f pos = tileLocTo3dCoords(building.getTile().getLocation(), building.getTile().getHeight() + Liquid.WALL_HEIGHT);
+				terrainObject.liquid.render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+			}
+			else {
+				Vector3f pos = tileTo3dCoords(building.getTile());
+				building.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1.2f, 1.2f, 1.2f));
+			}
 		}
 
 		for(Projectile projectile : game.world.getData().getProjectiles()) {
