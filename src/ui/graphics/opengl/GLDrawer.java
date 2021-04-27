@@ -27,11 +27,13 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	
 	private final GLCanvas glcanvas;
 	private Shader shader;
+	private Shader liquidShader;
 	private Matrix4f projection;
 	
 	private Vector3f sunDirection = new Vector3f();
 	private Vector3f sunColor = new Vector3f();
 	private Vector3f ambientColor = new Vector3f();
+	private long startTime = System.currentTimeMillis();
 	
 	private TerrainObject terrainObject;
 	private Mesh hoveredTileBox = MeshUtils.getMeshByFileName("models/selection_cube.ply");
@@ -92,6 +94,9 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 		shader = new Shader("/shaders/mainVertex.glsl", "/shaders/mainFragment.glsl");
 		shader.create(gl);
+		
+		liquidShader = new Shader("/shaders/liquidVertex.glsl", "/shaders/liquidFragment.glsl");
+		liquidShader.create(gl);
 		
 		updateProjectionMatrix();
 	}
@@ -158,6 +163,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("sunColor", sunColor);
 		shader.setUniform("ambientColor", ambientColor);
 		
+		
 		MeshUtils.x.render(gl, shader, 
 				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
 				new Vector3f(-20, 0, 0), 
@@ -192,6 +198,14 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("isHighlight", 0f);
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
 		
+		shader.unbind(gl);
+		liquidShader.bind(gl);
+		liquidShader.setUniform("projection", projection);
+		liquidShader.setUniform("view", camera.getView());
+		liquidShader.setUniform("sunDirection", sunDirection);
+		liquidShader.setUniform("sunColor", sunColor);
+		liquidShader.setUniform("ambientColor", ambientColor);
+		liquidShader.setUniform("waveOffset", (float)(System.currentTimeMillis() - startTime));
 		for(Tile tile : game.world.getTiles()) {
 			float bright = Math.min(1, (float) tile.getBrightness(state.faction));
 			Vector3f ambientColorWithBrightness = ambientColor.add(bright, bright, bright);
@@ -208,6 +222,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				MeshUtils.getMeshByFileName("models/fire.ply").render(gl, shader, TextureUtils.getTextureByFileName("Images/ground_modifiers/fire.png", gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, scale));
 			}
 		}
+		liquidShader.unbind(gl);
+		shader.bind(gl);
 		shader.setUniform("ambientColor", ambientColor);
 		for(Plant plant : game.world.getPlants()) {
 			Vector3f pos = tileTo3dCoords(plant.getTile());
