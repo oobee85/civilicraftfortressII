@@ -45,40 +45,37 @@ public class Generation {
 	
 	
 	public static TileLoc makeVolcano(World world, float[][] heightMap) {
-		int x = 0;
-		int y = 0; 
 		float highest = -1000;
-//		for(int i = 0; i < world.getWidth(); i++) {
-//			for(int j = 0; j < world.getHeight(); j++) {
-//				if(heightMap[i][j] > highest) {
-//					highest = heightMap[i][j];
-//					x = i;
-//					y = j;
-//				}
-//			}
-//		}
-		x = world.getWidth()/2;
-		y = world.getHeight()/2;
+		for(int i = 0; i < world.getWidth(); i++) {
+			for(int j = 0; j < world.getHeight(); j++) {
+				if(heightMap[i][j] > highest) {
+					highest = heightMap[i][j];
+				}
+			}
+		}
+		highest = highest*1.1f;
+		int x = world.getWidth()/2;
+		int y = world.getHeight()/2;
 		float lavaRadius = 5;
 		float volcanoRadius = 10;
 		float mountainRadius = 20;
-		float mountainEdgeRadius = 23;
+		float mountainEdgeRadius = 30;
 		
 		for(Tile tile : world.getTiles()) {
 			int i =  tile.getLocation().x();
-			int j =  tile.getLocation().y();
+			int j =  (int) (tile.getLocation().y() + (i%2)*0.5f);
 			int dx = i - x;
 			int dy = j - y;
 			float distanceFromCenter = (float) Math.sqrt(dx*dx + dy*dy);
 			if(distanceFromCenter < mountainEdgeRadius) {
 				
-				float height = 1 - 0.2f*(lavaRadius - distanceFromCenter)/lavaRadius;
 				if(distanceFromCenter > lavaRadius) {
-					height = 1 - (distanceFromCenter - lavaRadius)/mountainEdgeRadius;
-//					heightMap[i][j] = Math.max(height, heightMap[i][j]);
+					float height = highest - highest*(distanceFromCenter - lavaRadius)/(mountainEdgeRadius-lavaRadius);
+					heightMap[i][j] = Math.max(height, heightMap[i][j]);
 				}
 				else {
-//					heightMap[i][j] = height;
+					float height = highest - highest*(lavaRadius - distanceFromCenter)/lavaRadius;
+					heightMap[i][j] = Math.max(height, heightMap[i][j]);
 				}
 				
 				if(distanceFromCenter < lavaRadius) {
