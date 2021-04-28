@@ -137,6 +137,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		GL3 gl = drawable.getGL().getGL3();
 		updateBackgroundColor(gl, game.getBackgroundColor());
 		gl.glClear(GL3.GL_DEPTH_BUFFER_BIT | GL3.GL_COLOR_BUFFER_BIT);
+		camera.updateMatrices();
 
 		if(game.world != null) {
 		
@@ -518,7 +519,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	@Override
 	public void zoomViewTo(int newTileSize, int mx, int my) {
 	}
-
+	
 	@Override
 	public void shiftView(int dx, int dy) {
 		if(state.fpMode) {

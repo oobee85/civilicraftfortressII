@@ -14,7 +14,7 @@ public class Camera {
 	private Vector3f position;
 	private static final Matrix4f prerotate = Matrix4f.rotate(-90, new Vector3f(1, 0, 0));
 	public static final Matrix4f prerotateInv = Matrix4f.rotate(90, new Vector3f(1, 0, 0));
-
+	
 	public Camera(Vector3f position, float theta, float pitch) {
 		this.position = position;
 		this.theta = theta;
@@ -53,13 +53,22 @@ public class Camera {
 	public Vector3f getPosition() {
 		return position;
 	}
+
+	private Matrix4f translation;
+	private Matrix4f rotation;
+	private Matrix4f view;
+	public void updateMatrices() {
+		translation = Matrix4f.translate(position.multiply(-1));
+		rotation = prerotate.multiply(Matrix4f.rotate(theta, up)).multiply(Matrix4f.rotate(-pitch, side));
+		view = rotation.multiply(translation);
+	}
 	private Matrix4f getTranslationMatrix() {
-		return Matrix4f.translate(position.multiply(-1));
+		return translation;
 	}
 	public Matrix4f getRotationMatrix() {
-		return prerotate.multiply(Matrix4f.rotate(theta, up)).multiply(Matrix4f.rotate(-pitch, side));
+		return rotation;
 	}
 	public Matrix4f getView() {
-		return getRotationMatrix().multiply(getTranslationMatrix());
+		return view;
 	}
 }
