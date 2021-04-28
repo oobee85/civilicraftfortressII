@@ -167,7 +167,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			Vector3f result = rot.multiply(initPosition, 1);
 			sunDirection = result.multiply(-1).normalize();
 			sunColor.set(1f, 1f, 0.95f);
-			float multiplier = (float)World.getDaylight();
+			float multiplier = (float)Math.max(World.getDaylight(), 0.1);
 			if(Game.DISABLE_NIGHT) {
 				multiplier = Math.min(1, multiplier);
 			}
@@ -289,15 +289,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		torender.get(mesh).add(obj);
 	}
 	
-	public void renderStuff(GL3 gl, Shader shader) {
-		clearToRender();
-		shader.setUniform("projection", projection);
-		shader.setUniform("view", camera.getView());
-		shader.setUniform("sunDirection", sunDirection);
-		shader.setUniform("sunColor", sunColor);
-		shader.setUniform("ambientColor", ambientColor);
-		shader.setUniform("isHighlight", 0f);
-		
+	public void renderAxis(GL3 gl, Shader shader) {
 		MeshUtils.x.render(gl, shader, 
 				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
 				new Vector3f(-20, 0, 0), 
@@ -328,35 +320,21 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				new Vector3f(0, 0, 5), 
 				Matrix4f.rotate(90, new Vector3f(0, 1, 0)), 
 				new Vector3f(.1f, .1f, .1f));
+	}
+	
+	public void renderStuff(GL3 gl, Shader shader) {
+		clearToRender();
+		shader.setUniform("projection", projection);
+		shader.setUniform("view", camera.getView());
+		shader.setUniform("sunDirection", sunDirection);
+		shader.setUniform("sunColor", sunColor);
+		shader.setUniform("ambientColor", ambientColor);
+		shader.setUniform("isHighlight", 0f);
+		
+		renderAxis(gl, shader);
 
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
 		
-//		shader.unbind(gl);
-//		liquidShader.bind(gl);
-//		liquidShader.setUniform("projection", projection);
-//		liquidShader.setUniform("view", camera.getView());
-//		liquidShader.setUniform("sunDirection", sunDirection);
-//		liquidShader.setUniform("sunColor", sunColor);
-//		liquidShader.setUniform("ambientColor", ambientColor);
-//		liquidShader.setUniform("waveOffset", (float)(System.currentTimeMillis() - startTime));
-//		for(Tile tile : game.world.getTiles()) {
-//			float bright = Math.min(1, (float) tile.getBrightness(state.faction));
-//			Vector3f ambientColorWithBrightness = ambientColor.add(bright, bright, bright);
-//			shader.setUniform("ambientColor", ambientColorWithBrightness);
-//			if(tile.liquidType != LiquidType.DRY) {
-//				float cutoff = 1f;
-//				float scale = Math.min(1, tile.liquidAmount * tile.liquidAmount / cutoff);
-//				Vector3f pos = tileLocTo3dCoords(tile.getLocation(), tile.getHeight() + tile.liquidAmount);
-//				terrainObject.liquid.render(gl, shader, TextureUtils.getTextureByFileName(tile.liquidType.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, 1));
-//			}
-//			if(tile.getModifier() != null) {
-//				Vector3f pos = tileTo3dCoords(tile);
-//				float scale = 1.0f + (float)Math.random()*0.1f;
-//				MeshUtils.getMeshByFileName("models/fire.ply").render(gl, shader, TextureUtils.getTextureByFileName("Images/ground_modifiers/fire.png", gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, scale));
-//			}
-//		}
-//		liquidShader.unbind(gl);
-//		shader.bind(gl);
 		shader.setUniform("ambientColor", ambientColor);
 		for(Plant plant : game.world.getPlants()) {
 			float height = plant.getTile().getHeight();
