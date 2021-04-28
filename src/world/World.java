@@ -472,7 +472,7 @@ public class World {
 			while(target == null) {
 				for(int i = 0; i < 20; i++) {
 //					System.out.println(i);
-					if(t.getLocation().x() + i <= tiles.length) {
+					if(t.getLocation().x() + i < tiles.length) {
 						target = tiles[t.getLocation().x() + i][t.getLocation().y()];
 					}
 				}

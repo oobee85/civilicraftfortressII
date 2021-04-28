@@ -389,13 +389,16 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 		for(Projectile projectile : game.world.getData().getProjectiles()) {
 			float height = projectile.getTile().getHeight() + projectile.getHeight();
+			Vector3f vector = new Vector3f(1, 1, 1);
 			if(projectile.getType() == ProjectileType.METEOR) {
 //				height -=projectile.getHeight();
-				height = projectile.getTile().getHeight()*2;
+				height = projectile.getTile().getHeight()*2 + projectile.getHeight()*2;
+				vector = new Vector3f(5, 5, 5);
 			}
 			Vector3f pos = tileLocTo3dCoords(projectile.getTile().getLocation(), height);
 //			Vector3f pos = tileTo3dCoords(projectile.getTile());
-			MeshUtils.getMeshByFileName("models/bomb.ply").render(gl, shader, TextureUtils.getTextureByFileName(PlantType.BERRY.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+			
+			MeshUtils.getMeshByFileName("models/bomb.ply").render(gl, shader, TextureUtils.getTextureByFileName(PlantType.BERRY.getTextureFile(), gl), pos, Matrix4f.identity(), vector);
 		}
 
 		if(!state.fpMode && game.world.get(state.hoveredTile) != null) {
