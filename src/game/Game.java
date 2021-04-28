@@ -128,7 +128,10 @@ public class Game {
 			updateTerritory();
 		}
 		
-		Liquid.propogate(world);
+		if(World.ticks % 2 == 0) {
+			Liquid.propogate(world);
+		}
+
 		
 		// Remove dead things
 		world.clearDeadAndAddNewThings();

@@ -466,13 +466,22 @@ public class World {
 				.findFirst();
 		if (potential.isPresent()) {
 			Tile t = potential.get();
-
+			Tile target = null;
 			int radius = (int) (Utils.getRandomNormal(2) * 30 + 5);
 			System.out.println("meteor at: " + t.getLocation().x() + ", " + t.getLocation().y());
-			;
-			spawnExplosionCircle(t, radius, 5000);
-			int rockRadius = radius / 5;
-			spawnRock(t, rockRadius);
+			while(target == null) {
+				for(int i = 0; i < 20; i++) {
+//					System.out.println(i);
+					if(t.getLocation().x() + i <= tiles.length) {
+						target = tiles[t.getLocation().x() + i][t.getLocation().y()];
+					}
+				}
+			}
+			Projectile meteor = new Projectile(ProjectileType.METEOR, target, t, null, 10000);
+			worldData.addProjectile(meteor);
+//			spawnExplosionCircle(t, radius, 5000);
+//			int rockRadius = radius / 5;
+//			spawnRock(t, rockRadius);
 		}
 	}
 	public void spawnRock(Tile tile, int radius) {
