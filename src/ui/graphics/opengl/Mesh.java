@@ -27,7 +27,39 @@ public class Mesh {
 		this.indices = indices;
 		allMeshes.add(this);
 	}
+	
+	public void renderSkybox(GL3 gl, Shader shader, Texture texture) {
+//		GL30.glBindVertexArray(mesh.getVAO());
+		gl.glBindVertexArray(this.getVAO());
+//		GL30.glEnableVertexAttribArray(0);
+		gl.glEnableVertexAttribArray(0);
+		gl.glEnableVertexAttribArray(1);
+		gl.glEnableVertexAttribArray(2);
+		gl.glEnableVertexAttribArray(3);
 
+		gl.glActiveTexture(GL3.GL_TEXTURE0);
+		texture.enable(gl);
+		texture.bind(gl); 
+		shader.setUniform("textureSampler", 0);
+//		shader.setUniform("model", Matrix4f.getModelMatrix(position, rotation, scale));
+//		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, mesh.getIBO());
+		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, this.getIBO());
+//		GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getIndices().length, GL11.GL_UNSIGNED_INT, 0);
+		gl.glDrawElements(GL2.GL_TRIANGLES, this.getIndices().length, GL2.GL_UNSIGNED_INT, 0);
+//		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		gl.glBindTexture(texture.getTarget(), 0);
+		texture.disable(gl);
+		
+//		GL30.glDisableVertexAttribArray(0);
+		gl.glDisableVertexAttribArray(0);
+		gl.glDisableVertexAttribArray(1);
+		gl.glDisableVertexAttribArray(2);
+		gl.glDisableVertexAttribArray(3);
+//		GL30.glBindVertexArray(0);
+		gl.glBindVertexArray(0);
+	}
 	public void render(GL3 gl, Shader shader, Texture texture, Vector3f position, Matrix4f rotation, Vector3f scale) {
 //		GL30.glBindVertexArray(mesh.getVAO());
 		gl.glBindVertexArray(this.getVAO());

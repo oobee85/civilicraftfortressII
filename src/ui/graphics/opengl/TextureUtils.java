@@ -2,6 +2,7 @@ package ui.graphics.opengl;
 
 import java.awt.*;
 import java.awt.image.*;
+import java.io.*;
 import java.util.*;
 
 import com.jogamp.opengl.*;
@@ -54,6 +55,19 @@ public class TextureUtils {
 		ERROR_TEXTURE = textureFromImage(gl, error);
 	}
 	
+	public static Texture cubeMapFromImages(GL3 gl, BufferedImage[] images) {
+		Texture cubemap = TextureIO.newTexture(GL.GL_TEXTURE_CUBE_MAP);
+		for(int i = 0; i < images.length; i++) {
+			TextureData texData = AWTTextureIO.newTextureData(gl.getGLProfile(), images[i], false);
+			if(texData == null) {
+				break;
+			}
+			cubemap.updateImage(gl, texData, GL.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i);
+		}
+		cubemap.setTexParameteri(gl, GL3.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+		cubemap.setTexParameteri(gl, GL3.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+		return cubemap;
+	}
 	public static Texture textureFromImage(GL3 gl, BufferedImage image) {
 		TextureData texData = AWTTextureIO.newTextureData(gl.getGLProfile(), image, false);
 		try {

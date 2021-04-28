@@ -28,6 +28,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	private final GLCanvas glcanvas;
 	private Shader shader;
 	private Shader liquidShader;
+	private Shader skyboxShader;
 	private Matrix4f projection;
 	
 	private Vector3f sunDirection = new Vector3f();
@@ -37,6 +38,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	
 	private TerrainObject terrainObject;
 	private Mesh hoveredTileBox = MeshUtils.getMeshByFileName("models/selection_cube.ply");
+	private Texture skybox;
 	
 	private final Camera camera;
 	
@@ -75,21 +77,38 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		return null;
 	}
 
+	private BufferedImage[] getskyboxImages() {
+		String[] filenames = new String[] {
+				"textures/sh_ft.png",
+				"textures/sh_bk.png",
+				"textures/sh_up.png",
+				"textures/sh_dn.png",
+				"textures/sh_rt.png",
+				"textures/sh_lf.png",
+		};
+		BufferedImage[] images = new BufferedImage[6];
+		for(int i = 0; i < images.length; i++) {
+			images[i] = Utils.toBufferedImage(Utils.loadImage(filenames[i]));
+		}
+		return images;
+	}
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		GL3 gl = drawable.getGL().getGL3();
 		gl.glEnable(GL3.GL_CULL_FACE);
 		gl.glCullFace(GL3.GL_BACK);
 		TextureUtils.initDefaultTextures(gl);
+		
+		skybox = TextureUtils.cubeMapFromImages(gl, getskyboxImages());
 		MeshUtils.getMeshByFileName("models/fire.ply");
 		Mesh.initAllMeshes(gl);
 		
 		gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
 
 		gl.glEnable(GL2.GL_DEPTH_TEST);
+		gl.glDepthFunc(GL2.GL_LEQUAL);
 		gl.glClearDepthf(1);
 		updateBackgroundColor(gl, Color.black);
-		gl.glDepthFunc(GL2.GL_LEQUAL);
 		
 
 		shader = new Shader("/shaders/mainVertex.glsl", "/shaders/mainFragment.glsl");
@@ -97,6 +116,9 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		
 		liquidShader = new Shader("/shaders/liquidVertex.glsl", "/shaders/liquidFragment.glsl");
 		liquidShader.create(gl);
+
+		skyboxShader = new Shader("/shaders/skyboxVertex.glsl", "/shaders/skyboxFragment.glsl");
+		skyboxShader.create(gl);
 		
 		updateProjectionMatrix();
 	}
@@ -115,7 +137,6 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 		if(game.world != null) {
 		
-			shader.bind(gl);
 			
 			// Initialize terrainObject
 			if(terrainObject == null) {
@@ -140,7 +161,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			Matrix4f rot = Matrix4f.rotate(ratio * 360, new Vector3f(0, 1, 0));
 			Vector3f initPosition = new Vector3f(-1, 0, 0);
 			Vector3f result = rot.multiply(initPosition, 1);
-			sunDirection = result.multiply(-1);
+			sunDirection = result.multiply(-1).normalize();
 			sunColor.set(1f, 1f, 0.95f);
 			float multiplier = (float)World.getDaylight();
 			if(Game.DISABLE_NIGHT) {
@@ -149,11 +170,28 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			sunColor = sunColor.multiply(new Vector3f(multiplier, multiplier*multiplier, multiplier*multiplier));
 			float ambient = multiplier/2;
 			ambientColor.set(ambient, ambient, ambient);
+
+			renderSkybox(gl, skyboxShader, multiplier);
+			
+			shader.bind(gl);
 			renderStuff(gl, shader);
 			shader.unbind(gl);
 		}
 		
 		gl.glFlush();
+	}
+	
+	public void renderSkybox(GL3 gl, Shader shader, float daylight) {
+		gl.glDisable(GL2.GL_DEPTH_TEST);
+		skyboxShader.bind(gl);
+		skyboxShader.setUniform("projection", projection);
+		skyboxShader.setUniform("view", camera.getRotationMatrix().multiply(Camera.prerotateInv));
+		skyboxShader.setUniform("daylight", daylight);
+		MeshUtils.skybox.renderSkybox(gl, 
+				skyboxShader, 
+				skybox);
+		skyboxShader.unbind(gl);
+		gl.glEnable(GL2.GL_DEPTH_TEST);
 	}
 
 	public void renderStuff(GL3 gl, Shader shader) {
@@ -162,7 +200,22 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("sunDirection", sunDirection);
 		shader.setUniform("sunColor", sunColor);
 		shader.setUniform("ambientColor", ambientColor);
-		
+		shader.setUniform("isHighlight", 0f);
+
+//		gl.glDisable(GL2.GL_DEPTH_TEST);
+		MeshUtils.square.render(gl,
+				shader,
+				TextureUtils.getTextureByFileName("textures/sh_ft.png", gl),
+				new Vector3f(64,4,12),
+				Matrix4f.rotate(90, Vector3f.xAxis()),
+				new Vector3f(1, 1, 1));
+		MeshUtils.skybox.render(gl, 
+				shader, 
+				TextureUtils.getTextureByFileName("textures/sh_ft.png", gl), 
+				new Vector3f(64,5,12), 
+				Matrix4f.identity(), 
+				new Vector3f(1, 1, 1));
+//		gl.glEnable(GL2.GL_DEPTH_TEST);
 		
 		MeshUtils.x.render(gl, shader, 
 				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
@@ -198,32 +251,32 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("isHighlight", 0f);
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
 		
-		shader.unbind(gl);
-		liquidShader.bind(gl);
-		liquidShader.setUniform("projection", projection);
-		liquidShader.setUniform("view", camera.getView());
-		liquidShader.setUniform("sunDirection", sunDirection);
-		liquidShader.setUniform("sunColor", sunColor);
-		liquidShader.setUniform("ambientColor", ambientColor);
-		liquidShader.setUniform("waveOffset", (float)(System.currentTimeMillis() - startTime));
-		for(Tile tile : game.world.getTiles()) {
-			float bright = Math.min(1, (float) tile.getBrightness(state.faction));
-			Vector3f ambientColorWithBrightness = ambientColor.add(bright, bright, bright);
-			shader.setUniform("ambientColor", ambientColorWithBrightness);
-			if(tile.liquidType != LiquidType.DRY) {
-				float cutoff = 1f;
-				float scale = Math.min(1, tile.liquidAmount * tile.liquidAmount / cutoff);
-				Vector3f pos = tileLocTo3dCoords(tile.getLocation(), tile.getHeight() + tile.liquidAmount);
-				terrainObject.liquid.render(gl, shader, TextureUtils.getTextureByFileName(tile.liquidType.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, 1));
-			}
-			if(tile.getModifier() != null) {
-				Vector3f pos = tileTo3dCoords(tile);
-				float scale = 1.0f + (float)Math.random()*0.1f;
-				MeshUtils.getMeshByFileName("models/fire.ply").render(gl, shader, TextureUtils.getTextureByFileName("Images/ground_modifiers/fire.png", gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, scale));
-			}
-		}
-		liquidShader.unbind(gl);
-		shader.bind(gl);
+//		shader.unbind(gl);
+//		liquidShader.bind(gl);
+//		liquidShader.setUniform("projection", projection);
+//		liquidShader.setUniform("view", camera.getView());
+//		liquidShader.setUniform("sunDirection", sunDirection);
+//		liquidShader.setUniform("sunColor", sunColor);
+//		liquidShader.setUniform("ambientColor", ambientColor);
+//		liquidShader.setUniform("waveOffset", (float)(System.currentTimeMillis() - startTime));
+//		for(Tile tile : game.world.getTiles()) {
+//			float bright = Math.min(1, (float) tile.getBrightness(state.faction));
+//			Vector3f ambientColorWithBrightness = ambientColor.add(bright, bright, bright);
+//			shader.setUniform("ambientColor", ambientColorWithBrightness);
+//			if(tile.liquidType != LiquidType.DRY) {
+//				float cutoff = 1f;
+//				float scale = Math.min(1, tile.liquidAmount * tile.liquidAmount / cutoff);
+//				Vector3f pos = tileLocTo3dCoords(tile.getLocation(), tile.getHeight() + tile.liquidAmount);
+//				terrainObject.liquid.render(gl, shader, TextureUtils.getTextureByFileName(tile.liquidType.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, 1));
+//			}
+//			if(tile.getModifier() != null) {
+//				Vector3f pos = tileTo3dCoords(tile);
+//				float scale = 1.0f + (float)Math.random()*0.1f;
+//				MeshUtils.getMeshByFileName("models/fire.ply").render(gl, shader, TextureUtils.getTextureByFileName("Images/ground_modifiers/fire.png", gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, scale));
+//			}
+//		}
+//		liquidShader.unbind(gl);
+//		shader.bind(gl);
 		shader.setUniform("ambientColor", ambientColor);
 		for(Plant plant : game.world.getPlants()) {
 			Vector3f pos = tileTo3dCoords(plant.getTile());
