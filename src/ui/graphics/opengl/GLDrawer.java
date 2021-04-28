@@ -501,7 +501,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	@Override
 	public void shiftView(int dx, int dy) {
 		if(state.fpMode) {
-			float adjust = 0.6f;
+			float adjust = 0.4f * TerrainObject.FULL_TILE;
 			camera.shiftView(dx*adjust, -dy*adjust);
 			Tile tile = game.world.get(coordsToTile(camera.getPosition()));
 			if(tile != null) {
@@ -509,11 +509,11 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				if(tile.liquidType == LiquidType.ICE) {
 					height += tile.liquidAmount;
 				}
-				camera.getPosition().z = tileHeightTo3dHeight(height) + 4;
+				camera.getPosition().z = tileHeightTo3dHeight(height) + 2;
 			}
 		}
 		else {
-			float adjust = 0.2f;
+			float adjust = 0.2f * TerrainObject.FULL_TILE;
 			camera.shiftView(dx*adjust, dy*adjust);
 		}
 	}
