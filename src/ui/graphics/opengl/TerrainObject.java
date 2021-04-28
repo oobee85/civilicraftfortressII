@@ -67,8 +67,9 @@ public class TerrainObject extends GameObject {
 		int originalIndex = vecs.length;
 		int index = originalIndex;
 		for(int i = 1; i < vecs.length; i++) {
-			verts.add(new Vertex(vecs[i], white, null, new Vector2f(0.5f, 0.5f)));
-			verts.add(new Vertex(vecs[i].add(0, 0, -400), white, null, new Vector2f(0.5f, 0.5f)));
+			float xoffset = (i % 2);
+			verts.add(new Vertex(vecs[i], white, null, new Vector2f(xoffset, 1)));
+			verts.add(new Vertex(vecs[i].add(0, 0, -400), white, null, new Vector2f(xoffset, 0)));
 			
 			if(i != vecs.length - 1) {
 				indicesList.add(index);

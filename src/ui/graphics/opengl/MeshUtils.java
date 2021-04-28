@@ -12,6 +12,7 @@ import utils.*;
 public class MeshUtils {
 
 	public static final Mesh cube;
+	public static final Mesh skybox;
 	public static final Mesh square;
 	public static final Mesh cattail;
 	public static final Mesh star;
@@ -33,13 +34,13 @@ public class MeshUtils {
 	public static Mesh getMeshByFileName(String filename) {
 		if(!meshes.containsKey(filename)) {
 			Mesh mesh = loadMeshFromFile(filename);
-			normalize(mesh);
+			normalize(mesh, false);
 			meshes.put(filename, mesh);
 		}
 		return meshes.get(filename);
 	}
 	
-	private static void normalize(Mesh mesh) {
+	private static void normalize(Mesh mesh, boolean zeroZ) {
 		Vector3f min = new Vector3f(mesh.getVertices()[0].getPosition());
 		Vector3f max = new Vector3f(min);
 		for(Vertex v : mesh.getVertices()) {
@@ -55,6 +56,9 @@ public class MeshUtils {
 		float maximumRange = Math.max(range.y, range.x);
 		float scale = 1f/maximumRange;
 		Vector3f offset = new Vector3f(-range.x*scale*0.5f, -range.y*scale*0.5f, 0);
+		if(zeroZ) {
+			offset.z = -range.z*scale*0.5f;
+		}
 		for(Vertex v : mesh.getVertices()) {
 			Vector3f newPos = v.getPosition().subtract(min);
 			newPos = newPos.multiply(scale);
@@ -211,6 +215,8 @@ public class MeshUtils {
 	}
 	static {
 		cube = getMeshByFileName("models/cube.obj");
+		skybox = getMeshByFileName("models/skybox.obj");
+		normalize(skybox, true);
 		square = getMeshByFileName("models/square.obj");
 		cattail = getMeshByFileName("models/cattail.ply");
 		star = getMeshByFileName("models/star.obj");
