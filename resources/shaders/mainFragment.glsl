@@ -13,5 +13,8 @@ void main() {
 //	outColor = texture(textureSampler, passTextureCoord);
 	vec4 textureColor = texture(textureSampler, passTextureCoord);
 	outColor = (passUseTexture*textureColor + (1-passUseTexture)*vec4(1, 1, 1, 1)) * vec4(passColor, 1.0);
+	if(outColor.a < 0.05){
+		discard;
+	}
 //	outColor = vec4(passColor, 1.0);
 }
