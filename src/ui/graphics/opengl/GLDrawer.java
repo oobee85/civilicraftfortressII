@@ -422,7 +422,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				obj.texture.bind(gl); 
 				shader.setUniform("textureSampler", 0);
 				shader.setUniform("useTexture", 1f);
-				shader.setUniform("model", obj.model);
+				Matrix4f scaledModel = obj.model.multiply(Matrix4f.scale(new Vector3f(TerrainObject.FULL_TILE, TerrainObject.FULL_TILE, TerrainObject.FULL_TILE)));
+				shader.setUniform("model", scaledModel);
 				gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, mesh.getIBO());
 				gl.glDrawElements(GL2.GL_TRIANGLES, mesh.getIndices().length, GL2.GL_UNSIGNED_INT, 0);
 				gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -518,7 +519,6 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				}
 				camera.getPosition().z = tileHeightTo3dHeight(height) + 4;
 			}
-			System.out.println("Camera is at " + camera.getPosition());
 		}
 		else {
 			float adjust = 0.2f;
@@ -533,8 +533,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	}
 
 	public static TileLoc coordsToTile(Vector3f coords) {
-		int x = (int)(coords.x + TerrainObject.TILE_RADIUS);
-		int y = (int)((coords.y + TerrainObject.Y_OFFSET)/(TerrainObject.Y_OFFSET*2));
+		int x = (int)((coords.x + TerrainObject.FULL_TILE/2) / TerrainObject.FULL_TILE);
+		int y = (int)((coords.y + TerrainObject.Y_MULTIPLIER)/(TerrainObject.Y_MULTIPLIER*2));
 		return new TileLoc(x, y);
 	}
 	public static Vector3f tileTo3dCoords(Tile tile) {
@@ -542,11 +542,11 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	}
 	public static Vector3f tileLocTo3dCoords(TileLoc tileLoc, float height) {
 		return new Vector3f(
-				tileLoc.x(), 
-				(tileLoc.y() + (tileLoc.x() % 2) * 0.5f)*TerrainObject.Y_OFFSET*2, 
+				TerrainObject.FULL_TILE*tileLoc.x(), 
+				2 * TerrainObject.Y_MULTIPLIER * (tileLoc.y() + (tileLoc.x() % 2) * 0.5f), 
 				tileHeightTo3dHeight(height));
 	}
 	public static float tileHeightTo3dHeight(float height) {
-		return height*height/20000;
+		return height*height/(20000/TerrainObject.FULL_TILE);
 	}
 }
