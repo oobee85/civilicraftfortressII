@@ -3,13 +3,13 @@ package ui.graphics.opengl;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-
-import org.smurn.jply.util.*;
+import java.util.*;
+import java.util.List;
+import java.util.Map.*;
 
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.*;
 import com.jogamp.opengl.util.texture.*;
-import com.jogamp.opengl.util.texture.awt.*;
 
 import game.*;
 import game.liquid.*;
@@ -172,7 +172,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			ambientColor.set(ambient, ambient, ambient);
 
 			renderSkybox(gl, skyboxShader, multiplier);
-			
+			renderLiquids(gl, liquidShader);
 			shader.bind(gl);
 			renderStuff(gl, shader);
 			shader.unbind(gl);
@@ -193,29 +193,99 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		skyboxShader.unbind(gl);
 		gl.glEnable(GL2.GL_DEPTH_TEST);
 	}
+	
+	public void renderLiquids(GL3 gl, Shader shader) {
+		shader.bind(gl);
+		shader.setUniform("projection", projection);
+		shader.setUniform("view", camera.getView());
+		shader.setUniform("sunDirection", sunDirection);
+		shader.setUniform("sunColor", sunColor);
+		shader.setUniform("ambientColor", ambientColor);
+		shader.setUniform("waveOffset", (float)(System.currentTimeMillis() - startTime));
+		
+		gl.glBindVertexArray(terrainObject.liquid.getVAO());
+		gl.glEnableVertexAttribArray(0);
+		gl.glEnableVertexAttribArray(1);
+		gl.glEnableVertexAttribArray(2);
+		gl.glEnableVertexAttribArray(3);
+		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, terrainObject.liquid.getIBO());
+		for(Tile tile : game.world.getTiles()) {
+			float bright = Math.min(1, (float) tile.getBrightness(state.faction));
+			Vector3f ambientColorWithBrightness = ambientColor.add(bright, bright, bright);
+			shader.setUniform("ambientColor", ambientColorWithBrightness);
+			if(tile.liquidType != LiquidType.DRY) {
+				float cutoff = 1f;
+				float scale = Math.min(1, tile.liquidAmount * tile.liquidAmount / cutoff);
+				Vector3f pos = tileLocTo3dCoords(tile.getLocation(), tile.getHeight() + tile.liquidAmount);
+				gl.glActiveTexture(GL3.GL_TEXTURE0);
+				Texture texture = TextureUtils.getTextureByFileName(tile.liquidType.getTextureFile(), gl);
+				texture.enable(gl);
+				texture.bind(gl); 
+				gl.glActiveTexture(GL3.GL_TEXTURE1);
+				skybox.enable(gl);
+				skybox.bind(gl);
+				shader.setUniform("textureSampler", 0);
+				shader.setUniform("cubeMap", 1);
+				shader.setUniform("useTexture", 1f);
+				shader.setUniform("model", Matrix4f.getModelMatrix(pos, Matrix4f.identity(), new Vector3f(scale, scale, 1)));
+				gl.glDrawElements(GL2.GL_TRIANGLES, terrainObject.liquid.getIndices().length, GL2.GL_UNSIGNED_INT, 0);
 
+				gl.glBindTexture(skybox.getTarget(), 0);
+				skybox.disable(gl);
+				gl.glBindTexture(texture.getTarget(), 0);
+				texture.disable(gl);
+//				terrainObject.liquid.render(gl, shader, TextureUtils.getTextureByFileName(tile.liquidType.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, 1));
+			}
+		}
+		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
+		gl.glDisableVertexAttribArray(0);
+		gl.glDisableVertexAttribArray(1);
+		gl.glDisableVertexAttribArray(2);
+		gl.glDisableVertexAttribArray(3);
+		gl.glBindVertexArray(0);
+		
+		for(Tile tile : game.world.getTiles()) {
+			float bright = Math.min(1, (float) tile.getBrightness(state.faction));
+			Vector3f ambientColorWithBrightness = ambientColor.add(bright, bright, bright);
+			shader.setUniform("ambientColor", ambientColorWithBrightness);
+			if(tile.getModifier() != null) {
+				Vector3f pos = tileTo3dCoords(tile);
+				float scale = 1.0f + (float)Math.random()*0.1f;
+				MeshUtils.getMeshByFileName("models/fire.ply").render(gl, shader, TextureUtils.getTextureByFileName("Images/ground_modifiers/fire.png", gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, scale));
+			}
+		}
+		shader.unbind(gl);
+	}
+	
+	class RenderObject {
+		Texture texture;
+		Matrix4f model;
+		public RenderObject(Texture texture, Matrix4f model) {
+			this.texture = texture;
+			this.model = model;
+		}
+	}
+	HashMap<Mesh, List<RenderObject>> torender = new HashMap<>();
+	private void clearToRender() {
+		for(Entry<Mesh, List<RenderObject>> entry : torender.entrySet()) {
+			entry.getValue().clear();
+		}
+	}
+	private void addToRender(Mesh mesh, RenderObject obj) {
+		if(!torender.containsKey(mesh)) {
+			torender.put(mesh, new ArrayList<>());
+		}
+		torender.get(mesh).add(obj);
+	}
+	
 	public void renderStuff(GL3 gl, Shader shader) {
+		clearToRender();
 		shader.setUniform("projection", projection);
 		shader.setUniform("view", camera.getView());
 		shader.setUniform("sunDirection", sunDirection);
 		shader.setUniform("sunColor", sunColor);
 		shader.setUniform("ambientColor", ambientColor);
 		shader.setUniform("isHighlight", 0f);
-
-//		gl.glDisable(GL2.GL_DEPTH_TEST);
-		MeshUtils.square.render(gl,
-				shader,
-				TextureUtils.getTextureByFileName("textures/sh_ft.png", gl),
-				new Vector3f(64,4,12),
-				Matrix4f.rotate(90, Vector3f.xAxis()),
-				new Vector3f(1, 1, 1));
-		MeshUtils.skybox.render(gl, 
-				shader, 
-				TextureUtils.getTextureByFileName("textures/sh_ft.png", gl), 
-				new Vector3f(64,5,12), 
-				Matrix4f.identity(), 
-				new Vector3f(1, 1, 1));
-//		gl.glEnable(GL2.GL_DEPTH_TEST);
 		
 		MeshUtils.x.render(gl, shader, 
 				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
@@ -248,7 +318,6 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				Matrix4f.rotate(90, new Vector3f(0, 1, 0)), 
 				new Vector3f(.1f, .1f, .1f));
 
-		shader.setUniform("isHighlight", 0f);
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
 		
 //		shader.unbind(gl);
@@ -286,7 +355,9 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				scale.y = scale.x;
 				scale.z = scale.z * (2f + 0.1f*(plant.getTile().getLocation().x()%7) + 0.1f*(plant.getTile().getLocation().y()%13));
 			}
-			plant.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(plant.getTextureFile(), gl), pos, Matrix4f.identity(), scale);
+			addToRender(plant.getMesh(), new RenderObject(
+					TextureUtils.getTextureByFileName(plant.getTextureFile(), gl), 
+					Matrix4f.getModelMatrix(pos, Matrix4f.identity(), scale)));
 		}
 		UnitType dragonType = Game.unitTypeMap.get("DRAGON");
 		for(Unit unit : game.world.getUnits()) {
@@ -302,16 +373,22 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			if(unit.getType().isFlying()) {
 				pos.z += 3;
 			}
-			unit.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(unit.getTextureFile(), gl), pos, Matrix4f.identity(), scale);
+			addToRender(unit.getMesh(), new RenderObject(
+					TextureUtils.getTextureByFileName(unit.getTextureFile(), gl), 
+					Matrix4f.getModelMatrix(pos, Matrix4f.identity(), scale)));
 		}
 		for(Building building : game.world.getBuildings()) {
 			if(building.getType().blocksMovement()) {
 				Vector3f pos = tileLocTo3dCoords(building.getTile().getLocation(), building.getTile().getHeight() + Liquid.WALL_HEIGHT);
-				terrainObject.liquid.render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+				addToRender(terrainObject.liquid, new RenderObject(
+						TextureUtils.getTextureByFileName(building.getTextureFile(), gl), 
+						Matrix4f.getModelMatrix(pos, Matrix4f.identity(), new Vector3f(1, 1, 1))));
 			}
 			else {
 				Vector3f pos = tileTo3dCoords(building.getTile());
-				building.getMesh().render(gl, shader, TextureUtils.getTextureByFileName(building.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(1.2f, 1.2f, 1.2f));
+				addToRender(building.getMesh(), new RenderObject(
+						TextureUtils.getTextureByFileName(building.getTextureFile(), gl), 
+						Matrix4f.getModelMatrix(pos, Matrix4f.identity(), new Vector3f(1.2f, 1.2f, 1.2f))));
 			}
 		}
 
@@ -323,6 +400,38 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		if(!state.fpMode && game.world.get(state.hoveredTile) != null) {
 			Vector3f pos = tileTo3dCoords(game.world.get(state.hoveredTile));
 			hoveredTileBox.render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
+		}
+		
+		// Matrix4f.getModelMatrix(position, rotation, scale)
+//		System.out.println(torender.size());
+		for(Entry<Mesh, List<RenderObject>> entry : torender.entrySet()) {
+			Mesh mesh = entry.getKey();
+			List<RenderObject> list = entry.getValue();
+			gl.glBindVertexArray(mesh.getVAO());
+			gl.glEnableVertexAttribArray(0);
+			gl.glEnableVertexAttribArray(1);
+			gl.glEnableVertexAttribArray(2);
+			gl.glEnableVertexAttribArray(3);
+			gl.glActiveTexture(GL3.GL_TEXTURE0);
+			for(RenderObject obj : list) {
+
+				obj.texture.enable(gl);
+				obj.texture.bind(gl); 
+				shader.setUniform("textureSampler", 0);
+				shader.setUniform("useTexture", 1f);
+				shader.setUniform("model", obj.model);
+				gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, mesh.getIBO());
+				gl.glDrawElements(GL2.GL_TRIANGLES, mesh.getIndices().length, GL2.GL_UNSIGNED_INT, 0);
+				gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
+
+				gl.glBindTexture(obj.texture.getTarget(), 0);
+				obj.texture.disable(gl);
+			}
+			gl.glDisableVertexAttribArray(0);
+			gl.glDisableVertexAttribArray(1);
+			gl.glDisableVertexAttribArray(2);
+			gl.glDisableVertexAttribArray(3);
+			gl.glBindVertexArray(0);
 		}
 
 		shader.setUniform("isHighlight", 1f);
