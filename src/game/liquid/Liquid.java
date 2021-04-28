@@ -101,6 +101,7 @@ public class Liquid {
 			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount > tile.liquidType.surfaceTension*2) {
 				if(tile.getTerrain().isPlantable(tile.getTerrain())) {
 					tile.setTerrain(Terrain.DIRT);
+					tile.setTickLastTerrainChange(World.ticks);
 //					tile.setTerrain(Terrain.BURNED_GROUND);
 				}
 				if(tile.getModifier() != null && tile.getModifier().isCold()) {
@@ -131,25 +132,30 @@ public class Liquid {
 		float tempurature = (float) tile.getTemperature();
 		double temperatureOffset = 0;
 		if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.ICE) {
-			temperatureOffset = tile.liquidAmount/10;
+			temperatureOffset = tile.liquidAmount / 10;
 		}
-		if(tempurature + temperatureOffset > World.FREEZETEMP) {
-			if(tile.liquidType == LiquidType.ICE) {
-				tile.liquidType = LiquidType.WATER;
-				liquidTypesTemp[x][y] = LiquidType.WATER;
-			}
-			if(tile.liquidType == LiquidType.SNOW) {
-				tile.liquidType = LiquidType.WATER;
-				liquidTypesTemp[x][y] = LiquidType.WATER;
+		if (World.ticks - tile.getTickLastTerrainChange() >= World.MIN_TIME_TO_SWITCH_TERRAIN) {
+
+			if (tempurature + temperatureOffset > World.FREEZETEMP) {
+				if (tile.liquidType == LiquidType.ICE) {
+					tile.liquidType = LiquidType.WATER;
+					liquidTypesTemp[x][y] = LiquidType.WATER;
+					tile.setTickLastTerrainChange(World.ticks);
+				}
+				if (tile.liquidType == LiquidType.SNOW) {
+					tile.liquidType = LiquidType.WATER;
+					liquidTypesTemp[x][y] = LiquidType.WATER;
+					tile.setTickLastTerrainChange(World.ticks);
+				}
+			} else if (tempurature + temperatureOffset < World.FREEZETEMP) {
+				if (tile.liquidType == LiquidType.WATER) {
+					tile.liquidType = LiquidType.ICE;
+					liquidTypesTemp[x][y] = LiquidType.ICE;
+					tile.setTickLastTerrainChange(World.ticks);
+				}
 			}
 		}
-		else if(tempurature + temperatureOffset < World.FREEZETEMP) {
-			if(tile.liquidType == LiquidType.WATER) {
-				tile.liquidType = LiquidType.ICE;
-				liquidTypesTemp[x][y] = LiquidType.ICE;
-			}
-		}
-		
+
 		for(Tile otherTile : tile.getNeighbors()) {
 			TileLoc other = otherTile.getLocation();
 			LiquidType otype = liquidTypesTemp[other.x()][other.y()];

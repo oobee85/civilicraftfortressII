@@ -53,7 +53,7 @@ public class Generation {
 				}
 			}
 		}
-		highest = highest*1.1f;
+		highest = highest*0.6f;
 		int x = world.getWidth()/2;
 		int y = world.getHeight()/2;
 		float lavaRadius = 5;

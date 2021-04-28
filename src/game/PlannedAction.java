@@ -14,6 +14,7 @@ public class PlannedAction {
 	public static final int BUILD_ROAD = 2;
 	public static final int HARVEST = 3;
 	public static final int DELIVER = 4;
+	public static final int TAKE = 5;
 	
 	public final Tile targetTile;
 	public final Thing target;
@@ -66,6 +67,9 @@ public class PlannedAction {
 	}
 	public boolean isDeliverAction() {
 		return type == DELIVER;
+	}
+	public boolean isTakeAction() {
+		return type == TAKE;
 	}
 	public boolean isBuildRoadAction() {
 		return type == BUILD_ROAD;

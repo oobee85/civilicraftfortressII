@@ -91,11 +91,11 @@ public class Building extends Thing implements Serializable {
 			resetTimeToHarvest();
 		}
 		if(getType() == Game.buildingTypeMap.get("GRANARY")) {
-			getFaction().addItem(ItemType.FOOD, 2);
+			getFaction().getInventory().addItem(ItemType.FOOD, 2);
 			resetTimeToHarvest();
 		}
 		if(getType() == Game.buildingTypeMap.get("WINDMILL")) {
-			getFaction().addItem(ItemType.FOOD, 8);
+			getFaction().getInventory().addItem(ItemType.FOOD, 8);
 			resetTimeToHarvest();
 		}
 		if(getType() == Game.buildingTypeMap.get("SAWMILL")) {
@@ -119,8 +119,8 @@ public class Building extends Thing implements Serializable {
 		}
 
 		if(getType() == Game.buildingTypeMap.get("FARM") && getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
-			getFaction().addItem(ItemType.HORSE, 1);
-			getFaction().addItem(ItemType.FOOD, 1);
+			getFaction().getInventory().addItem(ItemType.HORSE, 1);
+			getFaction().getInventory().addItem(ItemType.FOOD, 1);
 			resetTimeToHarvest();
 		}
 	}

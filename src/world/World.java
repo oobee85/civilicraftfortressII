@@ -25,11 +25,12 @@ public class World {
 	public static final int NIGHT_DURATION = 500;
 	public static final int TRANSITION_PERIOD = 100;
 	private static final double CHANCE_TO_SWITCH_TERRAIN = 1;
+	public static final int MIN_TIME_TO_SWITCH_TERRAIN = 100;
 	
 	public static final int MINTEMP = -273;
 	public static final int BALANCETEMP = -20;
 	public static final int FREEZETEMP = 0;
-	public static final int BALANCEWATER = 5;
+	public static final int BALANCEWATER = 4;
 	public static final int MAXTEMP = 1000;
 	public static final int MAXHEIGHT = 1000;
 	public static final int JOULESPERTILE = 1;
@@ -604,6 +605,7 @@ public class World {
 		if (tile.getHumidity() < terrain.getMinMax().x) {
 			if (terrain == Terrain.GRASS) {
 				tile.setTerrain(Terrain.DIRT);
+				tile.setTickLastTerrainChange(World.ticks);
 			}
 			
 			//start variable indicates if the function was called when map was made
@@ -613,11 +615,13 @@ public class World {
 				//if there is only 1 ineligible desert tile, the dirt turns to sand
 				if (terrain == Terrain.DIRT && failTiles < 2) {
 					tile.setTerrain(Terrain.SAND);
+					tile.setTickLastTerrainChange(World.ticks);
 				}
 			//when start == false, we only allow desert to spread if nearby other desert tiles
 			}else if (start == false) {
 				if (terrain == Terrain.DIRT && failTiles < 2 && numDesertNeighbors >= 2 && numGrassNeighbor == 0) {
 					tile.setTerrain(Terrain.SAND);
+					tile.setTickLastTerrainChange(World.ticks);
 				}
 			}
 		}
@@ -628,21 +632,25 @@ public class World {
 		if (tile.getHumidity() > terrain.getMinMax().y ) {
 			if (terrain == Terrain.DIRT && tile.canGrow() && numGrassNeighbor >= 3) {
 				tile.setTerrain(Terrain.GRASS);
+				tile.setTickLastTerrainChange(World.ticks);
 				
 			//if there are too many failed tiles to support desert
 			} else if(terrain == Terrain.SAND && failTiles >= 2) {
 				tile.setTerrain(Terrain.DIRT);
+				tile.setTickLastTerrainChange(World.ticks);
 			}
 		}
 		
 		//if there arent enough desert neighbors
 		if(terrain == Terrain.SAND && numDesertNeighbors < 2) {
 			tile.setTerrain(Terrain.DIRT);
+			tile.setTickLastTerrainChange(World.ticks);
 		}
 		
 		//if there is a neighbor that is grass
 		if(terrain == Terrain.SAND && grassNeighbor == true) {
 			tile.setTerrain(Terrain.DIRT);
+			tile.setTickLastTerrainChange(World.ticks);
 		}
 		
 		
@@ -698,6 +706,7 @@ public class World {
 				double modifier = 1 - (tile.getTemperature()/MAXTEMP);
 				tile.addEnergy(tile.liquidAmount * modifier);
 			}
+			
 			
 			//adds energy for water
 //			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
@@ -762,7 +771,15 @@ public class World {
 //				seasonEnergy += 0.01;
 			}
 			
-			
+//			double tempChange = averageTemp / tile.getTemperature();
+//			if(tempChange < 1 && tile.liquidType != LiquidType.LAVA) {
+//				if(tempChange < 0.25) {
+//					tempChange *= -1;
+//				}else {
+//					addedEnergy *= tempChange;
+//				}
+//				
+//			}
 			
 			
 			tile.addEnergy(seasonEnergy);
@@ -860,7 +877,7 @@ public class World {
 				defaultEnergy *= pressureMultiplier;
 			}
 			double maxVol = tile.getAir().getMaxVolume();
-			tile.getAir().setVolume(maxVol/4);
+			tile.getAir().setVolume(maxVol/1.5);
 			tile.setEnergy(defaultEnergy);
 		}
 	}
@@ -899,21 +916,28 @@ public class World {
 			}
 			tile.updateHumidity(World.ticks);
 			
+			
+			if(World.ticks - tile.getTickLastTerrainChange() <= MIN_TIME_TO_SWITCH_TERRAIN) {
+				continue;
+			}
 //			updateDesertChange(tile, start);
 			
 			
 			if(start == true && tile.getHeight() <= 300 && tile.canPlant()) {
 				tile.setTerrain(Terrain.GRASS);
+				tile.setTickLastTerrainChange(World.ticks);
 			}
 			
 			//turns grass to dirt if tile has a cold liquid || the temperature is cold
 			if(tile.checkTerrain(Terrain.GRASS) && tile.isCold() && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
 					tile.setTerrain(Terrain.DIRT);
+					tile.setTickLastTerrainChange(World.ticks);
 				}
 			}
 			if(tile.checkTerrain(Terrain.GRASS) && Math.random() < CHANCE_TO_SWITCH_TERRAIN/1000) {
 				tile.setTerrain(Terrain.DIRT);
+				tile.setTickLastTerrainChange(World.ticks);
 			}
 			
 //			
@@ -948,6 +972,7 @@ public class World {
 				}
 				if(tile.canGrow() && Math.random() < tile.liquidAmount*threshold) {
 					tile.setTerrain(Terrain.GRASS);
+					tile.setTickLastTerrainChange(World.ticks);
 				}
 			}
 		}
@@ -1155,6 +1180,9 @@ public class World {
 						double liquidDamage = tile.liquidAmount * tile.liquidType.getDamage();
 						totalDamage += liquidDamage;
 					}
+				}
+				if(plant.isAquatic() && tile.liquidType != LiquidType.WATER) {
+					totalDamage += 5;
 				}
 				if(tile.getTerrain().isPlantable(tile.getTerrain()) == false && plant.getType().isDesertResistant() == false) {
 					totalDamage += 5;

@@ -11,7 +11,7 @@ import world.*;
 
 public class MainMenuImageView extends JPanel {
 
-	private long startTime = System.currentTimeMillis();
+	private long startTime = System.currentTimeMillis() -125000;
 	private int imgSize = 40;
 	private int padding = 5;
 	private int speed = 100;

@@ -134,15 +134,13 @@
 	},
 	{
 		"image":"Images/units/chariot.png",
-		"cost":{"WOOD":200,"HORSE":20,"IRON_BAR":10,"FOOD":200},
-		"stats":{"movespeed":15,"buildtime":200,"health":300,"healspeed":50},
+		"cost":{"WOOD":100,"FOOD":200},
+		"stats":{"movespeed":20,"buildtime":200,"health":300,"healspeed":50},
 		"name":"CARAVAN",
 		"attackstyles":[
-			{"damage":30, "cooldown":30, "range":3, "minrange":2, "projectile":"ARROW"}
+			{"damage":1, "cooldown":60, "range":1}
 		],
-		"attributes":["hostile", "caravan", "nonselectable"],
-		"research":"HORSEBACK_RIDING",
-		"targeting":[{"type":"game.Unit"}]
+		"attributes":["caravan", "nonselectable"],
 	},
 	{
 		"image":"Images/units/wizard.png",

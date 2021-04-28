@@ -206,6 +206,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("ambientColor", ambientColor);
 		shader.setUniform("waveOffset", (float)(System.currentTimeMillis() - startTime));
 		
+		
 		gl.glBindVertexArray(terrainObject.liquid.getVAO());
 		gl.glEnableVertexAttribArray(0);
 		gl.glEnableVertexAttribArray(1);
@@ -228,6 +229,12 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				skybox.enable(gl);
 				skybox.bind(gl);
 				shader.setUniform("textureSampler", 0);
+				if(tile.liquidType == LiquidType.ICE) {
+					shader.setUniform("waveAmplitude", 0f);
+				}else {
+					shader.setUniform("waveAmplitude", 1f);
+				}
+				
 				shader.setUniform("cubeMap", 1);
 				shader.setUniform("useTexture", 1f);
 				shader.setUniform("model", Matrix4f.getModelMatrix(pos, Matrix4f.identity(), new Vector3f(scale, scale, 1)));
@@ -351,13 +358,19 @@ public class GLDrawer extends Drawer implements GLEventListener {
 //		shader.bind(gl);
 		shader.setUniform("ambientColor", ambientColor);
 		for(Plant plant : game.world.getPlants()) {
-			Vector3f pos = tileTo3dCoords(plant.getTile());
+			float height = plant.getTile().getHeight();
+			if(plant.getType().isAquatic()) {
+				height = plant.getTile().getHeight() + plant.getTile().liquidAmount;
+			}
+			Vector3f pos = tileLocTo3dCoords(plant.getTile().getLocation(), height);
+//			Vector3f pos = tileTo3dCoords(plant.getTile());
 			Vector3f scale = new Vector3f(1, 1, 1);
 			if(plant.getType() == PlantType.FOREST1) {
 				scale.x = scale.x * (1f + 0.15f*(plant.getTile().getLocation().x()%3) + 0.15f*(plant.getTile().getLocation().y()%5));
 				scale.y = scale.x;
 				scale.z = scale.z * (2f + 0.1f*(plant.getTile().getLocation().x()%7) + 0.1f*(plant.getTile().getLocation().y()%13));
 			}
+			
 			addToRender(plant.getMesh(), new RenderObject(
 					TextureUtils.getTextureByFileName(plant.getTextureFile(), gl), 
 					Matrix4f.getModelMatrix(pos, Matrix4f.identity(), scale)));
