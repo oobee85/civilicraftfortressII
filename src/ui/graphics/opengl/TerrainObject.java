@@ -10,9 +10,10 @@ import utils.*;
 import world.*;
 
 public class TerrainObject extends GameObject {
-	
-	public static final float TILE_RADIUS = 0.66f;
-	public static final float Y_OFFSET = (float) (TILE_RADIUS * Math.sin(Math.toRadians(60)));
+
+	public static final float FULL_TILE = 1f;
+	public static final float TILE_RADIUS = FULL_TILE*2/3;
+	public static final float Y_MULTIPLIER = (float) (TILE_RADIUS * Math.sin(Math.toRadians(60)));
 	Mesh mesh;
 	Texture texture;
 	

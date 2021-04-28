@@ -29,11 +29,11 @@ void main() {
 
 	vec3 lightDir = normalize(-sunDirection);
 	float diffuseRatio = max(dot(fragNormal, lightDir), 0.0);
-	vec3 diffuseColor = diffuseRatio * sunColor;
+	vec3 diffuseColor = max(diffuseRatio * sunColor, ambientColor);
 	vec3 highlightColor = vec3(1, 1, 0);
 
 	gl_Position = projection * view * fragPosition;
-	passColor = (diffuseColor + ambientColor) * (1 - isHighlight) + highlightColor * isHighlight;
+	passColor = (diffuseColor) * (1 - isHighlight) + highlightColor * isHighlight;
 	passTextureCoord = textureCoord;
 	passUseTexture = useTexture * (1 - isHighlight);
 }

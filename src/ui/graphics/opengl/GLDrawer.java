@@ -108,6 +108,9 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		gl.glEnable(GL2.GL_DEPTH_TEST);
 		gl.glDepthFunc(GL2.GL_LEQUAL);
 		gl.glClearDepthf(1);
+		
+		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA); 
+		gl.glEnable(GL.GL_BLEND);  
 		updateBackgroundColor(gl, Color.black);
 		
 
@@ -134,6 +137,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		GL3 gl = drawable.getGL().getGL3();
 		updateBackgroundColor(gl, game.getBackgroundColor());
 		gl.glClear(GL3.GL_DEPTH_BUFFER_BIT | GL3.GL_COLOR_BUFFER_BIT);
+		camera.updateMatrices();
 
 		if(game.world != null) {
 		
@@ -163,7 +167,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			Vector3f result = rot.multiply(initPosition, 1);
 			sunDirection = result.multiply(-1).normalize();
 			sunColor.set(1f, 1f, 0.95f);
-			float multiplier = (float)World.getDaylight();
+			float multiplier = (float)Math.max(World.getDaylight(), 0.1);
 			if(Game.DISABLE_NIGHT) {
 				multiplier = Math.min(1, multiplier);
 			}
@@ -172,10 +176,10 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			ambientColor.set(ambient, ambient, ambient);
 
 			renderSkybox(gl, skyboxShader, multiplier);
-			renderLiquids(gl, liquidShader);
 			shader.bind(gl);
 			renderStuff(gl, shader);
 			shader.unbind(gl);
+			renderLiquids(gl, liquidShader);
 		}
 		
 		gl.glFlush();
@@ -285,15 +289,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		torender.get(mesh).add(obj);
 	}
 	
-	public void renderStuff(GL3 gl, Shader shader) {
-		clearToRender();
-		shader.setUniform("projection", projection);
-		shader.setUniform("view", camera.getView());
-		shader.setUniform("sunDirection", sunDirection);
-		shader.setUniform("sunColor", sunColor);
-		shader.setUniform("ambientColor", ambientColor);
-		shader.setUniform("isHighlight", 0f);
-		
+	public void renderAxis(GL3 gl, Shader shader) {
 		MeshUtils.x.render(gl, shader, 
 				TextureUtils.getTextureByFileName(PlantType.FOREST1.getTextureFile(), gl), 
 				new Vector3f(-20, 0, 0), 
@@ -324,35 +320,21 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				new Vector3f(0, 0, 5), 
 				Matrix4f.rotate(90, new Vector3f(0, 1, 0)), 
 				new Vector3f(.1f, .1f, .1f));
+	}
+	
+	public void renderStuff(GL3 gl, Shader shader) {
+		clearToRender();
+		shader.setUniform("projection", projection);
+		shader.setUniform("view", camera.getView());
+		shader.setUniform("sunDirection", sunDirection);
+		shader.setUniform("sunColor", sunColor);
+		shader.setUniform("ambientColor", ambientColor);
+		shader.setUniform("isHighlight", 0f);
+		
+		renderAxis(gl, shader);
 
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
 		
-//		shader.unbind(gl);
-//		liquidShader.bind(gl);
-//		liquidShader.setUniform("projection", projection);
-//		liquidShader.setUniform("view", camera.getView());
-//		liquidShader.setUniform("sunDirection", sunDirection);
-//		liquidShader.setUniform("sunColor", sunColor);
-//		liquidShader.setUniform("ambientColor", ambientColor);
-//		liquidShader.setUniform("waveOffset", (float)(System.currentTimeMillis() - startTime));
-//		for(Tile tile : game.world.getTiles()) {
-//			float bright = Math.min(1, (float) tile.getBrightness(state.faction));
-//			Vector3f ambientColorWithBrightness = ambientColor.add(bright, bright, bright);
-//			shader.setUniform("ambientColor", ambientColorWithBrightness);
-//			if(tile.liquidType != LiquidType.DRY) {
-//				float cutoff = 1f;
-//				float scale = Math.min(1, tile.liquidAmount * tile.liquidAmount / cutoff);
-//				Vector3f pos = tileLocTo3dCoords(tile.getLocation(), tile.getHeight() + tile.liquidAmount);
-//				terrainObject.liquid.render(gl, shader, TextureUtils.getTextureByFileName(tile.liquidType.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, 1));
-//			}
-//			if(tile.getModifier() != null) {
-//				Vector3f pos = tileTo3dCoords(tile);
-//				float scale = 1.0f + (float)Math.random()*0.1f;
-//				MeshUtils.getMeshByFileName("models/fire.ply").render(gl, shader, TextureUtils.getTextureByFileName("Images/ground_modifiers/fire.png", gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, scale));
-//			}
-//		}
-//		liquidShader.unbind(gl);
-//		shader.bind(gl);
 		shader.setUniform("ambientColor", ambientColor);
 		for(Plant plant : game.world.getPlants()) {
 			float height = plant.getTile().getHeight();
@@ -432,7 +414,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				obj.texture.bind(gl); 
 				shader.setUniform("textureSampler", 0);
 				shader.setUniform("useTexture", 1f);
-				shader.setUniform("model", obj.model);
+				Matrix4f scaledModel = obj.model.multiply(Matrix4f.scale(new Vector3f(TerrainObject.FULL_TILE, TerrainObject.FULL_TILE, TerrainObject.FULL_TILE)));
+				shader.setUniform("model", scaledModel);
 				gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, mesh.getIBO());
 				gl.glDrawElements(GL2.GL_TRIANGLES, mesh.getIndices().length, GL2.GL_UNSIGNED_INT, 0);
 				gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -460,7 +443,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	}
 	
 	private void updateBackgroundColor(GL3 gl, Color background) {
-		gl.glClearColor(background.getRed()/255f, background.getGreen()/255f, background.getBlue()/255f, 1.0f);
+//		gl.glClearColor(background.getRed()/255f, background.getGreen()/255f, background.getBlue()/255f, 0.0f);
+		gl.glClearColor(0, 0, 0, 0);
 	}
 
 	public Vector3f rayCast(Vector3f start, Vector3f direction, World world) {
@@ -513,11 +497,11 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	@Override
 	public void zoomViewTo(int newTileSize, int mx, int my) {
 	}
-
+	
 	@Override
 	public void shiftView(int dx, int dy) {
 		if(state.fpMode) {
-			float adjust = 0.6f;
+			float adjust = 0.4f * TerrainObject.FULL_TILE;
 			camera.shiftView(dx*adjust, -dy*adjust);
 			Tile tile = game.world.get(coordsToTile(camera.getPosition()));
 			if(tile != null) {
@@ -525,12 +509,11 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				if(tile.liquidType == LiquidType.ICE) {
 					height += tile.liquidAmount;
 				}
-				camera.getPosition().z = tileHeightTo3dHeight(height) + 4;
+				camera.getPosition().z = tileHeightTo3dHeight(height) + 2;
 			}
-			System.out.println("Camera is at " + camera.getPosition());
 		}
 		else {
-			float adjust = 0.2f;
+			float adjust = 0.2f * TerrainObject.FULL_TILE;
 			camera.shiftView(dx*adjust, dy*adjust);
 		}
 	}
@@ -542,8 +525,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	}
 
 	public static TileLoc coordsToTile(Vector3f coords) {
-		int x = (int)(coords.x + TerrainObject.TILE_RADIUS);
-		int y = (int)((coords.y + TerrainObject.Y_OFFSET)/(TerrainObject.Y_OFFSET*2));
+		int x = (int)((coords.x + TerrainObject.FULL_TILE/2) / TerrainObject.FULL_TILE);
+		int y = (int)((coords.y + TerrainObject.Y_MULTIPLIER)/(TerrainObject.Y_MULTIPLIER*2));
 		return new TileLoc(x, y);
 	}
 	public static Vector3f tileTo3dCoords(Tile tile) {
@@ -551,11 +534,11 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	}
 	public static Vector3f tileLocTo3dCoords(TileLoc tileLoc, float height) {
 		return new Vector3f(
-				tileLoc.x(), 
-				(tileLoc.y() + (tileLoc.x() % 2) * 0.5f)*TerrainObject.Y_OFFSET*2, 
+				TerrainObject.FULL_TILE*tileLoc.x(), 
+				2 * TerrainObject.Y_MULTIPLIER * (tileLoc.y() + (tileLoc.x() % 2) * 0.5f), 
 				tileHeightTo3dHeight(height));
 	}
 	public static float tileHeightTo3dHeight(float height) {
-		return height*height/20000;
+		return height*height/(20000/TerrainObject.FULL_TILE);
 	}
 }
