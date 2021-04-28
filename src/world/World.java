@@ -707,6 +707,7 @@ public class World {
 				tile.addEnergy(tile.liquidAmount * modifier);
 			}
 			
+			
 			//adds energy for water
 //			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
 //				double modifier = 1 - (tile.getTemperature()/50);
@@ -770,7 +771,15 @@ public class World {
 //				seasonEnergy += 0.01;
 			}
 			
-			
+//			double tempChange = averageTemp / tile.getTemperature();
+//			if(tempChange < 1 && tile.liquidType != LiquidType.LAVA) {
+//				if(tempChange < 0.25) {
+//					tempChange *= -1;
+//				}else {
+//					addedEnergy *= tempChange;
+//				}
+//				
+//			}
 			
 			
 			tile.addEnergy(seasonEnergy);

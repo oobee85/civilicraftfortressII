@@ -15,6 +15,7 @@ uniform vec3 ambientColor;
 uniform float useTexture;
 uniform float isHighlight;
 uniform float waveOffset;
+uniform float waveAmplitude;
 
 out vec3 passColor;
 out vec2 passTextureCoord;
@@ -44,7 +45,7 @@ void main() {
 
 	float angle1 = worldPos.y*2 - waveOffset*0.005;
 	float angle2 = worldPos.x*2 - waveOffset*0.006;
-	worldPos.z += 0.03*(1 + sin(angle1));
+	worldPos.z += 0.03*(1 + sin(angle1)) * waveAmplitude;
 //	worldNormal = normalize(worldNormal + 0.1*vec4(0, 1, 0, 0) * cos(angle1));
 
 	vec4 camToPos = cameraPosition - worldPos;
