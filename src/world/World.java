@@ -25,7 +25,7 @@ public class World {
 	public static final int NIGHT_DURATION = 500;
 	public static final int TRANSITION_PERIOD = 100;
 	private static final double CHANCE_TO_SWITCH_TERRAIN = 1;
-	public static final int MIN_TIME_TO_SWITCH_TERRAIN = 10;
+	public static final int MIN_TIME_TO_SWITCH_TERRAIN = 100;
 	
 	public static final int MINTEMP = -273;
 	public static final int BALANCETEMP = -20;
@@ -1171,6 +1171,9 @@ public class World {
 						double liquidDamage = tile.liquidAmount * tile.liquidType.getDamage();
 						totalDamage += liquidDamage;
 					}
+				}
+				if(plant.isAquatic() && tile.liquidType != LiquidType.WATER) {
+					totalDamage += 5;
 				}
 				if(tile.getTerrain().isPlantable(tile.getTerrain()) == false && plant.getType().isDesertResistant() == false) {
 					totalDamage += 5;
