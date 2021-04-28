@@ -20,6 +20,8 @@ out vec3 passColor;
 out vec2 passTextureCoord;
 out float passUseTexture;
 out vec3 passReflect;
+out float transparency;
+out float reflectance;
 
 
 mat4 rotationMatrix(vec3 axis, float angle)
@@ -48,6 +50,8 @@ void main() {
 //	worldNormal = normalize(worldNormal + 0.1*vec4(0, 1, 0, 0) * cos(angle1));
 
 	vec4 camToPos = cameraPosition - worldPos;
+	transparency = 1 - abs(dot(normalize(camToPos), worldNormal))/2;
+	reflectance = abs(dot(normalize(camToPos), worldNormal));
 	vec4 reflect = camToPos - 2 * dot(camToPos, worldNormal) * worldNormal;
 	passReflect = (rotationMatrix(vec3(1, 0, 0), -3.14159/2) * reflect).xyz;
 	passReflect.x *= -1;

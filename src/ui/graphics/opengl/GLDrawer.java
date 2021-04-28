@@ -108,6 +108,9 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		gl.glEnable(GL2.GL_DEPTH_TEST);
 		gl.glDepthFunc(GL2.GL_LEQUAL);
 		gl.glClearDepthf(1);
+		
+		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA); 
+		gl.glEnable(GL.GL_BLEND);  
 		updateBackgroundColor(gl, Color.black);
 		
 
@@ -172,10 +175,10 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			ambientColor.set(ambient, ambient, ambient);
 
 			renderSkybox(gl, skyboxShader, multiplier);
-			renderLiquids(gl, liquidShader);
 			shader.bind(gl);
 			renderStuff(gl, shader);
 			shader.unbind(gl);
+			renderLiquids(gl, liquidShader);
 		}
 		
 		gl.glFlush();
@@ -447,7 +450,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	}
 	
 	private void updateBackgroundColor(GL3 gl, Color background) {
-		gl.glClearColor(background.getRed()/255f, background.getGreen()/255f, background.getBlue()/255f, 1.0f);
+//		gl.glClearColor(background.getRed()/255f, background.getGreen()/255f, background.getBlue()/255f, 0.0f);
+		gl.glClearColor(0, 0, 0, 0);
 	}
 
 	public Vector3f rayCast(Vector3f start, Vector3f direction, World world) {
