@@ -649,7 +649,7 @@ public class GameView {
 	}
 
 	private void selectThing(Thing thing) {
-		thing.setIsSelected(true);
+		thing.setSelected(true);
 		state.selectedThings.add(thing);
 		if (thing instanceof Unit) {
 			guiController.selectedUnit((Unit) thing, true);
@@ -663,7 +663,7 @@ public class GameView {
 	public void deselectEverything() {
 		for (Thing thing : state.selectedThings) {
 			if (thing != null) {
-				thing.setIsSelected(false);
+				thing.setSelected(false);
 
 				if (thing instanceof Unit) {
 					guiController.selectedUnit((Unit) thing, false);
@@ -692,7 +692,7 @@ public class GameView {
 
 	private void deselectOneThing(Thing deselect) {
 		state.selectedThings.remove(deselect);
-		deselect.setIsSelected(false);
+		deselect.setSelected(false);
 		if (deselect instanceof Unit) {
 			guiController.selectedUnit((Unit) deselect, false);
 		}
@@ -700,7 +700,7 @@ public class GameView {
 
 	private void deselectOtherThings(Thing keep) {
 		for (Thing thing : state.selectedThings) {
-			thing.setIsSelected(false);
+			thing.setSelected(false);
 			if (thing instanceof Unit) {
 				guiController.selectedUnit((Unit) thing, false);
 			}

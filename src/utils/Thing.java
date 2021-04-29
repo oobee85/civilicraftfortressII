@@ -182,10 +182,10 @@ public class Thing implements HasImage, HasMesh, Serializable {
 	public Hitsplat[] getHitsplatList() {
 		return hitsplats;
 	}
-	public void setIsSelected(boolean select) {
-		isSelected = select;
+	public void setSelected(boolean isSelected) {
+		this.isSelected = isSelected;
 	}
-	public boolean getIsSelected() {
+	public boolean isSelected() {
 		return isSelected;
 	}
 	

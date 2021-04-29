@@ -1,7 +1,6 @@
 package wildlife;
 
 import game.*;
-import ui.*;
 import utils.Thing;
 import world.*;
 
@@ -23,7 +22,6 @@ public class Werewolf extends Animal {
 	
 	private void transform() {
 		this.setType(Game.unitTypeMap.get("WEREWOLF"));
-//		this.setHealth(UnitType.WEREWOLF.getCombatStats().getHealth());
 		this.setMaxHealth(getType().getCombatStats().getHealth());
 		transformed = true;
 	}

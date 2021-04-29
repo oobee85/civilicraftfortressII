@@ -188,8 +188,8 @@ public class Unit extends Thing implements Serializable {
 		if (timeToHarvest > 0) {
 			timeToHarvest -= 1;
 		}
-		isIdle = readyToMove() && readyToAttack() && actionQueue.isEmpty() && getIsSelected() == false;
-		if (getHealth() < combatStats.getHealth() && readyToHeal()) {
+		isIdle = readyToMove() && readyToAttack() && actionQueue.isEmpty() && isSelected() == false;
+		if (getHealth() < getMaxHealth() && readyToHeal()) {
 			heal(1, false);
 			resetTimeToHeal();
 		}

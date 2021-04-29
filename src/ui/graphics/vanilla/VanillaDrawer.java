@@ -699,7 +699,7 @@ public class VanillaDrawer extends Drawer {
 			}
 
 			if (theTile.getBuilding() != null) {
-				if (theTile.getBuilding().getIsSelected()) {
+				if (theTile.getBuilding().isSelected()) {
 					g.drawImage(theTile.getBuilding().getHighlight(frozenTileSize), drawAt.x, drawAt.y, draww, drawh,
 							null);
 				}
@@ -722,7 +722,7 @@ public class VanillaDrawer extends Drawer {
 //			percent = timeLeft / timeStart;
 //		}
 		
-		if (unit.getIsSelected()) {
+		if (unit.isSelected()) {
 			g.drawImage(unit.getHighlight(frozenTileSize), drawx, drawy, draww, drawh, null);
 		}
 //		if(path != null && path.peek() != null) {
