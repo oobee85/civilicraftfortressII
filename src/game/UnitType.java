@@ -11,7 +11,7 @@ import ui.graphics.opengl.*;
 import utils.*;
 import utils.Loader.*;
 
-public class UnitType implements HasImage, HasMesh, Serializable {
+public class UnitType implements HasMesh, Serializable {
 	
 	private final String name;
 	private transient final MipMap mipmap;
@@ -112,26 +112,8 @@ public class UnitType implements HasImage, HasMesh, Serializable {
 		return textureFile;
 	}
 
-	@Override
-	public Image getImage(int size) {
-		return mipmap.getImage(size);
-	}
-	@Override
-	public Image getShadow(int size) {
-		return mipmap.getShadow(size);
-	}
-	@Override
-	public Image getHighlight(int size) {
-		return mipmap.getHighlight(size);
-	}
-
-	@Override
-	public ImageIcon getImageIcon(int size) {
-		return mipmap.getImageIcon(size);
-	}
-	@Override
-	public Color getColor(int size) {
-		return mipmap.getColor(size);
+	public HasImage getHasImage() {
+		return mipmap;
 	}
 
 	@Override

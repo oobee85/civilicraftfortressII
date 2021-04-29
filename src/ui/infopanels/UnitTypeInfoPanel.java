@@ -21,7 +21,7 @@ public class UnitTypeInfoPanel extends InfoPanel {
 	private Faction faction;
 
 	public UnitTypeInfoPanel(UnitType showing, Faction faction) {
-		super(showing.toString(), showing.getImage(DEFAULT_IMAGE_SIZE));
+		super(showing.toString(), showing.getHasImage().getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
 		this.faction = faction;
 	}

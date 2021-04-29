@@ -29,7 +29,7 @@ public class MainMenuImageView extends JPanel {
 		int delta = (int) (System.currentTimeMillis() - startTime);
 		int index = 0;
 		for(UnitType type : Game.unitTypeList) {
-			if(draw(g, type, index, delta)) {
+			if(draw(g, type.getHasImage(), index, delta)) {
 				return;
 			}
 			index++;

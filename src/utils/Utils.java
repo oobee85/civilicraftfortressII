@@ -21,7 +21,7 @@ public final class Utils {
 	
 	public static HasImage getImageFromThingType(Object thingType) {
 		if(thingType instanceof UnitType) {
-			return ((UnitType)thingType);
+			return ((UnitType)thingType).getHasImage();
 		}
 		else if(thingType instanceof BuildingType) {
 			return ((BuildingType)thingType).getHasImage();
