@@ -10,7 +10,7 @@ import ui.graphics.*;
 import ui.graphics.opengl.*;
 import utils.*;
 
-public enum PlantType implements HasImage, HasMesh {
+public enum PlantType implements HasMesh {
 	
 	BERRY ( new String[] {"Images/plants/berry16.png"}, 
 			MeshUtils.cube, 
@@ -66,30 +66,11 @@ public enum PlantType implements HasImage, HasMesh {
 	public String getTextureFile() {
 		return textureFile;
 	}
-	@Override
-	public Image getImage(int size) {
-		return mipmap.getImage(size);
+	
+	public HasImage getHasImage() {
+		return mipmap;
 	}
 
-	@Override
-	public Image getShadow(int size) {
-		return mipmap.getShadow(size);
-	}
-	@Override
-	public Image getHighlight(int size) {
-		return mipmap.getHighlight(size);
-	}
-
-	@Override
-	public ImageIcon getImageIcon(int size) {
-		return mipmap.getImageIcon(size);
-	}
-
-	@Override
-	public Color getColor(int size) {
-		return mipmap.getColor(size);
-	}
-    
 	public ItemType getItem() {
 		return itemType;
 	}

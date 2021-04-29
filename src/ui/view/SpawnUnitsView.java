@@ -79,7 +79,7 @@ public class SpawnUnitsView {
 		for (int i = 0; i < Game.plantTypeList.size(); i++) {
 			PlantType type = Game.plantTypeList.get(i);
 			KButton button = KUIConstants.setupButton(null,
-					Utils.resizeImageIcon(type.getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width), (int)(SPAWN_BUTTON_SIZE.height)),
+					Utils.resizeImageIcon(type.getHasImage().getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width), (int)(SPAWN_BUTTON_SIZE.height)),
 					SPAWN_BUTTON_SIZE);
 			button.setBorder(KUIConstants.tinyBorder);
 			button.addActionListener(e -> {

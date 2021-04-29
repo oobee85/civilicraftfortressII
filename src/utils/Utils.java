@@ -27,7 +27,7 @@ public final class Utils {
 			return ((BuildingType)thingType).getHasImage();
 		}
 		else if(thingType instanceof PlantType) {
-			return ((PlantType)thingType);
+			return ((PlantType)thingType).getHasImage();
 		}
 		return null;
 	}

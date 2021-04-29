@@ -47,7 +47,7 @@ public class MainMenuImageView extends JPanel {
 			index++;
 		}
 		for(PlantType type : PlantType.values()) {
-			if(draw(g, type, index, delta)) {
+			if(draw(g, type.getHasImage(), index, delta)) {
 				return;
 			}
 			index++;

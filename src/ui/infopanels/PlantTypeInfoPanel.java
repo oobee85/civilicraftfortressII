@@ -11,7 +11,7 @@ public class PlantTypeInfoPanel extends InfoPanel {
 	private PlantType showing;
 
 	public PlantTypeInfoPanel(PlantType showing) {
-		super(showing.toString(), showing.getImage(DEFAULT_IMAGE_SIZE));
+		super(showing.toString(), showing.getHasImage().getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
 		
 	}
