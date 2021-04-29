@@ -30,6 +30,7 @@ public class World {
 	public static final int MINTEMP = -273;
 	public static final int BALANCETEMP = -20;
 	public static final int FREEZETEMP = 0;
+	public static final float FREEZING_TEMPURATURE = 0.33f;
 	public static final int BALANCEWATER = 4;
 	public static final int MAXTEMP = 1000;
 	public static final int MAXHEIGHT = 1000;
@@ -745,7 +746,7 @@ public class World {
 				addedEnergy += (mod);
 			}
 			
-			float seasonEnergy = Season.getRateEnergy();
+			float seasonEnergy = Seasons.getRateEnergy();
 			
 			
 			double heightMod = 1 - tile.getHeight() / World.MAXHEIGHT;

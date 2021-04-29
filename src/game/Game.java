@@ -267,7 +267,7 @@ public class Game {
 			}
 		}
 		if(World.days >= 1 && Math.random() > 0.5) {
-			int number = (int)(Season.MELTING_TEMPURATURE + Math.random()*day);
+			int number = (int)(Math.random()*day);
 			makeAnimal(spawnTile, Game.unitTypeMap.get("FLAMELET"), number);
 			System.out.println(number + " flamelets");
 		}
@@ -289,7 +289,7 @@ public class Game {
 			}
 		}
 		if(World.days >= 10) {
-			int number = (int)(Math.random() * Season.FREEZING_TEMPURATURE * day);
+			int number = (int)(Math.random() * day);
 			for(int i = 0; i < number; i++) {
 				world.spawnVampire(targetTile);
 			}
@@ -418,7 +418,6 @@ public class Game {
 	
 	public void initializeWorld(int width, int height) {
 		world = new World(width, height);
-		Season.makeSeasonArrays(height);
 	}
 	public void generateWorld(int width, int height, boolean easymode, List<PlayerInfo> players) {
 		initializeWorld(width, height);

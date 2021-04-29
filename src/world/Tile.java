@@ -476,7 +476,7 @@ public class Tile implements Externalizable {
 
 	public boolean airTemperature() {
 		double temp = this.air.getTemperature();
-		if (temp < Season.FREEZING_TEMPURATURE) {
+		if (temp < World.FREEZING_TEMPURATURE) {
 			return true;
 		}
 		return false;
