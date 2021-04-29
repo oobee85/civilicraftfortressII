@@ -7,6 +7,7 @@ import java.util.*;
 
 import javax.imageio.*;
 
+import ui.graphics.opengl.maths.*;
 import utils.*;
 
 public class PerlinNoise {
@@ -49,16 +50,16 @@ public class PerlinNoise {
 	}
 	
 	// From https://en.wikipedia.org/wiki/Perlin_noise
-	private static final Vec2 randomGradient(int ix, int iy) {
+	private static final Vector2f randomGradient(int ix, int iy) {
 		// Random float. No precomputed gradients mean this works for any number of grid coordinates
 		double random = mult * Math.sin(ix * multx1 + iy * multy1 + multz1) * Math.cos(ix * multx2 * iy * multy2 + multz2);
-		return new Vec2(Math.cos(random), Math.sin(random));
+		return new Vector2f((float)Math.cos(random), (float)Math.sin(random));
 	}
 	
 	// Computes the dot product of the distance and gradient vectors.
 	private static final double dotGridGradient(int ix, int iy, double x, double y) {
 		// Get gradient from integer coordinates
-		Vec2 gradient = randomGradient(ix, iy);
+		Vector2f gradient = randomGradient(ix, iy);
 
 		// Compute the distance vector
 		double dx = x - (double) ix;
