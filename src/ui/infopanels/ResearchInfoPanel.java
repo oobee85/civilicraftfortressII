@@ -12,7 +12,7 @@ public class ResearchInfoPanel extends InfoPanel {
 	private Faction faction;
 
 	public ResearchInfoPanel(Research showing, Faction faction) {
-		super(showing.toString(), showing.type().getImage(70), 70);
+		super(showing.toString(), showing.type().getMipMap().getImage(70), 70);
 		this.showing = showing;
 		this.faction = faction;
 	}

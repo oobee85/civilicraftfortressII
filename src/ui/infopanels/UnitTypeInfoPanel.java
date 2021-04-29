@@ -21,7 +21,7 @@ public class UnitTypeInfoPanel extends InfoPanel {
 	private Faction faction;
 
 	public UnitTypeInfoPanel(UnitType showing, Faction faction) {
-		super(showing.toString(), showing.getHasImage().getImage(DEFAULT_IMAGE_SIZE));
+		super(showing.toString(), showing.getMipMap().getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
 		this.faction = faction;
 	}
@@ -69,7 +69,7 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		int gap = 1;
 		
 		for(Entry<ItemType, Integer> entry : costs.entrySet()) {
-			g.drawImage(entry.getKey().getImage(iconSize), x, y, iconSize, iconSize, null);
+			g.drawImage(entry.getKey().getMipMap().getImage(iconSize), x, y, iconSize, iconSize, null);
 			int currentAmount = faction.getInventory().getItemAmount(entry.getKey());
 			String str = currentAmount + "/" + entry.getValue() + " " + entry.getKey().toString();
 			g.setColor(currentAmount >= entry.getValue() ? Color.black : Color.red);

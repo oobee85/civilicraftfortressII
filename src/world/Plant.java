@@ -10,7 +10,7 @@ public class Plant extends Thing implements Serializable {
 	private PlantType plantType;
 	
 	public Plant(PlantType pt, Tile t, Faction faction) {
-		super(pt.getHealth(), pt.getHasImage(), pt, faction, t);
+		super(pt.getHealth(), pt.getMipMap(), pt, faction, t);
 		plantType = pt;
 	}
 	public ItemType getItem() {

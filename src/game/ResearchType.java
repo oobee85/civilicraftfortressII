@@ -7,7 +7,7 @@ import javax.swing.*;
 
 import utils.*;
 
-public class ResearchType implements HasImage {
+public class ResearchType {
 
 	public static final String DEFAULT_RESEARCH_IMAGE_PATH = "Images/interfaces/tech.png";
 
@@ -37,25 +37,8 @@ public class ResearchType implements HasImage {
 	public String toString() {
 		return Utils.getName(this);
 	}
-
-	@Override
-	public Image getImage(int size) {
-		return mipmap.getImage(size);
-	}
-	@Override
-	public Image getShadow(int size) {
-		return mipmap.getShadow(size);
-	}
-	@Override
-	public Image getHighlight(int size) {
-		return mipmap.getHighlight(size);
-	}
-	@Override
-	public ImageIcon getImageIcon(int size) {
-		return mipmap.getImageIcon(size);
-	}
-	@Override
-	public Color getColor(int size) {
-		return mipmap.getColor(size);
+	
+	public MipMap getMipMap() {
+		return mipmap;
 	}
 }

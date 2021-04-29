@@ -29,7 +29,7 @@ public class Building extends Thing implements Serializable {
 	private Inventory inventory;
 	
 	public Building(BuildingType buildingType, Tile tile, Faction faction) {
-		super(buildingType.getHealth(), buildingType.getHasImage(), buildingType, faction, tile);
+		super(buildingType.getHealth(), buildingType.getMipMap(), buildingType, faction, tile);
 		this.remainingEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
 		this.spawnLocation = tile;
@@ -222,29 +222,29 @@ public class Building extends Thing implements Serializable {
 		if(!getType().isRoad()) {
 			return;
 		}
-		HasImage hasImage = new HasImage() {
+		MipMap mipmap = new MipMap("Images/buildings/wall_brick.png") {
 			@Override
 			public Image getImage(int size) {
 				return getType().getRoadImage(roadCorner);
 			}
 			@Override
 			public Image getShadow(int size) {
-				return getType().getHasImage().getShadow(size);
+				return getType().getMipMap().getShadow(size);
 			}
 			@Override
 			public Image getHighlight(int size) {
-				return getType().getHasImage().getHighlight(size);
+				return getType().getMipMap().getHighlight(size);
 			}
 			@Override
 			public ImageIcon getImageIcon(int size) {
-				return getType().getHasImage().getImageIcon(size);
+				return getType().getMipMap().getImageIcon(size);
 			}
 			@Override
 			public Color getColor(int size) {
-				return getType().getHasImage().getColor(size);
+				return getType().getMipMap().getColor(size);
 			}
 		};
-		super.setImage(hasImage);
+		super.setMipMap(mipmap);
 	}
 	
 	@Override

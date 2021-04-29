@@ -28,24 +28,24 @@ public class Thing implements HasMesh, Serializable {
 	private Tile tile;
 	private transient boolean isSelected;
 	
-	private transient HasImage hasImage;
+	private transient MipMap mipmap;
 	private transient Mesh mesh;
 	private transient String textureFile;
 	
 	private transient Hitsplat[] hitsplats = new Hitsplat[4];
 	
-	public Thing(double maxHealth, HasImage hasImage, HasMesh hasMesh, Faction faction) {
+	public Thing(double maxHealth, MipMap mipmap, HasMesh hasMesh, Faction faction) {
 		health = maxHealth;
 		this.maxHealth = maxHealth;
-		this.hasImage = hasImage;
+		this.mipmap = mipmap;
 		this.mesh = hasMesh.getMesh();
 		this.textureFile = hasMesh.getTextureFile();
 		setFaction(faction);
 		this.id = idCounter++;
 		ThingMapper.created(this);
 	}
-	public Thing(double maxHealth, HasImage hasImage, HasMesh hasMesh, Faction faction, Tile tile) {
-		this(maxHealth, hasImage, hasMesh, faction);
+	public Thing(double maxHealth, MipMap mipmap, HasMesh hasMesh, Faction faction, Tile tile) {
+		this(maxHealth, mipmap, hasMesh, faction);
 		this.tile = tile;
 	}
 	
@@ -63,10 +63,6 @@ public class Thing implements HasMesh, Serializable {
 	}
 	public void setID(int id) {
 		this.id = id;
-	}
-	
-	public void setImage(HasImage hasImage) {
-		this.hasImage = hasImage;
 	}
 	
 	public Faction getFaction() {
@@ -197,8 +193,12 @@ public class Thing implements HasMesh, Serializable {
 		return tile;
 	}
 	
-	public HasImage getHasImage() {
-		return hasImage;
+	public MipMap getMipMap() {
+		return mipmap;
+	}
+	
+	public void setMipMap(MipMap mipmap) {
+		this.mipmap = mipmap;
 	}
 	
 	public List<String> getDebugStrings() {

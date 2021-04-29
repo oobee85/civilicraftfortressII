@@ -79,7 +79,7 @@ public class BuildingType implements HasMesh, Serializable {
 		return textureFile;
 	}
 	
-	public HasImage getHasImage() {
+	public MipMap getMipMap() {
 		return mipmap;
 	}
 //	@Override

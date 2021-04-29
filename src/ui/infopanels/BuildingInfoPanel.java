@@ -10,7 +10,7 @@ public class BuildingInfoPanel extends InfoPanel {
 	Building showing;
 
 	public BuildingInfoPanel(Building showing) {
-		super(showing.toString(), showing.getHasImage().getImage(DEFAULT_IMAGE_SIZE));
+		super(showing.toString(), showing.getMipMap().getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
 	}
 	@Override
@@ -35,7 +35,7 @@ public class BuildingInfoPanel extends InfoPanel {
 			int progressBarHeight = 30;
 			int buffer = 1;
 			int imageSize = progressBarHeight - 2*buffer;
-			g.drawImage(showing.getProducingUnit().peek().getHasImage().getImage(imageSize), x + buffer, y + buffer, imageSize, imageSize, null);
+			g.drawImage(showing.getProducingUnit().peek().getMipMap().getImage(imageSize), x + buffer, y + buffer, imageSize, imageSize, null);
 			
 			
 			int totalEffort = showing.getProducingUnit().peek().getType().getCombatStats().getTicksToBuild();
@@ -54,7 +54,7 @@ public class BuildingInfoPanel extends InfoPanel {
 						first = false;
 						continue;
 					}
-					g.drawImage(unit.getHasImage().getImage(imageSize), x + buffer + offset, y + buffer, imageSize, imageSize, null);
+					g.drawImage(unit.getMipMap().getImage(imageSize), x + buffer + offset, y + buffer, imageSize, imageSize, null);
 					offset += imageSize + buffer;
 				}
 			}

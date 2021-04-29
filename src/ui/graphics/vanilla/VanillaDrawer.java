@@ -335,17 +335,17 @@ public class VanillaDrawer extends Drawer {
 				int shadowOffset = (int) (frozenTileSize * ratio / 2);
 				Point drawAt = getDrawingCoords(p.getTile().getLocation());
 				
-				g.drawImage(p.getShadow(0), drawAt.x + shadowOffset,
+				g.drawImage(p.getType().getMipMap().getShadow(0), drawAt.x + shadowOffset,
 						drawAt.y + shadowOffset, frozenTileSize - shadowOffset * 2,
 						frozenTileSize - shadowOffset * 2, null);
-				g.drawImage(p.getImage(0), drawAt.x - extra / 2,
+				g.drawImage(p.getType().getMipMap().getImage(0), drawAt.x - extra / 2,
 						drawAt.y - p.getHeight() - extra / 2, frozenTileSize + extra,
 						frozenTileSize + extra, null);
 			}
 			for (WeatherEvent w : game.world.getWeatherEvents()) {
 				
 				Point drawAt = getDrawingCoords(w.getTile().getLocation());
-				g.drawImage(w.getImage(0), drawAt.x ,
+				g.drawImage(WeatherEventType.RAIN.getMipMap().getImage(0), drawAt.x ,
 						drawAt.y, frozenTileSize, frozenTileSize, null);
 			}
 
@@ -502,7 +502,7 @@ public class VanillaDrawer extends Drawer {
 	private void drawPlannedThing(Graphics2D g) {
 		BufferedImage bI = null;
 		if (state.leftClickAction == LeftClickAction.PLAN_BUILDING) {
-			bI = Utils.toBufferedImage(state.selectedBuildingToPlan.getHasImage().getImage(frozenTileSize));
+			bI = Utils.toBufferedImage(state.selectedBuildingToPlan.getMipMap().getImage(frozenTileSize));
 		} else if (state.leftClickAction == LeftClickAction.SPAWN_THING) {
 			bI = Utils.toBufferedImage(Utils.getImageFromThingType(state.selectedThingToSpawn).getImage(frozenTileSize));
 		}
@@ -643,7 +643,7 @@ public class VanillaDrawer extends Drawer {
 //			t.drawEntities(g, currentMode);
 
 			if (theTile.getResource() != null && state.faction.areRequirementsMet(theTile.getResource().getType())) {
-				g.drawImage(theTile.getResource().getType().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh,
+				g.drawImage(theTile.getResource().getType().getMipMap().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh,
 						null);
 			}
 
@@ -668,38 +668,38 @@ public class VanillaDrawer extends Drawer {
 				double alpha = Utils.getAlphaOfLiquid(theTile.liquidAmount);
 //				 transparency liquids
 				Utils.setTransparency(g, alpha);
-				g.setColor(theTile.liquidType.getColor(imagesize));
+				g.setColor(theTile.liquidType.getMipMap().getColor(imagesize));
 				g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 				Utils.setTransparency(g, 1);
 
 				int imageSize = (int) Math.min(Math.max(draww * theTile.liquidAmount / 20, 1), draww);
-				g.setColor(theTile.liquidType.getColor(imagesize));
+				g.setColor(theTile.liquidType.getMipMap().getColor(imagesize));
 				g.fillRect(drawAt.x + draww / 2 - imageSize / 2, drawAt.y + drawh / 2 - imageSize / 2, imageSize,
 						imageSize);
-				g.drawImage(theTile.liquidType.getImage(imagesize), drawAt.x + draww / 2 - imageSize / 2,
+				g.drawImage(theTile.liquidType.getMipMap().getImage(imagesize), drawAt.x + draww / 2 - imageSize / 2,
 						drawAt.y + draww / 2 - imageSize / 2, imageSize, imageSize, null);
 			}
 
 			if (theTile.getModifier() != null) {
 				Utils.setTransparency(g, 0.9);
-				g.drawImage(theTile.getModifier().getType().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh,
+				g.drawImage(theTile.getModifier().getType().getMipMap().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh,
 						null);
 				Utils.setTransparency(g, 1);
 			}
 
 			if (!theTile.getItems().isEmpty()) {
 				for (Item item : theTile.getItems()) {
-					g.drawImage(item.getType().getImage(imagesize), drawAt.x + frozenTileSize / 4,
+					g.drawImage(item.getType().getMipMap().getImage(imagesize), drawAt.x + frozenTileSize / 4,
 							drawAt.y + frozenTileSize / 4, frozenTileSize / 2, frozenTileSize / 2, null);
 				}
 			}
 			if (theTile.getPlant() != null) {
-				g.drawImage(theTile.getPlant().getHasImage().getImage(frozenTileSize), drawAt.x, drawAt.y, draww, drawh, null);
+				g.drawImage(theTile.getPlant().getMipMap().getImage(frozenTileSize), drawAt.x, drawAt.y, draww, drawh, null);
 			}
 
 			if (theTile.getBuilding() != null) {
 				if (theTile.getBuilding().isSelected()) {
-					g.drawImage(theTile.getBuilding().getHasImage().getHighlight(frozenTileSize), drawAt.x, drawAt.y, draww, drawh,
+					g.drawImage(theTile.getBuilding().getMipMap().getHighlight(frozenTileSize), drawAt.x, drawAt.y, draww, drawh,
 							null);
 				}
 				drawBuilding(theTile.getBuilding(), g, drawAt.x, drawAt.y, draww, drawh);
@@ -722,7 +722,7 @@ public class VanillaDrawer extends Drawer {
 //		}
 		
 		if (unit.isSelected()) {
-			g.drawImage(unit.getHasImage().getHighlight(frozenTileSize), drawx, drawy, draww, drawh, null);
+			g.drawImage(unit.getMipMap().getHighlight(frozenTileSize), drawx, drawy, draww, drawh, null);
 		}
 //		if(path != null && path.peek() != null) {
 //			Tile targetTile = path.peek();
@@ -745,7 +745,7 @@ public class VanillaDrawer extends Drawer {
 //			}
 //			g.drawImage(unit.getImage(frozenTileSize), (int)(drawx + drawx - dx), (int)(drawy + drawy - dy), draww, drawh, null);
 //		}else {
-			g.drawImage(unit.getHasImage().getImage(frozenTileSize), drawx, drawy, draww, drawh, null);
+			g.drawImage(unit.getMipMap().getImage(frozenTileSize), drawx, drawy, draww, drawh, null);
 //		}
 		
 		
@@ -761,7 +761,7 @@ public class VanillaDrawer extends Drawer {
 	
 	private void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh) {
 
-		BufferedImage bI = Utils.toBufferedImage(building.getHasImage().getImage(0));
+		BufferedImage bI = Utils.toBufferedImage(building.getMipMap().getImage(0));
 		if (building.isBuilt() == false) {
 			// draws the transparent version
 			Utils.setTransparency(g, 0.5f);
@@ -796,7 +796,7 @@ public class VanillaDrawer extends Drawer {
 			Point drawAt = getDrawingCoords(building.getTile().getLocation());
 			for (Item item : building.getInventory().getItems()) {
 				if (item != null) {
-					g.drawImage(item.getType().getImage(frozenTileSize/4), drawAt.x+(frozenTileSize/4*numDrawn), drawAt.y, null);
+					g.drawImage(item.getType().getMipMap().getImage(frozenTileSize/4), drawAt.x+(frozenTileSize/4*numDrawn), drawAt.y, null);
 					numDrawn ++;
 				}
 			}
@@ -805,7 +805,7 @@ public class VanillaDrawer extends Drawer {
 			Point drawAt = getDrawingCoords(unit.getTile().getLocation());
 			for (Item item : unit.getInventory().getItems()) {
 				if (item != null) {
-					g.drawImage(item.getType().getImage(frozenTileSize), drawAt.x+(frozenTileSize/4*numDrawn), drawAt.y, null);
+					g.drawImage(item.getType().getMipMap().getImage(frozenTileSize), drawAt.x+(frozenTileSize/4*numDrawn), drawAt.y, null);
 					numDrawn ++;
 				}
 			}

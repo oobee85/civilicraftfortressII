@@ -1445,29 +1445,29 @@ public class World {
 			Color minimapColor = terrainColors.get(tile.getTerrain());
 			Color terrainColor = terrainColors.get(tile.getTerrain());
 			if(tile.getResource() != null && faction.areRequirementsMet(tile.getResource().getType())) {
-				terrainColor = tile.getResource().getType().getColor(0);
-				minimapColor = tile.getResource().getType().getColor(0);
+				terrainColor = tile.getResource().getType().getMipMap().getColor(0);
+				minimapColor = tile.getResource().getType().getMipMap().getColor(0);
 			}
 			if(tile.getRoad() != null) {
-				terrainColor = tile.getRoad().getType().getHasImage().getColor(0);
-				minimapColor = tile.getRoad().getType().getHasImage().getColor(0);
+				terrainColor = tile.getRoad().getType().getMipMap().getColor(0);
+				minimapColor = tile.getRoad().getType().getMipMap().getColor(0);
 			}
 			if(tile.liquidAmount > 0) {
 				double alpha = Utils.getAlphaOfLiquid(tile.liquidAmount);
-				minimapColor = Utils.blendColors(tile.liquidType.getColor(0), minimapColor, alpha);
-				terrainColor = Utils.blendColors(tile.liquidType.getColor(0), terrainColor, alpha);
+				minimapColor = Utils.blendColors(tile.liquidType.getMipMap().getColor(0), minimapColor, alpha);
+				terrainColor = Utils.blendColors(tile.liquidType.getMipMap().getColor(0), terrainColor, alpha);
 			}
 			if(tile.getPlant() != null) {
-				terrainColor = tile.getPlant().getHasImage().getColor(0);
-				minimapColor = tile.getPlant().getHasImage().getColor(0);
+				terrainColor = tile.getPlant().getMipMap().getColor(0);
+				minimapColor = tile.getPlant().getMipMap().getColor(0);
 			}
 			if(tile.hasBuilding()) {
-				terrainColor = tile.getBuilding().getHasImage().getColor(0);
-				minimapColor = tile.getBuilding().getHasImage().getColor(0);
+				terrainColor = tile.getBuilding().getMipMap().getColor(0);
+				minimapColor = tile.getBuilding().getMipMap().getColor(0);
 			}
 			if(tile.getModifier() != null) {
-				minimapColor = tile.getModifier().getType().getColor(0);
-				terrainColor = Utils.blendColors(tile.getModifier().getType().getColor(0), terrainColor, 0.9);
+				minimapColor = tile.getModifier().getType().getMipMap().getColor(0);
+				terrainColor = Utils.blendColors(tile.getModifier().getType().getMipMap().getColor(0), terrainColor, 0.9);
 			}
 			if(tile.getFaction() != getFaction(NO_FACTION_ID)) {
 				minimapColor = Utils.blendColors(tile.getFaction().color(), minimapColor, 0.3);

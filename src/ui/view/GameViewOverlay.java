@@ -54,7 +54,7 @@ public class GameViewOverlay extends JPanel {
 		for (int i = 0; i < ItemType.values().length; i++) {
 			ItemType type = ItemType.values()[i];
 			KButton button = KUIConstants.setupButton("",
-					Utils.resizeImageIcon(type.getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE),
+					Utils.resizeImageIcon(type.getMipMap().getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE),
 					RESOURCE_BUTTON_SIZE);
 			button.setEnabled(false);
 			resourcePanel2.add(button);
@@ -116,7 +116,7 @@ public class GameViewOverlay extends JPanel {
 		}
 	}
 	private JButton setupUnitButton(Unit unit) {
-		KButton button = new KButton(null, Utils.resizeImageIcon(unit.getHasImage().getImageIcon(10), 30, 30)) {
+		KButton button = new KButton(null, Utils.resizeImageIcon(unit.getMipMap().getImageIcon(10), 30, 30)) {
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);

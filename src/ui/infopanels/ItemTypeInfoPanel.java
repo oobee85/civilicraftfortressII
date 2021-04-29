@@ -10,7 +10,7 @@ public class ItemTypeInfoPanel extends InfoPanel {
 	private Faction faction;
 
 	public ItemTypeInfoPanel(ItemType showing, Faction faction) {
-		super(showing.toString(), showing.getImage(DEFAULT_IMAGE_SIZE));
+		super(showing.toString(), showing.getMipMap().getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
 		this.faction = faction;
 	}

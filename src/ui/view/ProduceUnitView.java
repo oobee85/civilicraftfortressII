@@ -39,7 +39,7 @@ public class ProduceUnitView {
 		for(int i = 0; i < Game.unitTypeList.size(); i++) {
 			UnitType type = Game.unitTypeList.get(i);
 			KButton button = KUIConstants.setupButton("Build " + type.toString(),
-					Utils.resizeImageIcon(type.getHasImage().getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
+					Utils.resizeImageIcon(type.getMipMap().getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
 			button.addActionListener(e -> {
 				gameView.tryToBuildUnit(type);
 			});

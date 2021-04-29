@@ -67,7 +67,7 @@ public enum PlantType implements HasMesh {
 		return textureFile;
 	}
 	
-	public HasImage getHasImage() {
+	public MipMap getMipMap() {
 		return mipmap;
 	}
 

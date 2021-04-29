@@ -29,43 +29,43 @@ public class MainMenuImageView extends JPanel {
 		int delta = (int) (System.currentTimeMillis() - startTime);
 		int index = 0;
 		for(UnitType type : Game.unitTypeList) {
-			if(draw(g, type.getHasImage(), index, delta)) {
+			if(draw(g, type.getMipMap(), index, delta)) {
 				return;
 			}
 			index++;
 		}
 		for(BuildingType type : Game.buildingTypeList) {
-			if(draw(g, type.getHasImage(), index, delta)) {
+			if(draw(g, type.getMipMap(), index, delta)) {
 				return;
 			}
 			index++;
 		}
 		for(ResearchType type : Game.researchTypeList) {
-			if(draw(g, type, index, delta)) {
+			if(draw(g, type.getMipMap(), index, delta)) {
 				return;
 			}
 			index++;
 		}
 		for(PlantType type : PlantType.values()) {
-			if(draw(g, type.getHasImage(), index, delta)) {
+			if(draw(g, type.getMipMap(), index, delta)) {
 				return;
 			}
 			index++;
 		}
 		for(ResourceType type : ResourceType.values()) {
-			if(draw(g, type, index, delta)) {
+			if(draw(g, type.getMipMap(), index, delta)) {
 				return;
 			}
 			index++;
 		}
 		for(ItemType type : ItemType.values()) {
-			if(draw(g, type, index, delta)) {
+			if(draw(g, type.getMipMap(), index, delta)) {
 				return;
 			}
 			index++;
 		}
 		for(ProjectileType type : ProjectileType.values()) {
-			if(draw(g, type, index, delta)) {
+			if(draw(g, type.getMipMap(), index, delta)) {
 				return;
 			}
 			index++;
@@ -75,7 +75,7 @@ public class MainMenuImageView extends JPanel {
 		}
 	}
 	
-	private boolean draw(Graphics g, HasImage hasImage, int index, int delta) {
+	private boolean draw(Graphics g, MipMap mipmap, int index, int delta) {
 		int x = -delta/speed + index*(imgSize+padding);
 		if(x < -getWidth() - imgSize) {
 			return false;
@@ -83,7 +83,7 @@ public class MainMenuImageView extends JPanel {
 		else if(x > 0) {
 			return true;
 		}
-		Image image = hasImage.getImage(imgSize);
+		Image image = mipmap.getImage(imgSize);
 		g.drawImage(image, getWidth() + x, 1, imgSize, imgSize, null);
 		return false;
 	}

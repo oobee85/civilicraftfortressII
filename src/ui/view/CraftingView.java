@@ -34,7 +34,7 @@ public class CraftingView {
 				continue;
 			}
 			KButton button = KUIConstants.setupButton(type.toString(),
-					Utils.resizeImageIcon(type.getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
+					Utils.resizeImageIcon(type.getMipMap().getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
 					BUILDING_BUTTON_SIZE);
 			button.setEnabled(false);
 			button.addActionListener(e -> {

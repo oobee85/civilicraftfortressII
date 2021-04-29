@@ -3,7 +3,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
-public class MipMap implements HasImage {
+public class MipMap {
 	
 	private static final Color HIGHLIGHT_COLOR = Color.yellow;
 
@@ -45,7 +45,6 @@ public class MipMap implements HasImage {
 		this(new String[] {path});
 	}
 
-	@Override
 	public Image getImage(int size) {
 		// Get the first mipmap that is larger than the tile size
 		for (int i = 0; i < mipmapSizes.length; i++) {
@@ -55,7 +54,6 @@ public class MipMap implements HasImage {
 		}
 		return mipmaps[mipmaps.length - 1].getImage();
 	}
-	@Override
 	public Image getShadow(int size) {
 		// Get the first mipmap that is larger than the tile size
 		for (int i = 0; i < mipmapSizes.length; i++) {
@@ -66,7 +64,6 @@ public class MipMap implements HasImage {
 		return shadows[shadows.length - 1].getImage();
 	}
 
-	@Override
 	public Image getHighlight(int size) {
 		// Get the first mipmap that is larger than the tile size
 		for (int i = 0; i < mipmapSizes.length; i++) {
@@ -77,7 +74,6 @@ public class MipMap implements HasImage {
 		return highlights[highlights.length - 1].getImage();
 	}
 
-	@Override
 	public ImageIcon getImageIcon(int size) {
 		// Get the first mipmap that is larger than the tile size
 		for (int i = 0; i < mipmapSizes.length; i++) {
@@ -88,7 +84,6 @@ public class MipMap implements HasImage {
 		return mipmaps[mipmaps.length - 1];
 	}
 
-	@Override
 	public Color getColor(int size) {
 		// Get the first mipmap that is larger than the tile size
 		for (int i = 0; i < mipmapSizes.length; i++) {

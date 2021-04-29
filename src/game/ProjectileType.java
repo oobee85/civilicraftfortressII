@@ -5,13 +5,10 @@ import java.awt.Image;
 
 import javax.swing.ImageIcon;
 
-import utils.HasImage;
 import utils.MipMap;
 import utils.Utils;
 
-
-
-public enum ProjectileType implements HasImage {
+public enum ProjectileType {
 
 		ARROW(2, "Images/projectiles/arrow.png", 1, null, 0),
 		RUNE_ARROW(2, "Images/projectiles/rune_arrow.png", 1, null, 0),
@@ -57,27 +54,9 @@ public enum ProjectileType implements HasImage {
 	public double getSpeed() {
 		return speed;
 	}
-	@Override
-	public Image getImage(int size) {
-		return mipmap.getImage(size);
-	}
-	@Override
-	public Image getShadow(int size) {
-		return mipmap.getShadow(size);
-	}
-	@Override
-	public Image getHighlight(int size) {
-		return mipmap.getHighlight(size);
-	}
-
-	@Override
-	public ImageIcon getImageIcon(int size) {
-		return mipmap.getImageIcon(size);
-	}
-
-	@Override
-	public Color getColor(int size) {
-		return mipmap.getColor(size);
+	
+	public MipMap getMipMap() {
+		return mipmap;
 	}
 
 	@Override

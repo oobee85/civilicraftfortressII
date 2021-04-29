@@ -7,7 +7,7 @@ import javax.swing.ImageIcon;
 
 import utils.*;
 
-public enum ItemType implements HasImage {
+public enum ItemType {
 	
 	COPPER_ORE ( "Images/itemicons/copper_ore.png", null),
 	SILVER_ORE ( "Images/itemicons/silver_ore.png", null),
@@ -58,12 +58,6 @@ public enum ItemType implements HasImage {
 		 this(s, resourcesNeeded);
 		 this.building = building;
 	}
-
-	
-	
-//	public ResearchType getResearchRequirement() {
-//		return researchRequirement;
-//	}
 	
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;
@@ -72,28 +66,9 @@ public enum ItemType implements HasImage {
 	public String getBuilding() {
 		return building;
 	}
-
-	@Override
-	public Image getImage(int size) {
-		return mipmap.getImage(size);
-	}
-	@Override
-	public Image getShadow(int size) {
-		return mipmap.getShadow(size);
-	}
-	@Override
-	public Image getHighlight(int size) {
-		return mipmap.getHighlight(size);
-	}
-
-	@Override
-	public ImageIcon getImageIcon(int size) {
-		return mipmap.getImageIcon(size);
-	}
-
-	@Override
-	public Color getColor(int size) {
-		return mipmap.getColor(size);
+	
+	public MipMap getMipMap() {
+		return mipmap;
 	}
 	
 	@Override

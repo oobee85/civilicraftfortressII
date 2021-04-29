@@ -32,7 +32,7 @@ public class ResearchView {
 		for (int i = 0; i < Game.researchTypeList.size(); i++) {
 			ResearchType researchType = Game.researchTypeList.get(i);
 			KButton button = KUIConstants.setupButton(researchType.toString(),
-					Utils.resizeImageIcon(researchType.getImageIcon(0), RESEARCH_ICON_SIZE, RESEARCH_ICON_SIZE), null);
+					Utils.resizeImageIcon(researchType.getMipMap().getImageIcon(0), RESEARCH_ICON_SIZE, RESEARCH_ICON_SIZE), null);
 			button.setEnabled(false);
 			button.addActionListener(e -> {
 				gameView.getGameInstance().getGUIController().research(researchType);

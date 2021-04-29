@@ -10,7 +10,7 @@ import game.liquid.*;
 import utils.*;
 import world.*;
 
-public class WeatherEvent implements HasImage, Externalizable {
+public class WeatherEvent implements Externalizable {
 
 	
 	private double strength;
@@ -19,9 +19,7 @@ public class WeatherEvent implements HasImage, Externalizable {
 	private Tile targetTile;
 	private double timeToMove;
 	private int speed;
-	private HasImage hasImage;
 	private LiquidType liquidType;
-	private MipMap mipmap;
 	private boolean isCold;
 
 	@Override
@@ -50,7 +48,6 @@ public class WeatherEvent implements HasImage, Externalizable {
 //		this.aliveUntil = World.ticks + duration;
 		this.strength = strength;
 		this.liquidType = liquidType;
-		this.hasImage = WeatherEventType.RAIN;
 		this.isCold = false;
 		this.speed = WeatherEventType.RAIN.getSpeed();
 		
@@ -76,11 +73,11 @@ public class WeatherEvent implements HasImage, Externalizable {
 	private void updateColdness() {
 //		isCold = tile.airTemperature();
 //		if(isCold == true) {
-//			this.hasImage = WeatherEventType.SNOW;
+//			this.mipmap = WeatherEventType.SNOW;
 //			liquidType = LiquidType.SNOW;
 //			strength = 0.0003;
 //		}else {
-//			this.hasImage = WeatherEventType.RAIN;
+//			this.mipmap = WeatherEventType.RAIN;
 //			liquidType = LiquidType.WATER;
 //			strength = 0.0002;
 //		}
@@ -143,24 +140,5 @@ public class WeatherEvent implements HasImage, Externalizable {
 	}
 	public void setTargetTile(Tile t) {
 		this.targetTile = t;
-	}
-	public Image getImage(int size) {
-		return hasImage.getImage(size);
-	}
-	@Override
-	public Image getShadow(int size) {
-		return null;
-	}
-	@Override
-	public Image getHighlight(int size) {
-		return mipmap.getHighlight(size);
-	}
-	@Override
-	public ImageIcon getImageIcon(int size) {
-		return hasImage.getImageIcon(size);
-	}
-	@Override
-	public Color getColor(int size) {
-		return hasImage.getColor(size);
 	}
 }

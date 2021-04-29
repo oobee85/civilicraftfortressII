@@ -112,7 +112,7 @@ public class UnitType implements HasMesh, Serializable {
 		return textureFile;
 	}
 
-	public HasImage getHasImage() {
+	public MipMap getMipMap() {
 		return mipmap;
 	}
 

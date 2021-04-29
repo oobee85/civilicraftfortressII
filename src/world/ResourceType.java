@@ -6,7 +6,7 @@ import javax.swing.*;
 import game.ItemType;
 import utils.*;
 
-public enum ResourceType implements HasImage {
+public enum ResourceType {
 	
 	COPPER (100 , 4, 15, false, ItemType.COPPER_ORE, true, 3, "BRONZE_WORKING",
 			new String[] {"Images/resources/copper/ore_copper128.png"}),
@@ -87,31 +87,7 @@ public enum ResourceType implements HasImage {
 		return itemType;
 	}
 
-
-	@Override
-	public Image getImage(int size) {
-		return mipmap.getImage(size);
-	}
-	@Override
-	public Image getShadow(int size) {
-		return mipmap.getShadow(size);
-	}
-	@Override
-	public Image getHighlight(int size) {
-		return mipmap.getHighlight(size);
-	}
-
-	@Override
-	public ImageIcon getImageIcon(int size) {
-		return mipmap.getImageIcon(size);
-	}
-	@Override
-	public Color getColor(int size) {
-		return mipmap.getColor(size);
-	}
-	
-	@Override
-	public String toString() {
-		return Utils.getName(this);
+	public MipMap getMipMap() {
+		return mipmap;
 	}
 }

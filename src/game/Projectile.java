@@ -1,25 +1,19 @@
 package game;
 
-import java.awt.Color;
-import java.awt.Image;
 import java.io.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.ImageIcon;
-
-import ui.*;
 import utils.*;
 import world.*;
 
-public class Projectile implements HasImage, Externalizable {
+public class Projectile implements Externalizable {
 
 	private ProjectileType type;
 	private Tile targetTile;
 	private double timeToMove;
 	private Tile tile;
-	private HasImage hasImage;
 	
 	private Unit source;
 	private int damage;
@@ -50,7 +44,6 @@ public class Projectile implements HasImage, Externalizable {
 	public Projectile(ProjectileType type, Tile tile, Tile targetTile, Unit source, int damage) {
 		this.type = type;
 		this.tile = tile;
-		this.hasImage = type;
 		this.targetTile = targetTile;
 		this.source = source;
 		this.timeToMove = type.getSpeed();
@@ -140,29 +133,10 @@ public class Projectile implements HasImage, Externalizable {
 	public String toString() {
 		return type.toString();
 	}
-	public Image getImage(int size) {
-		return hasImage.getImage(size);
-	}
-	public Image getShadow(int size) {
-		return hasImage.getShadow(size);
-	}
-	@Override
-	public Image getHighlight(int size) {
-		return hasImage.getHighlight(size);
-	}
-	public ImageIcon getImageIcon(int size) {
-		return hasImage.getImageIcon(size);
-	}
-	public Color getColor(int size) {
-		return hasImage.getColor(size);
-	}
 	
 	public List<String> getDebugStrings() {
 		return new LinkedList<String>(Arrays.asList(
 				String.format("TTM=%.0f", getTimeToMove())
 				));
 	}
-	
-	
-	
 }

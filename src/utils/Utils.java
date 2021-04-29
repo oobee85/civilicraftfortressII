@@ -19,15 +19,15 @@ public final class Utils {
 	
 	public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	
-	public static HasImage getImageFromThingType(Object thingType) {
+	public static MipMap getImageFromThingType(Object thingType) {
 		if(thingType instanceof UnitType) {
-			return ((UnitType)thingType).getHasImage();
+			return ((UnitType)thingType).getMipMap();
 		}
 		else if(thingType instanceof BuildingType) {
-			return ((BuildingType)thingType).getHasImage();
+			return ((BuildingType)thingType).getMipMap();
 		}
 		else if(thingType instanceof PlantType) {
-			return ((PlantType)thingType).getHasImage();
+			return ((PlantType)thingType).getMipMap();
 		}
 		return null;
 	}

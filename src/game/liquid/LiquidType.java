@@ -8,7 +8,7 @@ import ui.graphics.*;
 import ui.graphics.opengl.*;
 import utils.*;
 
-public enum LiquidType implements HasImage, HasMesh {
+public enum LiquidType implements HasMesh {
 		DRY(new String[] {"Images/liquid/lavaanim32.gif"}, "Images/liquid/lavaanim32.gif",
 				0f, 1000f, 1000f, 5f, 0.08f, 0f, false),
 		WATER(new String[] {"Images/liquid/watermoving.gif"}, "Images/liquid/watermoving.gif",
@@ -56,26 +56,9 @@ public enum LiquidType implements HasImage, HasMesh {
 	public double getBrightness() {
 		return brightness;
 	}
-	
-	@Override
-	public Image getImage(int size) {
-		return mipmap.getImage(size);
-	}
-	@Override
-	public Image getShadow(int size) {
-		return mipmap.getShadow(size);
-	}
-	@Override
-	public Image getHighlight(int size) {
-		return mipmap.getHighlight(size);
-	}
-	@Override
-	public ImageIcon getImageIcon(int size) {
-		return mipmap.getImageIcon(size);
-	}
-	@Override
-	public Color getColor(int size) {
-		return mipmap.getColor(size);
+
+	public MipMap getMipMap() {
+		return mipmap;
 	}
 
 	@Override
