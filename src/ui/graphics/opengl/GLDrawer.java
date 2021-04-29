@@ -269,10 +269,10 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	}
 	
 	class RenderObject {
-		Texture texture;
+		String textureFile;
 		Matrix4f model;
-		public RenderObject(Texture texture, Matrix4f model) {
-			this.texture = texture;
+		public RenderObject(String textureFile, Matrix4f model) {
+			this.textureFile = textureFile;
 			this.model = model;
 		}
 	}
@@ -282,11 +282,14 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			entry.getValue().clear();
 		}
 	}
-	private void addToRender(Mesh mesh, RenderObject obj) {
+	private void addToRender(TexturedMesh mesh, Matrix4f model) {
+		addToRender(mesh.mesh, mesh.textureFile, model);
+	}
+	private void addToRender(Mesh mesh, String textureFile, Matrix4f model) {
 		if(!torender.containsKey(mesh)) {
 			torender.put(mesh, new ArrayList<>());
 		}
-		torender.get(mesh).add(obj);
+		torender.get(mesh).add(new RenderObject(textureFile, model));
 	}
 	
 	public void renderAxis(GL3 gl, Shader shader) {
@@ -350,9 +353,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				scale.z = scale.z * (2f + 0.1f*(plant.getTile().getLocation().x()%7) + 0.1f*(plant.getTile().getLocation().y()%13));
 			}
 			
-			addToRender(plant.getMesh().getMesh(), new RenderObject(
-					TextureUtils.getTextureByFileName(plant.getMesh().getTextureFile(), gl), 
-					Matrix4f.getModelMatrix(pos, Matrix4f.identity(), scale)));
+			addToRender(plant.getMesh(), Matrix4f.getModelMatrix(pos, Matrix4f.identity(), scale));
 		}
 		UnitType dragonType = Game.unitTypeMap.get("DRAGON");
 		for(Unit unit : game.world.getUnits()) {
@@ -368,22 +369,18 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			if(unit.getType().isFlying()) {
 				pos.z += 3;
 			}
-			addToRender(unit.getMesh().getMesh(), new RenderObject(
-					TextureUtils.getTextureByFileName(unit.getMesh().getTextureFile(), gl), 
-					Matrix4f.getModelMatrix(pos, Matrix4f.identity(), scale)));
+			addToRender(unit.getMesh(), Matrix4f.getModelMatrix(pos, Matrix4f.identity(), scale));
 		}
 		for(Building building : game.world.getBuildings()) {
 			if(building.getType().blocksMovement()) {
 				Vector3f pos = tileLocTo3dCoords(building.getTile().getLocation(), building.getTile().getHeight() + Liquid.WALL_HEIGHT);
-				addToRender(terrainObject.liquid, new RenderObject(
-						TextureUtils.getTextureByFileName(building.getMesh().getTextureFile(), gl), 
-						Matrix4f.getModelMatrix(pos, Matrix4f.identity(), new Vector3f(1, 1, 1))));
+				addToRender(terrainObject.liquid, 
+						building.getMesh().getTextureFile(), 
+						Matrix4f.getModelMatrix(pos, Matrix4f.identity(), new Vector3f(1, 1, 1)));
 			}
 			else {
 				Vector3f pos = tileTo3dCoords(building.getTile());
-				addToRender(building.getMesh().getMesh(), new RenderObject(
-						TextureUtils.getTextureByFileName(building.getMesh().getTextureFile(), gl), 
-						Matrix4f.getModelMatrix(pos, Matrix4f.identity(), new Vector3f(1.2f, 1.2f, 1.2f))));
+				addToRender(building.getMesh(), Matrix4f.getModelMatrix(pos, Matrix4f.identity(), new Vector3f(1.2f, 1.2f, 1.2f)));
 			}
 		}
 
@@ -418,9 +415,9 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			gl.glEnableVertexAttribArray(3);
 			gl.glActiveTexture(GL3.GL_TEXTURE0);
 			for(RenderObject obj : list) {
-
-				obj.texture.enable(gl);
-				obj.texture.bind(gl); 
+				Texture texture = TextureUtils.getTextureByFileName(obj.textureFile, gl);
+				texture.enable(gl);
+				texture.bind(gl); 
 				shader.setUniform("textureSampler", 0);
 				shader.setUniform("useTexture", 1f);
 				Matrix4f scaledModel = obj.model.multiply(Matrix4f.scale(new Vector3f(TerrainObject.FULL_TILE, TerrainObject.FULL_TILE, TerrainObject.FULL_TILE)));
@@ -429,8 +426,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				gl.glDrawElements(GL2.GL_TRIANGLES, mesh.getIndices().length, GL2.GL_UNSIGNED_INT, 0);
 				gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
 
-				gl.glBindTexture(obj.texture.getTarget(), 0);
-				obj.texture.disable(gl);
+				gl.glBindTexture(texture.getTarget(), 0);
+				texture.disable(gl);
 			}
 			gl.glDisableVertexAttribArray(0);
 			gl.glDisableVertexAttribArray(1);
