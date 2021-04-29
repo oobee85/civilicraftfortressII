@@ -10,7 +10,7 @@ import ui.graphics.*;
 import ui.graphics.opengl.*;
 import utils.*;
 
-public class BuildingType implements HasImage, HasMesh, Serializable {
+public class BuildingType implements HasMesh, Serializable {
 
 	private final String name;
 	private final String info;
@@ -78,28 +78,37 @@ public class BuildingType implements HasImage, HasMesh, Serializable {
 	public String getTextureFile() {
 		return textureFile;
 	}
-	@Override
-	public Image getImage(int size) {
-		return mipmap.getImage(size);
+	
+	public HasImage getHasImage() {
+		return mipmap;
 	}
-	@Override
-	public Image getShadow(int size) {
-		return mipmap.getShadow(size);
-	}
-	@Override
-	public Image getHighlight(int size) {
-		return mipmap.getHighlight(size);
-	}
-
-	@Override
-	public ImageIcon getImageIcon(int size) {
-		if(isRoad()) {
-			return new ImageIcon(roadImages.get(Direction.ALL_DIRECTIONS));
-		}
-		else {
-			return mipmap.getImageIcon(size);
-		}
-	}
+//	@Override
+//	public Image getImage(int size) {
+//		return mipmap.getImage(size);
+//	}
+//	@Override
+//	public Image getShadow(int size) {
+//		return mipmap.getShadow(size);
+//	}
+//	@Override
+//	public Image getHighlight(int size) {
+//		return mipmap.getHighlight(size);
+//	}
+//
+//	@Override
+//	public ImageIcon getImageIcon(int size) {
+//		if(isRoad()) {
+//			return new ImageIcon(roadImages.get(Direction.ALL_DIRECTIONS));
+//		}
+//		else {
+//			return mipmap.getImageIcon(size);
+//		}
+//	}
+//
+//	@Override
+//	public Color getColor(int size) {
+//		return mipmap.getColor(size);
+//	}
 
 	public boolean blocksMovement() {
 		return attributes.contains("blocksmovement");
@@ -135,11 +144,6 @@ public class BuildingType implements HasImage, HasMesh, Serializable {
 	}
 	public double getSpeed() {
 		return moveSpeedEnhancement;
-	}
-
-	@Override
-	public Color getColor(int size) {
-		return mipmap.getColor(size);
 	}
 
 	@Override

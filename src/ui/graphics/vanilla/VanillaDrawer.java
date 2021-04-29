@@ -502,9 +502,9 @@ public class VanillaDrawer extends Drawer {
 	private void drawPlannedThing(Graphics2D g) {
 		BufferedImage bI = null;
 		if (state.leftClickAction == LeftClickAction.PLAN_BUILDING) {
-			bI = Utils.toBufferedImage(state.selectedBuildingToPlan.getImage(frozenTileSize));
+			bI = Utils.toBufferedImage(state.selectedBuildingToPlan.getHasImage().getImage(frozenTileSize));
 		} else if (state.leftClickAction == LeftClickAction.SPAWN_THING) {
-			bI = Utils.toBufferedImage(state.selectedThingToSpawn.getImage(frozenTileSize));
+			bI = Utils.toBufferedImage(Utils.getImageFromThingType(state.selectedThingToSpawn).getImage(frozenTileSize));
 		}
 		if (bI != null) {
 			Utils.setTransparency(g, 0.5f);

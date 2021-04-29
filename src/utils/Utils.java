@@ -19,6 +19,18 @@ public final class Utils {
 	
 	public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	
+	public static HasImage getImageFromThingType(Object thingType) {
+		if(thingType instanceof UnitType) {
+			return ((UnitType)thingType);
+		}
+		else if(thingType instanceof BuildingType) {
+			return ((BuildingType)thingType).getHasImage();
+		}
+		else if(thingType instanceof PlantType) {
+			return ((PlantType)thingType);
+		}
+		return null;
+	}
 
 	public static String loadFileAsString(String path) {
 		StringBuilder result = new StringBuilder();

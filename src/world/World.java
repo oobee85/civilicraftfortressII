@@ -1449,8 +1449,8 @@ public class World {
 				minimapColor = tile.getResource().getType().getColor(0);
 			}
 			if(tile.getRoad() != null) {
-				terrainColor = tile.getRoad().getType().getColor(0);
-				minimapColor = tile.getRoad().getType().getColor(0);
+				terrainColor = tile.getRoad().getType().getHasImage().getColor(0);
+				minimapColor = tile.getRoad().getType().getHasImage().getColor(0);
 			}
 			if(tile.liquidAmount > 0) {
 				double alpha = Utils.getAlphaOfLiquid(tile.liquidAmount);

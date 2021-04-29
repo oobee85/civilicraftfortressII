@@ -35,7 +35,7 @@ public class MainMenuImageView extends JPanel {
 			index++;
 		}
 		for(BuildingType type : Game.buildingTypeList) {
-			if(draw(g, type, index, delta)) {
+			if(draw(g, type.getHasImage(), index, delta)) {
 				return;
 			}
 			index++;

@@ -54,7 +54,7 @@ public class SpawnUnitsView {
 		for (int i = 0; i < Game.buildingTypeList.size(); i++) {
 			BuildingType type = Game.buildingTypeList.get(i);
 			KButton button = KUIConstants.setupButton(null,
-					Utils.resizeImageIcon(type.getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width), (int)(SPAWN_BUTTON_SIZE.height)),
+					Utils.resizeImageIcon(type.getHasImage().getImageIcon(0), (int)(SPAWN_BUTTON_SIZE.width), (int)(SPAWN_BUTTON_SIZE.height)),
 					SPAWN_BUTTON_SIZE);
 			button.setBorder(KUIConstants.tinyBorder);
 			button.addActionListener(e -> {

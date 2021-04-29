@@ -71,7 +71,7 @@ public class GameView {
 		public boolean showTemperatureMap;
 		
 		public BuildingType selectedBuildingToPlan;
-		public HasImage selectedThingToSpawn;
+		public Object selectedThingToSpawn;
 		
 		public Faction faction = Faction.getTempFaction();
 		public ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
@@ -582,7 +582,7 @@ public class GameView {
 		}
 	}
 
-	public void setThingToSpawn(HasImage thingType) {
+	public void setThingToSpawn(Object thingType) {
 		state.leftClickAction = LeftClickAction.SPAWN_THING;
 		state.selectedThingToSpawn = thingType;
 	}

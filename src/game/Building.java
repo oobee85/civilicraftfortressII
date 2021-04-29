@@ -29,7 +29,7 @@ public class Building extends Thing implements Serializable {
 	private Inventory inventory;
 	
 	public Building(BuildingType buildingType, Tile tile, Faction faction) {
-		super(buildingType.getHealth(), buildingType, buildingType, faction, tile);
+		super(buildingType.getHealth(), buildingType.getHasImage(), buildingType, faction, tile);
 		this.remainingEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
 		this.spawnLocation = tile;
@@ -229,19 +229,19 @@ public class Building extends Thing implements Serializable {
 			}
 			@Override
 			public Image getShadow(int size) {
-				return getType().getShadow(size);
+				return getType().getHasImage().getShadow(size);
 			}
 			@Override
 			public Image getHighlight(int size) {
-				return getType().getHighlight(size);
+				return getType().getHasImage().getHighlight(size);
 			}
 			@Override
 			public ImageIcon getImageIcon(int size) {
-				return getType().getImageIcon(size);
+				return getType().getHasImage().getImageIcon(size);
 			}
 			@Override
 			public Color getColor(int size) {
-				return getType().getColor(size);
+				return getType().getHasImage().getColor(size);
 			}
 		};
 		super.setImage(hasImage);

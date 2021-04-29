@@ -398,8 +398,8 @@ public class Game {
 		}
 		int y = world.getHeight() - 18;
 		for(int x = 0; x < 5; x++) {
-			summonThing(world.get(new TileLoc(x, y)), Game.buildingTypeMap.get("WALL_WOOD"), cyclops);
-			summonThing(world.get(new TileLoc(world.getWidth() - x, y)), Game.buildingTypeMap.get("WALL_WOOD"), cyclops);
+			summonBuilding(world.get(new TileLoc(x, y)), Game.buildingTypeMap.get("WALL_WOOD"), cyclops);
+			summonBuilding(world.get(new TileLoc(world.getWidth() - x, y)), Game.buildingTypeMap.get("WALL_WOOD"), cyclops);
 		}
 		
 	}
@@ -453,11 +453,11 @@ public class Game {
 		spawnCyclops(tile);
 	}
 	public void spawnCyclops(Tile tile) {
-		summonThing(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y())), Game.buildingTypeMap.get("WATCHTOWER"), world.getFaction(World.CYCLOPS_FACTION_ID));
-		summonThing(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("GRANARY"), world.getFaction(World.CYCLOPS_FACTION_ID));
-		summonThing(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("BARRACKS"), world.getFaction(World.CYCLOPS_FACTION_ID));
-		summonThing(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("WINDMILL"), world.getFaction(World.CYCLOPS_FACTION_ID));
-		summonThing(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("MINE"), world.getFaction(World.CYCLOPS_FACTION_ID));
+		summonBuilding(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y())), Game.buildingTypeMap.get("WATCHTOWER"), world.getFaction(World.CYCLOPS_FACTION_ID));
+		summonBuilding(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("GRANARY"), world.getFaction(World.CYCLOPS_FACTION_ID));
+		summonBuilding(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("BARRACKS"), world.getFaction(World.CYCLOPS_FACTION_ID));
+		summonBuilding(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("WINDMILL"), world.getFaction(World.CYCLOPS_FACTION_ID));
+		summonBuilding(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("MINE"), world.getFaction(World.CYCLOPS_FACTION_ID));
 		
 		//makes the walls
 		for(int i = 0; i < 5; i++) {
@@ -467,9 +467,9 @@ public class Game {
 			}
 			Tile wall;
 			wall = world.get(new TileLoc(tile.getLocation().x()+3, tile.getLocation().y()-2 + i));
-			summonThing(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
+			summonBuilding(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
 			wall = world.get(new TileLoc(tile.getLocation().x()-3, tile.getLocation().y()-2 + i));
-			summonThing(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
+			summonBuilding(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
 		}
 		for(int i = 1; i < 6; i++) {
 			BuildingType type = Game.buildingTypeMap.get("WALL_WOOD");
@@ -485,11 +485,11 @@ public class Game {
 			yoffset /= 2;
 			
 			wall = world.get(new TileLoc(tile.getLocation().x()-3 + i, tile.getLocation().y()-2 - yoffset));
-			summonThing(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
+			summonBuilding(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
 
 			yoffset = yoffset + (tile.getLocation().x() + i)%2 - 2 - (tile.getLocation().x()%2);
 			wall = world.get(new TileLoc(tile.getLocation().x()-3 + i, tile.getLocation().y()+4 + yoffset));
-			summonThing(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
+			summonBuilding(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
 		}
 		
 		for(int i = -1; i < 2; i ++) {
@@ -684,7 +684,7 @@ public class Game {
 			newFaction.getInventory().addItem(ItemType.FOOD, 200);
 			world.addFaction(newFaction);
 			
-			LinkedList<HasImage> thingsToPlace = new LinkedList<>();
+			LinkedList<Object> thingsToPlace = new LinkedList<>();
 			thingsToPlace.add(Game.buildingTypeMap.get("CASTLE"));
 			thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 //			thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
@@ -706,28 +706,26 @@ public class Game {
 			
 			while(!thingsToPlace.isEmpty()) {
 				Tile current = tovisit.removeFirst();
-				HasImage thing = thingsToPlace.getFirst();
-				if(thing instanceof BuildingType) {
-					BuildingType type = (BuildingType)thing;
+				Object thingType = thingsToPlace.getFirst();
+				if(thingType instanceof BuildingType) {
+					BuildingType type = (BuildingType)thingType;
 					if (current.canBuild() == true 
 							&& !current.hasBuilding()
 							&& current.liquidAmount < current.liquidType.getMinimumDamageAmount()
 							&& current.getLocation().distanceTo(world.volcano) > 30
 							&& (current.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"))) {
-						Building building = new Building(type, current, newFaction);
-						current.setBuilding(building);
-						world.addBuilding(building);
-						building.setRemainingEffort(0);
-						thing = null;
+						summonBuilding(current, type, newFaction);
+						thingType = null;
+						
 					}
 				}
-				else if(thing instanceof UnitType) {
+				else if(thingType instanceof UnitType) {
 					if (current.liquidAmount < current.liquidType.getMinimumDamageAmount()) {
-						summonThing(current, thing, newFaction);
-						thing = null;
+						summonUnit(current, (UnitType)thingType, newFaction);
+						thingType = null;
 					}
 				}
-				if(thing == null) {
+				if(thingType == null) {
 					tovisit.clear();
 					visited.clear();
 					visited.add(current);
@@ -752,49 +750,65 @@ public class Game {
 		}
 	}
 	
-	public Thing summonThing(Tile tile, HasImage thingType, Faction faction) {
+	public Thing summonUnit(Tile tile, UnitType unitType, Faction faction) {
 		if(tile == null) {
 			return null;
 		}
+		if(faction.isPlayer()) {
+			Unit unit = new Unit(unitType, tile, faction);
+			world.addUnit(unit);
+			tile.addUnit(unit);
+			unit.setTimeToAttack(0);
+			return unit;
+		} else {
+			return world.spawnAnimal(unitType, tile, faction, null);
+		}
+	}
+	public Thing summonBuilding(Tile tile, BuildingType buildingType, Faction faction) {
+		if(tile == null) {
+			return null;
+		}
+		if(tile.getBuilding() != null) {
+			tile.getBuilding().setDead(true);
+		}
+		Building building = new Building(buildingType, tile, faction);
+		building.setRemainingEffort(0);
+		world.addBuilding(building);
+		if(buildingType.isRoad()) {
+			tile.setRoad(building);
+		}
+		else {
+			tile.setBuilding(building);
+		}
+		return building;
+	}
+	public Thing summonPlant(Tile tile, PlantType plantType, Faction faction) {
+		if(tile == null) {
+			return null;
+		}
+		if(tile.getPlant() != null) {
+			tile.getPlant().setDead(true);
+		}
+		Plant plant = new Plant(plantType, tile, faction);
+		world.addPlant(plant);
+		tile.setHasPlant(plant);
+		return plant;
+	
+	}
+	public Thing summonThing(Tile tile, Object thingType, Faction faction) {
 		if(thingType instanceof UnitType) {
-			UnitType unitType = (UnitType)thingType;
-			if(faction.isPlayer()) {
-				Unit unit = new Unit(unitType, tile, faction);
-				world.addUnit(unit);
-				tile.addUnit(unit);
-				unit.setTimeToAttack(0);
-				return unit;
-			} else {
-				return world.spawnAnimal(unitType, tile, faction, null);
-			}
+			return summonUnit(tile, (UnitType)thingType, faction);
 		}
 		else if(thingType instanceof BuildingType) {
-			BuildingType buildingType = (BuildingType)thingType;
-			if(tile.getBuilding() != null) {
-				tile.getBuilding().setDead(true);
-			}
-			Building building = new Building(buildingType, tile, faction);
-			building.setRemainingEffort(0);
-			world.addBuilding(building);
-			if(buildingType.isRoad()) {
-				tile.setRoad(building);
-			}
-			else {
-				tile.setBuilding(building);
-			}
-			return building;
+			return summonBuilding(tile, (BuildingType)thingType, faction);
 		}
 		else if(thingType instanceof PlantType) {
-			PlantType plantType = (PlantType)thingType;
-			if(tile.getPlant() != null) {
-				tile.getPlant().setDead(true);
-			}
-			Plant plant = new Plant(plantType, tile, faction);
-			world.addPlant(plant);
-			tile.setHasPlant(plant);
-			return plant;
+			return summonPlant(tile, (PlantType)thingType, faction);
 		}
-		return null;
+		else {
+			System.err.println("ERROR tried to summon invalid type: " + thingType);
+			return null;
+		}
 	}
 	
 	public void spawnWeather(Tile center, int radius) {
