@@ -32,6 +32,8 @@ public class Game {
 
 	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
 	public static boolean DISABLE_NIGHT = false;
+	// disables enemies and volcano
+	public static boolean EASY_MODE = true;
 	
 	private GUIController guiController;
 	public static final int howFarAwayStuffSpawn = 30;
@@ -39,16 +41,7 @@ public class Game {
 	
 	public Game(GUIController guiController) {
 		this.guiController = guiController;
-		
 		Loader.doTargetingMappings();
-		
-//		resources.get(ItemType.IRON_ORE).addAmount(200);
-//		resources.get(ItemType.COPPER_ORE).addAmount(200);
-//		resources.get(ItemType.HORSE).addAmount(200);
-//		resources.get(ItemType.FOOD).addAmount(2000);
-//		resources.get(ItemType.WOOD).addAmount(2000);
-//		resources.get(ItemType.ROCK).addAmount(2000);
-		
 	}
 	
 	public void saveToFile() {
@@ -60,8 +53,6 @@ public class Game {
 		if(World.days > 10 && Math.random() < 0.00001) {
 			meteorStrike();
 		}
-		
-		
 		world.rains();
 		
 		// rain event
@@ -74,8 +65,8 @@ public class Game {
 		
 		if(world.volcano != null) {
 			world.get(world.volcano).liquidType = LiquidType.LAVA;
-			if(World.days >= 10 && Math.random() < 0.0001) {
-//				eruptVolcano();
+			if(World.days >= 10 && Math.random() < 0.0001 && !EASY_MODE) {
+				eruptVolcano();
 			}
 		}
 	}
