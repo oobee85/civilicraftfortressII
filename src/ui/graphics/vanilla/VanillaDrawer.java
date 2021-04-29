@@ -795,7 +795,7 @@ public class VanillaDrawer extends Drawer {
 		if (building != null) {
 			Point drawAt = getDrawingCoords(building.getTile().getLocation());
 			for (Item item : building.getInventory().getItems()) {
-				if (item != null) {
+				if (item != null && item.getAmount() > 0) {
 					g.drawImage(item.getType().getMipMap().getImage(frozenTileSize/4), drawAt.x+(frozenTileSize/4*numDrawn), drawAt.y, null);
 					numDrawn ++;
 				}
@@ -804,7 +804,7 @@ public class VanillaDrawer extends Drawer {
 		if (unit != null) {
 			Point drawAt = getDrawingCoords(unit.getTile().getLocation());
 			for (Item item : unit.getInventory().getItems()) {
-				if (item != null) {
+				if (item != null && item.getAmount() > 0) {
 					g.drawImage(item.getType().getMipMap().getImage(frozenTileSize), drawAt.x+(frozenTileSize/4*numDrawn), drawAt.y, null);
 					numDrawn ++;
 				}

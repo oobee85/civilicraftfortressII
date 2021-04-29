@@ -507,7 +507,20 @@ public class GameView {
 				if (!shiftDown) {
 					unit.clearPlannedActions();
 				}
-				if (unit.getType().isBuilder()) {
+				if(unit.getType().isCaravan()) {
+					Building targetBuilding = targetTile.getBuilding();
+					if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
+							&& targetBuilding.isBuilt() && targetBuilding.getType().isCastle()) {
+						commandInterface.deliver(unit, targetBuilding, !shiftDown);
+					}
+					else if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
+							&& targetBuilding.isBuilt() && targetBuilding.getInventory().isEmpty() == false) {
+						commandInterface.takeItems(unit, targetBuilding, !shiftDown);
+					}else {
+						commandInterface.moveTo(unit, targetTile, !shiftDown);
+					}
+				}
+				else if (unit.getType().isBuilder()) {
 					Building targetBuilding = targetTile.getBuilding();
 					if (targetTile.getResource() != null) {
 

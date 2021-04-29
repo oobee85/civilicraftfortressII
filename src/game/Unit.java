@@ -39,7 +39,7 @@ public class Unit extends Thing implements Serializable {
 		this.inventory = new Inventory();
 		this.maxItemAmount = 20;
 		if(this.getType().isCaravan()) {
-			this.maxItemAmount = 100;
+			this.maxItemAmount = 1;
 		}
 	}
 	
@@ -69,10 +69,10 @@ public class Unit extends Thing implements Serializable {
 	}
 	
 	public boolean addItem(ItemType type, int amount) {
-		this.inventory.addItem(type, amount);
 		if(this.inventory.getItemAmount(type) >= this.maxItemAmount) {
 			return true;
 		}
+		this.inventory.addItem(type, amount);
 		return false;
 	}
 	public void setType(UnitType type) {
@@ -105,6 +105,10 @@ public class Unit extends Thing implements Serializable {
 		return null;
 	}
 	public void queuePlannedAction(PlannedAction plan) {
+		if(this.isSelected()) {
+			System.out.println("queued action: " + plan.type);
+		}
+		
 		actionQueue.add(plan);
 	}
 	public void clearCompletedPlannedActions() {
@@ -313,12 +317,35 @@ public class Unit extends Thing implements Serializable {
 			this.queuePlannedAction(new PlannedAction(attacker));
 		}
 	}
+
 	public Building getNearestBuildingToDeliver() {
-		Building bestBuilding = (Building) this.getFaction().getBuildings().toArray()[0];
+		Building bestBuilding = null;
+		for (Building building : this.getFaction().getBuildings()) {
+			if ((building.getType().isColony() || building.getType().isCastle())) {
+				if(bestBuilding == null) {
+					bestBuilding = building;
+				}
+				if (this.getTile().getLocation().distanceTo(building.getTile().getLocation()) < 
+						this.getTile().getLocation().distanceTo(bestBuilding.getTile().getLocation())) {
+					bestBuilding = building;
+				}
+			}
+		}
+		return bestBuilding;
+	}
+	public Building getNearestCastleToDeliver() {
+		Building bestBuilding = null;
 		for(Building building: this.getFaction().getBuildings()) {
-			if((building.getType().isColony() || building.getType().isCastle()) && this.getTile().getLocation().distanceTo(building.getTile().getLocation()) < 
-					this.getTile().getLocation().distanceTo(bestBuilding.getTile().getLocation())) {
-				bestBuilding = building;
+			
+			if((building.getType().isCastle())) {
+				if(bestBuilding == null) {
+					bestBuilding = building;
+				}
+				if(this.getTile().getLocation().distanceTo(building.getTile().getLocation()) < 
+						this.getTile().getLocation().distanceTo(bestBuilding.getTile().getLocation())) {
+					bestBuilding = building;
+				}
+				
 			}
 				
 		}
@@ -377,6 +404,7 @@ public class Unit extends Thing implements Serializable {
 			Building building = (Building) target;
 			this.inventory.takeAll(building.getInventory());
 		}
+		action.setDone(true);
 	}
 	public void doDelivery(PlannedAction action, Thing target) {
 		if(target instanceof Building) {
@@ -503,7 +531,7 @@ public class Unit extends Thing implements Serializable {
 				this.doHarvest((Plant)plan.target, plan);
 				
 			}
-			else if(plan.isDeliverAction() && unitType.isBuilder() && inRange(plan.target)) {
+			else if(plan.isDeliverAction() && inRange(plan.target)) {
 				this.doDelivery(plan, plan.target);
 				
 			}
@@ -549,9 +577,15 @@ public class Unit extends Thing implements Serializable {
 		if(finished.isHarvestAction()) {
 			Building building = getNearestBuildingToDeliver();
 			this.queuePlannedAction(new PlannedAction(building, PlannedAction.DELIVER, new PlannedAction(finished.target, PlannedAction.HARVEST)));
-	
+		}
+		else if(finished.isTakeAction()) {
+			Building castle = getNearestCastleToDeliver();
+			this.queuePlannedAction(new PlannedAction(castle, PlannedAction.DELIVER, new PlannedAction(finished.target, PlannedAction.TAKE)));
 		}else if(finished.isDeliverAction()) {
 			PlannedAction followup = finished.getFollowUp();
+			if(followup == null) {
+				return;
+			}
 			//delivery
 			if(followup.target instanceof Plant) {
 				Plant oldTarget = (Plant)followup.target;
@@ -567,8 +601,6 @@ public class Unit extends Thing implements Serializable {
 //				if(oldTarget.isDead()) {
 //
 //				}
-			}else if(finished.isTakeAction()) {
-				
 			}
 			
 			this.queuePlannedAction(followup);

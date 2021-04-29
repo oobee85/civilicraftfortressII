@@ -170,6 +170,16 @@ public class Client {
 				localCommands.harvestThing(unit, target, clearQueue);
 			}
 			@Override
+			public void deliver(Unit unit, Thing target, boolean clearQueue) {
+				sendMessage(CommandMessage.makeDeliverCommand(unit.id(), target.id(), clearQueue));
+				localCommands.deliver(unit, target, clearQueue);
+			}
+			@Override
+			public void takeItems(Unit unit, Thing target, boolean clearQueue) {
+				sendMessage(CommandMessage.makeTakeItemsCommand(unit.id(), target.id(), clearQueue));
+				localCommands.takeItems(unit, target, clearQueue);
+			}
+			@Override
 			public void stop(Unit unit) {
 				sendMessage(CommandMessage.makeStopCommand(unit.id()));
 				localCommands.stop(unit);

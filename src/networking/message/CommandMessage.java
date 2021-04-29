@@ -52,6 +52,22 @@ public class CommandMessage implements Externalizable {
 		msg.clearQueue = clearQueue;
 		return msg;
 	}
+	public static CommandMessage makeDeliverCommand(int thingID, int targetID, boolean clearQueue) {
+		CommandMessage msg = new CommandMessage();
+		msg.command = CommandType.DELIVER;
+		msg.thingID = thingID;
+		msg.targetID = targetID;
+		msg.clearQueue = clearQueue;
+		return msg;
+	}
+	public static CommandMessage makeTakeItemsCommand(int thingID, int targetID, boolean clearQueue) {
+		CommandMessage msg = new CommandMessage();
+		msg.command = CommandType.TAKEITEMS;
+		msg.thingID = thingID;
+		msg.targetID = targetID;
+		msg.clearQueue = clearQueue;
+		return msg;
+	}
 	public static CommandMessage makeBuildRoadCommand(int thingID, TileLoc target, boolean clearQueue) {
 		CommandMessage msg = new CommandMessage();
 		msg.command = CommandType.BUILD_ROAD;

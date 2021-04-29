@@ -22,7 +22,14 @@ public class Inventory {
 			}
 		}
 	}
-	
+	public boolean isEmpty() {
+		for(Item item: items) {
+			if(item != null && item.getAmount() != 0) {
+				return false;
+			}
+		}
+		return true;
+	}
 	public void addItem(ItemType type, int amount) {
 		if(items[type.ordinal()] == null) {
 			this.setAmount(type, 0);

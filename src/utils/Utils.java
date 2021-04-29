@@ -581,6 +581,20 @@ public final class Utils {
 				unit.queuePlannedAction(new PlannedAction(target, PlannedAction.HARVEST));
 			}
 			@Override
+			public void deliver(Unit unit, Thing target, boolean clearQueue) {
+				if(clearQueue) {
+					unit.clearPlannedActions();
+				}
+				unit.queuePlannedAction(new PlannedAction(target, PlannedAction.DELIVER));
+			}
+			@Override
+			public void takeItems(Unit unit, Thing target, boolean clearQueue) {
+				if(clearQueue) {
+					unit.clearPlannedActions();
+				}
+				unit.queuePlannedAction(new PlannedAction(target, PlannedAction.TAKE));
+			}
+			@Override
 			public Building planBuilding(Unit unit, Tile target, boolean clearQueue, BuildingType buildingType) {
 				if(clearQueue) {
 					unit.clearPlannedActions();
