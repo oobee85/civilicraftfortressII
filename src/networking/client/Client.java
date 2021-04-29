@@ -433,7 +433,7 @@ public class Client {
 		if(existing instanceof Plant) {
 			Plant existingPlant = (Plant)existing;
 			Plant plantUpdate = (Plant)update;
-			existingPlant.setPlantType(plantUpdate.getType());
+			existingPlant.setType(plantUpdate.getType());
 		}
 		else if(update instanceof Building) {
 			Building existingBuilding = (Building)existing;

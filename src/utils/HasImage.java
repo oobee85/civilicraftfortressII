@@ -8,6 +8,6 @@ public interface HasImage {
 	public Image getImage(int size);
 	public Image getShadow(int size);
 	public Image getHighlight(int size);
-    public ImageIcon getImageIcon(int size);
-    public Color getColor(int size);
+	public ImageIcon getImageIcon(int size);
+	public Color getColor(int size);
 }

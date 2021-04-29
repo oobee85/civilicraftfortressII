@@ -999,11 +999,11 @@ public class World {
 			if(plant.getTile().isCold() == true) {
 				continue;
 			}
-			if(plant.getType() == PlantType.FOREST1) {
+			if(plant.getType() == PlantType.TREE) {
 				if(Math.random() < 0.02) {
 					for(Tile tile : plant.getTile().getNeighbors()) {
 						if(tile.getPlant() == null && tile.canPlant()) {
-							tile.setHasPlant(new Plant(PlantType.FOREST1, tile, getFaction(NO_FACTION_ID)));
+							tile.setHasPlant(new Plant(PlantType.TREE, tile, getFaction(NO_FACTION_ID)));
 							worldData.addPlant(tile.getPlant());
 							break;
 						}
@@ -1269,7 +1269,7 @@ public class World {
 				visited.put(ti, ti.getLocation().distanceTo(t.getLocation()) + Math.random() * 10);
 				search.add(ti);
 			}
-			if(type == PlantType.FOREST1) {
+			if(type == PlantType.TREE) {
 				if ((potential.canPlant() || type.isDesertResistant()) && potential.getPlant() == null && potential.getTerrain() != Terrain.DIRT) {
 					Plant plant = new Plant(type, potential, getFaction(NO_FACTION_ID));
 					potential.setHasPlant(plant);
@@ -1298,7 +1298,7 @@ public class World {
 			}
 			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < t.liquidType.getMinimumDamageAmount() / 2)
 				if (Math.random() < tempDensity) {
-					makePlantVein(t, PlantType.FOREST1, 30);
+					makePlantVein(t, PlantType.TREE, 30);
 //					Plant plant = new Plant(PlantType.FOREST1, t, getFaction(NO_FACTION_ID));
 //					t.setHasPlant(plant);
 //					worldData.addPlant(plant);

@@ -24,7 +24,7 @@ public enum PlantType implements HasImage, HasMesh {
 			MeshUtils.cattail, 
 			"textures/pallet1.png",
 			false, 1.0, 50, true, ItemType.FOOD),
-	FOREST1 ( new String[] {"Images/plants/tree1.png"},
+	TREE ( new String[] {"Images/plants/tree1.png"},
 			MeshUtils.getMeshByFileName("models/square_tree.ply"), 
 			"Images/plants/tree1.png",
 			false, 1, 100, false, ItemType.WOOD),

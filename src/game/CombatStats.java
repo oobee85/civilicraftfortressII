@@ -1,7 +1,6 @@
 package game;
 
 import java.io.*;
-import java.util.*;
 
 public class CombatStats implements Serializable {
 

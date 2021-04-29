@@ -22,7 +22,7 @@ public class Plant extends Thing implements Serializable {
 	public PlantType getType() {
 		return plantType;
 	}
-	public void setPlantType(PlantType type) {
+	public void setType(PlantType type) {
 		this.plantType = type;
 	}
 	
