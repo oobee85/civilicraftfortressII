@@ -1,22 +1,16 @@
 package game;
-import java.awt.Color;
-import java.awt.Image;
 import java.io.*;
 import java.util.*;
 
-import javax.swing.ImageIcon;
-
-import ui.graphics.*;
 import ui.graphics.opengl.*;
 import utils.*;
 import utils.Loader.*;
 
-public class UnitType implements HasMesh, Serializable {
+public class UnitType implements Serializable {
 	
 	private final String name;
 	private transient final MipMap mipmap;
-	private transient final Mesh mesh;
-	private transient final String textureFile;
+	private transient final TexturedMesh mesh;
 	private transient final CombatStats combatStats;
 	private transient final HashSet<String> attributes;
 	private transient final HashMap <ItemType, Integer> cost;
@@ -29,8 +23,7 @@ public class UnitType implements HasMesh, Serializable {
 	public UnitType(String name, String image, Mesh mesh, String textureFile, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles) {
 		this.name = name;
 		this.mipmap = new MipMap(image);
-		this.mesh = mesh;
-		this.textureFile = textureFile;
+		this.mesh = new TexturedMesh(mesh, textureFile);
 		this.combatStats = cs;
 		this.attributes = attributes;
 		this.cost = resourcesNeeded;
@@ -103,13 +96,8 @@ public class UnitType implements HasMesh, Serializable {
 		return cost;
 	}
 	
-	@Override
-	public Mesh getMesh() {
+	public TexturedMesh getMesh() {
 		return mesh;
-	}
-	@Override
-	public String getTextureFile() {
-		return textureFile;
 	}
 
 	public MipMap getMipMap() {

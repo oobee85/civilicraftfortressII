@@ -291,32 +291,32 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	
 	public void renderAxis(GL3 gl, Shader shader) {
 		MeshUtils.x.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
 				new Vector3f(-20, 0, 0), 
 				Matrix4f.rotate(90, new Vector3f(0, 0, 1)), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.x.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
 				new Vector3f(5, 0, 0), 
 				Matrix4f.rotate(90, new Vector3f(0, 0, 1)), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.y.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
 				new Vector3f(0, -20, 0), 
 				Matrix4f.identity(), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.y.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
 				new Vector3f(0, 5, 0), 
 				Matrix4f.identity(), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.z.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
 				new Vector3f(0, 0, -20), 
 				Matrix4f.rotate(90, new Vector3f(0, 1, 0)), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.z.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
 				new Vector3f(0, 0, 5), 
 				Matrix4f.rotate(90, new Vector3f(0, 1, 0)), 
 				new Vector3f(.1f, .1f, .1f));
@@ -350,8 +350,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				scale.z = scale.z * (2f + 0.1f*(plant.getTile().getLocation().x()%7) + 0.1f*(plant.getTile().getLocation().y()%13));
 			}
 			
-			addToRender(plant.getMesh(), new RenderObject(
-					TextureUtils.getTextureByFileName(plant.getTextureFile(), gl), 
+			addToRender(plant.getMesh().getMesh(), new RenderObject(
+					TextureUtils.getTextureByFileName(plant.getMesh().getTextureFile(), gl), 
 					Matrix4f.getModelMatrix(pos, Matrix4f.identity(), scale)));
 		}
 		UnitType dragonType = Game.unitTypeMap.get("DRAGON");
@@ -368,21 +368,21 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			if(unit.getType().isFlying()) {
 				pos.z += 3;
 			}
-			addToRender(unit.getMesh(), new RenderObject(
-					TextureUtils.getTextureByFileName(unit.getTextureFile(), gl), 
+			addToRender(unit.getMesh().getMesh(), new RenderObject(
+					TextureUtils.getTextureByFileName(unit.getMesh().getTextureFile(), gl), 
 					Matrix4f.getModelMatrix(pos, Matrix4f.identity(), scale)));
 		}
 		for(Building building : game.world.getBuildings()) {
 			if(building.getType().blocksMovement()) {
 				Vector3f pos = tileLocTo3dCoords(building.getTile().getLocation(), building.getTile().getHeight() + Liquid.WALL_HEIGHT);
 				addToRender(terrainObject.liquid, new RenderObject(
-						TextureUtils.getTextureByFileName(building.getTextureFile(), gl), 
+						TextureUtils.getTextureByFileName(building.getMesh().getTextureFile(), gl), 
 						Matrix4f.getModelMatrix(pos, Matrix4f.identity(), new Vector3f(1, 1, 1))));
 			}
 			else {
 				Vector3f pos = tileTo3dCoords(building.getTile());
-				addToRender(building.getMesh(), new RenderObject(
-						TextureUtils.getTextureByFileName(building.getTextureFile(), gl), 
+				addToRender(building.getMesh().getMesh(), new RenderObject(
+						TextureUtils.getTextureByFileName(building.getMesh().getTextureFile(), gl), 
 						Matrix4f.getModelMatrix(pos, Matrix4f.identity(), new Vector3f(1.2f, 1.2f, 1.2f))));
 			}
 		}
@@ -398,7 +398,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			Vector3f pos = tileLocTo3dCoords(projectile.getTile().getLocation(), height);
 //			Vector3f pos = tileTo3dCoords(projectile.getTile());
 			
-			MeshUtils.getMeshByFileName("models/bomb.ply").render(gl, shader, TextureUtils.getTextureByFileName(PlantType.BERRY.getTextureFile(), gl), pos, Matrix4f.identity(), vector);
+			MeshUtils.getMeshByFileName("models/bomb.ply").render(gl, shader, TextureUtils.getTextureByFileName(PlantType.BERRY.getMesh().getTextureFile(), gl), pos, Matrix4f.identity(), vector);
 		}
 
 		if(!state.fpMode && game.world.get(state.hoveredTile) != null) {

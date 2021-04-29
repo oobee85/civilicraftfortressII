@@ -8,7 +8,7 @@ import ui.graphics.*;
 import ui.graphics.opengl.*;
 import utils.*;
 
-public enum LiquidType implements HasMesh {
+public enum LiquidType {
 		DRY(new String[] {"Images/liquid/lavaanim32.gif"}, "Images/liquid/lavaanim32.gif",
 				0f, 1000f, 1000f, 5f, 0.08f, 0f, false),
 		WATER(new String[] {"Images/liquid/watermoving.gif"}, "Images/liquid/watermoving.gif",
@@ -65,11 +65,7 @@ public enum LiquidType implements HasMesh {
 	public String toString() {
 		return Utils.getName(this);
 	}
-	@Override
-	public Mesh getMesh() {
-		return null;
-	}
-	@Override
+	
 	public String getTextureFile() {
 		return textureFile;
 	}

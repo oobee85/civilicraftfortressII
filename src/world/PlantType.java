@@ -10,7 +10,7 @@ import ui.graphics.*;
 import ui.graphics.opengl.*;
 import utils.*;
 
-public enum PlantType implements HasMesh {
+public enum PlantType {
 	
 	BERRY ( new String[] {"Images/plants/berry16.png"}, 
 			MeshUtils.cube, 
@@ -36,8 +36,7 @@ public enum PlantType implements HasMesh {
 	
 	private double rarity;
 	private MipMap mipmap;
-	private Mesh mesh;
-	private String textureFile;
+	private TexturedMesh mesh;
 	private double health;	
 	private boolean aquatic;
 	private ItemType itemType;
@@ -48,8 +47,7 @@ public enum PlantType implements HasMesh {
 		this.health = health;
 		this.aquatic = aquatic;
 		mipmap = new MipMap(s);
-		this.mesh = mesh;
-		this.textureFile = textureFile;
+		this.mesh = new TexturedMesh(mesh, textureFile);
 		this.itemType = itemType;
 		this.desertResistant = desertResistant;
 		
@@ -58,13 +56,8 @@ public enum PlantType implements HasMesh {
 	public boolean isDesertResistant() {
 		return desertResistant;
 	}
-	@Override
-	public Mesh getMesh() {
+	public TexturedMesh getMesh() {
 		return mesh;
-	}
-	@Override
-	public String getTextureFile() {
-		return textureFile;
 	}
 	
 	public MipMap getMipMap() {

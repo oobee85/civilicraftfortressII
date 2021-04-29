@@ -31,7 +31,7 @@ public class Unit extends Thing implements Serializable {
 	private Inventory inventory;
 	
 	public Unit(UnitType unitType, Tile tile, Faction faction) {
-		super(unitType.getCombatStats().getHealth(), unitType.getMipMap(), unitType, faction, tile);
+		super(unitType.getCombatStats().getHealth(), unitType.getMipMap(), unitType.getMesh(), faction, tile);
 		this.unitType = unitType;
 		this.combatStats = unitType.getCombatStats();
 		this.timeToHeal = unitType.getCombatStats().getHealSpeed();

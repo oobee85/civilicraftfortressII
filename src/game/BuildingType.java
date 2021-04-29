@@ -10,14 +10,13 @@ import ui.graphics.*;
 import ui.graphics.opengl.*;
 import utils.*;
 
-public class BuildingType implements HasMesh, Serializable {
+public class BuildingType implements Serializable {
 
 	private final String name;
 	private final String info;
 	private transient final int health;
 	private transient final MipMap mipmap;
-	private transient final Mesh mesh;
-	private transient final String textureFile;
+	private transient final TexturedMesh mesh;
 	private transient final double moveSpeedEnhancement;
 	private transient final int visionRadius;
 	private transient final String researchRequirement;
@@ -36,8 +35,7 @@ public class BuildingType implements HasMesh, Serializable {
 		this.name = name;
 		this.info = info;
 		mipmap = new MipMap(texturePath);
-		this.mesh = mesh;
-		this.textureFile = textureFile;
+		this.mesh = new TexturedMesh(mesh, textureFile);
 		this.researchRequirement = requirement;
 		this.health = hp;
 		this.cultureRate = cultureRate;
@@ -70,13 +68,8 @@ public class BuildingType implements HasMesh, Serializable {
 	public Image getRoadImage(String roadCorner) {
 		return roadImages.get(roadCorner);
 	}
-	@Override
-	public Mesh getMesh() {
+	public TexturedMesh getMesh() {
 		return mesh;
-	}
-	@Override
-	public String getTextureFile() {
-		return textureFile;
 	}
 	
 	public MipMap getMipMap() {

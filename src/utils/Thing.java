@@ -1,20 +1,14 @@
 package utils;
-import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
 
-import javax.swing.*;
-
-import com.jogamp.opengl.util.texture.*;
-
 import game.*;
 import networking.server.*;
-import ui.graphics.*;
 import ui.graphics.opengl.*;
 import world.*;
 
-public class Thing implements HasMesh, Serializable {
+public class Thing implements Serializable {
 	
 	private transient static int idCounter = 0;
 	private int id;
@@ -29,33 +23,26 @@ public class Thing implements HasMesh, Serializable {
 	private transient boolean isSelected;
 	
 	private transient MipMap mipmap;
-	private transient Mesh mesh;
-	private transient String textureFile;
+	private transient TexturedMesh mesh;
 	
 	private transient Hitsplat[] hitsplats = new Hitsplat[4];
 	
-	public Thing(double maxHealth, MipMap mipmap, HasMesh hasMesh, Faction faction) {
+	public Thing(double maxHealth, MipMap mipmap, TexturedMesh hasMesh, Faction faction) {
 		health = maxHealth;
 		this.maxHealth = maxHealth;
 		this.mipmap = mipmap;
-		this.mesh = hasMesh.getMesh();
-		this.textureFile = hasMesh.getTextureFile();
+		this.mesh = hasMesh;
 		setFaction(faction);
 		this.id = idCounter++;
 		ThingMapper.created(this);
 	}
-	public Thing(double maxHealth, MipMap mipmap, HasMesh hasMesh, Faction faction, Tile tile) {
+	public Thing(double maxHealth, MipMap mipmap, TexturedMesh hasMesh, Faction faction, Tile tile) {
 		this(maxHealth, mipmap, hasMesh, faction);
 		this.tile = tile;
 	}
 	
-	@Override
-	public Mesh getMesh() {
+	public TexturedMesh getMesh() {
 		return mesh;
-	}
-	@Override
-	public String getTextureFile() {
-		return textureFile;
 	}
 	
 	public int id() {
