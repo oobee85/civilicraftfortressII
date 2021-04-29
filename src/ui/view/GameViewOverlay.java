@@ -116,7 +116,7 @@ public class GameViewOverlay extends JPanel {
 		}
 	}
 	private JButton setupUnitButton(Unit unit) {
-		KButton button = new KButton(null, Utils.resizeImageIcon(unit.getImageIcon(10), 30, 30)) {
+		KButton button = new KButton(null, Utils.resizeImageIcon(unit.getHasImage().getImageIcon(10), 30, 30)) {
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);

@@ -1458,12 +1458,12 @@ public class World {
 				terrainColor = Utils.blendColors(tile.liquidType.getColor(0), terrainColor, alpha);
 			}
 			if(tile.getPlant() != null) {
-				terrainColor = tile.getPlant().getColor(0);
-				minimapColor = tile.getPlant().getColor(0);
+				terrainColor = tile.getPlant().getHasImage().getColor(0);
+				minimapColor = tile.getPlant().getHasImage().getColor(0);
 			}
 			if(tile.hasBuilding()) {
-				terrainColor = tile.getBuilding().getColor(0);
-				minimapColor = tile.getBuilding().getColor(0);
+				terrainColor = tile.getBuilding().getHasImage().getColor(0);
+				minimapColor = tile.getBuilding().getHasImage().getColor(0);
 			}
 			if(tile.getModifier() != null) {
 				minimapColor = tile.getModifier().getType().getColor(0);

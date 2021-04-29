@@ -5,7 +5,8 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 
-import game.liquid.*;
+import javax.swing.*;
+
 import utils.*;
 import world.*;
 
@@ -35,6 +36,7 @@ public class Building extends Thing implements Serializable {
 		this.timeToHarvest = baseTimeToHarvest;
 		this.isPlanned = false;
 		this.inventory = new Inventory();
+		setRoadCorner(Direction.ALL_DIRECTIONS);
 	}
 	public void setPlanned(boolean planned) {
 		isPlanned = planned;
@@ -216,18 +218,33 @@ public class Building extends Thing implements Serializable {
 		}
 		return strings;
 	}
-	private String roadCorner;
-	public void setRoadCorner(String s) {
-		roadCorner = s;
-	}
-	@Override
-	public Image getImage(int size) {
-		if(getType().isRoad()) {
-			return getType().getRoadImage(roadCorner);
+	public void setRoadCorner(String roadCorner) {
+		if(!getType().isRoad()) {
+			return;
 		}
-		else {
-			return super.getImage(size);
-		}
+		HasImage hasImage = new HasImage() {
+			@Override
+			public Image getImage(int size) {
+				return getType().getRoadImage(roadCorner);
+			}
+			@Override
+			public Image getShadow(int size) {
+				return getType().getShadow(size);
+			}
+			@Override
+			public Image getHighlight(int size) {
+				return getType().getHighlight(size);
+			}
+			@Override
+			public ImageIcon getImageIcon(int size) {
+				return getType().getImageIcon(size);
+			}
+			@Override
+			public Color getColor(int size) {
+				return getType().getColor(size);
+			}
+		};
+		super.setImage(hasImage);
 	}
 	
 	@Override

@@ -3,8 +3,6 @@ import java.awt.*;
 
 import javax.swing.*;
 
-import ui.graphics.opengl.*;
-
 public class MipMap implements HasImage {
 	
 	private static final Color HIGHLIGHT_COLOR = Color.yellow;

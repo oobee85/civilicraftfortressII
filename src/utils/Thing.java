@@ -14,7 +14,7 @@ import ui.graphics.*;
 import ui.graphics.opengl.*;
 import world.*;
 
-public class Thing implements HasImage, HasMesh, Serializable {
+public class Thing implements HasMesh, Serializable {
 	
 	private transient static int idCounter = 0;
 	private int id;
@@ -197,25 +197,8 @@ public class Thing implements HasImage, HasMesh, Serializable {
 		return tile;
 	}
 	
-	@Override
-	public Image getImage(int size) {
-		return hasImage.getImage(size);
-	}
-	@Override
-	public Image getShadow(int size) {
-		return hasImage.getShadow(size);
-	}
-	@Override
-	public Image getHighlight(int size) {
-		return hasImage.getHighlight(size);
-	}
-	@Override
-	public ImageIcon getImageIcon(int size) {
-		return hasImage.getImageIcon(size);
-	}
-	@Override
-	public Color getColor(int size) {
-		return hasImage.getColor(size);
+	public HasImage getHasImage() {
+		return hasImage;
 	}
 	
 	public List<String> getDebugStrings() {

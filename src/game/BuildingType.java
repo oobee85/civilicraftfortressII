@@ -80,12 +80,7 @@ public class BuildingType implements HasImage, HasMesh, Serializable {
 	}
 	@Override
 	public Image getImage(int size) {
-		if(isRoad()) {
-			return roadImages.get(Direction.ALL_DIRECTIONS);
-		}
-		else {
-			return mipmap.getImage(size);
-		}
+		return mipmap.getImage(size);
 	}
 	@Override
 	public Image getShadow(int size) {

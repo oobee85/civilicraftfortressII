@@ -694,13 +694,12 @@ public class VanillaDrawer extends Drawer {
 				}
 			}
 			if (theTile.getPlant() != null) {
-				Plant p = theTile.getPlant();
-				g.drawImage(p.getImage(frozenTileSize), drawAt.x, drawAt.y, draww, drawh, null);
+				g.drawImage(theTile.getPlant().getHasImage().getImage(frozenTileSize), drawAt.x, drawAt.y, draww, drawh, null);
 			}
 
 			if (theTile.getBuilding() != null) {
 				if (theTile.getBuilding().isSelected()) {
-					g.drawImage(theTile.getBuilding().getHighlight(frozenTileSize), drawAt.x, drawAt.y, draww, drawh,
+					g.drawImage(theTile.getBuilding().getHasImage().getHighlight(frozenTileSize), drawAt.x, drawAt.y, draww, drawh,
 							null);
 				}
 				drawBuilding(theTile.getBuilding(), g, drawAt.x, drawAt.y, draww, drawh);
@@ -723,7 +722,7 @@ public class VanillaDrawer extends Drawer {
 //		}
 		
 		if (unit.isSelected()) {
-			g.drawImage(unit.getHighlight(frozenTileSize), drawx, drawy, draww, drawh, null);
+			g.drawImage(unit.getHasImage().getHighlight(frozenTileSize), drawx, drawy, draww, drawh, null);
 		}
 //		if(path != null && path.peek() != null) {
 //			Tile targetTile = path.peek();
@@ -746,7 +745,7 @@ public class VanillaDrawer extends Drawer {
 //			}
 //			g.drawImage(unit.getImage(frozenTileSize), (int)(drawx + drawx - dx), (int)(drawy + drawy - dy), draww, drawh, null);
 //		}else {
-			g.drawImage(unit.getImage(frozenTileSize), drawx, drawy, draww, drawh, null);
+			g.drawImage(unit.getHasImage().getImage(frozenTileSize), drawx, drawy, draww, drawh, null);
 //		}
 		
 		
@@ -762,7 +761,7 @@ public class VanillaDrawer extends Drawer {
 	
 	private void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh) {
 
-		BufferedImage bI = Utils.toBufferedImage(building.getImage(0));
+		BufferedImage bI = Utils.toBufferedImage(building.getHasImage().getImage(0));
 		if (building.isBuilt() == false) {
 			// draws the transparent version
 			Utils.setTransparency(g, 0.5f);
