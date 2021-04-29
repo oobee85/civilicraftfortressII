@@ -10,7 +10,6 @@ import java.util.*;
 import networking.message.*;
 import networking.server.*;
 import ui.*;
-import ui.view.SpawnUnitsView;
 import utils.*;
 import wildlife.*;
 import world.*;
@@ -18,8 +17,6 @@ import world.*;
 public class Game {
 	
 	public static boolean DEBUG = false;
-	
-	public static final CombatStats combatBuffs = new CombatStats(0, 0, 0, 0);
 
 	public static final ArrayList<UnitType> unitTypeList = new ArrayList<>();
 	public static final HashMap<String, UnitType> unitTypeMap = new HashMap<>();
@@ -33,7 +30,8 @@ public class Game {
 	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
 	public static boolean DISABLE_NIGHT = false;
 	// disables enemies and volcano
-	public static boolean EASY_MODE = true;
+	public static boolean DISABLE_ENEMY_SPAWNS = true;
+	public static boolean DISABLE_VOLCANO_ERUPT = true;
 	
 	private GUIController guiController;
 	public static final int howFarAwayStuffSpawn = 30;
@@ -65,7 +63,7 @@ public class Game {
 		
 		if(world.volcano != null) {
 			world.get(world.volcano).liquidType = LiquidType.LAVA;
-			if(World.days >= 10 && Math.random() < 0.0001 && !EASY_MODE) {
+			if(World.days >= 10 && Math.random() < 0.0001 && !DISABLE_VOLCANO_ERUPT) {
 				eruptVolcano();
 			}
 		}
@@ -123,8 +121,6 @@ public class Game {
 			Liquid.propogate(world);
 		}
 
-		
-		// Remove dead things
 		world.clearDeadAndAddNewThings();
 		
 		buildingTick();
@@ -135,11 +131,15 @@ public class Game {
 		}
 		
 		if(World.ticks % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
-//			dayEvents();
+			if(!DISABLE_ENEMY_SPAWNS) {
+				dayEvents();
+			}
 			World.days ++;
 		}
 		if((World.ticks + World.DAY_DURATION) % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
-//			nightEvents();
+			if(!DISABLE_ENEMY_SPAWNS) {
+				nightEvents();
+			}
 			World.nights ++;
 		}
 		world.doWeatherUpdate();
@@ -295,12 +295,6 @@ public class Game {
 			}
 			System.out.println(number + " vampire");
 		}
-	}
-	public void addCombatBuff(CombatStats cs) {
-		combatBuffs.combine(cs);
-	}
-	public CombatStats getCombatBuffs() {
-		return combatBuffs;
 	}
 	public void addResources(Faction faction) {
 		for(ItemType itemType : ItemType.values()) {
