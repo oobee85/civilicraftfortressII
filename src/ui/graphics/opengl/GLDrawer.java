@@ -176,9 +176,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			ambientColor.set(ambient, ambient, ambient);
 
 			renderSkybox(gl, skyboxShader, multiplier);
-			shader.bind(gl);
 			renderStuff(gl, shader);
-			shader.unbind(gl);
 			renderLiquids(gl, liquidShader);
 		}
 		
@@ -326,6 +324,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	}
 	
 	public void renderStuff(GL3 gl, Shader shader) {
+		shader.bind(gl);
 		clearToRender();
 		shader.setUniform("projection", projection);
 		shader.setUniform("view", camera.getView());
@@ -441,6 +440,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			Vector3f pos = tileTo3dCoords(thing.getTile());
 			hoveredTileBox.render(gl, shader, TextureUtils.ERROR_TEXTURE, pos, Matrix4f.identity(), new Vector3f(1, 1, 1));
 		}
+		shader.unbind(gl);
 	}
 	
 	@Override
