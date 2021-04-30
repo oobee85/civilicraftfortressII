@@ -30,9 +30,10 @@ public class Client {
 	private CommandInterface networkingCommands;
 	private volatile Object updatedTerrain = new Object();
 	private HashMap<Integer, Thing> things = new HashMap<>();
+	
 	private ArrayList<AIInterface> ailist = new ArrayList<>();
-	private static final long AIDELAY = 1000;
-	private static final long NUM_AI = 5;
+	private static final long AIDELAY = 2000;
+	private static final long NUM_AI = 1;
 	
 	private volatile boolean isFastForwarding;
 	private volatile boolean isRaiseTerrain;

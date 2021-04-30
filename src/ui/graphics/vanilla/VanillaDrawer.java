@@ -802,7 +802,7 @@ public class VanillaDrawer extends Drawer {
 		int numDrawn = 0;
 		int draww = frozenTileSize/4;
 		Point drawAt = getDrawingCoords(tile.getLocation());
-		drawAt.x += draww;
+		drawAt.x += draww/2;
 		for (Item item : inventory.getItems()) {
 			if (item != null && item.getAmount() > 0) {
 				g.drawImage(item.getType().getMipMap().getImage(draww), drawAt.x+(draww*numDrawn), drawAt.y, draww, draww, null);

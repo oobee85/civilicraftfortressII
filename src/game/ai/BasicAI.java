@@ -66,17 +66,21 @@ public class BasicAI implements AIInterface {
 					}
 				}
 			}
-			
 			while(wantsMoreIrrigation() && !state.plantGatherers.isEmpty()) {
-				Unit unit = state.plantGatherers.remove();
-				irrigate(unit);
+				Unit unit = state.plantGatherers.getFirst();
+				if(irrigate(unit)) {
+					state.plantGatherers.remove();
+				}
+				else {
+					break;
+				}
 			}
 			
 			if(wantsWorker()) {
 				commands.produceUnit(state.castle, Game.unitTypeMap.get("WORKER"));
 			}
 			if(state.barracks != null) {
-				if(wantsWarrior()) {
+				if(wantsWarrior() && !wantsMoreIrrigation()) {
 					commands.produceUnit(state.barracks, Game.unitTypeMap.get("WARRIOR"));
 				}
 			}
@@ -133,21 +137,28 @@ public class BasicAI implements AIInterface {
 		if(tile == null) {
 			return false;
 		}
-		Building building = commands.planBuilding(unit, tile, true, Game.buildingTypeMap.get("BARRACKS"));
+		Building building = planBuilding(unit, tile, true, Game.buildingTypeMap.get("BARRACKS"));
 		if(building != null) {
 			state.buildingQuantities[Game.buildingTypeMap.get("BARRACKS").id()]++;
 		}
 		return building != null;
 	}
 	
+	private Building planBuilding(Unit unit, Tile tile, boolean clearQueue, BuildingType type) {
+		if(faction.canAfford(type.getCost())) {
+			return commands.planBuilding(unit, tile, clearQueue, type);
+		}
+		return null;
+	}
+	
 	private boolean irrigate(Unit unit) {
 		Tile tile = getTargetTile(state.castle.getTile(), 2, MAX_BUILD_RADIUS, e -> {
-			return !e.hasBuilding() && e.canBuild();
+			return !e.hasBuilding() && e.canBuild() && e.canPlant();
 		});
 		if(tile == null) {
 			return false;
 		}
-		Building building = commands.planBuilding(unit, tile, true, Game.buildingTypeMap.get("IRRIGATION"));
+		Building building = planBuilding(unit, tile, true, Game.buildingTypeMap.get("IRRIGATION"));
 		if(building != null) {
 			state.buildingQuantities[Game.buildingTypeMap.get("IRRIGATION").id()]++;
 			commands.harvestThing(unit, building, false);
@@ -171,8 +182,8 @@ public class BasicAI implements AIInterface {
 		if(!unit.isGuarding()) {
 			commands.setGuarding(unit, true);
 		}
-		if(unit.getTile().getLocation().distanceTo(state.castle.getTile().getLocation()) < MAX_BUILD_RADIUS) {
-			Tile tile = getTargetTile(unit.getTile(), MAX_BUILD_RADIUS/2, MAX_BUILD_RADIUS, e -> {
+		if(unit.getTile().getLocation().distanceTo(state.castle.getTile().getLocation()) < MAX_BUILD_RADIUS/2) {
+			Tile tile = getTargetTile(unit.getTile(), MAX_BUILD_RADIUS/2, MAX_BUILD_RADIUS*2/3, e -> {
 				return e.getUnits().isEmpty();
 			});
 			if(tile == null) {

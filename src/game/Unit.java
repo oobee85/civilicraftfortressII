@@ -236,9 +236,6 @@ public class Unit extends Thing implements Serializable {
 				onFinishedAction(plan);
 			}
 			else {
-				if(Game.DEBUG && isSelected()) {
-					System.out.println("next action: " + plan);
-				}
 				return plan;
 			}
 		}
@@ -385,7 +382,7 @@ public class Unit extends Thing implements Serializable {
 			boolean isFull = false;
 			if(building.getType().name().equals("IRRIGATION")) {
 				building.takeDamage(1);
-				isFull = this.addItem(ItemType.FOOD, 1);
+				isFull = this.addItem(ItemType.FOOD, 2);
 				this.resetTimeToHarvest(1);
 			}else if(building.getType().name().equals("MINE")) {
 				building.takeDamage(1);
