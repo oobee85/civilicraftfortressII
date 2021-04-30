@@ -87,9 +87,6 @@ public class UnitType implements Serializable {
 	public boolean isCaravan() {
 		return attributes.contains("caravan");
 	}
-	public boolean isNonSelectable() {
-		return attributes.contains("nonselectable");
-	}
 	public boolean hasCleave() {
 		return attributes.contains("cleave");
 	}

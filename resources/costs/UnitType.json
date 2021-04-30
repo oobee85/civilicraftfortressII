@@ -3,17 +3,17 @@
 	{
 		"image":"Images/units/worker.png",
 		"mesh":"models/star.obj",
-		"cost":{"FOOD":10},
-		"stats":{"movespeed":10,"buildtime":30,"health":100,"healspeed":50},
+		"cost":{"FOOD":50},
+		"stats":{"movespeed":15,"buildtime":30,"health":100,"healspeed":50},
 		"attackstyles":[
-			{"damage":1, "cooldown":60, "range":1}
+			{"damage":0, "cooldown":60, "range":1}
 		],
 		"name":"WORKER",
 		"attributes":["builder"]
 	},
 	{
 		"image":"Images/units/warrior.png",
-		"cost":{"WOOD":50,"FOOD":50},
+		"cost":{"WOOD":50,"FOOD":100},
 		"stats":{"movespeed":15,"buildtime":100,"health":100,"healspeed":50},
 		"name":"WARRIOR",
 		"attackstyles":[
@@ -24,8 +24,8 @@
 	},
 	{
 		"image":"Images/units/spearman.png",
-		"cost":{"BRONZE_SWORD":1,"FOOD":50},
-		"stats":{"movespeed":10,"buildtime":150,"health":300,"healspeed":50},
+		"cost":{"BRONZE_SWORD":1,"FOOD":100},
+		"stats":{"movespeed":15,"buildtime":150,"health":300,"healspeed":50},
 		"name":"SPEARMAN",
 		"attackstyles":[
 			{"damage":30, "cooldown":30, "range":1}
@@ -36,7 +36,7 @@
 	},
 	{
 		"image":"Images/units/archer.png",
-		"cost":{"BRONZE_BAR":2,"FOOD":100},
+		"cost":{"BRONZE_BAR":2,"FOOD":150},
 		"stats":{"movespeed":15,"buildtime":100,"health":200,"healspeed":50},
 		"name":"ARCHER",
 		"attributes":["hostile"],
@@ -48,7 +48,7 @@
 	},
 	{
 		"image":"Images/units/swordsman.png",
-		"cost":{"IRON_SWORD":1,"FOOD":100},
+		"cost":{"IRON_SWORD":1,"FOOD":150},
 		"stats":{"movespeed":10,"buildtime":200,"health":300,"healspeed":50},
 		"name":"SWORDSMAN",
 		"attackstyles":[
@@ -60,7 +60,7 @@
 	},
 	{
 		"image":"Images/units/longbowman.png",
-		"cost":{"MITHRIL_BAR":5,"FOOD":200},
+		"cost":{"MITHRIL_BAR":5,"FOOD":300},
 		"stats":{"movespeed":15,"buildtime":400,"health":300,"healspeed":50},
 		"name":"LONGBOWMAN",
 		"attackstyles":[
@@ -134,13 +134,13 @@
 	},
 	{
 		"image":"Images/units/chariot.png",
-		"cost":{"WOOD":100,"FOOD":200},
-		"stats":{"movespeed":20,"buildtime":200,"health":300,"healspeed":50},
+		"cost":{"WOOD":50,"FOOD":200},
+		"stats":{"movespeed":25,"buildtime":200,"health":300,"healspeed":50},
 		"name":"CARAVAN",
 		"attackstyles":[
-			{"damage":1, "cooldown":60, "range":1}
+			{"damage":0, "cooldown":60, "range":1}
 		],
-		"attributes":["caravan", "nonselectable"],
+		"attributes":["caravan"],
 	},
 	{
 		"image":"Images/units/wizard.png",
@@ -491,7 +491,7 @@
 		"stats":{"movespeed":0,"buildtime":0,"health":1000,"healspeed":0},
 		"name":"TWIG",
 		"attackstyles":[
-			{"damage":2000, "cooldown":0, "range":100}
+			{"damage":0, "cooldown":0, "range":100}
 		],
 		"attributes":["flying","fireresistant","coldresistant"],
 		"targeting":[{"type":"game.Unit"}]

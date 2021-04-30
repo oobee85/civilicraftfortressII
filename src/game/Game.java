@@ -337,6 +337,7 @@ public class Game {
 //			world.spawnDragon(null);
 //		}
 		for(int x = 0; x < world.getWidth(); x++) {
+			
 			Tile tile;
 			tile = world.get(new TileLoc(x, 0));
 			world.spawnAnimal(Game.unitTypeMap.get("STONE_GOLEM"), tile, undead, null);
@@ -410,9 +411,12 @@ public class Game {
 		Iterator<Tile> iterator = tiles.iterator();
 		for(UnitType type : Game.unitTypeList) {
 			if(type.name() == "TWIG") {
+				System.out.println("twig");
 				continue;
+			}else {
+				world.spawnAnimal(type, iterator.next(), world.getFaction(World.NO_FACTION_ID), null);
 			}
-			world.spawnAnimal(type, iterator.next(), world.getFaction(World.NO_FACTION_ID), null);
+			
 		}
 	}
 	

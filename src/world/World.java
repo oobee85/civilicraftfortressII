@@ -945,7 +945,7 @@ public class World {
 					tile.setTickLastTerrainChange(World.ticks);
 				}
 			}
-			if(tile.checkTerrain(Terrain.GRASS) && Math.random() < CHANCE_TO_SWITCH_TERRAIN/1000) {
+			if(tile.checkTerrain(Terrain.GRASS) && Math.random() < CHANCE_TO_SWITCH_TERRAIN/10000) {
 				tile.setTerrain(Terrain.DIRT);
 				tile.setTickLastTerrainChange(World.ticks);
 			}
