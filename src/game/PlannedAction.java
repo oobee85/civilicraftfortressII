@@ -99,4 +99,20 @@ public class PlannedAction {
 		}
 		return currentPosition == targetTile;
 	}
+	
+	@Override
+	public String toString() {
+		String str = "{type: " + type;
+		
+		if(targetTile != null ) {
+			str += ", target: " + targetTile;
+		}
+		if(target != null) {
+			str += ", target: " + target;
+		}
+		if(followup != null) {
+			str += ", followup: " + followup;
+		}
+		return str + "}";
+	}
 }

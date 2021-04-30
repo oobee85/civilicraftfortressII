@@ -12,6 +12,9 @@ import utils.*;
 
 public class BuildingType implements Serializable {
 
+	private transient static int idCounter = 0;
+	private transient final int id;
+
 	private final String name;
 	private final String info;
 	private transient final int health;
@@ -32,6 +35,7 @@ public class BuildingType implements Serializable {
 	
 	public BuildingType(String name, String info, int hp, double buildingEffort, String texturePath, Mesh mesh, String textureFile, double cultureRate, int visionRadius, 
 			String requirement, HashMap <ItemType, Integer> resourcesNeeded, String[] canProduce, double moveSpeedEnhancement, HashSet<String> attributes) {
+		id = idCounter++;
 		this.name = name;
 		this.info = info;
 		mipmap = new MipMap(texturePath);
@@ -62,8 +66,6 @@ public class BuildingType implements Serializable {
 	public double getCultureRate() {
 		return cultureRate;
 	}
-	
-	
 
 	public Image getRoadImage(String roadCorner) {
 		return roadImages.get(roadCorner);
@@ -75,33 +77,6 @@ public class BuildingType implements Serializable {
 	public MipMap getMipMap() {
 		return mipmap;
 	}
-//	@Override
-//	public Image getImage(int size) {
-//		return mipmap.getImage(size);
-//	}
-//	@Override
-//	public Image getShadow(int size) {
-//		return mipmap.getShadow(size);
-//	}
-//	@Override
-//	public Image getHighlight(int size) {
-//		return mipmap.getHighlight(size);
-//	}
-//
-//	@Override
-//	public ImageIcon getImageIcon(int size) {
-//		if(isRoad()) {
-//			return new ImageIcon(roadImages.get(Direction.ALL_DIRECTIONS));
-//		}
-//		else {
-//			return mipmap.getImageIcon(size);
-//		}
-//	}
-//
-//	@Override
-//	public Color getColor(int size) {
-//		return mipmap.getColor(size);
-//	}
 
 	public boolean blocksMovement() {
 		return attributes.contains("blocksmovement");
@@ -149,5 +124,8 @@ public class BuildingType implements Serializable {
 	}
 	public String info() {
 		return info;
+	}
+	public int id() {
+		return id;
 	}
 }

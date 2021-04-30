@@ -13,6 +13,7 @@ import game.*;
 import game.liquid.*;
 import networking.message.*;
 import ui.*;
+import ui.graphics.opengl.maths.*;
 import world.*;
 
 public final class Utils {
@@ -497,6 +498,36 @@ public final class Utils {
 		}
 		return tiles;
 	}
+	public static void getRingOfTiles(TileLoc center, World world, int radius, List<TileLoc> ring) {
+		ring.add(new TileLoc(center.x(), center.y() + radius));
+		if(radius == 0) {
+			return;
+		}
+		ring.add(new TileLoc(center.x(), center.y() - radius));
+		for(int i = 0; i < radius+1; i++) {
+			int y = center.y() + radius/2 - i;
+			if(radius%2 == 1 && center.x()%2 == 1) {
+				y += 1;
+			}
+			ring.add(new TileLoc(center.x()+radius, y));
+			ring.add(new TileLoc(center.x()-radius, y));
+		}
+		for(int i = 1; i < radius; i++) {
+			int yoffset = radius - i/2;
+			if(center.x()%2 == 0 && i%2 == 1) {
+				yoffset -= 1;
+			}
+			ring.add(new TileLoc(center.x()+i, center.y() + yoffset));
+			ring.add(new TileLoc(center.x()-i, center.y() + yoffset));
+
+			int minusyoffset = radius - i/2;
+			if(center.x()%2 == 1 && i%2 == 1) {
+				minusyoffset -= 1;
+			}
+			ring.add(new TileLoc(center.x()+i, center.y() - minusyoffset));
+			ring.add(new TileLoc(center.x()-i, center.y() - minusyoffset));
+		}
+	}
 	public static double getRandomNormal(int tries) {
 		double rand = 0;
 		for (int i = 0; i < tries; i++) {
@@ -510,6 +541,10 @@ public final class Utils {
 			rand += Math.random();
 		}
 		return rand / tries;
+	}
+	public static Vector2f getRandomDirection() {
+		double angle = Math.random()*Math.PI*2;
+		return new Vector2f((float)Math.sin(angle), (float)Math.cos(angle));
 	}
 
 	public static Position[] normalizeRectangle(Position one, Position two) {

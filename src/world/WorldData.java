@@ -123,6 +123,7 @@ public class WorldData {
 		synchronized(newUnits) {
 			newUnits.add(unit);
 		}
+		unit.getFaction().addUnit(unit);
 	}
 	public LinkedList<Unit> getUnits() {
 		return units;
@@ -132,6 +133,7 @@ public class WorldData {
 		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
 		for (Unit unit : units) {
 			if (unit.isDead() == true) {
+				unit.getFaction().removeUnit(unit);
 				unit.getTile().removeUnit(unit);
 				ThingMapper.removed(unit);
 				addDeadThing(unit);

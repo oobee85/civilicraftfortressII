@@ -12,7 +12,7 @@ public class Faction implements Externalizable {
 	
 	private static final Color[] factionColors = new Color[] { 
 			Color.lightGray, Color.blue, Color.green.darker(), Color.pink, 
-			Color.orange, Color.cyan, Color.yellow};
+			Color.orange, Color.cyan, Color.yellow, Color.red, Color.magenta, Color.green};
 	private static int idCounter = 0;
 	
 	private HashMap<BuildingType, ResearchRequirement> buildingResearchRequirements = new HashMap<>();
@@ -31,6 +31,7 @@ public class Faction implements Externalizable {
 	private LinkedList<AttackedNotification> newAttacked = new LinkedList<>();
 	
 	private HashSet<Building> buildings = new HashSet<>();
+	private HashSet<Unit> units = new HashSet<>();
 	
 	private int id;
 	private Color color;
@@ -66,11 +67,16 @@ public class Faction implements Externalizable {
 	}
 	
 	public Faction(String name, boolean isPlayer, boolean usesItems) {
-		this(name, isPlayer, usesItems, idCounter < factionColors.length ? factionColors[idCounter] : factionColors[0]);
+		this(name, isPlayer, usesItems, null);
 	}
 	public Faction(String name, boolean isPlayer, boolean usesItems, Color color) {
 		this.id = idCounter++;
-		this.setColor(color);
+		if(color == null) {
+			this.setColor(idCounter < factionColors.length ? factionColors[idCounter] : factionColors[0]);
+		}
+		else {
+			this.setColor(color);
+		}
 		this.name = name;
 		this.usesItems = usesItems;
 		this.isPlayer = isPlayer;
@@ -78,6 +84,15 @@ public class Faction implements Externalizable {
 		setupResearch();
 	}
 	
+	public void addUnit(Unit unit) {
+		units.add(unit);
+	}
+	public void removeUnit(Unit unit) {
+		units.remove(unit);
+	}
+	public HashSet<Unit> getUnits() {
+		return units;
+	}
 	public void addBuilding(Building building) {
 		buildings.add(building);
 	}
@@ -170,6 +185,9 @@ public class Faction implements Externalizable {
 	public void spendResearch(int points) {
 		if(researchTarget != null) {
 			researchTarget.spendResearch(points);
+			if(researchTarget.isCompleted()) {
+				researchTarget = null;
+			}
 		}
 	}
 	public Research getResearch(ResearchType type) {
@@ -180,7 +198,7 @@ public class Faction implements Externalizable {
 	}
 	public void setResearchTarget(ResearchType researchType) {
 		Research research = researchMap.get(researchType.name);
-		if(!research.getRequirement().areRequirementsMet()) {
+		if(!research.getRequirement().areRequirementsMet() || research.isCompleted()) {
 			return;
 		}
 		if(!research.isPayedFor()) {

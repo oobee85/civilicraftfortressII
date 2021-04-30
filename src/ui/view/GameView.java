@@ -230,6 +230,8 @@ public class GameView {
 					controlDown = false;
 				} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
 					shiftDown = false;
+				} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+					recenterCamera();
 				}
 			}
 
@@ -748,6 +750,23 @@ public class GameView {
 		Position pixel = tile.multiply(state.tileSize).subtract(new Position(panelWidth / 2, panelHeight / 2));
 		state.viewOffset = pixel;
 		panel.repaint();
+	}
+	public void moveViewTo(TileLoc tileloc, int panelWidth, int panelHeight) {
+		moveViewTo(
+				(double)tileloc.x() / game.world.getWidth(), 
+				(double)tileloc.y() / game.world.getHeight(), 
+				panelWidth, panelHeight);
+	}
+	public void recenterCamera() {
+		// move camera to first building or first unit.
+		for(Building building : state.faction.getBuildings()) {
+			GameView.this.moveViewTo(building.getTile().getLocation(), panel.getWidth(), panel.getHeight());
+			return;
+		}
+		for(Unit unit : state.faction.getUnits()) {
+			GameView.this.moveViewTo(unit.getTile().getLocation(), panel.getWidth(), panel.getHeight());
+			return;
+		}
 	}
 
 	public CommandInterface getCommandInterface() {

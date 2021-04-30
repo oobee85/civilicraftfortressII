@@ -228,6 +228,22 @@ public class Unit extends Thing implements Serializable {
 			getTile().clearItems();
 		}
 	}
+	public PlannedAction getNextPlannedAction() {
+		while(!actionQueue.isEmpty()) {
+			PlannedAction plan = actionQueue.peek();
+			if(plan.isDone(getTile())) {
+				actionQueue.poll();
+				onFinishedAction(plan);
+			}
+			else {
+				if(Game.DEBUG && isSelected()) {
+					System.out.println("next action: " + plan);
+				}
+				return plan;
+			}
+		}
+		return null;
+	}
 
 	@Override
 	public boolean takeDamage(int damage) {
@@ -352,12 +368,16 @@ public class Unit extends Thing implements Serializable {
 		return bestBuilding;
 	}
 	public Plant getNearestPlantToHarvest(Tile oldTile, PlantType type) {
+		Plant target = null;
 		for(Tile tile: oldTile.getNeighbors()) {
 			if(tile.getPlant() != null && tile.getPlant().getType() == type) {
-				return tile.getPlant();
+				target = tile.getPlant();
+				if(Math.random() < 0.3) {
+					break;
+				}
 			}
 		}
-		return null;
+		return target;
 	}
 	
 	public void doHarvestBuilding(Building building, PlannedAction action) {
@@ -376,16 +396,11 @@ public class Unit extends Thing implements Serializable {
 					isFull = this.addItem(ItemType.STONE, 1);
 					this.resetTimeToHarvest(1);
 				}
-				
-				
 			}
-				
-			
 			if(isFull) {
 				action.setDone(true);
 			}
 		}
-		
 	}
 	
 	public void doHarvest(Plant plant, PlannedAction action) {
@@ -464,104 +479,83 @@ public class Unit extends Thing implements Serializable {
 	}
 
 	public void doMovement() {
-		if(actionQueue.isEmpty()) {
+		if(!readyToMove()) {
 			return;
 		}
-		if(readyToMove()) {
-			PlannedAction plan = null;
-			while(!actionQueue.isEmpty()) {
-				plan = actionQueue.peek();
-				if(plan.isDone(getTile())) {
-					actionQueue.poll();
-					onFinishedAction(plan);
-					plan = null;
-					continue;
-				}
-				break;
-			}
-			if(plan == null) {
-				return;
-			}
-			boolean alreadyInRangeToAttack = plan.target != null && this.inRange(plan.target);
-			boolean alreadyInRangeToBuild = plan.isBuildAction() && this.inRange(plan.getTile());
-			if(plan.getTile() != null && !alreadyInRangeToAttack && !alreadyInRangeToBuild) {
-				moveTowards(plan.getTile());
-				// can't reach target
-				if(currentPath == null) {
-					actionQueue.poll();
-				}
+		PlannedAction plan = getNextPlannedAction();
+		if(plan == null) {
+			return;
+		}
+		boolean alreadyInRangeToAttack = plan.target != null && this.inRange(plan.target);
+		boolean alreadyInRangeToBuild = plan.isBuildAction() && this.inRange(plan.getTile());
+		if(plan.getTile() != null && !alreadyInRangeToAttack && !alreadyInRangeToBuild) {
+			moveTowards(plan.getTile());
+			// can't reach target so mark the plan as finished.
+			if(currentPath == null) {
+				plan.setDone(true);
 			}
 		}
 	}
 
 	public final boolean doAttacks(World world) {
-		boolean attacked = false;
-		// remove already finished planned actions
-		if(!actionQueue.isEmpty()) {
-			PlannedAction plan = actionQueue.peek();
-			if(plan.isDone(getTile())) {
-				actionQueue.poll();
-				onFinishedAction(plan);
-			}
+		PlannedAction plan = getNextPlannedAction();
+		if(plan == null) {
+			return false;
 		}
+		boolean didSomething = false;
 		if(!readyToAttack()) {
 			return false;
 		}
-		if(!actionQueue.isEmpty()) {
-			PlannedAction plan = actionQueue.peek();
-			if(plan.isBuildAction() && unitType.isBuilder() && inRange(plan.targetTile)) {
-				Building tobuild = null;
-				if(plan.isBuildRoadAction()) {
-					tobuild = plan.getTile().getRoad();
-				}
-				else if(plan.isBuildBuildingAction()) {
-					tobuild = plan.getTile().getBuilding();
-				}
-				if(tobuild != null) {
-					boolean finished = buildBuilding(tobuild);
-					attacked = true;
-				}
-				
+		if(plan.isBuildAction() && unitType.isBuilder() && inRange(plan.targetTile)) {
+			Building tobuild = null;
+			if(plan.isBuildRoadAction()) {
+				tobuild = plan.getTile().getRoad();
 			}
-			else if(plan.isHarvestAction() && unitType.isBuilder() && inRange(plan.target) && plan.target instanceof Building) {
-				this.doHarvestBuilding((Building)plan.target, plan);
-				
+			else if(plan.isBuildBuildingAction()) {
+				tobuild = plan.getTile().getBuilding();
 			}
-			else if(plan.isHarvestAction() && unitType.isBuilder() && inRange(plan.target) && plan.target instanceof Plant) {
-				this.doHarvest((Plant)plan.target, plan);
-				
+			if(tobuild != null) {
+				buildBuilding(tobuild);
+				didSomething = true;
 			}
-			else if(plan.isDeliverAction() && inRange(plan.target)) {
-				this.doDelivery(plan, plan.target);
-				
-			}
-			else if(plan.isTakeAction() && unitType.isCaravan() && inRange(plan.target) && plan.target instanceof Building) {
-				this.doTake(plan, plan.target);
-				
-			}
-			else if(plan.target != null) {
-				attacked = attack(plan.target);	
-				
-			}
-			
-//			if(plan.target != null) {
-//				if(plan.isBuildAction() && unitType.isBuilder() && inRange(plan.target)) {
-//					boolean finished = buildBuilding((Building)plan.target);
-//					attacked = true;
-//				}
-//				else {
-//					attacked = attack(plan.target);
-//				}
-//			}
 		}
-		if (!attacked && isGuarding()) {
+		else if(plan.isHarvestAction() && unitType.isBuilder() && inRange(plan.target) && plan.target instanceof Building) {
+			this.doHarvestBuilding((Building)plan.target, plan);
+			didSomething = true;
+		}
+		else if(plan.isHarvestAction() && unitType.isBuilder() && inRange(plan.target) && plan.target instanceof Plant) {
+			this.doHarvest((Plant)plan.target, plan);
+			didSomething = true;
+		}
+		else if(plan.isDeliverAction() && inRange(plan.target)) {
+			this.doDelivery(plan, plan.target);
+			didSomething = true;
+		}
+		else if(plan.isTakeAction() && unitType.isCaravan() && inRange(plan.target) && plan.target instanceof Building) {
+			this.doTake(plan, plan.target);
+			didSomething = true;
+		}
+		else if(plan.target != null) {
+			didSomething = attack(plan.target);	
+		}
+		
+//		if(plan.target != null) {
+//			if(plan.isBuildAction() && unitType.isBuilder() && inRange(plan.target)) {
+//				boolean finished = buildBuilding((Building)plan.target);
+//				attacked = true;
+//			}
+//			else {
+//				attacked = attack(plan.target);
+//			}
+//		}
+		if (!didSomething && isGuarding()) {
 			HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getMaxRange());
 			for (Tile tile : inrange) {
 				if (tile.getFaction() == getFaction()) {
 					for (Unit unit : tile.getUnits()) {
 						if (unit.getFaction() != this.getFaction() && unit.getType().isHostile() && unit != this) {
-							attacked = attacked || attack(unit);
-							if (attacked) {
+							didSomething = didSomething || attack(unit);
+							if (didSomething) {
 								break;
 							}
 						}
@@ -569,7 +563,7 @@ public class Unit extends Thing implements Serializable {
 				}
 			}
 		}
-		return attacked;
+		return didSomething;
 	}
 	
 	private void onFinishedAction(PlannedAction finished) {
@@ -597,23 +591,18 @@ public class Unit extends Thing implements Serializable {
 				}
 			}else if(followup.target instanceof Building) {
 //				if followup building dead, doesnt find new target
-//				Building oldTarget = (Building)followup.target;
-//				if(oldTarget.isDead()) {
-//
-//				}
 			}
 			
-			this.queuePlannedAction(followup);
+			if(followup != null && !followup.target.isDead()) {
+				this.queuePlannedAction(followup);
+			}
 		}
-			
-			
-		
 	}
 	
 	/**
 	 * @return true if finished building false otherwise
 	 */
-	private boolean buildBuilding(Building building) {
+	private void buildBuilding(Building building) {
 		building.expendEffort(1);
 		if (building.getRemainingEffort() > 0) {
 			building.heal(building.getMaxHealth() / building.getType().getBuildingEffort(), false);
@@ -621,7 +610,6 @@ public class Unit extends Thing implements Serializable {
 		if (building.getRemainingEffort() < building.getType().getBuildingEffort()) {
 			building.setPlanned(false);
 		}
-		return building.isBuilt();
 	}
 	
 

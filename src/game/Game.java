@@ -501,7 +501,6 @@ public class Game {
 				Animal cyclops = world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp, world.getFaction(World.CYCLOPS_FACTION_ID), null);
 				cyclops.setPassiveAction(PlannedAction.GUARD);
 			}
-			
 		}
 	}
 
@@ -674,6 +673,25 @@ public class Game {
 		makeRoadBetween(world.get(new TileLoc(0, 0)), world.get(new TileLoc(world.getWidth()-1, world.getHeight()-1)));
 		makeRoadBetween(highestTile, lowestTile);
 	}
+	private boolean isValidSpawnLocation(Tile spawnTile, int radius) {
+		List<Tile> tiles = Utils.getTilesInRadius(spawnTile, world, radius);
+		for(Tile t : tiles) {
+			if(t == spawnTile) {
+				continue;
+			}
+			if(!isValidSpawnTileForBuilding(t, Game.buildingTypeMap.get("CASTLE"))) {
+				return false;
+			}
+		}
+		return true;
+	}
+	private boolean isValidSpawnTileForBuilding(Tile tile, BuildingType type) {
+		return tile.canBuild() == true 
+				&& !tile.hasBuilding()
+				&& tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()
+				&& tile.getLocation().distanceTo(world.volcano) > 30
+				&& (tile.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"));
+	}
 	private void makeStartingCastleAndUnits(boolean easymode, List<PlayerInfo> players) {
 		double spacePerPlayer = (double)world.getWidth()/players.size();
 		int index = 0;
@@ -698,6 +716,12 @@ public class Game {
 				addResources(newFaction);
 			}
 			Tile spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), world.getHeight()/2));
+			int minRadius = 20;
+			while(!isValidSpawnLocation(spawnTile, minRadius)) {
+				spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), (int) (Math.random()*world.getHeight())));
+				minRadius = Math.max(0, minRadius-1);
+			};
+			
 			HashSet<Tile> visited = new HashSet<>();
 			LinkedList<Tile> tovisit = new LinkedList<>();
 			
@@ -709,11 +733,7 @@ public class Game {
 				Object thingType = thingsToPlace.getFirst();
 				if(thingType instanceof BuildingType) {
 					BuildingType type = (BuildingType)thingType;
-					if (current.canBuild() == true 
-							&& !current.hasBuilding()
-							&& current.liquidAmount < current.liquidType.getMinimumDamageAmount()
-							&& current.getLocation().distanceTo(world.volcano) > 30
-							&& (current.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"))) {
+					if (isValidSpawnTileForBuilding(current, type)) {
 						summonBuilding(current, type, newFaction);
 						thingType = null;
 						
@@ -877,7 +897,6 @@ public class Game {
 		if(canBuild(unit, bt, tile) == true) {
 			unit.getFaction().payCost(bt.getCost());
 			Building building = new Building(bt, tile, unit.getFaction());
-			unit.getFaction().addBuilding(building);
 			world.addBuilding(building);
 			building.setPlanned(true);
 			building.setHealth(1);

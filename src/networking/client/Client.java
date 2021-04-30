@@ -1,14 +1,17 @@
 package networking.client;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.Timer;
 
 import game.*;
+import game.ai.*;
 import networking.*;
 import networking.message.*;
 import networking.server.*;
@@ -19,7 +22,6 @@ import world.*;
 
 public class Client {
 
-	
 	private Connection connection;
 	private ClientGUI clientGUI;
 
@@ -28,6 +30,9 @@ public class Client {
 	private CommandInterface networkingCommands;
 	private volatile Object updatedTerrain = new Object();
 	private HashMap<Integer, Thing> things = new HashMap<>();
+	private ArrayList<AIInterface> ailist = new ArrayList<>();
+	private static final long AIDELAY = 1000;
+	private static final long NUM_AI = 5;
 	
 	private volatile boolean isFastForwarding;
 	private volatile boolean isRaiseTerrain;
@@ -220,27 +225,30 @@ public class Client {
 	public void setupSinglePlayer(boolean createWorld) {
 		clientGUI.getGameView().setCommandInterface(localCommands);
 		if(createWorld) {
-			gameInstance.generateWorld(128, 128, false, Arrays.asList(clientGUI.getPlayerInfo()));
+			LinkedList<PlayerInfo> players = new LinkedList<>();
+			players.add(clientGUI.getPlayerInfo());
+			for(int i = 0; i < NUM_AI; i++) {
+				players.add(new PlayerInfo("Bot " + i, null));
+			}
+			gameInstance.generateWorld(128, 128, false, players);
 		}
+		boolean assignedPlayer = false;
 		for(Faction f : gameInstance.world.getFactions()) {
 			if(f.isPlayer()) {
-				gameInstance.getGUIController().changedFaction(f);
-				break;
+				if(!assignedPlayer) {
+					gameInstance.getGUIController().changedFaction(f);
+					assignedPlayer = true;
+				}
+				else {
+					// create and assign ai
+					BasicAI ai = new BasicAI(localCommands, f, gameInstance.world);
+					ailist.add(ai);
+				}
 			}
 		}
 
 		SwingUtilities.invokeLater(() -> {
 			clientGUI.startedSinglePlayer();
-//			frame.remove(mainMenuPanel);
-//			mainMenuPanel = null;
-			
-//			frame.getContentPane().add(gamepanel, BorderLayout.CENTER);
-//			frame.getContentPane().add(guiSplitter, BorderLayout.EAST);
-//			frame.pack();
-//			
-//			gamepanel.centerViewOn(gameInstance.world.buildings.getLast().getTile(), 50, gamepanel.getWidth(), gamepanel.getHeight());
-//			gamepanel.requestFocusInWindow();
-//			gamepanel.requestFocus();
 			clientGUI.repaint();
 			startLocalGameLoopThread(false);
 		});
@@ -319,6 +327,20 @@ public class Client {
 			}
 		});
 		gameLoopThread.start();
+		
+		Thread aiThread = new Thread(() -> {
+			try {
+				while(true) {
+					for(AIInterface ai : ailist) {
+						ai.tick();
+					}
+					Thread.sleep(AIDELAY);
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
+		aiThread.start();
 	}
 	private boolean tilesReceived;
 	private void worldInfoUpdate(WorldInfo worldInfo) {

@@ -311,7 +311,7 @@ public class VanillaDrawer extends Drawer {
 			drawSelectedThings((Graphics2D) g, lowerX, lowerY, upperX, upperY);
 
 			for (Building building : game.world.getBuildings()) {
-				drawInventory(g, null, building);
+				drawInventory(g, building.getTile(), building.getInventory());
 				drawHealthBar(g, building);
 				drawHitsplat(g, building);
 			}
@@ -320,7 +320,7 @@ public class VanillaDrawer extends Drawer {
 				drawHitsplat(g, plant);
 			}
 			for (Unit unit : game.world.getUnits()) {
-				drawInventory(g, unit, null);
+				drawInventory(g, unit.getTile(), unit.getInventory());
 				drawHealthBar(g, unit);
 				drawHitsplat(g, unit);
 //				Point drawAt = getDrawingCoords(unit.getTile().getLocation());
@@ -592,9 +592,17 @@ public class VanillaDrawer extends Drawer {
 			}
 		} else {
 			if (game.world.get(state.hoveredTile) != null) {
+//				for(TileLoc tileloc : Utils.getRingOfTiles(state.hoveredTile, game.world, RADIUS)) {
+//					Point drawAt = getDrawingCoords(tileloc);
+//					g.drawRect(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, frozenTileSize - strokeWidth,
+//							frozenTileSize - strokeWidth);
+//				}
 				Point drawAt = getDrawingCoords(state.hoveredTile);
 				g.drawRect(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, frozenTileSize - strokeWidth,
 						frozenTileSize - strokeWidth);
+//				g.setStroke(stroke);
+//				g.setColor(Color.yellow);
+//				g.drawString(state.hoveredTile.toString(), drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2);
 			}
 		}
 		g.setStroke(stroke);
@@ -787,30 +795,20 @@ public class VanillaDrawer extends Drawer {
 		g.drawImage(TARGET_IMAGE, drawAt.x + frozenTileSize * 1 / 10, drawAt.y + frozenTileSize * 1 / 10, w, hi, null);
 	}
 
-	private void drawInventory(Graphics g, Unit unit, Building building) {
+	private void drawInventory(Graphics g, Tile tile, Inventory inventory) {
 		if (frozenTileSize <= 30) {
 			return;
 		}
 		int numDrawn = 0;
-		if (building != null) {
-			Point drawAt = getDrawingCoords(building.getTile().getLocation());
-			for (Item item : building.getInventory().getItems()) {
-				if (item != null && item.getAmount() > 0) {
-					g.drawImage(item.getType().getMipMap().getImage(frozenTileSize/4), drawAt.x+(frozenTileSize/4*numDrawn), drawAt.y, null);
-					numDrawn ++;
-				}
+		int draww = frozenTileSize/4;
+		Point drawAt = getDrawingCoords(tile.getLocation());
+		drawAt.x += draww;
+		for (Item item : inventory.getItems()) {
+			if (item != null && item.getAmount() > 0) {
+				g.drawImage(item.getType().getMipMap().getImage(draww), drawAt.x+(draww*numDrawn), drawAt.y, draww, draww, null);
+				numDrawn ++;
 			}
 		}
-		if (unit != null) {
-			Point drawAt = getDrawingCoords(unit.getTile().getLocation());
-			for (Item item : unit.getInventory().getItems()) {
-				if (item != null && item.getAmount() > 0) {
-					g.drawImage(item.getType().getMipMap().getImage(frozenTileSize), drawAt.x+(frozenTileSize/4*numDrawn), drawAt.y, null);
-					numDrawn ++;
-				}
-			}
-		}
-
 	}
 
 	private void drawHealthBar(Graphics g, Thing thing) {

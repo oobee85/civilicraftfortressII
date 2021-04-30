@@ -7,6 +7,9 @@ import utils.*;
 import utils.Loader.*;
 
 public class UnitType implements Serializable {
+
+	private transient static int idCounter = 0;
+	private transient final int id;
 	
 	private final String name;
 	private transient final MipMap mipmap;
@@ -21,6 +24,7 @@ public class UnitType implements Serializable {
 	private transient final LinkedList<AttackStyle> attackStyles;
 
 	public UnitType(String name, String image, Mesh mesh, String textureFile, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles) {
+		id = idCounter++;
 		this.name = name;
 		this.mipmap = new MipMap(image);
 		this.mesh = new TexturedMesh(mesh, textureFile);
@@ -102,6 +106,10 @@ public class UnitType implements Serializable {
 
 	public MipMap getMipMap() {
 		return mipmap;
+	}
+	
+	public int id() {
+		return id;
 	}
 
 	@Override
