@@ -520,12 +520,6 @@ public final class Utils {
 		return new Position[] { new Position(x, y), new Position(x + width, y + height) };
 	}
 
-
-	public static Position getWorldCoordOfPixel(Position pixelOnScreen, Position viewOffset, int tileSize) {
-		return (pixelOnScreen.add(viewOffset)).divide(tileSize);
-	}
-	
-
 	public static List<Tile> getTilesBetween(World world, Position topLeft, Position botRight) {
 		int topEvenY = (int) topLeft.y;
 		int topOddY = (int) (topLeft.y - 0.5);

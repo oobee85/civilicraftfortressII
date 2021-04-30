@@ -933,9 +933,9 @@ public class VanillaDrawer extends Drawer {
 		if (game.world == null) {
 			return null;
 		}
-		Position offsetTile = Utils.getWorldCoordOfPixel(new Position(0, 0), state.viewOffset, state.tileSize);
-		Position offsetTilePlusCanvas = Utils.getWorldCoordOfPixel(
-				new Position(canvas.getWidth(), canvas.getHeight()), state.viewOffset, state.tileSize);
+		Position offsetTile = getWorldCoordOfPixel(new Point(0, 0), state.viewOffset, state.tileSize);
+		Position offsetTilePlusCanvas = getWorldCoordOfPixel(
+				new Point(canvas.getWidth(), canvas.getHeight()), state.viewOffset, state.tileSize);
 		return new Position[] {
 				offsetTile,
 				new Position(offsetTile.x, offsetTilePlusCanvas.y),
@@ -947,7 +947,13 @@ public class VanillaDrawer extends Drawer {
 	@Override
 	public Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
 		double column = ((pixelOnScreen.x + viewOffset.x) / tileSize);
-		int row = (int) ((pixelOnScreen.y + viewOffset.y - (column % 2) * tileSize / 2) / tileSize);
+		int yoffset = ((int)column % 2) * tileSize / 2;
+		double row = (pixelOnScreen.y + viewOffset.y - yoffset) / tileSize;
+		return new Position(column, row);
+	}
+	public Position getWorldCoordOfPixelWithoutOffset(Point pixelOnScreen, Position viewOffset, int tileSize) {
+		double column = ((pixelOnScreen.x + viewOffset.x) / tileSize);
+		double row = (pixelOnScreen.y + viewOffset.y) / tileSize;
 		return new Position(column, row);
 	}
 
@@ -965,7 +971,7 @@ public class VanillaDrawer extends Drawer {
 	@Override
 	public void zoomViewTo(int newTileSize, int mx, int my) {
 		if (newTileSize > 0) {
-			Position tile = Utils.getWorldCoordOfPixel(new Position(mx, my), state.viewOffset, state.tileSize);
+			Position tile = getWorldCoordOfPixelWithoutOffset(new Point(mx, my), state.viewOffset, state.tileSize);
 			state.tileSize = newTileSize;
 			Position focalPoint = tile.multiply(state.tileSize).subtract(state.viewOffset);
 			state.viewOffset.x -= mx - focalPoint.x;
