@@ -304,6 +304,14 @@ public class Tile implements Externalizable {
 	public ConcurrentLinkedQueue<Item> getItems() {
 		return items;
 	}
+	public boolean hasItem(ItemType type) {
+		for(Item item : items) {
+			if(item.getType() == type) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public boolean hasUnit(UnitType unit) {
 		for (Unit u : units) {

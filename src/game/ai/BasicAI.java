@@ -82,7 +82,7 @@ public class BasicAI implements AIInterface {
 	private void computeTargetAssignments() {
 		int[] assignments = new int[WorkerTask.values().length];
 		int numWorkers = state.workers.size();
-//		assignments[WorkerTask.FORAGE.ordinal()] = numWorkers/16;
+		assignments[WorkerTask.FORAGE.ordinal()] = numWorkers > 2 ? 1 : 0;
 		
 		int maxWoodAmount = 2000;
 		double woodratio = (1.0*maxWoodAmount - faction.getInventory().getItemAmount(ItemType.WOOD))/maxWoodAmount;
@@ -91,7 +91,9 @@ public class BasicAI implements AIInterface {
 		int maxStoneAmount = 1000;
 		double stoneratio = (1.0*maxStoneAmount - faction.getInventory().getItemAmount(ItemType.STONE))/maxStoneAmount;
 		assignments[WorkerTask.GATHERSTONE.ordinal()] = lerp(0, numWorkers/3, stoneratio);
-		
+		if(faction.getInventory().getItemAmount(ItemType.FOOD) < 50) {
+			assignments[WorkerTask.GATHERSTONE.ordinal()] = 0;
+		}
 		int total = 0;
 		for(int amount : assignments) {
 			total += amount;
@@ -348,12 +350,20 @@ public class BasicAI implements AIInterface {
 	}
 	private boolean forage(Unit unit) {
 		Tile tile = getTargetTile(unit.getTile(), MAX_SEARCH_RADIUS, e -> {
-			return e.getPlant() != null && e.getPlant().getType() != PlantType.TREE;
+			
+			return (e.getPlant() != null && e.getPlant().getType() != PlantType.TREE)
+					|| e.hasItem(ItemType.FOOD);
 		});
 		if(tile == null) {
 			return false;
 		}
-		commands.harvestThing(unit, tile.getPlant(), true);
+		if(tile.getPlant() != null && tile.getPlant().getType() != PlantType.TREE) {
+			commands.harvestThing(unit, tile.getPlant(), true);
+		}
+		else {
+			commands.moveTo(unit, tile, true);
+			commands.deliver(unit, state.castle, false);
+		}
 		return true;
 	}
 	
@@ -361,16 +371,33 @@ public class BasicAI implements AIInterface {
 		if(!unit.isGuarding()) {
 			commands.setGuarding(unit, true);
 		}
-		if(unit.getTile().getLocation().distanceTo(state.castle.getTile().getLocation()) < MAX_BUILD_RADIUS/2) {
-			Tile tile = getTargetTile(unit.getTile(), MAX_BUILD_RADIUS/2, MAX_BUILD_RADIUS*2/3, e -> {
-				return e.getUnits().isEmpty();
-			});
-			if(tile == null) {
-				return false;
+		Tile target = getTargetTile(state.castle.getTile(), MAX_SEARCH_RADIUS, e -> {
+			for(Unit u : e.getUnits()) {
+				if(u.getFactionID() != faction.id()) {
+					return true;
+				}
 			}
-			commands.moveTo(unit, tile, true);
-			return true;
+			return false;
+		});
+		if(target == null) {
+			return false;
 		}
+		for(Unit u : target.getUnits()) {
+			if(u.getFactionID() != faction.id()) {
+				commands.attackThing(unit, u, true);
+			}
+		}
+		
+//		if(unit.getTile().getLocation().distanceTo(state.castle.getTile().getLocation()) < MAX_BUILD_RADIUS/2) {
+//			Tile tile = getTargetTile(unit.getTile(), MAX_BUILD_RADIUS/2, MAX_BUILD_RADIUS*2/3, e -> {
+//				return e.getUnits().isEmpty();
+//			});
+//			if(tile == null) {
+//				return false;
+//			}
+//			commands.moveTo(unit, tile, true);
+//			return true;
+//		}
 		return false;
 	}
 	

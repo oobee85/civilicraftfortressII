@@ -335,6 +335,9 @@ public class Unit extends Thing implements Serializable {
 		Building bestBuilding = null;
 		// TODO fix concurrent modification exception on this for loop
 		for (Building building : this.getFaction().getBuildings()) {
+			if(!building.isBuilt()) {
+				continue;
+			}
 			if ((building.getType().isColony() || building.getType().isCastle())) {
 				if(bestBuilding == null) {
 					bestBuilding = building;
