@@ -148,7 +148,7 @@ public class Game {
 		world.updateTerrainChange(false);
 	}
 	private void makeAnimal(Tile tile, UnitType unitType, int number) {
-		for(Tile t: Utils.getTilesInRadius(tile, world, Math.max(1, (int)(Math.sqrt(number))-2))) {
+		for(Tile t: Utils.getTilesInRadius(tile, world, Math.max(1, (int)(Math.sqrt(number))-1))) {
 			if(number > 0) {
 				world.spawnAnimal(unitType, t, world.getFaction(World.NO_FACTION_ID), null);
 				number --;

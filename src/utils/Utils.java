@@ -478,22 +478,15 @@ public final class Utils {
 		return tile.getNeighbors();
 	}
 	public static List<Tile> getTilesInRadius(Tile tile, World world, double radius) {
-		int maxr = (int) Math.ceil(radius);
-		TileLoc center = tile.getLocation();
-		int mini = (int) Math.max(0, center.x()-maxr);
-		int maxi = (int) Math.min(world.getWidth()-1, center.x()+maxr);
-		int minj = (int) Math.max(0, center.y()-maxr);
-		int maxj = (int) Math.min(world.getHeight()-1, center.y()+maxr);
+		LinkedList<TileLoc> ring = new LinkedList<>();
+		for(int r = 0; r <= radius; r++) {
+			Utils.getRingOfTiles(tile.getLocation(), world, r, ring);
+		}
 		LinkedList<Tile> tiles = new LinkedList<>();
-		for(int i = mini; i <= maxi; i++) {
-			for(int j = minj; j <= maxj; j++) {
-				TileLoc otherLoc = new TileLoc(i, j);
-				Tile otherTile = world.get(otherLoc);
-				if(otherTile != null) {
-					if(center.euclideanDistance(otherLoc) <= radius) {
-						tiles.add(otherTile);
-					}
-				}
+		for(TileLoc loc : ring) {
+			Tile t = world.get(loc);
+			if(t != null) {
+				tiles.add(t);
 			}
 		}
 		return tiles;

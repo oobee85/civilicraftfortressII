@@ -115,6 +115,30 @@ public class Generation {
 				
 			}
 		}
+		// scatter some random rocks around
+		int numRegions = 5;
+		int regionWidth = world.getWidth()/numRegions;
+		int regionHeight = world.getHeight()/numRegions;
+		int maxRadius = 2;
+		for(int xdiv = 0; xdiv < numRegions; xdiv++) {
+			for(int ydiv = 0; ydiv < numRegions; ydiv++) {
+				List<Tile> regionTiles = Utils.getTilesBetween(
+						world, 
+						new Position(xdiv*regionWidth, ydiv*regionHeight), 
+						new Position(xdiv*regionWidth + regionWidth, ydiv*regionHeight + regionHeight));
+				Collections.shuffle(regionTiles);
+				Tile targetTile = regionTiles.get(0);
+				int radius = (int) (Math.random()*(maxRadius + 1));
+				List<Tile> targetTiles = Utils.getTilesInRadius(targetTile, world, radius);
+				for(Tile tile : targetTiles) {
+					if(tile.getTerrain() == Terrain.DIRT || tile.getTerrain() == Terrain.GRASS) {
+						if(Math.random() < 0.75) {
+							tile.setTerrain(Terrain.ROCK);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	
