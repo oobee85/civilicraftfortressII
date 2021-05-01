@@ -760,9 +760,13 @@ public class VanillaDrawer extends Drawer {
 		if (unit.isGuarding() == true) {
 			g.drawImage(GUARD_ICON, drawx + draww / 4, drawy + drawh / 4, draww / 2, drawh / 2, null);
 		}
-		if (unit.getAutoBuild() == true) {
+		if (unit.isAutoBuilding() == true) {
 			g.drawImage(AUTO_BUILD_ICON, drawx + draww / 4, drawy + drawh / 4, draww / 2, drawh / 2,
 					null);
+		}
+		if(unit.isIdle()) {
+			g.setColor(Color.gray);
+			g.fillRect(drawx + draww*3/4, drawy, draww/4, drawh/4);
 		}
 	}
 	

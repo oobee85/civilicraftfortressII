@@ -32,7 +32,7 @@ public class Client {
 	private HashMap<Integer, Thing> things = new HashMap<>();
 	
 	private ArrayList<AIInterface> ailist = new ArrayList<>();
-	private static final long AIDELAY = 2000;
+	private static final long AIDELAY = 1000;
 	private static final long NUM_AI = 1;
 	
 	private volatile boolean isFastForwarding;

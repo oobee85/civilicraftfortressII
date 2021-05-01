@@ -858,7 +858,7 @@ public class Game {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;
 				if(unit.getType().isBuilder()) {
-					unit.setAutoBuild(!unit.getAutoBuild());
+					unit.setAutoBuild(!unit.isAutoBuilding());
 				}
 			}
 		}

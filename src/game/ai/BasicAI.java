@@ -9,16 +9,24 @@ import utils.*;
 import world.*;
 
 public class BasicAI implements AIInterface {
+	private static final BuildingType IRRIGATION = Game.buildingTypeMap.get("IRRIGATION");
 	
 	private static final int MAX_BUILD_RADIUS = 10;
-	private static final int MAX_SEARCH_RADIUS = 30;
-
+	private static final int MAX_SEARCH_RADIUS = 40;
+	
+	public enum WorkerTask {
+		IDLE, IRRIGATE, FORAGE, CHOP, GATHERSTONE
+	}
 	public class State {
 		Building castle;
 		Building barracks;
 		int[] buildingQuantities;
 		int[] unitQuantities;
-		LinkedList<Unit> plantGatherers = new LinkedList<>();
+		
+		LinkedList<Unit> workers = new LinkedList<>();
+		int[] targetAssignments;
+		HashMap<WorkerTask, LinkedList<Unit>> workerAssignments = new HashMap<>();
+		HashMap<Unit, WorkerTask> taskPerWorker = new HashMap<>();
 	}
 	
 	private CommandInterface commands;
@@ -38,41 +46,19 @@ public class BasicAI implements AIInterface {
 		updateBuildings();
 		updateUnits();
 		queueResearch();
+		computeTargetAssignments();
 		
 		if(state.castle != null) {
 			
+			reassignWorkers();
 			for(Unit unit : faction.getUnits()) {
 				if(unit.isIdle()) {
 					if(unit.getType().isBuilder()) {
-						if(wantsMoreIrrigation()) { 
-							if(irrigate(unit)) {
-								continue;
-							}
-						}
-						if(wantsBarracks()) {
-							if(buildBarracks(unit)) {
-								continue;
-							}
-						}
-						if(gatherPlants(unit)) {
-							continue;
-						}
+						handleWorker(unit);
 					}
 					else {
-						if(defend(unit)) {
-							continue;
-						}
-						
+						defend(unit);
 					}
-				}
-			}
-			while(wantsMoreIrrigation() && !state.plantGatherers.isEmpty()) {
-				Unit unit = state.plantGatherers.getFirst();
-				if(irrigate(unit)) {
-					state.plantGatherers.remove();
-				}
-				else {
-					break;
 				}
 			}
 			
@@ -87,25 +73,145 @@ public class BasicAI implements AIInterface {
 		}
 	}
 	
+	private static int lerp(int min, int max, double ratio) {
+		ratio = Math.max(Math.min(ratio, 1), 0);
+		max = Math.max(max, min);
+		return (int) (min + (max - min) * ratio);
+	}
+	
+	private void computeTargetAssignments() {
+		int[] assignments = new int[WorkerTask.values().length];
+		int numWorkers = state.workers.size();
+//		assignments[WorkerTask.FORAGE.ordinal()] = numWorkers/16;
+		
+		int maxWoodAmount = 2000;
+		double woodratio = (1.0*maxWoodAmount - faction.getInventory().getItemAmount(ItemType.WOOD))/maxWoodAmount;
+		assignments[WorkerTask.CHOP.ordinal()] = lerp(1, numWorkers/2, woodratio);
+
+		int maxStoneAmount = 1000;
+		double stoneratio = (1.0*maxStoneAmount - faction.getInventory().getItemAmount(ItemType.STONE))/maxStoneAmount;
+		assignments[WorkerTask.GATHERSTONE.ordinal()] = lerp(0, numWorkers/3, stoneratio);
+		
+		int total = 0;
+		for(int amount : assignments) {
+			total += amount;
+		}
+		assignments[WorkerTask.IRRIGATE.ordinal()] = Math.max(0, numWorkers - total);
+		state.targetAssignments = assignments;
+		System.out.println("assignments: " + printArray(state.targetAssignments));
+	}
+	public static String printArray(int[] arr) {
+		StringBuilder sb = new StringBuilder();
+		for(int value : arr) {
+			sb.append(value + ", ");
+		}
+		return sb.substring(0, sb.length()-2);
+	}
+	
+	private LinkedList<Unit> getWorkersOnTask(WorkerTask task) {
+		if(!state.workerAssignments.containsKey(task) ) {
+			state.workerAssignments.put(task, new LinkedList<>());
+		}
+		return state.workerAssignments.get(task);
+	}
+	private void assignTask(Unit worker, WorkerTask task) {
+		state.taskPerWorker.put(worker, task);
+		getWorkersOnTask(task).add(worker);
+	}
+	private void reassignWorkers() {
+		for(Unit worker : state.workers) {
+			if(!state.taskPerWorker.containsKey(worker)) {
+				assignTask(worker, WorkerTask.IDLE);
+			}
+		}
+		for(WorkerTask task : WorkerTask.values()) {
+			if(task == WorkerTask.IDLE) {
+				continue;
+			}
+			while(getWorkersOnTask(task).size() > state.targetAssignments[task.ordinal()]) {
+				assignTask(getWorkersOnTask(task).removeLast(), WorkerTask.IDLE);
+			}
+		}
+		for(WorkerTask task : WorkerTask.values()) {
+			if(task == WorkerTask.IDLE) {
+				continue;
+			}
+			while(getWorkersOnTask(task).size() < state.targetAssignments[task.ordinal()]) {
+				assignTask(getWorkersOnTask(WorkerTask.IDLE).removeLast(), task);
+			}
+		}
+	}
+	
+	private void handleWorker(Unit worker) {
+		if(!worker.isAutoBuilding()) {
+			// TODO need to add autobuild to command interface
+			worker.setAutoBuild(true);
+		}
+		
+		WorkerTask task = state.taskPerWorker.get(worker);
+		if(task == WorkerTask.IRRIGATE) {
+			if(wantsBarracks()) {
+				if(buildBarracks(worker)) {
+					return;
+				}
+			}
+			if(wantsWall()) {
+				if(buildWall(worker)) {
+					return;
+				}
+			}
+			if(wantsRoad()) {
+				if(buildRoad(worker)) {
+					return;
+				}
+			}
+			if(faction.getInventory().getItemAmount(ItemType.FOOD) < 500) {
+				if(irrigate(worker)) {
+					return;
+				}
+			}
+			if(forage(worker)) {
+				return;
+			}
+			chopWood(worker);
+		}
+		else if(task == WorkerTask.FORAGE) {
+			forage(worker);
+		}
+		else if(task == WorkerTask.CHOP) {
+			chopWood(worker);
+		}
+		else if(task == WorkerTask.GATHERSTONE) {
+			gatherStone(worker);
+		}
+	}
+	
 	private boolean wantsWorker() {
-		return faction.getInventory().getItemAmount(ItemType.FOOD) > faction.getUnits().size()*20 
+		return state.unitQuantities[Game.unitTypeMap.get("WORKER").id()] < 16
+				&& faction.getInventory().getItemAmount(ItemType.FOOD) > 50 
 				&& state.castle.getProducingUnit().isEmpty();
 	}
 	private boolean wantsWarrior() {
-		return faction.getInventory().getItemAmount(ItemType.FOOD) > faction.getUnits().size()*5
+		return state.unitQuantities[Game.unitTypeMap.get("WARRIOR").id()] < 10
+				&& faction.getInventory().getItemAmount(ItemType.FOOD) > faction.getUnits().size()*5
 				&& state.barracks.getProducingUnit().isEmpty()
 				&& state.unitQuantities[Game.unitTypeMap.get("WARRIOR").id()]*5 < faction.getUnits().size();
 	}
 	
 	private boolean wantsBarracks() {
 		int numBarracks = state.buildingQuantities[Game.buildingTypeMap.get("BARRACKS").id()];
-		return numBarracks < 1;
+		return faction.getInventory().getItemAmount(ItemType.FOOD) > 100 && numBarracks < 1;
+	}
+	private boolean wantsWall() {
+		return faction.getInventory().getItemAmount(ItemType.FOOD) > 100 && state.barracks != null && faction.getInventory().getItemAmount(ItemType.WOOD) > 200;
+	}
+	private boolean wantsRoad() {
+		return faction.getInventory().getItemAmount(ItemType.FOOD) > 500 && state.barracks != null && faction.getInventory().getItemAmount(ItemType.STONE) > 300;
 	}
 	
 	private boolean wantsMoreIrrigation() {
-		int numIrrigation = state.buildingQuantities[Game.buildingTypeMap.get("IRRIGATION").id()];
 		int numUnits = faction.getUnits().size();
-		return numIrrigation*2 < numUnits;
+		return faction.getInventory().getItemAmount(ItemType.FOOD) < 100 + numUnits*25;
 	}
 	
 	private Tile getTargetTile(Tile source, int minRadius, int maxRadius, Predicate<Tile> requirement) {
@@ -143,6 +249,38 @@ public class BasicAI implements AIInterface {
 		}
 		return building != null;
 	}
+	private boolean buildWall(Unit unit) {
+		Tile tile = getTargetTile(state.castle.getTile(), MAX_BUILD_RADIUS, MAX_BUILD_RADIUS, e -> {
+			return (!e.hasBuilding() && e.canBuild()) || (e.hasBuilding() && !e.getBuilding().isBuilt());
+		});
+		if(tile == null) {
+			return false;
+		}
+		Building building = tile.getBuilding();
+		if(building == null) {
+			building = planBuilding(unit, tile, true, Game.buildingTypeMap.get("WALL_WOOD"));
+		}
+		else if(!building.isBuilt()) {
+			commands.buildThing(unit, tile, false, true);
+		}
+		return building != null;
+	}
+	private boolean buildRoad(Unit unit) {
+		Tile tile = getTargetTile(state.castle.getTile(), 0, MAX_BUILD_RADIUS, e -> {
+			return (!e.hasRoad() && e.canBuild()) || (e.hasRoad() && !e.getRoad().isBuilt());
+		});
+		if(tile == null) {
+			return false;
+		}
+		Building road = tile.getRoad();
+		if(road == null) {
+			road = planBuilding(unit, tile, true, Game.buildingTypeMap.get("STONE_ROAD"));
+		}
+		else if(!road.isBuilt()) {
+			commands.buildThing(unit, tile, true, true);
+		}
+		return road != null;
+	}
 	
 	private Building planBuilding(Unit unit, Tile tile, boolean clearQueue, BuildingType type) {
 		if(faction.canAfford(type.getCost())) {
@@ -152,29 +290,70 @@ public class BasicAI implements AIInterface {
 	}
 	
 	private boolean irrigate(Unit unit) {
+		// look for already built irrigations first
+		Tile existingIrrigation = getTargetTile(state.castle.getTile(), 2, MAX_BUILD_RADIUS, e -> {
+			return e.hasBuilding() && e.getBuilding().getType() == IRRIGATION;
+		});
+		if(existingIrrigation != null) {
+			return null != buildAndHarvest(unit, existingIrrigation, IRRIGATION);
+		}
+		
+		// otherwise build a new irrigation nearby
 		Tile tile = getTargetTile(state.castle.getTile(), 2, MAX_BUILD_RADIUS, e -> {
 			return !e.hasBuilding() && e.canBuild() && e.canPlant();
 		});
 		if(tile == null) {
 			return false;
 		}
-		Building building = planBuilding(unit, tile, true, Game.buildingTypeMap.get("IRRIGATION"));
-		if(building != null) {
-			state.buildingQuantities[Game.buildingTypeMap.get("IRRIGATION").id()]++;
-			commands.harvestThing(unit, building, false);
-		}
+		Building building = buildAndHarvest(unit, tile, IRRIGATION);
 		return building != null;
 	}
+	private Building buildAndHarvest(Unit unit, Tile tile, BuildingType type) {
+		Building building = tile.getBuilding();
+		boolean clearQueue = true;
+		if(building == null) {
+			building = planBuilding(unit, tile, true, type);
+			state.buildingQuantities[type.id()]++;
+			clearQueue = false;
+		}
+		else if(!building.isBuilt()) {
+			commands.buildThing(unit, tile, false, true);
+			clearQueue = false;
+		}
+		if(building != null) {
+			commands.harvestThing(unit, tile.getBuilding(), clearQueue);
+		}
+		return building;
+	}
 	
-	private boolean gatherPlants(Unit unit) {
+	private boolean gatherStone(Unit unit) {
 		Tile tile = getTargetTile(unit.getTile(), MAX_SEARCH_RADIUS, e -> {
-			return e.getPlant() != null;
+			return e.getTerrain() == Terrain.ROCK;
+		});
+		if(tile == null) {
+			return false;
+		}
+		Building building = buildAndHarvest(unit, tile, Game.buildingTypeMap.get("MINE"));
+		return building != null;
+	}
+	private boolean chopWood(Unit unit) {
+		Tile tile = getTargetTile(unit.getTile(), MAX_SEARCH_RADIUS, e -> {
+			return e.getPlant() != null && e.getPlant().getType() == PlantType.TREE;
 		});
 		if(tile == null) {
 			return false;
 		}
 		commands.harvestThing(unit, tile.getPlant(), true);
-		state.plantGatherers.add(unit);
+		return true;
+	}
+	private boolean forage(Unit unit) {
+		Tile tile = getTargetTile(unit.getTile(), MAX_SEARCH_RADIUS, e -> {
+			return e.getPlant() != null && e.getPlant().getType() != PlantType.TREE;
+		});
+		if(tile == null) {
+			return false;
+		}
+		commands.harvestThing(unit, tile.getPlant(), true);
 		return true;
 	}
 	
@@ -217,8 +396,12 @@ public class BasicAI implements AIInterface {
 	}
 	private void updateUnits() {
 		int[] unitQuantities = new int[Game.unitTypeMap.size()];
+		state.workers.clear();
 		for(Unit unit : faction.getUnits()) {
 			unitQuantities[unit.getType().id()]++;
+			if(unit.getType().isBuilder()) {
+				state.workers.add(unit);
+			}
 		}
 		state.unitQuantities = unitQuantities;
 	}

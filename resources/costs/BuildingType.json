@@ -118,7 +118,7 @@
 		"image":"Images/buildings/irrigation.png",
 		"mesh":"models/flatcube.obj",
 		"vision":1,
-		"cost":{"WOOD":50},
+		"cost":{"WOOD":20},
 		"culture":0,
 		"attributes":["harvestable"],
 		"health":100,

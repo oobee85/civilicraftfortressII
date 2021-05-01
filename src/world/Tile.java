@@ -420,7 +420,10 @@ public class Tile implements Externalizable {
 		row += 1;
 		return row;
 	}
-
+	
+	public boolean hasRoad() {
+		return road != null;
+	}
 	public Building getRoad() {
 		return road;
 	}

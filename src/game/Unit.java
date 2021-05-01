@@ -53,7 +53,7 @@ public class Unit extends Thing implements Serializable {
 	public void setAutoBuild(boolean auto) {
 		passiveAction = auto ? PlannedAction.BUILD : PlannedAction.NOTHING;
 	}
-	public boolean getAutoBuild() {
+	public boolean isAutoBuilding() {
 		return passiveAction == PlannedAction.BUILD;
 	}
 	
@@ -333,6 +333,7 @@ public class Unit extends Thing implements Serializable {
 
 	public Building getNearestBuildingToDeliver() {
 		Building bestBuilding = null;
+		// TODO fix concurrent modification exception on this for loop
 		for (Building building : this.getFaction().getBuildings()) {
 			if ((building.getType().isColony() || building.getType().isCastle())) {
 				if(bestBuilding == null) {
@@ -381,8 +382,8 @@ public class Unit extends Thing implements Serializable {
 		if(readyToHarvest()) {
 			boolean isFull = false;
 			if(building.getType().name().equals("IRRIGATION")) {
-				building.takeDamage(1);
-				isFull = this.addItem(ItemType.FOOD, 2);
+				building.takeDamage(3);
+				isFull = this.addItem(ItemType.FOOD, 3);
 				this.resetTimeToHarvest(1);
 			}else if(building.getType().name().equals("MINE")) {
 				building.takeDamage(1);
@@ -402,9 +403,9 @@ public class Unit extends Thing implements Serializable {
 	
 	public void doHarvest(Plant plant, PlannedAction action) {
 		if(readyToHarvest()) {
-			plant.takeDamage(1);
+			plant.takeDamage(2);
 			boolean isFull = this.addItem(plant.getItem(), 1);
-			this.resetTimeToHarvest(1);
+			this.resetTimeToHarvest(2);
 			if(isFull) {
 				action.setDone(true);
 			}

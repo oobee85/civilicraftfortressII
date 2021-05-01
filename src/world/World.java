@@ -1465,9 +1465,10 @@ public class World {
 				terrainColor = tile.getBuilding().getMipMap().getColor(0);
 				minimapColor = tile.getBuilding().getMipMap().getColor(0);
 			}
-			if(tile.getModifier() != null) {
-				minimapColor = tile.getModifier().getType().getMipMap().getColor(0);
-				terrainColor = Utils.blendColors(tile.getModifier().getType().getMipMap().getColor(0), terrainColor, 0.9);
+			GroundModifier modifier = tile.getModifier(); 
+			if(modifier != null) {
+				minimapColor = modifier.getType().getMipMap().getColor(0);
+				terrainColor = Utils.blendColors(modifier.getType().getMipMap().getColor(0), terrainColor, 0.9);
 			}
 			if(tile.getFaction() != getFaction(NO_FACTION_ID)) {
 				minimapColor = Utils.blendColors(tile.getFaction().color(), minimapColor, 0.3);
