@@ -21,7 +21,6 @@ public class Tile implements Externalizable {
 	public volatile LiquidType liquidType;
 
 	private volatile Faction faction;
-	private boolean isSelected = false;
 	private boolean inVisionRange = false;
 
 	private Resource resource;
@@ -434,10 +433,6 @@ public class Tile implements Externalizable {
 
 	public Terrain getTerrain() {
 		return terr;
-	}
-
-	public boolean getIsSelected() {
-		return isSelected;
 	}
 
 	public Faction getFaction() {
