@@ -1415,32 +1415,12 @@ public class World {
 		System.out.println("Finished generating " + width + "x" + height + " world with " + tileList.size() + " tiles.");
 	}
 	
-
 	public BufferedImage[] createTerrainImage(Faction faction) {
 		double brighnessModifier = getDaylight();
-		HashMap<Terrain, Color> terrainColors = new HashMap<>();
-		for(Terrain t : Terrain.values()) {
-			BufferedImage image = Utils.toBufferedImage(t.getImage(0));
-			int sumr = 0;
-			int sumg = 0;
-			int sumb = 0;
-			for(int i = 0; i < image.getWidth(); i++) {
-				for(int j = 0; j < image.getHeight(); j++) {
-					Color c = new Color(image.getRGB(i, j));
-					sumr += c.getRed();
-					sumg += c.getGreen();
-					sumb += c.getBlue();
-				}
-			}
-			int totalNumPixels = image.getWidth()*image.getHeight();
-			Color average = new Color(sumr/totalNumPixels, sumg/totalNumPixels, sumb/totalNumPixels);
-			terrainColors.put(t, average);
-		}
+		HashMap<Terrain, Color> terrainColors = Utils.computeTerrainAverageColor();
 		BufferedImage terrainImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 		BufferedImage minimapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 
-		Graphics minimapGraphics = minimapImage.getGraphics();
-		Graphics terrainGraphics = terrainImage.getGraphics();
 		for(Tile tile : this.getTiles()) {
 			Color minimapColor = terrainColors.get(tile.getTerrain());
 			Color terrainColor = terrainColors.get(tile.getTerrain());
@@ -1485,80 +1465,52 @@ public class World {
 			minimapImage.setRGB(notification.tile.getLocation().x(), notification.tile.getLocation().y(), Color.red.getRGB());
 			terrainImage.setRGB(notification.tile.getLocation().x(), notification.tile.getLocation().y(), Color.red.getRGB());
 		}
-		minimapGraphics.dispose();
-		terrainGraphics.dispose();
-		
 		
 		double highHeight = Double.MIN_VALUE;
 		double lowHeight = Double.MAX_VALUE;
-		for(Tile tile : getTiles() ) {
-			highHeight = Math.max(highHeight, tile.getHeight());
-			lowHeight = Math.min(lowHeight, tile.getHeight());
-		}
-		
-		BufferedImage heightMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
-		for(Tile tile : getTiles() ) {
-			float heightRatio = (float) ((tile.getHeight() - lowHeight) / (highHeight - lowHeight));
-			int r = Math.max(Math.min((int)(255*heightRatio), 255), 0);
-			Color c = new Color(r, 0, 255-r);
-			heightMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
-		}
-		
 		double highPressure = Double.MIN_VALUE;
 		double lowPressure = Double.MAX_VALUE;
-		for(Tile tile : getTiles() ) {
-			highPressure = Math.max(highPressure, tile.getAir().getPressure());
-			lowPressure = Math.min(lowPressure, tile.getAir().getPressure());
-		}
-		
-		BufferedImage pressureMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
-		for(Tile tile : getTiles() ) {
-			float pressureRatio = (float) ((tile.getAir().getPressure() - lowPressure) / (highPressure - lowPressure));
-			int r = Math.max(Math.min((int)(255*pressureRatio), 255), 0);
-			Color c = new Color(r, 0, 255-r);
-			pressureMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
-		}
-		
 		double highTemperature = MINTEMP;
 		double lowTemperature = MAXTEMP;
-		for(Tile tile : getTiles() ) {
-			highTemperature = Math.max(highTemperature, tile.getAir().getTemperature());
-			lowTemperature = Math.min(lowTemperature, tile.getAir().getTemperature());
-		}
-		
-		BufferedImage temperatureMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
-		for(Tile tile : getTiles() ) {
-			float temperatureRatio = (float) ((tile.getAir().getTemperature() - lowTemperature) / (highTemperature - lowTemperature));
-			int r = Math.max(Math.min((int)(255*temperatureRatio), 255), 0);
-			Color c = new Color(r, 0, 255-r);
-			temperatureMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
-		}
-		
-		BufferedImage humidityMapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
-		
 		double highHumidity = Double.MIN_VALUE;
 		double lowHumidity = Double.MAX_VALUE;
 		for(Tile tile : getTiles() ) {
+			highHeight = Math.max(highHeight, tile.getHeight());
+			lowHeight = Math.min(lowHeight, tile.getHeight());
+			highPressure = Math.max(highPressure, tile.getAir().getPressure());
+			lowPressure = Math.min(lowPressure, tile.getAir().getPressure());
+			highTemperature = Math.max(highTemperature, tile.getAir().getTemperature());
+			lowTemperature = Math.min(lowTemperature, tile.getAir().getTemperature());
 			highHumidity = Math.max(highHumidity, tile.getAir().getHumidity());
 			lowHumidity = Math.min(lowHumidity, tile.getAir().getHumidity());
 		}
 		
-		for(Tile tile : getTiles() ) {
-			float massRatio = (float) ((tile.getAir().getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
-			int r = Math.max(Math.min((int)(255*massRatio), 255), 0);
-			Color c = new Color(r, 0, 255 - r);
-			humidityMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
+		BufferedImage[] mapImages = new BufferedImage[MapMode.values().length];
+		mapImages[MapMode.TERRAIN.ordinal()] = terrainImage;
+		mapImages[MapMode.MINIMAP.ordinal()] = minimapImage;
+		for(int i = 1; i < MapMode.values().length-1; i++) {
+			BufferedImage image = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
+			for(Tile tile : getTiles() ) {
+				float ratio = 0;
+				if(i == MapMode.HEIGHT.ordinal()) {
+					ratio = (float) ((tile.getHeight() - lowHeight) / (highHeight - lowHeight));
+				}
+				else if(i == MapMode.PRESSURE.ordinal()) {
+					ratio = (float) ((tile.getAir().getPressure() - lowPressure) / (highPressure - lowPressure));
+				}
+				else if(i == MapMode.TEMPURATURE.ordinal()) {
+					ratio = (float) ((tile.getAir().getTemperature() - lowTemperature) / (highTemperature - lowTemperature));
+				}
+				else if(i == MapMode.HUMIDITY.ordinal()) {
+					ratio = (float) ((tile.getAir().getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
+				}
+				ratio = Math.max(Math.min(ratio, 1), 0);
+				Color c = new Color(ratio, 0, 1-ratio);
+				image.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
+			}
+			mapImages[i] = image;
 		}
-		// These must be in same order as MapMode
-		return new BufferedImage[] { 
-				ImageCreation.convertToHexagonal(terrainImage), 
-				ImageCreation.convertToHexagonal(heightMapImage),
-				ImageCreation.convertToHexagonal(humidityMapImage), 
-				ImageCreation.convertToHexagonal(pressureMapImage),
-				ImageCreation.convertToHexagonal(temperatureMapImage),
-				ImageCreation.convertToHexagonal(minimapImage), 
-				};
-		
+		return mapImages;
 	}
 
 	public int ticksUntilDay() {
