@@ -220,13 +220,12 @@ public class VanillaDrawer extends Drawer {
 		int upperY = Math.min(game.world.getHeight(), lowerY + panelHeight / frozenTileSize + 4);
 
 		if (frozenTileSize < FAST_MODE_TILE_SIZE) {
-			g.drawImage(
-					mapImages[state.mapMode.ordinal()], 
-					0, 
-					0, 
-					frozenTileSize * game.world.getWidth(), 
-					frozenTileSize * game.world.getHeight(), 
-					null);
+			g.drawImage( mapImages[state.mapMode.ordinal()], 
+						0, 
+						0, 
+						frozenTileSize * game.world.getWidth(), 
+						frozenTileSize * game.world.getHeight(), 
+						null);
 		} else {
 			double highHeight = Double.MIN_VALUE;
 			double lowHeight = Double.MAX_VALUE;
@@ -236,7 +235,7 @@ public class VanillaDrawer extends Drawer {
 			double lowTemp = Double.MAX_VALUE;
 			double highHumidity = Double.MIN_VALUE;
 			double lowHumidity = Double.MAX_VALUE;
-			if (state.mapMode == MapMode.HEIGHT) {
+			if(state.mapMode != MapMode.TERRAIN) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
@@ -245,40 +244,10 @@ public class VanillaDrawer extends Drawer {
 						}
 						highHeight = Math.max(highHeight, tile.getHeight());
 						lowHeight = Math.min(lowHeight, tile.getHeight());
-					}
-				}
-			}
-			else if (state.mapMode == MapMode.PRESSURE) {
-				for (int i = lowerX; i < upperX; i++) {
-					for (int j = lowerY; j < upperY; j++) {
-						Tile tile = game.world.get(new TileLoc(i, j));
-						if (tile == null) {
-							continue;
-						}
 						highPressure = Math.max(highPressure, tile.getAir().getPressure());
 						lowPressure = Math.min(lowPressure, tile.getAir().getPressure());
-					}
-				}
-			}
-			else if (state.mapMode == MapMode.TEMPURATURE) {
-				for (int i = lowerX; i < upperX; i++) {
-					for (int j = lowerY; j < upperY; j++) {
-						Tile tile = game.world.get(new TileLoc(i, j));
-						if (tile == null) {
-							continue;
-						}
 						highTemp = Math.max(highTemp, tile.getAir().getTemperature());
 						lowTemp = Math.min(lowTemp, tile.getAir().getTemperature());
-					}
-				}
-			}
-			else if (state.mapMode == MapMode.HUMIDITY) {
-				for (int i = lowerX; i < upperX; i++) {
-					for (int j = lowerY; j < upperY; j++) {
-						Tile tile = game.world.get(new TileLoc(i, j));
-						if (tile == null) {
-							continue;
-						}
 						highHumidity = Math.max(highHumidity, tile.getAir().getHumidity());
 						lowHumidity = Math.min(lowHumidity, tile.getAir().getHumidity());
 					}
@@ -291,7 +260,23 @@ public class VanillaDrawer extends Drawer {
 					if (tile == null) {
 						continue;
 					}
-					drawTile((Graphics2D) g, tile, lowHeight, highHeight, lowHumidity, highHumidity, lowPressure, highPressure, lowTemp, highTemp);
+					float ratio = 0;
+					if (state.mapMode == MapMode.HEIGHT) {
+						ratio = (float) ((tile.getHeight() - lowHeight) / (highHeight - lowHeight));
+					} else if (state.mapMode == MapMode.PRESSURE) {
+						ratio = (float) ((tile.getAir().getPressure() - lowPressure)
+								/ (highPressure - lowPressure));
+					} else if (state.mapMode == MapMode.TEMPURATURE) {
+						ratio = (float) ((tile.getAir().getTemperature() - lowTemp) / (highTemp - lowTemp));
+//						if (tile.getAir().getTemperature() <= World.FREEZETEMP) {
+//							g.drawImage(SNOW, drawAt.x, drawAt.y, draww, drawh, null);
+//						}
+					} else if (state.mapMode == MapMode.HUMIDITY) {
+						ratio = (float) ((tile.getAir().getHumidity() - lowHumidity)
+								/ (highHumidity - lowHumidity));
+					}
+					ratio = Math.max(Math.min(ratio, 1f), 0f);
+					drawTile((Graphics2D) g, tile, new Color(ratio, 0f, 1f - ratio));
 				}
 			}
 
@@ -578,17 +563,14 @@ public class VanillaDrawer extends Drawer {
 			}
 		} else {
 			if (game.world.get(state.hoveredTile) != null) {
-//				for(TileLoc tileloc : Utils.getRingOfTiles(state.hoveredTile, game.world, RADIUS)) {
-//					Point drawAt = getDrawingCoords(tileloc);
-//					g.drawRect(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, frozenTileSize - strokeWidth,
-//							frozenTileSize - strokeWidth);
-//				}
 				Point drawAt = getDrawingCoords(state.hoveredTile);
 				g.drawRect(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, frozenTileSize - strokeWidth,
 						frozenTileSize - strokeWidth);
-//				g.setStroke(stroke);
-//				g.setColor(Color.yellow);
-//				g.drawString(state.hoveredTile.toString(), drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2);
+				if(state.drawDebugStrings) {
+					g.setStroke(stroke);
+					g.setColor(Color.yellow);
+					g.drawString(state.hoveredTile.toString(), drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2);
+				}
 			}
 		}
 		g.setStroke(stroke);
@@ -600,16 +582,22 @@ public class VanillaDrawer extends Drawer {
 		return new Point(x, y);
 	}
 
-	private void drawTile(Graphics2D g, Tile theTile, double lowHeight, double highHeight, double lowHumidity,
-			double highHumidity, double lowPressure, double highPressure, double lowTemp, double highTemp) {
+	private void drawTile(Graphics2D g, Tile theTile, Color color) {
 		Point drawAt = getDrawingCoords(theTile.getLocation());
 		int draww = frozenTileSize;
 		int drawh = frozenTileSize;
 		int imagesize = draww < drawh ? draww : drawh;
 
-		if(state.mapMode == MapMode.TERRAIN) {
+		if(state.mapMode != MapMode.TERRAIN) {
+			g.setColor(color);
+			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
+			if (state.mapMode == MapMode.TEMPURATURE 
+					&& theTile.getAir().getTemperature() <= World.FREEZETEMP) {
+				g.drawImage(SNOW, drawAt.x, drawAt.y, draww, drawh, null);
+			}
+		} 
+		else {
 			g.drawImage(theTile.getTerrain().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh, null);
-//			t.drawEntities(g, currentMode);
 
 			if (theTile.getResource() != null && state.faction.areRequirementsMet(theTile.getResource().getType())) {
 				g.drawImage(theTile.getResource().getType().getMipMap().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh,
@@ -675,27 +663,6 @@ public class VanillaDrawer extends Drawer {
 				drawUnit(unit, g, drawAt.x, drawAt.y, draww, drawh);
 			}
 		}
-		else {
-			float ratio = 0;
-			if (state.mapMode == MapMode.HEIGHT) {
-				ratio = (float) ((theTile.getHeight() - lowHeight) / (highHeight - lowHeight));
-			} else if (state.mapMode == MapMode.PRESSURE) {
-				ratio = (float) ((theTile.getAir().getPressure() - lowPressure)
-						/ (highPressure - lowPressure));
-			} else if (state.mapMode == MapMode.TEMPURATURE) {
-				ratio = (float) ((theTile.getAir().getTemperature() - lowTemp) / (highTemp - lowTemp));
-				if (theTile.getAir().getTemperature() <= World.FREEZETEMP) {
-					g.drawImage(SNOW, drawAt.x, drawAt.y, draww, drawh, null);
-				}
-			} else if (state.mapMode == MapMode.HUMIDITY) {
-				ratio = (float) ((theTile.getAir().getHumidity() - lowHumidity)
-						/ (highHumidity - lowHumidity));
-			}
-			ratio = Math.max(Math.min(ratio, 1f), 0f);
-			g.setColor(new Color(ratio, 0f, 1f - ratio));
-			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-		}
-		
 	}
 
 	private void drawUnit(Unit unit, Graphics g, int drawx, int drawy, int draww, int drawh) {
