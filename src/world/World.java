@@ -1528,10 +1528,20 @@ public class World {
 	public static int getCurrentDayOffset() {
 		return (World.ticks + TRANSITION_PERIOD)%(DAY_DURATION + NIGHT_DURATION);
 	}
+
+	private static double precomputedDaylight;
+	private static int precomputedDaylightTick = -1;
+	
 	public static double getDaylight() {
 		if(Game.DISABLE_NIGHT) {
 			return 1;
 		}
+		if(World.ticks != precomputedDaylightTick) {
+			recomputeDaylight();
+		}
+		return precomputedDaylight;
+	}
+	private static void recomputeDaylight() {
 		double ratio = 1;
 		int currentDayOffset = getCurrentDayOffset();
 		if(currentDayOffset < TRANSITION_PERIOD) {
@@ -1549,7 +1559,8 @@ public class World {
 		else {
 			ratio = 0.5 - 0.5*(DAY_DURATION + NIGHT_DURATION - currentDayOffset)/TRANSITION_PERIOD;
 		}
-		return ratio;
+		precomputedDaylight = ratio;
+		precomputedDaylightTick = World.ticks;
 	}
 	
 }

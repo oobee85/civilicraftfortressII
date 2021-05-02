@@ -268,9 +268,6 @@ public class VanillaDrawer extends Drawer {
 								/ (highPressure - lowPressure));
 					} else if (state.mapMode == MapMode.TEMPURATURE) {
 						ratio = (float) ((tile.getAir().getTemperature() - lowTemp) / (highTemp - lowTemp));
-//						if (tile.getAir().getTemperature() <= World.FREEZETEMP) {
-//							g.drawImage(SNOW, drawAt.x, drawAt.y, draww, drawh, null);
-//						}
 					} else if (state.mapMode == MapMode.HUMIDITY) {
 						ratio = (float) ((tile.getAir().getHumidity() - lowHumidity)
 								/ (highHumidity - lowHumidity));
