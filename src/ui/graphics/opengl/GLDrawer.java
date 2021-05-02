@@ -13,6 +13,7 @@ import com.jogamp.opengl.util.texture.*;
 
 import game.*;
 import game.liquid.*;
+import ui.*;
 import ui.graphics.*;
 import ui.graphics.opengl.maths.*;
 import ui.view.GameView.*;
@@ -149,11 +150,11 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				camera.set(new Vector3f(game.world.getWidth()/2, 0, 100), 0, -45);
 				this.updateTerrainImages();
 			}
-			if(this.terrainImage != null) {
+			if(mapImages != null && mapImages[MapMode.TERRAIN.ordinal()] != null) {
 				if(terrainObject.texture != null) {
 					terrainObject.texture.destroy(gl);
 				}
-				terrainObject.texture = TextureUtils.textureFromImage(gl, this.terrainImage);
+				terrainObject.texture = TextureUtils.textureFromImage(gl, mapImages[MapMode.TERRAIN.ordinal()]);
 			}
 			
 //			terrainObject.rotate(Matrix4f.rotate(1, new Vector3f(0, 1, 0)));

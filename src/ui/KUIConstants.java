@@ -52,6 +52,13 @@ public class KUIConstants {
 		setComponentAttributes(b, size);
 		return b;
 	}
+	public static JRadioButton setupRadioButton(String text, Icon icon, Dimension size) {
+		JRadioButton b = new KRadioButton(text, icon);
+		b.setMargin(zeroMargin);
+		b.setHorizontalAlignment(SwingConstants.LEFT);
+		setComponentAttributes(b, size);
+		return b;
+	}
 
 	public static KLabel setupLabel(String text, Icon icon, Dimension size) {
 		KLabel b = new KLabel(icon);

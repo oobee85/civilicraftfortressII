@@ -4,18 +4,14 @@ import java.awt.*;
 import java.awt.image.*;
 
 import game.*;
+import ui.*;
 import ui.view.GameView.*;
 import utils.*;
 import world.*;
 
 public abstract class Drawer {
 
-	protected volatile BufferedImage terrainImage;
-	protected volatile BufferedImage minimapImage;
-	protected volatile BufferedImage heightMapImage;
-	protected volatile BufferedImage humidityMapImage;
-	protected volatile BufferedImage pressureMapImage;
-	protected volatile BufferedImage temperatureMapImage;
+	protected volatile BufferedImage[] mapImages = new BufferedImage[MapMode.values().length];
 
 	protected GameViewState state;
 	protected Game game;
@@ -25,17 +21,17 @@ public abstract class Drawer {
 		this.game = game;
 	}
 
+	public void updateTerrainImages() {
+		if (game.world != null) {
+			mapImages = game.world.createTerrainImage(state.faction);
+		}
+	}
 	public BufferedImage getImageToDrawMinimap() {
-		if (state.showHeightMap) {
-			return heightMapImage;
-		} else if (state.showPressureMap) {
-			return pressureMapImage;
-		} else if (state.showTemperatureMap) {
-			return temperatureMapImage;
-		} else if (state.showHumidityMap) {
-			return humidityMapImage;
-		} else {
-			return minimapImage;
+		if(state.mapMode == MapMode.TERRAIN) {
+			return mapImages[MapMode.MINIMAP.ordinal()];
+		}
+		else {
+			return mapImages[state.mapMode.ordinal()];
 		}
 	}
 	public abstract Position[] getVisibleTileBounds();
@@ -51,16 +47,4 @@ public abstract class Drawer {
 	 */
 	public abstract void shiftView(int dx, int dy);
 	public abstract void rotateView(int dx, int dy);
-
-	public void updateTerrainImages() {
-		if (game.world != null) {
-			BufferedImage[] images = game.world.createTerrainImage(state.faction);
-			this.terrainImage = images[0];
-			this.minimapImage = images[1];
-			this.heightMapImage = images[2];
-			this.humidityMapImage = images[3];
-			this.pressureMapImage = images[4];
-			this.temperatureMapImage = images[5];
-		}
-	}
 }

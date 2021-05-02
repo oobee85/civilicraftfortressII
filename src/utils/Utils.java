@@ -342,6 +342,16 @@ public final class Utils {
 				(int) (top.getBlue()*alpha + bottom.getBlue()*beta)
 				);
 	}
+
+	/**
+	 * Interpolates between min and max depending on ratio.
+	 * ratio gets bounded between 0 and 1
+	 */
+	public static int lerp(int min, int max, double ratio) {
+		ratio = Math.max(Math.min(ratio, 1), 0);
+		max = Math.max(max, min);
+		return (int) (min + (max - min) * ratio);
+	}
 	
 	public static double getAlphaOfLiquid(double amount) {
 		// 1 units of fluid is opaque, linearly becoming transparent at 0 units of fluid.

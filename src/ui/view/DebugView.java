@@ -2,6 +2,7 @@ package ui.view;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -39,28 +40,21 @@ public class DebugView {
 	}
 	
 	private void setupButtons() {
-
-		JToggleButton showHeightMap = KUIConstants.setupToggleButton("Show Height Map", null, DEBUG_BUTTON_SIZE);
-		showHeightMap.addActionListener(e -> {
-			showHeightMap.setText(showHeightMap.isSelected() ? "Hide Height Map" : "Show Height Map");
-			gameView.setShowHeightMap(showHeightMap.isSelected());
-		});
-		JToggleButton showPressureMap = KUIConstants.setupToggleButton("Show Pressure Map", null, DEBUG_BUTTON_SIZE);
-		showPressureMap.addActionListener(e -> {
-			showPressureMap.setText(showPressureMap.isSelected() ? "Hide Pressure Map" : "Show Pressure Map");
-			gameView.setShowPressureMap(showPressureMap.isSelected());
-		});
-		JToggleButton showTemperatureMap = KUIConstants.setupToggleButton("Show Temperature Map", null, DEBUG_BUTTON_SIZE);
-		showTemperatureMap.addActionListener(e -> {
-			showTemperatureMap.setText(showTemperatureMap.isSelected() ? "Hide Temperature Map" : "Show Temperature Map");
-			gameView.setShowTemperatureMap(showTemperatureMap.isSelected());
-		});
 		
-		JToggleButton showMassMap = KUIConstants.setupToggleButton("Show Mass Map", null, DEBUG_BUTTON_SIZE);
-		showMassMap.addActionListener(e -> {
-			showMassMap.setText(showMassMap.isSelected() ? "Hide Mass Map" : "Show Mass Map");
-			gameView.setShowMassMap(showMassMap.isSelected());
-		});
+		ButtonGroup group = new ButtonGroup();
+		LinkedList<JRadioButton> mapModeButtons = new LinkedList<>();
+		for(MapMode mode : MapMode.values()) {
+			if(mode == MapMode.MINIMAP) {
+				continue;
+			}
+			JRadioButton button = KUIConstants.setupRadioButton(Utils.getNiceName(mode.toString()), null, DEBUG_BUTTON_SIZE);
+			button.addActionListener(e -> {
+				gameView.setMapMode(mode);
+			});
+			group.add(button);
+			mapModeButtons.add(button);
+		}
+		mapModeButtons.getFirst().setSelected(true);
 
 		JToggleButton flipTable = KUIConstants.setupToggleButton("Flip Table", null, DEBUG_BUTTON_SIZE);
 		flipTable.addActionListener(new ActionListener() {
@@ -113,7 +107,7 @@ public class DebugView {
 				fastForward.setText(fastForward.isSelected() ? "Stop Fast Forward" : "Fast Forward");
 			}
 		});
-		JButton raiseHeight = KUIConstants.setupButton("SpawnWeather", RESEARCH_TAB_ICON, DEBUG_BUTTON_SIZE);
+		JButton raiseHeight = KUIConstants.setupButton("SpawnWeather", RAIN_ICON, DEBUG_BUTTON_SIZE);
 		raiseHeight.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -244,10 +238,9 @@ public class DebugView {
 		});
 		
 
-		scrollingPanel.add(showHeightMap);
-		scrollingPanel.add(showPressureMap);
-		scrollingPanel.add(showTemperatureMap);
-		scrollingPanel.add(showMassMap);
+		for(JRadioButton button : mapModeButtons) {
+			scrollingPanel.add(button);
+		}
 		scrollingPanel.add(flipTable);
 		scrollingPanel.add(makeItRain);
 		scrollingPanel.add(makeItDry);

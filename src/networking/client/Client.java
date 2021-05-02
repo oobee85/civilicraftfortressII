@@ -232,6 +232,7 @@ public class Client {
 				players.add(new PlayerInfo("Bot " + i, null));
 			}
 			gameInstance.generateWorld(128, 128, false, players);
+			clientGUI.getGameView().getDrawer().updateTerrainImages();
 		}
 		boolean assignedPlayer = false;
 		for(Faction f : gameInstance.world.getFactions()) {

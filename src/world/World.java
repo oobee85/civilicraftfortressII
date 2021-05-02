@@ -1549,13 +1549,14 @@ public class World {
 			Color c = new Color(r, 0, 255 - r);
 			humidityMapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 		}
+		// These must be in same order as MapMode
 		return new BufferedImage[] { 
 				ImageCreation.convertToHexagonal(terrainImage), 
-				ImageCreation.convertToHexagonal(minimapImage), 
 				ImageCreation.convertToHexagonal(heightMapImage),
 				ImageCreation.convertToHexagonal(humidityMapImage), 
 				ImageCreation.convertToHexagonal(pressureMapImage),
 				ImageCreation.convertToHexagonal(temperatureMapImage),
+				ImageCreation.convertToHexagonal(minimapImage), 
 				};
 		
 	}

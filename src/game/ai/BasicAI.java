@@ -73,12 +73,6 @@ public class BasicAI implements AIInterface {
 		}
 	}
 	
-	private static int lerp(int min, int max, double ratio) {
-		ratio = Math.max(Math.min(ratio, 1), 0);
-		max = Math.max(max, min);
-		return (int) (min + (max - min) * ratio);
-	}
-	
 	private void computeTargetAssignments() {
 		int[] assignments = new int[WorkerTask.values().length];
 		int numWorkers = state.workers.size();
@@ -86,11 +80,11 @@ public class BasicAI implements AIInterface {
 		
 		int maxWoodAmount = 2000;
 		double woodratio = (1.0*maxWoodAmount - faction.getInventory().getItemAmount(ItemType.WOOD))/maxWoodAmount;
-		assignments[WorkerTask.CHOP.ordinal()] = lerp(1, numWorkers/2, woodratio);
+		assignments[WorkerTask.CHOP.ordinal()] = Utils.lerp(1, numWorkers/2, woodratio);
 
 		int maxStoneAmount = 1000;
 		double stoneratio = (1.0*maxStoneAmount - faction.getInventory().getItemAmount(ItemType.STONE))/maxStoneAmount;
-		assignments[WorkerTask.GATHERSTONE.ordinal()] = lerp(0, numWorkers/3, stoneratio);
+		assignments[WorkerTask.GATHERSTONE.ordinal()] = Utils.lerp(0, numWorkers/3, stoneratio);
 		if(faction.getInventory().getItemAmount(ItemType.FOOD) < 50) {
 			assignments[WorkerTask.GATHERSTONE.ordinal()] = 0;
 		}

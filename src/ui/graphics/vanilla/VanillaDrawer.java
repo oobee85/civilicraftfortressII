@@ -220,22 +220,13 @@ public class VanillaDrawer extends Drawer {
 		int upperY = Math.min(game.world.getHeight(), lowerY + panelHeight / frozenTileSize + 4);
 
 		if (frozenTileSize < FAST_MODE_TILE_SIZE) {
-			if (state.showHeightMap) {
-				g.drawImage(heightMapImage, 0, 0, frozenTileSize * game.world.getWidth(), frozenTileSize * game.world.getHeight(),
-						null);
-			}else if (state.showPressureMap) {
-				g.drawImage(pressureMapImage, 0, 0, frozenTileSize * game.world.getWidth(), frozenTileSize * game.world.getHeight(),
-						null);
-			}else if (state.showTemperatureMap) {
-				g.drawImage(temperatureMapImage, 0, 0, frozenTileSize * game.world.getWidth(), frozenTileSize * game.world.getHeight(),
-						null);
-			} else if (state.showHumidityMap) {
-				g.drawImage(humidityMapImage, 0, 0, frozenTileSize * game.world.getWidth(), frozenTileSize * game.world.getHeight(),
-						null);
-			} else {
-				g.drawImage(terrainImage, 0, 0, frozenTileSize * game.world.getWidth(), frozenTileSize * game.world.getHeight(),
-						null);
-			}
+			g.drawImage(
+					mapImages[state.mapMode.ordinal()], 
+					0, 
+					0, 
+					frozenTileSize * game.world.getWidth(), 
+					frozenTileSize * game.world.getHeight(), 
+					null);
 		} else {
 			double highHeight = Double.MIN_VALUE;
 			double lowHeight = Double.MAX_VALUE;
@@ -245,7 +236,7 @@ public class VanillaDrawer extends Drawer {
 			double lowTemp = Double.MAX_VALUE;
 			double highHumidity = Double.MIN_VALUE;
 			double lowHumidity = Double.MAX_VALUE;
-			if (state.showHeightMap) {
+			if (state.mapMode == MapMode.HEIGHT) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
@@ -254,10 +245,10 @@ public class VanillaDrawer extends Drawer {
 						}
 						highHeight = Math.max(highHeight, tile.getHeight());
 						lowHeight = Math.min(lowHeight, tile.getHeight());
-
 					}
 				}
-			}else if (state.showPressureMap) {
+			}
+			else if (state.mapMode == MapMode.PRESSURE) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
@@ -266,10 +257,10 @@ public class VanillaDrawer extends Drawer {
 						}
 						highPressure = Math.max(highPressure, tile.getAir().getPressure());
 						lowPressure = Math.min(lowPressure, tile.getAir().getPressure());
-
 					}
 				}
-			}else if (state.showTemperatureMap) {
+			}
+			else if (state.mapMode == MapMode.TEMPURATURE) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
@@ -278,10 +269,10 @@ public class VanillaDrawer extends Drawer {
 						}
 						highTemp = Math.max(highTemp, tile.getAir().getTemperature());
 						lowTemp = Math.min(lowTemp, tile.getAir().getTemperature());
-
 					}
 				}
-			}else if (state.showHumidityMap) {
+			}
+			else if (state.mapMode == MapMode.HUMIDITY) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
@@ -290,10 +281,8 @@ public class VanillaDrawer extends Drawer {
 						}
 						highHumidity = Math.max(highHumidity, tile.getAir().getHumidity());
 						lowHumidity = Math.min(lowHumidity, tile.getAir().getHumidity());
-
 					}
 				}
-
 			}
 
 			for (int i = lowerX; i < upperX; i++) {
@@ -365,8 +354,9 @@ public class VanillaDrawer extends Drawer {
 				g.drawRect(xx, yy, indicatorSize, indicatorSize);
 				count++;
 			}
-
-			if (!state.showHeightMap && !state.showHumidityMap && !state.showPressureMap && !state.showTemperatureMap) {
+			
+			// draw brightness of tiles as translucent rectangle
+			if (state.mapMode == MapMode.TERRAIN) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
@@ -617,32 +607,7 @@ public class VanillaDrawer extends Drawer {
 		int drawh = frozenTileSize;
 		int imagesize = draww < drawh ? draww : drawh;
 
-		if (state.showHeightMap) {
-			float heightRatio = (float) ((theTile.getHeight() - lowHeight) / (highHeight - lowHeight));
-			int r = Math.max(Math.min((int) (255 * heightRatio), 255), 0);
-			g.setColor(new Color(r, 0, 255 - r));
-			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-		} else if (state.showPressureMap) {
-			float pressureRatio = (float) ((theTile.getAir().getPressure() - lowPressure)
-					/ (highPressure - lowPressure));
-			int r = Math.max(Math.min((int) (255 * pressureRatio), 255), 0);
-			g.setColor(new Color(r, 0, 255 - r));
-			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-		} else if (state.showTemperatureMap) {
-			float tempRatio = (float) ((theTile.getAir().getTemperature() - lowTemp) / (highTemp - lowTemp));
-			int r = Math.max(Math.min((int) (255 * tempRatio), 255), 0);
-			g.setColor(new Color(r, 0, 255 - r));
-			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-			if (theTile.getAir().getTemperature() <= World.FREEZETEMP) {
-				g.drawImage(SNOW, drawAt.x, drawAt.y, draww, drawh, null);
-			}
-		} else if (state.showHumidityMap) {
-			float humidityRatio = (float) ((theTile.getAir().getHumidity() - lowHumidity)
-					/ (highHumidity - lowHumidity));
-			int r = Math.max(Math.min((int) (255 * humidityRatio), 255), 0);
-			g.setColor(new Color(r, 0, 255 - r));
-			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-		} else {
+		if(state.mapMode == MapMode.TERRAIN) {
 			g.drawImage(theTile.getTerrain().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh, null);
 //			t.drawEntities(g, currentMode);
 
@@ -709,6 +674,26 @@ public class VanillaDrawer extends Drawer {
 			for (Unit unit : theTile.getUnits()) {
 				drawUnit(unit, g, drawAt.x, drawAt.y, draww, drawh);
 			}
+		}
+		else {
+			float ratio = 0;
+			if (state.mapMode == MapMode.HEIGHT) {
+				ratio = (float) ((theTile.getHeight() - lowHeight) / (highHeight - lowHeight));
+			} else if (state.mapMode == MapMode.PRESSURE) {
+				ratio = (float) ((theTile.getAir().getPressure() - lowPressure)
+						/ (highPressure - lowPressure));
+			} else if (state.mapMode == MapMode.TEMPURATURE) {
+				ratio = (float) ((theTile.getAir().getTemperature() - lowTemp) / (highTemp - lowTemp));
+				if (theTile.getAir().getTemperature() <= World.FREEZETEMP) {
+					g.drawImage(SNOW, drawAt.x, drawAt.y, draww, drawh, null);
+				}
+			} else if (state.mapMode == MapMode.HUMIDITY) {
+				ratio = (float) ((theTile.getAir().getHumidity() - lowHumidity)
+						/ (highHumidity - lowHumidity));
+			}
+			ratio = Math.max(Math.min(ratio, 1f), 0f);
+			g.setColor(new Color(ratio, 0f, 1f - ratio));
+			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 		}
 		
 	}
@@ -805,6 +790,9 @@ public class VanillaDrawer extends Drawer {
 			return;
 		}
 		int numUnique = inventory.numUnique();
+		if(numUnique == 0) {
+			return;
+		}
 		int rows = (int) Math.ceil(Math.sqrt(numUnique));
 		int imageWidth = Math.max(draww, drawh) / rows;
 		int x = 0;
