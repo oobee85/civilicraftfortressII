@@ -38,7 +38,7 @@ public class Tile implements Externalizable {
 
 	private ConcurrentLinkedQueue<Unit> units;
 	private ConcurrentLinkedQueue<Projectile> projectiles;
-	private ConcurrentLinkedQueue<Item> items;
+	private Inventory inventory;
 
 	private List<Tile> neighborTiles = new LinkedList<Tile>();
 
@@ -89,7 +89,7 @@ public class Tile implements Externalizable {
 		liquidAmount = 0;
 		units = new ConcurrentLinkedQueue<Unit>();
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
-		items = new ConcurrentLinkedQueue<Item>();
+		inventory = new Inventory();
 		this.humidity = 1;
 		this.energy = 20000;
 		air = new Air(this.height, 0);
@@ -301,16 +301,8 @@ public class Tile implements Externalizable {
 		return projectiles;
 	}
 
-	public ConcurrentLinkedQueue<Item> getItems() {
-		return items;
-	}
-	public boolean hasItem(ItemType type) {
-		for(Item item : items) {
-			if(item.getType() == type) {
-				return true;
-			}
-		}
-		return false;
+	public Inventory getInventory() {
+		return inventory;
 	}
 
 	public boolean hasUnit(UnitType unit) {
@@ -394,14 +386,6 @@ public class Tile implements Externalizable {
 
 	public void removeProjectile(Projectile p) {
 		projectiles.remove(p);
-	}
-
-	public void addItem(Item i) {
-		items.add(i);
-	}
-
-	public void clearItems() {
-		items.clear();
 	}
 
 //	public void drawHeightMap(Graphics g, double height, int tileSize) {

@@ -323,10 +323,6 @@ public class VanillaDrawer extends Drawer {
 				drawInventory(g, unit.getTile(), unit.getInventory());
 				drawHealthBar(g, unit);
 				drawHitsplat(g, unit);
-//				Point drawAt = getDrawingCoords(unit.getTile().getLocation());
-//				int draww = frozenTileSize;
-//				int drawh = frozenTileSize;
-//				drawUnit(unit, g, drawAt.x, drawAt.y, draww, drawh);
 			}
 
 			for (Projectile p : game.world.getData().getProjectiles()) {
@@ -695,11 +691,9 @@ public class VanillaDrawer extends Drawer {
 				Utils.setTransparency(g, 1);
 			}
 
-			if (!theTile.getItems().isEmpty()) {
-				for (Item item : theTile.getItems()) {
-					g.drawImage(item.getType().getMipMap().getImage(imagesize), drawAt.x + frozenTileSize / 4,
-							drawAt.y + frozenTileSize / 4, frozenTileSize / 2, frozenTileSize / 2, null);
-				}
+			if (!theTile.getInventory().isEmpty()) {
+				drawInventory(g, theTile.getInventory(), drawAt.x + frozenTileSize / 5,
+							drawAt.y + frozenTileSize / 5, frozenTileSize * 3/5, frozenTileSize * 3/5);
 			}
 			if (theTile.getPlant() != null) {
 				g.drawImage(theTile.getPlant().getMipMap().getImage(frozenTileSize), drawAt.x, drawAt.y, draww, drawh, null);
@@ -800,17 +794,33 @@ public class VanillaDrawer extends Drawer {
 	}
 
 	private void drawInventory(Graphics g, Tile tile, Inventory inventory) {
-		if (frozenTileSize <= 30) {
-			return;
-		}
-		int numDrawn = 0;
 		int draww = frozenTileSize/4;
 		Point drawAt = getDrawingCoords(tile.getLocation());
 		drawAt.x += draww/2;
+		drawInventory(g, inventory, drawAt.x, drawAt.y, draww, draww);
+	}
+	
+	private void drawInventory(Graphics g, Inventory inventory, int drawx, int drawy, int draww, int drawh) {
+		if (frozenTileSize <= 20) {
+			return;
+		}
+		int numUnique = inventory.numUnique();
+		int rows = (int) Math.ceil(Math.sqrt(numUnique));
+		int imageWidth = Math.max(draww, drawh) / rows;
+		int x = 0;
+		int y = 0;
 		for (Item item : inventory.getItems()) {
-			if (item != null && item.getAmount() > 0) {
-				g.drawImage(item.getType().getMipMap().getImage(draww), drawAt.x+(draww*numDrawn), drawAt.y, draww, draww, null);
-				numDrawn ++;
+			if(item == null || item.getAmount() == 0) {
+				continue;
+			}
+			g.drawImage(item.getType().getMipMap().getImage(imageWidth), 
+					drawx + x*imageWidth,
+					drawy + y*imageWidth, 
+					imageWidth, imageWidth, null);
+			x++;
+			if(x >= rows) {
+				x = 0;
+				y++;
 			}
 		}
 	}

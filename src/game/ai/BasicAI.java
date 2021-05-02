@@ -352,7 +352,7 @@ public class BasicAI implements AIInterface {
 		Tile tile = getTargetTile(unit.getTile(), MAX_SEARCH_RADIUS, e -> {
 			
 			return (e.getPlant() != null && e.getPlant().getType() != PlantType.TREE)
-					|| e.hasItem(ItemType.FOOD);
+					|| e.getInventory().getItemAmount(ItemType.FOOD) > 0;
 		});
 		if(tile == null) {
 			return false;

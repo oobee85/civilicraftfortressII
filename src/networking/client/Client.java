@@ -492,7 +492,7 @@ public class Client {
 				existingUnit.getTile().addUnit(existingUnit);
 			}
 			if(existingUnit.getTile() != null && existingUnit.getFaction().usesItems()) {
-				existingUnit.getTile().getItems().clear();
+				existingUnit.getTile().getInventory().clear();
 			}
 		}
 		if(existing.isDead()) {

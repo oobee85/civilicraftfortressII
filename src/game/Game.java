@@ -88,11 +88,11 @@ public class Game {
 		for(Unit unit : world.getUnits()) {
 			if(unit.isDead()) {
 				for (Item item : unit.getType().getDeadItem()) {
-					unit.getTile().addItem(item);
+					unit.getTile().getInventory().addItem(item.getType(), item.getAmount());
 				}
 			}
 			else {
-				unit.getTile().getItems().clear();
+				unit.getTile().getInventory().clear();
 				PlannedAction plan = unit.actionQueue.peek();
 				if(plan != null) {
 					if(plan.isDone(unit.getTile())) {
