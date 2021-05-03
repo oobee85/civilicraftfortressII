@@ -34,6 +34,8 @@ public class Tile implements Externalizable {
 	private Air air;
 	private int tickLastTerrainChange;
 	
+	private double precomputedBrightness;
+	
 
 	private ConcurrentLinkedQueue<Unit> units;
 	private ConcurrentLinkedQueue<Projectile> projectiles;
@@ -316,35 +318,16 @@ public class Tile implements Externalizable {
 	public void setInVisionRange(boolean inRange) {
 		this.inVisionRange = inRange;
 	}
-
-	private double getBrightnessNonRecursive(Faction faction) {
-		double brightness = 0;
-		if (this.getThingOfFaction(faction) != null) {
-			brightness += 1;
-		}
-		if (this.faction == faction) {
-			brightness += 0.4;
-		}
-		if (inVisionRange == true) {
-			brightness += 1;
-		}
-		brightness += getTerrain().getBrightness();
-		brightness += liquidAmount * liquidType.getBrightness();
-		if (modifier != null) {
-			brightness += getModifier().getType().getBrightness();
-		}
-		return brightness;
+	public boolean isInVision() {
+		return inVisionRange;
 	}
 
 	public double getBrightness(Faction faction) {
-		double brightness = this.getBrightnessNonRecursive(faction);
-//		for (Tile tile : getNeighbors()) {
-//			brightness += tile.getBrightnessNonRecursive(faction);
-//		}
-		if (inVisionRange == true) {
-			brightness += 1;
-		}
-		return brightness;
+		return precomputedBrightness;
+	}
+	
+	public void setBrightness(double brightness) {
+		precomputedBrightness = brightness;
 	}
 
 	public void setBuilding(Building b) {

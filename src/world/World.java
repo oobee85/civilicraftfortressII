@@ -2,10 +2,13 @@ package world;
 
 import java.awt.*;
 import java.awt.image.*;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.*;
+
+import javax.imageio.*;
 
 import game.*;
 import game.liquid.*;
@@ -1488,29 +1491,92 @@ public class World {
 		BufferedImage[] mapImages = new BufferedImage[MapMode.values().length];
 		mapImages[MapMode.TERRAIN.ordinal()] = terrainImage;
 		mapImages[MapMode.MINIMAP.ordinal()] = minimapImage;
-		for(int i = 1; i < MapMode.values().length-1; i++) {
+		mapImages[MapMode.LIGHT.ordinal()] = computeTileBrightness(faction);
+		for(MapMode mode : MapMode.HEATMAP_MODES) {
 			BufferedImage image = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 			for(Tile tile : getTiles() ) {
 				float ratio = 0;
-				if(i == MapMode.HEIGHT.ordinal()) {
+				if(mode == MapMode.HEIGHT) {
 					ratio = (float) ((tile.getHeight() - lowHeight) / (highHeight - lowHeight));
 				}
-				else if(i == MapMode.PRESSURE.ordinal()) {
+				else if(mode == MapMode.PRESSURE) {
 					ratio = (float) ((tile.getAir().getPressure() - lowPressure) / (highPressure - lowPressure));
 				}
-				else if(i == MapMode.TEMPURATURE.ordinal()) {
+				else if(mode == MapMode.TEMPURATURE) {
 					ratio = (float) ((tile.getAir().getTemperature() - lowTemperature) / (highTemperature - lowTemperature));
 				}
-				else if(i == MapMode.HUMIDITY.ordinal()) {
+				else if(mode == MapMode.HUMIDITY) {
 					ratio = (float) ((tile.getAir().getHumidity() - lowHumidity) / (highHumidity - lowHumidity));
 				}
 				ratio = Math.max(Math.min(ratio, 1), 0);
 				Color c = new Color(ratio, 0, 1-ratio);
 				image.setRGB(tile.getLocation().x(), tile.getLocation().y(), c.getRGB());
 			}
-			mapImages[i] = image;
+			mapImages[mode.ordinal()] = image;
 		}
 		return mapImages;
+	}
+	
+	/**
+	 * computes all tile brightnesses and creates brightness image
+	 */
+	private BufferedImage computeTileBrightness(Faction faction) {
+		int w = getWidth();
+		int h = getHeight();
+		BufferedImage rawImage = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_GRAY);
+		for(Tile tile : getTiles() ) {
+			double brightness = 0;
+			if (tile.getThingOfFaction(faction) != null
+					|| tile.isInVision()) {
+				brightness += 1;
+			}
+			else if (tile.getFaction() == faction) {
+				brightness += 0.4;
+			}
+			brightness = Math.max(brightness, tile.getTerrain().getBrightness());
+			brightness = Math.max(brightness, tile.liquidAmount * tile.liquidType.getBrightness());
+			if (tile.getModifier() != null) {
+				brightness = Math.max(brightness, tile.getModifier().getType().getBrightness());
+			}
+			byte brightnessByte = (byte) Math.min(255, brightness*255);
+			int rgb = (brightnessByte << 24) |  (brightnessByte << 16) | (brightnessByte << 8) | brightnessByte;
+			rawImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), rgb);
+		}
+		rawImage = ImageCreation.convertToHexagonal(rawImage);
+		
+		int r = 27;
+		BufferedImage rawImagePlusEdges = new BufferedImage(rawImage.getWidth() + r*2, rawImage.getHeight() + r*2, rawImage.getType());
+		Graphics g = rawImagePlusEdges.getGraphics();
+		for(int i = 0; i < r; i++) {
+			g.drawImage(rawImage, i, i, null);
+			g.drawImage(rawImage, r*2 - i, i, null);
+			g.drawImage(rawImage, r*2 - i, r*2 - i, null);
+			g.drawImage(rawImage, i, r*2 - i, null);
+		}
+		g.drawImage(rawImage, r, r, null);
+		g.dispose();
+		float[] kernelData = new float[r*r];
+		for(int y = 0; y < r; y++) {
+			for(int x = 0; x < r; x++) {
+				int dist = (x - r/2)*(x - r/2) + (y - r/2)*(y - r/2);
+				if(dist == 0) {
+					kernelData[x + y*r] = 1;
+				}
+				else if(dist <= r*r/4){
+					kernelData[x + y*r] = (float) (1f / dist);
+				}
+			}
+		}
+		Kernel kernel = new Kernel(r, r, kernelData);
+		ConvolveOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_ZERO_FILL, null);
+		BufferedImage blurred = op.filter(rawImagePlusEdges, null);
+		blurred = blurred.getSubimage(r, r, rawImage.getWidth(), rawImage.getHeight());
+		blurred = ImageCreation.convertFromHexagonal(blurred);
+		for(Tile tile : getTiles()) {
+			int brightness = blurred.getRGB(tile.getLocation().x(), tile.getLocation().y()) & 0xFF;
+			tile.setBrightness(brightness / 255.0);
+		}
+		return blurred;
 	}
 
 	public int ticksUntilDay() {

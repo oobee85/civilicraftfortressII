@@ -219,7 +219,7 @@ public class VanillaDrawer extends Drawer {
 		int upperX = Math.min(game.world.getWidth(), lowerX + panelWidth / frozenTileSize + 4);
 		int upperY = Math.min(game.world.getHeight(), lowerY + panelHeight / frozenTileSize + 4);
 
-		if (frozenTileSize < FAST_MODE_TILE_SIZE) {
+		if (frozenTileSize < FAST_MODE_TILE_SIZE || state.mapMode == MapMode.LIGHT) {
 			g.drawImage( mapImages[state.mapMode.ordinal()], 
 						0, 
 						0, 
