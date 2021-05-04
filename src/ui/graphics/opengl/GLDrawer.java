@@ -38,6 +38,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	private long startTime = System.currentTimeMillis();
 	
 	private TerrainObject terrainObject;
+	private TerrainObject liquidObject;
 	private Mesh hoveredTileBox = MeshUtils.getMeshByFileName("models/selection_cube.ply");
 	private Texture skybox;
 	
@@ -147,8 +148,15 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			if(terrainObject == null) {
 				terrainObject = new TerrainObject();
 				terrainObject.create(gl, game.world);
+				terrainObject.updateHeights(game.world, gl, false);
 				camera.set(new Vector3f(game.world.getWidth()/2, 0, 100), 0, -45);
 				this.updateTerrainImages();
+			}
+			if(liquidObject == null) {
+				liquidObject = new TerrainObject();
+				liquidObject.create(gl, game.world);
+				liquidObject.updateHeights(game.world, gl, true);
+				liquidObject.texture = TextureUtils.getTextureByFileName(LiquidType.WATER.getTextureFile(), gl);
 			}
 			if(mapImages != null && mapImages[MapMode.TERRAIN.ordinal()] != null) {
 				if(terrainObject.texture != null) {
@@ -156,6 +164,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 				}
 				terrainObject.texture = TextureUtils.textureFromImage(gl, mapImages[MapMode.TERRAIN.ordinal()]);
 			}
+			
 			
 //			terrainObject.rotate(Matrix4f.rotate(1, new Vector3f(0, 1, 0)));
 			int dayOffset = World.getCurrentDayOffset();
@@ -206,53 +215,76 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("ambientColor", ambientColor);
 		shader.setUniform("waveOffset", (float)(System.currentTimeMillis() - startTime));
 		
-		
-		gl.glBindVertexArray(terrainObject.liquid.getVAO());
-		gl.glEnableVertexAttribArray(0);
-		gl.glEnableVertexAttribArray(1);
-		gl.glEnableVertexAttribArray(2);
-		gl.glEnableVertexAttribArray(3);
-		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, terrainObject.liquid.getIBO());
-		for(Tile tile : game.world.getTiles()) {
-			float bright = Math.min(1, (float) tile.getBrightness(state.faction));
-			Vector3f ambientColorWithBrightness = ambientColor.add(bright, bright, bright);
-			shader.setUniform("ambientColor", ambientColorWithBrightness);
-			if(tile.liquidType != LiquidType.DRY) {
-				float cutoff = 1f;
-				float scale = Math.min(1, tile.liquidAmount * tile.liquidAmount / cutoff);
-				Vector3f pos = tileLocTo3dCoords(tile.getLocation(), tile.getHeight() + tile.liquidAmount);
-				gl.glActiveTexture(GL3.GL_TEXTURE0);
-				Texture texture = TextureUtils.getTextureByFileName(tile.liquidType.getTextureFile(), gl);
-				texture.enable(gl);
-				texture.bind(gl); 
-				gl.glActiveTexture(GL3.GL_TEXTURE1);
-				skybox.enable(gl);
-				skybox.bind(gl);
-				shader.setUniform("textureSampler", 0);
-				if(tile.liquidType == LiquidType.ICE) {
-					shader.setUniform("waveAmplitude", 0f);
-				}else {
-					shader.setUniform("waveAmplitude", 1f);
-				}
-				
-				shader.setUniform("cubeMap", 1);
-				shader.setUniform("useTexture", 1f);
-				shader.setUniform("model", Matrix4f.getModelMatrix(pos, Matrix4f.identity(), new Vector3f(scale, scale, 1)));
-				gl.glDrawElements(GL2.GL_TRIANGLES, terrainObject.liquid.getIndices().length, GL2.GL_UNSIGNED_INT, 0);
 
-				gl.glBindTexture(skybox.getTarget(), 0);
-				skybox.disable(gl);
-				gl.glBindTexture(texture.getTarget(), 0);
-				texture.disable(gl);
-//				terrainObject.liquid.render(gl, shader, TextureUtils.getTextureByFileName(tile.liquidType.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, 1));
-			}
-		}
-		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
-		gl.glDisableVertexAttribArray(0);
-		gl.glDisableVertexAttribArray(1);
-		gl.glDisableVertexAttribArray(2);
-		gl.glDisableVertexAttribArray(3);
-		gl.glBindVertexArray(0);
+//		liquidObject.updateHeights(game.world, gl, true);
+		gl.glActiveTexture(GL3.GL_TEXTURE0);
+		Texture texture = liquidObject.texture;
+		texture.enable(gl);
+		texture.bind(gl); 
+		gl.glActiveTexture(GL3.GL_TEXTURE1);
+		skybox.enable(gl);
+		skybox.bind(gl);
+		shader.setUniform("textureSampler", 0);
+		shader.setUniform("waveAmplitude", 1f);
+		
+		shader.setUniform("cubeMap", 1);
+		shader.setUniform("useTexture", 1f);
+
+		// TODO need to figure out how to make updating liquids not laggy
+		liquidObject.mesh.render(gl, shader, liquidObject.texture, new Vector3f(0, 0, 0), liquidObject.getModelMatrix(), new Vector3f(1, 1, 1));
+		
+		gl.glBindTexture(skybox.getTarget(), 0);
+		skybox.disable(gl);
+		gl.glBindTexture(texture.getTarget(), 0);
+		texture.disable(gl);
+
+		
+//		gl.glBindVertexArray(terrainObject.liquid.getVAO());
+//		gl.glEnableVertexAttribArray(0);
+//		gl.glEnableVertexAttribArray(1);
+//		gl.glEnableVertexAttribArray(2);
+//		gl.glEnableVertexAttribArray(3);
+//		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, terrainObject.liquid.getIBO());
+//		for(Tile tile : game.world.getTiles()) {
+//			float bright = Math.min(1, (float) tile.getBrightness(state.faction));
+//			Vector3f ambientColorWithBrightness = ambientColor.add(bright, bright, bright);
+//			shader.setUniform("ambientColor", ambientColorWithBrightness);
+//			if(tile.liquidType != LiquidType.DRY) {
+//				float cutoff = 1f;
+//				float scale = Math.min(1, tile.liquidAmount * tile.liquidAmount / cutoff);
+//				Vector3f pos = tileLocTo3dCoords(tile.getLocation(), tile.getHeight() + tile.liquidAmount);
+//				gl.glActiveTexture(GL3.GL_TEXTURE0);
+//				Texture texture = TextureUtils.getTextureByFileName(tile.liquidType.getTextureFile(), gl);
+//				texture.enable(gl);
+//				texture.bind(gl); 
+//				gl.glActiveTexture(GL3.GL_TEXTURE1);
+//				skybox.enable(gl);
+//				skybox.bind(gl);
+//				shader.setUniform("textureSampler", 0);
+//				if(tile.liquidType == LiquidType.ICE) {
+//					shader.setUniform("waveAmplitude", 0f);
+//				}else {
+//					shader.setUniform("waveAmplitude", 1f);
+//				}
+//				
+//				shader.setUniform("cubeMap", 1);
+//				shader.setUniform("useTexture", 1f);
+//				shader.setUniform("model", Matrix4f.getModelMatrix(pos, Matrix4f.identity(), new Vector3f(scale, scale, 1)));
+//				gl.glDrawElements(GL2.GL_TRIANGLES, terrainObject.liquid.getIndices().length, GL2.GL_UNSIGNED_INT, 0);
+//
+//				gl.glBindTexture(skybox.getTarget(), 0);
+//				skybox.disable(gl);
+//				gl.glBindTexture(texture.getTarget(), 0);
+//				texture.disable(gl);
+////				terrainObject.liquid.render(gl, shader, TextureUtils.getTextureByFileName(tile.liquidType.getTextureFile(), gl), pos, Matrix4f.identity(), new Vector3f(scale, scale, 1));
+//			}
+//		}
+//		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
+//		gl.glDisableVertexAttribArray(0);
+//		gl.glDisableVertexAttribArray(1);
+//		gl.glDisableVertexAttribArray(2);
+//		gl.glDisableVertexAttribArray(3);
+//		gl.glBindVertexArray(0);
 		
 		for(Tile tile : game.world.getTiles()) {
 			float bright = Math.min(1, (float) tile.getBrightness(state.faction));
@@ -336,6 +368,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		
 		renderAxis(gl, shader);
 
+		// TODO need to figure out how to make updating terrain not laggy
+//		terrainObject.updateHeights(game.world, gl, false);
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
 		
 		shader.setUniform("ambientColor", ambientColor);

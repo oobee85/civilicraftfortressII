@@ -540,8 +540,14 @@ public class Game {
 	
 	
 	public void flipTable() {
+		float minheight = Integer.MAX_VALUE;
+		float maxheight = Integer.MIN_VALUE;
 		for(Tile tile : world.getTiles()) {
-			tile.setHeight(1 - tile.getHeight());
+			minheight = Math.min(minheight, tile.getHeight());
+			maxheight = Math.max(maxheight, tile.getHeight());
+		}
+		for(Tile tile : world.getTiles()) {
+			tile.setHeight(maxheight - (tile.getHeight() - minheight));
 		}
 	}
 	
