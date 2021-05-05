@@ -118,10 +118,10 @@
 		"image":"Images/buildings/irrigation.png",
 		"mesh":"models/flatcube.obj",
 		"vision":1,
-		"cost":{"WOOD":20},
+		"cost":{"WOOD":50},
 		"culture":0,
 		"attributes":["harvestable"],
-		"health":100,
+		"health":200,
 		"effort":100},
 	{
 		"name":"GRANARY",

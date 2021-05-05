@@ -99,7 +99,7 @@ public class Air {
 		
 		double P0 = World.STANDARDPRESSURE; // mmHg
 		double g = 9.80665; // m/s^2
-		double MMair = 0.0289644; // kg/mol
+		double MMair = 0.04401; // kg/mol CO2
 		double R = 8.31432; // Nm/molK
 		double h0 = 100; // m sealevel
 		double h = this.height; // m

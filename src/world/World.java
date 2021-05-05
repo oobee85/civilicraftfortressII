@@ -34,7 +34,7 @@ public class World {
 	public static final int BALANCETEMP = -20;
 	public static final int FREEZETEMP = 0;
 	public static final float FREEZING_TEMPURATURE = 0.33f;
-	public static final int BALANCEWATER = 4;
+	public static final int BALANCEWATER = 5;
 	public static final int MAXTEMP = 1000;
 	public static final int MAXHEIGHT = 1000;
 	public static final int JOULESPERTILE = 1;
@@ -773,15 +773,16 @@ public class World {
 					tile.liquidType = LiquidType.WATER;
 				}
 				double totalAmount = tile.liquidAmount + tile.getAir().getVolume();
-				double addedMod = 1;
-				if(averageWater < BALANCEWATER) {
-					addedMod = BALANCEWATER / averageWater;
-				}
+				
 				
 				double amount = 0.1 * vol / maxVol;
 				tile.getAir().addVolume(-amount);
-				tile.liquidAmount += amount * addedMod;
+				tile.liquidAmount += amount;
 //				seasonEnergy += 0.01;
+			}
+			if(tile.getHeight() > 800 && averageWater < BALANCEWATER) {
+				double addedMod = BALANCEWATER / averageWater - 1;
+				tile.liquidAmount += addedMod;
 			}
 			
 //			double tempChange = averageTemp / tile.getTemperature();

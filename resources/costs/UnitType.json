@@ -134,7 +134,7 @@
 	},
 	{
 		"image":"Images/units/chariot.png",
-		"cost":{"WOOD":50,"FOOD":200},
+		"cost":{"WOOD":50,"FOOD":100},
 		"stats":{"movespeed":25,"buildtime":200,"health":300,"healspeed":50},
 		"name":"CARAVAN",
 		"attackstyles":[
