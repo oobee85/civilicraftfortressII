@@ -353,10 +353,7 @@ public class VanillaDrawer extends Drawer {
 			int offset = 4;
 			HashMap<Tile, Integer> visited = new HashMap<>();
 			for (Unit unit : game.world.getUnits()) {
-				int count = 0;
-				if (visited.containsKey(unit.getTile())) {
-					count = visited.get(unit.getTile());
-				}
+				int count = visited.getOrDefault(unit.getTile(), 0);
 				visited.put(unit.getTile(), count + 1);
 
 				// draws a square for every player unit on the tile
