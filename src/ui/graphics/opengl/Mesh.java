@@ -20,7 +20,7 @@ public class Mesh {
 	private GL3 gl;
 	private Vertex[] vertices;
 	private int[] indices;
-	private int vao, pbo, ibo, cbo, nbo;
+	private int vao, pbo, ibo, cbo, nbo, tbo;
 
 	public Mesh(Vertex[] vertices, int[] indices) {
 		this.vertices = vertices;
@@ -119,6 +119,35 @@ public class Mesh {
 		}
 	}
 	
+	public void updatePositions(GL3 gl) {
+		generateNormals();
+		this.gl = gl;
+
+		gl.glBindVertexArray(vao);
+		
+		// Vertex positions
+		FloatBuffer positionBuffer = FloatBuffer.allocate(vertices.length * 3);
+		float[] positionData = new float[vertices.length * 3];
+		for(int i = 0; i < vertices.length; i++) {
+			positionData[i*3    ] = vertices[i].getPosition().x;
+			positionData[i*3 + 1] = vertices[i].getPosition().y;
+			positionData[i*3 + 2] = vertices[i].getPosition().z;
+		}
+		positionBuffer.put(positionData).flip();
+		updateData(positionBuffer, 0, 3, pbo);
+		
+		// Vertex normals
+		FloatBuffer normalBuffer = FloatBuffer.allocate(vertices.length * 3);
+		float[] normalData = new float[vertices.length * 3];
+		for(int i = 0; i < vertices.length; i++) {
+			normalData[i*3    ] = vertices[i].getNormal().x;
+			normalData[i*3 + 1] = vertices[i].getNormal().y;
+			normalData[i*3 + 2] = vertices[i].getNormal().z;
+		}
+		normalBuffer.put(normalData).flip();
+		updateData(normalBuffer, 2, 3, nbo);
+	}
+	
 	public void create(GL3 gl) {
 		generateNormals();
 		this.gl = gl;
@@ -171,7 +200,7 @@ public class Mesh {
 			textureCoordData[i*2 + 1] = vertices[i].getTextureCoord().y;
 		}
 		textureCoordBuffer.put(textureCoordData).flip();
-		nbo = storeData(textureCoordBuffer, 3, 2);
+		tbo = storeData(textureCoordBuffer, 3, 2);
 		
 		
 //		IntBuffer indicesBuffer = MemoryUtil.memAllocInt(indices.length);
@@ -191,6 +220,12 @@ public class Mesh {
 		gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 	
+	private void updateData(FloatBuffer buffer, int index, int size, int bufferID) {
+		gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, bufferID);
+		gl.glBufferData(GL2.GL_ARRAY_BUFFER, 4 * buffer.capacity(), buffer, GL2.GL_STATIC_DRAW);
+		gl.glVertexAttribPointer(index, size, GL2.GL_FLOAT, false, 0, 0);
+		gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+	}
 	private int storeData(FloatBuffer buffer, int index, int size) {
 //		int bufferID = GL15.glGenBuffers();
 		IntBuffer temp = IntBuffer.allocate(1);

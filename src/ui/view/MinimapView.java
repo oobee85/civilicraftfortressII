@@ -11,7 +11,7 @@ import utils.*;
 import world.*;
 
 public class MinimapView extends JPanel {
-
+	
 	private static final Image MOON_IMAGE = Utils.loadImage("Images/interfaces/moon.png");
 	private static final Image SUN_IMAGE = Utils.loadImage("Images/interfaces/sun.png");
 

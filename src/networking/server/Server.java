@@ -142,6 +142,7 @@ public class Server {
 			players.add(connection.getPlayerInfo());
 		}
 		gameInstance.generateWorld(128, 128, false, players);
+		gui.getGameView().getDrawer().updateTerrainImages();
 		gui.setGameInstance(gameInstance);
 		startWorldNetworkingUpdateThread();
 

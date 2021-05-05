@@ -254,6 +254,28 @@ public final class Utils {
 		return new Color(sumr/total, sumg/total, sumb/total);
 	}
 	
+	public static HashMap<Terrain, Color> computeTerrainAverageColor() {
+		HashMap<Terrain, Color> terrainColors = new HashMap<>();
+		for(Terrain t : Terrain.values()) {
+			BufferedImage image = Utils.toBufferedImage(t.getImage(0));
+			int sumr = 0;
+			int sumg = 0;
+			int sumb = 0;
+			for(int i = 0; i < image.getWidth(); i++) {
+				for(int j = 0; j < image.getHeight(); j++) {
+					Color c = new Color(image.getRGB(i, j));
+					sumr += c.getRed();
+					sumg += c.getGreen();
+					sumb += c.getBlue();
+				}
+			}
+			int totalNumPixels = image.getWidth()*image.getHeight();
+			Color average = new Color(sumr/totalNumPixels, sumg/totalNumPixels, sumb/totalNumPixels);
+			terrainColors.put(t, average);
+		}
+		return terrainColors;
+	}
+	
 
 //	public Driver() {
 //		Image lava = Utils.loadImage("Images/lava_flow.png");
@@ -341,6 +363,16 @@ public final class Utils {
 				(int) (top.getGreen()*alpha + bottom.getGreen()*beta),
 				(int) (top.getBlue()*alpha + bottom.getBlue()*beta)
 				);
+	}
+
+	/**
+	 * Interpolates between min and max depending on ratio.
+	 * ratio gets bounded between 0 and 1
+	 */
+	public static int lerp(int min, int max, double ratio) {
+		ratio = Math.max(Math.min(ratio, 1), 0);
+		max = Math.max(max, min);
+		return (int) (min + (max - min) * ratio);
 	}
 	
 	public static double getAlphaOfLiquid(double amount) {

@@ -21,7 +21,6 @@ public class Tile implements Externalizable {
 	public volatile LiquidType liquidType;
 
 	private volatile Faction faction;
-	private boolean isSelected = false;
 	private boolean inVisionRange = false;
 
 	private Resource resource;
@@ -35,10 +34,12 @@ public class Tile implements Externalizable {
 	private Air air;
 	private int tickLastTerrainChange;
 	
+	private double precomputedBrightness;
+	
 
 	private ConcurrentLinkedQueue<Unit> units;
 	private ConcurrentLinkedQueue<Projectile> projectiles;
-	private ConcurrentLinkedQueue<Item> items;
+	private Inventory inventory;
 
 	private List<Tile> neighborTiles = new LinkedList<Tile>();
 
@@ -89,7 +90,7 @@ public class Tile implements Externalizable {
 		liquidAmount = 0;
 		units = new ConcurrentLinkedQueue<Unit>();
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
-		items = new ConcurrentLinkedQueue<Item>();
+		inventory = new Inventory();
 		this.humidity = 1;
 		this.energy = 20000;
 		air = new Air(this.height, 0);
@@ -301,8 +302,8 @@ public class Tile implements Externalizable {
 		return projectiles;
 	}
 
-	public ConcurrentLinkedQueue<Item> getItems() {
-		return items;
+	public Inventory getInventory() {
+		return inventory;
 	}
 
 	public boolean hasUnit(UnitType unit) {
@@ -317,35 +318,16 @@ public class Tile implements Externalizable {
 	public void setInVisionRange(boolean inRange) {
 		this.inVisionRange = inRange;
 	}
-
-	private double getBrightnessNonRecursive(Faction faction) {
-		double brightness = 0;
-		if (this.getThingOfFaction(faction) != null) {
-			brightness += 1;
-		}
-		if (this.faction == faction) {
-			brightness += 0.4;
-		}
-		if (inVisionRange == true) {
-			brightness += 1;
-		}
-		brightness += getTerrain().getBrightness();
-		brightness += liquidAmount * liquidType.getBrightness();
-		if (modifier != null) {
-			brightness += getModifier().getType().getBrightness();
-		}
-		return brightness;
+	public boolean isInVision() {
+		return inVisionRange;
 	}
 
 	public double getBrightness(Faction faction) {
-		double brightness = this.getBrightnessNonRecursive(faction);
-//		for (Tile tile : getNeighbors()) {
-//			brightness += tile.getBrightnessNonRecursive(faction);
-//		}
-		if (inVisionRange == true) {
-			brightness += 1;
-		}
-		return brightness;
+		return precomputedBrightness;
+	}
+	
+	public void setBrightness(double brightness) {
+		precomputedBrightness = brightness;
 	}
 
 	public void setBuilding(Building b) {
@@ -386,14 +368,6 @@ public class Tile implements Externalizable {
 
 	public void removeProjectile(Projectile p) {
 		projectiles.remove(p);
-	}
-
-	public void addItem(Item i) {
-		items.add(i);
-	}
-
-	public void clearItems() {
-		items.clear();
 	}
 
 //	public void drawHeightMap(Graphics g, double height, int tileSize) {
@@ -442,10 +416,6 @@ public class Tile implements Externalizable {
 
 	public Terrain getTerrain() {
 		return terr;
-	}
-
-	public boolean getIsSelected() {
-		return isSelected;
 	}
 
 	public Faction getFaction() {

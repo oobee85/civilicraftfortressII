@@ -65,10 +65,7 @@ public class GameView {
 		public LeftClickAction leftClickAction = LeftClickAction.NONE;
 
 		public boolean drawDebugStrings;
-		public boolean showHeightMap;
-		public boolean showHumidityMap;
-		public boolean showPressureMap;
-		public boolean showTemperatureMap;
+		public MapMode mapMode = MapMode.TERRAIN;
 		
 		public BuildingType selectedBuildingToPlan;
 		public Object selectedThingToSpawn;
@@ -727,18 +724,9 @@ public class GameView {
 	public void updateTerrainImages() {
 		currentActiveDrawer.updateTerrainImages();
 	}
-
-	public void setShowHeightMap(boolean show) {
-		state.showHeightMap = show;
-	}
-	public void setShowPressureMap(boolean show) {
-		state.showPressureMap = show;
-	}
-	public void setShowTemperatureMap(boolean show) {
-		state.showTemperatureMap = show;
-	}
-	public void setShowMassMap(boolean show) {
-		state.showHumidityMap = show;
+	
+	public void setMapMode(MapMode mode) {
+		state.mapMode = mode;
 	}
 
 	private void mouseOver(Position tilepos) {

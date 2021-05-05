@@ -8,6 +8,24 @@ public class Inventory {
 		
 	}
 	
+	public void clear() {
+		for(Item item : items) {
+			if(item != null) {
+				item.addAmount(-item.getAmount());
+			}
+		}
+	}
+	
+	public int numUnique() {
+		int unique = 0;
+		for(Item item : items) {
+			if(item != null && item.getAmount() > 0) {
+				unique++;
+			}
+		}
+		return unique;
+	}
+	
 	public Item[] getItems() {
 		return items;
 	}
@@ -35,7 +53,9 @@ public class Inventory {
 			this.setAmount(type, 0);
 		}
 		items[type.ordinal()].addAmount(amount);
-	
+	}
+	public void addItem(Item item) {
+		addItem(item.getType(), item.getAmount());
 	}
 	
 	public void setAmount(ItemType type, int amount) {

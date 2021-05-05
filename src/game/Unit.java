@@ -221,11 +221,7 @@ public class Unit extends Thing implements Serializable {
 
 		// If on tile with an item, take the item
 		if (getFaction().usesItems() && this.getType().isBuilder()) {
-			for (Item item : getTile().getItems()) {
-				this.addItem(item.getType(), item.getAmount());
-//				getFaction().addItem(item.getType(), item.getAmount());
-			}
-			getTile().clearItems();
+			this.getInventory().takeAll(getTile().getInventory());
 		}
 	}
 	public PlannedAction getNextPlannedAction() {
@@ -247,7 +243,7 @@ public class Unit extends Thing implements Serializable {
 		boolean lethal = super.takeDamage(damage);
 		if (lethal) {
 			for (Item item : getType().getDeadItem()) {
-				getTile().addItem(item);
+				getTile().getInventory().addItem(item);
 			}
 		}
 		return lethal;
@@ -335,6 +331,9 @@ public class Unit extends Thing implements Serializable {
 		Building bestBuilding = null;
 		// TODO fix concurrent modification exception on this for loop
 		for (Building building : this.getFaction().getBuildings()) {
+			if(!building.isBuilt()) {
+				continue;
+			}
 			if ((building.getType().isColony() || building.getType().isCastle())) {
 				if(bestBuilding == null) {
 					bestBuilding = building;

@@ -88,11 +88,11 @@ public class Game {
 		for(Unit unit : world.getUnits()) {
 			if(unit.isDead()) {
 				for (Item item : unit.getType().getDeadItem()) {
-					unit.getTile().addItem(item);
+					unit.getTile().getInventory().addItem(item.getType(), item.getAmount());
 				}
 			}
 			else {
-				unit.getTile().getItems().clear();
+				unit.getTile().getInventory().clear();
 				PlannedAction plan = unit.actionQueue.peek();
 				if(plan != null) {
 					if(plan.isDone(unit.getTile())) {
@@ -540,8 +540,14 @@ public class Game {
 	
 	
 	public void flipTable() {
+		float minheight = Integer.MAX_VALUE;
+		float maxheight = Integer.MIN_VALUE;
 		for(Tile tile : world.getTiles()) {
-			tile.setHeight(1 - tile.getHeight());
+			minheight = Math.min(minheight, tile.getHeight());
+			maxheight = Math.max(maxheight, tile.getHeight());
+		}
+		for(Tile tile : world.getTiles()) {
+			tile.setHeight(maxheight - (tile.getHeight() - minheight));
 		}
 	}
 	
