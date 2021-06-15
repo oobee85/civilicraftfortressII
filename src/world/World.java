@@ -29,6 +29,7 @@ public class World {
 	public static final int TRANSITION_PERIOD = 100;
 	private static final double CHANCE_TO_SWITCH_TERRAIN = 1;
 	public static final int MIN_TIME_TO_SWITCH_TERRAIN = 100;
+	public static final int TICKSTOUPDATEAIR = 2;
 	
 	public static final int MINTEMP = -273;
 	public static final int BALANCETEMP = -20;
@@ -42,6 +43,7 @@ public class World {
 	public static final int VOLUMEPERTILE = 100;
 	public static final int STARTINGMASS = 10;
 	public static final int MMAIR = 10;
+	
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
@@ -693,7 +695,7 @@ public class World {
 			
 	}
 	public void updateEnergy() {
-		if(World.ticks % 2 == 0) {
+		if(World.ticks % TICKSTOUPDATEAIR == 0) {
 			return;
 		}
 		double averageWater = 0;
@@ -811,6 +813,9 @@ public class World {
 	}
 	
 	public void updateAirMovement() {
+		if(World.ticks % TICKSTOUPDATEAIR == 0) {
+			return;
+		}
 		double totalMass = 0;
 		double [][] pressureTemp = new double[width][height];
 		double [][] volumeTemp = new double[width][height];
@@ -828,21 +833,26 @@ public class World {
 			for(Tile otherTile : tile.getNeighbors()) {
 				TileLoc otherLoc = otherTile.getLocation();
 				Air otherAir = otherTile.getAir();
-				double mypres = tileAir.getPressure();
+				double mypress = tileAir.getPressure();
 				double myvolume = tileAir.getVolume();
 				double mytemp = tile.getEnergy();
+				double mycombined = mypress / (myvolume);
 				
 				double opress = otherAir.getPressure();
 				double ovolume = otherAir.getVolume();
 				double otemp = otherTile.getEnergy();
+				double ocombined = opress / (ovolume);
 				
 				boolean transferred = false;
-				if(mypres > opress && myvolume > ovolume) {
+				double deltap = 1 - opress / mypress;
+				double deltavol = Math.sqrt((myvolume - ovolume)*deltap);
+//				if(mycombined > ocombined && Math.abs(deltavol) > 0.002) {
+				if(mypress > opress && myvolume > ovolume && Math.abs(deltavol) > 0.002) {
 					Direction direction = Direction.getDirection(tileLoc, otherLoc);
 					tileAir.setFlowDirection(direction);
 //					System.out.println(direction);
-					double deltap = 1 - opress / mypres;
-					double deltavol = Math.sqrt((myvolume - ovolume)*deltap)/2;
+//					double deltap = 1 - opress / mypress;
+//					double deltavol = Math.sqrt((myvolume - ovolume)*deltap);
 //					System.out.println(deltavol);
 					if(volumeTemp[tileLoc.x()][tileLoc.y()] - deltavol > 0) {
 						volumeTemp[otherLoc.x()][otherLoc.y()] += deltavol;
@@ -857,7 +867,7 @@ public class World {
 					tileAir.setFlowDirection(Direction.NONE);
 				}
 				
-				if(mytemp > otemp && mypres > opress) {
+				if(mytemp > otemp && mypress > opress) {
 					double transferAmount = 1;
 					double deltae = mytemp - otemp;
 					double ratio = otemp / mytemp * Math.sqrt(deltae);
