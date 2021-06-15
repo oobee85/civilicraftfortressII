@@ -36,6 +36,7 @@ public class VanillaDrawer extends Drawer {
 	private static final Image BLUE_HITSPLAT = Utils.loadImage("Images/interfaces/bluehitsplat.png");
 	private static final Image GREEN_HITSPLAT = Utils.loadImage("Images/interfaces/greenhitsplat.png");
 	private static final Image SNOW = Utils.loadImage("Images/weather/snow.png");
+
 	
 	private JPanel canvas;
 	
@@ -271,7 +272,12 @@ public class VanillaDrawer extends Drawer {
 					} else if (state.mapMode == MapMode.HUMIDITY) {
 						ratio = (float) ((tile.getAir().getHumidity() - lowHumidity)
 								/ (highHumidity - lowHumidity));
+					} else if (state.mapMode == MapMode.FLOW) {
+						ratio = (float) ((tile.getAir().getPressure() - lowPressure)
+								/ (highPressure - lowPressure));
 					}
+					
+					
 					ratio = Math.max(Math.min(ratio, 1f), 0f);
 					drawTile((Graphics2D) g, tile, new Color(ratio, 0f, 1f - ratio));
 				}
@@ -346,6 +352,18 @@ public class VanillaDrawer extends Drawer {
 						g.setColor(new Color(0, 0, 0, (int) (255 * (1 - brightness))));
 						Point drawAt = getDrawingCoords(tile.getLocation());
 						g.fillRect(drawAt.x, drawAt.y, frozenTileSize, frozenTileSize);
+						
+						
+					}
+				}
+			}
+			if (state.mapMode == MapMode.FLOW) {
+				for (int i = lowerX; i < upperX; i++) {
+					for (int j = lowerY; j < upperY; j++) {
+						Tile tile = game.world.get(new TileLoc(i, j));
+						if (tile == null)
+							continue;
+						drawAirFlow(g, tile);
 					}
 				}
 			}
@@ -737,6 +755,19 @@ public class VanillaDrawer extends Drawer {
 		int w = (int) (frozenTileSize * 8 / 10);
 		int hi = (int) (frozenTileSize * 8 / 10);
 		g.drawImage(TARGET_IMAGE, drawAt.x + frozenTileSize * 1 / 10, drawAt.y + frozenTileSize * 1 / 10, w, hi, null);
+	}
+	private void drawAirFlow(Graphics g, Tile tile) {
+		TileLoc tileLoc = tile.getLocation();
+		Point drawAt = getDrawingCoords(tileLoc);
+		int w = (int) (frozenTileSize * 8 / 10);
+		int hi = (int) (frozenTileSize * 8 / 10);
+		if(tile.getAir().getFlowDirection() != null) {
+			Image image = tile.getAir().getFlowDirection().getImage();
+//			System.out.println(tile.getAir().getFlowDirection());
+			g.drawImage(image, drawAt.x, drawAt.y, frozenTileSize, frozenTileSize, null);
+//			g.drawImage(TARGET_IMAGE, drawAt.x + frozenTileSize * 1 / 10, drawAt.y + frozenTileSize * 1 / 10, w, hi, null);
+		}
+
 	}
 
 	private void drawInventory(Graphics g, Tile tile, Inventory inventory) {

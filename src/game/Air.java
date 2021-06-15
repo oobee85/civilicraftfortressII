@@ -1,5 +1,6 @@
 package game;
 
+import utils.Direction;
 import world.World;
 
 public class Air {
@@ -15,6 +16,7 @@ public class Air {
 	private double maxVolume;
 	private boolean canRain;
 	private double volumeChange;
+	private Direction flowDirection;
 	
 	public Air(double height, double temp) {
 		this.maxHumidity = 1.0;
@@ -27,6 +29,13 @@ public class Air {
 		this.pressure = 760;
 		this.updateMaxVolume();
 		this.updateHumidity();
+		this.flowDirection = Direction.NONE;
+	}
+	public Direction getFlowDirection() {
+		return flowDirection;
+	}
+	public void setFlowDirection(Direction direction) {
+		flowDirection = direction;
 	}
 	
 	public void setTemperature(double temp) {

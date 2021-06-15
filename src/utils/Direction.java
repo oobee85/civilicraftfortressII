@@ -1,22 +1,34 @@
 package utils;
 
+import java.awt.Image;
+
 public enum Direction {
-	NORTH(0, -1),
-	NORTHEAST(1, 0.5),
-	SOUTHEAST(1, -0.5),
-	SOUTH(0, 1),
-	SOUTHWEST(-1, -0.5),
-	NORTHWEST(-1, 0.5)
+	
+	NORTH(0, -1, "Images/interfaces/arrow_north.png"),
+	NORTHEAST(1, 0.5, "Images/interfaces/arrow_upright.png"),
+	SOUTHEAST(1, -0.5, "Images/interfaces/arrow_botright.png"),
+	SOUTH(0, 1, "Images/interfaces/arrow_bot.png"),
+	SOUTHWEST(-1, -0.5, "Images/interfaces/arrow_botleft.png"),
+	NORTHWEST(-1, 0.5, "Images/interfaces/arrow_upleft.png"),
+	UP(0, 0, "Images/interfaces/arrow_up.png"),
+	DOWN(0, 0, "Images/interfaces/arrow_down.png"),
+	NONE(0, 0, "Images/interfaces/arrow_none.png")
 	;
+	
+	
 	public static final String ALL_DIRECTIONS = NORTH.toString() + NORTHEAST.toString() + SOUTHEAST.toString() + SOUTH.toString() + SOUTHWEST.toString() + NORTHWEST.toString();
 	
 	private double deltax;
 	private double deltay;
-	private Direction(double deltax, double deltay) {
+	private Image image;
+	private Direction(double deltax, double deltay, String string) {
 		this.deltax = deltax;
 		this.deltay = deltay;
+		this.image = Utils.loadImage(string);
 	}
-	
+	public Image getImage() {
+		return this.image;
+	}
 	public double deltax() {
 		return deltax;
 	}

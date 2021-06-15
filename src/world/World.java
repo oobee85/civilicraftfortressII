@@ -734,10 +734,11 @@ public class World {
 //			}
 			double addedEnergy = 0;
 			//removes energy for hight level
-			if(tile.getTemperature() <= 0) {
+			if(tile.getTemperature() <= 5) {
 				double modifier = 1 - (tile.getTemperature()/BALANCETEMP);
 				double heightRatio = tile.getHeight() / World.MAXHEIGHT;
-				addedEnergy += (-Math.sqrt(Math.abs(heightRatio * modifier)));
+				addedEnergy -= (Math.sqrt(Math.abs(heightRatio * modifier)));
+//				System.out.println(addedEnergy);
 			}
 			
 			
@@ -809,7 +810,7 @@ public class World {
 		}
 	}
 	
-	public void updateTileMass() {
+	public void updateAirMovement() {
 		double totalMass = 0;
 		double [][] pressureTemp = new double[width][height];
 		double [][] volumeTemp = new double[width][height];
@@ -822,29 +823,38 @@ public class World {
 		
 		for(Tile tile: getTilesRandomly()) {
 			TileLoc tileLoc = tile.getLocation();
+			Air tileAir = tile.getAir();
+			tileAir.setFlowDirection(Direction.NONE);
 			for(Tile otherTile : tile.getNeighbors()) {
 				TileLoc otherLoc = otherTile.getLocation();
-				
-				double mypres = tile.getAir().getPressure();
-				double myvolume = tile.getAir().getVolume();
+				Air otherAir = otherTile.getAir();
+				double mypres = tileAir.getPressure();
+				double myvolume = tileAir.getVolume();
 				double mytemp = tile.getEnergy();
 				
-				double opress = otherTile.getAir().getPressure();
-				double ovolume = otherTile.getAir().getVolume();
+				double opress = otherAir.getPressure();
+				double ovolume = otherAir.getVolume();
 				double otemp = otherTile.getEnergy();
 				
+				boolean transferred = false;
 				if(mypres > opress && myvolume > ovolume) {
+					Direction direction = Direction.getDirection(tileLoc, otherLoc);
+					tileAir.setFlowDirection(direction);
+//					System.out.println(direction);
 					double deltap = 1 - opress / mypres;
 					double deltavol = Math.sqrt((myvolume - ovolume)*deltap)/2;
 //					System.out.println(deltavol);
 					if(volumeTemp[tileLoc.x()][tileLoc.y()] - deltavol > 0) {
 						volumeTemp[otherLoc.x()][otherLoc.y()] += deltavol;
 						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltavol;
+						transferred = true;
 					}
 //					if(massTemp[tileLoc.x()][tileLoc.y()] - change >= 0) {
 //						massTemp[otherLoc.x()][otherLoc.y()] += change;
 //						massTemp[tileLoc.x()][tileLoc.y()] -= change;
 //					}
+				}else {
+					tileAir.setFlowDirection(Direction.NONE);
 				}
 				
 				if(mytemp > otemp && mypres > opress) {
@@ -855,7 +865,9 @@ public class World {
 					energyTemp[tileLoc.x()][tileLoc.y()] -= ratio;
 					
 				}
-				
+				if(transferred == true) {
+					break;
+				}
 				
 			}
 		}
@@ -915,7 +927,7 @@ public class World {
 		updateAirStuff();
 		updateEnergy();
 		updateTileTemperature();
-		updateTileMass();
+		updateAirMovement();
 		if(start == true) {
 			setTileMass();
 			setTileEnergy();
