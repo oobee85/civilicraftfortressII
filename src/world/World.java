@@ -671,26 +671,9 @@ public class World {
 		
 	}
 	public void updateAirStuff() {
-		for(Tile tile : getTiles()) {
+		for(Tile tile : getTilesRandomly()) {
 			tile.updateAir();
-		}
-		for(Tile tile: getTilesRandomly()) {
-			TileLoc tileLoc = tile.getLocation();
-			for(Tile otherTile : tile.getNeighbors()) {
-				TileLoc otherLoc = otherTile.getLocation();
-				double mypres = tile.getAir().getPressure();
-				double mymass = tile.getAir().getMass();
-				
-				double opress = otherTile.getAir().getPressure();
-				double omass = otherTile.getAir().getMass();
-				
-				if(mypres > opress) {
-					double deltap = mypres - opress;
-					double change = deltap / mypres;
-					
-				}
-				
-			}
+//			tile.updateAtmosphere();
 		}
 			
 	}
@@ -698,6 +681,22 @@ public class World {
 		if(World.ticks % TICKSTOUPDATEAIR == 0) {
 			return;
 		}
+//		for(Tile tile: getTilesRandomly()) {
+//			// Radiation for ground -> first layer air
+//			// Q = o(T1 - T2) * A
+//			// o = 5.670374419 × 10^-8 W*m-2*K-4
+//			double boltzmannConstant = 5.670374e-8;
+//			Air air = tile.getAir();
+//			double end = 0;
+//			double deltaT = (tile.getTemperature() + World.MINTEMP) - (air.getTemperature() + World.MINTEMP);
+//			if(deltaT > 1) {
+//				end = boltzmannConstant * World.VOLUMEPERTILE * deltaT;
+//			}else {
+//				deltaT = (air.getTemperature() + World.MINTEMP) - (tile.getTemperature() + World.MINTEMP);
+//				end = boltzmannConstant * World.VOLUMEPERTILE * deltaT;
+//			}
+//			
+//		}
 		double averageWater = 0;
 		double averageTemp = 0;
 		for(Tile t : getTiles()) {
@@ -705,7 +704,7 @@ public class World {
 			if(t.liquidType == LiquidType.WATER || t.liquidType == LiquidType.ICE) {
 				averageWater += t.liquidAmount;
 			}
-			averageWater += t.getAir().getVolume();
+			averageWater += t.getAir().getVolumeLiquid();
 			
 		}
 		averageTemp /= getTiles().size();
@@ -768,18 +767,18 @@ public class World {
 			double airloss = humidity * (-2*seasonEnergy);
 //			seasonEnergy += airloss;
 			
-			double vol = tile.getAir().getVolume();
-			double maxVol = tile.getAir().getMaxVolume();
+			double vol = tile.getAir().getVolumeLiquid();
+			double maxVol = tile.getAir().getMaxVolumeLiquid();
 			//does raining
 			if(tile.getAir().canRain() && tile.liquidType != LiquidType.LAVA) {
 				if(tile.liquidType != LiquidType.ICE) {
 					tile.liquidType = LiquidType.WATER;
 				}
-				double totalAmount = tile.liquidAmount + tile.getAir().getVolume();
+				double totalAmount = tile.liquidAmount + tile.getAir().getVolumeLiquid();
 				
 				
 				double amount = 0.1 * vol / maxVol;
-				tile.getAir().addVolume(-amount);
+				tile.getAir().addVolumeLiquid(-amount);
 				tile.liquidAmount += amount;
 //				seasonEnergy += 0.01;
 			}
@@ -822,7 +821,7 @@ public class World {
 		double [][] energyTemp = new double[width][height];
 		for(Tile t: getTiles()) {
 			pressureTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getPressure();
-			volumeTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getVolume();
+			volumeTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getVolumeLiquid();
 			energyTemp[t.getLocation().x()][t.getLocation().y()] = t.getEnergy();
 		}
 		
@@ -834,23 +833,24 @@ public class World {
 				TileLoc otherLoc = otherTile.getLocation();
 				Air otherAir = otherTile.getAir();
 				double mypress = tileAir.getPressure();
-				double myvolume = tileAir.getVolume();
-				double mytemp = tile.getEnergy();
+				double myvolume = tileAir.getVolumeLiquid();
+				double myenergy = tileAir.getEnergy();
 				double mycombined = mypress / (myvolume);
 				
 				double opress = otherAir.getPressure();
-				double ovolume = otherAir.getVolume();
-				double otemp = otherTile.getEnergy();
+				double ovolume = otherAir.getVolumeLiquid();
+				double oenergy = otherAir.getEnergy();
 				double ocombined = opress / (ovolume);
 				
 				boolean transferred = false;
 				double deltap = 1 - opress / mypress;
 				double deltavol = Math.sqrt((myvolume - ovolume)*deltap);
+				
 //				if(mycombined > ocombined && Math.abs(deltavol) > 0.002) {
-				if(mypress > opress && myvolume > ovolume && Math.abs(deltavol) > 0.002) {
+				if(mypress > opress*1.001 && myvolume > ovolume && Math.abs(deltavol) > 0.0015) {
+					
 					Direction direction = Direction.getDirection(tileLoc, otherLoc);
 					tileAir.setFlowDirection(direction);
-//					System.out.println(direction);
 //					double deltap = 1 - opress / mypress;
 //					double deltavol = Math.sqrt((myvolume - ovolume)*deltap);
 //					System.out.println(deltavol);
@@ -859,22 +859,17 @@ public class World {
 						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltavol;
 						transferred = true;
 					}
-//					if(massTemp[tileLoc.x()][tileLoc.y()] - change >= 0) {
-//						massTemp[otherLoc.x()][otherLoc.y()] += change;
-//						massTemp[tileLoc.x()][tileLoc.y()] -= change;
-//					}
-				}else {
+					
+					double deltae = myenergy - oenergy;
+					double ratio = myenergy / deltavol;
+//					double ratio = oenergy / myenergy * Math.sqrt(deltae);
+					energyTemp[otherLoc.x()][otherLoc.y()] += ratio;
+					energyTemp[tileLoc.x()][tileLoc.y()] -= ratio;
+
+				}else if (Math.abs(deltavol) <= 0.0015){
 					tileAir.setFlowDirection(Direction.NONE);
 				}
 				
-				if(mytemp > otemp && mypress > opress) {
-					double transferAmount = 1;
-					double deltae = mytemp - otemp;
-					double ratio = otemp / mytemp * Math.sqrt(deltae);
-					energyTemp[otherLoc.x()][otherLoc.y()] += ratio;
-					energyTemp[tileLoc.x()][tileLoc.y()] -= ratio;
-					
-				}
 				if(transferred == true) {
 					break;
 				}
@@ -883,9 +878,9 @@ public class World {
 		}
 		
 		for(Tile t: getTiles()) {
-			t.getAir().setVolume(volumeTemp[t.getLocation().x()][t.getLocation().y()]);
-			t.setEnergy(energyTemp[t.getLocation().x()][t.getLocation().y()]);
-			totalMass += t.getAir().getVolume();
+			t.getAir().setVolumeLiquid(volumeTemp[t.getLocation().x()][t.getLocation().y()]);
+//			t.setEnergy(energyTemp[t.getLocation().x()][t.getLocation().y()]);
+			totalMass += t.getAir().getVolumeLiquid();
 		}
 //		System.out.println(totalMass);
 	}
@@ -893,6 +888,7 @@ public class World {
 		for(Tile tile : getTiles()) {
 			
 			Air air = tile.getAir();
+//			Air atmosphere = tile.getAtmosphere();
 			double pressure = air.getPressure();
 			double volume = VOLUMEPERTILE;
 			double R = 8.314;
@@ -901,6 +897,7 @@ public class World {
 			double moles = (pressure*volume) / R * (temperature + Math.abs(MINTEMP));
 //			air.setMass(moles);
 			air.setMass(STARTINGMASS);
+//			atmosphere.setMass(STARTINGMASS/2);
 			
 		}
 	}
@@ -912,8 +909,9 @@ public class World {
 			if(pressureMultiplier != 0) {
 				defaultEnergy *= pressureMultiplier;
 			}
-			double maxVol = tile.getAir().getMaxVolume();
-			tile.getAir().setVolume(maxVol/1.5);
+			double maxVol = tile.getAir().getMaxVolumeLiquid();
+			tile.getAir().setVolumeLiquid(maxVol/1.5);
+//			tile.getAtmosphere().setVolumeLiquid(maxVol/5);
 			tile.setEnergy(defaultEnergy);
 		}
 	}

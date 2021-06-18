@@ -32,6 +32,8 @@ public class Tile implements Externalizable {
 	private Building road;
 	private WeatherEvent weather;
 	private Air air;
+//	private Air atmosphere;
+	
 	private int tickLastTerrainChange;
 	
 	private double precomputedBrightness;
@@ -94,10 +96,13 @@ public class Tile implements Externalizable {
 		this.humidity = 1;
 		this.energy = 20000;
 		air = new Air(this.height, 0);
+//		this.atmosphere = new Air(this.height + 1000, 0);
 		this.tickLastTerrainChange = -World.MIN_TIME_TO_SWITCH_TERRAIN;
 	}
 
-	
+//	public Air getAtmosphere() {
+//		return atmosphere;
+//	}
 	public double getTemperature() {
 		double Kgair = World.MMAIR * 10 * 0.721;
 		
@@ -148,11 +153,21 @@ public class Tile implements Externalizable {
 	
 	public void updateAir() {
 		air.setTemperature(this.getTemperature());
+		air.setEnergy(this.getEnergy());
 		air.updateMaxVolume();
 		air.updateHumidity();
 		air.updateHeight(this.height);
 		air.updatePressure();
+		
+		
 	}
+//	public void updateAtmosphere() {
+////		atmosphere.setTemperature(this.getTemperature());
+////		atmosphere.setEnergy(this.getEnergy());
+//		atmosphere.updateMaxVolume();
+//		atmosphere.updateHumidity();
+//		atmosphere.updatePressure();
+//	}
 	
 	public double getEvaporation() {
 		double evaporation = 0.0;

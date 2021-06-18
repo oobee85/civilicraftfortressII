@@ -11,12 +11,14 @@ public class Air {
 	private double height;
 	private double volume;
 	private double mass;
+	private double energy;
 	
 	private double maxHumidity;
 	private double maxVolume;
 	private boolean canRain;
 	private double volumeChange;
 	private Direction flowDirection;
+	
 	
 	public Air(double height, double temp) {
 		this.maxHumidity = 1.0;
@@ -30,7 +32,10 @@ public class Air {
 		this.updateMaxVolume();
 		this.updateHumidity();
 		this.flowDirection = Direction.NONE;
+		this.energy = 0;
+		
 	}
+	
 	public Direction getFlowDirection() {
 		return flowDirection;
 	}
@@ -41,10 +46,13 @@ public class Air {
 	public void setTemperature(double temp) {
 		this.temperature = temp;
 	}
-	public double getVolume() {
+	public void setEnergy(double energy) {
+		this.energy = energy;
+	}
+	public double getVolumeLiquid() {
 		return volume;
 	}
-	public double getMaxVolume() {
+	public double getMaxVolumeLiquid() {
 		return maxVolume;
 	}
 	public double getHumidity() {
@@ -53,13 +61,16 @@ public class Air {
 	public double getTemperature() {
 		return temperature;
 	}
+	public double getEnergy() {
+		return energy;
+	}
 	public double getPressure() {
 		return pressure;
 	}
-	public void setVolume(double set) {
+	public void setVolumeLiquid(double set) {
 		volume = set;
 	}
-	public void addVolume(double add) {
+	public void addVolumeLiquid(double add) {
 		this.volume += add;
 		volumeChange = add;
 	}
