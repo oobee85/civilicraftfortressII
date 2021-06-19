@@ -114,7 +114,6 @@ public class World {
 //				updateBorderTiles();
 			}
 			tile.setHeight(info.getHeight());
-			tile.setHumidity(info.getHumidity());
 			tile.setResource(info.getResource());
 
 			tile.setTerrain(info.getTerrain());
@@ -670,16 +669,49 @@ public class World {
 		
 		
 	}
-	public void updateAirStuff() {
+	public void updateInternalAirValues() {
 		for(Tile tile : getTilesRandomly()) {
 			tile.updateAir();
-//			tile.updateAtmosphere();
+			tile.updateAtmosphere();
 		}
 			
 	}
+	
+	public void updateTemperatureOfTilesAndAir() {
+		for(Tile tile: getTiles()) {
+			Air air = tile.getAir();
+//			Air atmosphere = tile.getAtmosphere();
+			double tileEnergy = tile.getEnergy();
+			double airEnergy = air.getEnergy();
+//			double atmosphereEnergy = atmosphere.getEnergy();
+			
+			double tileTemp = convertEnergyToTemp(tileEnergy);
+			double airTemp = convertEnergyToTemp(airEnergy);
+//			double atmosphereTemp = convertEnergyToTemp(atmosphereEnergy);
+			
+//			System.out.println("Tile: " + tileTemp);
+//			System.out.println("Air: " + airTemp);
+			tile.setTemperature(tileTemp);
+			air.setTemperature(airTemp);
+//			atmosphere.setTemperature(atmosphereTemp);
+		}
+	}
+	
+	public double convertEnergyToTemp(double energy) {
+		double Kgair = World.MMAIR * 10 * 0.721;
+		
+		double asdf = Kgair*Math.abs(World.MINTEMP);
+		double asd = energy - asdf;
+		double temperature = asd / Kgair;
+		return temperature;
+	}
+	
 	public void updateEnergy() {
 		if(World.ticks % TICKSTOUPDATEAIR == 0) {
 			return;
+		}
+		for(Tile tile: getTilesRandomly()) {
+			tile.getAir().setEnergy(tile.getEnergy());
 		}
 //		for(Tile tile: getTilesRandomly()) {
 //			// Radiation for ground -> first layer air
@@ -687,28 +719,37 @@ public class World {
 //			// o = 5.670374419 × 10^-8 W*m-2*K-4
 //			double boltzmannConstant = 5.670374e-8;
 //			Air air = tile.getAir();
-//			double end = 0;
-//			double deltaT = (tile.getTemperature() + World.MINTEMP) - (air.getTemperature() + World.MINTEMP);
-//			if(deltaT > 1) {
-//				end = boltzmannConstant * World.VOLUMEPERTILE * deltaT;
-//			}else {
-//				deltaT = (air.getTemperature() + World.MINTEMP) - (tile.getTemperature() + World.MINTEMP);
-//				end = boltzmannConstant * World.VOLUMEPERTILE * deltaT;
-//			}
+//			
+//			double deltaT = ((tile.getTemperature() + World.MINTEMP) - (air.getTemperature() + World.MINTEMP) );
+//			double end = boltzmannConstant * World.VOLUMEPERTILE * deltaT * 10000;
+//			tile.addEnergy(-end);
+//			tile.getAir().addEnergy(end);
+//			System.out.println(end);
 //			
 //		}
 		double averageWater = 0;
-		double averageTemp = 0;
+		double averageTileTemp = 0;
+		double averageAirTemp = 0;
+		double totalEnergy = 0;
+		double averageEnergy = 0;
 		for(Tile t : getTiles()) {
-			averageTemp += t.getTemperature();
+			averageTileTemp += t.getTemperature();
+			averageEnergy += t.getEnergy();
+			totalEnergy += t.getEnergy();
+			totalEnergy += t.getAir().getEnergy();
+			totalEnergy += t.getAtmosphere().getEnergy();
+			averageAirTemp += t.getAir().getTemperature();
 			if(t.liquidType == LiquidType.WATER || t.liquidType == LiquidType.ICE) {
 				averageWater += t.liquidAmount;
 			}
 			averageWater += t.getAir().getVolumeLiquid();
 			
 		}
-		averageTemp /= getTiles().size();
-		averageWater /= getTiles().size();;
+		int tileSize = getTiles().size();
+		averageTileTemp /= tileSize;
+		averageWater /= tileSize;
+		averageEnergy /= tileSize;
+		averageAirTemp /= tileSize;
 		for(Tile tile : getTiles()) {
 			if(tile == null) {
 				System.out.println("null tile when updating energy");
@@ -799,12 +840,22 @@ public class World {
 			
 			
 			tile.addEnergy(seasonEnergy);
+			
 //			tile.addEnergy(addedEnergy);
+			
+			float rounduE = (float) Math.round(averageEnergy * 100) / 100;
+			float roundTE = (float) Math.round(totalEnergy * 100) / 100;
+			float rounduAT = (float) Math.round(averageAirTemp * 100) / 100;
+			float rounduTT = (float) Math.round(averageTileTemp * 100) / 100;
+			float rounduW = (float) Math.round(averageWater * 100) / 100;
 			
 			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 1) {
 //				tile.setEnergy(21000);
 //				System.out.println(tile.getTemperature());
-				System.out.println("Energy: " + tile.getEnergy() + ", T: " + tile.getTemperature() + ", " + ticks + ", uT: " + averageTemp + ", uW: " + averageWater);
+//				System.out.println("Energy: " + tile.getEnergy() + ", T: " + tile.getTemperature() + ", " + ticks + ", uT: " + averageTemp + ", uW: " + averageWater);
+				System.out.println("uE: "+rounduE + "| TE: "+roundTE + "| uTT: "+rounduTT + "| uAT: "+rounduAT + "| uW: "+rounduW +"| "+ticks);
+				
+
 			}
 //			tile.setEnergy(energy);
 //			tile.addEnergy(joules);
@@ -847,7 +898,9 @@ public class World {
 				double deltavol = Math.sqrt((myvolume - ovolume)*deltap);
 				
 //				if(mycombined > ocombined && Math.abs(deltavol) > 0.002) {
-				if(mypress > opress*1.001 && myvolume > ovolume && Math.abs(deltavol) > 0.0015) {
+				if(mypress > opress*1.001 
+//						&& myvolume > ovolume 
+						&& Math.abs(deltavol) > 0.0015) {
 					
 					Direction direction = Direction.getDirection(tileLoc, otherLoc);
 					tileAir.setFlowDirection(direction);
@@ -915,26 +968,11 @@ public class World {
 			tile.setEnergy(defaultEnergy);
 		}
 	}
-	public void updateTileTemperature() {
-		for(Tile tile : getTiles()) {
-			if(tile == null) {
-				System.out.println("null tile when updating temperature");
-				continue;
-			}
-			
 
-//			tile.setTemperature(tile.getTemperature()+Season.getNightEnergy());
-			
-//			double temperature = tile.getTemperature();
-//			tile.getAir().setTemperature(temperature);
-			
-		}
-			
-	}
 	public void updateTerrainChange(boolean start) {
-		updateAirStuff();
+		updateInternalAirValues();
 		updateEnergy();
-		updateTileTemperature();
+		updateTemperatureOfTilesAndAir();
 		updateAirMovement();
 		if(start == true) {
 			setTileMass();

@@ -20,10 +20,10 @@ public class Air {
 	private Direction flowDirection;
 	
 	
-	public Air(double height, double temp) {
+	public Air(double height, double energy) {
 		this.maxHumidity = 1.0;
 		this.height = height;
-		this.temperature = temp;
+		this.temperature = 0;
 		this.maxVolume = 10;
 		this.canRain = false;
 		this.volume = 0;
@@ -32,7 +32,7 @@ public class Air {
 		this.updateMaxVolume();
 		this.updateHumidity();
 		this.flowDirection = Direction.NONE;
-		this.energy = 0;
+		this.energy = energy;
 		
 	}
 	
@@ -48,6 +48,9 @@ public class Air {
 	}
 	public void setEnergy(double energy) {
 		this.energy = energy;
+	}
+	public void addEnergy(double energy) {
+		this.energy += energy;
 	}
 	public double getVolumeLiquid() {
 		return volume;
@@ -77,7 +80,7 @@ public class Air {
 	public double getVolumeChange() {
 		return volumeChange;
 	}
-	public void updateHeight(double height) {
+	public void setHeight(double height) {
 		this.height = height;
 	}
 	public void updateMaxVolume() {
@@ -129,13 +132,15 @@ public class Air {
 //		double sub = boltz * temp;
 		
 		double sub = R * (temp + Math.abs(World.MINTEMP));
-		double standardPVNRT = World.STARTINGMASS * sub / World.VOLUMEPERTILE;
+//		double pvnrt = ( this.getVolumeLiquid() * R * (temp + Math.abs(World.MINTEMP)) ) / World.VOLUMEPERTILE;
+//		double standardPVNRT = World.STARTINGMASS * sub / World.VOLUMEPERTILE;
+//		double standardPVNRT = this.getMaxVolumeLiquid() * sub / World.VOLUMEPERTILE;
 		
 		double power = (-g * MMair * (h - h0)) / sub;
 		double pressure = P0 * Math.pow(Math.E, power);
 		
-		double pvnrt = mass * sub / World.VOLUMEPERTILE;
-		double mix = pressure+(pvnrt - standardPVNRT);
+//		double pvnrt = this.getVolumeLiquid() * sub / this.getMaxVolumeLiquid();
+//		double mix = pressure+(pvnrt - standardPVNRT);
 //		System.out.println("Pressure: " + pressure);
 //		System.out.println("pvnrt: "+other + "atm: "+pressure);
 		this.pressure = pressure;

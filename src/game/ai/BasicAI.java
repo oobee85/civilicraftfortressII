@@ -94,7 +94,7 @@ public class BasicAI implements AIInterface {
 		}
 		assignments[WorkerTask.IRRIGATE.ordinal()] = Math.max(0, numWorkers - total);
 		state.targetAssignments = assignments;
-		System.out.println("assignments: " + printArray(state.targetAssignments));
+//		System.out.println("assignments: " + printArray(state.targetAssignments));
 	}
 	public static String printArray(int[] arr) {
 		StringBuilder sb = new StringBuilder();

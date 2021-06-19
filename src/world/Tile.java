@@ -16,6 +16,7 @@ public class Tile implements Externalizable {
 	private float height;
 	private float humidity;
 	private double energy;
+	private double temperature;
 
 	public volatile float liquidAmount;
 	public volatile LiquidType liquidType;
@@ -32,7 +33,7 @@ public class Tile implements Externalizable {
 	private Building road;
 	private WeatherEvent weather;
 	private Air air;
-//	private Air atmosphere;
+	private Air atmosphere;
 	
 	private int tickLastTerrainChange;
 	
@@ -95,32 +96,17 @@ public class Tile implements Externalizable {
 		inventory = new Inventory();
 		this.humidity = 1;
 		this.energy = 20000;
-		air = new Air(this.height, 0);
-//		this.atmosphere = new Air(this.height + 1000, 0);
+		this.air = new Air(this.height, this.energy);
+		this.atmosphere = new Air(this.height + 1000, this.energy/2);
 		this.tickLastTerrainChange = -World.MIN_TIME_TO_SWITCH_TERRAIN;
 	}
 
-//	public Air getAtmosphere() {
-//		return atmosphere;
-//	}
+	
+	public void setTemperature(double temp) {
+		this.temperature = temp;
+	}
 	public double getTemperature() {
-		double Kgair = World.MMAIR * 10 * 0.721;
-		
-		double asdf = Kgair*Math.abs(World.MINTEMP);
-		double asd = energy - asdf;
-		double asdfg = asd / Kgair;
-		return asdfg;
-//		float season = Season.getSeason2();
-//		float night = Season.getNightEnergy();
-//		float seasonTemp = Season.winter[getLocation().y()] + season * Season.summer[getLocation().y()];
-		
-		
-//		float seasonTemp = 1 - ((1 - season) * Season.winter[getLocation().y()] + season*Season.summer[getLocation().y()]);
-//		float heightTemp = 1 - height;
-//		heightTemp = heightTemp*heightTemp;
-//		float nightMultiplier = World.isNightTime() ? 0.9f : 1f;
-//		return (seasonTemp + heightTemp)*nightMultiplier/2;
-//		return season+night;
+		return this.temperature;
 	}
 	public void setEnergy(double energy) {
 		this.energy = energy;
@@ -141,33 +127,31 @@ public class Tile implements Externalizable {
 	public float getHumidity() {
 		return humidity;
 	}
-
-	public void setHumidity(float humidity) {
-//		this.humidity = humidity;
-	}
 	
 	public Air getAir() {
 		return air;
 	}
-	
+	public Air getAtmosphere() {
+		return atmosphere;
+	}
 	
 	public void updateAir() {
-		air.setTemperature(this.getTemperature());
-		air.setEnergy(this.getEnergy());
+//		air.setTemperature(this.getTemperature());
+//		air.setEnergy(this.getEnergy());
 		air.updateMaxVolume();
 		air.updateHumidity();
-		air.updateHeight(this.height);
+//		air.updateHeight(this.height);
 		air.updatePressure();
 		
 		
 	}
-//	public void updateAtmosphere() {
-////		atmosphere.setTemperature(this.getTemperature());
-////		atmosphere.setEnergy(this.getEnergy());
-//		atmosphere.updateMaxVolume();
-//		atmosphere.updateHumidity();
-//		atmosphere.updatePressure();
-//	}
+	public void updateAtmosphere() {
+//		atmosphere.setTemperature(this.getTemperature());
+//		atmosphere.setEnergy(this.getEnergy());
+		atmosphere.updateMaxVolume();
+		atmosphere.updateHumidity();
+		atmosphere.updatePressure();
+	}
 	
 	public double getEvaporation() {
 		double evaporation = 0.0;

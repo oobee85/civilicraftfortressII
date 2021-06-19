@@ -276,8 +276,7 @@ public class VanillaDrawer extends Drawer {
 						ratio = (float) ((tile.getAir().getPressure() - lowPressure)
 								/ (highPressure - lowPressure));
 					} else if (state.mapMode == MapMode.PRESSURE2) {
-//						ratio = (float) ((tile.getAtmosphere().getPressure() - lowPressure)
-//								/ (highPressure - lowPressure));
+						ratio = (float) ((tile.getTemperature() - lowTemp) / (highTemp - lowTemp));
 					}
 					
 					
