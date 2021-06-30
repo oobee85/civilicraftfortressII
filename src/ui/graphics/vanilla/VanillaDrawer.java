@@ -515,7 +515,8 @@ public class VanillaDrawer extends Drawer {
 				List<String> strings = new LinkedList<String>();
 				strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
 				strings.add(String.format("PRE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getPressure()));
-				strings.add(String.format("TEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getTemperature()));
+				strings.add(String.format("ATEMP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getTemperature()));
+				strings.add(String.format("TT" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTemperature()));
 				strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getHumidity()));
 				
 				strings.add(String.format("EVAP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEvaporation()));

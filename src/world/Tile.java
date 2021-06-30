@@ -106,6 +106,12 @@ public class Tile implements Externalizable {
 		this.temperature = temp;
 	}
 	public double getTemperature() {
+//		double Kgair = World.MMAIR * 10 * 0.721;
+//		
+//		double asdf = Kgair*Math.abs(World.MINTEMP);
+//		double asd = energy - asdf;
+//		double temperature = asd / Kgair;
+//		return temperature;
 		return this.temperature;
 	}
 	public void setEnergy(double energy) {

@@ -685,8 +685,8 @@ public class World {
 			double airEnergy = air.getEnergy();
 //			double atmosphereEnergy = atmosphere.getEnergy();
 			
-			double tileTemp = convertEnergyToTemp(tileEnergy);
-			double airTemp = convertEnergyToTemp(airEnergy);
+			double tileTemp = convertEnergyToTemp(tileEnergy, tile, null);
+			double airTemp = convertEnergyToTemp(airEnergy, null, air);
 //			double atmosphereTemp = convertEnergyToTemp(atmosphereEnergy);
 			
 //			System.out.println("Tile: " + tileTemp);
@@ -697,8 +697,11 @@ public class World {
 		}
 	}
 	
-	public double convertEnergyToTemp(double energy) {
+	public double convertEnergyToTemp(double energy, Tile tile, Air air) {
 		double Kgair = World.MMAIR * 10 * 0.721;
+		if(tile != null) {
+			Kgair = 75;
+		}
 		
 		double asdf = Kgair*Math.abs(World.MINTEMP);
 		double asd = energy - asdf;
@@ -710,9 +713,9 @@ public class World {
 		if(World.ticks % TICKSTOUPDATEAIR == 0) {
 			return;
 		}
-		for(Tile tile: getTilesRandomly()) {
-			tile.getAir().setEnergy(tile.getEnergy());
-		}
+//		for(Tile tile: getTilesRandomly()) {
+//			tile.getAir().setEnergy(tile.getEnergy());
+//		}
 //		for(Tile tile: getTilesRandomly()) {
 //			// Radiation for ground -> first layer air
 //			// Q = o(T1 - T2) * A
@@ -957,15 +960,18 @@ public class World {
 	private void setTileEnergy() {
 
 		for(Tile tile: getTiles()) {
-			double defaultEnergy = 20800;
+			double defaultEnergy = 22000;
 			double pressureMultiplier = tile.getAir().getPressure()/STANDARDPRESSURE;
 			if(pressureMultiplier != 0) {
 				defaultEnergy *= pressureMultiplier;
 			}
+//			System.out.println(tile.getAir().getPressure());
 			double maxVol = tile.getAir().getMaxVolumeLiquid();
+
+			tile.setEnergy(defaultEnergy);
 			tile.getAir().setVolumeLiquid(maxVol/1.5);
 //			tile.getAtmosphere().setVolumeLiquid(maxVol/5);
-			tile.setEnergy(defaultEnergy);
+//			tile.setEnergy(defaultEnergy);
 		}
 	}
 
