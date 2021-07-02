@@ -34,37 +34,10 @@ public class MeshUtils {
 	public static Mesh getMeshByFileName(String filename) {
 		if (!meshes.containsKey(filename)) {
 			Mesh mesh = loadMeshFromFile(filename);
-			normalize(mesh, false);
+			mesh.normalize(false);
 			meshes.put(filename, mesh);
 		}
 		return meshes.get(filename);
-	}
-
-	private static void normalize(Mesh mesh, boolean zeroZ) {
-		Vector3f min = new Vector3f(mesh.getVertices()[0].getPosition());
-		Vector3f max = new Vector3f(min);
-		for (Vertex v : mesh.getVertices()) {
-			min.x = Math.min(v.getPosition().x, min.x);
-			min.y = Math.min(v.getPosition().y, min.y);
-			min.z = Math.min(v.getPosition().z, min.z);
-			max.x = Math.max(v.getPosition().x, max.x);
-			max.y = Math.max(v.getPosition().y, max.y);
-			max.z = Math.max(v.getPosition().z, max.z);
-		}
-
-		Vector3f range = max.subtract(min);
-		float maximumRange = Math.max(range.y, range.x);
-		float scale = 1f / maximumRange;
-		Vector3f offset = new Vector3f(-range.x * scale * 0.5f, -range.y * scale * 0.5f, 0);
-		if (zeroZ) {
-			offset.z = -range.z * scale * 0.5f;
-		}
-		for (Vertex v : mesh.getVertices()) {
-			Vector3f newPos = v.getPosition().subtract(min);
-			newPos = newPos.multiply(scale);
-			newPos = newPos.add(offset);
-			v.getPosition().set(newPos);
-		}
 	}
 
 	private static Mesh readObjFile(String filename) {
@@ -274,7 +247,7 @@ public class MeshUtils {
 	static {
 		cube = getMeshByFileName("models/cube.obj");
 		skybox = getMeshByFileName("models/skybox.obj");
-		normalize(skybox, true);
+		skybox.normalize(true);
 		square = getMeshByFileName("models/square.obj");
 		cattail = getMeshByFileName("models/cattail.ply");
 		star = getMeshByFileName("models/star.obj");

@@ -17,7 +17,7 @@ public class TerrainObject extends GameObject {
 	Mesh mesh;
 	Texture texture;
 	
-	private HashMap<TileLoc, ArrayList<Vertex>> locToHex;
+	private HashMap<TileLoc, ArrayList<Integer>> locToHex;
 	
 	public TerrainObject() {
 		super(null);
@@ -31,17 +31,18 @@ public class TerrainObject extends GameObject {
 	
 	
 	
-	public void updateHeights(World world, GL3 gl, boolean includeLiquid) {
+	public void updateHeights(World world, boolean includeLiquid) {
 		for(Tile tile : world.getTiles()) {
-			for(Vertex vertex : locToHex.get(tile.getLocation())) {
+			for(Integer vertexIndex : locToHex.get(tile.getLocation())) {
 				float effectiveHeight = tile.getHeight();
 				if(includeLiquid) {
 					effectiveHeight += tile.liquidAmount - 2;
 				}
-				vertex.getPosition().z = GLDrawer.tileHeightTo3dHeight(effectiveHeight);
+				mesh.setVertexZ(vertexIndex, GLDrawer.tileHeightTo3dHeight(effectiveHeight));
 			}
 		}
-		mesh.updatePositions(gl);
+		mesh.updateNormals();
+		mesh.updatePositions();
 	}
 
 	private Mesh createMeshFromWorld3(World world) {
@@ -49,7 +50,6 @@ public class TerrainObject extends GameObject {
 		ArrayList<Vertex> vertices = new ArrayList<>();
 		ArrayList<Integer> indicesList = new ArrayList<>();
 		HashMap<Tile, ArrayList<Vertex>> tileToVertex = new HashMap<>();
-		HashMap<Vertex, Integer> vertexToIndex = new HashMap<>();
 		float radius = TILE_RADIUS*4/5;
 		float yoffset = (float) (radius * Math.sin(Math.toRadians(60)));
 		Vector3f white = new Vector3f(1, 1, 1);
@@ -58,23 +58,35 @@ public class TerrainObject extends GameObject {
 			Vector2f textureCoord = new Vector2f(
 					(tile.getLocation().x() + 0.5f)/world.getWidth(), 
 					(tile.getLocation().y() + 0.5f)/world.getHeight());
-			
-			ArrayList<Vertex> verts = locToHex.getOrDefault(tile.getLocation(), new ArrayList<>());
+			ArrayList<Vertex> verts = new ArrayList<>();
+			ArrayList<Integer> vertIndices = new ArrayList<>();
 			Vector3f center = GLDrawer.tileLocTo3dCoords(tile.getLocation(), tile.getHeight());
 
-			verts.add(new Vertex(center, white, null, textureCoord));
-			verts.add(new Vertex(center.add(-radius, 0, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(-radius/2, -yoffset, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(radius/2, -yoffset, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(radius, 0, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(radius/2, yoffset, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(-radius/2, yoffset, 0), white, null, textureCoord));
-			locToHex.put(tile.getLocation(), verts);
+			vertices.add(new Vertex(center, white, null, textureCoord));
+			verts.add(vertices.get(vertices.size()-1));
+			vertIndices.add(vertices.size()-1);
+			vertices.add(new Vertex(center.add(-radius, 0, 0), white, null, textureCoord));
+			verts.add(vertices.get(vertices.size()-1));
+			vertIndices.add(vertices.size()-1);
+			vertices.add(new Vertex(center.add(-radius/2, -yoffset, 0), white, null, textureCoord));
+			verts.add(vertices.get(vertices.size()-1));
+			vertIndices.add(vertices.size()-1);
+			vertices.add(new Vertex(center.add(radius/2, -yoffset, 0), white, null, textureCoord));
+			verts.add(vertices.get(vertices.size()-1));
+			vertIndices.add(vertices.size()-1);
+			vertices.add(new Vertex(center.add(radius, 0, 0), white, null, textureCoord));
+			verts.add(vertices.get(vertices.size()-1));
+			vertIndices.add(vertices.size()-1);
+			vertices.add(new Vertex(center.add(radius/2, yoffset, 0), white, null, textureCoord));
+			verts.add(vertices.get(vertices.size()-1));
+			vertIndices.add(vertices.size()-1);
+			vertices.add(new Vertex(center.add(-radius/2, yoffset, 0), white, null, textureCoord));
+			verts.add(vertices.get(vertices.size()-1));
+			vertIndices.add(vertices.size()-1);
+			
+			locToHex.put(tile.getLocation(), vertIndices);
 			
 			int i = vertices.size();
-			for(int j = 0; j < verts.size(); j++) {
-				vertexToIndex.put(verts.get(j), i+j);
-			}
 			tileToVertex.put(tile, verts);
 			for(int j = 1; j <= 6; j++) {
 				indicesList.add(i);
@@ -86,9 +98,6 @@ public class TerrainObject extends GameObject {
 					indicesList.add(i+j+1);
 				}
 			}
-			for(Vertex vec : verts) {
-				vertices.add(vec);
-			}
 		}
 		for(Tile tile : world.getTiles()) {
 			int x = tile.getLocation().x();
@@ -97,93 +106,93 @@ public class TerrainObject extends GameObject {
 			if(north != null) {
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(6)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(5)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(north).get(3)));
-				locToHex.get(north.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(north.getLocation()).add(vertices.size()-1);
 				
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(6)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(north).get(3)));
-				locToHex.get(north.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(north.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(north).get(2)));
-				locToHex.get(north.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(north.getLocation()).add(vertices.size()-1);
 			}
 
 			Tile northeast = world.get(new TileLoc(x+1, y + (x%2)));
 			if(northeast != null) {
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(5)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(4)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(northeast).get(2)));
-				locToHex.get(northeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(northeast.getLocation()).add(vertices.size()-1);
 
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(5)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(northeast).get(2)));
-				locToHex.get(northeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(northeast.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(northeast).get(1)));
-				locToHex.get(northeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(northeast.getLocation()).add(vertices.size()-1);
 			}
 			
 			if(north != null && northeast != null) {
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(5)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(northeast).get(1)));
-				locToHex.get(northeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(northeast.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(north).get(3)));
-				locToHex.get(north.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(north.getLocation()).add(vertices.size()-1);
 			}
 			
 			Tile southeast = world.get(new TileLoc(x+1, y - (1 - (x%2))));
 			if(southeast != null) {
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(4)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(3)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(southeast).get(1)));
-				locToHex.get(southeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(southeast.getLocation()).add(vertices.size()-1);
 
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(4)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(southeast).get(1)));
-				locToHex.get(southeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(southeast.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(southeast).get(6)));
-				locToHex.get(southeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(southeast.getLocation()).add(vertices.size()-1);
 			}
 			
 			if(northeast != null && southeast != null) {
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(4)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(southeast).get(6)));
-				locToHex.get(southeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(southeast.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(northeast).get(2)));
-				locToHex.get(northeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(northeast.getLocation()).add(vertices.size()-1);
 			}
 		}
 		
