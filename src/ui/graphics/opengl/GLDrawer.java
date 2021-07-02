@@ -27,8 +27,8 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	private static final float FAR_CLIP = 1000f;
 	
 	
-	private static final boolean UPDATE_LIQUIDS = false;
-	private static final boolean UPDATE_TERRAIN_HEIGHT = false;
+	private static final boolean UPDATE_LIQUIDS = true;
+	private static final boolean UPDATE_TERRAIN_HEIGHT = true;
 	/**
 	 * This is a hack until I figure out frame rate issues updating every frame.
 	 * With this it will update terrain and liquid height once every 4s
@@ -155,7 +155,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	public void display(GLAutoDrawable drawable) {
 		numFramesRenderedSincePrint++;
 		long deltaTime = System.currentTimeMillis() - previousFPSPrint;
-		if(deltaTime > 1000) {
+		if(deltaTime > 4000) {
 			System.out.println("Avg frame time: " + deltaTime / numFramesRenderedSincePrint + "ms");
 			numFramesRenderedSincePrint = 0;
 			previousFPSPrint = System.currentTimeMillis();
@@ -172,14 +172,14 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			if(terrainObject == null) {
 				terrainObject = new TerrainObject();
 				terrainObject.create(gl, game.world);
-				terrainObject.updateHeights(game.world, gl, false);
+				terrainObject.updateHeights(game.world, false);
 				camera.set(new Vector3f(game.world.getWidth()/2, 0, 100), 0, -45);
 				this.updateTerrainImages();
 			}
 			if(liquidObject == null) {
 				liquidObject = new TerrainObject();
 				liquidObject.create(gl, game.world);
-				liquidObject.updateHeights(game.world, gl, true);
+				liquidObject.updateHeights(game.world, true);
 				liquidObject.texture = TextureUtils.getTextureByFileName(LiquidType.WATER.getTextureFile(), gl);
 			}
 			if(mapImages != null && mapImages[MapMode.TERRAIN.ordinal()] != null) {
@@ -240,7 +240,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("waveOffset", (float)(System.currentTimeMillis() - startTime));
 		
 		if(UPDATE_LIQUIDS || System.currentTimeMillis() - previousHeightUpdate > SLOW_HEIGHT_UPDATE_TIMER) {
-			liquidObject.updateHeights(game.world, gl, true);
+			liquidObject.updateHeights(game.world, true);
 			previousHeightUpdate = System.currentTimeMillis();
 		}
 		
@@ -397,7 +397,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 		// TODO need to figure out how to make updating terrain not laggy
 		if(UPDATE_TERRAIN_HEIGHT || System.currentTimeMillis() - previousHeightUpdate > SLOW_HEIGHT_UPDATE_TIMER) {
-			terrainObject.updateHeights(game.world, gl, false);
+			terrainObject.updateHeights(game.world, false);
 			previousHeightUpdate = System.currentTimeMillis();
 		}
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
