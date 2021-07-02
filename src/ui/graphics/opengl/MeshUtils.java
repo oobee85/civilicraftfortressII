@@ -19,6 +19,7 @@ public class MeshUtils {
 	public static final Mesh mushroom;
 	public static final Mesh house;
 	public static final Mesh meteor;
+	public static final Mesh hexwall;
 
 	public static final Mesh x;
 	public static final Mesh y;
@@ -200,7 +201,76 @@ public class MeshUtils {
 			return cube;
 		}
 	}
+	private static Mesh makeHexWallMesh(float radius) {
+		float yoffset = (float) (radius * Math.sin(Math.toRadians(60)));
+		Vector3f white = new Vector3f(1, 1, 1);
+		Vector3f center = new Vector3f(0, 0, 0);
+		Vector2f textureCoord = new Vector2f(0.5f, 0.5f);
+		ArrayList<Vertex> verts = new ArrayList<>();
+		ArrayList<Integer> indicesList = new ArrayList<>();
+		
+		Vector3f[] vecs = new Vector3f[] {
+				new Vector3f(),
+				center.add(-radius, 0, 0),
+				center.add(-radius/2, -yoffset, 0),
+				center.add(radius/2, -yoffset, 0),
+				center.add(radius, 0, 0),
+				center.add(radius/2, yoffset, 0),
+				center.add(-radius/2, yoffset, 0)
+		};
+		for(int i = 0; i < vecs.length; i++) {
+			float x = (vecs[i].x + radius) / (2*radius);
+			float y = (vecs[i].y + yoffset) / (2*yoffset);
+			verts.add(new Vertex(vecs[i], white, null, new Vector2f(x, y)));
+		}
 
+		for(int j = 1; j <= 6; j++) {
+			indicesList.add(0);
+			indicesList.add(j);
+			if(j == 6) {
+				indicesList.add(1);
+			}
+			else {
+				indicesList.add(j+1);
+			}
+		}
+		
+		// add side walls
+		int originalIndex = vecs.length;
+		int index = originalIndex;
+		for(int i = 1; i < vecs.length; i++) {
+			float xoffset = (i % 2);
+			verts.add(new Vertex(vecs[i], white, null, new Vector2f(xoffset, 1)));
+			verts.add(new Vertex(vecs[i].add(0, 0, -400), white, null, new Vector2f(xoffset, 0)));
+			
+			if(i != vecs.length - 1) {
+				indicesList.add(index);
+				indicesList.add(index + 1);
+				indicesList.add(index + 3);
+	
+				indicesList.add(index);
+				indicesList.add(index + 3);
+				indicesList.add(index + 2);
+			}
+			else {
+				indicesList.add(index);
+				indicesList.add(index + 1);
+				indicesList.add(originalIndex + 1);
+	
+				indicesList.add(index);
+				indicesList.add(originalIndex + 1);
+				indicesList.add(originalIndex);
+			}
+			index += 2;
+		}
+		int[] indices = new int[indicesList.size()];
+		for(int i = 0; i < indices.length; i++) {
+			indices[i] = indicesList.get(i);
+		}
+		Vertex[] vertexArray = verts.toArray(new Vertex[0]);
+		return new Mesh(vertexArray, indices);
+	}
+	
 	static {
 		cube = getMeshByFileName("models/cube.obj");
 		skybox = getMeshByFileName("models/skybox.obj");
@@ -217,5 +287,7 @@ public class MeshUtils {
 		defaultUnit = cube;
 		defaultPlant = mushroom;
 		defaultBuilding = house;
+		
+		hexwall = makeHexWallMesh(TerrainObject.TILE_RADIUS);
 	}
 }
