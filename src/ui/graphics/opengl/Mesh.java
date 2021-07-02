@@ -18,7 +18,6 @@ public class Mesh {
 	
 	
 	private GL3 gl;
-	private Vertex[] vertices;
 	private int[] indices;
 	private int vao, pbo, ibo, cbo, nbo, tbo;
 	private FloatBuffer positionBuffer;
@@ -27,9 +26,10 @@ public class Mesh {
 	private FloatBuffer textureCoordBuffer;
 
 	public Mesh(Vertex[] vertices, int[] indices) {
-		this.vertices = vertices;
 		this.indices = indices;
 		allMeshes.add(this);
+
+		initializeDataBuffers(vertices, indices);
 	}
 	public void setVertexZ(int vertexIndex, float z) {
 		positionBuffer.array()[vertexIndex*3 + 2] = z;
@@ -146,31 +146,7 @@ public class Mesh {
 		gl.glBindVertexArray(0);
 	}
 	
-	private void generateNormals() {
-		Vector3f[] normals = new Vector3f[vertices.length];
-		for(int i = 0; i < normals.length; i++) {
-			normals[i] = new Vector3f();
-		}
-		for(int i = 0; i < indices.length; i+=3) {
-			int i0 = indices[i+0];
-			int i1 = indices[i+1];
-			int i2 = indices[i+2];
-			Vector3f v0 = vertices[i0].getPosition();
-			Vector3f v1 = vertices[i1].getPosition();
-			Vector3f v2 = vertices[i2].getPosition();
-			Vector3f one = v0.subtract(v1);
-			Vector3f two = v0.subtract(v2);
-			Vector3f normal = one.cross(two);
-			normals[i0] = normals[i0].add(normal);
-			normals[i1] = normals[i1].add(normal);
-			normals[i2] = normals[i2].add(normal);
-		}
-		for(int i = 0; i < normals.length; i++) {
-			vertices[i].setNormal(normals[i].normalize());
-		}
-	}
-	
-	private void initializeDataBuffers() {
+	private void initializeDataBuffers(Vertex[] vertices, int[] indices) {
 
 		positionBuffer = FloatBuffer.allocate(vertices.length * 3);
 		float[] positionData = new float[vertices.length * 3];
@@ -189,15 +165,11 @@ public class Mesh {
 			colorData[i*3 + 2] = vertices[i].getColor().z;
 		}
 		colorBuffer.put(colorData).flip();
-
+		
 		normalBuffer = FloatBuffer.allocate(vertices.length * 3);
 		float[] normalData = new float[vertices.length * 3];
-		for(int i = 0; i < vertices.length; i++) {
-			normalData[i*3    ] = vertices[i].getNormal().x;
-			normalData[i*3 + 1] = vertices[i].getNormal().y;
-			normalData[i*3 + 2] = vertices[i].getNormal().z;
-		}
 		normalBuffer.put(normalData).flip();
+		updateNormals();
 		
 		textureCoordBuffer = FloatBuffer.allocate(vertices.length * 2);
 		float[] textureCoordData = new float[vertices.length * 2];
@@ -216,9 +188,6 @@ public class Mesh {
 	
 	public void create(GL3 gl) {
 		this.gl = gl;
-
-		generateNormals();
-		initializeDataBuffers();
 		
 		
 		IntBuffer vertexArray = IntBuffer.allocate(1);
@@ -272,15 +241,16 @@ public class Mesh {
 	}
 	
 	public void normalize(boolean zeroZ) {
-		Vector3f min = new Vector3f(vertices[0].getPosition());
+		float[] verticesArr = positionBuffer.array();
+		Vector3f min = new Vector3f(verticesArr[0], verticesArr[1], verticesArr[2]);
 		Vector3f max = new Vector3f(min);
-		for (Vertex v : vertices) {
-			min.x = Math.min(v.getPosition().x, min.x);
-			min.y = Math.min(v.getPosition().y, min.y);
-			min.z = Math.min(v.getPosition().z, min.z);
-			max.x = Math.max(v.getPosition().x, max.x);
-			max.y = Math.max(v.getPosition().y, max.y);
-			max.z = Math.max(v.getPosition().z, max.z);
+		for (int vertex = 0; vertex < verticesArr.length; vertex += 3) {
+			min.x = Math.min(verticesArr[vertex + 0], min.x);
+			min.y = Math.min(verticesArr[vertex + 1], min.y);
+			min.z = Math.min(verticesArr[vertex + 2], min.z);
+			max.x = Math.max(verticesArr[vertex + 0], max.x);
+			max.y = Math.max(verticesArr[vertex + 1], max.y);
+			max.z = Math.max(verticesArr[vertex + 2], max.z);
 		}
 
 		Vector3f range = max.subtract(min);
@@ -290,11 +260,10 @@ public class Mesh {
 		if (zeroZ) {
 			offset.z = -range.z * scale * 0.5f;
 		}
-		for (Vertex v : vertices) {
-			Vector3f newPos = v.getPosition().subtract(min);
-			newPos = newPos.multiply(scale);
-			newPos = newPos.add(offset);
-			v.getPosition().set(newPos);
+		for (int vertex = 0; vertex < verticesArr.length; vertex += 3) {
+			verticesArr[vertex + 0] = (verticesArr[vertex + 0] - min.x) * scale + offset.x;
+			verticesArr[vertex + 1] = (verticesArr[vertex + 1] - min.y) * scale + offset.y;
+			verticesArr[vertex + 2] = (verticesArr[vertex + 2] - min.z) * scale + offset.z;
 		}
 	}
 

@@ -62,25 +62,25 @@ public class TerrainObject extends GameObject {
 			ArrayList<Integer> vertIndices = new ArrayList<>();
 			Vector3f center = GLDrawer.tileLocTo3dCoords(tile.getLocation(), tile.getHeight());
 
-			vertices.add(new Vertex(center, white, null, textureCoord));
+			vertices.add(new Vertex(center, white, textureCoord));
 			verts.add(vertices.get(vertices.size()-1));
 			vertIndices.add(vertices.size()-1);
-			vertices.add(new Vertex(center.add(-radius, 0, 0), white, null, textureCoord));
+			vertices.add(new Vertex(center.add(-radius, 0, 0), white, textureCoord));
 			verts.add(vertices.get(vertices.size()-1));
 			vertIndices.add(vertices.size()-1);
-			vertices.add(new Vertex(center.add(-radius/2, -yoffset, 0), white, null, textureCoord));
+			vertices.add(new Vertex(center.add(-radius/2, -yoffset, 0), white, textureCoord));
 			verts.add(vertices.get(vertices.size()-1));
 			vertIndices.add(vertices.size()-1);
-			vertices.add(new Vertex(center.add(radius/2, -yoffset, 0), white, null, textureCoord));
+			vertices.add(new Vertex(center.add(radius/2, -yoffset, 0), white, textureCoord));
 			verts.add(vertices.get(vertices.size()-1));
 			vertIndices.add(vertices.size()-1);
-			vertices.add(new Vertex(center.add(radius, 0, 0), white, null, textureCoord));
+			vertices.add(new Vertex(center.add(radius, 0, 0), white, textureCoord));
 			verts.add(vertices.get(vertices.size()-1));
 			vertIndices.add(vertices.size()-1);
-			vertices.add(new Vertex(center.add(radius/2, yoffset, 0), white, null, textureCoord));
+			vertices.add(new Vertex(center.add(radius/2, yoffset, 0), white, textureCoord));
 			verts.add(vertices.get(vertices.size()-1));
 			vertIndices.add(vertices.size()-1);
-			vertices.add(new Vertex(center.add(-radius/2, yoffset, 0), white, null, textureCoord));
+			vertices.add(new Vertex(center.add(-radius/2, yoffset, 0), white, textureCoord));
 			verts.add(vertices.get(vertices.size()-1));
 			vertIndices.add(vertices.size()-1);
 			
@@ -218,7 +218,7 @@ public class TerrainObject extends GameObject {
 			Vector3f cb = (tile.getLocation().x() % 2 == 0) ? c2 : c3;
 			Vector3f c = (tile.getLocation().y() % 2 == 0) ? ca : cb;
 			Vector2f textureCoord = new Vector2f((float)tile.getLocation().x()/world.getWidth(), (float)tile.getLocation().y()/world.getHeight());
-			vertices[index] = new Vertex(pos0, c, null, textureCoord);
+			vertices[index] = new Vertex(pos0, c, textureCoord);
 			index++;
 		}
 		ArrayList<Integer> indicesList = new ArrayList<>();

@@ -14,6 +14,8 @@ public class BasicAI implements AIInterface {
 	private static final int MAX_BUILD_RADIUS = 10;
 	private static final int MAX_SEARCH_RADIUS = 40;
 	
+	private static final boolean DEBUG_AI = false;
+	
 	public enum WorkerTask {
 		IDLE, IRRIGATE, FORAGE, CHOP, GATHERSTONE
 	}
@@ -94,7 +96,9 @@ public class BasicAI implements AIInterface {
 		}
 		assignments[WorkerTask.IRRIGATE.ordinal()] = Math.max(0, numWorkers - total);
 		state.targetAssignments = assignments;
-		System.out.println("assignments: " + printArray(state.targetAssignments));
+		if(DEBUG_AI) {
+			System.out.println("assignments: " + printArray(state.targetAssignments));
+		}
 	}
 	public static String printArray(int[] arr) {
 		StringBuilder sb = new StringBuilder();

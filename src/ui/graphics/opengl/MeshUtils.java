@@ -154,7 +154,7 @@ public class MeshUtils {
 			if (i < textureMapping.size()) {
 				texCoord = textureMapping.get(i);
 			}
-			vertices[i] = new Vertex(vertexLocations.get(i), new Vector3f(1, 1, 1), null, texCoord);
+			vertices[i] = new Vertex(vertexLocations.get(i), new Vector3f(1, 1, 1), texCoord);
 		}
 		int[] facesArr = new int[faces.size()];
 		for (int i = 0; i < facesArr.length; i++) {
@@ -194,7 +194,7 @@ public class MeshUtils {
 		for(int i = 0; i < vecs.length; i++) {
 			float x = (vecs[i].x + radius) / (2*radius);
 			float y = (vecs[i].y + yoffset) / (2*yoffset);
-			verts.add(new Vertex(vecs[i], white, null, new Vector2f(x, y)));
+			verts.add(new Vertex(vecs[i], white, new Vector2f(x, y)));
 		}
 
 		for(int j = 1; j <= 6; j++) {
@@ -213,8 +213,8 @@ public class MeshUtils {
 		int index = originalIndex;
 		for(int i = 1; i < vecs.length; i++) {
 			float xoffset = (i % 2);
-			verts.add(new Vertex(vecs[i], white, null, new Vector2f(xoffset, 1)));
-			verts.add(new Vertex(vecs[i].add(0, 0, -400), white, null, new Vector2f(xoffset, 0)));
+			verts.add(new Vertex(vecs[i], white, new Vector2f(xoffset, 1)));
+			verts.add(new Vertex(vecs[i].add(0, 0, -400), white, new Vector2f(xoffset, 0)));
 			
 			if(i != vecs.length - 1) {
 				indicesList.add(index);

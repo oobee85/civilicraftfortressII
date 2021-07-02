@@ -33,13 +33,13 @@ public class TerrainSheet {
 			ArrayList<Vertex> verts = locToHex.getOrDefault(tile.getLocation(), new ArrayList<>());
 			Vector3f center = GLDrawer.tileLocTo3dCoords(tile.getLocation(), tile.getHeight());
 
-			verts.add(new Vertex(center, white, null, textureCoord));
-			verts.add(new Vertex(center.add(-radius, 0, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(-radius/2, -yoffset, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(radius/2, -yoffset, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(radius, 0, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(radius/2, yoffset, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(-radius/2, yoffset, 0), white, null, textureCoord));
+			verts.add(new Vertex(center, white, textureCoord));
+			verts.add(new Vertex(center.add(-radius, 0, 0), white, textureCoord));
+			verts.add(new Vertex(center.add(-radius/2, -yoffset, 0), white, textureCoord));
+			verts.add(new Vertex(center.add(radius/2, -yoffset, 0), white, textureCoord));
+			verts.add(new Vertex(center.add(radius, 0, 0), white, textureCoord));
+			verts.add(new Vertex(center.add(radius/2, yoffset, 0), white, textureCoord));
+			verts.add(new Vertex(center.add(-radius/2, yoffset, 0), white, textureCoord));
 			locToHex.put(tile.getLocation(), verts);
 			
 			int i = vertices.size();

@@ -155,7 +155,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	public void display(GLAutoDrawable drawable) {
 		numFramesRenderedSincePrint++;
 		long deltaTime = System.currentTimeMillis() - previousFPSPrint;
-		if(deltaTime > 1000) {
+		if(deltaTime > 4000) {
 			System.out.println("Avg frame time: " + deltaTime / numFramesRenderedSincePrint + "ms");
 			numFramesRenderedSincePrint = 0;
 			previousFPSPrint = System.currentTimeMillis();
