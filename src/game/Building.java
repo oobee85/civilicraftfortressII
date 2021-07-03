@@ -84,46 +84,23 @@ public class Building extends Thing implements Serializable {
 		if(!readyToHarvest() ) {
 			return;
 		}
+		resetTimeToHarvest();
 		if(getType() == Game.buildingTypeMap.get("CASTLE")) {
 			getFaction().spendResearch(20);
-			resetTimeToHarvest();
+			getFaction().getInventory().addItem(ItemType.FOOD, 1);
 		}
 		if(getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
 			getFaction().spendResearch(20);
-			resetTimeToHarvest();
 		}
 		if(getType() == Game.buildingTypeMap.get("GRANARY")) {
 			getFaction().getInventory().addItem(ItemType.FOOD, 2);
-			resetTimeToHarvest();
 		}
 		if(getType() == Game.buildingTypeMap.get("WINDMILL")) {
 			getFaction().getInventory().addItem(ItemType.FOOD, 8);
-			resetTimeToHarvest();
 		}
-		if(getType() == Game.buildingTypeMap.get("SAWMILL")) {
-//			HashSet<Tile> tilesToCut = new HashSet<>();
-//			tilesToCut.add(getTile());
-//			
-//			for(Tile t : world.getNeighborsInRadius(getTile(), getType().getVisionRadius())) {
-//				tilesToCut.add(t);
-//			}
-//			for(Tile tile : tilesToCut) {
-//				if(tile.getPlant() != null && tile.getPlant().getType() == PlantType.FOREST1) {
-//					tile.getPlant().takeDamage(1);
-//					getFaction().addItem(ItemType.WOOD, 1);
-//					if(tile.getPlant().isDead() ) {
-//						world.numCutTrees ++;
-//					}
-//				}
-//			}
-//			
-//			resetTimeToHarvest();
-		}
-
 		if(getType() == Game.buildingTypeMap.get("FARM") && getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
 			getFaction().getInventory().addItem(ItemType.HORSE, 1);
 			getFaction().getInventory().addItem(ItemType.FOOD, 1);
-			resetTimeToHarvest();
 		}
 	}
 	public boolean readyToHarvest() {

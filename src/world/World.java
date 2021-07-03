@@ -481,7 +481,7 @@ public class World {
 					}
 				}
 			}
-			Projectile meteor = new Projectile(ProjectileType.METEOR, target, t, null, 10000);
+			Projectile meteor = new Projectile(ProjectileType.METEOR, t, target, null, 10000, false, 200);
 			worldData.addProjectile(meteor);
 //			spawnExplosionCircle(t, radius, 5000);
 //			int rockRadius = radius / 5;
@@ -1118,6 +1118,10 @@ public class World {
 				}
 			}
 			if(!simulated && projectile.reachedTarget()) {
+				if(projectile.getType() == ProjectileType.METEOR) {
+					// meteor leaves a lil dent
+					projectile.getTile().setHeight(projectile.getTile().getHeight() - 10);
+				}
 				if(projectile.getType().isExplosive()) {
 					if(projectile.getType().getRadius() <= 2) {
 						spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getDamage());
