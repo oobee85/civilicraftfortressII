@@ -527,7 +527,18 @@
 		],
 		"attributes":["hostile"],
 		"loot":{"WOOD":100}
-	}
+	},
+	{
+		"image":"Images/units/infernal.gif",
+		"stats":{"movespeed":15,"buildtime":0,"health":1000000,"healspeed":5},
+		"name":"INFERNAL",
+		"attackstyles":[
+			{"damage":100, "cooldown":5, "range":1}
+		],
+		"attributes":["hostile", "fireresistant"],
+		"loot":{"TITANIUM_ORE":100, "RUNITE_ORE":100}
+	},
+	
 	
 ]
 }

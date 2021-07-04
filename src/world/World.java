@@ -1118,10 +1118,6 @@ public class World {
 				}
 			}
 			if(!simulated && projectile.reachedTarget()) {
-				if(projectile.getType() == ProjectileType.METEOR) {
-					// meteor leaves a lil dent
-					projectile.getTile().setHeight(projectile.getTile().getHeight() - 10);
-				}
 				if(projectile.getType().isExplosive()) {
 					if(projectile.getType().getRadius() <= 2) {
 						spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getDamage());
@@ -1141,6 +1137,11 @@ public class World {
 					if(projectile.getTile().hasBuilding() == true) {
 						projectile.getTile().getBuilding().takeDamage(projectile.getDamage());
 					}
+				}
+				if(projectile.getType() == ProjectileType.METEOR) {
+					// meteor leaves a lil dent
+					projectile.getTile().setHeight(projectile.getTile().getHeight() - 10);
+					spawnAnimal(Game.unitTypeMap.get("INFERNAL"), projectile.getTile(), getFaction(World.NO_FACTION_ID), null);
 				}
 			}
 		}
