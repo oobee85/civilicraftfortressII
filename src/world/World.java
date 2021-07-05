@@ -560,13 +560,13 @@ public class World {
 			
 		}
 	}
-	public void spawnExplosion(Tile tile, int radius, int damage) {
+	public void spawnExplosion(Tile tile, int radius, int[] damage) {
 	
 		for(Tile t : getNeighborsInRadius(tile, radius)) {
 
 			t.replaceOrAddDurationModifier(
 					GroundModifierType.FIRE, 
-					10 + (int)(Math.random()*damage/5),
+					10 + (int)(Math.random()*damage[DamageType.FIRE.ordinal()]/5),
 					worldData);
 			
 //			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
@@ -1120,22 +1120,23 @@ public class World {
 			if(!simulated && projectile.reachedTarget()) {
 				if(projectile.getType().isExplosive()) {
 					if(projectile.getType().getRadius() <= 2) {
-						spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getDamage());
+						spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), DamageType.makeDamageArray(projectile.getDamage(), DamageType.FIRE));
 					}else {
-						spawnExplosionCircle(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getDamage());
+						spawnExplosionCircle(projectile.getTile(), projectile.getType().getRadius(), projectile.getDamage());
 					}
 					
 				} 
 				else {
+					int[] damage = DamageType.makeDamageArray(projectile.getDamage(), DamageType.PHYSICAL);
 					for(Unit unit : projectile.getTile().getUnits()) {
-						unit.takeDamage(projectile.getDamage());
+						unit.takeDamage(damage);
 						unit.aggro(projectile.getSource());
 					}
 					if(projectile.getTile().getPlant() != null) {
-						projectile.getTile().getPlant().takeDamage(projectile.getDamage());
+						projectile.getTile().getPlant().takeDamage(damage);
 					}
 					if(projectile.getTile().hasBuilding() == true) {
-						projectile.getTile().getBuilding().takeDamage(projectile.getDamage());
+						projectile.getTile().getBuilding().takeDamage(damage);
 					}
 				}
 				if(projectile.getType() == ProjectileType.METEOR) {
@@ -1167,53 +1168,55 @@ public class World {
 	
 	public void updatePlantDamage() {
 		for(Plant plant : worldData.getPlants()) {
-			Tile tile = plant.getTile();
+			int[] damage = plant.getTile().computeTileDamage();
+			plant.takeDamage(damage);
 			
+//			Tile tile = plant.getTile();
 //			if(tile.isCold()) {
 //				plant.takeDamage(1);
 //			}
-			if (plant.isAquatic() && tile.liquidType == LiquidType.WATER) {
-				if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
-
-					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
-					double damageTaken = difInLiquids * tile.liquidType.getDamage();
-					int roundedDamage = (int) (damageTaken + 1);
-					if (roundedDamage >= 1) {
-						plant.takeDamage(roundedDamage);
-					}
-				}
-			} else {
-				int totalDamage = 0;
-				double modifierDamage = 0;
-				
-				//adds the damage of groundmodifier
-				if(tile.getModifier() != null) {
-					modifierDamage += tile.getModifier().getType().getDamage();
-				}
-				
-				
-				if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-					if(plant.isAquatic() == false || tile.liquidType != LiquidType.WATER) {
-						//adds damage of liquids
-						double liquidDamage = tile.liquidAmount * tile.liquidType.getDamage();
-						totalDamage += liquidDamage;
-					}
-				}
-				if(plant.isAquatic() && tile.liquidType != LiquidType.WATER) {
-					totalDamage += 5;
-				}
-				if(tile.getTerrain().isPlantable(tile.getTerrain()) == false && plant.getType().isDesertResistant() == false) {
-					totalDamage += 5;
-				}
-				
-				if(tile.getTerrain() == Terrain.GRASS && plant.getType().isDesertResistant() == true) {
-					totalDamage += 5;
-				}
-				totalDamage = (int) (modifierDamage+totalDamage);
-				if(totalDamage >= 1) {
-					plant.takeDamage(totalDamage);
-				}
-			}
+//			if (plant.isAquatic() && tile.liquidType == LiquidType.WATER) {
+//				if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+//
+//					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
+//					double damageTaken = difInLiquids * tile.liquidType.getDamage();
+//					int roundedDamage = (int) (damageTaken + 1);
+//					if (roundedDamage >= 1) {
+//						plant.takeDamage(roundedDamage);
+//					}
+//				}
+//			} else {
+//				int totalDamage = 0;
+//				double modifierDamage = 0;
+//				
+//				//adds the damage of groundmodifier
+//				if(tile.getModifier() != null) {
+//					modifierDamage += tile.getModifier().getType().getDamage();
+//				}
+//				
+//				
+//				if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+//					if(plant.isAquatic() == false || tile.liquidType != LiquidType.WATER) {
+//						//adds damage of liquids
+//						double liquidDamage = tile.liquidAmount * tile.liquidType.getDamage();
+//						totalDamage += liquidDamage;
+//					}
+//				}
+//				if(plant.isAquatic() && tile.liquidType != LiquidType.WATER) {
+//					totalDamage += 5;
+//				}
+//				if(tile.getTerrain().isPlantable(tile.getTerrain()) == false && plant.getType().isDesertResistant() == false) {
+//					totalDamage += 5;
+//				}
+//				
+//				if(tile.getTerrain() == Terrain.GRASS && plant.getType().isDesertResistant() == true) {
+//					totalDamage += 5;
+//				}
+//				totalDamage = (int) (modifierDamage+totalDamage);
+//				if(totalDamage >= 1) {
+//					plant.takeDamage(totalDamage);
+//				}
+//			}
 			
 		}	
 	}

@@ -321,7 +321,7 @@ public class Game {
 			world.spawnStoneGolem(t);
 			world.spawnRoc(t);
 			world.spawnVampire(t);
-			world.spawnBomb(t);
+//			world.spawnBomb(t);
 //			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID), null);
 			spawnCyclops();
 		}
@@ -413,7 +413,8 @@ public class Game {
 			if(type.name() == "TWIG") {
 				System.out.println("twig");
 				continue;
-			}else {
+			}
+			else {
 				world.spawnAnimal(type, iterator.next(), world.getFaction(World.NO_FACTION_ID), null);
 			}
 			
@@ -873,7 +874,7 @@ public class Game {
 		if(thing == null) {
 			return;
 		}
-		world.spawnExplosion(thing.getTile(), 1, 10000);
+		world.spawnExplosion(thing.getTile(), 1, DamageType.makeDamageArray(10000, DamageType.FIRE));
 	}
 	
 	private void unitTick() {

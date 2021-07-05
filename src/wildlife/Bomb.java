@@ -13,10 +13,10 @@ public class Bomb extends Animal {
 	}
 	
 	@Override
-	public boolean takeDamage(int damage) {
+	public boolean takeDamage(int[] damage) {
 		if(!isDead()) {
 			super.takeDamage(damage);
-			world.spawnExplosion(getTile(), 5, 500);
+			world.spawnExplosion(getTile(), 5, DamageType.makeDamageArray(500, DamageType.FIRE));
 			this.setDead(true);
 		}
 		return true;
@@ -25,7 +25,7 @@ public class Bomb extends Animal {
 	@Override
 	public boolean attack(Thing target) {
 		if(target.getTile().getLocation().distanceTo(getTile().getLocation()) == 0) {
-			takeDamage(1);
+			takeDamage(DamageType.makeDamageArray(1, DamageType.PHYSICAL));
 			return true;
 		}
 		return false;

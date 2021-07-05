@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.List;
 
 import game.*;
+import game.components.*;
 import networking.server.*;
 import ui.graphics.opengl.*;
 import world.*;
@@ -13,15 +14,17 @@ public class Thing implements Serializable {
 	private transient static int idCounter = 0;
 	private int id;
 
-	private transient Faction faction;
 	private int factionID;
 	private double maxHealth;
 	private double health;
 	private boolean isDead;
-	private transient int timeLastDamageTaken = -1000;
 	private Tile tile;
-	private transient boolean isSelected;
 	
+	private transient HashMap<Class, Component> components = new HashMap<>();
+
+	private transient Faction faction;
+	private transient int timeLastDamageTaken = -1000;
+	private transient boolean isSelected;
 	private transient MipMap mipmap;
 	private transient TexturedMesh mesh;
 	
@@ -72,17 +75,37 @@ public class Thing implements Serializable {
 	public boolean isDead() {
 		return health <= 0 || isDead;
 	}
+	
+	public int applyResistance(int[] damage) {
+		if(components.containsKey(DamageResistance.class)) {
+			return ((DamageResistance)components.get(DamageResistance.class)).computeDamage(damage);
+		}
+		else {
+			return DamageResistance.computeDamageDefault(damage);
+		}
+	}
+	public double applyResistance(double[] danger) {
+		if(components.containsKey(DamageResistance.class)) {
+			return ((DamageResistance)components.get(DamageResistance.class)).computeDamage(danger);
+		}
+		else {
+			return DamageResistance.computeDamageDefault(danger);
+		}
+	}
+	
+	
 	/**
 	 * @return true if this is lethal damage, false otherwise
 	 */
-	public boolean takeDamage(int damage) {
+	public boolean takeDamage(int[] damage) {
 		boolean before = isDead();
-		health -= damage;
-		if(damage != 0) {
+		int totalDamage = applyResistance(damage);
+		health -= totalDamage;
+		if(totalDamage != 0) {
 			timeLastDamageTaken = World.ticks;
 			getFaction().gotAttacked(getTile());
+			addHitsplat(totalDamage);
 		}
-		addHitsplat(damage);
 		// Return true if isDead changed from false to true.
 		return !before && isDead();
 	}

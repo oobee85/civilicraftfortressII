@@ -485,53 +485,47 @@ public class Tile implements Externalizable {
 		return false;
 	}
 
-	public double computeTileDamage(Thing thing) {
-		boolean flying = false;
-		boolean aquatic = false;
-		boolean fireResistant = false;
-		boolean coldResistant = false;
-
-		if (thing instanceof Unit) {
-			Unit unit = (Unit) thing;
-			flying = unit.getType().isFlying();
-			aquatic = unit.getType().isAquatic();
-			fireResistant = unit.getType().isFireResist();
-			coldResistant = unit.getType().isColdResist();
-		}
-		if (thing instanceof Building) {
-			coldResistant = true;
-		}
-
-		double damage = 0;
-		if (flying) {
-
-		} else {
-			if (aquatic) {
-				if (liquidAmount < LiquidType.WATER.getMinimumDamageAmount()) {
-
-//					damage += (LiquidType.WATER.getMinimumDamageAmount() - liquidAmount) * LiquidType.WATER.getDamage();
-					damage += 1;
-				} else if (liquidType == LiquidType.LAVA && !fireResistant) {
-					damage += liquidAmount * liquidType.getDamage();
-				}
-			} else {
-				if (liquidAmount > liquidType.getMinimumDamageAmount()) {
-					if (liquidType != LiquidType.LAVA || !fireResistant) {
-						damage += liquidAmount * liquidType.getDamage();
-					}
-
-				}
+	public double[] computeTileDanger() {
+		double[] damage = new double[DamageType.values().length];
+		if (liquidAmount > liquidType.getMinimumDamageAmount()) {
+			if(liquidType.isWater()) {
+				damage[DamageType.WATER.ordinal()] += liquidAmount * liquidType.getDamage();
 			}
-			if (modifier != null) {
-				if (modifier.getType() == GroundModifierType.FIRE && fireResistant) {
-					// resisted environment damage
-				} else {
-					damage += modifier.getType().getDamage() + modifier.timeLeft() * 0.0001;
-				}
-
+			else {
+				damage[DamageType.FIRE.ordinal()] += liquidAmount * liquidType.getDamage();
 			}
+		}
+		else {
+			damage[DamageType.DRY.ordinal()] += 1;
+		}
+		if (modifier != null) {
+			damage[DamageType.FIRE.ordinal()] += modifier.getType().getDamage() + modifier.timeLeft() * 0.0001;
 		}
 		return damage;
+	}
+	public int[] computeTileDamage() {
+		double[] doubleDamage = computeTileDanger();
+		int[] intDamage = new int[doubleDamage.length];
+		for(int i = 0; i < intDamage.length; i++) {
+			intDamage[i] = (int) doubleDamage[i];
+		}
+		return intDamage;
+//		boolean flying = false;
+//		boolean aquatic = false;
+//		boolean fireResistant = false;
+//		boolean coldResistant = false;
+//
+//		if (thing instanceof Unit) {
+//			Unit unit = (Unit) thing;
+//			flying = unit.getType().isFlying();
+//			aquatic = unit.getType().isAquatic();
+//			fireResistant = unit.getType().isFireResist();
+//			coldResistant = unit.getType().isColdResist();
+//		}
+//		if (thing instanceof Building) {
+//			coldResistant = true;
+//		}
+		
 	}
 
 	public void setTerrain(Terrain t) {
