@@ -79,12 +79,10 @@ public class Unit extends Thing implements Serializable {
 	}
 	public void setType(UnitType type) {
 		this.unitType = type;
+		this.addComponent(DamageResistance.class, type.getDamageResistance());
 		this.setMipMap(this.getType().getMipMap());
 	}
 
-//	public void addAttackType(Attack a) {
-//		attacks.add(a);
-//	}
 
 	public CombatStats getCombatStats() {
 		return combatStats;
