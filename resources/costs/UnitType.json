@@ -262,7 +262,8 @@
 		"attackstyles":[
 			{"damage":1, "cooldown":40, "range":1}
 		],
-		"resistances": {"COLD": 0, "DRY": 100},
+		"attributes":["aquatic"],
+		"resistances": {"COLD": 0, "DRY": 100, "WATER": 0},
 		"loot":{"FOOD":200}
 	},
 	{

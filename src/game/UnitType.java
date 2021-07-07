@@ -23,12 +23,11 @@ public class UnitType implements Serializable {
 	private transient final TargetInfo[] targetingInfoStrings;
 	private transient final ArrayList<TargetingInfo> targetingInfo = new ArrayList<>();
 	private transient final LinkedList<AttackStyle> attackStyles;
-	private transient final DamageResistance damageResistance;
+	private transient final Set<Component> components = new HashSet<>();
 
 	public UnitType(String name, String image, Mesh mesh, String textureFile, CombatStats cs, 
 	                HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, 
-	                LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles, 
-	                DamageResistance damageResistance) {
+	                LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles) {
 		id = idCounter++;
 		this.name = name;
 		this.mipmap = new MipMap(image);
@@ -40,7 +39,6 @@ public class UnitType implements Serializable {
 		this.deadItem = deadItem;
 		this.targetingInfoStrings = targeting;
 		this.attackStyles = attackStyles;
-		this.damageResistance = damageResistance;
 	}
 	public LinkedList<AttackStyle> getAttackStyles() {
 		return attackStyles;
@@ -64,7 +62,7 @@ public class UnitType implements Serializable {
 		return deadItem;
 	}
 	public boolean isAquatic() {
-		return damageResistance.isVulnerableTo(DamageType.DRY);
+		return attributes.contains("aquatic");
 	}
 	public boolean isFlying() {
 		return attributes.contains("flying");
@@ -96,8 +94,9 @@ public class UnitType implements Serializable {
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;
 	}
-	public DamageResistance getDamageResistance() {
-		return damageResistance;
+	
+	public Set<Component> getComponents() {
+		return components;
 	}
 	
 	public TexturedMesh getMesh() {

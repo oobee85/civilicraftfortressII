@@ -42,7 +42,9 @@ public class Unit extends Thing implements Serializable {
 		if(this.getType().isCaravan()) {
 			this.maxItemAmount = 1;
 		}
-		this.addComponent(DamageResistance.class, unitType.getDamageResistance());
+		for(Component c : unitType.getComponents()) {
+			this.addComponent(c.getClass(), c);
+		}
 	}
 	
 	public boolean readyToHarvest() {
@@ -79,10 +81,11 @@ public class Unit extends Thing implements Serializable {
 	}
 	public void setType(UnitType type) {
 		this.unitType = type;
-		this.addComponent(DamageResistance.class, type.getDamageResistance());
+		for(Component c : type.getComponents()) {
+			this.addComponent(c.getClass(), c);
+		}
 		this.setMipMap(this.getType().getMipMap());
 	}
-
 
 	public CombatStats getCombatStats() {
 		return combatStats;
