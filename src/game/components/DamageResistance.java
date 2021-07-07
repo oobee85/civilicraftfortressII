@@ -12,14 +12,14 @@ public class DamageResistance extends Component {
 		this.resistance = resistance;
 	}
 	
-	public int computeDamage(int[] damage) {
-		int totalDamage = 0;
-		for(int i = 0; i < damage.length; i++) {
-			totalDamage += damage[i] * resistance[i] / BASE_RESISTANCE;
-		}
-		return totalDamage;
+	public boolean isVulnerableTo(DamageType type) {
+		return resistance[type.ordinal()] > 0;
 	}
-	public double computeDamage(double[] danger) {
+	
+	public int applyResistance(int damage, DamageType type) {
+		return damage * resistance[type.ordinal()] / BASE_RESISTANCE;
+	}
+	public double applyResistance(double[] danger) {
 		double totalDamage = 0;
 		for(int i = 0; i < danger.length; i++) {
 			totalDamage += danger[i] * resistance[i] / BASE_RESISTANCE;
@@ -27,14 +27,10 @@ public class DamageResistance extends Component {
 		return totalDamage;
 	}
 	
-	public static final int computeDamageDefault(int[] damage) {
-		int totalDamage = 0;
-		for(int i = 0; i < damage.length; i++) {
-			totalDamage += damage[i] * DEFAULT_RESISTANCE[i] / BASE_RESISTANCE;
-		}
-		return totalDamage;
+	public static final int applyDefaultResistance(int damage, DamageType type) {
+		return damage * DEFAULT_RESISTANCE[type.ordinal()] / BASE_RESISTANCE;
 	}
-	public static final double computeDamageDefault(double[] danger) {
+	public static final double applyDefaultResistance(double[] danger) {
 		double totalDamage = 0;
 		for(int i = 0; i < danger.length; i++) {
 			totalDamage += danger[i];

@@ -8,6 +8,7 @@ import java.util.Map.*;
 import org.json.*;
 
 import game.*;
+import game.components.*;
 import ui.*;
 import ui.graphics.opengl.*;
 import world.*;
@@ -160,13 +161,25 @@ public class Loader {
 			int buildtime = statsObject.getInt("buildtime");
 			CombatStats combatStats = new CombatStats(health, movespeed, buildtime, healspeed);
 			
-			HashSet<String> attributes = new HashSet<>();;
+			HashSet<String> attributes = new HashSet<>();
 			if(unitTypeObject.has("attributes")) {
 				JSONArray attributelist = unitTypeObject.getJSONArray("attributes");
 				for(int j = 0; j < attributelist.length(); j++) {
 					attributes.add(attributelist.getString(j));
 				}
 			}
+			
+			// TODO resistances: { "heat":50, "cold":200 }
+			int[] resistanceValues = DamageResistance.getDefaultResistance();
+			if(unitTypeObject.has("resistances")) {
+				JSONObject resistances = unitTypeObject.getJSONObject("resistances");
+				for(String typeString : resistances.keySet()) {
+					int value = resistances.getInt(typeString);
+					DamageType type = DamageType.valueOf(typeString);
+					resistanceValues[type.ordinal()] = value;
+				}
+			}
+			DamageResistance damageResistance = new DamageResistance(resistanceValues);
 			
 			String researchReq = null;
 			if(unitTypeObject.has("research")) {
@@ -212,7 +225,7 @@ public class Loader {
 				}
 			}
 			
-			UnitType unitType = new UnitType(name, image, mesh, textureFile, combatStats, attributes, researchReq, cost, items, targeting, attackStyles);
+			UnitType unitType = new UnitType(name, image, mesh, textureFile, combatStats, attributes, researchReq, cost, items, targeting, attackStyles, damageResistance);
 			unitTypeMap.put(name, unitType);
 			unitTypeList.add(unitType);
 

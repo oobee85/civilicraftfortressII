@@ -63,7 +63,9 @@ public class Building extends Thing implements Serializable {
 		if(World.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			Tile tile = getTile();
 			int[] tileDamage = tile.computeTileDamage();
-			this.takeDamage(tileDamage);
+			for(int i = 0; i < tileDamage.length; i++) {
+				this.takeDamage(tileDamage[i], DamageType.values()[i]);
+			}
 		}
 
 		if(!isBuilt()) {

@@ -42,6 +42,7 @@ public class Unit extends Thing implements Serializable {
 		if(this.getType().isCaravan()) {
 			this.maxItemAmount = 1;
 		}
+		this.addComponent(DamageResistance.class, unitType.getDamageResistance());
 	}
 	
 	public boolean readyToHarvest() {
@@ -121,9 +122,7 @@ public class Unit extends Thing implements Serializable {
 	}
 
 	public double computeDanger(Tile tile) {
-		// currently only tile damage but at some point might check if enemies there
-		double[] danger = tile.computeTileDanger();
-		return this.applyResistance(danger);
+		return this.applyResistance(tile.computeTileDanger());
 	}
 
 	public double movePenaltyTo(Tile from, Tile to) {
@@ -202,7 +201,9 @@ public class Unit extends Thing implements Serializable {
 		// Take environment damage every 5 ticks
 		if (World.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			int[] tileDamage = getTile().computeTileDamage();
-			this.takeDamage(tileDamage);
+			for(int i = 0; i < tileDamage.length; i++) {
+				this.takeDamage(tileDamage[i], DamageType.values()[i]);
+			}
 		}
 		int ticksToCost =  ticksForFoodCost;
 		if(isHarvesting == true) {
@@ -216,8 +217,7 @@ public class Unit extends Thing implements Serializable {
 			} else {
 				starving++;
 				int[] damage = DamageType.getZeroDamageArray();
-				damage[DamageType.HUNGER.ordinal()] = starving;
-				takeDamage(damage);
+				takeDamage(starving, DamageType.HUNGER);
 			}
 		}
 
@@ -241,8 +241,8 @@ public class Unit extends Thing implements Serializable {
 	}
 
 	@Override
-	public boolean takeDamage(int[] damage) {
-		boolean lethal = super.takeDamage(damage);
+	public boolean takeDamage(int damage, DamageType type) {
+		boolean lethal = super.takeDamage(damage, type);
 		if (lethal) {
 			for (Item item : getType().getDeadItem()) {
 				getTile().getInventory().addItem(item);
@@ -280,15 +280,14 @@ public class Unit extends Thing implements Serializable {
 			// actually do the attack
 			if(style.getProjectile() == null) {
 				double initialHP = target.getHealth();
-				int[] damage = DamageType.makeDamageArray(style.getDamage(), DamageType.PHYSICAL);
 				//does cleave damage
 				if(this.getType().hasCleave()) {
 					for(Unit unit : target.getTile().getUnits()) {
-						unit.takeDamage(damage);
+						unit.takeDamage(style.getDamage(), DamageType.PHYSICAL);
 					}
 				} 
 				else {
-					target.takeDamage(damage);
+					target.takeDamage(style.getDamage(), DamageType.PHYSICAL);
 				}
 				
 				double damageDealt = initialHP - (target.getHealth() < 0 ? 0 : target.getHealth());
@@ -385,11 +384,11 @@ public class Unit extends Thing implements Serializable {
 		if(readyToHarvest()) {
 			boolean isFull = false;
 			if(building.getType().name().equals("IRRIGATION")) {
-				building.takeDamage(DamageType.makeDamageArray(3, DamageType.PHYSICAL));
+				building.takeDamage(3, DamageType.PHYSICAL);
 				isFull = this.addItem(ItemType.FOOD, 3);
 				this.resetTimeToHarvest(1);
 			}else if(building.getType().name().equals("MINE")) {
-				building.takeDamage(DamageType.makeDamageArray(1, DamageType.PHYSICAL));
+				building.takeDamage(1, DamageType.PHYSICAL);
 				if(building.getTile().getResource() != null) {
 					isFull = this.addItem(building.getTile().getResource().getType().getItemType(), 1);
 					this.resetTimeToHarvest(building.getTile().getResource().getType().getTimeToHarvest());
@@ -406,7 +405,7 @@ public class Unit extends Thing implements Serializable {
 	
 	public void doHarvest(Plant plant, PlannedAction action) {
 		if(readyToHarvest()) {
-			plant.takeDamage(DamageType.makeDamageArray(2, DamageType.PHYSICAL));
+			plant.takeDamage(2, DamageType.PHYSICAL);
 			boolean isFull = this.addItem(plant.getItem(), 1);
 			this.resetTimeToHarvest(2);
 			if(isFull) {
@@ -622,7 +621,7 @@ public class Unit extends Thing implements Serializable {
 				ItemType itemType = this.getTile().getPlant().getItem();
 				if(itemType != null) {
 					getFaction().getInventory().addItem(itemType, 1);
-					this.getTile().getPlant().takeDamage(DamageType.makeDamageArray(1, DamageType.PHYSICAL));
+					this.getTile().getPlant().takeDamage(1, DamageType.PHYSICAL);
 					resetTimeToHarvest(1);
 				}
 			}

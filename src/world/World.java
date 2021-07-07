@@ -455,7 +455,7 @@ public class World {
 	}
 	
 	public void makeAnimal(UnitType animalType, World world, TileLoc loc) {
-		if(animalType.isAquatic() == false && world.get(loc).liquidAmount > world.get(loc).liquidType.getMinimumDamageAmount()/2 ) {
+		if(!animalType.isAquatic() && world.get(loc).liquidAmount > world.get(loc).liquidType.getMinimumDamageAmount()/2 ) {
 			return;
 		}
 		Animal animal = new Animal(animalType, world.get(loc), getFaction(NO_FACTION_ID));
@@ -560,30 +560,32 @@ public class World {
 			
 		}
 	}
-	public void spawnExplosion(Tile tile, int radius, int[] damage) {
-	
-		for(Tile t : getNeighborsInRadius(tile, radius)) {
-
-			t.replaceOrAddDurationModifier(
-					GroundModifierType.FIRE, 
-					10 + (int)(Math.random()*damage[DamageType.FIRE.ordinal()]/5),
-					worldData);
-			
-//			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
-//			worldData.addGroundModifier(fire);
-//			t.setModifier(fire);
-			if(t.hasBuilding() == true) {
-				t.getBuilding().takeDamage(damage);
-			}
-			for(Unit unit : t.getUnits()) {
-				unit.takeDamage(damage);
-			}
-			if(t.getPlant() != null) {
-				t.getPlant().takeDamage(damage);
-			}
-		}
-
-	}
+//	public void spawnExplosion(Tile tile, int radius, int damage, DamageType type) {
+//	
+//		for(Tile t : getNeighborsInRadius(tile, radius)) {
+//			
+//			if(type == DamageType.HEAT) {
+//				t.replaceOrAddDurationModifier(
+//						GroundModifierType.FIRE, 
+//						10 + (int)(Math.random()*damage/5),
+//						worldData);
+//			}
+//			
+////			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
+////			worldData.addGroundModifier(fire);
+////			t.setModifier(fire);
+//			if(t.hasBuilding() == true) {
+//				t.getBuilding().takeDamage(damage, type);
+//			}
+//			for(Unit unit : t.getUnits()) {
+//				unit.takeDamage(damage, type);
+//			}
+//			if(t.getPlant() != null) {
+//				t.getPlant().takeDamage(damage, type);
+//			}
+//		}
+//
+//	}
 	
 	public void updateDesertChange(Tile tile, boolean start) {
 		int failTiles = 0;
@@ -1119,24 +1121,23 @@ public class World {
 			}
 			if(!simulated && projectile.reachedTarget()) {
 				if(projectile.getType().isExplosive()) {
-					if(projectile.getType().getRadius() <= 2) {
-						spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), DamageType.makeDamageArray(projectile.getDamage(), DamageType.FIRE));
-					}else {
+//					if(projectile.getType().getRadius() <= 2) {
+//						spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), projectile.getDamage(), DamageType.HEAT);
+//					}else {
 						spawnExplosionCircle(projectile.getTile(), projectile.getType().getRadius(), projectile.getDamage());
-					}
+//					}
 					
 				} 
 				else {
-					int[] damage = DamageType.makeDamageArray(projectile.getDamage(), DamageType.PHYSICAL);
 					for(Unit unit : projectile.getTile().getUnits()) {
-						unit.takeDamage(damage);
+						unit.takeDamage(projectile.getDamage(), DamageType.PHYSICAL);
 						unit.aggro(projectile.getSource());
 					}
 					if(projectile.getTile().getPlant() != null) {
-						projectile.getTile().getPlant().takeDamage(damage);
+						projectile.getTile().getPlant().takeDamage(projectile.getDamage(), DamageType.PHYSICAL);
 					}
 					if(projectile.getTile().hasBuilding() == true) {
-						projectile.getTile().getBuilding().takeDamage(damage);
+						projectile.getTile().getBuilding().takeDamage(projectile.getDamage(), DamageType.PHYSICAL);
 					}
 				}
 				if(projectile.getType() == ProjectileType.METEOR) {
@@ -1169,7 +1170,9 @@ public class World {
 	public void updatePlantDamage() {
 		for(Plant plant : worldData.getPlants()) {
 			int[] damage = plant.getTile().computeTileDamage();
-			plant.takeDamage(damage);
+			for(int i = 0; i < damage.length; i++) {
+				plant.takeDamage(damage[i], DamageType.values()[i]);
+			}
 			
 //			Tile tile = plant.getTile();
 //			if(tile.isCold()) {

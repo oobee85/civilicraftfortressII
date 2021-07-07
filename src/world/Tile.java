@@ -492,14 +492,14 @@ public class Tile implements Externalizable {
 				damage[DamageType.WATER.ordinal()] += liquidAmount * liquidType.getDamage();
 			}
 			else {
-				damage[DamageType.FIRE.ordinal()] += liquidAmount * liquidType.getDamage();
+				damage[DamageType.HEAT.ordinal()] += liquidAmount * liquidType.getDamage();
 			}
 		}
 		else {
 			damage[DamageType.DRY.ordinal()] += 1;
 		}
 		if (modifier != null) {
-			damage[DamageType.FIRE.ordinal()] += modifier.getType().getDamage() + modifier.timeLeft() * 0.0001;
+			damage[DamageType.HEAT.ordinal()] += modifier.getType().getDamage() + modifier.timeLeft() * 0.0001;
 		}
 		return damage;
 	}

@@ -79,13 +79,13 @@ public class Animal extends Unit {
 		}
 		// Try to avoid danger
 		Tile best = getTile();
-		double currentDanger = computeDanger(best);
+		double currentDanger = this.applyResistance(best.computeTileDanger());
 		double bestDanger = currentDanger;
 		for(Tile t : getTile().getNeighbors()) {
 			if(t.isBlocked(this)) {
 				continue;
 			}
-			double danger = computeDanger(t);
+			double danger = this.applyResistance(t.computeTileDanger());
 			if(danger < bestDanger) {
 				best = t;
 				bestDanger = danger;
@@ -112,7 +112,7 @@ public class Animal extends Unit {
 					bestHerdAmount = herdAmount;
 				}
 			}
-			if(bestHerdAmount > currentHerdAmount && computeDanger(bestHerd) < 1) {
+			if(bestHerdAmount > currentHerdAmount && this.applyResistance(bestHerd.computeTileDanger()) < 1) {
 				if(bestHerd != getTile()) {
 					queuePlannedAction(new PlannedAction(bestHerd));
 					return;

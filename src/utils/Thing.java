@@ -76,20 +76,24 @@ public class Thing implements Serializable {
 		return health <= 0 || isDead;
 	}
 	
-	public int applyResistance(int[] damage) {
+	public void addComponent(Class key, Component component) {
+		components.put(key, component);
+	}
+
+	public int applyResistance(int damage, DamageType type) {
 		if(components.containsKey(DamageResistance.class)) {
-			return ((DamageResistance)components.get(DamageResistance.class)).computeDamage(damage);
+			return ((DamageResistance)components.get(DamageResistance.class)).applyResistance(damage, type);
 		}
 		else {
-			return DamageResistance.computeDamageDefault(damage);
+			return DamageResistance.applyDefaultResistance(damage, type);
 		}
 	}
 	public double applyResistance(double[] danger) {
 		if(components.containsKey(DamageResistance.class)) {
-			return ((DamageResistance)components.get(DamageResistance.class)).computeDamage(danger);
+			return ((DamageResistance)components.get(DamageResistance.class)).applyResistance(danger);
 		}
 		else {
-			return DamageResistance.computeDamageDefault(danger);
+			return DamageResistance.applyDefaultResistance(danger);
 		}
 	}
 	
@@ -97,9 +101,9 @@ public class Thing implements Serializable {
 	/**
 	 * @return true if this is lethal damage, false otherwise
 	 */
-	public boolean takeDamage(int[] damage) {
+	public boolean takeDamage(int damage, DamageType type) {
 		boolean before = isDead();
-		int totalDamage = applyResistance(damage);
+		int totalDamage = applyResistance(damage, type);
 		health -= totalDamage;
 		if(totalDamage != 0) {
 			timeLastDamageTaken = World.ticks;

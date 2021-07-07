@@ -321,11 +321,9 @@ public class Game {
 			world.spawnStoneGolem(t);
 			world.spawnRoc(t);
 			world.spawnVampire(t);
-//			world.spawnBomb(t);
-//			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID), null);
 			spawnCyclops();
 		}
-		for(int i = 0; i < num/2; i++) {
+		for(int i = 0; i <= num/10; i++) {
 			spawnEverything();
 		}
 	}
@@ -874,7 +872,7 @@ public class Game {
 		if(thing == null) {
 			return;
 		}
-		world.spawnExplosion(thing.getTile(), 1, DamageType.makeDamageArray(10000, DamageType.FIRE));
+		world.spawnExplosionCircle(thing.getTile(), 1, 10000);
 	}
 	
 	private void unitTick() {

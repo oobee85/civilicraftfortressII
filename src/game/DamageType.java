@@ -2,7 +2,8 @@ package game;
 
 public enum DamageType {
 	PHYSICAL,
-	FIRE,
+	HEAT,
+	COLD,
 	WATER,
 	DRY,
 	HUNGER,
