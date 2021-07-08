@@ -30,6 +30,7 @@ public class PlantType implements Serializable {
 		this.attributes = attributes;
 	}
 	
+	// TODO remove desertresistant attribute and instead use whether or not the tile would take damage on the tile
 	public boolean isDesertResistant() {
 		return attributes.contains("desertresistant");
 	}
@@ -49,9 +50,6 @@ public class PlantType implements Serializable {
 	}
 	public double getRarity() {
 		return rarity;
-	}
-	public boolean isAquatic() {
-		return attributes.contains("aquatic");
 	}
 	public Set<Component> getComponents() {
 		return components;

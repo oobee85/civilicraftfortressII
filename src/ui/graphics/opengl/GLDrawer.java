@@ -405,9 +405,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("ambientColor", ambientColor);
 		for(Plant plant : game.world.getPlants()) {
 			float height = plant.getTile().getHeight();
-			if(plant.getType().isAquatic()) {
-				height = plant.getTile().getHeight() + plant.getTile().liquidAmount;
-			}
+			// TODO make cattails be taller depending on how much water there is
 			Vector3f pos = tileLocTo3dCoords(plant.getTile().getLocation(), height);
 //			Vector3f pos = tileTo3dCoords(plant.getTile());
 			Vector3f scale = new Vector3f(1, 1, 1);
