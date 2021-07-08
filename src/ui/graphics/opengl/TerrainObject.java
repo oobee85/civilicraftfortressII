@@ -17,110 +17,39 @@ public class TerrainObject extends GameObject {
 	Mesh mesh;
 	Texture texture;
 	
-	Mesh liquid;
-	private HashMap<TileLoc, ArrayList<Vertex>> locToHex;
+	private HashMap<TileLoc, ArrayList<Integer>> locToHex;
 	
 	public TerrainObject() {
 		super(null);
-		liquid = MeshUtils.square;
 	}
 
 	public void create(GL3 gl, World world) {
 		mesh = createMeshFromWorld3(world);
 		mesh.create(gl);
-		liquid.create(gl);
+		MeshUtils.hexwall.create(gl);
 	}
 	
-	private Mesh makeLiquidMesh(float radius) {
-		float yoffset = (float) (radius * Math.sin(Math.toRadians(60)));
-		Vector3f white = new Vector3f(1, 1, 1);
-		Vector3f center = new Vector3f(0, 0, 0);
-		Vector2f textureCoord = new Vector2f(0.5f, 0.5f);
-		ArrayList<Vertex> verts = new ArrayList<>();
-		ArrayList<Integer> indicesList = new ArrayList<>();
-		
-		Vector3f[] vecs = new Vector3f[] {
-				new Vector3f(),
-				center.add(-radius, 0, 0),
-				center.add(-radius/2, -yoffset, 0),
-				center.add(radius/2, -yoffset, 0),
-				center.add(radius, 0, 0),
-				center.add(radius/2, yoffset, 0),
-				center.add(-radius/2, yoffset, 0)
-		};
-		for(int i = 0; i < vecs.length; i++) {
-			float x = (vecs[i].x + radius) / (2*radius);
-			float y = (vecs[i].y + yoffset) / (2*yoffset);
-			verts.add(new Vertex(vecs[i], white, null, new Vector2f(x, y)));
-		}
-
-		for(int j = 1; j <= 6; j++) {
-			indicesList.add(0);
-			indicesList.add(j);
-			if(j == 6) {
-				indicesList.add(1);
-			}
-			else {
-				indicesList.add(j+1);
-			}
-		}
-		
-		// add side walls
-		int originalIndex = vecs.length;
-		int index = originalIndex;
-		for(int i = 1; i < vecs.length; i++) {
-			float xoffset = (i % 2);
-			verts.add(new Vertex(vecs[i], white, null, new Vector2f(xoffset, 1)));
-			verts.add(new Vertex(vecs[i].add(0, 0, -400), white, null, new Vector2f(xoffset, 0)));
-			
-			if(i != vecs.length - 1) {
-				indicesList.add(index);
-				indicesList.add(index + 1);
-				indicesList.add(index + 3);
 	
-				indicesList.add(index);
-				indicesList.add(index + 3);
-				indicesList.add(index + 2);
-			}
-			else {
-				indicesList.add(index);
-				indicesList.add(index + 1);
-				indicesList.add(originalIndex + 1);
 	
-				indicesList.add(index);
-				indicesList.add(originalIndex + 1);
-				indicesList.add(originalIndex);
-			}
-			index += 2;
-		}
-		int[] indices = new int[indicesList.size()];
-		for(int i = 0; i < indices.length; i++) {
-			indices[i] = indicesList.get(i);
-		}
-		Vertex[] vertexArray = verts.toArray(new Vertex[0]);
-		return new Mesh(vertexArray, indices);
-	}
-	
-	public void updateHeights(World world, GL3 gl, boolean includeLiquid) {
+	public void updateHeights(World world, boolean includeLiquid) {
 		for(Tile tile : world.getTiles()) {
-			for(Vertex vertex : locToHex.get(tile.getLocation())) {
+			for(Integer vertexIndex : locToHex.get(tile.getLocation())) {
 				float effectiveHeight = tile.getHeight();
 				if(includeLiquid) {
 					effectiveHeight += tile.liquidAmount - 2;
 				}
-				vertex.getPosition().z = GLDrawer.tileHeightTo3dHeight(effectiveHeight);
+				mesh.setVertexZ(vertexIndex, GLDrawer.tileHeightTo3dHeight(effectiveHeight));
 			}
 		}
-		mesh.updatePositions(gl);
+		mesh.updateNormals();
+		mesh.updatePositions();
 	}
 
 	private Mesh createMeshFromWorld3(World world) {
-		liquid = makeLiquidMesh(TILE_RADIUS);
 		locToHex = new HashMap<>();
 		ArrayList<Vertex> vertices = new ArrayList<>();
 		ArrayList<Integer> indicesList = new ArrayList<>();
 		HashMap<Tile, ArrayList<Vertex>> tileToVertex = new HashMap<>();
-		HashMap<Vertex, Integer> vertexToIndex = new HashMap<>();
 		float radius = TILE_RADIUS*4/5;
 		float yoffset = (float) (radius * Math.sin(Math.toRadians(60)));
 		Vector3f white = new Vector3f(1, 1, 1);
@@ -129,23 +58,35 @@ public class TerrainObject extends GameObject {
 			Vector2f textureCoord = new Vector2f(
 					(tile.getLocation().x() + 0.5f)/world.getWidth(), 
 					(tile.getLocation().y() + 0.5f)/world.getHeight());
-			
-			ArrayList<Vertex> verts = locToHex.getOrDefault(tile.getLocation(), new ArrayList<>());
+			ArrayList<Vertex> verts = new ArrayList<>();
+			ArrayList<Integer> vertIndices = new ArrayList<>();
 			Vector3f center = GLDrawer.tileLocTo3dCoords(tile.getLocation(), tile.getHeight());
 
-			verts.add(new Vertex(center, white, null, textureCoord));
-			verts.add(new Vertex(center.add(-radius, 0, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(-radius/2, -yoffset, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(radius/2, -yoffset, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(radius, 0, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(radius/2, yoffset, 0), white, null, textureCoord));
-			verts.add(new Vertex(center.add(-radius/2, yoffset, 0), white, null, textureCoord));
-			locToHex.put(tile.getLocation(), verts);
+			vertices.add(new Vertex(center, white, textureCoord));
+			verts.add(vertices.get(vertices.size()-1));
+			vertIndices.add(vertices.size()-1);
+			vertices.add(new Vertex(center.add(-radius, 0, 0), white, textureCoord));
+			verts.add(vertices.get(vertices.size()-1));
+			vertIndices.add(vertices.size()-1);
+			vertices.add(new Vertex(center.add(-radius/2, -yoffset, 0), white, textureCoord));
+			verts.add(vertices.get(vertices.size()-1));
+			vertIndices.add(vertices.size()-1);
+			vertices.add(new Vertex(center.add(radius/2, -yoffset, 0), white, textureCoord));
+			verts.add(vertices.get(vertices.size()-1));
+			vertIndices.add(vertices.size()-1);
+			vertices.add(new Vertex(center.add(radius, 0, 0), white, textureCoord));
+			verts.add(vertices.get(vertices.size()-1));
+			vertIndices.add(vertices.size()-1);
+			vertices.add(new Vertex(center.add(radius/2, yoffset, 0), white, textureCoord));
+			verts.add(vertices.get(vertices.size()-1));
+			vertIndices.add(vertices.size()-1);
+			vertices.add(new Vertex(center.add(-radius/2, yoffset, 0), white, textureCoord));
+			verts.add(vertices.get(vertices.size()-1));
+			vertIndices.add(vertices.size()-1);
+			
+			locToHex.put(tile.getLocation(), vertIndices);
 			
 			int i = vertices.size();
-			for(int j = 0; j < verts.size(); j++) {
-				vertexToIndex.put(verts.get(j), i+j);
-			}
 			tileToVertex.put(tile, verts);
 			for(int j = 1; j <= 6; j++) {
 				indicesList.add(i);
@@ -157,9 +98,6 @@ public class TerrainObject extends GameObject {
 					indicesList.add(i+j+1);
 				}
 			}
-			for(Vertex vec : verts) {
-				vertices.add(vec);
-			}
 		}
 		for(Tile tile : world.getTiles()) {
 			int x = tile.getLocation().x();
@@ -168,93 +106,93 @@ public class TerrainObject extends GameObject {
 			if(north != null) {
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(6)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(5)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(north).get(3)));
-				locToHex.get(north.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(north.getLocation()).add(vertices.size()-1);
 				
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(6)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(north).get(3)));
-				locToHex.get(north.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(north.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(north).get(2)));
-				locToHex.get(north.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(north.getLocation()).add(vertices.size()-1);
 			}
 
 			Tile northeast = world.get(new TileLoc(x+1, y + (x%2)));
 			if(northeast != null) {
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(5)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(4)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(northeast).get(2)));
-				locToHex.get(northeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(northeast.getLocation()).add(vertices.size()-1);
 
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(5)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(northeast).get(2)));
-				locToHex.get(northeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(northeast.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(northeast).get(1)));
-				locToHex.get(northeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(northeast.getLocation()).add(vertices.size()-1);
 			}
 			
 			if(north != null && northeast != null) {
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(5)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(northeast).get(1)));
-				locToHex.get(northeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(northeast.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(north).get(3)));
-				locToHex.get(north.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(north.getLocation()).add(vertices.size()-1);
 			}
 			
 			Tile southeast = world.get(new TileLoc(x+1, y - (1 - (x%2))));
 			if(southeast != null) {
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(4)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(3)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(southeast).get(1)));
-				locToHex.get(southeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(southeast.getLocation()).add(vertices.size()-1);
 
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(4)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(southeast).get(1)));
-				locToHex.get(southeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(southeast.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(southeast).get(6)));
-				locToHex.get(southeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(southeast.getLocation()).add(vertices.size()-1);
 			}
 			
 			if(northeast != null && southeast != null) {
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(tile).get(4)));
-				locToHex.get(tile.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(tile.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(southeast).get(6)));
-				locToHex.get(southeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(southeast.getLocation()).add(vertices.size()-1);
 				indicesList.add(vertices.size());
 				vertices.add(new Vertex(tileToVertex.get(northeast).get(2)));
-				locToHex.get(northeast.getLocation()).add(vertices.get(vertices.size()-1));
+				locToHex.get(northeast.getLocation()).add(vertices.size()-1);
 			}
 		}
 		
@@ -280,7 +218,7 @@ public class TerrainObject extends GameObject {
 			Vector3f cb = (tile.getLocation().x() % 2 == 0) ? c2 : c3;
 			Vector3f c = (tile.getLocation().y() % 2 == 0) ? ca : cb;
 			Vector2f textureCoord = new Vector2f((float)tile.getLocation().x()/world.getWidth(), (float)tile.getLocation().y()/world.getHeight());
-			vertices[index] = new Vertex(pos0, c, null, textureCoord);
+			vertices[index] = new Vertex(pos0, c, textureCoord);
 			index++;
 		}
 		ArrayList<Integer> indicesList = new ArrayList<>();

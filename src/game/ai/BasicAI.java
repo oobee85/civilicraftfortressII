@@ -14,6 +14,8 @@ public class BasicAI implements AIInterface {
 	private static final int MAX_BUILD_RADIUS = 10;
 	private static final int MAX_SEARCH_RADIUS = 40;
 	
+	private static final boolean DEBUG_AI = false;
+	
 	public enum WorkerTask {
 		IDLE, IRRIGATE, FORAGE, CHOP, GATHERSTONE
 	}
@@ -94,7 +96,9 @@ public class BasicAI implements AIInterface {
 		}
 		assignments[WorkerTask.IRRIGATE.ordinal()] = Math.max(0, numWorkers - total);
 		state.targetAssignments = assignments;
-		System.out.println("assignments: " + printArray(state.targetAssignments));
+		if(DEBUG_AI) {
+			System.out.println("assignments: " + printArray(state.targetAssignments));
+		}
 	}
 	public static String printArray(int[] arr) {
 		StringBuilder sb = new StringBuilder();
@@ -334,7 +338,7 @@ public class BasicAI implements AIInterface {
 	}
 	private boolean chopWood(Unit unit) {
 		Tile tile = getTargetTile(unit.getTile(), MAX_SEARCH_RADIUS, e -> {
-			return e.getPlant() != null && e.getPlant().getType() == PlantType.TREE;
+			return e.getPlant() != null && e.getPlant().getType() == Game.plantTypeMap.get("TREE");
 		});
 		if(tile == null) {
 			return false;
@@ -345,13 +349,13 @@ public class BasicAI implements AIInterface {
 	private boolean forage(Unit unit) {
 		Tile tile = getTargetTile(unit.getTile(), MAX_SEARCH_RADIUS, e -> {
 			
-			return (e.getPlant() != null && e.getPlant().getType() != PlantType.TREE)
+			return (e.getPlant() != null && e.getPlant().getType() != Game.plantTypeMap.get("TREE"))
 					|| e.getInventory().getItemAmount(ItemType.FOOD) > 0;
 		});
 		if(tile == null) {
 			return false;
 		}
-		if(tile.getPlant() != null && tile.getPlant().getType() != PlantType.TREE) {
+		if(tile.getPlant() != null && tile.getPlant().getType() != Game.plantTypeMap.get("TREE")) {
 			commands.harvestThing(unit, tile.getPlant(), true);
 		}
 		else {

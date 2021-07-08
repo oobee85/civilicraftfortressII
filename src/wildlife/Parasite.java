@@ -57,8 +57,8 @@ public class Parasite extends Animal {
 	}
 	
 	@Override
-	public boolean takeDamage(int damage) {
-		boolean lethal = super.takeDamage(damage);
+	public boolean takeDamage(int damage, DamageType type) {
+		boolean lethal = super.takeDamage(damage, type);
 		if(transformed) {
 			if(lethal) {
 				transformBack();

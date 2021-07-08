@@ -380,7 +380,9 @@ public class Client {
 					gameInstance.world.get(projectileMessage.getTile().getLocation()), 
 					gameInstance.world.get(projectileMessage.getTargetTile().getLocation()), 
 					null, 
-					projectileMessage.getDamage());
+					projectileMessage.getDamage(),
+					projectileMessage.getFromGround(),
+					0); // TODO serialize ticksUntilLanding
 			gameInstance.world.getData().addProjectile(newProjectile);
 		}
 		for(WeatherEvent weatherMessage : worldInfo.getWeatherEvents()) {

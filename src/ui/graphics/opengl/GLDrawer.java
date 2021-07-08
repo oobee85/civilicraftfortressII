@@ -26,6 +26,17 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	private static final float NEAR_CLIP = 0.1f;
 	private static final float FAR_CLIP = 1000f;
 	
+	
+	private static final boolean UPDATE_LIQUIDS = true;
+	private static final boolean UPDATE_TERRAIN_HEIGHT = true;
+	/**
+	 * This is a hack until I figure out frame rate issues updating every frame.
+	 * With this it will update terrain and liquid height once every 4s
+	 */
+	private static final long SLOW_HEIGHT_UPDATE_TIMER = 4000;
+	private long previousHeightUpdate = 0;
+	
+	
 	private final GLCanvas glcanvas;
 	private Shader shader;
 	private Shader liquidShader;
@@ -35,7 +46,13 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	private Vector3f sunDirection = new Vector3f();
 	private Vector3f sunColor = new Vector3f();
 	private Vector3f ambientColor = new Vector3f();
+	/**
+	 * Used for wave effect on liquids
+	 */
 	private long startTime = System.currentTimeMillis();
+
+	private long previousFPSPrint = System.currentTimeMillis();
+	private int numFramesRenderedSincePrint = 0;
 	
 	private TerrainObject terrainObject;
 	private TerrainObject liquidObject;
@@ -136,6 +153,13 @@ public class GLDrawer extends Drawer implements GLEventListener {
 
 	@Override
 	public void display(GLAutoDrawable drawable) {
+		numFramesRenderedSincePrint++;
+		long deltaTime = System.currentTimeMillis() - previousFPSPrint;
+		if(deltaTime > 4000) {
+			System.out.println("Avg frame time: " + deltaTime / numFramesRenderedSincePrint + "ms");
+			numFramesRenderedSincePrint = 0;
+			previousFPSPrint = System.currentTimeMillis();
+		}
 		GL3 gl = drawable.getGL().getGL3();
 		updateBackgroundColor(gl, game.getBackgroundColor());
 		gl.glClear(GL3.GL_DEPTH_BUFFER_BIT | GL3.GL_COLOR_BUFFER_BIT);
@@ -148,14 +172,14 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			if(terrainObject == null) {
 				terrainObject = new TerrainObject();
 				terrainObject.create(gl, game.world);
-				terrainObject.updateHeights(game.world, gl, false);
+				terrainObject.updateHeights(game.world, false);
 				camera.set(new Vector3f(game.world.getWidth()/2, 0, 100), 0, -45);
 				this.updateTerrainImages();
 			}
 			if(liquidObject == null) {
 				liquidObject = new TerrainObject();
 				liquidObject.create(gl, game.world);
-				liquidObject.updateHeights(game.world, gl, true);
+				liquidObject.updateHeights(game.world, true);
 				liquidObject.texture = TextureUtils.getTextureByFileName(LiquidType.WATER.getTextureFile(), gl);
 			}
 			if(mapImages != null && mapImages[MapMode.TERRAIN.ordinal()] != null) {
@@ -215,8 +239,11 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("ambientColor", ambientColor);
 		shader.setUniform("waveOffset", (float)(System.currentTimeMillis() - startTime));
 		
-
-//		liquidObject.updateHeights(game.world, gl, true);
+		if(UPDATE_LIQUIDS || System.currentTimeMillis() - previousHeightUpdate > SLOW_HEIGHT_UPDATE_TIMER) {
+			liquidObject.updateHeights(game.world, true);
+			previousHeightUpdate = System.currentTimeMillis();
+		}
+		
 		gl.glActiveTexture(GL3.GL_TEXTURE0);
 		Texture texture = liquidObject.texture;
 		texture.enable(gl);
@@ -325,32 +352,32 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	
 	public void renderAxis(GL3 gl, Shader shader) {
 		MeshUtils.x.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName("textures/pallet1.png", gl), 
 				new Vector3f(-20, 0, 0), 
 				Matrix4f.rotate(90, new Vector3f(0, 0, 1)), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.x.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName("textures/pallet1.png", gl), 
 				new Vector3f(5, 0, 0), 
 				Matrix4f.rotate(90, new Vector3f(0, 0, 1)), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.y.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName("textures/pallet1.png", gl), 
 				new Vector3f(0, -20, 0), 
 				Matrix4f.identity(), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.y.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName("textures/pallet1.png", gl), 
 				new Vector3f(0, 5, 0), 
 				Matrix4f.identity(), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.z.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName("textures/pallet1.png", gl), 
 				new Vector3f(0, 0, -20), 
 				Matrix4f.rotate(90, new Vector3f(0, 1, 0)), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.z.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName("textures/pallet1.png", gl), 
 				new Vector3f(0, 0, 5), 
 				Matrix4f.rotate(90, new Vector3f(0, 1, 0)), 
 				new Vector3f(.1f, .1f, .1f));
@@ -369,19 +396,20 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		renderAxis(gl, shader);
 
 		// TODO need to figure out how to make updating terrain not laggy
-//		terrainObject.updateHeights(game.world, gl, false);
+		if(UPDATE_TERRAIN_HEIGHT || System.currentTimeMillis() - previousHeightUpdate > SLOW_HEIGHT_UPDATE_TIMER) {
+			terrainObject.updateHeights(game.world, false);
+			previousHeightUpdate = System.currentTimeMillis();
+		}
 		terrainObject.mesh.render(gl, shader, terrainObject.texture, new Vector3f(0, 0, 0), terrainObject.getModelMatrix(), new Vector3f(1, 1, 1));
 		
 		shader.setUniform("ambientColor", ambientColor);
 		for(Plant plant : game.world.getPlants()) {
 			float height = plant.getTile().getHeight();
-			if(plant.getType().isAquatic()) {
-				height = plant.getTile().getHeight() + plant.getTile().liquidAmount;
-			}
+			// TODO make cattails be taller depending on how much water there is
 			Vector3f pos = tileLocTo3dCoords(plant.getTile().getLocation(), height);
 //			Vector3f pos = tileTo3dCoords(plant.getTile());
 			Vector3f scale = new Vector3f(1, 1, 1);
-			if(plant.getType() == PlantType.TREE) {
+			if(plant.getType() == Game.plantTypeMap.get("TREE")) {
 				scale.x = scale.x * (1f + 0.15f*(plant.getTile().getLocation().x()%3) + 0.15f*(plant.getTile().getLocation().y()%5));
 				scale.y = scale.x;
 				scale.z = scale.z * (2f + 0.1f*(plant.getTile().getLocation().x()%7) + 0.1f*(plant.getTile().getLocation().y()%13));
@@ -408,7 +436,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		for(Building building : game.world.getBuildings()) {
 			if(building.getType().blocksMovement()) {
 				Vector3f pos = tileLocTo3dCoords(building.getTile().getLocation(), building.getTile().getHeight() + Liquid.WALL_HEIGHT);
-				addToRender(terrainObject.liquid, 
+				addToRender(MeshUtils.hexwall, 
 						building.getMesh().getTextureFile(), 
 						Matrix4f.getModelMatrix(pos, Matrix4f.identity(), new Vector3f(1, 1, 1)));
 			}
@@ -419,17 +447,14 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		}
 
 		for(Projectile projectile : game.world.getData().getProjectiles()) {
-			float height = projectile.getTile().getHeight() + projectile.getHeight();
-			Vector3f vector = new Vector3f(1, 1, 1);
+			float height = projectile.getTile().getHeight() + projectile.getHeight()*2;
+			Vector3f scale = new Vector3f(1, 1, 1);
 			if(projectile.getType() == ProjectileType.METEOR) {
-//				height -=projectile.getHeight();
-				height = projectile.getTile().getHeight()*2 + projectile.getHeight()*2;
-				vector = new Vector3f(20, 20, 20);
+				scale = new Vector3f(15, 15, 15);
 			}
 			Vector3f pos = tileLocTo3dCoords(projectile.getTile().getLocation(), height);
-//			Vector3f pos = tileTo3dCoords(projectile.getTile());
 			
-			MeshUtils.meteor.render(gl, shader, TextureUtils.getTextureByFileName("textures/pallet1.png", gl), pos, Matrix4f.identity(), vector);
+			MeshUtils.meteor.render(gl, shader, TextureUtils.getTextureByFileName("textures/pallet1.png", gl), pos, Matrix4f.identity(), scale);
 		}
 
 		if(!state.fpMode && game.world.get(state.hoveredTile) != null) {

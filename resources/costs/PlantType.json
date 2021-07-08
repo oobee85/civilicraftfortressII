@@ -1,0 +1,46 @@
+{
+"planttypes": [
+	{
+		"name":"BERRY",
+		"image":"Images/plants/berry16.png",
+		"mesh":"models/cube.obj",
+		"harvestitem": "FOOD",
+		"health":100,
+		"rarity": 1,
+	},
+	{
+		"name":"BERRY_DEPLETED",
+		"image":"Images/plants/berry_depleted16.png",
+		"mesh":"models/cube.obj",
+		"harvestitem": "RUNITE_BAR",
+		"health":1,
+		"rarity": 0.2,
+	},
+	{
+		"name":"CATTAIL",
+		"image":"Images/plants/cattail32.png",
+		"mesh":"models/cattail.ply",
+		"texture":"textures/pallet1.png",
+		"harvestitem": "FOOD",
+		"health":50,
+		"rarity": 1,
+		"resistances": {"DRY": 100, "WATER": 0},
+	},
+	{
+		"name":"TREE",
+		"image":"Images/plants/tree1.png",
+		"mesh":"models/square_tree.ply",
+		"harvestitem": "WOOD",
+		"health":100,
+		"rarity": 1,
+	},
+	{
+		"name":"CACTUS",
+		"image":"Images/plants/cactus.png",
+		"harvestitem": "FOOD",
+		"health":100,
+		"rarity": 1,
+		"attributes":["desertresistant"],
+	},
+]
+}

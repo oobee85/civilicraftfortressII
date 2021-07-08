@@ -19,6 +19,7 @@ public class MeshUtils {
 	public static final Mesh mushroom;
 	public static final Mesh house;
 	public static final Mesh meteor;
+	public static final Mesh hexwall;
 
 	public static final Mesh x;
 	public static final Mesh y;
@@ -33,37 +34,10 @@ public class MeshUtils {
 	public static Mesh getMeshByFileName(String filename) {
 		if (!meshes.containsKey(filename)) {
 			Mesh mesh = loadMeshFromFile(filename);
-			normalize(mesh, false);
+			mesh.normalize(false);
 			meshes.put(filename, mesh);
 		}
 		return meshes.get(filename);
-	}
-
-	private static void normalize(Mesh mesh, boolean zeroZ) {
-		Vector3f min = new Vector3f(mesh.getVertices()[0].getPosition());
-		Vector3f max = new Vector3f(min);
-		for (Vertex v : mesh.getVertices()) {
-			min.x = Math.min(v.getPosition().x, min.x);
-			min.y = Math.min(v.getPosition().y, min.y);
-			min.z = Math.min(v.getPosition().z, min.z);
-			max.x = Math.max(v.getPosition().x, max.x);
-			max.y = Math.max(v.getPosition().y, max.y);
-			max.z = Math.max(v.getPosition().z, max.z);
-		}
-
-		Vector3f range = max.subtract(min);
-		float maximumRange = Math.max(range.y, range.x);
-		float scale = 1f / maximumRange;
-		Vector3f offset = new Vector3f(-range.x * scale * 0.5f, -range.y * scale * 0.5f, 0);
-		if (zeroZ) {
-			offset.z = -range.z * scale * 0.5f;
-		}
-		for (Vertex v : mesh.getVertices()) {
-			Vector3f newPos = v.getPosition().subtract(min);
-			newPos = newPos.multiply(scale);
-			newPos = newPos.add(offset);
-			v.getPosition().set(newPos);
-		}
 	}
 
 	private static Mesh readObjFile(String filename) {
@@ -180,7 +154,7 @@ public class MeshUtils {
 			if (i < textureMapping.size()) {
 				texCoord = textureMapping.get(i);
 			}
-			vertices[i] = new Vertex(vertexLocations.get(i), new Vector3f(1, 1, 1), null, texCoord);
+			vertices[i] = new Vertex(vertexLocations.get(i), new Vector3f(1, 1, 1), texCoord);
 		}
 		int[] facesArr = new int[faces.size()];
 		for (int i = 0; i < facesArr.length; i++) {
@@ -200,11 +174,80 @@ public class MeshUtils {
 			return cube;
 		}
 	}
+	private static Mesh makeHexWallMesh(float radius) {
+		float yoffset = (float) (radius * Math.sin(Math.toRadians(60)));
+		Vector3f white = new Vector3f(1, 1, 1);
+		Vector3f center = new Vector3f(0, 0, 0);
+		Vector2f textureCoord = new Vector2f(0.5f, 0.5f);
+		ArrayList<Vertex> verts = new ArrayList<>();
+		ArrayList<Integer> indicesList = new ArrayList<>();
+		
+		Vector3f[] vecs = new Vector3f[] {
+				new Vector3f(),
+				center.add(-radius, 0, 0),
+				center.add(-radius/2, -yoffset, 0),
+				center.add(radius/2, -yoffset, 0),
+				center.add(radius, 0, 0),
+				center.add(radius/2, yoffset, 0),
+				center.add(-radius/2, yoffset, 0)
+		};
+		for(int i = 0; i < vecs.length; i++) {
+			float x = (vecs[i].x + radius) / (2*radius);
+			float y = (vecs[i].y + yoffset) / (2*yoffset);
+			verts.add(new Vertex(vecs[i], white, new Vector2f(x, y)));
+		}
 
+		for(int j = 1; j <= 6; j++) {
+			indicesList.add(0);
+			indicesList.add(j);
+			if(j == 6) {
+				indicesList.add(1);
+			}
+			else {
+				indicesList.add(j+1);
+			}
+		}
+		
+		// add side walls
+		int originalIndex = vecs.length;
+		int index = originalIndex;
+		for(int i = 1; i < vecs.length; i++) {
+			float xoffset = (i % 2);
+			verts.add(new Vertex(vecs[i], white, new Vector2f(xoffset, 1)));
+			verts.add(new Vertex(vecs[i].add(0, 0, -400), white, new Vector2f(xoffset, 0)));
+			
+			if(i != vecs.length - 1) {
+				indicesList.add(index);
+				indicesList.add(index + 1);
+				indicesList.add(index + 3);
+	
+				indicesList.add(index);
+				indicesList.add(index + 3);
+				indicesList.add(index + 2);
+			}
+			else {
+				indicesList.add(index);
+				indicesList.add(index + 1);
+				indicesList.add(originalIndex + 1);
+	
+				indicesList.add(index);
+				indicesList.add(originalIndex + 1);
+				indicesList.add(originalIndex);
+			}
+			index += 2;
+		}
+		int[] indices = new int[indicesList.size()];
+		for(int i = 0; i < indices.length; i++) {
+			indices[i] = indicesList.get(i);
+		}
+		Vertex[] vertexArray = verts.toArray(new Vertex[0]);
+		return new Mesh(vertexArray, indices);
+	}
+	
 	static {
 		cube = getMeshByFileName("models/cube.obj");
 		skybox = getMeshByFileName("models/skybox.obj");
-		normalize(skybox, true);
+		skybox.normalize(true);
 		square = getMeshByFileName("models/square.obj");
 		cattail = getMeshByFileName("models/cattail.ply");
 		star = getMeshByFileName("models/star.obj");
@@ -217,5 +260,7 @@ public class MeshUtils {
 		defaultUnit = cube;
 		defaultPlant = mushroom;
 		defaultBuilding = house;
+		
+		hexwall = makeHexWallMesh(TerrainObject.TILE_RADIUS);
 	}
 }

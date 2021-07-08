@@ -69,7 +69,11 @@ public class TileLoc implements Externalizable {
 		return deltax + extraY;
 	}
 	public double euclideanDistance(TileLoc other) {
-		return Math.sqrt((this.x - other.x)*(this.x - other.x) + (this.y - other.y)*(this.y - other.y));
+		double myy = (this.x % 2 == 0) ? this.y : this.y + 0.5;
+		double othery = (other.x % 2 == 0) ? other.y : other.y + 0.5;
+		double deltay = myy - othery;
+		double deltax = this.x - other.x; 
+		return Math.sqrt(deltax*deltax + deltay*deltay);
 	}
 	public int x() {
 		return x;
