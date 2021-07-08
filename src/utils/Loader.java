@@ -38,6 +38,49 @@ public class Loader {
 		return components;
 	}
 	
+	public static void loadPlantType(HashMap<String, PlantType> plantTypeMap, ArrayList<PlantType> plantTypeList) {
+		String plantTypeString = Utils.readFile("costs/PlantType.json");
+		JSONObject obj = new JSONObject(plantTypeString);
+		JSONArray arr = obj.getJSONArray("planttypes");
+		for (int i = 0; i < arr.length(); i++) {
+			JSONObject plantTypeObject = arr.getJSONObject(i);
+
+			String name = plantTypeObject.getString("name");
+			String image = plantTypeObject.getString("image");
+			int health = plantTypeObject.getInt("health");
+			double rarity = plantTypeObject.getDouble("rarity");
+			String itemString = plantTypeObject.getString("harvestitem");
+			ItemType itemType = ItemType.valueOf(itemString);
+
+			String textureFile = image;
+			Mesh mesh = MeshUtils.defaultPlant;
+			if(plantTypeObject.has("mesh")) {
+				String meshString = plantTypeObject.getString("mesh");
+				mesh = MeshUtils.getMeshByFileName(meshString);
+				
+				if(plantTypeObject.has("texture")) {
+					textureFile = plantTypeObject.getString("texture");
+				}
+			}
+
+			HashSet<String> attributes = new HashSet<>();
+			if(plantTypeObject.has("attributes")) {
+				JSONArray attributelist = plantTypeObject.getJSONArray("attributes");
+				for(int j = 0; j < attributelist.length(); j++) {
+					attributes.add(attributelist.getString(j));
+				}
+			}
+
+			Set<Component> components = loadComponents(plantTypeObject);
+			PlantType plantType = new PlantType(name, image, mesh, textureFile, rarity, health, itemType, attributes);
+			plantType.getComponents().addAll(components);
+			
+			plantTypeMap.put(name, plantType);
+			plantTypeList.add(plantType);
+		}
+		
+	}
+	
 	public static void loadBuildingType(HashMap<String, BuildingType> buildingTypeMap, ArrayList<BuildingType> buildingTypeList) {
 
 		String buildingTypeString = Utils.readFile("costs/BuildingType.json");
@@ -359,9 +402,6 @@ public class Loader {
 			for(String unittypestring : type.unitsCanProduce()) {
 				type.unitsCanProduceSet().add(Game.unitTypeMap.get(unittypestring));
 			}
-		}
-		for(PlantType type : PlantType.values()) {
-			Game.plantTypeList.add(type);
 		}
 		for(ResearchType type : Game.researchTypeList) {
 			for(String req : type.researchRequirements) {

@@ -1,60 +1,37 @@
 package world;
 
-import java.awt.*;
+import java.io.*;
 import java.util.*;
 
-import javax.swing.*;
-
 import game.*;
-import ui.graphics.*;
+import game.components.*;
 import ui.graphics.opengl.*;
 import utils.*;
 
-public enum PlantType {
+public class PlantType implements Serializable {
 	
-	BERRY ( new String[] {"Images/plants/berry16.png"}, 
-			MeshUtils.cube, 
-			"Images/plants/berry16.png",
-			false, 1.0, 100, false, ItemType.FOOD),
-	BERRY_DEPLETED ( new String[] {"Images/plants/berry_depleted16.png"},
-			MeshUtils.cube, 
-			"Images/plants/berry_depleted16.png",
-			false, 0.2, 1, false, ItemType.RUNITE_BAR),
-	CATTAIL ( new String[] {"Images/plants/cattail32.png"},
-			MeshUtils.cattail, 
-			"textures/pallet1.png",
-			false, 1.0, 50, true, ItemType.FOOD),
-	TREE ( new String[] {"Images/plants/tree1.png"},
-			MeshUtils.getMeshByFileName("models/square_tree.ply"), 
-			"Images/plants/tree1.png",
-			false, 1, 100, false, ItemType.WOOD),
-	CACTUS ( new String[] {"Images/plants/cactus.png"},
-			MeshUtils.defaultPlant, 
-			"Images/plants/cactus.png",
-			true, 1, 100, false, ItemType.FOOD),
-	;
-	
-	private double rarity;
-	private MipMap mipmap;
-	private TexturedMesh mesh;
-	private double health;	
-	private boolean aquatic;
-	private ItemType itemType;
-	private boolean desertResistant;
+	private final String name;
+	private transient final MipMap mipmap;
+	private transient final TexturedMesh mesh;
+	private transient final double health;	
+	private transient final double rarity;
+	private transient final ItemType itemType;
+	private transient final HashSet<String> attributes;
+	private transient final Set<Component> components = new HashSet<>();
 
-	PlantType( String[] s, Mesh mesh, String textureFile, boolean desertResistant, double rare, double health, boolean aquatic, ItemType itemType){
+	public PlantType(String name, String image, Mesh mesh, String textureFile, 
+	                 double rare, double health, ItemType itemType, HashSet<String> attributes){
+		this.name = name;
 		this.rarity = rare;
 		this.health = health;
-		this.aquatic = aquatic;
-		mipmap = new MipMap(s);
+		mipmap = new MipMap(image);
 		this.mesh = new TexturedMesh(mesh, textureFile);
 		this.itemType = itemType;
-		this.desertResistant = desertResistant;
-		
+		this.attributes = attributes;
 	}
 	
 	public boolean isDesertResistant() {
-		return desertResistant;
+		return attributes.contains("desertresistant");
 	}
 	public TexturedMesh getMesh() {
 		return mesh;
@@ -74,11 +51,17 @@ public enum PlantType {
 		return rarity;
 	}
 	public boolean isAquatic() {
-		return aquatic;
+		return attributes.contains("aquatic");
+	}
+	public Set<Component> getComponents() {
+		return components;
 	}
 	
 	public HashMap<ItemType, Integer> getCost(){
 		return null;
+	}
+	public String name() {
+		return name;
 	}
 	@Override
 	public String toString() {

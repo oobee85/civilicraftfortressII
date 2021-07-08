@@ -1004,11 +1004,11 @@ public class World {
 			if(plant.getTile().isCold() == true) {
 				continue;
 			}
-			if(plant.getType() == PlantType.TREE) {
+			if(plant.getType() == Game.plantTypeMap.get("TREE")) {
 				if(Math.random() < 0.02) {
 					for(Tile tile : plant.getTile().getNeighbors()) {
 						if(tile.getPlant() == null && tile.canPlant()) {
-							tile.setHasPlant(new Plant(PlantType.TREE, tile, getFaction(NO_FACTION_ID)));
+							tile.setHasPlant(new Plant(plant.getType(), tile, getFaction(NO_FACTION_ID)));
 							worldData.addPlant(tile.getPlant());
 							break;
 						}
@@ -1029,7 +1029,7 @@ public class World {
 			
 			if(tile.getTerrain() == Terrain.SAND) {
 				if(Math.random() < 0.001) {
-					Plant plant = new Plant(PlantType.CACTUS, tile, getFaction(NO_FACTION_ID));
+					Plant plant = new Plant(Game.plantTypeMap.get("CACTUS"), tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(plant);
 					worldData.addPlant(plant);
 				}
@@ -1042,14 +1042,14 @@ public class World {
 			
 			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(Math.random() < 0.01) {
-					Plant plant = new Plant(PlantType.CATTAIL, tile, getFaction(NO_FACTION_ID));
+					Plant plant = new Plant(Game.plantTypeMap.get("CATTAIL"), tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(plant);
 					worldData.addPlant(plant);
 				}
 			}
 			if(tile.liquidType != null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 				if (Math.random() < 0.001) {
-					tile.setHasPlant(new Plant(PlantType.BERRY, tile, getFaction(NO_FACTION_ID)));
+					tile.setHasPlant(new Plant(Game.plantTypeMap.get("BERRY"), tile, getFaction(NO_FACTION_ID)));
 					worldData.addPlant(tile.getPlant());
 				}
 			}
@@ -1229,7 +1229,7 @@ public class World {
 			//generates cactus
 			if(tile.getTerrain() == Terrain.SAND) {
 				if(Math.random() < 0.01) {
-					Plant plant = new Plant(PlantType.CACTUS, tile, getFaction(NO_FACTION_ID));
+					Plant plant = new Plant(Game.plantTypeMap.get("CACTUS"), tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(plant);
 					worldData.addPlant(plant);
 				}
@@ -1237,8 +1237,8 @@ public class World {
 			//generates land plants
 			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < BUSH_RARITY) {
 				double o = Math.random();
-				if(o < PlantType.BERRY.getRarity()) {
-					makePlantVein(tile, PlantType.BERRY, 6);
+				if(o < Game.plantTypeMap.get("BERRY").getRarity()) {
+					makePlantVein(tile, Game.plantTypeMap.get("BERRY"), 6);
 //					Plant p = new Plant(PlantType.BERRY, tile, getFaction(NO_FACTION_ID));
 //					tile.setHasPlant(p);
 //					worldData.addPlant(tile.getPlant());
@@ -1248,8 +1248,8 @@ public class World {
 			//generates water plants
 			if( Math.random() < WATER_PLANT_RARITY) {
 				double o = Math.random();
-				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()  && o < PlantType.CATTAIL.getRarity()) {
-					Plant p = new Plant(PlantType.CATTAIL, tile, getFaction(NO_FACTION_ID));
+				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()  && o < Game.plantTypeMap.get("CATTAIL").getRarity()) {
+					Plant p = new Plant(Game.plantTypeMap.get("CATTAIL"), tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(p);
 					worldData.addPlant(tile.getPlant());
 				}
@@ -1283,7 +1283,7 @@ public class World {
 				visited.put(ti, ti.getLocation().distanceTo(t.getLocation()) + Math.random() * 10);
 				search.add(ti);
 			}
-			if(type == PlantType.TREE) {
+			if(type == Game.plantTypeMap.get("TREE")) {
 				if ((potential.canPlant() || type.isDesertResistant()) && potential.getPlant() == null && potential.getTerrain() != Terrain.DIRT) {
 					Plant plant = new Plant(type, potential, getFaction(NO_FACTION_ID));
 					potential.setHasPlant(plant);
@@ -1312,10 +1312,7 @@ public class World {
 			}
 			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < t.liquidType.getMinimumDamageAmount() / 2)
 				if (Math.random() < tempDensity) {
-					makePlantVein(t, PlantType.TREE, 30);
-//					Plant plant = new Plant(PlantType.FOREST1, t, getFaction(NO_FACTION_ID));
-//					t.setHasPlant(plant);
-//					worldData.addPlant(plant);
+					makePlantVein(t, Game.plantTypeMap.get("TREE"), 30);
 				}
 		}
 		
