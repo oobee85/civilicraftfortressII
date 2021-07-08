@@ -191,7 +191,6 @@ public class Pathfinding {
 			if(neighbor.isBlocked(unit)) {
 				continue;
 			}
-			double tiledamage = neighbor.computeTileDamage(unit);
 			double cost = currentNode.cost;
 			double movePenalty = 0;
 			if(forward) {
@@ -201,8 +200,9 @@ public class Pathfinding {
 				movePenalty = unit.movePenaltyTo(neighbor, currentTile);
 			}
 			cost += movePenalty;
-			if(tiledamage >= 1) {
-				cost += tiledamage*movePenalty*10;
+			double danger = unit.applyResistance(neighbor.computeTileDanger());
+			if(danger >= 1) {
+				cost += danger*movePenalty*10;
 			}
 			// if tile not visited, or the cost can be improved
 			if(!visited.containsKey(neighbor) || cost < visited.get(neighbor).cost) {

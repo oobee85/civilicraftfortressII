@@ -338,7 +338,7 @@ public class BasicAI implements AIInterface {
 	}
 	private boolean chopWood(Unit unit) {
 		Tile tile = getTargetTile(unit.getTile(), MAX_SEARCH_RADIUS, e -> {
-			return e.getPlant() != null && e.getPlant().getType() == PlantType.TREE;
+			return e.getPlant() != null && e.getPlant().getType() == Game.plantTypeMap.get("TREE");
 		});
 		if(tile == null) {
 			return false;
@@ -349,13 +349,13 @@ public class BasicAI implements AIInterface {
 	private boolean forage(Unit unit) {
 		Tile tile = getTargetTile(unit.getTile(), MAX_SEARCH_RADIUS, e -> {
 			
-			return (e.getPlant() != null && e.getPlant().getType() != PlantType.TREE)
+			return (e.getPlant() != null && e.getPlant().getType() != Game.plantTypeMap.get("TREE"))
 					|| e.getInventory().getItemAmount(ItemType.FOOD) > 0;
 		});
 		if(tile == null) {
 			return false;
 		}
-		if(tile.getPlant() != null && tile.getPlant().getType() != PlantType.TREE) {
+		if(tile.getPlant() != null && tile.getPlant().getType() != Game.plantTypeMap.get("TREE")) {
 			commands.harvestThing(unit, tile.getPlant(), true);
 		}
 		else {

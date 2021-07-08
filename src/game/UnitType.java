@@ -2,6 +2,7 @@ package game;
 import java.io.*;
 import java.util.*;
 
+import game.components.*;
 import ui.graphics.opengl.*;
 import utils.*;
 import utils.Loader.*;
@@ -22,8 +23,11 @@ public class UnitType implements Serializable {
 	private transient final TargetInfo[] targetingInfoStrings;
 	private transient final ArrayList<TargetingInfo> targetingInfo = new ArrayList<>();
 	private transient final LinkedList<AttackStyle> attackStyles;
+	private transient final Set<Component> components = new HashSet<>();
 
-	public UnitType(String name, String image, Mesh mesh, String textureFile, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles) {
+	public UnitType(String name, String image, Mesh mesh, String textureFile, CombatStats cs, 
+	                HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, 
+	                LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles) {
 		id = idCounter++;
 		this.name = name;
 		this.mipmap = new MipMap(image);
@@ -69,12 +73,6 @@ public class UnitType implements Serializable {
 	public boolean isHerbivore() {
 		return attributes.contains("herbivore");
 	}
-	public boolean isColdResist() {
-		return attributes.contains("coldresistant");
-	}
-	public boolean isFireResist() {
-		return attributes.contains("fireresistant");
-	}
 	public boolean isMigratory() {
 		return attributes.contains("migratory");
 	}
@@ -95,6 +93,10 @@ public class UnitType implements Serializable {
 	}
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;
+	}
+	
+	public Set<Component> getComponents() {
+		return components;
 	}
 	
 	public TexturedMesh getMesh() {

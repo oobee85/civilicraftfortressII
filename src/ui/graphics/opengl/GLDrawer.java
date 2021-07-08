@@ -352,32 +352,32 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	
 	public void renderAxis(GL3 gl, Shader shader) {
 		MeshUtils.x.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName("textures/pallet1.png", gl), 
 				new Vector3f(-20, 0, 0), 
 				Matrix4f.rotate(90, new Vector3f(0, 0, 1)), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.x.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName("textures/pallet1.png", gl), 
 				new Vector3f(5, 0, 0), 
 				Matrix4f.rotate(90, new Vector3f(0, 0, 1)), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.y.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName("textures/pallet1.png", gl), 
 				new Vector3f(0, -20, 0), 
 				Matrix4f.identity(), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.y.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName("textures/pallet1.png", gl), 
 				new Vector3f(0, 5, 0), 
 				Matrix4f.identity(), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.z.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName("textures/pallet1.png", gl), 
 				new Vector3f(0, 0, -20), 
 				Matrix4f.rotate(90, new Vector3f(0, 1, 0)), 
 				new Vector3f(.1f, .1f, .1f));
 		MeshUtils.z.render(gl, shader, 
-				TextureUtils.getTextureByFileName(PlantType.TREE.getMesh().getTextureFile(), gl), 
+				TextureUtils.getTextureByFileName("textures/pallet1.png", gl), 
 				new Vector3f(0, 0, 5), 
 				Matrix4f.rotate(90, new Vector3f(0, 1, 0)), 
 				new Vector3f(.1f, .1f, .1f));
@@ -405,13 +405,11 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		shader.setUniform("ambientColor", ambientColor);
 		for(Plant plant : game.world.getPlants()) {
 			float height = plant.getTile().getHeight();
-			if(plant.getType().isAquatic()) {
-				height = plant.getTile().getHeight() + plant.getTile().liquidAmount;
-			}
+			// TODO make cattails be taller depending on how much water there is
 			Vector3f pos = tileLocTo3dCoords(plant.getTile().getLocation(), height);
 //			Vector3f pos = tileTo3dCoords(plant.getTile());
 			Vector3f scale = new Vector3f(1, 1, 1);
-			if(plant.getType() == PlantType.TREE) {
+			if(plant.getType() == Game.plantTypeMap.get("TREE")) {
 				scale.x = scale.x * (1f + 0.15f*(plant.getTile().getLocation().x()%3) + 0.15f*(plant.getTile().getLocation().y()%5));
 				scale.y = scale.x;
 				scale.z = scale.z * (2f + 0.1f*(plant.getTile().getLocation().x()%7) + 0.1f*(plant.getTile().getLocation().y()%13));

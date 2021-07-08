@@ -130,7 +130,7 @@
 		],
 		"attributes":["hostile"],
 		"research":"CHIVALRY",
-		"targeting":[{"type":"game.Unit"}]
+		"targeting":[{"type":"game.Unit"}],
 	},
 	{
 		"image":"Images/units/chariot.png",
@@ -171,7 +171,8 @@
 			{"type":"game.Building"},
 			{"type":"game.Unit"}
 		],
-		"attributes":["hostile", "flying", "coldresistant"],
+		"attributes":["hostile", "flying"],
+		"resistances": {"COLD": 0}
 	},
 	{
 		"image":"Images/units/priest.png",
@@ -240,7 +241,7 @@
 		"attackstyles":[
 			{"damage":5, "cooldown":40, "range":1}
 		],
-		"attributes":["coldresistant"],
+		"resistances": {"COLD": 0},
 		"loot":{"FOOD":200}
 	},
 	{
@@ -261,7 +262,8 @@
 		"attackstyles":[
 			{"damage":1, "cooldown":40, "range":1}
 		],
-		"attributes":["aquatic","coldresistant"],
+		"attributes":["aquatic"],
+		"resistances": {"COLD": 0, "DRY": 100, "WATER": 0},
 		"loot":{"FOOD":200}
 	},
 	{
@@ -273,7 +275,8 @@
 			{"damage":120, "cooldown":30, "range":4, "minrange":1, "projectile":"FIREBREATH"},
 			{"damage":50, "cooldown":30, "range":1}
 		],
-		"attributes":["flying","hostile","fireresistant","coldresistant","cleave"],
+		"attributes":["flying","hostile","cleave"],
+		"resistances": {"COLD": 0, "HEAT": 0},
 		"loot":{"RUNITE_BAR":20, "TITANIUM_BAR":10},
 		"targeting":[
 			{"type":"game.Unit"},
@@ -305,7 +308,8 @@
 			{"type":"game.Building", "faction":"PLAYER"},
 			{"type":"game.Unit"}
 		],
-		"attributes":["flying","hostile","coldresistant"],
+		"attributes":["flying","hostile"],
+		"resistances": {"COLD": 0},
 		"loot":{"ADAMANTITE_ORE":10}
 	},
 	{
@@ -329,7 +333,8 @@
 		"attackstyles":[
 			{"damage":50, "cooldown":50, "range":1}
 		],
-		"attributes":["hostile","coldresistant","delayedinvasion"],
+		"attributes":["hostile","delayedinvasion"],
+		"resistances": {"COLD": 0},
 		"targeting":[
 			{"type":"SAWMILL"}, 
 			{"type":"game.Unit", "faction":"PLAYER"}, 
@@ -357,7 +362,8 @@
 		"attackstyles":[
 			{"damage":150, "cooldown":50, "range":1}
 		],
-		"attributes":["hostile","fireresistant","delayedinvasion"],
+		"attributes":["hostile","delayedinvasion"],
+		"resistances": {"HEAT": 0},
 		"targeting":[
 			{"type":"MINE"}
 		],
@@ -370,7 +376,8 @@
 		"attackstyles":[
 			{"damage":40, "cooldown":20, "range":1}
 		],
-		"attributes":["hostile","coldresistant"],
+		"attributes":["hostile"],
+		"resistances": {"COLD": 0},
 		"loot":{"FOOD":300}
 	},
 	{
@@ -394,7 +401,8 @@
 		"attackstyles":[
 			{"damage":10, "cooldown":20, "range":1}
 		],
-		"attributes":["hostile","coldresistant","delayedinvasion"],
+		"attributes":["hostile","delayedinvasion"],
+		"resistances": {"COLD": 0},
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"},
 			{"type":"game.Building", "faction":"PLAYER"},
@@ -410,7 +418,8 @@
 		"attackstyles":[
 			{"damage":60, "cooldown":20, "range":1}
 		],
-		"attributes":["hostile","coldresistant","delayedinvasion","cleave"],
+		"attributes":["hostile","delayedinvasion","cleave"],
+		"resistances": {"COLD": 0},
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"},
 			{"type":"game.Unit"}
@@ -424,7 +433,8 @@
 		"attackstyles":[
 			{"damage":1, "cooldown":30, "range":1, "projectile":"FIREBREATH"}
 		],
-		"attributes":["hostile","fireresistant"],
+		"attributes":["hostile"],
+		"resistances": {"HEAT": 0},
 		"targeting":[
 			{"type":"game.Building", "faction":"PLAYER"},
 			{"type":"game.Building"}
@@ -446,7 +456,8 @@
 		"attackstyles":[
 			{"damage":1, "cooldown":10, "range":0}
 		],
-		"attributes":["hostile","fireresistant"],
+		"attributes":["hostile"],
+		"resistances": {"HEAT": 0},
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"},
 			{"type":"game.Unit", "faction":"CYCLOPS"}
@@ -483,7 +494,6 @@
 		"attackstyles":[
 			{"damage":40, "cooldown":20, "range":1}
 		],
-		"attributes":[],
 		"loot":{"GOLD_ORE":50}
 	},
 	{
@@ -493,7 +503,8 @@
 		"attackstyles":[
 			{"damage":0, "cooldown":0, "range":100}
 		],
-		"attributes":["flying","fireresistant","coldresistant"],
+		"attributes":["flying"],
+		"resistances": {"COLD": 0, "HEAT": 0},
 		"targeting":[{"type":"game.Unit"}]
 	},
 	{
@@ -504,7 +515,8 @@
 			{"damage":200, "cooldown":50, "range":6, "minrange":3, "projectile":"ROCK_STONE_GOLEM"},
 			{"damage":100, "cooldown":50, "range":1}
 		],
-		"attributes":["fireresistant","hostile","coldresistant","delayedinvasion"],
+		"attributes":["hostile","delayedinvasion"],
+		"resistances": {"COLD": 0, "HEAT": 0},
 		"targeting":[
 			{"type":"GATE_BRICK"},
 			{"type":"GATE_STONE"},
@@ -535,7 +547,8 @@
 		"attackstyles":[
 			{"damage":100, "cooldown":5, "range":1}
 		],
-		"attributes":["hostile", "fireresistant"],
+		"attributes":["hostile"],
+		"resistances": {"HEAT": 0},
 		"loot":{"TITANIUM_ORE":100, "RUNITE_ORE":100}
 	},
 	

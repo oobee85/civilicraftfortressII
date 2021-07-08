@@ -455,7 +455,7 @@ public class World {
 	}
 	
 	public void makeAnimal(UnitType animalType, World world, TileLoc loc) {
-		if(animalType.isAquatic() == false && world.get(loc).liquidAmount > world.get(loc).liquidType.getMinimumDamageAmount()/2 ) {
+		if(!animalType.isAquatic() && world.get(loc).liquidAmount > world.get(loc).liquidType.getMinimumDamageAmount()/2 ) {
 			return;
 		}
 		Animal animal = new Animal(animalType, world.get(loc), getFaction(NO_FACTION_ID));
@@ -560,30 +560,32 @@ public class World {
 			
 		}
 	}
-	public void spawnExplosion(Tile tile, int radius, int damage) {
-	
-		for(Tile t : getNeighborsInRadius(tile, radius)) {
-
-			t.replaceOrAddDurationModifier(
-					GroundModifierType.FIRE, 
-					10 + (int)(Math.random()*damage/5),
-					worldData);
-			
-//			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
-//			worldData.addGroundModifier(fire);
-//			t.setModifier(fire);
-			if(t.hasBuilding() == true) {
-				t.getBuilding().takeDamage(damage);
-			}
-			for(Unit unit : t.getUnits()) {
-				unit.takeDamage(damage);
-			}
-			if(t.getPlant() != null) {
-				t.getPlant().takeDamage(damage);
-			}
-		}
-
-	}
+//	public void spawnExplosion(Tile tile, int radius, int damage, DamageType type) {
+//	
+//		for(Tile t : getNeighborsInRadius(tile, radius)) {
+//			
+//			if(type == DamageType.HEAT) {
+//				t.replaceOrAddDurationModifier(
+//						GroundModifierType.FIRE, 
+//						10 + (int)(Math.random()*damage/5),
+//						worldData);
+//			}
+//			
+////			GroundModifier fire = new GroundModifier(GroundModifierType.FIRE, t, 10 + (int)(Math.random()*damage/5));
+////			worldData.addGroundModifier(fire);
+////			t.setModifier(fire);
+//			if(t.hasBuilding() == true) {
+//				t.getBuilding().takeDamage(damage, type);
+//			}
+//			for(Unit unit : t.getUnits()) {
+//				unit.takeDamage(damage, type);
+//			}
+//			if(t.getPlant() != null) {
+//				t.getPlant().takeDamage(damage, type);
+//			}
+//		}
+//
+//	}
 	
 	public void updateDesertChange(Tile tile, boolean start) {
 		int failTiles = 0;
@@ -1002,11 +1004,11 @@ public class World {
 			if(plant.getTile().isCold() == true) {
 				continue;
 			}
-			if(plant.getType() == PlantType.TREE) {
+			if(plant.getType() == Game.plantTypeMap.get("TREE")) {
 				if(Math.random() < 0.02) {
 					for(Tile tile : plant.getTile().getNeighbors()) {
 						if(tile.getPlant() == null && tile.canPlant()) {
-							tile.setHasPlant(new Plant(PlantType.TREE, tile, getFaction(NO_FACTION_ID)));
+							tile.setHasPlant(new Plant(plant.getType(), tile, getFaction(NO_FACTION_ID)));
 							worldData.addPlant(tile.getPlant());
 							break;
 						}
@@ -1027,7 +1029,7 @@ public class World {
 			
 			if(tile.getTerrain() == Terrain.SAND) {
 				if(Math.random() < 0.001) {
-					Plant plant = new Plant(PlantType.CACTUS, tile, getFaction(NO_FACTION_ID));
+					Plant plant = new Plant(Game.plantTypeMap.get("CACTUS"), tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(plant);
 					worldData.addPlant(plant);
 				}
@@ -1040,14 +1042,14 @@ public class World {
 			
 			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(Math.random() < 0.01) {
-					Plant plant = new Plant(PlantType.CATTAIL, tile, getFaction(NO_FACTION_ID));
+					Plant plant = new Plant(Game.plantTypeMap.get("CATTAIL"), tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(plant);
 					worldData.addPlant(plant);
 				}
 			}
 			if(tile.liquidType != null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
 				if (Math.random() < 0.001) {
-					tile.setHasPlant(new Plant(PlantType.BERRY, tile, getFaction(NO_FACTION_ID)));
+					tile.setHasPlant(new Plant(Game.plantTypeMap.get("BERRY"), tile, getFaction(NO_FACTION_ID)));
 					worldData.addPlant(tile.getPlant());
 				}
 			}
@@ -1119,23 +1121,23 @@ public class World {
 			}
 			if(!simulated && projectile.reachedTarget()) {
 				if(projectile.getType().isExplosive()) {
-					if(projectile.getType().getRadius() <= 2) {
-						spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getDamage());
-					}else {
-						spawnExplosionCircle(projectile.getTile(), projectile.getType().getRadius(), (int)projectile.getDamage());
-					}
+//					if(projectile.getType().getRadius() <= 2) {
+//						spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), projectile.getDamage(), DamageType.HEAT);
+//					}else {
+						spawnExplosionCircle(projectile.getTile(), projectile.getType().getRadius(), projectile.getDamage());
+//					}
 					
 				} 
 				else {
 					for(Unit unit : projectile.getTile().getUnits()) {
-						unit.takeDamage(projectile.getDamage());
+						unit.takeDamage(projectile.getDamage(), DamageType.PHYSICAL);
 						unit.aggro(projectile.getSource());
 					}
 					if(projectile.getTile().getPlant() != null) {
-						projectile.getTile().getPlant().takeDamage(projectile.getDamage());
+						projectile.getTile().getPlant().takeDamage(projectile.getDamage(), DamageType.PHYSICAL);
 					}
 					if(projectile.getTile().hasBuilding() == true) {
-						projectile.getTile().getBuilding().takeDamage(projectile.getDamage());
+						projectile.getTile().getBuilding().takeDamage(projectile.getDamage(), DamageType.PHYSICAL);
 					}
 				}
 				if(projectile.getType() == ProjectileType.METEOR) {
@@ -1167,53 +1169,57 @@ public class World {
 	
 	public void updatePlantDamage() {
 		for(Plant plant : worldData.getPlants()) {
-			Tile tile = plant.getTile();
+			int[] damage = plant.getTile().computeTileDamage();
+			for(int i = 0; i < damage.length; i++) {
+				plant.takeDamage(damage[i], DamageType.values()[i]);
+			}
 			
+//			Tile tile = plant.getTile();
 //			if(tile.isCold()) {
 //				plant.takeDamage(1);
 //			}
-			if (plant.isAquatic() && tile.liquidType == LiquidType.WATER) {
-				if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
-
-					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
-					double damageTaken = difInLiquids * tile.liquidType.getDamage();
-					int roundedDamage = (int) (damageTaken + 1);
-					if (roundedDamage >= 1) {
-						plant.takeDamage(roundedDamage);
-					}
-				}
-			} else {
-				int totalDamage = 0;
-				double modifierDamage = 0;
-				
-				//adds the damage of groundmodifier
-				if(tile.getModifier() != null) {
-					modifierDamage += tile.getModifier().getType().getDamage();
-				}
-				
-				
-				if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-					if(plant.isAquatic() == false || tile.liquidType != LiquidType.WATER) {
-						//adds damage of liquids
-						double liquidDamage = tile.liquidAmount * tile.liquidType.getDamage();
-						totalDamage += liquidDamage;
-					}
-				}
-				if(plant.isAquatic() && tile.liquidType != LiquidType.WATER) {
-					totalDamage += 5;
-				}
-				if(tile.getTerrain().isPlantable(tile.getTerrain()) == false && plant.getType().isDesertResistant() == false) {
-					totalDamage += 5;
-				}
-				
-				if(tile.getTerrain() == Terrain.GRASS && plant.getType().isDesertResistant() == true) {
-					totalDamage += 5;
-				}
-				totalDamage = (int) (modifierDamage+totalDamage);
-				if(totalDamage >= 1) {
-					plant.takeDamage(totalDamage);
-				}
-			}
+//			if (plant.isAquatic() && tile.liquidType == LiquidType.WATER) {
+//				if (tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
+//
+//					double difInLiquids = tile.liquidType.getMinimumDamageAmount() - tile.liquidAmount;
+//					double damageTaken = difInLiquids * tile.liquidType.getDamage();
+//					int roundedDamage = (int) (damageTaken + 1);
+//					if (roundedDamage >= 1) {
+//						plant.takeDamage(roundedDamage);
+//					}
+//				}
+//			} else {
+//				int totalDamage = 0;
+//				double modifierDamage = 0;
+//				
+//				//adds the damage of groundmodifier
+//				if(tile.getModifier() != null) {
+//					modifierDamage += tile.getModifier().getType().getDamage();
+//				}
+//				
+//				
+//				if(tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+//					if(plant.isAquatic() == false || tile.liquidType != LiquidType.WATER) {
+//						//adds damage of liquids
+//						double liquidDamage = tile.liquidAmount * tile.liquidType.getDamage();
+//						totalDamage += liquidDamage;
+//					}
+//				}
+//				if(plant.isAquatic() && tile.liquidType != LiquidType.WATER) {
+//					totalDamage += 5;
+//				}
+//				if(tile.getTerrain().isPlantable(tile.getTerrain()) == false && plant.getType().isDesertResistant() == false) {
+//					totalDamage += 5;
+//				}
+//				
+//				if(tile.getTerrain() == Terrain.GRASS && plant.getType().isDesertResistant() == true) {
+//					totalDamage += 5;
+//				}
+//				totalDamage = (int) (modifierDamage+totalDamage);
+//				if(totalDamage >= 1) {
+//					plant.takeDamage(totalDamage);
+//				}
+//			}
 			
 		}	
 	}
@@ -1223,7 +1229,7 @@ public class World {
 			//generates cactus
 			if(tile.getTerrain() == Terrain.SAND) {
 				if(Math.random() < 0.01) {
-					Plant plant = new Plant(PlantType.CACTUS, tile, getFaction(NO_FACTION_ID));
+					Plant plant = new Plant(Game.plantTypeMap.get("CACTUS"), tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(plant);
 					worldData.addPlant(plant);
 				}
@@ -1231,8 +1237,8 @@ public class World {
 			//generates land plants
 			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < BUSH_RARITY) {
 				double o = Math.random();
-				if(o < PlantType.BERRY.getRarity()) {
-					makePlantVein(tile, PlantType.BERRY, 6);
+				if(o < Game.plantTypeMap.get("BERRY").getRarity()) {
+					makePlantVein(tile, Game.plantTypeMap.get("BERRY"), 6);
 //					Plant p = new Plant(PlantType.BERRY, tile, getFaction(NO_FACTION_ID));
 //					tile.setHasPlant(p);
 //					worldData.addPlant(tile.getPlant());
@@ -1242,8 +1248,8 @@ public class World {
 			//generates water plants
 			if( Math.random() < WATER_PLANT_RARITY) {
 				double o = Math.random();
-				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()  && o < PlantType.CATTAIL.getRarity()) {
-					Plant p = new Plant(PlantType.CATTAIL, tile, getFaction(NO_FACTION_ID));
+				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()  && o < Game.plantTypeMap.get("CATTAIL").getRarity()) {
+					Plant p = new Plant(Game.plantTypeMap.get("CATTAIL"), tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(p);
 					worldData.addPlant(tile.getPlant());
 				}
@@ -1277,7 +1283,7 @@ public class World {
 				visited.put(ti, ti.getLocation().distanceTo(t.getLocation()) + Math.random() * 10);
 				search.add(ti);
 			}
-			if(type == PlantType.TREE) {
+			if(type == Game.plantTypeMap.get("TREE")) {
 				if ((potential.canPlant() || type.isDesertResistant()) && potential.getPlant() == null && potential.getTerrain() != Terrain.DIRT) {
 					Plant plant = new Plant(type, potential, getFaction(NO_FACTION_ID));
 					potential.setHasPlant(plant);
@@ -1306,10 +1312,7 @@ public class World {
 			}
 			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < t.liquidType.getMinimumDamageAmount() / 2)
 				if (Math.random() < tempDensity) {
-					makePlantVein(t, PlantType.TREE, 30);
-//					Plant plant = new Plant(PlantType.FOREST1, t, getFaction(NO_FACTION_ID));
-//					t.setHasPlant(plant);
-//					worldData.addPlant(plant);
+					makePlantVein(t, Game.plantTypeMap.get("TREE"), 30);
 				}
 		}
 		

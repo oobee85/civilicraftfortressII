@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.*;
 
+import game.components.Component;
 import utils.*;
 import world.*;
 
@@ -37,6 +38,9 @@ public class Building extends Thing implements Serializable {
 		this.isPlanned = false;
 		this.inventory = new Inventory();
 		setRoadCorner(Direction.ALL_DIRECTIONS);
+		for(Component c : buildingType.getComponents()) {
+			this.addComponent(c.getClass(), c);
+		}
 	}
 	public void setPlanned(boolean planned) {
 		isPlanned = planned;
@@ -62,9 +66,9 @@ public class Building extends Thing implements Serializable {
 		
 		if(World.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			Tile tile = getTile();
-			int tileDamage = (int)tile.computeTileDamage(this);
-			if (tileDamage != 0) {
-				this.takeDamage(tileDamage);
+			int[] tileDamage = tile.computeTileDamage();
+			for(int i = 0; i < tileDamage.length; i++) {
+				this.takeDamage(tileDamage[i], DamageType.values()[i]);
 			}
 		}
 
