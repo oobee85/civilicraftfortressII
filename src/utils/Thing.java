@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.List;
 
 import game.*;
+import game.components.*;
 import networking.server.*;
 import ui.graphics.opengl.*;
 import world.*;
@@ -13,15 +14,17 @@ public class Thing implements Serializable {
 	private transient static int idCounter = 0;
 	private int id;
 
-	private transient Faction faction;
 	private int factionID;
 	private double maxHealth;
 	private double health;
 	private boolean isDead;
-	private transient int timeLastDamageTaken = -1000;
 	private Tile tile;
-	private transient boolean isSelected;
 	
+	private transient HashMap<Class, Component> components = new HashMap<>();
+
+	private transient Faction faction;
+	private transient int timeLastDamageTaken = -1000;
+	private transient boolean isSelected;
 	private transient MipMap mipmap;
 	private transient TexturedMesh mesh;
 	
@@ -72,17 +75,41 @@ public class Thing implements Serializable {
 	public boolean isDead() {
 		return health <= 0 || isDead;
 	}
+	
+	public void addComponent(Class key, Component component) {
+		components.put(key, component);
+	}
+
+	public int applyResistance(int damage, DamageType type) {
+		if(components.containsKey(DamageResistance.class)) {
+			return ((DamageResistance)components.get(DamageResistance.class)).applyResistance(damage, type);
+		}
+		else {
+			return DamageResistance.applyDefaultResistance(damage, type);
+		}
+	}
+	public double applyResistance(double[] danger) {
+		if(components.containsKey(DamageResistance.class)) {
+			return ((DamageResistance)components.get(DamageResistance.class)).applyResistance(danger);
+		}
+		else {
+			return DamageResistance.applyDefaultResistance(danger);
+		}
+	}
+	
+	
 	/**
 	 * @return true if this is lethal damage, false otherwise
 	 */
-	public boolean takeDamage(int damage) {
+	public boolean takeDamage(int damage, DamageType type) {
 		boolean before = isDead();
-		health -= damage;
-		if(damage != 0) {
+		int totalDamage = applyResistance(damage, type);
+		health -= totalDamage;
+		if(totalDamage != 0) {
 			timeLastDamageTaken = World.ticks;
 			getFaction().gotAttacked(getTile());
+			addHitsplat(totalDamage);
 		}
-		addHitsplat(damage);
 		// Return true if isDead changed from false to true.
 		return !before && isDead();
 	}

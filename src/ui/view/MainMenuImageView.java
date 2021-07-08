@@ -46,7 +46,7 @@ public class MainMenuImageView extends JPanel {
 			}
 			index++;
 		}
-		for(PlantType type : PlantType.values()) {
+		for(PlantType type : Game.plantTypeList) {
 			if(draw(g, type.getMipMap(), index, delta)) {
 				return;
 			}

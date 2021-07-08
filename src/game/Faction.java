@@ -4,6 +4,7 @@ import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.Map.*;
+import java.util.concurrent.*;
 
 import utils.*;
 import world.*;
@@ -30,8 +31,8 @@ public class Faction implements Externalizable {
 	private LinkedList<AttackedNotification> attacked = new LinkedList<>();
 	private LinkedList<AttackedNotification> newAttacked = new LinkedList<>();
 	
-	private HashSet<Building> buildings = new HashSet<>();
-	private HashSet<Unit> units = new HashSet<>();
+	private Set<Building> buildings = Collections.newSetFromMap(new ConcurrentHashMap<>());
+	private Set<Unit> units = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	
 	private int id;
 	private Color color;
@@ -90,7 +91,7 @@ public class Faction implements Externalizable {
 	public void removeUnit(Unit unit) {
 		units.remove(unit);
 	}
-	public HashSet<Unit> getUnits() {
+	public Set<Unit> getUnits() {
 		return units;
 	}
 	public void addBuilding(Building building) {
@@ -99,7 +100,7 @@ public class Faction implements Externalizable {
 	public void removeBuilding(Building building) {
 		buildings.remove(building);
 	}
-	public HashSet<Building> getBuildings() {
+	public Set<Building> getBuildings() {
 		return buildings;
 	}
 	

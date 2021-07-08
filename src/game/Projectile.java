@@ -18,6 +18,8 @@ public class Projectile implements Externalizable {
 	private Unit source;
 	private int damage;
 	private int totalDistance;
+	private boolean fromGround;
+	private int ticksUntilLanding;
 	public int currentHeight = 0;
 
 	@Override
@@ -26,6 +28,7 @@ public class Projectile implements Externalizable {
 		targetTile = new Tile(TileLoc.readFromExternal(in), Terrain.DIRT);
 		tile = new Tile(TileLoc.readFromExternal(in), Terrain.DIRT);
 		damage = in.readInt();
+		fromGround = in.readBoolean();
 	}
 
 	@Override
@@ -34,6 +37,7 @@ public class Projectile implements Externalizable {
 		targetTile.getLocation().writeExternal(out);
 		tile.getLocation().writeExternal(out);
 		out.writeInt(damage);
+		out.writeBoolean(fromGround);
 	}
 	
 	/** used by Externalizable interface */
@@ -41,14 +45,20 @@ public class Projectile implements Externalizable {
 		
 	}
 	
-	public Projectile(ProjectileType type, Tile tile, Tile targetTile, Unit source, int damage) {
+	public Projectile(ProjectileType type, Tile tile, Tile targetTile, Unit source, int damage, boolean fromGround, int ticksUntilLanding) {
 		this.type = type;
 		this.tile = tile;
 		this.targetTile = targetTile;
 		this.source = source;
 		this.timeToMove = type.getSpeed();
 		this.damage = damage;
+		this.fromGround = fromGround;
+		this.ticksUntilLanding = ticksUntilLanding;
 		totalDistance = tile.getLocation().distanceTo(targetTile.getLocation());
+		updateCurrentHeight(totalDistance);
+	}
+	public Projectile(ProjectileType type, Tile tile, Tile targetTile, Unit source, int damage) {
+		this(type, tile, targetTile, source, damage, true, 0);
 	}
 	
 	public int getDamage() {
@@ -75,6 +85,9 @@ public class Projectile implements Externalizable {
 		if(timeToMove > 0) {
 			timeToMove -= 1;
 		}
+		if(ticksUntilLanding > 0) {
+			ticksUntilLanding -= 1;
+		}
 	}
 	
 	private void moveTo(Tile t) {
@@ -100,10 +113,18 @@ public class Projectile implements Externalizable {
 		}
 		moveTo(nextTile);
 		resetTimeToMove();
-		currentHeight = (int) (nextDistance * (totalDistance - nextDistance)*type.getSpeed());
+		updateCurrentHeight(nextDistance);
+	}
+	private void updateCurrentHeight(int nextDistance) {
+		if(fromGround) {
+			currentHeight = (int) (nextDistance * (totalDistance - nextDistance)*type.getSpeed() + ticksUntilLanding*3);
+		}
+		else {
+			currentHeight = nextDistance + ticksUntilLanding*3;
+		}
 	}
 	public boolean reachedTarget() {
-		return this.targetTile == this.tile;
+		return this.targetTile == this.tile && ticksUntilLanding <= 0;
 	}
 	public void setTile(Tile t) {
 		this.tile = t;
@@ -119,6 +140,9 @@ public class Projectile implements Externalizable {
 	}
 	public void resetTimeToMove() {
 		timeToMove = type.getSpeed();
+	}
+	public boolean getFromGround() {
+		return fromGround;
 	}
 	public Tile getTargetTile() {
 		return targetTile;

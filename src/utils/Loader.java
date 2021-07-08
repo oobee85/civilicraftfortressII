@@ -8,6 +8,7 @@ import java.util.Map.*;
 import org.json.*;
 
 import game.*;
+import game.components.*;
 import ui.*;
 import ui.graphics.opengl.*;
 import world.*;
@@ -19,6 +20,65 @@ public class Loader {
 			map.put(ItemType.valueOf(itemName), costObject.getInt(itemName));
 		}
 		return map;
+	}
+	
+	public static Set<Component> loadComponents(JSONObject obj) {
+		Set<Component> components = new HashSet<>();
+
+		if(obj.has("resistances")) {
+			JSONObject resistances = obj.getJSONObject("resistances");
+			int[] resistanceValues = DamageResistance.getDefaultResistance();
+			for(String typeString : resistances.keySet()) {
+				int value = resistances.getInt(typeString);
+				DamageType type = DamageType.valueOf(typeString);
+				resistanceValues[type.ordinal()] = value;
+			}
+			components.add(new DamageResistance(resistanceValues));
+		}
+		return components;
+	}
+	
+	public static void loadPlantType(HashMap<String, PlantType> plantTypeMap, ArrayList<PlantType> plantTypeList) {
+		String plantTypeString = Utils.readFile("costs/PlantType.json");
+		JSONObject obj = new JSONObject(plantTypeString);
+		JSONArray arr = obj.getJSONArray("planttypes");
+		for (int i = 0; i < arr.length(); i++) {
+			JSONObject plantTypeObject = arr.getJSONObject(i);
+
+			String name = plantTypeObject.getString("name");
+			String image = plantTypeObject.getString("image");
+			int health = plantTypeObject.getInt("health");
+			double rarity = plantTypeObject.getDouble("rarity");
+			String itemString = plantTypeObject.getString("harvestitem");
+			ItemType itemType = ItemType.valueOf(itemString);
+
+			String textureFile = image;
+			Mesh mesh = MeshUtils.defaultPlant;
+			if(plantTypeObject.has("mesh")) {
+				String meshString = plantTypeObject.getString("mesh");
+				mesh = MeshUtils.getMeshByFileName(meshString);
+				
+				if(plantTypeObject.has("texture")) {
+					textureFile = plantTypeObject.getString("texture");
+				}
+			}
+
+			HashSet<String> attributes = new HashSet<>();
+			if(plantTypeObject.has("attributes")) {
+				JSONArray attributelist = plantTypeObject.getJSONArray("attributes");
+				for(int j = 0; j < attributelist.length(); j++) {
+					attributes.add(attributelist.getString(j));
+				}
+			}
+
+			Set<Component> components = loadComponents(plantTypeObject);
+			PlantType plantType = new PlantType(name, image, mesh, textureFile, rarity, health, itemType, attributes);
+			plantType.getComponents().addAll(components);
+			
+			plantTypeMap.put(name, plantType);
+			plantTypeList.add(plantType);
+		}
+		
 	}
 	
 	public static void loadBuildingType(HashMap<String, BuildingType> buildingTypeMap, ArrayList<BuildingType> buildingTypeList) {
@@ -82,8 +142,10 @@ public class Loader {
 					textureFile = buildingTypeObject.getString("texture");
 				}
 			}
-			
+
+			Set<Component> components = loadComponents(buildingTypeObject);
 			BuildingType buildingType = new BuildingType(name, info, health, effort, image, mesh, textureFile, culture, vision, researchReq, cost, buildsunits, movespeed, attributes);
+			buildingType.getComponents().addAll(components);
 			buildingTypeMap.put(name, buildingType);
 			buildingTypeList.add(buildingType);
 		}
@@ -160,13 +222,26 @@ public class Loader {
 			int buildtime = statsObject.getInt("buildtime");
 			CombatStats combatStats = new CombatStats(health, movespeed, buildtime, healspeed);
 			
-			HashSet<String> attributes = new HashSet<>();;
+			HashSet<String> attributes = new HashSet<>();
 			if(unitTypeObject.has("attributes")) {
 				JSONArray attributelist = unitTypeObject.getJSONArray("attributes");
 				for(int j = 0; j < attributelist.length(); j++) {
 					attributes.add(attributelist.getString(j));
 				}
 			}
+			
+			// TODO resistances: { "heat":50, "cold":200 }
+//			DamageResistance damageResistance = null;
+//			if(unitTypeObject.has("resistances")) {
+//				int[] resistanceValues = DamageResistance.getDefaultResistance();
+//				JSONObject resistances = unitTypeObject.getJSONObject("resistances");
+//				for(String typeString : resistances.keySet()) {
+//					int value = resistances.getInt(typeString);
+//					DamageType type = DamageType.valueOf(typeString);
+//					resistanceValues[type.ordinal()] = value;
+//				}
+//				damageResistance = new DamageResistance(resistanceValues);
+//			}
 			
 			String researchReq = null;
 			if(unitTypeObject.has("research")) {
@@ -211,8 +286,9 @@ public class Loader {
 					textureFile = unitTypeObject.getString("texture");
 				}
 			}
-			
+			Set<Component> components = loadComponents(unitTypeObject);
 			UnitType unitType = new UnitType(name, image, mesh, textureFile, combatStats, attributes, researchReq, cost, items, targeting, attackStyles);
+			unitType.getComponents().addAll(components);
 			unitTypeMap.put(name, unitType);
 			unitTypeList.add(unitType);
 
@@ -326,9 +402,6 @@ public class Loader {
 			for(String unittypestring : type.unitsCanProduce()) {
 				type.unitsCanProduceSet().add(Game.unitTypeMap.get(unittypestring));
 			}
-		}
-		for(PlantType type : PlantType.values()) {
-			Game.plantTypeList.add(type);
 		}
 		for(ResearchType type : Game.researchTypeList) {
 			for(String req : type.researchRequirements) {

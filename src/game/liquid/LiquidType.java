@@ -50,6 +50,9 @@ public enum LiquidType {
 	public double getDamage() {
 		return damage;
 	}
+	public boolean isWater() {
+		return isWater;
+	}
 	public double getMinimumDamageAmount() {
 		return minimumDamageAmount;
 	}

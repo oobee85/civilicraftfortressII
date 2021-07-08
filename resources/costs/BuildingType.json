@@ -46,7 +46,9 @@
 		"health":1000,
 		"effort":200,
 		"attributes":["blocksmovement"],
-		"research":"MASONRY"},
+		"resistances": {"HEAT": 50},
+		"research":"MASONRY",
+	},
 	{
 		"name":"WALL_BRICK",
 		"info":"Blocks movement",
@@ -57,6 +59,7 @@
 		"health":5000,
 		"effort":500,
 		"attributes":["blocksmovement"],
+		"resistances": {"HEAT": 20},
 		"research":"ENGINEERING"},
 	{
 		"name":"GATE_WOOD",
@@ -79,6 +82,7 @@
 		"health":750,
 		"effort":400,
 		"attributes":["blocksmovement", "gate"],
+		"resistances": {"HEAT": 50},
 		"research":"ENGINEERING"},
 	{
 		"name":"GATE_BRICK",
@@ -90,6 +94,7 @@
 		"health":3750,
 		"effort":1000,
 		"attributes":["blocksmovement", "gate"],
+		"resistances": {"HEAT": 20},
 		"research":"MONARCHY"},
 	{
 		"name":"MINE",
