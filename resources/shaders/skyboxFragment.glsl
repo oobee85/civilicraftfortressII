@@ -1,7 +1,7 @@
 #version 330 core
 
 in vec3 passTextureCoord;
-in float brightness;
+in vec3 sunColorPass;
 
 out vec4 outColor;
 
@@ -9,6 +9,6 @@ uniform samplerCube textureSampler;
 
 void main() {
 	vec4 textureColor = texture(textureSampler, passTextureCoord);
-//	outColor = vec4(0, 0, 0, 1);
-	outColor = textureColor * brightness;
+	outColor = textureColor * vec4(sunColorPass, 1);
+
 }

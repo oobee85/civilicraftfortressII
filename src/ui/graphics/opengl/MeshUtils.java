@@ -246,7 +246,7 @@ public class MeshUtils {
 	
 	static {
 		cube = getMeshByFileName("models/cube.obj");
-		skybox = getMeshByFileName("models/skybox.obj");
+		skybox = getMeshByFileName("models/skybox.ply");
 		skybox.normalize(true);
 		square = getMeshByFileName("models/square.obj");
 		cattail = getMeshByFileName("models/cattail.ply");
