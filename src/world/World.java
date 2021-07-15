@@ -1409,7 +1409,7 @@ public class World {
 		reseedTerrain(PerlinNoise.DEFAULT_SEED);
 
 		int numTiles = width*height;
-//		Generation.makeLake(numTiles * 1, this);
+		Generation.makeLake(numTiles * 1, this);
 		Generation.makeLake(numTiles * 2, this);
 		Generation.makeLake(numTiles * 4, this);
 		Generation.makeLake(numTiles * 8, this);
