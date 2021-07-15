@@ -1372,6 +1372,7 @@ public class World {
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		volcano = Generation.makeVolcano(this, heightMap);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
+		Generation.addCliff(heightMap);
 
 		for(Tile tile : getTiles()) {
 			tile.setFaction(getFaction(NO_FACTION_ID));

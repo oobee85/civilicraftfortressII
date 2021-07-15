@@ -16,6 +16,18 @@ public class Generation {
 		return (float) Utils.getRandomNormalF(5);
 	}
 	
+	public static void addCliff(float[][] heightmap) {
+		int x = (int)(Math.random()*heightmap.length);
+		int y = (int)(Math.random()*heightmap[x].length);
+		
+		for(int i = 0; i < 20 && x + i < heightmap.length; i++) {
+			int yy = y + i/3;
+			if(yy - 1 >= 0) {
+				heightmap[x + i][yy] /= 2;
+			}
+		}
+		
+	}
 	public static float[][] generateHeightMap(long seed, int smoothingRadius, int width, int height) {
 		int power = 1;
 		while(power < width || power < height) {
