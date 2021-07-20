@@ -406,6 +406,8 @@ public class GameView {
 		}
 		if (state.leftClickAction == LeftClickAction.WEATHER) {
 			game.spawnWeather(tile, 3);
+		} else if (state.leftClickAction == LeftClickAction.PRESSURE) {
+			game.increasePressure(tile, 3);
 		} else if (state.leftClickAction == LeftClickAction.SET_TERRITORY) {
 			game.setTerritory(tile, 2, state.faction);
 		}
@@ -598,7 +600,10 @@ public class GameView {
 		state.leftClickAction = LeftClickAction.SPAWN_THING;
 		state.selectedThingToSpawn = thingType;
 	}
-
+	
+	public void increasePressure(boolean raising) {
+		state.leftClickAction = LeftClickAction.PRESSURE;
+	}
 	public void setWeather(boolean raising) {
 		state.leftClickAction = LeftClickAction.WEATHER;
 	}

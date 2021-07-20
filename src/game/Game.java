@@ -850,6 +850,15 @@ public class Game {
 //			t.setHeight(height);
 		}
 	}
+	public void increasePressure(Tile center, int radius) {
+		HashSet<Tile> tiles = world.getNeighborsInRadius(center, radius);
+		for(Tile t: tiles) {
+			t.getAir().decreaseVolumePerTile(500);
+//			double distance = t.getLocation().distanceTo(center.getLocation());
+//			float height = (float) (t.getHeight() + (radius - distance) / (radius) * 0.1);
+//			t.setHeight(height);
+		}
+	}
 	public void setTerritory(Tile center, int radius, Faction faction) {
 		HashSet<Tile> tiles = world.getNeighborsInRadius(center, radius);
 		for(Tile t: tiles) {

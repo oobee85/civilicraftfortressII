@@ -4,12 +4,14 @@ import java.awt.Image;
 
 public enum Direction {
 	
-	NORTH(0, -1, "Images/interfaces/arrow_north.png"),
-	NORTHEAST(1, 0.5, "Images/interfaces/arrow_upright.png"),
-	SOUTHEAST(1, -0.5, "Images/interfaces/arrow_botright.png"),
-	SOUTH(0, 1, "Images/interfaces/arrow_bot.png"),
-	SOUTHWEST(-1, -0.5, "Images/interfaces/arrow_botleft.png"),
-	NORTHWEST(-1, 0.5, "Images/interfaces/arrow_upleft.png"),
+	NORTH		(0, -1, "Images/interfaces/arrow_north.png"),
+	NORTHEAST	(1, 0.5, "Images/interfaces/arrow_upright.png"),
+	NORTHWEST	(-1, 0.5, "Images/interfaces/arrow_upleft.png"),
+	
+	SOUTH		(0, 1, "Images/interfaces/arrow_bot.png"),
+	SOUTHEAST	(1, -0.5, "Images/interfaces/arrow_botright.png"),
+	SOUTHWEST	(-1, -0.5, "Images/interfaces/arrow_botleft.png"),
+	
 	UP(0, 0, "Images/interfaces/arrow_up.png"),
 	DOWN(0, 0, "Images/interfaces/arrow_down.png"),
 	NONE(0, 0, "Images/interfaces/arrow_none.png")

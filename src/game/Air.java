@@ -18,6 +18,7 @@ public class Air {
 	private boolean canRain;
 	private double volumeChange;
 	private Direction flowDirection;
+	private double tileVolume;
 	
 	
 	public Air(double height, double temp) {
@@ -33,6 +34,7 @@ public class Air {
 		this.updateHumidity();
 		this.flowDirection = Direction.NONE;
 		this.energy = 0;
+		this.tileVolume = World.VOLUMEPERTILE;
 		
 	}
 	
@@ -114,6 +116,14 @@ public class Air {
 	public void addMass(double mass) {
 		this.mass += mass;
 	}
+	public void decreaseVolumePerTile(double volume) {
+//		if(this.tileVolume > 0) {
+		System.out.println("working");
+			this.tileVolume += volume;
+			this.energy += 10000;
+//		}
+		
+	}
 	public void updatePressure() {
 		
 		
@@ -129,12 +139,12 @@ public class Air {
 //		double sub = boltz * temp;
 		
 		double sub = R * (temp + Math.abs(World.MINTEMP));
-		double standardPVNRT = World.STARTINGMASS * sub / World.VOLUMEPERTILE;
+		double standardPVNRT = World.STARTINGMASS * sub / tileVolume;
 		
 		double power = (-g * MMair * (h - h0)) / sub;
 		double pressure = P0 * Math.pow(Math.E, power);
 		
-		double pvnrt = mass * sub / World.VOLUMEPERTILE;
+		double pvnrt = mass * sub / tileVolume;
 		double mix = pressure+(pvnrt - standardPVNRT);
 //		System.out.println("Pressure: " + pressure);
 //		System.out.println("pvnrt: "+other + "atm: "+pressure);

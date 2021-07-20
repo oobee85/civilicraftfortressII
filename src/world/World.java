@@ -848,30 +848,35 @@ public class World {
 				double deltap = 1 - opress / mypress;
 				double deltavol = Math.sqrt((myvolume - ovolume)*deltap);
 				
+				
+				Direction attemptFlow = Direction.getDirection(tileLoc, otherLoc);
+				Direction oldFlow = tileAir.getFlowDirection();
+				double directionValue = Math.abs(oldFlow.deltay() + attemptFlow.deltay());
+				if (directionValue == 0.5 || directionValue == 2) {
+
 //				if(mycombined > ocombined && Math.abs(deltavol) > 0.002) {
-				if(mypress > opress*1.001 && myvolume > ovolume && Math.abs(deltavol) > 0.0015) {
-					
-					Direction direction = Direction.getDirection(tileLoc, otherLoc);
-					tileAir.setFlowDirection(direction);
+					if (mypress > opress * 1.001 && myvolume > ovolume && Math.abs(deltavol) > 0.0015) {
+
+						tileAir.setFlowDirection(attemptFlow);
 //					double deltap = 1 - opress / mypress;
 //					double deltavol = Math.sqrt((myvolume - ovolume)*deltap);
 //					System.out.println(deltavol);
-					if(volumeTemp[tileLoc.x()][tileLoc.y()] - deltavol > 0) {
-						volumeTemp[otherLoc.x()][otherLoc.y()] += deltavol;
-						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltavol;
-						transferred = true;
-					}
-					
-					double deltae = myenergy - oenergy;
-					double ratio = myenergy / deltavol;
-//					double ratio = oenergy / myenergy * Math.sqrt(deltae);
-					energyTemp[otherLoc.x()][otherLoc.y()] += ratio;
-					energyTemp[tileLoc.x()][tileLoc.y()] -= ratio;
+						if (volumeTemp[tileLoc.x()][tileLoc.y()] - deltavol > 0) {
+							volumeTemp[otherLoc.x()][otherLoc.y()] += deltavol;
+							volumeTemp[tileLoc.x()][tileLoc.y()] -= deltavol;
+							transferred = true;
+						}
 
-				}else if (Math.abs(deltavol) <= 0.0015){
-					tileAir.setFlowDirection(Direction.NONE);
+						double deltae = myenergy - oenergy;
+						double ratio = myenergy / deltavol;
+//					double ratio = oenergy / myenergy * Math.sqrt(deltae);
+						energyTemp[otherLoc.x()][otherLoc.y()] += ratio;
+						energyTemp[tileLoc.x()][tileLoc.y()] -= ratio;
+
+//				}else if (Math.abs(deltavol) <= 0.0015){
+//					tileAir.setFlowDirection(Direction.NONE);
+					}
 				}
-				
 				if(transferred == true) {
 					break;
 				}

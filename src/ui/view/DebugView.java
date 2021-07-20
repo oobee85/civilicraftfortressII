@@ -90,6 +90,7 @@ public class DebugView {
 			
 			}
 		});
+		
 
 		JButton makeItDry = KUIConstants.setupButton("Drought", null, DEBUG_BUTTON_SIZE);
 		makeItDry.addActionListener(new ActionListener() {
@@ -112,6 +113,13 @@ public class DebugView {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gameView.setWeather(true);
+			}
+		});
+		JButton increasePressure = KUIConstants.setupButton("pressure", RAIN_ICON, DEBUG_BUTTON_SIZE);
+		increasePressure.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameView.increasePressure(true);
 			}
 		});
 		JButton setTerritoryButton = KUIConstants.setupButton("Set Territory", null, DEBUG_BUTTON_SIZE);
@@ -254,6 +262,7 @@ public class DebugView {
 		scrollingPanel.add(setPlayerFaction);
 		scrollingPanel.add(researchEverything);
 		scrollingPanel.add(raiseHeight);
+		scrollingPanel.add(increasePressure);
 		scrollingPanel.add(setTerritoryButton);
 //		scrollingPanel.add(save); // doesnt currently work
 		scrollingPanel.add(exit);
