@@ -9,7 +9,7 @@ Download and run client.jar from [https://github.com/oobee85/civilicraftfortress
 
 ---
 
-## Devolopers
+## Developers
 
 Feel free to explore the code base and make contributions however you see fit but be aware that documentation is slim and sparse.
 
