@@ -202,6 +202,8 @@
 	},
 	{
 		"image":"Images/units/deer.png",
+		"mesh":"models/deer.ply",
+		"texture":"textures/pallet1.png",
 		"stats":{"movespeed":5,"buildtime":0,"health":200,"healspeed":50},
 		"name":"DEER",
 		"attackstyles":[
