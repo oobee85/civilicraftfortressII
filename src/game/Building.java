@@ -7,27 +7,25 @@ import java.util.List;
 
 import javax.swing.*;
 
-import game.components.Component;
+import game.components.GameComponent;
 import utils.*;
 import world.*;
 
 public class Building extends Thing implements Serializable {
+
+	public transient static final double CULTURE_AREA_MULTIPLIER = 0.1;
 	
 	private BuildingType buildingType;
 	private double remainingEffort;
 	private LinkedList<Unit> producingUnitList = new LinkedList<Unit>();
 	private double culture;
-	public transient static double CULTURE_AREA_MULTIPLIER = 0.1;
 	private transient Tile spawnLocation;
 	private transient double timeToHarvest;
-	private transient int maxItemAmount = 18;
 	private transient double baseTimeToHarvest = 20;
 	private boolean isPlanned;
 
 	private int remainingEffortToProduceUnit;
 	private transient Unit currentProducingUnit;
-	
-	private Inventory inventory;
 	
 	public Building(BuildingType buildingType, Tile tile, Faction faction) {
 		super(buildingType.getHealth(), buildingType.getMipMap(), buildingType.getMesh(), faction, tile);
@@ -36,9 +34,8 @@ public class Building extends Thing implements Serializable {
 		this.spawnLocation = tile;
 		this.timeToHarvest = baseTimeToHarvest;
 		this.isPlanned = false;
-		this.inventory = new Inventory();
 		setRoadCorner(Direction.ALL_DIRECTIONS);
-		for(Component c : buildingType.getComponents()) {
+		for(GameComponent c : buildingType.getComponents()) {
 			this.addComponent(c.getClass(), c);
 		}
 	}
@@ -47,18 +44,6 @@ public class Building extends Thing implements Serializable {
 	}
 	public boolean isPlanned() {
 		return isPlanned;
-	}
-	public Inventory getInventory() {
-		return inventory;
-	}
-	public boolean isFull() {
-		for(Item item: inventory.getItems()) {
-			if(item != null && this.inventory.getItemAmount(item.getType()) >= this.maxItemAmount) {
-				return true;
-			}
-		}
-		
-		return false;
 	}
 	public void tick(World world) {
 		updateInProgressUnit();
@@ -92,6 +77,7 @@ public class Building extends Thing implements Serializable {
 		if(getType() == Game.buildingTypeMap.get("CASTLE")) {
 			getFaction().spendResearch(20);
 			getFaction().getInventory().addItem(ItemType.FOOD, 1);
+			getFaction().getInventory().takeAll(this.getInventory());
 		}
 		if(getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
 			getFaction().spendResearch(20);
@@ -102,7 +88,7 @@ public class Building extends Thing implements Serializable {
 		if(getType() == Game.buildingTypeMap.get("WINDMILL")) {
 			getFaction().getInventory().addItem(ItemType.FOOD, 8);
 		}
-		if(getType() == Game.buildingTypeMap.get("FARM") && getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
+		if(getType() == Game.buildingTypeMap.get("STABLES") && getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
 			getFaction().getInventory().addItem(ItemType.HORSE, 1);
 			getFaction().getInventory().addItem(ItemType.FOOD, 1);
 		}

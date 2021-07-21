@@ -20,7 +20,7 @@ public class Thing implements Serializable {
 	private boolean isDead;
 	private Tile tile;
 	
-	private transient HashMap<Class, Component> components = new HashMap<>();
+	private transient HashMap<Class, GameComponent> components = new HashMap<>();
 
 	private transient Faction faction;
 	private transient int timeLastDamageTaken = -1000;
@@ -76,8 +76,16 @@ public class Thing implements Serializable {
 		return health <= 0 || isDead;
 	}
 	
-	public void addComponent(Class key, Component component) {
-		components.put(key, component);
+	public void addComponent(Class key, GameComponent component) {
+		components.put(key, component.instance());
+	}
+	
+	public boolean hasInventory() {
+		return components.containsKey(Inventory.class);
+	}
+	
+	public Inventory getInventory() {
+		return (Inventory) components.get(Inventory.class);
 	}
 
 	public int applyResistance(int damage, DamageType type) {

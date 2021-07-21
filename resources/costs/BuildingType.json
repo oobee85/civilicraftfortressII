@@ -115,10 +115,11 @@
 		"culture":0.5,
 		"health":300,
 		"attributes":["colony"],
+		"inventory":{"maxstack":20},
 		"effort":200},
 		
 	{
-		"name":"IRRIGATION",
+		"name":"FARM",
 		"info":"Workers harvest food from here",
 		"image":"Images/buildings/irrigation.png",
 		"mesh":"models/flatcube.obj",
@@ -161,10 +162,11 @@
 		"cost":{"WOOD":100, "STONE":50},
 		"culture":0,
 		"attributes":["colony"],
+		"inventory":{"maxstack":20},
 		"health":250,
 		"effort":250},
 	{
-		"name":"FARM",
+		"name":"STABLES",
 		"info":"Trap a horse to breed horses",
 		"image":"Images/buildings/farm.png",
 		"vision":1,
@@ -207,8 +209,9 @@
 		"attributes":["castle"],
 		"health":1000,
 		"effort":1000,
-		"research":"MASONRY"},
-	{
+		"research":"MASONRY",
+		"inventory":{"maxstack":1000},
+	}, {
 		"name":"BARRACKS",
 		"info":"Produces basic combat units",
 		"image":"Images/buildings/barracks256.png",

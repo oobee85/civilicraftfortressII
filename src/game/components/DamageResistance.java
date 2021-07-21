@@ -2,7 +2,7 @@ package game.components;
 
 import game.*;
 
-public class DamageResistance extends Component {
+public class DamageResistance extends GameComponent {
 	
 	public static final int BASE_RESISTANCE = 100;
 	public static final int[] DEFAULT_RESISTANCE = getDefaultResistance();
@@ -10,6 +10,10 @@ public class DamageResistance extends Component {
 	private int[] resistance;
 	public DamageResistance(int[] resistance) {
 		this.resistance = resistance;
+	}
+	
+	public GameComponent instance() {
+		return new DamageResistance(resistance.clone());
 	}
 	
 	public boolean isVulnerableTo(DamageType type) {

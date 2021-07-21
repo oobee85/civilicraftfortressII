@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import game.*;
+import game.components.*;
 import game.liquid.*;
 import utils.*;
 

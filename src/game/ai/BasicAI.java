@@ -9,7 +9,7 @@ import utils.*;
 import world.*;
 
 public class BasicAI implements AIInterface {
-	private static final BuildingType IRRIGATION = Game.buildingTypeMap.get("IRRIGATION");
+	public static final BuildingType FARM = Game.buildingTypeMap.get("FARM");
 	
 	private static final int MAX_BUILD_RADIUS = 10;
 	private static final int MAX_SEARCH_RADIUS = 40;
@@ -292,10 +292,10 @@ public class BasicAI implements AIInterface {
 	private boolean irrigate(Unit unit) {
 		// look for already built irrigations first
 		Tile existingIrrigation = getTargetTile(state.castle.getTile(), 2, MAX_BUILD_RADIUS, e -> {
-			return e.hasBuilding() && e.getBuilding().getType() == IRRIGATION;
+			return e.hasBuilding() && e.getBuilding().getType() == FARM;
 		});
 		if(existingIrrigation != null) {
-			return null != buildAndHarvest(unit, existingIrrigation, IRRIGATION);
+			return null != buildAndHarvest(unit, existingIrrigation, FARM);
 		}
 		
 		// otherwise build a new irrigation nearby
@@ -305,7 +305,7 @@ public class BasicAI implements AIInterface {
 		if(tile == null) {
 			return false;
 		}
-		Building building = buildAndHarvest(unit, tile, IRRIGATION);
+		Building building = buildAndHarvest(unit, tile, FARM);
 		return building != null;
 	}
 	private Building buildAndHarvest(Unit unit, Tile tile, BuildingType type) {

@@ -513,7 +513,7 @@ public class GameView {
 						commandInterface.deliver(unit, targetBuilding, !shiftDown);
 					}
 					else if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
-							&& targetBuilding.isBuilt() && targetBuilding.getInventory().isEmpty() == false) {
+							&& targetBuilding.isBuilt() && targetBuilding.hasInventory() && !targetBuilding.getInventory().isEmpty()) {
 						commandInterface.takeItems(unit, targetBuilding, !shiftDown);
 					}else {
 						commandInterface.moveTo(unit, targetTile, !shiftDown);
@@ -535,7 +535,12 @@ public class GameView {
 							&& !targetBuilding.isBuilt()) {
 						commandInterface.buildThing(unit, targetBuilding.getTile(), targetBuilding.getType().isRoad(),
 								!shiftDown);
-					} else if (targetTile.getPlant() != null && targetTile.getPlant().isDead() == false) {
+					}
+					else if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction() 
+							&& targetBuilding.getType().isCastle() && unit.hasInventory()) {
+						commandInterface.deliver(unit, targetBuilding, !shiftDown);
+					}
+					else if (targetTile.getPlant() != null && targetTile.getPlant().isDead() == false) {
 						commandInterface.harvestThing(unit, targetTile.getPlant(), !shiftDown);
 					} else {
 						commandInterface.moveTo(unit, targetTile, !shiftDown);

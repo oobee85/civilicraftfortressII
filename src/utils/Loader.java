@@ -22,8 +22,8 @@ public class Loader {
 		return map;
 	}
 	
-	public static Set<Component> loadComponents(JSONObject obj) {
-		Set<Component> components = new HashSet<>();
+	public static Set<GameComponent> loadComponents(JSONObject obj) {
+		Set<GameComponent> components = new HashSet<>();
 
 		if(obj.has("resistances")) {
 			JSONObject resistances = obj.getJSONObject("resistances");
@@ -34,6 +34,16 @@ public class Loader {
 				resistanceValues[type.ordinal()] = value;
 			}
 			components.add(new DamageResistance(resistanceValues));
+		}
+		if(obj.has("inventory")) {
+			JSONObject inventoryProperties = obj.getJSONObject("inventory");
+			if(!inventoryProperties.has("maxstack")) {
+				System.err.println("ERROR inventory does not have maxstack defined.");
+				return null;
+			}
+			int maxStack = inventoryProperties.getInt("maxstack");
+			Inventory inventory = new Inventory(maxStack);
+			components.add(inventory);
 		}
 		return components;
 	}
@@ -71,7 +81,7 @@ public class Loader {
 				}
 			}
 
-			Set<Component> components = loadComponents(plantTypeObject);
+			Set<GameComponent> components = loadComponents(plantTypeObject);
 			PlantType plantType = new PlantType(name, image, mesh, textureFile, rarity, health, itemType, attributes);
 			plantType.getComponents().addAll(components);
 			
@@ -143,7 +153,7 @@ public class Loader {
 				}
 			}
 
-			Set<Component> components = loadComponents(buildingTypeObject);
+			Set<GameComponent> components = loadComponents(buildingTypeObject);
 			BuildingType buildingType = new BuildingType(name, info, health, effort, image, mesh, textureFile, culture, vision, researchReq, cost, buildsunits, movespeed, attributes);
 			buildingType.getComponents().addAll(components);
 			buildingTypeMap.put(name, buildingType);
@@ -286,7 +296,7 @@ public class Loader {
 					textureFile = unitTypeObject.getString("texture");
 				}
 			}
-			Set<Component> components = loadComponents(unitTypeObject);
+			Set<GameComponent> components = loadComponents(unitTypeObject);
 			UnitType unitType = new UnitType(name, image, mesh, textureFile, combatStats, attributes, researchReq, cost, items, targeting, attackStyles);
 			unitType.getComponents().addAll(components);
 			unitTypeMap.put(name, unitType);

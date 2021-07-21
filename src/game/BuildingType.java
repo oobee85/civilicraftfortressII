@@ -6,7 +6,7 @@ import java.util.*;
 
 import javax.swing.*;
 
-import game.components.Component;
+import game.components.GameComponent;
 import ui.graphics.*;
 import ui.graphics.opengl.*;
 import utils.*;
@@ -31,7 +31,7 @@ public class BuildingType implements Serializable {
 	private transient final String[] canProduce;
 	private transient final HashSet<UnitType> canProduceSet = new HashSet<>();
 	private transient HashMap<String, Image> roadImages;
-	private transient final Set<Component> components = new HashSet<>();
+	private transient final Set<GameComponent> components = new HashSet<>();
 	
 
 	
@@ -57,7 +57,7 @@ public class BuildingType implements Serializable {
 		}
 	}
 	
-	public Set<Component> getComponents() {
+	public Set<GameComponent> getComponents() {
 		return components;
 	}
 	public HashSet<UnitType> unitsCanProduceSet() {

@@ -23,7 +23,7 @@ public class UnitType implements Serializable {
 	private transient final TargetInfo[] targetingInfoStrings;
 	private transient final ArrayList<TargetingInfo> targetingInfo = new ArrayList<>();
 	private transient final LinkedList<AttackStyle> attackStyles;
-	private transient final Set<Component> components = new HashSet<>();
+	private transient final Set<GameComponent> components = new HashSet<>();
 
 	public UnitType(String name, String image, Mesh mesh, String textureFile, CombatStats cs, 
 	                HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, 
@@ -95,7 +95,7 @@ public class UnitType implements Serializable {
 		return cost;
 	}
 	
-	public Set<Component> getComponents() {
+	public Set<GameComponent> getComponents() {
 		return components;
 	}
 	

@@ -9,7 +9,8 @@
 			{"damage":0, "cooldown":60, "range":1}
 		],
 		"name":"WORKER",
-		"attributes":["builder"]
+		"attributes":["builder"],
+		"inventory":{"maxstack":18},
 	},
 	{
 		"image":"Images/units/warrior.png",
@@ -141,6 +142,7 @@
 			{"damage":0, "cooldown":60, "range":1}
 		],
 		"attributes":["caravan"],
+		"inventory":{"maxstack":18},
 	},
 	{
 		"image":"Images/units/wizard.png",

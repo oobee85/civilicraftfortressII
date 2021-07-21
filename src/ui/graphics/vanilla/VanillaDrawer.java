@@ -1,6 +1,7 @@
 package ui.graphics.vanilla;
 
 import java.awt.*;
+import java.awt.Component;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
@@ -11,6 +12,7 @@ import java.util.concurrent.*;
 import javax.swing.*;
 
 import game.*;
+import game.components.*;
 import game.liquid.*;
 import ui.*;
 import ui.graphics.*;
@@ -282,7 +284,8 @@ public class VanillaDrawer extends Drawer {
 			drawSelectedThings((Graphics2D) g, lowerX, lowerY, upperX, upperY);
 
 			for (Building building : game.world.getBuildings()) {
-				drawInventory(g, building.getTile(), building.getInventory());
+				if(building.hasInventory())
+					drawInventory(g, building.getTile(), building.getInventory());
 				drawHealthBar(g, building);
 				drawHitsplat(g, building);
 			}
@@ -291,7 +294,8 @@ public class VanillaDrawer extends Drawer {
 				drawHitsplat(g, plant);
 			}
 			for (Unit unit : game.world.getUnits()) {
-				drawInventory(g, unit.getTile(), unit.getInventory());
+				if(unit.hasInventory())
+					drawInventory(g, unit.getTile(), unit.getInventory());
 				drawHealthBar(g, unit);
 				drawHitsplat(g, unit);
 			}

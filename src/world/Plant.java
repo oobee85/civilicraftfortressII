@@ -13,7 +13,7 @@ public class Plant extends Thing implements Serializable {
 	public Plant(PlantType pt, Tile t, Faction faction) {
 		super(pt.getHealth(), pt.getMipMap(), pt.getMesh(), faction, t);
 		plantType = pt;
-		for(Component c : plantType.getComponents()) {
+		for(GameComponent c : plantType.getComponents()) {
 			this.addComponent(c.getClass(), c);
 		}
 	}
