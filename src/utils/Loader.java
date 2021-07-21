@@ -291,10 +291,6 @@ public class Loader {
 			unitType.getComponents().addAll(components);
 			unitTypeMap.put(name, unitType);
 			unitTypeList.add(unitType);
-
-			if(unitType.isDelayedInvasion()) {
-				System.out.println(unitType + " has delayed invasion");
-			}
 		}
 	}
 	

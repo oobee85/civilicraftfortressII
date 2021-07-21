@@ -96,12 +96,12 @@ public class MeshUtils {
 			ArrayList<Integer> faces = new ArrayList<>();
 			while ((reader = ply.nextElementReader()) != null) {
 				ElementType type = reader.getElementType();
-				System.out.println(type.getName());
+//				System.out.println(type.getName());
 
 				HashSet<String> properties = new HashSet<>();
 				for (Property p : type.getProperties()) {
 					properties.add(p.getName());
-					System.out.println(p.getName() + ": " + p.getType().toString());
+//					System.out.println(p.getName() + ": " + p.getType().toString());
 				}
 
 				boolean hasTextureCoords = false;
@@ -109,7 +109,7 @@ public class MeshUtils {
 					hasTextureCoords = true;
 				}
 				if (type.getName().equals("vertex")) {
-					System.out.println("reader has " + reader.getCount() + " elements");
+//					System.out.println("reader has " + reader.getCount() + " elements");
 					Element element;
 					while ((element = reader.readElement()) != null) {
 						Vector3f loc = new Vector3f((float) element.getDouble("x"), (float) element.getDouble("y"),
@@ -125,7 +125,7 @@ public class MeshUtils {
 						}
 					}
 				} else if (type.getName().equals("face")) {
-					System.out.println("reader has " + reader.getCount() + " elements");
+//					System.out.println("reader has " + reader.getCount() + " elements");
 					Element element;
 					String elementname = type.getProperties().get(0).getName();
 					while ((element = reader.readElement()) != null) {
@@ -139,6 +139,8 @@ public class MeshUtils {
 				}
 				reader.close();
 			}
+			System.out.println("Parsed '" + filename + "': " + 
+						vertexLocations.size() + " vertices, " + faces.size() + " faces");
 			return arraysToMesh(vertexLocations, textureMapping, faces);
 		} catch (IOException e) {
 			e.printStackTrace();
