@@ -88,7 +88,7 @@ public class Faction implements Externalizable {
 	
 	public boolean inRangeColony(Unit unit, Tile targetTile) {
 		for(Building building: buildings) {
-			if(building.getType().isColony()) {
+			if(building.getType().isColony() || building.getType().isCastle()) {
 				int radius = building.getType().getVisionRadius();
 				if(targetTile.getLocation().distanceTo(building.getTile().getLocation()) <= radius) {
 					return true;
