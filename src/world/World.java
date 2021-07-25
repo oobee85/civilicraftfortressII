@@ -855,7 +855,9 @@ public class World {
 				if (directionValue == 0.5 || directionValue == 2) {
 
 //				if(mycombined > ocombined && Math.abs(deltavol) > 0.002) {
-					if (mypress > opress * 1.001 && myvolume > ovolume && Math.abs(deltavol) > 0.0015) {
+					if (mypress > opress * 1.001 
+//							&& myvolume > ovolume 
+							&& Math.abs(deltavol) > 0.0015) {
 
 						tileAir.setFlowDirection(attemptFlow);
 //					double deltap = 1 - opress / mypress;
