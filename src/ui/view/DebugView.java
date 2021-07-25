@@ -35,7 +35,7 @@ public class DebugView {
 	public DebugView(GameView gameView) {
 		this.gameView = gameView;
 		
-		scrollingPanel = new ScrollingPanel(new Dimension(ClientGUI.GUIWIDTH, 500));
+		scrollingPanel = new ScrollingPanel(new Dimension(ClientGUI.GUIWIDTH, 700));
 		setupButtons();
 	}
 	

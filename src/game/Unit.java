@@ -371,16 +371,17 @@ public class Unit extends Thing implements Serializable {
 				building.takeDamage(3, DamageType.PHYSICAL);
 				getInventory().addItem(ItemType.FOOD, 3);
 				this.resetTimeToHarvest(1);
-			}else if(building.getType().name().equals("MINE")) {
-				building.takeDamage(1, DamageType.PHYSICAL);
-				if(building.getTile().getResource() != null) {
-					getInventory().addItem(building.getTile().getResource().getType().getItemType(), 1);
-					this.resetTimeToHarvest(building.getTile().getResource().getType().getTimeToHarvest());
-				}else {
-					getInventory().addItem(ItemType.STONE, 1);
-					this.resetTimeToHarvest(1);
-				}
 			}
+//			else if(building.getType().name().equals("MINE")) {
+//				building.takeDamage(1, DamageType.PHYSICAL);
+//				if(building.getTile().getResource() != null) {
+//					getInventory().addItem(building.getTile().getResource().getType().getItemType(), 1);
+//					this.resetTimeToHarvest(building.getTile().getResource().getType().getTimeToHarvest());
+//				}else {
+//					getInventory().addItem(ItemType.STONE, 1);
+//					this.resetTimeToHarvest(1);
+//				}
+//			}
 			if(getInventory().isFull()) {
 				action.setDone(true);
 			}

@@ -863,6 +863,7 @@ public class Game {
 		}
 	}
 
+	
 	public void toggleAutoBuild(ConcurrentLinkedQueue<Thing> selectedThings) {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
