@@ -44,6 +44,11 @@ public class PlannedAction {
 		this.target = target;
 		this.type = type;
 	}
+	public PlannedAction(Tile target, int type) {
+		this.targetTile = target;
+		this.target = null;
+		this.type = type;
+	}
 	public PlannedAction(Thing target, int type, PlannedAction followup) {
 		this.targetTile = null;
 		this.target = target;

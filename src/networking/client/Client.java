@@ -176,6 +176,10 @@ public class Client {
 				localCommands.harvestThing(unit, target, clearQueue);
 			}
 			@Override
+			public void harvestResource(Unit unit, Tile targetTile, boolean clearQueue) {
+				// TODO implement this.
+			}
+			@Override
 			public void deliver(Unit unit, Thing target, boolean clearQueue) {
 				sendMessage(CommandMessage.makeDeliverCommand(unit.id(), target.id(), clearQueue));
 				localCommands.deliver(unit, target, clearQueue);

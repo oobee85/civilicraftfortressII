@@ -523,9 +523,9 @@ public class GameView {
 				}
 				else if (unit.getType().isBuilder()) {
 					Building targetBuilding = targetTile.getBuilding();
-					if (targetTile.getResource() != null) {
-
-					}
+//					if (targetTile.getResource() != null) {
+//
+//					}
 					if (targetBuilding == null) {
 						targetBuilding = targetTile.getRoad();
 					}
@@ -544,7 +544,14 @@ public class GameView {
 					}
 					else if (targetTile.getPlant() != null && targetTile.getPlant().isDead() == false) {
 						commandInterface.harvestThing(unit, targetTile.getPlant(), !shiftDown);
-					} else {
+					}
+					else if(targetTile.getResource() != null && unit.getFaction().inRangeColony(unit, targetTile)) {
+						commandInterface.harvestResource(unit, targetTile, !shiftDown);
+					}
+					else if(targetTile.getTerrain() == Terrain.ROCK && unit.getFaction().inRangeColony(unit, targetTile)) {
+						commandInterface.harvestResource(unit, targetTile, !shiftDown);
+					}
+					else {
 						commandInterface.moveTo(unit, targetTile, !shiftDown);
 					}
 

@@ -397,7 +397,17 @@ public class Unit extends Thing implements Serializable {
 				action.setDone(true);
 			}
 		}
-		
+	}
+	public void doHarvest(Tile tile, PlannedAction action) {
+		if(readyToHarvest() && hasInventory()) {
+			//  figure out if harvest stone or ore
+			if(tile.getResource() != null && getFaction().areRequirementsMet(tile.getResource().getType())) {
+				getInventory().addItem(tile.getResource().getType().getItemType(), 1);
+			}
+			else if(tile.getTerrain() == Terrain.ROCK) {
+				getInventory().addItem(ItemType.STONE, 1);
+			}
+		}
 	}
 	public void doTake(PlannedAction action, Thing target) {
 		if(this.hasInventory()) {
@@ -497,11 +507,15 @@ public class Unit extends Thing implements Serializable {
 				didSomething = true;
 			}
 		}
-		else if(plan.isHarvestAction() && unitType.isBuilder() && inRange(plan.target) && plan.target instanceof Building) {
+		else if(plan.isHarvestAction() && unitType.isBuilder() && plan.targetTile != null && inRange(plan.targetTile)) {
+			this.doHarvest(plan.targetTile, plan);
+			didSomething = true;
+		}
+		else if(plan.isHarvestAction() && unitType.isBuilder() && inRange(plan.target) && plan.target != null && plan.target instanceof Building) {
 			this.doHarvestBuilding((Building)plan.target, plan);
 			didSomething = true;
 		}
-		else if(plan.isHarvestAction() && unitType.isBuilder() && inRange(plan.target) && plan.target instanceof Plant) {
+		else if(plan.isHarvestAction() && unitType.isBuilder() && inRange(plan.target) && plan.target != null && plan.target instanceof Plant) {
 			this.doHarvest((Plant)plan.target, plan);
 			didSomething = true;
 		}
