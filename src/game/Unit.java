@@ -4,13 +4,16 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import game.ai.*;
 import game.components.*;
 import game.pathfinding.*;
 import utils.*;
 import world.*;
 
 public class Unit extends Thing implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
+	
 	private UnitType unitType;
 	private transient double timeToMove;
 	private transient double timeToAttack;
@@ -25,11 +28,8 @@ public class Unit extends Thing implements Serializable {
 	
 	private transient boolean isHarvesting;
 	private transient double timeToHarvest;
-	private transient int maxItemAmount;
 	private transient double baseTimeToHarvest = 10;
 	private transient int ticksForFoodCost = 50;
-	
-	private Inventory inventory;
 	
 	public Unit(UnitType unitType, Tile tile, Faction faction) {
 		super(unitType.getCombatStats().getHealth(), unitType.getMipMap(), unitType.getMesh(), faction, tile);
@@ -37,12 +37,7 @@ public class Unit extends Thing implements Serializable {
 		this.combatStats = unitType.getCombatStats();
 		this.timeToHeal = unitType.getCombatStats().getHealSpeed();
 		this.isIdle = false;
-		this.inventory = new Inventory();
-		this.maxItemAmount = 20;
-		if(this.getType().isCaravan()) {
-			this.maxItemAmount = 1;
-		}
-		for(Component c : unitType.getComponents()) {
+		for(GameComponent c : unitType.getComponents()) {
 			this.addComponent(c.getClass(), c);
 		}
 	}
@@ -68,20 +63,9 @@ public class Unit extends Thing implements Serializable {
 		return passiveAction == PlannedAction.GUARD;
 	}
 	
-	public Inventory getInventory() {
-		return inventory;
-	}
-	
-	public boolean addItem(ItemType type, int amount) {
-		if(this.inventory.getItemAmount(type) >= this.maxItemAmount) {
-			return true;
-		}
-		this.inventory.addItem(type, amount);
-		return false;
-	}
 	public void setType(UnitType type) {
 		this.unitType = type;
-		for(Component c : type.getComponents()) {
+		for(GameComponent c : type.getComponents()) {
 			this.addComponent(c.getClass(), c);
 		}
 		this.setMipMap(this.getType().getMipMap());
@@ -223,7 +207,7 @@ public class Unit extends Thing implements Serializable {
 		}
 
 		// If on tile with an item, take the item
-		if (getFaction().usesItems() && this.getType().isBuilder()) {
+		if (this.hasInventory()) {
 			this.getInventory().takeAll(getTile().getInventory());
 		}
 	}
@@ -382,59 +366,51 @@ public class Unit extends Thing implements Serializable {
 	}
 	
 	public void doHarvestBuilding(Building building, PlannedAction action) {
-		if(readyToHarvest()) {
-			boolean isFull = false;
-			if(building.getType().name().equals("IRRIGATION")) {
+		if(readyToHarvest() && hasInventory()) {
+			if(building.getType() == BasicAI.FARM) {
 				building.takeDamage(3, DamageType.PHYSICAL);
-				isFull = this.addItem(ItemType.FOOD, 3);
+				getInventory().addItem(ItemType.FOOD, 3);
 				this.resetTimeToHarvest(1);
 			}else if(building.getType().name().equals("MINE")) {
 				building.takeDamage(1, DamageType.PHYSICAL);
 				if(building.getTile().getResource() != null) {
-					isFull = this.addItem(building.getTile().getResource().getType().getItemType(), 1);
+					getInventory().addItem(building.getTile().getResource().getType().getItemType(), 1);
 					this.resetTimeToHarvest(building.getTile().getResource().getType().getTimeToHarvest());
 				}else {
-					isFull = this.addItem(ItemType.STONE, 1);
+					getInventory().addItem(ItemType.STONE, 1);
 					this.resetTimeToHarvest(1);
 				}
 			}
-			if(isFull) {
+			if(getInventory().isFull()) {
 				action.setDone(true);
 			}
 		}
 	}
 	
 	public void doHarvest(Plant plant, PlannedAction action) {
-		if(readyToHarvest()) {
+		if(readyToHarvest() && hasInventory()) {
 			plant.takeDamage(2, DamageType.PHYSICAL);
-			boolean isFull = this.addItem(plant.getItem(), 1);
+			getInventory().addItem(plant.getItem(), 1);
 			this.resetTimeToHarvest(2);
-			if(isFull) {
+			if(getInventory().isFull()) {
 				action.setDone(true);
 			}
 		}
 		
 	}
 	public void doTake(PlannedAction action, Thing target) {
-		if(target instanceof Building) {
-			Building building = (Building) target;
-			this.inventory.takeAll(building.getInventory());
+		if(this.hasInventory()) {
+			this.getInventory().takeAll(target.getInventory());
 		}
 		action.setDone(true);
 	}
 	public void doDelivery(PlannedAction action, Thing target) {
 		if(target instanceof Building) {
 			Building building = (Building) target;
-			//stores inventory in colony
-			if(building.getType().isColony()) {
-				building.getInventory().takeAll(this.inventory);
-				
-				//stores inventory in faction inventory
-			}else if(building.getType().isCastle()) {
-				this.getFaction().getInventory().takeAll(this.inventory);
+			if(building.hasInventory()) {
+				building.getInventory().takeAll(this.getInventory());
 			}
 		}
-		
 		action.setDone(true);
 	}
 	
@@ -551,13 +527,13 @@ public class Unit extends Thing implements Serializable {
 //		}
 		if (!didSomething && isGuarding()) {
 			HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getMaxRange());
-			for (Tile tile : inrange) {
+			tilesloop: for (Tile tile : inrange) {
 				if (tile.getFaction() == getFaction()) {
 					for (Unit unit : tile.getUnits()) {
 						if (unit.getFaction() != this.getFaction() && unit.getType().isHostile() && unit != this) {
 							didSomething = didSomething || attack(unit);
 							if (didSomething) {
-								break;
+								break tilesloop;
 							}
 						}
 					}
@@ -625,11 +601,6 @@ public class Unit extends Thing implements Serializable {
 					this.getTile().getPlant().takeDamage(1, DamageType.PHYSICAL);
 					resetTimeToHarvest(1);
 				}
-			}
-			Building building = this.getTile().getBuilding();
-			if(building != null && building.getType().isColony()) {
-				this.getFaction().getInventory().takeAll(this.inventory);
-				
 			}
 		}
 		if (getType().isHealer()) {

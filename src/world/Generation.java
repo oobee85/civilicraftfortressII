@@ -16,6 +16,18 @@ public class Generation {
 		return (float) Utils.getRandomNormalF(5);
 	}
 	
+	public static void addCliff(float[][] heightmap) {
+		int x = (int)(Math.random()*heightmap.length);
+		int y = (int)(Math.random()*heightmap[x].length);
+		
+		for(int i = 0; i < 20 && x + i < heightmap.length; i++) {
+			int yy = y + i/3;
+			if(yy - 1 >= 0) {
+				heightmap[x + i][yy] /= 2;
+			}
+		}
+		
+	}
 	public static float[][] generateHeightMap(long seed, int smoothingRadius, int width, int height) {
 		int power = 1;
 		while(power < width || power < height) {
@@ -228,37 +240,17 @@ public class Generation {
 		PriorityQueue<TileLoc> queue = new PriorityQueue<TileLoc>((p1, p2) -> {
 			return (world.get(p1).getHeight() + world.get(p1).liquidAmount) - (world.get(p2).getHeight() + world.get(p2).liquidAmount) > 0 ? 1 : -1;
 		});
-		boolean[][] visited = new boolean[world.getWidth()][world.getHeight()];
-		queue.add(new TileLoc((int) (Math.random() * world.getWidth()), (int) (Math.random() * world.getHeight())));
+		TileLoc startingLoc = new TileLoc((int) (Math.random() * world.getWidth()), (int) (Math.random() * world.getHeight()));
+		queue.add(startingLoc);
 		while(!queue.isEmpty() && volume > 0) {
 			TileLoc next = queue.poll();
-			int i = next.x();
-			int j = next.y();
-			world.get(next).liquidAmount += 2;
-			volume -= 2;
-			// Add adjacent tiles to the queue
-			for(Tile t : world.get(next).getNeighbors()) {
-				if(!visited[t.getLocation().x()][t.getLocation().y()]) {
-					queue.add(t.getLocation());
-					visited[t.getLocation().x()][t.getLocation().y()] = true;
-				}
+			Tile tile = world.get(next);
+			tile.liquidAmount += 100;
+			volume -= 100;
+			queue.add(next);
+			for(Tile neighbor : tile.getNeighbors()) {
+				queue.add(neighbor.getLocation());
 			}
-//			if(i > 0 && !visited[i-1][j]) {
-//				queue.add(new TileLoc(i-1, j));
-//				visited[i-1][j] = true;
-//			}
-//			if(j > 0 && !visited[i][j-1]) {
-//				queue.add(new TileLoc(i, j-1));
-//				visited[i][j-1] = true;
-//			}
-//			if(i + 1 < world.getWidth() && !visited[i+1][j]) {
-//				queue.add(new TileLoc(i+1, j));
-//				visited[i+1][j] = true;
-//			}
-//			if(j + 1 < world.getHeight() && !visited[i][j+1]) {
-//				queue.add(new TileLoc(i, j+1));
-//				visited[i][j+1] = true;
-//			}
 		}
 	}
 	public static void generateWildLife(World world) {

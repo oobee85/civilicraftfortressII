@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.Map.*;
 import java.util.concurrent.*;
 
+import game.components.*;
 import utils.*;
 import world.*;
 

@@ -200,7 +200,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			Vector3f initPosition = new Vector3f(-1, 0, 0);
 			Vector3f result = rot.multiply(initPosition, 1);
 			sunDirection = result.multiply(-1).normalize();
-			sunColor.set(1f, 1f, 0.95f);
+			sunColor.set(1f, 1f, 0.96f);
 			float multiplier = (float)Math.max(World.getDaylight(), 0.1);
 			if(Game.DISABLE_NIGHT) {
 				multiplier = Math.min(1, multiplier);
@@ -209,7 +209,10 @@ public class GLDrawer extends Drawer implements GLEventListener {
 			float ambient = multiplier/2;
 			ambientColor.set(ambient, ambient, ambient);
 
-			renderSkybox(gl, skyboxShader, multiplier);
+			// skybox uses y up instead of z up
+			Matrix4f rot2 = Matrix4f.rotate(ratio * 360, new Vector3f(0, 0, -1));
+			Vector3f sunPosition = rot2.multiply(initPosition, 1);
+			renderSkybox(gl, skyboxShader, sunColor, sunPosition);
 			renderStuff(gl, shader);
 			renderLiquids(gl, liquidShader);
 		}
@@ -217,12 +220,13 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		gl.glFlush();
 	}
 	
-	public void renderSkybox(GL3 gl, Shader shader, float daylight) {
+	public void renderSkybox(GL3 gl, Shader shader, Vector3f sunColor, Vector3f sunDirection) {
 		gl.glDisable(GL2.GL_DEPTH_TEST);
 		skyboxShader.bind(gl);
 		skyboxShader.setUniform("projection", projection);
 		skyboxShader.setUniform("view", camera.getRotationMatrix().multiply(Camera.prerotateInv));
-		skyboxShader.setUniform("daylight", daylight);
+		skyboxShader.setUniform("sunColor", sunColor);
+		skyboxShader.setUniform("sunPosition", sunDirection);
 		MeshUtils.skybox.renderSkybox(gl, 
 				skyboxShader, 
 				skybox);

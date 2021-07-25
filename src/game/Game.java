@@ -530,10 +530,6 @@ public class Game {
 				}
 			}
 			building.tick(world);
-			if(building.isFull()) {
-//				spawnCaravan(building);
-			}
-			
 		}
 	}
 	

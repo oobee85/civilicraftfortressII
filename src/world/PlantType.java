@@ -17,7 +17,7 @@ public class PlantType implements Serializable {
 	private transient final double rarity;
 	private transient final ItemType itemType;
 	private transient final HashSet<String> attributes;
-	private transient final Set<Component> components = new HashSet<>();
+	private transient final Set<GameComponent> components = new HashSet<>();
 
 	public PlantType(String name, String image, Mesh mesh, String textureFile, 
 	                 double rare, double health, ItemType itemType, HashSet<String> attributes){
@@ -51,7 +51,7 @@ public class PlantType implements Serializable {
 	public double getRarity() {
 		return rarity;
 	}
-	public Set<Component> getComponents() {
+	public Set<GameComponent> getComponents() {
 		return components;
 	}
 	
