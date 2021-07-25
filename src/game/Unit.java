@@ -401,11 +401,19 @@ public class Unit extends Thing implements Serializable {
 	public void doHarvest(Tile tile, PlannedAction action) {
 		if(readyToHarvest() && hasInventory()) {
 			//  figure out if harvest stone or ore
+			ItemType itemType = null;
 			if(tile.getResource() != null && getFaction().areRequirementsMet(tile.getResource().getType())) {
-				getInventory().addItem(tile.getResource().getType().getItemType(), 1);
+				itemType = tile.getResource().getType().getItemType();
 			}
 			else if(tile.getTerrain() == Terrain.ROCK) {
-				getInventory().addItem(ItemType.STONE, 1);
+				itemType = ItemType.STONE;
+			}
+			if(itemType != null) {
+				getInventory().addItem(itemType, 1);
+				this.resetTimeToHarvest(2);
+				if(getInventory().isFull()) {
+					action.setDone(true);
+				}
 			}
 		}
 	}
