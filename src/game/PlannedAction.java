@@ -24,6 +24,12 @@ public class PlannedAction {
 	// for stuff like harvesting
 	private PlannedAction followup;
 	
+	
+	public PlannedAction(PlannedAction copy) {
+		this.targetTile = copy.targetTile;
+		this.target = copy.target;
+		this.type = copy.type;
+	}
 	public PlannedAction(Tile targetTile) {
 		this.targetTile = targetTile;
 		this.target = null;

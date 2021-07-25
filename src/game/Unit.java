@@ -562,18 +562,19 @@ public class Unit extends Thing implements Serializable {
 		//harvesting
 		if(finished.isHarvestAction()) {
 			Building building = getNearestBuildingToDeliver();
-			this.queuePlannedAction(new PlannedAction(building, PlannedAction.DELIVER, new PlannedAction(finished.target, PlannedAction.HARVEST)));
+			this.queuePlannedAction(new PlannedAction(building, PlannedAction.DELIVER, new PlannedAction(finished)));
 		}
 		else if(finished.isTakeAction()) {
 			Building castle = getNearestCastleToDeliver();
 			this.queuePlannedAction(new PlannedAction(castle, PlannedAction.DELIVER, new PlannedAction(finished.target, PlannedAction.TAKE)));
-		}else if(finished.isDeliverAction()) {
+		}
+		else if(finished.isDeliverAction()) {
 			PlannedAction followup = finished.getFollowUp();
 			if(followup == null) {
 				return;
 			}
 			//delivery
-			if(followup.target instanceof Plant) {
+			if(followup.target != null && followup.target instanceof Plant) {
 				Plant oldTarget = (Plant)followup.target;
 				if(oldTarget.isDead()) {
 					Plant newTarget = getNearestPlantToHarvest(followup.getTile(), oldTarget.getType());
@@ -581,11 +582,11 @@ public class Unit extends Thing implements Serializable {
 						followup = new PlannedAction(newTarget, PlannedAction.HARVEST);
 					}
 				}
-			}else if(followup.target instanceof Building) {
+			}
+			else if(followup.target instanceof Building) {
 //				if followup building dead, doesnt find new target
 			}
-			
-			if(followup != null && !followup.target.isDead()) {
+			else if(followup.targetTile != null) {
 				this.queuePlannedAction(followup);
 			}
 		}
