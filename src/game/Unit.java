@@ -296,7 +296,7 @@ public class Unit extends Thing implements Serializable {
 				}
 			}
 			else {
-				Attack.shoot(this, target, style);
+				AttackUtils.shoot(this, target, style);
 			}
 			resetTimeToAttack(style.getCooldown());
 			return true;

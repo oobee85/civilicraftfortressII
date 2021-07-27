@@ -437,7 +437,7 @@ public class Game {
 		UNDEAD_FACTION.getInventory().addItem(ItemType.FOOD, 999999);
 		world.addFaction(UNDEAD_FACTION);
 		
-		Attack.world = world;
+		AttackUtils.world = world;
 		world.generateWorld();
 		makeRoads(easymode);
 		world.clearDeadAndAddNewThings();

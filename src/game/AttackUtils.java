@@ -3,7 +3,7 @@ package game;
 import utils.*;
 import world.*;
 
-public class Attack {
+public class AttackUtils {
 	public static World world;
 
 	public static void shoot(Unit unit, Thing target, AttackStyle style) {
