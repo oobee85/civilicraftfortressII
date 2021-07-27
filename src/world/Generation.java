@@ -22,7 +22,7 @@ public class Generation {
 		
 		for(int i = 0; i < 20 && x + i < heightmap.length; i++) {
 			int yy = y + i/3;
-			if(yy - 1 >= 0) {
+			if(yy - 1 >= 0 && yy < heightmap[x+i].length) {
 				heightmap[x + i][yy] /= 2;
 			}
 		}
