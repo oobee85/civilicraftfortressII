@@ -115,7 +115,7 @@
 		"culture":0.5,
 		"health":300,
 		"attributes":["colony"],
-		"inventory":{"maxstack":20},
+		"inventory":{"maxstack":500},
 		"effort":200},
 		
 	{
@@ -162,7 +162,7 @@
 		"cost":{"WOOD":100, "STONE":50},
 		"culture":0,
 		"attributes":["colony"],
-		"inventory":{"maxstack":20},
+		"inventory":{"maxstack":500},
 		"health":250,
 		"effort":250},
 	{
@@ -210,7 +210,7 @@
 		"health":1000,
 		"effort":1000,
 		"research":"MASONRY",
-		"inventory":{"maxstack":1000},
+		"inventory":{"maxstack":10000},
 	}, {
 		"name":"BARRACKS",
 		"info":"Produces basic combat units",

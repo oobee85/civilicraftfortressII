@@ -11,6 +11,7 @@ import java.util.stream.*;
 import javax.imageio.*;
 
 import game.*;
+import game.actions.*;
 import game.liquid.*;
 import networking.message.*;
 import networking.server.*;
@@ -421,7 +422,7 @@ public class World {
 		tile.addUnit(animal);
 		worldData.addUnit(animal);
 		if(target != null) {
-			animal.queuePlannedAction(new PlannedAction(target));
+			animal.queuePlannedAction(new PlannedAction(target, ActionType.MOVE));
 		}
 		return animal;
 	}

@@ -3,6 +3,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import game.actions.*;
 import game.liquid.*;
 
 import java.util.*;
@@ -95,7 +96,7 @@ public class Game {
 				unit.getTile().getInventory().clear();
 				PlannedAction plan = unit.actionQueue.peek();
 				if(plan != null) {
-					if(plan.isDone(unit.getTile())) {
+					if(plan.isDone(unit)) {
 						unit.actionQueue.poll();
 					}
 				}
@@ -783,7 +784,7 @@ public class Game {
 			Unit unit = new Unit(unitType, tile, faction);
 			world.addUnit(unit);
 			tile.addUnit(unit);
-			unit.setTimeToAttack(0);
+			unit.setCooldownToDoAction(0);
 			return unit;
 		} else {
 			return world.spawnAnimal(unitType, tile, faction, null);
@@ -886,7 +887,7 @@ public class Game {
 			unit.updateState();
 			unit.planActions(world);
 			unit.doMovement();
-			unit.doAttacks(world);
+			unit.doActions(world);
 			unit.doPassiveThings(world);
 		}
 	}

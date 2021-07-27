@@ -10,6 +10,7 @@ import java.util.concurrent.*;
 import javax.swing.*;
 
 import game.*;
+import game.actions.*;
 import game.liquid.*;
 import networking.message.*;
 import ui.*;
@@ -612,14 +613,14 @@ public final class Utils {
 				if(clearQueue) {
 					unit.clearPlannedActions();
 				}
-				unit.queuePlannedAction(new PlannedAction(target));
+				unit.queuePlannedAction(new PlannedAction(target, ActionType.MOVE));
 			}
 			@Override
 			public void attackThing(Unit unit, Thing target, boolean clearQueue) {
 				if(clearQueue) {
 					unit.clearPlannedActions();
 				}
-				unit.queuePlannedAction(new PlannedAction(target));
+				unit.queuePlannedAction(new PlannedAction(target, ActionType.ATTACK));
 			}
 			@Override
 			public void buildThing(Unit unit, Tile target, boolean isRoad, boolean clearQueue) {
@@ -633,28 +634,28 @@ public final class Utils {
 				if(clearQueue) {
 					unit.clearPlannedActions();
 				}
-				unit.queuePlannedAction(new PlannedAction(target, PlannedAction.HARVEST));
+				unit.queuePlannedAction(new PlannedAction(target, ActionType.HARVEST));
 			}
 			@Override
 			public void harvestResource(Unit unit, Tile tile, boolean clearQueue) {
 				if(clearQueue) {
 					unit.clearPlannedActions();
 				}
-				unit.queuePlannedAction(new PlannedAction(tile, PlannedAction.HARVEST));
+				unit.queuePlannedAction(new PlannedAction(tile, ActionType.HARVEST));
 			}
 			@Override
 			public void deliver(Unit unit, Thing target, boolean clearQueue) {
 				if(clearQueue) {
 					unit.clearPlannedActions();
 				}
-				unit.queuePlannedAction(new PlannedAction(target, PlannedAction.DELIVER));
+				unit.queuePlannedAction(new PlannedAction(target, ActionType.DELIVER));
 			}
 			@Override
 			public void takeItems(Unit unit, Thing target, boolean clearQueue) {
 				if(clearQueue) {
 					unit.clearPlannedActions();
 				}
-				unit.queuePlannedAction(new PlannedAction(target, PlannedAction.TAKE));
+				unit.queuePlannedAction(new PlannedAction(target, ActionType.TAKE_ITEMS));
 			}
 			@Override
 			public Building planBuilding(Unit unit, Tile target, boolean clearQueue, BuildingType buildingType) {

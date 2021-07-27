@@ -12,6 +12,7 @@ import java.util.concurrent.*;
 import javax.swing.*;
 
 import game.*;
+import game.actions.*;
 import game.components.*;
 import game.liquid.*;
 import ui.*;
@@ -462,7 +463,7 @@ public class VanillaDrawer extends Drawer {
 					drawAt = getDrawingCoords(targetTile.getLocation());
 					g.drawImage(FLAG, drawAt.x, drawAt.y, frozenTileSize, frozenTileSize, null);
 				}
-				int range = unit.getMaxRange();
+				int range = unit.getMaxAttackRange();
 				if (range > 1) {
 					// draws the attack range for units
 					for (int i = lowerX; i < upperX; i++) {

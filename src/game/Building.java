@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.*;
 
+import game.actions.*;
 import game.components.GameComponent;
 import utils.*;
 import world.*;
@@ -64,7 +65,7 @@ public class Building extends Thing implements Serializable {
 		// building builds units
 		if(remainingEffortToProduceUnit <= 0 && currentProducingUnit != null) {
 			Unit unit = getProducingUnit().remove();
-			unit.queuePlannedAction(new PlannedAction(getSpawnLocation()));
+			unit.queuePlannedAction(new PlannedAction(getSpawnLocation(), ActionType.MOVE));
 			getTile().addUnit(unit);
 			world.addUnit(unit);
 			currentProducingUnit = null;

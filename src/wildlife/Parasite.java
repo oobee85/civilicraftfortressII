@@ -3,6 +3,7 @@ package wildlife;
 import java.util.*;
 
 import game.*;
+import game.actions.*;
 import ui.*;
 import utils.*;
 import world.*;
@@ -30,7 +31,7 @@ public class Parasite extends Animal {
 	@Override
 	public boolean attack(Thing other) {
 		if(!transformed) {
-			if(other instanceof Unit && inRange(other)) {
+			if(other instanceof Unit && inRangeToAttack(other)) {
 				Unit otherUnit = (Unit)other;
 				transform(otherUnit);
 			}
@@ -82,7 +83,7 @@ public class Parasite extends Animal {
 		}
 		else {
 			clearPlannedActions();
-			queuePlannedAction(new PlannedAction(volcano));
+			queuePlannedAction(new PlannedAction(volcano, ActionType.MOVE));
 		}
 	}
 }

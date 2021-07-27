@@ -584,7 +584,14 @@ public class Tile implements Externalizable {
 		}
 		return false;
 	}
-
+	
+	public int distanceTo(Tile other) {
+		if(other == null) {
+			return Integer.MAX_VALUE;
+		}
+		return this.getLocation().distanceTo(other.getLocation());
+	}
+	
 	public void setNeighbors(List<Tile> tiles) {
 		neighborTiles = tiles;
 	}

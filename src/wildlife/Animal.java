@@ -3,6 +3,7 @@ package wildlife;
 import java.util.*;
 
 import game.*;
+import game.actions.*;
 import ui.*;
 import utils.*;
 import world.*;
@@ -93,7 +94,7 @@ public class Animal extends Unit {
 		}
 		if(bestDanger < currentDanger && currentDanger >= 0.9) {
 			if(best != getTile()) {
-				queuePlannedAction(new PlannedAction(best));
+				queuePlannedAction(new PlannedAction(best, ActionType.MOVE));
 			}
 			return;
 		}
@@ -114,7 +115,7 @@ public class Animal extends Unit {
 			}
 			if(bestHerdAmount > currentHerdAmount && this.applyResistance(bestHerd.computeTileDanger()) < 1) {
 				if(bestHerd != getTile()) {
-					queuePlannedAction(new PlannedAction(bestHerd));
+					queuePlannedAction(new PlannedAction(bestHerd, ActionType.MOVE));
 					return;
 				}
 			}
@@ -134,7 +135,7 @@ public class Animal extends Unit {
 			if(migrationTarget != null) {
 //				System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + migrationTarget);
 				migratingUntil = World.ticks + World.SEASON_DURATION/2;
-				queuePlannedAction(new PlannedAction(migrationTarget));
+				queuePlannedAction(new PlannedAction(migrationTarget, ActionType.MOVE));
 			}
 		}
 	}
@@ -150,7 +151,7 @@ public class Animal extends Unit {
 			}
 			if(iveGotYouInMySights != this) {
 				clearPlannedActions();
-				queuePlannedAction(new PlannedAction(iveGotYouInMySights));
+				queuePlannedAction(new PlannedAction(iveGotYouInMySights, ActionType.ATTACK));
 			}
 		}
 		else {
@@ -184,7 +185,7 @@ public class Animal extends Unit {
 			Thing target = targetType.getValidTargetFor(this, units, buildings);
 			if(target != null) {
 				clearPlannedActions();
-				queuePlannedAction(new PlannedAction(target));
+				queuePlannedAction(new PlannedAction(target, ActionType.ATTACK));
 				return;
 			}
 		}
