@@ -91,6 +91,7 @@ public class GameView {
 		};
 		panel.setLayout(new BorderLayout());
 		panel.setBackground(Color.black);
+		panel.add(overlayPanel, BorderLayout.SOUTH);
 		
 		glDrawer.getDrawingCanvas().setFocusable(false);
 		vanillaDrawer.getDrawingCanvas().setFocusable(false);
@@ -317,11 +318,7 @@ public class GameView {
 		if(drawingCanvas != null) {
 			panel.remove(drawingCanvas);
 		}
-		panel.remove(overlayPanel);
 		drawingCanvas = currentActiveDrawer.getDrawingCanvas();
-		if(!activate3D) {
-			panel.add(overlayPanel);
-		}
 		panel.add(drawingCanvas);
 	}
 	public boolean is3d() {
