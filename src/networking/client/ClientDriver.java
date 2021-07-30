@@ -14,7 +14,7 @@ public class ClientDriver {
 	private ClientGUI clientGUI = new ClientGUI();
 	
 	public ClientDriver() {
-		frame = new JFrame("civilicraftfortressIII");
+		frame = new JFrame("Settlers of Might and Magic");
 		int height = Toolkit.getDefaultToolkit().getScreenSize().height;
 		height = Math.min(height, 1080);
 		height = height * 8 / 9;
