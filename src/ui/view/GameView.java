@@ -32,7 +32,7 @@ public class GameView {
 	private boolean rightMouseDown = false;
 	private boolean controlDown = false;
 	private boolean shiftDown = false;
-	private boolean[] pressedKeys = new boolean[KeyEvent.KEY_LAST];
+	private boolean[] pressedKeys = new boolean[600];
 	private Thread fpsMovementThread;
 	private Robot fpsMouseRobot;
 
