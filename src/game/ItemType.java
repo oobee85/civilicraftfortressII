@@ -1,62 +1,70 @@
 package game;
 
-import java.awt.*;
 import java.util.HashMap;
-
-import javax.swing.ImageIcon;
 
 import utils.*;
 
 public enum ItemType {
+
+	FOOD ( "Images/itemicons/wheat.png"),
+	WOOD ( "Images/itemicons/wood.png"),
+	STONE ( "Images/itemicons/rock.png"),
+	COAL ( "Images/itemicons/coal.png"),
+	HORSE ( "Images/units/horse.png"),
 	
-	COPPER_ORE ( "Images/itemicons/copper_ore.png", null),
-	SILVER_ORE ( "Images/itemicons/silver_ore.png", null),
-	IRON_ORE ( "Images/itemicons/iron_ore.png", null),
-	MITHRIL_ORE ( "Images/itemicons/mithril_ore.png", null),
-	GOLD_ORE ( "Images/itemicons/gold_ore.png", null),
-	ADAMANTITE_ORE ( "Images/itemicons/adamantite_ore.png", null),
-	RUNITE_ORE ( "Images/itemicons/runite_ore.png", null),
-	TITANIUM_ORE ( "Images/itemicons/titanium_ore.png", null),
+	COPPER_ORE ( "Images/itemicons/copper_ore.png"),
+	SILVER_ORE ( "Images/itemicons/silver_ore.png"),
+	IRON_ORE ( "Images/itemicons/iron_ore.png"),
+	MITHRIL_ORE ( "Images/itemicons/mithril_ore.png"),
+	GOLD_ORE ( "Images/itemicons/gold_ore.png"),
+	ADAMANTITE_ORE ( "Images/itemicons/adamantite_ore.png"),
+	RUNITE_ORE ( "Images/itemicons/runite_ore.png"),
+	TITANIUM_ORE ( "Images/itemicons/titanium_ore.png"),
 	
-	FOOD ( "Images/itemicons/wheat.png", null),
-	HORSE ( "Images/units/horse.png", null),
-	WOOD ( "Images/itemicons/wood.png", null),
-	STONE ( "Images/itemicons/rock.png", null),
-	COAL ( "Images/itemicons/coal.png", null),
+	BRONZE_BAR 	("BLACKSMITH", makeCosts(COPPER_ORE,5, 		SILVER_ORE, 5),	"Images/itemicons/bronze_bar.png"),
+	IRON_BAR 	("BLACKSMITH", makeCosts(COAL,15, 	IRON_ORE,10),		"Images/itemicons/iron_bar.png"),
+	MITHRIL_BAR ("BLACKSMITH", makeCosts(COAL,20, 	MITHRIL_ORE,10),	"Images/itemicons/mithril_bar.png"),
+	GOLD_BAR 	("BLACKSMITH", makeCosts(COAL,20, 	GOLD_ORE,10), 		"Images/itemicons/gold_bar.png"),
 	
-//	COPPER_BAR ( "Images/itemicons/copper_bar.png", 			new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,10);	put(ItemType.COAL,10); }}, "BLACKSMITH"),
-//	SILVER_BAR ( "Images/itemicons/silver_bar.png",  			new HashMap<ItemType, Integer>() { {put(ItemType.SILVER_ORE,10); 	put(ItemType.COAL,10);}}, "BLACKSMITH"),
-	BRONZE_BAR ( "Images/itemicons/bronze_bar.png", 			new HashMap<ItemType, Integer>() { {put(ItemType.COPPER_ORE,5); 	put(ItemType.SILVER_ORE, 5); }}, "BLACKSMITH"),
-	IRON_BAR ( "Images/itemicons/iron_bar.png", 				new HashMap<ItemType, Integer>() { {put(ItemType.IRON_ORE,10); 		put(ItemType.COAL,15);  }}, "BLACKSMITH"),
-	MITHRIL_BAR ( "Images/itemicons/mithril_bar.png",			new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_ORE,10); 	put(ItemType.COAL,20); }}, "BLACKSMITH"),
-	GOLD_BAR ( "Images/itemicons/gold_bar.png", 				new HashMap<ItemType, Integer>() { {put(ItemType.GOLD_ORE,10); 		put(ItemType.COAL,20); }}, "BLACKSMITH"),
+	ADAMANTITE_BAR("HELLFORGE",makeCosts(COAL,30, 	ADAMANTITE_ORE,10),	"Images/itemicons/adamantite_bar.png"),
+	RUNITE_BAR 	("HELLFORGE",  makeCosts(COAL,50, 	RUNITE_ORE,10),		"Images/itemicons/runite_bar.png"),
+	TITANIUM_BAR("HELLFORGE",  makeCosts(COAL,80, 	TITANIUM_ORE,10),	"Images/itemicons/titanium_bar.png"),
 	
-	ADAMANTITE_BAR ( "Images/itemicons/adamantite_bar.png", 	new HashMap<ItemType, Integer>() { {put(ItemType.ADAMANTITE_ORE,10);put(ItemType.COAL,30); }}, "HELLFORGE"),
-	RUNITE_BAR ( "Images/itemicons/runite_bar.png", 			new HashMap<ItemType, Integer>() { {put(ItemType.RUNITE_ORE,10);  	put(ItemType.COAL,50);}}, "HELLFORGE"),
-	TITANIUM_BAR ( "Images/itemicons/titanium_bar.png", 		new HashMap<ItemType, Integer>() { {put(ItemType.TITANIUM_ORE,10); 	put(ItemType.COAL,80); }}, "HELLFORGE"),
+	BRONZE_SWORD("BLACKSMITH", makeCosts(WOOD,50, 	BRONZE_BAR,5),	"Images/itemicons/bronze_sword.png"),
+	IRON_SWORD 	("BLACKSMITH", makeCosts(WOOD,50, 	IRON_BAR,5),	"Images/itemicons/iron_sword.png"),
+	MITHRIL_SWORD("BLACKSMITH",makeCosts(WOOD,50, 	MITHRIL_BAR,5),	"Images/itemicons/mithril_sword.png"),
 	
-	BRONZE_SWORD ( "Images/itemicons/bronze_sword.png", 		new HashMap<ItemType, Integer>() { {put(ItemType.BRONZE_BAR,5); put(ItemType.WOOD, 50); }}, "BLACKSMITH"),
-	IRON_SWORD ( "Images/itemicons/iron_sword.png", 			new HashMap<ItemType, Integer>() { {put(ItemType.IRON_BAR,5); put(ItemType.WOOD, 50); }}, "BLACKSMITH"),
-	MITHRIL_SWORD ( "Images/itemicons/mithril_sword.png",		new HashMap<ItemType, Integer>() { {put(ItemType.MITHRIL_BAR,5); put(ItemType.WOOD, 50); }}, "BLACKSMITH"),
-	
-	ADAMANT_SWORD ( "Images/itemicons/adamant_sword.png", 	new HashMap<ItemType, Integer>() { {put(ItemType.ADAMANTITE_BAR,5); put(ItemType.IRON_BAR,5); put(ItemType.WOOD, 50); }}, "HELLFORGE"),
-	RUNE_SWORD ( "Images/itemicons/rune_sword.png", 			new HashMap<ItemType, Integer>() { {put(ItemType.RUNITE_BAR,5); put(ItemType.IRON_BAR,5); put(ItemType.WOOD, 50); }}, "HELLFORGE"),
-	TITANIUM_SWORD ( "Images/itemicons/titanium_sword.png", 	new HashMap<ItemType, Integer>() { {put(ItemType.TITANIUM_BAR,5); put(ItemType.IRON_BAR,5); put(ItemType.WOOD, 50); }}, "HELLFORGE"),
+	ADAMANT_SWORD("HELLFORGE", makeCosts(WOOD,50, 	IRON_BAR,5,	ADAMANTITE_BAR,5),	"Images/itemicons/adamant_sword.png"),
+	RUNE_SWORD 	("HELLFORGE",  makeCosts(WOOD,50, 	IRON_BAR,5,	RUNITE_BAR,5),		"Images/itemicons/rune_sword.png"),
+	TITANIUM_SWORD("HELLFORGE",makeCosts(WOOD,50, 	IRON_BAR,5,	TITANIUM_BAR,5),	"Images/itemicons/titanium_sword.png"),
 	;
 	
 	private MipMap mipmap;
 	private HashMap <ItemType, Integer> cost;
 	private String building;
 
-	ItemType(String s, HashMap <ItemType, Integer> resourcesNeeded) {
+	ItemType(String s) {
 		 this.mipmap = new MipMap(s);
-//		 this.researchRequirement = researchNeeded;
-		 this.cost = resourcesNeeded;
 	}
 	
-	ItemType(String s, HashMap <ItemType, Integer> resourcesNeeded, String building) {
-		 this(s, resourcesNeeded);
-		 this.building = building;
+	ItemType(String building, HashMap <ItemType, Integer> resourcesNeeded, String s) {
+		this(s);
+		this.cost = resourcesNeeded;
+		this.building = building;
+	}
+	
+	/**
+	 * Creates HashMap of argument pairs
+	 * @param costs must be an even sized array of <ItemType, Integer> pairs.
+	 */
+	private static HashMap<ItemType, Integer> makeCosts(Object ...costs) {
+		HashMap<ItemType, Integer> map = new HashMap<>();
+		for(int i = 0; i < costs.length; i+=2) {
+			ItemType type = (ItemType)costs[i];
+			int amount = (int)costs[i+1];
+			map.put(type, amount);
+		}
+		return map;
 	}
 	
 	public HashMap<ItemType, Integer> getCost(){
