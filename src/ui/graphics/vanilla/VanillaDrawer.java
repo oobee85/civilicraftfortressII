@@ -447,14 +447,19 @@ public class VanillaDrawer extends Drawer {
 					g.setColor(Color.green);
 					TileLoc prev = unit.getTile().getLocation();
 					Point prevDrawAt = getDrawingCoords(prev);
-					for (Tile t : path) {
-						drawAt = getDrawingCoords(t.getLocation());
-						if (prev != null) {
-							g.drawLine(prevDrawAt.x + frozenTileSize / 2, prevDrawAt.y + frozenTileSize / 2,
-									drawAt.x + frozenTileSize / 2, drawAt.y + frozenTileSize / 2);
+					try {
+						for (Tile t : path) {
+							drawAt = getDrawingCoords(t.getLocation());
+							if (prev != null) {
+								g.drawLine(prevDrawAt.x + frozenTileSize / 2, prevDrawAt.y + frozenTileSize / 2,
+										drawAt.x + frozenTileSize / 2, drawAt.y + frozenTileSize / 2);
+							}
+							prev = t.getLocation();
+							prevDrawAt = drawAt;
 						}
-						prev = t.getLocation();
-						prevDrawAt = drawAt;
+					}
+					catch (ConcurrentModificationException e) {
+						System.err.println("Concurrent modification while drawing path.");
 					}
 				}
 				// draw destination flags
