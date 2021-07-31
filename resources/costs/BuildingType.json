@@ -195,8 +195,8 @@
 		"culture":0.25,
 		"health":500,
 		"effort":250,
-		"research":"MYSTICISM"},
-	{
+		"research":"MYSTICISM"
+	}, {
 		"name":"CASTLE",
 		"info":"Produces workers",
 		"image":"Images/buildings/castle256.png",
@@ -210,6 +210,19 @@
 		"health":1000,
 		"effort":1000,
 		"research":"MASONRY",
+		"inventory":{"maxstack":10000},
+	}, {
+		"name":"NECROPOLIS",
+		"info":"Produces skeletons and other undead beings",
+		"image":"Images/buildings/necropolis.png",
+		"vision":6,
+		"cost":{"WOOD":2000, "STONE":5000},
+		"buildsunits":["WORKER", "VAMPIRE", "SKELETON"],
+		"culture":1,
+		"attributes":["castle"],
+		"health":1500,
+		"effort":1500,
+		"research":"MONARCHY",
 		"inventory":{"maxstack":10000},
 	}, {
 		"name":"BARRACKS",

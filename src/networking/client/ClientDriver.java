@@ -46,7 +46,7 @@ public class ClientDriver {
 			System.out.println(args[i]);
 		}
 		if(args.length >= 1) {
-			if(args[0].equals("debug")) {
+			if(args[0].toLowerCase().equals("debug")) {
 				Game.DEBUG = true;
 			}
 		}

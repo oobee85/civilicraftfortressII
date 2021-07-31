@@ -258,7 +258,7 @@ public class Loader {
 				researchReq = unitTypeObject.getString("research");
 			}
 			
-			HashMap<ItemType, Integer> cost = null;
+			HashMap<ItemType, Integer> cost = UnitType.EMPTY_COST;
 			if(unitTypeObject.has("cost")) {
 				cost = loadItemTypeMap(unitTypeObject.getJSONObject("cost"));
 			}

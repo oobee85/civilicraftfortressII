@@ -63,12 +63,15 @@ public class ProduceUnitView {
 	}
 	
 	public void updateButtons() {
+		// TODO clean up this hardcoded garbage
 		boolean castleSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("CASTLE"));
+		boolean necropolisSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("NECROPOLIS"));
 		boolean barracksSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("BARRACKS"));
 		boolean workshopSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("WORKSHOP"));
 		boolean stablesSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("STABLES"));
 		for(Pair pair : unitButtons) {
 			if((castleSelected && Game.buildingTypeMap.get("CASTLE").unitsCanProduceSet().contains(pair.unitType)) 
+					|| (necropolisSelected && Game.buildingTypeMap.get("NECROPOLIS").unitsCanProduceSet().contains(pair.unitType))
 					|| (barracksSelected && Game.buildingTypeMap.get("BARRACKS").unitsCanProduceSet().contains(pair.unitType))
 					|| (stablesSelected && Game.buildingTypeMap.get("STABLES").unitsCanProduceSet().contains(pair.unitType))
 					|| (workshopSelected && Game.buildingTypeMap.get("WORKSHOP").unitsCanProduceSet().contains(pair.unitType))) {

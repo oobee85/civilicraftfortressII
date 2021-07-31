@@ -8,6 +8,8 @@ import utils.*;
 import utils.Loader.*;
 
 public class UnitType implements Serializable {
+	
+	public transient static final HashMap <ItemType, Integer> EMPTY_COST = new HashMap <>();
 
 	private transient static int idCounter = 0;
 	private transient final int id;

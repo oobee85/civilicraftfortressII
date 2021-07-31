@@ -73,16 +73,7 @@ public class Client {
 			}
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {
-				if (building.getType() == Game.buildingTypeMap.get("BARRACKS")) {
-					clientGUI.manageProduceUnitTab(selected);
-				}
-				if (building.getType() == Game.buildingTypeMap.get("STABLES")) {
-					clientGUI.manageProduceUnitTab(selected);
-				}
-				if (building.getType() == Game.buildingTypeMap.get("CASTLE")) {
-					clientGUI.manageProduceUnitTab(selected);
-				}
-				if (building.getType() == Game.buildingTypeMap.get("WORKSHOP")) {
+				if(building.getType().unitsCanProduceSet().size() > 0) {
 					clientGUI.manageProduceUnitTab(selected);
 				}
 				if (building.getType() == Game.buildingTypeMap.get("BLACKSMITH")) {
