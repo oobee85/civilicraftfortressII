@@ -203,6 +203,18 @@
 		"targeting":[{"type":"game.Unit"}]
 	},
 	{
+		"image":"Images/units/boat.png",
+		"cost":{"RUNITE_BAR":10,"WOOD":500,"FOOD":400},
+		"stats":{"movespeed":10,"buildtime":1000,"health":2000,"healspeed":400},
+		"name":"BOAT",
+		"attackstyles":[
+			{"damage":200, "cooldown":100, "range":6, "minrange":1, "projectile":"ROCK"}
+		],
+		"attributes":["aquatic"],
+		"resistances": {"COLD": 0, "DRY": 10000, "WATER": 0},
+		"loot":{"WOOD":250, "RUNITE_BAR":2}
+	},
+	{
 		"image":"Images/units/deer.png",
 		"mesh":"models/deer.ply",
 		"texture":"textures/pallet1.png",

@@ -63,26 +63,19 @@ public class ProduceUnitView {
 	}
 	
 	public void updateButtons() {
-		// TODO clean up this hardcoded garbage
-		boolean castleSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("CASTLE"));
-		boolean necropolisSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("NECROPOLIS"));
-		boolean barracksSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("BARRACKS"));
-		boolean workshopSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("WORKSHOP"));
-		boolean stablesSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("STABLES"));
 		for(Pair pair : unitButtons) {
-			if((castleSelected && Game.buildingTypeMap.get("CASTLE").unitsCanProduceSet().contains(pair.unitType)) 
-					|| (necropolisSelected && Game.buildingTypeMap.get("NECROPOLIS").unitsCanProduceSet().contains(pair.unitType))
-					|| (barracksSelected && Game.buildingTypeMap.get("BARRACKS").unitsCanProduceSet().contains(pair.unitType))
-					|| (stablesSelected && Game.buildingTypeMap.get("STABLES").unitsCanProduceSet().contains(pair.unitType))
-					|| (workshopSelected && Game.buildingTypeMap.get("WORKSHOP").unitsCanProduceSet().contains(pair.unitType))) {
-				if (gameView.getFaction().areRequirementsMet(pair.unitType)) {
-					pair.button.setEnabled(true);
-					pair.button.setVisible(true);
-					continue;
-				}
-			}
 			pair.button.setEnabled(false);
 			pair.button.setVisible(false);
+			if (gameView.getFaction().areRequirementsMet(pair.unitType)) {
+				for(BuildingType buildingType : Game.buildingTypeList) {
+					if(buildingType.unitsCanProduceSet().contains(pair.unitType)
+							&& gameView.getFaction().isBuildingSelected(buildingType)) {
+						pair.button.setEnabled(true);
+						pair.button.setVisible(true);
+						break;
+					}
+				}
+			}
 		}
 	}
 	
