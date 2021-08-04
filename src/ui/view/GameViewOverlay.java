@@ -69,10 +69,11 @@ public class GameViewOverlay extends JPanel {
 		selectedUnitsPanelLayout = new WrapLayout(FlowLayout.CENTER, 5, 5);
 		selectedUnitsPanel.setLayout(selectedUnitsPanelLayout);
 		selectedUnitsPanel.setFocusable(false);
+		filler.add(selectedUnitsPanel, BorderLayout.SOUTH);
 		this.setLayout(new BorderLayout());
 		this.add(resourcePanel2, BorderLayout.WEST);
 		this.add(filler, BorderLayout.CENTER);
-		filler.add(selectedUnitsPanel, BorderLayout.SOUTH);
+		this.setPreferredSize(new Dimension(0, 100));
 		setupButtons();
 	}
 	
