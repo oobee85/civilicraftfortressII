@@ -444,6 +444,12 @@ public class Game {
 //		spawnCyclops();
 //		meteorStrike();
 		makeStartingCastleAndUnits(easymode, players);
+		spawnStartingEnemies();
+	}
+	public void spawnStartingEnemies() {
+		spawnCyclops();
+		Tile targetTile = getTargetTileForSpawns();
+		world.spawnOgre(targetTile);
 	}
 	public void spawnCyclops() {
 		LinkedList<Tile> tiles = world.getTilesRandomly();

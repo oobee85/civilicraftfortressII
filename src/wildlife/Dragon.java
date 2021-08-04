@@ -48,7 +48,8 @@ public class Dragon extends Animal {
 	}
 	@Override
 	public boolean wantsToAttack() {
-		return readyToHunt();
+		return false;
+//		return readyToHunt();
 	}
 	
 	@Override 
