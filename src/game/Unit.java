@@ -393,7 +393,10 @@ public class Unit extends Thing implements Serializable {
 	public void doHarvest(Plant plant, PlannedAction action) {
 		if(readyToHarvest() && hasInventory()) {
 			plant.takeDamage(2, DamageType.PHYSICAL);
-			getInventory().addItem(plant.getItem(), 1);
+			for(Item item: plant.getItem()) {
+				getInventory().addItem(item.getType(), item.getAmount());
+			}
+			
 			this.resetTimeToHarvest(2);
 			if(getInventory().isFull()) {
 				action.setDone(true);
@@ -663,12 +666,15 @@ public class Unit extends Thing implements Serializable {
 		if (getType().isBuilder()) {
 			//worker harvesting
 			if(readyToHarvest() && isHarvesting == true && this.getTile().getPlant() != null) {
-				ItemType itemType = this.getTile().getPlant().getItem();
-				if(itemType != null) {
-					getFaction().getInventory().addItem(itemType, 1);
-					this.getTile().getPlant().takeDamage(1, DamageType.PHYSICAL);
-					resetTimeToHarvest(1);
+				for(Item item: this.getTile().getPlant().getItem()) {
+					ItemType itemType = item.getType();
+					if(itemType != null) {
+						getFaction().getInventory().addItem(itemType, 1);
+						this.getTile().getPlant().takeDamage(1, DamageType.PHYSICAL);
+						resetTimeToHarvest(1);
+					}
 				}
+				
 			}
 		}
 		if (getType().isHealer()) {

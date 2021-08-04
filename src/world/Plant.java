@@ -1,6 +1,7 @@
 package world;
 
 import java.io.*;
+import java.util.LinkedList;
 
 import game.*;
 import game.components.*;
@@ -17,7 +18,7 @@ public class Plant extends Thing implements Serializable {
 			this.addComponent(c.getClass(), c);
 		}
 	}
-	public ItemType getItem() {
+	public LinkedList<Item> getItem() {
 		return plantType.getItem();
 	}
 	public PlantType getType() {

@@ -48,7 +48,7 @@ public class World {
 	
 	private static final double BUSH_RARITY = 0.005;
 	private static final double WATER_PLANT_RARITY = 0.05;
-	private static final double FOREST_DENSITY = 0.01;
+	private static final double FOREST_DENSITY = 0.005;
 	
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;

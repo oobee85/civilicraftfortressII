@@ -15,18 +15,18 @@ public class PlantType implements Serializable {
 	private transient final TexturedMesh mesh;
 	private transient final double health;	
 	private transient final double rarity;
-	private transient final ItemType itemType;
+	private transient final LinkedList<Item> harvestItems;
 	private transient final HashSet<String> attributes;
 	private transient final Set<GameComponent> components = new HashSet<>();
 
 	public PlantType(String name, String image, Mesh mesh, String textureFile, 
-	                 double rare, double health, ItemType itemType, HashSet<String> attributes){
+	                 double rare, double health, LinkedList<Item> harvestItems, HashSet<String> attributes){
 		this.name = name;
 		this.rarity = rare;
 		this.health = health;
 		mipmap = new MipMap(image);
 		this.mesh = new TexturedMesh(mesh, textureFile);
-		this.itemType = itemType;
+		this.harvestItems = harvestItems;
 		this.attributes = attributes;
 	}
 	
@@ -42,8 +42,8 @@ public class PlantType implements Serializable {
 		return mipmap;
 	}
 
-	public ItemType getItem() {
-		return itemType;
+	public LinkedList<Item> getItem() {
+		return harvestItems;
 	}
 	public double getHealth() {
 		return health;

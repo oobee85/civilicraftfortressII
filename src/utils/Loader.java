@@ -59,8 +59,16 @@ public class Loader {
 			String image = plantTypeObject.getString("image");
 			int health = plantTypeObject.getInt("health");
 			double rarity = plantTypeObject.getDouble("rarity");
-			String itemString = plantTypeObject.getString("harvestitem");
-			ItemType itemType = ItemType.valueOf(itemString);
+//			String itemString = plantTypeObject.getString("harvestitem");
+//			ItemType itemType = ItemType.valueOf(itemString);
+			
+			LinkedList<Item> harvestItems = new LinkedList<>();
+			if(plantTypeObject.has("harvestitems")) {
+				HashMap<ItemType, Integer> loot = loadItemTypeMap(plantTypeObject.getJSONObject("harvestitems"));
+				for(Entry<ItemType, Integer> entry : loot.entrySet()) {
+					harvestItems.add(new Item(entry.getValue(), entry.getKey()));
+				}
+			}
 
 			String textureFile = image;
 			Mesh mesh = MeshUtils.defaultPlant;
@@ -82,7 +90,7 @@ public class Loader {
 			}
 
 			Set<GameComponent> components = loadComponents(plantTypeObject);
-			PlantType plantType = new PlantType(name, image, mesh, textureFile, rarity, health, itemType, attributes);
+			PlantType plantType = new PlantType(name, image, mesh, textureFile, rarity, health, harvestItems, attributes);
 			plantType.getComponents().addAll(components);
 			
 			plantTypeMap.put(name, plantType);

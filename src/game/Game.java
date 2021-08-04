@@ -717,6 +717,8 @@ public class Game {
 			LinkedList<Object> thingsToPlace = new LinkedList<>();
 			thingsToPlace.add(Game.buildingTypeMap.get("CASTLE"));
 			thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
+			thingsToPlace.add(Game.plantTypeMap.get("BERRY"));
+			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
 //			thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
 //			thingsToPlace.add(Game.buildingTypeMap.get("BLACKSMITH"));
 //			thingsToPlace.add(Game.unitTypeMap.get("HORSEARCHER"));
@@ -725,6 +727,8 @@ public class Game {
 				thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
 				thingsToPlace.add(Game.buildingTypeMap.get("WORKSHOP"));
 				thingsToPlace.add(Game.buildingTypeMap.get("BLACKSMITH"));
+				thingsToPlace.add(Game.plantTypeMap.get("BERRY"));
+				thingsToPlace.add(Game.plantTypeMap.get("TREE"));
 				addResources(newFaction);
 			}
 			Tile spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), world.getHeight()/2));
@@ -751,6 +755,12 @@ public class Game {
 						
 					}
 				}
+				else if(thingType instanceof PlantType) {
+					if(current.getTerrain().isPlantable(current.getTerrain()) && current.getRoad() == null && current.liquidAmount < current.liquidType.getMinimumDamageAmount() / 2) {
+						world.makePlantVein(current, (PlantType)thingType, 2);
+						thingType = null;
+					}
+				}
 				else if(thingType instanceof UnitType) {
 					if (current.liquidAmount < current.liquidType.getMinimumDamageAmount()) {
 						summonUnit(current, (UnitType)thingType, newFaction);
@@ -773,6 +783,7 @@ public class Game {
 			}
 			index++;
 		}
+		
 	}
 	
 	

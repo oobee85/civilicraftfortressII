@@ -82,9 +82,11 @@ public class PlannedAction {
 	
 	public boolean inRange(Unit actor) {
 		int range = 0;
-		if(type == BUILD_BUILDING || type == BUILD_ROAD ||
-				type == HARVEST || type == DELIVER || type == TAKE_ITEMS) {
+		if(type == BUILD_BUILDING || type == BUILD_ROAD) {
 			range = 1;
+		}
+		else if(type == HARVEST || type == DELIVER || type == TAKE_ITEMS) {
+			range = 0;
 		}
 		else if(type == ATTACK) {
 			range = actor.getMaxAttackRange();
