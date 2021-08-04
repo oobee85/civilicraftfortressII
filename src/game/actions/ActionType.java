@@ -9,7 +9,9 @@ public enum ActionType {
 	BUILD_ROAD,
 	HARVEST,
 	DELIVER,
-	TAKE_ITEMS
+	TAKE_ITEMS,
+	WANDER_AROUND,
+	ATTACK_MOVE
 	;
 	
 	private ActionType() {

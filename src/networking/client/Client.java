@@ -11,6 +11,7 @@ import javax.swing.*;
 import javax.swing.Timer;
 
 import game.*;
+import game.actions.*;
 import game.ai.*;
 import networking.*;
 import networking.message.*;
@@ -146,6 +147,12 @@ public class Client {
 				localCommands.attackThing(unit, target, clearQueue);
 			}
 			@Override
+			public void attackMove(Unit unit, Tile target, boolean clearQueue) {
+				// TODO make attack move network message
+//				sendMessage(CommandMessage.makeAttackThingCommand(unit.id(), target.id(), clearQueue));
+				localCommands.attackMove(unit, target, clearQueue);
+			}
+			@Override
 			public void buildThing(Unit unit, Tile target, boolean isRoad, boolean clearQueue) {
 				if(isRoad) {
 					sendMessage(CommandMessage.makeBuildRoadCommand(unit.id(), target.getLocation(), clearQueue));
@@ -204,6 +211,11 @@ public class Client {
 			public void setGuarding(Unit unit, boolean enabled) {
 				sendMessage(CommandMessage.makeSetGuardingCommand(unit.id(), enabled));
 				localCommands.setGuarding(unit, enabled);
+			}
+			@Override
+			public void planAction(Unit unit, PlannedAction plan, boolean enabled) {
+				sendMessage(CommandMessage.makeSetGuardingCommand(unit.id(), enabled));
+				// TODO figure out more generic networking stuff.
 			}
 			
 		};

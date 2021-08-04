@@ -127,6 +127,12 @@ public class PlannedAction {
 		else if(type == TAKE_ITEMS) {
 			return actor.getTile() == targetTile;
 		}
+		else if(type == ATTACK_MOVE) {
+			return actor.getTile() == targetTile;
+		}
+		else if(type == WANDER_AROUND) {
+			return false;
+		}
 		return actor.getTile() == targetTile;
 	}
 	

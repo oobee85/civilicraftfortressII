@@ -623,6 +623,13 @@ public final class Utils {
 				unit.queuePlannedAction(new PlannedAction(target, ActionType.ATTACK));
 			}
 			@Override
+			public void attackMove(Unit unit, Tile target, boolean clearQueue) {
+				if(clearQueue) {
+					unit.clearPlannedActions();
+				}
+				unit.queuePlannedAction(new PlannedAction(target, ActionType.ATTACK_MOVE));
+			}
+			@Override
 			public void buildThing(Unit unit, Tile target, boolean isRoad, boolean clearQueue) {
 				if(clearQueue) {
 					unit.clearPlannedActions();
@@ -697,6 +704,13 @@ public final class Utils {
 			@Override
 			public void setGuarding(Unit unit, boolean enabled) {
 				unit.setGuarding(enabled);
+			}
+			@Override
+			public void planAction(Unit unit, PlannedAction plan, boolean clearQueue) {
+				if(clearQueue) {
+					unit.clearPlannedActions();
+				}
+				unit.queuePlannedAction(plan);
 			}
 		};
 	}

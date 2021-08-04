@@ -12,6 +12,7 @@ import javax.swing.*;
 import com.jogamp.common.util.RunnableExecutor.*;
 
 import game.*;
+import game.actions.*;
 import ui.*;
 import ui.graphics.*;
 import ui.graphics.opengl.*;
@@ -261,6 +262,8 @@ public class GameView {
 						setBuildingToPlan(Game.buildingTypeMap.get("WALL_WOOD"));
 					} else if (e.getKeyCode() == KeyEvent.VK_B) {
 						setBuildingToPlan(Game.buildingTypeMap.get("BARRACKS"));
+					} else if (e.getKeyCode() == KeyEvent.VK_D) {
+						state.leftClickAction = LeftClickAction.WANDER_AROUND;
 					}
 				}
 			}
@@ -451,6 +454,9 @@ public class GameView {
 		else if (state.leftClickAction == LeftClickAction.ATTACK) {
 			attackCommand(state.selectedThings, tile, shiftDown, true);
 		}
+		else if (state.leftClickAction == LeftClickAction.WANDER_AROUND) {
+			wanderCommand(state.selectedThings, tile, shiftDown);
+		}
 		// select units on tile
 		else {
 			toggleSelectionForTiles(Arrays.asList(tile), shiftDown, controlDown);
@@ -458,6 +464,15 @@ public class GameView {
 
 		if (!shiftDown) {
 			state.leftClickAction = LeftClickAction.NONE;
+		}
+	}
+	
+	private void wanderCommand(ConcurrentLinkedQueue<Thing> selectedThings, Tile tile, boolean shiftEnabled) {
+		for (Thing thing : selectedThings) {
+			if (thing instanceof Unit) {
+				Unit unit = (Unit) thing;
+				commandInterface.planAction(unit, new PlannedAction(tile, ActionType.WANDER_AROUND), !shiftEnabled);
+			}
 		}
 	}
 
@@ -482,6 +497,9 @@ public class GameView {
 				}
 				if (targetThing != null) {
 					commandInterface.attackThing(unit, targetThing, !shiftEnabled);
+				}
+				else {
+					commandInterface.attackMove(unit, tile, !shiftEnabled);
 				}
 			}
 		}

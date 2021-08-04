@@ -20,17 +20,18 @@ public class Unit extends Thing implements Serializable {
 	private transient double cooldownToDoAction;
 	private transient double timeToHeal;
 	private transient boolean isIdle;
-	private transient int starving;
 	private CombatStats combatStats;
 	private transient LinkedList<Tile> currentPath;
 	
-	public transient ConcurrentLinkedQueue<PlannedAction> actionQueue = new ConcurrentLinkedQueue<>();
+	public transient ConcurrentLinkedDeque<PlannedAction> actionQueue = new ConcurrentLinkedDeque<>();
 	private transient PlannedAction passiveAction = PlannedAction.NOTHING;
 	
 	private transient boolean isHarvesting;
 	private transient double timeToHarvest;
 	private transient double baseTimeToHarvest = 10;
+	
 	private transient int ticksForFoodCost = 50;
+	private transient int starving;
 	
 	public Unit(UnitType unitType, Tile tile, Faction faction) {
 		super(unitType.getCombatStats().getHealth(), unitType.getMipMap(), unitType.getMesh(), faction, tile);
@@ -99,8 +100,11 @@ public class Unit extends Thing implements Serializable {
 		
 		actionQueue.add(plan);
 	}
-	public void clearCompletedPlannedActions() {
-		
+	public void prequeuePlannedAction(PlannedAction plan) {
+		if(this.isSelected()) {
+			System.out.println("queued action: " + plan.type);
+		}
+		actionQueue.addFirst(plan);
 	}
 
 	public UnitType getUnitType() {
@@ -480,8 +484,9 @@ public class Unit extends Thing implements Serializable {
 		if(plan == null) {
 			return;
 		}
-		if(plan.getTile() != null && !plan.inRange(this)) {
-			moveTowards(plan.getTile());
+		Tile targetTile = plan.getTile();
+		if(targetTile != null && !plan.inRange(this)) {
+			moveTowards(targetTile);
 			// can't reach target so mark the plan as finished.
 			if(currentPath == null) {
 				plan.setDone(true);
@@ -497,6 +502,27 @@ public class Unit extends Thing implements Serializable {
 		if(plan == null) {
 			return false;
 		}
+
+		if(plan.type == ActionType.WANDER_AROUND) {
+			Tile targetTile = plan.targetTile;
+			if(Math.random() < 0.9) {
+				List<Tile> nearby = Utils.getTilesInRadius(getTile(), world, 5);
+				targetTile = nearby.get((int)(Math.random()*nearby.size()));
+			}
+			if(getTile().distanceTo(plan.targetTile) > 5) {
+				prequeuePlannedAction(new PlannedAction(targetTile, ActionType.MOVE));
+			}
+			else {
+				prequeuePlannedAction(new PlannedAction(targetTile, ActionType.ATTACK_MOVE));
+			}
+		}
+		else if(plan.type == ActionType.ATTACK_MOVE) {
+			Thing closestEnemy = getClosestEnemyInRange(world);
+			if(closestEnemy != null) {
+				prequeuePlannedAction(new PlannedAction(closestEnemy, ActionType.ATTACK));
+			}
+		}
+		
 		if(!plan.inRange(this)) {
 			return false;
 		}
@@ -557,6 +583,33 @@ public class Unit extends Thing implements Serializable {
 			}
 		}
 		return didSomething;
+	}
+	
+	private Thing getClosestEnemyInRange(World world) {
+		Thing closest = null;
+		int closestDistance = -1;
+		HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getMaxAttackRange()+1);
+		for (Tile tile : inrange) {
+			for (Unit unit : tile.getUnits()) {
+				if(shouldAggroOn(unit)) {
+					int dist = getTile().distanceTo(unit.getTile());
+					if(closest == null || dist < closestDistance) {
+						closest = unit;
+						closestDistance = dist;
+					}
+				}
+			}
+		}
+		return closest;
+	}
+	
+	private boolean shouldAggroOn(Thing potential) {
+		// TODO replace anywhere faction comparison is used to determine enemies
+		if(potential != this && potential.getFaction().isNeutral() 
+				|| potential.getFactionID() != this.getFactionID()) {
+			return true;
+		}
+		return false;
 	}
 	
 	private void onFinishedAction(PlannedAction finished) {
