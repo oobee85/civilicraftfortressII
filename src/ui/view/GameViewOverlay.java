@@ -38,16 +38,14 @@ public class GameViewOverlay extends JPanel {
 	private static final SelectedButtonSizes[] selectedButtonSizes = new SelectedButtonSizes[] {
 			new SelectedButtonSizes(40, 5, 5, 2),
 			new SelectedButtonSizes(30, 4, 3, 3),
-			new SelectedButtonSizes(20, 3, 2, 4),
-			new SelectedButtonSizes(14, 0, 1, 5),
-			new SelectedButtonSizes(10, 0, 0, 99),
+			new SelectedButtonSizes(25, 3, 2, 4),
 	};
 	
 	private GUIController guiController;
 	private Faction faction;
 	
 	private JPanel resourcePanel2;
-	private JPanel selectedUnitsPanel;
+	private ScrollingPanel selectedUnitsPanel;
 	private SelectedButtonSizes currentUnitButtonSize = selectedButtonSizes[0];
 	private WrapLayout selectedUnitsPanelLayout;
 	
@@ -62,17 +60,15 @@ public class GameViewOverlay extends JPanel {
 		resourcePanel2 = new JPanel();
 		resourcePanel2.setLayout(new GridBagLayout());
 		resourcePanel2.setOpaque(false);
-		JPanel filler = new JPanel();
-		filler.setFocusable(false);
-		filler.setLayout(new BorderLayout());
-		selectedUnitsPanel = new JPanel();
+		
+		selectedUnitsPanel = new ScrollingPanel(null);
 		selectedUnitsPanelLayout = new WrapLayout(FlowLayout.CENTER, 5, 5);
 		selectedUnitsPanel.setLayout(selectedUnitsPanelLayout);
 		selectedUnitsPanel.setFocusable(false);
-		filler.add(selectedUnitsPanel, BorderLayout.SOUTH);
+		
 		this.setLayout(new BorderLayout());
 		this.add(resourcePanel2, BorderLayout.WEST);
-		this.add(filler, BorderLayout.CENTER);
+		this.add(selectedUnitsPanel.getRootPanel(), BorderLayout.CENTER);
 		this.setPreferredSize(new Dimension(0, 100));
 		setupButtons();
 	}
