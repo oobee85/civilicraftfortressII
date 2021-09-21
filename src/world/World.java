@@ -858,8 +858,9 @@ public class World {
 //				if(mycombined > ocombined && Math.abs(deltavol) > 0.002) {
 					if (mypress > opress * 1.001 
 //							&& myvolume > ovolume 
-							&& Math.abs(deltavol) > 0.0015) {
-
+							&& Math.abs(deltavol) > 0.00001
+							){
+						// 0.0015
 						tileAir.setFlowDirection(attemptFlow);
 //					double deltap = 1 - opress / mypress;
 //					double deltavol = Math.sqrt((myvolume - ovolume)*deltap);
@@ -920,7 +921,7 @@ public class World {
 				defaultEnergy *= pressureMultiplier;
 			}
 			double maxVol = tile.getAir().getMaxVolumeLiquid();
-			tile.getAir().setVolumeLiquid(maxVol/1.5);
+			tile.getAir().setVolumeLiquid(maxVol/1.5 + Math.random());
 //			tile.getAtmosphere().setVolumeLiquid(maxVol/5);
 			tile.setEnergy(defaultEnergy);
 		}

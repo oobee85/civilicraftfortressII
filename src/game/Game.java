@@ -448,8 +448,8 @@ public class Game {
 	}
 	public void spawnStartingEnemies() {
 		spawnCyclops();
-		Tile targetTile = getTargetTileForSpawns();
-		world.spawnOgre(targetTile);
+//		Tile targetTile = getTargetTileForSpawns();
+//		world.spawnOgre(targetTile);
 	}
 	public void spawnCyclops() {
 		LinkedList<Tile> tiles = world.getTilesRandomly();

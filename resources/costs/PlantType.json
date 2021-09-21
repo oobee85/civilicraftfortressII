@@ -6,7 +6,7 @@
 		"mesh":"models/cube.obj",
 		"health":200,
 		"rarity": 1,
-		"harvestitems":{"FOOD":1}
+		"harvestitems":{"FOOD":5}
 	},
 	{
 		"name":"BERRY_DEPLETED",
@@ -24,7 +24,7 @@
 		"health":100,
 		"rarity": 1,
 		"resistances": {"DRY": 100, "WATER": 0},
-		"harvestitems":{"FOOD":2}
+		"harvestitems":{"FOOD":5}
 	},
 	{
 		"name":"TREE",
@@ -40,7 +40,7 @@
 		"health":100,
 		"rarity": 1,
 		"attributes":["desertresistant"],
-		"harvestitems":{"FOOD":1, "WOOD":1}
+		"harvestitems":{"FOOD":2, "WOOD":2}
 	},
 ]
 }

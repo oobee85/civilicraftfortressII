@@ -4,7 +4,7 @@
 		"image":"Images/units/worker.png",
 		"mesh":"models/star.obj",
 		"cost":{"FOOD":50},
-		"stats":{"movespeed":15,"buildtime":30,"health":100,"healspeed":50},
+		"stats":{"movespeed":20,"buildtime":30,"health":100,"healspeed":50},
 		"attackstyles":[
 			{"damage":0, "cooldown":60, "range":1}
 		],
@@ -14,8 +14,8 @@
 	},
 	{
 		"image":"Images/units/warrior.png",
-		"cost":{"WOOD":50,"FOOD":100},
-		"stats":{"movespeed":15,"buildtime":100,"health":100,"healspeed":50},
+		"cost":{"WOOD":100,"FOOD":100},
+		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":50},
 		"name":"WARRIOR",
 		"attackstyles":[
 			{"damage":10, "cooldown":30, "range":1}
@@ -37,8 +37,8 @@
 	},
 	{
 		"image":"Images/units/archer.png",
-		"cost":{"BRONZE_BAR":2,"FOOD":150},
-		"stats":{"movespeed":15,"buildtime":100,"health":200,"healspeed":50},
+		"cost":{"BRONZE_BAR":5,"FOOD":200},
+		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":50},
 		"name":"ARCHER",
 		"attributes":["hostile"],
 		"attackstyles":[
@@ -50,7 +50,7 @@
 	{
 		"image":"Images/units/swordsman.png",
 		"cost":{"IRON_SWORD":1,"FOOD":150},
-		"stats":{"movespeed":10,"buildtime":200,"health":300,"healspeed":50},
+		"stats":{"movespeed":10,"buildtime":200,"health":500,"healspeed":50},
 		"name":"SWORDSMAN",
 		"attackstyles":[
 			{"damage":40, "cooldown":20, "range":1}
@@ -62,7 +62,7 @@
 	{
 		"image":"Images/units/longbowman.png",
 		"cost":{"MITHRIL_BAR":5,"FOOD":300},
-		"stats":{"movespeed":15,"buildtime":400,"health":300,"healspeed":50},
+		"stats":{"movespeed":20,"buildtime":400,"health":100,"healspeed":50},
 		"name":"LONGBOWMAN",
 		"attackstyles":[
 			{"damage":60, "cooldown":30, "range":6, "minrange":2, "projectile":"ARROW"}
@@ -136,7 +136,7 @@
 	{
 		"image":"Images/units/chariot.png",
 		"cost":{"WOOD":50,"FOOD":100},
-		"stats":{"movespeed":25,"buildtime":200,"health":300,"healspeed":50},
+		"stats":{"movespeed":10,"buildtime":200,"health":100,"healspeed":50},
 		"name":"CARAVAN",
 		"attackstyles":[
 			{"damage":0, "cooldown":60, "range":1}
