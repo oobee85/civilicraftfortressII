@@ -97,7 +97,7 @@ public class Tile implements Externalizable {
 		this.humidity = 1;
 		this.energy = 20000;
 		air = new Air(this.height);
-//		this.atmosphere = new Air(this.height + 1000, 0);
+//		this.atmosphere = new Air(this.height + 1000);
 		this.tickLastTerrainChange = -World.MIN_TIME_TO_SWITCH_TERRAIN;
 	}
 
@@ -157,14 +157,13 @@ public class Tile implements Externalizable {
 		air.setEnergy(this.getEnergy());
 		air.updateMaxVolume();
 		air.updateHumidity();
-		air.updateHeight(this.height);
 		air.updatePressure();
 		
 		
 	}
 //	public void updateAtmosphere() {
-////		atmosphere.setTemperature(this.getTemperature());
-////		atmosphere.setEnergy(this.getEnergy());
+//		atmosphere.setTemperature(this.getTemperature());
+//		atmosphere.setEnergy(this.getEnergy());
 //		atmosphere.updateMaxVolume();
 //		atmosphere.updateHumidity();
 //		atmosphere.updatePressure();

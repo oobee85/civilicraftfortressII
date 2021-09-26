@@ -78,9 +78,6 @@ public class Air {
 	public double getVolumeChange() {
 		return volumeChange;
 	}
-	public void updateHeight(double height) {
-		this.height = height;
-	}
 	public void updateMaxVolume() {
 		if(temperature > 2) {
 			maxVolume = this.temperature/2;
