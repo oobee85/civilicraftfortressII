@@ -541,7 +541,7 @@ public class World {
 				if(damage < 500) {
 					wave = new Projectile(ProjectileType.FIRE_WAVE, tile, t, null, damage);
 				}
-				t.addEnergy(damage);
+				t.addEnergy(damage*10 / (distanceFromCenter + 1));
 				tile.addProjectile(wave);
 				worldData.addProjectile(wave);
 				
@@ -826,8 +826,8 @@ public class World {
 //			}
 			
 			
-			
-//			tile.addEnergy(addedEnergy);
+			tile.addEnergy(seasonEnergy);
+			tile.addEnergy(addedEnergy);
 			
 			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 1) {
 //				tile.setEnergy(21000);
@@ -875,33 +875,38 @@ public class World {
 				double deltavol = Math.sqrt((myvolume - ovolume)*deltap);
 				
 				
+				// PREVENTS AIRFLOW DIRECTIONS FROM CHANGING RAPIDLY
 				Direction attemptFlow = Direction.getDirection(tileLoc, otherLoc);
 				Direction oldFlow = tileAir.getFlowDirection();
 				double directionValue = Math.abs(oldFlow.deltay() + attemptFlow.deltay());
 				if (directionValue == 0.5 || directionValue == 2) {
 
+					
+				// IF CONDITIONS MET FOR TRANSFER
 //				if(mycombined > ocombined && Math.abs(deltavol) > 0.002) {
-					if (myenergy > oenergy * 1.002) {
+					if (myenergy > oenergy * 1.0020) {
 //					if (mypress > opress * 1.001 
 ////							&& myvolume > ovolume 
 //							&& Math.abs(deltavol) > 0.00001 // 0.0015
 //							){
-						
+						transferred = true;
 						tileAir.setFlowDirection(attemptFlow);
 //					double deltap = 1 - opress / mypress;
 //					double deltavol = Math.sqrt((myvolume - ovolume)*deltap);
 //					System.out.println(deltavol);
-						if (volumeTemp[tileLoc.x()][tileLoc.y()] - deltavol > 0) {
-							volumeTemp[otherLoc.x()][otherLoc.y()] += deltavol;
-							volumeTemp[tileLoc.x()][tileLoc.y()] -= deltavol;
-							transferred = true;
-						}
+//						if (volumeTemp[tileLoc.x()][tileLoc.y()] - deltavol > 0) {
+//							volumeTemp[otherLoc.x()][otherLoc.y()] += deltavol;
+//							volumeTemp[tileLoc.x()][tileLoc.y()] -= deltavol;
+//							transferred = true;
+//						}
 
-						double deltae = myenergy - oenergy;
+						double deltae = (myenergy - oenergy) /100;
 						double ratio = myenergy / deltavol;
 //					double ratio = oenergy / myenergy * Math.sqrt(deltae);
-						energyTemp[otherLoc.x()][otherLoc.y()] += ratio;
-						energyTemp[tileLoc.x()][tileLoc.y()] -= ratio;
+						energyTemp[otherLoc.x()][otherLoc.y()] += deltae;
+						energyTemp[tileLoc.x()][tileLoc.y()] -= deltae;
+						
+//						System.out.println(deltae);
 
 //				}else if (Math.abs(deltavol) <= 0.0015){
 //					tileAir.setFlowDirection(Direction.NONE);
@@ -915,9 +920,10 @@ public class World {
 		}
 		
 		for(Tile t: getTiles()) {
-			t.getAir().setVolumeLiquid(volumeTemp[t.getLocation().x()][t.getLocation().y()]);
+			t.setEnergy(energyTemp[t.getLocation().x()][t.getLocation().y()]);
+//			t.getAir().setVolumeLiquid(volumeTemp[t.getLocation().x()][t.getLocation().y()]);
 //			t.setEnergy(energyTemp[t.getLocation().x()][t.getLocation().y()]);
-			totalMass += t.getAir().getVolumeLiquid();
+//			totalMass += t.getAir().getVolumeLiquid();
 		}
 //		System.out.println(totalMass);
 	}

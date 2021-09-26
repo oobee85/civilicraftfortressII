@@ -36,7 +36,9 @@ public class Air {
 		this.tileVolume = World.VOLUMEPERTILE;
 		
 	}
-	
+	public void updateHeight(double height) {
+		this.height = height;
+	}
 	public Direction getFlowDirection() {
 		return flowDirection;
 	}
