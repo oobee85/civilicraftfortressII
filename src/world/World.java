@@ -39,9 +39,9 @@ public class World {
 	public static final int BALANCEWATER = 5;
 	public static final int MAXTEMP = 1000;
 	public static final int MAXHEIGHT = 1000;
-	public static final int JOULESPERTILE = 1;
+	public static final int WATTSPERTILE = 1;
 	public static final double STANDARDPRESSURE = 760;
-	public static final int VOLUMEPERTILE = 100;
+	public static final int VOLUMEPERTILE = 100; //cubic meters
 	public static final int STARTINGMASS = 10;
 	public static final int MMAIR = 10;
 	
@@ -770,6 +770,7 @@ public class World {
 			double airloss = humidity * (-2*seasonEnergy);
 //			seasonEnergy += airloss;
 			
+			
 			double vol = tile.getAir().getVolumeLiquid();
 			double maxVol = tile.getAir().getMaxVolumeLiquid();
 			//does raining
@@ -800,8 +801,32 @@ public class World {
 //				
 //			}
 			
+			// adds some randomness into energy distribution
+//			if(Math.random() > 0.01) {
+//				boolean addEnergy = false;
+//				boolean stop = false;
+//				double num = Math.random();
+//				if(num > 0.5) {
+//					addEnergy = true;
+//					seasonEnergy *= 2;
+//				}else if(num < 0.5) {
+//					addEnergy = false;
+//					seasonEnergy *= -2;
+//				}else {
+//					stop = true;
+//				}
+//				if(stop != true) {
+//					for(Tile t: tile.getNeighbors()) {
+//						t.addEnergy(seasonEnergy);
+//					}
+//				}
+//				
+//			}else {
+//				tile.addEnergy(seasonEnergy);
+//			}
 			
-			tile.addEnergy(seasonEnergy);
+			
+			
 //			tile.addEnergy(addedEnergy);
 			
 			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 1) {
@@ -856,11 +881,12 @@ public class World {
 				if (directionValue == 0.5 || directionValue == 2) {
 
 //				if(mycombined > ocombined && Math.abs(deltavol) > 0.002) {
-					if (mypress > opress * 1.001 
-//							&& myvolume > ovolume 
-							&& Math.abs(deltavol) > 0.00001
-							){
-						// 0.0015
+					if (myenergy > oenergy * 1.002) {
+//					if (mypress > opress * 1.001 
+////							&& myvolume > ovolume 
+//							&& Math.abs(deltavol) > 0.00001 // 0.0015
+//							){
+						
 						tileAir.setFlowDirection(attemptFlow);
 //					double deltap = 1 - opress / mypress;
 //					double deltavol = Math.sqrt((myvolume - ovolume)*deltap);
@@ -1402,7 +1428,7 @@ public class World {
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
 		volcano = Generation.makeVolcano(this, heightMap);
 		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
-		Generation.addCliff(heightMap);
+		Generation.addCliff(this, heightMap);
 
 		for(Tile tile : getTiles()) {
 			tile.setFaction(getFaction(NO_FACTION_ID));

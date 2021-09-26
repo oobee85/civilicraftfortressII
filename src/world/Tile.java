@@ -96,7 +96,7 @@ public class Tile implements Externalizable {
 		inventory = new Inventory();
 		this.humidity = 1;
 		this.energy = 20000;
-		air = new Air(this.height, 0);
+		air = new Air(this.height);
 //		this.atmosphere = new Air(this.height + 1000, 0);
 		this.tickLastTerrainChange = -World.MIN_TIME_TO_SWITCH_TERRAIN;
 	}

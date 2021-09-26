@@ -21,10 +21,9 @@ public class Air {
 	private double tileVolume;
 	
 	
-	public Air(double height, double temp) {
+	public Air(double height) {
 		this.maxHumidity = 1.0;
 		this.height = height;
-		this.temperature = temp;
 		this.maxVolume = 10;
 		this.canRain = false;
 		this.volume = 0;

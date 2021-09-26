@@ -16,7 +16,7 @@ public class Generation {
 		return (float) Utils.getRandomNormalF(5);
 	}
 	
-	public static void addCliff(float[][] heightmap) {
+	public static void addCliff(World world, float[][] heightmap) {
 		int x = (int)(Math.random()*heightmap.length);
 		int y = (int)(Math.random()*heightmap[x].length);
 		
@@ -24,6 +24,7 @@ public class Generation {
 			int yy = y + i/3;
 			if(yy - 1 >= 0 && yy < heightmap[x+i].length) {
 				heightmap[x + i][yy] /= 2;
+				world.get(new TileLoc(x + i, yy)).setTerrain(Terrain.ROCK);
 			}
 		}
 		
