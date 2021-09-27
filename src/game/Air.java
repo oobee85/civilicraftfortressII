@@ -126,20 +126,16 @@ public class Air {
 		
 		
 		double P0 = World.STANDARDPRESSURE; // mmHg
-		double g = 9.80665; // m/s^2
-		double MMair = 0.04401; // kg/mol CO2
-		double R = 8.31432; // Nm/molK
-		double h0 = 100; // m sealevel
+		double h0 = World.SEALEVEL; // m sealevel
 		double h = this.height; // m
-		double boltz = 1.380649e-23;
 		double temp = getTemperature();
 		
 //		double sub = boltz * temp;
 		
-		double sub = R * (temp + Math.abs(World.MINTEMP));
+		double sub = World.R * (temp + Math.abs(World.MINTEMP));
 		double standardPVNRT = World.STARTINGMASS * sub / tileVolume;
 		
-		double power = (-g * MMair * (h - h0)) / sub;
+		double power = (-World.G * 10 * (h - h0)) / sub;
 		double pressure = P0 * Math.pow(Math.E, power);
 		
 		double pvnrt = mass * sub / tileVolume;
@@ -150,7 +146,7 @@ public class Air {
 
 	}
 	public double getDensity() {
-		double density = this.pressure/World.STANDARDPRESSURE*World.MMAIR / (0.0821 * (getTemperature() + Math.abs(World.MINTEMP)) );
+		double density = this.pressure/World.STANDARDPRESSURE*World.MMAIR / (World.r * (getTemperature() + Math.abs(World.MINTEMP)) );
 		return density;
 	}
 	public double getRelativeHumidity() {

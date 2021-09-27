@@ -32,18 +32,26 @@ public class World {
 	public static final int MIN_TIME_TO_SWITCH_TERRAIN = 100;
 	public static final int TICKSTOUPDATEAIR = 2;
 	
-	public static final int MINTEMP = -273;
-	public static final int BALANCETEMP = -20;
-	public static final int FREEZETEMP = 0;
+	public static final int MINTEMP = -273; // [c]
+	public static final int BALANCETEMP = -20; // [c]
+	public static final int FREEZETEMP = 0; // [c]
 	public static final float FREEZING_TEMPURATURE = 0.33f;
 	public static final int BALANCEWATER = 5;
-	public static final int MAXTEMP = 1000;
-	public static final int MAXHEIGHT = 1000;
-	public static final int WATTSPERTILE = 1;
-	public static final double STANDARDPRESSURE = 760;
-	public static final int VOLUMEPERTILE = 100; //cubic meters
-	public static final int STARTINGMASS = 10;
-	public static final int MMAIR = 10;
+	public static final int MAXTEMP = 1000; // [c]
+	public static final int MAXHEIGHT = 1000; // [m]
+	public static final int SEALEVEL = 100; // [m]
+	public static final int WATTSPERTILE = 1; // [J/s]
+	public static final double STANDARDPRESSURE = 760; // [mmHg]
+	public static final int VOLUMEPERTILE = 100; // [m^3]
+//	public static final int STARTINGMASS = (int)(VOLUMEPERTILE * 1.2); // [kg]
+	public static final int STARTINGMASS = 10; // [kg]
+//	public static final int MMAIR = 10;
+	public static final double MMAIR = 0.04401; // [kg/mol CO2]
+//	public static final double MMAIR = 0.02897; // [kg/mol AIR]
+	public static final double R = 8.31432; // [Nm/mol*K]  [J/mol*K]
+	public static final double r = 0.0821; // [atm*L/mol*K]
+	public static final double G = 9.80665; // [m/s^2]
+	public static final double BOLTZMANN = 1.380649e-23; // [J/K]
 	
 	
 	private static final double BUSH_RARITY = 0.005;
