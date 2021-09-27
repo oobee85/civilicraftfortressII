@@ -105,7 +105,7 @@ public class Tile implements Externalizable {
 //		return atmosphere;
 //	}
 	public double getTemperature() {
-		double Kgair = World.MMAIR * 10 * 0.721;
+		double Kgair = 10 * 10 * 0.721;
 		
 		double asdf = Kgair*Math.abs(World.MINTEMP);
 		double asd = energy - asdf;
@@ -163,12 +163,12 @@ public class Tile implements Externalizable {
 		
 	}
 	public void updateAtmosphere() {
-		atmosphere.setTemperature(this.getTemperature());
-		atmosphere.setEnergy(this.getEnergy() * 2/3);
-		atmosphere.updateHeight(this.height + 1000);
-		atmosphere.updateMaxVolume();
-		atmosphere.updateHumidity();
-		atmosphere.updatePressure();
+//		atmosphere.setTemperature(this.getTemperature());
+//		atmosphere.setEnergy(this.getEnergy() * 2/3);
+//		atmosphere.updateHeight(this.height + 1000);
+//		atmosphere.updateMaxVolume();
+//		atmosphere.updateHumidity();
+//		atmosphere.updatePressure();
 	}
 	
 	public double getEvaporation() {

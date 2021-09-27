@@ -122,11 +122,8 @@ public class Air {
 //		}
 		
 	}
-	public void updatePressure() {
+public void updatePressure() {
 		
-		
-		double P0 = World.STANDARDPRESSURE; // mmHg
-		double h0 = World.SEALEVEL; // m sealevel
 		double h = this.height; // m
 		double temp = getTemperature();
 		
@@ -135,16 +132,16 @@ public class Air {
 		double sub = World.R * (temp + Math.abs(World.MINTEMP));
 		double standardPVNRT = World.STARTINGMASS * sub / tileVolume;
 		
-		double power = (-World.G * 10 * (h - h0)) / sub;
-		double pressure = P0 * Math.pow(Math.E, power);
+		double power = (-World.G * World.MMAIR * (h - World.SEALEVEL)) / sub;
+		double pressure = World.STANDARDPRESSURE * Math.pow(Math.E, power);
 		
 		double pvnrt = mass * sub / tileVolume;
 		double mix = pressure+(pvnrt - standardPVNRT);
 //		System.out.println("Pressure: " + pressure);
 //		System.out.println("pvnrt: "+other + "atm: "+pressure);
 		this.pressure = pressure;
-
 	}
+
 	public double getDensity() {
 		double density = this.pressure/World.STANDARDPRESSURE*World.MMAIR / (World.r * (getTemperature() + Math.abs(World.MINTEMP)) );
 		return density;

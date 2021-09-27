@@ -43,11 +43,11 @@ public class World {
 	public static final int WATTSPERTILE = 1; // [J/s]
 	public static final double STANDARDPRESSURE = 760; // [mmHg]
 	public static final int VOLUMEPERTILE = 100; // [m^3]
-//	public static final int STARTINGMASS = (int)(VOLUMEPERTILE * 1.2); // [kg]
-	public static final int STARTINGMASS = 10; // [kg]
+	public static final int STARTINGMASS = (int)(VOLUMEPERTILE * 1.22); // [kg]
+//	public static final int STARTINGMASS = 10; // [kg]
 //	public static final int MMAIR = 10;
-	public static final double MMAIR = 0.04401; // [kg/mol CO2]
-//	public static final double MMAIR = 0.02897; // [kg/mol AIR]
+//	public static final double MMAIR = 0.04401; // [kg/mol CO2]
+	public static final double MMAIR = 0.02897; // [kg/mol AIR]
 	public static final double R = 8.31432; // [Nm/mol*K]  [J/mol*K]
 	public static final double r = 0.0821; // [atm*L/mol*K]
 	public static final double G = 9.80665; // [m/s^2]
@@ -908,7 +908,7 @@ public class World {
 //							transferred = true;
 //						}
 
-						double deltae = (myenergy - oenergy) /100;
+						double deltae = Math.abs(myenergy - oenergy) /100;
 						double ratio = myenergy / deltavol;
 //					double ratio = oenergy / myenergy * Math.sqrt(deltae);
 						energyTemp[otherLoc.x()][otherLoc.y()] += deltae;
@@ -973,7 +973,6 @@ public class World {
 				continue;
 			}
 			
-
 //			tile.setTemperature(tile.getTemperature()+Season.getNightEnergy());
 			
 //			double temperature = tile.getTemperature();
