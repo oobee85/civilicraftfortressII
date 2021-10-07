@@ -46,12 +46,14 @@ public class World {
 	public static final int STARTINGMASS = (int)(VOLUMEPERTILE * 1.22); // [kg]
 //	public static final int STARTINGMASS = 10; // [kg]
 //	public static final int MMAIR = 10;
-//	public static final double MMAIR = 0.04401; // [kg/mol CO2]
+//	public static final double MMCO2 = 0.04401; // [kg/mol CO2]
+	public static final double MASSGROUND = 1 * VOLUMEPERTILE; // [kg]
 	public static final double MMAIR = 0.02897; // [kg/mol AIR]
 	public static final double R = 8.31432; // [Nm/mol*K]  [J/mol*K]
-	public static final double r = 0.0821; // [atm*L/mol*K]
+	public static final double RYDBERG = 0.0821; // [atm*L/mol*K]
 	public static final double G = 9.80665; // [m/s^2]
 	public static final double BOLTZMANN = 1.380649e-23; // [J/K]
+	public static final double DEFAULTENERGY = 28000;
 	
 	
 	private static final double BUSH_RARITY = 0.005;
@@ -688,6 +690,52 @@ public class World {
 		}
 			
 	}
+	
+	public void updateEnergyToTemperature() {
+		for(Tile tile : getTiles()) {
+			Air air = tile.getAir();
+			double tileEnergy = tile.getEnergy();
+			double airEnergy = air.getEnergy();
+			
+			// Q=mcAT
+			// T= Q/mc -273
+			double tileTemp = tileEnergy / (World.MASSGROUND) + World.MINTEMP;
+			
+			tile.setTemperature(tileTemp);
+			
+//			double airPressure = air.getPressure() / World.STANDARDPRESSURE;
+//			double PV = airPressure * World.VOLUMEPERTILE;
+//			double n = World.MASSPERTILE * World.MMAIR;
+//			double airTemp = PV/(n * World.RYDBERG);// + World.MINTEMP;
+//			air.setTemperature(airTemp);
+			
+			double airTemp = airEnergy / (35) + World.MINTEMP;
+			air.setTemperature(airTemp);
+			
+			
+			
+		}
+	}
+	public void transferEnergy() {
+		for(Tile tile : getTilesRandomly()) {
+			Air air = tile.getAir();
+//			Air atmosphere = tile.getAtmosphere();
+			
+			// Q = o(T1 - T2) * A
+			// o = 5.670374419 × 10^-8 W*m-2*K-4
+			double boltzmannConstant = 5.670374e-8;
+//			Air air = tile.getAir();
+			double end = 0;
+			double deltaT = (tile.getTemperature() + World.MINTEMP) - (air.getTemperature() + World.MINTEMP);
+			if(deltaT > 1) {
+				end = boltzmannConstant * World.VOLUMEPERTILE * deltaT;
+			}else {
+				deltaT = (air.getTemperature() + World.MINTEMP) - (tile.getTemperature() + World.MINTEMP);
+				end = boltzmannConstant * World.VOLUMEPERTILE * deltaT;
+			}
+			
+		}
+	}
 	public void updateEnergy() {
 		if(World.ticks % TICKSTOUPDATEAIR == 0) {
 			return;
@@ -837,6 +885,8 @@ public class World {
 			tile.addEnergy(seasonEnergy);
 			tile.addEnergy(addedEnergy);
 			
+			updateEnergyToTemperature();
+			
 			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 1) {
 //				tile.setEnergy(21000);
 //				System.out.println(tile.getTemperature());
@@ -952,18 +1002,21 @@ public class World {
 			
 		}
 	}
-	private void setTileEnergy() {
-
+	private void initializeTileEnergy() {
+		double energy = DEFAULTENERGY;
+		double airEnergy = energy / 2.8;
 		for(Tile tile: getTiles()) {
-			double defaultEnergy = 20800;
-			double pressureMultiplier = tile.getAir().getPressure()/STANDARDPRESSURE;
-			if(pressureMultiplier != 0) {
-				defaultEnergy *= pressureMultiplier;
-			}
-			double maxVol = tile.getAir().getMaxVolumeLiquid();
-			tile.getAir().setVolumeLiquid(maxVol/1.5 + Math.random());
+			Air air = tile.getAir();
+			tile.setEnergy(energy);
+			air.setEnergy(airEnergy);
+//			double altitudeMultiplier = World.SEALEVEL/tile.getHeight();
+//			if(altitudeMultiplier != 0) {
+////				energy *= altitudeMultiplier;
+//			}
+//			double maxVol = tile.getAir().getMaxVolumeLiquid();
+//			tile.getAir().setVolumeLiquid(maxVol/1.5 + Math.random());
 //			tile.getAtmosphere().setVolumeLiquid(maxVol/5);
-			tile.setEnergy(defaultEnergy);
+
 		}
 	}
 	public void updateTileTemperature() {
@@ -988,7 +1041,7 @@ public class World {
 		updateAirMovement();
 		if(start == true) {
 			setTileMass();
-			setTileEnergy();
+			initializeTileEnergy();
 		}
 		
 		
@@ -1487,7 +1540,6 @@ public class World {
 		for(int i = 0; i < 100; i++) {
 			Liquid.propogate(this);
 		}
-		
 		updateTerrainChange(true);
 		Generation.generateResources(this);
 		this.genPlants();

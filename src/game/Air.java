@@ -122,7 +122,7 @@ public class Air {
 //		}
 		
 	}
-public void updatePressure() {
+	public void updatePressure() {
 		
 		double h = this.height; // m
 		double temp = getTemperature();
@@ -135,15 +135,16 @@ public void updatePressure() {
 		double power = (-World.G * World.MMAIR * (h - World.SEALEVEL)) / sub;
 		double pressure = World.STANDARDPRESSURE * Math.pow(Math.E, power);
 		
-		double pvnrt = mass * sub / tileVolume;
-		double mix = pressure+(pvnrt - standardPVNRT);
+//		double pvnrt = mass * sub / tileVolume;
+//		double mix = pressure+(pvnrt - standardPVNRT);
+		
 //		System.out.println("Pressure: " + pressure);
 //		System.out.println("pvnrt: "+other + "atm: "+pressure);
 		this.pressure = pressure;
 	}
 
 	public double getDensity() {
-		double density = this.pressure/World.STANDARDPRESSURE*World.MMAIR / (World.r * (getTemperature() + Math.abs(World.MINTEMP)) );
+		double density = this.pressure/World.STANDARDPRESSURE*World.MMAIR / (World.RYDBERG * (getTemperature() + Math.abs(World.MINTEMP)) );
 		return density;
 	}
 	public double getRelativeHumidity() {

@@ -17,6 +17,7 @@ public class Tile implements Externalizable {
 	private float height;
 	private float humidity;
 	private double energy;
+	private double temperature;
 
 	public volatile float liquidAmount;
 	public volatile LiquidType liquidType;
@@ -95,7 +96,7 @@ public class Tile implements Externalizable {
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
 		inventory = new Inventory();
 		this.humidity = 1;
-		this.energy = 20000;
+		this.energy = 100000;
 		air = new Air(this.height);
 		atmosphere = new Air(this.height + 1000);
 		this.tickLastTerrainChange = -World.MIN_TIME_TO_SWITCH_TERRAIN;
@@ -104,24 +105,18 @@ public class Tile implements Externalizable {
 //	public Air getAtmosphere() {
 //		return atmosphere;
 //	}
+	public void setTemperature(double temp) {
+		this.temperature = temp;
+	}
 	public double getTemperature() {
-		double Kgair = 10 * 10 * 0.721;
-		
-		double asdf = Kgair*Math.abs(World.MINTEMP);
-		double asd = energy - asdf;
-		double asdfg = asd / Kgair;
-		return asdfg;
-//		float season = Season.getSeason2();
-//		float night = Season.getNightEnergy();
-//		float seasonTemp = Season.winter[getLocation().y()] + season * Season.summer[getLocation().y()];
-		
-		
-//		float seasonTemp = 1 - ((1 - season) * Season.winter[getLocation().y()] + season*Season.summer[getLocation().y()]);
-//		float heightTemp = 1 - height;
-//		heightTemp = heightTemp*heightTemp;
-//		float nightMultiplier = World.isNightTime() ? 0.9f : 1f;
-//		return (seasonTemp + heightTemp)*nightMultiplier/2;
-//		return season+night;
+		return this.temperature;
+//		double Kgair = 10 * 10 * 0.721;
+////		return Kgair;
+//		double asdf = Kgair*Math.abs(World.MINTEMP);
+//		double asd = energy - asdf;
+//		double asdfg = asd / Kgair;
+//		return asdfg;
+
 	}
 	public void setEnergy(double energy) {
 		this.energy = energy;
@@ -153,8 +148,8 @@ public class Tile implements Externalizable {
 	
 	
 	public void updateAir() {
-		air.setTemperature(this.getTemperature());
-		air.setEnergy(this.getEnergy());
+//		air.setTemperature(this.getTemperature());
+//		air.setEnergy(this.getEnergy());
 		air.updateHeight(this.height);
 		air.updateMaxVolume();
 		air.updateHumidity();
