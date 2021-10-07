@@ -50,9 +50,10 @@ public class World {
 	public static final double MASSGROUND = 1 * VOLUMEPERTILE; // [kg]
 	public static final double MMAIR = 0.02897; // [kg/mol AIR]
 	public static final double R = 8.31432; // [Nm/mol*K]  [J/mol*K]
-	public static final double RYDBERG = 0.0821; // [atm*L/mol*K]
+	public static final double RYDBERG = 0.08206; // [atm*L/mol*K]
 	public static final double G = 9.80665; // [m/s^2]
 	public static final double BOLTZMANN = 1.380649e-23; // [J/K]
+	public static final double BOLTZMANNMODIFIED = 5.670374e-7; // [J/K]
 	public static final double DEFAULTENERGY = 28000;
 	
 	
@@ -716,22 +717,24 @@ public class World {
 			
 		}
 	}
-	public void transferEnergy() {
+	public void blackBodyRadiation() {
 		for(Tile tile : getTilesRandomly()) {
 			Air air = tile.getAir();
 //			Air atmosphere = tile.getAtmosphere();
 			
 			// Q = o(T1 - T2) * A
 			// o = 5.670374419 × 10^-8 W*m-2*K-4
-			double boltzmannConstant = 5.670374e-8;
+//			double boltzmannConstantMod = 5.670374e-4;
 //			Air air = tile.getAir();
 			double end = 0;
-			double deltaT = (tile.getTemperature() + World.MINTEMP) - (air.getTemperature() + World.MINTEMP);
-			if(deltaT > 1) {
-				end = boltzmannConstant * World.VOLUMEPERTILE * deltaT;
+			double deltaT = Math.abs((tile.getTemperature() - World.MINTEMP) - (air.getTemperature() - World.MINTEMP));
+			end = World.BOLTZMANNMODIFIED * World.VOLUMEPERTILE * deltaT;
+			if(tile.getTemperature() > air.getTemperature()) {
+				air.addEnergy(end);
+				tile.addEnergy(-1*end);
 			}else {
-				deltaT = (air.getTemperature() + World.MINTEMP) - (tile.getTemperature() + World.MINTEMP);
-				end = boltzmannConstant * World.VOLUMEPERTILE * deltaT;
+				tile.addEnergy(end);
+				air.addEnergy(-1*end);
 			}
 			
 		}
@@ -886,6 +889,7 @@ public class World {
 			tile.addEnergy(addedEnergy);
 			
 			updateEnergyToTemperature();
+			blackBodyRadiation();
 			
 			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 1) {
 //				tile.setEnergy(21000);
@@ -992,12 +996,12 @@ public class World {
 //			Air atmosphere = tile.getAtmosphere();
 			double pressure = air.getPressure();
 			double volume = VOLUMEPERTILE;
-			double R = 8.314;
 			double temperature = tile.getAir().getTemperature();
 			
-			double moles = (pressure*volume) / R * (temperature + Math.abs(MINTEMP));
+			double moles = (pressure*volume) / World.R * (temperature + Math.abs(MINTEMP));
 //			air.setMass(moles);
-			air.setMass(STARTINGMASS);
+//			air.setMass(STARTINGMASS);
+			air.setMass(5);
 //			atmosphere.setMass(STARTINGMASS/2);
 			
 		}

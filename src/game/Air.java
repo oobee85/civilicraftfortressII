@@ -67,6 +67,9 @@ public class Air {
 	public double getEnergy() {
 		return energy;
 	}
+	public void addEnergy(double added) {
+		this.energy += added;
+	}
 	public double getPressure() {
 		return pressure;
 	}
