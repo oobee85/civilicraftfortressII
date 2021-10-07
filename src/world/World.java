@@ -39,7 +39,7 @@ public class World {
 	public static final int BALANCEWATER = 5;
 	public static final int MAXTEMP = 1000; // [c]
 	public static final int MAXHEIGHT = 1000; // [m]
-	public static final int SEALEVEL = 100; // [m]
+	public static final int SEALEVEL = 300; // [m]
 	public static final int WATTSPERTILE = 1; // [J/s]
 	public static final double STANDARDPRESSURE = 760; // [mmHg]
 	public static final int VOLUMEPERTILE = 100; // [m^3]
@@ -740,9 +740,9 @@ public class World {
 		}
 	}
 	public void updateEnergy() {
-		if(World.ticks % TICKSTOUPDATEAIR == 0) {
-			return;
-		}
+//		if(World.ticks % TICKSTOUPDATEAIR == 0) {
+//			return;
+//		}
 //		for(Tile tile: getTilesRandomly()) {
 //			// Radiation for ground -> first layer air
 //			// Q = o(T1 - T2) * A
@@ -1007,20 +1007,24 @@ public class World {
 		}
 	}
 	private void initializeTileEnergy() {
-		double energy = DEFAULTENERGY;
-		double airEnergy = energy / 2.8;
-		for(Tile tile: getTiles()) {
+		double defaultEnergy = DEFAULTENERGY + 2000;
+		double defaultAirEnergy = defaultEnergy / 2.8;
+		for(Tile tile: getTilesRandomly()) {
+			double energy = defaultEnergy;
+			double airEnergy = defaultAirEnergy;
+			
 			Air air = tile.getAir();
-			tile.setEnergy(energy);
-			air.setEnergy(airEnergy);
-//			double altitudeMultiplier = World.SEALEVEL/tile.getHeight();
-//			if(altitudeMultiplier != 0) {
-////				energy *= altitudeMultiplier;
-//			}
+			double altitudeMultiplier = Math.sqrt( Math.sqrt(World.SEALEVEL) / Math.sqrt(tile.getHeight()) );
+			if(altitudeMultiplier != 0 && altitudeMultiplier < 1) {
+				energy *= altitudeMultiplier;
+				
+			}
 //			double maxVol = tile.getAir().getMaxVolumeLiquid();
 //			tile.getAir().setVolumeLiquid(maxVol/1.5 + Math.random());
 //			tile.getAtmosphere().setVolumeLiquid(maxVol/5);
-
+			tile.setEnergy(energy);
+			
+			air.setEnergy(airEnergy);
 		}
 	}
 	public void updateTileTemperature() {
