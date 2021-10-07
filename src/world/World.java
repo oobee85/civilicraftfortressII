@@ -701,26 +701,17 @@ public class World {
 			// Q=mcAT
 			// T= Q/mc -273
 			double tileTemp = tileEnergy / (World.MASSGROUND) + World.MINTEMP;
-			
 			tile.setTemperature(tileTemp);
 			
-//			double airPressure = air.getPressure() / World.STANDARDPRESSURE;
-//			double PV = airPressure * World.VOLUMEPERTILE;
-//			double n = World.MASSPERTILE * World.MMAIR;
-//			double airTemp = PV/(n * World.RYDBERG);// + World.MINTEMP;
-//			air.setTemperature(airTemp);
-			
+			// T = Q/moles -273
 			double airTemp = airEnergy / (35) + World.MINTEMP;
 			air.setTemperature(airTemp);
-			
-			
-			
 		}
 	}
+	
 	public void blackBodyRadiation() {
 		for(Tile tile : getTilesRandomly()) {
 			Air air = tile.getAir();
-//			Air atmosphere = tile.getAtmosphere();
 			
 			// Q = o(T1 - T2) * A
 			// o = 5.670374419 × 10^-8 W*m-2*K-4
@@ -743,22 +734,6 @@ public class World {
 //		if(World.ticks % TICKSTOUPDATEAIR == 0) {
 //			return;
 //		}
-//		for(Tile tile: getTilesRandomly()) {
-//			// Radiation for ground -> first layer air
-//			// Q = o(T1 - T2) * A
-//			// o = 5.670374419 × 10^-8 W*m-2*K-4
-//			double boltzmannConstant = 5.670374e-8;
-//			Air air = tile.getAir();
-//			double end = 0;
-//			double deltaT = (tile.getTemperature() + World.MINTEMP) - (air.getTemperature() + World.MINTEMP);
-//			if(deltaT > 1) {
-//				end = boltzmannConstant * World.VOLUMEPERTILE * deltaT;
-//			}else {
-//				deltaT = (air.getTemperature() + World.MINTEMP) - (tile.getTemperature() + World.MINTEMP);
-//				end = boltzmannConstant * World.VOLUMEPERTILE * deltaT;
-//			}
-//			
-//		}
 		double averageWater = 0;
 		double averageTemp = 0;
 		for(Tile t : getTiles()) {
@@ -779,8 +754,8 @@ public class World {
 			
 			//adds energy for lava
 			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
-				double modifier = 1 - (tile.getTemperature()/MAXTEMP);
-				tile.addEnergy(tile.liquidAmount * modifier);
+//				double modifier = 1 - (tile.getTemperature()/MAXTEMP);
+				tile.addEnergy(tile.liquidAmount);
 			}
 			
 			
