@@ -238,7 +238,7 @@ public class Client {
 			for(int i = 0; i < NUM_AI; i++) {
 				players.add(new PlayerInfo("Bot " + i, null));
 			}
-			gameInstance.generateWorld(64, 64, false, players);
+			gameInstance.generateWorld(128, 128, false, players);
 			clientGUI.getGameView().getDrawer().updateTerrainImages();
 		}
 		boolean assignedPlayer = false;

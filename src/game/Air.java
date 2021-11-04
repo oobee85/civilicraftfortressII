@@ -138,12 +138,12 @@ public class Air {
 		double power = (-World.G * World.MMAIR * (h - World.SEALEVEL)) / sub;
 		double pressure = World.STANDARDPRESSURE * Math.pow(Math.E, power);
 		
-//		double pvnrt = mass * sub / tileVolume;
-//		double mix = pressure+(pvnrt - standardPVNRT);
+		double pvnrt = mass * sub / tileVolume;
+		double mix = pressure+(pvnrt - standardPVNRT);
 		
 //		System.out.println("Pressure: " + pressure);
 //		System.out.println("pvnrt: "+other + "atm: "+pressure);
-		this.pressure = pressure;
+		this.pressure = -1*mix - 1350;
 	}
 
 	public double getDensity() {

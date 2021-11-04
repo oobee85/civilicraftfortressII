@@ -737,18 +737,12 @@ public class World {
 			
 			// Q = o(T1 - T2) * A
 			// o = 5.670374419 × 10^-8 W*m-2*K-4
-//			double boltzmannConstantMod = 5.670374e-4;
-//			Air air = tile.getAir();
 			double end = 0;
-			double deltaT = Math.abs((tile.getTemperature() - World.MINTEMP) - (air.getTemperature() - World.MINTEMP));
+			double deltaT = (tile.getTemperature() - World.MINTEMP) - (air.getTemperature() - World.MINTEMP);
 			end = World.BOLTZMANNMODIFIED * World.VOLUMEPERTILE * deltaT * 1000;
-			if(tile.getTemperature() > air.getTemperature()) {
-				air.addEnergy(end);
-				tile.addEnergy(-1*end);
-			}else {
-				tile.addEnergy(end);
-				air.addEnergy(-1*end);
-			}
+			air.addEnergy(end);
+			tile.addEnergy(-1*end);
+
 			
 		}
 	}
