@@ -686,27 +686,49 @@ public class World {
 	}
 	public void updateAirStuff() {
 		for(Tile tile : getTilesRandomly()) {
+//			Air air = tile.getAir();
+//			air.updateHeight(tile.getHeight());
+//			air.updateMaxVolume();
+//			air.updateHumidity();
+//			air.updatePressure();
+
 			tile.updateAir();
 //			tile.updateAtmosphere();
 		}
 			
 	}
 	
-	public void updateEnergyToTemperature() {
-		for(Tile tile : getTiles()) {
-			Air air = tile.getAir();
-			double tileEnergy = tile.getEnergy();
+	public void updateEnergyToTemperature(Tile t) {
+		if(t != null) {
+			Air air = t.getAir();
+			double tileEnergy = t.getEnergy();
 			double airEnergy = air.getEnergy();
 			
 			// Q=mcAT
 			// T= Q/mc -273
 			double tileTemp = tileEnergy / (World.MASSGROUND) + World.MINTEMP;
-			tile.setTemperature(tileTemp);
+			t.setTemperature(tileTemp);
 			
 			// T = Q/moles -273
 			double airTemp = airEnergy / (35) + World.MINTEMP;
 			air.setTemperature(airTemp);
+		}else {
+			for(Tile tile : getTilesRandomly()) {
+				Air air = tile.getAir();
+				double tileEnergy = tile.getEnergy();
+				double airEnergy = air.getEnergy();
+				
+				// Q=mcAT
+				// T= Q/mc -273
+				double tileTemp = tileEnergy / (World.MASSGROUND) + World.MINTEMP;
+				tile.setTemperature(tileTemp);
+				
+				// T = Q/moles -273
+				double airTemp = airEnergy / (35) + World.MINTEMP;
+				air.setTemperature(airTemp);
+			}
 		}
+		
 	}
 	
 	public void blackBodyRadiation() {
@@ -719,7 +741,7 @@ public class World {
 //			Air air = tile.getAir();
 			double end = 0;
 			double deltaT = Math.abs((tile.getTemperature() - World.MINTEMP) - (air.getTemperature() - World.MINTEMP));
-			end = World.BOLTZMANNMODIFIED * World.VOLUMEPERTILE * deltaT;
+			end = World.BOLTZMANNMODIFIED * World.VOLUMEPERTILE * deltaT * 1000;
 			if(tile.getTemperature() > air.getTemperature()) {
 				air.addEnergy(end);
 				tile.addEnergy(-1*end);
@@ -734,6 +756,7 @@ public class World {
 //		if(World.ticks % TICKSTOUPDATEAIR == 0) {
 //			return;
 //		}
+	
 		double averageWater = 0;
 		double averageTemp = 0;
 		for(Tile t : getTiles()) {
@@ -751,7 +774,8 @@ public class World {
 				System.out.println("null tile when updating energy");
 				continue;
 			}
-			
+//			blackBodyRadiation();
+//			updateEnergyToTemperature(tile);
 			//adds energy for lava
 			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
 //				double modifier = 1 - (tile.getTemperature()/MAXTEMP);
@@ -859,12 +883,13 @@ public class World {
 //				tile.addEnergy(seasonEnergy);
 //			}
 			
+			updateEnergyToTemperature(tile);
+//			blackBodyRadiation();
 			
 			tile.addEnergy(seasonEnergy);
 			tile.addEnergy(addedEnergy);
 			
-			updateEnergyToTemperature();
-			blackBodyRadiation();
+			updateEnergyToTemperature(tile);
 			
 			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 1) {
 //				tile.setEnergy(21000);
@@ -874,6 +899,7 @@ public class World {
 //			tile.setEnergy(energy);
 //			tile.addEnergy(joules);
 		}
+		
 	}
 	
 	public void updateAirMovement() {
@@ -983,7 +1009,7 @@ public class World {
 	}
 	private void initializeTileEnergy() {
 		double defaultEnergy = DEFAULTENERGY + 2000;
-		double defaultAirEnergy = defaultEnergy / 2.8;
+		double defaultAirEnergy = defaultEnergy / 3;
 		for(Tile tile: getTilesRandomly()) {
 			double energy = defaultEnergy;
 			double airEnergy = defaultAirEnergy;
@@ -1018,14 +1044,19 @@ public class World {
 			
 	}
 	public void updateTerrainChange(boolean start) {
-		updateAirStuff();
-		updateEnergy();
-		updateTileTemperature();
-		updateAirMovement();
 		if(start == true) {
 			setTileMass();
 			initializeTileEnergy();
 		}
+		updateAirStuff();
+		updateEnergyToTemperature(null);
+		updateEnergy();
+		updateEnergyToTemperature(null);
+		blackBodyRadiation();
+		updateEnergyToTemperature(null);
+		updateAirMovement();
+		updateEnergyToTemperature(null);
+		
 		
 		
 		for(Tile tile : getTiles()) {
