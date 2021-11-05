@@ -167,7 +167,6 @@ public class GameView {
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.tileSize);
 						state.boxSelect[1] = currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize);
-						state.boxSelect = Utils.normalizeRectangle(state.boxSelect[0], state.boxSelect[1]);
 						selectInBox(state.boxSelect[0], state.boxSelect[1], shiftDown);
 					}
 				}

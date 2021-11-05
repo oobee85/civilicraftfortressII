@@ -582,13 +582,47 @@ public final class Utils {
 		return new Position[] { new Position(x, y), new Position(x + width, y + height) };
 	}
 
-	public static List<Tile> getTilesBetween(World world, Position topLeft, Position botRight) {
-		int topEvenY = (int) topLeft.y;
-		int topOddY = (int) (topLeft.y - 0.5);
-		int botEvenY = (int) (botRight.y);
-		int botOddY = (int) (botRight.y - 0.5);
+	public static List<Tile> getTilesBetween(World world, Position cornerOne, Position cornerTwo) {
+		int leftEdge = Math.min(cornerOne.getIntX(), cornerTwo.getIntX());
+		int rightEdge = Math.max(cornerOne.getIntX(), cornerTwo.getIntX());
+		int topEvenY = cornerOne.getIntY();
+		int topOddY = cornerOne.getIntY();
+		if (cornerOne.getIntX() % 2 == 0) {
+			if (cornerOne.y - cornerOne.getIntY() < 0.5f) {
+				topOddY = cornerOne.getIntY() - 1;
+			}
+		}
+		else {
+			if (cornerOne.y - cornerOne.getIntY() >= 0.5f) {
+				topEvenY = cornerOne.getIntY() + 1;
+			}
+		}
+		int botEvenY = cornerTwo.getIntY();
+		int botOddY = cornerTwo.getIntY();
+		if (cornerTwo.getIntX() % 2 == 0) {
+			if (cornerTwo.y - cornerTwo.getIntY() < 0.5f) {
+				botOddY = cornerTwo.getIntY() - 1;
+			}
+		}
+		else {
+			if (cornerTwo.y - cornerTwo.getIntY() >= 0.5f) {
+				botEvenY = cornerTwo.getIntY() + 1;
+			}
+		}
+		
+		if (topEvenY > botEvenY) {
+			int temp = topEvenY;
+			topEvenY = botEvenY;
+			botEvenY = temp;
+		}
+		if (topOddY > botOddY) {
+			int temp = topOddY;
+			topOddY = botOddY;
+			botOddY = temp;
+		}
+		
 		LinkedList<Tile> tiles = new LinkedList<>();
-		for (int i = topLeft.getIntX(); i <= botRight.getIntX(); i++) {
+		for (int i = leftEdge; i <= rightEdge; i++) {
 			int minj = i % 2 == 0 ? topEvenY : topOddY;
 			int maxj = i % 2 == 0 ? botEvenY : botOddY;
 			for (int j = minj; j <= maxj; j++) {

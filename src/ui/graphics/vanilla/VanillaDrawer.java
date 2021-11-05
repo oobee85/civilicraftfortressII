@@ -585,8 +585,7 @@ public class VanillaDrawer extends Drawer {
 		g.setStroke(new BasicStroke(strokeWidth));
 		g.setColor(new Color(0, 0, 0, 64));
 		if (state.leftMouseDown && state.draggingMouse && state.boxSelect[0] != null && state.boxSelect[1] != null) {
-			Position[] box = Utils.normalizeRectangle(state.boxSelect[0], state.boxSelect[1]);
-			for (Tile tile : Utils.getTilesBetween(game.world, box[0], box[1])) {
+			for (Tile tile : Utils.getTilesBetween(game.world, state.boxSelect[0], state.boxSelect[1])) {
 				Point drawAt = getDrawingCoords(tile.getLocation());
 				g.drawRect(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, frozenTileSize - strokeWidth,
 						frozenTileSize - strokeWidth);
