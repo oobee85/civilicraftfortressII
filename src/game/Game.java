@@ -857,7 +857,7 @@ public class Game {
 	public void spawnWeather(Tile center, int radius) {
 		HashSet<Tile> tiles = world.getNeighborsInRadius(center, radius);
 		for(Tile t: tiles) {
-			t.liquidType = LiquidType.WATER;
+			t.liquidType = LiquidType.SNOW;
 			t.liquidAmount += 5;
 //			double distance = t.getLocation().distanceTo(center.getLocation());
 //			float height = (float) (t.getHeight() + (radius - distance) / (radius) * 0.1);

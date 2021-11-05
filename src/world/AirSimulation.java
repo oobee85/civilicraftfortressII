@@ -122,8 +122,10 @@ public class AirSimulation {
 			double maxVol = tile.getAir().getMaxVolumeLiquid();
 			//does raining
 			if(tile.getAir().canRain() && tile.liquidType != LiquidType.LAVA) {
-				if(tile.liquidType != LiquidType.ICE) {
+				if(tile.liquidType != LiquidType.ICE && tile.liquidType != LiquidType.SNOW && tile.getTemperature() >= World.FREEZETEMP) {
 					tile.liquidType = LiquidType.WATER;
+				}else if(tile.liquidType != LiquidType.WATER && tile.liquidType != LiquidType.ICE && tile.getTemperature() < World.FREEZETEMP) {
+					tile.liquidType = LiquidType.SNOW;
 				}
 				double totalAmount = tile.liquidAmount + tile.getAir().getVolumeLiquid();
 				
