@@ -48,7 +48,7 @@ public class World {
 //	public static final int MMAIR = 10;
 //	public static final double MMCO2 = 0.04401; // [kg/mol CO2]
 	public static final double MASSGROUND = 1 * VOLUMEPERTILE; // [kg]
-	public static final double MMAIR = 0.02897; // [kg/mol AIR]
+	public static final double MMAIR = 0.05; // [kg/mol AIR]
 	public static final double R = 8.31432; // [Nm/mol*K]  [J/mol*K]
 	public static final double RYDBERG = 0.08206; // [atm*L/mol*K]
 	public static final double G = 9.80665; // [m/s^2]

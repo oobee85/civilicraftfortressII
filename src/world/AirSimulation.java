@@ -67,7 +67,8 @@ public class AirSimulation {
 			//adds energy for lava
 			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
 //				double modifier = 1 - (tile.getTemperature()/MAXTEMP);
-				tile.addEnergy(tile.liquidAmount);
+				double addedEnergy = tile.liquidAmount / tile.getEnergy() * 1000;
+				tile.addEnergy(addedEnergy);
 			}
 			
 			
@@ -197,11 +198,13 @@ public class AirSimulation {
 		double totalMass = 0;
 		double [][] pressureTemp = new double[worldWidth][worldHeight];
 		double [][] volumeTemp = new double[worldWidth][worldHeight];
+//		double [][] humidityTemp = new double[worldWidth][worldHeight];
 		double [][] energyTemp = new double[worldWidth][worldHeight];
 		for(Tile t: tiles) {
 			pressureTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getPressure();
 			volumeTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getVolumeLiquid();
-			energyTemp[t.getLocation().x()][t.getLocation().y()] = t.getEnergy();
+//			humidityTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getVolumeLiquid();
+			energyTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getEnergy();
 		}
 		
 		for(Tile tile: tiles) {
@@ -252,10 +255,17 @@ public class AirSimulation {
 //						}
 
 						double deltae = Math.abs(myenergy - oenergy) /100;
+						
 						double ratio = myenergy / deltavol;
 //					double ratio = oenergy / myenergy * Math.sqrt(deltae);
 						energyTemp[otherLoc.x()][otherLoc.y()] += deltae;
 						energyTemp[tileLoc.x()][tileLoc.y()] -= deltae;
+						
+						if (myvolume > ovolume * 1.002) {
+							double deltaHum = Math.abs(myvolume - ovolume) /10;
+							volumeTemp[otherLoc.x()][otherLoc.y()] += deltaHum;
+							volumeTemp[tileLoc.x()][tileLoc.y()] -= deltaHum;
+						}
 						
 //						System.out.println(deltae);
 
@@ -271,11 +281,16 @@ public class AirSimulation {
 		}
 		
 		for(Tile t: tiles) {
-			t.setEnergy(energyTemp[t.getLocation().x()][t.getLocation().y()]);
-//			t.getAir().setVolumeLiquid(volumeTemp[t.getLocation().x()][t.getLocation().y()]);
+			Air air = t.getAir();
+			air.setEnergy(energyTemp[t.getLocation().x()][t.getLocation().y()]);
+//			t.setHumidity(energyTemp[t.getLocation().x()][t.getLocation().y()]);
+			air.setVolumeLiquid(volumeTemp[t.getLocation().x()][t.getLocation().y()]);
 //			t.setEnergy(energyTemp[t.getLocation().x()][t.getLocation().y()]);
 //			totalMass += t.getAir().getVolumeLiquid();
 		}
 //		System.out.println(totalMass);
 	}
+	
+	
+	
 }
