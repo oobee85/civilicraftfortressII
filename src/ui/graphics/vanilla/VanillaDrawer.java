@@ -31,7 +31,7 @@ public class VanillaDrawer extends Drawer {
 	private static final Image RALLY_POINT_IMAGE = Utils.loadImage("Images/interfaces/queuelocation.png");
 	private static final Image TARGET_IMAGE = Utils.loadImage("Images/interfaces/ivegotyouinmysights.png");
 	private static final Image FLAG = Utils.loadImage("Images/interfaces/flag.png");
-	private static final Image BUILD_ICON = Utils.loadImage("Images/interfaces/building.png");
+	private static final Image BUILD_ICON = Utils.loadImage("Images/interfaces/building.gif");
 	private static final Image HARVEST_ICON = Utils.loadImage("Images/interfaces/harvest.png");
 	private static final Image GUARD_ICON = Utils.loadImage("Images/interfaces/guard.png");
 	private static final Image AUTO_BUILD_ICON = Utils.loadImage("Images/interfaces/autobuild.png");
@@ -761,7 +761,7 @@ public class VanillaDrawer extends Drawer {
 			int partialHeight = Math.max(1, (int) (frozenTileSize * percentDone));
 			bI = bI.getSubimage(0, bI.getHeight() - imageRatio, bI.getWidth(), imageRatio);
 			g.drawImage(bI, drawx, drawy - partialHeight + drawh, draww, partialHeight, null);
-			g.drawImage(BUILD_ICON, drawx + frozenTileSize / 4, drawy + frozenTileSize / 4, draww * 3 / 4, drawh * 3 / 4, null);
+			g.drawImage(BUILD_ICON, drawx + frozenTileSize / 8, drawy + frozenTileSize / 8, draww * 6 / 8, drawh * 6 / 8, null);
 		} else {
 			g.drawImage(bI, drawx, drawy, draww, drawh, null);
 		}

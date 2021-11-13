@@ -735,6 +735,9 @@ public class Game {
 				thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 				thingsToPlace.add(Game.unitTypeMap.get("CARAVAN"));
 			}
+			if(SPAWN_EXTRA) {
+				thingsToPlace.add(Game.buildingTypeMap.get("WINDMILL"));
+			}
 			Tile spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), world.getHeight()/2));
 			int minRadius = 20;
 			while(!isValidSpawnLocation(spawnTile, minRadius)) {
@@ -792,17 +795,25 @@ public class Game {
 		}
 	}
 	private void spawnExtraStuff(Faction faction) {
-		for(Building b : faction.getBuildings()) {
-			if(b.hasInventory()) {
-				b.getInventory().addItem(ItemType.values()[(int)(Math.random()*ItemType.values().length)],
-				                         b.getInventory().getMaxStack()/4);
-			}
-		}
 		for(Unit u : faction.getUnits()) {
 			if(u.hasInventory()) {
 				u.getInventory().addItem(ItemType.values()[(int)(Math.random()*ItemType.values().length)], 
 				                         u.getInventory().getMaxStack()/4);
 			}
+		}
+		Building windmill = null;
+		for(Building b : faction.getBuildings()) {
+			if(b.hasInventory()) {
+				b.getInventory().addItem(ItemType.values()[(int)(Math.random()*ItemType.values().length)],
+				                         b.getInventory().getMaxStack()/4);
+			}
+			if(b.getType() == buildingTypeMap.get("WINDMILL")) {
+				windmill = b;
+			}
+		}
+		if(windmill != null) {
+			windmill.setRemainingEffort(windmill.getType().getBuildingEffort());
+			windmill.setPlanned(true);
 		}
 	}
 	
