@@ -145,7 +145,7 @@
 	{
 		"name":"WINDMILL",
 		"info":"Produces lots of food",
-		"image":"Images/buildings/ancientwindmill.png",
+		"image":"Images/buildings/ancientwindmill.gif",
 		"mesh":"models/windmill.ply",
 		"texture":"textures/pallet1.png",
 		"vision":1,
