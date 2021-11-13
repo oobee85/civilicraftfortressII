@@ -43,8 +43,9 @@ public class InfoPanel extends JPanel {
 		return button;
 	}
 	
+	public static final int EXPLODE_BUTTON_SIZE = 28;
 	public JButton addExplodeButton() {
-		Dimension size = new Dimension(28, 28);
+		Dimension size = new Dimension(EXPLODE_BUTTON_SIZE, EXPLODE_BUTTON_SIZE);
 		JButton button = KUIConstants.setupButton("", EXPLODE_ICON, size);
 		button.setFont(KUIConstants.buttonFontMini);
 		this.setLayout(null);

@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.Map.*;
 
 import game.*;
+import game.components.*;
 import ui.*;
 import utils.*;
 
@@ -61,20 +62,34 @@ public class UnitTypeInfoPanel extends InfoPanel {
 			g.drawString(rangeStr, x + iconSize + gap, y + iconSize/2 + fontSize/3);
 		}
 	}
-	
+
+	private static final int ITEM_ICON_SIZE = 16;
 	public static void drawCosts(Graphics g, HashMap<ItemType, Integer> costs, int x, int y, Faction faction) {
 		g.setFont(KUIConstants.combatStatsFont);
 		int fontSize = g.getFont().getSize();
-		int iconSize = 16;
 		int gap = 1;
 		
 		for(Entry<ItemType, Integer> entry : costs.entrySet()) {
-			g.drawImage(entry.getKey().getMipMap().getImage(iconSize), x, y, iconSize, iconSize, null);
+			g.drawImage(entry.getKey().getMipMap().getImage(ITEM_ICON_SIZE), x, y, ITEM_ICON_SIZE, ITEM_ICON_SIZE, null);
 			int currentAmount = faction.getInventory().getItemAmount(entry.getKey());
 			String str = currentAmount + "/" + entry.getValue() + " " + entry.getKey().toString();
 			g.setColor(currentAmount >= entry.getValue() ? Color.black : Color.red);
-			g.drawString(str, x + iconSize + gap + 1, y + iconSize/2 + fontSize/3);
-			y += iconSize + gap;
+			g.drawString(str, x + ITEM_ICON_SIZE + gap + 1, y + ITEM_ICON_SIZE/2 + fontSize/3);
+			y += ITEM_ICON_SIZE + gap;
+		}
+	}
+	public static void drawInventory(Graphics g, Inventory inventory, int x, int y) {
+		int fontSize = g.getFont().getSize();
+		int gap = 1;
+		
+		for(Item item : inventory.getItems()) {
+			if(item != null && item.getAmount() != 0) {
+				g.drawImage(item.getType().getMipMap().getImage(ITEM_ICON_SIZE), x, y, ITEM_ICON_SIZE, ITEM_ICON_SIZE, null);
+				String str = item.getAmount() + "/" + inventory.getMaxStack();
+				g.setColor(Color.black);
+				g.drawString(str, x + ITEM_ICON_SIZE + gap + 1, y + ITEM_ICON_SIZE/2 + fontSize/3);
+				y += ITEM_ICON_SIZE + gap;
+			}
 		}
 	}
 	
