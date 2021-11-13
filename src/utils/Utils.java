@@ -18,6 +18,8 @@ import ui.graphics.opengl.maths.*;
 import world.*;
 
 public final class Utils {
+
+	public static final String IMAGEICON_ANIMATED = "GIF";
 	
 	public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	
@@ -142,7 +144,11 @@ public final class Utils {
 	
 	public static final ImageIcon resizeImageIcon(ImageIcon icon, int width, int height) {
 		Image image = icon.getImage(); // transform it 
-		Image newimg = image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+		int scalingMode = java.awt.Image.SCALE_SMOOTH;
+		if(icon.getDescription().equals(IMAGEICON_ANIMATED)) {
+			scalingMode = java.awt.Image.SCALE_DEFAULT;
+		}
+		Image newimg = image.getScaledInstance(width, height, scalingMode);
 		return new ImageIcon(newimg);  // transform it back
 	}
 

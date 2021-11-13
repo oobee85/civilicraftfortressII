@@ -25,10 +25,15 @@ public class MipMap {
 		int index = 0;
 		for (String s : paths) {
 			mipmaps[index] = Utils.loadImageIcon(s);
+			if(s.endsWith(".gif")) {
+				// resizing animated imageicon is different from static
+				mipmaps[index].setDescription(Utils.IMAGEICON_ANIMATED);
+			}
 			mipmapSizes[index] = mipmaps[index].getIconWidth();
 			avgColors[index] = Utils.getAverageColor(Utils.toBufferedImage(mipmaps[index].getImage()));
 			shadows[index] = Utils.shadowFilter(mipmaps[index]);
 			highlights[index] = Utils.highlightFilter(mipmaps[index], HIGHLIGHT_COLOR);
+
 			index++;
 		}
 	}
