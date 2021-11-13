@@ -64,5 +64,8 @@ public class BuildingInfoPanel extends InfoPanel {
 		int hpbarHeight = g.getFont().getSize();
 		String hpstring =  String.format("%d/%d",(int)showing.getHealth(), (int)showing.getType().getHealth());
 		KUIConstants.drawProgressBar(g, Color.green, Color.red, Color.black, showing.getHealth()/showing.getType().getHealth(), hpstring, 0, getHeight()-hpbarHeight, getWidth(), hpbarHeight);
+		
+		if(showing.hasInventory())
+			UnitTypeInfoPanel.drawInventory(g, showing.getInventory(), 2, EXPLODE_BUTTON_SIZE + 2);
 	}
 }

@@ -18,6 +18,7 @@ import world.*;
 public class Game {
 	
 	public static boolean DEBUG = false;
+	public static boolean SPAWN_EXTRA = false;
 
 	public static final ArrayList<UnitType> unitTypeList = new ArrayList<>();
 	public static final HashMap<String, UnitType> unitTypeMap = new HashMap<>();
@@ -723,13 +724,16 @@ public class Game {
 //			thingsToPlace.add(Game.buildingTypeMap.get("BLACKSMITH"));
 //			thingsToPlace.add(Game.unitTypeMap.get("HORSEARCHER"));
 //			thingsToPlace.add(Game.unitTypeMap.get("KNIGHT"));
-			if(easymode) {
+			if(easymode || SPAWN_EXTRA) {
+				addResources(newFaction);
 				thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
 				thingsToPlace.add(Game.buildingTypeMap.get("WORKSHOP"));
 				thingsToPlace.add(Game.buildingTypeMap.get("BLACKSMITH"));
+				thingsToPlace.add(Game.buildingTypeMap.get("SAWMILL"));
 				thingsToPlace.add(Game.plantTypeMap.get("BERRY"));
 				thingsToPlace.add(Game.plantTypeMap.get("TREE"));
-				addResources(newFaction);
+				thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
+				thingsToPlace.add(Game.unitTypeMap.get("CARAVAN"));
 			}
 			Tile spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), world.getHeight()/2));
 			int minRadius = 20;
@@ -745,6 +749,7 @@ public class Game {
 			visited.add(spawnTile);
 			
 			while(!thingsToPlace.isEmpty()) {
+				Collections.shuffle(tovisit);
 				Tile current = tovisit.removeFirst();
 				Object thingType = thingsToPlace.getFirst();
 				if(thingType instanceof BuildingType) {
@@ -752,7 +757,6 @@ public class Game {
 					if (isValidSpawnTileForBuilding(current, type)) {
 						summonBuilding(current, type, newFaction);
 						thingType = null;
-						
 					}
 				}
 				else if(thingType instanceof PlantType) {
@@ -782,8 +786,24 @@ public class Game {
 				}
 			}
 			index++;
+			if(SPAWN_EXTRA) {
+				spawnExtraStuff(newFaction);
+			}
 		}
-		
+	}
+	private void spawnExtraStuff(Faction faction) {
+		for(Building b : faction.getBuildings()) {
+			if(b.hasInventory()) {
+				b.getInventory().addItem(ItemType.values()[(int)(Math.random()*ItemType.values().length)],
+				                         b.getInventory().getMaxStack()/4);
+			}
+		}
+		for(Unit u : faction.getUnits()) {
+			if(u.hasInventory()) {
+				u.getInventory().addItem(ItemType.values()[(int)(Math.random()*ItemType.values().length)], 
+				                         u.getInventory().getMaxStack()/4);
+			}
+		}
 	}
 	
 	

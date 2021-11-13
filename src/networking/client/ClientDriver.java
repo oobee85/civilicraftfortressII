@@ -1,6 +1,7 @@
 package networking.client;
 
 import java.awt.*;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -42,14 +43,13 @@ public class ClientDriver {
 	}
 	
 	public static void main(String[] args) {
+		Set<String> flags = new HashSet<>();
 		for(int i = 0; i < args.length; i++) {
 			System.out.println(args[i]);
+			flags.add(args[i].toLowerCase());
 		}
-		if(args.length >= 1) {
-			if(args[0].toLowerCase().equals("debug")) {
-				Game.DEBUG = true;
-			}
-		}
+		Game.DEBUG = flags.contains("debug");
+		Game.SPAWN_EXTRA = flags.contains("spawn_extra");
 		EventQueue.invokeLater(() -> {
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
