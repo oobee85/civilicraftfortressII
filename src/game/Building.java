@@ -65,7 +65,7 @@ public class Building extends Thing implements Serializable {
 		// building builds units
 		if(remainingEffortToProduceUnit <= 0 && currentProducingUnit != null) {
 			Unit unit = getProducingUnit().remove();
-			unit.queuePlannedAction(new PlannedAction(getSpawnLocation(), ActionType.MOVE));
+			unit.queuePlannedAction(PlannedAction.moveTo(getSpawnLocation()));
 			getTile().addUnit(unit);
 			world.addUnit(unit);
 			currentProducingUnit = null;

@@ -10,6 +10,7 @@ import java.util.concurrent.*;
 import javax.swing.Timer;
 
 import game.*;
+import game.actions.*;
 import networking.*;
 import networking.message.*;
 import ui.*;
@@ -270,7 +271,7 @@ public class Server {
 			if(thing instanceof Unit) {
 				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
 				if(targetTile != null) {
-					gui.getCommandInterface().moveTo((Unit)thing, targetTile, message.getClearQueue());
+					gui.getCommandInterface().planAction((Unit)thing, PlannedAction.moveTo(targetTile), message.getClearQueue());
 				}
 			}
 		}
@@ -278,7 +279,7 @@ public class Server {
 			if(thing instanceof Unit) {
 				Thing target = ThingMapper.get(message.getTargetID());
 				if(target != null) {
-					gui.getCommandInterface().attackThing((Unit)thing, target, message.getClearQueue());
+					gui.getCommandInterface().planAction((Unit)thing, PlannedAction.attack(target), message.getClearQueue());
 				}
 			}
 		}
@@ -286,7 +287,7 @@ public class Server {
 			if(thing instanceof Unit) {
 				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
 				if(targetTile != null) {
-					gui.getCommandInterface().buildThing((Unit)thing, targetTile, true, message.getClearQueue());
+					gui.getCommandInterface().planAction((Unit)thing, PlannedAction.buildOnTile(targetTile, true), message.getClearQueue());
 				}
 			}
 		}
@@ -294,7 +295,7 @@ public class Server {
 			if(thing instanceof Unit) {
 				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
 				if(targetTile != null) {
-					gui.getCommandInterface().buildThing((Unit)thing, targetTile, false, message.getClearQueue());
+					gui.getCommandInterface().planAction((Unit)thing, PlannedAction.buildOnTile(targetTile, false), message.getClearQueue());
 				}
 			}
 		}
@@ -304,7 +305,7 @@ public class Server {
 				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
 				BuildingType buildingType = Game.buildingTypeMap.get(message.getType());
 				if(target != null) {
-					gui.getCommandInterface().buildThing((Unit)thing, target.getTile(), buildingType.isRoad(), message.getClearQueue());
+					gui.getCommandInterface().planAction((Unit)thing, PlannedAction.buildOnTile(target.getTile(), buildingType.isRoad()), message.getClearQueue());
 				}
 				if(targetTile != null) {
 					gui.getCommandInterface().planBuilding((Unit)thing, targetTile, message.getClearQueue(), buildingType);

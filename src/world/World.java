@@ -433,7 +433,7 @@ public class World {
 		tile.addUnit(animal);
 		worldData.addUnit(animal);
 		if(target != null) {
-			animal.queuePlannedAction(new PlannedAction(target, ActionType.MOVE));
+			animal.queuePlannedAction(PlannedAction.moveTo(target));
 		}
 		return animal;
 	}

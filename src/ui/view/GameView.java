@@ -470,7 +470,7 @@ public class GameView {
 		for (Thing thing : selectedThings) {
 			if (thing instanceof Unit) {
 				Unit unit = (Unit) thing;
-				commandInterface.planAction(unit, new PlannedAction(tile, ActionType.WANDER_AROUND), !shiftEnabled);
+				commandInterface.planAction(unit, PlannedAction.wanderAroundTile(tile), !shiftEnabled);
 			}
 		}
 	}
@@ -495,10 +495,10 @@ public class GameView {
 					targetThing = tile.getRoad();
 				}
 				if (targetThing != null) {
-					commandInterface.attackThing(unit, targetThing, !shiftEnabled);
+					commandInterface.planAction(unit, PlannedAction.attack(targetThing), !shiftEnabled);
 				}
 				else {
-					commandInterface.attackMove(unit, tile, !shiftEnabled);
+					commandInterface.planAction(unit, PlannedAction.attackMoveTo(tile), !shiftEnabled);
 				}
 			}
 		}
@@ -526,13 +526,14 @@ public class GameView {
 					Building targetBuilding = targetTile.getBuilding();
 					if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
 							&& targetBuilding.isBuilt() && targetBuilding.getType().isCastle()) {
-						commandInterface.deliver(unit, targetBuilding, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.deliver(targetBuilding), !shiftDown);
 					}
 					else if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
 							&& targetBuilding.isBuilt() && targetBuilding.hasInventory() && !targetBuilding.getInventory().isEmpty()) {
-						commandInterface.takeItems(unit, targetBuilding, !shiftDown);
-					}else {
-						commandInterface.moveTo(unit, targetTile, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.takeItemsFrom(targetBuilding), !shiftDown);
+					}
+					else {
+						commandInterface.planAction(unit, PlannedAction.moveTo(targetTile), !shiftDown);
 					}
 				}
 				else if (unit.getType().isBuilder()) {
@@ -542,28 +543,29 @@ public class GameView {
 					}
 					if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
 							&& targetBuilding.isBuilt() && targetBuilding.getType().isHarvestable()) {
-						commandInterface.harvestThing(unit, targetBuilding, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.harvest(targetBuilding), !shiftDown);
 					} else if (targetBuilding != null
 							&& (targetBuilding.getFaction() == unit.getFaction() || targetBuilding.getType().isRoad())
 							&& !targetBuilding.isBuilt()) {
-						commandInterface.buildThing(unit, targetBuilding.getTile(), targetBuilding.getType().isRoad(),
-								!shiftDown);
+						commandInterface.planAction(unit, 
+						                            PlannedAction.buildOnTile(targetBuilding.getTile(), targetBuilding.getType().isRoad()),
+						                            !shiftDown);
 					}
 					else if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction() 
 							&& targetBuilding.getType().isCastle() && unit.hasInventory()) {
-						commandInterface.deliver(unit, targetBuilding, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.deliver(targetBuilding), !shiftDown);
 					}
 					else if (targetTile.getPlant() != null && targetTile.getPlant().isDead() == false) {
-						commandInterface.harvestThing(unit, targetTile.getPlant(), !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.harvest(targetTile.getPlant()), !shiftDown);
 					}
 					else if(targetTile.getResource() != null && unit.getFaction().inRangeColony(unit, targetTile)) {
-						commandInterface.harvestResource(unit, targetTile, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.harvestTile(targetTile), !shiftDown);
 					}
 					else if(targetTile.getTerrain() == Terrain.ROCK && unit.getFaction().inRangeColony(unit, targetTile)) {
-						commandInterface.harvestResource(unit, targetTile, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.harvestTile(targetTile), !shiftDown);
 					}
 					else {
-						commandInterface.moveTo(unit, targetTile, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.moveTo(targetTile), !shiftDown);
 					}
 
 				} else {
@@ -581,9 +583,9 @@ public class GameView {
 						targetThing = targetTile.getBuilding();
 					}
 					if (targetThing != null) {
-						commandInterface.attackThing(unit, targetThing, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.attack(targetThing), !shiftDown);
 					} else {
-						commandInterface.moveTo(unit, targetTile, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.moveTo(targetTile), !shiftDown);
 					}
 				}
 			}

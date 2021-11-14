@@ -4,6 +4,8 @@ import utils.*;
 import world.*;
 import static game.actions.ActionType.*;
 
+import java.util.*;
+
 import game.*;
 
 public class PlannedAction {
@@ -15,47 +17,83 @@ public class PlannedAction {
 	public final Tile targetTile;
 	public final Thing target;
 	public final ActionType type;
-	private boolean forceDone;
 	
-	// for stuff like harvesting
+	private boolean forceDone;
 	private PlannedAction followup;
 	
-	
-	public PlannedAction(PlannedAction copy) {
+	private PlannedAction(PlannedAction copy) {
 		this.targetTile = copy.targetTile;
 		this.target = copy.target;
 		this.type = copy.type;
 	}
-	public PlannedAction(Thing target) {
-		this.targetTile = null;
-		this.target = target;
-		this.type = NO_TYPE;
+	private PlannedAction(Tile targetTile, ActionType type) {
+		this.targetTile = targetTile;
+		this.target = null;
+		this.type = type;
 	}
-	public PlannedAction(Tile targetTile, boolean isRoad) {
+	private PlannedAction(Tile targetTile, boolean isRoad) {
+		this(targetTile, isRoad, null);
+	}
+	private PlannedAction(Tile targetTile, boolean isRoad, PlannedAction followup) {
 		this.targetTile = targetTile;
 		this.target = null;
 		this.type = isRoad ? BUILD_ROAD : BUILD_BUILDING;
-	}
-	public PlannedAction(Tile targetTile, boolean isRoad, PlannedAction followup) {
-		this(targetTile, isRoad);
 		this.followup = followup;
 	}
-	public PlannedAction(Thing target, ActionType type) {
-		this.targetTile = null;
-		this.target = target;
-		this.type = type;
+	
+	private PlannedAction(Thing target) {
+		this(target, NO_TYPE);
 	}
-	public PlannedAction(Tile target, ActionType type) {
-		this.targetTile = target;
-		this.target = null;
-		this.type = type;
+	private PlannedAction(Thing target, ActionType type) {
+		this(target, type, null);
 	}
-	public PlannedAction(Thing target, ActionType type, PlannedAction followup) {
+	private PlannedAction(Thing target, ActionType type, PlannedAction followup) {
 		this.targetTile = null;
 		this.target = target;
 		this.type = type;
 		this.followup = followup;
 	}
+
+	public static PlannedAction makeCopy(PlannedAction original) {
+		return new PlannedAction(original);
+	}
+	public static PlannedAction eatPlant(Plant plant) {
+		return new PlannedAction(plant);
+	}
+	public static PlannedAction buildOnTile(Tile tile, boolean road) {
+		return new PlannedAction(tile, road);
+	}
+	public static PlannedAction buildOnTile(Tile tile, boolean road, PlannedAction followup) {
+		return new PlannedAction(tile, road, followup);
+	}
+	public static PlannedAction attack(Thing target) {
+		return new PlannedAction(target, ActionType.ATTACK);
+	}
+	public static PlannedAction harvest(Thing target) {
+		return new PlannedAction(target, ActionType.HARVEST);
+	}
+	public static PlannedAction takeItemsFrom(Thing target) {
+		return new PlannedAction(target, ActionType.TAKE_ITEMS);
+	}
+	public static PlannedAction deliver(Thing target) {
+		return new PlannedAction(target, ActionType.DELIVER);
+	}
+	public static PlannedAction deliver(Thing target, PlannedAction followup) {
+		return new PlannedAction(target, ActionType.DELIVER, followup);
+	}
+	public static PlannedAction moveTo(Tile targetTile) {
+		return new PlannedAction(targetTile, ActionType.MOVE);
+	}
+	public static PlannedAction attackMoveTo(Tile targetTile) {
+		return new PlannedAction(targetTile, ActionType.ATTACK_MOVE);
+	}
+	public static PlannedAction harvestTile(Tile targetTile) {
+		return new PlannedAction(targetTile, ActionType.HARVEST);
+	}
+	public static PlannedAction wanderAroundTile(Tile targetTile) {
+		return new PlannedAction(targetTile, ActionType.WANDER_AROUND);
+	}
+	
 	public PlannedAction getFollowUp() {
 		return this.followup;
 	}

@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.*;
 
 import game.*;
+import game.actions.*;
 import ui.*;
 import utils.*;
 import world.*;
@@ -273,7 +274,7 @@ public class BasicAI implements AIInterface {
 			building = planBuilding(unit, tile, true, Game.buildingTypeMap.get("WALL_WOOD"));
 		}
 		else if(!building.isBuilt()) {
-			commands.buildThing(unit, tile, false, true);
+			commands.planAction(unit, PlannedAction.buildOnTile(tile, false), true);
 		}
 		return building != null;
 	}
@@ -289,7 +290,7 @@ public class BasicAI implements AIInterface {
 			road = planBuilding(unit, tile, true, Game.buildingTypeMap.get("STONE_ROAD"));
 		}
 		else if(!road.isBuilt()) {
-			commands.buildThing(unit, tile, true, true);
+			commands.planAction(unit, PlannedAction.buildOnTile(tile, true), true);
 		}
 		return road != null;
 	}
@@ -329,11 +330,11 @@ public class BasicAI implements AIInterface {
 			clearQueue = false;
 		}
 		else if(!building.isBuilt()) {
-			commands.buildThing(unit, tile, false, true);
+			commands.planAction(unit, PlannedAction.buildOnTile(tile, false), true);
 			clearQueue = false;
 		}
 		if(building != null) {
-			commands.harvestThing(unit, tile.getBuilding(), clearQueue);
+			commands.planAction(unit, PlannedAction.harvest(tile.getBuilding()), clearQueue);
 		}
 		return building;
 	}
@@ -345,7 +346,7 @@ public class BasicAI implements AIInterface {
 		if(tile == null) {
 			return false;
 		}
-		commands.harvestResource(unit, tile, true);
+		commands.planAction(unit, PlannedAction.harvestTile(tile), true);
 		return true;
 	}
 	private boolean chopWood(Unit unit) {
@@ -355,7 +356,7 @@ public class BasicAI implements AIInterface {
 		if(tile == null) {
 			return false;
 		}
-		commands.harvestThing(unit, tile.getPlant(), true);
+		commands.planAction(unit, PlannedAction.harvest(tile.getPlant()), true);
 		return true;
 	}
 	private boolean forage(Unit unit, int searchRadius) {
@@ -368,11 +369,11 @@ public class BasicAI implements AIInterface {
 			return false;
 		}
 		if(tile.getPlant() != null && tile.getPlant().getType() != Game.plantTypeMap.get("TREE")) {
-			commands.harvestThing(unit, tile.getPlant(), true);
+			commands.planAction(unit, PlannedAction.harvest(tile.getPlant()), true);
 		}
 		else {
-			commands.moveTo(unit, tile, true);
-			commands.deliver(unit, state.castle, false);
+			commands.planAction(unit, PlannedAction.moveTo(tile), true);
+			commands.planAction(unit, PlannedAction.deliver(state.castle), false);
 		}
 		return true;
 	}
@@ -384,8 +385,8 @@ public class BasicAI implements AIInterface {
 		if(tile == null) {
 			return false;
 		}
-		commands.moveTo(unit, tile, true);
-		commands.deliver(unit, state.castle, false);
+		commands.planAction(unit, PlannedAction.moveTo(tile), true);
+		commands.planAction(unit, PlannedAction.deliver(state.castle), false);
 		return true;
 	}
 	
@@ -406,7 +407,7 @@ public class BasicAI implements AIInterface {
 		}
 		for(Unit u : target.getUnits()) {
 			if(u.getFactionID() != faction.id()) {
-				commands.attackThing(unit, u, true);
+				commands.planAction(unit, PlannedAction.attack(u), true);
 			}
 		}
 		

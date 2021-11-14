@@ -650,62 +650,6 @@ public final class Utils {
 				building.setRallyPoint(rallyPoint);
 			}
 			@Override
-			public void moveTo(Unit unit, Tile target, boolean clearQueue) {
-				if(clearQueue) {
-					unit.clearPlannedActions();
-				}
-				unit.queuePlannedAction(new PlannedAction(target, ActionType.MOVE));
-			}
-			@Override
-			public void attackThing(Unit unit, Thing target, boolean clearQueue) {
-				if(clearQueue) {
-					unit.clearPlannedActions();
-				}
-				unit.queuePlannedAction(new PlannedAction(target, ActionType.ATTACK));
-			}
-			@Override
-			public void attackMove(Unit unit, Tile target, boolean clearQueue) {
-				if(clearQueue) {
-					unit.clearPlannedActions();
-				}
-				unit.queuePlannedAction(new PlannedAction(target, ActionType.ATTACK_MOVE));
-			}
-			@Override
-			public void buildThing(Unit unit, Tile target, boolean isRoad, boolean clearQueue) {
-				if(clearQueue) {
-					unit.clearPlannedActions();
-				}
-				unit.queuePlannedAction(new PlannedAction(target, isRoad));
-			}
-			@Override
-			public void harvestThing(Unit unit, Thing target, boolean clearQueue) {
-				if(clearQueue) {
-					unit.clearPlannedActions();
-				}
-				unit.queuePlannedAction(new PlannedAction(target, ActionType.HARVEST));
-			}
-			@Override
-			public void harvestResource(Unit unit, Tile tile, boolean clearQueue) {
-				if(clearQueue) {
-					unit.clearPlannedActions();
-				}
-				unit.queuePlannedAction(new PlannedAction(tile, ActionType.HARVEST));
-			}
-			@Override
-			public void deliver(Unit unit, Thing target, boolean clearQueue) {
-				if(clearQueue) {
-					unit.clearPlannedActions();
-				}
-				unit.queuePlannedAction(new PlannedAction(target, ActionType.DELIVER));
-			}
-			@Override
-			public void takeItems(Unit unit, Thing target, boolean clearQueue) {
-				if(clearQueue) {
-					unit.clearPlannedActions();
-				}
-				unit.queuePlannedAction(new PlannedAction(target, ActionType.TAKE_ITEMS));
-			}
-			@Override
 			public Building planBuilding(Unit unit, Tile target, boolean clearQueue, BuildingType buildingType) {
 				if(clearQueue) {
 					unit.clearPlannedActions();
@@ -713,11 +657,13 @@ public final class Utils {
 				if(unit.getType().isBuilder()) {
 					Building plannedBuilding = game.planBuilding(unit, buildingType, target);
 					if(plannedBuilding != null) {
-						PlannedAction followup = null;
 						if(plannedBuilding.getType().isHarvestable()) {
-							followup = new PlannedAction(plannedBuilding, ActionType.HARVEST);
+							PlannedAction followup = PlannedAction.harvest(plannedBuilding);
+							unit.queuePlannedAction(PlannedAction.buildOnTile(target, buildingType.isRoad(), followup));
 						}
-						unit.queuePlannedAction(new PlannedAction(target, buildingType.isRoad(), followup));
+						else {
+							unit.queuePlannedAction(PlannedAction.buildOnTile(target, buildingType.isRoad()));
+						}
 					}
 					return plannedBuilding;
 				}
