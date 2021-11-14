@@ -21,18 +21,18 @@ public enum ItemType {
 	RUNITE_ORE ( "Images/itemicons/runite_ore.png"),
 	TITANIUM_ORE ( "Images/itemicons/titanium_ore.png"),
 	
-	BRONZE_BAR 	("BLACKSMITH", makeCosts(COPPER_ORE,5, 		SILVER_ORE, 5),	"Images/itemicons/bronze_bar.png"),
-	IRON_BAR 	("BLACKSMITH", makeCosts(COAL,15, 	IRON_ORE,10),		"Images/itemicons/iron_bar.png"),
-	MITHRIL_BAR ("BLACKSMITH", makeCosts(COAL,20, 	MITHRIL_ORE,10),	"Images/itemicons/mithril_bar.png"),
-	GOLD_BAR 	("BLACKSMITH", makeCosts(COAL,20, 	GOLD_ORE,10), 		"Images/itemicons/gold_bar.png"),
+	BRONZE_BAR 	("SMITHY",     makeCosts(COPPER_ORE,5,SILVER_ORE, 5),	"Images/itemicons/bronze_bar.png"),
+	IRON_BAR 	("SMITHY",     makeCosts(COAL,15, 	IRON_ORE,10),		"Images/itemicons/iron_bar.png"),
+	MITHRIL_BAR ("SMITHY",     makeCosts(COAL,20, 	MITHRIL_ORE,10),	"Images/itemicons/mithril_bar.png"),
+	GOLD_BAR 	("SMITHY",     makeCosts(COAL,20, 	GOLD_ORE,10), 		"Images/itemicons/gold_bar.png"),
 	
 	ADAMANTITE_BAR("HELLFORGE",makeCosts(COAL,30, 	ADAMANTITE_ORE,10),	"Images/itemicons/adamantite_bar.png"),
 	RUNITE_BAR 	("HELLFORGE",  makeCosts(COAL,50, 	RUNITE_ORE,10),		"Images/itemicons/runite_bar.png"),
 	TITANIUM_BAR("HELLFORGE",  makeCosts(COAL,80, 	TITANIUM_ORE,10),	"Images/itemicons/titanium_bar.png"),
 	
-	BRONZE_SWORD("BLACKSMITH", makeCosts(WOOD,50, 	BRONZE_BAR,5),	"Images/itemicons/bronze_sword.png"),
-	IRON_SWORD 	("BLACKSMITH", makeCosts(WOOD,50, 	IRON_BAR,5),	"Images/itemicons/iron_sword.png"),
-	MITHRIL_SWORD("BLACKSMITH",makeCosts(WOOD,50, 	MITHRIL_BAR,5),	"Images/itemicons/mithril_sword.png"),
+	BRONZE_SWORD("SMITHY",     makeCosts(WOOD,50, 	BRONZE_BAR,5),	"Images/itemicons/bronze_sword.png"),
+	IRON_SWORD 	("SMITHY",     makeCosts(WOOD,50, 	IRON_BAR,5),	"Images/itemicons/iron_sword.png"),
+	MITHRIL_SWORD("SMITHY",    makeCosts(WOOD,50, 	MITHRIL_BAR,5),	"Images/itemicons/mithril_sword.png"),
 	
 	ADAMANT_SWORD("HELLFORGE", makeCosts(WOOD,50, 	IRON_BAR,5,	ADAMANTITE_BAR,5),	"Images/itemicons/adamant_sword.png"),
 	RUNE_SWORD 	("HELLFORGE",  makeCosts(WOOD,50, 	IRON_BAR,5,	RUNITE_BAR,5),		"Images/itemicons/rune_sword.png"),

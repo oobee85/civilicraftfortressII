@@ -720,20 +720,17 @@ public class Game {
 			thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 			thingsToPlace.add(Game.plantTypeMap.get("BERRY"));
 			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
-//			thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
-//			thingsToPlace.add(Game.buildingTypeMap.get("BLACKSMITH"));
-//			thingsToPlace.add(Game.unitTypeMap.get("HORSEARCHER"));
-//			thingsToPlace.add(Game.unitTypeMap.get("KNIGHT"));
 			if(easymode || SPAWN_EXTRA) {
 				addResources(newFaction);
 				thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
 				thingsToPlace.add(Game.buildingTypeMap.get("WORKSHOP"));
-				thingsToPlace.add(Game.buildingTypeMap.get("BLACKSMITH"));
+				thingsToPlace.add(Game.buildingTypeMap.get("SMITHY"));
 				thingsToPlace.add(Game.buildingTypeMap.get("SAWMILL"));
 				thingsToPlace.add(Game.plantTypeMap.get("BERRY"));
 				thingsToPlace.add(Game.plantTypeMap.get("TREE"));
 				thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 				thingsToPlace.add(Game.unitTypeMap.get("CARAVAN"));
+				thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
 			}
 			if(SPAWN_EXTRA) {
 				thingsToPlace.add(Game.buildingTypeMap.get("WINDMILL"));

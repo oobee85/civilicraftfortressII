@@ -261,9 +261,9 @@
 		"effort":500,
 		"research":"MATHEMATICS"},
 	{
-		"name":"BLACKSMITH",
+		"name":"SMITHY",
 		"info":"Crafts items up to mithril",
-		"image":"Images/buildings/blacksmith.png",
+		"image":"Images/buildings/blacksmith.gif",
 		"vision":1,
 		"cost":{"WOOD":100, "STONE":100},
 		"culture":0.5,
