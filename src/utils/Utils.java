@@ -157,6 +157,9 @@ public final class Utils {
 	 * @return The converted BufferedImage
 	 */
 	public static BufferedImage toBufferedImage(Image img) {
+		if (img == null) {
+			return toBufferedImage(Utils.getDefaultSkin());
+		}
 		if (img instanceof BufferedImage) {
 			return (BufferedImage) img;
 		}
