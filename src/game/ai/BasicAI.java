@@ -58,43 +58,47 @@ public class BasicAI implements AIInterface {
 					if(unit.getType().isBuilder()) {
 						handleWorker(unit);
 					}
+					else if(unit.getType().isCaravan()) {
+						pickupResources(unit);
+					}
 					else {
 						defend(unit);
 					}
 				}
 			}
 			
-			if(wantsWorker()) {
-				commands.produceUnit(state.castle, Game.unitTypeMap.get("WORKER"));
-			}
-			if(state.barracks != null) {
-				if(wantsWarrior() && !wantsMoreIrrigation()) {
-					commands.produceUnit(state.barracks, Game.unitTypeMap.get("WARRIOR"));
+			if(amountOfFoodMissing() == 0) {
+				if(wantsWorker()) {
+					commands.produceUnit(state.castle, Game.unitTypeMap.get("WORKER"));
+				}
+				if(wantsCaravan()) {
+					commands.produceUnit(state.castle, Game.unitTypeMap.get("CARAVAN"));
+				}
+				if(state.barracks != null) {
+					if(wantsWarrior()) {
+						commands.produceUnit(state.barracks, Game.unitTypeMap.get("WARRIOR"));
+					}
 				}
 			}
 		}
 	}
-	
+
+	/** TOTAL ASSIGNMENTS MUST SUM TO THE NUMBER OF WORKERS!!!*/
 	private void computeTargetAssignments() {
 		int[] assignments = new int[WorkerTask.values().length];
 		int numWorkers = state.workers.size();
-		assignments[WorkerTask.FORAGE.ordinal()] = numWorkers > 2 ? 1 : 0;
+		assignments[WorkerTask.FORAGE.ordinal()] = 1;
+		numWorkers -= assignments[WorkerTask.FORAGE.ordinal()];
 		
-		int maxWoodAmount = 2000;
-		double woodratio = (1.0*maxWoodAmount - faction.getInventory().getItemAmount(ItemType.WOOD))/maxWoodAmount;
-		assignments[WorkerTask.CHOP.ordinal()] = Utils.lerp(1, numWorkers/2, woodratio);
+		int numToAssignToFarming = amountOfFoodMissing() / 25 + 1;
+		assignments[WorkerTask.IRRIGATE.ordinal()] = Math.min(numToAssignToFarming, numWorkers);
+		numWorkers -= assignments[WorkerTask.IRRIGATE.ordinal()];
+		
 
-		int maxStoneAmount = 1000;
-		double stoneratio = (1.0*maxStoneAmount - faction.getInventory().getItemAmount(ItemType.STONE))/maxStoneAmount;
-		assignments[WorkerTask.GATHERSTONE.ordinal()] = Utils.lerp(0, numWorkers/3, stoneratio);
-		if(faction.getInventory().getItemAmount(ItemType.FOOD) < 50) {
-			assignments[WorkerTask.GATHERSTONE.ordinal()] = 0;
-		}
-		int total = 0;
-		for(int amount : assignments) {
-			total += amount;
-		}
-		assignments[WorkerTask.IRRIGATE.ordinal()] = Math.max(0, numWorkers - total);
+		assignments[WorkerTask.GATHERSTONE.ordinal()] = numWorkers/3;
+		numWorkers -= assignments[WorkerTask.GATHERSTONE.ordinal()];
+		assignments[WorkerTask.CHOP.ordinal()] = numWorkers;
+		
 		state.targetAssignments = assignments;
 		if(DEBUG_AI) {
 			System.out.println("assignments: " + printArray(state.targetAssignments));
@@ -115,6 +119,7 @@ public class BasicAI implements AIInterface {
 		return state.workerAssignments.get(task);
 	}
 	private void assignTask(Unit worker, WorkerTask task) {
+		worker.clearPlannedActions();
 		state.taskPerWorker.put(worker, task);
 		getWorkersOnTask(task).add(worker);
 	}
@@ -150,6 +155,23 @@ public class BasicAI implements AIInterface {
 		
 		WorkerTask task = state.taskPerWorker.get(worker);
 		if(task == WorkerTask.IRRIGATE) {
+			// before making a farm, see if there are any berry bushes nearby
+			if(forage(worker, 3)) {
+				return;
+			}
+			if(amountOfFoodMissing() > 0) {
+				if(irrigate(worker)) {
+					return;
+				}
+			}
+			if(forage(worker, MAX_SEARCH_RADIUS)) {
+				return;
+			}
+		}
+		else if(task == WorkerTask.FORAGE) {
+			forage(worker, MAX_SEARCH_RADIUS);
+		}
+		else if(task == WorkerTask.CHOP) {
 			if(wantsBarracks()) {
 				if(buildBarracks(worker)) {
 					return;
@@ -160,58 +182,48 @@ public class BasicAI implements AIInterface {
 					return;
 				}
 			}
+			chopWood(worker);
+		}
+		else if(task == WorkerTask.GATHERSTONE) {
+			gatherStone(worker);
 			if(wantsRoad()) {
 				if(buildRoad(worker)) {
 					return;
 				}
 			}
-			if(faction.getInventory().getItemAmount(ItemType.FOOD) < 500) {
-				if(irrigate(worker)) {
-					return;
-				}
-			}
-			if(forage(worker)) {
-				return;
-			}
-			chopWood(worker);
-		}
-		else if(task == WorkerTask.FORAGE) {
-			forage(worker);
-		}
-		else if(task == WorkerTask.CHOP) {
-			chopWood(worker);
-		}
-		else if(task == WorkerTask.GATHERSTONE) {
-			gatherStone(worker);
 		}
 	}
 	
 	private boolean wantsWorker() {
-		return state.unitQuantities[Game.unitTypeMap.get("WORKER").id()] < 16
-				&& faction.getInventory().getItemAmount(ItemType.FOOD) > 50 
+		return state.unitQuantities[Game.unitTypeMap.get("WORKER").id()] < 20
 				&& state.castle.getProducingUnit().isEmpty();
 	}
 	private boolean wantsWarrior() {
 		return state.unitQuantities[Game.unitTypeMap.get("WARRIOR").id()] < 10
-				&& faction.getInventory().getItemAmount(ItemType.FOOD) > faction.getUnits().size()*5
 				&& state.barracks.getProducingUnit().isEmpty()
 				&& state.unitQuantities[Game.unitTypeMap.get("WARRIOR").id()]*5 < faction.getUnits().size();
+	}
+	private boolean wantsCaravan() {
+		return state.unitQuantities[Game.unitTypeMap.get("WARRIOR").id()] > 0
+				&& state.castle.getProducingUnit().isEmpty()
+				&& state.unitQuantities[Game.unitTypeMap.get("CARAVAN").id()] < 1;
 	}
 	
 	private boolean wantsBarracks() {
 		int numBarracks = state.buildingQuantities[Game.buildingTypeMap.get("BARRACKS").id()];
-		return faction.getInventory().getItemAmount(ItemType.FOOD) > 100 && numBarracks < 1;
+		return numBarracks < 1;
 	}
 	private boolean wantsWall() {
-		return faction.getInventory().getItemAmount(ItemType.FOOD) > 100 && state.barracks != null && faction.getInventory().getItemAmount(ItemType.WOOD) > 200;
+		return state.barracks != null && faction.getInventory().getItemAmount(ItemType.WOOD) > 200;
 	}
 	private boolean wantsRoad() {
-		return faction.getInventory().getItemAmount(ItemType.FOOD) > 500 && state.barracks != null && faction.getInventory().getItemAmount(ItemType.STONE) > 300;
+		return state.barracks != null && faction.getInventory().getItemAmount(ItemType.STONE) > 300;
 	}
 	
-	private boolean wantsMoreIrrigation() {
-		int numUnits = faction.getUnits().size();
-		return faction.getInventory().getItemAmount(ItemType.FOOD) < 100 + numUnits*25;
+	private int amountOfFoodMissing() {
+		int targetFoodAmount = faction.getUnits().size() * 50;
+		int needFood = targetFoodAmount - faction.getInventory().getItemAmount(ItemType.FOOD);
+		return Math.max(0, needFood);
 	}
 	
 	private Tile getTargetTile(Tile source, int minRadius, int maxRadius, Predicate<Tile> requirement) {
@@ -291,7 +303,7 @@ public class BasicAI implements AIInterface {
 	
 	private boolean irrigate(Unit unit) {
 		// look for already built irrigations first
-		Tile existingIrrigation = getTargetTile(state.castle.getTile(), 2, MAX_BUILD_RADIUS, e -> {
+		Tile existingIrrigation = getTargetTile(state.castle.getTile(), 1, MAX_BUILD_RADIUS, e -> {
 			return e.hasBuilding() && e.getBuilding().getType() == FARM;
 		});
 		if(existingIrrigation != null) {
@@ -299,7 +311,7 @@ public class BasicAI implements AIInterface {
 		}
 		
 		// otherwise build a new irrigation nearby
-		Tile tile = getTargetTile(state.castle.getTile(), 2, MAX_BUILD_RADIUS, e -> {
+		Tile tile = getTargetTile(state.castle.getTile(), 1, MAX_BUILD_RADIUS, e -> {
 			return !e.hasBuilding() && e.canBuild() && e.canPlant();
 		});
 		if(tile == null) {
@@ -333,8 +345,8 @@ public class BasicAI implements AIInterface {
 		if(tile == null) {
 			return false;
 		}
-		Building building = buildAndHarvest(unit, tile, Game.buildingTypeMap.get("MINE"));
-		return building != null;
+		commands.harvestResource(unit, tile, true);
+		return true;
 	}
 	private boolean chopWood(Unit unit) {
 		Tile tile = getTargetTile(unit.getTile(), MAX_SEARCH_RADIUS, e -> {
@@ -346,8 +358,8 @@ public class BasicAI implements AIInterface {
 		commands.harvestThing(unit, tile.getPlant(), true);
 		return true;
 	}
-	private boolean forage(Unit unit) {
-		Tile tile = getTargetTile(unit.getTile(), MAX_SEARCH_RADIUS, e -> {
+	private boolean forage(Unit unit, int searchRadius) {
+		Tile tile = getTargetTile(unit.getTile(), searchRadius, e -> {
 			
 			return (e.getPlant() != null && e.getPlant().getType() != Game.plantTypeMap.get("TREE"))
 					|| e.getInventory().getItemAmount(ItemType.FOOD) > 0;
@@ -362,6 +374,18 @@ public class BasicAI implements AIInterface {
 			commands.moveTo(unit, tile, true);
 			commands.deliver(unit, state.castle, false);
 		}
+		return true;
+	}
+	
+	private boolean pickupResources(Unit unit) {
+		Tile tile = getTargetTile(unit.getTile(), MAX_SEARCH_RADIUS, e -> {
+			return !e.getInventory().isEmpty() && !e.isBlocked(unit);
+		});
+		if(tile == null) {
+			return false;
+		}
+		commands.moveTo(unit, tile, true);
+		commands.deliver(unit, state.castle, false);
 		return true;
 	}
 	

@@ -34,7 +34,7 @@ public class Client {
 	
 	private ArrayList<AIInterface> ailist = new ArrayList<>();
 	private static final long AIDELAY = 1000;
-	private static final long NUM_AI = 1;
+	private static final long NUM_AI = 2;
 	
 	private volatile boolean isFastForwarding;
 	private volatile boolean isRaiseTerrain;
