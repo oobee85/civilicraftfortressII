@@ -2,7 +2,6 @@ package ui;
 
 import game.*;
 import game.actions.*;
-import utils.*;
 import world.*;
 
 public interface CommandInterface {

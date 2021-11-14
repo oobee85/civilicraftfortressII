@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import game.actions.*;
+import game.components.*;
 import game.liquid.*;
 
 import java.util.*;
@@ -465,11 +466,12 @@ public class Game {
 	}
 	public void spawnCyclops(Tile tile) {
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y())), Game.buildingTypeMap.get("WATCHTOWER"), world.getFaction(World.CYCLOPS_FACTION_ID));
-		summonBuilding(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("GRANARY"), world.getFaction(World.CYCLOPS_FACTION_ID));
+		Thing granary = summonBuilding(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("GRANARY"), world.getFaction(World.CYCLOPS_FACTION_ID));
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("BARRACKS"), world.getFaction(World.CYCLOPS_FACTION_ID));
-		summonBuilding(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("WINDMILL"), world.getFaction(World.CYCLOPS_FACTION_ID));
+		Thing windmill = summonBuilding(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("WINDMILL"), world.getFaction(World.CYCLOPS_FACTION_ID));
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("MINE"), world.getFaction(World.CYCLOPS_FACTION_ID));
-		
+		granary.replaceComponent(Inventory.class, world.getFaction(World.CYCLOPS_FACTION_ID).getInventory());
+		windmill.replaceComponent(Inventory.class, world.getFaction(World.CYCLOPS_FACTION_ID).getInventory());
 		//makes the walls
 		for(int i = 0; i < 5; i++) {
 			BuildingType type = Game.buildingTypeMap.get("WALL_WOOD");

@@ -255,8 +255,8 @@ public class GameView {
 						toggleGuarding();
 					} else if (e.getKeyCode() == KeyEvent.VK_M) {
 						setBuildingToPlan(Game.buildingTypeMap.get("MINE"));
-					} else if (e.getKeyCode() == KeyEvent.VK_I) {
-						setBuildingToPlan(Game.buildingTypeMap.get("IRRIGATION"));
+					} else if (e.getKeyCode() == KeyEvent.VK_F) {
+						setBuildingToPlan(Game.buildingTypeMap.get("FARM"));
 					} else if (e.getKeyCode() == KeyEvent.VK_W) {
 						setBuildingToPlan(Game.buildingTypeMap.get("WALL_WOOD"));
 					} else if (e.getKeyCode() == KeyEvent.VK_B) {
@@ -529,7 +529,7 @@ public class GameView {
 						commandInterface.planAction(unit, PlannedAction.deliver(targetBuilding), !shiftDown);
 					}
 					else if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
-							&& targetBuilding.isBuilt() && targetBuilding.hasInventory() && !targetBuilding.getInventory().isEmpty()) {
+							&& targetBuilding.isBuilt() && targetBuilding.hasInventory()) {
 						commandInterface.planAction(unit, PlannedAction.takeItemsFrom(targetBuilding), !shiftDown);
 					}
 					else {
