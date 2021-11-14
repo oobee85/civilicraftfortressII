@@ -66,8 +66,8 @@ public class Inventory extends GameComponent {
 		}
 		for(Item item: from.getItems()) {
 			if(item != null) {
-				this.addItem(item.getType(), item.getAmount());
-				from.setAmount(item.getType(), 0);
+				int amountTaken = this.addItem(item.getType(), item.getAmount());
+				from.addItem(item.getType(), -amountTaken);
 			}
 		}
 	}
