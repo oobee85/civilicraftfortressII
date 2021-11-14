@@ -36,6 +36,10 @@ public class PlannedAction {
 		this.target = null;
 		this.type = isRoad ? BUILD_ROAD : BUILD_BUILDING;
 	}
+	public PlannedAction(Tile targetTile, boolean isRoad, PlannedAction followup) {
+		this(targetTile, isRoad);
+		this.followup = followup;
+	}
 	public PlannedAction(Thing target, ActionType type) {
 		this.targetTile = null;
 		this.target = target;

@@ -710,7 +710,11 @@ public final class Utils {
 				if(unit.getType().isBuilder()) {
 					Building plannedBuilding = game.planBuilding(unit, buildingType, target);
 					if(plannedBuilding != null) {
-						unit.queuePlannedAction(new PlannedAction(target, buildingType.isRoad()));
+						PlannedAction followup = null;
+						if(plannedBuilding.getType().isHarvestable()) {
+							followup = new PlannedAction(plannedBuilding, ActionType.HARVEST);
+						}
+						unit.queuePlannedAction(new PlannedAction(target, buildingType.isRoad(), followup));
 					}
 					return plannedBuilding;
 				}

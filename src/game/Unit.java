@@ -95,7 +95,7 @@ public class Unit extends Thing implements Serializable {
 	}
 	public void queuePlannedAction(PlannedAction plan) {
 		if(this.isSelected()) {
-			System.out.println("queued action: " + plan.type);
+			System.out.println("queued action: " + plan);
 		}
 		
 		actionQueue.add(plan);
@@ -533,8 +533,8 @@ public class Unit extends Thing implements Serializable {
 		if(plan.isBuildRoadAction() && unitType.isBuilder()) {
 			Building tobuild = plan.getTile().getRoad();
 			if(tobuild != null) {
-				buildBuilding(tobuild);
 				didSomething = true;
+				buildBuilding(tobuild);
 			}
 		}
 		else if(plan.isBuildBuildingAction() && unitType.isBuilder()) {
@@ -634,6 +634,9 @@ public class Unit extends Thing implements Serializable {
 						if(newTarget != null) {
 							followup = new PlannedAction(newTarget, ActionType.HARVEST);
 						}
+						else {
+							followup = null;
+						}
 					}
 				}
 				else if(followup.target instanceof Building) {
@@ -643,14 +646,18 @@ public class Unit extends Thing implements Serializable {
 					}
 				}
 			}
-			this.queuePlannedAction(followup);
+			if(followup != null) 
+				this.queuePlannedAction(followup);
+		}
+		else if(finished.getFollowUp() != null) {
+			this.queuePlannedAction(finished.getFollowUp());
 		}
 	}
 	
 	/**
 	 * @return true if finished building false otherwise
 	 */
-	private void buildBuilding(Building building) {
+	private boolean buildBuilding(Building building) {
 		building.expendEffort(1);
 		if (building.getRemainingEffort() > 0) {
 			building.heal(building.getMaxHealth() / building.getType().getBuildingEffort(), false);
@@ -658,6 +665,7 @@ public class Unit extends Thing implements Serializable {
 		if (building.getRemainingEffort() < building.getType().getBuildingEffort()) {
 			building.setPlanned(false);
 		}
+		return building.isBuilt();
 	}
 	
 
