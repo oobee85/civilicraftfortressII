@@ -458,7 +458,7 @@ public class GameView {
 		}
 		// select units on tile
 		else {
-			toggleSelectionForTiles(Arrays.asList(tile), shiftDown, controlDown);
+			toggleSelectionForTile(tile, shiftDown || controlDown);
 		}
 
 		if (!shiftDown) {
@@ -537,9 +537,6 @@ public class GameView {
 				}
 				else if (unit.getType().isBuilder()) {
 					Building targetBuilding = targetTile.getBuilding();
-//					if (targetTile.getResource() != null) {
-//
-//					}
 					if (targetBuilding == null) {
 						targetBuilding = targetTile.getRoad();
 					}
@@ -657,7 +654,30 @@ public class GameView {
 			}
 		}
 	}
-
+	private void toggleSelectionForTile(Tile tile, boolean addToSelection) {
+		Thing thingToSelect = null;
+		for (Unit candidate : tile.getUnits()) {
+			if (candidate.getFaction() == state.faction) {
+				if(!candidate.isSelected()) {
+					thingToSelect = candidate;
+					break;
+				}
+			}
+		}
+		if(thingToSelect == null) {
+			Building building = tile.getBuilding();
+			if (building != null && building.getFaction() == state.faction) {
+				deselectEverything();
+				thingToSelect = building;
+			}
+		}
+		if(!addToSelection) {
+			deselectEverything();
+		}
+		if(thingToSelect != null) {
+			selectThing(thingToSelect);
+		}
+	}
 	private void toggleSelectionForTiles(List<Tile> tiles, boolean shiftEnabled, boolean controlEnabled) {
 
 		// deselects everything if shift or control isnt enabled
