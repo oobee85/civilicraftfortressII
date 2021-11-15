@@ -75,7 +75,7 @@
 	{
 		"name":"GATE_STONE",
 		"info":"Blocks movement except for own faction",
-		"image":"Images/buildings/gate_stone.png",
+		"image":"Images/buildings/gate_stone.gif",
 		"vision":1,
 		"cost":{"WOOD":400, "MITHRIL_BAR":5, "STONE":400},
 		"culture":0.5,
@@ -159,7 +159,7 @@
 	{
 		"name":"SAWMILL",
 		"info":"Workers harvest wood from here",
-		"image":"Images/buildings/sawmill.png",
+		"image":"Images/buildings/sawmill.gif",
 		"vision":5,
 		"cost":{"WOOD":100, "STONE":50},
 		"culture":0,
