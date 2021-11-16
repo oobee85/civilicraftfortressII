@@ -45,10 +45,10 @@ void main() {
 	vec4 worldNormal = normalize(model * vec4(normal, 0));
 	vec4 cameraPosition = inverse(view) * vec4(0, 0, 0, 1);
 
-	float angle1 = worldPos.y*2 - waveOffset*0.005;
-	float angle2 = worldPos.x*2 - waveOffset*0.006;
-	worldPos.z += 0.03*(1 + sin(angle1)) * waveAmplitude;
-//	worldNormal = normalize(worldNormal + 0.1*vec4(0, 1, 0, 0) * cos(angle1));
+	float angle1 = worldPos.y*2 - waveOffset*0.003;
+	float angle2 = worldPos.x*2 - waveOffset*0.005;
+//	worldPos.z += 0.03*(1 + sin(angle1)) * waveAmplitude;
+	worldNormal = normalize(worldNormal + 0.005*vec4(0, 1, 0, 0) * cos(angle1)  + 0.005*vec4(1, 0, 0, 0) * cos(angle2)*cos(angle2));
 
 	vec4 camToPos = cameraPosition - worldPos;
 	transparency = 1 - abs(dot(normalize(camToPos), worldNormal))/2;
