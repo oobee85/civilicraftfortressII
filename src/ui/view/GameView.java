@@ -229,7 +229,7 @@ public class GameView {
 				} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
 					shiftDown = false;
 				} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-					recenterCamera();
+					recenterCameraOnPlayer();
 				}
 			}
 
@@ -786,26 +786,41 @@ public class GameView {
 		state.hoveredTile = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
 	}
 
-	public void moveViewTo(double ratiox, double ratioy, int panelWidth, int panelHeight) {
-		Position tile = new Position(ratiox * game.world.getWidth(), ratioy * game.world.getHeight());
-		Position pixel = tile.multiply(state.tileSize).subtract(new Position(panelWidth / 2, panelHeight / 2));
-		state.viewOffset = pixel;
+	/** Centers camera view onto the specified pixel which is
+	 *  scaled to (tile.x * tileSize), ((tile.y + hexOffset)*tileSize) 
+	 */
+	private void centerViewOnPixel(Position pixel) {
+		Position halfScreenOffset = new Position(panel.getWidth() / 2, 
+		                                         (panel.getHeight() - overlayPanel.getHeight()) / 2);
+		state.viewOffset = pixel.subtract(halfScreenOffset);
 		panel.repaint();
 	}
-	public void moveViewTo(TileLoc tileloc, int panelWidth, int panelHeight) {
-		moveViewTo(
-				(double)tileloc.x() / game.world.getWidth(), 
-				(double)tileloc.y() / game.world.getHeight(), 
-				panelWidth, panelHeight);
+
+	/** Don't apply hex offset for minimap-camera-moves to avoid zigzagging during mouse drag. 
+	 */
+	public void minimapMoveViewTo(double ratiox, double ratioy) {
+		Position tile = new Position(ratiox * game.world.getWidth(), ratioy * game.world.getHeight());
+		centerViewOnPixel(tile.multiply(state.tileSize));
 	}
-	public void recenterCamera() {
-		// move camera to first building or first unit.
+	
+	/** Adjusts the camera view so that the center of the specified tileloc is in the center
+	 *  of the viewable game view. 
+	 */
+	public void centerViewOnTile(TileLoc tileloc) {
+		Position worldPos = new Position(tileloc.x()+0.5, tileloc.y()+0.5);
+		Point pixel = currentActiveDrawer.getPixelOfWorldCoord(worldPos, state.tileSize);
+		centerViewOnPixel(new Position(pixel.x, pixel.y));
+	}
+
+	/** moves camera to first building or first unit owned by the current active player.
+	*/
+	public void recenterCameraOnPlayer() {
 		for(Building building : state.faction.getBuildings()) {
-			GameView.this.moveViewTo(building.getTile().getLocation(), panel.getWidth(), panel.getHeight());
+			GameView.this.centerViewOnTile(building.getTile().getLocation());
 			return;
 		}
 		for(Unit unit : state.faction.getUnits()) {
-			GameView.this.moveViewTo(unit.getTile().getLocation(), panel.getWidth(), panel.getHeight());
+			GameView.this.centerViewOnTile(unit.getTile().getLocation());
 			return;
 		}
 	}

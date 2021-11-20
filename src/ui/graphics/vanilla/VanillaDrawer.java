@@ -965,6 +965,13 @@ public class VanillaDrawer extends Drawer {
 		double row = (pixelOnScreen.y + viewOffset.y) / tileSize;
 		return new Position(column, row);
 	}
+	@Override
+	public Point getPixelOfWorldCoord(Position worldCoord, int tileSize) {
+		int onScreenX = (int) (worldCoord.x*tileSize);
+		int yoffset = ((int)worldCoord.x % 2) * tileSize / 2;
+		int onScreenY = (int) (worldCoord.y*tileSize + yoffset);
+		return new Point(onScreenX, onScreenY);
+	}
 
 	@Override
 	public void zoomView(int scroll, int mx, int my) {

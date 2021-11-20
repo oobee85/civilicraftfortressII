@@ -537,6 +537,11 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	}
 	
 	@Override
+	public Point getPixelOfWorldCoord(Position worldCoord, int tileSize) {
+		// TODO
+		return new Point(0, 0);
+	}
+	@Override
 	public Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
 		
 		double halfFOV = Math.toRadians(FOV/2);
