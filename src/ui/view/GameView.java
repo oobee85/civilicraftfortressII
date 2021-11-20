@@ -53,7 +53,7 @@ public class GameView {
 	public class GameViewState {
 		public long previousTickTime;
 		public volatile Position viewOffset = new Position(0, 0);
-		public volatile int tileSize = 15;
+		public volatile int tileSize = 30;
 		public boolean fpMode = true;
 		
 		public Point mousePressLocation;
@@ -101,7 +101,6 @@ public class GameView {
 		
 		this.game = game;
 		this.guiController = game.getGUIController();
-		state.viewOffset = new Position(0, 0);
 
 		MouseWheelListener mouseWheelListener = new MouseWheelListener() {
 			@Override

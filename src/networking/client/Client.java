@@ -224,6 +224,9 @@ public class Client {
 			clientGUI.startedSinglePlayer();
 			clientGUI.repaint();
 			startLocalGameLoopThread(false);
+			SwingUtilities.invokeLater(() -> {
+				clientGUI.getGameView().recenterCameraOnPlayer();
+			});
 		});
 	}
 	public void sendMessage(Object message) {
