@@ -741,7 +741,7 @@ public class VanillaDrawer extends Drawer {
 		}
 		if(unit.isIdle()) {
 			g.setColor(Color.gray);
-			g.fillRect(drawx + draww*3/4, drawy, draww/4, drawh/4);
+			g.fillRect(drawx + draww*4/5, drawy, draww/5, drawh/5);
 		}
 	}
 	

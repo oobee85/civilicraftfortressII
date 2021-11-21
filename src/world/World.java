@@ -301,6 +301,24 @@ public class World {
 		
 //		world[volcano].liquidType = LiquidType.WATER;
 //		world[volcano].liquidAmount += 200;
+		
+		int[] numProjectiles = new int[ProjectileType.values().length]; 
+		numProjectiles[ProjectileType.LAVA_BALL.ordinal()] = 10;
+		numProjectiles[ProjectileType.ROCK.ordinal()] = 30;
+		numProjectiles[ProjectileType.WIZARD_BALL.ordinal()] = 5;
+		int typeIndex = 0;
+		TileLoop: for(Tile tile : this.getTilesRandomly()) {
+			while(numProjectiles[typeIndex] == 0) {
+				typeIndex++;
+				if(typeIndex >= numProjectiles.length) {
+					break TileLoop;
+				}
+			}
+			Projectile meteor = new Projectile(ProjectileType.values()[typeIndex], this.get(volcano), tile, null, 100);
+			worldData.addProjectile(meteor);
+			--numProjectiles[typeIndex];
+		}
+	
 	}
 	
 	public void spawnOgre(Tile target) {
@@ -981,6 +999,10 @@ public class World {
 					// meteor leaves a lil dent
 					projectile.getTile().setHeight(projectile.getTile().getHeight() - 10);
 					spawnAnimal(Game.unitTypeMap.get("INFERNAL"), projectile.getTile(), getFaction(World.NO_FACTION_ID), null);
+				}
+				if(projectile.getType() == ProjectileType.LAVA_BALL) {
+					projectile.getTile().liquidType = LiquidType.LAVA;
+					projectile.getTile().liquidAmount += 100;
 				}
 			}
 		}
