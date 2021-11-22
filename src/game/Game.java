@@ -430,6 +430,9 @@ public class Game {
 		
 		Faction CYCLOPS_FACTION = new Faction("CYCLOPS", false, true);
 		CYCLOPS_FACTION.getInventory().addItem(ItemType.FOOD, 50);
+		if(Utils.CMD_ARG_CINEMATIC) {
+			CYCLOPS_FACTION.getInventory().addItem(ItemType.FOOD, 5000);
+		}
 		world.addFaction(CYCLOPS_FACTION);
 		
 		Faction UNDEAD_FACTION = new Faction("UNDEAD", false, true);
