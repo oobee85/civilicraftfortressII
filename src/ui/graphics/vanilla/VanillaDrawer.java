@@ -166,23 +166,25 @@ public class VanillaDrawer extends Drawer {
 					canvas.getWidth() - canvas.getWidth() / 3 - 4, 4, canvas.getWidth() / 3, 30);
 		}
 		g.setFont(KUIConstants.infoFont);
-		for (int i = 0; i < 2; i++) {
-			int x = 10;
-			int y = canvas.getHeight() - 5;
-			g.setColor(Color.green);
-			if (i == 1) {
-				g.setColor(Color.black);
-				x++;
-				y++;
-			}
-			g.drawString("DRAW(ms):" + drawTime, x, y);
-			g.drawString("TICK(ms):" + state.previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
-			if (Utils.CMD_ARG_DEBUG) {
-				String fstr = "";
-				for (Faction f : game.world.getFactions()) {
-					fstr += f.name() + ":" + f.getBuildings().size() + ", ";
+		if (!Utils.CMD_ARG_CINEMATIC) {
+			for (int i = 0; i < 2; i++) {
+				int x = 10;
+				int y = canvas.getHeight() - 5;
+				g.setColor(Color.green);
+				if (i == 1) {
+					g.setColor(Color.black);
+					x++;
+					y++;
 				}
-				g.drawString(fstr, x + 200, y);
+				g.drawString("DRAW(ms):" + drawTime, x, y);
+				g.drawString("TICK(ms):" + state.previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
+				if (Utils.CMD_ARG_DEBUG) {
+					String fstr = "";
+					for (Faction f : game.world.getFactions()) {
+						fstr += f.name() + ":" + f.getBuildings().size() + ", ";
+					}
+					g.drawString(fstr, x + 200, y);
+				}
 			}
 		}
 	}
