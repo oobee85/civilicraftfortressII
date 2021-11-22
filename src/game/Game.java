@@ -17,9 +17,6 @@ import wildlife.*;
 import world.*;
 
 public class Game {
-	
-	public static boolean DEBUG = false;
-	public static boolean SPAWN_EXTRA = false;
 
 	public static final ArrayList<UnitType> unitTypeList = new ArrayList<>();
 	public static final HashMap<String, UnitType> unitTypeMap = new HashMap<>();
@@ -722,7 +719,7 @@ public class Game {
 			thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 			thingsToPlace.add(Game.plantTypeMap.get("BERRY"));
 			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
-			if(easymode || SPAWN_EXTRA) {
+			if(easymode || Utils.CMD_ARG_SPAWN_EXTRA) {
 				addResources(newFaction);
 				thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
 				thingsToPlace.add(Game.buildingTypeMap.get("WORKSHOP"));
@@ -734,7 +731,7 @@ public class Game {
 				thingsToPlace.add(Game.unitTypeMap.get("CARAVAN"));
 				thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
 			}
-			if(SPAWN_EXTRA) {
+			if(Utils.CMD_ARG_SPAWN_EXTRA) {
 				thingsToPlace.add(Game.buildingTypeMap.get("WINDMILL"));
 			}
 			Tile spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), world.getHeight()/2));
@@ -788,7 +785,7 @@ public class Game {
 				}
 			}
 			index++;
-			if(SPAWN_EXTRA) {
+			if(Utils.CMD_ARG_SPAWN_EXTRA) {
 				spawnExtraStuff(newFaction);
 			}
 		}

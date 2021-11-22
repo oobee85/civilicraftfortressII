@@ -43,13 +43,7 @@ public class ClientDriver {
 	}
 	
 	public static void main(String[] args) {
-		Set<String> flags = new HashSet<>();
-		for(int i = 0; i < args.length; i++) {
-			System.out.println(args[i]);
-			flags.add(args[i].toLowerCase());
-		}
-		Game.DEBUG = flags.contains("debug");
-		Game.SPAWN_EXTRA = flags.contains("spawn_extra");
+		Utils.parseCmdArgs(args);
 		EventQueue.invokeLater(() -> {
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

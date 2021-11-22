@@ -177,7 +177,7 @@ public class VanillaDrawer extends Drawer {
 			}
 			g.drawString("DRAW(ms):" + drawTime, x, y);
 			g.drawString("TICK(ms):" + state.previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
-			if (Game.DEBUG) {
+			if (Utils.CMD_ARG_DEBUG) {
 				String fstr = "";
 				for (Faction f : game.world.getFactions()) {
 					fstr += f.name() + ":" + f.getBuildings().size() + ", ";

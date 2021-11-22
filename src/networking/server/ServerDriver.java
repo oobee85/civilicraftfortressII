@@ -33,6 +33,7 @@ public class ServerDriver {
 	}
 
 	public static void main(String[] args) {
+		Utils.parseCmdArgs(args);
 //		EventQueue.invokeLater(() -> {
 //			try {
 //				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

@@ -90,6 +90,9 @@ public class GameView {
 				}
 			}
 		};
+		if(Utils.CMD_ARG_CINEMATIC) {
+			panel.setCursor(BLANK_CURSOR);
+		}
 		panel.setLayout(new BorderLayout());
 		panel.setBackground(Color.black);
 		panel.add(overlayPanel, BorderLayout.SOUTH);
