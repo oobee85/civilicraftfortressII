@@ -30,6 +30,7 @@ public class ServerDriver {
 		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);
 		Loader.loadPlantType(Game.plantTypeMap, Game.plantTypeList);
 		Loader.doMappings();
+		Settings.fromFile();
 	}
 
 	public static void main(String[] args) {
