@@ -135,14 +135,12 @@ public class Server {
 			public void research(ResearchType researchType) { }
 			@Override
 			public void setFastForwarding(boolean enabled) { }
-			@Override
-			public void setRaiseTerrain(boolean enabled) { }
 		});
 		LinkedList<PlayerInfo> players = new LinkedList<>();
 		for (Connection connection : connections.keySet()) {
 			players.add(connection.getPlayerInfo());
 		}
-		gameInstance.generateWorld(128, 128, false, players);
+		gameInstance.generateWorld(Settings.WORLD_WIDTH, Settings.WORLD_HEIGHT, false, players);
 		gui.getGameView().getDrawer().updateTerrainImages();
 		gui.setGameInstance(gameInstance);
 		startWorldNetworkingUpdateThread();

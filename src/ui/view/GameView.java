@@ -90,7 +90,7 @@ public class GameView {
 				}
 			}
 		};
-		if(Settings.CMD_ARG_CINEMATIC) {
+		if(Settings.CINEMATIC) {
 			panel.setCursor(BLANK_CURSOR);
 		}
 		panel.setLayout(new BorderLayout());

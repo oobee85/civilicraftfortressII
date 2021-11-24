@@ -174,7 +174,7 @@ public class ClientGUI {
 		menuButtonPanel.add(singlePlayer);
 		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
 		menuButtonPanel.add(loadGameButton);
-		if(Settings.CMD_ARG_DEBUG) {
+		if(Settings.DEBUG) {
 			menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
 			menuButtonPanel.add(startLocalHostButton);
 		}
@@ -358,7 +358,7 @@ public class ClientGUI {
 		CRAFTING_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, craftingView.getRootPanel(), "Craft items", CRAFTING_TAB);
 		
-		if(Settings.CMD_ARG_DEBUG) {
+		if(Settings.DEBUG) {
 			SpawnUnitsView spawnUnitsView = new SpawnUnitsView(gameView);
 			SPAWN_UNITS_TAB = tabbedPane.getTabCount();
 			tabbedPane.insertTab(null, SPAWN_TAB_ICON, spawnUnitsView.getRootPanel(), "Summon units for testing", SPAWN_UNITS_TAB);

@@ -29,9 +29,6 @@ public class Game {
 
 	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
 	public static boolean DISABLE_NIGHT = false;
-	// disables enemies and volcano
-	public static boolean DISABLE_ENEMY_SPAWNS = true;
-	public static boolean DISABLE_VOLCANO_ERUPT = true;
 	
 	private GUIController guiController;
 	public static final int howFarAwayStuffSpawn = 30;
@@ -63,7 +60,7 @@ public class Game {
 		
 		if(world.volcano != null) {
 			world.get(world.volcano).liquidType = LiquidType.LAVA;
-			if(World.days >= 10 && Math.random() < 0.0001 && !DISABLE_VOLCANO_ERUPT) {
+			if(World.days >= 10 && Math.random() < 0.0001 && !Settings.DISABLE_VOLCANO_ERUPT) {
 				eruptVolcano();
 			}
 		}
@@ -131,13 +128,13 @@ public class Game {
 		}
 		
 		if(World.ticks % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
-			if(!DISABLE_ENEMY_SPAWNS) {
+			if(!Settings.DISABLE_ENEMY_SPAWNS) {
 				dayEvents();
 			}
 			World.days ++;
 		}
 		if((World.ticks + World.DAY_DURATION) % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
-			if(!DISABLE_ENEMY_SPAWNS) {
+			if(!Settings.DISABLE_ENEMY_SPAWNS) {
 				nightEvents();
 			}
 			World.nights ++;
@@ -467,7 +464,7 @@ public class Game {
 		
 		Faction CYCLOPS_FACTION = new Faction("CYCLOPS", false, true);
 		CYCLOPS_FACTION.getInventory().addItem(ItemType.FOOD, 50);
-		if(Settings.CMD_ARG_CINEMATIC) {
+		if(Settings.CINEMATIC) {
 			CYCLOPS_FACTION.getInventory().addItem(ItemType.FOOD, 5000);
 		}
 		world.addFaction(CYCLOPS_FACTION);
@@ -759,7 +756,7 @@ public class Game {
 			thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 			thingsToPlace.add(Game.plantTypeMap.get("BERRY"));
 			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
-			if(easymode || Settings.CMD_ARG_SPAWN_EXTRA) {
+			if(easymode || Settings.SPAWN_EXTRA) {
 				addResources(newFaction);
 				thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
 				thingsToPlace.add(Game.buildingTypeMap.get("WORKSHOP"));
@@ -771,7 +768,7 @@ public class Game {
 				thingsToPlace.add(Game.unitTypeMap.get("CARAVAN"));
 				thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
 			}
-			if(Settings.CMD_ARG_SPAWN_EXTRA) {
+			if(Settings.SPAWN_EXTRA) {
 				thingsToPlace.add(Game.buildingTypeMap.get("WINDMILL"));
 			}
 			Tile spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), world.getHeight()/2));
@@ -825,7 +822,7 @@ public class Game {
 				}
 			}
 			index++;
-			if(Settings.CMD_ARG_SPAWN_EXTRA) {
+			if(Settings.SPAWN_EXTRA) {
 				spawnExtraStuff(newFaction);
 			}
 		}

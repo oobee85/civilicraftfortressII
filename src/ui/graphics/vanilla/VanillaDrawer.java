@@ -166,7 +166,7 @@ public class VanillaDrawer extends Drawer {
 					canvas.getWidth() - canvas.getWidth() / 3 - 4, 4, canvas.getWidth() / 3, 30);
 		}
 		g.setFont(KUIConstants.infoFont);
-		if (!Settings.CMD_ARG_CINEMATIC) {
+		if (!Settings.CINEMATIC) {
 			for (int i = 0; i < 2; i++) {
 				int x = 10;
 				int y = canvas.getHeight() - 5;
@@ -178,7 +178,7 @@ public class VanillaDrawer extends Drawer {
 				}
 				g.drawString("DRAW(ms):" + drawTime, x, y);
 				g.drawString("TICK(ms):" + state.previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
-				if (Settings.CMD_ARG_DEBUG) {
+				if (Settings.DEBUG) {
 					String fstr = "";
 					for (Faction f : game.world.getFactions()) {
 						fstr += f.name() + ":" + f.getBuildings().size() + ", ";

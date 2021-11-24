@@ -1,6 +1,8 @@
 package ui.view;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import ui.KButton;
 import ui.KToggleButton;
@@ -30,18 +32,46 @@ public class SettingsMenu {
 					toggle.addActionListener(e -> {
 						try {
 							f.set(null, toggle.isSelected());
-						} catch (IllegalArgumentException e1) {
-							e1.printStackTrace();
-						} catch (IllegalAccessException e1) {
+						} catch (IllegalArgumentException | IllegalAccessException e1) {
 							e1.printStackTrace();
 						}
 					});
 					content.add(toggle);
 				}
+				else if(f.getType() == int.class) {
+					JTextField text = KUIConstants.setupTextField("" + (int)f.get(null), KUIConstants.MAIN_MENU_BUTTON_SIZE);
+					text.getDocument().addDocumentListener(new DocumentListener() {
+						@Override
+						public void removeUpdate(DocumentEvent e) {
+							changedUpdate(e);
+						}
+						@Override
+						public void insertUpdate(DocumentEvent e) {
+							changedUpdate(e);
+						}
+						@Override
+						public void changedUpdate(DocumentEvent e) {
+							try {
+								int i = Integer.parseInt(text.getText());
+								f.set(null, i);
+							} catch (NumberFormatException e1) {
+								
+							} catch (IllegalArgumentException | IllegalAccessException e1) {
+								e1.printStackTrace();
+							}
+						}
+					});
+					JLabel label = KUIConstants.setupLabel(f.getName(), null, null);
+					label.setBorder(BorderFactory.createEmptyBorder());
+					JPanel group = new JPanel();
+					group.setLayout(new BoxLayout(group, BoxLayout.X_AXIS));
+					group.add(label);
+					group.add(text);
+					
+					content.add(group);
+				}
 			}
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
+		} catch (IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
 	}

@@ -1281,7 +1281,9 @@ public class World {
 		Generation.generateResources(this);
 		this.genPlants();
 		this.makeForest();
-		Generation.generateWildLife(this);
+		if(!Settings.DISABLE_WILDLIFE_SPAWNS) {
+			Generation.generateWildLife(this);
+		}
 		System.out.println("Finished generating " + width + "x" + height + " world with " + tileList.size() + " tiles.");
 	}
 	

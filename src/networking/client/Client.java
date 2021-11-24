@@ -34,10 +34,8 @@ public class Client {
 	
 	private ArrayList<AIInterface> ailist = new ArrayList<>();
 	private static final long AIDELAY = 1000;
-	private static final long NUM_AI = 2;
 	
 	private volatile boolean isFastForwarding;
-	private volatile boolean isRaiseTerrain;
 
 	public Client() {
 		gameInstance = new Game(new GUIController() {
@@ -124,10 +122,6 @@ public class Client {
 			public void setFastForwarding(boolean enabled) {
 				isFastForwarding = enabled;
 			}
-			@Override
-			public void setRaiseTerrain(boolean enabled) {
-				isRaiseTerrain = enabled;
-			}
 		});
 		localCommands = Utils.makeFunctionalCommandInterface(gameInstance);
 		networkingCommands = new CommandInterface() {
@@ -199,10 +193,10 @@ public class Client {
 		if(createWorld) {
 			LinkedList<PlayerInfo> players = new LinkedList<>();
 			players.add(clientGUI.getPlayerInfo());
-			for(int i = 0; i < NUM_AI; i++) {
+			for(int i = 0; i < Settings.NUM_AI; i++) {
 				players.add(new PlayerInfo("Bot " + i, null));
 			}
-			gameInstance.generateWorld(128, 128, false, players);
+			gameInstance.generateWorld(Settings.WORLD_WIDTH, Settings.WORLD_HEIGHT, false, players);
 			clientGUI.getGameView().getDrawer().updateTerrainImages();
 		}
 		boolean assignedPlayer = false;
@@ -429,7 +423,7 @@ public class Client {
 			newThing.setID(update.id());
 		}
 	}
-	
+
 	private void updateThing(Thing existing, Thing update) {
 		existing.setFaction(gameInstance.world.getFactions().get(update.getFactionID()));
 		existing.setMaxHealth(update.getMaxHealth());

@@ -1,7 +1,6 @@
 package networking.client;
 
 import java.awt.*;
-import java.util.*;
 
 import javax.swing.*;
 
