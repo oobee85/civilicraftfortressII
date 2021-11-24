@@ -309,23 +309,60 @@ public class Game {
 		world.meteorStrike();
 	}
 	public void shadowWordDeath(int num){
-		Tile t = world.getTilesRandomly().getFirst();
-		for(int i = 0; i < num; i++) {
-			world.spawnOgre(t);
-			world.spawnDragon(t);
-			world.spawnWerewolf(t);
-			world.spawnEnt(t);
-			world.spawnLavaGolem(t);
-			world.spawnIceGiant(t);
-			world.spawnSkeletonArmy(t);
-			world.spawnStoneGolem(t);
-			world.spawnRoc(t);
-			world.spawnVampire(t);
-			spawnCyclops();
+		Faction undead = world.getFaction(World.UNDEAD_FACTION_ID);
+		Faction cyclops = world.getFaction(World.CYCLOPS_FACTION_ID);
+		int x = 15;
+		int y = 50;
+		int x2 = 45;
+		for (int i = 0; i < 30; ++i) {
+			Tile tile = world.get(new TileLoc(x, y + i));
+			if(i%2 == 0) {
+				world.spawnAnimal(Game.unitTypeMap.get("TREBUCHET"), tile, undead, null);
+			}
+			else {
+				world.spawnAnimal(Game.unitTypeMap.get("CATAPULT"), tile, undead, null);
+			}
+			tile = world.get(new TileLoc(x + 3, y + i));
+			world.spawnAnimal(Game.unitTypeMap.get("SWORDSMAN"), tile, undead, null);
+			tile = world.get(new TileLoc(x + 4, y + i));
+			world.spawnAnimal(Game.unitTypeMap.get("SPEARMAN"), tile, undead, null);
+			
+			
+			tile = world.get(new TileLoc(x2 + 5, y + i));
+			Tile tile2 = world.get(new TileLoc(x2 + 4, y + i));
+			if((x2 + i) % 2 == 0) {
+				world.spawnAnimal(Game.unitTypeMap.get("ARCHER"), tile, cyclops, null);
+				world.spawnAnimal(Game.unitTypeMap.get("LONGBOWMAN"), tile2, cyclops, null);
+			}
+			else {
+				world.spawnAnimal(Game.unitTypeMap.get("LONGBOWMAN"), tile, cyclops, null);
+				world.spawnAnimal(Game.unitTypeMap.get("ARCHER"), tile2, cyclops, null);
+			}
+			tile = world.get(new TileLoc(x2 + 3, y + i));
+			world.spawnAnimal(Game.unitTypeMap.get("SWORDSMAN"), tile, cyclops, null);
+			
+			tile = world.get(new TileLoc(x2 + 2, y + i));
+			world.spawnAnimal(Game.unitTypeMap.get("HORSEARCHER"), tile, cyclops, null);
+			tile = world.get(new TileLoc(x2, y + i));
+			world.spawnAnimal(Game.unitTypeMap.get("KNIGHT"), tile, cyclops, null);
 		}
-		for(int i = 0; i <= num/10; i++) {
-			spawnEverything();
-		}
+//		Tile t = world.getTilesRandomly().getFirst();
+//		for(int i = 0; i < num; i++) {
+//			world.spawnOgre(t);
+//			world.spawnDragon(t);
+//			world.spawnWerewolf(t);
+//			world.spawnEnt(t);
+//			world.spawnLavaGolem(t);
+//			world.spawnIceGiant(t);
+//			world.spawnSkeletonArmy(t);
+//			world.spawnStoneGolem(t);
+//			world.spawnRoc(t);
+//			world.spawnVampire(t);
+//			spawnCyclops();
+//		}
+//		for(int i = 0; i <= num/10; i++) {
+//			spawnEverything();
+//		}
 	}
 
 	public void shadowWordPain(int num){
@@ -430,7 +467,7 @@ public class Game {
 		
 		Faction CYCLOPS_FACTION = new Faction("CYCLOPS", false, true);
 		CYCLOPS_FACTION.getInventory().addItem(ItemType.FOOD, 50);
-		if(Utils.CMD_ARG_CINEMATIC) {
+		if(Settings.CMD_ARG_CINEMATIC) {
 			CYCLOPS_FACTION.getInventory().addItem(ItemType.FOOD, 5000);
 		}
 		world.addFaction(CYCLOPS_FACTION);
@@ -722,7 +759,7 @@ public class Game {
 			thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 			thingsToPlace.add(Game.plantTypeMap.get("BERRY"));
 			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
-			if(easymode || Utils.CMD_ARG_SPAWN_EXTRA) {
+			if(easymode || Settings.CMD_ARG_SPAWN_EXTRA) {
 				addResources(newFaction);
 				thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
 				thingsToPlace.add(Game.buildingTypeMap.get("WORKSHOP"));
@@ -734,7 +771,7 @@ public class Game {
 				thingsToPlace.add(Game.unitTypeMap.get("CARAVAN"));
 				thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
 			}
-			if(Utils.CMD_ARG_SPAWN_EXTRA) {
+			if(Settings.CMD_ARG_SPAWN_EXTRA) {
 				thingsToPlace.add(Game.buildingTypeMap.get("WINDMILL"));
 			}
 			Tile spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), world.getHeight()/2));
@@ -788,7 +825,7 @@ public class Game {
 				}
 			}
 			index++;
-			if(Utils.CMD_ARG_SPAWN_EXTRA) {
+			if(Settings.CMD_ARG_SPAWN_EXTRA) {
 				spawnExtraStuff(newFaction);
 			}
 		}

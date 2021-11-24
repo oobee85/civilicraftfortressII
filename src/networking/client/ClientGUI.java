@@ -11,6 +11,7 @@ import networking.server.*;
 import ui.*;
 import ui.view.*;
 import utils.*;
+import static ui.KUIConstants.MAIN_MENU_BUTTON_SIZE;
 
 public class ClientGUI {
 	
@@ -26,7 +27,6 @@ public class ClientGUI {
 	private static final ImageIcon SPAWN_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/spawn_tab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon DEBUG_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/debugtab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	
-	private static final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(200, 40);
 	private static final Dimension CONNECTION_MENU_BUTTON_SIZE = new Dimension(120, 30);
 
 	private static final ImageIcon AZURE_LOGO = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/azurelogo.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
@@ -39,6 +39,8 @@ public class ClientGUI {
 	private JPanel rootPanel;
 	
 	private JPanel mainMenuPanel;
+	private JPanel menuButtonPanel;
+	private JPanel mainMenuImagePanel;
 	private JPanel ingamePanel;
 	
 	private JPanel topPanel;
@@ -153,8 +155,14 @@ public class ClientGUI {
 		playerInfoPanel.add(nameTextField);
 		playerInfoPanel.add(colorButton);
 		
+		KButton settingsMenuButton = KUIConstants.setupButton("Settings", null, MAIN_MENU_BUTTON_SIZE);
+		settingsMenuButton.setHorizontalAlignment(SwingConstants.CENTER);
+		settingsMenuButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		settingsMenuButton.addActionListener(e -> {
+			switchToSettingsMenu();
+		});
 		
-		JPanel menuButtonPanel = new JPanel();
+		menuButtonPanel = new JPanel();
 		menuButtonPanel.setOpaque(false);
 		menuButtonPanel.setLayout(new BoxLayout(menuButtonPanel, BoxLayout.Y_AXIS));
 		menuButtonPanel.setFocusable(false);
@@ -166,7 +174,7 @@ public class ClientGUI {
 		menuButtonPanel.add(singlePlayer);
 		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
 		menuButtonPanel.add(loadGameButton);
-		if(Utils.CMD_ARG_DEBUG) {
+		if(Settings.CMD_ARG_DEBUG) {
 			menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
 			menuButtonPanel.add(startLocalHostButton);
 		}
@@ -175,10 +183,15 @@ public class ClientGUI {
 		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
 		menuButtonPanel.add(ipTextField);
 		menuButtonPanel.add(startButton);
+
+		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		menuButtonPanel.add(settingsMenuButton);
+		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		
 		menuButtonPanel.add(Box.createVerticalGlue());
 		
 		mainMenuPanel.add(menuButtonPanel, BorderLayout.CENTER);
-		JPanel mainMenuImagePanel = new MainMenuImageView();
+		mainMenuImagePanel = new MainMenuImageView();
 		mainMenuPanel.add(mainMenuImagePanel, BorderLayout.SOUTH);
 
 		rootPanel.add(mainMenuPanel, BorderLayout.CENTER);
@@ -245,6 +258,28 @@ public class ClientGUI {
 	
 	public void worldReceived() {
 		startGameButton.setEnabled(true);
+	}
+	
+	public void switchToMainMenu() {
+		mainMenuPanel.removeAll();
+		mainMenuPanel.add(menuButtonPanel, BorderLayout.CENTER);
+		mainMenuPanel.add(mainMenuImagePanel, BorderLayout.SOUTH);
+		resetFocus();
+		
+		rootPanel.revalidate();
+		rootPanel.repaint();
+	}
+	
+	public void switchToSettingsMenu() {
+		SettingsMenu settingsMenu = new SettingsMenu(e -> switchToMainMenu());
+		settingsMenu.addControlFor(Settings.class);
+		mainMenuPanel.removeAll();
+		mainMenuPanel.add(settingsMenu.getContentPanel(), BorderLayout.CENTER);
+		mainMenuPanel.add(mainMenuImagePanel, BorderLayout.SOUTH);
+		resetFocus();
+		
+		rootPanel.revalidate();
+		rootPanel.repaint();
 	}
 	
 	public void startedSinglePlayer() {
@@ -323,7 +358,7 @@ public class ClientGUI {
 		CRAFTING_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, craftingView.getRootPanel(), "Craft items", CRAFTING_TAB);
 		
-		if(Utils.CMD_ARG_DEBUG) {
+		if(Settings.CMD_ARG_DEBUG) {
 			SpawnUnitsView spawnUnitsView = new SpawnUnitsView(gameView);
 			SPAWN_UNITS_TAB = tabbedPane.getTabCount();
 			tabbedPane.insertTab(null, SPAWN_TAB_ICON, spawnUnitsView.getRootPanel(), "Summon units for testing", SPAWN_UNITS_TAB);

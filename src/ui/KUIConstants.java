@@ -14,6 +14,8 @@ public class KUIConstants {
 	public static final Color NORMAL_TEXT_COLOR = Color.black;
 	public static final Color SELECTED_TEXT_COLOR = Color.white;
 	public static final Color DISABLED_TEXT_COLOR = new Color(50, 50, 50);
+
+	public static final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(200, 40);
 	
 
 

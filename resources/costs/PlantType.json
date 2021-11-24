@@ -18,7 +18,7 @@
 	},
 	{
 		"name":"CATTAIL",
-		"image":"Images/plants/cattail32.gif",
+		"image":"Images/plants/cattail32.png",
 		"mesh":"models/cattail.ply",
 		"texture":"textures/pallet1.png",
 		"health":100,
