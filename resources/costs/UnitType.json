@@ -567,6 +567,17 @@
 		"resistances": {"HEAT": 0},
 		"loot":{"TITANIUM_ORE":100, "RUNITE_ORE":100}
 	},
+	{
+		"image":"Images/units/balrog.png",
+		"stats":{"movespeed":15,"buildtime":0,"health":1000000,"healspeed":5},
+		"name":"BALROG",
+		"attackstyles":[
+			{"damage":20, "cooldown":2, "range":1}
+		],
+		"attributes":["hostile"],
+		"resistances": {"HEAT": 0},
+		"loot":{"TITANIUM_ORE":100, "RUNITE_ORE":100}
+	},
 	
 	
 ]

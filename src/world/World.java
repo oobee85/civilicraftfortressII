@@ -323,6 +323,7 @@ public class World {
 	public void eruptVolcano() {
 		System.out.println("eruption");
 		eruptingUntil = ticks + (int)(Math.random()*100 + 50);
+		spawnAnimal(Game.unitTypeMap.get("BALROG"), get(volcano), getFaction(NO_FACTION_ID), null);
 	}
 	
 	public void spawnOgre(Tile target) {
