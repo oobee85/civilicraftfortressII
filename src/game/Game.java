@@ -117,6 +117,8 @@ public class Game {
 		if(World.ticks % 2 == 0) {
 			Liquid.propogate(world);
 		}
+		
+		world.updateVolcano();
 
 		world.clearDeadAndAddNewThings();
 		

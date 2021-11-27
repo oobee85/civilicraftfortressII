@@ -80,6 +80,7 @@ public class World {
 	private WorldData worldData;
 	
 	public TileLoc volcano;
+	public int eruptingUntil = 0;
 	public int numCutTrees = 10;
 	public static int nights = 0;
 	public static int days = 1;
@@ -295,30 +296,33 @@ public class World {
 		}
 	}
 	
+	public void updateVolcano() {
+	  if (ticks < eruptingUntil) {
+	    this.get(volcano).liquidType = LiquidType.LAVA;
+	    this.get(volcano).liquidAmount += 1000;
+
+	    int[] numProjectiles = new int[ProjectileType.values().length]; 
+	    numProjectiles[ProjectileType.LAVA_BALL.ordinal()] = 3;
+	    numProjectiles[ProjectileType.ROCK.ordinal()] = 10;
+	    numProjectiles[ProjectileType.WIZARD_BALL.ordinal()] = 1;
+	    int typeIndex = 0;
+	    TileLoop: for(Tile tile : this.getTilesRandomly()) {
+	      while(numProjectiles[typeIndex] == 0) {
+	        typeIndex++;
+	        if(typeIndex >= numProjectiles.length) {
+	          break TileLoop;
+	        }
+	      }
+	      Projectile meteor = new Projectile(ProjectileType.values()[typeIndex], this.get(volcano), tile, null, 100);
+	      worldData.addProjectile(meteor);
+	      --numProjectiles[typeIndex];
+	    }
+	  }
+	}
+	
 	public void eruptVolcano() {
 		System.out.println("eruption");
-		this.get(volcano).liquidAmount += 200000;
-		
-//		world[volcano].liquidType = LiquidType.WATER;
-//		world[volcano].liquidAmount += 200;
-		
-		int[] numProjectiles = new int[ProjectileType.values().length]; 
-		numProjectiles[ProjectileType.LAVA_BALL.ordinal()] = 10;
-		numProjectiles[ProjectileType.ROCK.ordinal()] = 30;
-		numProjectiles[ProjectileType.WIZARD_BALL.ordinal()] = 5;
-		int typeIndex = 0;
-		TileLoop: for(Tile tile : this.getTilesRandomly()) {
-			while(numProjectiles[typeIndex] == 0) {
-				typeIndex++;
-				if(typeIndex >= numProjectiles.length) {
-					break TileLoop;
-				}
-			}
-			Projectile meteor = new Projectile(ProjectileType.values()[typeIndex], this.get(volcano), tile, null, 100);
-			worldData.addProjectile(meteor);
-			--numProjectiles[typeIndex];
-		}
-	
+		eruptingUntil = ticks + (int)(Math.random()*100 + 50);
 	}
 	
 	public void spawnOgre(Tile target) {
