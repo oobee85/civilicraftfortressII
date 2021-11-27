@@ -31,9 +31,9 @@ public class Settings {
 			System.out.println(args[i]);
 			flags.add(args[i].toLowerCase());
 		}
-		DEBUG = flags.contains("debug");
-		SPAWN_EXTRA = flags.contains("spawn_extra");
-		CINEMATIC = flags.contains("cinematic");
+		DEBUG |= flags.contains("debug");
+		SPAWN_EXTRA |= flags.contains("spawn_extra");
+		CINEMATIC |= flags.contains("cinematic");
 	}
 	
 	public static void toFile() {
