@@ -788,6 +788,9 @@ public class Game {
 			
 			while(!thingsToPlace.isEmpty()) {
 				Collections.shuffle(tovisit);
+				if(tovisit.isEmpty()) {
+				  break;
+				}
 				Tile current = tovisit.removeFirst();
 				Object thingType = thingsToPlace.getFirst();
 				if(thingType instanceof BuildingType) {

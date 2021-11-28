@@ -299,10 +299,10 @@ public class World {
 	public void updateVolcano() {
 	  if (ticks < eruptingUntil) {
 	    this.get(volcano).liquidType = LiquidType.LAVA;
-	    this.get(volcano).liquidAmount += 1000;
+	    this.get(volcano).liquidAmount += 300;
 
 	    int[] numProjectiles = new int[ProjectileType.values().length]; 
-	    numProjectiles[ProjectileType.LAVA_BALL.ordinal()] = 3;
+	    numProjectiles[ProjectileType.LAVA_BALL.ordinal()] = 2;
 	    numProjectiles[ProjectileType.ROCK.ordinal()] = 10;
 	    numProjectiles[ProjectileType.WIZARD_BALL.ordinal()] = 1;
 	    int typeIndex = 0;
