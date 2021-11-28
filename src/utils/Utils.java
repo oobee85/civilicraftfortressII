@@ -1,5 +1,7 @@
 package utils;
 import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.io.*;
 import java.net.*;
@@ -22,6 +24,11 @@ public final class Utils {
 	public static final String IMAGEICON_ANIMATED = "GIF";
 	
 	public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	
+	public static int stringWidth(String text, Font font) {
+	  FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, true);
+	  return (int)(font.getStringBounds(text, frc).getWidth());
+	}
 	
 	public static MipMap getImageFromThingType(Object thingType) {
 		if(thingType instanceof UnitType) {

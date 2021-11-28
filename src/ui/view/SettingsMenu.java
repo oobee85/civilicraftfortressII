@@ -7,8 +7,10 @@ import javax.swing.event.DocumentListener;
 import ui.KButton;
 import ui.KToggleButton;
 import ui.KUIConstants;
+import utils.Utils;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 
@@ -19,7 +21,7 @@ public class SettingsMenu {
 	public SettingsMenu(ActionListener backCallback) {
 		content = new JPanel();
 		content.setBackground(Color.black);
-		KButton backButton = KUIConstants.setupButton("Back", null, KUIConstants.MAIN_MENU_BUTTON_SIZE);
+		KButton backButton = KUIConstants.setupButton("Back", null, DebugView.DEBUG_BUTTON_SIZE);
 		backButton.addActionListener(backCallback);
 		content.add(backButton);
 	}
@@ -27,7 +29,8 @@ public class SettingsMenu {
 		try {
 			for(Field f : c.getFields()) {
 				if(f.getType() == boolean.class) {
-					KToggleButton toggle = KUIConstants.setupToggleButton(f.getName(), null, KUIConstants.MAIN_MENU_BUTTON_SIZE);
+					KToggleButton toggle = KUIConstants.setupToggleButton(f.getName(), null, DebugView.DEBUG_BUTTON_SIZE);
+					KUIConstants.resizeToFitContent(toggle, toggle.getText());
 					toggle.setSelected((boolean)f.get(null));
 					toggle.addActionListener(e -> {
 						try {
@@ -39,7 +42,7 @@ public class SettingsMenu {
 					content.add(toggle);
 				}
 				else if(f.getType() == int.class) {
-					JTextField text = KUIConstants.setupTextField("" + (int)f.get(null), KUIConstants.MAIN_MENU_BUTTON_SIZE);
+					JTextField text = KUIConstants.setupTextField("" + (int)f.get(null), DebugView.DEBUG_BUTTON_SIZE);
 					text.getDocument().addDocumentListener(new DocumentListener() {
 						@Override
 						public void removeUpdate(DocumentEvent e) {

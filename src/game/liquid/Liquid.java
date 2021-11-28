@@ -19,8 +19,6 @@ public class Liquid {
 	private static LiquidType[][] liquidTypesTemp;
 	
 	
-	private static final boolean MULTITHREADED = true;
-	
 	// idea: create constant arraylist of positions, initialize it once, then every time simply use a random permutation to access all elements randomly.
 	
 	public static void propogate(World world) {
@@ -55,10 +53,9 @@ public class Liquid {
 //			}
 //		}
 
-		if(MULTITHREADED) {
+		if(Settings.LIQUID_MULTITHREADED) {
 			for(ArrayList<Tile> tiles : world.getLiquidSimulationPhases()) {
-				int chunkSize = tiles.size()/world.getWidth();
-				chunkSize = chunkSize<1 ? 1 : chunkSize;
+				int chunkSize = Math.max(1, tiles.size()/world.getWidth());
 				ArrayList<Future<?>> futures = new ArrayList<>();
 				for(int chunkIndex = 0; chunkIndex < tiles.size(); chunkIndex+=chunkSize) {
 					final int start = chunkIndex;

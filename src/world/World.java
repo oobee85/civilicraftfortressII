@@ -781,8 +781,6 @@ public class World {
 		AirSimulation.updateAirMovement(tiles, width, height);
 		AirSimulation.updateEnergyToTemperature(tiles);
 		
-		
-		
 		for(Tile tile : getTiles()) {
 			
 			

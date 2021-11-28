@@ -27,8 +27,8 @@ public class DebugView {
 	private static final ImageIcon SHADOW_WORD_DEATH = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/soyouhavechosendeath.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon SHADOW_WORD_PAIN = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/shadowwordpain.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/tech.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
-	
-	
+
+  private JFrame settingsWindow;
 	private ScrollingPanel scrollingPanel;
 	private GameView gameView;
 	
@@ -244,7 +244,44 @@ public class DebugView {
 				}
 			}
 		});
-		
+
+    JButton settingsButton = KUIConstants.setupButton("Settings", null, DEBUG_BUTTON_SIZE);
+    settingsButton.addActionListener(e -> {
+      if(settingsWindow != null) {    
+        int sta = settingsWindow.getExtendedState() & ~JFrame.ICONIFIED & JFrame.NORMAL;
+        settingsWindow.setExtendedState(sta);
+        settingsWindow.setAlwaysOnTop(true);
+        settingsWindow.toFront();
+        settingsWindow.requestFocus();
+        settingsWindow.setAlwaysOnTop(false);
+      }
+      else {
+        settingsWindow = new JFrame("Settings");
+        settingsWindow.setLocationRelativeTo(null);
+        settingsWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        settingsWindow.setSize(500, 500);
+        settingsWindow.addWindowListener(new WindowListener() {
+          @Override
+          public void windowClosing(WindowEvent e) { 
+            settingsWindow = null;
+          }
+          @Override public void windowOpened(WindowEvent e) { }
+          @Override public void windowIconified(WindowEvent e) { }
+          @Override public void windowDeiconified(WindowEvent e) { }
+          @Override public void windowDeactivated(WindowEvent e) { }
+          @Override public void windowClosed(WindowEvent e) { }
+          @Override public void windowActivated(WindowEvent e) { }
+        });
+        SettingsMenu settingsMenu = new SettingsMenu(
+            ee -> {
+              settingsWindow.dispose();
+              settingsWindow = null;
+            });
+        settingsMenu.addControlFor(Settings.class);
+        settingsWindow.add(settingsMenu.getContentPanel());
+        settingsWindow.setVisible(true);
+      }
+    });
 
 		for(JRadioButton button : mapModeButtons) {
 			scrollingPanel.add(button);
@@ -271,6 +308,7 @@ public class DebugView {
 		scrollingPanel.add(shadowWordDeath);
 		scrollingPanel.add(shadowWordPain);
 		scrollingPanel.add(reseedButton);
+    scrollingPanel.add(settingsButton);
 	}
 	
 	public JPanel getRootPanel() {
