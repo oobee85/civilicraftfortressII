@@ -28,7 +28,7 @@ public class AirSimulation {
 			// o = 5.670374419 × 10^-8 W*m-2*K-4
 			double end = 0;
 			double deltaT = (tile.getTemperature() - World.MINTEMP) - (air.getTemperature() - World.MINTEMP);
-			end = World.BOLTZMANNMODIFIED * World.VOLUMEPERTILE * deltaT * 1000;
+			end = World.BOLTZMANNMODIFIED * World.VOLUMEPERTILE * deltaT * 750;
 			air.addEnergy(end);
 			tile.addEnergy(-1*end);
 		}
@@ -120,12 +120,14 @@ public class AirSimulation {
 			
 			double vol = tile.getAir().getVolumeLiquid();
 			double maxVol = tile.getAir().getMaxVolumeLiquid();
+			boolean isSnow = false;
 			//does raining
 			if(tile.getAir().canRain() && tile.liquidType != LiquidType.LAVA) {
 				if(tile.liquidType != LiquidType.ICE && tile.liquidType != LiquidType.SNOW && tile.getTemperature() >= World.FREEZETEMP) {
 					tile.liquidType = LiquidType.WATER;
 				}else if(tile.liquidType != LiquidType.WATER && tile.liquidType != LiquidType.ICE && tile.getTemperature() < World.FREEZETEMP) {
 					tile.liquidType = LiquidType.SNOW;
+					isSnow = true;
 				}
 				double totalAmount = tile.liquidAmount + tile.getAir().getVolumeLiquid();
 				
@@ -133,6 +135,9 @@ public class AirSimulation {
 				double amount = 0.1 * vol / maxVol;
 				tile.getAir().addVolumeLiquid(-amount);
 				tile.liquidAmount += amount;
+				if(isSnow == true) {
+					tile.liquidAmount += amount;
+				}
 //				seasonEnergy += 0.01;
 			}
 			if(tile.getHeight() > 800 && averageWater < World.BALANCEWATER) {
@@ -177,8 +182,10 @@ public class AirSimulation {
 			tile.updateEnergyToTemperature();
 //			blackBodyRadiation();
 			
-			tile.addEnergy(seasonEnergy);
-			tile.addEnergy(addedEnergy);
+//			tile.addEnergy(seasonEnergy);
+//			tile.addEnergy(addedEnergy);
+			tile.getAir().addEnergy(seasonEnergy);
+			tile.getAir().addEnergy(addedEnergy);
 			
 			tile.updateEnergyToTemperature();
 			

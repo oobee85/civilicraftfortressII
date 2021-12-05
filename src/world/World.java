@@ -708,8 +708,8 @@ public class World {
 		}
 	}
 	private void initializeTileEnergy() {
-		double defaultEnergy = DEFAULTENERGY + 2000;
-		double defaultAirEnergy = defaultEnergy / 3;
+		double defaultEnergy = DEFAULTENERGY + 2500;
+		double defaultAirEnergy = defaultEnergy / 3.2;
 		for(Tile tile: getTilesRandomly()) {
 			double energy = defaultEnergy;
 			double airEnergy = defaultAirEnergy;

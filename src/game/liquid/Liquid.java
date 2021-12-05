@@ -143,6 +143,7 @@ public class Liquid {
 					tile.setTickLastTerrainChange(World.ticks);
 				}
 				if (tile.liquidType == LiquidType.SNOW) {
+					tile.liquidAmount = tile.liquidAmount/2;
 					tile.liquidType = LiquidType.WATER;
 					liquidTypesTemp[x][y] = LiquidType.WATER;
 					tile.setTickLastTerrainChange(World.ticks);

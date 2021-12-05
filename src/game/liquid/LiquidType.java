@@ -18,7 +18,9 @@ public enum LiquidType {
 		ICE(new String[] {"Images/liquid/ice.png"}, "Images/liquid/ice.png",
 				0f, 10000f, 10000f, 0.1f, 3f, 0f, true),
 		SNOW(new String[] {"Images/liquid/snow128.png"}, "Images/liquid/snow128.png",
-				0.1f, 0.0001f, 0.001f, 1f, 1f, 0.1f, true),
+				0f, 1f, 1f, 0.1f, 3f, 0f, true),
+//				0.1f, 0.9f, 1f, 1f, 1f, 0.1f, true),
+		
 		;
 	
 	float viscosity;
