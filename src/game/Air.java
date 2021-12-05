@@ -84,11 +84,12 @@ public class Air {
 		return volumeChange;
 	}
 	public void updateMaxVolume() {
-		if(temperature > 2) {
-			maxVolume = this.temperature/2;
+		if(temperature > -10) {
+			maxVolume = this.temperature/4 + 3.5;
 		}else {
 			maxVolume = 1;
 		}
+
 		
 	}
 	public void updateHumidity() {

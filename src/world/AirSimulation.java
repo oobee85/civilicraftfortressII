@@ -91,6 +91,12 @@ public class AirSimulation {
 				addedEnergy -= (Math.sqrt(Math.abs(heightRatio * modifier)));
 //				System.out.println(addedEnergy);
 			}
+			if(tile.getTemperature() <= -20) {
+				double modifier = 1 - (tile.getTemperature()/World.BALANCETEMP);
+				double heightRatio = tile.getHeight() / World.MAXHEIGHT;
+				addedEnergy -= (modifier*Math.sqrt(Math.abs(heightRatio)));
+//				System.out.println(addedEnergy);
+			}
 			
 			
 			
@@ -247,7 +253,7 @@ public class AirSimulation {
 					
 				// IF CONDITIONS MET FOR TRANSFER
 //				if(mycombined > ocombined && Math.abs(deltavol) > 0.002) {
-					if (myenergy > oenergy * 1.0020) {
+					if (myenergy > oenergy * 1.0010) {
 //					if (mypress > opress * 1.001 
 ////							&& myvolume > ovolume 
 //							&& Math.abs(deltavol) > 0.00001 // 0.0015
@@ -263,15 +269,15 @@ public class AirSimulation {
 //							transferred = true;
 //						}
 
-						double deltae = Math.abs(myenergy - oenergy) /100;
+						double deltae = Math.abs(myenergy - oenergy) /50;
 						
 						double ratio = myenergy / deltavol;
 //					double ratio = oenergy / myenergy * Math.sqrt(deltae);
 						energyTemp[otherLoc.x()][otherLoc.y()] += deltae;
 						energyTemp[tileLoc.x()][tileLoc.y()] -= deltae;
 						
-						if (myvolume > ovolume * 1.002) {
-							double deltaHum = Math.abs(myvolume - ovolume) /10;
+						if (myvolume > ovolume * 1.0010) {
+							double deltaHum = Math.abs(myvolume - ovolume) /5;
 							volumeTemp[otherLoc.x()][otherLoc.y()] += deltaHum;
 							volumeTemp[tileLoc.x()][tileLoc.y()] -= deltaHum;
 						}

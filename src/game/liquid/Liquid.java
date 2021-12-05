@@ -148,7 +148,7 @@ public class Liquid {
 					liquidTypesTemp[x][y] = LiquidType.WATER;
 					tile.setTickLastTerrainChange(World.ticks);
 				}
-			} else if (tempurature + temperatureOffset < World.FREEZETEMP) {
+			} else if (tempurature + temperatureOffset < World.FREEZETEMP-1) {
 				if (tile.liquidType == LiquidType.WATER) {
 					tile.liquidType = LiquidType.ICE;
 					liquidTypesTemp[x][y] = LiquidType.ICE;
