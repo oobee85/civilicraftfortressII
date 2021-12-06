@@ -1,14 +1,15 @@
 package networking.client;
 
 import java.awt.*;
-import java.util.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.*;
 
 import game.*;
 import utils.*;
 
-public class ClientDriver {
+public class ClientDriver implements WindowListener {
 
 	private JFrame frame;
 	private Client client = new Client();
@@ -23,6 +24,7 @@ public class ClientDriver {
 		frame.setSize(width, height);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addWindowListener(this);
 		frame.setIconImage(Utils.loadImageIcon("Images/logo.png").getImage());
 		frame.add(clientGUI.getMainPanel());
 		
@@ -40,16 +42,11 @@ public class ClientDriver {
 		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);
 		Loader.loadPlantType(Game.plantTypeMap, Game.plantTypeList);
 		Loader.doMappings();
+		Settings.fromFile();
 	}
 	
 	public static void main(String[] args) {
-		Set<String> flags = new HashSet<>();
-		for(int i = 0; i < args.length; i++) {
-			System.out.println(args[i]);
-			flags.add(args[i].toLowerCase());
-		}
-		Game.DEBUG = flags.contains("debug");
-		Game.SPAWN_EXTRA = flags.contains("spawn_extra");
+		Settings.fromCmdArgs(args);
 		EventQueue.invokeLater(() -> {
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -61,4 +58,15 @@ public class ClientDriver {
 		driver.start();
 	}
 
+	@Override
+	public void windowClosing(WindowEvent e) {
+		Settings.toFile();
+	}
+
+	@Override public void windowOpened(WindowEvent e) { }
+	@Override public void windowClosed(WindowEvent e) { }
+	@Override public void windowIconified(WindowEvent e) { }
+	@Override public void windowDeiconified(WindowEvent e) { }
+	@Override public void windowActivated(WindowEvent e) { }
+	@Override public void windowDeactivated(WindowEvent e) { }
 }

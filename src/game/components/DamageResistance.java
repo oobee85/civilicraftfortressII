@@ -37,7 +37,7 @@ public class DamageResistance extends GameComponent {
 	public static final double applyDefaultResistance(double[] danger) {
 		double totalDamage = 0;
 		for(int i = 0; i < danger.length; i++) {
-			totalDamage += danger[i];
+			totalDamage += danger[i] * DEFAULT_RESISTANCE[i] / BASE_RESISTANCE;
 		}
 		return totalDamage;
 	}

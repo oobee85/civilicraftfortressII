@@ -10,6 +10,7 @@ import java.util.concurrent.*;
 import javax.swing.Timer;
 
 import game.*;
+import game.actions.*;
 import networking.*;
 import networking.message.*;
 import ui.*;
@@ -134,14 +135,12 @@ public class Server {
 			public void research(ResearchType researchType) { }
 			@Override
 			public void setFastForwarding(boolean enabled) { }
-			@Override
-			public void setRaiseTerrain(boolean enabled) { }
 		});
 		LinkedList<PlayerInfo> players = new LinkedList<>();
 		for (Connection connection : connections.keySet()) {
 			players.add(connection.getPlayerInfo());
 		}
-		gameInstance.generateWorld(128, 128, false, players);
+		gameInstance.generateWorld(Settings.WORLD_WIDTH, Settings.WORLD_HEIGHT, false, players);
 		gui.getGameView().getDrawer().updateTerrainImages();
 		gui.setGameInstance(gameInstance);
 		startWorldNetworkingUpdateThread();
@@ -270,7 +269,7 @@ public class Server {
 			if(thing instanceof Unit) {
 				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
 				if(targetTile != null) {
-					gui.getCommandInterface().moveTo((Unit)thing, targetTile, message.getClearQueue());
+					gui.getCommandInterface().planAction((Unit)thing, PlannedAction.moveTo(targetTile), message.getClearQueue());
 				}
 			}
 		}
@@ -278,7 +277,7 @@ public class Server {
 			if(thing instanceof Unit) {
 				Thing target = ThingMapper.get(message.getTargetID());
 				if(target != null) {
-					gui.getCommandInterface().attackThing((Unit)thing, target, message.getClearQueue());
+					gui.getCommandInterface().planAction((Unit)thing, PlannedAction.attack(target), message.getClearQueue());
 				}
 			}
 		}
@@ -286,7 +285,7 @@ public class Server {
 			if(thing instanceof Unit) {
 				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
 				if(targetTile != null) {
-					gui.getCommandInterface().buildThing((Unit)thing, targetTile, true, message.getClearQueue());
+					gui.getCommandInterface().planAction((Unit)thing, PlannedAction.buildOnTile(targetTile, true), message.getClearQueue());
 				}
 			}
 		}
@@ -294,7 +293,7 @@ public class Server {
 			if(thing instanceof Unit) {
 				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
 				if(targetTile != null) {
-					gui.getCommandInterface().buildThing((Unit)thing, targetTile, false, message.getClearQueue());
+					gui.getCommandInterface().planAction((Unit)thing, PlannedAction.buildOnTile(targetTile, false), message.getClearQueue());
 				}
 			}
 		}
@@ -304,7 +303,7 @@ public class Server {
 				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
 				BuildingType buildingType = Game.buildingTypeMap.get(message.getType());
 				if(target != null) {
-					gui.getCommandInterface().buildThing((Unit)thing, target.getTile(), buildingType.isRoad(), message.getClearQueue());
+					gui.getCommandInterface().planAction((Unit)thing, PlannedAction.buildOnTile(target.getTile(), buildingType.isRoad()), message.getClearQueue());
 				}
 				if(targetTile != null) {
 					gui.getCommandInterface().planBuilding((Unit)thing, targetTile, message.getClearQueue(), buildingType);

@@ -83,7 +83,7 @@ public class Parasite extends Animal {
 		}
 		else {
 			clearPlannedActions();
-			queuePlannedAction(new PlannedAction(volcano, ActionType.MOVE));
+			queuePlannedAction(PlannedAction.moveTo(volcano));
 		}
 	}
 }

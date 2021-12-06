@@ -39,6 +39,7 @@ public abstract class Drawer {
 	
 	/** Converts the on screen pixel to a tile position */
 	public abstract Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize);
+	public abstract Point getPixelOfWorldCoord(Position worldCoord, int tileSize);
 	public abstract void zoomView(int scroll, int mx, int my);
 	public abstract void zoomViewTo(int newTileSize, int mx, int my);
 	/**

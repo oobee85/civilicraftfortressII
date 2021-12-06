@@ -166,23 +166,25 @@ public class VanillaDrawer extends Drawer {
 					canvas.getWidth() - canvas.getWidth() / 3 - 4, 4, canvas.getWidth() / 3, 30);
 		}
 		g.setFont(KUIConstants.infoFont);
-		for (int i = 0; i < 2; i++) {
-			int x = 10;
-			int y = canvas.getHeight() - 5;
-			g.setColor(Color.green);
-			if (i == 1) {
-				g.setColor(Color.black);
-				x++;
-				y++;
-			}
-			g.drawString("DRAW(ms):" + drawTime, x, y);
-			g.drawString("TICK(ms):" + state.previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
-			if (Game.DEBUG) {
-				String fstr = "";
-				for (Faction f : game.world.getFactions()) {
-					fstr += f.name() + ":" + f.getBuildings().size() + ", ";
+		if (!Settings.CINEMATIC) {
+			for (int i = 0; i < 2; i++) {
+				int x = 10;
+				int y = canvas.getHeight() - 5;
+				g.setColor(Color.green);
+				if (i == 1) {
+					g.setColor(Color.black);
+					x++;
+					y++;
 				}
-				g.drawString(fstr, x + 200, y);
+				g.drawString("DRAW(ms):" + drawTime, x, y);
+				g.drawString("TICK(ms):" + state.previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
+				if (Settings.DEBUG) {
+					String fstr = "";
+					for (Faction f : game.world.getFactions()) {
+						fstr += f.name() + ":" + f.getBuildings().size() + ", ";
+					}
+					g.drawString(fstr, x + 200, y);
+				}
 			}
 		}
 	}
@@ -741,7 +743,7 @@ public class VanillaDrawer extends Drawer {
 		}
 		if(unit.isIdle()) {
 			g.setColor(Color.gray);
-			g.fillRect(drawx + draww*3/4, drawy, draww/4, drawh/4);
+			g.fillRect(drawx + draww*4/5, drawy, draww/5, drawh/5);
 		}
 	}
 	
@@ -964,6 +966,13 @@ public class VanillaDrawer extends Drawer {
 		double column = ((pixelOnScreen.x + viewOffset.x) / tileSize);
 		double row = (pixelOnScreen.y + viewOffset.y) / tileSize;
 		return new Position(column, row);
+	}
+	@Override
+	public Point getPixelOfWorldCoord(Position worldCoord, int tileSize) {
+		int onScreenX = (int) (worldCoord.x*tileSize);
+		int yoffset = ((int)worldCoord.x % 2) * tileSize / 2;
+		int onScreenY = (int) (worldCoord.y*tileSize + yoffset);
+		return new Point(onScreenX, onScreenY);
 	}
 
 	@Override

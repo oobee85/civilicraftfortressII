@@ -80,6 +80,10 @@ public class Thing implements Serializable {
 		components.put(key, component.instance());
 	}
 	
+	public void replaceComponent(Class key, GameComponent component) {
+		components.put(key, component);
+	}
+	
 	public boolean hasInventory() {
 		return components.containsKey(Inventory.class);
 	}

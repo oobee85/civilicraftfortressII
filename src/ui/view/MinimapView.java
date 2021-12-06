@@ -26,7 +26,7 @@ public class MinimapView extends JPanel {
 			public void mousePressed(MouseEvent e) {
 				double ratiox = ((double) e.getX() - MINIMAPBORDERWIDTH) / (getWidth() - 2 * MINIMAPBORDERWIDTH);
 				double ratioy = ((double) e.getY() - MINIMAPBORDERWIDTH) / (getHeight() - 2 * MINIMAPBORDERWIDTH);
-				gameView.moveViewTo(ratiox, ratioy, gameView.getWidth(), gameView.getHeight());
+				gameView.minimapMoveViewTo(ratiox, ratioy);
 			}
 		});
 		addMouseMotionListener(new MouseMotionAdapter() {
@@ -34,7 +34,7 @@ public class MinimapView extends JPanel {
 			public void mouseDragged(MouseEvent e) {
 				double ratiox = ((double) e.getX() - MINIMAPBORDERWIDTH) / (getWidth() - 2 * MINIMAPBORDERWIDTH);
 				double ratioy = ((double) e.getY() - MINIMAPBORDERWIDTH) / (getHeight() - 2 * MINIMAPBORDERWIDTH);
-				gameView.moveViewTo(ratiox, ratioy, gameView.getWidth(), gameView.getHeight());
+				gameView.minimapMoveViewTo(ratiox, ratioy);
 			}
 		});
 	}

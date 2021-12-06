@@ -1,7 +1,5 @@
 package utils;
 
-import java.io.*;
-import java.net.*;
 import java.util.*;
 import java.util.Map.*;
 
@@ -9,7 +7,6 @@ import org.json.*;
 
 import game.*;
 import game.components.*;
-import ui.*;
 import ui.graphics.opengl.*;
 import world.*;
 

@@ -53,7 +53,7 @@ public class GameView {
 	public class GameViewState {
 		public long previousTickTime;
 		public volatile Position viewOffset = new Position(0, 0);
-		public volatile int tileSize = 15;
+		public volatile int tileSize = 30;
 		public boolean fpMode = true;
 		
 		public Point mousePressLocation;
@@ -90,6 +90,9 @@ public class GameView {
 				}
 			}
 		};
+		if(Settings.CINEMATIC) {
+			panel.setCursor(BLANK_CURSOR);
+		}
 		panel.setLayout(new BorderLayout());
 		panel.setBackground(Color.black);
 		panel.add(overlayPanel, BorderLayout.SOUTH);
@@ -101,7 +104,6 @@ public class GameView {
 		
 		this.game = game;
 		this.guiController = game.getGUIController();
-		state.viewOffset = new Position(0, 0);
 
 		MouseWheelListener mouseWheelListener = new MouseWheelListener() {
 			@Override
@@ -229,7 +231,7 @@ public class GameView {
 				} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
 					shiftDown = false;
 				} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-					recenterCamera();
+					recenterCameraOnPlayer();
 				}
 			}
 
@@ -255,8 +257,8 @@ public class GameView {
 						toggleGuarding();
 					} else if (e.getKeyCode() == KeyEvent.VK_M) {
 						setBuildingToPlan(Game.buildingTypeMap.get("MINE"));
-					} else if (e.getKeyCode() == KeyEvent.VK_I) {
-						setBuildingToPlan(Game.buildingTypeMap.get("IRRIGATION"));
+					} else if (e.getKeyCode() == KeyEvent.VK_F) {
+						setBuildingToPlan(Game.buildingTypeMap.get("FARM"));
 					} else if (e.getKeyCode() == KeyEvent.VK_W) {
 						setBuildingToPlan(Game.buildingTypeMap.get("WALL_WOOD"));
 					} else if (e.getKeyCode() == KeyEvent.VK_B) {
@@ -470,7 +472,7 @@ public class GameView {
 		for (Thing thing : selectedThings) {
 			if (thing instanceof Unit) {
 				Unit unit = (Unit) thing;
-				commandInterface.planAction(unit, new PlannedAction(tile, ActionType.WANDER_AROUND), !shiftEnabled);
+				commandInterface.planAction(unit, PlannedAction.wanderAroundTile(tile), !shiftEnabled);
 			}
 		}
 	}
@@ -495,10 +497,10 @@ public class GameView {
 					targetThing = tile.getRoad();
 				}
 				if (targetThing != null) {
-					commandInterface.attackThing(unit, targetThing, !shiftEnabled);
+					commandInterface.planAction(unit, PlannedAction.attack(targetThing), !shiftEnabled);
 				}
 				else {
-					commandInterface.attackMove(unit, tile, !shiftEnabled);
+					commandInterface.planAction(unit, PlannedAction.attackMoveTo(tile), !shiftEnabled);
 				}
 			}
 		}
@@ -526,13 +528,14 @@ public class GameView {
 					Building targetBuilding = targetTile.getBuilding();
 					if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
 							&& targetBuilding.isBuilt() && targetBuilding.getType().isCastle()) {
-						commandInterface.deliver(unit, targetBuilding, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.deliver(targetBuilding), !shiftDown);
 					}
 					else if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
-							&& targetBuilding.isBuilt() && targetBuilding.hasInventory() && !targetBuilding.getInventory().isEmpty()) {
-						commandInterface.takeItems(unit, targetBuilding, !shiftDown);
-					}else {
-						commandInterface.moveTo(unit, targetTile, !shiftDown);
+							&& targetBuilding.isBuilt() && targetBuilding.hasInventory()) {
+						commandInterface.planAction(unit, PlannedAction.takeItemsFrom(targetBuilding), !shiftDown);
+					}
+					else {
+						commandInterface.planAction(unit, PlannedAction.moveTo(targetTile), !shiftDown);
 					}
 				}
 				else if (unit.getType().isBuilder()) {
@@ -542,28 +545,29 @@ public class GameView {
 					}
 					if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
 							&& targetBuilding.isBuilt() && targetBuilding.getType().isHarvestable()) {
-						commandInterface.harvestThing(unit, targetBuilding, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.harvest(targetBuilding), !shiftDown);
 					} else if (targetBuilding != null
 							&& (targetBuilding.getFaction() == unit.getFaction() || targetBuilding.getType().isRoad())
 							&& !targetBuilding.isBuilt()) {
-						commandInterface.buildThing(unit, targetBuilding.getTile(), targetBuilding.getType().isRoad(),
-								!shiftDown);
+						commandInterface.planAction(unit, 
+						                            PlannedAction.buildOnTile(targetBuilding.getTile(), targetBuilding.getType().isRoad()),
+						                            !shiftDown);
 					}
 					else if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction() 
 							&& targetBuilding.getType().isCastle() && unit.hasInventory()) {
-						commandInterface.deliver(unit, targetBuilding, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.deliver(targetBuilding), !shiftDown);
 					}
 					else if (targetTile.getPlant() != null && targetTile.getPlant().isDead() == false) {
-						commandInterface.harvestThing(unit, targetTile.getPlant(), !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.harvest(targetTile.getPlant()), !shiftDown);
 					}
 					else if(targetTile.getResource() != null && unit.getFaction().inRangeColony(unit, targetTile)) {
-						commandInterface.harvestResource(unit, targetTile, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.harvestTile(targetTile), !shiftDown);
 					}
 					else if(targetTile.getTerrain() == Terrain.ROCK && unit.getFaction().inRangeColony(unit, targetTile)) {
-						commandInterface.harvestResource(unit, targetTile, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.harvestTile(targetTile), !shiftDown);
 					}
 					else {
-						commandInterface.moveTo(unit, targetTile, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.moveTo(targetTile), !shiftDown);
 					}
 
 				} else {
@@ -581,9 +585,9 @@ public class GameView {
 						targetThing = targetTile.getBuilding();
 					}
 					if (targetThing != null) {
-						commandInterface.attackThing(unit, targetThing, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.attack(targetThing), !shiftDown);
 					} else {
-						commandInterface.moveTo(unit, targetTile, !shiftDown);
+						commandInterface.planAction(unit, PlannedAction.moveTo(targetTile), !shiftDown);
 					}
 				}
 			}
@@ -784,26 +788,41 @@ public class GameView {
 		state.hoveredTile = new TileLoc(tilepos.getIntX(), tilepos.getIntY());
 	}
 
-	public void moveViewTo(double ratiox, double ratioy, int panelWidth, int panelHeight) {
-		Position tile = new Position(ratiox * game.world.getWidth(), ratioy * game.world.getHeight());
-		Position pixel = tile.multiply(state.tileSize).subtract(new Position(panelWidth / 2, panelHeight / 2));
-		state.viewOffset = pixel;
+	/** Centers camera view onto the specified pixel which is
+	 *  scaled to (tile.x * tileSize), ((tile.y + hexOffset)*tileSize) 
+	 */
+	private void centerViewOnPixel(Position pixel) {
+		Position halfScreenOffset = new Position(panel.getWidth() / 2, 
+		                                         (panel.getHeight() - overlayPanel.getHeight()) / 2);
+		state.viewOffset = pixel.subtract(halfScreenOffset);
 		panel.repaint();
 	}
-	public void moveViewTo(TileLoc tileloc, int panelWidth, int panelHeight) {
-		moveViewTo(
-				(double)tileloc.x() / game.world.getWidth(), 
-				(double)tileloc.y() / game.world.getHeight(), 
-				panelWidth, panelHeight);
+
+	/** Don't apply hex offset for minimap-camera-moves to avoid zigzagging during mouse drag. 
+	 */
+	public void minimapMoveViewTo(double ratiox, double ratioy) {
+		Position tile = new Position(ratiox * game.world.getWidth(), ratioy * game.world.getHeight());
+		centerViewOnPixel(tile.multiply(state.tileSize));
 	}
-	public void recenterCamera() {
-		// move camera to first building or first unit.
+	
+	/** Adjusts the camera view so that the center of the specified tileloc is in the center
+	 *  of the viewable game view. 
+	 */
+	public void centerViewOnTile(TileLoc tileloc) {
+		Position worldPos = new Position(tileloc.x()+0.5, tileloc.y()+0.5);
+		Point pixel = currentActiveDrawer.getPixelOfWorldCoord(worldPos, state.tileSize);
+		centerViewOnPixel(new Position(pixel.x, pixel.y));
+	}
+
+	/** moves camera to first building or first unit owned by the current active player.
+	*/
+	public void recenterCameraOnPlayer() {
 		for(Building building : state.faction.getBuildings()) {
-			GameView.this.moveViewTo(building.getTile().getLocation(), panel.getWidth(), panel.getHeight());
+			GameView.this.centerViewOnTile(building.getTile().getLocation());
 			return;
 		}
 		for(Unit unit : state.faction.getUnits()) {
-			GameView.this.moveViewTo(unit.getTile().getLocation(), panel.getWidth(), panel.getHeight());
+			GameView.this.centerViewOnTile(unit.getTile().getLocation());
 			return;
 		}
 	}

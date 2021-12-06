@@ -80,6 +80,7 @@ public class World {
 	private WorldData worldData;
 	
 	public TileLoc volcano;
+	public int eruptingUntil = 0;
 	public int numCutTrees = 10;
 	public static int nights = 0;
 	public static int days = 1;
@@ -295,12 +296,34 @@ public class World {
 		}
 	}
 	
+	public void updateVolcano() {
+	  if (ticks < eruptingUntil) {
+	    this.get(volcano).liquidType = LiquidType.LAVA;
+	    this.get(volcano).liquidAmount += 300;
+
+	    int[] numProjectiles = new int[ProjectileType.values().length]; 
+	    numProjectiles[ProjectileType.LAVA_BALL.ordinal()] = 2;
+	    numProjectiles[ProjectileType.ROCK.ordinal()] = 10;
+	    numProjectiles[ProjectileType.WIZARD_BALL.ordinal()] = 1;
+	    int typeIndex = 0;
+	    TileLoop: for(Tile tile : this.getTilesRandomly()) {
+	      while(numProjectiles[typeIndex] == 0) {
+	        typeIndex++;
+	        if(typeIndex >= numProjectiles.length) {
+	          break TileLoop;
+	        }
+	      }
+	      Projectile meteor = new Projectile(ProjectileType.values()[typeIndex], this.get(volcano), tile, null, 100);
+	      worldData.addProjectile(meteor);
+	      --numProjectiles[typeIndex];
+	    }
+	  }
+	}
+	
 	public void eruptVolcano() {
 		System.out.println("eruption");
-		this.get(volcano).liquidAmount += 200000;
-		
-//		world[volcano].liquidType = LiquidType.WATER;
-//		world[volcano].liquidAmount += 200;
+		eruptingUntil = ticks + (int)(Math.random()*100 + 50);
+		spawnAnimal(Game.unitTypeMap.get("BALROG"), get(volcano), getFaction(NO_FACTION_ID), null);
 	}
 	
 	public void spawnOgre(Tile target) {
@@ -433,7 +456,7 @@ public class World {
 		tile.addUnit(animal);
 		worldData.addUnit(animal);
 		if(target != null) {
-			animal.queuePlannedAction(new PlannedAction(target, ActionType.MOVE));
+			animal.queuePlannedAction(PlannedAction.moveTo(target));
 		}
 		return animal;
 	}
@@ -758,8 +781,6 @@ public class World {
 		AirSimulation.updateAirMovement(tiles, width, height);
 		AirSimulation.updateEnergyToTemperature(tiles);
 		
-		
-		
 		for(Tile tile : getTiles()) {
 			
 			
@@ -981,6 +1002,10 @@ public class World {
 					// meteor leaves a lil dent
 					projectile.getTile().setHeight(projectile.getTile().getHeight() - 10);
 					spawnAnimal(Game.unitTypeMap.get("INFERNAL"), projectile.getTile(), getFaction(World.NO_FACTION_ID), null);
+				}
+				if(projectile.getType() == ProjectileType.LAVA_BALL) {
+					projectile.getTile().liquidType = LiquidType.LAVA;
+					projectile.getTile().liquidAmount += 100;
 				}
 			}
 		}
@@ -1259,7 +1284,9 @@ public class World {
 		Generation.generateResources(this);
 		this.genPlants();
 		this.makeForest();
-		Generation.generateWildLife(this);
+		if(!Settings.DISABLE_WILDLIFE_SPAWNS) {
+			Generation.generateWildLife(this);
+		}
 		System.out.println("Finished generating " + width + "x" + height + " world with " + tileList.size() + " tiles.");
 	}
 	

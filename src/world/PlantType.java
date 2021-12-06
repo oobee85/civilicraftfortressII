@@ -30,7 +30,7 @@ public class PlantType implements Serializable {
 		this.attributes = attributes;
 	}
 	
-	// TODO remove desertresistant attribute and instead use whether or not the tile would take damage on the tile
+	// TODO remove desertresistant attribute and instead use whether or not the plant would take damage on the tile
 	public boolean isDesertResistant() {
 		return attributes.contains("desertresistant");
 	}

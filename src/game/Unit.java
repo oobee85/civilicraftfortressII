@@ -313,7 +313,7 @@ public class Unit extends Thing implements Serializable {
 			return;
 		}
 		if (this.getFaction() != attacker.getFaction() && getTarget() != attacker && isIdle()) {
-			this.queuePlannedAction(new PlannedAction(attacker, ActionType.ATTACK));
+			this.queuePlannedAction(PlannedAction.attack(attacker));
 		}
 	}
 
@@ -471,10 +471,11 @@ public class Unit extends Thing implements Serializable {
 
 	public void planActions(World world) {
 		// Workers deciding whether to move toward something to build
-		if (unitType.isBuilder() && isIdle() && passiveAction == PlannedAction.BUILD && getTile().getFaction() == getFaction()) {
+		if (unitType.isBuilder() && isIdle() && passiveAction == PlannedAction.BUILD 
+				&& getTile().getFaction() == getFaction()) {
 			Building building = getBuildingToBuild(world.getBuildings());
 			if (building != null && building.getTile().getFaction() == getFaction()) {
-				queuePlannedAction(new PlannedAction(building.getTile(), building.getType().isRoad()));
+				queuePlannedAction(PlannedAction.buildOnTile(building.getTile(), building.getType().isRoad()));
 			}
 		}
 	}
@@ -513,16 +514,16 @@ public class Unit extends Thing implements Serializable {
 				targetTile = nearby.get((int)(Math.random()*nearby.size()));
 			}
 			if(getTile().distanceTo(plan.targetTile) > 5) {
-				prequeuePlannedAction(new PlannedAction(targetTile, ActionType.MOVE));
+				prequeuePlannedAction(PlannedAction.moveTo(targetTile));
 			}
 			else {
-				prequeuePlannedAction(new PlannedAction(targetTile, ActionType.ATTACK_MOVE));
+				prequeuePlannedAction(PlannedAction.attackMoveTo(targetTile));
 			}
 		}
 		else if(plan.type == ActionType.ATTACK_MOVE) {
 			Thing closestEnemy = getClosestEnemyInRange(world);
 			if(closestEnemy != null) {
-				prequeuePlannedAction(new PlannedAction(closestEnemy, ActionType.ATTACK));
+				prequeuePlannedAction(PlannedAction.attack(closestEnemy));
 			}
 		}
 		
@@ -618,11 +619,11 @@ public class Unit extends Thing implements Serializable {
 	private void onFinishedAction(PlannedAction finished) {
 		if(finished.isHarvestAction()) {
 			Building building = getNearestBuildingToDeliver();
-			this.queuePlannedAction(new PlannedAction(building, ActionType.DELIVER, new PlannedAction(finished)));
+			this.queuePlannedAction(PlannedAction.deliver(building, PlannedAction.makeCopy(finished)));
 		}
 		else if(finished.isTakeItemsAction()) {
 			Building castle = getNearestCastleToDeliver();
-			this.queuePlannedAction(new PlannedAction(castle, ActionType.DELIVER, new PlannedAction(finished.target, ActionType.TAKE_ITEMS)));
+			this.queuePlannedAction(PlannedAction.deliver(castle, PlannedAction.takeItemsFrom(finished.target)));
 		}
 		else if(finished.isDeliverAction() && finished.getFollowUp() != null) {
 			PlannedAction followup = finished.getFollowUp();
@@ -632,7 +633,7 @@ public class Unit extends Thing implements Serializable {
 					if(oldTarget.isDead()) {
 						Plant newTarget = getNearestPlantToHarvest(followup.getTile(), oldTarget.getType());
 						if(newTarget != null) {
-							followup = new PlannedAction(newTarget, ActionType.HARVEST);
+							followup = PlannedAction.harvest(newTarget);
 						}
 						else {
 							followup = null;

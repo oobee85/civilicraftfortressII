@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import game.actions.*;
+import game.components.*;
 import game.liquid.*;
 
 import java.util.*;
@@ -16,9 +17,6 @@ import wildlife.*;
 import world.*;
 
 public class Game {
-	
-	public static boolean DEBUG = false;
-	public static boolean SPAWN_EXTRA = false;
 
 	public static final ArrayList<UnitType> unitTypeList = new ArrayList<>();
 	public static final HashMap<String, UnitType> unitTypeMap = new HashMap<>();
@@ -31,9 +29,6 @@ public class Game {
 
 	public static boolean USE_BIDIRECTIONAL_A_STAR = true;
 	public static boolean DISABLE_NIGHT = false;
-	// disables enemies and volcano
-	public static boolean DISABLE_ENEMY_SPAWNS = true;
-	public static boolean DISABLE_VOLCANO_ERUPT = true;
 	
 	private GUIController guiController;
 	public static final int howFarAwayStuffSpawn = 30;
@@ -65,7 +60,7 @@ public class Game {
 		
 		if(world.volcano != null) {
 			world.get(world.volcano).liquidType = LiquidType.LAVA;
-			if(World.days >= 10 && Math.random() < 0.0001 && !DISABLE_VOLCANO_ERUPT) {
+			if(World.days >= 10 && Math.random() < 0.0001 && !Settings.DISABLE_VOLCANO_ERUPT) {
 				eruptVolcano();
 			}
 		}
@@ -122,6 +117,8 @@ public class Game {
 		if(World.ticks % 2 == 0) {
 			Liquid.propogate(world);
 		}
+		
+		world.updateVolcano();
 
 		world.clearDeadAndAddNewThings();
 		
@@ -133,13 +130,13 @@ public class Game {
 		}
 		
 		if(World.ticks % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
-			if(!DISABLE_ENEMY_SPAWNS) {
+			if(!Settings.DISABLE_ENEMY_SPAWNS) {
 				dayEvents();
 			}
 			World.days ++;
 		}
 		if((World.ticks + World.DAY_DURATION) % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
-			if(!DISABLE_ENEMY_SPAWNS) {
+			if(!Settings.DISABLE_ENEMY_SPAWNS) {
 				nightEvents();
 			}
 			World.nights ++;
@@ -311,23 +308,60 @@ public class Game {
 		world.meteorStrike();
 	}
 	public void shadowWordDeath(int num){
-		Tile t = world.getTilesRandomly().getFirst();
-		for(int i = 0; i < num; i++) {
-			world.spawnOgre(t);
-			world.spawnDragon(t);
-			world.spawnWerewolf(t);
-			world.spawnEnt(t);
-			world.spawnLavaGolem(t);
-			world.spawnIceGiant(t);
-			world.spawnSkeletonArmy(t);
-			world.spawnStoneGolem(t);
-			world.spawnRoc(t);
-			world.spawnVampire(t);
-			spawnCyclops();
+		Faction undead = world.getFaction(World.UNDEAD_FACTION_ID);
+		Faction cyclops = world.getFaction(World.CYCLOPS_FACTION_ID);
+		int x = 15;
+		int y = 50;
+		int x2 = 45;
+		for (int i = 0; i < 30; ++i) {
+			Tile tile = world.get(new TileLoc(x, y + i));
+			if(i%2 == 0) {
+				world.spawnAnimal(Game.unitTypeMap.get("TREBUCHET"), tile, undead, null);
+			}
+			else {
+				world.spawnAnimal(Game.unitTypeMap.get("CATAPULT"), tile, undead, null);
+			}
+			tile = world.get(new TileLoc(x + 3, y + i));
+			world.spawnAnimal(Game.unitTypeMap.get("SWORDSMAN"), tile, undead, null);
+			tile = world.get(new TileLoc(x + 4, y + i));
+			world.spawnAnimal(Game.unitTypeMap.get("SPEARMAN"), tile, undead, null);
+			
+			
+			tile = world.get(new TileLoc(x2 + 5, y + i));
+			Tile tile2 = world.get(new TileLoc(x2 + 4, y + i));
+			if((x2 + i) % 2 == 0) {
+				world.spawnAnimal(Game.unitTypeMap.get("ARCHER"), tile, cyclops, null);
+				world.spawnAnimal(Game.unitTypeMap.get("LONGBOWMAN"), tile2, cyclops, null);
+			}
+			else {
+				world.spawnAnimal(Game.unitTypeMap.get("LONGBOWMAN"), tile, cyclops, null);
+				world.spawnAnimal(Game.unitTypeMap.get("ARCHER"), tile2, cyclops, null);
+			}
+			tile = world.get(new TileLoc(x2 + 3, y + i));
+			world.spawnAnimal(Game.unitTypeMap.get("SWORDSMAN"), tile, cyclops, null);
+			
+			tile = world.get(new TileLoc(x2 + 2, y + i));
+			world.spawnAnimal(Game.unitTypeMap.get("HORSEARCHER"), tile, cyclops, null);
+			tile = world.get(new TileLoc(x2, y + i));
+			world.spawnAnimal(Game.unitTypeMap.get("KNIGHT"), tile, cyclops, null);
 		}
-		for(int i = 0; i <= num/10; i++) {
-			spawnEverything();
-		}
+//		Tile t = world.getTilesRandomly().getFirst();
+//		for(int i = 0; i < num; i++) {
+//			world.spawnOgre(t);
+//			world.spawnDragon(t);
+//			world.spawnWerewolf(t);
+//			world.spawnEnt(t);
+//			world.spawnLavaGolem(t);
+//			world.spawnIceGiant(t);
+//			world.spawnSkeletonArmy(t);
+//			world.spawnStoneGolem(t);
+//			world.spawnRoc(t);
+//			world.spawnVampire(t);
+//			spawnCyclops();
+//		}
+//		for(int i = 0; i <= num/10; i++) {
+//			spawnEverything();
+//		}
 	}
 
 	public void shadowWordPain(int num){
@@ -432,6 +466,9 @@ public class Game {
 		
 		Faction CYCLOPS_FACTION = new Faction("CYCLOPS", false, true);
 		CYCLOPS_FACTION.getInventory().addItem(ItemType.FOOD, 50);
+		if(Settings.CINEMATIC) {
+			CYCLOPS_FACTION.getInventory().addItem(ItemType.FOOD, 5000);
+		}
 		world.addFaction(CYCLOPS_FACTION);
 		
 		Faction UNDEAD_FACTION = new Faction("UNDEAD", false, true);
@@ -465,11 +502,12 @@ public class Game {
 	}
 	public void spawnCyclops(Tile tile) {
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y())), Game.buildingTypeMap.get("WATCHTOWER"), world.getFaction(World.CYCLOPS_FACTION_ID));
-		summonBuilding(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("GRANARY"), world.getFaction(World.CYCLOPS_FACTION_ID));
+		Thing granary = summonBuilding(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("GRANARY"), world.getFaction(World.CYCLOPS_FACTION_ID));
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("BARRACKS"), world.getFaction(World.CYCLOPS_FACTION_ID));
-		summonBuilding(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("WINDMILL"), world.getFaction(World.CYCLOPS_FACTION_ID));
+		Thing windmill = summonBuilding(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("WINDMILL"), world.getFaction(World.CYCLOPS_FACTION_ID));
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("MINE"), world.getFaction(World.CYCLOPS_FACTION_ID));
-		
+		granary.replaceComponent(Inventory.class, world.getFaction(World.CYCLOPS_FACTION_ID).getInventory());
+		windmill.replaceComponent(Inventory.class, world.getFaction(World.CYCLOPS_FACTION_ID).getInventory());
 		//makes the walls
 		for(int i = 0; i < 5; i++) {
 			BuildingType type = Game.buildingTypeMap.get("WALL_WOOD");
@@ -720,7 +758,7 @@ public class Game {
 			thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 			thingsToPlace.add(Game.plantTypeMap.get("BERRY"));
 			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
-			if(easymode || SPAWN_EXTRA) {
+			if(easymode || Settings.SPAWN_EXTRA) {
 				addResources(newFaction);
 				thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
 				thingsToPlace.add(Game.buildingTypeMap.get("WORKSHOP"));
@@ -732,7 +770,7 @@ public class Game {
 				thingsToPlace.add(Game.unitTypeMap.get("CARAVAN"));
 				thingsToPlace.add(Game.unitTypeMap.get("WARRIOR"));
 			}
-			if(SPAWN_EXTRA) {
+			if(Settings.SPAWN_EXTRA) {
 				thingsToPlace.add(Game.buildingTypeMap.get("WINDMILL"));
 			}
 			Tile spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), world.getHeight()/2));
@@ -750,6 +788,9 @@ public class Game {
 			
 			while(!thingsToPlace.isEmpty()) {
 				Collections.shuffle(tovisit);
+				if(tovisit.isEmpty()) {
+				  break;
+				}
 				Tile current = tovisit.removeFirst();
 				Object thingType = thingsToPlace.getFirst();
 				if(thingType instanceof BuildingType) {
@@ -786,7 +827,7 @@ public class Game {
 				}
 			}
 			index++;
-			if(SPAWN_EXTRA) {
+			if(Settings.SPAWN_EXTRA) {
 				spawnExtraStuff(newFaction);
 			}
 		}

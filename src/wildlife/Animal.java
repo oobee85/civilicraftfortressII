@@ -93,7 +93,7 @@ public class Animal extends Unit {
 		}
 		if(bestDanger < currentDanger && currentDanger >= 0.9) {
 			if(best != getTile()) {
-				queuePlannedAction(new PlannedAction(best, ActionType.MOVE));
+				queuePlannedAction(PlannedAction.moveTo(best));
 			}
 			return;
 		}
@@ -114,7 +114,7 @@ public class Animal extends Unit {
 			}
 			if(bestHerdAmount > currentHerdAmount && this.applyResistance(bestHerd.computeTileDanger()) < 1) {
 				if(bestHerd != getTile()) {
-					queuePlannedAction(new PlannedAction(bestHerd, ActionType.MOVE));
+					queuePlannedAction(PlannedAction.moveTo(bestHerd));
 					return;
 				}
 			}
@@ -134,7 +134,7 @@ public class Animal extends Unit {
 			if(migrationTarget != null) {
 //				System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + migrationTarget);
 				migratingUntil = World.ticks + World.SEASON_DURATION/2;
-				queuePlannedAction(new PlannedAction(migrationTarget, ActionType.MOVE));
+				queuePlannedAction(PlannedAction.moveTo(migrationTarget));
 			}
 		}
 	}
@@ -150,17 +150,17 @@ public class Animal extends Unit {
 			}
 			if(iveGotYouInMySights != this) {
 				clearPlannedActions();
-				queuePlannedAction(new PlannedAction(iveGotYouInMySights, ActionType.ATTACK));
+				queuePlannedAction(PlannedAction.attack(iveGotYouInMySights));
 			}
 		}
 		else {
 			if(getTile().getPlant() != null) {
-				queuePlannedAction(new PlannedAction(getTile().getPlant()));
+				queuePlannedAction(PlannedAction.eatPlant(getTile().getPlant()));
 			}
 			else {
 				for(Tile neighbor : getTile().getNeighbors()) {
 					if(neighbor.getPlant() != null) {
-						queuePlannedAction(new PlannedAction(neighbor.getPlant()));
+						queuePlannedAction(PlannedAction.eatPlant(neighbor.getPlant()));
 					}
 				}
 			}
@@ -185,7 +185,7 @@ public class Animal extends Unit {
 			Thing target = targetType.getValidTargetFor(this, units, buildings);
 			if(target != null) {
 				clearPlannedActions();
-				queuePlannedAction(new PlannedAction(target, ActionType.ATTACK));
+				queuePlannedAction(PlannedAction.attack(target));
 				return;
 			}
 		}
