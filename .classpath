@@ -10,7 +10,6 @@
 	<classpathentry kind="lib" path="lib/json.jar"/>
 	<classpathentry kind="lib" path="lib/jply.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="lib/jogamp-all-platforms/jar/gluegen-rt.jar" sourcepath="lib/jogamp-all-platforms/jar/gluegen-rt.jar"/>
-	<classpathentry kind="lib" path="lib/jogamp-all-platforms/jar/jogl-all.jar" sourcepath="lib/jogamp-all-platforms/jar/jogl-all.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JOGL"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
