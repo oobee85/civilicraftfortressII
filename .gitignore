@@ -4,6 +4,7 @@ bin/
 .settings/
 *.jar
 !jply.jar
+!json.jar
 profiling/
 ERROR_LOG.txt
 *.ser
@@ -11,4 +12,4 @@ ser/
 lootStatistics.txt
 *.civ
 settings.ini
-lib/
+lib/jogamp-all-platforms
