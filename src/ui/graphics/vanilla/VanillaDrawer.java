@@ -39,6 +39,7 @@ public class VanillaDrawer extends Drawer {
 	private static final Image BLUE_HITSPLAT = Utils.loadImage("Images/interfaces/bluehitsplat.png");
 	private static final Image GREEN_HITSPLAT = Utils.loadImage("Images/interfaces/greenhitsplat.png");
 	private static final Image SNOW = Utils.loadImage("Images/weather/snow.png");
+	private static final Image SKY_BACKGROUND = Utils.loadImage("Images/lightbluesky.png");
 
 	
 	private JPanel canvas;
@@ -70,6 +71,9 @@ public class VanillaDrawer extends Drawer {
 				
 				g.setColor(game.getBackgroundColor());
 				g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+				Utils.setTransparency(g, World.getDaylight());
+				g.drawImage(SKY_BACKGROUND, 0, 0, canvas.getWidth(), canvas.getHeight(), null);
+				Utils.setTransparency(g, 1);
 				
 				int buffer = currentBuffer;
 				if(state.tileSize == drawnAtTileSize[buffer]) {
@@ -199,8 +203,7 @@ public class VanillaDrawer extends Drawer {
 				RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 				RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-		g.setColor(game.getBackgroundColor());
-		g.fillRect(0, 0, w, h);
+		Utils.clearBufferedImageTo(((Graphics2D)g), new Color(0, 0, 0, 0), w, h);
 		drawGame(g);
 	}
 	
