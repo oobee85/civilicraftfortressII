@@ -72,7 +72,7 @@ public class VanillaDrawer extends Drawer {
 				g.setColor(game.getBackgroundColor());
 				g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 				Utils.setTransparency(g, World.getDaylight());
-				g.drawImage(SKY_BACKGROUND, 0, 0, canvas.getWidth(), canvas.getHeight(), null);
+				g.drawImage(SKY_BACKGROUND, -state.viewOffset.getIntX()/20 - 100, -state.viewOffset.getIntY()/20 - 100, null);
 				Utils.setTransparency(g, 1);
 				
 				int buffer = currentBuffer;
