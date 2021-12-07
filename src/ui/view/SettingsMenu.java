@@ -7,10 +7,8 @@ import javax.swing.event.DocumentListener;
 import ui.KButton;
 import ui.KToggleButton;
 import ui.KUIConstants;
-import utils.Utils;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 
@@ -35,31 +33,32 @@ public class SettingsMenu {
 					toggle.addActionListener(e -> {
 						try {
 							f.set(null, toggle.isSelected());
-						} catch (IllegalArgumentException | IllegalAccessException e1) {
+						} catch (IllegalAccessException e1) {
 							e1.printStackTrace();
 						}
 					});
 					content.add(toggle);
 				}
-				else if(f.getType() == int.class) {
-					JTextField text = KUIConstants.setupTextField("" + (int)f.get(null), DebugView.DEBUG_BUTTON_SIZE);
+				else if(f.getType() == int.class || f.getType() == double.class) {
+					JTextField text = KUIConstants.setupTextField("" + f.get(null), DebugView.DEBUG_BUTTON_SIZE);
 					text.getDocument().addDocumentListener(new DocumentListener() {
-						@Override
-						public void removeUpdate(DocumentEvent e) {
-							changedUpdate(e);
-						}
-						@Override
-						public void insertUpdate(DocumentEvent e) {
-							changedUpdate(e);
-						}
+						@Override public void removeUpdate(DocumentEvent e) { changedUpdate(e); }
+						@Override public void insertUpdate(DocumentEvent e) { changedUpdate(e); }
 						@Override
 						public void changedUpdate(DocumentEvent e) {
 							try {
-								int i = Integer.parseInt(text.getText());
-								f.set(null, i);
+								if(f.getType() == int.class) {
+									int i = Integer.parseInt(text.getText());
+									f.set(null, i);
+								}
+								else if(f.getType() == double.class) {
+									double i = Double.parseDouble(text.getText());
+									f.set(null, i);
+								}
 							} catch (NumberFormatException e1) {
 								
-							} catch (IllegalArgumentException | IllegalAccessException e1) {
+							}
+							catch (IllegalAccessException e1) {
 								e1.printStackTrace();
 							}
 						}
@@ -74,7 +73,7 @@ public class SettingsMenu {
 					content.add(group);
 				}
 			}
-		} catch (IllegalArgumentException | IllegalAccessException e) {
+		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
 	}

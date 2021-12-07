@@ -269,16 +269,12 @@ public class GameView {
 				}
 			}
 		};
-//		if(useOpenGL) {
-			glDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
-			glDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
-			glDrawer.getDrawingCanvas().addMouseListener(mouseListener);
-//		}
-//		else {
-			vanillaDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
-			vanillaDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
-			vanillaDrawer.getDrawingCanvas().addMouseListener(mouseListener);
-//		}
+		glDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
+		glDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
+		glDrawer.getDrawingCanvas().addMouseListener(mouseListener);
+		vanillaDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
+		vanillaDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
+		vanillaDrawer.getDrawingCanvas().addMouseListener(mouseListener);
 		panel.addKeyListener(keyListener);
 		fpsMovementThread = new Thread(() -> {
 			try {

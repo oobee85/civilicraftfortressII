@@ -20,7 +20,7 @@ public class Settings {
 	public static boolean DISABLE_VOLCANO_ERUPT = true;
 	public static boolean DISABLE_ENEMY_SPAWNS = true;
 	public static boolean DISABLE_WILDLIFE_SPAWNS = false;
-  public static boolean LIQUID_MULTITHREADED = true;
+	public static boolean LIQUID_MULTITHREADED = true;
 
 	public static int NUM_AI = 0;
 	public static int WORLD_WIDTH = 128;
