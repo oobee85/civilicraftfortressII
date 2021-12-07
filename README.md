@@ -10,4 +10,5 @@ Dependencies:
 	- jply.jar built from: [github.com/0leks/jPLY](https://github.com/0leks/jPLY) 
 		- (The 0leks fork includes a bug-fix for parsing ints)
 - Not included in the repo:
-	- download the jogamp-all-platforms release from [jogamp.org](https://jogamp.org/) and add jogamp-all-platforms/jar/gluegen-rt.jar and jogamp-all-platforms/jar/jogl-all.jar to the classpath
+	- Download the jogamp-all-platforms release from [jogamp.org](https://jogamp.org/) and add jogamp-all-platforms/jar/gluegen-rt.jar and jogamp-all-platforms/jar/jogl-all.jar to the classpath
+		- Recommended to make a user library in eclipse that links against the above two mentioned jars.
