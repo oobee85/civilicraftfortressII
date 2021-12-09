@@ -6,7 +6,7 @@
 		"mesh":"models/cube.obj",
 		"health":200,
 		"rarity": 1,
-		"harvestitems":{"FOOD":6}
+		"harvestitems":{"FOOD":5}
 	},
 	{
 		"name":"BERRY_DEPLETED",
