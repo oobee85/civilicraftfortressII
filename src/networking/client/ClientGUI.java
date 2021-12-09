@@ -324,7 +324,7 @@ public class ClientGUI {
 			ingamePanel.remove(gameView.getPanel());
 		}
 		gameViewOverlay = new GameViewOverlay(instance.getGUIController());
-		gameView = new GameView(instance, false, gameViewOverlay);
+		gameView = new GameView(instance, Settings.DEFAULT_TO_OPENGL, gameViewOverlay);
 		MinimapView minimapView = new MinimapView(gameView);
 		minimapView.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, ClientGUI.GUIWIDTH));
 		gameView.requestFocus();
