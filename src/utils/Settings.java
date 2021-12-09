@@ -17,6 +17,8 @@ public class Settings {
 	public static boolean DEBUG;
 	public static boolean SPAWN_EXTRA;
 	public static boolean CINEMATIC;
+	public static boolean SHOW_FPS = false;
+	public static boolean SHOW_BUILDING_COUNTS = false;
 	public static boolean DISABLE_VOLCANO_ERUPT = true;
 	public static boolean DISABLE_ENEMY_SPAWNS = true;
 	public static boolean DISABLE_WILDLIFE_SPAWNS = false;
@@ -27,7 +29,7 @@ public class Settings {
 	public static int NUM_AI = 0;
 	public static int WORLD_WIDTH = 128;
 	public static int WORLD_HEIGHT = 128;
-	public static int DEFAULT_TILE_SIZE = 30;
+	public static int DEFAULT_TILE_SIZE = 45;
 
 	public static void fromCmdArgs(String[] args) {
 		Set<String> flags = new HashSet<>();
