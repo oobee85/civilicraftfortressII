@@ -1,5 +1,6 @@
 package utils;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,6 +31,9 @@ public class Settings {
 	public static int WORLD_WIDTH = 128;
 	public static int WORLD_HEIGHT = 128;
 	public static int DEFAULT_TILE_SIZE = 45;
+	
+	public static String DEFAULT_PLAYER_NAME = "Player";
+	public static int DEFAULT_PLAYER_COLOR = Color.red.getRGB();
 
 	public static void fromCmdArgs(String[] args) {
 		Set<String> flags = new HashSet<>();
@@ -79,6 +83,9 @@ public class Settings {
 				}
 				else if(f.getType() == int.class) {
 					f.set(null, Integer.parseInt(value));
+				}
+				else if(f.getType() == String.class) {
+					f.set(null, value);
 				}
 			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
 				e.printStackTrace();

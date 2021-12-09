@@ -1,6 +1,5 @@
 package networking.server;
 
-import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
@@ -20,7 +19,6 @@ import world.*;
 
 public class Server {
 	public static final int PORT = 25565;
-	public static final PlayerInfo DEFAULT_PLAYER_INFO = new PlayerInfo("Player", Color.red);
 	
 	private ConcurrentHashMap<Connection, Boolean> connections = new ConcurrentHashMap<>();
 	private Thread thread;
