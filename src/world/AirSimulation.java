@@ -91,7 +91,7 @@ public class AirSimulation {
 				addedEnergy -= (Math.sqrt(Math.abs(heightRatio * modifier)));
 //				System.out.println(addedEnergy);
 			}
-			if(tile.getTemperature() <= -20) {
+			if(tile.getTemperature() <= -5) {
 				double modifier = 1 - (tile.getTemperature()/World.BALANCETEMP);
 				double heightRatio = tile.getHeight() / World.MAXHEIGHT;
 				addedEnergy -= (modifier*Math.sqrt(Math.abs(heightRatio)));
@@ -127,6 +127,7 @@ public class AirSimulation {
 			double vol = tile.getAir().getVolumeLiquid();
 			double maxVol = tile.getAir().getMaxVolumeLiquid();
 			boolean isSnow = false;
+			
 			//does raining
 			if(tile.getAir().canRain() && tile.liquidType != LiquidType.LAVA) {
 				if(tile.liquidType != LiquidType.ICE && tile.liquidType != LiquidType.SNOW && tile.getTemperature() >= World.FREEZETEMP) {
@@ -138,7 +139,10 @@ public class AirSimulation {
 				double totalAmount = tile.liquidAmount + tile.getAir().getVolumeLiquid();
 				
 				
-				double amount = 0.1 * vol / maxVol;
+				double amount = 0.05 * vol / maxVol;
+				if(tile.liquidAmount >= 10) {
+					amount = 0;
+				}
 				tile.getAir().addVolumeLiquid(-amount);
 				tile.liquidAmount += amount;
 				if(isSnow == true) {
@@ -248,7 +252,7 @@ public class AirSimulation {
 				Direction attemptFlow = Direction.getDirection(tileLoc, otherLoc);
 				Direction oldFlow = tileAir.getFlowDirection();
 				double directionValue = Math.abs(oldFlow.deltay() + attemptFlow.deltay());
-				if (directionValue == 0.5 || directionValue == 2) {
+//				if (directionValue == 0.5 || directionValue == 2) {
 
 					
 				// IF CONDITIONS MET FOR TRANSFER
@@ -277,7 +281,7 @@ public class AirSimulation {
 						energyTemp[tileLoc.x()][tileLoc.y()] -= deltae;
 						
 						if (myvolume > ovolume * 1.0010) {
-							double deltaHum = Math.abs(myvolume - ovolume) /5;
+							double deltaHum = Math.abs(myvolume - ovolume) /2;
 							volumeTemp[otherLoc.x()][otherLoc.y()] += deltaHum;
 							volumeTemp[tileLoc.x()][tileLoc.y()] -= deltaHum;
 						}
@@ -286,7 +290,7 @@ public class AirSimulation {
 
 //				}else if (Math.abs(deltavol) <= 0.0015){
 //					tileAir.setFlowDirection(Direction.NONE);
-					}
+//					}
 				}
 				if(transferred == true) {
 					break;

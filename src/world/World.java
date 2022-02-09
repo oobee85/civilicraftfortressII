@@ -33,7 +33,7 @@ public class World {
 	public static final int TICKSTOUPDATEAIR = 2;
 	
 	public static final int MINTEMP = -273; // [c]
-	public static final int BALANCETEMP = -20; // [c]
+	public static final int BALANCETEMP = -10; // [c]
 	public static final int FREEZETEMP = 0; // [c]
 	public static final float FREEZING_TEMPURATURE = 0.33f;
 	public static final int BALANCEWATER = 5;
@@ -732,15 +732,16 @@ public class World {
 	}
 	private void initializeTileEnergy() {
 		double defaultEnergy = DEFAULTENERGY + 2500;
-		double defaultAirEnergy = defaultEnergy / 3.2;
+		double defaultAirEnergy = defaultEnergy / 3.1;
 		for(Tile tile: getTilesRandomly()) {
 			double energy = defaultEnergy;
 			double airEnergy = defaultAirEnergy;
 			
 			Air air = tile.getAir();
-			double altitudeMultiplier = Math.sqrt( Math.sqrt(World.SEALEVEL) / Math.sqrt(tile.getHeight()) );
-			if(altitudeMultiplier != 0 && altitudeMultiplier < 1) {
+			double altitudeMultiplier = Math.sqrt(Math.sqrt( Math.sqrt(World.SEALEVEL) / Math.sqrt(tile.getHeight()) ));
+			if(altitudeMultiplier > 0.5 && altitudeMultiplier < 1) {
 				energy *= altitudeMultiplier;
+				airEnergy *= Math.sqrt(altitudeMultiplier);
 				
 			}
 //			double maxVol = tile.getAir().getMaxVolumeLiquid();
