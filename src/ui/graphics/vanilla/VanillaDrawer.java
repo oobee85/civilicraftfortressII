@@ -17,6 +17,7 @@ import game.components.*;
 import game.liquid.*;
 import ui.*;
 import ui.graphics.*;
+import ui.utils.DrawingUtils;
 import ui.view.GameView.*;
 import utils.*;
 import world.*;
@@ -39,6 +40,7 @@ public class VanillaDrawer extends Drawer {
 	private static final Image BLUE_HITSPLAT = Utils.loadImage("Images/interfaces/bluehitsplat.png");
 	private static final Image GREEN_HITSPLAT = Utils.loadImage("Images/interfaces/greenhitsplat.png");
 	private static final Image SNOW = Utils.loadImage("Images/weather/snow.png");
+	private static final Image SKY_BACKGROUND = Utils.loadImage("Images/lightbluesky.png");
 
 	
 	private JPanel canvas;
@@ -70,6 +72,9 @@ public class VanillaDrawer extends Drawer {
 				
 				g.setColor(game.getBackgroundColor());
 				g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+				Utils.setTransparency(g, World.getDaylight());
+				g.drawImage(SKY_BACKGROUND, -state.viewOffset.getIntX()/20 - 100, -state.viewOffset.getIntY()/20 - 100, null);
+				Utils.setTransparency(g, 1);
 				
 				int buffer = currentBuffer;
 				if(state.tileSize == drawnAtTileSize[buffer]) {
@@ -165,26 +170,20 @@ public class VanillaDrawer extends Drawer {
 			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress,
 					canvas.getWidth() - canvas.getWidth() / 3 - 4, 4, canvas.getWidth() / 3, 30);
 		}
-		g.setFont(KUIConstants.infoFont);
 		if (!Settings.CINEMATIC) {
-			for (int i = 0; i < 2; i++) {
-				int x = 10;
-				int y = canvas.getHeight() - 5;
-				g.setColor(Color.green);
-				if (i == 1) {
-					g.setColor(Color.black);
-					x++;
-					y++;
+			g.setFont(KUIConstants.infoFont);
+			int x = 10;
+			int y = canvas.getHeight() - 5;
+			if(Settings.SHOW_FPS) {
+				DrawingUtils.drawStringWithShadow(g, "DRAW(ms):" + drawTime, x, y);
+				DrawingUtils.drawStringWithShadow(g, "TICK(ms):" + state.previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
+			}
+			if (Settings.SHOW_BUILDING_COUNTS) {
+				String fstr = "";
+				for (Faction f : game.world.getFactions()) {
+					fstr += f.name() + ":" + f.getBuildings().size() + ", ";
 				}
-				g.drawString("DRAW(ms):" + drawTime, x, y);
-				g.drawString("TICK(ms):" + state.previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
-				if (Settings.DEBUG) {
-					String fstr = "";
-					for (Faction f : game.world.getFactions()) {
-						fstr += f.name() + ":" + f.getBuildings().size() + ", ";
-					}
-					g.drawString(fstr, x + 200, y);
-				}
+				DrawingUtils.drawStringWithShadow(g, fstr, x + 200, y);
 			}
 		}
 	}
@@ -199,8 +198,7 @@ public class VanillaDrawer extends Drawer {
 				RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 				RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-		g.setColor(game.getBackgroundColor());
-		g.fillRect(0, 0, w, h);
+		Utils.clearBufferedImageTo(((Graphics2D)g), new Color(0, 0, 0, 0), w, h);
 		drawGame(g);
 	}
 	

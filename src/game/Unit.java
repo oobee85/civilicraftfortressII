@@ -370,9 +370,9 @@ public class Unit extends Thing implements Serializable {
 	public void doHarvestBuilding(Building building, PlannedAction action) {
 		if(readyToHarvest() && hasInventory()) {
 			if(building.getType() == BasicAI.FARM) {
-				building.takeDamage(3, DamageType.PHYSICAL);
-				getInventory().addItem(ItemType.FOOD, 3);
-				this.resetTimeToHarvest(1);
+				building.takeDamage(5, DamageType.PHYSICAL);
+				getInventory().addItem(ItemType.FOOD, 5);
+				this.resetTimeToHarvest(2);
 			}
 //			else if(building.getType().name().equals("MINE")) {
 //				building.takeDamage(1, DamageType.PHYSICAL);
@@ -415,7 +415,7 @@ public class Unit extends Thing implements Serializable {
 			}
 			if(itemType != null) {
 				getInventory().addItem(itemType, 1);
-				this.resetTimeToHarvest(2);
+				this.resetTimeToHarvest(2.5);
 				if(getInventory().isFull()) {
 					action.setDone(true);
 				}

@@ -4,6 +4,8 @@ import java.awt.*;
 import java.net.*;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import game.*;
 import networking.message.*;
@@ -49,7 +51,6 @@ public class ClientGUI {
 	private JPanel connectionControlsPanel;
 	private JPanel lobbyInfo;
 	private JTextField nameTextField;
-	private Color selectedColor = Server.DEFAULT_PLAYER_INFO.getColor();
 	
 	private JButton makeWorldButton;
 	private JButton startGameButton;
@@ -135,16 +136,24 @@ public class ClientGUI {
 		});
 		
 		Dimension colorButtonSize = new Dimension(MAIN_MENU_BUTTON_SIZE.height + 8, MAIN_MENU_BUTTON_SIZE.height);
-		nameTextField = KUIConstants.setupTextField(Server.DEFAULT_PLAYER_INFO.getName(), new Dimension(MAIN_MENU_BUTTON_SIZE.width - colorButtonSize.width, MAIN_MENU_BUTTON_SIZE.height));
+		nameTextField = KUIConstants.setupTextField(Settings.DEFAULT_PLAYER_NAME, new Dimension(MAIN_MENU_BUTTON_SIZE.width - colorButtonSize.width, MAIN_MENU_BUTTON_SIZE.height));
 		nameTextField.setToolTipText("Choose your faction's name");
+		nameTextField.getDocument().addDocumentListener(new DocumentListener() {
+			@Override public void removeUpdate(DocumentEvent e) { changedUpdate(e); }
+			@Override public void insertUpdate(DocumentEvent e) { changedUpdate(e); }
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				Settings.DEFAULT_PLAYER_NAME = nameTextField.getText();
+			}
+		});
 		KButton colorButton = KUIConstants.setupButton("", null, colorButtonSize);
 		colorButton.setToolTipText("Choose your faction's color");
-		colorButton.setBorder(BorderFactory.createLineBorder(selectedColor, 10));
+		colorButton.setBorder(BorderFactory.createLineBorder(new Color(Settings.DEFAULT_PLAYER_COLOR), 10));
 		colorButton.addActionListener(e -> {
 			Color newColor = JColorChooser.showDialog(rootPanel, "Choose Color", colorButton.getBackground());
 			if(newColor != null) {
-				selectedColor = newColor;
-				colorButton.setBorder(BorderFactory.createLineBorder(selectedColor, 10));
+				Settings.DEFAULT_PLAYER_COLOR = newColor.getRGB();
+				colorButton.setBorder(BorderFactory.createLineBorder(new Color(Settings.DEFAULT_PLAYER_COLOR), 10));
 			}
 			resetFocus();
 		});
@@ -253,7 +262,7 @@ public class ClientGUI {
 	}
 	
 	public PlayerInfo getPlayerInfo() {
-		return new PlayerInfo(nameTextField.getText(), selectedColor);
+		return new PlayerInfo(nameTextField.getText(), new Color(Settings.DEFAULT_PLAYER_COLOR));
 	}
 	
 	public void worldReceived() {
@@ -324,7 +333,7 @@ public class ClientGUI {
 			ingamePanel.remove(gameView.getPanel());
 		}
 		gameViewOverlay = new GameViewOverlay(instance.getGUIController());
-		gameView = new GameView(instance, false, gameViewOverlay);
+		gameView = new GameView(instance, Settings.DEFAULT_TO_OPENGL, gameViewOverlay);
 		MinimapView minimapView = new MinimapView(gameView);
 		minimapView.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, ClientGUI.GUIWIDTH));
 		gameView.requestFocus();

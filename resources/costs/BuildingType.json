@@ -121,7 +121,7 @@
 	{
 		"name":"FARM",
 		"info":"Workers harvest food from here",
-		"image":"Images/buildings/irrigation.png",
+		"image":"Images/buildings/irrigation.gif",
 		"mesh":"models/flatcube.obj",
 		"vision":1,
 		"cost":{"WOOD":50},

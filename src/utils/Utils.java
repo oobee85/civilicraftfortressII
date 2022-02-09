@@ -391,6 +391,13 @@ public final class Utils {
 		return (int) (min + (max - min) * ratio);
 	}
 	
+	public static void clearBufferedImageTo(Graphics2D g, Color color, int w, int h) {
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OUT));
+		g.setColor(color);
+		g.fillRect(0, 0, w, h);
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+	}
+	
 	public static double getAlphaOfLiquid(double amount) {
 		// 1 units of fluid is opaque, linearly becoming transparent at 0 units of fluid.
 		double alpha = Math.max(Math.min(amount*0.05 - 0.1, 1), 0);

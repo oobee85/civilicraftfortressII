@@ -1,5 +1,6 @@
 package utils;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,14 +18,22 @@ public class Settings {
 	public static boolean DEBUG;
 	public static boolean SPAWN_EXTRA;
 	public static boolean CINEMATIC;
+	public static boolean SHOW_FPS = false;
+	public static boolean SHOW_BUILDING_COUNTS = false;
 	public static boolean DISABLE_VOLCANO_ERUPT = true;
 	public static boolean DISABLE_ENEMY_SPAWNS = true;
 	public static boolean DISABLE_WILDLIFE_SPAWNS = false;
-  public static boolean LIQUID_MULTITHREADED = true;
+	public static boolean LIQUID_MULTITHREADED = true;
+	public static boolean DEFAULT_TO_OPENGL = false;
+	public static boolean DEFAULT_TO_FPMODE = true;
 
 	public static int NUM_AI = 0;
 	public static int WORLD_WIDTH = 128;
 	public static int WORLD_HEIGHT = 128;
+	public static int DEFAULT_TILE_SIZE = 45;
+	
+	public static String DEFAULT_PLAYER_NAME = "Player";
+	public static int DEFAULT_PLAYER_COLOR = Color.red.getRGB();
 
 	public static void fromCmdArgs(String[] args) {
 		Set<String> flags = new HashSet<>();
@@ -74,6 +83,9 @@ public class Settings {
 				}
 				else if(f.getType() == int.class) {
 					f.set(null, Integer.parseInt(value));
+				}
+				else if(f.getType() == String.class) {
+					f.set(null, value);
 				}
 			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
 				e.printStackTrace();

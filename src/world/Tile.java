@@ -512,15 +512,17 @@ public class Tile implements Externalizable {
 		}
 		return false;
 	}
+	
+	private boolean hasBridgeOrPort() {
+		return hasBuilding() && getBuilding().getType() == Game.buildingTypeMap.get("PORT");
+	}
 
 	public double[] computeTileDanger() {
 		double[] damage = new double[DamageType.values().length];
 		if (liquidAmount > liquidType.getMinimumDamageAmount()) {
-			if(liquidType.isWater()) {
-				damage[DamageType.WATER.ordinal()] += liquidAmount * liquidType.getDamage();
-			}
-			else {
-				damage[DamageType.HEAT.ordinal()] += liquidAmount * liquidType.getDamage();
+			// Don't take water damage if there is a port or bridge
+			if(!(liquidType.isWater() && hasBridgeOrPort())) {
+				damage[liquidType.getDamageType().ordinal()] += liquidAmount * liquidType.getDamage();
 			}
 		}
 		else {

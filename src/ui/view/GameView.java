@@ -53,8 +53,8 @@ public class GameView {
 	public class GameViewState {
 		public long previousTickTime;
 		public volatile Position viewOffset = new Position(0, 0);
-		public volatile int tileSize = 30;
-		public boolean fpMode = true;
+		public volatile int tileSize = Settings.DEFAULT_TILE_SIZE;
+		public boolean fpMode;
 		
 		public Point mousePressLocation;
 		public Point previousMouse;
@@ -269,16 +269,12 @@ public class GameView {
 				}
 			}
 		};
-//		if(useOpenGL) {
-			glDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
-			glDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
-			glDrawer.getDrawingCanvas().addMouseListener(mouseListener);
-//		}
-//		else {
-			vanillaDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
-			vanillaDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
-			vanillaDrawer.getDrawingCanvas().addMouseListener(mouseListener);
-//		}
+		glDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
+		glDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
+		glDrawer.getDrawingCanvas().addMouseListener(mouseListener);
+		vanillaDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
+		vanillaDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
+		vanillaDrawer.getDrawingCanvas().addMouseListener(mouseListener);
 		panel.addKeyListener(keyListener);
 		fpsMovementThread = new Thread(() -> {
 			try {
@@ -286,7 +282,7 @@ public class GameView {
 			} catch (AWTException e2) {
 				e2.printStackTrace();
 			}
-			switchFirstPerson(true);
+			switchFirstPerson(Settings.DEFAULT_TO_FPMODE);
 			try {
 				while(true) {
 					if(isFirstPerson()) {

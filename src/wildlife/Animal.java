@@ -10,7 +10,7 @@ import world.*;
 public class Animal extends Unit {
 	private static final int TARGETING_COOLDOWN = 10;
 	
-	private int migratingUntil;
+	private int dontMigrateUntil;
 	private int nextTimeToChooseTarget;
 	private int whenToInvade;
 	
@@ -78,24 +78,26 @@ public class Animal extends Unit {
 			return;
 		}
 		// Try to avoid danger
-		Tile best = getTile();
-		double currentDanger = this.applyResistance(best.computeTileDanger());
-		double bestDanger = currentDanger;
-		for(Tile t : getTile().getNeighbors()) {
-			if(t.isBlocked(this)) {
-				continue;
+		double currentDanger = this.applyResistance(getTile().computeTileDanger());
+		if(currentDanger >= 0.9) {
+			Tile best = getTile();
+			double bestDanger = currentDanger;
+			for(Tile t : getTile().getNeighbors()) {
+				if(t.isBlocked(this)) {
+					continue;
+				}
+				double danger = this.applyResistance(t.computeTileDanger());
+				if(danger < bestDanger) {
+					best = t;
+					bestDanger = danger;
+				}
 			}
-			double danger = this.applyResistance(t.computeTileDanger());
-			if(danger < bestDanger) {
-				best = t;
-				bestDanger = danger;
+			if(bestDanger < currentDanger) {
+				if(best != getTile()) {
+					queuePlannedAction(PlannedAction.moveTo(best));
+					return;
+				}
 			}
-		}
-		if(bestDanger < currentDanger && currentDanger >= 0.9) {
-			if(best != getTile()) {
-				queuePlannedAction(PlannedAction.moveTo(best));
-			}
-			return;
 		}
 		// Try to stay next to same species
 		if(Math.random() < 0.1) {
@@ -119,22 +121,17 @@ public class Animal extends Unit {
 				}
 			}
 		}
-		// Migrate according to the season
-		if(getType().isMigratory() && World.ticks > migratingUntil && Math.random() < 0.1) {
-			double season = Seasons.getSeason4migration();
-			Tile migrationTarget = null;
-			// heading into winter
-			if(season > 0.4 && season < 0.8 && getTile().getLocation().y() < world.getHeight()/2) {
-				migrationTarget = world.get(new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y() + (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4)));
-			}
-			// heading into summer
-			else if(season > 1.4 && season < 1.8 && getTile().getLocation().y() > world.getHeight()/2) {
-				migrationTarget = world.get(new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y() - (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4)));
-			}
-			if(migrationTarget != null) {
-//				System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + migrationTarget);
-				migratingUntil = World.ticks + World.SEASON_DURATION/2;
-				queuePlannedAction(PlannedAction.moveTo(migrationTarget));
+		// Go to a random tile
+		if(World.ticks > dontMigrateUntil && Math.random() < 0.1) {
+			Tile target;
+			if(getType().isMigratory())
+				target = world.getTilesRandomly().getFirst();
+			else 
+				target = getTile().getNeighbors().get((int)(Math.random()*getTile().getNeighbors().size()));
+			if(this.applyResistance(target.computeTileDanger()) <= 0.9) {
+				dontMigrateUntil = World.ticks + (int)((2 + Math.random()*4) * World.DAY_DURATION);
+				queuePlannedAction(PlannedAction.moveTo(target));
+				return;
 			}
 		}
 	}
@@ -154,16 +151,16 @@ public class Animal extends Unit {
 			}
 		}
 		else {
-			if(getTile().getPlant() != null) {
-				queuePlannedAction(PlannedAction.eatPlant(getTile().getPlant()));
-			}
-			else {
-				for(Tile neighbor : getTile().getNeighbors()) {
-					if(neighbor.getPlant() != null) {
-						queuePlannedAction(PlannedAction.eatPlant(neighbor.getPlant()));
-					}
-				}
-			}
+//			if(getTile().getPlant() != null) {
+//				queuePlannedAction(PlannedAction.eatPlant(getTile().getPlant()));
+//			}
+//			else {
+//				for(Tile neighbor : getTile().getNeighbors()) {
+//					if(neighbor.getPlant() != null) {
+//						queuePlannedAction(PlannedAction.eatPlant(neighbor.getPlant()));
+//					}
+//				}
+//			}
 		}
 	}
 	
