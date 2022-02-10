@@ -740,7 +740,7 @@ public class World {
 			Air air = tile.getAir();
 			double altitudeMultiplier = Math.sqrt(Math.sqrt( Math.sqrt(World.SEALEVEL) / Math.sqrt(tile.getHeight()) ));
 			if(altitudeMultiplier > 0.5 && altitudeMultiplier < 1) {
-				energy *= altitudeMultiplier;
+				energy *= (altitudeMultiplier);
 				airEnergy *= Math.sqrt(altitudeMultiplier);
 				
 			}

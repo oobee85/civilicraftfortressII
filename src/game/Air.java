@@ -84,6 +84,9 @@ public class Air {
 		return volumeChange;
 	}
 	public void updateMaxVolume() {
+		if(temperature < 0) {
+			maxVolume = 0;
+		}
 		if(temperature > -10) {
 			maxVolume = this.temperature/4 + 3.5;
 		}else {
@@ -132,6 +135,7 @@ public class Air {
 		double temp = getTemperature() - World.MINTEMP;
 		
 		double moles = this.mass / World.MMAIR;
+//		double moles = this.getHumidity();
 		double pvnrt = (moles * World.R * temp) / (World.VOLUMEPERTILE *2);
 //		this.pressure = pvnrt;
 				
