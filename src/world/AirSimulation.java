@@ -83,6 +83,7 @@ public class AirSimulation {
 //				double modifier = 1 - (tile.getTemperature()/100);
 //				tile.addEnergy(-Math.log(Math.sqrt(Math.sqrt(tile.liquidAmount * modifier))));
 //			}
+			float seasonEnergy = Seasons.getRateEnergy();
 			double addedEnergy = 0;
 			//removes energy for hight level
 			if(tile.getTemperature() <= 15) {
@@ -91,11 +92,17 @@ public class AirSimulation {
 				addedEnergy -= (Math.sqrt(Math.abs(heightRatio * modifier)));
 //				System.out.println(addedEnergy);
 			}
-			if(tile.getTemperature() <= -15) {
+			if(tile.getTemperature() > 30 || tile.getAir().getTemperature() > 30) {
+				seasonEnergy -= 1;
+			}
+			if(tile.getTemperature() <= -10) {
 				double modifier = 1 - (tile.getTemperature()/World.BALANCETEMP);
 				double heightRatio = tile.getHeight() / World.MAXHEIGHT;
 				addedEnergy -= (modifier*Math.sqrt(Math.abs(heightRatio)));
 //				System.out.println(addedEnergy);
+			}
+			if(tile.getTemperature() < -20 || tile.getAir().getTemperature() < -20) {
+				seasonEnergy += 1;
 			}
 			
 			
@@ -107,7 +114,7 @@ public class AirSimulation {
 				addedEnergy += (mod);
 			}
 			
-			float seasonEnergy = Seasons.getRateEnergy();
+			
 			
 			
 			double heightMod = 1 - tile.getHeight() / World.MAXHEIGHT;
@@ -140,11 +147,13 @@ public class AirSimulation {
 				
 				
 				double amount = 0.05 * vol / maxVol;
-				if(tile.liquidAmount >= 10) {
+				// if too much liquid on the ground, cant rain
+				if(tile.liquidAmount >= 7.5) {
 					amount = 0;
 				}
 				tile.getAir().addVolumeLiquid(-amount);
 				tile.liquidAmount += amount;
+				// snow takes up twice the volume of other liquids
 				if(isSnow == true) {
 					tile.liquidAmount += amount;
 				}
@@ -197,8 +206,10 @@ public class AirSimulation {
 //			if(tile.getTemperature() >= 30) {
 //				seasonEnergy = 0;
 //			}
-			tile.getAir().addEnergy(seasonEnergy);
-			tile.getAir().addEnergy(addedEnergy);
+			tile.getAir().addEnergy(seasonEnergy/2);
+			tile.getAir().addEnergy(addedEnergy/2);
+			tile.addEnergy(seasonEnergy/2);
+			tile.addEnergy(addedEnergy/2);
 			
 			tile.updateEnergyToTemperature();
 			
@@ -243,6 +254,7 @@ public class AirSimulation {
 				
 				double opress = otherAir.getPressure();
 				double ovolume = otherAir.getVolumeLiquid();
+				double omaxvolume = otherAir.getMaxVolumeLiquid();
 				double oenergy = otherAir.getEnergy();
 				double ocombined = opress / (ovolume);
 				
@@ -255,56 +267,49 @@ public class AirSimulation {
 				Direction attemptFlow = Direction.getDirection(tileLoc, otherLoc);
 				Direction oldFlow = tileAir.getFlowDirection();
 				double directionValue = Math.abs(oldFlow.deltay() + attemptFlow.deltay());
+				
 				// on: set flow to only move in 4 direction. off: flow move in any direction
 //				if (directionValue == 0.5 || directionValue == 2) {
 
-					
 				// IF CONDITIONS MET FOR TRANSFER
-//				if(mycombined > ocombined && Math.abs(deltavol) > 0.002) {
-//					if (myenergy > (oenergy * 1.0010)) {
-					if(mypress > (opress * 1.001)) {
-//					if (mypress > opress * 1.001 
-////							&& myvolume > ovolume 
-//							&& Math.abs(deltavol) > 0.00001 // 0.0015
-//							){
-						
-
-						double deltaE = Math.abs(myenergy - oenergy) /50;
-						
-//						double ratio = myenergy / deltavol;
-//						double ratio = oenergy / myenergy * Math.sqrt(deltae);
-						// if energy can handle transfer
-						if(myenergy - deltaE > 0 && oenergy - deltaE > 0) {
-							transferred = true;
-							tileAir.setFlowDirection(attemptFlow);
-							energyTemp[otherLoc.x()][otherLoc.y()] += deltaE;
-							energyTemp[tileLoc.x()][tileLoc.y()] -= deltaE;
+				if (mypress > (opress * 1.001)) {
+					double deltaE = Math.abs(myenergy - oenergy) / 25;
+					// if energy can handle transfer
+					if (myenergy - deltaE > 0) {
+						transferred = true;
+						tileAir.setFlowDirection(attemptFlow);
+						energyTemp[otherLoc.x()][otherLoc.y()] += deltaE;
+						energyTemp[tileLoc.x()][tileLoc.y()] -= deltaE;
+						// if transfer energy, transfer some humidity too
+						double deltaVol = Math.abs(myvolume - ovolume) / 2;
+						if (myvolume - deltaVol > 0 && ovolume + deltaVol < omaxvolume) {
+							volumeTemp[otherLoc.x()][otherLoc.y()] += deltaVol;
+							volumeTemp[tileLoc.x()][tileLoc.y()] -= deltaVol;
+							break;
 						}
-						
-						// if volume can handle transfer
-						if (myvolume > (ovolume * 1.0010)) {
-							double deltaVol = (myvolume - ovolume) /2;
-							if(myvolume - deltaVol > 0 && ovolume - deltaVol > 0) {
-								volumeTemp[otherLoc.x()][otherLoc.y()] += deltaVol;
-								volumeTemp[tileLoc.x()][tileLoc.y()] -= deltaVol;
-							}
-							
-						}
-						
-//						System.out.println(deltae);
-
-//				}else if (Math.abs(deltavol) <= 0.0015){
-//					tileAir.setFlowDirection(Direction.NONE);
-//					}
-				}
-					//stops air from being transferred to multiple tiles
-				if(transferred == true) {
-					break;
+					}
 				}
 				
+				// if volume can handle transfer
+				if (myvolume > (ovolume * 1)) {
+					double deltaVol = Math.abs(myvolume - ovolume) / 2;
+					if (myvolume - deltaVol > 0 && ovolume + deltaVol < omaxvolume) {
+						transferred = true;
+						tileAir.setFlowDirection(attemptFlow);
+						volumeTemp[otherLoc.x()][otherLoc.y()] += deltaVol;
+						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltaVol;
+					}
+
+				}
+//				} // on: set flow to only move in 4 direction. off: flow move in any direction
+				// stops air from being transferred to multiple tiles
+				if (transferred == true) {
+					break;
+				}
+
 			}
 		}
-		
+
 		for(Tile t: tiles) {
 			Air air = t.getAir();
 			air.setEnergy(energyTemp[t.getLocation().x()][t.getLocation().y()]);

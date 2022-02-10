@@ -26,7 +26,7 @@ public class Air {
 		this.height = height;
 		this.maxVolume = 10;
 		this.canRain = false;
-		this.volume = 0;
+		this.volume = 1;
 		this.humidity = 0.0;
 		this.pressure = 760;
 		this.updateMaxVolume();
@@ -146,6 +146,9 @@ public class Air {
 		double power = (-World.G * World.MMAIR * (h - World.SEALEVEL)) / sub;
 		double pressure = World.STANDARDPRESSURE * Math.pow(Math.E, power);
 		this.pressure = (pressure + pvnrt)/2 - 200;
+//		if(this.flowDirection != Direction.NONE) {
+//			this.pressure -= 5;
+//		}
 //		double pvnrt = mass * sub / tileVolume;
 //		double mix = pressure+(pvnrt - standardPVNRT);
 //		
