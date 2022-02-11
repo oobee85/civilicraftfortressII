@@ -28,17 +28,20 @@ public class World {
 	public static final int DAY_DURATION = 500;
 	public static final int NIGHT_DURATION = 500;
 	public static final int TRANSITION_PERIOD = 100;
-	private static final double CHANCE_TO_SWITCH_TERRAIN = 1;
+	private static final double CHANCE_TO_SWITCH_TERRAIN = 0.1;
 	public static final int MIN_TIME_TO_SWITCH_TERRAIN = 100;
 	public static final int TICKSTOUPDATEAIR = 2;
 	
 	public static final int KELVINOFFSET = 273;
 	public static final int MINTEMP = 0; // [K]
+	public static final int MAXTEMP = 1273; // [c]
 	public static final int BALANCETEMP = 272; // [K]
 	public static final int FREEZETEMP = 273; // [K]
+	public static final int LETHALHOTTEMP = 311; // [K]
+	public static final int LETHALCOLDTEMP = 263; // [K]
 	public static final float FREEZING_TEMPURATURE = 0.33f;
-	public static final int BALANCEWATER = 5;
-	public static final int MAXTEMP = 1000; // [c]
+	public static final int BALANCEWATER = 12;
+	
 	public static final int MAXHEIGHT = 1000; // [m]
 	public static final int SEALEVEL = 300; // [m]
 	public static final int WATTSPERTILE = 1; // [J/s]
@@ -576,7 +579,10 @@ public class World {
 				if(damage < 500) {
 					wave = new Projectile(ProjectileType.FIRE_WAVE, tile, t, null, damage);
 				}
-				t.addEnergy(damage*10 / (distanceFromCenter + 1));
+				double Energy = damage*10 / (distanceFromCenter + 1);
+				t.addEnergy(Energy/2);
+				t.getAir().addEnergy(Energy/2);
+				
 				tile.addProjectile(wave);
 				worldData.addProjectile(wave);
 				
@@ -796,21 +802,36 @@ public class World {
 				continue;
 			}
 //			updateDesertChange(tile, start);
-			
+			Terrain terrain = tile.getTerrain();
 			
 			if(start == true && tile.getHeight() <= 300 && tile.canPlant()) {
 				tile.setTerrain(Terrain.GRASS);
 				tile.setTickLastTerrainChange(World.ticks);
 			}
 			
+			// kills plants if its too hot or cold
+			if(tile.canPlant() && (tile.getTemperature() >= LETHALHOTTEMP || tile.getTemperature() <= LETHALCOLDTEMP)) {
+				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+					
+					tile.setTerrain(Terrain.DIRT);
+					tile.setTickLastTerrainChange(World.ticks);
+					Plant plant = tile.getPlant();
+					if(plant != null && Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+						plant.takeDamage((int)plant.getHealth(), DamageType.HEAT);
+						worldData.addDeadThing(plant);
+					}
+				}
+			}
+			
+			
 			//turns grass to dirt if tile has a cold liquid || the temperature is cold
-			if(tile.checkTerrain(Terrain.GRASS) && tile.isCold() && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
+			if(terrain == Terrain.GRASS && tile.isCold() && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
 				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
 					tile.setTerrain(Terrain.DIRT);
 					tile.setTickLastTerrainChange(World.ticks);
 				}
 			}
-			if(tile.checkTerrain(Terrain.GRASS) && Math.random() < CHANCE_TO_SWITCH_TERRAIN/10000) {
+			if(terrain == Terrain.GRASS && Math.random() < CHANCE_TO_SWITCH_TERRAIN/10000) {
 				tile.setTerrain(Terrain.DIRT);
 				tile.setTickLastTerrainChange(World.ticks);
 			}
@@ -825,7 +846,7 @@ public class World {
 				boolean adjacentGrass = false;
 				boolean adjacentWater = false;
 				for(Tile neighbor : Utils.getNeighbors(tile, this)) {
-					if(neighbor.checkTerrain(Terrain.GRASS)) {
+					if(neighbor.getTerrain() == Terrain.GRASS) {
 						adjacentGrass = true;
 					}
 					if(neighbor.liquidType == LiquidType.WATER) {

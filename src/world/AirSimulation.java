@@ -49,7 +49,7 @@ public class AirSimulation {
 		double averageTemp = 0;
 		for(Tile t : tiles) {
 			averageTemp += t.getTemperature();
-			if(t.liquidType == LiquidType.WATER || t.liquidType == LiquidType.ICE) {
+			if(t.liquidType == LiquidType.WATER || t.liquidType == LiquidType.ICE || t.liquidType == LiquidType.SNOW) {
 				averageWater += t.liquidAmount;
 			}
 			averageWater += t.getAir().getVolumeLiquid();
@@ -67,7 +67,7 @@ public class AirSimulation {
 			//adds energy for lava
 			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
 //				double modifier = 1 - (tile.getTemperature()/MAXTEMP);
-				double addedEnergy = tile.liquidAmount / tile.getEnergy() * 1000;
+				double addedEnergy = tile.liquidAmount / tile.getEnergy() * 10000;
 				tile.addEnergy(addedEnergy);
 			}
 			

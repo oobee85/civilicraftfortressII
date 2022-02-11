@@ -565,7 +565,7 @@ public class Tile implements Externalizable {
 	public boolean canSupportRareOre() {
 		return terr.canSupportRare(terr);
 	}
-
+	
 	public boolean checkTerrain(Terrain t) {
 		return terr == t;
 	}
