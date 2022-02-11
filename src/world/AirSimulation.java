@@ -27,7 +27,7 @@ public class AirSimulation {
 			// Q = o(T1 - T2) * A
 			// o = 5.670374419 × 10^-8 W*m-2*K-4
 			double end = 0;
-			double deltaT = (tile.getTemperature() - World.MINTEMP) - (air.getTemperature() - World.MINTEMP);
+			double deltaT = (tile.getTemperature() - World.KELVINOFFSET) - (air.getTemperature() - World.KELVINOFFSET);
 			end = World.BOLTZMANNMODIFIED * World.VOLUMEPERTILE * deltaT * 750;
 			air.addEnergy(end);
 			tile.addEnergy(-1*end);
@@ -85,23 +85,24 @@ public class AirSimulation {
 //			}
 			float seasonEnergy = Seasons.getRateEnergy();
 			double addedEnergy = 0;
-			//removes energy for hight level
-			if(tile.getTemperature() <= 15) {
+			
+			
+			if(tile.getTemperature() <= (World.BALANCETEMP + 5)) {
 				double modifier = -1 * (tile.getTemperature()/World.BALANCETEMP);
 				double heightRatio = tile.getHeight() / World.MAXHEIGHT;
 				addedEnergy -= (Math.sqrt(Math.abs(heightRatio * modifier)));
 //				System.out.println(addedEnergy);
 			}
-			if(tile.getTemperature() > 25 || tile.getAir().getTemperature() > 25) {
+			if(tile.getTemperature() > (World.BALANCETEMP + 25) || tile.getAir().getTemperature() > (World.BALANCETEMP + 25)) {
 				seasonEnergy -= 1;
 			}
-			if(tile.getTemperature() <= -10) {
+			if(tile.getTemperature() <= (World.BALANCETEMP - 5)) {
 				double modifier = 1 - (tile.getTemperature()/World.BALANCETEMP);
 				double heightRatio = tile.getHeight() / World.MAXHEIGHT;
 				addedEnergy -= (modifier*Math.sqrt(Math.abs(heightRatio)));
 //				System.out.println(addedEnergy);
 			}
-			if(tile.getTemperature() < -20 || tile.getAir().getTemperature() < -20) {
+			if(tile.getTemperature() < (World.BALANCETEMP - 20) || tile.getAir().getTemperature() < (World.BALANCETEMP - 20)) {
 				seasonEnergy += 1;
 			}
 			
@@ -250,18 +251,13 @@ public class AirSimulation {
 				double mypress = tileAir.getPressure();
 				double myvolume = tileAir.getVolumeLiquid();
 				double myenergy = tileAir.getEnergy();
-				double mycombined = mypress / (myvolume);
 				
 				double opress = otherAir.getPressure();
 				double ovolume = otherAir.getVolumeLiquid();
 				double omaxvolume = otherAir.getMaxVolumeLiquid();
 				double oenergy = otherAir.getEnergy();
-				double ocombined = opress / (ovolume);
-				
+
 				boolean transferred = false;
-				double deltap = 1 - opress / mypress;
-				double deltavol = Math.sqrt((myvolume - ovolume)*deltap);
-				
 				
 				// PREVENTS AIRFLOW DIRECTIONS FROM CHANGING RAPIDLY
 				Direction attemptFlow = Direction.getDirection(tileLoc, otherLoc);
@@ -291,9 +287,9 @@ public class AirSimulation {
 				}
 				
 				// if volume can handle transfer
-				if (myvolume > (ovolume * 1)) {
+				if (myvolume > (ovolume * 1.15)) {
 					double deltaVol = Math.abs(myvolume - ovolume) / 2;
-					if (myvolume - deltaVol > 0 && ovolume + deltaVol < omaxvolume) {
+					if (myvolume - deltaVol > 0) {
 						transferred = true;
 						tileAir.setFlowDirection(attemptFlow);
 						volumeTemp[otherLoc.x()][otherLoc.y()] += deltaVol;
@@ -302,8 +298,8 @@ public class AirSimulation {
 
 				}
 //				} // on: set flow to only move in 4 direction. off: flow move in any direction
-				// stops air from being transferred to multiple tiles
-				if (transferred == true) {
+				
+				if (transferred == true) { // stops air from being transferred to multiple tiles
 					break;
 				}
 

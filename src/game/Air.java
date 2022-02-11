@@ -84,11 +84,11 @@ public class Air {
 		return volumeChange;
 	}
 	public void updateMaxVolume() {
-		if(temperature < 0) {
+		if(temperature < World.FREEZETEMP) {
 			maxVolume = 0;
 		}
-		if(temperature > -10) {
-			maxVolume = this.temperature/4 + 3.5;
+		if(temperature > World.FREEZETEMP - 10) {
+			maxVolume = (this.temperature - World.KELVINOFFSET)/4 + 3.5;
 		}else {
 			maxVolume = 1;
 		}
@@ -132,7 +132,7 @@ public class Air {
 	public void updatePressure() {
 		
 		double h = this.height; // m
-		double temp = getTemperature() - World.MINTEMP;
+		double temp = getTemperature();
 		
 		double moles = this.mass / World.MMAIR;
 //		double moles = this.getHumidity();
@@ -140,7 +140,7 @@ public class Air {
 //		this.pressure = pvnrt;
 				
 		
-		double sub = World.R * (temp + Math.abs(World.MINTEMP));
+		double sub = World.R * (temp + World.KELVINOFFSET);
 //		double standardPVNRT = World.STARTINGMASS * sub / World.VOLUMEPERTILE;
 		
 		double power = (-World.G * World.MMAIR * (h - World.SEALEVEL)) / sub;
@@ -158,7 +158,7 @@ public class Air {
 	}
 
 	public double getDensity() {
-		double density = this.pressure/World.STANDARDPRESSURE*World.MMAIR / (World.RYDBERG * (getTemperature() + Math.abs(World.MINTEMP)) );
+		double density = this.pressure/World.STANDARDPRESSURE*World.MMAIR / (World.RYDBERG * (getTemperature() + World.KELVINOFFSET) );
 		return density;
 	}
 	public double getRelativeHumidity() {

@@ -172,20 +172,20 @@ public class Tile implements Externalizable {
 		
 		// Q=mcAT
 		// T= Q/mc -273
-		double tileTemp = tileEnergy / (World.MASSGROUND) + World.MINTEMP;
+		double tileTemp = tileEnergy / (World.MASSGROUND);
 		setTemperature(tileTemp);
 		
 		// T = Q/moles -273
-		double airTemp = airEnergy / (35) + World.MINTEMP;
+		double airTemp = airEnergy / (35);
 		air.setTemperature(airTemp);
 	}
 	
 	public double getEvaporation() {
 		double evaporation = 0.0;
-		if(this.liquidType == LiquidType.WATER && this.getTemperature() > 0 && this.getAir().canRain() == false) {
+		if(this.liquidType == LiquidType.WATER && this.getTemperature() > World.FREEZETEMP && this.getAir().canRain() == false) {
 			
 //			evaporation = (Math.exp(this.getTemperature()/50) /(2*this.liquidAmount));
-			evaporation = ( 0.01*this.getTemperature()*this.liquidAmount );
+			evaporation = ( 0.01*(this.getTemperature() - World.KELVINOFFSET)*this.liquidAmount );
 //			liquidAmount -= evaporation;
 		}
 		

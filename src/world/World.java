@@ -32,9 +32,10 @@ public class World {
 	public static final int MIN_TIME_TO_SWITCH_TERRAIN = 100;
 	public static final int TICKSTOUPDATEAIR = 2;
 	
-	public static final int MINTEMP = -273; // [c]
-	public static final int BALANCETEMP = -1; // [c] // CANNOT BE 0
-	public static final int FREEZETEMP = 0; // [c]
+	public static final int KELVINOFFSET = 273;
+	public static final int MINTEMP = 0; // [K]
+	public static final int BALANCETEMP = 272; // [K]
+	public static final int FREEZETEMP = 273; // [K]
 	public static final float FREEZING_TEMPURATURE = 0.33f;
 	public static final int BALANCEWATER = 5;
 	public static final int MAXTEMP = 1000; // [c]
