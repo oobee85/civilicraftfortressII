@@ -40,6 +40,7 @@ public class VanillaDrawer extends Drawer {
 	private static final Image BLUE_HITSPLAT = Utils.loadImage("Images/interfaces/bluehitsplat.png");
 	private static final Image GREEN_HITSPLAT = Utils.loadImage("Images/interfaces/greenhitsplat.png");
 	private static final Image SNOW = Utils.loadImage("Images/weather/snow.png");
+	private static final Image SNOW2 = Utils.loadImage("Images/weather/snow2.png");
 	private static final Image SKY_BACKGROUND = Utils.loadImage("Images/lightbluesky.png");
 
 	
@@ -620,9 +621,13 @@ public class VanillaDrawer extends Drawer {
 		if(state.mapMode != MapMode.TERRAIN) {
 			g.setColor(color);
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-			if (state.mapMode == MapMode.TEMPURATURE 
-					&& theTile.getAir().getTemperature() <= World.FREEZETEMP) {
-				g.drawImage(SNOW, drawAt.x, drawAt.y, draww, drawh, null);
+			if (state.mapMode == MapMode.TEMPURATURE) {
+				if(theTile.getTemperature() <= World.FREEZETEMP) {
+					g.drawImage(SNOW2, drawAt.x, drawAt.y, draww, drawh, null);
+				}else if(theTile.getAir().getTemperature() <= World.FREEZETEMP) {
+					g.drawImage(SNOW, drawAt.x, drawAt.y, draww, drawh, null);
+				}
+				
 			}
 		} 
 		else {
