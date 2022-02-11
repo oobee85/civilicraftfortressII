@@ -92,7 +92,7 @@ public class AirSimulation {
 				addedEnergy -= (Math.sqrt(Math.abs(heightRatio * modifier)));
 //				System.out.println(addedEnergy);
 			}
-			if(tile.getTemperature() > 30 || tile.getAir().getTemperature() > 30) {
+			if(tile.getTemperature() > 25 || tile.getAir().getTemperature() > 25) {
 				seasonEnergy -= 1;
 			}
 			if(tile.getTemperature() <= -10) {
