@@ -529,8 +529,8 @@ public class VanillaDrawer extends Drawer {
 				strings.add(String.format("PRES" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getPressure()));
 
 //				strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getHumidity()));
-				strings.add(String.format("TTEM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getTemperature()));
-				strings.add(String.format("ATEM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getTemperature()));
+				strings.add(String.format("TTEM" + "=%." + NUM_DEBUG_DIGITS + "f", (tile.getTemperature() - World.FREEZETEMP)));
+				strings.add(String.format("ATEM" + "=%." + NUM_DEBUG_DIGITS + "f", (tile.getAir().getTemperature() - World.FREEZETEMP)));
 				strings.add(String.format("TENE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEnergy()));
 				strings.add(String.format("AENE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getEnergy()));
 				

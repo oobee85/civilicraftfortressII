@@ -17,9 +17,9 @@ public enum LiquidType {
 		LAVA(new String[] {"Images/liquid/lava16.png", "Images/liquid/lavaanim32.gif"}, "Images/liquid/lava16.png",
 				0.1f, 0.0005f, 0.005f, 1f, 1f, 0.1f, false, DamageType.HEAT),
 		ICE(new String[] {"Images/liquid/ice.png"}, "Images/liquid/ice.png",
-				0f, 10000f, 10000f, 0.1f, 3f, 0f, true, DamageType.COLD),
+				0f, 10000f, 10000f, 0.1f, 2f, 0f, true, DamageType.COLD),
 		SNOW(new String[] {"Images/liquid/snow128.png"}, "Images/liquid/snow128.png",
-				0f, 1f, 1f, 0.1f, 3f, 0f, true, DamageType.COLD),
+				0f, 1f, 1f, 0.1f, 2f, 0f, true, DamageType.COLD),
 //				0.1f, 0.9f, 1f, 1f, 1f, 0.1f, true, DamageType.COLD),
 		
 		;

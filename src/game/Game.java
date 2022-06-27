@@ -741,7 +741,8 @@ public class Game {
 				&& !tile.hasBuilding()
 				&& tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()
 				&& tile.getLocation().distanceTo(world.volcano) > 30
-				&& (tile.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"));
+				&& (tile.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"))
+				&& tile.getHeight() >= World.MAXHEIGHT * 0.45;
 	}
 	private void makeStartingCastleAndUnits(boolean easymode, List<PlayerInfo> players) {
 		double spacePerPlayer = (double)world.getWidth()/players.size();

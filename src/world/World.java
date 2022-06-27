@@ -34,8 +34,8 @@ public class World {
 	
 	public static final int KELVINOFFSET = 273;
 	public static final int MINTEMP = 0; // [K]
-	public static final int MAXTEMP = 1273; // [c]
-	public static final int BALANCETEMP = 272; // [K]
+	public static final int MAXTEMP = 1273; // [K]
+	public static final int BALANCETEMP = 283; // [K]
 	public static final int FREEZETEMP = 273; // [K]
 	public static final int LETHALHOTTEMP = 311; // [K]
 	public static final int LETHALCOLDTEMP = 263; // [K]

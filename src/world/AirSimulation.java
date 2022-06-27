@@ -87,23 +87,29 @@ public class AirSimulation {
 			double addedEnergy = 0;
 			
 			
-			if(tile.getTemperature() <= (World.BALANCETEMP + 5)) {
-				double modifier = -1 * (tile.getTemperature()/World.BALANCETEMP);
+			if(tile.getTemperature() >= (World.BALANCETEMP +5)) {
+				double modifier = (tile.getTemperature()/World.BALANCETEMP);
 				double heightRatio = tile.getHeight() / World.MAXHEIGHT;
 				addedEnergy -= (Math.sqrt(Math.abs(heightRatio * modifier)));
 //				System.out.println(addedEnergy);
 			}
-			if(tile.getTemperature() > (World.BALANCETEMP + 25) || tile.getAir().getTemperature() > (World.BALANCETEMP + 25)) {
-				seasonEnergy -= 1;
+			if(tile.getTemperature() > (World.BALANCETEMP + 20) || tile.getAir().getTemperature() > (World.BALANCETEMP + 20)) {
+				addedEnergy -= 2;
 			}
-			if(tile.getTemperature() <= (World.BALANCETEMP - 5)) {
-				double modifier = 1 - (tile.getTemperature()/World.BALANCETEMP);
+			if(tile.getTemperature() <= (World.BALANCETEMP -5)) {
+				double modifier = (tile.getTemperature()/World.BALANCETEMP);
 				double heightRatio = tile.getHeight() / World.MAXHEIGHT;
-				addedEnergy -= (modifier*Math.sqrt(Math.abs(heightRatio)));
+				addedEnergy += (Math.sqrt(Math.abs(heightRatio * modifier)));
 //				System.out.println(addedEnergy);
 			}
 			if(tile.getTemperature() < (World.BALANCETEMP - 20) || tile.getAir().getTemperature() < (World.BALANCETEMP - 20)) {
-				seasonEnergy += 1;
+				addedEnergy += 2;
+			}
+			
+			if(tile.getHeight() >= World.MAXHEIGHT /1.25) {
+//				double modifier = (tile.getTemperature()/World.BALANCETEMP);
+				double heightRatio = tile.getHeight() / World.MAXHEIGHT;
+				addedEnergy -= heightRatio;
 			}
 			
 			
@@ -160,7 +166,7 @@ public class AirSimulation {
 				}
 //				seasonEnergy += 0.01;
 			}
-			if(tile.getHeight() > 800 && averageWater < World.BALANCEWATER) {
+			if(tile.getHeight() > 900 && averageWater < World.BALANCEWATER) {
 				double addedMod = World.BALANCEWATER / averageWater - 1;
 				tile.liquidAmount += addedMod;
 			}
