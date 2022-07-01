@@ -13,11 +13,11 @@ import javax.swing.*;
 
 import game.*;
 import game.actions.*;
-import game.liquid.*;
 import networking.message.*;
 import ui.*;
 import ui.graphics.opengl.maths.*;
 import world.*;
+import world.liquid.*;
 
 public final class Utils {
 

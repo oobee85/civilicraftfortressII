@@ -8,8 +8,8 @@ import java.util.concurrent.*;
 
 import game.*;
 import game.components.*;
-import game.liquid.*;
 import utils.*;
+import world.liquid.*;
 
 public class Tile implements Externalizable {
 
@@ -146,7 +146,6 @@ public class Tile implements Externalizable {
 		return air;
 	}
 	
-	
 	public void updateAir() {
 //		air.setTemperature(this.getTemperature());
 //		air.setEnergy(this.getEnergy());
@@ -154,16 +153,6 @@ public class Tile implements Externalizable {
 		air.updateMaxVolume();
 		air.updateHumidity();
 		air.updatePressure();
-		
-		
-	}
-	public void updateAtmosphere() {
-//		atmosphere.setTemperature(this.getTemperature());
-//		atmosphere.setEnergy(this.getEnergy() * 2/3);
-//		atmosphere.updateHeight(this.height + 1000);
-//		atmosphere.updateMaxVolume();
-//		atmosphere.updateHumidity();
-//		atmosphere.updatePressure();
 	}
 	
 	public void updateEnergyToTemperature() {

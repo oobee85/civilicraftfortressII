@@ -5,7 +5,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import game.actions.*;
 import game.components.*;
-import game.liquid.*;
 
 import java.util.*;
 
@@ -15,6 +14,7 @@ import ui.*;
 import utils.*;
 import wildlife.*;
 import world.*;
+import world.liquid.*;
 
 public class Game {
 
@@ -71,7 +71,7 @@ public class Game {
 		if(World.ticks%20 == 0) {
 			updateTerritory();
 		}
-		Liquid.propogate(world);
+		LiquidSimulation.propogate(world);
 		// Remove dead things
 		for(Unit unit : world.getUnits()) {
 			if(unit.isDead()) {
@@ -110,7 +110,7 @@ public class Game {
 		}
 
 		if (World.ticks % 2 == 0) {
-			Liquid.propogate(world);
+			LiquidSimulation.propogate(world);
 		}
 
 		meteorAndVolcanoEvents();

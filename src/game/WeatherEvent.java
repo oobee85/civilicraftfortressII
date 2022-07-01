@@ -6,9 +6,9 @@ import java.io.*;
 
 import javax.swing.ImageIcon;
 
-import game.liquid.*;
 import utils.*;
 import world.*;
+import world.liquid.*;
 
 /**
  * THIS CLASS IS DEPRECATED.

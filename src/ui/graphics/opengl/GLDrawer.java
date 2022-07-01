@@ -12,13 +12,13 @@ import com.jogamp.opengl.awt.*;
 import com.jogamp.opengl.util.texture.*;
 
 import game.*;
-import game.liquid.*;
 import ui.*;
 import ui.graphics.*;
 import ui.graphics.opengl.maths.*;
 import ui.view.GameView.*;
 import utils.*;
 import world.*;
+import world.liquid.*;
 
 public class GLDrawer extends Drawer implements GLEventListener {
 	
@@ -439,7 +439,7 @@ public class GLDrawer extends Drawer implements GLEventListener {
 		}
 		for(Building building : game.world.getBuildings()) {
 			if(building.getType().blocksMovement()) {
-				Vector3f pos = tileLocTo3dCoords(building.getTile().getLocation(), building.getTile().getHeight() + Liquid.WALL_HEIGHT);
+				Vector3f pos = tileLocTo3dCoords(building.getTile().getLocation(), building.getTile().getHeight() + LiquidSimulation.WALL_HEIGHT);
 				addToRender(MeshUtils.hexwall, 
 						building.getMesh().getTextureFile(), 
 						Matrix4f.getModelMatrix(pos, Matrix4f.identity(), new Vector3f(1, 1, 1)));

@@ -14,13 +14,13 @@ import javax.swing.*;
 import game.*;
 import game.actions.*;
 import game.components.*;
-import game.liquid.*;
 import ui.*;
 import ui.graphics.*;
 import ui.utils.DrawingUtils;
 import ui.view.GameView.*;
 import utils.*;
 import world.*;
+import world.liquid.*;
 
 public class VanillaDrawer extends Drawer {
 

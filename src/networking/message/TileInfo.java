@@ -2,9 +2,9 @@ package networking.message;
 
 import java.io.*;
 
-import game.liquid.*;
 import utils.*;
 import world.*;
+import world.liquid.*;
 
 public class TileInfo implements Serializable {
 

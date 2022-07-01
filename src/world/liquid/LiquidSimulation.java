@@ -1,4 +1,4 @@
-package game.liquid;
+package world.liquid;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -7,7 +7,7 @@ import game.*;
 import utils.*;
 import world.*;
 
-public class Liquid {
+public class LiquidSimulation {
 	
 	public static final float WALL_HEIGHT = 10;
 	public static final float MINIMUM_LIQUID_THRESHOLD = 0.001f;

@@ -3,8 +3,8 @@ package world;
 import java.util.*;
 
 import game.*;
-import game.liquid.*;
 import utils.*;
+import world.liquid.*;
 
 public class Generation {
 	

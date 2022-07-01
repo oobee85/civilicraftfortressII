@@ -12,12 +12,12 @@ import javax.imageio.*;
 
 import game.*;
 import game.actions.*;
-import game.liquid.*;
 import networking.message.*;
 import networking.server.*;
 import ui.*;
 import utils.*;
 import wildlife.*;
+import world.liquid.*;
 
 public class World {
 
@@ -748,20 +748,6 @@ public class World {
 			air.setEnergy(airEnergy);
 		}
 	}
-	public void updateTileTemperature() {
-		for(Tile tile : getTiles()) {
-			if(tile == null) {
-				System.out.println("null tile when updating temperature");
-				continue;
-			}
-			
-//			tile.setTemperature(tile.getTemperature()+Season.getNightEnergy());
-			
-//			double temperature = tile.getTemperature();
-//			tile.getAir().setTemperature(temperature);
-			
-		}	
-	}
 	
 	public void initializeAirSimulationStuff() {
 		setTileMass();
@@ -1295,7 +1281,7 @@ public class World {
 		Generation.makeLake(numTiles * 8, this);
 		System.out.println("Simulating water for 100 iterations");
 		for(int i = 0; i < 100; i++) {
-			Liquid.propogate(this);
+			LiquidSimulation.propogate(this);
 		}
 		initializeAirSimulationStuff();
 		doAirSimulationStuff();
