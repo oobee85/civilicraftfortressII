@@ -34,7 +34,6 @@ public class Tile implements Externalizable {
 	private Building road;
 	private WeatherEvent weather;
 	private Air air;
-	private Air atmosphere;
 	
 	private int tickLastTerrainChange;
 	
@@ -98,13 +97,9 @@ public class Tile implements Externalizable {
 		this.humidity = 1;
 		this.energy = 100000;
 		air = new Air(this.height);
-		atmosphere = new Air(this.height + 1000);
 		this.tickLastTerrainChange = -Constants.MIN_TIME_TO_SWITCH_TERRAIN;
 	}
 
-//	public Air getAtmosphere() {
-//		return atmosphere;
-//	}
 	public void setTemperature(double temp) {
 		this.temperature = temp;
 	}

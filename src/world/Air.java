@@ -12,19 +12,14 @@ public class Air {
 	private double mass;
 	private double energy;
 	
-	private double maxHumidity;
 	private double maxVolume;
-	private boolean canRain;
 	private double volumeChange;
 	private Direction flowDirection;
-	private double tileVolume;
 	
 	
 	public Air(double height) {
-		this.maxHumidity = 1.0;
 		this.height = height;
 		this.maxVolume = 10;
-		this.canRain = false;
 		this.volume = 1;
 		this.humidity = 0.0;
 		this.pressure = 760;
@@ -32,8 +27,6 @@ public class Air {
 		this.updateHumidity();
 		this.flowDirection = Direction.NONE;
 		this.energy = 0;
-		this.tileVolume = Constants.VOLUMEPERTILE;
-		
 	}
 	public void updateHeight(double height) {
 		this.height = height;
@@ -104,12 +97,6 @@ public class Air {
 	}
 	public void addHumidity(double added) {
 		this.humidity += added;
-		if(humidity >= 1.0) {
-			canRain = true;
-		}else {
-			canRain = false;
-		}
-		
 	}
 	public void setMass(double mass) {
 		this.mass = mass;
@@ -122,8 +109,7 @@ public class Air {
 	}
 	public void decreaseVolumePerTile(double volume) {
 //		if(this.tileVolume > 0) {
-		System.out.println("working");
-			this.tileVolume += volume;
+			System.out.println("working");
 			this.energy += 10000;
 //		}
 		
