@@ -93,10 +93,12 @@ public class Air {
 		}else {
 			humidity = 0;
 		}
-		
 	}
 	public void addHumidity(double added) {
 		this.humidity += added;
+	}
+	public void setHumidity(double h) {
+		this.humidity = h;
 	}
 	public void setMass(double mass) {
 		this.mass = mass;

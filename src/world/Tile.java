@@ -15,7 +15,6 @@ public class Tile implements Externalizable {
 
 	private TileLoc location;
 	private float height;
-	private float humidity;
 	private double energy;
 	private double temperature;
 
@@ -50,7 +49,7 @@ public class Tile implements Externalizable {
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 
 		height = in.readFloat();
-		humidity = in.readFloat();
+		air.setHumidity(in.readDouble());
 //		air.setHumidity(humidity);
 //		air.setTemperature(this.getTemperature());
 		liquidAmount = in.readFloat();
@@ -69,7 +68,7 @@ public class Tile implements Externalizable {
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
 		out.writeFloat(height);
-		out.writeFloat(humidity);
+		out.writeDouble(air.getHumidity());
 		out.writeFloat(liquidAmount);
 
 		location.writeExternal(out);
@@ -94,7 +93,6 @@ public class Tile implements Externalizable {
 		units = new ConcurrentLinkedQueue<Unit>();
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
 		inventory = new Inventory();
-		this.humidity = 1;
 		this.energy = 100000;
 		air = new Air(this.height);
 		this.tickLastTerrainChange = -Constants.MIN_TIME_TO_SWITCH_TERRAIN;
@@ -127,14 +125,6 @@ public class Tile implements Externalizable {
 	}
 	public void addEnergy(double added) {
 		this.energy += added;
-	}
-	
-	public float getHumidity() {
-		return humidity;
-	}
-
-	public void setHumidity(float humidity) {
-//		this.humidity = humidity;
 	}
 	
 	public Air getAir() {
@@ -178,32 +168,6 @@ public class Tile implements Externalizable {
 		
 	}
 	
-	public void updateHumidity(int currentTick) {
-
-		if (liquidType == LiquidType.WATER || liquidType == LiquidType.ICE || liquidType == LiquidType.SNOW) {
-			if (liquidAmount > 0) {
-//				humidity += Math.sqrt(Math.sqrt(liquidAmount)); // sqrt(0.01) -> 0.1
-			}
-		}
-		if (modifier != null && modifier.isHot()) {
-//			humidity -= 1;
-		}
-		if (liquidType == LiquidType.LAVA) {
-//			humidity -= liquidAmount * 10;
-		}
-
-//		humidity *= 0.995;
-		if (terr == Terrain.GRASS) {
-//			humidity *= 1.004;
-		}
-		if (humidity < 0) {
-//			humidity = 0;
-		}
-		if (humidity > 20) {
-//			humidity = 20;
-		}
-	}
-
 	public void setWeather(WeatherEvent weatherEvent) {
 		weather = weatherEvent;
 	}

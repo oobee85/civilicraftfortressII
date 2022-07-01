@@ -87,7 +87,7 @@ public class World {
 //				updateBorderTiles();
 			}
 			tile.setHeight(info.getHeight());
-			tile.setHumidity(info.getHumidity());
+			tile.getAir().setHumidity(info.getAir().getHumidity());
 			tile.setResource(info.getResource());
 
 			tile.setTerrain(info.getTerrain());
@@ -589,7 +589,7 @@ public class World {
 		
 		for(Tile t : tile.getNeighbors()) {
 			//counts the tiles are too humid to be desert
-			if(t.getHumidity() > Constants.DESERT_HUMIDITY) {
+			if(t.getAir().getHumidity() > Constants.DESERT_HUMIDITY) {
 				failTiles ++;
 			}
 			//counts up how many neighbors are desert
@@ -606,7 +606,7 @@ public class World {
 		// changes terrain if it isnt in the humidity range of the terrain type
 		Terrain terrain = tile.getTerrain();
 		//if the humidity is less than the minimum terrain humidity
-		if (tile.getHumidity() < terrain.getMinMax().x) {
+		if (tile.getAir().getHumidity() < terrain.getMinMax().x) {
 			if (terrain == Terrain.GRASS) {
 				tile.setTerrain(Terrain.DIRT);
 				tile.setTickLastTerrainChange(World.ticks);
@@ -633,7 +633,7 @@ public class World {
 			return;
 		}
 		//if the humidity is more than the max terrain humidity
-		if (tile.getHumidity() > terrain.getMinMax().y ) {
+		if (tile.getAir().getHumidity() > terrain.getMinMax().y ) {
 			if (terrain == Terrain.DIRT && tile.canGrow() && numGrassNeighbor >= 3) {
 				tile.setTerrain(Terrain.GRASS);
 				tile.setTickLastTerrainChange(World.ticks);
@@ -731,7 +731,6 @@ public class World {
 			if(tile.getResource() != null) {
 				tile.getResource().tick(World.ticks);
 			}
-			tile.updateHumidity(World.ticks);
 			
 			
 			if(World.ticks - tile.getTickLastTerrainChange() <= Constants.MIN_TIME_TO_SWITCH_TERRAIN) {
