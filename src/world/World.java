@@ -1322,6 +1322,7 @@ public class World {
 		
 		BufferedImage[] mapImages = new BufferedImage[MapMode.values().length];
 		mapImages[MapMode.TERRAIN.ordinal()] = terrainImage;
+		mapImages[MapMode.FLOW2.ordinal()] = terrainImage;
 		mapImages[MapMode.MINIMAP.ordinal()] = minimapImage;
 		mapImages[MapMode.LIGHT.ordinal()] = computeTileBrightness(faction);
 		for(MapMode mode : MapMode.HEATMAP_MODES) {

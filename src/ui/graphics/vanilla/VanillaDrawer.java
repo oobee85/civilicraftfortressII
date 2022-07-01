@@ -225,7 +225,7 @@ public class VanillaDrawer extends Drawer {
 		int upperY = Math.min(game.world.getHeight(), lowerY + panelHeight / frozenTileSize + 4);
 
 		if (frozenTileSize < FAST_MODE_TILE_SIZE || state.mapMode == MapMode.LIGHT) {
-			g.drawImage( mapImages[state.mapMode.ordinal()], 
+			g.drawImage(mapImages[state.mapMode.ordinal()], 
 						0, 
 						0, 
 						frozenTileSize * game.world.getWidth(), 
@@ -240,7 +240,7 @@ public class VanillaDrawer extends Drawer {
 			double lowTemp = Double.MAX_VALUE;
 			double highHumidity = Double.MIN_VALUE;
 			double lowHumidity = Double.MAX_VALUE;
-			if(state.mapMode != MapMode.TERRAIN) {
+			if(state.mapMode.isHeatMapType()) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
@@ -361,8 +361,6 @@ public class VanillaDrawer extends Drawer {
 						g.setColor(new Color(0, 0, 0, (int) (255 * (1 - brightness))));
 						Point drawAt = getDrawingCoords(tile.getLocation());
 						g.fillRect(drawAt.x, drawAt.y, frozenTileSize, frozenTileSize);
-						
-						
 					}
 				}
 			}
@@ -372,7 +370,17 @@ public class VanillaDrawer extends Drawer {
 						Tile tile = game.world.get(new TileLoc(i, j));
 						if (tile == null)
 							continue;
-						drawAirFlow(g, tile);
+						drawAirFlow(g, tile, true);
+					}
+				}
+			}
+			if (state.mapMode == MapMode.FLOW2) {
+				for (int i = lowerX; i < upperX; i++) {
+					for (int j = lowerY; j < upperY; j++) {
+						Tile tile = game.world.get(new TileLoc(i, j));
+						if (tile == null)
+							continue;
+						drawAirFlow(g, tile, false);
 					}
 				}
 			}
@@ -618,7 +626,7 @@ public class VanillaDrawer extends Drawer {
 		int drawh = frozenTileSize;
 		int imagesize = draww < drawh ? draww : drawh;
 
-		if(state.mapMode != MapMode.TERRAIN) {
+		if(state.mapMode.isHeatMapType()) {
 			g.setColor(color);
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 			if (state.mapMode == MapMode.TEMPURATURE) {
@@ -778,13 +786,13 @@ public class VanillaDrawer extends Drawer {
 		int hi = (int) (frozenTileSize * 8 / 10);
 		g.drawImage(TARGET_IMAGE, drawAt.x + frozenTileSize * 1 / 10, drawAt.y + frozenTileSize * 1 / 10, w, hi, null);
 	}
-	private void drawAirFlow(Graphics g, Tile tile) {
+	private void drawAirFlow(Graphics g, Tile tile, boolean arrows) {
 		TileLoc tileLoc = tile.getLocation();
 		Point drawAt = getDrawingCoords(tileLoc);
 		int w = (int) (frozenTileSize * 8 / 10);
 		int hi = (int) (frozenTileSize * 8 / 10);
 		if(tile.getAir().getFlowDirection() != null) {
-			Image image = tile.getAir().getFlowDirection().getImage();
+			Image image = arrows ? tile.getAir().getFlowDirection().getArrowImage() : tile.getAir().getFlowDirection().getImage() ;
 //			System.out.println(tile.getAir().getFlowDirection());
 			g.drawImage(image, drawAt.x, drawAt.y, frozenTileSize, frozenTileSize, null);
 //			g.drawImage(TARGET_IMAGE, drawAt.x + frozenTileSize * 1 / 10, drawAt.y + frozenTileSize * 1 / 10, w, hi, null);

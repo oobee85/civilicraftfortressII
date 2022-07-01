@@ -2,10 +2,30 @@ package ui;
 
 public enum MapMode {
 	
-	TERRAIN, HEIGHT, HUMIDITY, PRESSURE, TEMPURATURE, FLOW, PRESSURE2, LIGHT, 
+	TERRAIN,
+	HEIGHT(true),
+	HUMIDITY(true),
+	PRESSURE(true),
+	TEMPURATURE(true),
+	FLOW(true),
+	PRESSURE2(true),
+	LIGHT(true),
+	FLOW2,
 	
-	// MINIMAP must be last
+	/** MINIMAP must be the last MapMode*/
 	MINIMAP;
 	
 	public static final MapMode[] HEATMAP_MODES = new MapMode[] {HEIGHT, HUMIDITY, PRESSURE, TEMPURATURE, FLOW, PRESSURE2};
+	
+	private boolean heatmaptype;
+	private MapMode() {
+		this(false);
+	}
+	private MapMode(boolean heatmaptype) {
+		this.heatmaptype = heatmaptype;
+	}
+	
+	public boolean isHeatMapType() {
+		return heatmaptype;
+	}
 }
