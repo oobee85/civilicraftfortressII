@@ -1,7 +1,6 @@
-package game;
+package world;
 
 import utils.Direction;
-import world.*;
 
 public class Air {
 

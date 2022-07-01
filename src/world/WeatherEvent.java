@@ -1,4 +1,4 @@
-package game;
+package world;
 
 import java.awt.Color;
 import java.awt.Image;
@@ -7,7 +7,6 @@ import java.io.*;
 import javax.swing.ImageIcon;
 
 import utils.*;
-import world.*;
 import world.liquid.*;
 
 /**
