@@ -1,7 +1,7 @@
 package game;
 
 import utils.Direction;
-import world.World;
+import world.*;
 
 public class Air {
 
@@ -33,7 +33,7 @@ public class Air {
 		this.updateHumidity();
 		this.flowDirection = Direction.NONE;
 		this.energy = 0;
-		this.tileVolume = World.VOLUMEPERTILE;
+		this.tileVolume = Constants.VOLUMEPERTILE;
 		
 	}
 	public void updateHeight(double height) {
@@ -84,11 +84,11 @@ public class Air {
 		return volumeChange;
 	}
 	public void updateMaxVolume() {
-		if(temperature < World.FREEZETEMP) {
+		if(temperature < Constants.FREEZETEMP) {
 			maxVolume = 0;
 		}
-		if(temperature > World.FREEZETEMP - 10) {
-			maxVolume = (this.temperature - World.KELVINOFFSET)/4 + 3.5;
+		if(temperature > Constants.FREEZETEMP - 10) {
+			maxVolume = (this.temperature - Constants.KELVINOFFSET)/4 + 3.5;
 		}else {
 			maxVolume = 1;
 		}
@@ -134,17 +134,17 @@ public class Air {
 		double h = this.height; // m
 		double temp = getTemperature();
 		
-		double moles = this.mass / World.MMAIR;
+		double moles = this.mass / Constants.MMAIR;
 //		double moles = this.getHumidity();
-		double pvnrt = (moles * World.R * temp) / (World.VOLUMEPERTILE *2);
+		double pvnrt = (moles * Constants.R * temp) / (Constants.VOLUMEPERTILE *2);
 //		this.pressure = pvnrt;
 				
 		
-		double sub = World.R * (temp + World.KELVINOFFSET);
+		double sub = Constants.R * (temp + Constants.KELVINOFFSET);
 //		double standardPVNRT = World.STARTINGMASS * sub / World.VOLUMEPERTILE;
 		
-		double power = (-World.G * World.MMAIR * (h - World.SEALEVEL)) / sub;
-		double pressure = World.STANDARDPRESSURE * Math.pow(Math.E, power);
+		double power = (-Constants.G * Constants.MMAIR * (h - Constants.SEALEVEL)) / sub;
+		double pressure = Constants.STANDARDPRESSURE * Math.pow(Math.E, power);
 		this.pressure = (pressure + pvnrt)/2 - 200;
 //		if(this.flowDirection != Direction.NONE) {
 //			this.pressure -= 5;
@@ -158,7 +158,7 @@ public class Air {
 	}
 
 	public double getDensity() {
-		double density = this.pressure/World.STANDARDPRESSURE*World.MMAIR / (World.RYDBERG * (getTemperature() + World.KELVINOFFSET) );
+		double density = this.pressure/Constants.STANDARDPRESSURE*Constants.MMAIR / (Constants.RYDBERG * (getTemperature() + Constants.KELVINOFFSET) );
 		return density;
 	}
 	public double getRelativeHumidity() {

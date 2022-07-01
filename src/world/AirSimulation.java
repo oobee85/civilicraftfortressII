@@ -27,8 +27,8 @@ public class AirSimulation {
 			// Q = o(T1 - T2) * A
 			// o = 5.670374419 × 10^-8 W*m-2*K-4
 			double end = 0;
-			double deltaT = (tile.getTemperature() - World.KELVINOFFSET) - (air.getTemperature() - World.KELVINOFFSET);
-			end = World.BOLTZMANNMODIFIED * World.VOLUMEPERTILE * deltaT * 750;
+			double deltaT = (tile.getTemperature() - Constants.KELVINOFFSET) - (air.getTemperature() - Constants.KELVINOFFSET);
+			end = Constants.BOLTZMANNMODIFIED * Constants.VOLUMEPERTILE * deltaT * 750;
 			air.addEnergy(end);
 			tile.addEnergy(-1*end);
 		}
@@ -87,28 +87,28 @@ public class AirSimulation {
 			double addedEnergy = 0;
 			
 			
-			if(tile.getTemperature() >= (World.BALANCETEMP +5)) {
-				double modifier = (tile.getTemperature()/World.BALANCETEMP);
-				double heightRatio = tile.getHeight() / World.MAXHEIGHT;
+			if(tile.getTemperature() >= (Constants.BALANCETEMP +5)) {
+				double modifier = (tile.getTemperature()/Constants.BALANCETEMP);
+				double heightRatio = tile.getHeight() / Constants.MAXHEIGHT;
 				addedEnergy -= (Math.sqrt(Math.abs(heightRatio * modifier)));
 //				System.out.println(addedEnergy);
 			}
-			if(tile.getTemperature() > (World.BALANCETEMP + 20) || tile.getAir().getTemperature() > (World.BALANCETEMP + 20)) {
+			if(tile.getTemperature() > (Constants.BALANCETEMP + 20) || tile.getAir().getTemperature() > (Constants.BALANCETEMP + 20)) {
 				addedEnergy -= 2;
 			}
-			if(tile.getTemperature() <= (World.BALANCETEMP -5)) {
-				double modifier = (tile.getTemperature()/World.BALANCETEMP);
-				double heightRatio = tile.getHeight() / World.MAXHEIGHT;
+			if(tile.getTemperature() <= (Constants.BALANCETEMP -5)) {
+				double modifier = (tile.getTemperature()/Constants.BALANCETEMP);
+				double heightRatio = tile.getHeight() / Constants.MAXHEIGHT;
 				addedEnergy += (Math.sqrt(Math.abs(heightRatio * modifier)));
 //				System.out.println(addedEnergy);
 			}
-			if(tile.getTemperature() < (World.BALANCETEMP - 20) || tile.getAir().getTemperature() < (World.BALANCETEMP - 20)) {
+			if(tile.getTemperature() < (Constants.BALANCETEMP - 20) || tile.getAir().getTemperature() < (Constants.BALANCETEMP - 20)) {
 				addedEnergy += 2;
 			}
 			
-			if(tile.getHeight() >= World.MAXHEIGHT /1.25) {
+			if(tile.getHeight() >= Constants.MAXHEIGHT /1.25) {
 //				double modifier = (tile.getTemperature()/World.BALANCETEMP);
-				double heightRatio = tile.getHeight() / World.MAXHEIGHT;
+				double heightRatio = tile.getHeight() / Constants.MAXHEIGHT;
 				addedEnergy -= heightRatio;
 			}
 			
@@ -124,7 +124,7 @@ public class AirSimulation {
 			
 			
 			
-			double heightMod = 1 - tile.getHeight() / World.MAXHEIGHT;
+			double heightMod = 1 - tile.getHeight() / Constants.MAXHEIGHT;
 //			seasonEnergy *= heightMod;
 			
 			
@@ -144,9 +144,9 @@ public class AirSimulation {
 			
 			//does raining
 			if(tile.getAir().canRain() && tile.liquidType != LiquidType.LAVA) {
-				if(tile.liquidType != LiquidType.ICE && tile.liquidType != LiquidType.SNOW && tile.getTemperature() >= World.FREEZETEMP) {
+				if(tile.liquidType != LiquidType.ICE && tile.liquidType != LiquidType.SNOW && tile.getTemperature() >= Constants.FREEZETEMP) {
 					tile.liquidType = LiquidType.WATER;
-				}else if(tile.liquidType != LiquidType.WATER && tile.liquidType != LiquidType.ICE && tile.getTemperature() < World.FREEZETEMP && tile.getAir().getTemperature() < World.FREEZETEMP) {
+				}else if(tile.liquidType != LiquidType.WATER && tile.liquidType != LiquidType.ICE && tile.getTemperature() < Constants.FREEZETEMP && tile.getAir().getTemperature() < Constants.FREEZETEMP) {
 					tile.liquidType = LiquidType.SNOW;
 					isSnow = true;
 				}
@@ -166,8 +166,8 @@ public class AirSimulation {
 				}
 //				seasonEnergy += 0.01;
 			}
-			if(tile.getHeight() > 900 && averageWater < World.BALANCEWATER) {
-				double addedMod = World.BALANCEWATER / averageWater - 1;
+			if(tile.getHeight() > 900 && averageWater < Constants.BALANCEWATER) {
+				double addedMod = Constants.BALANCEWATER / averageWater - 1;
 				tile.liquidAmount += addedMod;
 			}
 			
@@ -232,7 +232,7 @@ public class AirSimulation {
 	}
 	
 	public static void updateAirMovement(LinkedList<Tile> tiles, int worldWidth, int worldHeight) {
-		if(World.ticks % World.TICKSTOUPDATEAIR == 0) {
+		if(World.ticks % Constants.TICKSTOUPDATEAIR == 0) {
 			return;
 		}
 		double totalMass = 0;

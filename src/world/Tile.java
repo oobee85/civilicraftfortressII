@@ -99,7 +99,7 @@ public class Tile implements Externalizable {
 		this.energy = 100000;
 		air = new Air(this.height);
 		atmosphere = new Air(this.height + 1000);
-		this.tickLastTerrainChange = -World.MIN_TIME_TO_SWITCH_TERRAIN;
+		this.tickLastTerrainChange = -Constants.MIN_TIME_TO_SWITCH_TERRAIN;
 	}
 
 //	public Air getAtmosphere() {
@@ -161,7 +161,7 @@ public class Tile implements Externalizable {
 		
 		// Q=mcAT
 		// T= Q/mc -273
-		double tileTemp = tileEnergy / (World.MASSGROUND);
+		double tileTemp = tileEnergy / (Constants.MASSGROUND);
 		setTemperature(tileTemp);
 		
 		// T = Q/moles -273
@@ -171,10 +171,10 @@ public class Tile implements Externalizable {
 	
 	public double getEvaporation() {
 		double evaporation = 0.0;
-		if(this.liquidType == LiquidType.WATER && this.getTemperature() > World.FREEZETEMP && this.getAir().canRain() == false) {
+		if(this.liquidType == LiquidType.WATER && this.getTemperature() > Constants.FREEZETEMP && this.getAir().canRain() == false) {
 			
 //			evaporation = (Math.exp(this.getTemperature()/50) /(2*this.liquidAmount));
-			evaporation = ( 0.01*(this.getTemperature() - World.KELVINOFFSET)*this.liquidAmount );
+			evaporation = ( 0.01*(this.getTemperature() - Constants.KELVINOFFSET)*this.liquidAmount );
 //			liquidAmount -= evaporation;
 		}
 		
@@ -466,7 +466,7 @@ public class Tile implements Externalizable {
 
 	public boolean airTemperature() {
 		double temp = this.air.getTemperature();
-		if (temp < World.FREEZING_TEMPURATURE) {
+		if (temp < Constants.FREEZING_TEMPURATURE) {
 			return true;
 		}
 		return false;

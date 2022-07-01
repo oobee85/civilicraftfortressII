@@ -51,11 +51,11 @@ public class MinimapView extends JPanel {
 		g.drawString(dayCounter, padding, g.getFont().getSize() + padding);
 		g.setColor(temp);
 
-		int offset = World.getCurrentDayOffset() + World.TRANSITION_PERIOD;
+		int offset = World.getCurrentDayOffset() + Constants.TRANSITION_PERIOD;
 		int pathwidth = getWidth() - MINIMAPBORDERWIDTH;
 		int pathheight = getHeight() - MINIMAPBORDERWIDTH;
 		int totallength = 2 * pathwidth + 2 * pathheight;
-		offset = totallength * offset / (World.DAY_DURATION + World.NIGHT_DURATION);
+		offset = totallength * offset / (Constants.DAY_DURATION + Constants.NIGHT_DURATION);
 		int imagesize = MINIMAPBORDERWIDTH - padding * 2;
 		if (offset < pathheight) {
 			g.drawImage(SUN_IMAGE, padding, padding + pathheight - offset, imagesize, imagesize, null);

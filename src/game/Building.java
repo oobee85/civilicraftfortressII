@@ -50,7 +50,7 @@ public class Building extends Thing implements Serializable {
 		updateInProgressUnit();
 		timeToHarvest --;
 		
-		if(World.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
+		if (World.ticks % Constants.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			Tile tile = getTile();
 			int[] tileDamage = tile.computeTileDamage();
 			for(int i = 0; i < tileDamage.length; i++) {

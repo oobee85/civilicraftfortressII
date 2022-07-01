@@ -129,7 +129,7 @@ public class Animal extends Unit {
 			else 
 				target = getTile().getNeighbors().get((int)(Math.random()*getTile().getNeighbors().size()));
 			if(this.applyResistance(target.computeTileDanger()) <= 0.9) {
-				dontMigrateUntil = World.ticks + (int)((2 + Math.random()*4) * World.DAY_DURATION);
+				dontMigrateUntil = World.ticks + (int)((2 + Math.random()*4) * Constants.DAY_DURATION);
 				queuePlannedAction(PlannedAction.moveTo(target));
 				return;
 			}

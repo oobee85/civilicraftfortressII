@@ -189,7 +189,7 @@ public class Unit extends Thing implements Serializable {
 			resetTimeToHeal();
 		}
 		// Take environment damage every 5 ticks
-		if (World.ticks % World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
+		if (World.ticks % Constants.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			int[] tileDamage = getTile().computeTileDamage();
 			for(int i = 0; i < tileDamage.length; i++) {
 				this.takeDamage(tileDamage[i], DamageType.values()[i]);

@@ -131,9 +131,9 @@ public class LiquidSimulation {
 		if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.ICE) {
 			temperatureOffset = tile.liquidAmount / 10;
 		}
-		if (World.ticks - tile.getTickLastTerrainChange() >= World.MIN_TIME_TO_SWITCH_TERRAIN) {
+		if (World.ticks - tile.getTickLastTerrainChange() >= Constants.MIN_TIME_TO_SWITCH_TERRAIN) {
 
-			if (tempurature + temperatureOffset > World.FREEZETEMP) {
+			if (tempurature + temperatureOffset > Constants.FREEZETEMP) {
 				if (tile.liquidType == LiquidType.ICE) {
 					tile.liquidType = LiquidType.WATER;
 					liquidTypesTemp[x][y] = LiquidType.WATER;
@@ -145,7 +145,7 @@ public class LiquidSimulation {
 					liquidTypesTemp[x][y] = LiquidType.WATER;
 					tile.setTickLastTerrainChange(World.ticks);
 				}
-			} else if (tempurature + temperatureOffset < World.FREEZETEMP-1) {
+			} else if (tempurature + temperatureOffset < Constants.FREEZETEMP-1) {
 				if (tile.liquidType == LiquidType.WATER) {
 					tile.liquidType = LiquidType.ICE;
 					liquidTypesTemp[x][y] = LiquidType.ICE;

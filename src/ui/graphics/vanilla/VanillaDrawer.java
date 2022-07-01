@@ -529,8 +529,8 @@ public class VanillaDrawer extends Drawer {
 				strings.add(String.format("PRES" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getPressure()));
 
 //				strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getHumidity()));
-				strings.add(String.format("TTEM" + "=%." + NUM_DEBUG_DIGITS + "f", (tile.getTemperature() - World.FREEZETEMP)));
-				strings.add(String.format("ATEM" + "=%." + NUM_DEBUG_DIGITS + "f", (tile.getAir().getTemperature() - World.FREEZETEMP)));
+				strings.add(String.format("TTEM" + "=%." + NUM_DEBUG_DIGITS + "f", (tile.getTemperature() - Constants.FREEZETEMP)));
+				strings.add(String.format("ATEM" + "=%." + NUM_DEBUG_DIGITS + "f", (tile.getAir().getTemperature() - Constants.FREEZETEMP)));
 				strings.add(String.format("TENE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEnergy()));
 				strings.add(String.format("AENE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getEnergy()));
 				
@@ -622,9 +622,9 @@ public class VanillaDrawer extends Drawer {
 			g.setColor(color);
 			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
 			if (state.mapMode == MapMode.TEMPURATURE) {
-				if(theTile.getTemperature() <= World.FREEZETEMP) {
+				if(theTile.getTemperature() <= Constants.FREEZETEMP) {
 					g.drawImage(SNOW2, drawAt.x, drawAt.y, draww, drawh, null);
-				}else if(theTile.getAir().getTemperature() <= World.FREEZETEMP) {
+				}else if(theTile.getAir().getTemperature() <= Constants.FREEZETEMP) {
 					g.drawImage(SNOW, drawAt.x, drawAt.y, draww, drawh, null);
 				}
 				

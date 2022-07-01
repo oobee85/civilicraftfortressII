@@ -20,50 +20,6 @@ import wildlife.*;
 import world.liquid.*;
 
 public class World {
-
-	public static final int TICKS_PER_ENVIRONMENTAL_DAMAGE = 10;
-	public static final double TERRAIN_SNOW_LEVEL = 1;
-	public static final double DESERT_HUMIDITY = 1;
-	public static final int SEASON_DURATION = 10000;
-	public static final int DAY_DURATION = 500;
-	public static final int NIGHT_DURATION = 500;
-	public static final int TRANSITION_PERIOD = 100;
-	private static final double CHANCE_TO_SWITCH_TERRAIN = 0.1;
-	public static final int MIN_TIME_TO_SWITCH_TERRAIN = 100;
-	public static final int TICKSTOUPDATEAIR = 2;
-	
-	public static final int KELVINOFFSET = 273;
-	public static final int MINTEMP = 0; // [K]
-	public static final int MAXTEMP = 1273; // [K]
-	public static final int BALANCETEMP = 283; // [K]
-	public static final int FREEZETEMP = 273; // [K]
-	public static final int LETHALHOTTEMP = 311; // [K]
-	public static final int LETHALCOLDTEMP = 263; // [K]
-	public static final float FREEZING_TEMPURATURE = 0.33f;
-	public static final int BALANCEWATER = 12;
-	
-	public static final int MAXHEIGHT = 1000; // [m]
-	public static final int SEALEVEL = 300; // [m]
-	public static final int WATTSPERTILE = 1; // [J/s]
-	public static final double STANDARDPRESSURE = 760; // [mmHg]
-	public static final int VOLUMEPERTILE = 100; // [m^3]
-	public static final int STARTINGMASS = (int)(VOLUMEPERTILE * 1.22); // [kg]
-//	public static final int STARTINGMASS = 10; // [kg]
-//	public static final int MMAIR = 10;
-//	public static final double MMCO2 = 0.04401; // [kg/mol CO2]
-	public static final double MASSGROUND = 1 * VOLUMEPERTILE; // [kg]
-	public static final double MMAIR = 0.05; // [kg/mol AIR]
-	public static final double R = 8.31432; // [Nm/mol*K]  [J/mol*K]
-	public static final double RYDBERG = 0.08206; // [atm*L/mol*K]
-	public static final double G = 9.80665; // [m/s^2]
-	public static final double BOLTZMANN = 1.380649e-23; // [J/K]
-	public static final double BOLTZMANNMODIFIED = 5.670374e-7; // [J/K]
-	public static final double DEFAULTENERGY = 28000;
-	
-	
-	private static final double BUSH_RARITY = 0.005;
-	private static final double WATER_PLANT_RARITY = 0.05;
-	private static final double FOREST_DENSITY = 0.005;
 	
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
@@ -627,13 +583,13 @@ public class World {
 		boolean grassNeighbor = false;
 		
 		//if it doesnt roll chance to change terrain, return
-		if(Math.random() >= CHANCE_TO_SWITCH_TERRAIN && start == false) {
+		if(Math.random() >= Constants.CHANCE_TO_SWITCH_TERRAIN && start == false) {
 			return;
 		}
 		
 		for(Tile t : tile.getNeighbors()) {
 			//counts the tiles are too humid to be desert
-			if(t.getHumidity() > DESERT_HUMIDITY) {
+			if(t.getHumidity() > Constants.DESERT_HUMIDITY) {
 				failTiles ++;
 			}
 			//counts up how many neighbors are desert
@@ -715,10 +671,10 @@ public class World {
 			Air air = tile.getAir();
 //			Air atmosphere = tile.getAtmosphere();
 			double pressure = air.getPressure();
-			double volume = VOLUMEPERTILE;
+			double volume = Constants.VOLUMEPERTILE;
 			double temperature = tile.getAir().getTemperature();
 			
-			double moles = (pressure*volume) / World.R * (temperature + Math.abs(MINTEMP));
+			double moles = (pressure*volume) / Constants.R * (temperature + Math.abs(Constants.MINTEMP));
 //			air.setMass(moles);
 //			air.setMass(STARTINGMASS);
 			air.setMass(5);
@@ -727,14 +683,14 @@ public class World {
 		}
 	}
 	private void initializeTileEnergy() {
-		double defaultEnergy = DEFAULTENERGY + 2500;
+		double defaultEnergy = Constants.DEFAULTENERGY + 2500;
 		double defaultAirEnergy = defaultEnergy / 3.1;
 		for(Tile tile: getTilesRandomly()) {
 			double energy = defaultEnergy;
 			double airEnergy = defaultAirEnergy;
 			
 			Air air = tile.getAir();
-			double altitudeMultiplier = Math.sqrt(Math.sqrt( Math.sqrt(World.SEALEVEL) / Math.sqrt(tile.getHeight()) ));
+			double altitudeMultiplier = Math.sqrt(Math.sqrt( Math.sqrt(Constants.SEALEVEL) / Math.sqrt(tile.getHeight()) ));
 			if(altitudeMultiplier > 0.5 && altitudeMultiplier < 1) {
 				energy *= (altitudeMultiplier);
 				airEnergy *= Math.sqrt(altitudeMultiplier);
@@ -778,7 +734,7 @@ public class World {
 			tile.updateHumidity(World.ticks);
 			
 			
-			if(World.ticks - tile.getTickLastTerrainChange() <= MIN_TIME_TO_SWITCH_TERRAIN) {
+			if(World.ticks - tile.getTickLastTerrainChange() <= Constants.MIN_TIME_TO_SWITCH_TERRAIN) {
 				continue;
 			}
 //			updateDesertChange(tile, start);
@@ -790,13 +746,13 @@ public class World {
 			}
 			
 			// kills plants if its too hot or cold
-			if(tile.canPlant() && (tile.getTemperature() >= LETHALHOTTEMP || tile.getTemperature() <= LETHALCOLDTEMP)) {
-				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+			if(tile.canPlant() && (tile.getTemperature() >= Constants.LETHALHOTTEMP || tile.getTemperature() <= Constants.LETHALCOLDTEMP)) {
+				if(Math.random() < Constants.CHANCE_TO_SWITCH_TERRAIN) {
 					
 					tile.setTerrain(Terrain.DIRT);
 					tile.setTickLastTerrainChange(World.ticks);
 					Plant plant = tile.getPlant();
-					if(plant != null && Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+					if(plant != null && Math.random() < Constants.CHANCE_TO_SWITCH_TERRAIN) {
 						plant.takeDamage((int)plant.getHealth(), DamageType.HEAT);
 						worldData.addDeadThing(plant);
 					}
@@ -806,12 +762,12 @@ public class World {
 			
 			//turns grass to dirt if tile has a cold liquid || the temperature is cold
 			if(terrain == Terrain.GRASS && tile.isCold() && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
+				if(Math.random() < Constants.CHANCE_TO_SWITCH_TERRAIN) {
 					tile.setTerrain(Terrain.DIRT);
 					tile.setTickLastTerrainChange(World.ticks);
 				}
 			}
-			if(terrain == Terrain.GRASS && Math.random() < CHANCE_TO_SWITCH_TERRAIN/10000) {
+			if(terrain == Terrain.GRASS && Math.random() < Constants.CHANCE_TO_SWITCH_TERRAIN/10000) {
 				tile.setTerrain(Terrain.DIRT);
 				tile.setTickLastTerrainChange(World.ticks);
 			}
@@ -833,7 +789,7 @@ public class World {
 						adjacentWater = true;
 					}
 				}
-				double threshold = CHANCE_TO_SWITCH_TERRAIN;
+				double threshold = Constants.CHANCE_TO_SWITCH_TERRAIN;
 				if(tile.liquidType == LiquidType.WATER) {
 					threshold += 0.001;
 				}
@@ -1100,7 +1056,7 @@ public class World {
 				}
 			}
 			//generates land plants
-			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < BUSH_RARITY) {
+			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < Constants.BUSH_RARITY) {
 				double o = Math.random();
 				if(o < Game.plantTypeMap.get("BERRY").getRarity()) {
 					makePlantVein(tile, Game.plantTypeMap.get("BERRY"), 6);
@@ -1111,7 +1067,7 @@ public class World {
 			}
 			//tile.liquidType.WATER &&
 			//generates water plants
-			if( Math.random() < WATER_PLANT_RARITY) {
+			if( Math.random() < Constants.WATER_PLANT_RARITY) {
 				double o = Math.random();
 				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()  && o < Game.plantTypeMap.get("CATTAIL").getRarity()) {
 					Plant p = new Plant(Game.plantTypeMap.get("CATTAIL"), tile, getFaction(NO_FACTION_ID));
@@ -1171,7 +1127,7 @@ public class World {
 	public void makeForest() {
 		
 		for(Tile t : tileListRandom) {
-			double tempDensity = FOREST_DENSITY;
+			double tempDensity = Constants.FOREST_DENSITY;
 			if(t.getTerrain() == Terrain.DIRT) {
 				tempDensity /= 2;
 			}
@@ -1350,8 +1306,8 @@ public class World {
 		double lowHeight = Double.MAX_VALUE;
 		double highPressure = Double.MIN_VALUE;
 		double lowPressure = Double.MAX_VALUE;
-		double highTemperature = MINTEMP;
-		double lowTemperature = MAXTEMP;
+		double highTemperature = Constants.MINTEMP;
+		double lowTemperature = Constants.MAXTEMP;
 		double highHumidity = Double.MIN_VALUE;
 		double lowHumidity = Double.MAX_VALUE;
 		for(Tile tile : getTiles() ) {
@@ -1457,10 +1413,10 @@ public class World {
 	}
 
 	public int ticksUntilDay() {
-		int currentDayOffset = World.ticks%(DAY_DURATION + NIGHT_DURATION);
-		int skipAmount = (DAY_DURATION + NIGHT_DURATION - TRANSITION_PERIOD) - currentDayOffset;
+		int currentDayOffset = World.ticks%(Constants.DAY_DURATION + Constants.NIGHT_DURATION);
+		int skipAmount = (Constants.DAY_DURATION + Constants.NIGHT_DURATION - Constants.TRANSITION_PERIOD) - currentDayOffset;
 		if(skipAmount < 0) {
-			skipAmount += DAY_DURATION + NIGHT_DURATION;
+			skipAmount += Constants.DAY_DURATION + Constants.NIGHT_DURATION;
 		}
 		return skipAmount;
 	}
@@ -1469,7 +1425,7 @@ public class World {
 		return getDaylight() < 0.4;
 	}
 	public static int getCurrentDayOffset() {
-		return (World.ticks + TRANSITION_PERIOD)%(DAY_DURATION + NIGHT_DURATION);
+		return (World.ticks + Constants.TRANSITION_PERIOD) % (Constants.DAY_DURATION + Constants.NIGHT_DURATION);
 	}
 
 	private static double precomputedDaylight;
@@ -1487,20 +1443,20 @@ public class World {
 	private static void recomputeDaylight() {
 		double ratio = 1;
 		int currentDayOffset = getCurrentDayOffset();
-		if(currentDayOffset < TRANSITION_PERIOD) {
-			ratio = 0.5 + 0.5*currentDayOffset/TRANSITION_PERIOD;
+		if(currentDayOffset < Constants.TRANSITION_PERIOD) {
+			ratio = 0.5 + 0.5 * currentDayOffset / Constants.TRANSITION_PERIOD;
 		}
-		else if(currentDayOffset < DAY_DURATION - TRANSITION_PERIOD) {
+		else if(currentDayOffset < Constants.DAY_DURATION - Constants.TRANSITION_PERIOD) {
 			ratio = 1;
 		}
-		else if(currentDayOffset < DAY_DURATION + TRANSITION_PERIOD) {
-			ratio = 0.5 - 0.5*(currentDayOffset - DAY_DURATION)/TRANSITION_PERIOD;
+		else if(currentDayOffset < Constants.DAY_DURATION + Constants.TRANSITION_PERIOD) {
+			ratio = 0.5 - 0.5 * (currentDayOffset - Constants.DAY_DURATION) / Constants.TRANSITION_PERIOD;
 		}
-		else if(currentDayOffset < DAY_DURATION + NIGHT_DURATION - TRANSITION_PERIOD) {
+		else if(currentDayOffset < Constants.DAY_DURATION + Constants.NIGHT_DURATION - Constants.TRANSITION_PERIOD) {
 			ratio = 0;
 		}
 		else {
-			ratio = 0.5 - 0.5*(DAY_DURATION + NIGHT_DURATION - currentDayOffset)/TRANSITION_PERIOD;
+			ratio = 0.5 - 0.5 * (Constants.DAY_DURATION + Constants.NIGHT_DURATION - currentDayOffset) / Constants.TRANSITION_PERIOD;
 		}
 		precomputedDaylight = ratio;
 		precomputedDaylightTick = World.ticks;

@@ -126,17 +126,17 @@ public class Game {
 		buildingTick();
 		unitTick();
 		world.doProjectileUpdates(false);
-		if(World.ticks%World.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
+		if (World.ticks % Constants.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			world.updatePlantDamage();
 		}
 		
-		if(World.ticks % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
-			if(!Settings.DISABLE_ENEMY_SPAWNS) {
+		if (World.ticks % (Constants.DAY_DURATION + Constants.NIGHT_DURATION) == 0) {
+			if (!Settings.DISABLE_ENEMY_SPAWNS) {
 				dayEvents();
 			}
 			World.days ++;
 		}
-		if((World.ticks + World.DAY_DURATION) % (World.DAY_DURATION + World.NIGHT_DURATION) == 0) {
+		if ((World.ticks + Constants.DAY_DURATION) % (Constants.DAY_DURATION + Constants.NIGHT_DURATION) == 0) {
 			if(!Settings.DISABLE_ENEMY_SPAWNS) {
 				nightEvents();
 			}
@@ -739,7 +739,7 @@ public class Game {
 				&& tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()
 				&& tile.getLocation().distanceTo(world.volcano) > 30
 				&& (tile.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"))
-				&& tile.getHeight() >= World.MAXHEIGHT * 0.45;
+				&& tile.getHeight() >= Constants.MAXHEIGHT * 0.45;
 	}
 	private void makeStartingCastleAndUnits(boolean easymode, List<PlayerInfo> players) {
 		double spacePerPlayer = (double)world.getWidth()/players.size();

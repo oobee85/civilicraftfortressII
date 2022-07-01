@@ -193,9 +193,9 @@ public class GLDrawer extends Drawer implements GLEventListener {
 //			terrainObject.rotate(Matrix4f.rotate(1, new Vector3f(0, 1, 0)));
 			int dayOffset = World.getCurrentDayOffset();
 			if(Game.DISABLE_NIGHT) {
-				dayOffset = World.DAY_DURATION/2;
+				dayOffset = Constants.DAY_DURATION/2;
 			}
-			float ratio = (float)dayOffset / (World.DAY_DURATION + World.NIGHT_DURATION);
+			float ratio = (float)dayOffset / (Constants.DAY_DURATION + Constants.NIGHT_DURATION);
 			Matrix4f rot = Matrix4f.rotate(ratio * 360, new Vector3f(0, 1, 0));
 			Vector3f initPosition = new Vector3f(-1, 0, 0);
 			Vector3f result = rot.multiply(initPosition, 1);
