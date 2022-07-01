@@ -261,17 +261,6 @@ public class World {
 		}
 	}
 	
-	
-	public void rains() {
-		for(Tile tile : getTiles()) {
-			if(tile.getAir().canRain() == true && tile.getWeather() == null) {
-//				WeatherEvent weather = new WeatherEvent(tile, tile, tile.getAir().getVolume(), LiquidType.WATER);;
-//				tile.setWeather(weather);
-//				worldData.addWeatherEvent(weather);
-//				weather.addStrength(tile.getAir().getVolume());
-			}
-		}
-	}
 	public void rain() {
 		
 		//makes it so that it doesnt spawn the center of rain in deserts or on the volcano
@@ -771,14 +760,15 @@ public class World {
 //			double temperature = tile.getTemperature();
 //			tile.getAir().setTemperature(temperature);
 			
-		}
-			
+		}	
 	}
-	public void updateTerrainChange(boolean start) {
-		if(start == true) {
-			setTileMass();
-			initializeTileEnergy();
-		}
+	
+	public void initializeAirSimulationStuff() {
+		setTileMass();
+		initializeTileEnergy();
+	}
+	
+	public void doAirSimulationStuff() {
 		LinkedList<Tile> tiles = getTilesRandomly();
 		AirSimulation.updateAirStuff(tiles);
 		AirSimulation.updateEnergyToTemperature(tiles);
@@ -788,10 +778,14 @@ public class World {
 		AirSimulation.updateEnergyToTemperature(tiles);
 		AirSimulation.updateAirMovement(tiles, width, height);
 		AirSimulation.updateEnergyToTemperature(tiles);
-		
+	}
+	
+	/**
+	 * Updates terrain types such as grass growing or dying
+	 * also does desertification and plants taking damage
+	 */
+	public void updateTerrainChange(boolean start) {
 		for(Tile tile : getTiles()) {
-			
-			
 			if(tile.getResource() != null) {
 				tile.getResource().tick(World.ticks);
 			}
@@ -1303,6 +1297,8 @@ public class World {
 		for(int i = 0; i < 100; i++) {
 			Liquid.propogate(this);
 		}
+		initializeAirSimulationStuff();
+		doAirSimulationStuff();
 		updateTerrainChange(true);
 		Generation.generateResources(this);
 		this.genPlants();

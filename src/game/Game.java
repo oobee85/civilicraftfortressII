@@ -44,26 +44,17 @@ public class Game {
 		Utils.saveToFile(worldInfo, "save1.civ", false);
 	}
 	
-	public void weatherEvents() {
+	public void meteorAndVolcanoEvents() {
 		if(World.days > 10 && Math.random() < 0.00001) {
 			meteorStrike();
 		}
-		world.rains();
-		
-		// rain event
-//		if(Math.random() < 0.002) {
-//			world.rain();
-//		}
-//		if(Math.random() < 0.01) {
-//			world.grow();
-//		}
-		
 		if(world.volcano != null) {
 			world.get(world.volcano).liquidType = LiquidType.LAVA;
 			if(World.days >= 10 && Math.random() < 0.0001 && !Settings.DISABLE_VOLCANO_ERUPT) {
 				eruptVolcano();
 			}
 		}
+		world.updateVolcano();
 	}
 	public GUIController getGUIController() {
 		return guiController;
@@ -106,20 +97,30 @@ public class Game {
 		world.doProjectileUpdates(true);
 		world.doWeatherUpdate();
 	}
+
+	/**
+	 * Do all the game events like unit movement, time passing, building things, growing, etc
+	 * happens once every 100ms
+	 */
 	public void gameTick() {
-		// Do all the game events like unit movement, time passing, building things, growing, etc
-		// happens once every 100ms
 		World.ticks++;
-		if(World.ticks%20 == 0) {
+
+		if (World.ticks % 20 == 0) {
 			updateTerritory();
 		}
-		
-		if(World.ticks % 2 == 0) {
+
+		if (World.ticks % 2 == 0) {
 			Liquid.propogate(world);
 		}
-		
-		world.updateVolcano();
 
+		meteorAndVolcanoEvents();
+		
+		// WeatherEvents have been deprecated
+		// world.doWeatherUpdate();
+
+		world.doAirSimulationStuff();
+		world.updateTerrainChange(false);
+		
 		world.clearDeadAndAddNewThings();
 		
 		buildingTick();
@@ -141,10 +142,6 @@ public class Game {
 			}
 			World.nights ++;
 		}
-		world.doWeatherUpdate();
-		weatherEvents();
-		// GUI updates
-		world.updateTerrainChange(false);
 	}
 	private void makeAnimal(Tile tile, UnitType unitType, int number) {
 		for(Tile t: Utils.getTilesInRadius(tile, world, Math.max(1, (int)(Math.sqrt(number))-1))) {

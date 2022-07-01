@@ -10,8 +10,14 @@ import game.liquid.*;
 import utils.*;
 import world.*;
 
+/**
+ * THIS CLASS IS DEPRECATED.
+ * THIS USED TO BE USED FOR RAIN CLOUDS AND SNOW STORMS BUT IT HAS BEEN REPLACED
+ * WITH THE WEATHER SIMULATION SYSTEM.
+ * @author oleks2
+ *
+ */
 public class WeatherEvent implements Externalizable {
-
 	
 	private double strength;
 	private int aliveUntil;
