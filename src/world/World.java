@@ -1277,7 +1277,8 @@ public class World {
 		HashMap<Terrain, Color> terrainColors = Utils.computeTerrainAverageColor();
 		BufferedImage terrainImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 		BufferedImage minimapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
-
+		BufferedImage bigTerrainImage = new BufferedImage(terrainImage.getWidth()*2, terrainImage.getHeight()*2+1, terrainImage.getType());
+		
 		for(Tile tile : this.getTiles()) {
 			Color minimapColor = terrainColors.get(tile.getTerrain());
 			Color terrainColor = terrainColors.get(tile.getTerrain());
@@ -1317,6 +1318,11 @@ public class World {
 			
 			minimapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), minimapColor.getRGB());
 			terrainImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), terrainColor.getRGB());
+			int oddColumn = tile.getLocation().x() % 2;
+			bigTerrainImage.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2 + oddColumn, terrainColor.getRGB());
+			bigTerrainImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2 + oddColumn, terrainColor.getRGB());
+			bigTerrainImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2+1 + oddColumn, terrainColor.getRGB());
+			bigTerrainImage.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2+1 + oddColumn, terrainColor.getRGB());
 		}
 		for(AttackedNotification notification : faction.getAttackedNotifications()) {
 			minimapImage.setRGB(notification.tile.getLocation().x(), notification.tile.getLocation().y(), Color.red.getRGB());
@@ -1343,6 +1349,7 @@ public class World {
 		}
 		
 		BufferedImage[] mapImages = new BufferedImage[MapMode.values().length];
+		mapImages[MapMode.TERRAIN_BIG.ordinal()] = bigTerrainImage;
 		mapImages[MapMode.TERRAIN.ordinal()] = terrainImage;
 		mapImages[MapMode.FLOW2.ordinal()] = terrainImage;
 		mapImages[MapMode.MINIMAP.ordinal()] = minimapImage;

@@ -66,7 +66,7 @@ public class GameView {
 		public LeftClickAction leftClickAction = LeftClickAction.NONE;
 
 		public boolean drawDebugStrings;
-		public MapMode mapMode = MapMode.TERRAIN;
+		public MapMode mapMode = MapMode.TERRAIN_BIG;
 		
 		public BuildingType selectedBuildingToPlan;
 		public Object selectedThingToSpawn;

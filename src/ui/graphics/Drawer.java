@@ -27,7 +27,7 @@ public abstract class Drawer {
 		}
 	}
 	public BufferedImage getImageToDrawMinimap() {
-		if(state.mapMode == MapMode.TERRAIN) {
+		if(state.mapMode == MapMode.TERRAIN_BIG) {
 			return mapImages[MapMode.MINIMAP.ordinal()];
 		}
 		else {

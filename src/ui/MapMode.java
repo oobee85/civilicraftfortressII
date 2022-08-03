@@ -1,8 +1,9 @@
 package ui;
 
 public enum MapMode {
-	
-	TERRAIN,
+
+	TERRAIN_BIG, // this image is twice as big to have offset pixels
+	TERRAIN, // Used for texture for 3d terrain
 	HEIGHT(true),
 	HUMIDITY(true),
 	PRESSURE(true),

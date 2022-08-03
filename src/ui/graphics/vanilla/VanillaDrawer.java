@@ -221,20 +221,18 @@ public class VanillaDrawer extends Drawer {
 	}
 
 	private void draw(Graphics g, int panelWidth, int panelHeight) {
+		// Start by drawing plain terrain image
+		g.drawImage(mapImages[state.mapMode.ordinal()], 0, 0, 
+				frozenTileSize * game.world.getWidth(), 
+				frozenTileSize * game.world.getHeight() + frozenTileSize/2, null);
+		
 		// Try to only draw stuff that is visible on the screen
 		int lowerX = Math.max(0, state.viewOffset.divide(frozenTileSize).getIntX() - 2);
 		int lowerY = Math.max(0, state.viewOffset.divide(frozenTileSize).getIntY() - 2);
 		int upperX = Math.min(game.world.getWidth(), lowerX + panelWidth / frozenTileSize + 4);
 		int upperY = Math.min(game.world.getHeight(), lowerY + panelHeight / frozenTileSize + 4);
 
-		if (frozenTileSize < FAST_MODE_TILE_SIZE || state.mapMode == MapMode.LIGHT) {
-			g.drawImage(mapImages[state.mapMode.ordinal()], 
-						0, 
-						0, 
-						frozenTileSize * game.world.getWidth(), 
-						frozenTileSize * game.world.getHeight(), 
-						null);
-		} else {
+		if (frozenTileSize >= FAST_MODE_TILE_SIZE && state.mapMode != MapMode.LIGHT) {
 			double highHeight = Double.MIN_VALUE;
 			double lowHeight = Double.MAX_VALUE;
 			double highPressure = Double.MIN_VALUE;
@@ -353,7 +351,7 @@ public class VanillaDrawer extends Drawer {
 			}
 			
 			// draw brightness of tiles as translucent rectangle
-			if (state.mapMode == MapMode.TERRAIN) {
+			if (state.mapMode == MapMode.TERRAIN_BIG) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
