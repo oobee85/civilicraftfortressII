@@ -73,15 +73,15 @@ public class PlannedAction {
 		return new PlannedAction(target, ActionType.HARVEST);
 	}
 	public static PlannedAction takeItemsFrom(Thing target) {
-		System.out.println("aaAAAAAAAAAAAAA");
+//		System.out.println("aaAAAAAAAAAAAAA");
 		return new PlannedAction(target, ActionType.TAKE_ITEMS);
 	}
 	public static PlannedAction deliver(Thing target) {
-		System.out.println("FOLLOWUP");
+//		System.out.println("FOLLOWUP");
 		return new PlannedAction(target, ActionType.DELIVER);
 	}
 	public static PlannedAction deliver(Thing target, PlannedAction followup) {
-		System.out.println("FOLLOWUP2222222");
+//		System.out.println("FOLLOWUP2222222");
 		return new PlannedAction(target, ActionType.DELIVER, followup);
 	}
 	public static PlannedAction moveTo(Tile targetTile) {
@@ -131,7 +131,7 @@ public class PlannedAction {
 			range = 1;
 		}
 		else if(type == HARVEST || type == DELIVER || type == TAKE_ITEMS) {
-			range = 0;
+			range = 1;
 		}
 		else if(type == ATTACK) {
 			range = actor.getMaxAttackRange();

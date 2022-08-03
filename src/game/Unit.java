@@ -557,11 +557,6 @@ public class Unit extends Thing implements Serializable {
 			this.doHarvestBuilding((Building)plan.target, plan);
 			didSomething = true;
 		}
-//		else if(plan.isTakeItemsAction() && unitType.isBuilder() && plan.target instanceof Building
-//				&& ((Building)plan.target).getType().isColony() == true) {
-//			this.doTake(plan, plan.target);
-//			didSomething = true;
-//		}
 		else if(plan.isTakeItemsAction() && (unitType.isCaravan() || unitType.isBuilder()) && plan.target instanceof Building
 				&& ((Building)plan.target).getType().isColony() == true) {
 			this.doTake(plan, plan.target);

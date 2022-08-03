@@ -743,6 +743,23 @@ public class World {
 				tile.setTerrain(Terrain.GRASS);
 				tile.setTickLastTerrainChange(World.ticks);
 			}
+			for(Building building: worldData.getBuildings()) {
+				Tile t = building.getTile();
+				Plant p = t.getPlant();
+				if(p != null) {
+					p.takeDamage((int)p.getHealth(), DamageType.PHYSICAL);
+					worldData.addDeadThing(p);
+				}
+				if(building.getType().isHarvestable() == false) {
+					continue;
+				}
+				
+				if(t.getTerrain() == Terrain.GRASS || p != null) {
+					t.setTerrain(Terrain.DIRT);
+					
+				}
+			}
+			
 			
 			// kills plants if its too hot or cold
 			if(tile.canPlant() && (tile.getTemperature() >= Constants.LETHALHOTTEMP || tile.getTemperature() <= Constants.LETHALCOLDTEMP)) {

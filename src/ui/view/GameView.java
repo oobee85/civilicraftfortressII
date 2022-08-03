@@ -528,7 +528,7 @@ public class GameView {
 					}
 					else if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
 							&& targetBuilding.isBuilt() && targetBuilding.hasInventory()) {
-						System.out.println("taking items, caravan");
+//						System.out.println("taking items, caravan");
 						commandInterface.planAction(unit, PlannedAction.takeItemsFrom(targetBuilding), !shiftDown);
 					}
 					else {
@@ -553,7 +553,7 @@ public class GameView {
 					}
 					else if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
 							&& targetBuilding.isBuilt() && targetBuilding.hasInventory()) {
-						System.out.println("taking items, builder");
+//						System.out.println("taking items, builder");
 						commandInterface.planAction(unit, PlannedAction.takeItemsFrom(targetBuilding), !shiftDown);
 					}
 					else if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction() 
