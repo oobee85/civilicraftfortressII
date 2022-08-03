@@ -530,6 +530,9 @@ public class Unit extends Thing implements Serializable {
 		if(!plan.inRange(this)) {
 			return false;
 		}
+		if(plan.target instanceof Building) {
+			Building building = (Building)plan.target;
+		}
 		boolean didSomething = false;
 		if(plan.isBuildRoadAction() && unitType.isBuilder()) {
 			Building tobuild = plan.getTile().getRoad();
@@ -549,8 +552,19 @@ public class Unit extends Thing implements Serializable {
 			this.doHarvest(plan.targetTile, plan);
 			didSomething = true;
 		}
-		else if(plan.isHarvestAction() && unitType.isBuilder() && plan.target != null && plan.target instanceof Building) {
+		else if(plan.isHarvestAction() && unitType.isBuilder() && plan.target != null && plan.target instanceof Building 
+				&& ((Building)plan.target).getType().isHarvestable() == true) {
 			this.doHarvestBuilding((Building)plan.target, plan);
+			didSomething = true;
+		}
+//		else if(plan.isTakeItemsAction() && unitType.isBuilder() && plan.target instanceof Building
+//				&& ((Building)plan.target).getType().isColony() == true) {
+//			this.doTake(plan, plan.target);
+//			didSomething = true;
+//		}
+		else if(plan.isTakeItemsAction() && (unitType.isCaravan() || unitType.isBuilder()) && plan.target instanceof Building
+				&& ((Building)plan.target).getType().isColony() == true) {
+			this.doTake(plan, plan.target);
 			didSomething = true;
 		}
 		else if(plan.isHarvestAction() && unitType.isBuilder() && plan.target != null && plan.target instanceof Plant) {
@@ -561,10 +575,7 @@ public class Unit extends Thing implements Serializable {
 			this.doDelivery(plan, plan.target);
 			didSomething = true;
 		}
-		else if(plan.isTakeItemsAction() && unitType.isCaravan() && plan.target instanceof Building) {
-			this.doTake(plan, plan.target);
-			didSomething = true;
-		}
+		
 		else if(plan.type == ActionType.MOVE) {
 			
 		}
@@ -622,6 +633,7 @@ public class Unit extends Thing implements Serializable {
 			this.queuePlannedAction(PlannedAction.deliver(building, PlannedAction.makeCopy(finished)));
 		}
 		else if(finished.isTakeItemsAction()) {
+			System.out.println("finding castle");
 			Building castle = getNearestCastleToDeliver();
 			this.queuePlannedAction(PlannedAction.deliver(castle, PlannedAction.takeItemsFrom(finished.target)));
 		}

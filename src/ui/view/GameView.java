@@ -520,7 +520,7 @@ public class GameView {
 				if (!shiftDown) {
 					unit.clearPlannedActions();
 				}
-				if(unit.getType().isCaravan()) {
+				if(unit.getType().isCaravan() ) {
 					Building targetBuilding = targetTile.getBuilding();
 					if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
 							&& targetBuilding.isBuilt() && targetBuilding.getType().isCastle()) {
@@ -528,12 +528,14 @@ public class GameView {
 					}
 					else if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
 							&& targetBuilding.isBuilt() && targetBuilding.hasInventory()) {
+						System.out.println("taking items, caravan");
 						commandInterface.planAction(unit, PlannedAction.takeItemsFrom(targetBuilding), !shiftDown);
 					}
 					else {
 						commandInterface.planAction(unit, PlannedAction.moveTo(targetTile), !shiftDown);
 					}
 				}
+				
 				else if (unit.getType().isBuilder()) {
 					Building targetBuilding = targetTile.getBuilding();
 					if (targetBuilding == null) {
@@ -548,6 +550,11 @@ public class GameView {
 						commandInterface.planAction(unit, 
 						                            PlannedAction.buildOnTile(targetBuilding.getTile(), targetBuilding.getType().isRoad()),
 						                            !shiftDown);
+					}
+					else if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
+							&& targetBuilding.isBuilt() && targetBuilding.hasInventory()) {
+						System.out.println("taking items, builder");
+						commandInterface.planAction(unit, PlannedAction.takeItemsFrom(targetBuilding), !shiftDown);
 					}
 					else if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction() 
 							&& targetBuilding.getType().isCastle() && unit.hasInventory()) {
