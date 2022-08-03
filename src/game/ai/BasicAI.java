@@ -11,6 +11,7 @@ import world.*;
 
 public class BasicAI implements AIInterface {
 	public static final BuildingType FARM = Game.buildingTypeMap.get("FARM");
+	public static final BuildingType MINE = Game.buildingTypeMap.get("MINE");
 	
 	private static final int MAX_BUILD_RADIUS = 10;
 	private static final int MAX_SEARCH_RADIUS = 40;

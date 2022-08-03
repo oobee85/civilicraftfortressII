@@ -3,14 +3,17 @@
 	{	
 		"name": "WARRIOR_CODE", 
 		"points": 300, "tier": 1,
+		"cost": {"WOOD": 100},
 		"image": "Images/research/warrior_code.png"},
 	{	
 		"name": "BRONZE_WORKING", 
 		"points": 300, "tier": 1,
+		"cost": {"STONE": 100},
 		"image": "Images/research/bronze_working.png"},
 	{
 		"name": "WHEEL", 
 		"points": 300, "tier": 1,
+		"cost": {"FOOD": 200},
 		"image": "Images/research/wheel.png"},
 	{
 		"name": "IRON_WORKING", 
@@ -34,7 +37,7 @@
 	{
 		"name": "MASONRY", 
 		"points": 600, "tier": 2,
-		"cost": {"STONE": 500}, 
+		"cost": {"STONE": 1000}, 
 		"requirements": ["WHEEL"],
 		"image": "Images/research/masonry.png"},
 	
@@ -53,7 +56,7 @@
 	{
 		"name": "CURRENCY", 
 		"points": 1200, "tier": 3,
-		"cost": {"FOOD": 100}, 
+		"cost": {"FOOD": 500}, 
 		"requirements": ["FARMING", "MATHEMATICS"],
 		"image": "Images/itemicons/gold.png"},
 	{
@@ -65,7 +68,7 @@
 	{
 		"name": "MYSTICISM", 
 		"points": 1200, "tier": 3,
-		"cost": {"STONE": 1000}, 
+		"cost": {"STONE": 1500}, 
 		"requirements": ["MASONRY"],
 		"image": "Images/research/mysticism.png"},
 	

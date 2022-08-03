@@ -42,6 +42,9 @@ public class VanillaDrawer extends Drawer {
 	private static final Image SNOW = Utils.loadImage("Images/weather/snow.png");
 	private static final Image SNOW2 = Utils.loadImage("Images/weather/snow2.png");
 	private static final Image SKY_BACKGROUND = Utils.loadImage("Images/lightbluesky.png");
+	private static final Image WOODCUTTING_ICON = Utils.loadImage("Images/interfaces/axe.png");
+	private static final Image MINING_ICON = Utils.loadImage("Images/interfaces/pick.png");
+	private static final Image FARMING_ICON = Utils.loadImage("Images/interfaces/hoe.png");
 
 	
 	private JPanel canvas;
@@ -753,9 +756,19 @@ public class VanillaDrawer extends Drawer {
 					null);
 		}
 		if(unit.isIdle()) {
-			g.setColor(Color.gray);
-			g.fillRect(drawx + draww*4/5, drawy, draww/5, drawh/5);
-		}
+            g.setColor(Color.gray);
+            g.fillRect(drawx + draww*4/5, drawy, draww/5, drawh/5);
+        }
+        else {
+            PlannedAction action = unit.getNextPlannedAction();
+            if(action != null) {
+            	Image image = getIconForAction(action);
+                if (image != null) {
+                    g.drawImage(image, drawx, drawy, draww, drawh, null);
+                }
+            }
+            
+        }
 	}
 	
 	
@@ -842,7 +855,7 @@ public class VanillaDrawer extends Drawer {
 		if (World.ticks - thing.getTimeLastDamageTaken() < 20 || thing.getTile().getLocation().equals(state.hoveredTile)) {
 			Point drawAt = getDrawingCoords(thing.getTile().getLocation());
 			int w = frozenTileSize - 1;
-			int h = frozenTileSize / 4 - 1;
+			int h = frozenTileSize / 6 - 1;
 			drawHealthBar2(g, thing, drawAt.x + 1, drawAt.y + 1, w, h, 2, thing.getHealth() / thing.getMaxHealth());
 		}
 	}
@@ -965,7 +978,41 @@ public class VanillaDrawer extends Drawer {
 				new Position(offsetTilePlusCanvas.x, offsetTile.y)
 		};
 	}
-
+	
+	public static Image getIconForAction(PlannedAction action) {
+        if (action.type == ActionType.HARVEST) {
+        	
+        	if(action.target instanceof Plant) {
+        		if(((Plant)action.target).getType() == Game.plantTypeMap.get("TREE")) {
+        			return WOODCUTTING_ICON;
+        		}
+        		else if(((Plant)action.target).getType() == Game.plantTypeMap.get("BERRY")) {
+        			return FARMING_ICON;
+        		}
+        		else if(((Plant)action.target).getType() == Game.plantTypeMap.get("CACTUS")) {
+        			return WOODCUTTING_ICON;
+        		}
+        		else if(((Plant)action.target).getType() == Game.plantTypeMap.get("CATTAILS")) {
+        			return FARMING_ICON;
+        		}
+        	}
+        	
+        	if(action.target instanceof Building) {
+        		if (((Building)action.target).getType() == Game.buildingTypeMap.get("MINE")) {
+        			return MINING_ICON;
+        		}
+        		else if (((Building)action.target).getType() == Game.buildingTypeMap.get("FARM")) {
+        			return FARMING_ICON;
+        		}
+        	}
+        	
+        	if(action.target == null) {
+        		return MINING_ICON;
+        	}
+        }
+		return null;
+    }
+	
 	@Override
 	public Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
 		double column = ((pixelOnScreen.x + viewOffset.x) / tileSize);

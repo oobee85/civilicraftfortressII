@@ -130,9 +130,13 @@ public class PlannedAction {
 		if(type == BUILD_BUILDING || type == BUILD_ROAD) {
 			range = 1;
 		}
-		else if(type == HARVEST || type == DELIVER || type == TAKE_ITEMS) {
+		else if(type == HARVEST) {
+			range = 0;
+		}
+		else if(type == DELIVER || type == TAKE_ITEMS) {
 			range = 1;
 		}
+		
 		else if(type == ATTACK) {
 			range = actor.getMaxAttackRange();
 		}

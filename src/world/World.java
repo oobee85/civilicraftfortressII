@@ -727,22 +727,7 @@ public class World {
 	 * also does desertification and plants taking damage
 	 */
 	public void updateTerrainChange(boolean start) {
-		for(Tile tile : getTiles()) {
-			if(tile.getResource() != null) {
-				tile.getResource().tick(World.ticks);
-			}
-			
-			
-			if(World.ticks - tile.getTickLastTerrainChange() <= Constants.MIN_TIME_TO_SWITCH_TERRAIN) {
-				continue;
-			}
-//			updateDesertChange(tile, start);
-			Terrain terrain = tile.getTerrain();
-			
-			if(start == true && tile.getHeight() <= 300 && tile.canPlant()) {
-				tile.setTerrain(Terrain.GRASS);
-				tile.setTickLastTerrainChange(World.ticks);
-			}
+		if(World.ticks % 50 == 0) {
 			for(Building building: worldData.getBuildings()) {
 				Tile t = building.getTile();
 				Plant p = t.getPlant();
@@ -759,6 +744,26 @@ public class World {
 					
 				}
 			}
+		}
+		
+		for(Tile tile : getTiles()) {
+			if(tile.getResource() != null) {
+				tile.getResource().tick(World.ticks);
+			}
+			
+			
+			if(World.ticks - tile.getTickLastTerrainChange() <= Constants.MIN_TIME_TO_SWITCH_TERRAIN) {
+				continue;
+			}
+//			updateDesertChange(tile, start);
+			Terrain terrain = tile.getTerrain();
+			
+			if(start == true && tile.getHeight() <= 300 && tile.canPlant()) {
+				tile.setTerrain(Terrain.GRASS);
+				tile.setTickLastTerrainChange(World.ticks);
+			}
+			
+			
 			
 			
 			// kills plants if its too hot or cold
@@ -829,7 +834,7 @@ public class World {
 	
 	private void spreadForest() {
 		
-		if(worldData.getPlants().size() >= 3000) {
+		if(worldData.getPlants().size() >= 4000) {
 			return;
 		}
 		for(Plant plant : worldData.getPlants()) {
@@ -838,7 +843,7 @@ public class World {
 				continue;
 			}
 			if(plant.getType() == Game.plantTypeMap.get("TREE")) {
-				if(Math.random() < 0.02) {
+				if(Math.random() < 0.05) {
 					for(Tile tile : plant.getTile().getNeighbors()) {
 						if(tile.getPlant() == null && tile.canPlant()) {
 							tile.setHasPlant(new Plant(plant.getType(), tile, getFaction(NO_FACTION_ID)));

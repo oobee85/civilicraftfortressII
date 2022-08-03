@@ -372,7 +372,12 @@ public class Unit extends Thing implements Serializable {
 			if(building.getType() == BasicAI.FARM) {
 				building.takeDamage(5, DamageType.PHYSICAL);
 				getInventory().addItem(ItemType.FOOD, 5);
-				this.resetTimeToHarvest(2);
+				this.resetTimeToHarvest(3);
+			}
+			if(building.getType() == BasicAI.MINE) {
+				building.takeDamage(5, DamageType.PHYSICAL);
+				getInventory().addItem(ItemType.STONE, 5);
+				this.resetTimeToHarvest(5);
 			}
 //			else if(building.getType().name().equals("MINE")) {
 //				building.takeDamage(1, DamageType.PHYSICAL);
@@ -566,6 +571,7 @@ public class Unit extends Thing implements Serializable {
 			this.doHarvest((Plant)plan.target, plan);
 			didSomething = true;
 		}
+		
 		else if(plan.isDeliverAction()) {
 			this.doDelivery(plan, plan.target);
 			didSomething = true;

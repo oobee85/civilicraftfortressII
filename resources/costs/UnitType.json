@@ -4,7 +4,7 @@
 		"image":"Images/units/worker.png",
 		"mesh":"models/star.obj",
 		"cost":{"FOOD":50},
-		"stats":{"movespeed":20,"buildtime":30,"health":100,"healspeed":50},
+		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":50},
 		"attackstyles":[
 			{"damage":0, "cooldown":60, "range":1}
 		],
@@ -13,9 +13,20 @@
 		"inventory":{"maxstack":20},
 	},
 	{
+		"image":"Images/units/chariot.png",
+		"cost":{"WOOD":50,"FOOD":100},
+		"stats":{"movespeed":10,"buildtime":200,"health":100,"healspeed":50},
+		"name":"CARAVAN",
+		"attackstyles":[
+			{"damage":0, "cooldown":60, "range":1}
+		],
+		"attributes":["caravan"],
+		"inventory":{"maxstack":400},
+	},
+	{
 		"image":"Images/units/warrior.png",
 		"cost":{"WOOD":100,"FOOD":100},
-		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":50},
+		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":50},
 		"name":"WARRIOR",
 		"attackstyles":[
 			{"damage":10, "cooldown":30, "range":1}
@@ -26,7 +37,7 @@
 	{
 		"image":"Images/units/spearman.png",
 		"cost":{"BRONZE_SWORD":1,"FOOD":100},
-		"stats":{"movespeed":15,"buildtime":150,"health":300,"healspeed":50},
+		"stats":{"movespeed":15,"buildtime":200,"health":300,"healspeed":50},
 		"name":"SPEARMAN",
 		"attackstyles":[
 			{"damage":30, "cooldown":30, "range":1}
@@ -38,7 +49,7 @@
 	{
 		"image":"Images/units/archer.png",
 		"cost":{"BRONZE_BAR":5,"FOOD":200},
-		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":50},
+		"stats":{"movespeed":20,"buildtime":300,"health":100,"healspeed":50},
 		"name":"ARCHER",
 		"attributes":["hostile"],
 		"attackstyles":[
@@ -49,7 +60,7 @@
 	},
 	{
 		"image":"Images/units/swordsman.png",
-		"cost":{"IRON_SWORD":1,"FOOD":150},
+		"cost":{"IRON_SWORD":1,"FOOD":200},
 		"stats":{"movespeed":10,"buildtime":200,"health":500,"healspeed":50},
 		"name":"SWORDSMAN",
 		"attackstyles":[
@@ -88,7 +99,7 @@
 	{
 		"image":"Images/units/trebuchet.png",
 		"cost":{"RUNITE_BAR":10,"WOOD":1000,"STONE":2000},
-		"stats":{"movespeed":40,"buildtime":1500,"health":200,"healspeed":100},
+		"stats":{"movespeed":40,"buildtime":2000,"health":200,"healspeed":100},
 		"name":"TREBUCHET",
 		"attackstyles":[
 			{"damage":600, "cooldown":100, "range":20, "minrange":5, "projectile":"FIREBALL_TREBUCHET"}
@@ -100,7 +111,7 @@
 	{
 		"image":"Images/units/sniper.png",
 		"cost":{"MITHRIL_SWORD":5,"ADAMANT_SWORD":5,"RUNE_SWORD":5,"TITANIUM_SWORD":10},
-		"stats":{"movespeed":100,"buildtime":2000,"health":20,"healspeed":50},
+		"stats":{"movespeed":100,"buildtime":3000,"health":20,"healspeed":50},
 		"name":"SNIPER",
 		"attackstyles":[
 			{"damage":1000, "cooldown":200, "range":30, "minrange":1}
@@ -132,17 +143,6 @@
 		"attributes":["hostile"],
 		"research":"CHIVALRY",
 		"targeting":[{"type":"game.Unit"}],
-	},
-	{
-		"image":"Images/units/chariot.png",
-		"cost":{"WOOD":50,"FOOD":100},
-		"stats":{"movespeed":10,"buildtime":200,"health":100,"healspeed":50},
-		"name":"CARAVAN",
-		"attackstyles":[
-			{"damage":0, "cooldown":60, "range":1}
-		],
-		"attributes":["caravan"],
-		"inventory":{"maxstack":400},
 	},
 	{
 		"image":"Images/units/wizard.png",
