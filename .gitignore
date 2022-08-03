@@ -13,3 +13,4 @@ lootStatistics.txt
 *.civ
 settings.ini
 lib/jogamp-all-platforms
+animation/
