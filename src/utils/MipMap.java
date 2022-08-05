@@ -6,9 +6,11 @@ import javax.swing.*;
 public class MipMap {
 	
 	private static final Color HIGHLIGHT_COLOR = Color.yellow;
+	public static final int NUM_SUN_SHADOWS = 10;
 
 	private final ImageIcon[] mipmaps;
 	private final ImageIcon[] shadows;
+	private final ImageIcon[][] sunShadows;
 	private final ImageIcon[] highlights;
 	private final int[] mipmapSizes;
 	
@@ -21,6 +23,7 @@ public class MipMap {
 		mipmapSizes = new int[numFiles];
 		avgColors = new Color[numFiles];
 		shadows = new ImageIcon[numFiles];
+		sunShadows = new ImageIcon[numFiles][NUM_SUN_SHADOWS];
 		highlights = new ImageIcon[numFiles];
 		int index = 0;
 		for (String s : paths) {
@@ -32,6 +35,11 @@ public class MipMap {
 			mipmapSizes[index] = mipmaps[index].getIconWidth();
 			avgColors[index] = Utils.getAverageColor(Utils.toBufferedImage(mipmaps[index].getImage()));
 			shadows[index] = Utils.shadowFilter(mipmaps[index]);
+			for (int shearIndex = 0; shearIndex < sunShadows[index].length; shearIndex++) {
+				double shear = 3.3 / NUM_SUN_SHADOWS * (shearIndex - (sunShadows[index].length-1.0)/2.0);
+				shear = shear * shear * (shear >= 0 ? 1 : -1);
+				sunShadows[index][shearIndex] = Utils.sunShadowFilter(mipmaps[index], shear);
+			}
 			highlights[index] = Utils.highlightFilter(mipmaps[index], HIGHLIGHT_COLOR);
 
 			index++;
@@ -67,6 +75,15 @@ public class MipMap {
 			}
 		}
 		return shadows[shadows.length - 1].getImage();
+	}
+	public Image getSunShadow(int size, int sun) {
+		// Get the first mipmap that is larger than the tile size
+		for (int i = 0; i < mipmapSizes.length; i++) {
+			if (mipmapSizes[i] > size) {
+				return sunShadows[i][sun].getImage();
+			}
+		}
+		return sunShadows[shadows.length - 1][sun].getImage();
 	}
 
 	public Image getHighlight(int size) {

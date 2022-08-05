@@ -202,6 +202,29 @@ public final class Utils {
 		return new ImageIcon(image);
 	}
 	
+	public static ImageIcon sunShadowFilter(ImageIcon icon, double shear) {
+		BufferedImage image = toBufferedImage(icon.getImage());
+		Color blank = new Color(0, 0, 0, 0);
+		for(int x = 0; x < image.getWidth(); x++) {
+			for(int y = 0; y < image.getHeight(); y++) {
+				Color c = new Color(image.getRGB(x, y), true);
+				if(c.getAlpha() > 0.1) {
+					image.setRGB(x, y, new Color(0, 0, 0, c.getAlpha()).getRGB());
+				}
+				else {
+					image.setRGB(x, y, blank.getRGB());
+				}
+			}
+		}
+		BufferedImage sheared = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+		Graphics2D g = sheared.createGraphics();
+		g.transform(AffineTransform.getShearInstance(shear, 0));
+		g.translate(-sheared.getWidth() * shear, 0);
+		g.drawImage(image, 0, 0, null);
+		g.dispose();
+		return new ImageIcon(sheared);
+	}
+	
 	public static ImageIcon highlightFilter(ImageIcon icon, Color color) {
 		BufferedImage image = toBufferedImage(icon.getImage());
 		Color blank = new Color(0, 0, 0, 0);

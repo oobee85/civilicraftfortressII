@@ -194,6 +194,8 @@ public class Building extends Thing implements Serializable {
 		if(!getType().isRoad()) {
 			return;
 		}
+		
+		// Images/buildings/wall_brick.png is a placeholder image so mipmap doesnt fail to load
 		MipMap mipmap = new MipMap("Images/buildings/wall_brick.png") {
 			@Override
 			public Image getImage(int size) {
@@ -202,6 +204,10 @@ public class Building extends Thing implements Serializable {
 			@Override
 			public Image getShadow(int size) {
 				return getType().getMipMap().getShadow(size);
+			}
+			@Override
+			public Image getSunShadow(int size, int sun) {
+				return getType().getMipMap().getSunShadow(size, sun);
 			}
 			@Override
 			public Image getHighlight(int size) {

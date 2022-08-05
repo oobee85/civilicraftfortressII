@@ -661,7 +661,7 @@ public class VanillaDrawer extends Drawer {
 //				g.fillRect(drawAt.x, drawAt.y, draww, drawh); 
 //			}
 			if (theTile.getRoad() != null) {
-				drawBuilding(theTile.getRoad(), g, drawAt.x, drawAt.y, draww, drawh);
+				drawBuilding(theTile.getRoad(), g, drawAt.x, drawAt.y, draww, drawh, false);
 			}
 
 			if (theTile.liquidType != LiquidType.DRY) {
@@ -692,6 +692,7 @@ public class VanillaDrawer extends Drawer {
 							drawAt.y + frozenTileSize / 5, frozenTileSize * 3/5, frozenTileSize * 3/5);
 			}
 			if (theTile.getPlant() != null) {
+				drawSunShadow(theTile.getPlant().getMipMap(), g, drawAt.x, drawAt.y, draww, drawh);
 				g.drawImage(theTile.getPlant().getMipMap().getImage(frozenTileSize), drawAt.x, drawAt.y, draww, drawh, null);
 			}
 
@@ -700,12 +701,29 @@ public class VanillaDrawer extends Drawer {
 					g.drawImage(theTile.getBuilding().getMipMap().getHighlight(frozenTileSize), drawAt.x, drawAt.y, draww, drawh,
 							null);
 				}
-				drawBuilding(theTile.getBuilding(), g, drawAt.x, drawAt.y, draww, drawh);
+				drawBuilding(theTile.getBuilding(), g, drawAt.x, drawAt.y, draww, drawh, true);
 			}
 			for (Unit unit : theTile.getUnits()) {
 				drawUnit(unit, g, drawAt.x, drawAt.y, draww, drawh);
 			}
 		}
+	}
+	
+	private void drawSunShadow(MipMap m, Graphics g, int drawx, int drawy, int draww, int drawh) {
+		int dayOffset = World.getCurrentDayOffset();
+		if (dayOffset > Constants.DAY_DURATION) {
+			if (dayOffset < Constants.DAY_DURATION + Constants.NIGHT_DURATION/2) {
+				dayOffset = Constants.DAY_DURATION;
+			}
+			else {
+				dayOffset = 0;
+			}
+		}
+		int sunShadow = (int) (dayOffset * MipMap.NUM_SUN_SHADOWS / (Constants.DAY_DURATION + 1));
+		double daylight = World.getDaylight();
+		Utils.setTransparency(g, daylight * daylight / 4);
+		g.drawImage(m.getSunShadow(frozenTileSize, sunShadow), drawx, drawy, draww, drawh, null);
+		Utils.setTransparency(g, 1);
 	}
 
 	private void drawUnit(Unit unit, Graphics g, int drawx, int drawy, int draww, int drawh) {
@@ -742,6 +760,7 @@ public class VanillaDrawer extends Drawer {
 //			}
 //			g.drawImage(unit.getImage(frozenTileSize), (int)(drawx + drawx - dx), (int)(drawy + drawy - dy), draww, drawh, null);
 //		}else {
+			drawSunShadow(unit.getMipMap(), g, drawx, drawy, draww, drawh);
 			g.drawImage(unit.getMipMap().getImage(frozenTileSize), drawx, drawy, draww, drawh, null);
 //		}
 		
@@ -770,7 +789,7 @@ public class VanillaDrawer extends Drawer {
 	}
 	
 	
-	private void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh) {
+	private void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh, boolean drawSunShadow) {
 
 		BufferedImage bI = Utils.toBufferedImage(building.getMipMap().getImage(0));
 		if (building.isBuilt() == false) {
@@ -787,6 +806,9 @@ public class VanillaDrawer extends Drawer {
 			g.drawImage(bI, drawx, drawy - partialHeight + drawh, draww, partialHeight, null);
 			g.drawImage(BUILD_ICON, drawx + frozenTileSize / 8, drawy + frozenTileSize / 8, draww * 6 / 8, drawh * 6 / 8, null);
 		} else {
+			if (drawSunShadow) {
+				drawSunShadow(building.getMipMap(), g, drawx, drawy, draww, drawh);
+			}
 			g.drawImage(bI, drawx, drawy, draww, drawh, null);
 		}
 	}
