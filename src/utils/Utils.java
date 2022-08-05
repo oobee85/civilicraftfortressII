@@ -184,6 +184,25 @@ public final class Utils {
 		return bimage;
 	}
 	
+	public static BufferedImage applyGrayscaleMaskToAlpha(BufferedImage image, BufferedImage mask)
+	{
+	    int width = image.getWidth();
+	    int height = image.getHeight();
+
+	    int[] imagePixels = image.getRGB(0, 0, width, height, null, 0, width);
+	    int[] maskPixels = mask.getRGB(0, 0, width, height, null, 0, width);
+	    
+	    for (int i = 0; i < imagePixels.length; i++)
+	    {
+	        int color = imagePixels[i] & 0x00ffffff; // Mask preexisting alpha
+	        int alpha = maskPixels[i] << 24; // Shift blue to alpha
+	        imagePixels[i] = color | alpha;
+	    }
+	    BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+	    result.setRGB(0, 0, width, height, imagePixels, 0, width);
+	    return result;
+	}
+	
 	public static ImageIcon shadowFilter(ImageIcon icon) {
 		BufferedImage image = toBufferedImage(icon.getImage());
 		Color blank = new Color(0, 0, 0, 0);

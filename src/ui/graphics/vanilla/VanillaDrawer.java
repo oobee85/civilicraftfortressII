@@ -41,15 +41,17 @@ public class VanillaDrawer extends Drawer {
 	private static final Image GREEN_HITSPLAT = Utils.loadImage("Images/interfaces/greenhitsplat.png");
 	private static final Image SNOW = Utils.loadImage("Images/weather/snow.png");
 	private static final Image SNOW2 = Utils.loadImage("Images/weather/snow2.png");
-	private static final Image SKY_BACKGROUND = Utils.loadImage("Images/lightbluesky.png");
+	private static final BufferedImage SKY_BACKGROUND = Utils.toBufferedImage(Utils.loadImage("Images/lightbluesky.png"));
 	private static final Image WOODCUTTING_ICON = Utils.loadImage("Images/interfaces/axe.png");
 	private static final Image MINING_ICON = Utils.loadImage("Images/interfaces/pick.png");
 	private static final Image FARMING_ICON = Utils.loadImage("Images/interfaces/hoe.png");
 
+	private static final Color REFLECTION_MASK_COLOR = new Color(0, 0, 128);
 	
 	private JPanel canvas;
 	
 	private volatile BufferedImage[] buffers = new BufferedImage[3];
+	private volatile BufferedImage[] reflectionBuffers = new BufferedImage[3];
 	private volatile Position[] drawnAtOffset = new Position[3];
 	private volatile int[] drawnAtTileSize = new int[3];
 	private volatile int currentBuffer = 0;
@@ -80,16 +82,33 @@ public class VanillaDrawer extends Drawer {
 				g.drawImage(SKY_BACKGROUND, -state.viewOffset.getIntX()/20 - 100, -state.viewOffset.getIntY()/20 - 100, null);
 				Utils.setTransparency(g, 1);
 				
+//				SKY_BACKGROUND.getSubimage(frozenViewOffset.x, 
+//						frozenViewOffset.y, 
+//						buffers[next].getWidth(), 
+//						buffers[next].getHeight());
+//				reflectionBuffers[next] = Utils.applyGrayscaleMaskToAlpha(SKY_BACKGROUND, reflectionBuffered[next]);
+//				
 				int buffer = currentBuffer;
+				BufferedImage skySnip = SKY_BACKGROUND.getSubimage(
+						0, 0, 
+						buffers[buffer].getWidth(), 
+						buffers[buffer].getHeight());
+				BufferedImage masked = Utils.applyGrayscaleMaskToAlpha(skySnip, reflectionBuffers[buffer]);
+				
 				if(state.tileSize == drawnAtTileSize[buffer]) {
 					g.drawImage(buffers[buffer], 
 							drawnAtOffset[buffer].getIntX() - state.viewOffset.getIntX(), 
 							drawnAtOffset[buffer].getIntY() - state.viewOffset.getIntY(), 
 							null);
+					g.drawImage(masked, 
+							drawnAtOffset[buffer].getIntX() - state.viewOffset.getIntX(), 
+							drawnAtOffset[buffer].getIntY() - state.viewOffset.getIntY(),  null);
 				}
 				else {
 					g.drawImage(buffers[buffer], 0, 0, null);
+					g.drawImage(masked, 0, 0, null);
 				}
+				
 				numAvailable.tryAcquire();
 
 				g.setColor(Color.black);
@@ -119,11 +138,13 @@ public class VanillaDrawer extends Drawer {
 						nextRequested.acquire();
 						int next = (currentBuffer + 1) % buffers.length;
 						Graphics2D g = buffers[next].createGraphics();
+						Graphics2D gReflect = reflectionBuffers[next].createGraphics();
 						frozenViewOffset.x = state.viewOffset.x;
 						frozenViewOffset.y = state.viewOffset.y;
 						frozenTileSize = state.tileSize;
-						drawStuff(g, buffers[next].getWidth(), buffers[next].getHeight());
+						drawStuff(g, buffers[next].getWidth(), buffers[next].getHeight(), gReflect);
 						g.dispose();
+						gReflect.dispose();
 						drawnAtOffset[next].x = frozenViewOffset.x;
 						drawnAtOffset[next].y = frozenViewOffset.y;
 						drawnAtTileSize[next] = frozenTileSize;
@@ -147,6 +168,7 @@ public class VanillaDrawer extends Drawer {
 		int h = Math.max(1, canvas.getHeight());
 		for(int i = 0; i < buffers.length; i++) {
 			buffers[i] = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
+			reflectionBuffers[i] = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
 		}
 	}
 	
@@ -192,7 +214,7 @@ public class VanillaDrawer extends Drawer {
 		}
 	}
 
-	private void drawStuff(Graphics g, int w, int h) {
+	private void drawStuff(Graphics g, int w, int h, Graphics2D gReflect) {
 		if (game == null) {
 			return;
 		}
@@ -203,24 +225,27 @@ public class VanillaDrawer extends Drawer {
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 				RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 		Utils.clearBufferedImageTo(((Graphics2D)g), new Color(0, 0, 0, 0), w, h);
-		drawGame(g);
+		Utils.clearBufferedImageTo(gReflect, new Color(0, 0, 0, 0), w, h);
+		drawGame(g, gReflect);
 	}
 	
-	private void drawGame(Graphics g) {
+	private void drawGame(Graphics g, Graphics2D gReflect) {
 		if (game.world == null) {
 			g.drawString("No World to display", 20, 20);
 			return;
 		}
 		long startTime = System.currentTimeMillis();
 		g.translate(-frozenViewOffset.getIntX(), -frozenViewOffset.getIntY());
-		draw(g, canvas.getWidth(), canvas.getHeight());
+		gReflect.translate(-frozenViewOffset.getIntX(), -frozenViewOffset.getIntY());
+		draw(g, canvas.getWidth(), canvas.getHeight(), gReflect);
 		g.translate(frozenViewOffset.getIntX(), frozenViewOffset.getIntY());
+		gReflect.translate(frozenViewOffset.getIntX(), frozenViewOffset.getIntY());
 		long endTime = System.currentTimeMillis();
 		drawTime = endTime - startTime;
 //		Toolkit.getDefaultToolkit().sync();
 	}
 
-	private void draw(Graphics g, int panelWidth, int panelHeight) {
+	private void draw(Graphics g, int panelWidth, int panelHeight, Graphics2D gReflect) {
 		// Start by drawing plain terrain image
 		g.drawImage(mapImages[state.mapMode.ordinal()], 0, 0, 
 				frozenTileSize * game.world.getWidth(), 
@@ -287,7 +312,7 @@ public class VanillaDrawer extends Drawer {
 					
 					
 					ratio = Math.max(Math.min(ratio, 1f), 0f);
-					drawTile((Graphics2D) g, tile, new Color(ratio, 0f, 1f - ratio));
+					drawTile((Graphics2D) g, tile, new Color(ratio, 0f, 1f - ratio), gReflect);
 				}
 			}
 
@@ -621,7 +646,7 @@ public class VanillaDrawer extends Drawer {
 		return new Point(x, y);
 	}
 
-	private void drawTile(Graphics2D g, Tile theTile, Color color) {
+	private void drawTile(Graphics2D g, Tile theTile, Color color, Graphics2D gReflect) {
 		Point drawAt = getDrawingCoords(theTile.getLocation());
 		int draww = frozenTileSize;
 		int drawh = frozenTileSize;
@@ -678,6 +703,10 @@ public class VanillaDrawer extends Drawer {
 						imageSize);
 				g.drawImage(theTile.liquidType.getMipMap().getImage(imagesize), drawAt.x + draww / 2 - imageSize / 2,
 						drawAt.y + draww / 2 - imageSize / 2, imageSize, imageSize, null);
+				
+				gReflect.setColor(REFLECTION_MASK_COLOR);
+				gReflect.fillRect(drawAt.x + draww / 2 - imageSize / 2, drawAt.y + drawh / 2 - imageSize / 2, imageSize,
+						imageSize);
 			}
 
 			if (theTile.getModifier() != null) {
