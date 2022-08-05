@@ -576,6 +576,8 @@ public class World {
 //
 //	}
 	
+	
+	// UNUSED
 	public void updateDesertChange(Tile tile, boolean start) {
 		int failTiles = 0;
 		int numDesertNeighbors = 0;
@@ -782,13 +784,14 @@ public class World {
 			
 			
 			//turns grass to dirt if tile has a cold liquid || the temperature is cold
-			if(terrain == Terrain.GRASS && tile.isCold() && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				if(Math.random() < Constants.CHANCE_TO_SWITCH_TERRAIN) {
-					tile.setTerrain(Terrain.DIRT);
-					tile.setTickLastTerrainChange(World.ticks);
-				}
-			}
-			if(terrain == Terrain.GRASS && Math.random() < Constants.CHANCE_TO_SWITCH_TERRAIN/10000) {
+//			if(terrain == Terrain.GRASS && tile.canGrow() == false) {
+//				if(Math.random() < Constants.CHANCE_TO_SWITCH_TERRAIN) {
+//					tile.setTerrain(Terrain.DIRT);
+//					tile.setTickLastTerrainChange(World.ticks);
+//				}
+//			}
+			
+			if(terrain == Terrain.GRASS && tile.canGrow() == false && Math.random() < Constants.CHANCE_TO_SWITCH_TERRAIN/10000) {
 				tile.setTerrain(Terrain.DIRT);
 				tile.setTickLastTerrainChange(World.ticks);
 			}
@@ -800,52 +803,50 @@ public class World {
 //				}
 //			}
 			if(tile.checkTerrain(Terrain.DIRT)) {
-				boolean adjacentGrass = false;
-				boolean adjacentWater = false;
-				for(Tile neighbor : Utils.getNeighbors(tile, this)) {
-					if(neighbor.getTerrain() == Terrain.GRASS) {
-						adjacentGrass = true;
-					}
-					if(neighbor.liquidType == LiquidType.WATER) {
-						adjacentWater = true;
-					}
-				}
-				double threshold = Constants.CHANCE_TO_SWITCH_TERRAIN;
+//				boolean adjacentGrass = false;
+//				for(Tile neighbor : Utils.getNeighbors(tile, this)) {
+//					if(neighbor.getTerrain() == Terrain.GRASS) {
+//						adjacentGrass = true;
+//					}
+//					
+//				}
+				double threshold = 0;
+				
 				if(tile.liquidType == LiquidType.WATER) {
-					threshold += 0.001;
+					threshold = Constants.CHANCE_TO_SWITCH_TERRAIN/1000;
 				}
-				if(adjacentGrass) {
-					threshold += 0.01;
+//				if(adjacentGrass) {
+//					threshold += 0.0001;
+//				}
+				
+				if(tile.canGrow() == true) {
+					if(Math.random() < threshold) {
+						tile.setTerrain(Terrain.GRASS);
+						tile.setTickLastTerrainChange(World.ticks);
+					}
 				}
-				if(adjacentWater) {
-					threshold += 0.01;
-				}
-				if(adjacentGrass && adjacentWater) {
-					threshold += 0.1;
-				}
-				if(tile.canGrow() && Math.random() < tile.liquidAmount*threshold) {
-					tile.setTerrain(Terrain.GRASS);
-					tile.setTickLastTerrainChange(World.ticks);
-				}
+				
+				
+				
 			}
 		}
 		
 	}
 	
-	private void spreadForest() {
+	private void spreadPlants() {
 		
 		if(worldData.getPlants().size() >= 4000) {
 			return;
 		}
 		for(Plant plant : worldData.getPlants()) {
 			
-			if(plant.getTile().isCold() == true) {
+			if(plant.getTile().canGrow() == false) {
 				continue;
 			}
 			if(plant.getType() == Game.plantTypeMap.get("TREE")) {
 				if(Math.random() < 0.05) {
 					for(Tile tile : plant.getTile().getNeighbors()) {
-						if(tile.getPlant() == null && tile.canPlant()) {
+						if(tile.getPlant() == null && tile.canGrow()) {
 							tile.setHasPlant(new Plant(plant.getType(), tile, getFaction(NO_FACTION_ID)));
 							worldData.addPlant(tile.getPlant());
 							break;
@@ -853,12 +854,25 @@ public class World {
 					}
 				}
 			}
+			if(plant.getType() == Game.plantTypeMap.get("BERRY")) {
+				if(Math.random() < 0.01) {
+					for(Tile tile : plant.getTile().getNeighbors()) {
+						if(tile.getPlant() == null && tile.canGrow()) {
+							tile.setHasPlant(new Plant(plant.getType(), tile, getFaction(NO_FACTION_ID)));
+							worldData.addPlant(tile.getPlant());
+							break;
+						}
+					}
+				}
+			}
+			
 		}
 		
 		
 	}
+	
 	public void grow() {
-		spreadForest();
+		spreadPlants();
 		
 		for(Tile tile : getTilesRandomly()) {
 			if(tile.getPlant() != null) {
@@ -866,27 +880,22 @@ public class World {
 			}
 			
 			if(tile.getTerrain() == Terrain.SAND) {
-				if(Math.random() < 0.001) {
+				if(Math.random() < 0.01) {
 					Plant plant = new Plant(Game.plantTypeMap.get("CACTUS"), tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(plant);
 					worldData.addPlant(plant);
 				}
 			}
-			if(tile.canPlant() == false || tile.isCold() == true) {
-				continue;
-			}
-			
-			
 			
 			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()) {
-				if(Math.random() < 0.01) {
+				if(tile.isCold() == false && Math.random() < 0.01) {
 					Plant plant = new Plant(Game.plantTypeMap.get("CATTAIL"), tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(plant);
 					worldData.addPlant(plant);
 				}
 			}
 			if(tile.liquidType != null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()) {
-				if (Math.random() < 0.001) {
+				if (tile.canGrow() && Math.random() < 0.001) {
 					tile.setHasPlant(new Plant(Game.plantTypeMap.get("BERRY"), tile, getFaction(NO_FACTION_ID)));
 					worldData.addPlant(tile.getPlant());
 				}
@@ -1262,6 +1271,8 @@ public class World {
 		}
 		initializeAirSimulationStuff();
 		doAirSimulationStuff();
+		Tile t = getTilesRandomly().peek();
+		Generation.makeBiome(t, Terrain.SAND, 1000, 0, new Terrain[]{Terrain.GRASS, Terrain.DIRT});
 		updateTerrainChange(true);
 		Generation.generateResources(this);
 		this.genPlants();

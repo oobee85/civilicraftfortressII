@@ -153,6 +153,54 @@ public class Generation {
 			}
 		}
 	}
+	
+	// maxHeightDifference = 0 means height is not taken into account,, no height level
+	public static void makeBiome(Tile tile, Terrain newTerrain, int size, int maxHeightDifference, Terrain toReplace[]) {
+		HashMap<Tile, Double> visited = new HashMap<>();
+		List<Terrain> replaceable = new LinkedList<Terrain>();
+		for(Terrain terr: toReplace) {
+			replaceable.add(terr);
+		}
+		
+		PriorityQueue<Tile> search = new PriorityQueue<>((x, y) ->  { 
+			double distancex = visited.get(x);
+			double distancey = visited.get(y);
+			if(distancey < distancex) {
+				return 1;
+			}
+			else if(distancey > distancex) {
+				return -1;
+			}
+			else {
+				return 0;
+			}
+		});
+		visited.put(tile, 0.0);
+		search.add(tile);
+		
+		while(size > 0 && !search.isEmpty()) {
+			Tile potential = search.poll();
+			
+			for(Tile ti : potential.getNeighbors()) {
+				if(visited.containsKey(ti)) {
+					continue;
+				}
+				visited.put(ti, ti.getLocation().distanceTo(tile.getLocation()) + Math.random()*10);
+				search.add(ti);
+			}
+			if(Math.abs(tile.getHeight() - potential.getHeight()) < maxHeightDifference || maxHeightDifference == 0) {
+				if(replaceable.contains(potential.getTerrain())) {
+					potential.setTerrain(newTerrain);
+					size--;
+				}
+			}
+			
+			
+		}
+		
+		
+		
+	}
 
 	
 	public static void makeOreVein(Tile t, ResourceType resource, int veinSize) {

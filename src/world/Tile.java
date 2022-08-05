@@ -405,27 +405,36 @@ public class Tile implements Externalizable {
 	public boolean canPlant() {
 		return terr.isPlantable(terr);
 	}
-
+	
+	public boolean canGrow() {
+		if (isCold() || isHot()) {
+			return false;
+		}
+		if (canPlant() == false) {
+			return false;
+		}
+//		if (liquidType == LiquidType.WATER && liquidAmount > liquidType.getMinimumDamageAmount()) {
+//			return false;
+//		}
+		return true;
+	}
+	
 	public boolean isCold() {
 		if (liquidType == LiquidType.ICE || liquidType == LiquidType.SNOW) {
 			return true;
 		}
-		return airTemperature();
-	}
-
-	public boolean canGrow() {
-		if (isCold()) {
-			return false;
+		
+		if (this.air.getTemperature() < Constants.LETHALCOLDTEMP) { // -10 c
+			return true;
 		}
+		return false;
+	}
+	
+	public boolean isHot() {
 		if (liquidType == LiquidType.LAVA) {
-			return false;
+			return true;
 		}
-		return true;
-	}
-
-	public boolean airTemperature() {
-		double temp = this.air.getTemperature();
-		if (temp < Constants.FREEZING_TEMPURATURE) {
+		if (this.air.getTemperature() > Constants.LETHALHOTTEMP) { // 37.8 c, 100f
 			return true;
 		}
 		return false;
