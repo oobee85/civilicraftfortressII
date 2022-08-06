@@ -34,17 +34,12 @@ public class VanillaDrawer extends Drawer {
 	private static final Image FLAG = Utils.loadImage("Images/interfaces/flag.png");
 	private static final Image BUILD_ICON = Utils.loadImage("Images/interfaces/building.gif");
 	private static final Image HARVEST_ICON = Utils.loadImage("Images/interfaces/harvest.png");
-	private static final Image GUARD_ICON = Utils.loadImage("Images/interfaces/guard.png");
-	private static final Image AUTO_BUILD_ICON = Utils.loadImage("Images/interfaces/autobuild.png");
 	private static final Image RED_HITSPLAT = Utils.loadImage("Images/interfaces/redhitsplat.png");
 	private static final Image BLUE_HITSPLAT = Utils.loadImage("Images/interfaces/bluehitsplat.png");
 	private static final Image GREEN_HITSPLAT = Utils.loadImage("Images/interfaces/greenhitsplat.png");
 	private static final Image SNOW = Utils.loadImage("Images/weather/snow.png");
 	private static final Image SNOW2 = Utils.loadImage("Images/weather/snow2.png");
 	private static final Image SKY_BACKGROUND = Utils.loadImage("Images/lightbluesky.png");
-	private static final Image WOODCUTTING_ICON = Utils.loadImage("Images/interfaces/axe.png");
-	private static final Image MINING_ICON = Utils.loadImage("Images/interfaces/pick.png");
-	private static final Image FARMING_ICON = Utils.loadImage("Images/interfaces/hoe.png");
 
 	
 	private JPanel canvas;
@@ -64,8 +59,13 @@ public class VanillaDrawer extends Drawer {
 	private int frozenTileSize;
 	private Position frozenViewOffset = new Position(0, 0);
 	
+	private RenderingPipeline[] pipelines = new RenderingPipeline[MapMode.values().length];
+	
 	public VanillaDrawer(Game game, GameViewState state) {
 		super(game, state);
+		for (MapMode mode : MapMode.values()) {
+			pipelines[mode.ordinal()] = RenderingPipeline.getRenderingPipeline(mode);
+		}
 		canvas = new JPanel() {
 			private static final long serialVersionUID = 1L;
 			@Override
@@ -226,6 +226,7 @@ public class VanillaDrawer extends Drawer {
 		g.translate(frozenViewOffset.getIntX(), frozenViewOffset.getIntY());
 //		Toolkit.getDefaultToolkit().sync();
 	}
+	
 
 	private void draw(Graphics g, int panelWidth, int panelHeight) {
 		// Start by drawing plain terrain image
@@ -240,61 +241,29 @@ public class VanillaDrawer extends Drawer {
 		int upperY = Math.min(game.world.getHeight(), lowerY + panelHeight / frozenTileSize + 4);
 
 		if (frozenTileSize >= FAST_MODE_TILE_SIZE && state.mapMode != MapMode.LIGHT) {
-			double highHeight = Double.MIN_VALUE;
-			double lowHeight = Double.MAX_VALUE;
-			double highPressure = Double.MIN_VALUE;
-			double lowPressure = Double.MAX_VALUE;
-			double highTemp = Double.MIN_VALUE;
-			double lowTemp = Double.MAX_VALUE;
-			double highHumidity = Double.MIN_VALUE;
-			double lowHumidity = Double.MAX_VALUE;
-			if(state.mapMode.isHeatMapType()) {
+
+			RenderingState renderState = new RenderingState();
+			renderState.mapMode = state.mapMode;
+			renderState.g = (Graphics2D) g;
+			renderState.faction = state.faction;
+			renderState.tileSize = frozenTileSize;
+			renderState.draww = frozenTileSize;
+			renderState.drawh = frozenTileSize;
+
+			for (RenderingStep step : pipelines[state.mapMode.ordinal()].steps) {
 				for (int i = lowerX; i < upperX; i++) {
 					for (int j = lowerY; j < upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
 						if (tile == null) {
 							continue;
 						}
-						highHeight = Math.max(highHeight, tile.getHeight());
-						lowHeight = Math.min(lowHeight, tile.getHeight());
-						highPressure = Math.max(highPressure, tile.getAir().getPressure());
-						lowPressure = Math.min(lowPressure, tile.getAir().getPressure());
-						highTemp = Math.max(highTemp, tile.getAir().getTemperature());
-						lowTemp = Math.min(lowTemp, tile.getAir().getTemperature());
-						highHumidity = Math.max(highHumidity, tile.getAir().getHumidity());
-						lowHumidity = Math.min(lowHumidity, tile.getAir().getHumidity());
+						renderState.tile = tile;
+						Point drawAt = getDrawingCoords(tile.getLocation());
+						renderState.drawx = drawAt.x;
+						renderState.drawy = drawAt.y;
+						
+						step.render(renderState);
 					}
-				}
-			}
-
-			for (int i = lowerX; i < upperX; i++) {
-				for (int j = lowerY; j < upperY; j++) {
-					Tile tile = game.world.get(new TileLoc(i, j));
-					if (tile == null) {
-						continue;
-					}
-					float ratio = 0;
-					if (state.mapMode == MapMode.HEIGHT) {
-						ratio = (float) ((tile.getHeight() - lowHeight) / (highHeight - lowHeight));
-					} else if (state.mapMode == MapMode.PRESSURE) {
-						ratio = (float) ((tile.getAir().getPressure() - lowPressure)
-								/ (highPressure - lowPressure));
-					} else if (state.mapMode == MapMode.TEMPURATURE) {
-						ratio = (float) ((tile.getAir().getTemperature() - lowTemp) / (highTemp - lowTemp));
-					} else if (state.mapMode == MapMode.HUMIDITY) {
-						ratio = (float) ((tile.getAir().getHumidity() - lowHumidity)
-								/ (highHumidity - lowHumidity));
-					} else if (state.mapMode == MapMode.FLOW) {
-						ratio = (float) ((tile.getAir().getPressure() - lowPressure)
-								/ (highPressure - lowPressure));
-					} else if (state.mapMode == MapMode.PRESSURE2) {
-//						ratio = (float) ((tile.getAtmosphere().getPressure() - lowPressure)
-//								/ (highPressure - lowPressure));
-					}
-					
-					
-					ratio = Math.max(Math.min(ratio, 1f), 0f);
-					drawTile((Graphics2D) g, tile, new Color(ratio, 0f, 1f - ratio));
 				}
 			}
 
@@ -628,198 +597,6 @@ public class VanillaDrawer extends Drawer {
 		return new Point(x, y);
 	}
 
-	private void drawTile(Graphics2D g, Tile theTile, Color color) {
-		Point drawAt = getDrawingCoords(theTile.getLocation());
-		int draww = frozenTileSize;
-		int drawh = frozenTileSize;
-		int imagesize = draww < drawh ? draww : drawh;
-
-		if(state.mapMode.isHeatMapType()) {
-			g.setColor(color);
-			g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-			if (state.mapMode == MapMode.TEMPURATURE) {
-				if(theTile.getTemperature() <= Constants.FREEZETEMP) {
-					g.drawImage(SNOW2, drawAt.x, drawAt.y, draww, drawh, null);
-				}else if(theTile.getAir().getTemperature() <= Constants.FREEZETEMP) {
-					g.drawImage(SNOW, drawAt.x, drawAt.y, draww, drawh, null);
-				}
-				
-			}
-		} 
-		else {
-			g.drawImage(theTile.getTerrain().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh, null);
-
-			if (theTile.getResource() != null && state.faction.areRequirementsMet(theTile.getResource().getType())) {
-				g.drawImage(theTile.getResource().getType().getMipMap().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh,
-						null);
-			}
-
-			if (theTile.getFaction() != null && theTile.getFaction() != game.world.getFaction(World.NO_FACTION_ID)) {
-				g.setColor(theTile.getFaction().borderColor());
-				for (Tile tile : theTile.getNeighbors()) {
-					if (tile.getFaction() != theTile.getFaction()) {
-						drawBorderBetween(g, theTile.getLocation(), tile.getLocation());
-					}
-				}
-			}
-//			if(game.world.borderTerritory.containsKey(theTile)) {
-//				Utils.setTransparency(g, 1);
-//				g.setColor(Color.BLACK);
-//				g.fillRect(drawAt.x, drawAt.y, draww, drawh); 
-//			}
-			if (theTile.getRoad() != null) {
-				drawBuilding(theTile.getRoad(), g, drawAt.x, drawAt.y, draww, drawh, false);
-			}
-
-			if (theTile.liquidType != LiquidType.DRY) {
-				double alpha = Utils.getAlphaOfLiquid(theTile.liquidAmount);
-//				 transparency liquids
-				Utils.setTransparency(g, alpha);
-				g.setColor(theTile.liquidType.getMipMap().getColor(imagesize));
-				g.fillRect(drawAt.x, drawAt.y, draww, drawh);
-				Utils.setTransparency(g, 1);
-
-				int imageSize = (int) Math.min(Math.max(draww * theTile.liquidAmount / 20, 1), draww);
-				g.setColor(theTile.liquidType.getMipMap().getColor(imagesize));
-				g.fillRect(drawAt.x + draww / 2 - imageSize / 2, drawAt.y + drawh / 2 - imageSize / 2, imageSize,
-						imageSize);
-				g.drawImage(theTile.liquidType.getMipMap().getImage(imagesize), drawAt.x + draww / 2 - imageSize / 2,
-						drawAt.y + draww / 2 - imageSize / 2, imageSize, imageSize, null);
-			}
-
-			if (theTile.getModifier() != null) {
-				Utils.setTransparency(g, 0.9);
-				g.drawImage(theTile.getModifier().getType().getMipMap().getImage(imagesize), drawAt.x, drawAt.y, draww, drawh,
-						null);
-				Utils.setTransparency(g, 1);
-			}
-
-			if (!theTile.getInventory().isEmpty()) {
-				drawInventory(g, theTile.getInventory(), drawAt.x + frozenTileSize / 5,
-							drawAt.y + frozenTileSize / 5, frozenTileSize * 3/5, frozenTileSize * 3/5);
-			}
-			if (theTile.getPlant() != null) {
-				drawSunShadow(theTile.getPlant().getMipMap(), g, drawAt.x, drawAt.y, draww, drawh);
-				g.drawImage(theTile.getPlant().getMipMap().getImage(frozenTileSize), drawAt.x, drawAt.y, draww, drawh, null);
-			}
-
-			if (theTile.getBuilding() != null) {
-				if (theTile.getBuilding().isSelected()) {
-					g.drawImage(theTile.getBuilding().getMipMap().getHighlight(frozenTileSize), drawAt.x, drawAt.y, draww, drawh,
-							null);
-				}
-				drawBuilding(theTile.getBuilding(), g, drawAt.x, drawAt.y, draww, drawh, true);
-			}
-			for (Unit unit : theTile.getUnits()) {
-				drawUnit(unit, g, drawAt.x, drawAt.y, draww, drawh);
-			}
-		}
-	}
-	
-	private void drawSunShadow(MipMap m, Graphics g, int drawx, int drawy, int draww, int drawh) {
-		int dayOffset = World.getCurrentDayOffset();
-		if (dayOffset > Constants.DAY_DURATION) {
-			if (dayOffset < Constants.DAY_DURATION + Constants.NIGHT_DURATION/2) {
-				dayOffset = Constants.DAY_DURATION;
-			}
-			else {
-				dayOffset = 0;
-			}
-		}
-		int sunShadow = (int) (dayOffset * MipMap.NUM_SUN_SHADOWS / (Constants.DAY_DURATION + 1));
-		double daylight = World.getDaylight();
-		Utils.setTransparency(g, daylight * daylight / 4);
-		g.drawImage(m.getSunShadow(frozenTileSize, sunShadow), drawx, drawy, draww, drawh, null);
-		Utils.setTransparency(g, 1);
-	}
-
-	private void drawUnit(Unit unit, Graphics g, int drawx, int drawy, int draww, int drawh) {
-		
-//		LinkedList<Tile> path = unit.getCurrentPath();
-//		double timeLeft = unit.getTimeToMove();
-//		double timeStart = unit.getCombatStats().getMoveSpeed();
-//		double percent = 0;
-//		if(timeStart != 0) {
-//			percent = timeLeft / timeStart;
-//		}
-		
-		if (unit.isSelected()) {
-			g.drawImage(unit.getMipMap().getHighlight(frozenTileSize), drawx, drawy, draww, drawh, null);
-		}
-//		if(path != null && path.peek() != null) {
-//			Tile targetTile = path.peek();
-//			int targetx = targetTile.getLocation().x();
-//			int targety = targetTile.getLocation().y();
-//			int dx = Math.abs(drawx - targetx);
-//			int dy = Math.abs(drawy - targety);
-//			if(targetx > drawx) {
-//				dx *= -1; 
-//			}
-//			if(targetx < drawx){
-//				dx *= 1; 
-//			}
-//			
-//			if(targety > drawy) {
-//				dy *= -1; 
-//			}
-//			if(targety < drawy){
-//				dy *= 1; 
-//			}
-//			g.drawImage(unit.getImage(frozenTileSize), (int)(drawx + drawx - dx), (int)(drawy + drawy - dy), draww, drawh, null);
-//		}else {
-			drawSunShadow(unit.getMipMap(), g, drawx, drawy, draww, drawh);
-			g.drawImage(unit.getMipMap().getImage(frozenTileSize), drawx, drawy, draww, drawh, null);
-//		}
-		
-		
-		if (unit.isGuarding() == true) {
-			g.drawImage(GUARD_ICON, drawx + draww / 4, drawy + drawh / 4, draww / 2, drawh / 2, null);
-		}
-		if (unit.isAutoBuilding() == true) {
-			g.drawImage(AUTO_BUILD_ICON, drawx + draww / 4, drawy + drawh / 4, draww / 2, drawh / 2,
-					null);
-		}
-		if(unit.isIdle()) {
-            g.setColor(Color.gray);
-            g.fillRect(drawx + draww*4/5, drawy, draww/5, drawh/5);
-        }
-        else {
-            PlannedAction action = unit.getNextPlannedAction();
-            if(action != null) {
-            	Image image = getIconForAction(action);
-                if (image != null) {
-                    g.drawImage(image, drawx, drawy, draww, drawh, null);
-                }
-            }
-            
-        }
-	}
-	
-	
-	private void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh, boolean drawSunShadow) {
-
-		BufferedImage bI = Utils.toBufferedImage(building.getMipMap().getImage(0));
-		if (building.isBuilt() == false) {
-			// draws the transparent version
-			Utils.setTransparency(g, 0.5f);
-			Graphics2D g2d = (Graphics2D) g;
-			g2d.drawImage(bI, drawx, drawy, draww, drawh, null);
-			Utils.setTransparency(g, 1f);
-			// draws the partial image
-			double percentDone = 1 - building.getRemainingEffort() / building.getType().getBuildingEffort();
-			int imageRatio = Math.max(1, (int) (bI.getHeight() * percentDone));
-			int partialHeight = Math.max(1, (int) (frozenTileSize * percentDone));
-			bI = bI.getSubimage(0, bI.getHeight() - imageRatio, bI.getWidth(), imageRatio);
-			g.drawImage(bI, drawx, drawy - partialHeight + drawh, draww, partialHeight, null);
-			g.drawImage(BUILD_ICON, drawx + frozenTileSize / 8, drawy + frozenTileSize / 8, draww * 6 / 8, drawh * 6 / 8, null);
-		} else {
-			if (drawSunShadow) {
-				drawSunShadow(building.getMipMap(), g, drawx, drawy, draww, drawh);
-			}
-			g.drawImage(bI, drawx, drawy, draww, drawh, null);
-		}
-	}
-
 	private void drawTarget(Graphics g, TileLoc tileLoc) {
 		Point drawAt = getDrawingCoords(tileLoc);
 		int w = (int) (frozenTileSize * 8 / 10);
@@ -1007,39 +784,7 @@ public class VanillaDrawer extends Drawer {
 		};
 	}
 	
-	public static Image getIconForAction(PlannedAction action) {
-        if (action.type == ActionType.HARVEST) {
-        	
-        	if(action.target instanceof Plant) {
-        		if(((Plant)action.target).getType() == Game.plantTypeMap.get("TREE")) {
-        			return WOODCUTTING_ICON;
-        		}
-        		else if(((Plant)action.target).getType() == Game.plantTypeMap.get("BERRY")) {
-        			return FARMING_ICON;
-        		}
-        		else if(((Plant)action.target).getType() == Game.plantTypeMap.get("CACTUS")) {
-        			return WOODCUTTING_ICON;
-        		}
-        		else if(((Plant)action.target).getType() == Game.plantTypeMap.get("CATTAILS")) {
-        			return FARMING_ICON;
-        		}
-        	}
-        	
-        	if(action.target instanceof Building) {
-        		if (((Building)action.target).getType() == Game.buildingTypeMap.get("MINE")) {
-        			return MINING_ICON;
-        		}
-        		else if (((Building)action.target).getType() == Game.buildingTypeMap.get("FARM")) {
-        			return FARMING_ICON;
-        		}
-        	}
-        	
-        	if(action.target == null) {
-        		return MINING_ICON;
-        	}
-        }
-		return null;
-    }
+	
 	
 	@Override
 	public Position getWorldCoordOfPixel(Point pixelOnScreen, Position viewOffset, int tileSize) {
