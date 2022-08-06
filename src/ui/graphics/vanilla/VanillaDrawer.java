@@ -49,13 +49,14 @@ public class VanillaDrawer extends Drawer {
 	
 	private JPanel canvas;
 	
-	private volatile BufferedImage[] buffers = new BufferedImage[3];
-	private volatile Position[] drawnAtOffset = new Position[3];
-	private volatile int[] drawnAtTileSize = new int[3];
+	private static final int NUM_BUFFERS = 3;
+	private volatile BufferedImage[] buffers = new BufferedImage[NUM_BUFFERS];
+	private volatile Position[] drawnAtOffset = new Position[NUM_BUFFERS];
+	private volatile int[] bufferDrawTimes = new int[NUM_BUFFERS];
+	private volatile int[] drawnAtTileSize = new int[NUM_BUFFERS];
 	private volatile int currentBuffer = 0;
 	private Semaphore nextRequested = new Semaphore(1);
 	private Semaphore numAvailable = new Semaphore(0);
-	private long drawTime;
 	
 	// must take snapshot of current tile size and view offset to draw a consistent image
 	// otherwise while player is dragging view it will change view offset 
@@ -117,6 +118,7 @@ public class VanillaDrawer extends Drawer {
 				try {
 					while(true) {
 						nextRequested.acquire();
+						long startDrawing = System.currentTimeMillis();
 						int next = (currentBuffer + 1) % buffers.length;
 						Graphics2D g = buffers[next].createGraphics();
 						frozenViewOffset.x = state.viewOffset.x;
@@ -127,6 +129,8 @@ public class VanillaDrawer extends Drawer {
 						drawnAtOffset[next].x = frozenViewOffset.x;
 						drawnAtOffset[next].y = frozenViewOffset.y;
 						drawnAtTileSize[next] = frozenTileSize;
+						long finishedDrawing = System.currentTimeMillis();
+						bufferDrawTimes[next] = (int) (finishedDrawing - startDrawing);
 						numAvailable.release();
 						currentBuffer = next;
 					}
@@ -179,8 +183,14 @@ public class VanillaDrawer extends Drawer {
 			int x = 10;
 			int y = canvas.getHeight() - 5;
 			if(Settings.SHOW_FPS) {
-				DrawingUtils.drawStringWithShadow(g, "DRAW(ms):" + drawTime, x, y);
-				DrawingUtils.drawStringWithShadow(g, "TICK(ms):" + state.previousTickTime, x, y - KUIConstants.infoFont.getSize() - 2);
+				int yOffset = KUIConstants.infoFont.getSize() + 2;
+				int avgBufferDrawTime = 0;
+				for (int i = 0; i < bufferDrawTimes.length; i++) {
+					avgBufferDrawTime += bufferDrawTimes[i];
+				}
+				avgBufferDrawTime /= 3;
+				DrawingUtils.drawStringWithShadow(g, String.format("DRAW(ms): %d", avgBufferDrawTime), x, y);
+				DrawingUtils.drawStringWithShadow(g, String.format("TICK(ms): %d", state.previousTickTime), x, y - yOffset);
 			}
 			if (Settings.SHOW_BUILDING_COUNTS) {
 				String fstr = "";
@@ -211,12 +221,9 @@ public class VanillaDrawer extends Drawer {
 			g.drawString("No World to display", 20, 20);
 			return;
 		}
-		long startTime = System.currentTimeMillis();
 		g.translate(-frozenViewOffset.getIntX(), -frozenViewOffset.getIntY());
 		draw(g, canvas.getWidth(), canvas.getHeight());
 		g.translate(frozenViewOffset.getIntX(), frozenViewOffset.getIntY());
-		long endTime = System.currentTimeMillis();
-		drawTime = endTime - startTime;
 //		Toolkit.getDefaultToolkit().sync();
 	}
 
@@ -875,22 +882,23 @@ public class VanillaDrawer extends Drawer {
 		if (World.ticks - thing.getTimeLastDamageTaken() < 20 || thing.getTile().getLocation().equals(state.hoveredTile)) {
 			Point drawAt = getDrawingCoords(thing.getTile().getLocation());
 			int w = frozenTileSize - 1;
-			int h = frozenTileSize / 6 - 1;
-			drawHealthBar2(g, thing, drawAt.x + 1, drawAt.y + 1, w, h, 2, thing.getHealth() / thing.getMaxHealth());
+			int h = frozenTileSize / 7 - 1;
+			int borderThickness = h / 8;
+			drawHealthBar2(g, thing, drawAt.x + 1, drawAt.y + 1, w, h, borderThickness, thing.getHealth() / thing.getMaxHealth());
 		}
 	}
 
-	public static void drawHealthBar2(Graphics g, Thing thing, int x, int y, int w, int h, int thickness,
-			double ratio) {
+	public static void drawHealthBar2(Graphics g, Thing thing, 
+			int x, int y, int w, int h, int borderThickness, double ratio) {
 		g.setColor(Color.BLACK);
 		g.fillRect(x, y, w, h);
 
 		g.setColor(Color.RED);
-		g.fillRect(x + thickness, y + thickness, w - thickness * 2, h - thickness * 2);
+		g.fillRect(x + borderThickness, y + borderThickness, w - borderThickness * 2, h - borderThickness * 2);
 
-		int greenBarWidth = (int) (ratio * (w - thickness * 2));
+		int greenBarWidth = (int) (ratio * (w - borderThickness * 2));
 		g.setColor(Color.GREEN);
-		g.fillRect(x + thickness, y + thickness, greenBarWidth, h - thickness * 2);
+		g.fillRect(x + borderThickness, y + borderThickness, greenBarWidth, h - borderThickness * 2);
 	}
 
 	private void drawHitsplat(Graphics g, Thing thing) {
