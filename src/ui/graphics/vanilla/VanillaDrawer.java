@@ -243,6 +243,8 @@ public class VanillaDrawer extends Drawer {
 		if (frozenTileSize >= FAST_MODE_TILE_SIZE && state.mapMode != MapMode.LIGHT) {
 
 			RenderingState renderState = new RenderingState();
+			renderState.gameViewState = state;
+			renderState.world = game.world;
 			renderState.mapMode = state.mapMode;
 			renderState.g = (Graphics2D) g;
 			renderState.faction = state.faction;
@@ -251,24 +253,30 @@ public class VanillaDrawer extends Drawer {
 			renderState.drawh = frozenTileSize;
 
 			for (RenderingStep step : pipelines[state.mapMode.ordinal()].steps) {
-				for (int i = lowerX; i < upperX; i++) {
-					for (int j = lowerY; j < upperY; j++) {
-						Tile tile = game.world.get(new TileLoc(i, j));
-						if (tile == null) {
-							continue;
+				if (step.perTile) {
+					for (int i = lowerX; i < upperX; i++) {
+						for (int j = lowerY; j < upperY; j++) {
+							Tile tile = game.world.get(new TileLoc(i, j));
+							if (tile == null) {
+								continue;
+							}
+							renderState.tile = tile;
+							Point drawAt = getDrawingCoords(tile.getLocation());
+							renderState.drawx = drawAt.x;
+							renderState.drawy = drawAt.y;
+							
+							step.render(renderState);
 						}
-						renderState.tile = tile;
-						Point drawAt = getDrawingCoords(tile.getLocation());
-						renderState.drawx = drawAt.x;
-						renderState.drawy = drawAt.y;
-						
-						step.render(renderState);
 					}
+				}
+				else {
+					renderState.tile = null;
+					renderState.drawx = -1;
+					renderState.drawy = -1;
+					step.render(renderState);
 				}
 			}
 
-			drawHoveredTiles((Graphics2D) g);
-			drawPlannedThing((Graphics2D) g);
 			drawSelectedThings((Graphics2D) g, lowerX, lowerY, upperX, upperY);
 
 			for (Building building : game.world.getBuildings()) {
@@ -481,20 +489,20 @@ public class VanillaDrawer extends Drawer {
 		}
 	}
 
-	private void drawPlannedThing(Graphics2D g) {
-		BufferedImage bI = null;
-		if (state.leftClickAction == LeftClickAction.PLAN_BUILDING) {
-			bI = Utils.toBufferedImage(state.selectedBuildingToPlan.getMipMap().getImage(frozenTileSize));
-		} else if (state.leftClickAction == LeftClickAction.SPAWN_THING) {
-			bI = Utils.toBufferedImage(Utils.getImageFromThingType(state.selectedThingToSpawn).getImage(frozenTileSize));
-		}
-		if (bI != null) {
-			Utils.setTransparency(g, 0.5f);
-			Point drawAt = getDrawingCoords(state.hoveredTile);
-			g.drawImage(bI, drawAt.x, drawAt.y, frozenTileSize, frozenTileSize, null);
-			Utils.setTransparency(g, 1f);
-		}
-	}
+//	private void drawPlannedThing(Graphics2D g) {
+//		BufferedImage bI = null;
+//		if (state.leftClickAction == LeftClickAction.PLAN_BUILDING) {
+//			bI = Utils.toBufferedImage(state.selectedBuildingToPlan.getMipMap().getImage(frozenTileSize));
+//		} else if (state.leftClickAction == LeftClickAction.SPAWN_THING) {
+//			bI = Utils.toBufferedImage(Utils.getImageFromThingType(state.selectedThingToSpawn).getImage(frozenTileSize));
+//		}
+//		if (bI != null) {
+//			Utils.setTransparency(g, 0.5f);
+//			Point drawAt = getDrawingCoords(state.hoveredTile);
+//			g.drawImage(bI, drawAt.x, drawAt.y, frozenTileSize, frozenTileSize, null);
+//			Utils.setTransparency(g, 1f);
+//		}
+//	}
 
 	private void drawDebugStrings(Graphics g, int lowerX, int lowerY, int upperX, int upperY) {
 		if(upperX - lowerX <= 0 || upperY - lowerY <= 0) {

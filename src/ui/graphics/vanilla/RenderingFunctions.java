@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import game.*;
 import game.actions.*;
 import game.components.Inventory;
-import ui.MapMode;
+import ui.*;
 import utils.*;
 import world.*;
 
@@ -21,6 +21,48 @@ public class RenderingFunctions {
 	private static final Image SNOW = Utils.loadImage("Images/weather/snow.png");
 	private static final Image SNOW2 = Utils.loadImage("Images/weather/snow2.png");
 
+	public static void drawPlannedThing(RenderingState state) {
+		BufferedImage bI = null;
+		if (state.gameViewState.leftClickAction == LeftClickAction.PLAN_BUILDING) {
+			bI = Utils.toBufferedImage(state.gameViewState.selectedBuildingToPlan.getMipMap().getImage(state.tileSize));
+		} else if (state.gameViewState.leftClickAction == LeftClickAction.SPAWN_THING) {
+			bI = Utils.toBufferedImage(Utils.getImageFromThingType(state.gameViewState.selectedThingToSpawn).getImage(state.tileSize));
+		}
+		if (bI != null) {
+			Utils.setTransparency(state.g, 0.5f);
+			Point drawAt = getDrawingCoords(state.gameViewState.hoveredTile, state.tileSize);
+			state.g.drawImage(bI, drawAt.x, drawAt.y, state.tileSize, state.tileSize, null);
+			Utils.setTransparency(state.g, 1f);
+		}
+	}
+	
+	public static void drawHoveredTiles(RenderingState state) {
+		int strokeWidth = state.tileSize / 10;
+		strokeWidth = strokeWidth < 1 ? 1 : strokeWidth;
+		Stroke stroke = state.g.getStroke();
+		state.g.setStroke(new BasicStroke(strokeWidth));
+		state.g.setColor(new Color(0, 0, 0, 64));
+		if (state.gameViewState.leftMouseDown && state.gameViewState.draggingMouse && state.gameViewState.boxSelect[0] != null && state.gameViewState.boxSelect[1] != null) {
+			for (Tile tile : Utils.getTilesBetween(state.world, state.gameViewState.boxSelect[0], state.gameViewState.boxSelect[1])) {
+				Point drawAt = getDrawingCoords(tile.getLocation(), state.tileSize);
+				state.g.drawRect(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, state.tileSize - strokeWidth,
+						state.tileSize - strokeWidth);
+			}
+		} else {
+			if (state.world.get(state.gameViewState.hoveredTile) != null) {
+				Point drawAt = getDrawingCoords(state.gameViewState.hoveredTile, state.tileSize);
+				state.g.drawRect(drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2, state.tileSize - strokeWidth,
+						state.tileSize - strokeWidth);
+				if(state.gameViewState.drawDebugStrings) {
+					state.g.setStroke(stroke);
+					state.g.setColor(Color.yellow);
+					state.g.drawString(state.gameViewState.hoveredTile.toString(), drawAt.x + strokeWidth / 2, drawAt.y + strokeWidth / 2);
+				}
+			}
+		}
+		state.g.setStroke(stroke);
+	}
+	
 	public static void drawHeatMapColor(RenderingState state) {
 		float ratio = getHeatMapColorRatio(state.tile, state.mapMode,
 				state.lowHeight, state.highHeight, state.lowPressure, state.highPressure, 
