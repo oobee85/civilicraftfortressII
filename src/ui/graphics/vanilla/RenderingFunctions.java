@@ -574,25 +574,33 @@ public class RenderingFunctions {
 	}
 	
 	public static void drawUnits(RenderingState state, Tile tile, Point drawat) {
-		final int MAX_DRAW = 7;
+//		final int MAX_NUM_ROWS = Math.max(1, state.tileSize / 32);
+//		final int MAX_PER_ROW = Math.max(1, state.tileSize / 12);
+		final int MAX_NUM_ROWS = 2;
+		final int MAX_PER_ROW = 6;
+		final int MAX_TOTAL = MAX_PER_ROW * MAX_NUM_ROWS;
 		int counter = tile.getUnits().size();
-		int total = Math.min(MAX_DRAW, counter);
+		int total = Math.min(MAX_PER_ROW, counter);
 		Iterator<Unit> it = tile.getUnits().descendingIterator();
 		while (it.hasNext()) {
 			Unit unit = it.next();
 			counter--;
-			if (counter >= MAX_DRAW) {
+			if (counter >= MAX_TOTAL) {
 				continue;
 			}
+			int row = counter / MAX_PER_ROW;
+			int rowTotal = (counter <= MAX_PER_ROW) ? counter : counter % MAX_PER_ROW;
+			int column = counter % MAX_PER_ROW;
 			int tileSize = state.tileSize;
 			int offset = 0;
 			if (total >= 2) {
-				tileSize = state.tileSize * (MAX_DRAW  + 7 - total) / (MAX_DRAW + 5);
+				tileSize = state.tileSize * (MAX_PER_ROW + 9 - total) / (MAX_PER_ROW + 7);
 				offset = tileSize / (total + 1);
 			}
 			
-			int drawatx = drawat.x + offset * counter - offset / 2;
-			int drawaty = drawat.y + (state.tileSize - tileSize) / 2;
+			int drawatx = drawat.x + offset * column - offset / 2;
+			int drawaty = drawat.y + (state.tileSize - tileSize) - row * tileSize/2 - column;
+//			int drawaty = drawat.y + (state.tileSize - tileSize) / 2 - row * tileSize/2;
 			
 			drawUnit(state.g, drawatx, drawaty, tileSize, unit);
 		}
