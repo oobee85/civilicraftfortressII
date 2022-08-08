@@ -56,6 +56,25 @@ public class VanillaDrawer extends Drawer {
 				g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 				
 				int buffer = currentBuffer;
+				
+				int startxoffset = state.viewOffset.getIntX() / drawnAtTileSize[buffer];
+				int startyoffset = state.viewOffset.getIntY() / drawnAtTileSize[buffer];
+				int numtilesx = canvas.getWidth() / drawnAtTileSize[buffer] + 2;
+				int numtilesy = canvas.getHeight() / drawnAtTileSize[buffer] + 2;
+				
+				int startx = startxoffset * drawnAtTileSize[buffer] - (state.viewOffset.getIntX());
+				int starty = startyoffset * drawnAtTileSize[buffer] - (state.viewOffset.getIntY());
+				int width = numtilesx * drawnAtTileSize[buffer];
+				int height = numtilesy * drawnAtTileSize[buffer];
+
+				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+				g.drawImage(mapImages[MapMode.TERRAIN_BIG.ordinal()], 
+						startx, starty, 
+						startx + width, starty + height, 
+						startxoffset * 2, startyoffset * 2, 
+						startxoffset * 2 + numtilesx * 2, startyoffset * 2 + numtilesy * 2, 
+						null);
+				
 				if(state.volatileTileSize == drawnAtTileSize[buffer]) {
 					g.drawImage(buffers[buffer], 
 							drawnAtOffset[buffer].getIntX() - state.viewOffset.getIntX(), 
