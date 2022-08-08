@@ -1489,9 +1489,6 @@ public class World {
 	private static int precomputedDaylightTick = -1;
 	
 	public static double getDaylight() {
-		if(Game.DISABLE_NIGHT) {
-			return 1;
-		}
 		if(World.ticks != precomputedDaylightTick) {
 			recomputeDaylight();
 		}

@@ -187,10 +187,12 @@ public class VanillaDrawer extends Drawer {
 			g.translate(-viewOffsetX, -viewOffsetY);
 			draw(g, canvas.getWidth(), canvas.getHeight(), tileSize);
 
-			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-			g.drawImage(mapImages[MapMode.LIGHT_BIG.ordinal()], 0, 0, 
-					tileSize * game.world.getWidth(), 
-					tileSize * game.world.getHeight() + tileSize/2, null);
+			if (!Game.DISABLE_NIGHT) {
+				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+				g.drawImage(mapImages[MapMode.LIGHT_BIG.ordinal()], 0, 0, 
+						tileSize * game.world.getWidth(), 
+						tileSize * game.world.getHeight() + tileSize/2, null);
+			}
 			g.translate(viewOffsetX, viewOffsetY);
 		}
 		g.dispose();
