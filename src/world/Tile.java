@@ -39,7 +39,7 @@ public class Tile implements Externalizable {
 	private double precomputedBrightness;
 	
 
-	private ConcurrentLinkedQueue<Unit> units;
+	private ConcurrentLinkedDeque<Unit> units;
 	private ConcurrentLinkedQueue<Projectile> projectiles;
 	private Inventory inventory;
 
@@ -90,7 +90,7 @@ public class Tile implements Externalizable {
 		terr = t;
 		liquidType = LiquidType.WATER;
 		liquidAmount = 0;
-		units = new ConcurrentLinkedQueue<Unit>();
+		units = new ConcurrentLinkedDeque<Unit>();
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
 		inventory = new Inventory();
 		this.energy = 100000;
@@ -270,7 +270,7 @@ public class Tile implements Externalizable {
 		return null;
 	}
 
-	public ConcurrentLinkedQueue<Unit> getUnits() {
+	public ConcurrentLinkedDeque<Unit> getUnits() {
 		return units;
 	}
 

@@ -540,38 +540,61 @@ public class RenderingFunctions {
 			g.drawImage(bI, drawx, drawy, draww, drawh, null);
 		}
 	}
-	private static void drawUnit(Graphics g, Point drawat, int size, Unit unit) {
+	private static void drawUnit(Graphics g, int drawatx, int drawaty, int size, Unit unit) {
 		if (unit.isSelected()) {
-			g.drawImage(unit.getMipMap().getHighlight(size), drawat.x, drawat.y, size, size, null);
+			g.drawImage(unit.getMipMap().getHighlight(size), drawatx, drawaty, size, size, null);
 		}
-		drawSunShadow(unit.getMipMap(), g, drawat.x, drawat.y, size, size, size);
-		g.drawImage(unit.getMipMap().getImage(size), drawat.x, drawat.y, size, size, null);
+		drawSunShadow(unit.getMipMap(), g, drawatx, drawaty, size, size, size);
+		g.drawImage(unit.getMipMap().getImage(size), drawatx, drawaty, size, size, null);
 
 		if (unit.isGuarding() == true) {
-			g.drawImage(GUARD_ICON, drawat.x + size / 4, drawat.y + size / 4, size / 2, size / 2, null);
+			g.drawImage(GUARD_ICON, drawatx + size / 4, drawaty + size / 4, size / 2, size / 2, null);
 		}
 		if (unit.isAutoBuilding() == true) {
-			g.drawImage(AUTO_BUILD_ICON, drawat.x + size / 4, drawat.y + size / 4, size / 2, size / 2, null);
+			g.drawImage(AUTO_BUILD_ICON, drawatx + size / 4, drawaty + size / 4, size / 2, size / 2, null);
 		}
 		if (unit.isIdle()) {
 			g.setColor(Color.gray);
-			g.fillRect(drawat.x + size * 4 / 5, drawat.y, size / 5, size / 5);
+			int w = size / 2;
+			int h = size / 10;
+			int x = drawatx + w / 2;
+			int y = drawaty + size - h;
+			g.fillRect(x, y, w, h);
+			g.setColor(Color.DARK_GRAY);
+			g.drawRect(x, y, w, h);
 		} else {
 			PlannedAction action = unit.getNextPlannedAction();
 			if (action != null) {
 				Image image = getIconForAction(action);
 				if (image != null) {
-					g.drawImage(image, drawat.x, drawat.y, size, size, null);
+					g.drawImage(image, drawatx, drawaty, size, size, null);
 				}
 			}
-
 		}
 	}
 	
 	public static void drawUnits(RenderingState state, Tile tile, Point drawat) {
-		
-		for (Unit unit : tile.getUnits()) {
-			drawUnit(state.g, drawat, state.tileSize, unit);
+		final int MAX_DRAW = 7;
+		int counter = tile.getUnits().size();
+		int total = Math.min(MAX_DRAW, counter);
+		Iterator<Unit> it = tile.getUnits().descendingIterator();
+		while (it.hasNext()) {
+			Unit unit = it.next();
+			counter--;
+			if (counter >= MAX_DRAW) {
+				continue;
+			}
+			int tileSize = state.tileSize;
+			int offset = 0;
+			if (total >= 2) {
+				tileSize = state.tileSize * (MAX_DRAW  + 7 - total) / (MAX_DRAW + 5);
+				offset = tileSize / (total + 1);
+			}
+			
+			int drawatx = drawat.x + offset * counter - offset / 2;
+			int drawaty = drawat.y + (state.tileSize - tileSize) / 2;
+			
+			drawUnit(state.g, drawatx, drawaty, tileSize, unit);
 		}
 	}
 	
