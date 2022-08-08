@@ -97,33 +97,28 @@ public class VanillaDrawer extends Drawer {
 			}
 		});
 		resetBuffers();
-		Thread thread = new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					while(true) {
-						nextRequested.acquire();
-						long startDrawing = System.currentTimeMillis();
-						int next = (currentBuffer + 1) % buffers.length;
-						Graphics2D g = buffers[next].createGraphics();
-						frozenViewOffset.x = state.viewOffset.x;
-						frozenViewOffset.y = state.viewOffset.y;
-						frozenTileSize = state.tileSize;
-						drawStuff(g, buffers[next].getWidth(), buffers[next].getHeight());
-						g.dispose();
-						drawnAtOffset[next].x = frozenViewOffset.x;
-						drawnAtOffset[next].y = frozenViewOffset.y;
-						drawnAtTileSize[next] = frozenTileSize;
-						long finishedDrawing = System.currentTimeMillis();
-						bufferDrawTimes[next] = (int) (finishedDrawing - startDrawing);
-						numAvailable.release();
-						currentBuffer = next;
-					}
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+		Thread thread = new Thread(() -> {
+			try {
+				while(true) {
+					nextRequested.acquire();
+					long startDrawing = System.currentTimeMillis();
+					int next = (currentBuffer + 1) % buffers.length;
+					frozenViewOffset.x = state.viewOffset.x;
+					frozenViewOffset.y = state.viewOffset.y;
+					frozenTileSize = state.tileSize;
+					
+					drawStuff(buffers[next]);
+					
+					drawnAtOffset[next].x = frozenViewOffset.x;
+					drawnAtOffset[next].y = frozenViewOffset.y;
+					drawnAtTileSize[next] = frozenTileSize;
+					long finishedDrawing = System.currentTimeMillis();
+					bufferDrawTimes[next] = (int) (finishedDrawing - startDrawing);
+					currentBuffer = next;
+					numAvailable.release();
 				}
-				
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		});
 		thread.start();
@@ -188,31 +183,24 @@ public class VanillaDrawer extends Drawer {
 		}
 	}
 
-	private void drawStuff(Graphics g, int w, int h) {
-		if (game == null) {
-			return;
-		}
-		
-		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
+	private void drawStuff(BufferedImage image) {
+		Graphics2D g = image.createGraphics();
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
 				RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 				RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-		Utils.clearBufferedImageTo(((Graphics2D)g), new Color(0, 0, 0, 0), w, h);
-		drawGame(g);
-	}
-	
-	private void drawGame(Graphics g) {
-		if (game.world == null) {
+		Utils.clearBufferedImageTo(g, new Color(0, 0, 0, 0), image.getWidth(), image.getHeight());
+		if (game == null || game.world == null) {
 			g.drawString("No World to display", 20, 20);
-			return;
 		}
-		g.translate(-frozenViewOffset.getIntX(), -frozenViewOffset.getIntY());
-		draw(g, canvas.getWidth(), canvas.getHeight());
-		g.translate(frozenViewOffset.getIntX(), frozenViewOffset.getIntY());
-//		Toolkit.getDefaultToolkit().sync();
+		else {
+			g.translate(-frozenViewOffset.getIntX(), -frozenViewOffset.getIntY());
+			draw(g, canvas.getWidth(), canvas.getHeight());
+			g.translate(frozenViewOffset.getIntX(), frozenViewOffset.getIntY());
+		}
+		g.dispose();
 	}
-	
 
 	private void draw(Graphics g, int panelWidth, int panelHeight) {
 		RenderingState renderState = new RenderingState();
@@ -239,7 +227,13 @@ public class VanillaDrawer extends Drawer {
 			renderState.drawh = frozenTileSize;
 
 			for (RenderingStep step : pipelines[state.mapMode.ordinal()].steps) {
-				if (step.perTile) {
+				if (!step.perTile) {
+					renderState.tile = null;
+					renderState.drawx = -1;
+					renderState.drawy = -1;
+					step.render(renderState);
+				}
+				else {
 					for (int i = renderState.lowerX; i <= renderState.upperX; i++) {
 						for (int j = renderState.lowerY; j <= renderState.upperY; j++) {
 							Tile tile = game.world.get(new TileLoc(i, j));
@@ -254,12 +248,6 @@ public class VanillaDrawer extends Drawer {
 							step.render(renderState);
 						}
 					}
-				}
-				else {
-					renderState.tile = null;
-					renderState.drawx = -1;
-					renderState.drawy = -1;
-					step.render(renderState);
 				}
 			}
 
