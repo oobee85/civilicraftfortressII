@@ -57,27 +57,21 @@ public class RenderingFunctions {
 		state.g.setColor(new Color(0, 0, 0, (int) (255 * (1 - brightness))));
 		Point drawAt = getDrawingCoords(tile.getLocation(), state.tileSize);
 		state.g.fillRect(drawAt.x, drawAt.y, state.tileSize, state.tileSize);
-	
 	}
 	
-	public static void drawUnitQuantitySquares(RenderingState state) {
+	public static void drawUnitQuantitySquares(RenderingState state, Tile tile, Point drawat) {
 		int indicatorSize = state.tileSize / 12;
 		int offset = 4;
-		HashMap<Tile, Integer> visited = new HashMap<>();
-		for (Unit unit : state.world.getUnits()) {
-			int count = visited.getOrDefault(unit.getTile(), 0);
-			visited.put(unit.getTile(), count + 1);
-
-			// draws a square for every player unit on the tile
-			Point drawAt = getDrawingCoords(unit.getTile().getLocation(), state.tileSize);
-			int xx = drawAt.x + offset;
-			int yy = drawAt.y + (indicatorSize + offset) * count + offset;
+		int count = 0;
+		for (Unit unit : tile.getUnits()) {
+			int xx = drawat.x + offset;
+			int yy = drawat.y + (indicatorSize + offset) * count + offset;
 			state.g.setColor(unit.getFaction().color());
 			state.g.fillRect(xx, yy, indicatorSize, indicatorSize);
 			state.g.setColor(Color.BLACK);
 			state.g.drawRect(xx, yy, indicatorSize, indicatorSize);
 			count++;
-		}	
+		}
 	}
 	
 	public static void drawWeatherEvents(RenderingState state) {
@@ -104,23 +98,27 @@ public class RenderingFunctions {
 		}
 	}
 	
-	public static void drawInventoryHealthBar(RenderingState state) {
-		for (Building building : state.world.getBuildings()) {
-			if(building.hasInventory())
-				drawInventory(state.g, building.getTile(), building.getInventory(), state.tileSize);
-			drawHealthBar(state, building);
-			drawHitsplat(state.g, building, state.tileSize);
+	public static void drawInventoryHealthBar(RenderingState state, Tile tile, Point drawat) {
+		if (tile.getRoad() != null) {
+			drawHealthBar(state, tile.getRoad());
+			drawHitsplat(state.g, tile.getRoad(), state.tileSize);
 		}
-		for (Plant plant : state.world.getPlants()) {
-			drawHealthBar(state, plant);
-			drawHitsplat(state.g, plant, state.tileSize);
+		if (tile.getBuilding() != null) {
+			if(tile.getBuilding().hasInventory())
+				drawInventory(state.g, tile, tile.getBuilding().getInventory(), state.tileSize);
+			drawHealthBar(state, tile.getBuilding());
+			drawHitsplat(state.g, tile.getBuilding(), state.tileSize);
 		}
-		for (Unit unit : state.world.getUnits()) {
+		if (tile.getPlant() != null) {
+			drawHealthBar(state, tile.getPlant());
+			drawHitsplat(state.g, tile.getPlant(), state.tileSize);
+		}
+		for (Unit unit : tile.getUnits()) {
 			if(unit.hasInventory())
 				drawInventory(state.g, unit.getTile(), unit.getInventory(), state.tileSize);
-			drawHealthBar(state, unit);
 			drawHitsplat(state.g, unit, state.tileSize);
 		}
+		RenderingFunctions.drawUnitHealthBars(state, tile, drawat);
 	}
 
 	private static void drawInventory(Graphics g, Tile tile, Inventory inventory, int tileSize) {
@@ -181,11 +179,18 @@ public class RenderingFunctions {
 		}
 	}
 	
-	private static void drawHealthBar(RenderingState state, Thing thing) {
-		if (state.tileSize <= 30) {
-			return;
+	private static boolean shouldDrawHealthBar(int tileSize, Thing thing, TileLoc hoveredTile) {
+		if (tileSize <= 30) {
+			return false;
 		}
-		if (World.ticks - thing.getTimeLastDamageTaken() < 20 || thing.getTile().getLocation().equals(state.gameViewState.hoveredTile)) {
+		if (World.ticks - thing.getTimeLastDamageTaken() < 20 || thing.getTile().getLocation().equals(hoveredTile)) {
+			return true;
+		}
+		return false;
+	}
+	
+	private static void drawHealthBar(RenderingState state, Thing thing) {
+		if (shouldDrawHealthBar(state.tileSize, thing, state.gameViewState.hoveredTile)) {
 			Point drawAt = getDrawingCoords(thing.getTile().getLocation(), state.tileSize);
 			int w = state.tileSize - 1;
 			int h = state.tileSize / 7 - 1;
@@ -205,6 +210,16 @@ public class RenderingFunctions {
 		int greenBarWidth = (int) (ratio * (w - borderThickness * 2));
 		g.setColor(Color.GREEN);
 		g.fillRect(x + borderThickness, y + borderThickness, greenBarWidth, h - borderThickness * 2);
+	}
+	
+	private static void drawUnitHealthBar(RenderingState state, int drawatx, int drawaty, int size, Unit unit) {
+		if (shouldDrawHealthBar(state.tileSize, unit, state.gameViewState.hoveredTile)) {
+			state.g.setColor(Color.RED);
+			state.g.fillRect(drawatx + size/4, drawaty, 3, size);
+			int greenBarHeight = (int) (size * unit.getHealth() / unit.getMaxHealth());
+			state.g.setColor(Color.GREEN);
+			state.g.fillRect(drawatx + size/4, drawaty + size - greenBarHeight, 3, greenBarHeight);
+		}
 	}
 	
 	public static  void drawSelectedThings(RenderingState state) {
@@ -540,45 +555,61 @@ public class RenderingFunctions {
 			g.drawImage(bI, drawx, drawy, draww, drawh, null);
 		}
 	}
-	private static void drawUnit(Graphics g, int drawatx, int drawaty, int size, Unit unit) {
+	
+	private static void drawUnitImage(RenderingState state, int drawatx, int drawaty, int size, Unit unit) {
 		if (unit.isSelected()) {
-			g.drawImage(unit.getMipMap().getHighlight(size), drawatx, drawaty, size, size, null);
+			state.g.drawImage(unit.getMipMap().getHighlight(size), drawatx, drawaty, size, size, null);
 		}
-		drawSunShadow(unit.getMipMap(), g, drawatx, drawaty, size, size, size);
-		g.drawImage(unit.getMipMap().getImage(size), drawatx, drawaty, size, size, null);
+		drawSunShadow(unit.getMipMap(), state.g, drawatx, drawaty, size, size, size);
+		state.g.drawImage(unit.getMipMap().getImage(size), drawatx, drawaty, size, size, null);
 
 		if (unit.isGuarding() == true) {
-			g.drawImage(GUARD_ICON, drawatx + size / 4, drawaty + size / 4, size / 2, size / 2, null);
+			state.g.drawImage(GUARD_ICON, drawatx + size / 4, drawaty + size / 4, size / 2, size / 2, null);
 		}
 		if (unit.isAutoBuilding() == true) {
-			g.drawImage(AUTO_BUILD_ICON, drawatx + size / 4, drawaty + size / 4, size / 2, size / 2, null);
+			state.g.drawImage(AUTO_BUILD_ICON, drawatx + size / 4, drawaty + size / 4, size / 2, size / 2, null);
 		}
 		if (unit.isIdle()) {
-			g.setColor(Color.gray);
+			state.g.setColor(Color.gray);
 			int w = size / 2;
 			int h = size / 10;
 			int x = drawatx + w / 2;
 			int y = drawaty + size - h;
-			g.fillRect(x, y, w, h);
-			g.setColor(Color.DARK_GRAY);
-			g.drawRect(x, y, w, h);
+			state.g.fillRect(x, y, w, h);
+			state.g.setColor(Color.DARK_GRAY);
+			state.g.drawRect(x, y, w, h);
 		} else {
 			PlannedAction action = unit.getNextPlannedAction();
 			if (action != null) {
 				Image image = getIconForAction(action);
 				if (image != null) {
-					g.drawImage(image, drawatx, drawaty, size, size, null);
+					state.g.drawImage(image, drawatx, drawaty, size, size, null);
 				}
 			}
 		}
 	}
+
+	public static final int MAX_NUM_ROWS = 2;
+	public static final int MAX_PER_ROW = 6;
+	public static final int MAX_TOTAL = MAX_PER_ROW * MAX_NUM_ROWS;
 	
-	public static void drawUnits(RenderingState state, Tile tile, Point drawat) {
-//		final int MAX_NUM_ROWS = Math.max(1, state.tileSize / 32);
-//		final int MAX_PER_ROW = Math.max(1, state.tileSize / 12);
-		final int MAX_NUM_ROWS = 2;
-		final int MAX_PER_ROW = 6;
-		final int MAX_TOTAL = MAX_PER_ROW * MAX_NUM_ROWS;
+	private static UnitDrawLoc computeUnitDrawLoc(Point drawat, int counter, int total, int tileSize) {
+		int row = counter / MAX_PER_ROW;
+		int rowTotal = (counter <= MAX_PER_ROW) ? counter : counter % MAX_PER_ROW;
+		int column = counter % MAX_PER_ROW;
+		int drawSize = tileSize;
+		int offset = 0;
+		if (total >= 2) {
+			drawSize = tileSize * (MAX_PER_ROW + 9 - total) / (MAX_PER_ROW + 7);
+			offset = drawSize / (total + 1);
+		}
+
+		int drawatx = drawat.x + offset * column - offset / 2 + row;
+		int drawaty = drawat.y + (tileSize - drawSize) - row * drawSize/2 - column;
+		return new UnitDrawLoc(drawatx, drawaty, drawSize);
+	}
+
+	private static void drawUnitsIterationHelper(RenderingState state, Tile tile, Point drawat, DrawThingFunction drawFunc) {
 		int counter = tile.getUnits().size();
 		int total = Math.min(MAX_PER_ROW, counter);
 		Iterator<Unit> it = tile.getUnits().descendingIterator();
@@ -588,22 +619,20 @@ public class RenderingFunctions {
 			if (counter >= MAX_TOTAL) {
 				continue;
 			}
-			int row = counter / MAX_PER_ROW;
-			int rowTotal = (counter <= MAX_PER_ROW) ? counter : counter % MAX_PER_ROW;
-			int column = counter % MAX_PER_ROW;
-			int tileSize = state.tileSize;
-			int offset = 0;
-			if (total >= 2) {
-				tileSize = state.tileSize * (MAX_PER_ROW + 9 - total) / (MAX_PER_ROW + 7);
-				offset = tileSize / (total + 1);
-			}
-			
-			int drawatx = drawat.x + offset * column - offset / 2;
-			int drawaty = drawat.y + (state.tileSize - tileSize) - row * tileSize/2 - column;
-//			int drawaty = drawat.y + (state.tileSize - tileSize) / 2 - row * tileSize/2;
-			
-			drawUnit(state.g, drawatx, drawaty, tileSize, unit);
+			UnitDrawLoc drawLoc = computeUnitDrawLoc(drawat, counter, total, state.tileSize);
+//			drawUnitImage(state.g, drawLoc.x, drawLoc.y, drawLoc.size, unit);
+			drawFunc.draw(state, drawLoc.x, drawLoc.y, drawLoc.size, unit);
 		}
+	}
+	
+	public static void drawUnitImages(RenderingState state, Tile tile, Point drawat) {
+		drawUnitsIterationHelper(state, tile, drawat, 
+				(s, x, y, size, thing) -> drawUnitImage(s, x, y, size, (Unit)thing));
+	}
+	
+	public static void drawUnitHealthBars(RenderingState state, Tile tile, Point drawat) {
+		drawUnitsIterationHelper(state, tile, drawat, 
+				(s, x, y, size, thing) -> drawUnitHealthBar(s, x, y, size, (Unit)thing));
 	}
 	
 	public static Image getIconForAction(PlannedAction action) {

@@ -6,7 +6,7 @@ import java.util.*;
 
 import game.*;
 import ui.*;
-import utils.Utils;
+import utils.*;
 import world.*;
 import world.liquid.LiquidType;
 
@@ -91,9 +91,9 @@ public class RenderingPipeline {
 		RenderingFunctions.drawNightTimeFogOfWar(state, tile, drawat);
 	});
 	
-	private static RenderingStep unitQuantitySquares = new RenderingStep(state -> {
-		RenderingFunctions.drawUnitQuantitySquares(state);
-	}, null);
+	private static RenderingStep unitQuantitySquares = new RenderingStep(null, (state, tile, drawat) -> {
+		RenderingFunctions.drawUnitQuantitySquares(state, tile, drawat);
+	});
 	
 	private static RenderingStep weatherEvents = new RenderingStep(state -> {
 		RenderingFunctions.drawWeatherEvents(state);
@@ -103,9 +103,9 @@ public class RenderingPipeline {
 		RenderingFunctions.drawProjectiles(state);
 	}, null);
 	
-	private static RenderingStep thingInventoryHealthBarHitsplat = new RenderingStep(state -> {
-		RenderingFunctions.drawInventoryHealthBar(state);
-	}, null);
+	private static RenderingStep thingInventoryHealthBarHitsplat = new RenderingStep(null, (state, tile, drawat) -> {
+		RenderingFunctions.drawInventoryHealthBar(state, tile, drawat);
+	});
 	
 	private static RenderingStep selectedThings = new RenderingStep(state -> {
 		RenderingFunctions.drawSelectedThings(state);
@@ -201,6 +201,6 @@ public class RenderingPipeline {
 	});
 	
 	private static RenderingStep units = new RenderingStep(null, (state, tile, drawat) -> {
-		RenderingFunctions.drawUnits(state, tile, drawat);
+		RenderingFunctions.drawUnitImages(state, tile, drawat);
 	});
 }

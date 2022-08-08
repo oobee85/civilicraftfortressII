@@ -221,6 +221,10 @@ public class VanillaDrawer extends Drawer {
 						if (tile == null) {
 							continue;
 						}
+						// If tile is 0 brightness, don't bother drawing it
+						if (World.getDaylight() + tile.getBrightness(state.faction) <= 0) {
+							continue;
+						}
 						Point drawAt = RenderingFunctions.getDrawingCoords(tile.getLocation(), tileSize);
 						step.render(renderState, tile, drawAt);
 					}
