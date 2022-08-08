@@ -42,17 +42,18 @@ public class VanillaDrawer extends Drawer {
 		canvas = new JPanel() {
 			private static final long serialVersionUID = 1L;
 			@Override
-			public void paintComponent(Graphics g) {
-				super.paintComponent(g);
+			public void paintComponent(Graphics gg) {
+				super.paintComponent(gg);
 				if(game == null) {
 					return;
 				}
+				Graphics2D g = (Graphics2D)gg;
 				
 				g.setColor(game.getBackgroundColor());
 				g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-				Utils.setTransparency(g, World.getDaylight());
 				g.drawImage(SKY_BACKGROUND, -state.viewOffset.getIntX()/20 - 100, -state.viewOffset.getIntY()/20 - 100, null);
-				Utils.setTransparency(g, 1);
+				g.setColor(new Color(0, 0, 0, (float) (1 - World.getDaylight())));
+				g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 				
 				int buffer = currentBuffer;
 				if(state.volatileTileSize == drawnAtTileSize[buffer]) {
@@ -185,6 +186,11 @@ public class VanillaDrawer extends Drawer {
 			// These must be integers otherwise weird off-by-one artifacts
 			g.translate(-viewOffsetX, -viewOffsetY);
 			draw(g, canvas.getWidth(), canvas.getHeight(), tileSize);
+
+			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			g.drawImage(mapImages[MapMode.LIGHT_BIG.ordinal()], 0, 0, 
+					tileSize * game.world.getWidth(), 
+					tileSize * game.world.getHeight() + tileSize/2, null);
 			g.translate(viewOffsetX, viewOffsetY);
 		}
 		g.dispose();
@@ -220,10 +226,6 @@ public class VanillaDrawer extends Drawer {
 					for (int j = renderState.lowerY; j <= renderState.upperY; j++) {
 						Tile tile = game.world.get(new TileLoc(i, j));
 						if (tile == null) {
-							continue;
-						}
-						// If tile is 0 brightness, don't bother drawing it
-						if (World.getDaylight() + tile.getBrightness(state.faction) <= 0) {
 							continue;
 						}
 						Point4 drawat = RenderingFunctions.getDrawingCoords(tile.getLocation(), tileSize);

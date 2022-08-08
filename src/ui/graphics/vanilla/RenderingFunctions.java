@@ -11,7 +11,6 @@ import game.components.Inventory;
 import ui.*;
 import utils.*;
 import world.*;
-import world.liquid.LiquidType;
 
 public class RenderingFunctions {
 	private static final Image TARGET_IMAGE = Utils.loadImage("Images/interfaces/ivegotyouinmysights.png");
@@ -49,20 +48,6 @@ public class RenderingFunctions {
 //			g.drawImage(TARGET_IMAGE, drawAt.x + frozenTileSize * 1 / 10, drawAt.y + frozenTileSize * 1 / 10, w, hi, null);
 		}
 
-	}
-	
-	public static void drawNightTimeFogOfWar(RenderingState state, Tile tile, Point4 drawat) {
-		double brightness = World.getDaylight() + tile.getBrightness(state.faction);
-		if (brightness >= 1) {
-			return;
-		}
-		else if (brightness <= 0) {
-			state.g.setColor(Color.black);
-		}
-		else {
-			state.g.setColor(new Color(0, 0, 0, (int) (255 * (1 - brightness))));
-		}
-		state.g.fillRect(drawat.x, drawat.y, drawat.w, drawat.h);
 	}
 	
 	private static int drawUnitQuantitySquaresHelper(Graphics2D g, int numInFaction, Color factionColor, int x, int y, int indicatorSize) {

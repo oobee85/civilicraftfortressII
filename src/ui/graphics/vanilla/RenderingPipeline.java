@@ -54,7 +54,6 @@ public class RenderingPipeline {
 				pipeline.steps.add(airFlow2);
 			}
 			pipeline.steps.add(target);
-			pipeline.steps.add(nightTimeFogOfWar);
 		}
 		
 		pipeline.steps.add(debugStrings);
@@ -85,10 +84,6 @@ public class RenderingPipeline {
 	
 	private static RenderingStep airFlow = new RenderingStep(null, (state, tile, drawat) -> {
 		RenderingFunctions.drawAirFlow(state, true, tile, drawat);
-	});
-	
-	private static RenderingStep nightTimeFogOfWar = new RenderingStep(null, (state, tile, drawat) -> {
-		RenderingFunctions.drawNightTimeFogOfWar(state, tile, drawat);
 	});
 	
 	private static RenderingStep unitQuantitySquares = new RenderingStep(null, (state, tile, drawat) -> {

@@ -11,6 +11,7 @@ public enum MapMode {
 	FLOW(true),
 	PRESSURE2(true),
 	LIGHT(true),
+	LIGHT_BIG(false),
 	FLOW2,
 	
 	/** MINIMAP must be the last MapMode*/
