@@ -19,9 +19,7 @@ public class VanillaDrawer extends Drawer {
 
 	private static final int FAST_MODE_TILE_SIZE = 10;
 	
-	private static final Image TARGET_IMAGE = Utils.loadImage("Images/interfaces/ivegotyouinmysights.png");
 	private static final Image SKY_BACKGROUND = Utils.loadImage("Images/lightbluesky.png");
-
 	
 	private JPanel canvas;
 	
@@ -33,12 +31,6 @@ public class VanillaDrawer extends Drawer {
 	private volatile int currentBuffer = 0;
 	private Semaphore nextRequested = new Semaphore(1);
 	private Semaphore numAvailable = new Semaphore(0);
-	
-	// must take snapshot of current tile size and view offset to draw a consistent image
-	// otherwise while player is dragging view it will change view offset 
-	// while it is drawing which causes a bunch of issues.
-	private int frozenTileSize;
-	private Position frozenViewOffset = new Position(0, 0);
 	
 	private RenderingPipeline[] pipelines = new RenderingPipeline[MapMode.values().length];
 	
@@ -63,7 +55,7 @@ public class VanillaDrawer extends Drawer {
 				Utils.setTransparency(g, 1);
 				
 				int buffer = currentBuffer;
-				if(state.tileSize == drawnAtTileSize[buffer]) {
+				if(state.volatileTileSize == drawnAtTileSize[buffer]) {
 					g.drawImage(buffers[buffer], 
 							drawnAtOffset[buffer].getIntX() - state.viewOffset.getIntX(), 
 							drawnAtOffset[buffer].getIntY() - state.viewOffset.getIntY(), 
@@ -98,15 +90,15 @@ public class VanillaDrawer extends Drawer {
 					nextRequested.acquire();
 					long startDrawing = System.currentTimeMillis();
 					int next = (currentBuffer + 1) % buffers.length;
-					frozenViewOffset.x = state.viewOffset.x;
-					frozenViewOffset.y = state.viewOffset.y;
-					frozenTileSize = state.tileSize;
+
+					// Must take snapshot of current tile size and view offset to draw a 
+					// consistent image. Otherwise while player is dragging view it will 
+					// change view offset while it is drawing which causes a bunch of issues.
+					drawnAtOffset[next].x = state.viewOffset.x;
+					drawnAtOffset[next].y = state.viewOffset.y;
+					drawnAtTileSize[next] = state.volatileTileSize;
+					drawStuff(buffers[next], drawnAtOffset[next].x, drawnAtOffset[next].y, drawnAtTileSize[next]);
 					
-					drawStuff(buffers[next]);
-					
-					drawnAtOffset[next].x = frozenViewOffset.x;
-					drawnAtOffset[next].y = frozenViewOffset.y;
-					drawnAtTileSize[next] = frozenTileSize;
 					long finishedDrawing = System.currentTimeMillis();
 					bufferDrawTimes[next] = (int) (finishedDrawing - startDrawing);
 					currentBuffer = next;
@@ -178,7 +170,7 @@ public class VanillaDrawer extends Drawer {
 		}
 	}
 
-	private void drawStuff(BufferedImage image) {
+	private void drawStuff(BufferedImage image, double viewOffsetX, double viewOffsetY, int tileSize) {
 		Graphics2D g = image.createGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
@@ -190,36 +182,36 @@ public class VanillaDrawer extends Drawer {
 			g.drawString("No World to display", 20, 20);
 		}
 		else {
-			g.translate(-frozenViewOffset.getIntX(), -frozenViewOffset.getIntY());
-			draw(g, canvas.getWidth(), canvas.getHeight());
-			g.translate(frozenViewOffset.getIntX(), frozenViewOffset.getIntY());
+			g.translate(-viewOffsetX, -viewOffsetY);
+			draw(g, canvas.getWidth(), canvas.getHeight(), tileSize);
+			g.translate(viewOffsetX, viewOffsetY);
 		}
 		g.dispose();
 	}
 
-	private void draw(Graphics g, int panelWidth, int panelHeight) {
+	private void draw(Graphics g, int panelWidth, int panelHeight, int tileSize) {
 		RenderingState renderState = new RenderingState();
 		// Start by drawing plain terrain image
 		g.drawImage(mapImages[state.mapMode.ordinal()], 0, 0, 
-				frozenTileSize * game.world.getWidth(), 
-				frozenTileSize * game.world.getHeight() + frozenTileSize/2, null);
+				tileSize * game.world.getWidth(), 
+				tileSize * game.world.getHeight() + tileSize/2, null);
 
 		// Try to only draw stuff that is visible on the screen
-		renderState.lowerX = Math.max(0, state.viewOffset.divide(frozenTileSize).getIntX() - 2);
-		renderState.lowerY = Math.max(0, state.viewOffset.divide(frozenTileSize).getIntY() - 2);
-		renderState.upperX = Math.min(game.world.getWidth(), renderState.lowerX + panelWidth / frozenTileSize + 4);
-		renderState.upperY = Math.min(game.world.getHeight(), renderState.lowerY + panelHeight / frozenTileSize + 4);
+		renderState.lowerX = Math.max(0, state.viewOffset.divide(tileSize).getIntX() - 2);
+		renderState.lowerY = Math.max(0, state.viewOffset.divide(tileSize).getIntY() - 2);
+		renderState.upperX = Math.min(game.world.getWidth(), renderState.lowerX + panelWidth / tileSize + 4);
+		renderState.upperY = Math.min(game.world.getHeight(), renderState.lowerY + panelHeight / tileSize + 4);
 
-		if (frozenTileSize >= FAST_MODE_TILE_SIZE && state.mapMode != MapMode.LIGHT) {
+		if (tileSize >= FAST_MODE_TILE_SIZE && state.mapMode != MapMode.LIGHT) {
 
 			renderState.gameViewState = state;
 			renderState.world = game.world;
 			renderState.mapMode = state.mapMode;
 			renderState.g = (Graphics2D) g;
 			renderState.faction = state.faction;
-			renderState.tileSize = frozenTileSize;
-			renderState.draww = frozenTileSize;
-			renderState.drawh = frozenTileSize;
+			renderState.tileSize = tileSize;
+			renderState.draww = tileSize;
+			renderState.drawh = tileSize;
 
 			for (RenderingStep step : pipelines[state.mapMode.ordinal()].steps) {
 				step.render(renderState);
@@ -229,7 +221,7 @@ public class VanillaDrawer extends Drawer {
 						if (tile == null) {
 							continue;
 						}
-						Point drawAt = RenderingFunctions.getDrawingCoords(tile.getLocation(), state.tileSize);
+						Point drawAt = RenderingFunctions.getDrawingCoords(tile.getLocation(), tileSize);
 						step.render(renderState, tile, drawAt);
 					}
 				}
@@ -245,9 +237,9 @@ public class VanillaDrawer extends Drawer {
 		if (game.world == null) {
 			return null;
 		}
-		Position offsetTile = getWorldCoordOfPixel(new Point(0, 0), state.viewOffset, state.tileSize);
+		Position offsetTile = getWorldCoordOfPixel(new Point(0, 0), state.viewOffset, state.volatileTileSize);
 		Position offsetTilePlusCanvas = getWorldCoordOfPixel(
-				new Point(canvas.getWidth(), canvas.getHeight()), state.viewOffset, state.tileSize);
+				new Point(canvas.getWidth(), canvas.getHeight()), state.viewOffset, state.volatileTileSize);
 		return new Position[] {
 				offsetTile,
 				new Position(offsetTile.x, offsetTilePlusCanvas.y),
@@ -280,9 +272,9 @@ public class VanillaDrawer extends Drawer {
 	public void zoomView(int scroll, int mx, int my) {
 		int newTileSize;
 		if (scroll > 0) {
-			newTileSize = (int) ((state.tileSize - 1) * 0.95);
+			newTileSize = (int) ((state.volatileTileSize - 1) * 0.95);
 		} else {
-			newTileSize = (int) ((state.tileSize + 1) * 1.05);
+			newTileSize = (int) ((state.volatileTileSize + 1) * 1.05);
 		}
 		zoomViewTo(newTileSize, mx, my);
 	}
@@ -290,9 +282,9 @@ public class VanillaDrawer extends Drawer {
 	@Override
 	public void zoomViewTo(int newTileSize, int mx, int my) {
 		if (newTileSize > 0) {
-			Position tile = getWorldCoordOfPixelWithoutOffset(new Point(mx, my), state.viewOffset, state.tileSize);
-			state.tileSize = newTileSize;
-			Position focalPoint = tile.multiply(state.tileSize).subtract(state.viewOffset);
+			Position tile = getWorldCoordOfPixelWithoutOffset(new Point(mx, my), state.viewOffset, state.volatileTileSize);
+			state.volatileTileSize = newTileSize;
+			Position focalPoint = tile.multiply(state.volatileTileSize).subtract(state.viewOffset);
 			state.viewOffset.x -= mx - focalPoint.x;
 			state.viewOffset.y -= my - focalPoint.y;
 		}
