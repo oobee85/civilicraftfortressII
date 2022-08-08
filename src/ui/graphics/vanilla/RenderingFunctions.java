@@ -3,6 +3,7 @@ package ui.graphics.vanilla;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.List;
 
 import game.*;
 import game.actions.*;
@@ -10,9 +11,9 @@ import game.components.Inventory;
 import ui.*;
 import utils.*;
 import world.*;
+import world.liquid.LiquidType;
 
 public class RenderingFunctions {
-
 	private static final Image TARGET_IMAGE = Utils.loadImage("Images/interfaces/ivegotyouinmysights.png");
 	private static final Image RALLY_POINT_IMAGE = Utils.loadImage("Images/interfaces/queuelocation.png");
 	private static final Image FLAG = Utils.loadImage("Images/interfaces/flag.png");
@@ -29,6 +30,79 @@ public class RenderingFunctions {
 	private static final Image GREEN_HITSPLAT = Utils.loadImage("Images/interfaces/greenhitsplat.png");
 
 	private static final Font DAMAGE_FONT = new Font("Comic Sans MS", Font.BOLD, 14);
+
+	public static void drawTarget(RenderingState state, TileLoc tileLoc) {
+		Point drawAt = getDrawingCoords(tileLoc, state.tileSize);
+		int w = (int) (state.tileSize * 8 / 10);
+		int hi = (int) (state.tileSize * 8 / 10);
+		state.g.drawImage(TARGET_IMAGE, drawAt.x + state.tileSize * 1 / 10, drawAt.y + state.tileSize * 1 / 10, w, hi, null);
+	}
+	
+	public static void drawAirFlow(RenderingState state, boolean arrows, Tile tile, Point drawat) {
+//		int w = (int) (state.tileSize * 8 / 10);
+//		int hi = (int) (state.tileSize * 8 / 10);
+		if(tile.getAir().getFlowDirection() != null) {
+			Image image = arrows ? tile.getAir().getFlowDirection().getArrowImage() 
+					: tile.getAir().getFlowDirection().getImage() ;
+//			System.out.println(tile.getAir().getFlowDirection());
+			state.g.drawImage(image, drawat.x, drawat.y, state.tileSize, state.tileSize, null);
+//			g.drawImage(TARGET_IMAGE, drawAt.x + frozenTileSize * 1 / 10, drawAt.y + frozenTileSize * 1 / 10, w, hi, null);
+		}
+
+	}
+	
+	public static void drawNightTimeFogOfWar(RenderingState state, Tile tile, Point drawat) {
+		double brightness = World.getDaylight() + tile.getBrightness(state.faction);
+		brightness = Math.max(Math.min(brightness, 1), 0);
+		state.g.setColor(new Color(0, 0, 0, (int) (255 * (1 - brightness))));
+		Point drawAt = getDrawingCoords(tile.getLocation(), state.tileSize);
+		state.g.fillRect(drawAt.x, drawAt.y, state.tileSize, state.tileSize);
+	
+	}
+	
+	public static void drawUnitQuantitySquares(RenderingState state) {
+		int indicatorSize = state.tileSize / 12;
+		int offset = 4;
+		HashMap<Tile, Integer> visited = new HashMap<>();
+		for (Unit unit : state.world.getUnits()) {
+			int count = visited.getOrDefault(unit.getTile(), 0);
+			visited.put(unit.getTile(), count + 1);
+
+			// draws a square for every player unit on the tile
+			Point drawAt = getDrawingCoords(unit.getTile().getLocation(), state.tileSize);
+			int xx = drawAt.x + offset;
+			int yy = drawAt.y + (indicatorSize + offset) * count + offset;
+			state.g.setColor(unit.getFaction().color());
+			state.g.fillRect(xx, yy, indicatorSize, indicatorSize);
+			state.g.setColor(Color.BLACK);
+			state.g.drawRect(xx, yy, indicatorSize, indicatorSize);
+			count++;
+		}	
+	}
+	
+	public static void drawWeatherEvents(RenderingState state) {
+		for (WeatherEvent w : state.world.getWeatherEvents()) {
+			Point drawAt = getDrawingCoords(w.getTile().getLocation(), state.tileSize);
+			state.g.drawImage(WeatherEventType.RAIN.getMipMap().getImage(0), drawAt.x ,
+					drawAt.y, state.tileSize, state.tileSize, null);
+		}
+	}
+	
+	public static void drawProjectiles(RenderingState state) {
+		for (Projectile p : state.world.getData().getProjectiles()) {
+			int extra = (int) (state.tileSize * p.getExtraSize());
+			double ratio = 0.5 * p.getHeight() / p.getMaxHeight();
+			int shadowOffset = (int) (state.tileSize * ratio / 2);
+			Point drawAt = getDrawingCoords(p.getTile().getLocation(), state.tileSize);
+			
+			state.g.drawImage(p.getType().getMipMap().getShadow(0), drawAt.x + shadowOffset,
+					drawAt.y + shadowOffset, state.tileSize - shadowOffset * 2,
+					state.tileSize - shadowOffset * 2, null);
+			state.g.drawImage(p.getType().getMipMap().getImage(0), drawAt.x - extra / 2,
+					drawAt.y - p.getHeight() - extra / 2, state.tileSize + extra,
+					state.tileSize + extra, null);
+		}
+	}
 	
 	public static void drawInventoryHealthBar(RenderingState state) {
 		for (Building building : state.world.getBuildings()) {
@@ -293,12 +367,12 @@ public class RenderingFunctions {
 		state.g.setStroke(stroke);
 	}
 	
-	public static void drawHeatMapColor(RenderingState state) {
-		float ratio = getHeatMapColorRatio(state.tile, state.mapMode,
+	public static void drawHeatMapColor(RenderingState state, Tile tile, Point drawat) {
+		float ratio = getHeatMapColorRatio(tile, state.mapMode,
 				state.lowHeight, state.highHeight, state.lowPressure, state.highPressure, 
 				state.lowTemp, state.highTemp, state.lowHumidity, state.highHumidity);
 		state.g.setColor(new Color(ratio, 0f, 1f - ratio));
-		state.g.fillRect(state.drawx, state.drawy, state.draww, state.drawh);
+		state.g.fillRect(drawat.x, drawat.y, state.draww, state.drawh);
 	}
 	
 	public static float getHeatMapColorRatio(Tile tile, MapMode mapMode,
@@ -326,12 +400,12 @@ public class RenderingFunctions {
 		return Math.max(Math.min(ratio, 1f), 0f);
 	}
 	
-	public static void drawSnowTemp(Tile tile, Graphics2D g, int drawx, int drawy, int draww, int drawh) {
+	public static void drawSnowTemp(RenderingState state, Tile tile, Point drawat) {
 		if(tile.getTemperature() <= Constants.FREEZETEMP) {
-			g.drawImage(SNOW2, drawx, drawy, draww, drawh, null);
+			state.g.drawImage(SNOW2, drawat.x, drawat.y, state.draww, state.drawh, null);
 		}
 		else if(tile.getAir().getTemperature() <= Constants.FREEZETEMP) {
-			g.drawImage(SNOW, drawx, drawy, draww, drawh, null);
+			state.g.drawImage(SNOW, drawat.x, drawat.y, state.draww, state.drawh, null);
 		}
 	}
 	
@@ -467,7 +541,7 @@ public class RenderingFunctions {
 		}
 	}
 	
-	public static void drawUnit(Unit unit, RenderingState state) {
+	public static void drawUnit(Unit unit, RenderingState state, Tile tile, Point drawat) {
 
 //		LinkedList<Tile> path = unit.getCurrentPath();
 //		double timeLeft = unit.getTimeToMove();
@@ -478,7 +552,7 @@ public class RenderingFunctions {
 //		}
 
 		if (unit.isSelected()) {
-			state.g.drawImage(unit.getMipMap().getHighlight(state.tileSize), state.drawx, state.drawy, state.draww, state.drawh, null);
+			state.g.drawImage(unit.getMipMap().getHighlight(state.tileSize), drawat.x, drawat.y, state.draww, state.drawh, null);
 		}
 //		if(path != null && path.peek() != null) {
 //			Tile targetTile = path.peek();
@@ -501,25 +575,25 @@ public class RenderingFunctions {
 //			}
 //			g.drawImage(unit.getImage(frozenTileSize), (int)(drawx + drawx - dx), (int)(drawy + drawy - dy), draww, drawh, null);
 //		}else {
-		drawSunShadow(unit.getMipMap(), state.g, state.drawx, state.drawy, state.draww, state.drawh, state.tileSize);
-		state.g.drawImage(unit.getMipMap().getImage(state.tileSize), state.drawx, state.drawy, state.draww, state.drawh, null);
+		drawSunShadow(unit.getMipMap(), state.g, drawat.x, drawat.y, state.draww, state.drawh, state.tileSize);
+		state.g.drawImage(unit.getMipMap().getImage(state.tileSize), drawat.x, drawat.y, state.draww, state.drawh, null);
 //		}
 
 		if (unit.isGuarding() == true) {
-			state.g.drawImage(GUARD_ICON, state.drawx + state.draww / 4, state.drawy + state.drawh / 4, state.draww / 2, state.drawh / 2, null);
+			state.g.drawImage(GUARD_ICON, drawat.x + state.draww / 4, drawat.y + state.drawh / 4, state.draww / 2, state.drawh / 2, null);
 		}
 		if (unit.isAutoBuilding() == true) {
-			state.g.drawImage(AUTO_BUILD_ICON, state.drawx + state.draww / 4, state.drawy + state.drawh / 4, state.draww / 2, state.drawh / 2, null);
+			state.g.drawImage(AUTO_BUILD_ICON, drawat.x + state.draww / 4, drawat.y + state.drawh / 4, state.draww / 2, state.drawh / 2, null);
 		}
 		if (unit.isIdle()) {
 			state.g.setColor(Color.gray);
-			state.g.fillRect(state.drawx + state.draww * 4 / 5, state.drawy, state.draww / 5, state.drawh / 5);
+			state.g.fillRect(drawat.x + state.draww * 4 / 5, drawat.y, state.draww / 5, state.drawh / 5);
 		} else {
 			PlannedAction action = unit.getNextPlannedAction();
 			if (action != null) {
 				Image image = getIconForAction(action);
 				if (image != null) {
-					state.g.drawImage(image, state.drawx, state.drawy, state.draww, state.drawh, null);
+					state.g.drawImage(image, drawat.x, drawat.y, state.draww, state.drawh, null);
 				}
 			}
 
@@ -576,8 +650,50 @@ public class RenderingFunctions {
 		g.drawImage(m.getSunShadow(frozenTileSize, sunShadow), drawx, drawy, draww, drawh, null);
 		Utils.setTransparency(g, 1);
 	}
+
+	private static int drawDebugStringsHelper(Graphics g, List<String> strings, int row, int fontsize, int tileSize, Point drawAt) {
+		int x = drawAt.x + 2;
+		int y = drawAt.y + fontsize / 2;
+		int maxWidth = 0;
+		for (String s : strings) {
+			int stringWidth = g.getFontMetrics().stringWidth(s) + 2;
+			maxWidth = maxWidth > stringWidth ? maxWidth : stringWidth;
+		}
+		g.setColor(Color.black);
+		g.fillRect(x, y + 2 + row, maxWidth, fontsize * strings.size());
+		for (String s : strings) {
+			g.setColor(Color.green);
+			row += fontsize;
+			g.drawString(s, x, y + row);
+		}
+		row += 1;
+		return row;
+	}
+
+	public static void drawDebugStringsHelper1(RenderingState state, Tile tile, Point drawat, int fontsize) {
+		int row = 0;
+		row = drawDebugStringsHelper(state.g, tile.getDebugStrings(), row, fontsize,
+				state.tileSize, drawat);
+
+		for (Unit unit : tile.getUnits()) {
+			row = drawDebugStringsHelper(state.g, unit.getDebugStrings(),
+					row, fontsize, state.tileSize, drawat);
+		}
+		if (tile.getPlant() != null) {
+			row = drawDebugStringsHelper(state.g, tile.getPlant().getDebugStrings(),
+					row, fontsize, state.tileSize, drawat);
+		}
+		if (tile.hasBuilding()) {
+			row = drawDebugStringsHelper(state.g, tile.getBuilding().getDebugStrings(),
+					row, fontsize, state.tileSize, drawat);
+		}
+		if (tile.getRoad() != null) {
+			row = drawDebugStringsHelper(state.g, tile.getRoad().getDebugStrings(),
+					row, fontsize, state.tileSize, drawat);
+		}
+	}
 	
-	private static Point getDrawingCoords(TileLoc tileLoc, int frozenTileSize) {
+	public static Point getDrawingCoords(TileLoc tileLoc, int frozenTileSize) {
 		int x = tileLoc.x() * frozenTileSize;
 		int y = tileLoc.y() * frozenTileSize + (tileLoc.x() % 2) * frozenTileSize / 2;
 		return new Point(x, y);

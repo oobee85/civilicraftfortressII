@@ -24,11 +24,10 @@ public class RenderingState {
 	GameViewState gameViewState;
 	World world;
 	
-	int drawx;
-	int drawy;
+	/** TODO: need to deprecate draww and drawh and just use tileSize */
 	int draww;
+	/** TODO: need to deprecate draww and drawh and just use tileSize */
 	int drawh;
-	Tile tile;
 
 	int lowerX;
 	int lowerY;

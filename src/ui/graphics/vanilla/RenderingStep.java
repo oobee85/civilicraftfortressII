@@ -1,15 +1,33 @@
 package ui.graphics.vanilla;
 
-public class RenderingStep implements RenderStepInterface {
+import java.awt.Point;
 
-	boolean perTile = true;
-	RenderStepInterface renderStepInterface;
-	public RenderingStep(boolean perTile, RenderStepInterface renderStepInterface) {
-		this.perTile = perTile;
-		this.renderStepInterface = renderStepInterface;
+import world.Tile;
+
+/**
+ * RenderingStep is a wrapper for potentially 2 different rendering steps.
+ * The first is a tile-independent step that can be used to draw lists of things around the world
+ * or to set up some state for the second, tile-specific render step.
+ */
+public class RenderingStep implements RenderStepInterface, TileRenderStepInterface {
+
+	RenderStepInterface renderStep;
+	TileRenderStepInterface tileRenderStep;
+	public RenderingStep(RenderStepInterface renderStep, TileRenderStepInterface tileRenderStep) {
+		this.renderStep = renderStep;
+		this.tileRenderStep = tileRenderStep;
 	}
 	@Override
 	public void render(RenderingState state) {
-		renderStepInterface.render(state);
+		if (renderStep != null) {
+			renderStep.render(state);
+		}
+	}
+	
+	@Override
+	public void render(RenderingState state, Tile tile, Point drawat) {
+		if (tileRenderStep != null) {
+			tileRenderStep.render(state, tile, drawat);
+		}
 	}
 }

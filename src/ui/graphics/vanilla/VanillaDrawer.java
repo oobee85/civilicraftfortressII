@@ -1,11 +1,8 @@
 package ui.graphics.vanilla;
 
 import java.awt.*;
-import java.awt.Component;
 import java.awt.event.*;
 import java.awt.image.*;
-import java.util.*;
-import java.util.List;
 import java.util.concurrent.*;
 
 import javax.swing.*;
@@ -17,12 +14,10 @@ import ui.utils.DrawingUtils;
 import ui.view.GameView.*;
 import utils.*;
 import world.*;
-import world.liquid.*;
 
 public class VanillaDrawer extends Drawer {
 
 	private static final int FAST_MODE_TILE_SIZE = 10;
-	private static final int NUM_DEBUG_DIGITS = 3;
 	
 	private static final Image TARGET_IMAGE = Utils.loadImage("Images/interfaces/ivegotyouinmysights.png");
 	private static final Image SKY_BACKGROUND = Utils.loadImage("Images/lightbluesky.png");
@@ -227,207 +222,19 @@ public class VanillaDrawer extends Drawer {
 			renderState.drawh = frozenTileSize;
 
 			for (RenderingStep step : pipelines[state.mapMode.ordinal()].steps) {
-				if (!step.perTile) {
-					renderState.tile = null;
-					renderState.drawx = -1;
-					renderState.drawy = -1;
-					step.render(renderState);
-				}
-				else {
-					for (int i = renderState.lowerX; i <= renderState.upperX; i++) {
-						for (int j = renderState.lowerY; j <= renderState.upperY; j++) {
-							Tile tile = game.world.get(new TileLoc(i, j));
-							if (tile == null) {
-								continue;
-							}
-							renderState.tile = tile;
-							Point drawAt = getDrawingCoords(tile.getLocation());
-							renderState.drawx = drawAt.x;
-							renderState.drawy = drawAt.y;
-							
-							step.render(renderState);
+				step.render(renderState);
+				for (int i = renderState.lowerX; i <= renderState.upperX; i++) {
+					for (int j = renderState.lowerY; j <= renderState.upperY; j++) {
+						Tile tile = game.world.get(new TileLoc(i, j));
+						if (tile == null) {
+							continue;
 						}
+						Point drawAt = RenderingFunctions.getDrawingCoords(tile.getLocation(), state.tileSize);
+						step.render(renderState, tile, drawAt);
 					}
 				}
 			}
-
-			for (Projectile p : game.world.getData().getProjectiles()) {
-				int extra = (int) (frozenTileSize * p.getExtraSize());
-				double ratio = 0.5 * p.getHeight() / p.getMaxHeight();
-				int shadowOffset = (int) (frozenTileSize * ratio / 2);
-				Point drawAt = getDrawingCoords(p.getTile().getLocation());
-				
-				g.drawImage(p.getType().getMipMap().getShadow(0), drawAt.x + shadowOffset,
-						drawAt.y + shadowOffset, frozenTileSize - shadowOffset * 2,
-						frozenTileSize - shadowOffset * 2, null);
-				g.drawImage(p.getType().getMipMap().getImage(0), drawAt.x - extra / 2,
-						drawAt.y - p.getHeight() - extra / 2, frozenTileSize + extra,
-						frozenTileSize + extra, null);
-			}
-			for (WeatherEvent w : game.world.getWeatherEvents()) {
-				
-				Point drawAt = getDrawingCoords(w.getTile().getLocation());
-				g.drawImage(WeatherEventType.RAIN.getMipMap().getImage(0), drawAt.x ,
-						drawAt.y, frozenTileSize, frozenTileSize, null);
-			}
-
-			int indicatorSize = frozenTileSize / 12;
-			int offset = 4;
-			HashMap<Tile, Integer> visited = new HashMap<>();
-			for (Unit unit : game.world.getUnits()) {
-				int count = visited.getOrDefault(unit.getTile(), 0);
-				visited.put(unit.getTile(), count + 1);
-
-				// draws a square for every player unit on the tile
-				Point drawAt = getDrawingCoords(unit.getTile().getLocation());
-				int xx = drawAt.x + offset;
-				int yy = drawAt.y + (indicatorSize + offset) * count + offset;
-				g.setColor(unit.getFaction().color());
-				g.fillRect(xx, yy, indicatorSize, indicatorSize);
-				g.setColor(Color.BLACK);
-				g.drawRect(xx, yy, indicatorSize, indicatorSize);
-				count++;
-			}
-			
-			// draw brightness of tiles as translucent rectangle
-			if (state.mapMode == MapMode.TERRAIN_BIG) {
-				for (int i = renderState.lowerX; i < renderState.upperX; i++) {
-					for (int j = renderState.lowerY; j < renderState.upperY; j++) {
-						Tile tile = game.world.get(new TileLoc(i, j));
-						if (tile == null)
-							continue;
-						double brightness = World.getDaylight() + tile.getBrightness(state.faction);
-						brightness = Math.max(Math.min(brightness, 1), 0);
-						g.setColor(new Color(0, 0, 0, (int) (255 * (1 - brightness))));
-						Point drawAt = getDrawingCoords(tile.getLocation());
-						g.fillRect(drawAt.x, drawAt.y, frozenTileSize, frozenTileSize);
-					}
-				}
-			}
-			if (state.mapMode == MapMode.FLOW) {
-				for (int i = renderState.lowerX; i < renderState.upperX; i++) {
-					for (int j = renderState.lowerY; j < renderState.upperY; j++) {
-						Tile tile = game.world.get(new TileLoc(i, j));
-						if (tile == null)
-							continue;
-						drawAirFlow(g, tile, true);
-					}
-				}
-			}
-			if (state.mapMode == MapMode.FLOW2) {
-				for (int i = renderState.lowerX; i < renderState.upperX; i++) {
-					for (int j = renderState.lowerY; j < renderState.upperY; j++) {
-						Tile tile = game.world.get(new TileLoc(i, j));
-						if (tile == null)
-							continue;
-						drawAirFlow(g, tile, false);
-					}
-				}
-			}
-
-			if (state.drawDebugStrings) {
-				if (frozenTileSize >= 150) {
-					drawDebugStrings(g, renderState.lowerX, renderState.lowerY, renderState.upperX, renderState.upperY);
-				}
-			}
-			if (state.leftClickAction == LeftClickAction.ATTACK) {
-				drawTarget(g, state.hoveredTile);
-			}
 		}
-	}
-
-	private void drawDebugStrings(Graphics g, int lowerX, int lowerY, int upperX, int upperY) {
-		if(upperX - lowerX <= 0 || upperY - lowerY <= 0) {
-			return;
-		}
-		int[][] rows = new int[upperX - lowerX][upperY - lowerY];
-		int fontsize = frozenTileSize / 4;
-		fontsize = Math.min(fontsize, 13);
-		Font font = new Font("Consolas", Font.PLAIN, fontsize);
-		g.setFont(font);
-		for (int i = lowerX; i < upperX; i++) {
-			for (int j = lowerY; j < upperY; j++) {
-				Tile tile = game.world.get(new TileLoc(i, j));
-				Point drawAt = getDrawingCoords(tile.getLocation());
-				List<String> strings = new LinkedList<String>();
-				strings.add(String.format("H=%." + NUM_DEBUG_DIGITS + "f", tile.getHeight()));
-				strings.add(String.format("PRES" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getPressure()));
-
-//				strings.add(String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getHumidity()));
-				strings.add(String.format("TTEM" + "=%." + NUM_DEBUG_DIGITS + "f", (tile.getTemperature() - Constants.FREEZETEMP)));
-				strings.add(String.format("ATEM" + "=%." + NUM_DEBUG_DIGITS + "f", (tile.getAir().getTemperature() - Constants.FREEZETEMP)));
-				strings.add(String.format("TENE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEnergy()));
-				strings.add(String.format("AENE" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getEnergy()));
-				
-				
-//				strings.add(String.format("EVAP" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getEvaporation()));
-//				strings.add(String.format("dVOL" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getVolumeChange()));
-				strings.add(String.format("VOL" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getVolumeLiquid()));
-				strings.add(String.format("MVOL" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getMaxVolumeLiquid()));
-				
-//				strings.add(String.format("RH" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getRelativeHumidity()));
-//				strings.add(String.format("DEW" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getDewPoint()));
-
-//				strings.add(String.format("MASS" + "=%." + NUM_DEBUG_DIGITS + "f", tile.getAir().getMass()));
-				if (tile.getResource() != null) {
-					strings.add(String.format("ORE" + "=%d", tile.getResource().getYield()));
-				}
-
-				if (tile.liquidType != LiquidType.DRY) {
-					strings.add(String.format(tile.liquidType.name().charAt(0) + "=%." + NUM_DEBUG_DIGITS + "f",
-							tile.liquidAmount));
-				}
-
-				if (tile.getModifier() != null) {
-					strings.add("GM=" + tile.getModifier().timeLeft());
-				}
-				rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, strings, rows[i - lowerX][j - lowerY], fontsize,
-						frozenTileSize, drawAt);
-
-				for (Unit unit : tile.getUnits()) {
-					rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, unit.getDebugStrings(),
-							rows[i - lowerX][j - lowerY], fontsize, frozenTileSize, drawAt);
-				}
-				if (tile.getPlant() != null) {
-					rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, tile.getPlant().getDebugStrings(),
-							rows[i - lowerX][j - lowerY], fontsize, frozenTileSize, drawAt);
-				}
-				if (tile.hasBuilding()) {
-					rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, tile.getBuilding().getDebugStrings(),
-							rows[i - lowerX][j - lowerY], fontsize, frozenTileSize, drawAt);
-				}
-				if (tile.getRoad() != null) {
-					rows[i - lowerX][j - lowerY] = tile.drawDebugStrings(g, tile.getRoad().getDebugStrings(),
-							rows[i - lowerX][j - lowerY], fontsize, frozenTileSize, drawAt);
-				}
-			}
-		}
-	}
-
-	private Point getDrawingCoords(TileLoc tileLoc) {
-		int x = tileLoc.x() * frozenTileSize;
-		int y = tileLoc.y() * frozenTileSize + (tileLoc.x() % 2) * frozenTileSize / 2;
-		return new Point(x, y);
-	}
-
-	private void drawTarget(Graphics g, TileLoc tileLoc) {
-		Point drawAt = getDrawingCoords(tileLoc);
-		int w = (int) (frozenTileSize * 8 / 10);
-		int hi = (int) (frozenTileSize * 8 / 10);
-		g.drawImage(TARGET_IMAGE, drawAt.x + frozenTileSize * 1 / 10, drawAt.y + frozenTileSize * 1 / 10, w, hi, null);
-	}
-	private void drawAirFlow(Graphics g, Tile tile, boolean arrows) {
-		TileLoc tileLoc = tile.getLocation();
-		Point drawAt = getDrawingCoords(tileLoc);
-		int w = (int) (frozenTileSize * 8 / 10);
-		int hi = (int) (frozenTileSize * 8 / 10);
-		if(tile.getAir().getFlowDirection() != null) {
-			Image image = arrows ? tile.getAir().getFlowDirection().getArrowImage() : tile.getAir().getFlowDirection().getImage() ;
-//			System.out.println(tile.getAir().getFlowDirection());
-			g.drawImage(image, drawAt.x, drawAt.y, frozenTileSize, frozenTileSize, null);
-//			g.drawImage(TARGET_IMAGE, drawAt.x + frozenTileSize * 1 / 10, drawAt.y + frozenTileSize * 1 / 10, w, hi, null);
-		}
-
 	}
 	
 	/**
