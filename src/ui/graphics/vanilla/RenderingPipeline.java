@@ -11,6 +11,8 @@ import world.*;
 import world.liquid.LiquidType;
 
 public class RenderingPipeline {
+	
+	public static final int MIN_TILESIZE_FOR_DEBUG_STRINGS = 150;
 
 	public List<RenderingStep> steps;
 	private RenderingPipeline() {
@@ -66,13 +68,13 @@ public class RenderingPipeline {
 	}, null);
 	
 	private static RenderingStep debugStrings = new RenderingStep(state -> {
-		if (state.gameViewState.drawDebugStrings && state.tileSize >= 150) {
+		if (state.gameViewState.drawDebugStrings && state.tileSize >= MIN_TILESIZE_FOR_DEBUG_STRINGS) {
 			int fontsize = Math.min(13, state.tileSize / 4);
 			Font font = new Font("Consolas", Font.PLAIN, fontsize);
 			state.g.setFont(font);
 		}
 	}, (state, tile, drawat) -> {
-		if (state.gameViewState.drawDebugStrings && state.tileSize >= 150) {
+		if (state.gameViewState.drawDebugStrings && state.tileSize >= MIN_TILESIZE_FOR_DEBUG_STRINGS) {
 			RenderingFunctions.drawDebugStringsHelper1(state, tile, drawat, state.g.getFont().getSize());
 		}
 	});
@@ -170,10 +172,7 @@ public class RenderingPipeline {
 	});
 	
 	private static RenderingStep tileInventory = new RenderingStep(null, (state, tile, drawat) -> {
-		if (state.tileSize <= 20) {
-			return;
-		}
-		if (!tile.getInventory().isEmpty()) {
+		if (state.tileSize > 20 && !tile.getInventory().isEmpty()) {
 			RenderingFunctions.drawInventory(state.g, 
 					tile.getInventory(), 
 					drawat.x + state.tileSize / 5,
