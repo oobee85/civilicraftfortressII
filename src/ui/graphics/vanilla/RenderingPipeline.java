@@ -201,8 +201,6 @@ public class RenderingPipeline {
 	});
 	
 	private static RenderingStep units = new RenderingStep(null, (state, tile, drawat) -> {
-		for (Unit unit : tile.getUnits()) {
-			RenderingFunctions.drawUnit(unit, state, tile, drawat);
-		}
+		RenderingFunctions.drawUnits(state, tile, drawat);
 	});
 }

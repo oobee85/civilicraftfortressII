@@ -540,63 +540,38 @@ public class RenderingFunctions {
 			g.drawImage(bI, drawx, drawy, draww, drawh, null);
 		}
 	}
-	
-	public static void drawUnit(Unit unit, RenderingState state, Tile tile, Point drawat) {
-
-//		LinkedList<Tile> path = unit.getCurrentPath();
-//		double timeLeft = unit.getTimeToMove();
-//		double timeStart = unit.getCombatStats().getMoveSpeed();
-//		double percent = 0;
-//		if(timeStart != 0) {
-//			percent = timeLeft / timeStart;
-//		}
-
+	private static void drawUnit(Graphics g, Point drawat, int size, Unit unit) {
 		if (unit.isSelected()) {
-			state.g.drawImage(unit.getMipMap().getHighlight(state.tileSize), drawat.x, drawat.y, state.draww, state.drawh, null);
+			g.drawImage(unit.getMipMap().getHighlight(size), drawat.x, drawat.y, size, size, null);
 		}
-//		if(path != null && path.peek() != null) {
-//			Tile targetTile = path.peek();
-//			int targetx = targetTile.getLocation().x();
-//			int targety = targetTile.getLocation().y();
-//			int dx = Math.abs(drawx - targetx);
-//			int dy = Math.abs(drawy - targety);
-//			if(targetx > drawx) {
-//				dx *= -1; 
-//			}
-//			if(targetx < drawx){
-//				dx *= 1; 
-//			}
-//			
-//			if(targety > drawy) {
-//				dy *= -1; 
-//			}
-//			if(targety < drawy){
-//				dy *= 1; 
-//			}
-//			g.drawImage(unit.getImage(frozenTileSize), (int)(drawx + drawx - dx), (int)(drawy + drawy - dy), draww, drawh, null);
-//		}else {
-		drawSunShadow(unit.getMipMap(), state.g, drawat.x, drawat.y, state.draww, state.drawh, state.tileSize);
-		state.g.drawImage(unit.getMipMap().getImage(state.tileSize), drawat.x, drawat.y, state.draww, state.drawh, null);
-//		}
+		drawSunShadow(unit.getMipMap(), g, drawat.x, drawat.y, size, size, size);
+		g.drawImage(unit.getMipMap().getImage(size), drawat.x, drawat.y, size, size, null);
 
 		if (unit.isGuarding() == true) {
-			state.g.drawImage(GUARD_ICON, drawat.x + state.draww / 4, drawat.y + state.drawh / 4, state.draww / 2, state.drawh / 2, null);
+			g.drawImage(GUARD_ICON, drawat.x + size / 4, drawat.y + size / 4, size / 2, size / 2, null);
 		}
 		if (unit.isAutoBuilding() == true) {
-			state.g.drawImage(AUTO_BUILD_ICON, drawat.x + state.draww / 4, drawat.y + state.drawh / 4, state.draww / 2, state.drawh / 2, null);
+			g.drawImage(AUTO_BUILD_ICON, drawat.x + size / 4, drawat.y + size / 4, size / 2, size / 2, null);
 		}
 		if (unit.isIdle()) {
-			state.g.setColor(Color.gray);
-			state.g.fillRect(drawat.x + state.draww * 4 / 5, drawat.y, state.draww / 5, state.drawh / 5);
+			g.setColor(Color.gray);
+			g.fillRect(drawat.x + size * 4 / 5, drawat.y, size / 5, size / 5);
 		} else {
 			PlannedAction action = unit.getNextPlannedAction();
 			if (action != null) {
 				Image image = getIconForAction(action);
 				if (image != null) {
-					state.g.drawImage(image, drawat.x, drawat.y, state.draww, state.drawh, null);
+					g.drawImage(image, drawat.x, drawat.y, size, size, null);
 				}
 			}
 
+		}
+	}
+	
+	public static void drawUnits(RenderingState state, Tile tile, Point drawat) {
+		
+		for (Unit unit : tile.getUnits()) {
+			drawUnit(state.g, drawat, state.tileSize, unit);
 		}
 	}
 	
