@@ -188,7 +188,7 @@ public class GameViewOverlay extends JPanel {
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				VanillaDrawer.drawHealthBar2(g, unit, 0, getHeight() - currentUnitButtonSize.healthBarSize, getWidth(), currentUnitButtonSize.healthBarSize, 1, unit.getHealth()/unit.getMaxHealth());
+				RenderingFunctions.drawHealthBar2(g, unit, 0, getHeight() - currentUnitButtonSize.healthBarSize, getWidth(), currentUnitButtonSize.healthBarSize, 1, unit.getHealth()/unit.getMaxHealth());
 			}
 		};
 		button.setPreferredSize(new Dimension(currentUnitButtonSize.buttonSize, currentUnitButtonSize.buttonSize));

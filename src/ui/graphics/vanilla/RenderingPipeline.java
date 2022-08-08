@@ -40,9 +40,19 @@ public class RenderingPipeline {
 			
 			pipeline.steps.add(drawHoveredTiles);
 			pipeline.steps.add(drawPlannedThing);
+			pipeline.steps.add(drawSelectedThings);
+			pipeline.steps.add(drawInventoryHealthBarHitsplat);
 		}
 		return pipeline;
 	}
+	
+	private static RenderingStep drawInventoryHealthBarHitsplat = new RenderingStep(false, state -> {
+		RenderingFunctions.drawInventoryHealthBar(state);
+	});
+	
+	private static RenderingStep drawSelectedThings = new RenderingStep(false, state -> {
+		RenderingFunctions.drawSelectedThings(state);
+	});
 
 	private static RenderingStep drawPlannedThing = new RenderingStep(false, state -> {
 		RenderingFunctions.drawPlannedThing(state);

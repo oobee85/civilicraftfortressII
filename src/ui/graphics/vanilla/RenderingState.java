@@ -30,4 +30,9 @@ public class RenderingState {
 	int drawh;
 	Tile tile;
 
+	int lowerX;
+	int lowerY;
+	int upperX;
+	int upperY;
+
 }
