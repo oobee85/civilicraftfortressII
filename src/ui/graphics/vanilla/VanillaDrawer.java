@@ -189,9 +189,23 @@ public class VanillaDrawer extends Drawer {
 
 			if (!Game.DISABLE_NIGHT) {
 				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-				g.drawImage(mapImages[MapMode.LIGHT_BIG.ordinal()], 0, 0, 
-						tileSize * game.world.getWidth(), 
-						tileSize * game.world.getHeight() + tileSize/2, null);
+				
+				int startxoffset = viewOffsetX / tileSize;
+				int startyoffset = viewOffsetY / tileSize;
+				int numtilesx = canvas.getWidth() / tileSize + 2;
+				int numtilesy = canvas.getHeight() / tileSize + 2;
+				
+				int startx = startxoffset * tileSize;
+				int starty = startyoffset * tileSize;
+				int width = numtilesx * tileSize;
+				int height = numtilesy * tileSize;
+
+				g.drawImage(mapImages[MapMode.LIGHT_BIG.ordinal()], 
+						startx, starty, 
+						startx + width, starty + height, 
+						startxoffset * 2, startyoffset * 2, 
+						startxoffset * 2 + numtilesx * 2, startyoffset * 2 + numtilesy * 2, 
+						null);
 			}
 			g.translate(viewOffsetX, viewOffsetY);
 		}
