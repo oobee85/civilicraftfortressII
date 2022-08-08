@@ -25,7 +25,7 @@ public class RenderingStep implements RenderStepInterface, TileRenderStepInterfa
 	}
 	
 	@Override
-	public void render(RenderingState state, Tile tile, Point drawat) {
+	public void render(RenderingState state, Tile tile, Point4 drawat) {
 		if (tileRenderStep != null) {
 			tileRenderStep.render(state, tile, drawat);
 		}

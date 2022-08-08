@@ -84,32 +84,34 @@ public class VanillaDrawer extends Drawer {
 			}
 		});
 		resetBuffers();
-		Thread thread = new Thread(() -> {
-			try {
-				while(true) {
-					nextRequested.acquire();
-					long startDrawing = System.currentTimeMillis();
-					int next = (currentBuffer + 1) % buffers.length;
-
-					// Must take snapshot of current tile size and view offset to draw a 
-					// consistent image. Otherwise while player is dragging view it will 
-					// change view offset while it is drawing which causes a bunch of issues.
-					drawnAtOffset[next].x = state.viewOffset.x;
-					drawnAtOffset[next].y = state.viewOffset.y;
-					drawnAtTileSize[next] = state.volatileTileSize;
-					drawStuff(buffers[next], drawnAtOffset[next].x, drawnAtOffset[next].y, drawnAtTileSize[next]);
-					
-					long finishedDrawing = System.currentTimeMillis();
-					bufferDrawTimes[next] = (int) (finishedDrawing - startDrawing);
-					currentBuffer = next;
-					numAvailable.release();
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		});
+		Thread thread = new Thread(bufferDrawingLoop);
 		thread.start();
 	}
+	
+	private Runnable bufferDrawingLoop = () -> {
+		try {
+			while(true) {
+				nextRequested.acquire();
+				long startDrawing = System.currentTimeMillis();
+				int next = (currentBuffer + 1) % buffers.length;
+
+				// Must take snapshot of current tile size and view offset to draw a 
+				// consistent image. Otherwise while player is dragging view it will 
+				// change view offset while it is drawing which causes a bunch of issues.
+				drawnAtOffset[next].x = state.viewOffset.x;
+				drawnAtOffset[next].y = state.viewOffset.y;
+				drawnAtTileSize[next] = state.volatileTileSize;
+				drawStuff(buffers[next], drawnAtOffset[next].getIntX(), drawnAtOffset[next].getIntY(), drawnAtTileSize[next]);
+				
+				long finishedDrawing = System.currentTimeMillis();
+				bufferDrawTimes[next] = (int) (finishedDrawing - startDrawing);
+				currentBuffer = next;
+				numAvailable.release();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	};
 	
 	private void resetBuffers() {
 		for(int i = 0; i < buffers.length; i++) {
@@ -170,18 +172,17 @@ public class VanillaDrawer extends Drawer {
 		}
 	}
 
-	private void drawStuff(BufferedImage image, double viewOffsetX, double viewOffsetY, int tileSize) {
+	private void drawStuff(BufferedImage image, int viewOffsetX, int viewOffsetY, int tileSize) {
 		Graphics2D g = image.createGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
-				RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-				RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+		g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 		Utils.clearBufferedImageTo(g, new Color(0, 0, 0, 0), image.getWidth(), image.getHeight());
 		if (game == null || game.world == null) {
 			g.drawString("No World to display", 20, 20);
 		}
 		else {
+			// These must be integers otherwise weird off-by-one artifacts
 			g.translate(-viewOffsetX, -viewOffsetY);
 			draw(g, canvas.getWidth(), canvas.getHeight(), tileSize);
 			g.translate(viewOffsetX, viewOffsetY);
@@ -225,8 +226,8 @@ public class VanillaDrawer extends Drawer {
 						if (World.getDaylight() + tile.getBrightness(state.faction) <= 0) {
 							continue;
 						}
-						Point drawAt = RenderingFunctions.getDrawingCoords(tile.getLocation(), tileSize);
-						step.render(renderState, tile, drawAt);
+						Point4 drawat = RenderingFunctions.getDrawingCoords(tile.getLocation(), tileSize);
+						step.render(renderState, tile, drawat);
 					}
 				}
 			}

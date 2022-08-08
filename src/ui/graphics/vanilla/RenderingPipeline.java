@@ -50,11 +50,11 @@ public class RenderingPipeline {
 			pipeline.steps.add(projectiles);
 			pipeline.steps.add(weatherEvents);
 			pipeline.steps.add(unitQuantitySquares);
-			pipeline.steps.add(nightTimeFogOfWar);
 			if (mode == MapMode.FLOW2) {
 				pipeline.steps.add(airFlow2);
 			}
 			pipeline.steps.add(target);
+			pipeline.steps.add(nightTimeFogOfWar);
 		}
 		
 		pipeline.steps.add(debugStrings);
@@ -140,7 +140,7 @@ public class RenderingPipeline {
 	
 	private static RenderingStep terrain = new RenderingStep(null, (state, tile, drawat) -> {
 		state.g.drawImage(tile.getTerrain().getImage(state.tileSize), 
-				drawat.x, drawat.y, state.draww, state.drawh, null);
+				drawat.x, drawat.y, drawat.w, drawat.h, null);
 	});
 	
 	private static RenderingStep resource = new RenderingStep(null, (state, tile, drawat) -> {

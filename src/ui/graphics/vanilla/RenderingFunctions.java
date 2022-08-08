@@ -51,12 +51,18 @@ public class RenderingFunctions {
 
 	}
 	
-	public static void drawNightTimeFogOfWar(RenderingState state, Tile tile, Point drawat) {
+	public static void drawNightTimeFogOfWar(RenderingState state, Tile tile, Point4 drawat) {
 		double brightness = World.getDaylight() + tile.getBrightness(state.faction);
-		brightness = Math.max(Math.min(brightness, 1), 0);
-		state.g.setColor(new Color(0, 0, 0, (int) (255 * (1 - brightness))));
-		Point drawAt = getDrawingCoords(tile.getLocation(), state.tileSize);
-		state.g.fillRect(drawAt.x, drawAt.y, state.tileSize, state.tileSize);
+		if (brightness >= 1) {
+			return;
+		}
+		else if (brightness <= 0) {
+			state.g.setColor(Color.black);
+		}
+		else {
+			state.g.setColor(new Color(0, 0, 0, (int) (255 * (1 - brightness))));
+		}
+		state.g.fillRect(drawat.x, drawat.y, drawat.w, drawat.h);
 	}
 	
 	public static void drawUnitQuantitySquares(RenderingState state, Tile tile, Point drawat) {
@@ -728,9 +734,12 @@ public class RenderingFunctions {
 		}
 	}
 	
-	public static Point getDrawingCoords(TileLoc tileLoc, int frozenTileSize) {
+	public static Point4 getDrawingCoords(TileLoc tileLoc, int frozenTileSize) {
+		int yoffset = (tileLoc.x() % 2) * frozenTileSize / 2;
 		int x = tileLoc.x() * frozenTileSize;
-		int y = tileLoc.y() * frozenTileSize + (tileLoc.x() % 2) * frozenTileSize / 2;
-		return new Point(x, y);
+		int y = tileLoc.y() * frozenTileSize;
+		int x2 = (tileLoc.x() + 1) * frozenTileSize;
+		int y2 = (tileLoc.y() + 1) * frozenTileSize;
+		return new Point4(x, y + yoffset, x2 - x, y2 - y);
 	}
 }
