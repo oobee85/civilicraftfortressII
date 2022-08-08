@@ -65,18 +65,69 @@ public class RenderingFunctions {
 		state.g.fillRect(drawat.x, drawat.y, drawat.w, drawat.h);
 	}
 	
-	public static void drawUnitQuantitySquares(RenderingState state, Tile tile, Point drawat) {
-		int indicatorSize = state.tileSize / 12;
-		int offset = 4;
-		int count = 0;
+	private static int drawUnitQuantitySquaresHelper(Graphics2D g, int numInFaction, Color factionColor, int x, int y, int indicatorSize) {
+		while (numInFaction > 0) {
+			if (numInFaction >= 20) {
+				g.setColor(factionColor);
+				int size = indicatorSize * 20 / 2;
+				g.fillRect(x, y + 2, indicatorSize, size);
+				g.setColor(Color.BLACK);
+				g.drawRect(x, y, indicatorSize, size + 4);
+				g.drawRect(x, y + 1, indicatorSize, size + 2);
+				g.drawRect(x, y + 2, indicatorSize, size);
+				for (int i = 1; i < 20; i++) {
+					int w = (i % 5 == 0) ? indicatorSize : indicatorSize / 2;
+					int yy = y + 1 + size * i / 20;
+					g.drawLine(x, yy, x + w, yy);
+				}
+				y += size + 4;
+				numInFaction -= 20;
+			}
+			else if (numInFaction >= 5) {
+				g.setColor(factionColor);
+				int size = indicatorSize * 5 * 3 / 5;
+				g.fillRect(x, y + 1, indicatorSize, size);
+				g.setColor(Color.BLACK);
+				g.drawRect(x, y, indicatorSize, size + 2);
+				g.drawRect(x, y + 1, indicatorSize, size);
+				for (int i = 1; i < 5; i++) {
+					g.drawLine(x, y + 1 + size * i / 5, x + indicatorSize/2, y + 1 + size * i / 5);
+				}
+				y += size + 2;
+				numInFaction -= 5;
+			}
+			else {
+				g.setColor(factionColor);
+				g.fillRect(x, y, indicatorSize, indicatorSize);
+				g.setColor(Color.BLACK);
+				g.drawRect(x, y, indicatorSize, indicatorSize);
+				y += indicatorSize;
+				numInFaction -= 1;
+			}
+		}
+		return y;
+	}
+	
+	public static void drawUnitQuantitySquares(RenderingState state, Tile tile, Point4 drawat) {
+		int[] numPerFaction = new int[state.world.getFactions().size()];
 		for (Unit unit : tile.getUnits()) {
-			int xx = drawat.x + offset;
-			int yy = drawat.y + (indicatorSize + offset) * count + offset;
-			state.g.setColor(unit.getFaction().color());
-			state.g.fillRect(xx, yy, indicatorSize, indicatorSize);
-			state.g.setColor(Color.BLACK);
-			state.g.drawRect(xx, yy, indicatorSize, indicatorSize);
-			count++;
+			numPerFaction[unit.getFactionID()]++;
+		}
+		
+		int offset = state.tileSize / 40;
+		int spacePerIndicator = state.tileSize / 10;
+		int yy = drawat.y + offset;
+		int xx = drawat.x + offset;
+		yy = drawUnitQuantitySquaresHelper(state.g, numPerFaction[state.faction.id()], 
+				state.faction.color(), xx, yy, spacePerIndicator);
+		
+		for (int factionid = 0; factionid < numPerFaction.length; factionid++) {
+			if (factionid == state.faction.id()) {
+				continue;
+			}
+			yy += offset;
+			yy = drawUnitQuantitySquaresHelper(state.g, numPerFaction[factionid], 
+					state.world.getFactions().get(factionid).color(), xx, yy, spacePerIndicator);
 		}
 	}
 	
