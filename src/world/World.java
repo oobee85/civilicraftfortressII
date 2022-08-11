@@ -1284,12 +1284,16 @@ public class World {
 	}
 	
 	public BufferedImage[] createTerrainImage(Faction faction) {
+		BufferedImage[] mapImages = new BufferedImage[MapMode.values().length];
+		mapImages[MapMode.LIGHT.ordinal()] = computeTileBrightness(faction);
 		double brighnessModifier = getDaylight();
+		
 		HashMap<Terrain, Color> terrainColors = Utils.computeTerrainAverageColor();
 		BufferedImage terrainImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 		BufferedImage minimapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 		BufferedImage bigTerrainImage = new BufferedImage(terrainImage.getWidth()*2, terrainImage.getHeight()*2+1, terrainImage.getType());
-		
+		BufferedImage bigLightImage = new BufferedImage(terrainImage.getWidth()*2, terrainImage.getHeight()*2+1, terrainImage.getType());
+
 		for(Tile tile : this.getTiles()) {
 			Color minimapColor = terrainColors.get(tile.getTerrain());
 			Color terrainColor = terrainColors.get(tile.getTerrain());
@@ -1329,11 +1333,25 @@ public class World {
 			
 			minimapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), minimapColor.getRGB());
 			terrainImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), terrainColor.getRGB());
+			
 			int oddColumn = tile.getLocation().x() % 2;
 			bigTerrainImage.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2 + oddColumn, terrainColor.getRGB());
 			bigTerrainImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2 + oddColumn, terrainColor.getRGB());
 			bigTerrainImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2+1 + oddColumn, terrainColor.getRGB());
 			bigTerrainImage.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2+1 + oddColumn, terrainColor.getRGB());
+			
+			int alpha = (int) (255 * (1 - (brighnessModifier + tilebrightness)));
+			alpha = (alpha > 255) ? 255 : ((alpha < 0) ? 0 : alpha);
+			int nightColor = new Color(0, 0, 0, alpha).getRGB();
+			bigLightImage.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2 + oddColumn, nightColor);
+			bigLightImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2 + oddColumn, nightColor);
+			bigLightImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2+1 + oddColumn, nightColor);
+			bigLightImage.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2+1 + oddColumn, nightColor);
+		}
+		for (int x = 0; x < bigLightImage.getWidth(); x++) {
+			bigLightImage.setRGB(x, 0, bigLightImage.getRGB(x, 1));
+			bigLightImage.setRGB(x, bigLightImage.getHeight()-1, 
+					bigLightImage.getRGB(x, bigLightImage.getHeight() - 2));
 		}
 		for(AttackedNotification notification : faction.getAttackedNotifications()) {
 			minimapImage.setRGB(notification.tile.getLocation().x(), notification.tile.getLocation().y(), Color.red.getRGB());
@@ -1359,12 +1377,11 @@ public class World {
 			lowHumidity = Math.min(lowHumidity, tile.getAir().getHumidity());
 		}
 		
-		BufferedImage[] mapImages = new BufferedImage[MapMode.values().length];
 		mapImages[MapMode.TERRAIN_BIG.ordinal()] = bigTerrainImage;
 		mapImages[MapMode.TERRAIN.ordinal()] = terrainImage;
 		mapImages[MapMode.FLOW2.ordinal()] = terrainImage;
 		mapImages[MapMode.MINIMAP.ordinal()] = minimapImage;
-		mapImages[MapMode.LIGHT.ordinal()] = computeTileBrightness(faction);
+		mapImages[MapMode.LIGHT_BIG.ordinal()] = bigLightImage;
 		for(MapMode mode : MapMode.HEATMAP_MODES) {
 			BufferedImage image = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 			for(Tile tile : getTiles() ) {
@@ -1472,9 +1489,6 @@ public class World {
 	private static int precomputedDaylightTick = -1;
 	
 	public static double getDaylight() {
-		if(Game.DISABLE_NIGHT) {
-			return 1;
-		}
 		if(World.ticks != precomputedDaylightTick) {
 			recomputeDaylight();
 		}

@@ -53,7 +53,7 @@ public class GameView {
 	public class GameViewState {
 		public long previousTickTime;
 		public volatile Position viewOffset = new Position(0, 0);
-		public volatile int tileSize = Settings.DEFAULT_TILE_SIZE;
+		public volatile int volatileTileSize = Settings.DEFAULT_TILE_SIZE;
 		public boolean fpMode;
 		
 		public Point mousePressLocation;
@@ -126,7 +126,7 @@ public class GameView {
 					fpsMouseRobot.mouseMove(drawingCanvas.getLocationOnScreen().x + currentMouse.x, 
 							drawingCanvas.getLocationOnScreen().y + currentMouse.y);
 				}
-				mouseOver(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize));
+				mouseOver(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize));
 				state.previousMouse = currentMouse;
 			}
 
@@ -148,11 +148,11 @@ public class GameView {
 						currentActiveDrawer.rotateView(dx, dy);
 					}
 					if (state.leftMouseDown) {
-						state.boxSelect[1] = currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize);
+						state.boxSelect[1] = currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize);
 					}
 					state.previousMouse = currentMouse;
 				}
-				mouseOver(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize));
+				mouseOver(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize));
 			}
 		};
 		MouseListener mouseListener = new MouseListener() {
@@ -161,14 +161,14 @@ public class GameView {
 				Point currentMouse = e.getPoint();
 				if (!state.draggingMouse) {
 					if (SwingUtilities.isRightMouseButton(e)) {
-						rightClick(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize), shiftDown);
+						rightClick(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize), shiftDown);
 					} else if (SwingUtilities.isLeftMouseButton(e)) {
-						leftClick(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize), shiftDown);
+						leftClick(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize), shiftDown);
 					}
 				} else {
 					if (SwingUtilities.isLeftMouseButton(e)) {
-						state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.tileSize);
-						state.boxSelect[1] = currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.tileSize);
+						state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.volatileTileSize);
+						state.boxSelect[1] = currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize);
 						selectInBox(state.boxSelect[0], state.boxSelect[1], shiftDown);
 					}
 				}
@@ -190,7 +190,7 @@ public class GameView {
 				if (SwingUtilities.isLeftMouseButton(e)) {
 					state.leftMouseDown = true;
 					state.mousePressLocation = e.getPoint();
-					state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.tileSize);
+					state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.volatileTileSize);
 				} else if (SwingUtilities.isRightMouseButton(e)) {
 					rightMouseDown = true;
 				} else if (SwingUtilities.isMiddleMouseButton(e)) {
@@ -805,7 +805,7 @@ public class GameView {
 	 */
 	public void minimapMoveViewTo(double ratiox, double ratioy) {
 		Position tile = new Position(ratiox * game.world.getWidth(), ratioy * game.world.getHeight());
-		centerViewOnPixel(tile.multiply(state.tileSize));
+		centerViewOnPixel(tile.multiply(state.volatileTileSize));
 	}
 	
 	/** Adjusts the camera view so that the center of the specified tileloc is in the center
@@ -813,7 +813,7 @@ public class GameView {
 	 */
 	public void centerViewOnTile(TileLoc tileloc) {
 		Position worldPos = new Position(tileloc.x()+0.5, tileloc.y()+0.5);
-		Point pixel = currentActiveDrawer.getPixelOfWorldCoord(worldPos, state.tileSize);
+		Point pixel = currentActiveDrawer.getPixelOfWorldCoord(worldPos, state.volatileTileSize);
 		centerViewOnPixel(new Position(pixel.x, pixel.y));
 	}
 

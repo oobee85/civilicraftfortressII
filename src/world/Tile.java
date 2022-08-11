@@ -39,7 +39,7 @@ public class Tile implements Externalizable {
 	private double precomputedBrightness;
 	
 
-	private ConcurrentLinkedQueue<Unit> units;
+	private ConcurrentLinkedDeque<Unit> units;
 	private ConcurrentLinkedQueue<Projectile> projectiles;
 	private Inventory inventory;
 
@@ -90,7 +90,7 @@ public class Tile implements Externalizable {
 		terr = t;
 		liquidType = LiquidType.WATER;
 		liquidAmount = 0;
-		units = new ConcurrentLinkedQueue<Unit>();
+		units = new ConcurrentLinkedDeque<Unit>();
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
 		inventory = new Inventory();
 		this.energy = 100000;
@@ -270,7 +270,7 @@ public class Tile implements Externalizable {
 		return null;
 	}
 
-	public ConcurrentLinkedQueue<Unit> getUnits() {
+	public ConcurrentLinkedDeque<Unit> getUnits() {
 		return units;
 	}
 
@@ -351,25 +351,6 @@ public class Tile implements Externalizable {
 //		g.setColor(new Color(r, 0, 255 - r));
 //		g.fillRect(location.x() * tileSize, location.y() * tileSize, tileSize, tileSize);
 //	}
-
-	public int drawDebugStrings(Graphics g, List<String> strings, int row, int fontsize, int tileSize, Point drawAt) {
-		int x = drawAt.x + 2;
-		int y = drawAt.y + fontsize / 2;
-		int maxWidth = 0;
-		for (String s : strings) {
-			int stringWidth = g.getFontMetrics().stringWidth(s) + 2;
-			maxWidth = maxWidth > stringWidth ? maxWidth : stringWidth;
-		}
-		g.setColor(Color.black);
-		g.fillRect(x, y + 2 + row, maxWidth, fontsize * strings.size());
-		for (String s : strings) {
-			g.setColor(Color.green);
-			row += fontsize;
-			g.drawString(s, x, y + row);
-		}
-		row += 1;
-		return row;
-	}
 	
 	public boolean hasRoad() {
 		return road != null;
@@ -574,6 +555,44 @@ public class Tile implements Externalizable {
 	@Override
 	public String toString() {
 		return location.toString();
+	}
+	
+	public List<String> getDebugStrings() {
+		int NUM_DEBUG_DIGITS = 3;
+		String fvalue = "%." + NUM_DEBUG_DIGITS + "f";
+		List<String> strings = new LinkedList<String>(Arrays.asList(
+				String.format("H=" + fvalue, getHeight()),
+				String.format("PRES=" + fvalue, getAir().getPressure()),
+				
+//				String.format("HUM" + "=%." + NUM_DEBUG_DIGITS + "f", getAir().getHumidity()),
+				String.format("TTEM=" + fvalue, (getTemperature() - Constants.FREEZETEMP)),
+				String.format("ATEM=" + fvalue, (getAir().getTemperature() - Constants.FREEZETEMP)),
+				String.format("TENE=" + fvalue, getEnergy()),
+				String.format("AENE=" + fvalue, getAir().getEnergy()),
+				
+//				String.format("EVAP=" + fvalue, getEvaporation()),
+//				String.format("dVOL=" + fvalue, getAir().getVolumeChange()),
+				String.format("VOL=" + fvalue, getAir().getVolumeLiquid()),
+				String.format("MVOL=" + fvalue, getAir().getMaxVolumeLiquid())
+				
+//				String.format("RH=" + fvalue, getAir().getRelativeHumidity()),
+//				String.format("DEW=" + fvalue, getAir().getDewPoint()),
+//				String.format("MASS=" + fvalue, getAir().getMass())
+		));
+		
+		if (getResource() != null) {
+			strings.add(String.format("ORE=%d", getResource().getYield()));
+		}
+
+		if (liquidType != LiquidType.DRY) {
+			strings.add(String.format(liquidType.name().charAt(0) + "=" + fvalue,
+					liquidAmount));
+		}
+
+		if (getModifier() != null) {
+			strings.add(String.format("GM=%d", getModifier().timeLeft()));
+		}
+		return strings;
 	}
 
 	@Override
