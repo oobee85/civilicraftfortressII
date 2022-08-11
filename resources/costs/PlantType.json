@@ -21,26 +21,26 @@
 		"image":"Images/plants/cattail32.png",
 		"mesh":"models/cattail.ply",
 		"texture":"textures/pallet1.png",
-		"health":100,
+		"health":200,
 		"rarity": 1,
 		"resistances": {"DRY": 100, "WATER": 0},
-		"harvestitems":{"FOOD":6}
+		"harvestitems":{"FOOD":10}
 	},
 	{
 		"name":"TREE",
 		"image":"Images/plants/tree1.png",
 		"mesh":"models/square_tree.ply",
-		"health":100,
+		"health":500,
 		"rarity": 1,
 		"harvestitems":{"WOOD":2}
 	},
 	{
 		"name":"CACTUS",
 		"image":"Images/plants/cactus.png",
-		"health":100,
+		"health":200,
 		"rarity": 1,
 		"attributes":["desertresistant"],
-		"harvestitems":{"FOOD":2, "WOOD":2}
+		"harvestitems":{"FOOD":5, "WOOD":5}
 	},
 ]
 }

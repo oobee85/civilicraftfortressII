@@ -1079,7 +1079,7 @@ public class World {
 		for(Tile tile : getTiles()) {
 			//generates cactus
 			if(tile.getTerrain() == Terrain.SAND) {
-				if(Math.random() < 0.01) {
+				if(Math.random() < 0.05) {
 					Plant plant = new Plant(Game.plantTypeMap.get("CACTUS"), tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(plant);
 					worldData.addPlant(plant);

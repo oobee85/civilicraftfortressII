@@ -563,7 +563,8 @@ public class Unit extends Thing implements Serializable {
 			didSomething = true;
 		}
 		else if(plan.isTakeItemsAction() && (unitType.isCaravan() || unitType.isBuilder()) && plan.target instanceof Building
-				&& ((Building)plan.target).getType().isColony() == true) {
+				&& ((Building)plan.target).hasInventory() == true) {
+//				&& ((Building)plan.target).getType().isColony() == true) {
 			this.doTake(plan, plan.target);
 			didSomething = true;
 		}
