@@ -16,8 +16,8 @@ Feel free to explore the code base and make contributions however you see fit bu
 	- [json.jar](https://github.com/stleary/JSON-java)
 	- [jPLY.jar](https://github.com/0leks/jPLY/releases/download/1/jply.jar)
 - Not included in the repo:
-	- Download the jogamp-all-platforms release from [jogamp.org](https://jogamp.org/) and add jogamp-all-platforms/jar/gluegen-rt.jar and jogamp-all-platforms/jar/jogl-all.jar to the classpath
-		- Recommended setup is to make a user library in eclipse that links against the above two mentioned jars.
+	- Download the jogamp-all-platforms release from [jogamp.org](https://jogamp.org/) and add `jogamp-all-platforms/jar/gluegen-rt.jar` and `jogamp-all-platforms/jar/jogl-all.jar` to the classpath
+		- Recommended setup is to make a user library in eclipse that links against the above two mentioned jars. (Not sure if actually necessary but you might need the platform specific versions of the above 2 jars as well. For example on my windows amd64 I use `gluegen-rt-natives-windows-amd64.jar` and `jogl-all-natives-windows-amd64.jar`
 
 ### Testing
 To run the project, run ClientDriver.java 
