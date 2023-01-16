@@ -69,8 +69,9 @@ public class Settings {
 				values.put(name, value);
 			});
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("Did not find settings.ini file. Creating one with default settings.");
 		} catch (IOException e) {
+			System.err.println("Failed to parse settings.ini");
 			e.printStackTrace();
 		}
 		for(Entry<String, String> entry : values.entrySet()) {
