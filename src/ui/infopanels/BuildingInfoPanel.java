@@ -10,7 +10,7 @@ public class BuildingInfoPanel extends InfoPanel {
 	Building showing;
 
 	public BuildingInfoPanel(Building showing) {
-		super(showing.toString(), showing.getMipMap().getImage(DEFAULT_IMAGE_SIZE));
+		super(showing.getType().toString(), showing.getMipMap().getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
 	}
 	@Override

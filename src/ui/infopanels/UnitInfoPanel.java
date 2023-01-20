@@ -10,7 +10,7 @@ public class UnitInfoPanel extends InfoPanel {
 	Unit showing;
 
 	public UnitInfoPanel(Unit showing) {
-		super(showing.toString(), showing.getMipMap().getImage(DEFAULT_IMAGE_SIZE));
+		super(showing.getType().toString(), showing.getMipMap().getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
 	}
 	
