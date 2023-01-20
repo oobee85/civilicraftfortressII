@@ -522,12 +522,16 @@ public class GameView {
 				}
 				if(unit.getType().isCaravan() ) {
 					Building targetBuilding = targetTile.getBuilding();
-					if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
-							&& targetBuilding.isBuilt() && targetBuilding.getType().isCastle()) {
+					if(targetBuilding != null && 
+							targetBuilding.getFaction() == unit.getFaction() && 
+							targetBuilding.isBuilt() && 
+							targetBuilding.getType().isCastle()) {
 						commandInterface.planAction(unit, PlannedAction.deliver(targetBuilding), !shiftDown);
 					}
-					else if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
-							&& targetBuilding.isBuilt() && targetBuilding.hasInventory()) {
+					else if (targetBuilding != null && 
+							targetBuilding.getFaction() == unit.getFaction() && 
+							targetBuilding.isBuilt() && 
+							targetBuilding.hasInventory()) {
 //						System.out.println("taking items, caravan");
 						commandInterface.planAction(unit, PlannedAction.takeItemsFrom(targetBuilding), !shiftDown);
 					}
@@ -547,8 +551,20 @@ public class GameView {
 					} else if (targetBuilding != null
 							&& (targetBuilding.getFaction() == unit.getFaction() || targetBuilding.getType().isRoad())
 							&& !targetBuilding.isBuilt()) {
+						PlannedAction plan;
+						if (targetBuilding.getType().isHarvestable()) {
+							plan = PlannedAction.buildOnTile(
+									targetBuilding.getTile(),
+									targetBuilding.getType().isRoad(),
+									PlannedAction.harvest(targetBuilding));
+						}
+						else {
+							plan = PlannedAction.buildOnTile(
+									targetBuilding.getTile(),
+									targetBuilding.getType().isRoad());
+						}
 						commandInterface.planAction(unit, 
-						                            PlannedAction.buildOnTile(targetBuilding.getTile(), targetBuilding.getType().isRoad()),
+						                            plan,
 						                            !shiftDown);
 					}
 					else if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction() 
