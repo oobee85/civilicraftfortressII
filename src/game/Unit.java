@@ -102,7 +102,7 @@ public class Unit extends Thing implements Serializable {
 	}
 	public void prequeuePlannedAction(PlannedAction plan) {
 		if(this.isSelected()) {
-			System.out.println("queued action: " + plan.type);
+			System.out.println("queued action: " + plan);
 		}
 		actionQueue.addFirst(plan);
 	}
@@ -635,7 +635,6 @@ public class Unit extends Thing implements Serializable {
 			this.queuePlannedAction(PlannedAction.deliver(building, PlannedAction.makeCopy(finished)));
 		}
 		else if(finished.isTakeItemsAction()) {
-			System.out.println("finding castle");
 			Building castle = getNearestCastleToDeliver();
 			this.queuePlannedAction(PlannedAction.deliver(castle, PlannedAction.takeItemsFrom(finished.target)));
 		}
@@ -781,6 +780,6 @@ public class Unit extends Thing implements Serializable {
 
 	@Override
 	public String toString() {
-		return unitType.toString();
+		return unitType.toString() + this.id();
 	}
 }

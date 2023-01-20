@@ -227,7 +227,7 @@ public class Building extends Thing implements Serializable {
 	
 	@Override
 	public String toString() {
-		return buildingType.toString();
+		return buildingType.toString() + this.id();
 	}
 	
 }

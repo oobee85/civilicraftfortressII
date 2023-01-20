@@ -551,14 +551,14 @@ public class GameView {
 						                            PlannedAction.buildOnTile(targetBuilding.getTile(), targetBuilding.getType().isRoad()),
 						                            !shiftDown);
 					}
+					else if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction() 
+							&& targetBuilding.getType().isCastle() && unit.hasInventory()) {
+						commandInterface.planAction(unit, PlannedAction.deliver(targetBuilding), !shiftDown);
+					}
 					else if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
 							&& targetBuilding.isBuilt() && targetBuilding.hasInventory()) {
 //						System.out.println("taking items, builder");
 						commandInterface.planAction(unit, PlannedAction.takeItemsFrom(targetBuilding), !shiftDown);
-					}
-					else if(targetBuilding != null && targetBuilding.getFaction() == unit.getFaction() 
-							&& targetBuilding.getType().isCastle() && unit.hasInventory()) {
-						commandInterface.planAction(unit, PlannedAction.deliver(targetBuilding), !shiftDown);
 					}
 					else if (targetTile.getPlant() != null && targetTile.getPlant().isDead() == false) {
 						commandInterface.planAction(unit, PlannedAction.harvest(targetTile.getPlant()), !shiftDown);
