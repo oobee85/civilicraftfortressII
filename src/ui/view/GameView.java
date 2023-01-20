@@ -545,8 +545,10 @@ public class GameView {
 					if (targetBuilding == null) {
 						targetBuilding = targetTile.getRoad();
 					}
-					if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
-							&& targetBuilding.isBuilt() && targetBuilding.getType().isHarvestable()) {
+					if (targetBuilding != null && 
+							targetBuilding.getFaction() == unit.getFaction() && 
+							targetBuilding.isBuilt() && 
+							targetBuilding.getType().isHarvestable()) {
 						commandInterface.planAction(unit, PlannedAction.harvest(targetBuilding), !shiftDown);
 					} else if (targetBuilding != null
 							&& (targetBuilding.getFaction() == unit.getFaction() || targetBuilding.getType().isRoad())

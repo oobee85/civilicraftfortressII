@@ -369,14 +369,23 @@ public class Unit extends Thing implements Serializable {
 	
 	public void doHarvestBuilding(Building building, PlannedAction action) {
 		if(readyToHarvest() && hasInventory()) {
+			if (building.isDead()) {
+				action.setDone(true);
+				return;
+			}
 			if(building.getType() == BasicAI.FARM) {
-				building.takeDamage(5, DamageType.PHYSICAL);
-				getInventory().addItem(ItemType.FOOD, 5);
-				this.resetTimeToHarvest(6);
-				if (building.isDead()) {
-					building.setPlanned(true);
-					building.setHealth(1);
-					building.setRemainingEffort(building.getType().getBuildingEffort());
+				// Someone else might have finished harvesting the farm
+				if (building.isBuilt()) {
+					building.takeDamage(5, DamageType.PHYSICAL);
+					getInventory().addItem(ItemType.FOOD, 5);
+					this.resetTimeToHarvest(6);
+					if (building.isDead()) {
+						building.setPlanned(true);
+						building.setHealth(1);
+						building.setRemainingEffort(building.getType().getBuildingEffort());
+					}
+				}
+				if (!building.isBuilt()) {
 					action.setFollowUp(PlannedAction.buildOnTile(
 							building.getTile(), 
 							false, 
@@ -567,10 +576,13 @@ public class Unit extends Thing implements Serializable {
 			this.doHarvest(plan.targetTile, plan);
 			didSomething = true;
 		}
-		else if(plan.isHarvestAction() && unitType.isBuilder() && plan.target != null 
-				&& plan.target instanceof Building 
-				&& ((Building)plan.target).getType().isHarvestable() == true) {
+		else if(plan.isHarvestAction() && 
+				unitType.isBuilder() && 
+				plan.target != null && 
+				plan.target instanceof Building && 
+				((Building)plan.target).getType().isHarvestable()) {
 			this.doHarvestBuilding((Building)plan.target, plan);
+			// TODO
 			didSomething = true;
 		}
 		else if(plan.isTakeItemsAction() && (unitType.isCaravan() || unitType.isBuilder()) && plan.target instanceof Building
@@ -579,8 +591,10 @@ public class Unit extends Thing implements Serializable {
 			this.doTake(plan, plan.target);
 			didSomething = true;
 		}
-		else if(plan.isHarvestAction() && unitType.isBuilder() && plan.target != null 
-				&& plan.target instanceof Plant) {
+		else if(plan.isHarvestAction() && 
+				unitType.isBuilder() && 
+				plan.target != null && 
+				plan.target instanceof Plant) {
 			this.doHarvest((Plant)plan.target, plan);
 			didSomething = true;
 		}
