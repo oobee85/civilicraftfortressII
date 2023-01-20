@@ -131,18 +131,21 @@ public class Thing implements Serializable {
 	}
 	
 	public void heal(double healing, boolean hitsplat) {
-		int roundedHealing = (int)Math.ceil(healing);
-		double tempHealing = roundedHealing;
-		if((health + healing) > this.maxHealth) {
-			tempHealing = this.maxHealth - health;
+		if (health == maxHealth) {
+			return;
 		}
-		int finalHealing = (int)tempHealing;
-		health += finalHealing;
-		if(finalHealing != 0) {
+		int oldHealth = (int)health;
+		health += healing;
+		if (health > maxHealth) {
+			health = maxHealth;
+		}
+		// Check if health increased to the next int
+		int amountHealed = (int)health - oldHealth;
+		if (amountHealed >= 1) {
 			timeLastDamageTaken = World.ticks;
-		}
-		if(hitsplat == true && finalHealing > 0) {
-			addHitsplat(-finalHealing);
+			if(hitsplat == true && amountHealed >= 1) {
+				addHitsplat(-amountHealed);
+			}
 		}
 	}
 	private void addHitsplat(int damage) {
