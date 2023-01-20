@@ -372,7 +372,17 @@ public class Unit extends Thing implements Serializable {
 			if(building.getType() == BasicAI.FARM) {
 				building.takeDamage(5, DamageType.PHYSICAL);
 				getInventory().addItem(ItemType.FOOD, 5);
-				this.resetTimeToHarvest(3);
+				this.resetTimeToHarvest(6);
+				if (building.isDead()) {
+					building.setPlanned(true);
+					building.setHealth(1);
+					building.setRemainingEffort(building.getType().getBuildingEffort());
+					action.setFollowUp(PlannedAction.buildOnTile(
+							building.getTile(), 
+							false, 
+							PlannedAction.harvest(building)));
+					action.setDone(true);
+				}
 			}
 			if(building.getType() == BasicAI.MINE) {
 				building.takeDamage(5, DamageType.PHYSICAL);
@@ -557,7 +567,8 @@ public class Unit extends Thing implements Serializable {
 			this.doHarvest(plan.targetTile, plan);
 			didSomething = true;
 		}
-		else if(plan.isHarvestAction() && unitType.isBuilder() && plan.target != null && plan.target instanceof Building 
+		else if(plan.isHarvestAction() && unitType.isBuilder() && plan.target != null 
+				&& plan.target instanceof Building 
 				&& ((Building)plan.target).getType().isHarvestable() == true) {
 			this.doHarvestBuilding((Building)plan.target, plan);
 			didSomething = true;
@@ -568,7 +579,8 @@ public class Unit extends Thing implements Serializable {
 			this.doTake(plan, plan.target);
 			didSomething = true;
 		}
-		else if(plan.isHarvestAction() && unitType.isBuilder() && plan.target != null && plan.target instanceof Plant) {
+		else if(plan.isHarvestAction() && unitType.isBuilder() && plan.target != null 
+				&& plan.target instanceof Plant) {
 			this.doHarvest((Plant)plan.target, plan);
 			didSomething = true;
 		}
@@ -630,7 +642,10 @@ public class Unit extends Thing implements Serializable {
 	}
 	
 	private void onFinishedAction(PlannedAction finished) {
-		if(finished.isHarvestAction()) {
+		if(finished.getFollowUp() != null) {
+			this.queuePlannedAction(finished.getFollowUp());
+		}
+		else if(finished.isHarvestAction()) {
 			Building building = getNearestBuildingToDeliver();
 			this.queuePlannedAction(PlannedAction.deliver(building, PlannedAction.makeCopy(finished)));
 		}
@@ -662,9 +677,6 @@ public class Unit extends Thing implements Serializable {
 			}
 			if(followup != null) 
 				this.queuePlannedAction(followup);
-		}
-		else if(finished.getFollowUp() != null) {
-			this.queuePlannedAction(finished.getFollowUp());
 		}
 	}
 	

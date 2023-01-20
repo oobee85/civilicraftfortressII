@@ -100,6 +100,10 @@ public class PlannedAction {
 	public PlannedAction getFollowUp() {
 		return this.followup;
 	}
+	public void setFollowUp(PlannedAction followup) {
+		this.followup = followup;
+	}
+
 	public Tile getTile() {
 		return (target == null || target.getTile() == null) ? targetTile : target.getTile();
 	}

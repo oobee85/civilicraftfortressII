@@ -999,7 +999,8 @@ public class Game {
 			Building building = new Building(bt, tile, unit.getFaction());
 			world.addBuilding(building);
 			building.setPlanned(true);
-			building.setHealth(1);
+			// Start off planned buildings at 10% health
+			building.setHealth(bt.getHealth() * 0.1);
 			if(bt.isRoad()) {
 				tile.setRoad(building);
 			}

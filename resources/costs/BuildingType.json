@@ -9,8 +9,8 @@
 		"cost":{"WOOD":50},
 		"culture":0,
 		"attributes":["harvestable"],
-		"health":100,
-		"effort":100},
+		"health":80,
+		"effort":200},
 	{
 		"name":"MINE",
 		"info":"Workers mine stone from here",
@@ -23,7 +23,7 @@
 		"effort":100},
 	{
 		"name":"SAWMILL",
-		"info":"Workers harvest wood from here",
+		"info":"Workers deposit wood here",
 		"image":"Images/buildings/sawmill.gif",
 		"vision":5,
 		"cost":{"WOOD":100, "STONE":100},
@@ -34,7 +34,7 @@
 		"effort":200},
 	{
 		"name":"QUARRY",
-		"info":"Workers can mine ores from here",
+		"info":"Workers can mine ores near here",
 		"image":"Images/buildings/quarry.png",
 		"vision":5,
 		"cost":{"WOOD":100, "STONE":100},
