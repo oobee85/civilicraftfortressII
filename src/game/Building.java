@@ -48,7 +48,9 @@ public class Building extends Thing implements Serializable {
 	}
 	public void tick(World world) {
 		updateInProgressUnit();
-		timeToHarvest --;
+		if (timeToHarvest > 0) {
+			timeToHarvest -= 1;
+		}
 		
 		if (World.ticks % Constants.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			Tile tile = getTile();
@@ -70,44 +72,55 @@ public class Building extends Thing implements Serializable {
 			world.addUnit(unit);
 			currentProducingUnit = null;
 		}
-		
+
+		if(getType() == Game.buildingTypeMap.get("CASTLE")) {
+			getFaction().getInventory().takeAll(this.getInventory());
+		}
+
 		if(!readyToHarvest() ) {
 			return;
 		}
-		resetTimeToHarvest();
 		if(getType() == Game.buildingTypeMap.get("CASTLE")) {
 			getFaction().spendResearch(20);
 			getFaction().getInventory().addItem(ItemType.FOOD, 1);
-			getFaction().getInventory().takeAll(this.getInventory());
+			resetTimeToHarvest();
 		}
-		if(getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
+		else if(getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
 			getFaction().spendResearch(20);
+			resetTimeToHarvest();
 		}
-		if(getType() == Game.buildingTypeMap.get("GRANARY")) {
+		else if(getType() == Game.buildingTypeMap.get("GRANARY")) {
 			this.getInventory().addItem(ItemType.FOOD, 2);
+			resetTimeToHarvest();
 		}
-		if(getType() == Game.buildingTypeMap.get("WINDMILL")) {
+		else if(getType() == Game.buildingTypeMap.get("WINDMILL")) {
 			this.getInventory().addItem(ItemType.FOOD, 8);
+			resetTimeToHarvest();
 		}
-		if(getType() == Game.buildingTypeMap.get("STABLES") 
-				&& getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
-			this.getInventory().addItem(ItemType.HORSE, 1);
-		}
-		if(getType() == Game.buildingTypeMap.get("STABLES") 
-				&& getTile().hasUnit(Game.unitTypeMap.get("PIG"))) {
-			this.getInventory().addItem(ItemType.FOOD, 1);
+		else if(getType() == Game.buildingTypeMap.get("STABLES")) {
+			if (getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
+				this.getInventory().addItem(ItemType.HORSE, 1);
+				resetTimeToHarvest();
+			}
+			if (getTile().hasUnit(Game.unitTypeMap.get("PIG"))) {
+				this.getInventory().addItem(ItemType.FOOD, 1);
+				resetTimeToHarvest();
+			}
 		}
 	}
 	public boolean readyToHarvest() {
 		return timeToHarvest <= 0;
 	}
+	public void resetTimeToHarvest(double timeToHarvest) {
+		this.timeToHarvest = timeToHarvest;
+	}
 	public void resetTimeToHarvest() {
-		if(this.getTile().getResource() != null) {
-			timeToHarvest = this.getTile().getResource().getType().getTimeToHarvest();
-		}else {
-			timeToHarvest = baseTimeToHarvest;
+		if(getTile().getResource() != null) {
+			resetTimeToHarvest(getTile().getResource().getType().getTimeToHarvest());
 		}
-		
+		else {
+			resetTimeToHarvest(baseTimeToHarvest);
+		}	
 	}
 	public Tile getSpawnLocation() {
 		return spawnLocation;

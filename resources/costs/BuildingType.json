@@ -10,7 +10,7 @@
 		"culture":0,
 		"attributes":["harvestable"],
 		"health":80,
-		"effort":200},
+		"effort":160},
 	{
 		"name":"MINE",
 		"info":"Workers mine stone from here",

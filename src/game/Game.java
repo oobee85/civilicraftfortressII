@@ -180,21 +180,19 @@ public class Game {
 		Tile targetTile = getTargetTileForSpawns();
 		
 		//all the forced spawns
-		if(World.days % 5 == 0) {
+		if(World.days % 6 == 0) {
 			world.spawnLavaGolem(targetTile);
-			world.spawnIceGiant(targetTile);
-			System.out.println(day + " lava & ice giants");
-			
 		}
-		if(World.days % 10 == 0) {
+		if(World.days % 7 == 0) {
+			world.spawnIceGiant(targetTile);
+		}
+		if(World.days % 11 == 0) {
 			meteorStrike();
 		}
 		if(World.days % 8 == 0) {
 			world.spawnOgre(targetTile);
-			System.out.println(day + " ogres");
-			
 		}
-		if(World.days % 10 == 0) {
+		if(World.days % 12 == 0) {
 			world.spawnSkeletonArmy(targetTile);
 			System.out.println(day + " skeletons");
 		}
@@ -209,14 +207,14 @@ public class Game {
 		
 		
 		//random spawns
-		if(World.days >= 10 && Math.random() > 0.1) {
+		if(World.days >= 10 && Math.random() < 0.1) {
 //			int number = (int)(Math.random() * Season.FREEZING_TEMPURATURE * day);
 //			for(int i = 0; i < number; i++) {
 			world.spawnIceGiant(targetTile);
 //			}
 //			System.out.println(number + " ice giants");
 		}
-		if(World.days >= 10 && Math.random() > 0.1) {
+		if(World.days >= 10 && Math.random() < 0.1) {
 //			int number = (int)(Math.random() * Season.FREEZING_TEMPURATURE * day/2);
 //			number = 1;
 //			for(int i = 0; i < number; i++) {
@@ -224,7 +222,7 @@ public class Game {
 //			}
 //			System.out.println(number + " stone golem");
 		}
-		if(World.days >= 10 && Math.random() > 0.2) {
+		if(World.days >= 10 && Math.random() < 0.2) {
 //			int number = (int)(Math.random() * day/2);
 //			for(int i = 0; i < number; i++) {
 			world.spawnRoc(targetTile);
@@ -232,7 +230,7 @@ public class Game {
 //			System.out.println(number + " roc");
 		}
 		
-		if(World.days >= 5 && Math.random() > 0.2) {
+		if(World.days >= 7 && Math.random() < 0.2) {
 //			int number = (int)(Math.random()*day/2);
 //			for(int i = 0; i < number; i++) {
 			world.spawnEnt(targetTile);
@@ -240,14 +238,14 @@ public class Game {
 //			System.out.println(number + " ents");
 			
 		}
-		if(World.days >= 5 && Math.random() > 0.1) {
+		if(World.days >= 8 && Math.random() < 0.1) {
 //			int number = (int)(Math.random() * day);
 //			for(int i = 0; i < number; i++) {
 			world.spawnTermite(targetTile);
 //			}
 //			System.out.println(number + " termite");
 		}
-		if(World.days >= 5 && Math.random() > 0.5) {
+		if(World.days >= 6 && Math.random() < 0.5) {
 //			int number = (int)(Math.random() * day);
 //			for(int i = 0; i < number; i++) {
 			world.spawnBomb(targetTile);

@@ -368,49 +368,45 @@ public class Unit extends Thing implements Serializable {
 	}
 	
 	public void doHarvestBuilding(Building building, PlannedAction action) {
-		if(readyToHarvest() && hasInventory()) {
+		if (building.isDead()) {
+			action.setDone(true);
+			return;
+		}
+		
+		// If try to harvest from unfinished building, build it instead
+		if (!building.isBuilt()) {
+			action.setFollowUp(PlannedAction.buildOnTile(
+					building.getTile(), 
+					false, 
+					PlannedAction.harvest(building)));
+			action.setDone(true);
+			return;
+		}
+		
+		if (!readyToHarvest() || !hasInventory() || !building.readyToHarvest()) {
+			return;
+		}
+		
+		if (building.getType() == BasicAI.FARM) {
+			building.takeDamage(5, DamageType.PHYSICAL);
+			getInventory().addItem(ItemType.FOOD, 5);
+			this.resetTimeToHarvest(4);
+			building.resetTimeToHarvest(this.timeToHarvest);
 			if (building.isDead()) {
-				action.setDone(true);
-				return;
+				building.setPlanned(true);
+				building.setHealth(1);
+				building.setRemainingEffort(building.getType().getBuildingEffort());
 			}
-			if(building.getType() == BasicAI.FARM) {
-				// Someone else might have finished harvesting the farm
-				if (building.isBuilt()) {
-					building.takeDamage(5, DamageType.PHYSICAL);
-					getInventory().addItem(ItemType.FOOD, 5);
-					this.resetTimeToHarvest(6);
-					if (building.isDead()) {
-						building.setPlanned(true);
-						building.setHealth(1);
-						building.setRemainingEffort(building.getType().getBuildingEffort());
-					}
-				}
-				if (!building.isBuilt()) {
-					action.setFollowUp(PlannedAction.buildOnTile(
-							building.getTile(), 
-							false, 
-							PlannedAction.harvest(building)));
-					action.setDone(true);
-				}
-			}
-			if(building.getType() == BasicAI.MINE) {
-				building.takeDamage(5, DamageType.PHYSICAL);
-				getInventory().addItem(ItemType.STONE, 5);
-				this.resetTimeToHarvest(5);
-			}
-//			else if(building.getType().name().equals("MINE")) {
-//				building.takeDamage(1, DamageType.PHYSICAL);
-//				if(building.getTile().getResource() != null) {
-//					getInventory().addItem(building.getTile().getResource().getType().getItemType(), 1);
-//					this.resetTimeToHarvest(building.getTile().getResource().getType().getTimeToHarvest());
-//				}else {
-//					getInventory().addItem(ItemType.STONE, 1);
-//					this.resetTimeToHarvest(1);
-//				}
-//			}
-			if(getInventory().isFull()) {
-				action.setDone(true);
-			}
+		}
+		else if (building.getType() == BasicAI.MINE) {
+			building.takeDamage(5, DamageType.PHYSICAL);
+			getInventory().addItem(ItemType.STONE, 5);
+			this.resetTimeToHarvest(5);
+			building.resetTimeToHarvest(this.timeToHarvest);
+		}
+
+		if (getInventory().isFull()) {
+			action.setDone(true);
 		}
 	}
 	
@@ -582,7 +578,6 @@ public class Unit extends Thing implements Serializable {
 				plan.target instanceof Building && 
 				((Building)plan.target).getType().isHarvestable()) {
 			this.doHarvestBuilding((Building)plan.target, plan);
-			// TODO
 			didSomething = true;
 		}
 		else if(plan.isTakeItemsAction() && (unitType.isCaravan() || unitType.isBuilder()) && plan.target instanceof Building
