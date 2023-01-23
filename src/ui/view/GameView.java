@@ -439,9 +439,7 @@ public class GameView {
 			}
 			if (plannedBuilding != null) {
 				if (plannedBuilding.getFaction() == state.faction) {
-					HashSet<Tile> buildingVision = game.world.getNeighborsInRadius(plannedBuilding.getTile(),
-							plannedBuilding.getType().getVisionRadius());
-					for (Tile invision : buildingVision) {
+					for (Tile invision : Utils.getTilesInRadius(plannedBuilding.getTile(), game.world, plannedBuilding.getType().getVisionRadius())) {
 						invision.setInVisionRange(true);
 					}
 				}

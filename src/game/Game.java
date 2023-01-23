@@ -920,8 +920,7 @@ public class Game {
 	}
 	
 	public void spawnWeather(Tile center, int radius) {
-		HashSet<Tile> tiles = world.getNeighborsInRadius(center, radius);
-		for(Tile t: tiles) {
+		for(Tile t: Utils.getTilesInRadius(center, world, radius)) {
 			t.liquidType = LiquidType.SNOW;
 			t.liquidAmount += 5;
 //			double distance = t.getLocation().distanceTo(center.getLocation());
@@ -930,8 +929,7 @@ public class Game {
 		}
 	}
 	public void increasePressure(Tile center, int radius) {
-		HashSet<Tile> tiles = world.getNeighborsInRadius(center, radius);
-		for(Tile t: tiles) {
+		for(Tile t: Utils.getTilesInRadius(center, world, radius)) {
 			t.getAir().decreaseVolumePerTile(500);
 //			double distance = t.getLocation().distanceTo(center.getLocation());
 //			float height = (float) (t.getHeight() + (radius - distance) / (radius) * 0.1);
@@ -939,8 +937,7 @@ public class Game {
 		}
 	}
 	public void setTerritory(Tile center, int radius, Faction faction) {
-		HashSet<Tile> tiles = world.getNeighborsInRadius(center, radius);
-		for(Tile t: tiles) {
+		for(Tile t: Utils.getTilesInRadius(center, world, radius)) {
 			t.setFaction(faction);
 			world.addToTerritory(t);
 		}

@@ -492,22 +492,6 @@ public class World {
 		ResourceType resourceType = ResourceType.values()[resource];
 		Generation.makeOreVein(tile, resourceType, numTiles/2);
 	}
-	public HashSet<Tile> getNeighborsInRadius(Tile tile, int radius) {
-		// TODO use Utils function instead
-		HashSet<Tile> neighbors = new HashSet<>();
-		TileLoc tileLoc = tile.getLocation();
-		int x = tileLoc.x();
-		int y = tileLoc.y();
-		for(int i = Math.max(x - radius, 0) ; i <= x + radius && i < tiles.length ; i ++) {
-			for(int j = Math.max(y - radius, 0) ; j <= y + radius && j < tiles[i].length ; j ++) {
-				if(tileLoc.distanceTo(new TileLoc(i, j)) >= radius) {
-					continue;
-				}
-				neighbors.add(tiles[i][j]);
-			}
-		}
-		return neighbors;
-	}
 	public void spawnExplosionCircle(Tile tile, int radius, int damage) {
 //		int radius = 35;
 		float amplitude = (float)(radius)/100;

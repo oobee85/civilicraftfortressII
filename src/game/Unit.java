@@ -354,7 +354,7 @@ public class Unit extends Thing implements Serializable {
 		}
 		return bestBuilding;
 	}
-	public Plant getNearestPlantToHarvest(Tile oldTile, PlantType type) {
+	public Plant getNeighborPlantToHarvest(Tile oldTile, PlantType type) {
 		Plant target = null;
 		for(Tile tile: oldTile.getNeighbors()) {
 			if(tile.getPlant() != null && tile.getPlant().getType() == type) {
@@ -524,6 +524,7 @@ public class Unit extends Thing implements Serializable {
 		}
 		PlannedAction plan = getNextPlannedAction();
 		if(plan == null) {
+			doPassiveActions(world);
 			return false;
 		}
 
@@ -605,36 +606,49 @@ public class Unit extends Thing implements Serializable {
 		else if(plan.type == ActionType.ATTACK && plan.target != null) {
 			didSomething = attack(plan.target);	
 		}
-		if (!didSomething && isGuarding()) {
-			HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getMaxAttackRange());
-			tilesloop: for (Tile tile : inrange) {
-				if (tile.getFaction() == getFaction()) {
-					for (Unit unit : tile.getUnits()) {
-						if (unit.getFaction() != this.getFaction() && unit.getType().isHostile() && unit != this) {
-							didSomething = didSomething || attack(unit);
-							if (didSomething) {
-								break tilesloop;
-							}
-						}
+		if (!didSomething) {
+			doPassiveActions(world);
+		}
+		return didSomething;
+	}
+	
+	/**
+	 * Passive actions aren't actual actions. They are just a way for the unit to 
+	 * automatically queue real actions when it is idling. For example, an idle warrior
+	 * set to guard mode will automatically queue an attack action when an enemy comes
+	 * within range.
+	 */
+	private void doPassiveActions(World world) {
+		if (passiveAction == PlannedAction.GUARD) {
+			for (Tile tile : Utils.getTilesInRadius(getTile(), world, getMaxAttackRange())) {
+				if (tile.getFaction() != getFaction()) {
+					continue;
+				}
+				for (Unit unit : tile.getUnits()) {
+					if (unit.getFaction() != this.getFaction() && 
+							unit.getType().isHostile() && 
+							unit != this) {
+						prequeuePlannedAction(PlannedAction.attack(unit));
+						return;
 					}
 				}
 			}
 		}
-		return didSomething;
+		return;
 	}
 	
 	private Thing getClosestEnemyInRange(World world) {
 		Thing closest = null;
 		int closestDistance = -1;
-		HashSet<Tile> inrange = world.getNeighborsInRadius(getTile(), getMaxAttackRange()+1);
-		for (Tile tile : inrange) {
+		for (Tile tile : Utils.getTilesInRadius(getTile(), world, getMaxAttackRange()+1)) {
 			for (Unit unit : tile.getUnits()) {
-				if(shouldAggroOn(unit)) {
-					int dist = getTile().distanceTo(unit.getTile());
-					if(closest == null || dist < closestDistance) {
-						closest = unit;
-						closestDistance = dist;
-					}
+				if(!shouldAggroOn(unit)) {
+					continue;
+				}
+				int dist = getTile().distanceTo(unit.getTile());
+				if(closest == null || dist < closestDistance) {
+					closest = unit;
+					closestDistance = dist;
 				}
 			}
 		}
@@ -651,7 +665,29 @@ public class Unit extends Thing implements Serializable {
 	}
 	
 	private void onFinishedAction(PlannedAction finished) {
-		if(finished.getFollowUp() != null) {
+		// Special logic for delivery actions because the followup might be gone
+		if (finished.isDeliverAction() && finished.getFollowUp() != null) {
+			PlannedAction followup = finished.getFollowUp();
+			if (followup.target != null && followup.target.isDead()) {
+				if (followup.target instanceof Plant) {
+					// if followup plan is dead, find a nearby similar plant
+					Plant newTarget = getNeighborPlantToHarvest(followup.getTile(), ((Plant)followup.target).getType());
+					if (newTarget != null) {
+						followup = PlannedAction.harvest(newTarget);
+					}
+					else {
+						// failed to find similar plant
+						return;
+					}
+				}
+				else if (followup.target instanceof Building) {
+					// if followup building dead, doesnt find new target
+					return;
+				}
+			}
+			this.queuePlannedAction(followup);
+		}
+		else if(finished.getFollowUp() != null) {
 			this.queuePlannedAction(finished.getFollowUp());
 		}
 		else if(finished.isHarvestAction()) {
@@ -661,31 +697,6 @@ public class Unit extends Thing implements Serializable {
 		else if(finished.isTakeItemsAction()) {
 			Building castle = getNearestCastleToDeliver();
 			this.queuePlannedAction(PlannedAction.deliver(castle, PlannedAction.takeItemsFrom(finished.target)));
-		}
-		else if(finished.isDeliverAction() && finished.getFollowUp() != null) {
-			PlannedAction followup = finished.getFollowUp();
-			if(followup.target != null) {
-				if(followup.target instanceof Plant) {
-					Plant oldTarget = (Plant)followup.target;
-					if(oldTarget.isDead()) {
-						Plant newTarget = getNearestPlantToHarvest(followup.getTile(), oldTarget.getType());
-						if(newTarget != null) {
-							followup = PlannedAction.harvest(newTarget);
-						}
-						else {
-							followup = null;
-						}
-					}
-				}
-				else if(followup.target instanceof Building) {
-//					if followup building dead, doesnt find new target
-					if(followup.target.isDead()) {
-						return;
-					}
-				}
-			}
-			if(followup != null) 
-				this.queuePlannedAction(followup);
 		}
 	}
 	
