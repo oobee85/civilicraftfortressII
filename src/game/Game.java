@@ -138,7 +138,7 @@ public class Game {
 		}
 		if ((World.ticks + Constants.DAY_DURATION) % (Constants.DAY_DURATION + Constants.NIGHT_DURATION) == 0) {
 			if(!Settings.DISABLE_ENEMY_SPAWNS) {
-				nightEvents();
+//				nightEvents();
 			}
 			World.nights ++;
 		}
@@ -154,6 +154,28 @@ public class Game {
 			}
 		}
 	}
+	
+	private Tile getTargetTileForSpawns(Faction faction) {
+		LinkedList<Tile> factionTiles = new LinkedList<Tile>();
+		for (Tile t : world.territory.keySet()) {
+			if (t.getFaction() == faction) {
+				factionTiles.add(t);
+			}
+		}
+		if (!factionTiles.isEmpty()) {
+			Tile targetTile = factionTiles.get((int) (Math.random() * factionTiles.size()));
+			for(Tile tile : world.getTilesRandomly()) {
+				if (tile.getFaction().id() != World.NO_FACTION_ID) {
+					continue;
+				}
+				if (tile.distanceTo(targetTile) < howFarAwayStuffSpawn) {
+					return tile;
+				}
+			}
+		}
+		return null;
+	}
+	
 	
 	private Tile getTargetTileForSpawns() {
 		Tile targetTile = world.getTilesRandomly().peek();
@@ -176,103 +198,134 @@ public class Game {
 		return targetTile;
 	}
 	private void dayEvents() {
-		double day = Math.sqrt(World.days);
-		Tile targetTile = getTargetTileForSpawns();
 		
-		//all the forced spawns
-		if(World.days % 6 == 0) {
-			world.spawnLavaGolem(targetTile);
-		}
-		if(World.days % 7 == 0) {
-			world.spawnIceGiant(targetTile);
-		}
-		if(World.days % 11 == 0) {
-			meteorStrike();
-		}
-		if(World.days % 8 == 0) {
-			world.spawnOgre(targetTile);
-		}
-		if(World.days % 12 == 0) {
-			world.spawnSkeletonArmy(targetTile);
-			System.out.println(day + " skeletons");
-		}
-		if(World.days % 20 == 0) {
-			spawnCyclops();
-			System.out.println("cyclops");
-		}
-		if(World.days % 15 == 0) {
-			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID), null);
-			System.out.println("parasite");
-		}
-		
-		
-		//random spawns
-		if(World.days >= 10 && Math.random() < 0.1) {
-//			int number = (int)(Math.random() * Season.FREEZING_TEMPURATURE * day);
-//			for(int i = 0; i < number; i++) {
-			world.spawnIceGiant(targetTile);
-//			}
-//			System.out.println(number + " ice giants");
-		}
-		if(World.days >= 10 && Math.random() < 0.1) {
-//			int number = (int)(Math.random() * Season.FREEZING_TEMPURATURE * day/2);
-//			number = 1;
-//			for(int i = 0; i < number; i++) {
-			world.spawnStoneGolem(targetTile);
-//			}
-//			System.out.println(number + " stone golem");
-		}
-		if(World.days >= 10 && Math.random() < 0.2) {
-//			int number = (int)(Math.random() * day/2);
-//			for(int i = 0; i < number; i++) {
-			world.spawnRoc(targetTile);
-//			}
-//			System.out.println(number + " roc");
-		}
-		
-		if(World.days >= 7 && Math.random() < 0.2) {
-//			int number = (int)(Math.random()*day/2);
-//			for(int i = 0; i < number; i++) {
-			world.spawnEnt(targetTile);
-//			}
-//			System.out.println(number + " ents");
-			
-		}
-		if(World.days >= 8 && Math.random() < 0.1) {
-//			int number = (int)(Math.random() * day);
-//			for(int i = 0; i < number; i++) {
-			world.spawnTermite(targetTile);
-//			}
-//			System.out.println(number + " termite");
-		}
-		if(World.days >= 6 && Math.random() < 0.5) {
-//			int number = (int)(Math.random() * day);
-//			for(int i = 0; i < number; i++) {
-			world.spawnBomb(targetTile);
-//			}
-//			System.out.println(number + " bomb");
-		}
-
-		Tile spawnTile = targetTile;
-		for(Tile t: world.getTilesRandomly()) {
-			if(t.getLocation().distanceTo(targetTile.getLocation()) < howFarAwayStuffSpawn 
-					&& t.getFaction() == world.getFaction(World.NO_FACTION_ID)) {
-				spawnTile = t;
+		for (Faction faction : world.getFactions()) {
+			if (!faction.isPlayer()) {
+				continue;
+			}
+			double influence = faction.computeInfluence() - 3000;
+			System.out.println("Faction " + faction.name() + " influence = " + influence);
+			if (influence <= 0) {
+				continue;
+			}
+			Tile targetTile = getTargetTileForSpawns(faction);
+			while (influence > 2000) {
+				UnitType hard = EnemySpawns.getRandomHardType();
+				makeAnimal(targetTile, hard, 1);
+				influence -= hard.getCombatStats().getHealth();
+			}
+			targetTile = getTargetTileForSpawns(faction);
+			while (influence > 500) {
+				UnitType medium = EnemySpawns.getRandomMediumType();
+				makeAnimal(targetTile, medium, 1);
+				influence -= medium.getCombatStats().getHealth();
+			}
+			targetTile = getTargetTileForSpawns(faction);
+			while (influence > 0) {
+				UnitType easy = EnemySpawns.getRandomEasyType();
+				makeAnimal(targetTile, easy, 1);
+				influence -= easy.getCombatStats().getHealth();
 			}
 		}
-		if(World.days >= 1 && Math.random() > 0.5) {
-			int number = (int)(Math.random()*day);
-			makeAnimal(spawnTile, Game.unitTypeMap.get("FLAMELET"), number);
-			System.out.println(number + " flamelets");
-		}
-		
-		if(Math.random() < 0.2) {
-			makeAnimal(spawnTile, Game.unitTypeMap.get("WATER_SPIRIT"), 4);
-			System.out.println(4 + " water spirits");
-		}
-//		if(ticks >= 3000 && Math.random() < 0.0005) {
-//			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
+		return;
+//		
+//		double day = Math.sqrt(World.days);
+//		Tile targetTile = getTargetTileForSpawns();
+//		
+//		//all the forced spawns
+//		if(World.days % 6 == 0) {
+//			world.spawnLavaGolem(targetTile);
 //		}
+//		if(World.days % 7 == 0) {
+//			world.spawnIceGiant(targetTile);
+//		}
+//		if(World.days % 11 == 0) {
+//			meteorStrike();
+//		}
+//		if(World.days % 8 == 0) {
+//			world.spawnOgre(targetTile);
+//		}
+//		if(World.days % 12 == 0) {
+//			world.spawnSkeletonArmy(targetTile);
+//			System.out.println(day + " skeletons");
+//		}
+//		if(World.days % 20 == 0) {
+//			spawnCyclops();
+//			System.out.println("cyclops");
+//		}
+//		if(World.days % 15 == 0) {
+//			world.spawnAnimal(Game.unitTypeMap.get("PARASITE"), world.getTilesRandomly().getFirst(), world.getFaction(World.NO_FACTION_ID), null);
+//			System.out.println("parasite");
+//		}
+//		
+//		
+//		//random spawns
+//		if(World.days >= 10 && Math.random() < 0.1) {
+////			int number = (int)(Math.random() * Season.FREEZING_TEMPURATURE * day);
+////			for(int i = 0; i < number; i++) {
+//			world.spawnIceGiant(targetTile);
+////			}
+////			System.out.println(number + " ice giants");
+//		}
+//		if(World.days >= 10 && Math.random() < 0.1) {
+////			int number = (int)(Math.random() * Season.FREEZING_TEMPURATURE * day/2);
+////			number = 1;
+////			for(int i = 0; i < number; i++) {
+//			world.spawnStoneGolem(targetTile);
+////			}
+////			System.out.println(number + " stone golem");
+//		}
+//		if(World.days >= 10 && Math.random() < 0.2) {
+////			int number = (int)(Math.random() * day/2);
+////			for(int i = 0; i < number; i++) {
+//			world.spawnRoc(targetTile);
+////			}
+////			System.out.println(number + " roc");
+//		}
+//		
+//		if(World.days >= 7 && Math.random() < 0.2) {
+////			int number = (int)(Math.random()*day/2);
+////			for(int i = 0; i < number; i++) {
+//			world.spawnEnt(targetTile);
+////			}
+////			System.out.println(number + " ents");
+//			
+//		}
+//		if(World.days >= 8 && Math.random() < 0.1) {
+////			int number = (int)(Math.random() * day);
+////			for(int i = 0; i < number; i++) {
+//			world.spawnTermite(targetTile);
+////			}
+////			System.out.println(number + " termite");
+//		}
+//		if(World.days >= 6 && Math.random() < 0.5) {
+////			int number = (int)(Math.random() * day);
+////			for(int i = 0; i < number; i++) {
+//			world.spawnBomb(targetTile);
+////			}
+////			System.out.println(number + " bomb");
+//		}
+//
+//		Tile spawnTile = targetTile;
+//		for(Tile t: world.getTilesRandomly()) {
+//			if(t.getLocation().distanceTo(targetTile.getLocation()) < howFarAwayStuffSpawn 
+//					&& t.getFaction() == world.getFaction(World.NO_FACTION_ID)) {
+//				spawnTile = t;
+//			}
+//		}
+//		if(World.days >= 1 && Math.random() > 0.5) {
+//			int number = (int)(Math.random()*day);
+//			makeAnimal(spawnTile, Game.unitTypeMap.get("FLAMELET"), number);
+//			System.out.println(number + " flamelets");
+//		}
+//		
+//		if(Math.random() < 0.2) {
+//			makeAnimal(spawnTile, Game.unitTypeMap.get("WATER_SPIRIT"), 4);
+//			System.out.println(4 + " water spirits");
+//		}
+////		if(ticks >= 3000 && Math.random() < 0.0005) {
+////			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
+////		}
 	}
 	private void nightEvents() {
 		double day = Math.sqrt(World.days);

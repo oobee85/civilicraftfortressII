@@ -157,6 +157,17 @@ public class Faction implements Externalizable {
 	public boolean isPlayer() {
 		return isPlayer;
 	}
+	
+	public double computeInfluence() {
+		double influence = 0;
+		for (Building building : getBuildings()) {
+			influence += building.getMaxHealth() / 2;
+		}
+		for (Unit unit : getUnits()) {
+			influence += unit.getMaxHealth();
+		}
+		return influence;
+	}
 
 	public boolean isBuildingSelected(BuildingType type) {
 		for(Building building : getBuildings()) {

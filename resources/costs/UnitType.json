@@ -483,7 +483,15 @@
 		"image":"Images/units/firefly.png",
 		"stats":{"movespeed":25,"buildtime":0,"health":50,"healspeed":50},
 		"name":"FIREFLY",
-		"attributes":["flying"]
+		"attackstyles":[
+			{"damage":5, "cooldown":20, "range":1}
+		],
+		"attributes":["flying", "hostile"],
+		"targeting":[
+			{"type":"game.Building", "faction":"PLAYER"},
+			{"type":"game.Unit", "faction":"PLAYER"},
+			{"type":"game.Unit", "faction":"CYCLOPS"}
+		]
 	},
 	{
 		"image":"Images/units/bomb.png",
