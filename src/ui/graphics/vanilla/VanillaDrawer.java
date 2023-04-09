@@ -207,7 +207,9 @@ public class VanillaDrawer extends Drawer {
 			draw(g, canvas.getWidth(), canvas.getHeight(), tileSize);
 
 			if (!Game.DISABLE_NIGHT) {
-				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+				// Optionally draw the fog of war blurry but then it looks
+				// weird during the day.
+//				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 				
 				int startxoffset = viewOffsetX / tileSize;
 				int startyoffset = viewOffsetY / tileSize;

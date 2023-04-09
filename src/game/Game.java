@@ -203,28 +203,28 @@ public class Game {
 			if (!faction.isPlayer()) {
 				continue;
 			}
-			double influence = faction.computeInfluence() - 3000;
+			double influence = faction.computeInfluence() - 4000;
 			System.out.println("Faction " + faction.name() + " influence = " + influence);
 			if (influence <= 0) {
 				continue;
 			}
 			Tile targetTile = getTargetTileForSpawns(faction);
-			while (influence > 2000) {
+			while (influence > 6000) {
 				UnitType hard = EnemySpawns.getRandomHardType();
 				makeAnimal(targetTile, hard, 1);
-				influence -= hard.getCombatStats().getHealth();
+				influence -= hard.getCombatStats().getHealth()*2;
 			}
 			targetTile = getTargetTileForSpawns(faction);
-			while (influence > 500) {
+			while (influence > 1500) {
 				UnitType medium = EnemySpawns.getRandomMediumType();
 				makeAnimal(targetTile, medium, 1);
-				influence -= medium.getCombatStats().getHealth();
+				influence -= medium.getCombatStats().getHealth()*3;
 			}
 			targetTile = getTargetTileForSpawns(faction);
 			while (influence > 0) {
 				UnitType easy = EnemySpawns.getRandomEasyType();
 				makeAnimal(targetTile, easy, 1);
-				influence -= easy.getCombatStats().getHealth();
+				influence -= easy.getCombatStats().getHealth()*4;
 			}
 		}
 		return;

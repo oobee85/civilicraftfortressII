@@ -282,21 +282,15 @@ public class Unit extends Thing implements Serializable {
 					this.heal(damageDealt, true);
 				}
 				if (target instanceof Unit) {
-//					((Unit) target).aggro(this);
-					//does cleave retaliation
-					if(this.getType().hasCleave()) {
-						for(Unit unit : target.getTile().getUnits()) {
-							if(unit.getFaction() != this.getFaction()) {
-								unit.aggro(this);
-							}
+					((Unit) target).aggro(this);
+				}
+				//does cleave retaliation
+				if(this.getType().hasCleave()) {
+					for(Unit unit : target.getTile().getUnits()) {
+						if(unit.getFaction() != this.getFaction()) {
+							unit.aggro(this);
 						}
 					}
-//					for(Unit u: target.getTile().getUnits()) {
-//						if(u.getFaction() == target.getFaction()){
-//							u.aggro(this);
-//						}
-//					}
-						
 				}
 			}
 			else {
@@ -551,9 +545,6 @@ public class Unit extends Thing implements Serializable {
 		if(!plan.inRange(this)) {
 			return false;
 		}
-		if(plan.target instanceof Building) {
-			Building building = (Building)plan.target;
-		}
 		boolean didSomething = false;
 		if(plan.isBuildRoadAction() && unitType.isBuilder()) {
 			Building tobuild = plan.getTile().getRoad();
@@ -620,7 +611,8 @@ public class Unit extends Thing implements Serializable {
 	 */
 	private void doPassiveActions(World world) {
 		if (passiveAction == PlannedAction.GUARD) {
-			for (Tile tile : Utils.getTilesInRadius(getTile(), world, getMaxAttackRange())) {
+			int range = Math.max(5, getMaxAttackRange());
+			for (Tile tile : Utils.getTilesInRadius(getTile(), world, range)) {
 				if (tile.getFaction() != getFaction()) {
 					continue;
 				}

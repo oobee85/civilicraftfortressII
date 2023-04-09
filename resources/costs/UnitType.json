@@ -48,7 +48,7 @@
 	},
 	{
 		"image":"Images/units/archer.png",
-		"cost":{"BRONZE_BAR":5,"FOOD":200},
+		"cost":{"BRONZE_BAR":2,"FOOD":200},
 		"stats":{"movespeed":20,"buildtime":300,"health":100,"healspeed":50},
 		"name":"ARCHER",
 		"attributes":["hostile"],

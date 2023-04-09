@@ -1406,7 +1406,7 @@ public class World {
 		return mapImages;
 	}
 	
-	private static final int KERNEL_SIZE = 35;
+	private static final int KERNEL_SIZE = 27;
 	private static final float[] kernelData = Utils.createSpreadingKernel(KERNEL_SIZE);
 	/**
 	 * computes all tile brightnesses and creates brightness image
