@@ -1324,9 +1324,24 @@ public class World {
 			bigTerrainImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2+1 + oddColumn, terrainColor.getRGB());
 			bigTerrainImage.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2+1 + oddColumn, terrainColor.getRGB());
 			
-			int alpha = (int) (255 * (1 - (brighnessModifier + tilebrightness)));
+//			int alpha = (int) (255 * (1 - (brighnessModifier + tilebrightness)));
+			double brightnessHardCutoff = 0.5 - brighnessModifier*0.3;
+			double brightnessSoftCutoff = 1 - brighnessModifier*0.7;
+			if (tilebrightness > brightnessSoftCutoff) {
+				tilebrightness = 1;
+			}
+			else if (tilebrightness > brightnessHardCutoff) {
+				tilebrightness = (tilebrightness - brightnessHardCutoff) / (brightnessSoftCutoff - brightnessHardCutoff);
+			}
+			else {
+				tilebrightness = 0;
+			}
+			int alpha = (int) (255 * (1 - tilebrightness));
 			alpha = (alpha > 255) ? 255 : ((alpha < 0) ? 0 : alpha);
-			int nightColor = new Color(0, 0, 0, alpha).getRGB();
+//			int shade = (int) (brighnessModifier * 150);
+////			int nightColor = new Color(0, 0, 0, alpha).getRGB();
+//			int nightColor = new Color(shade, shade, shade, alpha).getRGB();
+			int nightColor = new Color(terrainColor.getRed(), terrainColor.getGreen(), terrainColor.getBlue(), alpha).getRGB();
 			bigLightImage.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2 + oddColumn, nightColor);
 			bigLightImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2 + oddColumn, nightColor);
 			bigLightImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2+1 + oddColumn, nightColor);
@@ -1391,64 +1406,61 @@ public class World {
 		return mapImages;
 	}
 	
+	private static final int KERNEL_SIZE = 31;
+	private static final float[] kernelData = Utils.createGaussianKernel(10, KERNEL_SIZE);
 	/**
 	 * computes all tile brightnesses and creates brightness image
 	 */
 	private BufferedImage computeTileBrightness(Faction faction) {
 		int w = getWidth();
 		int h = getHeight();
+		double daylight = getDaylight();
 		BufferedImage rawImage = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_GRAY);
 		for(Tile tile : getTiles() ) {
-			double brightness = 0;
+			double playerBrightness = 0;
 			if (tile.getThingOfFaction(faction) != null
 					|| tile.isInVision()) {
-				brightness += 1;
+				playerBrightness += 1;
+//				playerBrightness += daylight;
 			}
 			else if (tile.getFaction() == faction) {
-				brightness += 0.4;
+				playerBrightness += 0.4;
+//				playerBrightness += 0.4*daylight;
 			}
-			brightness = Math.max(brightness, tile.getTerrain().getBrightness());
-			brightness = Math.max(brightness, tile.liquidAmount * tile.liquidType.getBrightness());
+			double environmentBrightness = tile.getTerrain().getBrightness()
+							+ tile.liquidAmount * tile.liquidType.getBrightness();
 			if (tile.getModifier() != null) {
-				brightness = Math.max(brightness, tile.getModifier().getType().getBrightness());
+				environmentBrightness += tile.getModifier().getType().getBrightness();
 			}
-			byte brightnessByte = (byte) Math.min(255, brightness*255);
+
+			double brightness = Math.max(playerBrightness, environmentBrightness);
+			byte brightnessByte = (byte) Math.max(0, Math.min(255, brightness*128));
 			int rgb = (brightnessByte << 24) |  (brightnessByte << 16) | (brightnessByte << 8) | brightnessByte;
 			rawImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), rgb);
 		}
 		rawImage = ImageCreation.convertToHexagonal(rawImage);
 		
-		int r = 27;
-		BufferedImage rawImagePlusEdges = new BufferedImage(rawImage.getWidth() + r*2, rawImage.getHeight() + r*2, rawImage.getType());
+		BufferedImage rawImagePlusEdges = new BufferedImage(
+				rawImage.getWidth() + KERNEL_SIZE*2,
+				rawImage.getHeight() + KERNEL_SIZE*2,
+				rawImage.getType());
 		Graphics g = rawImagePlusEdges.getGraphics();
-		for(int i = 0; i < r; i++) {
+		for(int i = 0; i < KERNEL_SIZE; i++) {
 			g.drawImage(rawImage, i, i, null);
-			g.drawImage(rawImage, r*2 - i, i, null);
-			g.drawImage(rawImage, r*2 - i, r*2 - i, null);
-			g.drawImage(rawImage, i, r*2 - i, null);
+			g.drawImage(rawImage, KERNEL_SIZE*2 - i, i, null);
+			g.drawImage(rawImage, KERNEL_SIZE*2 - i, KERNEL_SIZE*2 - i, null);
+			g.drawImage(rawImage, i, KERNEL_SIZE*2 - i, null);
 		}
-		g.drawImage(rawImage, r, r, null);
+		g.drawImage(rawImage, KERNEL_SIZE, KERNEL_SIZE, null);
 		g.dispose();
-		float[] kernelData = new float[r*r];
-		for(int y = 0; y < r; y++) {
-			for(int x = 0; x < r; x++) {
-				int dist = (x - r/2)*(x - r/2) + (y - r/2)*(y - r/2);
-				if(dist == 0) {
-					kernelData[x + y*r] = 1;
-				}
-				else if(dist <= r*r/4){
-					kernelData[x + y*r] = (float) (1f / dist);
-				}
-			}
-		}
-		Kernel kernel = new Kernel(r, r, kernelData);
+		Kernel kernel = new Kernel(KERNEL_SIZE, KERNEL_SIZE, kernelData);
 		ConvolveOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_ZERO_FILL, null);
 		BufferedImage blurred = op.filter(rawImagePlusEdges, null);
-		blurred = blurred.getSubimage(r, r, rawImage.getWidth(), rawImage.getHeight());
+		blurred = blurred.getSubimage(KERNEL_SIZE, KERNEL_SIZE, rawImage.getWidth(), rawImage.getHeight());
 		blurred = ImageCreation.convertFromHexagonal(blurred);
 		for(Tile tile : getTiles()) {
 			int brightness = blurred.getRGB(tile.getLocation().x(), tile.getLocation().y()) & 0xFF;
-			tile.setBrightness(brightness / 255.0);
+			tile.setBrightness(Math.max(0, Math.min(1.0, (brightness) / 128.0)));
 		}
 		return blurred;
 	}
@@ -1472,6 +1484,9 @@ public class World {
 	private static double precomputedDaylight;
 	private static int precomputedDaylightTick = -1;
 	
+	/**
+	 * @return 0 to 1 describing how much daylight there is
+	 */
 	public static double getDaylight() {
 		if(World.ticks != precomputedDaylightTick) {
 			recomputeDaylight();
