@@ -1,6 +1,5 @@
 package world;
 
-import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -22,7 +21,6 @@ public class Tile implements Externalizable {
 	public volatile LiquidType liquidType;
 
 	private volatile Faction faction;
-	private boolean inVisionRange = false;
 
 	private Resource resource;
 	private Terrain terr;
@@ -289,13 +287,6 @@ public class Tile implements Externalizable {
 			}
 		}
 		return false;
-	}
-
-	public void setInVisionRange(boolean inRange) {
-		this.inVisionRange = inRange;
-	}
-	public boolean isInVision() {
-		return inVisionRange;
 	}
 
 	public double getBrightness(Faction faction) {

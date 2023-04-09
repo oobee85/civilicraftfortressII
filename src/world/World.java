@@ -1270,7 +1270,6 @@ public class World {
 	public BufferedImage[] createTerrainImage(Faction faction) {
 		BufferedImage[] mapImages = new BufferedImage[MapMode.values().length];
 		mapImages[MapMode.LIGHT.ordinal()] = computeTileBrightness(faction);
-		double brighnessModifier = getDaylight();
 		
 		HashMap<Terrain, Color> terrainColors = Utils.computeTerrainAverageColor();
 		BufferedImage terrainImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
@@ -1278,14 +1277,21 @@ public class World {
 		BufferedImage bigTerrainImage = new BufferedImage(terrainImage.getWidth()*2, terrainImage.getHeight()*2+1, terrainImage.getType());
 		BufferedImage bigLightImage = new BufferedImage(terrainImage.getWidth()*2, terrainImage.getHeight()*2+1, terrainImage.getType());
 
+		double daylight = getDaylight();
+		double brightnessHardCutoff = 0.5 - daylight*0.3;
+		double brightnessSoftCutoff = 1 - daylight*0.7;
 		for(Tile tile : this.getTiles()) {
+			double tilebrightness = tile.getBrightness(faction);
+			boolean isVisible = tilebrightness >= brightnessHardCutoff;
 			Color minimapColor = terrainColors.get(tile.getTerrain());
 			Color terrainColor = terrainColors.get(tile.getTerrain());
-			if(tile.getResource() != null && faction.areRequirementsMet(tile.getResource().getType())) {
+			if (isVisible
+				&& tile.getResource() != null
+				&& faction.areRequirementsMet(tile.getResource().getType())) {
 				terrainColor = tile.getResource().getType().getMipMap().getColor(0);
 				minimapColor = tile.getResource().getType().getMipMap().getColor(0);
 			}
-			if(tile.getRoad() != null) {
+			if (isVisible && tile.getRoad() != null) {
 				terrainColor = tile.getRoad().getType().getMipMap().getColor(0);
 				minimapColor = tile.getRoad().getType().getMipMap().getColor(0);
 			}
@@ -1311,9 +1317,27 @@ public class World {
 				minimapColor = Utils.blendColors(tile.getFaction().color(), minimapColor, 0.3);
 				terrainColor = Utils.blendColors(tile.getFaction().color(), terrainColor, 0.3);
 			}
-			double tilebrightness = tile.getBrightness(faction);
-			minimapColor = Utils.blendColors(minimapColor, Color.black, brighnessModifier + tilebrightness);
-			terrainColor = Utils.blendColors(terrainColor, Color.black, brighnessModifier + tilebrightness);
+
+			if (tilebrightness > brightnessSoftCutoff) {
+				tilebrightness = 1;
+			}
+			else if (tilebrightness > brightnessHardCutoff) {
+				tilebrightness = (tilebrightness - brightnessHardCutoff) / (brightnessSoftCutoff - brightnessHardCutoff);
+			}
+			else {
+				tilebrightness = 0;
+			}
+			tilebrightness = (tilebrightness > 1) ? 1 : ((tilebrightness < 0) ? 0 : tilebrightness);
+			int alphaValue = (int) ((1 - tilebrightness) * 255);
+			terrainColor = new Color(
+					(int) (terrainColor.getRed() * daylight),
+					(int) (terrainColor.getGreen() * daylight),
+					(int) (terrainColor.getBlue() * daylight),
+					alphaValue);
+			int nightColor = terrainColor.getRGB();
+			
+			Color outOfVisionColor = Utils.blendColors(minimapColor, Color.black, daylight);
+			minimapColor = Utils.blendColors(minimapColor, outOfVisionColor, tilebrightness);
 			
 			minimapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), minimapColor.getRGB());
 			terrainImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), terrainColor.getRGB());
@@ -1324,24 +1348,6 @@ public class World {
 			bigTerrainImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2+1 + oddColumn, terrainColor.getRGB());
 			bigTerrainImage.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2+1 + oddColumn, terrainColor.getRGB());
 			
-//			int alpha = (int) (255 * (1 - (brighnessModifier + tilebrightness)));
-			double brightnessHardCutoff = 0.5 - brighnessModifier*0.3;
-			double brightnessSoftCutoff = 1 - brighnessModifier*0.7;
-			if (tilebrightness > brightnessSoftCutoff) {
-				tilebrightness = 1;
-			}
-			else if (tilebrightness > brightnessHardCutoff) {
-				tilebrightness = (tilebrightness - brightnessHardCutoff) / (brightnessSoftCutoff - brightnessHardCutoff);
-			}
-			else {
-				tilebrightness = 0;
-			}
-			int alpha = (int) (255 * (1 - tilebrightness));
-			alpha = (alpha > 255) ? 255 : ((alpha < 0) ? 0 : alpha);
-//			int shade = (int) (brighnessModifier * 150);
-////			int nightColor = new Color(0, 0, 0, alpha).getRGB();
-//			int nightColor = new Color(shade, shade, shade, alpha).getRGB();
-			int nightColor = new Color(terrainColor.getRed(), terrainColor.getGreen(), terrainColor.getBlue(), alpha).getRGB();
 			bigLightImage.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2 + oddColumn, nightColor);
 			bigLightImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2 + oddColumn, nightColor);
 			bigLightImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2+1 + oddColumn, nightColor);
@@ -1414,30 +1420,23 @@ public class World {
 	private BufferedImage computeTileBrightness(Faction faction) {
 		int w = getWidth();
 		int h = getHeight();
-		double daylight = getDaylight();
 		BufferedImage rawImage = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_GRAY);
 		for(Tile tile : getTiles() ) {
-			double environmentBrightness = tile.getTerrain().getBrightness()
-							+ tile.liquidAmount * tile.liquidType.getBrightness();
-			if (tile.getModifier() != null) {
-				environmentBrightness += tile.getModifier().getType().getBrightness();
-			}
 			double playerBrightness = 0;
-			if (tile.getThingOfFaction(faction) != null
-					|| tile.isInVision()) {
+			if (tile.getThingOfFaction(faction) != null) {
 				playerBrightness += 1;
-				if (tile.getFaction() == faction) {
-					playerBrightness += 0.2;
-					playerBrightness += environmentBrightness;
-				}
 			}
-			else if (tile.getFaction() == faction) {
+			if (tile.getFaction() == faction) {
 				playerBrightness += 0.4;
+				double environmentBrightness = tile.getTerrain().getBrightness()
+						+ tile.liquidAmount * tile.liquidType.getBrightness();
+				if (tile.getModifier() != null) {
+					environmentBrightness += tile.getModifier().getType().getBrightness();
+				}
 				playerBrightness += environmentBrightness;
 			}
 
-			double brightness = playerBrightness;
-			byte brightnessByte = (byte) Math.max(0, Math.min(255, brightness*128));
+			byte brightnessByte = (byte) Math.max(0, Math.min(255, playerBrightness*128));
 			int rgb = (brightnessByte << 24) |  (brightnessByte << 16) | (brightnessByte << 8) | brightnessByte;
 			rawImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), rgb);
 		}

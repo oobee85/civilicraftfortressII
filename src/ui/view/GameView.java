@@ -437,13 +437,6 @@ public class GameView {
 					plannedBuilding = commandInterface.planBuilding(unit, tile, !shiftDown, state.selectedBuildingToPlan);
 				}
 			}
-			if (plannedBuilding != null) {
-				if (plannedBuilding.getFaction() == state.faction) {
-					for (Tile invision : Utils.getTilesInRadius(plannedBuilding.getTile(), game.world, plannedBuilding.getType().getVisionRadius())) {
-						invision.setInVisionRange(true);
-					}
-				}
-			}
 		}
 		// if a-click and the tile has a building or unit
 		else if (state.leftClickAction == LeftClickAction.ATTACK) {
