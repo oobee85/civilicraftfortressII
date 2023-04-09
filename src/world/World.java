@@ -1406,8 +1406,8 @@ public class World {
 		return mapImages;
 	}
 	
-	private static final int KERNEL_SIZE = 31;
-	private static final float[] kernelData = Utils.createGaussianKernel(10, KERNEL_SIZE);
+	private static final int KERNEL_SIZE = 35;
+	private static final float[] kernelData = Utils.createSpreadingKernel(KERNEL_SIZE);
 	/**
 	 * computes all tile brightnesses and creates brightness image
 	 */
@@ -1417,23 +1417,26 @@ public class World {
 		double daylight = getDaylight();
 		BufferedImage rawImage = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_GRAY);
 		for(Tile tile : getTiles() ) {
-			double playerBrightness = 0;
-			if (tile.getThingOfFaction(faction) != null
-					|| tile.isInVision()) {
-				playerBrightness += 1;
-//				playerBrightness += daylight;
-			}
-			else if (tile.getFaction() == faction) {
-				playerBrightness += 0.4;
-//				playerBrightness += 0.4*daylight;
-			}
 			double environmentBrightness = tile.getTerrain().getBrightness()
 							+ tile.liquidAmount * tile.liquidType.getBrightness();
 			if (tile.getModifier() != null) {
 				environmentBrightness += tile.getModifier().getType().getBrightness();
 			}
+			double playerBrightness = 0;
+			if (tile.getThingOfFaction(faction) != null
+					|| tile.isInVision()) {
+				playerBrightness += 1;
+				if (tile.getFaction() == faction) {
+					playerBrightness += 0.2;
+					playerBrightness += environmentBrightness;
+				}
+			}
+			else if (tile.getFaction() == faction) {
+				playerBrightness += 0.4;
+				playerBrightness += environmentBrightness;
+			}
 
-			double brightness = Math.max(playerBrightness, environmentBrightness);
+			double brightness = playerBrightness;
 			byte brightnessByte = (byte) Math.max(0, Math.min(255, brightness*128));
 			int rgb = (brightnessByte << 24) |  (brightnessByte << 16) | (brightnessByte << 8) | brightnessByte;
 			rawImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), rgb);

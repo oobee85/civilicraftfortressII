@@ -229,6 +229,16 @@ public class VanillaDrawer extends Drawer {
 			g.translate(viewOffsetX, viewOffsetY);
 		}
 		g.dispose();
+
+		float redshift = (float) (0.7 + 0.3 * game.world.getDaylight());
+		float[] factors = new float[] {
+				redshift, 1f, 1f
+		};
+		float[] offsets = new float[] {
+				0f, 0f, 0f
+		};
+		RescaleOp op = new RescaleOp(factors, offsets, null);
+		op.filter(image, image);
 	}
 
 	private void draw(Graphics g, int panelWidth, int panelHeight, int tileSize) {

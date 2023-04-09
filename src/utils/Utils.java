@@ -25,23 +25,12 @@ public final class Utils {
 	
 	public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	
-	public static float[] createGaussianKernel(int sigma, int r) {
-		// guassian blur function: 
-		// (1 / (2 pi sigma^2)) e ^ ((x^2 + y^2) / (-2 sigma^2)
-		//  A 					e ^ ( B 		 /  C)
-		double A = 1 / (2 * Math.PI * sigma * sigma);
-		double C = -2 * sigma * sigma;
+	public static float[] createSpreadingKernel(int r) {
 		double[] unnormalized = new double[r*r];
 		double total = 0;
 		for(int y = 0; y < r; y++) {
 			for(int x = 0; x < r; x++) {
 				double B = (x - r/2)*(x - r/2) + (y - r/2)*(y - r/2);
-//				double result = A * Math.exp(B / C);
-//				if (result > .001) {
-//					// truncate values below minimum to save on compute
-//					unnormalized[x + y*r] = result;
-//					total += result;
-//				}
 				if(B == 0) {
 					unnormalized[x + y*r] = 1;
 				}
