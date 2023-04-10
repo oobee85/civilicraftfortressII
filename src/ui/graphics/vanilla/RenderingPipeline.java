@@ -64,10 +64,10 @@ public class RenderingPipeline {
 
 	private static RenderingStep fogOfWar = new RenderingStep(state -> {
 		if (!Game.DISABLE_NIGHT) {
-			int startxoffset = state.lowerX;
-			int startyoffset = state.lowerY;
-			int numtilesx = state.upperX - state.lowerX;
-			int numtilesy = state.upperY - state.lowerY;
+			int startxoffset = state.lowerX - 2;
+			int startyoffset = state.lowerY - 2;
+			int numtilesx = state.upperX - state.lowerX + 4;
+			int numtilesy = state.upperY - state.lowerY + 4;
 			
 			int startx = startxoffset * state.tileSize;
 			int starty = startyoffset * state.tileSize;
