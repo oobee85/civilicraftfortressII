@@ -14,7 +14,7 @@ public enum MapMode {
 	LIGHT_BIG(false),
 	FLOW2,
 	
-	/** MINIMAP must be the last MapMode*/
+	/** MINIMAP must be the last MapMode */
 	MINIMAP;
 	
 	public static final MapMode[] HEATMAP_MODES = new MapMode[] {HEIGHT, HUMIDITY, PRESSURE, TEMPURATURE, FLOW, PRESSURE2};

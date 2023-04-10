@@ -1,6 +1,7 @@
 package ui.graphics.vanilla;
 
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 import game.Faction;
 import ui.MapMode;
@@ -23,15 +24,10 @@ public class RenderingState {
 	MapMode mapMode;
 	GameViewState gameViewState;
 	World world;
-	
-	/** TODO: need to deprecate draww and drawh and just use tileSize */
-	int draww;
-	/** TODO: need to deprecate draww and drawh and just use tileSize */
-	int drawh;
+	BufferedImage fogOfWarImage;
 
 	int lowerX;
 	int lowerY;
 	int upperX;
 	int upperY;
-
 }

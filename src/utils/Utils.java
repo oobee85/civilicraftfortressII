@@ -25,6 +25,17 @@ public final class Utils {
 	
 	public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	
+	public static void applyColorRescaleToImage(BufferedImage image, float red, float green, float blue) {
+		float[] factors = new float[] {
+				red, green, blue
+		};
+		float[] offsets = new float[] {
+				0f, 0f, 0f
+		};
+		RescaleOp op = new RescaleOp(factors, offsets, null);
+		op.filter(image, image);
+	}
+
 	public static float[] createSpreadingKernel(int r) {
 		double[] unnormalized = new double[r*r];
 		double total = 0;

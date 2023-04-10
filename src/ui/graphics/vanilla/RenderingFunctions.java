@@ -264,7 +264,7 @@ public class RenderingFunctions {
 		}
 	}
 
-	public static  void drawSelectedThings(RenderingState state) {
+	public static void drawSelectedThings(RenderingState state) {
 		for (Thing thing : state.gameViewState.selectedThings) {
 			// draw selection circle
 			state.g.setColor(Utils.getTransparentColor(state.faction.color(), 150));
@@ -429,7 +429,7 @@ public class RenderingFunctions {
 				state.lowHeight, state.highHeight, state.lowPressure, state.highPressure, 
 				state.lowTemp, state.highTemp, state.lowHumidity, state.highHumidity);
 		state.g.setColor(new Color(ratio, 0f, 1f - ratio));
-		state.g.fillRect(drawat.x, drawat.y, state.draww, state.drawh);
+		state.g.fillRect(drawat.x, drawat.y, state.tileSize, state.tileSize);
 	}
 	
 	public static float getHeatMapColorRatio(Tile tile, MapMode mapMode,
@@ -459,10 +459,10 @@ public class RenderingFunctions {
 	
 	public static void drawSnowTemp(RenderingState state, Tile tile, Point drawat) {
 		if(tile.getTemperature() <= Constants.FREEZETEMP) {
-			state.g.drawImage(SNOW2, drawat.x, drawat.y, state.draww, state.drawh, null);
+			state.g.drawImage(SNOW2, drawat.x, drawat.y, state.tileSize, state.tileSize, null);
 		}
 		else if(tile.getAir().getTemperature() <= Constants.FREEZETEMP) {
-			state.g.drawImage(SNOW, drawat.x, drawat.y, state.draww, state.drawh, null);
+			state.g.drawImage(SNOW, drawat.x, drawat.y, state.tileSize, state.tileSize, null);
 		}
 	}
 	

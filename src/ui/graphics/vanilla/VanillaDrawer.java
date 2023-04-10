@@ -205,42 +205,13 @@ public class VanillaDrawer extends Drawer {
 			// These must be integers otherwise weird off-by-one artifacts
 			g.translate(-viewOffsetX, -viewOffsetY);
 			draw(g, canvas.getWidth(), canvas.getHeight(), tileSize);
-
-			if (!Game.DISABLE_NIGHT) {
-				// Optionally draw the fog of war blurry but then it looks
-				// weird during the day.
-//				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-				
-				int startxoffset = viewOffsetX / tileSize;
-				int startyoffset = viewOffsetY / tileSize;
-				int numtilesx = canvas.getWidth() / tileSize + 2;
-				int numtilesy = canvas.getHeight() / tileSize + 2;
-				
-				int startx = startxoffset * tileSize;
-				int starty = startyoffset * tileSize;
-				int width = numtilesx * tileSize;
-				int height = numtilesy * tileSize;
-
-				g.drawImage(mapImages[MapMode.LIGHT_BIG.ordinal()], 
-						startx, starty, 
-						startx + width, starty + height, 
-						startxoffset * 2, startyoffset * 2, 
-						startxoffset * 2 + numtilesx * 2, startyoffset * 2 + numtilesy * 2, 
-						null);
-			}
 			g.translate(viewOffsetX, viewOffsetY);
 		}
 		g.dispose();
 
+		// In low light, human eyes don't see red as good
 		float redshift = (float) (0.7 + 0.3 * World.getDaylight());
-		float[] factors = new float[] {
-				redshift, 1f, 1f
-		};
-		float[] offsets = new float[] {
-				0f, 0f, 0f
-		};
-		RescaleOp op = new RescaleOp(factors, offsets, null);
-		op.filter(image, image);
+		Utils.applyColorRescaleToImage(image, redshift, 1f, 1f);
 	}
 
 	private void draw(Graphics g, int panelWidth, int panelHeight, int tileSize) {
@@ -254,7 +225,7 @@ public class VanillaDrawer extends Drawer {
 		renderState.lowerX = Math.max(0, state.viewOffset.divide(tileSize).getIntX() - 2);
 		renderState.lowerY = Math.max(0, state.viewOffset.divide(tileSize).getIntY() - 2);
 		renderState.upperX = Math.min(game.world.getWidth(), renderState.lowerX + panelWidth / tileSize + 4);
-		renderState.upperY = Math.min(game.world.getHeight(), renderState.lowerY + panelHeight / tileSize + 4);
+		renderState.upperY = Math.min(game.world.getHeight() + 1, renderState.lowerY + panelHeight / tileSize + 4);
 
 		if (tileSize >= FAST_MODE_TILE_SIZE && state.mapMode != MapMode.LIGHT) {
 
@@ -264,8 +235,7 @@ public class VanillaDrawer extends Drawer {
 			renderState.g = (Graphics2D) g;
 			renderState.faction = state.faction;
 			renderState.tileSize = tileSize;
-			renderState.draww = tileSize;
-			renderState.drawh = tileSize;
+			renderState.fogOfWarImage = mapImages[MapMode.LIGHT_BIG.ordinal()];
 
 			for (RenderingStep step : pipelines[state.mapMode.ordinal()].steps) {
 				step.render(renderState);

@@ -43,9 +43,6 @@ public class RenderingPipeline {
 			pipeline.steps.add(buildings);
 			pipeline.steps.add(units);
 			
-			pipeline.steps.add(hoveredTiles);
-			pipeline.steps.add(plannedThing);
-			pipeline.steps.add(selectedThings);
 			pipeline.steps.add(thingInventoryHealthBarHitsplat);
 			pipeline.steps.add(projectiles);
 			pipeline.steps.add(weatherEvents);
@@ -53,12 +50,38 @@ public class RenderingPipeline {
 			if (mode == MapMode.FLOW2) {
 				pipeline.steps.add(airFlow2);
 			}
+
+			pipeline.steps.add(fogOfWar);
 			pipeline.steps.add(target);
+			pipeline.steps.add(hoveredTiles);
+			pipeline.steps.add(plannedThing);
+			pipeline.steps.add(selectedThings);
 		}
 		
 		pipeline.steps.add(debugStrings);
 		return pipeline;
 	}
+
+	private static RenderingStep fogOfWar = new RenderingStep(state -> {
+		if (!Game.DISABLE_NIGHT) {
+			int startxoffset = state.lowerX;
+			int startyoffset = state.lowerY;
+			int numtilesx = state.upperX - state.lowerX;
+			int numtilesy = state.upperY - state.lowerY;
+			
+			int startx = startxoffset * state.tileSize;
+			int starty = startyoffset * state.tileSize;
+			int width = numtilesx * state.tileSize;
+			int height = numtilesy * state.tileSize;
+
+			state.g.drawImage(state.fogOfWarImage, 
+					startx, starty, 
+					startx + width, starty + height, 
+					startxoffset * 2, startyoffset * 2, 
+					startxoffset * 2 + numtilesx * 2, startyoffset * 2 + numtilesy * 2, 
+					null);
+		}
+	}, null);
 	
 	private static RenderingStep target = new RenderingStep(state -> {
 		if (state.gameViewState.leftClickAction == LeftClickAction.ATTACK) {
@@ -142,7 +165,7 @@ public class RenderingPipeline {
 		if (tile.getResource() != null 
 				&& state.faction.areRequirementsMet(tile.getResource().getType())) {
 			RenderingFunctions.drawResource(tile.getResource(), state.g, 
-					drawat.x, drawat.y, state.draww, state.drawh, state.tileSize);
+					drawat.x, drawat.y, state.tileSize, state.tileSize, state.tileSize);
 		}
 	});
 	
@@ -150,19 +173,19 @@ public class RenderingPipeline {
 		if (tile.getFaction() != null 
 				&& tile.getFaction().id() != World.NO_FACTION_ID) {
 			RenderingFunctions.drawFactionBorders(tile, state.g, 
-					drawat.x, drawat.y, state.draww, state.drawh, state.tileSize);
+					drawat.x, drawat.y, state.tileSize, state.tileSize, state.tileSize);
 		}
 	});
 	
 	private static RenderingStep liquids = new RenderingStep(null, (state, tile, drawat) -> {
 		if (tile.liquidType != LiquidType.DRY) {
-			RenderingFunctions.drawLiquid(tile, state.g, drawat.x, drawat.y, state.draww, state.drawh, state.tileSize);
+			RenderingFunctions.drawLiquid(tile, state.g, drawat.x, drawat.y, state.tileSize, state.tileSize, state.tileSize);
 		}
 	});
 	
 	private static RenderingStep modifiers = new RenderingStep(null, (state, tile, drawat) -> {
 		if (tile.getModifier() != null) {
-			RenderingFunctions.drawModifiers(tile.getModifier(), state.g, drawat.x, drawat.y, state.draww, state.drawh, state.tileSize);
+			RenderingFunctions.drawModifiers(tile.getModifier(), state.g, drawat.x, drawat.y, state.tileSize, state.tileSize, state.tileSize);
 		}
 	});
 	
@@ -179,19 +202,19 @@ public class RenderingPipeline {
 	
 	private static RenderingStep plants = new RenderingStep(null, (state, tile, drawat) -> {
 		if (tile.getPlant() != null) {
-			RenderingFunctions.drawPlant(tile.getPlant(), state.g, drawat.x, drawat.y, state.draww, state.drawh, state.tileSize);
+			RenderingFunctions.drawPlant(tile.getPlant(), state.g, drawat.x, drawat.y, state.tileSize, state.tileSize, state.tileSize);
 		}
 	});
 
 	private static RenderingStep roads = new RenderingStep(null, (state, tile, drawat) -> {
 		if (tile.getRoad() != null) {
-			RenderingFunctions.drawBuilding(tile.getRoad(), state.g, drawat.x, drawat.y, state.draww, state.drawh, false, state.tileSize);
+			RenderingFunctions.drawBuilding(tile.getRoad(), state.g, drawat.x, drawat.y, state.tileSize, state.tileSize, false, state.tileSize);
 		}
 	});
 	
 	private static RenderingStep buildings = new RenderingStep(null, (state, tile, drawat) -> {
 		if (tile.getBuilding() != null) {
-			RenderingFunctions.drawBuilding(tile.getBuilding(), state.g, drawat.x, drawat.y, state.draww, state.drawh, true, state.tileSize);
+			RenderingFunctions.drawBuilding(tile.getBuilding(), state.g, drawat.x, drawat.y, state.tileSize, state.tileSize, true, state.tileSize);
 		}
 	});
 	
