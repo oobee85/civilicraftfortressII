@@ -182,10 +182,13 @@ public class VanillaDrawer extends Drawer {
 				DrawingUtils.drawStringWithShadow(g, String.format("DRAW(ms): %d", avgBufferDrawTime), x, y);
 				DrawingUtils.drawStringWithShadow(g, String.format("TICK(ms): %d", state.previousTickTime), x, y - yOffset);
 			}
-			if (Settings.SHOW_BUILDING_COUNTS) {
+			if (Settings.SHOW_FACTION_INFLUENCE) {
 				String fstr = "";
 				for (Faction f : game.world.getFactions()) {
-					fstr += f.name() + ":" + f.getBuildings().size() + ", ";
+					if (fstr.length() > 0) {
+						fstr += ", ";
+					}
+					fstr += f.name() + ":" + f.getLastComputedInfluence();
 				}
 				DrawingUtils.drawStringWithShadow(g, fstr, x + 200, y);
 			}

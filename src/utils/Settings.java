@@ -19,7 +19,7 @@ public class Settings {
 	public static boolean SPAWN_EXTRA;
 	public static boolean CINEMATIC;
 	public static boolean SHOW_FPS = false;
-	public static boolean SHOW_BUILDING_COUNTS = false;
+	public static boolean SHOW_FACTION_INFLUENCE = false;
 	public static boolean DISABLE_VOLCANO_ERUPT = true;
 	public static boolean DISABLE_ENEMY_SPAWNS = true;
 	public static boolean DISABLE_WILDLIFE_SPAWNS = false;

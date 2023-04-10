@@ -42,6 +42,7 @@ public class Faction implements Externalizable {
 	private boolean usesItems;
 	private boolean isPlayer;
 	private double environmentalDifficulty = 1;
+	private int influence;
 	
 
 	@Override
@@ -158,14 +159,26 @@ public class Faction implements Externalizable {
 		return isPlayer;
 	}
 	
-	public double computeInfluence() {
+	public void recomputeInfluence() {
 		double influence = 0;
 		for (Building building : getBuildings()) {
-			influence += building.getMaxHealth() / 2;
+			if (building.getType().isRoad()) {
+				influence += building.getMaxHealth() / 20;
+			}
+			else if (building.getType().blocksMovement()) {
+				influence += building.getMaxHealth() / 10;
+			}
+			else {
+				influence += building.getMaxHealth() / 2;
+			}
 		}
 		for (Unit unit : getUnits()) {
 			influence += unit.getMaxHealth();
 		}
+		this.influence = (int) influence;
+	}
+	
+	public int getLastComputedInfluence() {
 		return influence;
 	}
 
