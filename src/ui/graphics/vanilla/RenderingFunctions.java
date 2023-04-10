@@ -170,57 +170,6 @@ public class RenderingFunctions {
 		drawInventory(g, inventory, drawAt.x, drawAt.y, draww, draww);
 	}
 	
-	private static void drawHitsplat(Graphics g, Thing thing, int tileSize) {
-
-		Point drawAt = getDrawingCoords(thing.getTile().getLocation(), tileSize);
-		int splatWidth = (int) (tileSize * .5);
-		int splatHeight = (int) (tileSize * .5);
-
-		thing.updateHitsplats();
-		Hitsplat[] hitsplats = thing.getHitsplatList();
-
-		for (int m = 0; m < hitsplats.length; m++) {
-			if (hitsplats[m] == null) {
-				continue;
-			}
-			double damage = hitsplats[m].getDamage();
-			int i = hitsplats[m].getSquare();
-
-			int x = (int) ((drawAt.x));
-			int y = (int) ((drawAt.y));
-
-			if (i == 1) {
-				x = (int) ((drawAt.x) + tileSize * 0.5);
-				y = (int) ((drawAt.y) + tileSize * 0.5);
-			}
-			if (i == 2) {
-				x = (int) ((drawAt.x) + tileSize * 0.5);
-				y = (int) ((drawAt.y));
-			}
-			if (i == 3) {
-				x = (int) ((drawAt.x));
-				y = (int) ((drawAt.y) + tileSize * 0.5);
-			}
-
-			String text = String.format("%.0f", damage);
-
-			if (damage > 0) {
-				g.drawImage(RED_HITSPLAT, x, y, splatWidth, splatHeight, null);
-			} else if (damage == 0) {
-				g.drawImage(BLUE_HITSPLAT, x, y, splatWidth, splatHeight, null);
-			} else if (damage < 0) {
-				g.drawImage(GREEN_HITSPLAT, x, y, splatWidth, splatHeight, null);
-				text = String.format("%.0f", -damage);
-			}
-
-			int fontSize = tileSize / 4;
-			g.setFont(new Font(DAMAGE_FONT.getFontName(), Font.BOLD, fontSize));
-			int width = g.getFontMetrics().stringWidth(text);
-			g.setColor(Color.WHITE);
-			g.drawString(text, x + splatWidth / 2 - width / 2, (int) (y + fontSize * 1.5));
-		}
-	}
-	
 	private static boolean shouldDrawHealthBar(int tileSize, Thing thing, TileLoc hoveredTile) {
 		if (tileSize <= 30) {
 			return false;
@@ -264,6 +213,57 @@ public class RenderingFunctions {
 		}
 	}
 	
+	private static void drawHitsplat(Graphics g, Thing thing, int tileSize) {
+	
+		Point drawAt = getDrawingCoords(thing.getTile().getLocation(), tileSize);
+		int splatWidth = (int) (tileSize * .5);
+		int splatHeight = (int) (tileSize * .5);
+	
+		thing.updateHitsplats();
+		Hitsplat[] hitsplats = thing.getHitsplatList();
+	
+		for (int m = 0; m < hitsplats.length; m++) {
+			if (hitsplats[m] == null) {
+				continue;
+			}
+			double damage = hitsplats[m].getDamage();
+			int i = hitsplats[m].getSquare();
+	
+			int x = (int) ((drawAt.x));
+			int y = (int) ((drawAt.y));
+	
+			if (i == 1) {
+				x = (int) ((drawAt.x) + tileSize * 0.5);
+				y = (int) ((drawAt.y) + tileSize * 0.5);
+			}
+			if (i == 2) {
+				x = (int) ((drawAt.x) + tileSize * 0.5);
+				y = (int) ((drawAt.y));
+			}
+			if (i == 3) {
+				x = (int) ((drawAt.x));
+				y = (int) ((drawAt.y) + tileSize * 0.5);
+			}
+	
+			String text = String.format("%.0f", damage);
+	
+			if (damage > 0) {
+				g.drawImage(RED_HITSPLAT, x, y, splatWidth, splatHeight, null);
+			} else if (damage == 0) {
+				g.drawImage(BLUE_HITSPLAT, x, y, splatWidth, splatHeight, null);
+			} else if (damage < 0) {
+				g.drawImage(GREEN_HITSPLAT, x, y, splatWidth, splatHeight, null);
+				text = String.format("%.0f", -damage);
+			}
+	
+			int fontSize = tileSize / 4;
+			g.setFont(new Font(DAMAGE_FONT.getFontName(), Font.BOLD, fontSize));
+			int width = g.getFontMetrics().stringWidth(text);
+			g.setColor(Color.WHITE);
+			g.drawString(text, x + splatWidth / 2 - width / 2, (int) (y + fontSize * 1.5));
+		}
+	}
+
 	public static  void drawSelectedThings(RenderingState state) {
 		for (Thing thing : state.gameViewState.selectedThings) {
 			// draw selection circle

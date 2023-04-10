@@ -1275,7 +1275,7 @@ public class World {
 		BufferedImage terrainImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 		BufferedImage minimapImage = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 		BufferedImage bigTerrainImage = new BufferedImage(terrainImage.getWidth()*2, terrainImage.getHeight()*2+1, terrainImage.getType());
-		BufferedImage bigLightImage = new BufferedImage(terrainImage.getWidth()*2, terrainImage.getHeight()*2+1, terrainImage.getType());
+		BufferedImage fogOfWarImageBig = new BufferedImage(terrainImage.getWidth()*2, terrainImage.getHeight()*2+1, terrainImage.getType());
 
 		double daylight = getDaylight();
 		double brightnessHardCutoff = 0.5 - daylight*0.3;
@@ -1283,16 +1283,15 @@ public class World {
 		for(Tile tile : this.getTiles()) {
 			double tilebrightness = tile.getBrightness(faction);
 			boolean isVisible = tilebrightness >= brightnessHardCutoff;
-			Color minimapColor = terrainColors.get(tile.getTerrain());
 			Color terrainColor = terrainColors.get(tile.getTerrain());
+			Color minimapColor = new Color(terrainColor.getRGB());
 			if (isVisible
-				&& tile.getResource() != null
-				&& faction.areRequirementsMet(tile.getResource().getType())) {
-				terrainColor = tile.getResource().getType().getMipMap().getColor(0);
+					&& tile.getResource() != null
+					&& faction.areRequirementsMet(tile.getResource().getType())) {
 				minimapColor = tile.getResource().getType().getMipMap().getColor(0);
+				terrainColor = tile.getResource().getType().getMipMap().getColor(0);
 			}
 			if (isVisible && tile.getRoad() != null) {
-				terrainColor = tile.getRoad().getType().getMipMap().getColor(0);
 				minimapColor = tile.getRoad().getType().getMipMap().getColor(0);
 			}
 			if(tile.liquidAmount > 0) {
@@ -1301,21 +1300,21 @@ public class World {
 				terrainColor = Utils.blendColors(tile.liquidType.getMipMap().getColor(0), terrainColor, alpha);
 			}
 			if(tile.getPlant() != null) {
-				terrainColor = tile.getPlant().getMipMap().getColor(0);
 				minimapColor = tile.getPlant().getMipMap().getColor(0);
+				terrainColor = tile.getPlant().getMipMap().getColor(0);
 			}
 			if(tile.hasBuilding()) {
-				terrainColor = tile.getBuilding().getMipMap().getColor(0);
 				minimapColor = tile.getBuilding().getMipMap().getColor(0);
+				terrainColor = tile.getBuilding().getMipMap().getColor(0);
 			}
 			GroundModifier modifier = tile.getModifier(); 
 			if(modifier != null) {
-				minimapColor = modifier.getType().getMipMap().getColor(0);
+				minimapColor = Utils.blendColors(modifier.getType().getMipMap().getColor(0), minimapColor, 0.9);
 				terrainColor = Utils.blendColors(modifier.getType().getMipMap().getColor(0), terrainColor, 0.9);
 			}
 			if(tile.getFaction() != getFaction(NO_FACTION_ID)) {
-				minimapColor = Utils.blendColors(tile.getFaction().color(), minimapColor, 0.3);
-				terrainColor = Utils.blendColors(tile.getFaction().color(), terrainColor, 0.3);
+				minimapColor = Utils.blendColors(tile.getFaction().color(), minimapColor, 0.2);
+				terrainColor = Utils.blendColors(tile.getFaction().color(), terrainColor, 0.2);
 			}
 
 			if (tilebrightness > brightnessSoftCutoff) {
@@ -1329,15 +1328,17 @@ public class World {
 			}
 			tilebrightness = (tilebrightness > 1) ? 1 : ((tilebrightness < 0) ? 0 : tilebrightness);
 			int alphaValue = (int) ((1 - tilebrightness) * 255);
-			terrainColor = new Color(
+			int nightColor = new Color(
 					(int) (terrainColor.getRed() * daylight),
 					(int) (terrainColor.getGreen() * daylight),
 					(int) (terrainColor.getBlue() * daylight),
-					alphaValue);
-			int nightColor = terrainColor.getRGB();
-			
-			Color outOfVisionColor = Utils.blendColors(minimapColor, Color.black, daylight);
-			minimapColor = Utils.blendColors(minimapColor, outOfVisionColor, tilebrightness);
+					alphaValue).getRGB();
+
+			Color fogOfWarTerrainColor = Utils.blendColors(terrainColor, Color.black, daylight);
+			terrainColor = Utils.blendColors(terrainColor, fogOfWarTerrainColor, tilebrightness);
+
+			Color fogOfWarMinimapColor = Utils.blendColors(minimapColor, Color.black, daylight);
+			minimapColor = Utils.blendColors(minimapColor, fogOfWarMinimapColor, tilebrightness);
 			
 			minimapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), minimapColor.getRGB());
 			terrainImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), terrainColor.getRGB());
@@ -1348,15 +1349,10 @@ public class World {
 			bigTerrainImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2+1 + oddColumn, terrainColor.getRGB());
 			bigTerrainImage.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2+1 + oddColumn, terrainColor.getRGB());
 			
-			bigLightImage.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2 + oddColumn, nightColor);
-			bigLightImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2 + oddColumn, nightColor);
-			bigLightImage.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2+1 + oddColumn, nightColor);
-			bigLightImage.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2+1 + oddColumn, nightColor);
-		}
-		for (int x = 0; x < bigLightImage.getWidth(); x++) {
-			bigLightImage.setRGB(x, 0, bigLightImage.getRGB(x, 1));
-			bigLightImage.setRGB(x, bigLightImage.getHeight()-1, 
-					bigLightImage.getRGB(x, bigLightImage.getHeight() - 2));
+			fogOfWarImageBig.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2 + oddColumn, nightColor);
+			fogOfWarImageBig.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2 + oddColumn, nightColor);
+			fogOfWarImageBig.setRGB(tile.getLocation().x()*2+1, tile.getLocation().y()*2+1 + oddColumn, nightColor);
+			fogOfWarImageBig.setRGB(tile.getLocation().x()*2, tile.getLocation().y()*2+1 + oddColumn, nightColor);
 		}
 		for(AttackedNotification notification : faction.getAttackedNotifications()) {
 			minimapImage.setRGB(notification.tile.getLocation().x(), notification.tile.getLocation().y(), Color.red.getRGB());
@@ -1386,7 +1382,7 @@ public class World {
 		mapImages[MapMode.TERRAIN.ordinal()] = terrainImage;
 		mapImages[MapMode.FLOW2.ordinal()] = terrainImage;
 		mapImages[MapMode.MINIMAP.ordinal()] = minimapImage;
-		mapImages[MapMode.LIGHT_BIG.ordinal()] = bigLightImage;
+		mapImages[MapMode.LIGHT_BIG.ordinal()] = fogOfWarImageBig;
 		for(MapMode mode : MapMode.HEATMAP_MODES) {
 			BufferedImage image = new BufferedImage(tiles.length, tiles[0].length, BufferedImage.TYPE_4BYTE_ABGR);
 			for(Tile tile : getTiles() ) {

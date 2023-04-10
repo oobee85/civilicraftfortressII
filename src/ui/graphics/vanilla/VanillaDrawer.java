@@ -232,7 +232,7 @@ public class VanillaDrawer extends Drawer {
 		}
 		g.dispose();
 
-		float redshift = (float) (0.7 + 0.3 * game.world.getDaylight());
+		float redshift = (float) (0.7 + 0.3 * World.getDaylight());
 		float[] factors = new float[] {
 				redshift, 1f, 1f
 		};

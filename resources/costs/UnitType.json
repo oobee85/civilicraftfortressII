@@ -449,7 +449,7 @@
 		"attackstyles":[
 			{"damage":1, "cooldown":30, "range":1, "projectile":"FIREBREATH"}
 		],
-		"attributes":["hostile"],
+		"attributes":["flying", "hostile"],
 		"resistances": {"HEAT": 0},
 		"targeting":[
 			{"type":"game.Building", "faction":"PLAYER"},
