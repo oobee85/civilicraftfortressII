@@ -1059,6 +1059,31 @@ public class World {
 			
 		}	
 	}
+	
+	public void growMoss() {
+		int attemptsRemaining = 10;
+		for (Tile tile : getTilesRandomly()) {
+			if (--attemptsRemaining < 0) {
+				break;
+			}
+			if (tile.getResource() == null) {
+				continue;
+			}
+			if (tile.getPlant() != null) {
+				continue;
+			}
+			if (!tile.getResource().getType().isRare()) {
+				continue;
+			}
+			Plant plant = new Plant(
+					Game.plantTypeMap.get("MOSS"),
+					tile,
+					getFaction(NO_FACTION_ID));
+			tile.setHasPlant(plant);
+			worldData.addPlant(plant);
+			break;
+		}
+	}
 
 	public void genPlants() {
 		for(Tile tile : getTiles()) {

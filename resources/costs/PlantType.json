@@ -42,5 +42,11 @@
 		"attributes":["desertresistant"],
 		"harvestitems":{"FOOD":5, "WOOD":5}
 	},
+	{
+		"name":"MOSS",
+		"image":"Images/plants/moss16.png",
+		"health":50,
+		"rarity":1
+	}
 ]
 }

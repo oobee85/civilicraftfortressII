@@ -107,6 +107,7 @@ public class Game {
 
 		if (World.ticks % 20 == 0) {
 			updateTerritory();
+			world.growMoss();
 		}
 
 		if (World.ticks % 2 == 0) {
