@@ -7,6 +7,7 @@ import java.awt.geom.*;
 import javax.swing.*;
 
 import ui.*;
+import ui.utils.DrawingUtils;
 import utils.*;
 import world.*;
 
@@ -91,9 +92,21 @@ public class MinimapView extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.setColor(gameView.getGameInstance().getBackgroundColor());
+		g.drawImage(DrawingUtils.SKY_BACKGROUND, 0, 0, getWidth(), getHeight(), null);
+		Color backgroundColor = gameView.getGameInstance().getBackgroundColor();
+		g.setColor(backgroundColor);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		drawSunMoon(g);
+		int skyBackgroundWidth = DrawingUtils.SKY_BACKGROUND.getWidth(null);
+		int skyBackgroundHeight = DrawingUtils.SKY_BACKGROUND.getHeight(null);
+		g.drawImage(
+				DrawingUtils.SKY_BACKGROUND,
+				0, getHeight() * 4 / 5,
+				getWidth(), getHeight(),
+				0, skyBackgroundHeight * 4 / 5,
+				skyBackgroundWidth, skyBackgroundHeight,
+				null);
+		g.setColor(backgroundColor);
 		g.fillRect(0, getHeight() * 4 / 5, getWidth(), getHeight() - getHeight() * 4 / 5);
 		g.setColor(Color.black);
 		g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);

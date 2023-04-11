@@ -1071,9 +1071,7 @@ public class Game {
 	}
 	
 	public Color getBackgroundColor() {
-		double ratio = World.getDaylight();
-		int c = (int)(ratio * 255);
-		return new Color(c, c, c);
+		return new Color(0, 0, 0, (float) (1 - World.getDaylight()));
 	}
 	
 	public void researchEverything(Faction faction) {

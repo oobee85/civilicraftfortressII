@@ -15,6 +15,7 @@ import game.actions.*;
 import networking.message.*;
 import networking.server.*;
 import ui.*;
+import ui.utils.DrawingUtils;
 import utils.*;
 import wildlife.*;
 import world.liquid.*;
@@ -1409,7 +1410,7 @@ public class World {
 	}
 	
 	private static final int KERNEL_SIZE = 27;
-	private static final float[] kernelData = Utils.createSpreadingKernel(KERNEL_SIZE);
+	private static final float[] kernelData = DrawingUtils.createSpreadingKernel(KERNEL_SIZE);
 	/**
 	 * computes all tile brightnesses and creates brightness image
 	 */
@@ -1438,23 +1439,19 @@ public class World {
 		}
 		rawImage = ImageCreation.convertToHexagonal(rawImage);
 		
+		// Add KERNEL_SIZE/2 buffer on every edge so that it can convolve
+		// the whole image
 		BufferedImage rawImagePlusEdges = new BufferedImage(
-				rawImage.getWidth() + KERNEL_SIZE*2,
-				rawImage.getHeight() + KERNEL_SIZE*2,
+				rawImage.getWidth() + KERNEL_SIZE,
+				rawImage.getHeight() + KERNEL_SIZE,
 				rawImage.getType());
 		Graphics g = rawImagePlusEdges.getGraphics();
-		for(int i = 0; i < KERNEL_SIZE; i++) {
-			g.drawImage(rawImage, i, i, null);
-			g.drawImage(rawImage, KERNEL_SIZE*2 - i, i, null);
-			g.drawImage(rawImage, KERNEL_SIZE*2 - i, KERNEL_SIZE*2 - i, null);
-			g.drawImage(rawImage, i, KERNEL_SIZE*2 - i, null);
-		}
-		g.drawImage(rawImage, KERNEL_SIZE, KERNEL_SIZE, null);
+		g.drawImage(rawImage, KERNEL_SIZE/2, KERNEL_SIZE/2, null);
 		g.dispose();
 		Kernel kernel = new Kernel(KERNEL_SIZE, KERNEL_SIZE, kernelData);
 		ConvolveOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_ZERO_FILL, null);
 		BufferedImage blurred = op.filter(rawImagePlusEdges, null);
-		blurred = blurred.getSubimage(KERNEL_SIZE, KERNEL_SIZE, rawImage.getWidth(), rawImage.getHeight());
+		blurred = blurred.getSubimage(KERNEL_SIZE/2, KERNEL_SIZE/2, rawImage.getWidth(), rawImage.getHeight());
 		blurred = ImageCreation.convertFromHexagonal(blurred);
 		for(Tile tile : getTiles()) {
 			int brightness = blurred.getRGB(tile.getLocation().x(), tile.getLocation().y()) & 0xFF;

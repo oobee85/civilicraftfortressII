@@ -25,41 +25,6 @@ public final class Utils {
 	
 	public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	
-	public static void applyColorRescaleToImage(BufferedImage image, float red, float green, float blue) {
-		float[] factors = new float[] {
-				red, green, blue
-		};
-		float[] offsets = new float[] {
-				0f, 0f, 0f
-		};
-		RescaleOp op = new RescaleOp(factors, offsets, null);
-		op.filter(image, image);
-	}
-
-	public static float[] createSpreadingKernel(int r) {
-		double[] unnormalized = new double[r*r];
-		double total = 0;
-		for(int y = 0; y < r; y++) {
-			for(int x = 0; x < r; x++) {
-				double B = (x - r/2)*(x - r/2) + (y - r/2)*(y - r/2);
-				if(B == 0) {
-					unnormalized[x + y*r] = 1;
-				}
-				else if(B <= r*r/4){
-					unnormalized[x + y*r] = (float) (1f / B);
-				}
-			}
-		}
-		total = 1;
-		float[] normalized = new float[r*r];
-		for(int y = 0; y < r; y++) {
-			for(int x = 0; x < r; x++) {
-				normalized[x + y*r] = (float) (unnormalized[x + y*r] / total);
-			}
-		}
-		return normalized;
-	}
-	
 	public static int stringWidth(String text, Font font) {
 	  FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, true);
 	  return (int)(font.getStringBounds(text, frc).getWidth());

@@ -19,8 +19,6 @@ public class VanillaDrawer extends Drawer {
 
 	private static final int FAST_MODE_TILE_SIZE = 10;
 	
-	private static final Image SKY_BACKGROUND = Utils.loadImage("Images/lightbluesky.png");
-	
 	private JPanel canvas;
 	
 	private static final int NUM_BUFFERS = 3;
@@ -51,39 +49,47 @@ public class VanillaDrawer extends Drawer {
 				
 				g.setColor(game.getBackgroundColor());
 				g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-				g.drawImage(SKY_BACKGROUND, -state.viewOffset.getIntX()/20 - 100, -state.viewOffset.getIntY()/20 - 100, null);
+				g.drawImage(DrawingUtils.SKY_BACKGROUND, -state.viewOffset.getIntX()/20 - 100, -state.viewOffset.getIntY()/20 - 100, null);
 				g.setColor(new Color(0, 0, 0, (float) (1 - World.getDaylight())));
 				g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 				
 				int buffer = currentBuffer;
-				
-				int startxoffset = state.viewOffset.getIntX() / drawnAtTileSize[buffer];
-				int startyoffset = state.viewOffset.getIntY() / drawnAtTileSize[buffer];
-				int numtilesx = canvas.getWidth() / drawnAtTileSize[buffer] + 2;
-				int numtilesy = canvas.getHeight() / drawnAtTileSize[buffer] + 2;
-				
-				int startx = startxoffset * drawnAtTileSize[buffer] - (state.viewOffset.getIntX());
-				int starty = startyoffset * drawnAtTileSize[buffer] - (state.viewOffset.getIntY());
-				int width = numtilesx * drawnAtTileSize[buffer];
-				int height = numtilesy * drawnAtTileSize[buffer];
-
-				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-				g.drawImage(mapImages[MapMode.TERRAIN_BIG.ordinal()], 
-						startx, starty, 
-						startx + width, starty + height, 
-						startxoffset * 2, startyoffset * 2, 
-						startxoffset * 2 + numtilesx * 2, startyoffset * 2 + numtilesy * 2, 
-						null);
-				
-				if(state.volatileTileSize == drawnAtTileSize[buffer]) {
-					g.drawImage(buffers[buffer], 
-							drawnAtOffset[buffer].getIntX() - state.viewOffset.getIntX(), 
-							drawnAtOffset[buffer].getIntY() - state.viewOffset.getIntY(), 
+				boolean zooming = (state.volatileTileSize != drawnAtTileSize[buffer]);
+				if(!zooming) {
+					int startxoffset = state.viewOffset.getIntX() / drawnAtTileSize[buffer];
+					int startyoffset = state.viewOffset.getIntY() / drawnAtTileSize[buffer];
+					int numtilesx = canvas.getWidth() / drawnAtTileSize[buffer] + 2;
+					int numtilesy = canvas.getHeight() / drawnAtTileSize[buffer] + 2;
+					int startx = startxoffset * drawnAtTileSize[buffer] - (state.viewOffset.getIntX());
+					int starty = startyoffset * drawnAtTileSize[buffer] - (state.viewOffset.getIntY());
+					int width = numtilesx * drawnAtTileSize[buffer];
+					int height = numtilesy * drawnAtTileSize[buffer];
+					g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+					// Only draw the TERRAIN_BIG in the background when user is panning
+					// the camera, not zooming in or out. This allows for real time camera
+					// panning while the rendering pipeline catches up. When we try to
+					// draw this during zooming, it gets drawn in the wrong place because
+					// the offsets no longer make sense.
+					g.drawImage(mapImages[MapMode.TERRAIN_BIG.ordinal()], 
+							startx, starty, 
+							startx + width, starty + height, 
+							startxoffset * 2, startyoffset * 2, 
+							startxoffset * 2 + numtilesx * 2, startyoffset * 2 + numtilesy * 2, 
 							null);
 				}
-				else {
-					g.drawImage(buffers[buffer], 0, 0, null);
-				}
+				
+				// While zooming, always draw buffer at 0, 0. Otherwise, draw it at the
+				// correct offset based on the camera movement.
+				Position drawBufferAt = 
+						zooming
+						? new Position(0, 0)
+						: drawnAtOffset[buffer].subtract(state.viewOffset);
+				g.drawImage(
+						buffers[buffer],
+						drawBufferAt.getIntX(),
+						drawBufferAt.getIntY(),
+						null);
+
 				numAvailable.tryAcquire();
 
 				g.setColor(Color.black);
@@ -214,7 +220,7 @@ public class VanillaDrawer extends Drawer {
 
 		// In low light, human eyes don't see red as good
 		float redshift = (float) (0.7 + 0.3 * World.getDaylight());
-		Utils.applyColorRescaleToImage(image, redshift, 1f, 1f);
+		DrawingUtils.applyColorRescaleToImage(image, redshift, 1f, 1f);
 	}
 
 	private void draw(Graphics g, int panelWidth, int panelHeight, int tileSize) {
