@@ -180,7 +180,7 @@ public class RenderingPipeline {
 	
 	private static RenderingStep liquids = new RenderingStep(null, (state, tile, drawat) -> {
 		if (tile.liquidType != LiquidType.DRY) {
-			RenderingFunctions.drawLiquid(tile, state.g, drawat.x, drawat.y, state.tileSize);
+			RenderingFunctions.drawLiquid(tile, state.g, drawat.x, drawat.y, state.tileSize, state);
 		}
 	});
 	

@@ -9,6 +9,7 @@ import game.*;
 import game.actions.*;
 import game.components.Inventory;
 import ui.*;
+import ui.utils.DrawingUtils;
 import utils.*;
 import world.*;
 
@@ -515,7 +516,7 @@ public class RenderingFunctions {
 		}
 	}
 	
-	public static void drawLiquid(Tile tile, Graphics g, int drawx, int drawy, int tileSize) {
+	public static void drawLiquid(Tile tile, Graphics g, int drawx, int drawy, int tileSize, RenderingState state) {
 		double alpha = Utils.getAlphaOfLiquid(tile.liquidAmount);
 //		 transparency liquids
 		Utils.setTransparency(g, alpha);
@@ -529,6 +530,21 @@ public class RenderingFunctions {
 				imageSize);
 		g.drawImage(tile.liquidType.getMipMap().getImage(tileSize), drawx + tileSize / 2 - imageSize / 2,
 				drawy + tileSize / 2 - imageSize / 2, imageSize, imageSize, null);
+		
+
+		// The idea is to draw some sort of reflection in the water but
+		// it currently doesn't look very good.
+//		Utils.setTransparency(g, alpha/2);
+//		double widthRatio = (double) DrawingUtils.SKY_BACKGROUND.getWidth(null) / state.world.getWidth();
+//		double heightRatio = (double) DrawingUtils.SKY_BACKGROUND.getHeight(null) / state.world.getHeight();
+//		g.drawImage(DrawingUtils.SKY_BACKGROUND,
+//				drawx, drawy, drawx + tileSize, drawy + tileSize,
+//				(int) (tile.getLocation().x() * widthRatio),
+//				(int) (tile.getLocation().y() * heightRatio),
+//				(int) ((tile.getLocation().x() + 1) * widthRatio),
+//				(int) ((tile.getLocation().y() + 1) * heightRatio),
+//				null);
+//		Utils.setTransparency(g, 1);
 	
 	}
 	
