@@ -626,14 +626,28 @@ public class RenderingFunctions {
 	}
 	
 	public static void drawSunShadows(RenderingState state, Tile tile, Point4 drawat) {
+		int dayOffset = World.getCurrentDayOffset();
+		if (dayOffset > Constants.DAY_DURATION) {
+			if (dayOffset < Constants.DAY_DURATION + Constants.NIGHT_DURATION/2) {
+				dayOffset = Constants.DAY_DURATION;
+			}
+			else {
+				dayOffset = 0;
+			}
+		}
+		int sunShadow = (int) (dayOffset * MipMap.NUM_SUN_SHADOWS / (Constants.DAY_DURATION + 1));
+		sunShadowSetup(state.g);
 		if (tile.getPlant() != null) {
-			drawSunShadow(tile.getPlant().getMipMap(), state.g, drawat.x, drawat.y, state.tileSize, state.tileSize, state.tileSize);
+			drawSunShadow(tile.getPlant().getMipMap(), state.g,
+					drawat.x, drawat.y, state.tileSize, sunShadow);
 		}
 		if (tile.getBuilding() != null && tile.getBuilding().isBuilt()) {
-			drawSunShadow(tile.getBuilding().getMipMap(), state.g, drawat.x, drawat.y, state.tileSize, state.tileSize, state.tileSize);
+			drawSunShadow(tile.getBuilding().getMipMap(), state.g,
+					drawat.x, drawat.y, state.tileSize, sunShadow);
 		}
 		drawUnitsIterationHelper(state, tile, drawat, 
-				(s, x, y, size, thing) -> drawSunShadow(thing.getMipMap(), s.g, x, y, size, size, size));
+				(s, x, y, size, thing) -> drawSunShadow(thing.getMipMap(), s.g, x, y, size, sunShadow));
+		sunShadowCleanup(state.g);
 	}
 
 	public static final int MAX_NUM_ROWS = 2;
@@ -716,21 +730,26 @@ public class RenderingFunctions {
 		return null;
     }
 	
-	private static void drawSunShadow(MipMap m, Graphics g, int drawx, int drawy, int draww, int drawh, int frozenTileSize) {
-		int dayOffset = World.getCurrentDayOffset();
-		if (dayOffset > Constants.DAY_DURATION) {
-			if (dayOffset < Constants.DAY_DURATION + Constants.NIGHT_DURATION/2) {
-				dayOffset = Constants.DAY_DURATION;
-			}
-			else {
-				dayOffset = 0;
-			}
-		}
-		int sunShadow = (int) (dayOffset * MipMap.NUM_SUN_SHADOWS / (Constants.DAY_DURATION + 1));
+	/**
+	 * Must be called before calling drawSunShadow
+	 */
+	private static void sunShadowSetup(Graphics g) {
 		double daylight = World.getDaylight();
 		Utils.setTransparency(g, daylight * daylight / 4);
+	}
+	/**
+	 * Must call sunShadowSetup before this and sunShadowCleanup after this
+	 */
+	private static void drawSunShadow(MipMap m, Graphics g, int drawx, int drawy, int tileSize, int sunShadow) {
 		// sun shadow images are double the width of a tile
-		g.drawImage(m.getSunShadow(frozenTileSize, sunShadow), drawx - draww/2, drawy, draww*2, drawh, null);
+		g.drawImage(m.getSunShadow(tileSize, sunShadow), 
+				drawx - tileSize/2, drawy, tileSize*2, tileSize, null);
+
+	}
+	/**
+	 * Must be called after all calls to drawSunShadow
+	 */
+	private static void sunShadowCleanup(Graphics g) {
 		Utils.setTransparency(g, 1);
 	}
 

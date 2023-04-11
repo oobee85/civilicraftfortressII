@@ -1,7 +1,5 @@
 package ui.graphics.vanilla;
 
-import java.awt.Point;
-
 import world.Tile;
 
 /**
