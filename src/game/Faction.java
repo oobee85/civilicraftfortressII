@@ -181,6 +181,35 @@ public class Faction implements Externalizable {
 	public int getLastComputedInfluence() {
 		return influence;
 	}
+	
+	public double computeVisibilityOfTile(Tile tile) {
+		double visibility = 0;
+		for (Unit u : tile.getUnits()) {
+			if (u.getFaction() == this) {
+				visibility += 1;
+			}
+		}
+		if (tile.getBuilding() != null 
+			&& tile.getBuilding().getFaction() == this
+			&& tile.getBuilding().isBuilt()) {
+
+			if (tile.getBuilding().getType().blocksMovement()) {
+				visibility += 0.2;
+			}
+			else {
+				visibility += 2;
+			}
+		}
+		if (tile.getFaction() == this) {
+			visibility += 0.2;
+			visibility += tile.getTerrain().getBrightness();
+			visibility += tile.liquidAmount * tile.liquidType.getBrightness();
+			if (tile.getModifier() != null) {
+				visibility += tile.getModifier().getType().getBrightness();
+			}
+		}
+		return visibility;
+	}
 
 	public boolean isBuildingSelected(BuildingType type) {
 		for(Building building : getBuildings()) {

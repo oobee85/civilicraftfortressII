@@ -1419,20 +1419,7 @@ public class World {
 		int h = getHeight();
 		BufferedImage rawImage = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_GRAY);
 		for(Tile tile : getTiles() ) {
-			double playerBrightness = 0;
-			if (tile.getThingOfFaction(faction) != null) {
-				playerBrightness += 1;
-			}
-			if (tile.getFaction() == faction) {
-				playerBrightness += 0.4;
-				double environmentBrightness = tile.getTerrain().getBrightness()
-						+ tile.liquidAmount * tile.liquidType.getBrightness();
-				if (tile.getModifier() != null) {
-					environmentBrightness += tile.getModifier().getType().getBrightness();
-				}
-				playerBrightness += environmentBrightness;
-			}
-
+			double playerBrightness = faction.computeVisibilityOfTile(tile);
 			byte brightnessByte = (byte) Math.max(0, Math.min(255, playerBrightness*128));
 			int rgb = (brightnessByte << 24) |  (brightnessByte << 16) | (brightnessByte << 8) | brightnessByte;
 			rawImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), rgb);
