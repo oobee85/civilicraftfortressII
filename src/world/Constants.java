@@ -6,8 +6,8 @@ public class Constants {
 	public static final double TERRAIN_SNOW_LEVEL = 1;
 	public static final double DESERT_HUMIDITY = 1;
 	public static final int SEASON_DURATION = 10000;
-	public static final int DAY_DURATION = 500;
-	public static final int NIGHT_DURATION = 500;
+	public static final int DAY_DURATION = 700;
+	public static final int NIGHT_DURATION = 600;
 	public static final int TRANSITION_PERIOD = 100;
 	public static final double CHANCE_TO_SWITCH_TERRAIN = 0.1;
 	public static final int MIN_TIME_TO_SWITCH_TERRAIN = 100;

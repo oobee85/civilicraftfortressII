@@ -37,6 +37,7 @@ public class RenderingPipeline {
 			pipeline.steps.add(factions);
 			pipeline.steps.add(roads);
 			pipeline.steps.add(liquids);
+			pipeline.steps.add(sunShadows);
 			pipeline.steps.add(modifiers);
 			pipeline.steps.add(tileInventory);
 			pipeline.steps.add(plants);
@@ -165,7 +166,7 @@ public class RenderingPipeline {
 		if (tile.getResource() != null 
 				&& state.faction.areRequirementsMet(tile.getResource().getType())) {
 			RenderingFunctions.drawResource(tile.getResource(), state.g, 
-					drawat.x, drawat.y, state.tileSize, state.tileSize, state.tileSize);
+					drawat.x, drawat.y, state.tileSize);
 		}
 	});
 	
@@ -179,13 +180,13 @@ public class RenderingPipeline {
 	
 	private static RenderingStep liquids = new RenderingStep(null, (state, tile, drawat) -> {
 		if (tile.liquidType != LiquidType.DRY) {
-			RenderingFunctions.drawLiquid(tile, state.g, drawat.x, drawat.y, state.tileSize, state.tileSize, state.tileSize);
+			RenderingFunctions.drawLiquid(tile, state.g, drawat.x, drawat.y, state.tileSize);
 		}
 	});
 	
 	private static RenderingStep modifiers = new RenderingStep(null, (state, tile, drawat) -> {
 		if (tile.getModifier() != null) {
-			RenderingFunctions.drawModifiers(tile.getModifier(), state.g, drawat.x, drawat.y, state.tileSize, state.tileSize, state.tileSize);
+			RenderingFunctions.drawModifiers(tile.getModifier(), state.g, drawat.x, drawat.y, state.tileSize);
 		}
 	});
 	
@@ -202,23 +203,27 @@ public class RenderingPipeline {
 	
 	private static RenderingStep plants = new RenderingStep(null, (state, tile, drawat) -> {
 		if (tile.getPlant() != null) {
-			RenderingFunctions.drawPlant(tile.getPlant(), state.g, drawat.x, drawat.y, state.tileSize, state.tileSize, state.tileSize);
+			RenderingFunctions.drawPlant(tile.getPlant(), state.g, drawat.x, drawat.y, state.tileSize);
 		}
 	});
 
 	private static RenderingStep roads = new RenderingStep(null, (state, tile, drawat) -> {
 		if (tile.getRoad() != null) {
-			RenderingFunctions.drawBuilding(tile.getRoad(), state.g, drawat.x, drawat.y, state.tileSize, state.tileSize, false, state.tileSize);
+			RenderingFunctions.drawBuilding(tile.getRoad(), state.g, drawat.x, drawat.y, state.tileSize);
 		}
 	});
 	
 	private static RenderingStep buildings = new RenderingStep(null, (state, tile, drawat) -> {
 		if (tile.getBuilding() != null) {
-			RenderingFunctions.drawBuilding(tile.getBuilding(), state.g, drawat.x, drawat.y, state.tileSize, state.tileSize, true, state.tileSize);
+			RenderingFunctions.drawBuilding(tile.getBuilding(), state.g, drawat.x, drawat.y, state.tileSize);
 		}
 	});
 	
 	private static RenderingStep units = new RenderingStep(null, (state, tile, drawat) -> {
 		RenderingFunctions.drawUnitImages(state, tile, drawat);
+	});
+	
+	private static RenderingStep sunShadows = new RenderingStep(null, (state, tile, drawat) -> {
+		RenderingFunctions.drawSunShadows(state, tile, drawat);
 	});
 }

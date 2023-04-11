@@ -216,11 +216,11 @@ public final class Utils {
 				}
 			}
 		}
-		BufferedImage sheared = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+		BufferedImage sheared = new BufferedImage(image.getWidth()*2, image.getHeight(), image.getType());
 		Graphics2D g = sheared.createGraphics();
 		g.transform(AffineTransform.getShearInstance(shear, 0));
-		g.translate(-sheared.getWidth() * shear, 0);
-		g.drawImage(image, 0, 0, null);
+		g.translate(-image.getWidth() * shear, 0);
+		g.drawImage(image, image.getWidth()/2, 0, null);
 		g.dispose();
 		return new ImageIcon(sheared);
 	}

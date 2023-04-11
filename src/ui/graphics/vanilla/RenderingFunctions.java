@@ -466,9 +466,9 @@ public class RenderingFunctions {
 		}
 	}
 	
-	public static void drawResource(Resource resource, Graphics2D g, int drawx, int drawy, int draww, int drawh, int frozenTileSize) {
-		g.drawImage(resource.getType().getMipMap().getImage(frozenTileSize), 
-				drawx, drawy, draww, drawh, null);
+	public static void drawResource(Resource resource, Graphics2D g, int drawx, int drawy, int tileSize) {
+		g.drawImage(resource.getType().getMipMap().getImage(tileSize), 
+				drawx, drawy, tileSize, tileSize, null);
 	}
 	
 	public static void drawFactionBorders(Tile tile, Graphics2D g, int drawx, int drawy, int draww, int drawh, int frozenTileSize) {
@@ -515,27 +515,27 @@ public class RenderingFunctions {
 		}
 	}
 	
-	public static void drawLiquid(Tile tile, Graphics g, int drawx, int drawy, int draww, int drawh, int frozenTileSize) {
+	public static void drawLiquid(Tile tile, Graphics g, int drawx, int drawy, int tileSize) {
 		double alpha = Utils.getAlphaOfLiquid(tile.liquidAmount);
 //		 transparency liquids
 		Utils.setTransparency(g, alpha);
-		g.setColor(tile.liquidType.getMipMap().getColor(frozenTileSize));
-		g.fillRect(drawx, drawy, draww, drawh);
+		g.setColor(tile.liquidType.getMipMap().getColor(tileSize));
+		g.fillRect(drawx, drawy, tileSize, tileSize);
 		Utils.setTransparency(g, 1);
 
-		int imageSize = (int) Math.min(Math.max(draww * tile.liquidAmount / 20, 1), draww);
-		g.setColor(tile.liquidType.getMipMap().getColor(frozenTileSize));
-		g.fillRect(drawx + draww / 2 - imageSize / 2, drawy + drawh / 2 - imageSize / 2, imageSize,
+		int imageSize = (int) Math.min(Math.max(tileSize * tile.liquidAmount / 20, 1), tileSize);
+		g.setColor(tile.liquidType.getMipMap().getColor(tileSize));
+		g.fillRect(drawx + tileSize / 2 - imageSize / 2, drawy + tileSize / 2 - imageSize / 2, imageSize,
 				imageSize);
-		g.drawImage(tile.liquidType.getMipMap().getImage(frozenTileSize), drawx + draww / 2 - imageSize / 2,
-				drawy + draww / 2 - imageSize / 2, imageSize, imageSize, null);
+		g.drawImage(tile.liquidType.getMipMap().getImage(tileSize), drawx + tileSize / 2 - imageSize / 2,
+				drawy + tileSize / 2 - imageSize / 2, imageSize, imageSize, null);
 	
 	}
 	
-	public static void drawModifiers(GroundModifier modifier, Graphics g, int drawx, int drawy, int draww, int drawh, int frozenTileSize) {
+	public static void drawModifiers(GroundModifier modifier, Graphics g, int drawx, int drawy, int tileSize) {
 		Utils.setTransparency(g, 0.9);
-		g.drawImage(modifier.getType().getMipMap().getImage(frozenTileSize), 
-				drawx, drawy, draww, drawh, null);
+		g.drawImage(modifier.getType().getMipMap().getImage(tileSize), 
+				drawx, drawy, tileSize, tileSize, null);
 		Utils.setTransparency(g, 1);
 	}
 	
@@ -564,15 +564,13 @@ public class RenderingFunctions {
 		}
 	}
 	
-	public static void drawPlant(Plant plant, Graphics g, int drawx, int drawy, int draww, int drawh, int frozenTileSize) {
-		drawSunShadow(plant.getMipMap(), g, drawx, drawy, draww, drawh, frozenTileSize);
-		g.drawImage(plant.getMipMap().getImage(frozenTileSize), drawx, drawy, draww, drawh, null);
-	
+	public static void drawPlant(Plant plant, Graphics g, int drawx, int drawy, int tileSize) {
+		g.drawImage(plant.getMipMap().getImage(tileSize), drawx, drawy, tileSize, tileSize, null);
 	}
 	
-	public static void drawBuilding(Building building, Graphics g, int drawx, int drawy, int draww, int drawh, boolean drawSunShadow, int frozenTileSize) {
+	public static void drawBuilding(Building building, Graphics g, int drawx, int drawy, int tileSize) {
 		if (building.isSelected()) {
-			g.drawImage(building.getMipMap().getHighlight(frozenTileSize), drawx, drawy, draww, drawh,
+			g.drawImage(building.getMipMap().getHighlight(tileSize), drawx, drawy, tileSize, tileSize,
 					null);
 		}
 		
@@ -581,20 +579,17 @@ public class RenderingFunctions {
 			// draws the transparent version
 			Utils.setTransparency(g, 0.5f);
 			Graphics2D g2d = (Graphics2D) g;
-			g2d.drawImage(bI, drawx, drawy, draww, drawh, null);
+			g2d.drawImage(bI, drawx, drawy, tileSize, tileSize, null);
 			Utils.setTransparency(g, 1f);
 			// draws the partial image
 			double percentDone = 1 - building.getRemainingEffort() / building.getType().getBuildingEffort();
 			int imageRatio = Math.max(1, (int) (bI.getHeight() * percentDone));
-			int partialHeight = Math.max(1, (int) (frozenTileSize * percentDone));
+			int partialHeight = Math.max(1, (int) (tileSize * percentDone));
 			bI = bI.getSubimage(0, bI.getHeight() - imageRatio, bI.getWidth(), imageRatio);
-			g.drawImage(bI, drawx, drawy - partialHeight + drawh, draww, partialHeight, null);
-			g.drawImage(BUILD_ICON, drawx + frozenTileSize / 8, drawy + frozenTileSize / 8, draww * 6 / 8, drawh * 6 / 8, null);
+			g.drawImage(bI, drawx, drawy - partialHeight + tileSize, tileSize, partialHeight, null);
+			g.drawImage(BUILD_ICON, drawx + tileSize / 8, drawy + tileSize / 8, tileSize * 6 / 8, tileSize * 6 / 8, null);
 		} else {
-			if (drawSunShadow) {
-				drawSunShadow(building.getMipMap(), g, drawx, drawy, draww, drawh, frozenTileSize);
-			}
-			g.drawImage(bI, drawx, drawy, draww, drawh, null);
+			g.drawImage(bI, drawx, drawy, tileSize, tileSize, null);
 		}
 	}
 	
@@ -602,7 +597,6 @@ public class RenderingFunctions {
 		if (unit.isSelected()) {
 			state.g.drawImage(unit.getMipMap().getHighlight(size), drawatx, drawaty, size, size, null);
 		}
-		drawSunShadow(unit.getMipMap(), state.g, drawatx, drawaty, size, size, size);
 		state.g.drawImage(unit.getMipMap().getImage(size), drawatx, drawaty, size, size, null);
 
 		if (unit.isGuarding() == true) {
@@ -629,6 +623,17 @@ public class RenderingFunctions {
 				}
 			}
 		}
+	}
+	
+	public static void drawSunShadows(RenderingState state, Tile tile, Point4 drawat) {
+		if (tile.getPlant() != null) {
+			drawSunShadow(tile.getPlant().getMipMap(), state.g, drawat.x, drawat.y, state.tileSize, state.tileSize, state.tileSize);
+		}
+		if (tile.getBuilding() != null && tile.getBuilding().isBuilt()) {
+			drawSunShadow(tile.getBuilding().getMipMap(), state.g, drawat.x, drawat.y, state.tileSize, state.tileSize, state.tileSize);
+		}
+		drawUnitsIterationHelper(state, tile, drawat, 
+				(s, x, y, size, thing) -> drawSunShadow(thing.getMipMap(), s.g, x, y, size, size, size));
 	}
 
 	public static final int MAX_NUM_ROWS = 2;
@@ -724,7 +729,8 @@ public class RenderingFunctions {
 		int sunShadow = (int) (dayOffset * MipMap.NUM_SUN_SHADOWS / (Constants.DAY_DURATION + 1));
 		double daylight = World.getDaylight();
 		Utils.setTransparency(g, daylight * daylight / 4);
-		g.drawImage(m.getSunShadow(frozenTileSize, sunShadow), drawx, drawy, draww, drawh, null);
+		// sun shadow images are double the width of a tile
+		g.drawImage(m.getSunShadow(frozenTileSize, sunShadow), drawx - draww/2, drawy, draww*2, drawh, null);
 		Utils.setTransparency(g, 1);
 	}
 
