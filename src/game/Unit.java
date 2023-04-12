@@ -145,21 +145,29 @@ public class Unit extends Thing implements Serializable {
 	}
 
 	public boolean moveTowards(Tile tile) {
-		if (((currentPath == null || currentPath.isEmpty() || currentPath.getLast() != tile) && tile != this.getTile())
-				|| (currentPath != null && !currentPath.isEmpty() && currentPath.getFirst().isBlocked(this))) {
+		if (tile == this.getTile()) {
+			return true;
+		}
+		if (currentPath == null
+				|| currentPath.isEmpty()
+				|| currentPath.getLast() != tile
+				|| currentPath.getFirst().isBlocked(this)) {
 			currentPath = Pathfinding.getBestPath(this, this.getTile(), tile);
 		}
-		if (currentPath != null && !currentPath.isEmpty()) {
-			Tile targetTile = currentPath.getFirst();
-			if(readyToInvade() || (targetTile.getFaction().id() == World.NO_FACTION_ID || targetTile.getFaction().id() == getFactionID())) {
-				boolean success = this.moveTo(targetTile);
-				if (success) {
-					currentPath.removeFirst();
-				}
-				return success;
-			}
+		if (currentPath == null || currentPath.isEmpty()) {
+			return false;
 		}
-		return false;
+		Tile targetTile = currentPath.getFirst();
+		if (!readyToInvade() 
+				&& !targetTile.getFaction().isNeutral()
+				&& targetTile.getFaction().id() != getFactionID()) {
+			return false;
+		}
+		boolean success = this.moveTo(targetTile);
+		if (success) {
+			currentPath.removeFirst();
+		}
+		return success;
 	}
 	
 	public boolean readyToInvade() {

@@ -3,7 +3,6 @@ package game.pathfinding;
 import java.util.*;
 
 import game.*;
-import ui.*;
 import world.*;
 
 public class Pathfinding {
@@ -15,8 +14,13 @@ public class Pathfinding {
 			return bestTilePath;
 		}
 		if(startingTile.getLocation().distanceTo(targetTile.getLocation()) == 1) {
-			bestTilePath.add(targetTile);
-			return bestTilePath;
+			if (targetTile.isBlocked(unit)) {
+				return null;
+			}
+			else {
+				bestTilePath.add(targetTile);
+				return bestTilePath;
+			}
 		}
 		PriorityQueue<Node> search = new PriorityQueue<>((x, y) -> {
 			int speed = unit.getUnitType().getCombatStats().getMoveSpeed();

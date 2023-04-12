@@ -124,7 +124,7 @@
 		"image":"Images/buildings/necropolis.png",
 		"vision":6,
 		"cost":{"WOOD":2000, "STONE":5000},
-		"buildsunits":["WORKER", "VAMPIRE", "SKELETON"],
+		"buildsunits":["WORKER", "SKELETON", "ICE_GIANT", "VAMPIRE"],
 		"culture":1,
 		"attributes":["castle"],
 		"health":3000,

@@ -571,32 +571,59 @@ public final class Utils {
 		return tiles;
 	}
 	public static void getRingOfTiles(TileLoc center, World world, int radius, List<TileLoc> ring) {
-		ring.add(new TileLoc(center.x(), center.y() + radius));
+		// top corner
+		ring.add(new TileLoc(center.x(), center.y() - radius));
 		if(radius == 0) {
 			return;
 		}
-		ring.add(new TileLoc(center.x(), center.y() - radius));
-		for(int i = 0; i < radius+1; i++) {
-			int y = center.y() + radius/2 - i;
-			if(radius%2 == 1 && center.x()%2 == 1) {
-				y += 1;
-			}
-			ring.add(new TileLoc(center.x()+radius, y));
-			ring.add(new TileLoc(center.x()-radius, y));
-		}
+		// top right edge
 		for(int i = 1; i < radius; i++) {
-			int yoffset = radius - i/2;
-			if(center.x()%2 == 0 && i%2 == 1) {
-				yoffset -= 1;
-			}
-			ring.add(new TileLoc(center.x()+i, center.y() + yoffset));
-			ring.add(new TileLoc(center.x()-i, center.y() + yoffset));
-
 			int minusyoffset = radius - i/2;
 			if(center.x()%2 == 1 && i%2 == 1) {
 				minusyoffset -= 1;
 			}
 			ring.add(new TileLoc(center.x()+i, center.y() - minusyoffset));
+		}
+		// right edge
+		for(int i = radius; i >= 0; i--) {
+			int y = center.y() + radius/2 - i;
+			if(radius%2 == 1 && center.x()%2 == 1) {
+				y += 1;
+			}
+			ring.add(new TileLoc(center.x()+radius, y));
+		}
+		// bottom right edge
+		for(int i = radius - 1; i >= 1; i--) {
+			int yoffset = radius - i/2;
+			if(center.x()%2 == 0 && i%2 == 1) {
+				yoffset -= 1;
+			}
+			ring.add(new TileLoc(center.x()+i, center.y() + yoffset));
+		}
+		// bottom corner
+		ring.add(new TileLoc(center.x(), center.y() + radius));
+		// bottom left edge
+		for(int i = 1; i < radius; i++) {
+			int yoffset = radius - i/2;
+			if(center.x()%2 == 0 && i%2 == 1) {
+				yoffset -= 1;
+			}
+			ring.add(new TileLoc(center.x()-i, center.y() + yoffset));
+		}
+		// left edge
+		for(int i = 0; i < radius+1; i++) {
+			int y = center.y() + radius/2 - i;
+			if(radius%2 == 1 && center.x()%2 == 1) {
+				y += 1;
+			}
+			ring.add(new TileLoc(center.x()-radius, y));
+		}
+		// top left edge
+		for(int i = radius - 1; i >= 1; i--) {
+			int minusyoffset = radius - i/2;
+			if(center.x()%2 == 1 && i%2 == 1) {
+				minusyoffset -= 1;
+			}
 			ring.add(new TileLoc(center.x()-i, center.y() - minusyoffset));
 		}
 	}

@@ -301,7 +301,8 @@
 	},
 	{
 		"image":"Images/units/vampire.png",
-		"stats":{"movespeed":15,"buildtime":0,"health":300,"healspeed":1},
+		"cost":{"GOLD_BAR":10,"FOOD":100},
+		"stats":{"movespeed":15,"buildtime":300,"health":300,"healspeed":1},
 		"name":"VAMPIRE",
 		"attackstyles":[
 			{"damage":20, "cooldown":20, "range":1, "lifesteal":true}
@@ -412,7 +413,8 @@
 	},
 	{
 		"image":"Images/units/skeleton.png",
-		"stats":{"movespeed":20,"buildtime":0,"health":300,"healspeed":50},
+		"cost":{"BRONZE_SWORD":1,"FOOD":200},
+		"stats":{"movespeed":20,"buildtime":100,"health":300,"healspeed":50},
 		"name":"SKELETON",
 		"attackstyles":[
 			{"damage":10, "cooldown":20, "range":1}
@@ -429,7 +431,8 @@
 	},
 	{
 		"image":"Images/units/icegiant.png",
-		"stats":{"movespeed":30,"buildtime":0,"health":800,"healspeed":10},
+		"cost":{"IRON_BAR":1,"MITHRIL_BAR":1,"FOOD":300},
+		"stats":{"movespeed":30,"buildtime":200,"health":800,"healspeed":10},
 		"name":"ICE_GIANT",
 		"attackstyles":[
 			{"damage":60, "cooldown":20, "range":1}
@@ -586,6 +589,16 @@
 		"resistances": {"HEAT": 0},
 		"loot":{"TITANIUM_ORE":100, "RUNITE_ORE":100}
 	},
+	{
+		"image":"Images/units/dwarf.png",
+		"stats":{"movespeed":30,"buildtime":150,"health":600,"healspeed":5},
+		"name":"DWARF",
+		"attackstyles":[
+			{"damage":30, "cooldown":30, "range":1}
+		],
+		"attributes":["hostile"],
+		"resistances": {"HEAT": 20}
+	}
 	
 	
 ]

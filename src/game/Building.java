@@ -73,7 +73,7 @@ public class Building extends Thing implements Serializable {
 			currentProducingUnit = null;
 		}
 
-		if(getType() == Game.buildingTypeMap.get("CASTLE")) {
+		if(getType().isCastle()) {
 			getFaction().getInventory().takeAll(this.getInventory());
 		}
 

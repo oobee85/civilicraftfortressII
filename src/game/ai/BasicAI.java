@@ -9,7 +9,7 @@ import ui.*;
 import utils.*;
 import world.*;
 
-public class BasicAI implements AIInterface {
+public class BasicAI extends AIInterface {
 	public static final BuildingType FARM = Game.buildingTypeMap.get("FARM");
 	public static final BuildingType MINE = Game.buildingTypeMap.get("MINE");
 	
@@ -22,10 +22,7 @@ public class BasicAI implements AIInterface {
 		IDLE, IRRIGATE, FORAGE, CHOP, GATHERSTONE
 	}
 	public class State {
-		Building castle;
 		Building barracks;
-		int[] buildingQuantities;
-		int[] unitQuantities;
 		
 		LinkedList<Unit> workers = new LinkedList<>();
 		int[] targetAssignments;
@@ -33,26 +30,21 @@ public class BasicAI implements AIInterface {
 		HashMap<Unit, WorkerTask> taskPerWorker = new HashMap<>();
 	}
 	
-	private CommandInterface commands;
-	private Faction faction;
-	private World world;
 	private State state;
 
 	public BasicAI(CommandInterface commands, Faction faction, World world) {
-		this.commands = commands;
-		this.faction = faction;
-		this.world = world;
+		super(commands, faction, world);
 		state = new State();
 	}
 	
 	@Override
-	public void tick() {
+	public void aiTickLogic() {
 		updateBuildings();
 		updateUnits();
 		queueResearch();
 		computeTargetAssignments();
 		
-		if(state.castle != null) {
+		if(castle != null) {
 			
 			reassignWorkers();
 			for(Unit unit : faction.getUnits()) {
@@ -71,10 +63,10 @@ public class BasicAI implements AIInterface {
 			
 			if(amountOfFoodMissing() == 0) {
 				if(wantsWorker()) {
-					commands.produceUnit(state.castle, Game.unitTypeMap.get("WORKER"));
+					commands.produceUnit(castle, Game.unitTypeMap.get("WORKER"));
 				}
 				if(wantsCaravan()) {
-					commands.produceUnit(state.castle, Game.unitTypeMap.get("CARAVAN"));
+					commands.produceUnit(castle, Game.unitTypeMap.get("CARAVAN"));
 				}
 				if(state.barracks != null) {
 					if(wantsWarrior()) {
@@ -197,22 +189,22 @@ public class BasicAI implements AIInterface {
 	}
 	
 	private boolean wantsWorker() {
-		return state.unitQuantities[Game.unitTypeMap.get("WORKER").id()] < 20
-				&& state.castle.getProducingUnit().isEmpty();
+		return unitQuantities[Game.unitTypeMap.get("WORKER").id()] < 20
+				&& castle.getProducingUnit().isEmpty();
 	}
 	private boolean wantsWarrior() {
-		return state.unitQuantities[Game.unitTypeMap.get("WARRIOR").id()] < 10
+		return unitQuantities[Game.unitTypeMap.get("WARRIOR").id()] < 10
 				&& state.barracks.getProducingUnit().isEmpty()
-				&& state.unitQuantities[Game.unitTypeMap.get("WARRIOR").id()]*5 < faction.getUnits().size();
+				&& unitQuantities[Game.unitTypeMap.get("WARRIOR").id()]*5 < faction.getUnits().size();
 	}
 	private boolean wantsCaravan() {
-		return state.unitQuantities[Game.unitTypeMap.get("WARRIOR").id()] > 0
-				&& state.castle.getProducingUnit().isEmpty()
-				&& state.unitQuantities[Game.unitTypeMap.get("CARAVAN").id()] < 1;
+		return unitQuantities[Game.unitTypeMap.get("WARRIOR").id()] > 0
+				&& castle.getProducingUnit().isEmpty()
+				&& unitQuantities[Game.unitTypeMap.get("CARAVAN").id()] < 1;
 	}
 	
 	private boolean wantsBarracks() {
-		int numBarracks = state.buildingQuantities[Game.buildingTypeMap.get("BARRACKS").id()];
+		int numBarracks = buildingQuantities[Game.buildingTypeMap.get("BARRACKS").id()];
 		return numBarracks < 1;
 	}
 	private boolean wantsWall() {
@@ -251,7 +243,7 @@ public class BasicAI implements AIInterface {
 	}
 	
 	private boolean buildBarracks(Unit unit) {
-		Tile tile = getTargetTile(state.castle.getTile(), MAX_BUILD_RADIUS, e -> {
+		Tile tile = getTargetTile(castle.getTile(), MAX_BUILD_RADIUS, e -> {
 			return !e.hasBuilding() && e.canBuild();
 		});
 		if(tile == null) {
@@ -259,12 +251,12 @@ public class BasicAI implements AIInterface {
 		}
 		Building building = planBuilding(unit, tile, true, Game.buildingTypeMap.get("BARRACKS"));
 		if(building != null) {
-			state.buildingQuantities[Game.buildingTypeMap.get("BARRACKS").id()]++;
+			buildingQuantities[Game.buildingTypeMap.get("BARRACKS").id()]++;
 		}
 		return building != null;
 	}
 	private boolean buildWall(Unit unit) {
-		Tile tile = getTargetTile(state.castle.getTile(), MAX_BUILD_RADIUS, MAX_BUILD_RADIUS, e -> {
+		Tile tile = getTargetTile(castle.getTile(), MAX_BUILD_RADIUS, MAX_BUILD_RADIUS, e -> {
 			return (!e.hasBuilding() && e.canBuild()) || (e.hasBuilding() && !e.getBuilding().isBuilt());
 		});
 		if(tile == null) {
@@ -280,7 +272,7 @@ public class BasicAI implements AIInterface {
 		return building != null;
 	}
 	private boolean buildRoad(Unit unit) {
-		Tile tile = getTargetTile(state.castle.getTile(), 0, MAX_BUILD_RADIUS, e -> {
+		Tile tile = getTargetTile(castle.getTile(), 0, MAX_BUILD_RADIUS, e -> {
 			return (!e.hasRoad() && e.canBuild()) || (e.hasRoad() && !e.getRoad().isBuilt());
 		});
 		if(tile == null) {
@@ -305,7 +297,7 @@ public class BasicAI implements AIInterface {
 	
 	private boolean irrigate(Unit unit) {
 		// look for already built irrigations first
-		Tile existingIrrigation = getTargetTile(state.castle.getTile(), 1, MAX_BUILD_RADIUS, e -> {
+		Tile existingIrrigation = getTargetTile(castle.getTile(), 1, MAX_BUILD_RADIUS, e -> {
 			return e.hasBuilding() && e.getBuilding().getType() == FARM;
 		});
 		if(existingIrrigation != null) {
@@ -313,7 +305,7 @@ public class BasicAI implements AIInterface {
 		}
 		
 		// otherwise build a new irrigation nearby
-		Tile tile = getTargetTile(state.castle.getTile(), 1, MAX_BUILD_RADIUS, e -> {
+		Tile tile = getTargetTile(castle.getTile(), 1, MAX_BUILD_RADIUS, e -> {
 			return !e.hasBuilding() && e.canBuild() && e.canPlant();
 		});
 		if(tile == null) {
@@ -327,7 +319,7 @@ public class BasicAI implements AIInterface {
 		boolean clearQueue = true;
 		if(building == null) {
 			building = planBuilding(unit, tile, true, type);
-			state.buildingQuantities[type.id()]++;
+			buildingQuantities[type.id()]++;
 			clearQueue = false;
 		}
 		else if(!building.isBuilt()) {
@@ -374,7 +366,7 @@ public class BasicAI implements AIInterface {
 		}
 		else {
 			commands.planAction(unit, PlannedAction.moveTo(tile), true);
-			commands.planAction(unit, PlannedAction.deliver(state.castle), false);
+			commands.planAction(unit, PlannedAction.deliver(castle), false);
 		}
 		return true;
 	}
@@ -387,7 +379,7 @@ public class BasicAI implements AIInterface {
 			return false;
 		}
 		commands.planAction(unit, PlannedAction.moveTo(tile), true);
-		commands.planAction(unit, PlannedAction.deliver(state.castle), false);
+		commands.planAction(unit, PlannedAction.deliver(castle), false);
 		return true;
 	}
 	
@@ -395,7 +387,7 @@ public class BasicAI implements AIInterface {
 		if(!unit.isGuarding()) {
 			commands.setGuarding(unit, true);
 		}
-		Tile target = getTargetTile(state.castle.getTile(), MAX_SEARCH_RADIUS, e -> {
+		Tile target = getTargetTile(castle.getTile(), MAX_SEARCH_RADIUS, e -> {
 			for(Unit u : e.getUnits()) {
 				if(u.getFactionID() != faction.id()) {
 					return true;
@@ -426,35 +418,22 @@ public class BasicAI implements AIInterface {
 	}
 	
 	private void updateBuildings() {
-		if(state.castle != null && state.castle.isDead()) {
-			state.castle = null;
-		}
 		if(state.barracks != null && state.barracks.isDead()) {
 			state.barracks = null;
 		}
-		int[] buildingQuantities = new int[Game.buildingTypeMap.size()];
 		for(Building building : faction.getBuildings()) {
-			buildingQuantities[building.getType().id()]++;
-			if(state.castle == null && building.getType().isCastle() && !building.isDead()) {
-				state.castle = building;
-			}
 			if(state.barracks == null && building.getType() == Game.buildingTypeMap.get("BARRACKS") && !building.isDead()) {
 				state.barracks = building;
 			}
-			
 		}
-		state.buildingQuantities = buildingQuantities;
 	}
 	private void updateUnits() {
-		int[] unitQuantities = new int[Game.unitTypeMap.size()];
 		state.workers.clear();
 		for(Unit unit : faction.getUnits()) {
-			unitQuantities[unit.getType().id()]++;
 			if(unit.getType().isBuilder()) {
 				state.workers.add(unit);
 			}
 		}
-		state.unitQuantities = unitQuantities;
 	}
 	
 	private void queueResearch() {

@@ -213,6 +213,11 @@ public class Client {
 				}
 			}
 		}
+		UndeadAI undeadAI = new UndeadAI(
+				localCommands,
+				gameInstance.world.getFaction(World.UNDEAD_FACTION_ID),
+				gameInstance.world);
+		ailist.add(undeadAI);
 
 		SwingUtilities.invokeLater(() -> {
 			clientGUI.startedSinglePlayer();

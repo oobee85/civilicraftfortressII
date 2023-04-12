@@ -520,23 +520,57 @@ public class Game {
 		}
 		world.addFaction(CYCLOPS_FACTION);
 		
-		Faction UNDEAD_FACTION = new Faction("UNDEAD", false, true);
-		UNDEAD_FACTION.getInventory().addItem(ItemType.FOOD, 999999);
+		Faction UNDEAD_FACTION = new Faction("UNDEAD", false, false);
+//		UNDEAD_FACTION.getInventory().addItem(ItemType.FOOD, 999999);
 		world.addFaction(UNDEAD_FACTION);
 		
 		AttackUtils.world = world;
 		world.generateWorld();
 		makeRoads(easymode);
 		world.clearDeadAndAddNewThings();
-//		spawnCyclops();
 //		meteorStrike();
 		makeStartingCastleAndUnits(easymode, players);
 		spawnStartingEnemies();
 	}
 	public void spawnStartingEnemies() {
 		spawnCyclops();
+		spawnUndead();
 //		Tile targetTile = getTargetTileForSpawns();
 //		world.spawnOgre(targetTile);
+	}
+	public void spawnUndead() {
+		Tile highestTile = null;
+		for(Tile t : world.getTiles()) {
+			if (highestTile == null || t.getHeight() > highestTile.getHeight()) {
+				highestTile = t;
+			}
+		}
+		
+		Thing necropolis = summonBuilding(highestTile, Game.buildingTypeMap.get("NECROPOLIS"), world.getFaction(World.UNDEAD_FACTION_ID));
+		
+		List<TileLoc> neighbors = new LinkedList<TileLoc>();
+		Utils.getRingOfTiles(highestTile.getLocation(), world, 1, neighbors);
+		Collections.shuffle(neighbors); 
+		
+		if (neighbors.isEmpty()) {
+			System.err.println("");
+		}
+		TileLoc forWindmill = neighbors.remove(0);
+		Thing windmill = summonBuilding(
+				world.get(forWindmill),
+				Game.buildingTypeMap.get("WINDMILL"),
+				world.getFaction(World.UNDEAD_FACTION_ID));
+		windmill.replaceComponent(Inventory.class, world.getFaction(World.UNDEAD_FACTION_ID).getInventory());
+		
+		
+//		for (TileLoc neighbor : neighbors) {
+//			Animal skeleton = world.spawnAnimal(
+//					Game.unitTypeMap.get("SKELETON"),
+//					world.get(neighbor),
+//					world.getFaction(World.CYCLOPS_FACTION_ID),
+//					null);
+//			skeleton.setPassiveAction(PlannedAction.GUARD);
+//		}
 	}
 	public void spawnCyclops() {
 		LinkedList<Tile> tiles = world.getTilesRandomly();
