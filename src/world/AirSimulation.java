@@ -25,7 +25,7 @@ public class AirSimulation {
 		for(Tile tile : tiles) {
 			Air air = tile.getAir();
 			// Q = o(T1 - T2) * A
-			// o = 5.670374419 × 10^-8 W*m-2*K-4
+			// o = 5.670374419 ï¿½ 10^-8 W*m-2*K-4
 			double end = 0;
 			double deltaT = (tile.getTemperature() - Constants.KELVINOFFSET) - (air.getTemperature() - Constants.KELVINOFFSET);
 			end = Constants.BOLTZMANNMODIFIED * Constants.VOLUMEPERTILE * deltaT * 750;
@@ -94,7 +94,7 @@ public class AirSimulation {
 //				System.out.println(addedEnergy);
 			}
 			if(tile.getTemperature() > (Constants.BALANCETEMP + 20) || tile.getAir().getTemperature() > (Constants.BALANCETEMP + 20)) {
-				addedEnergy -= 2;
+				addedEnergy -= 5;
 			}
 			if(tile.getTemperature() <= (Constants.BALANCETEMP -5)) {
 				double modifier = (tile.getTemperature()/Constants.BALANCETEMP);
@@ -103,7 +103,7 @@ public class AirSimulation {
 //				System.out.println(addedEnergy);
 			}
 			if(tile.getTemperature() < (Constants.BALANCETEMP - 20) || tile.getAir().getTemperature() < (Constants.BALANCETEMP - 20)) {
-				addedEnergy += 2;
+				addedEnergy += 5;
 			}
 			
 			if(tile.getHeight() >= Constants.MAXHEIGHT /1.25) {

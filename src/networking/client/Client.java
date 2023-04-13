@@ -36,6 +36,7 @@ public class Client {
 	private static final long AIDELAY = 1000;
 	
 	private volatile boolean isFastForwarding;
+	private volatile boolean isPaused;
 
 	public Client() {
 		gameInstance = new Game(new GUIController() {
@@ -121,6 +122,10 @@ public class Client {
 			@Override
 			public void setFastForwarding(boolean enabled) {
 				isFastForwarding = enabled;
+			}
+			@Override
+			public void setPauseGame(boolean enabled) {
+				isPaused = enabled;
 			}
 		});
 		localCommands = Utils.makeFunctionalCommandInterface(gameInstance);
@@ -265,12 +270,18 @@ public class Client {
 		Thread gameLoopThread = new Thread(() -> {
 			while (true) {
 				try {
+					
+					
 					long start = System.currentTimeMillis();
-					if(simulated) {
-						gameInstance.simulatedGameTick();
-					}
-					else {
-						gameInstance.gameTick();
+					
+					// IF PAUSED BUTTON PRESSED BUT NOT
+					if(!isPaused) {
+						if(simulated) {
+							gameInstance.simulatedGameTick();
+						}
+						else {
+							gameInstance.gameTick();
+						}
 					}
 					gameInstance.world.getData().clearDeadThings();
 					gameInstance.world.getData().clearProjectilesToSend();

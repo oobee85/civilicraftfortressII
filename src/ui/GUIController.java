@@ -19,4 +19,5 @@ public interface GUIController {
 	public void research(ResearchType researchType);
 
 	public void setFastForwarding(boolean enabled);
+	public void setPauseGame(boolean enabled);
 }

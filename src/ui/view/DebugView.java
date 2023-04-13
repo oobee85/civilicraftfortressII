@@ -17,6 +17,7 @@ public class DebugView {
 	public static final Dimension DEBUG_BUTTON_SIZE = new Dimension(140, 30);
 	public static final Dimension LONG_BUTTON_SIZE = new Dimension(285, 30);
 	
+	private static final ImageIcon PAUSE_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/pause.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon FAST_FORWARD_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/fastforward.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon RAIN_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/rain.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon ERUPTION_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/erupt.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
@@ -88,6 +89,11 @@ public class DebugView {
 		fastForward.addActionListener(e -> {
 			gameView.getGameInstance().getGUIController().setFastForwarding(fastForward.isSelected());
 			fastForward.setText(fastForward.isSelected() ? "Stop Fast Forward" : "Fast Forward");
+		});
+		JToggleButton pauseGame = KUIConstants.setupToggleButton("Pause Game", PAUSE_ICON, DEBUG_BUTTON_SIZE);
+		pauseGame.addActionListener(e -> {
+			gameView.getGameInstance().getGUIController().setPauseGame(pauseGame.isSelected());
+			pauseGame.setText(pauseGame.isSelected() ? "Play Game" : "Pause Game");
 		});
 		JButton raiseHeight = KUIConstants.setupButton("SpawnWeather", RAIN_ICON, DEBUG_BUTTON_SIZE);
 		raiseHeight.addActionListener(e -> {
@@ -196,6 +202,7 @@ public class DebugView {
 		scrollingPanel.add(makeItRain);
 		scrollingPanel.add(makeItDry);
 		scrollingPanel.add(fastForward);
+		scrollingPanel.add(pauseGame);
 		scrollingPanel.add(eruptVolcano);
 		scrollingPanel.add(meteor);
 		scrollingPanel.add(unitEvents);
