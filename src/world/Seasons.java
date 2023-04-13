@@ -8,7 +8,7 @@ public class Seasons {
 	}
 	public static float getRateEnergy() {
 		float day = (float) (4*Math.sin(Math.PI*World.ticks/Constants.NIGHT_DURATION));
-		float season = (float) (0.35*Math.sin(Math.PI*World.ticks/Constants.SEASON_DURATION)*(World.ticks/Constants.SEASON_DURATION) + World.ticks/(2*Constants.SEASON_DURATION));
+		float season = (float) (0.35*Math.sin(Math.PI*World.ticks/Constants.SEASON_DURATION)*(World.ticks/Constants.SEASON_DURATION) + 0.01);
 		float main = day + season;
 		return main;
 	}

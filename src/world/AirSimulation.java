@@ -168,7 +168,8 @@ public class AirSimulation {
 			}
 			if(tile.getHeight() > 900 && averageWater < Constants.BALANCEWATER) {
 				double addedMod = Constants.BALANCEWATER / averageWater - 1;
-				tile.liquidAmount += addedMod;
+//				tile.liquidAmount += addedMod;
+				tile.getAir().addHumidity(addedMod);
 			}
 			
 //			double tempChange = averageTemp / tile.getTemperature();
