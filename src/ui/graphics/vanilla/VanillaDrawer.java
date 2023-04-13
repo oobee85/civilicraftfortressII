@@ -219,8 +219,11 @@ public class VanillaDrawer extends Drawer {
 		g.dispose();
 
 		// In low light, human eyes don't see red as good
-		float redshift = (float) (0.7 + 0.3 * World.getDaylight());
-		DrawingUtils.applyColorRescaleToImage(image, redshift, 1f, 1f);
+		double daylight = World.getDaylight();
+		float redshift = (float) (0.8 + 0.2 * daylight);
+		float greenshift = (float) (0.95 + 0.05 * daylight);
+		float blueshift = (float) (0.95 + 0.05 * daylight);
+		DrawingUtils.applyColorRescaleToImage(image, redshift, greenshift, blueshift);
 	}
 
 	private void draw(Graphics g, int panelWidth, int panelHeight, int tileSize) {
