@@ -298,7 +298,16 @@ public class BasicAI extends AIInterface {
 	private boolean irrigate(Unit unit) {
 		// look for already built irrigations first
 		Tile existingIrrigation = getTargetTile(castle.getTile(), 1, MAX_BUILD_RADIUS, e -> {
-			return e.hasBuilding() && e.getBuilding().getType() == FARM;
+			boolean hasOtherWorker = false;
+			for (Unit u : e.getUnits()) {
+				if (u.getFaction() == faction
+						&& u.getType().isBuilder()) {
+					hasOtherWorker = true;
+				}
+			}
+			return e.hasBuilding() 
+					&& e.getBuilding().getType() == FARM
+					&& !hasOtherWorker;
 		});
 		if(existingIrrigation != null) {
 			return null != buildAndHarvest(unit, existingIrrigation, FARM);
