@@ -1339,8 +1339,8 @@ public class World {
 				terrainColor = Utils.blendColors(modifier.getType().getMipMap().getColor(0), terrainColor, 0.9);
 			}
 			if(tile.getFaction() != getFaction(NO_FACTION_ID)) {
-				minimapColor = Utils.blendColors(tile.getFaction().color(), minimapColor, 0.1);
-				terrainColor = Utils.blendColors(tile.getFaction().color(), terrainColor, 0.1);
+				minimapColor = Utils.blendColors(tile.getFaction().color(), minimapColor, 0.06);
+				terrainColor = Utils.blendColors(tile.getFaction().color(), terrainColor, 0.03);
 			}
 
 			if (tilebrightness > brightnessSoftCutoff) {
