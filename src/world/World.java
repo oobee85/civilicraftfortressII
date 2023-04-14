@@ -388,6 +388,23 @@ public class World {
 			spawnAnimal(Game.unitTypeMap.get("VAMPIRE"), t, getFaction(UNDEAD_FACTION_ID), target);
 		}
 	}
+	public void spawnScorpionDen() {
+		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
+				e.getTerrain() == Terrain.SAND 
+				&& e.getBuilding() == null
+				&& e.getPlant() == null
+				&& e.computeTileDamage()[DamageType.WATER.ordinal()] == 0).findFirst();
+		if(potential.isPresent()) {
+			Tile t = potential.get();
+			Building building = new Building(
+					Game.buildingTypeMap.get("SCORPION_DEN"),
+					t,
+					factions.get(NO_FACTION_ID));
+			building.setRemainingEffort(0);
+			worldData.addBuilding(building);
+			t.setBuilding(building);
+		}
+	}
 	public void spawnSkeletonArmy(Tile target) {
 		Optional<Tile> potential = getTilesRandomly().stream().filter(e -> 
 		e.getTerrain() == Terrain.ROCK 

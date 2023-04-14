@@ -218,11 +218,17 @@ public class Client {
 				}
 			}
 		}
+		NeutralAI neutralAI = new NeutralAI(
+				localCommands,
+				gameInstance.world.getFaction(World.NO_FACTION_ID),
+				gameInstance.world);
+		ailist.add(neutralAI);
 		UndeadAI undeadAI = new UndeadAI(
 				localCommands,
 				gameInstance.world.getFaction(World.UNDEAD_FACTION_ID),
 				gameInstance.world);
 		ailist.add(undeadAI);
+		
 
 		SwingUtilities.invokeLater(() -> {
 			clientGUI.startedSinglePlayer();

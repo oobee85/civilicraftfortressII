@@ -598,6 +598,17 @@
 		],
 		"attributes":["hostile"],
 		"resistances": {"HEAT": 20}
+	},
+	{
+		"image":"Images/units/scorpion.png",
+		"cost":{"FOOD":100},
+		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":50},
+		"name":"SCORPION",
+		"attackstyles":[
+			{"damage":10, "cooldown":30, "range":1}
+		],
+		"attributes":["hostile"],
+		"loot":{"STONE":5}
 	}
 	
 	

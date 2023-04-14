@@ -133,13 +133,13 @@ public class Game {
 		
 		if (World.ticks % (Constants.DAY_DURATION + Constants.NIGHT_DURATION) == 0) {
 			if (!Settings.DISABLE_ENEMY_SPAWNS) {
-				dayEvents();
+//				dayEvents();
 			}
 			World.days ++;
 		}
 		if ((World.ticks + Constants.DAY_DURATION) % (Constants.DAY_DURATION + Constants.NIGHT_DURATION) == 0) {
 			if(!Settings.DISABLE_ENEMY_SPAWNS) {
-//				nightEvents();
+				nightEvents();
 			}
 			World.nights ++;
 		}
@@ -198,7 +198,15 @@ public class Game {
 		}
 		return targetTile;
 	}
-	private void dayEvents() {
+	private void nightEvents() {
+		long numScorpionDens = world.getFaction(World.NO_FACTION_ID)
+					.getBuildings()
+					.stream()
+					.filter(building -> building.getType() == buildingTypeMap.get("SCORPION_DEN"))
+					.count();
+		if (numScorpionDens < 10) {
+			world.spawnScorpionDen();
+		}
 		for (Faction faction : world.getFactions()) {
 			if (!faction.isPlayer()) {
 				continue;
@@ -328,22 +336,22 @@ public class Game {
 ////			world.spawnAnimal(Game.unitTypeMap.get("BOMB"), world.getTilesRandomly().getFirst(), World.NEUTRAL_FACTION);
 ////		}
 	}
-	private void nightEvents() {
-		double day = Math.sqrt(World.days);
-		Tile targetTile = getTargetTileForSpawns();
-		if(World.days >= 10) {
-			if(Math.random() > 0.5) {
-				world.spawnWerewolf(targetTile);
-			}
-		}
-		if(World.days >= 10) {
-			int number = (int)(Math.random() * day);
-			for(int i = 0; i < number; i++) {
-				world.spawnVampire(targetTile);
-			}
-			System.out.println(number + " vampire");
-		}
-	}
+//	private void nightEvents() {
+//		double day = Math.sqrt(World.days);
+//		Tile targetTile = getTargetTileForSpawns();
+//		if(World.days >= 10) {
+//			if(Math.random() > 0.5) {
+//				world.spawnWerewolf(targetTile);
+//			}
+//		}
+//		if(World.days >= 10) {
+//			int number = (int)(Math.random() * day);
+//			for(int i = 0; i < number; i++) {
+//				world.spawnVampire(targetTile);
+//			}
+//			System.out.println(number + " vampire");
+//		}
+//	}
 	public void addResources(Faction faction) {
 		for(ItemType itemType : ItemType.values()) {
 			faction.getInventory().addItem(itemType, 1000);

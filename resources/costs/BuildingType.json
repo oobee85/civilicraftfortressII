@@ -282,6 +282,17 @@
 		"culture":0.5,
 		"health":1000,
 		"effort":1000,
-		"research":"ARMORING"}
+		"research":"ARMORING"},
+	{
+		"name":"SCORPION_DEN",
+		"info":"Scorpions live here",
+		"image":"Images/buildings/scorpionDen.png",
+		"vision":1,
+		"cost":{"WOOD":200, "STONE":200},
+		"buildsunits":["SCORPION"],
+		"culture":0,
+		"health":400,
+		"research":"MONARCHY",
+		"effort":300},
 ]
 }
