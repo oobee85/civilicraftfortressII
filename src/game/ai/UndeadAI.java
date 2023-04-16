@@ -74,7 +74,7 @@ public class UndeadAI extends AIInterface {
 	@Override
 	public void aiTickLogic() {
 		for (Unit unit : faction.getUnits()) {
-			if (unit.getType().isBuilder()) {
+			if (unit.isBuilder()) {
 				if (unit.isIdle()) {
 					buildWalls(unit);
 				}

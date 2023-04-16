@@ -64,18 +64,20 @@ public class ProduceUnitView {
 	
 	public void updateButtons() {
 		for(Pair pair : unitButtons) {
-			pair.button.setEnabled(false);
-			pair.button.setVisible(false);
+			boolean enabled = false;
+			boolean visible = false;
 			if (gameView.getFaction().areRequirementsMet(pair.unitType)) {
-				for(BuildingType buildingType : Game.buildingTypeList) {
-					if(buildingType.unitsCanProduceSet().contains(pair.unitType)
-							&& gameView.getFaction().isBuildingSelected(buildingType)) {
-						pair.button.setEnabled(true);
-						pair.button.setVisible(true);
-						break;
-					}
+				enabled = true;
+			}
+			for(BuildingType buildingType : Game.buildingTypeList) {
+				if(buildingType.unitsCanProduceSet().contains(pair.unitType)
+						&& gameView.getFaction().isBuildingSelected(buildingType)) {
+					visible = true;
+					break;
 				}
 			}
+			pair.button.setEnabled(enabled);
+			pair.button.setVisible(visible);
 		}
 	}
 	

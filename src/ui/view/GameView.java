@@ -531,7 +531,7 @@ public class GameView {
 					}
 				}
 				
-				else if (unit.getType().isBuilder()) {
+				else if (unit.isBuilder()) {
 					Building targetBuilding = targetTile.getBuilding();
 					if (targetBuilding == null) {
 						targetBuilding = targetTile.getRoad();
@@ -623,7 +623,7 @@ public class GameView {
 		for (Thing thing : state.selectedThings) {
 			if (thing instanceof Unit) {
 				Unit unit = (Unit) thing;
-				if (unit.getType().isBuilder()) {
+				if (unit.isBuilder() && unit.getBuildableBuildingTypes().contains(type)) {
 					for (Tile tile : Utils.getTilesInRadius(unit.getTile(), game.world, 4)) {
 						if (tile.getFaction() != unit.getFaction()) {
 							continue;
@@ -786,6 +786,13 @@ public class GameView {
 		}
 		state.selectedThings.clear();
 		selectThing(keep);
+	}
+	
+	/**
+	 * @return the returned queue must not be modified
+	 */
+	public ConcurrentLinkedQueue<Thing> getSelectedUnits() {
+		return state.selectedThings;
 	}
 
 	public void updateTerrainImages() {

@@ -78,9 +78,6 @@ public class UnitType implements Serializable {
 	public boolean isMigratory() {
 		return attributes.contains("migratory");
 	}
-	public boolean isBuilder() {
-		return attributes.contains("builder");
-	}
 	public boolean isHealer() {
 		return attributes.contains("healer");
 	}

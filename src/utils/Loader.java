@@ -39,8 +39,15 @@ public class Loader {
 				return null;
 			}
 			int maxStack = inventoryProperties.getInt("maxstack");
-			Inventory inventory = new Inventory(maxStack);
-			components.add(inventory);
+			components.add(new Inventory(maxStack));
+		}
+		if (obj.has("builds")) {
+			JSONArray buildingTypesArray = obj.getJSONArray("builds");
+			String[] buildingTypeNames = new String[buildingTypesArray.length()];
+			for (int i = 0; i < buildingTypesArray.length(); i++) {
+				buildingTypeNames[i] = buildingTypesArray.getString(i);
+			}
+			components.add(new Builder(buildingTypeNames));
 		}
 		return components;
 	}
@@ -245,19 +252,6 @@ public class Loader {
 				}
 			}
 			
-			// TODO resistances: { "heat":50, "cold":200 }
-//			DamageResistance damageResistance = null;
-//			if(unitTypeObject.has("resistances")) {
-//				int[] resistanceValues = DamageResistance.getDefaultResistance();
-//				JSONObject resistances = unitTypeObject.getJSONObject("resistances");
-//				for(String typeString : resistances.keySet()) {
-//					int value = resistances.getInt(typeString);
-//					DamageType type = DamageType.valueOf(typeString);
-//					resistanceValues[type.ordinal()] = value;
-//				}
-//				damageResistance = new DamageResistance(resistanceValues);
-//			}
-			
 			String researchReq = null;
 			if(unitTypeObject.has("research")) {
 				researchReq = unitTypeObject.getString("research");
@@ -430,6 +424,15 @@ public class Loader {
 			if(type.getResearchRequirement() != null) {
 				ResearchType researchReq = Game.researchTypeMap.get(type.getResearchRequirement());
 				researchReq.unlocks.add(Utils.getNiceName(type.name()));
+			}
+			for (GameComponent c : type.getComponents()) {
+				if (c instanceof Builder) {
+					Builder builder = (Builder)c;
+					Set<BuildingType> buildingTypes = builder.getBuildingTypeSet();
+					for (String buildingTypeName : builder.getBuildingTypeNames()) {
+						buildingTypes.add(Game.buildingTypeMap.get(buildingTypeName));
+					}
+				}
 			}
 		}
 	}

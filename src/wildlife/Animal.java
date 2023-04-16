@@ -37,6 +37,9 @@ public class Animal extends Unit {
 	
 	@Override
 	public void planActions(World world) {
+		if (!isIdle()) {
+			return;
+		}
 		chooseWhatToEat(world.getUnits());
 		if(wantsToAttack() && getTarget() == null && World.ticks >= nextTimeToChooseTarget) {
 			chooseWhatToAttack(world.getUnits(), world.getBuildings());

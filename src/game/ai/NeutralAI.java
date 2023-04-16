@@ -4,7 +4,7 @@ import java.util.*;
 
 import game.*;
 import ui.CommandInterface;
-import utils.Utils;
+import utils.*;
 import world.*;
 
 public class NeutralAI extends AIInterface {
@@ -20,7 +20,7 @@ public class NeutralAI extends AIInterface {
 				if (building.getType() != Game.buildingTypeMap.get("SCORPION_DEN")) {
 					continue;
 				}
-				if (building.getRemainingEffortToProduceUnit() > 0) {
+				if (!building.getProducingUnit().isEmpty()) {
 					continue;
 				}
 				commands.produceUnit(building, Game.unitTypeMap.get("SCORPION"));
@@ -32,6 +32,23 @@ public class NeutralAI extends AIInterface {
 		for (Unit unit : faction.getUnits()) {
 			if (unit.getType() != Game.unitTypeMap.get("SCORPION")) {
 				continue;
+			}
+			if (!unit.isIdle()) {
+				continue;
+			}
+			if (buildingQuantities[Game.buildingTypeMap.get("SCORPION_DEN").id()] < 10) {
+				List<TileLoc> nearby = new LinkedList<TileLoc>();
+				Utils.getRingOfTiles(unit.getTile().getLocation(), world, 10, nearby);
+				Collections.shuffle(nearby);
+				Optional<Tile> validNearby = nearby.stream()
+						.map(tileloc -> world.get(tileloc))
+						.filter(tile -> {
+					return (tile.getTerrain() == Terrain.SAND) && (tile.getBuilding() == null);
+				}).findFirst();
+				if (validNearby.isPresent()) {
+					commands.planBuilding(unit, validNearby.get(), true, Game.buildingTypeMap.get("SCORPION_DEN"));
+					continue;
+				}
 			}
 			if (!unit.isGuarding()) {
 				commands.setGuarding(unit, true);

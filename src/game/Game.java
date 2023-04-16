@@ -198,15 +198,21 @@ public class Game {
 		}
 		return targetTile;
 	}
-	private void nightEvents() {
-		long numScorpionDens = world.getFaction(World.NO_FACTION_ID)
-					.getBuildings()
-					.stream()
-					.filter(building -> building.getType() == buildingTypeMap.get("SCORPION_DEN"))
-					.count();
-		if (numScorpionDens < 10) {
-			world.spawnScorpionDen();
+	private void spawnScorpion() {
+		Optional<Tile> potential = world.getTilesRandomly().stream().filter(e -> 
+				e.getTerrain() == Terrain.SAND 
+				&& e.getBuilding() == null
+				&& e.getPlant() == null
+				&& e.computeTileDamage()[DamageType.WATER.ordinal()] == 0).findFirst();
+		if(potential.isPresent()) {
+			summonUnit(
+					potential.get(),
+					unitTypeMap.get("SCORPION"),
+					world.getFaction(World.NO_FACTION_ID));
 		}
+	}
+	private void nightEvents() {
+		spawnScorpion();
 		for (Faction faction : world.getFactions()) {
 			if (!faction.isPlayer()) {
 				continue;
@@ -1044,7 +1050,7 @@ public class Game {
 		for(Thing thing : selectedThings) {
 			if(thing instanceof Unit) {
 				Unit unit = (Unit)thing;
-				if(unit.getType().isBuilder()) {
+				if(unit.isBuilder()) {
 					unit.setAutoBuild(!unit.isAutoBuilding());
 				}
 			}

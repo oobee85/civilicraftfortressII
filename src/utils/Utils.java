@@ -719,7 +719,7 @@ public final class Utils {
 				if(clearQueue) {
 					unit.clearPlannedActions();
 				}
-				if(unit.getType().isBuilder()) {
+				if(unit.isBuilder() && unit.getBuildableBuildingTypes().contains(buildingType)) {
 					Building plannedBuilding = game.planBuilding(unit, buildingType, target);
 					if(plannedBuilding != null) {
 						if(plannedBuilding.getType().isHarvestable()) {

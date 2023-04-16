@@ -11,16 +11,22 @@
 		"cost": {"STONE": 100},
 		"image": "Images/research/bronze_working.png"},
 	{
-		"name": "WHEEL", 
-		"points": 300, "tier": 1,
-		"cost": {"FOOD": 200},
-		"image": "Images/research/wheel.png"},
-	{
 		"name": "IRON_WORKING", 
 		"points": 600, "tier": 1,
 		"cost": {"BRONZE_SWORD": 2}, 
 		"requirements": ["WARRIOR_CODE", "BRONZE_WORKING"],
 		"image": "Images/research/iron_working.png"},
+	{
+		"name": "WHEEL", 
+		"points": 300, "tier": 1,
+		"cost": {"FOOD": 200},
+		"image": "Images/research/wheel.png"},
+	{
+		"name": "MASONRY", 
+		"points": 600, "tier": 1,
+		"cost": {"STONE": 1000}, 
+		"requirements": ["WHEEL"],
+		"image": "Images/research/masonry.png"},
 		
 	{
 		"name": "FARMING",
@@ -34,12 +40,6 @@
 		"cost": {"IRON_BAR": 10}, 
 		"requirements": ["BRONZE_WORKING", "WHEEL"],
 		"image": "Images/research/mathematics.png"},
-	{
-		"name": "MASONRY", 
-		"points": 600, "tier": 2,
-		"cost": {"STONE": 1000}, 
-		"requirements": ["WHEEL"],
-		"image": "Images/research/masonry.png"},
 	
 	{
 		"name": "ARMORING", 

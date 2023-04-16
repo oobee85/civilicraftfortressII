@@ -111,7 +111,7 @@
 		"texture":"textures/pallet1.png",
 		"vision":5,
 		"cost":{"WOOD":500, "STONE":500},
-		"buildsunits":["WORKER", "PRIEST", "CARAVAN"],
+		"buildsunits":["WORKER", "MASON", "PRIEST", "CARAVAN"],
 		"culture":1,
 		"attributes":["castle"],
 		"health":2000,
@@ -282,8 +282,8 @@
 		"culture":0.5,
 		"health":1000,
 		"effort":1000,
-		"research":"ARMORING"},
-	{
+		"research":"ARMORING"
+	}, {
 		"name":"SCORPION_DEN",
 		"info":"Scorpions live here",
 		"image":"Images/buildings/scorpionDen.png",
@@ -293,6 +293,7 @@
 		"culture":0,
 		"health":400,
 		"research":"MONARCHY",
-		"effort":300},
+		"effort":500
+	},
 ]
 }

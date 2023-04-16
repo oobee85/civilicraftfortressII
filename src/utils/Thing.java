@@ -84,6 +84,15 @@ public class Thing implements Serializable {
 		components.put(key, component);
 	}
 	
+	public boolean isBuilder() {
+		return components.containsKey(Builder.class);
+	}
+	
+	public Set<BuildingType> getBuildableBuildingTypes() {
+		Builder builder = (Builder) components.get(Builder.class);
+		return builder.getBuildingTypeSet();
+	}
+	
 	public boolean hasInventory() {
 		return components.containsKey(Inventory.class);
 	}

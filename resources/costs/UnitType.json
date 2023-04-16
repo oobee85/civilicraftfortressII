@@ -9,8 +9,23 @@
 			{"damage":0, "cooldown":60, "range":1}
 		],
 		"name":"WORKER",
-		"attributes":["builder"],
 		"inventory":{"maxstack":20},
+		"builds":["WALL_WOOD", "GATE_WOOD", "FARM", "MINE", "SAWMILL", "QUARRY", "BARRACKS",
+				"STABLES", "WATCHTOWER", "PORT", "WORKSHOP", "SMITHY"]
+	},
+	{
+		"image":"Images/units/mason.png",
+		"mesh":"models/star.obj",
+		"cost":{"FOOD":60},
+		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":50},
+		"attackstyles":[
+			{"damage":0, "cooldown":60, "range":1}
+		],
+		"name":"MASON",
+		"research":"MASONRY",
+		"inventory":{"maxstack":30},
+		"builds":["WALL_STONE", "GATE_STONE", "WALL_BRICK", "GATE_BRICK", "MINE", "QUARRY", "GRANARY", "WINDMILL",
+				"WATCHTOWER", "CASTLE", "NECROPOLIS", "RESEARCH_LAB", "STONE_ROAD", "BRICK_ROAD", "HELLFORGE"]
 	},
 	{
 		"image":"Images/units/chariot.png",
@@ -602,15 +617,15 @@
 	{
 		"image":"Images/units/scorpion.png",
 		"cost":{"FOOD":100},
-		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":50},
+		"stats":{"movespeed":20,"buildtime":300,"health":100,"healspeed":50},
 		"name":"SCORPION",
 		"attackstyles":[
 			{"damage":10, "cooldown":30, "range":1}
 		],
+		"inventory":{"maxstack":1},
 		"attributes":["hostile"],
-		"loot":{"STONE":5}
+		"loot":{"STONE":5},
+		"builds":["SCORPION_DEN"]
 	}
-	
-	
 ]
 }

@@ -49,7 +49,7 @@ public class BasicAI extends AIInterface {
 			reassignWorkers();
 			for(Unit unit : faction.getUnits()) {
 				if(unit.isIdle()) {
-					if(unit.getType().isBuilder()) {
+					if(unit.isBuilder()) {
 						handleWorker(unit);
 					}
 					else if(unit.getType().isCaravan()) {
@@ -301,7 +301,7 @@ public class BasicAI extends AIInterface {
 			boolean hasOtherWorker = false;
 			for (Unit u : e.getUnits()) {
 				if (u.getFaction() == faction
-						&& u.getType().isBuilder()) {
+						&& u.isBuilder()) {
 					hasOtherWorker = true;
 				}
 			}
@@ -439,7 +439,7 @@ public class BasicAI extends AIInterface {
 	private void updateUnits() {
 		state.workers.clear();
 		for(Unit unit : faction.getUnits()) {
-			if(unit.getType().isBuilder()) {
+			if(unit.isBuilder()) {
 				state.workers.add(unit);
 			}
 		}

@@ -493,7 +493,7 @@ public class Unit extends Thing implements Serializable {
 
 	public void planActions(World world) {
 		// Workers deciding whether to move toward something to build
-		if (unitType.isBuilder() && isIdle() && passiveAction == PlannedAction.BUILD 
+		if (isBuilder() && isIdle() && passiveAction == PlannedAction.BUILD 
 				&& getTile().getFaction() == getFaction()) {
 			Building building = getBuildingToBuild(world.getBuildings());
 			if (building != null && building.getTile().getFaction() == getFaction()) {
@@ -554,40 +554,40 @@ public class Unit extends Thing implements Serializable {
 			return false;
 		}
 		boolean didSomething = false;
-		if(plan.isBuildRoadAction() && unitType.isBuilder()) {
+		if(plan.isBuildRoadAction() && isBuilder()) {
 			Building tobuild = plan.getTile().getRoad();
 			if(tobuild != null) {
 				didSomething = true;
 				buildBuilding(tobuild);
 			}
 		}
-		else if(plan.isBuildBuildingAction() && unitType.isBuilder()) {
+		else if(plan.isBuildBuildingAction() && isBuilder()) {
 			Building tobuild = plan.getTile().getBuilding();
 			if(tobuild != null) {
 				buildBuilding(tobuild);
 				didSomething = true;
 			}
 		}
-		else if(plan.isHarvestAction() && unitType.isBuilder() && plan.targetTile != null) {
+		else if(plan.isHarvestAction() && isBuilder() && plan.targetTile != null) {
 			this.doHarvest(plan.targetTile, plan);
 			didSomething = true;
 		}
 		else if(plan.isHarvestAction() && 
-				unitType.isBuilder() && 
+				isBuilder() && 
 				plan.target != null && 
 				plan.target instanceof Building && 
 				((Building)plan.target).getType().isHarvestable()) {
 			this.doHarvestBuilding((Building)plan.target, plan);
 			didSomething = true;
 		}
-		else if(plan.isTakeItemsAction() && (unitType.isCaravan() || unitType.isBuilder()) && plan.target instanceof Building
+		else if(plan.isTakeItemsAction() && (unitType.isCaravan() || isBuilder()) && plan.target instanceof Building
 				&& ((Building)plan.target).hasInventory() == true) {
 //				&& ((Building)plan.target).getType().isColony() == true) {
 			this.doTake(plan, plan.target);
 			didSomething = true;
 		}
 		else if(plan.isHarvestAction() && 
-				unitType.isBuilder() && 
+				isBuilder() && 
 				plan.target != null && 
 				plan.target instanceof Plant) {
 			this.doHarvest((Plant)plan.target, plan);
@@ -717,7 +717,7 @@ public class Unit extends Thing implements Serializable {
 
 	public void doPassiveThings(World world) {
 		// Workers building stuff
-		if (getType().isBuilder()) {
+		if (isBuilder()) {
 			//worker harvesting
 			if(readyToHarvest() && isHarvesting == true && this.getTile().getPlant() != null) {
 				for(Item item: this.getTile().getPlant().getItem()) {
