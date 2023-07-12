@@ -1285,7 +1285,7 @@ public class World {
 	}
 	
 	public void generateWorld() {
-		reseedTerrain(PerlinNoise.DEFAULT_SEED);
+		reseedTerrain(Generation.DEFAULT_SEED);
 
 		int numTiles = width*height;
 		Generation.makeLake(numTiles * 1, this);

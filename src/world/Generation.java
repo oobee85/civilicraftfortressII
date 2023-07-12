@@ -8,14 +8,9 @@ import world.liquid.*;
 
 public class Generation {
 	
+	public static final int DEFAULT_SEED = 13;
 	public static final int OREMULTIPLIER = 16384;
-	
-	// From https://en.wikipedia.org/wiki/Perlin_noise
-	
-	private static final float noise(double x, double y) {
-		return (float) Utils.getRandomNormalF(5);
-	}
-	
+
 	public static void addCliff(World world, float[][] heightmap) {
 		int x = (int)(Math.random()*heightmap.length);
 		int y = (int)(Math.random()*heightmap[x].length);
@@ -29,13 +24,80 @@ public class Generation {
 		}
 		
 	}
+
+	public static double[][] generateMap2(
+			long seed,
+			int width,
+			int height,
+			int scale,
+			int minValue,
+			int maxValue) {
+		double[][] map = new double[height][width];
+		double scaleMult = 1.0/scale;
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				double value = OpenSimplex2S.noise2(seed, x*scaleMult, y*scaleMult);
+				map[y][x] = (1 + value) / 2 * (maxValue - minValue) + minValue;
+			}
+		}
+		return map;
+	}
+
+	public static float[][] generateHeightMap(long seed, int width, int height) {
+		
+		int numoctaves = 6;
+		double amplitude = 1;
+		int frequency = 1;
+		float[][] heightmap = new float[height][width];
+		for(int octave = 0; octave < numoctaves; octave++) {
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					double nx = 1.0*x / width + 1;
+					double ny = 1.0*y / height;
+					float value = (float)(amplitude * OpenSimplex2S.noise2( seed + octave, frequency*nx, frequency*ny));
+					heightmap[y][x] += value;
+				}
+			}
+			frequency *= 2;
+			amplitude *= 0.5;
+		}
+
+		double[][] erosionMap = generateMap2(
+				seed - 1,width, height, 150*width*height/(256*256),
+				0, 1);
+		double[][] continentalMap = generateMap2(
+				seed - 2, width, height, 60*width*height/(256*256),
+				0, 1);
+
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				double multiplier = 1;
+				if (continentalMap[y][x] < .3) {
+					multiplier = .1;
+				}
+				else if (continentalMap[y][x] < .6) {
+					multiplier = .5;
+				}
+				else {
+					multiplier = 1;
+				}
+				double h = heightmap[y][x] * multiplier;
+				heightmap[y][x] = (float) (h * erosionMap[y][x] * erosionMap[y][x]);
+			}
+		}
+//		saveImage(heightmap, "map.png");
+//		maps.add(heightmap);
+//		saveImageChain(maps, "octaves.png");
+		return heightmap;
+	}
+
 	public static float[][] generateHeightMap(long seed, int smoothingRadius, int width, int height) {
 		int power = 1;
 		while(power < width || power < height) {
 			power *= 2;
 		}
 		
-		float[][] heightMap = PerlinNoise.generateHeightMap(seed, power, power);
+		float[][] heightMap = generateHeightMap(seed, power, power);
 		float[][] croppedHeightMap = new float[width][height];
 		int croppedWidth = (power - width)/2;
 		int croppedHeight = (power - height)/2;
@@ -55,7 +117,6 @@ public class Generation {
 		Utils.normalize(croppedHeightMap, 0, 1000);
 		return croppedHeightMap;
 	}
-	
 	
 	public static TileLoc makeVolcano(World world, float[][] heightMap) {
 		float highest = -1000;

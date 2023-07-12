@@ -824,9 +824,9 @@ public class Game {
 	private boolean isValidSpawnLocation(Tile spawnTile, int radius) {
 		List<Tile> tiles = Utils.getTilesInRadius(spawnTile, world, radius);
 		for(Tile t : tiles) {
-			if(t == spawnTile) {
-				continue;
-			}
+//			if(t == spawnTile) {
+//				continue;
+//			}
 			if(!isValidSpawnTileForBuilding(t, Game.buildingTypeMap.get("CASTLE"))) {
 				return false;
 			}
@@ -839,7 +839,7 @@ public class Game {
 				&& tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()
 				&& tile.getLocation().distanceTo(world.volcano) > 30
 				&& (tile.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"))
-				&& tile.getHeight() >= Constants.MAXHEIGHT * 0.45;
+				&& tile.getHeight() >= Constants.MAXHEIGHT * 0.25;
 	}
 	private void makeStartingCastleAndUnits(boolean easymode, List<PlayerInfo> players) {
 		double spacePerPlayer = (double)world.getWidth()/players.size();
@@ -876,7 +876,13 @@ public class Game {
 			while(!isValidSpawnLocation(spawnTile, minRadius)) {
 				spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), (int) (Math.random()*world.getHeight())));
 				minRadius = Math.max(0, minRadius-1);
+				if (minRadius == 0) {
+					System.err.println("Failed to find a good spawn tile!");
+					break;
+				}
 			};
+			
+			System.out.println("Spawning " + player.getName() + " at " + spawnTile);
 			
 			HashSet<Tile> visited = new HashSet<>();
 			LinkedList<Tile> tovisit = new LinkedList<>();
@@ -885,6 +891,10 @@ public class Game {
 			visited.add(spawnTile);
 			
 			while(!thingsToPlace.isEmpty()) {
+				if (tovisit.size() > 50) {
+					System.err.println("FAILSAFE, could not find tiles to place " + thingsToPlace.size() + " more things");
+					break;
+				}
 				Collections.shuffle(tovisit);
 				if(tovisit.isEmpty()) {
 				  break;
@@ -899,7 +909,10 @@ public class Game {
 					}
 				}
 				else if(thingType instanceof PlantType) {
-					if(current.getTerrain().isPlantable(current.getTerrain()) && current.getRoad() == null && current.liquidAmount < current.liquidType.getMinimumDamageAmount() / 2) {
+					if(current.getTerrain().isPlantable(current.getTerrain()) 
+							&& current.getRoad() == null 
+							&& current.liquidAmount < current.liquidType.getMinimumDamageAmount() / 2
+							) {
 						world.makePlantVein(current, (PlantType)thingType, 2);
 						thingType = null;
 					}
