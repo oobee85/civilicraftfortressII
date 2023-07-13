@@ -36,6 +36,7 @@ public class RenderingPipeline {
 			pipeline.steps.add(resource);
 			pipeline.steps.add(factions);
 			pipeline.steps.add(roads);
+			pipeline.steps.add(gradientShading);
 			pipeline.steps.add(liquids);
 			pipeline.steps.add(sunShadows);
 			pipeline.steps.add(modifiers);
@@ -129,6 +130,10 @@ public class RenderingPipeline {
 	private static RenderingStep selectedThings = new RenderingStep(state -> {
 		RenderingFunctions.drawSelectedThings(state);
 	}, null);
+
+	private static RenderingStep gradientShading = new RenderingStep(null, (state, tile, drawat) -> {
+		RenderingFunctions.drawTileGradientShading(state, tile, drawat);
+	});
 
 	private static RenderingStep plannedThing = new RenderingStep(state -> {
 		RenderingFunctions.drawPlannedThing(state);

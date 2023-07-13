@@ -164,6 +164,35 @@ public class RenderingFunctions {
 		}
 		RenderingFunctions.drawUnitHealthBars(state, tile, drawat);
 	}
+	
+	public static void drawTileGradientShading(RenderingState state, Tile tile, Point drawat) {
+
+		Utils.setTransparency(state.g, .15);
+		state.g.setColor(Color.black);
+		for (Tile neighbor : tile.getNeighbors()) {
+			float heightDiff = neighbor.getHeight() - tile.getHeight();
+			int MAX_HEIGHT_DIFF = 40;
+			if (heightDiff <= MAX_HEIGHT_DIFF / 100) {
+				continue;
+			}
+			heightDiff = Math.min(heightDiff, MAX_HEIGHT_DIFF);
+			double gradientRatio = heightDiff / MAX_HEIGHT_DIFF;
+			int offset = (int) (gradientRatio * state.tileSize / 4);
+//			if (neighbor.getLocation().x() == tile.getLocation().x()
+//					&& neighbor.getLocation().y() == tile.getLocation().y() - 1) {
+//				state.g.fillRect(drawat.x, drawat.y, state.tileSize, offset);
+//			}
+//			if (neighbor.getLocation().x() == tile.getLocation().x()
+//					&& neighbor.getLocation().y() == tile.getLocation().y() + 1) {
+//				state.g.fillRect(drawat.x, drawat.y + state.tileSize - offset, state.tileSize, offset);
+//			}
+			drawBorderBetween(
+					state.g, tile.getLocation(), neighbor.getLocation(),
+					drawat.x, drawat.y, state.tileSize, offset);
+			
+		}
+		Utils.setTransparency(state.g, 1);
+	}
 
 	private static void drawInventory(Graphics g, Tile tile, Inventory inventory, int tileSize) {
 		int draww = tileSize/4;
@@ -481,9 +510,12 @@ public class RenderingFunctions {
 			}
 		}
 	}
-	
 	private static void drawBorderBetween(Graphics2D g, TileLoc one, TileLoc two, int drawx, int drawy, int frozenTileSize) {
-		int width = frozenTileSize / 8;
+		drawBorderBetween(g, one, two, drawx, drawy, frozenTileSize, frozenTileSize/8);
+	}
+		
+	private static void drawBorderBetween(Graphics2D g, TileLoc one, TileLoc two, int drawx, int drawy, int frozenTileSize, int borderWidth) {
+		int width = borderWidth;
 		if (one.x() == two.x()) {
 			if (one.y() > two.y()) {
 				g.fillRect(drawx, drawy, frozenTileSize, width);
