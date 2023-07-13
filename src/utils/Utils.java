@@ -424,11 +424,17 @@ public final class Utils {
 	
 	public static double getAlphaOfLiquid(double amount) {
 		// 1 units of fluid is opaque, linearly becoming transparent at 0 units of fluid.
-		double alpha = Math.max(Math.min(amount*0.05 - 0.1, 1), 0);
+		double alpha = Math.sqrt(Math.max(Math.min(amount*0.1, 1), 0));
 		return alpha;
 		//return 1 - (1 - alpha) * (1 - alpha);
 	}
 	
+	public static double getAlphaDepthOfLiquid(double amount) {
+		// 1 units of fluid is opaque, linearly becoming transparent at 0 units of fluid.
+		double alpha = Math.sqrt(Math.max(Math.min(amount*0.01, 1), 0)) / 4;
+		return alpha;
+		//return 1 - (1 - alpha) * (1 - alpha);
+	}
 
 	public static void normalize(float[][] data, float upper, float inner) {
 		

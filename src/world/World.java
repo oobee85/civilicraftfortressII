@@ -45,6 +45,7 @@ public class World {
 	public int numCutTrees = 10;
 	public static int nights = 0;
 	public static int days = 1;
+	public static int WATER_SETTLING_TICKS = 600;
 	public static volatile int ticks;
 	
 	public World(int width, int height) {
@@ -1292,8 +1293,8 @@ public class World {
 		Generation.makeLake(numTiles * 2, this);
 		Generation.makeLake(numTiles * 4, this);
 		Generation.makeLake(numTiles * 8, this);
-		System.out.println("Simulating water for 100 iterations");
-		for(int i = 0; i < 100; i++) {
+		System.out.println("Settling water for iterations: " + WATER_SETTLING_TICKS);
+		for(int i = 0; i < WATER_SETTLING_TICKS; i++) {
 			LiquidSimulation.propogate(this);
 		}
 		initializeAirSimulationStuff();

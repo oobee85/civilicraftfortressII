@@ -131,7 +131,7 @@ public class LiquidSimulation {
 		if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.ICE) {
 			temperatureOffset = tile.liquidAmount / 10;
 		}
-		if (World.ticks - tile.getTickLastTerrainChange() >= Constants.MIN_TIME_TO_SWITCH_TERRAIN) {
+		if (World.ticks <= 50 || World.ticks - tile.getTickLastTerrainChange() >= Constants.MIN_TIME_TO_SWITCH_TERRAIN) {
 
 			if (tempurature + temperatureOffset > Constants.FREEZETEMP) {
 				if (tile.liquidType == LiquidType.ICE) {

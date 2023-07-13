@@ -12,6 +12,7 @@ import ui.*;
 import ui.utils.DrawingUtils;
 import utils.*;
 import world.*;
+import world.liquid.LiquidType;
 
 public class RenderingFunctions {
 	private static final Image TARGET_IMAGE = Utils.loadImage("Images/interfaces/ivegotyouinmysights.png");
@@ -530,6 +531,14 @@ public class RenderingFunctions {
 				imageSize);
 		g.drawImage(tile.liquidType.getMipMap().getImage(tileSize), drawx + tileSize / 2 - imageSize / 2,
 				drawy + tileSize / 2 - imageSize / 2, imageSize, imageSize, null);
+		
+		if(tile.liquidType == LiquidType.WATER) {
+			alpha = Utils.getAlphaDepthOfLiquid(tile.liquidAmount);
+			g.setColor(Color.BLACK);
+			Utils.setTransparency(g, alpha);
+			g.fillRect(drawx, drawy, tileSize, tileSize);
+			Utils.setTransparency(g, 1);
+		}
 		
 
 		// The idea is to draw some sort of reflection in the water but

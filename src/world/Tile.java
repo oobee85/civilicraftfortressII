@@ -16,7 +16,8 @@ public class Tile implements Externalizable {
 	private float height;
 	private double energy;
 	private double temperature;
-
+	private double wetness;
+	
 	public volatile float liquidAmount;
 	public volatile LiquidType liquidType;
 
@@ -31,6 +32,7 @@ public class Tile implements Externalizable {
 	private Building road;
 	private WeatherEvent weather;
 	private Air air;
+	private Air air2;
 	
 	private int tickLastTerrainChange;
 	
