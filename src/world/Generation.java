@@ -32,57 +32,70 @@ public class Generation {
 			int scale,
 			int minValue,
 			int maxValue) {
-		double[][] map = new double[height][width];
-		double scaleMult = 1.0/scale;
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				double value = OpenSimplex2S.noise2(seed, x*scaleMult, y*scaleMult);
-				map[y][x] = (1 + value) / 2 * (maxValue - minValue) + minValue;
-			}
-		}
-		return map;
-	}
-
-	public static float[][] generateHeightMap(long seed, int width, int height) {
-		
-		int numoctaves = 6;
+		int numoctaves = 4;
 		double amplitude = 1;
 		int frequency = 1;
-		float[][] heightmap = new float[height][width];
+		double[][] map = new double[height][width];
+		double scaleMult = 1.0/scale;
 		for(int octave = 0; octave < numoctaves; octave++) {
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
-					double nx = 1.0*x / width + 1;
-					double ny = 1.0*y / height;
-					float value = (float)(amplitude * OpenSimplex2S.noise2( seed + octave, frequency*nx, frequency*ny));
-					heightmap[y][x] += value;
+					map[y][x] += amplitude * OpenSimplex2S.noise2(seed*octave, x*scaleMult*frequency, y*scaleMult*frequency);
 				}
 			}
 			frequency *= 2;
 			amplitude *= 0.5;
 		}
+		Utils.normalize(map, maxValue, minValue);
+		return map;
+	}
+
+	public static float[][] generateHeightMap(long seed, int width, int height) {
+		
+//		int numoctaves = 6;
+//		double amplitude = 1;
+//		int frequency = 1;
+//		float[][] heightmap = new float[height][width];
+//		for(int octave = 0; octave < numoctaves; octave++) {
+//			for (int y = 0; y < height; y++) {
+//				for (int x = 0; x < width; x++) {
+//					double nx = 1.0*x / width + 1;
+//					double ny = 1.0*y / height;
+//					float value = (float)(amplitude * OpenSimplex2S.noise2( seed + octave, frequency*nx, frequency*ny));
+//					heightmap[y][x] += value;
+//				}
+//			}
+//			frequency *= 2;
+//			amplitude *= 0.5;
+//		}
+		double[][] basic = generateMap2(
+				seed, width, height, 50,
+				0, 1);
 
 		double[][] erosionMap = generateMap2(
-				seed - 1,width, height, 150*width*height/(256*256),
+				seed * seed,width, height, 200,
 				0, 1);
 		double[][] continentalMap = generateMap2(
-				seed - 2, width, height, 60*width*height/(256*256),
+				seed * seed / 31, width, height, 100,
 				0, 1);
-
+		
+		float[][] heightmap = new float[height][width];
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				double multiplier = 1;
 				if (continentalMap[y][x] < .3) {
-					multiplier = .1;
+					multiplier = .4;
 				}
 				else if (continentalMap[y][x] < .6) {
-					multiplier = .5;
+					multiplier = .7;
 				}
 				else {
 					multiplier = 1;
 				}
-				double h = heightmap[y][x] * multiplier;
-				heightmap[y][x] = (float) (h * erosionMap[y][x] * erosionMap[y][x]);
+				double h = basic[y][x] * multiplier;
+				h = h * erosionMap[y][x] * erosionMap[y][x];
+				heightmap[y][x] = (float) h;
+				
 			}
 		}
 //		saveImage(heightmap, "map.png");

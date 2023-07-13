@@ -167,29 +167,39 @@ public class RenderingFunctions {
 	
 	public static void drawTileGradientShading(RenderingState state, Tile tile, Point drawat) {
 
-		Utils.setTransparency(state.g, .15);
+		double regularShadowTransparency = .5;
+		Utils.setTransparency(state.g, regularShadowTransparency);
 		state.g.setColor(Color.black);
 		for (Tile neighbor : tile.getNeighbors()) {
-			float heightDiff = neighbor.getHeight() - tile.getHeight();
-			int MAX_HEIGHT_DIFF = 40;
-			if (heightDiff <= MAX_HEIGHT_DIFF / 100) {
+			float heightDiff = (neighbor.getHeight() + neighbor.liquidAmount) 
+					- (tile.getHeight() + tile.liquidAmount) - 10;
+			int MAX_HEIGHT_DIFF = 50;
+			if (heightDiff <= 2) {
 				continue;
 			}
-			heightDiff = Math.min(heightDiff, MAX_HEIGHT_DIFF);
-			double gradientRatio = heightDiff / MAX_HEIGHT_DIFF;
-			int offset = (int) (gradientRatio * state.tileSize / 4);
-//			if (neighbor.getLocation().x() == tile.getLocation().x()
-//					&& neighbor.getLocation().y() == tile.getLocation().y() - 1) {
-//				state.g.fillRect(drawat.x, drawat.y, state.tileSize, offset);
-//			}
-//			if (neighbor.getLocation().x() == tile.getLocation().x()
-//					&& neighbor.getLocation().y() == tile.getLocation().y() + 1) {
-//				state.g.fillRect(drawat.x, drawat.y + state.tileSize - offset, state.tileSize, offset);
-//			}
+			double gradientRatio = Math.min(heightDiff, MAX_HEIGHT_DIFF) / MAX_HEIGHT_DIFF;
+			int offset = (int) (gradientRatio * state.tileSize / 3);
+			Paint p = new GradientPaint(drawat.x, drawat.y, new Color(0, 0, 0, 0),
+					drawat.x + state.tileSize, drawat.y + state.tileSize, new Color(0, 0, 0, 255), true);
+            state.g.setPaint(p);
 			drawBorderBetween(
 					state.g, tile.getLocation(), neighbor.getLocation(),
 					drawat.x, drawat.y, state.tileSize, offset);
-			
+			state.g.fillRect(drawat.x, drawat.y, state.tileSize, state.tileSize);
+//			if (heightDiff > MAX_HEIGHT_DIFF) {
+//				gradientRatio = Math.min(heightDiff - MAX_HEIGHT_DIFF, MAX_HEIGHT_DIFF) / MAX_HEIGHT_DIFF;
+//				offset = (int) (gradientRatio * state.tileSize / 5);
+//				drawBorderBetween(
+//						state.g, tile.getLocation(), neighbor.getLocation(),
+//						drawat.x, drawat.y, state.tileSize, offset);
+//				if (heightDiff > MAX_HEIGHT_DIFF*2) {
+//					gradientRatio = Math.min(heightDiff - MAX_HEIGHT_DIFF*2, MAX_HEIGHT_DIFF) / MAX_HEIGHT_DIFF;
+//					offset = (int) (gradientRatio * state.tileSize / 7);
+//					drawBorderBetween(
+//							state.g, tile.getLocation(), neighbor.getLocation(),
+//							drawat.x, drawat.y, state.tileSize, offset);
+//				}
+//			}
 		}
 		Utils.setTransparency(state.g, 1);
 	}
@@ -521,6 +531,49 @@ public class RenderingFunctions {
 				g.fillRect(drawx, drawy, frozenTileSize, width);
 			}
 			if (one.y() < two.y()) {
+				g.fillRect(drawx, drawy + frozenTileSize - width, frozenTileSize, width);
+			}
+		} else {
+			if (one.y() > two.y()) {
+				int yoffset = (one.x() % 2) * frozenTileSize / 2;
+				if (one.x() < two.x()) {
+					g.fillRect(drawx + frozenTileSize - width, drawy + yoffset, width, frozenTileSize / 2);
+				} else if (one.x() > two.x()) {
+					g.fillRect(drawx, drawy + yoffset, width, frozenTileSize / 2);
+				}
+			} else if (one.y() < two.y()) {
+				int yoffset = (one.x() % 2) * frozenTileSize / 2;
+				if (one.x() < two.x()) {
+					g.fillRect(drawx + frozenTileSize - width, drawy + yoffset, width, frozenTileSize / 2);
+				} else if (one.x() > two.x()) {
+					g.fillRect(drawx, drawy + yoffset, width, frozenTileSize / 2);
+				}
+			} else {
+				int yoffset = (1 - one.x() % 2) * frozenTileSize / 2;
+				if (one.x() < two.x()) {
+					g.fillRect(drawx + frozenTileSize - width, drawy + yoffset, width, frozenTileSize / 2);
+				} else if (one.x() > two.x()) {
+					g.fillRect(drawx, drawy + yoffset, width, frozenTileSize / 2);
+				}
+			}
+		}
+	}
+
+	private static void drawGradientBorderBetween(Graphics2D g, TileLoc one, TileLoc two, int drawx, int drawy, int frozenTileSize, int borderWidth, Color color1, Color color2) {
+		int width = borderWidth;
+		if (one.x() == two.x()) {
+			if (one.y() > two.y()) {
+				GradientPaint c = new GradientPaint(
+						0, drawy, color2,
+						0, drawy + width, color1);
+				g.setPaint(c);
+				g.fillRect(drawx, drawy, frozenTileSize, width);
+			}
+			if (one.y() < two.y()) {
+				GradientPaint c = new GradientPaint(
+						0, drawy + frozenTileSize - width, color1,
+						0, drawy + frozenTileSize, color2);
+				g.setPaint(c);
 				g.fillRect(drawx, drawy + frozenTileSize - width, frozenTileSize, width);
 			}
 		} else {
