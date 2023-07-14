@@ -1,6 +1,11 @@
 package world;
 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.*;
+
+import javax.imageio.ImageIO;
 
 import game.*;
 import utils.*;
@@ -8,7 +13,7 @@ import world.liquid.*;
 
 public class Generation {
 	
-	public static final int DEFAULT_SEED = 13;
+	public static final long DEFAULT_SEED = 131313131313131313L;
 	public static final int OREMULTIPLIER = 16384;
 
 	public static void addCliff(World world, float[][] heightmap) {
@@ -73,35 +78,100 @@ public class Generation {
 				0, 1);
 
 		double[][] erosionMap = generateMap2(
-				seed * seed,width, height, 200,
+				seed + 12345678,width, height, 200,
 				0, 1);
 		double[][] continentalMap = generateMap2(
-				seed * seed / 31, width, height, 100,
+				seed + 9876123, width, height, 100,
 				0, 1);
-		
+
+		saveMap(basic, "basic.png");
+		saveMap(erosionMap, "erosionMap.png");
+		saveMap(continentalMap, "continentalMap.png");
+
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (continentalMap[y][x] < .25) {
+					continentalMap[y][x] = .25;
+				}
+				else if (continentalMap[y][x] < .5) {
+					continentalMap[y][x] = .5;
+				}
+				else if (continentalMap[y][x] < .75) {
+					continentalMap[y][x] = .75;
+				}
+				else {
+					continentalMap[y][x] = 1;
+				}
+				
+//				erosionMap[y][x] = erosionMap[y][x] * erosionMap[y][x];
+//				erosionMap[y][x] = erosionMap[y][x] > 0.5 ? 1 : 0;
+			}
+		}
+		saveMap(erosionMap, "erosionMap2.png");
+		saveMap(continentalMap, "continentalMap2.png");
+
 		float[][] heightmap = new float[height][width];
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				double multiplier = 1;
-				if (continentalMap[y][x] < .3) {
-					multiplier = .4;
-				}
-				else if (continentalMap[y][x] < .6) {
-					multiplier = .7;
-				}
-				else {
-					multiplier = 1;
-				}
-				double h = basic[y][x] * multiplier;
-				h = h * erosionMap[y][x] * erosionMap[y][x];
+				double h = basic[y][x] * continentalMap[y][x];
+				h = (h*h) * (erosionMap[y][x]) + (h) * (1 - erosionMap[y][x]);
+//				if (erosionMap[y][x] > 0.5) {
+//					h = h*h;
+//				}
 				heightmap[y][x] = (float) h;
-				
 			}
 		}
+		
+		
+		saveMap(heightmap, "heightmap.png");
 //		saveImage(heightmap, "map.png");
 //		maps.add(heightmap);
 //		saveImageChain(maps, "octaves.png");
 		return heightmap;
+	}
+
+	public static void saveMap(float[][] map, String filename) {
+		double[][] map2 = new double[map.length][map[0].length];
+		for (int y = 0; y < map.length; y++) {
+			for (int x = 0; x < map[y].length; x++) {
+				map2[y][x] = map[y][x];
+			}
+		}
+		saveMap(map2, filename);
+	}
+
+	public static void saveMap(double[][] map, String filename) {
+		double low = map[0][0];
+		double high = map[0][0];
+		for (int y = 0; y < map.length; y++) {
+			for (int x = 0; x < map[y].length; x++) {
+				low = Math.min(low, map[y][x]);
+				high = Math.max(high, map[y][x]);
+			}
+		}
+		Color[] colors = new Color[] {
+				new Color(255 * 0/5, 255 * 0/5, 255 * 0/5),
+				new Color(255 * 1/5, 255 * 1/5, 255 * 1/5),
+				new Color(255 * 2/5, 255 * 2/5, 255 * 2/5),
+				new Color(255 * 3/5, 255 * 3/5, 255 * 3/5),
+				new Color(255 * 4/5, 255 * 4/5, 255 * 4/5),
+				new Color(255 * 5/5, 255 * 5/5, 255 * 5/5),
+				new Color(255 * 5/5, 255 * 5/5, 255 * 5/5),
+		};
+		BufferedImage image = new BufferedImage(map[0].length, map.length, BufferedImage.TYPE_BYTE_GRAY);
+
+		for (int y = 0; y < map.length; y++) {
+			for (int x = 0; x < map[y].length; x++) {
+				double ratio = (double) (map[y][x] - low) / (high - low);
+				Color c = colors[(int)(ratio * (colors.length - 1))];
+				image.setRGB(x, y, c.getRGB());
+			}
+		}
+		try {
+			ImageIO.write(image, "png", new File("maps/" + filename));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static float[][] generateHeightMap(long seed, int smoothingRadius, int width, int height) {
@@ -169,7 +239,7 @@ public class Generation {
 					tile.setTerrain(Terrain.VOLCANO);
 					tile.liquidType = LiquidType.LAVA;
 					tile.liquidAmount = 0.2f;
-				}else if(distanceFromCenter < volcanoRadius) {
+				}else if(distanceFromCenter < volcanoRadius * .9) {
 					tile.setTerrain(Terrain.VOLCANO);
 				}
 			}
@@ -177,7 +247,7 @@ public class Generation {
 		return new TileLoc(x, y);
 	}
 
-	public static void generateResources(World world) {
+	public static void generateResources(World world, Random rand) {
 		for(ResourceType resource : ResourceType.values()) {
 			int numVeins = (int)(world.getWidth() * world.getHeight() * resource.getNumVeins() / OREMULTIPLIER);
 			
@@ -194,7 +264,7 @@ public class Generation {
 					// if ore is rare the tile must be able to support rare ore
 					
 					if(!resource.isRare() || tile.canSupportRareOre()) {
-						makeOreVein(tile, resource, resource.getVeinSize());
+						makeOreVein(tile, resource, resource.getVeinSize(), rand);
 						numVeins --;
 					}
 				}
@@ -213,13 +283,13 @@ public class Generation {
 						world, 
 						new Position(xdiv*regionWidth, ydiv*regionHeight), 
 						new Position(xdiv*regionWidth + regionWidth, ydiv*regionHeight + regionHeight));
-				Collections.shuffle(regionTiles);
+				Collections.shuffle(regionTiles, rand);
 				Tile targetTile = regionTiles.get(0);
-				int radius = (int) (Math.random()*(maxRadius + 1));
+				int radius = (int) (rand.nextDouble()*(maxRadius + 1));
 				List<Tile> targetTiles = Utils.getTilesInRadius(targetTile, world, radius);
 				for(Tile tile : targetTiles) {
 					if(tile.getTerrain() == Terrain.DIRT || tile.getTerrain() == Terrain.GRASS) {
-						if(Math.random() < 0.75) {
+						if(rand.nextDouble() < 0.75) {
 							tile.setTerrain(Terrain.ROCK);
 						}
 					}
@@ -228,8 +298,7 @@ public class Generation {
 		}
 	}
 	
-	// maxHeightDifference = 0 means height is not taken into account,, no height level
-	public static void makeBiome(Tile tile, Terrain newTerrain, int size, int maxHeightDifference, Terrain toReplace[]) {
+	public static void makeBiome(Tile tile, Terrain newTerrain, int size, int maxHeightDifference, Terrain toReplace[], Random rand) {
 		HashMap<Tile, Double> visited = new HashMap<>();
 		List<Terrain> replaceable = new LinkedList<Terrain>();
 		for(Terrain terr: toReplace) {
@@ -259,10 +328,10 @@ public class Generation {
 				if(visited.containsKey(ti)) {
 					continue;
 				}
-				visited.put(ti, ti.getLocation().distanceTo(tile.getLocation()) + Math.random()*10);
+				visited.put(ti, ti.getLocation().distanceTo(tile.getLocation()) + rand.nextDouble()*10);
 				search.add(ti);
 			}
-			if(Math.abs(tile.getHeight() - potential.getHeight()) < maxHeightDifference || maxHeightDifference == 0) {
+			if(Math.abs(tile.getHeight() - potential.getHeight()) < maxHeightDifference) {
 				if(replaceable.contains(potential.getTerrain())) {
 					potential.setTerrain(newTerrain);
 					size--;
@@ -277,7 +346,7 @@ public class Generation {
 	}
 
 	
-	public static void makeOreVein(Tile t, ResourceType resource, int veinSize) {
+	public static void makeOreVein(Tile t, ResourceType resource, int veinSize, Random rand) {
 		HashMap<Tile, Double> visited = new HashMap<>();
 		
 		PriorityQueue<Tile> search = new PriorityQueue<>((x, y) ->  { 
@@ -303,7 +372,7 @@ public class Generation {
 				if(visited.containsKey(ti)) {
 					continue;
 				}
-				visited.put(ti, ti.getLocation().distanceTo(t.getLocation()) + Math.random()*10);
+				visited.put(ti, ti.getLocation().distanceTo(t.getLocation()) + rand.nextDouble()*10);
 				search.add(ti);
 			}
 			
@@ -358,12 +427,12 @@ public class Generation {
 		}
 	}
 
-	public static void makeLake(double volume, World world) {
+	public static void makeLake(double volume, World world, Random rand) {
 		// Fill tiles until volume reached
 		PriorityQueue<TileLoc> queue = new PriorityQueue<TileLoc>((p1, p2) -> {
 			return (world.get(p1).getHeight() + world.get(p1).liquidAmount) - (world.get(p2).getHeight() + world.get(p2).liquidAmount) > 0 ? 1 : -1;
 		});
-		TileLoc startingLoc = new TileLoc((int) (Math.random() * world.getWidth()), (int) (Math.random() * world.getHeight()));
+		TileLoc startingLoc = new TileLoc((int) (rand.nextDouble() * world.getWidth()), (int) (rand.nextDouble() * world.getHeight()));
 		queue.add(startingLoc);
 		while(!queue.isEmpty() && volume > 0) {
 			TileLoc next = queue.poll();

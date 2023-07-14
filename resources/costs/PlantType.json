@@ -9,6 +9,12 @@
 		"harvestitems":{"FOOD":5}
 	},
 	{
+		"name":"SHRUB",
+		"image":"Images/plants/shrub.png",
+		"health":200,
+		"rarity": 1
+	},
+	{
 		"name":"BERRY_DEPLETED",
 		"image":"Images/plants/berry_depleted16.png",
 		"mesh":"models/cube.obj",
