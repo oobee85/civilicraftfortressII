@@ -49,6 +49,7 @@ public class World {
 	public static int nights = 0;
 	public static int days = 1;
 	public static int WATER_SETTLING_TICKS = 600;
+	public static float AVERAGE_WATER_PER_TILE = 10f;
 	public static volatile int ticks;
 	
 	public World(int width, int height) {
@@ -1314,11 +1315,18 @@ public class World {
 		reseedTerrain(Generation.DEFAULT_SEED);
 
 		int numTiles = width*height;
-		Generation.makeLake(numTiles * 1, this, worldRNG);
-		Generation.makeLake(numTiles * 1, this, worldRNG);
-		Generation.makeLake(numTiles * 2, this, worldRNG);
-		Generation.makeLake(numTiles * 6, this, worldRNG);
+//		Generation.makeLake(numTiles * 1, this, worldRNG);
+//		Generation.makeLake(numTiles * 1, this, worldRNG);
+//		Generation.makeLake(numTiles * 2, this, worldRNG);
+//		Generation.makeLake(numTiles * 6, this, worldRNG);
 		System.out.println("Settling water for iterations: " + WATER_SETTLING_TICKS);
+		float averageWaterPerTile = AVERAGE_WATER_PER_TILE;
+		for (Tile t : this.getTiles()) {
+			if (t.liquidType != LiquidType.LAVA) {
+				t.liquidAmount = averageWaterPerTile;
+				t.liquidType = LiquidType.WATER;
+			}
+		}
 		for(int i = 0; i < WATER_SETTLING_TICKS; i++) {
 			LiquidSimulation.propogate(this);
 		}
