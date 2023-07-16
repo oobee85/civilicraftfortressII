@@ -167,29 +167,23 @@ public class RenderingFunctions {
 	
 	public static void drawTileGradientShading(RenderingState state, Tile tile, Point drawat) {
 
-		Utils.setTransparency(state.g, .15);
+		double regularShadowTransparency = .5;
+		Utils.setTransparency(state.g, regularShadowTransparency);
 		state.g.setColor(Color.black);
+		
 		for (Tile neighbor : tile.getNeighbors()) {
-			float heightDiff = neighbor.getHeight() - tile.getHeight();
-			int MAX_HEIGHT_DIFF = 40;
-			if (heightDiff <= MAX_HEIGHT_DIFF / 100) {
+			float heightDiff = (neighbor.getHeight() + neighbor.liquidAmount) 
+					- (tile.getHeight() + tile.liquidAmount) - 10;
+			int MAX_HEIGHT_DIFF = 50;
+			if (heightDiff <= 2) {
 				continue;
 			}
-			heightDiff = Math.min(heightDiff, MAX_HEIGHT_DIFF);
-			double gradientRatio = heightDiff / MAX_HEIGHT_DIFF;
-			int offset = (int) (gradientRatio * state.tileSize / 4);
-//			if (neighbor.getLocation().x() == tile.getLocation().x()
-//					&& neighbor.getLocation().y() == tile.getLocation().y() - 1) {
-//				state.g.fillRect(drawat.x, drawat.y, state.tileSize, offset);
-//			}
-//			if (neighbor.getLocation().x() == tile.getLocation().x()
-//					&& neighbor.getLocation().y() == tile.getLocation().y() + 1) {
-//				state.g.fillRect(drawat.x, drawat.y + state.tileSize - offset, state.tileSize, offset);
-//			}
-			drawBorderBetween(
+			double gradientRatio = Math.min(heightDiff, MAX_HEIGHT_DIFF) / MAX_HEIGHT_DIFF;
+			int offset = (int) (gradientRatio * state.tileSize / 2);
+			drawGradientBorderBetween(
 					state.g, tile.getLocation(), neighbor.getLocation(),
-					drawat.x, drawat.y, state.tileSize, offset);
-			
+					drawat.x, drawat.y, state.tileSize, offset,
+					new Color(0, 0, 0, 0), new Color(0, 0, 0, 255));
 		}
 		Utils.setTransparency(state.g, 1);
 	}
@@ -514,39 +508,198 @@ public class RenderingFunctions {
 		drawBorderBetween(g, one, two, drawx, drawy, frozenTileSize, frozenTileSize/8);
 	}
 		
-	private static void drawBorderBetween(Graphics2D g, TileLoc one, TileLoc two, int drawx, int drawy, int frozenTileSize, int borderWidth) {
+	private static void drawBorderBetween(
+			Graphics2D g, TileLoc one, TileLoc two, 
+			int drawx, int drawy, int frozenTileSize, int borderWidth) {
 		int width = borderWidth;
+		// always draw shape counterclockwise with first edge being along tile border
+		int[] x = new int[4];
+		int[] y = new int[4];
 		if (one.x() == two.x()) {
 			if (one.y() > two.y()) {
-				g.fillRect(drawx, drawy, frozenTileSize, width);
+				x[0] = drawx + frozenTileSize;
+				x[1] = drawx;
+				x[2] = x[1] + width;
+				x[3] = x[0] - width;
+
+				y[0] = drawy;
+				y[1] = y[0];
+				y[2] = drawy + width;
+				y[3] = y[2];
 			}
 			if (one.y() < two.y()) {
-				g.fillRect(drawx, drawy + frozenTileSize - width, frozenTileSize, width);
+				x[0] = drawx;
+				x[1] = drawx + frozenTileSize;
+				x[2] = x[1] - width;
+				x[3] = x[0] + width;
+
+				y[0] = drawy + frozenTileSize;
+				y[1] = y[0];
+				y[2] = drawy + frozenTileSize - width;
+				y[3] = y[2];
 			}
 		} else {
-			if (one.y() > two.y()) {
-				int yoffset = (one.x() % 2) * frozenTileSize / 2;
-				if (one.x() < two.x()) {
-					g.fillRect(drawx + frozenTileSize - width, drawy + yoffset, width, frozenTileSize / 2);
-				} else if (one.x() > two.x()) {
-					g.fillRect(drawx, drawy + yoffset, width, frozenTileSize / 2);
-				}
-			} else if (one.y() < two.y()) {
-				int yoffset = (one.x() % 2) * frozenTileSize / 2;
-				if (one.x() < two.x()) {
-					g.fillRect(drawx + frozenTileSize - width, drawy + yoffset, width, frozenTileSize / 2);
-				} else if (one.x() > two.x()) {
-					g.fillRect(drawx, drawy + yoffset, width, frozenTileSize / 2);
-				}
+
+			int yoffset = 0;
+			if ((one.y() > two.y()) || (one.y() < two.y())) {
+				yoffset = one.x() % 2;
 			} else {
-				int yoffset = (1 - one.x() % 2) * frozenTileSize / 2;
-				if (one.x() < two.x()) {
-					g.fillRect(drawx + frozenTileSize - width, drawy + yoffset, width, frozenTileSize / 2);
-				} else if (one.x() > two.x()) {
-					g.fillRect(drawx, drawy + yoffset, width, frozenTileSize / 2);
+				yoffset = (1 - one.x()) % 2;
+			}
+
+			if (one.x() < two.x()) {
+				x[0] = drawx + frozenTileSize;
+				x[1] = x[0];
+				x[2] = drawx + frozenTileSize - width;
+				x[3] = x[2];
+				
+				// top right edge
+				if (yoffset == 0) {
+					y[0] = drawy + frozenTileSize/2;
+					y[1] = drawy;
+					y[2] = y[1] + width;
+					y[3] = y[0];
+				}
+				// bottom right edge
+				else {
+					y[0] = drawy + frozenTileSize;
+					y[1] = drawy + frozenTileSize/2;
+					y[2] = y[1];
+					y[3] = y[0] - width;
+				}
+			}
+			else {
+				x[0] = drawx;
+				x[1] = x[0];
+				x[2] = drawx + width;
+				x[3] = x[2];
+
+				// top left edge
+				if (yoffset == 0) {
+					y[0] = drawy;
+					y[1] = drawy + frozenTileSize/2;
+					y[2] = y[1];
+					y[3] = y[0] + width;
+				}
+				// bottom left edge
+				else {
+					y[0] = drawy + frozenTileSize/2;
+					y[1] = drawy + frozenTileSize;
+					y[2] = y[1] - width;
+					y[3] = y[0];
 				}
 			}
 		}
+		g.fillPolygon(x, y, x.length);
+	}
+
+	private static void drawGradientBorderBetween(
+			Graphics2D g, TileLoc one, TileLoc two, 
+			int drawx, int drawy, int frozenTileSize, 
+			int borderWidth, Color colorInside, Color colorOutside) {
+		int width = borderWidth;
+		// always draw shape counterclockwise with first edge being along tile border
+		int[] x = new int[4];
+		int[] y = new int[4];
+		int gradientx1 = 0, gradientx2 = 0;
+		int gradienty1 = 0, gradienty2 = 0;
+		if (one.x() == two.x()) {
+			if (one.y() > two.y()) {
+				gradientx1 = gradientx2 = drawx;
+				gradienty1 = drawy;
+				gradienty2 = drawy + width;
+
+				x[0] = drawx + frozenTileSize;
+				x[1] = drawx;
+				x[2] = x[1] + width;
+				x[3] = x[0] - width;
+
+				y[0] = drawy;
+				y[1] = y[0];
+				y[2] = drawy + width;
+				y[3] = y[2];
+			}
+			if (one.y() < two.y()) {
+				gradientx1 = gradientx2 = drawx;
+				gradienty1 = drawy + frozenTileSize;
+				gradienty2 = drawy + frozenTileSize - width;
+
+				x[0] = drawx;
+				x[1] = drawx + frozenTileSize;
+				x[2] = x[1] - width;
+				x[3] = x[0] + width;
+
+				y[0] = drawy + frozenTileSize;
+				y[1] = y[0];
+				y[2] = drawy + frozenTileSize - width;
+				y[3] = y[2];
+			}
+		} else {
+
+			int yoffset = 0;
+			if ((one.y() > two.y()) || (one.y() < two.y())) {
+				yoffset = one.x() % 2;
+			} else {
+				yoffset = (1 - one.x()) % 2;
+			}
+
+			if (one.x() < two.x()) {
+				gradientx1 = drawx + frozenTileSize;
+				gradientx2 = drawx + frozenTileSize - width;
+				gradienty1 = gradienty2 = drawy;
+
+				x[0] = drawx + frozenTileSize;
+				x[1] = x[0];
+				x[2] = drawx + frozenTileSize - width;
+				x[3] = x[2];
+				
+				// top right edge
+				if (yoffset == 0) {
+					y[0] = drawy + frozenTileSize/2;
+					y[1] = drawy;
+					y[2] = y[1] + width;
+					y[3] = y[0];
+				}
+				// bottom right edge
+				else {
+					y[0] = drawy + frozenTileSize;
+					y[1] = drawy + frozenTileSize/2;
+					y[2] = y[1];
+					y[3] = y[0] - width;
+				}
+			}
+			else {
+				gradientx1 = drawx;
+				gradientx2 = drawx + width;
+				gradienty1 = gradienty2 = drawy;
+
+				x[0] = drawx;
+				x[1] = x[0];
+				x[2] = drawx + width;
+				x[3] = x[2];
+
+				// top left edge
+				if (yoffset == 0) {
+					y[0] = drawy;
+					y[1] = drawy + frozenTileSize/2;
+					y[2] = y[1];
+					y[3] = y[0] + width;
+				}
+				// bottom left edge
+				else {
+					y[0] = drawy + frozenTileSize/2;
+					y[1] = drawy + frozenTileSize;
+					y[2] = y[1] - width;
+					y[3] = y[0];
+				}
+			}
+		}
+		Paint originalPaint = g.getPaint();
+		g.setPaint(new GradientPaint(
+				gradientx1, gradienty1, colorOutside,
+				gradientx2, gradienty2, colorInside));
+		g.fillPolygon(x, y, x.length);
+		g.setPaint(originalPaint);
 	}
 	
 	public static void drawLiquid(Tile tile, Graphics g, int drawx, int drawy, int tileSize, RenderingState state) {

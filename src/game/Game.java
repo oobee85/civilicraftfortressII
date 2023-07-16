@@ -543,7 +543,7 @@ public class Game {
 		makeRoads(easymode);
 		world.clearDeadAndAddNewThings();
 //		meteorStrike();
-		makeStartingCastleAndUnits(easymode, players);
+		makeStartingCastleAndUnits(easymode, players, world.worldRNG);
 		spawnStartingEnemies();
 	}
 	public void spawnStartingEnemies() {
@@ -841,7 +841,7 @@ public class Game {
 				&& (tile.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"))
 				&& tile.getHeight() >= Constants.MAXHEIGHT * 0.05;
 	}
-	private void makeStartingCastleAndUnits(boolean easymode, List<PlayerInfo> players) {
+	private void makeStartingCastleAndUnits(boolean easymode, List<PlayerInfo> players, Random rand) {
 		double spacePerPlayer = (double)world.getWidth()/players.size();
 		int index = 0;
 		for(PlayerInfo player : players) {
@@ -913,7 +913,7 @@ public class Game {
 							&& current.getRoad() == null 
 							&& current.liquidAmount < current.liquidType.getMinimumDamageAmount() / 2
 							) {
-						world.makePlantVein(current, (PlantType)thingType, 2);
+						world.makePlantVein(current, (PlantType)thingType, 2, rand);
 						thingType = null;
 					}
 				}

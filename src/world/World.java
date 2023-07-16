@@ -16,11 +16,14 @@ import networking.message.*;
 import networking.server.*;
 import ui.*;
 import ui.utils.DrawingUtils;
+import ui.view.TerrainGenView;
 import utils.*;
 import wildlife.*;
 import world.liquid.*;
 
 public class World {
+	
+	public Random worldRNG = new Random(Generation.DEFAULT_SEED);
 	
 	private LinkedList<Tile> tileList;
 	private LinkedList<Tile> tileListRandom;
@@ -175,6 +178,10 @@ public class World {
 	}
 	public LinkedList<Tile> getTilesRandomly() {
 		Collections.shuffle(tileListRandom);
+		return tileListRandom;
+	}
+	public LinkedList<Tile> getTilesRandomly(Random rand) {
+		Collections.shuffle(tileListRandom, rand);
 		return tileListRandom;
 	}
 	public ArrayList<ArrayList<Tile>> getLiquidSimulationPhases() {
@@ -493,24 +500,24 @@ public class World {
 //			spawnRock(t, rockRadius);
 		}
 	}
-	public void spawnRock(Tile tile, int radius) {
-		int numTiles = 0;
-		for(Tile t : this.getTiles()) {
-			int i =  t.getLocation().x();
-			int j =  t.getLocation().y();
-			int dx = i - tile.getLocation().x();
-			int dy = j - tile.getLocation().y();
-			double distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
-			
-			if (distanceFromCenter < radius) {
-				t.setTerrain(Terrain.VOLCANO);
-				numTiles ++;
-			}
-		}
-		int resource = (int) (Math.random()*ResourceType.values().length);
-		ResourceType resourceType = ResourceType.values()[resource];
-		Generation.makeOreVein(tile, resourceType, numTiles/2);
-	}
+//	public void spawnRock(Tile tile, int radius, Random rand) {
+//		int numTiles = 0;
+//		for(Tile t : this.getTiles()) {
+//			int i =  t.getLocation().x();
+//			int j =  t.getLocation().y();
+//			int dx = i - tile.getLocation().x();
+//			int dy = j - tile.getLocation().y();
+//			double distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
+//			
+//			if (distanceFromCenter < radius) {
+//				t.setTerrain(Terrain.VOLCANO);
+//				numTiles ++;
+//			}
+//		}
+//		int resource = (int) (Math.random()*ResourceType.values().length);
+//		ResourceType resourceType = ResourceType.values()[resource];
+//		Generation.makeOreVein(tile, resourceType, numTiles/2, rand);
+//	}
 	public void spawnExplosionCircle(Tile tile, int radius, int damage) {
 //		int radius = 35;
 		float amplitude = (float)(radius)/100;
@@ -1103,30 +1110,39 @@ public class World {
 		}
 	}
 
-	public void genPlants() {
+	public void genPlants(Random rand) {
 		for(Tile tile : getTiles()) {
 			//generates cactus
 			if(tile.getTerrain() == Terrain.SAND) {
-				if(Math.random() < 0.05) {
+				if(rand.nextDouble() < 0.05) {
 					Plant plant = new Plant(Game.plantTypeMap.get("CACTUS"), tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(plant);
 					worldData.addPlant(plant);
 				}
 			}
 			//generates land plants
-			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && Math.random() < Constants.BUSH_RARITY) {
-				double o = Math.random();
+			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && rand.nextDouble() < Constants.BUSH_RARITY) {
+				double o = rand.nextDouble();
 				if(o < Game.plantTypeMap.get("BERRY").getRarity()) {
-					makePlantVein(tile, Game.plantTypeMap.get("BERRY"), 6);
+					makePlantVein(tile, Game.plantTypeMap.get("BERRY"), 6, rand);
 //					Plant p = new Plant(PlantType.BERRY, tile, getFaction(NO_FACTION_ID));
 //					tile.setHasPlant(p);
 //					worldData.addPlant(tile.getPlant());
 				}
 			}
+			if(tile.checkTerrain(Terrain.DIRT) 
+					&& tile.getRoad() == null 
+					&& tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 
+					&& rand.nextDouble() < Constants.BUSH_RARITY/2) {
+				double o = rand.nextDouble();
+				if(o < Game.plantTypeMap.get("SHRUB").getRarity()) {
+					makePlantVein(tile, Game.plantTypeMap.get("SHRUB"), 4, rand);
+				}
+			}
 			//tile.liquidType.WATER &&
 			//generates water plants
-			if( Math.random() < Constants.WATER_PLANT_RARITY) {
-				double o = Math.random();
+			if( rand.nextDouble() < Constants.WATER_PLANT_RARITY) {
+				double o = rand.nextDouble();
 				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()  && o < Game.plantTypeMap.get("CATTAIL").getRarity()) {
 					Plant p = new Plant(Game.plantTypeMap.get("CATTAIL"), tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(p);
@@ -1135,7 +1151,7 @@ public class World {
 			}
 		}
 	}
-	public void makePlantVein(Tile t, PlantType type, int veinSize) {
+	public void makePlantVein(Tile t, PlantType type, int veinSize, Random rand) {
 		HashMap<Tile, Double> visited = new HashMap<>();
 
 		PriorityQueue<Tile> search = new PriorityQueue<>((x, y) -> {
@@ -1159,7 +1175,7 @@ public class World {
 				if (visited.containsKey(ti)) {
 					continue;
 				}
-				visited.put(ti, ti.getLocation().distanceTo(t.getLocation()) + Math.random() * 10);
+				visited.put(ti, ti.getLocation().distanceTo(t.getLocation()) + rand.nextDouble() * 10);
 				search.add(ti);
 			}
 			if(type == Game.plantTypeMap.get("TREE")) {
@@ -1182,7 +1198,7 @@ public class World {
 
 	}
 
-	public void makeForest() {
+	public void makeForest(Random rand) {
 		
 		for(Tile t : tileListRandom) {
 			double tempDensity = Constants.FOREST_DENSITY;
@@ -1191,7 +1207,7 @@ public class World {
 			}
 			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < t.liquidType.getMinimumDamageAmount() / 2)
 				if (Math.random() < tempDensity) {
-					makePlantVein(t, Game.plantTypeMap.get("TREE"), 30);
+					makePlantVein(t, Game.plantTypeMap.get("TREE"), 30, rand);
 				}
 		}
 		
@@ -1237,7 +1253,7 @@ public class World {
 //				}
 //			}
 //		}
-		Collections.shuffle(tiles); 
+		Collections.shuffle(tiles, worldRNG);
 		return tiles;
 	}
 	
@@ -1246,40 +1262,49 @@ public class World {
 			tile.setTerrain(Terrain.DIRT);
 		}
 		
-		int smoothingRadius = (int) (Math.sqrt((width + height)/2)/2);
-		float[][] heightMap = Generation.generateHeightMap(seed, smoothingRadius, width, height);
-		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
-		volcano = Generation.makeVolcano(this, heightMap);
-		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
+		float[][] heightMap = Generation.generateHeightMap(seed, width, height);
+		Utils.normalize(heightMap, 0, 1);
+		volcano = Generation.makeVolcano(this, heightMap, seed);
+		Utils.normalize(heightMap, 0, 1000);
+		heightMap = Utils.smoothingFilter(heightMap, 2, 2);
+		TerrainGenView.addMap(heightMap, "finalheightMap");
 		Generation.addCliff(this, heightMap);
 
 		for(Tile tile : getTiles()) {
 			tile.setFaction(getFaction(NO_FACTION_ID));
 			tile.setHeight(heightMap[tile.getLocation().x()][tile.getLocation().y()]);
 		}
-		LinkedList<Tile> tiles = getTilesRandomly();
+		LinkedList<Tile> tiles = getTilesRandomly(worldRNG);
 		Collections.sort(tiles, new Comparator<Tile>() {
 			@Override
 			public int compare(Tile o1, Tile o2) {
 				return o1.getHeight() > o2.getHeight() ? 1 : -1;
 			}
 		});
-		double rockpercentage = 0.30;
-		double rockCutoff = tiles.get((int)((1-rockpercentage)*tiles.size())).getHeight();
-		double dirtCutoff = tiles.get((int)((1-.5)*tiles.size())).getHeight();
+		double rockpercentageLow = 0.01;
+		double grassPercentage = .50;
+		double dirtPercentage = .80;
+//		double rockpercentageHigh = 1;
+		double rockCutoffLow = tiles.get((int)(rockpercentageLow*tiles.size())).getHeight();
+		double grassCutoff = tiles.get((int)(grassPercentage*tiles.size())).getHeight();
+		double dirtCutoff = tiles.get((int)(dirtPercentage*tiles.size())).getHeight();
+//		double rockCutoffHigh = tiles.get((int)(rockpercentageHigh*tiles.size())).getHeight();
 		for(Tile tile : getTiles()) {
 			if(tile.getTerrain() != Terrain.DIRT) {
 				continue;
 			}
 			Terrain t;
-			if (tile.getHeight() > rockCutoff) {
+			if (tile.getHeight() < rockCutoffLow) {
 				t = Terrain.ROCK;
 			}
-			else if (tile.getHeight() > dirtCutoff) {
+			else if (tile.getHeight() < grassCutoff) {
+				t = Terrain.GRASS;
+			}
+			else if (tile.getHeight() < dirtCutoff) {
 				t = Terrain.DIRT;
 			}
 			else {
-				t = Terrain.GRASS;
+				t = Terrain.ROCK;
 			}
 			tile.setTerrain(t);
 		}
@@ -1289,22 +1314,22 @@ public class World {
 		reseedTerrain(Generation.DEFAULT_SEED);
 
 		int numTiles = width*height;
-		Generation.makeLake(numTiles * 1, this);
-		Generation.makeLake(numTiles * 2, this);
-		Generation.makeLake(numTiles * 4, this);
-		Generation.makeLake(numTiles * 8, this);
+		Generation.makeLake(numTiles * 1, this, worldRNG);
+		Generation.makeLake(numTiles * 1, this, worldRNG);
+		Generation.makeLake(numTiles * 2, this, worldRNG);
+		Generation.makeLake(numTiles * 6, this, worldRNG);
 		System.out.println("Settling water for iterations: " + WATER_SETTLING_TICKS);
 		for(int i = 0; i < WATER_SETTLING_TICKS; i++) {
 			LiquidSimulation.propogate(this);
 		}
 		initializeAirSimulationStuff();
 		doAirSimulationStuff();
-		Tile t = getTilesRandomly().peek();
-		Generation.makeBiome(t, Terrain.SAND, 1000, 0, new Terrain[]{Terrain.GRASS, Terrain.DIRT});
+		Tile t = getTilesRandomly(worldRNG).peek();
+		Generation.makeBiome(t, Terrain.SAND, 1000, Integer.MAX_VALUE, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
 		updateTerrainChange(true);
-		Generation.generateResources(this);
-		this.genPlants();
-		this.makeForest();
+		Generation.generateResources(this, worldRNG);
+		this.genPlants(worldRNG);
+		this.makeForest(worldRNG);
 		if(!Settings.DISABLE_WILDLIFE_SPAWNS) {
 			Generation.generateWildLife(this);
 		}

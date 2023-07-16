@@ -1,14 +1,21 @@
 package world;
 
+import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.*;
 
+import javax.imageio.ImageIO;
+
 import game.*;
+import ui.view.TerrainGenView;
 import utils.*;
 import world.liquid.*;
 
 public class Generation {
 	
-	public static final int DEFAULT_SEED = 13;
+	public static final long DEFAULT_SEED = 131313131313131313L;
 	public static final int OREMULTIPLIER = 16384;
 
 	public static void addCliff(World world, float[][] heightmap) {
@@ -30,74 +37,138 @@ public class Generation {
 			int width,
 			int height,
 			int scale,
-			int minValue,
-			int maxValue) {
-		double[][] map = new double[height][width];
-		double scaleMult = 1.0/scale;
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				double value = OpenSimplex2S.noise2(seed, x*scaleMult, y*scaleMult);
-				map[y][x] = (1 + value) / 2 * (maxValue - minValue) + minValue;
-			}
-		}
-		return map;
+			double minValue,
+			double maxValue) {
+		return generateMap2(seed, width, height, scale, minValue, maxValue, 0, 0);
 	}
 
-	public static float[][] generateHeightMap(long seed, int width, int height) {
-		
-		int numoctaves = 6;
+	public static double[][] generateMap2(
+			long seed,
+			int width,
+			int height,
+			int scale,
+			double minValue,
+			double maxValue,
+			int offsetx,
+			int offsety) {
+		int numoctaves = 4;
 		double amplitude = 1;
 		int frequency = 1;
-		float[][] heightmap = new float[height][width];
+		double[][] map = new double[height][width];
+		double scaleMult = 1.0/scale;
 		for(int octave = 0; octave < numoctaves; octave++) {
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
-					double nx = 1.0*x / width + 1;
-					double ny = 1.0*y / height;
-					float value = (float)(amplitude * OpenSimplex2S.noise2( seed + octave, frequency*nx, frequency*ny));
-					heightmap[y][x] += value;
+					map[y][x] += amplitude * OpenSimplex2S.noise2(
+							seed*octave, 
+							(y - offsety)*scaleMult*frequency,
+							(x - offsetx)*scaleMult*frequency
+							);
 				}
 			}
 			frequency *= 2;
 			amplitude *= 0.5;
 		}
+		Utils.normalize(map, maxValue, minValue);
+		return map;
+	}
+
+	public static float[][] generateHeightMap2(long seed, int width, int height) {
+		double[][] basic = generateMap2(
+				seed, width, height, 50,
+				0, 1);
 
 		double[][] erosionMap = generateMap2(
-				seed - 1,width, height, 150*width*height/(256*256),
+				seed + 12345678,width, height, 200,
 				0, 1);
 		double[][] continentalMap = generateMap2(
-				seed - 2, width, height, 60*width*height/(256*256),
+				seed + 9876123, width, height, 100,
 				0, 1);
+		
+		double[][] canyons = generateMap2(
+				seed + 7621354378L, width, height, 100,
+				-1, 1);
+		double[][] canyonPrevalence = generateMap2(
+				seed + 236189929L, width, height, 250,
+				-1, 1);
+		
+		TerrainGenView.addMap(basic, "basic");
+		TerrainGenView.addMap(erosionMap, "erosionMap");
+		TerrainGenView.addMap(continentalMap, "continentalMap");
+		TerrainGenView.addMap(canyons, "canyons");
+		TerrainGenView.addMap(canyonPrevalence, "canyonPrevalence");
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				double multiplier = 1;
-				if (continentalMap[y][x] < .3) {
-					multiplier = .1;
+				if (continentalMap[y][x] < .25) {
+					continentalMap[y][x] = .25;
 				}
-				else if (continentalMap[y][x] < .6) {
-					multiplier = .5;
+				else if (continentalMap[y][x] < .5) {
+					continentalMap[y][x] = .5;
+				}
+				else if (continentalMap[y][x] < .75) {
+					continentalMap[y][x] = .75;
 				}
 				else {
-					multiplier = 1;
+					continentalMap[y][x] = 1;
 				}
-				double h = heightmap[y][x] * multiplier;
-				heightmap[y][x] = (float) (h * erosionMap[y][x] * erosionMap[y][x]);
+				
+				if (Math.abs(canyons[y][x]) < .05) {
+					canyons[y][x] = 1;
+				}
+				else {
+					canyons[y][x] = 0;
+				}
+				if (canyonPrevalence[y][x] < 0) {
+					canyonPrevalence[y][x] = 0;
+				}
+				
+				canyonPrevalence[y][x] = canyons[y][x] * canyonPrevalence[y][x];
+//				canyons[y][x] = 1 - canyons[y][x] * canyons[y][x];
+				
+//				erosionMap[y][x] = erosionMap[y][x] * erosionMap[y][x];
+//				erosionMap[y][x] = erosionMap[y][x] > 0.5 ? 1 : 0;
 			}
 		}
+		TerrainGenView.addMap(continentalMap, "continentalMap2");
+		TerrainGenView.addMap(canyons, "canyons2");
+		TerrainGenView.addMap(canyonPrevalence, "canyonPrevalence2");
+
+		float[][] heightmap = new float[height][width];
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				double h = basic[y][x] * continentalMap[y][x];
+				h = h - canyonPrevalence[y][x];
+				h = (h*h) * (erosionMap[y][x]) + (h) * (1 - erosionMap[y][x]);
+//				if (erosionMap[y][x] > 0.5) {
+//					h = h*h;
+//				}
+				heightmap[y][x] = (float) h;
+			}
+		}
+
+		TerrainGenView.addMap(heightmap, "heightmap");
 //		saveImage(heightmap, "map.png");
 //		maps.add(heightmap);
 //		saveImageChain(maps, "octaves.png");
 		return heightmap;
 	}
+	
+	private static void saveImage(BufferedImage image, String filename) {
+		try {
+			ImageIO.write(image, "png", new File(filename));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-	public static float[][] generateHeightMap(long seed, int smoothingRadius, int width, int height) {
+	public static float[][] generateHeightMap(long seed, int width, int height) {
 		int power = 1;
 		while(power < width || power < height) {
 			power *= 2;
 		}
 		
-		float[][] heightMap = generateHeightMap(seed, power, power);
+		float[][] heightMap = generateHeightMap2(seed, power, power);
 		float[][] croppedHeightMap = new float[width][height];
 		int croppedWidth = (power - width)/2;
 		int croppedHeight = (power - height)/2;
@@ -106,34 +177,81 @@ public class Generation {
 				croppedHeightMap[i][j] = heightMap[i + croppedWidth][j + croppedHeight];
 			}
 		}
-		Utils.normalize(croppedHeightMap, 0, 1000);
-		int center = width/2;
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
-				double dif = 1 * Math.abs(i-center)/center;
-				croppedHeightMap[i][j] +=  (float)1000 * Math.pow(dif +1, -0.1) + (float)(Math.random());
-			}
-		}
-		Utils.normalize(croppedHeightMap, 0, 1000);
+//		Utils.normalize(croppedHeightMap, 0, 1000);
+//		int center = width/2;
+//		for (int i = 0; i < width; i++) {
+//			for (int j = 0; j < height; j++) {
+//				double dif = 1 * Math.abs(i-center)/center;
+//				croppedHeightMap[i][j] +=  (float)1000 * Math.pow(dif +1, -0.1) + (float)(Math.random());
+//			}
+//		}
+//		Utils.normalize(croppedHeightMap, 0, 1000);
 		return croppedHeightMap;
 	}
 	
-	public static TileLoc makeVolcano(World world, float[][] heightMap) {
-		float highest = -1000;
-		for(int i = 0; i < world.getWidth(); i++) {
-			for(int j = 0; j < world.getHeight(); j++) {
-				if(heightMap[i][j] > highest) {
-					highest = heightMap[i][j];
+	private static TileLoc findHighest(double[][] map) {
+		double highest = map[0][0];
+		TileLoc highestTile = new TileLoc(0, 0);
+		for(int i = 0; i < map.length; i++) {
+			for(int j = 0; j < map[i].length; j++) {
+				if(map[i][j] > highest) {
+					highest = map[i][j];
+					highestTile = new TileLoc(i, j);
 				}
 			}
 		}
-		highest = highest*0.6f;
+		return highestTile;
+	}
+	
+	public static TileLoc makeVolcano(World world, float[][] heightMap, long seed) {
 		int x = world.getWidth()/2;
 		int y = world.getHeight()/2;
+		
+		double[][] peaks = Generation.generateMap2(
+				seed + 102983578L, world.getWidth(), world.getHeight(), 
+				40, 0, 1);
+		TerrainGenView.addMap(peaks, "volcano peaks");
+		TileLoc highestPeak = findHighest(peaks);
+		peaks = Generation.generateMap2(
+				seed + 102983578L, world.getWidth(), world.getHeight(), 
+				40, 0, 1, 
+				world.getHeight()/2 - highestPeak.y(), world.getWidth()/2 - highestPeak.x());
+
+		TerrainGenView.addMap(peaks, "volcano peaks2");
+		
 		float lavaRadius = 5;
 		float volcanoRadius = 10;
 		float mountainRadius = 20;
 		float mountainEdgeRadius = 30;
+		
+		double volcanoCraterPercent = .2;
+
+		for(Tile tile : world.getTiles()) {
+			int i =  tile.getLocation().x();
+			int j =  tile.getLocation().y();
+			int dx = i - x;
+			int dy = j - y;
+			float distanceFromCenter = (float) Math.sqrt(dx*dx + dy*dy);
+			if (distanceFromCenter > mountainEdgeRadius) {
+				continue;
+			}
+			if (peaks[i][j] > 1 - volcanoCraterPercent) {
+				double offset = peaks[i][j] - (1 - volcanoCraterPercent);
+				peaks[i][j] = peaks[i][j] - 5 * offset;
+				if (distanceFromCenter <= volcanoRadius) {
+					tile.setTerrain(Terrain.VOLCANO);
+				}
+			}
+		}
+//		for(int i = 0; i < world.getHeight(); i++) {
+//			for(int j = 0; j < world.getWidth(); j++) {
+//				if (peaks[i][j] > 1 - volcanoCraterPercent) {
+//					double offset = peaks[i][j] - (1 - volcanoCraterPercent);
+//					peaks[i][j] = peaks[i][j] - 5 * offset;
+//				}
+//			}
+//		}
+		TerrainGenView.addMap(peaks, "volcano peaks3");
 		
 		for(Tile tile : world.getTiles()) {
 			int i =  tile.getLocation().x();
@@ -141,30 +259,28 @@ public class Generation {
 			int dx = i - x;
 			int dy = j - y;
 			float distanceFromCenter = (float) Math.sqrt(dx*dx + dy*dy);
+			if (distanceFromCenter <= mountainRadius) {
+				heightMap[i][j] = (float) peaks[i][j];
+			}
+			else if(distanceFromCenter < mountainEdgeRadius) {
+				double ratio = (distanceFromCenter - mountainRadius) 
+						/ (mountainEdgeRadius - mountainRadius);
+				float interpolatedHeight = (float) (peaks[i][j] * (1 - ratio) 
+						+ heightMap[i][j] * ratio);
+				heightMap[i][j] = interpolatedHeight;
+			}
+
 			if(distanceFromCenter < mountainEdgeRadius) {
-				
-				if(distanceFromCenter > lavaRadius) {
-					float height = highest - highest*(distanceFromCenter - lavaRadius)/(mountainEdgeRadius-lavaRadius);
-					heightMap[i][j] = Math.max(height, heightMap[i][j]);
-				}
-				else {
-					float height = highest - highest*(lavaRadius - distanceFromCenter)/lavaRadius;
-					heightMap[i][j] = Math.max(height, heightMap[i][j]);
-				}
-				
 				if(distanceFromCenter < lavaRadius) {
-					tile.setTerrain(Terrain.VOLCANO);
 					tile.liquidType = LiquidType.LAVA;
-					tile.liquidAmount = 0.2f;
-				}else if(distanceFromCenter < volcanoRadius) {
-					tile.setTerrain(Terrain.VOLCANO);
+					tile.liquidAmount = 15f;
 				}
 			}
 		}
 		return new TileLoc(x, y);
 	}
 
-	public static void generateResources(World world) {
+	public static void generateResources(World world, Random rand) {
 		for(ResourceType resource : ResourceType.values()) {
 			int numVeins = (int)(world.getWidth() * world.getHeight() * resource.getNumVeins() / OREMULTIPLIER);
 			
@@ -181,7 +297,7 @@ public class Generation {
 					// if ore is rare the tile must be able to support rare ore
 					
 					if(!resource.isRare() || tile.canSupportRareOre()) {
-						makeOreVein(tile, resource, resource.getVeinSize());
+						makeOreVein(tile, resource, resource.getVeinSize(), rand);
 						numVeins --;
 					}
 				}
@@ -200,13 +316,13 @@ public class Generation {
 						world, 
 						new Position(xdiv*regionWidth, ydiv*regionHeight), 
 						new Position(xdiv*regionWidth + regionWidth, ydiv*regionHeight + regionHeight));
-				Collections.shuffle(regionTiles);
+				Collections.shuffle(regionTiles, rand);
 				Tile targetTile = regionTiles.get(0);
-				int radius = (int) (Math.random()*(maxRadius + 1));
+				int radius = (int) (rand.nextDouble()*(maxRadius + 1));
 				List<Tile> targetTiles = Utils.getTilesInRadius(targetTile, world, radius);
 				for(Tile tile : targetTiles) {
 					if(tile.getTerrain() == Terrain.DIRT || tile.getTerrain() == Terrain.GRASS) {
-						if(Math.random() < 0.75) {
+						if(rand.nextDouble() < 0.75) {
 							tile.setTerrain(Terrain.ROCK);
 						}
 					}
@@ -215,8 +331,7 @@ public class Generation {
 		}
 	}
 	
-	// maxHeightDifference = 0 means height is not taken into account,, no height level
-	public static void makeBiome(Tile tile, Terrain newTerrain, int size, int maxHeightDifference, Terrain toReplace[]) {
+	public static void makeBiome(Tile tile, Terrain newTerrain, int size, int maxHeightDifference, Terrain toReplace[], Random rand) {
 		HashMap<Tile, Double> visited = new HashMap<>();
 		List<Terrain> replaceable = new LinkedList<Terrain>();
 		for(Terrain terr: toReplace) {
@@ -246,10 +361,10 @@ public class Generation {
 				if(visited.containsKey(ti)) {
 					continue;
 				}
-				visited.put(ti, ti.getLocation().distanceTo(tile.getLocation()) + Math.random()*10);
+				visited.put(ti, ti.getLocation().distanceTo(tile.getLocation()) + rand.nextDouble()*10);
 				search.add(ti);
 			}
-			if(Math.abs(tile.getHeight() - potential.getHeight()) < maxHeightDifference || maxHeightDifference == 0) {
+			if(Math.abs(tile.getHeight() - potential.getHeight()) < maxHeightDifference) {
 				if(replaceable.contains(potential.getTerrain())) {
 					potential.setTerrain(newTerrain);
 					size--;
@@ -264,7 +379,7 @@ public class Generation {
 	}
 
 	
-	public static void makeOreVein(Tile t, ResourceType resource, int veinSize) {
+	public static void makeOreVein(Tile t, ResourceType resource, int veinSize, Random rand) {
 		HashMap<Tile, Double> visited = new HashMap<>();
 		
 		PriorityQueue<Tile> search = new PriorityQueue<>((x, y) ->  { 
@@ -290,7 +405,7 @@ public class Generation {
 				if(visited.containsKey(ti)) {
 					continue;
 				}
-				visited.put(ti, ti.getLocation().distanceTo(t.getLocation()) + Math.random()*10);
+				visited.put(ti, ti.getLocation().distanceTo(t.getLocation()) + rand.nextDouble()*10);
 				search.add(ti);
 			}
 			
@@ -345,12 +460,12 @@ public class Generation {
 		}
 	}
 
-	public static void makeLake(double volume, World world) {
+	public static void makeLake(double volume, World world, Random rand) {
 		// Fill tiles until volume reached
 		PriorityQueue<TileLoc> queue = new PriorityQueue<TileLoc>((p1, p2) -> {
 			return (world.get(p1).getHeight() + world.get(p1).liquidAmount) - (world.get(p2).getHeight() + world.get(p2).liquidAmount) > 0 ? 1 : -1;
 		});
-		TileLoc startingLoc = new TileLoc((int) (Math.random() * world.getWidth()), (int) (Math.random() * world.getHeight()));
+		TileLoc startingLoc = new TileLoc((int) (rand.nextDouble() * world.getWidth()), (int) (rand.nextDouble() * world.getHeight()));
 		queue.add(startingLoc);
 		while(!queue.isEmpty() && volume > 0) {
 			TileLoc next = queue.poll();
