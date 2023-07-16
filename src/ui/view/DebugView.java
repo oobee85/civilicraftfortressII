@@ -29,7 +29,8 @@ public class DebugView {
 	private static final ImageIcon SHADOW_WORD_PAIN = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/shadowwordpain.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/tech.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 
-  private JFrame settingsWindow;
+	private JFrame settingsWindow;
+	private JFrame terrainGenWindow;
 	private ScrollingPanel scrollingPanel;
 	private GameView gameView;
 	
@@ -195,6 +196,9 @@ public class DebugView {
 		JButton settingsButton = KUIConstants.setupButton("Settings", null, DEBUG_BUTTON_SIZE);
 		settingsButton.addActionListener(e -> setupSettingsMenu() );
 
+		JButton terrainGenViewButton = KUIConstants.setupButton("TerrainGen", null, DEBUG_BUTTON_SIZE);
+		terrainGenViewButton.addActionListener(e -> setupTerrainGenView() );
+
 		for(JRadioButton button : mapModeButtons) {
 			scrollingPanel.add(button);
 		}
@@ -222,6 +226,42 @@ public class DebugView {
 		scrollingPanel.add(shadowWordPain);
 		scrollingPanel.add(reseedButton);
 		scrollingPanel.add(settingsButton);
+		scrollingPanel.add(terrainGenViewButton);
+	}
+	
+	private void setupTerrainGenView() {
+		if (terrainGenWindow != null) {
+			int sta = terrainGenWindow.getExtendedState() & ~JFrame.ICONIFIED & JFrame.NORMAL;
+			terrainGenWindow.setExtendedState(sta);
+			terrainGenWindow.setAlwaysOnTop(true);
+			terrainGenWindow.toFront();
+			terrainGenWindow.requestFocus();
+			terrainGenWindow.setAlwaysOnTop(false);
+		}
+		else {
+			terrainGenWindow = new JFrame("TerrainGenView");
+			terrainGenWindow.setLocationRelativeTo(null);
+			terrainGenWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			terrainGenWindow.setSize(500, 500);
+			terrainGenWindow.addWindowListener(new WindowListener() {
+				@Override
+				public void windowClosing(WindowEvent e) {
+					terrainGenWindow = null;
+				}
+				@Override public void windowOpened(WindowEvent e) { }
+				@Override public void windowIconified(WindowEvent e) { }
+				@Override public void windowDeiconified(WindowEvent e) { }
+				@Override public void windowDeactivated(WindowEvent e) { }
+				@Override public void windowClosed(WindowEvent e) { } 
+				@Override public void windowActivated(WindowEvent e) { }
+			});
+			TerrainGenView terrainGenView = new TerrainGenView(ee -> {
+				terrainGenWindow.dispose();
+				terrainGenWindow = null;
+			});
+			terrainGenWindow.add(terrainGenView.getContentPanel());
+			terrainGenWindow.setVisible(true);
+		}
 	}
 	
 	private void setupSettingsMenu() {

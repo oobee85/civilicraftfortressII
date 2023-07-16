@@ -450,7 +450,23 @@ public final class Utils {
 			}
 		}
 	}
-	public static void normalize(float[][] data, float upper, float inner) {
+	public static void normalize(double[][] data, double upper, double inner) {
+		double minValue = data[0][0];
+		double maxValue = data[0][0];
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				minValue = data[i][j] < minValue ? data[i][j] : minValue;
+				maxValue = data[i][j] > maxValue ? data[i][j] : maxValue;
+			}
+		}
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				double ratio = (data[i][j] - minValue) / (maxValue - minValue);
+				data[i][j] = ratio * (upper-inner) + inner;
+			}
+		}
+	}
+	public static void normalize(float[][] data, float low, float high) {
 		
 		
 		float minValue = data[0][0];
@@ -467,7 +483,7 @@ public final class Utils {
 			for (int j = 0; j < data[0].length; j++) {
 				data[i][j] = (data[i][j] - minValue) / (maxValue - minValue);
 //				data[i][j] = data[i][j] * upper;
-				data[i][j] = data[i][j] * (upper-inner) + inner;
+				data[i][j] = data[i][j] * (high-low) + low;
 			}
 		}
 		minValue = data[0][0];

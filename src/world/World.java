@@ -16,6 +16,7 @@ import networking.message.*;
 import networking.server.*;
 import ui.*;
 import ui.utils.DrawingUtils;
+import ui.view.TerrainGenView;
 import utils.*;
 import wildlife.*;
 import world.liquid.*;
@@ -1261,11 +1262,12 @@ public class World {
 			tile.setTerrain(Terrain.DIRT);
 		}
 		
-		int smoothingRadius = (int) (Math.sqrt((width + height)/2)/2);
-		float[][] heightMap = Generation.generateHeightMap(seed, smoothingRadius, width, height);
-		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
-		volcano = Generation.makeVolcano(this, heightMap);
-		heightMap = Utils.smoothingFilter(heightMap, 3, 3);
+		float[][] heightMap = Generation.generateHeightMap(seed, width, height);
+		Utils.normalize(heightMap, 0, 1);
+		volcano = Generation.makeVolcano(this, heightMap, seed);
+		Utils.normalize(heightMap, 0, 1000);
+		heightMap = Utils.smoothingFilter(heightMap, 2, 2);
+		TerrainGenView.addMap(heightMap, "finalheightMap");
 		Generation.addCliff(this, heightMap);
 
 		for(Tile tile : getTiles()) {
@@ -1279,22 +1281,30 @@ public class World {
 				return o1.getHeight() > o2.getHeight() ? 1 : -1;
 			}
 		});
-		double rockpercentage = 0.20;
-		double rockCutoff = tiles.get((int)((1-rockpercentage)*tiles.size())).getHeight();
-		double dirtCutoff = tiles.get((int)((1-.5)*tiles.size())).getHeight();
+		double rockpercentageLow = 0.01;
+		double grassPercentage = .50;
+		double dirtPercentage = .80;
+//		double rockpercentageHigh = 1;
+		double rockCutoffLow = tiles.get((int)(rockpercentageLow*tiles.size())).getHeight();
+		double grassCutoff = tiles.get((int)(grassPercentage*tiles.size())).getHeight();
+		double dirtCutoff = tiles.get((int)(dirtPercentage*tiles.size())).getHeight();
+//		double rockCutoffHigh = tiles.get((int)(rockpercentageHigh*tiles.size())).getHeight();
 		for(Tile tile : getTiles()) {
 			if(tile.getTerrain() != Terrain.DIRT) {
 				continue;
 			}
 			Terrain t;
-			if (tile.getHeight() > rockCutoff) {
+			if (tile.getHeight() < rockCutoffLow) {
 				t = Terrain.ROCK;
 			}
-			else if (tile.getHeight() > dirtCutoff) {
+			else if (tile.getHeight() < grassCutoff) {
+				t = Terrain.GRASS;
+			}
+			else if (tile.getHeight() < dirtCutoff) {
 				t = Terrain.DIRT;
 			}
 			else {
-				t = Terrain.GRASS;
+				t = Terrain.ROCK;
 			}
 			tile.setTerrain(t);
 		}
