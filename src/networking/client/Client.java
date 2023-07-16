@@ -194,50 +194,54 @@ public class Client {
 	}
 	
 	public void setupSinglePlayer(boolean createWorld) {
-		clientGUI.getGameView().setCommandInterface(localCommands);
-		if(createWorld) {
-			LinkedList<PlayerInfo> players = new LinkedList<>();
-			players.add(clientGUI.getPlayerInfo());
-			for(int i = 0; i < Settings.NUM_AI; i++) {
-				players.add(new PlayerInfo("Bot " + i, null));
-			}
-			gameInstance.generateWorld(Settings.WORLD_WIDTH, Settings.WORLD_HEIGHT, false, players);
-			clientGUI.getGameView().getDrawer().updateTerrainImages();
-		}
-		boolean assignedPlayer = false;
-		for(Faction f : gameInstance.world.getFactions()) {
-			if(f.isPlayer()) {
-				if(!assignedPlayer) {
-					gameInstance.getGUIController().changedFaction(f);
-					assignedPlayer = true;
+		clientGUI.startedSinglePlayer();
+		Thread t = new Thread(() -> {
+			clientGUI.getGameView().setCommandInterface(localCommands);
+			if(createWorld) {
+				LinkedList<PlayerInfo> players = new LinkedList<>();
+				players.add(clientGUI.getPlayerInfo());
+				for(int i = 0; i < Settings.NUM_AI; i++) {
+					players.add(new PlayerInfo("Bot " + i, null));
 				}
-				else {
-					// create and assign ai
-					BasicAI ai = new BasicAI(localCommands, f, gameInstance.world);
-					ailist.add(ai);
+				gameInstance.generateWorld(Settings.WORLD_WIDTH, Settings.WORLD_HEIGHT, false, players);
+				clientGUI.getGameView().getDrawer().updateTerrainImages();
+			}
+			boolean assignedPlayer = false;
+			for(Faction f : gameInstance.world.getFactions()) {
+				if(f.isPlayer()) {
+					if(!assignedPlayer) {
+						gameInstance.getGUIController().changedFaction(f);
+						assignedPlayer = true;
+					}
+					else {
+						// create and assign ai
+						BasicAI ai = new BasicAI(localCommands, f, gameInstance.world);
+						ailist.add(ai);
+					}
 				}
 			}
-		}
-		NeutralAI neutralAI = new NeutralAI(
-				localCommands,
-				gameInstance.world.getFaction(World.NO_FACTION_ID),
-				gameInstance.world);
-		ailist.add(neutralAI);
-		UndeadAI undeadAI = new UndeadAI(
-				localCommands,
-				gameInstance.world.getFaction(World.UNDEAD_FACTION_ID),
-				gameInstance.world);
-		ailist.add(undeadAI);
-		
+			NeutralAI neutralAI = new NeutralAI(
+					localCommands,
+					gameInstance.world.getFaction(World.NO_FACTION_ID),
+					gameInstance.world);
+			ailist.add(neutralAI);
+			UndeadAI undeadAI = new UndeadAI(
+					localCommands,
+					gameInstance.world.getFaction(World.UNDEAD_FACTION_ID),
+					gameInstance.world);
+			ailist.add(undeadAI);
+			
 
-		SwingUtilities.invokeLater(() -> {
-			clientGUI.startedSinglePlayer();
-			clientGUI.repaint();
-			startLocalGameLoopThread(false);
-			SwingUtilities.invokeLater(() -> {
-				clientGUI.getGameView().recenterCameraOnPlayer();
-			});
+//			SwingUtilities.invokeLater(() -> {
+				clientGUI.repaint();
+				startLocalGameLoopThread(false);
+				SwingUtilities.invokeLater(() -> {
+					clientGUI.getGameView().recenterCameraOnPlayer();
+					clientGUI.getGameView().enableMouse();
+				});
+//			});
 		});
+		t.start();
 	}
 	public void sendMessage(Object message) {
 		connection.sendMessage(message);

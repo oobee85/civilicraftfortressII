@@ -463,5 +463,4 @@ public class ClientGUI {
 		}
 		tabbedPane.setEnabledAt(CRAFTING_TAB, enabled);
 	}
-
 }

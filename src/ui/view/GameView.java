@@ -30,6 +30,7 @@ public class GameView {
 
 	private Game game;
 
+	private boolean mouseCommandsEnabled = false;
 	private boolean rightMouseDown = false;
 	private boolean controlDown = false;
 	private boolean shiftDown = false;
@@ -163,13 +164,17 @@ public class GameView {
 					if (SwingUtilities.isRightMouseButton(e)) {
 						rightClick(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize), shiftDown);
 					} else if (SwingUtilities.isLeftMouseButton(e)) {
-						leftClick(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize), shiftDown);
+						if (mouseCommandsEnabled) {
+							leftClick(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize), shiftDown);
+						}
 					}
 				} else {
 					if (SwingUtilities.isLeftMouseButton(e)) {
-						state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.volatileTileSize);
-						state.boxSelect[1] = currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize);
-						selectInBox(state.boxSelect[0], state.boxSelect[1], shiftDown);
+						if (mouseCommandsEnabled && state.leftMouseDown) {
+							state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.volatileTileSize);
+							state.boxSelect[1] = currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize);
+							selectInBox(state.boxSelect[0], state.boxSelect[1], shiftDown);
+						}
 					}
 				}
 				state.draggingMouse = false;
@@ -188,9 +193,11 @@ public class GameView {
 			public void mousePressed(MouseEvent e) {
 				state.previousMouse = e.getPoint();
 				if (SwingUtilities.isLeftMouseButton(e)) {
-					state.leftMouseDown = true;
-					state.mousePressLocation = e.getPoint();
-					state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.volatileTileSize);
+					if (mouseCommandsEnabled) {
+						state.leftMouseDown = true;
+						state.mousePressLocation = e.getPoint();
+						state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.volatileTileSize);
+					}
 				} else if (SwingUtilities.isRightMouseButton(e)) {
 					rightMouseDown = true;
 				} else if (SwingUtilities.isMiddleMouseButton(e)) {
@@ -844,6 +851,10 @@ public class GameView {
 			GameView.this.centerViewOnTile(unit.getTile().getLocation());
 			return;
 		}
+	}
+
+	public void enableMouse() {
+		mouseCommandsEnabled = true;
 	}
 
 	public CommandInterface getCommandInterface() {

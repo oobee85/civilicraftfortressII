@@ -221,17 +221,12 @@ public class BasicAI extends AIInterface {
 	}
 	
 	private Tile getTargetTile(Tile source, int minRadius, int maxRadius, Predicate<Tile> requirement) {
-		List<TileLoc> candidates = new LinkedList<>();
 		for(int radius = minRadius; radius <= maxRadius; radius++) {
-			Utils.getRingOfTiles(source.getLocation(), world, radius, candidates);
+			List<Tile> candidates = Utils.getRingOfTiles(source, world, radius);
 			Collections.shuffle(candidates);
-			while(!candidates.isEmpty()) {
-				Tile potential = world.get(candidates.remove(0));
-				if(potential == null) {
-					continue;
-				}
-				if(requirement.test(potential)) {
-					return potential;
+			for (Tile t : candidates) {
+				if(requirement.test(t)) {
+					return t;
 				}
 			}
 		}

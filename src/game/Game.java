@@ -562,16 +562,15 @@ public class Game {
 		
 		Thing necropolis = summonBuilding(highestTile, Game.buildingTypeMap.get("NECROPOLIS"), world.getFaction(World.UNDEAD_FACTION_ID));
 		
-		List<TileLoc> neighbors = new LinkedList<TileLoc>();
-		Utils.getRingOfTiles(highestTile.getLocation(), world, 1, neighbors);
+		List<Tile> neighbors = Utils.getTilesInRadius(highestTile, world, 1);
 		Collections.shuffle(neighbors); 
 		
 		if (neighbors.isEmpty()) {
 			System.err.println("");
 		}
-		TileLoc forWindmill = neighbors.remove(0);
+		Tile forWindmill = neighbors.remove(0);
 		Thing windmill = summonBuilding(
-				world.get(forWindmill),
+				forWindmill,
 				Game.buildingTypeMap.get("WINDMILL"),
 				world.getFaction(World.UNDEAD_FACTION_ID));
 		windmill.replaceComponent(Inventory.class, world.getFaction(World.UNDEAD_FACTION_ID).getInventory());

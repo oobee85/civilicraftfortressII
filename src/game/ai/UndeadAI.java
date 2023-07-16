@@ -22,21 +22,15 @@ public class UndeadAI extends AIInterface {
 		outerloop: for (int layer = 1; layer <= 16; layer++) {
 			int radius = layer;
 			boolean wallOrRoad = (radius % 2) == 0;
-			List<TileLoc> tileRing = new LinkedList<TileLoc>();
-			Utils.getRingOfTiles(
-					castle.getTile().getLocation(),
+			List<Tile> tileRing = Utils.getRingOfTiles(
+					castle.getTile(),
 					world,
-					radius,
-					tileRing);
+					radius);
 			int buildEveryX = Math.max(layer / 4 + 2, 2);
 			int skipEveryOther = (radius % 7) % buildEveryX;
-			for (TileLoc tileLoc : tileRing) {
+			for (Tile tile : tileRing) {
 				skipEveryOther = (skipEveryOther + 1) % buildEveryX;
 				if (wallOrRoad && skipEveryOther == 0) {
-					continue;
-				}
-				Tile tile = world.get(tileLoc);
-				if (tile == null) {
 					continue;
 				}
 				// Don't try to build walls on tiles that already have a building

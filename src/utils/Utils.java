@@ -595,7 +595,7 @@ public final class Utils {
 	public static List<Tile> getTilesInRadius(Tile tile, World world, double radius) {
 		LinkedList<TileLoc> ring = new LinkedList<>();
 		for(int r = 0; r <= radius; r++) {
-			Utils.getRingOfTiles(tile.getLocation(), world, r, ring);
+			Utils.getRingOfTileLocs(tile.getLocation(), world, r, ring);
 		}
 		LinkedList<Tile> tiles = new LinkedList<>();
 		for(TileLoc loc : ring) {
@@ -606,7 +606,19 @@ public final class Utils {
 		}
 		return tiles;
 	}
-	public static void getRingOfTiles(TileLoc center, World world, int radius, List<TileLoc> ring) {
+	public static List<Tile> getRingOfTiles(Tile center, World world, int radius) {
+		LinkedList<TileLoc> ring = new LinkedList<>();
+		Utils.getRingOfTileLocs(center.getLocation(), world, radius, ring);
+		LinkedList<Tile> tiles = new LinkedList<>();
+		for(TileLoc loc : ring) {
+			Tile t = world.get(loc);
+			if(t != null) {
+				tiles.add(t);
+			}
+		}
+		return tiles;
+	}
+	private static void getRingOfTileLocs(TileLoc center, World world, int radius, List<TileLoc> ring) {
 		// top corner
 		ring.add(new TileLoc(center.x(), center.y() - radius));
 		if(radius == 0) {

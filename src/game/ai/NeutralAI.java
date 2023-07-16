@@ -37,11 +37,9 @@ public class NeutralAI extends AIInterface {
 				continue;
 			}
 			if (buildingQuantities[Game.buildingTypeMap.get("SCORPION_DEN").id()] < 10) {
-				List<TileLoc> nearby = new LinkedList<TileLoc>();
-				Utils.getRingOfTiles(unit.getTile().getLocation(), world, 10, nearby);
+				List<Tile> nearby = Utils.getRingOfTiles(unit.getTile(), world, 10);
 				Collections.shuffle(nearby);
 				Optional<Tile> validNearby = nearby.stream()
-						.map(tileloc -> world.get(tileloc))
 						.filter(tile -> {
 					return (tile.getTerrain() == Terrain.SAND) && (tile.getBuilding() == null);
 				}).findFirst();

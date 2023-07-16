@@ -95,7 +95,9 @@ public class VanillaDrawer extends Drawer {
 				g.setColor(Color.black);
 				g.drawRect(-1, 0, canvas.getWidth() + 1, canvas.getHeight());
 				
-				drawOverlayStuff(g);
+				if (game.world != null) {
+					drawOverlayStuff(g);
+				}
 				
 				if(nextRequested.availablePermits() < 1) {
 					nextRequested.release();
