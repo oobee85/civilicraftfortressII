@@ -1315,9 +1315,9 @@ public class World {
 
 		int numTiles = width*height;
 		Generation.makeLake(numTiles * 1, this, worldRNG);
+		Generation.makeLake(numTiles * 1, this, worldRNG);
 		Generation.makeLake(numTiles * 2, this, worldRNG);
-		Generation.makeLake(numTiles * 4, this, worldRNG);
-		Generation.makeLake(numTiles * 8, this, worldRNG);
+		Generation.makeLake(numTiles * 6, this, worldRNG);
 		System.out.println("Settling water for iterations: " + WATER_SETTLING_TICKS);
 		for(int i = 0; i < WATER_SETTLING_TICKS; i++) {
 			LiquidSimulation.propogate(this);
