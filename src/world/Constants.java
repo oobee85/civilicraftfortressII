@@ -6,7 +6,7 @@ public class Constants {
 	public static final double TERRAIN_SNOW_LEVEL = 1;
 	public static final double DESERT_HUMIDITY = 1;
 	public static final int DAY_DURATION = 1000;
-	public static final int NIGHT_DURATION = 800;
+	public static final int NIGHT_DURATION = 1000;
 	public static final int SEASON_DURATION = (DAY_DURATION+NIGHT_DURATION)*10;
 	public static final int TRANSITION_PERIOD = 100;
 	public static final double CHANCE_TO_SWITCH_TERRAIN = 0.1;
@@ -21,7 +21,7 @@ public class Constants {
 	public static final int LETHALHOTTEMP = 311; // [K]
 	public static final int LETHALCOLDTEMP = 263; // [K]
 	public static final float FREEZING_TEMPURATURE = 0.33f;
-	public static final int BALANCEWATER = 12;
+	public static final int BALANCEWATER = 10;
 	
 	public static final int MAXHEIGHT = 1000; // [m]
 	public static final int SEALEVEL = 300; // [m]

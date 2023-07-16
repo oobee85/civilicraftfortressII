@@ -128,12 +128,14 @@ public class LiquidSimulation {
 		
 		float tempurature = (float) tile.getTemperature();
 		double temperatureOffset = 0;
-		if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.ICE) {
-			temperatureOffset = tile.liquidAmount / 10;
+		if(tile.liquidType == LiquidType.WATER || tile.liquidType == LiquidType.ICE || tile.liquidType == LiquidType.SNOW) {
+			temperatureOffset = 2 + Math.log(tile.liquidAmount / 1);
 		}
-		if (World.ticks <= 50 || World.ticks - tile.getTickLastTerrainChange() >= Constants.MIN_TIME_TO_SWITCH_TERRAIN) {
-
-			if (tempurature + temperatureOffset > Constants.FREEZETEMP) {
+		
+		if (World.ticks >= 100 && World.ticks - tile.getTickLastTerrainChange() >= Constants.MIN_TIME_TO_SWITCH_TERRAIN) {
+			
+			// melting behavior
+			if (tempurature - temperatureOffset > Constants.FREEZETEMP) {
 				if (tile.liquidType == LiquidType.ICE) {
 					tile.liquidType = LiquidType.WATER;
 					liquidTypesTemp[x][y] = LiquidType.WATER;
@@ -145,7 +147,9 @@ public class LiquidSimulation {
 					liquidTypesTemp[x][y] = LiquidType.WATER;
 					tile.setTickLastTerrainChange(World.ticks);
 				}
-			} else if (tempurature + temperatureOffset < Constants.FREEZETEMP-1) {
+				
+			// freezing behavior
+			} else if (tempurature + temperatureOffset < Constants.FREEZETEMP) {
 				if (tile.liquidType == LiquidType.WATER) {
 					tile.liquidType = LiquidType.ICE;
 					liquidTypesTemp[x][y] = LiquidType.ICE;

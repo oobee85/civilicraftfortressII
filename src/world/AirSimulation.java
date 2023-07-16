@@ -87,7 +87,8 @@ public class AirSimulation {
 			double addedEnergy = 0;
 			
 			
-			if(tile.getTemperature() >= (Constants.BALANCETEMP +5)) {
+			// reduce energy if more than balancetemp
+			if(tile.getTemperature() >= (Constants.BALANCETEMP + 10)) {
 				double modifier = (tile.getTemperature()/Constants.BALANCETEMP);
 				double heightRatio = tile.getHeight() / Constants.MAXHEIGHT;
 				addedEnergy -= (Math.sqrt(Math.abs(heightRatio * modifier)));
@@ -96,7 +97,9 @@ public class AirSimulation {
 			if(tile.getTemperature() > (Constants.BALANCETEMP + 20) || tile.getAir().getTemperature() > (Constants.BALANCETEMP + 20)) {
 				addedEnergy -= 5;
 			}
-			if(tile.getTemperature() <= (Constants.BALANCETEMP -5)) {
+			
+			// add energy if less than balancetemp
+			if(tile.getTemperature() <= (Constants.BALANCETEMP - 10)) {
 				double modifier = (tile.getTemperature()/Constants.BALANCETEMP);
 				double heightRatio = tile.getHeight() / Constants.MAXHEIGHT;
 				addedEnergy += (Math.sqrt(Math.abs(heightRatio * modifier)));
@@ -106,7 +109,9 @@ public class AirSimulation {
 				addedEnergy += 5;
 			}
 			
-			if(tile.getHeight() >= Constants.MAXHEIGHT /1.25) {
+			
+			// height above 700 gets reduced energy
+			if(tile.getHeight() >= Constants.MAXHEIGHT /1.43) {
 //				double modifier = (tile.getTemperature()/World.BALANCETEMP);
 				double heightRatio = tile.getHeight() / Constants.MAXHEIGHT;
 				addedEnergy -= heightRatio;
@@ -124,7 +129,7 @@ public class AirSimulation {
 			
 			
 			
-			double heightMod = 1 - tile.getHeight() / Constants.MAXHEIGHT;
+			double heightMod = tile.getHeight() / Constants.MAXHEIGHT;
 //			seasonEnergy *= heightMod;
 			
 			
@@ -153,9 +158,9 @@ public class AirSimulation {
 				double totalAmount = tile.liquidAmount + tile.getAir().getVolumeLiquid();
 				
 				
-				double amount = 0.05 * vol / maxVol;
+				double amount = 0.01 * vol / maxVol;
 				// if too much liquid on the ground, cant rain
-				if(tile.liquidAmount >= 7.5) {
+				if(tile.liquidAmount >= 5) {
 					amount = 0;
 				}
 				tile.getAir().addVolumeLiquid(-amount);
@@ -166,7 +171,8 @@ public class AirSimulation {
 				}
 //				seasonEnergy += 0.01;
 			}
-			if(tile.getHeight() > 900 && averageWater < Constants.BALANCEWATER) {
+			
+			if(tile.getHeight() > 950 && averageWater < Constants.BALANCEWATER) {
 				double addedMod = Constants.BALANCEWATER / averageWater - 1;
 //				tile.liquidAmount += addedMod;
 				tile.getAir().addHumidity(addedMod);
