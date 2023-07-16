@@ -48,6 +48,10 @@ public class AirSimulation {
 		double averageWater = 0;
 		double averageTemp = 0;
 		for(Tile t : tiles) {
+			if(t == null) {
+				System.out.println("null tile when updating energy");
+				continue;
+			}
 			averageTemp += t.getTemperature();
 			if(t.liquidType == LiquidType.WATER || t.liquidType == LiquidType.ICE || t.liquidType == LiquidType.SNOW) {
 				averageWater += t.liquidAmount;
@@ -58,18 +62,9 @@ public class AirSimulation {
 		averageTemp /= tiles.size();
 		averageWater /= tiles.size();;
 		for(Tile tile : tiles) {
-			if(tile == null) {
-				System.out.println("null tile when updating energy");
-				continue;
-			}
+			
 //			blackBodyRadiation();
 //			updateEnergyToTemperature(tile);
-			//adds energy for lava
-			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
-//				double modifier = 1 - (tile.getTemperature()/MAXTEMP);
-				double addedEnergy = tile.liquidAmount / tile.getEnergy() * 10000;
-				tile.addEnergy(addedEnergy);
-			}
 			
 			
 			//adds energy for water
@@ -78,11 +73,7 @@ public class AirSimulation {
 //				tile.addEnergy(Math.log(Math.sqrt(Math.sqrt(tile.liquidAmount * modifier))));
 //			}
 			
-			//removes energy for ice
-//			if(tile.liquidType == LiquidType.ICE && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
-//				double modifier = 1 - (tile.getTemperature()/100);
-//				tile.addEnergy(-Math.log(Math.sqrt(Math.sqrt(tile.liquidAmount * modifier))));
-//			}
+			
 			float seasonEnergy = Seasons.getRateEnergy();
 			double addedEnergy = 0;
 			
@@ -126,12 +117,25 @@ public class AirSimulation {
 				addedEnergy += (mod);
 			}
 			
+			//adds energy for lava
+			if(tile.liquidType == LiquidType.LAVA && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
+//				double modifier = 1 - (tile.getTemperature()/MAXTEMP);
+				double modifier = tile.liquidAmount / tile.getEnergy() * 10000;
+				addedEnergy += modifier;
+			}
 			
-			
-			
-			double heightMod = tile.getHeight() / Constants.MAXHEIGHT;
+			// reduces energy gain linearly after 2h/maxHeight - 1
+			// i.e. at 500:0, at 1000:1
+			double heightMod = 2 * tile.getHeight() / Constants.MAXHEIGHT - 1;
+			addedEnergy = addedEnergy - heightMod;
 //			seasonEnergy *= heightMod;
 			
+			//removes energy for ice and snow reflecting sun
+			if(tile.liquidType == LiquidType.ICE || tile.liquidType == LiquidType.ICE) {
+				double modifier = tile.liquidAmount / 10;
+				addedEnergy = addedEnergy - modifier;
+//				tile.addEnergy(-Math.log(Math.sqrt(Math.sqrt(tile.liquidAmount * modifier))));
+			}
 			
 			//evaporative cooling
 			double evaporation = tile.getEvaporation();
@@ -172,7 +176,7 @@ public class AirSimulation {
 //				seasonEnergy += 0.01;
 			}
 			
-			if(tile.getHeight() > 950 && averageWater < Constants.BALANCEWATER) {
+			if(tile.getHeight() > 900 && averageWater < Constants.BALANCEWATER) {
 				double addedMod = Constants.BALANCEWATER / averageWater - 1;
 //				tile.liquidAmount += addedMod;
 				tile.getAir().addHumidity(addedMod);
