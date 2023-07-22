@@ -189,6 +189,7 @@ public class VanillaDrawer extends Drawer {
 				avgBufferDrawTime /= 3;
 				DrawingUtils.drawStringWithShadow(g, String.format("DRAW(ms): %d", avgBufferDrawTime), x, y);
 				DrawingUtils.drawStringWithShadow(g, String.format("TICK(ms): %d", state.previousTickTime), x, y - yOffset);
+				DrawingUtils.drawStringWithShadow(g, String.format("AVGTICK(ms): %d", state.averageTickTime), x, y - yOffset*2);
 			}
 			if (Settings.SHOW_FACTION_INFLUENCE) {
 				String fstr = "";

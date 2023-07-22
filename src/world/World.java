@@ -724,15 +724,7 @@ public class World {
 	}
 	
 	public void doAirSimulationStuff() {
-		LinkedList<Tile> tiles = getTilesRandomly();
-		AirSimulation.updateAirStuff(tiles);
-		AirSimulation.updateEnergyToTemperature(tiles);
-		AirSimulation.updateEnergy(tiles);
-		AirSimulation.updateEnergyToTemperature(tiles);
-		AirSimulation.blackBodyRadiation(tiles);
-		AirSimulation.updateEnergyToTemperature(tiles);
-		AirSimulation.updateAirMovement(tiles, width, height);
-		AirSimulation.updateEnergyToTemperature(tiles);
+		AirSimulation.doAirSimulationStuff(this, getTilesRandomly(), width, height);
 	}
 	
 	/**

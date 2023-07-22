@@ -53,6 +53,7 @@ public class GameView {
 
 	public class GameViewState {
 		public long previousTickTime;
+		public long averageTickTime;
 		public volatile Position viewOffset = new Position(0, 0);
 		public volatile int volatileTileSize = Settings.DEFAULT_TILE_SIZE;
 		public boolean fpMode;
@@ -896,5 +897,6 @@ public class GameView {
 	
 	public void setPreviousTickTime(long time) {
 		state.previousTickTime = time;
+		state.averageTickTime = (state.averageTickTime * 19 + time) / 20;
 	}
 }

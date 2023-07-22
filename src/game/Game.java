@@ -111,17 +111,20 @@ public class Game {
 		}
 
 		if (World.ticks % 2 == 0) {
-			LiquidSimulation.propogate(world);
+//			LiquidSimulation.propogate(world);
 		}
+		else if (World.ticks % 2 == 1) {
+//			world.doAirSimulationStuff();
+//			world.updateTerrainChange(false);
+		}
+		world.doAirSimulationStuff();
+		world.updateTerrainChange(false);
 
 		meteorAndVolcanoEvents();
 		
 		// WeatherEvents have been deprecated
 		// world.doWeatherUpdate();
 
-		world.doAirSimulationStuff();
-		world.updateTerrainChange(false);
-		
 		world.clearDeadAndAddNewThings();
 		
 		buildingTick();

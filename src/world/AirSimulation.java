@@ -1,6 +1,7 @@
 package world;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import game.*;
 import utils.*;
@@ -8,30 +9,96 @@ import world.liquid.*;
 
 public class AirSimulation {
 	
-	public static void updateAirStuff(LinkedList<Tile> tiles) {
-		for(Tile tile : tiles) {
-//			Air air = tile.getAir();
-//			air.updateHeight(tile.getHeight());
-//			air.updateMaxVolume();
-//			air.updateHumidity();
-//			air.updatePressure();
-
-			tile.updateAir();
-//			tile.updateAtmosphere();
+	public static void doAirSimulationStuff(World world, LinkedList<Tile> tilesRandomOrder, int width, int height) {
+		
+		if (Settings.AIR_MULTITHREADED) {
+			for(ArrayList<Tile> tiles : world.getLiquidSimulationPhases()) {
+				int chunkSize = Math.max(1, tiles.size()/world.getWidth());
+				ArrayList<Future<?>> futures = new ArrayList<>();
+				for(int chunkIndex = 0; chunkIndex < tiles.size(); chunkIndex+=chunkSize) {
+					final int start = chunkIndex;
+					final int end = Math.min(chunkIndex + chunkSize, tiles.size());
+					Future<?> future = Utils.executorService.submit(() -> {
+						for(int i = start; i < end; i++) {
+							tiles.get(i).updateAir();
+							tiles.get(i).updateEnergyToTemperature();
+						}
+					});
+					futures.add(future);
+				}
+				try {
+					for(Future<?> future : futures) {
+						future.get();
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
+			}
+	
+			double[] averages = AirSimulation.computeAverages(tilesRandomOrder);
+	
+			for(ArrayList<Tile> tiles : world.getLiquidSimulationPhases()) {
+				int chunkSize = Math.max(1, tiles.size()/world.getWidth());
+				ArrayList<Future<?>> futures = new ArrayList<>();
+				for(int chunkIndex = 0; chunkIndex < tiles.size(); chunkIndex+=chunkSize) {
+					final int start = chunkIndex;
+					final int end = Math.min(chunkIndex + chunkSize, tiles.size());
+					Future<?> future = Utils.executorService.submit(() -> {
+						for(int i = start; i < end; i++) {
+							AirSimulation.updateEnergy(tiles.get(i), averages[0], averages[1]);
+							tiles.get(i).updateEnergyToTemperature();
+							AirSimulation.blackBodyRadiation(tiles.get(i));
+							tiles.get(i).updateEnergyToTemperature();
+						}
+					});
+					futures.add(future);
+				}
+				try {
+					for(Future<?> future : futures) {
+						future.get();
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
+			}
+	
+			AirSimulation.updateAirMovement(tilesRandomOrder, width, height);
+			for(Tile tile : tilesRandomOrder) {
+				tile.updateEnergyToTemperature();
+			}
+		}
+		else {
+			for(Tile tile : tilesRandomOrder) {
+				tile.updateAir();
+				tile.updateEnergyToTemperature();
+			}
+			double[] averages = AirSimulation.computeAverages(tilesRandomOrder);
+			for(Tile tile : tilesRandomOrder) {
+				AirSimulation.updateEnergy(tile, averages[0], averages[1]);
+				tile.updateEnergyToTemperature();
+				AirSimulation.blackBodyRadiation(tile);
+				tile.updateEnergyToTemperature();
+			}
+			AirSimulation.updateAirMovement(tilesRandomOrder, width, height);
+			for(Tile tile : tilesRandomOrder) {
+				tile.updateEnergyToTemperature();
+			}
 		}
 	}
 	
-	public static void blackBodyRadiation(LinkedList<Tile> tiles) {
-		for(Tile tile : tiles) {
-			Air air = tile.getAir();
-			// Q = o(T1 - T2) * A
-			// o = 5.670374419 � 10^-8 W*m-2*K-4
-			double end = 0;
-			double deltaT = (tile.getTemperature() - Constants.KELVINOFFSET) - (air.getTemperature() - Constants.KELVINOFFSET);
-			end = Constants.BOLTZMANNMODIFIED * Constants.VOLUMEPERTILE * deltaT * 750;
-			air.addEnergy(end);
-			tile.addEnergy(-1*end);
-		}
+	public static void blackBodyRadiation(Tile tile) {
+		Air air = tile.getAir();
+		// Q = o(T1 - T2) * A
+		// o = 5.670374419 � 10^-8 W*m-2*K-4
+		double end = 0;
+		double deltaT = (tile.getTemperature() - Constants.KELVINOFFSET) - (air.getTemperature() - Constants.KELVINOFFSET);
+		end = Constants.BOLTZMANNMODIFIED * Constants.VOLUMEPERTILE * deltaT * 750;
+		air.addEnergy(end);
+		tile.addEnergy(-1*end);
 	}
 
 	public static void updateEnergyToTemperature(LinkedList<Tile> tiles) {
@@ -40,11 +107,7 @@ public class AirSimulation {
 		}
 	}
 	
-	public static void updateEnergy(LinkedList<Tile> tiles) {
-//		if(World.ticks % TICKSTOUPDATEAIR == 0) {
-//			return;
-//		}
-	
+	public static double[] computeAverages(LinkedList<Tile> tiles) {
 		double averageWater = 0;
 		double averageTemp = 0;
 		for(Tile t : tiles) {
@@ -60,8 +123,11 @@ public class AirSimulation {
 			
 		}
 		averageTemp /= tiles.size();
-		averageWater /= tiles.size();;
-		for(Tile tile : tiles) {
+		averageWater /= tiles.size();
+		return new double[] {averageTemp, averageWater};
+	}
+	
+	public static void updateEnergy(Tile tile, double averageTemp, double averageWater) {
 			
 //			blackBodyRadiation();
 //			updateEnergyToTemperature(tile);
@@ -238,7 +304,6 @@ public class AirSimulation {
 			}
 //			tile.setEnergy(energy);
 //			tile.addEnergy(joules);
-		}
 		
 	}
 	

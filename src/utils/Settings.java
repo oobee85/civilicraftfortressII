@@ -24,6 +24,7 @@ public class Settings {
 	public static boolean DISABLE_ENEMY_SPAWNS = true;
 	public static boolean DISABLE_WILDLIFE_SPAWNS = false;
 	public static boolean LIQUID_MULTITHREADED = true;
+	public static boolean AIR_MULTITHREADED = false;
 	public static boolean DEFAULT_TO_OPENGL = false;
 	public static boolean DEFAULT_TO_FPMODE = true;
 
