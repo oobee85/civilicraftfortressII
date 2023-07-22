@@ -42,6 +42,7 @@ public abstract class Drawer {
 	public abstract Point getPixelOfWorldCoord(Position worldCoord, int tileSize);
 	public abstract void zoomView(int scroll, int mx, int my);
 	public abstract void zoomViewTo(int newTileSize, int mx, int my);
+	public abstract void setZoomLevel(int tileSize);
 	/**
 	 * @param dx pixels moved left-right
 	 * @param dy pixels moved up-down

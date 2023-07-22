@@ -574,6 +574,10 @@ public class GLDrawer extends Drawer implements GLEventListener {
 	}
 	
 	@Override
+	public void setZoomLevel(int tileSize) {
+	}
+
+	@Override
 	public void shiftView(int dx, int dy) {
 		if(state.fpMode) {
 			float adjust = 0.4f * TerrainObject.FULL_TILE;

@@ -13,13 +13,13 @@ public enum LiquidType {
 		DRY(new String[] {"Images/liquid/lavaanim32.gif"}, "Images/liquid/lavaanim32.gif",
 				0f, 1000f, 1000f, 5f, 0.08f, 0f, false, DamageType.DRY),
 		WATER(new String[] {"Images/liquid/watermoving.gif"}, "Images/liquid/watermoving.gif",
-				0.1f, 0.1f, 0.8f, 0.1f, 2f, 0f, true, DamageType.WATER, new Color[] {new Color(50, 70, 250)}),
+				0.1f, 0.1f, 0.8f, 0.05f, 4f, 0f, true, DamageType.WATER, new Color[] {new Color(50, 70, 250)}),
 		LAVA(new String[] {"Images/liquid/lava16.png", "Images/liquid/lavaanim32.gif"}, "Images/liquid/lava16.png",
 				0.1f, 0.0005f, 0.005f, 1f, 1f, 0.1f, false, DamageType.HEAT),
 		ICE(new String[] {"Images/liquid/ice.png"}, "Images/liquid/ice.png",
-				0f, 10000f, 10000f, 0.1f, 2f, 0f, true, DamageType.COLD),
+				0f, 10000f, 10000f, 0.05f, 6f, 0f, true, DamageType.COLD),
 		SNOW(new String[] {"Images/liquid/snow128.png"}, "Images/liquid/snow128.png",
-				0f, 1f, 1f, 0.1f, 2f, 0f, true, DamageType.COLD),
+				0f, 1f, 1f, 0.05f, 6f, 0f, true, DamageType.COLD),
 //				0.1f, 0.9f, 1f, 1f, 1f, 0.1f, true, DamageType.COLD),
 		
 		;

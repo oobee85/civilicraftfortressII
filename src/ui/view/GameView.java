@@ -840,6 +840,13 @@ public class GameView {
 		centerViewOnPixel(new Position(pixel.x, pixel.y));
 	}
 
+	public void centerViewOnTile(TileLoc tileloc, int tileSize) {
+		Position worldPos = new Position(tileloc.x()+0.5, tileloc.y()+0.5);
+		Point pixel = currentActiveDrawer.getPixelOfWorldCoord(worldPos, state.volatileTileSize);
+		centerViewOnPixel(new Position(pixel.x, pixel.y));
+		currentActiveDrawer.setZoomLevel(tileSize);
+	}
+
 	/** moves camera to first building or first unit owned by the current active player.
 	*/
 	public void recenterCameraOnPlayer() {

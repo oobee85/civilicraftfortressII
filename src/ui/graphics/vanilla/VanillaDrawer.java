@@ -330,6 +330,11 @@ public class VanillaDrawer extends Drawer {
 	}
 
 	@Override
+	public void setZoomLevel(int tileSize) {
+		zoomViewTo(tileSize, canvas.getWidth()/2, canvas.getHeight()/2);
+	}
+
+	@Override
 	public void shiftView(int dx, int dy) {
 		state.viewOffset.x += dx;
 		state.viewOffset.y += dy;

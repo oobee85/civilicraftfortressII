@@ -203,6 +203,7 @@ public class Client {
 				for(int i = 0; i < Settings.NUM_AI; i++) {
 					players.add(new PlayerInfo("Bot " + i, null));
 				}
+				clientGUI.getGameView().centerViewOnTile(new TileLoc(Settings.WORLD_WIDTH/10, Settings.WORLD_HEIGHT/10), 10);
 				gameInstance.generateWorld(Settings.WORLD_WIDTH, Settings.WORLD_HEIGHT, false, players);
 				clientGUI.getGameView().getDrawer().updateTerrainImages();
 			}
@@ -236,6 +237,7 @@ public class Client {
 				clientGUI.repaint();
 				startLocalGameLoopThread(false);
 				SwingUtilities.invokeLater(() -> {
+					clientGUI.getGameView().centerViewOnTile(new TileLoc(Settings.WORLD_WIDTH/3, Settings.WORLD_HEIGHT/3), Settings.DEFAULT_TILE_SIZE);
 					clientGUI.getGameView().recenterCameraOnPlayer();
 					clientGUI.getGameView().enableMouse();
 				});
