@@ -8,6 +8,7 @@ import java.util.concurrent.*;
 import game.*;
 import game.components.*;
 import utils.*;
+import world.air.Air;
 import world.liquid.*;
 
 public class Tile implements Externalizable {

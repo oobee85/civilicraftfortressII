@@ -110,15 +110,21 @@ public class Game {
 			world.growMoss();
 		}
 
-		if (World.ticks % 2 == 0) {
-//			LiquidSimulation.propogate(world);
+		boolean everyOther = false;
+		if (everyOther) {
+			if (World.ticks % 2 == 0) {
+				LiquidSimulation.propogate(world);
+			}
+			else if (World.ticks % 2 == 1) {
+				world.doAirSimulationStuff();
+				world.updateTerrainChange(false);
+			}
 		}
-		else if (World.ticks % 2 == 1) {
-//			world.doAirSimulationStuff();
-//			world.updateTerrainChange(false);
+		else {
+			LiquidSimulation.propogate(world);
+			world.doAirSimulationStuff();
+			world.updateTerrainChange(false);
 		}
-		world.doAirSimulationStuff();
-		world.updateTerrainChange(false);
 
 		meteorAndVolcanoEvents();
 		
