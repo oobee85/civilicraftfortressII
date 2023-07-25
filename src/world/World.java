@@ -19,6 +19,7 @@ import ui.utils.DrawingUtils;
 import ui.view.TerrainGenView;
 import utils.*;
 import wildlife.*;
+import world.air.*;
 import world.liquid.*;
 
 public class World {
@@ -26,6 +27,7 @@ public class World {
 	public Random worldRNG = new Random(Generation.DEFAULT_SEED);
 	
 	private LinkedList<Tile> tileList;
+	private ArrayList<Tile> tileArray;
 	private LinkedList<Tile> tileListRandom;
 	
 	private static final int NUM_LIQUID_SIMULATION_PHASES = 9;
@@ -57,6 +59,7 @@ public class World {
 		this.width = width;
 		this.height = height;
 		tileList = new LinkedList<>();
+		tileArray = new ArrayList<>();
 		tileListRandom = new LinkedList<>();
 		tiles = new Tile[width][height];
 		liquidSimulationPhases.clear();
@@ -67,6 +70,7 @@ public class World {
 			for (int j = 0; j < height; j++) {
 				tiles[i][j] = new Tile(new TileLoc(i, j), Terrain.DIRT);
 				tileList.add(tiles[i][j]);
+				tileArray.add(tiles[i][j]);
 				tileListRandom.add(tiles[i][j]);
 				
 				// This one only has 5 phases
@@ -187,6 +191,9 @@ public class World {
 	}
 	public ArrayList<ArrayList<Tile>> getLiquidSimulationPhases() {
 		return liquidSimulationPhases;
+	}
+	public ArrayList<Tile> getTileArray() {
+		return tileArray;
 	}
 	
 	public Tile get(TileLoc loc) {

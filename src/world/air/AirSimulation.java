@@ -1,93 +1,126 @@
-package world;
+package world.air;
 
 import java.util.*;
 import java.util.concurrent.*;
 
 import game.*;
 import utils.*;
+import world.*;
 import world.liquid.*;
 
 public class AirSimulation {
 	
-	public static void doAirSimulationStuff(World world, LinkedList<Tile> tilesRandomOrder, int width, int height) {
-		
-		if (Settings.AIR_MULTITHREADED) {
-			for(ArrayList<Tile> tiles : world.getLiquidSimulationPhases()) {
-				int chunkSize = Math.max(1, tiles.size()/world.getWidth());
-				ArrayList<Future<?>> futures = new ArrayList<>();
-				for(int chunkIndex = 0; chunkIndex < tiles.size(); chunkIndex+=chunkSize) {
-					final int start = chunkIndex;
-					final int end = Math.min(chunkIndex + chunkSize, tiles.size());
-					Future<?> future = Utils.executorService.submit(() -> {
-						for(int i = start; i < end; i++) {
-							tiles.get(i).updateAir();
-							tiles.get(i).updateEnergyToTemperature();
-						}
-					});
-					futures.add(future);
-				}
-				try {
-					for(Future<?> future : futures) {
-						future.get();
-					}
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					e.printStackTrace();
-				}
-			}
+	private interface SimulationTask {
+		void task(Tile t);
+	}
 	
-			double[] averages = AirSimulation.computeAverages(tilesRandomOrder);
-	
-			for(ArrayList<Tile> tiles : world.getLiquidSimulationPhases()) {
-				int chunkSize = Math.max(1, tiles.size()/world.getWidth());
-				ArrayList<Future<?>> futures = new ArrayList<>();
-				for(int chunkIndex = 0; chunkIndex < tiles.size(); chunkIndex+=chunkSize) {
-					final int start = chunkIndex;
-					final int end = Math.min(chunkIndex + chunkSize, tiles.size());
-					Future<?> future = Utils.executorService.submit(() -> {
-						for(int i = start; i < end; i++) {
-							AirSimulation.updateEnergy(tiles.get(i), averages[0], averages[1]);
-							tiles.get(i).updateEnergyToTemperature();
-							AirSimulation.blackBodyRadiation(tiles.get(i));
-							tiles.get(i).updateEnergyToTemperature();
-						}
-					});
-					futures.add(future);
-				}
-				try {
-					for(Future<?> future : futures) {
-						future.get();
-					}
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					e.printStackTrace();
-				}
-			}
-	
-			AirSimulation.updateAirMovement(tilesRandomOrder, width, height);
+	private static void simulationWork(World world, LinkedList<Tile> tilesRandomOrder, SimulationTask task) {
+		if (!Settings.AIR_MULTITHREADED) {
 			for(Tile tile : tilesRandomOrder) {
-				tile.updateEnergyToTemperature();
+				task.task(tile);
+			}
+			return;
+		}
+
+		for(ArrayList<Tile> tiles : world.getLiquidSimulationPhases()) {
+			int chunkSize = Math.max(1, tiles.size()/world.getWidth());
+			ArrayList<Future<?>> futures = new ArrayList<>();
+			for(int chunkIndex = 0; chunkIndex < tiles.size(); chunkIndex+=chunkSize) {
+				final int start = chunkIndex;
+				final int end = Math.min(chunkIndex + chunkSize, tiles.size());
+				Future<?> future = Utils.executorService.submit(() -> {
+					for(int i = start; i < end; i++) {
+						task.task(tiles.get(i));
+					}
+				});
+				futures.add(future);
+			}
+			try {
+				for(Future<?> future : futures) {
+					future.get();
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private static void averagingHelper(Tile tile, AverageValues avg) {
+		avg.temp += tile.getTemperature();
+		if(tile.liquidType == LiquidType.WATER 
+				|| tile.liquidType == LiquidType.ICE 
+				|| tile.liquidType == LiquidType.SNOW) {
+			avg.water += tile.liquidAmount;
+		}
+		avg.water += tile.getAir().getVolumeLiquid();
+	}
+
+	private static AverageValues computeAverageValues(World world) {
+		AverageValues avg = new AverageValues();
+		if (!Settings.AIR_MULTITHREADED) {
+			for(Tile tile : world.getTiles()) {
+				averagingHelper(tile, avg);
 			}
 		}
 		else {
-			for(Tile tile : tilesRandomOrder) {
-				tile.updateAir();
-				tile.updateEnergyToTemperature();
+			int NUM_THREADS = 4;
+			ArrayList<Tile> tiles = world.getTileArray();
+			int chunkSize = tiles.size()/NUM_THREADS;
+			ArrayList<Future<?>> futures = new ArrayList<>();
+			AverageValues[] avgs = new AverageValues[NUM_THREADS];
+			for (int chunk = 0; chunk < NUM_THREADS; chunk++) {
+				final int index = chunk;
+				avgs[index] = new AverageValues();
+				final int start = chunk * chunkSize;
+				final int end = Math.min((chunk + 1) * chunkSize, tiles.size());
+				Future<?> future = Utils.executorService.submit(() -> {
+					for(int i = start; i < end; i++) {
+						averagingHelper(tiles.get(i), avgs[index]);
+					}
+				});
+				futures.add(future);
 			}
-			double[] averages = AirSimulation.computeAverages(tilesRandomOrder);
-			for(Tile tile : tilesRandomOrder) {
-				AirSimulation.updateEnergy(tile, averages[0], averages[1]);
-				tile.updateEnergyToTemperature();
-				AirSimulation.blackBodyRadiation(tile);
-				tile.updateEnergyToTemperature();
+			try {
+				for(Future<?> future : futures) {
+					future.get();
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
 			}
-			AirSimulation.updateAirMovement(tilesRandomOrder, width, height);
-			for(Tile tile : tilesRandomOrder) {
-				tile.updateEnergyToTemperature();
+			for (int i = 0; i < avgs.length; i++) {
+				avg.temp += avgs[i].temp;
+				avg.water += avgs[i].water;
 			}
 		}
+		avg.temp /= world.getTiles().size();
+		avg.water /= world.getTiles().size();
+		return avg;
+	}
+	
+	public static void doAirSimulationStuff(World world, LinkedList<Tile> tilesRandomOrder, int width, int height) {
+		
+		simulationWork(world, tilesRandomOrder, (tile) -> {
+			tile.updateAir();
+			tile.updateEnergyToTemperature();
+		});
+		
+		AverageValues avg = computeAverageValues(world);
+
+		simulationWork(world, tilesRandomOrder, (tile) -> {
+			AirSimulation.updateEnergy(tile, avg.temp, avg.water);
+			tile.updateEnergyToTemperature();
+			AirSimulation.blackBodyRadiation(tile);
+			tile.updateEnergyToTemperature();
+		});
+
+		AirSimulation.updateAirMovement(tilesRandomOrder, width, height);
+		simulationWork(world, tilesRandomOrder, (tile) -> {
+			tile.updateEnergyToTemperature();
+		});
 	}
 	
 	public static void blackBodyRadiation(Tile tile) {
@@ -105,26 +138,6 @@ public class AirSimulation {
 		for(Tile tile : tiles) {
 			tile.updateEnergyToTemperature();
 		}
-	}
-	
-	public static double[] computeAverages(LinkedList<Tile> tiles) {
-		double averageWater = 0;
-		double averageTemp = 0;
-		for(Tile t : tiles) {
-			if(t == null) {
-				System.out.println("null tile when updating energy");
-				continue;
-			}
-			averageTemp += t.getTemperature();
-			if(t.liquidType == LiquidType.WATER || t.liquidType == LiquidType.ICE || t.liquidType == LiquidType.SNOW) {
-				averageWater += t.liquidAmount;
-			}
-			averageWater += t.getAir().getVolumeLiquid();
-			
-		}
-		averageTemp /= tiles.size();
-		averageWater /= tiles.size();
-		return new double[] {averageTemp, averageWater};
 	}
 	
 	public static void updateEnergy(Tile tile, double averageTemp, double averageWater) {
