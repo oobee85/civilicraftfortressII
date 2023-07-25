@@ -139,7 +139,7 @@ public class Generation {
 			for (int x = 0; x < width; x++) {
 				double h = basic[y][x] * continentalMap[y][x];
 				h = h - canyonPrevalence[y][x];
-				h = (h*h) * (erosionMap[y][x]) + (h) * (1 - erosionMap[y][x]);
+				h = (h*h) *0 * (erosionMap[y][x]) + (h) * (1 - erosionMap[y][x]);
 //				if (erosionMap[y][x] > 0.5) {
 //					h = h*h;
 //				}

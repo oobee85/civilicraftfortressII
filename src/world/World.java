@@ -794,12 +794,30 @@ public class World {
 //				}
 //			}
 			
-			if(terrain == Terrain.GRASS && tile.canGrow() == false && Math.random() < Constants.CHANCE_TO_SWITCH_TERRAIN/10000) {
+			if(terrain == Terrain.GRASS && tile.canGrow() == false && Math.random() < Constants.CHANCE_TO_SWITCH_TERRAIN/1000) {
 				tile.setTerrain(Terrain.DIRT);
 				tile.setTickLastTerrainChange(World.ticks);
 			}
 			
-//			
+			
+			// RICHSOIL
+			if(tile.canPlant() && tile.liquidType == LiquidType.WATER && tile.liquidAmount >= 20) {
+				double threshold = 0;
+				threshold = Constants.CHANCE_TO_SWITCH_TERRAIN/500;
+				if(Math.random() < threshold) {
+					tile.setTerrain(Terrain.RICHSOIL);
+					tile.setTickLastTerrainChange(World.ticks);
+				}
+			}
+			
+			if(tile.checkTerrain(Terrain.RICHSOIL)) {
+				double threshold = 0;
+				threshold = Constants.CHANCE_TO_SWITCH_TERRAIN/1000;
+				if(Math.random() < threshold) {
+					tile.setTerrain(Terrain.GRASS);
+				}
+			}
+			
 //			if(tile.liquidType == LiquidType.LAVA &&(tile.getTerrain() == Terrain.GRASS || tile.getTerrain() == Terrain.DIRT) && tile.liquidAmount >= 0.05) {
 //				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {
 ////					tile.setTerrain(Terrain.SAND);
@@ -815,8 +833,8 @@ public class World {
 //				}
 				double threshold = 0;
 				
-				if(tile.liquidType == LiquidType.WATER) {
-					threshold = Constants.CHANCE_TO_SWITCH_TERRAIN/1000;
+				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount >= 5) {
+					threshold = Constants.CHANCE_TO_SWITCH_TERRAIN/100;
 				}
 //				if(adjacentGrass) {
 //					threshold += 0.0001;

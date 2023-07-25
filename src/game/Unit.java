@@ -390,8 +390,12 @@ public class Unit extends Thing implements Serializable {
 		}
 		
 		if (building.getType() == BasicAI.FARM) {
-			building.takeDamage(5, DamageType.PHYSICAL);
-			getInventory().addItem(ItemType.FOOD, 5);
+			int modifier = 1;
+			if(building.getTile().getTerrain() == Terrain.RICHSOIL) {
+				modifier = 4;
+			}
+			building.takeDamage(5 * modifier, DamageType.PHYSICAL);
+			getInventory().addItem(ItemType.FOOD, 5 * modifier);
 			this.resetTimeToHarvest(4);
 			building.resetTimeToHarvest(this.timeToHarvest);
 			if (building.isDead()) {

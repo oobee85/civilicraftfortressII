@@ -16,7 +16,6 @@ public class Tile implements Externalizable {
 	private float height;
 	private double energy;
 	private double temperature;
-	private double wetness;
 	
 	public volatile float liquidAmount;
 	public volatile LiquidType liquidType;
@@ -392,6 +391,7 @@ public class Tile implements Externalizable {
 //		}
 		return true;
 	}
+	
 	
 	public boolean isCold() {
 		if (liquidType == LiquidType.ICE || liquidType == LiquidType.SNOW) {
