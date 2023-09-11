@@ -363,7 +363,7 @@ public class AirSimulation {
 				
 				Direction oldFlow = tileAir.getFlowDirection();
 				Direction attemptFlow = Direction.getDirection(tileLoc, otherLoc);
-				double directionValue = Math.abs(oldFlow.deltay() + attemptFlow.deltay());
+//				double directionValue = Math.abs(oldFlow.deltay() + attemptFlow.deltay());
 				
 				// on: set flow to only move in 4 direction. off: flow move in any direction
 //				if (directionValue == 0.5 || directionValue == 2) {

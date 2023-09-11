@@ -501,7 +501,7 @@ public class World {
 					}
 				}
 			}
-			Projectile meteor = new Projectile(ProjectileType.METEOR, t, target, null, 10000, false, 200);
+			Projectile meteor = new Projectile(ProjectileType.METEOR, t, target, null, 1000000, false, 200);
 			worldData.addProjectile(meteor);
 //			spawnExplosionCircle(t, radius, 5000);
 //			int rockRadius = radius / 5;

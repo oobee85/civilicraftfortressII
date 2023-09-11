@@ -463,8 +463,12 @@ public class Tile implements Externalizable {
 		if (modifier != null) {
 			damage[DamageType.HEAT.ordinal()] += modifier.getType().getDamage() + modifier.timeLeft() * 0.0001;
 		}
+//		if ((this.getTemperature()-Constants.KELVINOFFSET >= 50) || (this.getAir().getTemperature()-Constants.KELVINOFFSET) >= 50) {
+//			damage[DamageType.HEAT.ordinal()] += 1;
+//		}
 		return damage;
 	}
+	
 	public int[] computeTileDamage() {
 		double[] doubleDamage = computeTileDanger();
 		int[] intDamage = new int[doubleDamage.length];
