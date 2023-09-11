@@ -542,9 +542,11 @@ public class World {
 				if(damage < 500) {
 					wave = new Projectile(ProjectileType.FIRE_WAVE, tile, t, null, damage);
 				}
-				double Energy = damage*10 / (distanceFromCenter + 1);
-				t.addEnergy(Energy/2);
-				t.getAir().addEnergy(Energy/2);
+				double Energy = damage * 10 * radius;
+//				t.addEnergy(Energy);
+				if(t == tile) {
+					t.getAir().addEnergy(Energy);
+				}
 				
 				tile.addProjectile(wave);
 				worldData.addProjectile(wave);
@@ -552,18 +554,18 @@ public class World {
 				
 				
 			}
-			if(radius >= 10) {
-				delta = (float)(amplitude*cos - 0.5*amplitude);
-				if (distanceFromCenter >= radius && distanceFromCenter < 2*radius) {
-					delta = (float)(amplitude*cos - 0.5*amplitude);
-					if(delta < 0) {
-						delta = 0f;
-					}
-				}
-				if(delta != 0) {
-					t.setHeight(t.getHeight() + delta);
-				}
-			}
+//			if(radius >= 10) {
+//				delta = (float)(amplitude*cos - 0.5*amplitude);
+//				if (distanceFromCenter >= radius && distanceFromCenter < 2*radius) {
+//					delta = (float)(amplitude*cos - 0.5*amplitude);
+//					if(delta < 0) {
+//						delta = 0f;
+//					}
+//				}
+//				if(delta != 0) {
+//					t.setHeight(t.getHeight() + delta);
+//				}
+//			}
 			
 		}
 	}

@@ -340,61 +340,53 @@ public class AirSimulation {
 			TileLoc tileLoc = tile.getLocation();
 			Air tileAir = tile.getAir();
 			tileAir.setFlowDirection(Direction.NONE);
+			
+			int transferred = 0;
+			
+			
 			for(Tile otherTile : tile.getNeighbors()) {
 				TileLoc otherLoc = otherTile.getLocation();
 				Air otherAir = otherTile.getAir();
+				
 				double mypress = tileAir.getPressure();
 				double myvolume = tileAir.getVolumeLiquid();
 				double myenergy = tileAir.getEnergy();
 				
 				double opress = otherAir.getPressure();
 				double ovolume = otherAir.getVolumeLiquid();
-				double omaxvolume = otherAir.getMaxVolumeLiquid();
 				double oenergy = otherAir.getEnergy();
+				double omaxvolume = otherAir.getMaxVolumeLiquid();
 
-				boolean transferred = false;
+				
 				
 				// PREVENTS AIRFLOW DIRECTIONS FROM CHANGING RAPIDLY
-				Direction attemptFlow = Direction.getDirection(tileLoc, otherLoc);
+				
 				Direction oldFlow = tileAir.getFlowDirection();
+				Direction attemptFlow = Direction.getDirection(tileLoc, otherLoc);
 				double directionValue = Math.abs(oldFlow.deltay() + attemptFlow.deltay());
 				
 				// on: set flow to only move in 4 direction. off: flow move in any direction
 //				if (directionValue == 0.5 || directionValue == 2) {
-
-				// IF CONDITIONS MET FOR TRANSFER
-				if (mypress > (opress * 1.001)) {
-					double deltaE = Math.abs(myenergy - oenergy) / 25;
-					// if energy can handle transfer
-					if (myenergy - deltaE > 0) {
-						transferred = true;
-						tileAir.setFlowDirection(attemptFlow);
-						energyTemp[otherLoc.x()][otherLoc.y()] += deltaE;
-						energyTemp[tileLoc.x()][tileLoc.y()] -= deltaE;
-						// if transfer energy, transfer some humidity too
-						double deltaVol = Math.abs(myvolume - ovolume) / 2;
-						if (myvolume - deltaVol > 0 && ovolume + deltaVol < omaxvolume) {
-							volumeTemp[otherLoc.x()][otherLoc.y()] += deltaVol;
-							volumeTemp[tileLoc.x()][tileLoc.y()] -= deltaVol;
-							break;
-						}
-					}
-				}
 				
-				// if volume can handle transfer
-				if (myvolume > (ovolume * 1.15)) {
+				// IF CONDITIONS MET FOR TRANSFER
+				if(mypress > (opress) ) {
+					float deltaE = (float) ((myenergy - oenergy) / 1) /tile.getNeighbors().size();
+					transferred += 1;
+					
+					tileAir.setFlowDirection(attemptFlow);
+					energyTemp[otherLoc.x()][otherLoc.y()] += deltaE;
+					energyTemp[tileLoc.x()][tileLoc.y()] -= deltaE;
 					double deltaVol = Math.abs(myvolume - ovolume) / 2;
-					if (myvolume - deltaVol > 0) {
-						transferred = true;
-						tileAir.setFlowDirection(attemptFlow);
+
+					if (myvolume - deltaVol > 0 && ovolume + deltaVol < omaxvolume) {
 						volumeTemp[otherLoc.x()][otherLoc.y()] += deltaVol;
 						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltaVol;
+//						break;
 					}
-
 				}
-//				} // on: set flow to only move in 4 direction. off: flow move in any direction
 				
-				if (transferred == true) { // stops air from being transferred to multiple tiles
+				if (transferred >= 6) { // stops air from being transferred to multiple tiles
+//					continue;
 					break;
 				}
 

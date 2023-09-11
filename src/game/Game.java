@@ -1081,7 +1081,7 @@ public class Game {
 		if(thing == null) {
 			return;
 		}
-		world.spawnExplosionCircle(thing.getTile(), 1, 10000);
+		world.spawnExplosionCircle(thing.getTile(), 1, 1000000);
 	}
 	
 	private void unitTick() {

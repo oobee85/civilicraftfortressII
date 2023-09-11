@@ -124,7 +124,7 @@ public class Air {
 		
 		double moles = this.mass / Constants.MMAIR;
 //		double moles = this.getHumidity();
-		double pvnrt = (moles * Constants.R * temp) / (Constants.VOLUMEPERTILE *2);
+		double pvnrt = (moles * Constants.R * temp) / (Constants.VOLUMEPERTILE);
 //		this.pressure = pvnrt;
 				
 		
