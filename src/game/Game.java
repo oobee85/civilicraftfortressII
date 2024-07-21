@@ -829,18 +829,23 @@ public class Game {
 		makeRoadBetween(world.get(new TileLoc(0, 0)), world.get(new TileLoc(world.getWidth()-1, world.getHeight()-1)));
 		makeRoadBetween(highestTile, lowestTile);
 	}
+	
 	private boolean isValidSpawnLocation(Tile spawnTile, int radius) {
 		List<Tile> tiles = Utils.getTilesInRadius(spawnTile, world, radius);
+		int numSafeTiles = 0;
+
 		for(Tile t : tiles) {
-//			if(t == spawnTile) {
-//				continue;
-//			}
-			if(!isValidSpawnTileForBuilding(t, Game.buildingTypeMap.get("CASTLE"))) {
-				return false;
+
+			if(isValidSpawnTileForBuilding(t, Game.buildingTypeMap.get("CASTLE"))) {
+				numSafeTiles ++;
 			}
 		}
-		return true;
+		if(numSafeTiles >= 6) {
+			return true;
+		}
+		return false;
 	}
+	
 	private boolean isValidSpawnTileForBuilding(Tile tile, BuildingType type) {
 		return tile.canBuild() == true 
 				&& !tile.hasBuilding()
@@ -849,6 +854,7 @@ public class Game {
 				&& (tile.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"))
 				&& tile.getHeight() >= Constants.MAXHEIGHT * 0.05;
 	}
+	
 	private void makeStartingCastleAndUnits(boolean easymode, List<PlayerInfo> players, Random rand) {
 		double spacePerPlayer = (double)world.getWidth()/players.size();
 		int index = 0;
@@ -880,15 +886,24 @@ public class Game {
 				thingsToPlace.add(Game.buildingTypeMap.get("WINDMILL"));
 			}
 			Tile spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), (world.getHeight()/2)));
-			int minRadius = 20;
-			while(!isValidSpawnLocation(spawnTile, minRadius)) {
-				spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), (int) (Math.random()*world.getHeight())));
-				minRadius = Math.max(0, minRadius-1);
-				if (minRadius == 0) {
-					System.err.println("Failed to find a good spawn tile!");
+			int minRadius = 5;
+			for(int i = 100; i > 0; i--) {
+				
+				if(isValidSpawnLocation(spawnTile, minRadius)) {
+					System.out.println("Successuflly found start location");
 					break;
+				}else {
+					spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), (int) (Math.random()*world.getHeight())));
 				}
-			};
+			}
+//			while(!isValidSpawnLocation(spawnTile, minRadius)) {
+//				spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), (int) (Math.random()*world.getHeight())));
+//				minRadius = Math.max(0, minRadius-1);
+//				if (minRadius == 0) {
+//					System.err.println("Failed to find a good spawn tile!");
+//					break;
+//				}
+//			};
 			
 			System.out.println("Spawning " + player.getName() + " at " + spawnTile);
 			

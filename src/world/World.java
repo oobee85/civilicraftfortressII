@@ -186,7 +186,7 @@ public class World {
 		return tileListRandom;
 	}
 	public LinkedList<Tile> getTilesRandomly(Random rand) {
-		Collections.shuffle(tileListRandom, rand);
+		Collections.shuffle(tileListRandom, new Random(rand.nextLong()));
 		return tileListRandom;
 	}
 	public ArrayList<ArrayList<Tile>> getLiquidSimulationPhases() {
@@ -1275,14 +1275,22 @@ public class World {
 //				}
 //			}
 //		}
-		Collections.shuffle(tiles, worldRNG);
+		Collections.shuffle(tiles, new Random(worldRNG.nextLong()));
 		return tiles;
 	}
 	
-	public void reseedTerrain(long seed) {
+	public Tile reseedTerrain(long seed) {
 		for(Tile tile : getTiles()) {
 			tile.setTerrain(Terrain.DIRT);
 		}
+		worldRNG = new Random(seed);
+		
+		
+		// for some reason desert picking needs to be up here or else its not reproducible 6/10 times
+		// something downstairs breaks it
+		Tile desertt = getTilesRandomly(worldRNG).peek();
+		System.out.println("desert tile :" + desertt + "and seed:" +seed);
+		
 		
 		float[][] heightMap = Generation.generateHeightMap(seed, width, height);
 		Utils.normalize(heightMap, 0, 1);
@@ -1297,12 +1305,17 @@ public class World {
 			tile.setHeight(heightMap[tile.getLocation().x()][tile.getLocation().y()]);
 		}
 		LinkedList<Tile> tiles = getTilesRandomly(worldRNG);
+		
+		
 		Collections.sort(tiles, new Comparator<Tile>() {
 			@Override
 			public int compare(Tile o1, Tile o2) {
 				return o1.getHeight() > o2.getHeight() ? 1 : -1;
 			}
 		});
+		
+		
+		
 		double rockpercentageLow = 0.01;
 		double grassPercentage = .50;
 		double dirtPercentage = .80;
@@ -1311,6 +1324,9 @@ public class World {
 		double grassCutoff = tiles.get((int)(grassPercentage*tiles.size())).getHeight();
 		double dirtCutoff = tiles.get((int)(dirtPercentage*tiles.size())).getHeight();
 //		double rockCutoffHigh = tiles.get((int)(rockpercentageHigh*tiles.size())).getHeight();
+		
+		
+		
 		for(Tile tile : getTiles()) {
 			if(tile.getTerrain() != Terrain.DIRT) {
 				continue;
@@ -1330,11 +1346,13 @@ public class World {
 			}
 			tile.setTerrain(t);
 		}
+		
+		return desertt;
 	}
 	
 	public void generateWorld() {
-		reseedTerrain(Generation.DEFAULT_SEED);
-
+		Tile desertt = reseedTerrain(Generation.DEFAULT_SEED);
+		
 		int numTiles = width*height;
 //		Generation.makeLake(numTiles * 1, this, worldRNG);
 //		Generation.makeLake(numTiles * 1, this, worldRNG);
@@ -1353,8 +1371,9 @@ public class World {
 		}
 		initializeAirSimulationStuff();
 		doAirSimulationStuff();
-		Tile t = getTilesRandomly(worldRNG).peek();
-		Generation.makeBiome(t, Terrain.SAND, 1000, Integer.MAX_VALUE, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
+		
+		
+		Generation.makeBiome(desertt, Terrain.SAND, 1000, Integer.MAX_VALUE, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
 		updateTerrainChange(true);
 		Generation.generateResources(this, worldRNG);
 		this.genPlants(worldRNG);
