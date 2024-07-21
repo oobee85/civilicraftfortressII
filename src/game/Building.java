@@ -81,20 +81,20 @@ public class Building extends Thing implements Serializable {
 			return;
 		}
 		if(getType() == Game.buildingTypeMap.get("CASTLE")) {
-			getFaction().spendResearch(20);
+			getFaction().spendResearch(10);
 			getFaction().getInventory().addItem(ItemType.FOOD, 1);
 			resetTimeToHarvest();
 		}
 		else if(getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
-			getFaction().spendResearch(20);
+			getFaction().spendResearch(10);
 			resetTimeToHarvest();
 		}
 		else if(getType() == Game.buildingTypeMap.get("GRANARY")) {
-			this.getInventory().addItem(ItemType.FOOD, 2);
+			this.getInventory().addItem(ItemType.FOOD, 1);
 			resetTimeToHarvest();
 		}
 		else if(getType() == Game.buildingTypeMap.get("WINDMILL")) {
-			this.getInventory().addItem(ItemType.FOOD, 8);
+			this.getInventory().addItem(ItemType.FOOD, 5);
 			resetTimeToHarvest();
 		}
 		else if(getType() == Game.buildingTypeMap.get("STABLES")) {

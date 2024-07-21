@@ -370,13 +370,13 @@ public class AirSimulation {
 				
 				// IF CONDITIONS MET FOR TRANSFER
 				if(mypress > (opress) ) {
-					float deltaE = (float) ((myenergy - oenergy) / 1) /tile.getNeighbors().size();
+					double deltaE = (double) ((myenergy - oenergy) / 1) /(tile.getNeighbors().size() + 1);
 					transferred += 1;
 					
 					tileAir.setFlowDirection(attemptFlow);
 					energyTemp[otherLoc.x()][otherLoc.y()] += deltaE;
 					energyTemp[tileLoc.x()][tileLoc.y()] -= deltaE;
-					double deltaVol = Math.abs(myvolume - ovolume) / 2;
+					double deltaVol = Math.abs(myvolume - ovolume) / 1 /(tile.getNeighbors().size() + 1);
 
 					if (myvolume - deltaVol > 0 && ovolume + deltaVol < omaxvolume) {
 						volumeTemp[otherLoc.x()][otherLoc.y()] += deltaVol;

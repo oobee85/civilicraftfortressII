@@ -844,7 +844,7 @@ public class Game {
 	private boolean isValidSpawnTileForBuilding(Tile tile, BuildingType type) {
 		return tile.canBuild() == true 
 				&& !tile.hasBuilding()
-				&& tile.liquidAmount < tile.liquidType.getMinimumDamageAmount()
+				&& tile.liquidAmount <= tile.liquidType.getMinimumDamageAmount()
 				&& tile.getLocation().distanceTo(world.volcano) > 30
 				&& (tile.getTerrain() != Terrain.ROCK || type != Game.buildingTypeMap.get("CASTLE"))
 				&& tile.getHeight() >= Constants.MAXHEIGHT * 0.05;
@@ -879,7 +879,7 @@ public class Game {
 			if(Settings.SPAWN_EXTRA) {
 				thingsToPlace.add(Game.buildingTypeMap.get("WINDMILL"));
 			}
-			Tile spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), world.getHeight()/2));
+			Tile spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), (world.getHeight()/2)));
 			int minRadius = 20;
 			while(!isValidSpawnLocation(spawnTile, minRadius)) {
 				spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), (int) (Math.random()*world.getHeight())));

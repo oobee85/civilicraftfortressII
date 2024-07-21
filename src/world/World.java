@@ -1199,7 +1199,7 @@ public class World {
 				search.add(ti);
 			}
 			if(type == Game.plantTypeMap.get("TREE")) {
-				if ((potential.canPlant() || type.isDesertResistant()) && potential.getPlant() == null && potential.getTerrain() != Terrain.DIRT) {
+				if ((potential.canPlant() || type.isDesertResistant()) && potential.getPlant() == null ) {
 					Plant plant = new Plant(type, potential, getFaction(NO_FACTION_ID));
 					potential.setHasPlant(plant);
 					worldData.addPlant(plant);
@@ -1223,12 +1223,14 @@ public class World {
 		for(Tile t : tileListRandom) {
 			double tempDensity = Constants.FOREST_DENSITY;
 			if(t.getTerrain() == Terrain.DIRT) {
-				tempDensity /= 2;
+//				tempDensity /= 2;
 			}
-			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < t.liquidType.getMinimumDamageAmount() / 2)
+			// t.liquidType.getMinimumDamageAmount()
+			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < 4) {
 				if (Math.random() < tempDensity) {
 					makePlantVein(t, Game.plantTypeMap.get("TREE"), 30, rand);
 				}
+			}
 		}
 		
 	}
