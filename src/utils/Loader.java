@@ -76,7 +76,7 @@ public class Loader {
 
 			String textureFile = image;
 			Mesh mesh = MeshUtils.defaultPlant;
-			if(plantTypeObject.has("mesh")) {
+			if(Settings.CUSTOM_MESHES && plantTypeObject.has("mesh")) {
 				String meshString = plantTypeObject.getString("mesh");
 				mesh = MeshUtils.getMeshByFileName(meshString);
 				
@@ -156,7 +156,7 @@ public class Loader {
 			
 			String textureFile = image;
 			Mesh mesh = MeshUtils.defaultBuilding;
-			if(buildingTypeObject.has("mesh")) {
+			if(Settings.CUSTOM_MESHES && buildingTypeObject.has("mesh")) {
 				String meshString = buildingTypeObject.getString("mesh");
 				mesh = MeshUtils.getMeshByFileName(meshString);
 				
@@ -287,7 +287,7 @@ public class Loader {
 
 			String textureFile = image;
 			Mesh mesh = MeshUtils.defaultUnit;
-			if(unitTypeObject.has("mesh")) {
+			if(Settings.CUSTOM_MESHES && unitTypeObject.has("mesh")) {
 				String meshString = unitTypeObject.getString("mesh");
 				mesh = MeshUtils.getMeshByFileName(meshString);
 				

@@ -18,9 +18,9 @@ public class Generation {
 	public static final long DEFAULT_SEED = 131313131313131313L;
 	public static final int OREMULTIPLIER = 16384;
 
-	public static void addCliff(World world, float[][] heightmap) {
-		int x = (int)(Math.random()*heightmap.length);
-		int y = (int)(Math.random()*heightmap[x].length);
+	public static void addCliff(World world, float[][] heightmap, Random rand) {
+		int x = (int)(rand.nextDouble()*heightmap.length);
+		int y = (int)(rand.nextDouble()*heightmap[x].length);
 		
 		for(int i = 0; i < 20 && x + i < heightmap.length; i++) {
 			int yy = y + i/3;
@@ -282,6 +282,9 @@ public class Generation {
 
 	public static void generateResources(World world, Random rand) {
 		for(ResourceType resource : ResourceType.values()) {
+			if (!resource.isOre()) {
+				continue;
+			}
 			int numVeins = (int)(world.getWidth() * world.getHeight() * resource.getNumVeins() / OREMULTIPLIER);
 			
 			System.out.println("Tiles of " + resource.name() + ": " + numVeins);
@@ -290,19 +293,17 @@ public class Generation {
 				if(tile.getResource() != null) {
 					continue;
 				}
-				if(numVeins <= 0) {
+				if(!tile.canOre() ) {
+					continue;
+				}
+				// if ore is rare the tile must be able to support rare ore
+				if (resource.isRare() && !tile.canSupportRareOre()) {
+					continue;
+				}
+				makeOreVein(tile, resource, resource.getVeinSize(), rand);
+				if(--numVeins <= 0) {
 					break;
 				}
-				if(resource.isOre() && tile.canOre() ) {
-					// if ore is rare the tile must be able to support rare ore
-					
-					if(!resource.isRare() || tile.canSupportRareOre()) {
-						makeOreVein(tile, resource, resource.getVeinSize(), rand);
-						numVeins --;
-					}
-				}
-				
-				
 			}
 		}
 		// scatter some random rocks around

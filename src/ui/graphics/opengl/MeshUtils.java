@@ -14,7 +14,7 @@ public class MeshUtils {
 	public static final Mesh cube;
 	public static final Mesh skybox;
 	public static final Mesh square;
-	public static final Mesh cattail;
+//	public static final Mesh cattail;
 	public static final Mesh star;
 	public static final Mesh mushroom;
 	public static final Mesh house;
@@ -251,7 +251,6 @@ public class MeshUtils {
 		skybox = getMeshByFileName("models/skybox.ply");
 		skybox.normalize(true);
 		square = getMeshByFileName("models/square.obj");
-		cattail = getMeshByFileName("models/cattail.ply");
 		star = getMeshByFileName("models/star.obj");
 		mushroom = getMeshByFileName("models/mushroom.obj");
 		house = getMeshByFileName("models/house.obj");
@@ -262,6 +261,8 @@ public class MeshUtils {
 		defaultUnit = cube;
 		defaultPlant = mushroom;
 		defaultBuilding = house;
+//		cattail = getMeshByFileName("models/cattail.ply");
+
 		
 		hexwall = makeHexWallMesh(TerrainObject.TILE_RADIUS);
 	}
