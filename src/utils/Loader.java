@@ -53,6 +53,7 @@ public class Loader {
 	}
 	
 	public static void loadPlantType(HashMap<String, PlantType> plantTypeMap, ArrayList<PlantType> plantTypeList) {
+		System.out.println("Loading Plants");
 		String plantTypeString = Utils.readFile("costs/PlantType.json");
 		JSONObject obj = new JSONObject(plantTypeString);
 		JSONArray arr = obj.getJSONArray("planttypes");
@@ -104,9 +105,8 @@ public class Loader {
 	}
 	
 	public static void loadBuildingType(HashMap<String, BuildingType> buildingTypeMap, ArrayList<BuildingType> buildingTypeList) {
-
+		System.out.println("Loading Buildings");
 		String buildingTypeString = Utils.readFile("costs/BuildingType.json");
-//		System.out.println("Loaded :" + buildingTypeString);
 		JSONObject obj = new JSONObject(buildingTypeString);
 		JSONArray arr = obj.getJSONArray("buildingtypes");
 		for (int i = 0; i < arr.length(); i++) {
@@ -227,8 +227,8 @@ public class Loader {
 //		}
 	}
 	public static void loadUnitType(HashMap<String, UnitType> unitTypeMap, ArrayList<UnitType> unitTypeList) {
+		System.out.println("Loading Units");
 		String unitTypeString = Utils.readFile("costs/UnitType.json");
-//		System.out.println("Loaded :" + unitTypeString);
 		JSONObject obj = new JSONObject(unitTypeString);
 		JSONArray arr = obj.getJSONArray("unittypes");
 		for (int i = 0; i < arr.length(); i++) {
@@ -371,7 +371,7 @@ public class Loader {
 	}
 	
 	public static void loadResearchType(HashMap<String, ResearchType> researchTypeMap, ArrayList<ResearchType> researchTypeList) {
-		HashMap<Research, LinkedList<String>> researchRequirements = new HashMap<>();
+		System.out.println("Loading Researches");
 		String researchCosts = Utils.readFile("costs/ResearchType.json");
 		JSONObject obj = new JSONObject(researchCosts);
 		JSONArray arr = obj.getJSONArray("researches");
@@ -403,6 +403,7 @@ public class Loader {
 	}
 	
 	public static void doMappings() {
+		System.out.println("Doing Mappings");
 		for(BuildingType type : Game.buildingTypeList) {
 			for(String unittypestring : type.unitsCanProduce()) {
 				type.unitsCanProduceSet().add(Game.unitTypeMap.get(unittypestring));

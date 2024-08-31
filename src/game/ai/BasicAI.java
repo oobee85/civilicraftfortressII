@@ -63,7 +63,12 @@ public class BasicAI extends AIInterface {
 			
 			if(amountOfFoodMissing() == 0) {
 				if(wantsWorker()) {
-					commands.produceUnit(castle, Game.unitTypeMap.get("WORKER"));
+					if (Math.random() < 0.5) {
+						commands.produceUnit(castle, Game.unitTypeMap.get("WORKER"));
+					}
+					else {
+						commands.produceUnit(castle, Game.unitTypeMap.get("MASON"));
+					}
 				}
 				if(wantsCaravan()) {
 					commands.produceUnit(castle, Game.unitTypeMap.get("CARAVAN"));
@@ -195,7 +200,7 @@ public class BasicAI extends AIInterface {
 	private boolean wantsWarrior() {
 		return unitQuantities[Game.unitTypeMap.get("WARRIOR").id()] < 10
 				&& state.barracks.getProducingUnit().isEmpty()
-				&& unitQuantities[Game.unitTypeMap.get("WARRIOR").id()]*5 < faction.getUnits().size();
+				&& unitQuantities[Game.unitTypeMap.get("WARRIOR").id()]*4 < faction.getUnits().size();
 	}
 	private boolean wantsCaravan() {
 		return unitQuantities[Game.unitTypeMap.get("WARRIOR").id()] > 0
@@ -223,8 +228,8 @@ public class BasicAI extends AIInterface {
 	private Tile getTargetTile(Tile source, int minRadius, int maxRadius, Predicate<Tile> requirement) {
 		for(int radius = minRadius; radius <= maxRadius; radius++) {
 			List<Tile> candidates = Utils.getRingOfTiles(source, world, radius);
-			Collections.shuffle(candidates);
-			for (Tile t : candidates) {
+			while (!candidates.isEmpty()) {
+				Tile t = candidates.remove((int)(Math.random() * candidates.size()));
 				if(requirement.test(t)) {
 					return t;
 				}

@@ -368,7 +368,10 @@ public class RenderingFunctions {
 				}
 				// draw destination flags
 				for (PlannedAction plan : unit.actionQueue) {
-					Tile targetTile = plan.targetTile == null ? plan.target.getTile() : plan.targetTile;
+					Tile targetTile = plan.targetTile == null ? (plan.target != null ? plan.target.getTile() : null) : plan.targetTile;
+					if (targetTile == null) {
+						continue;
+					}
 					drawAt = getDrawingCoords(targetTile.getLocation(), state.tileSize);
 					state.g.drawImage(FLAG, drawAt.x, drawAt.y, state.tileSize, state.tileSize, null);
 				}

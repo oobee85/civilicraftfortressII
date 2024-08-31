@@ -68,17 +68,15 @@ public class UndeadAI extends AIInterface {
 	@Override
 	public void aiTickLogic() {
 		for (Unit unit : faction.getUnits()) {
-			if (unit.isBuilder()) {
-				if (unit.isIdle()) {
-					buildWalls(unit);
-				}
+			if (unit.isBuilder() && unit.isIdle()) {
+				buildWalls(unit);
 			}
 			else if(!unit.isGuarding()) {
 				commands.setGuarding(unit, true);
 			}
 		}
 
-		if (castle.getProducingUnit().isEmpty()
+		if (castle != null && castle.getProducingUnit().isEmpty()
 			&& World.ticks >= nextTickToProduce) {
 			
 			int numBuildings = faction.getBuildings().size();
