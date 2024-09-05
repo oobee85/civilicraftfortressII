@@ -40,6 +40,7 @@ public class Faction implements Externalizable {
 	private Color borderColor;
 	private String name;
 	private boolean usesItems;
+	private boolean usesBuildings;
 	private boolean isPlayer;
 	private double environmentalDifficulty = 1;
 	private int influence;
@@ -51,6 +52,7 @@ public class Faction implements Externalizable {
 		this.setColor((Color)in.readObject());
 		name = in.readUTF();
 		usesItems = in.readBoolean();
+		usesBuildings = in.readBoolean();
 		isPlayer = in.readBoolean();
 		researchTarget = (Research)in.readObject();
 //		items = (Item[])in.readObject();
@@ -274,7 +276,7 @@ public class Faction implements Externalizable {
 			return;
 		}
 		if(!research.isPayedFor()) {
-			if(canAfford(research.getCost())) {
+			if(canAfford(research.getCost()) && canAffordBuildingRequirement(research.getBuildingRequirement())) {
 				payCost(research.getCost());
 				research.setPayedFor(true);
 			}
@@ -364,10 +366,33 @@ public class Faction implements Externalizable {
 		return usesItems;
 	}
 	
+	public boolean usesBuildings() {
+		return usesBuildings;
+	}
+	
 	public boolean canAfford(HashMap<ItemType, Integer> cost) {
 		if(usesItems) {
 			for (Entry<ItemType, Integer> entry : cost.entrySet()) {
 				if(this.inventory.getItemAmount(entry.getKey()) < entry.getValue()) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	public boolean canAffordBuildingRequirement(HashMap<BuildingType, Integer> cost) {
+		if(usesBuildings) {
+			for (Entry<BuildingType, Integer> entry : cost.entrySet()) {
+				int buildingCount = 0;
+				for(Building building: this.getBuildings()) {
+					if(building.getType() == entry) {
+						buildingCount ++;
+					}
+
+				}
+				if(buildingCount < entry.getValue()) {
 					return false;
 				}
 			}

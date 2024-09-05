@@ -23,16 +23,15 @@
 		"image": "Images/research/wheel.png"},
 	{
 		"name": "MASONRY", 
-		"points": 600, "tier": 1,
+		"points": 600, "tier": 3,
 		"cost": {"STONE": 1000}, 
 		"requirements": ["WHEEL"],
 		"image": "Images/research/masonry.png"},
 		
 	{
 		"name": "FARMING",
-		"points": 600, "tier": 2,
-		"cost": {"BRONZE_BAR": 10}, 
-		"requirements": ["BRONZE_WORKING"],
+		"points": 500, "tier": 1,
+		"cost": {"WOOD": 200, "STONE": 200, "FOOD": 200}, 
 		"image": "Images/research/farming.png"},
 	{
 		"name": "MATHEMATICS", 

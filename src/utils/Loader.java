@@ -19,6 +19,14 @@ public class Loader {
 		return map;
 	}
 	
+	private static HashMap<BuildingType, Integer> loadBuildingTypeMap(JSONObject costObject) {
+		HashMap<BuildingType, Integer> map = new HashMap<>();
+		for(String buildingName : costObject.keySet()) {
+//			map.put(BuildingType.valueOf(buildingName), costObject.getInt(buildingName));
+		}
+		return map;
+	}
+	
 	public static Set<GameComponent> loadComponents(JSONObject obj) {
 		Set<GameComponent> components = new HashSet<>();
 
@@ -385,9 +393,14 @@ public class Loader {
 			int points = researchObject.getInt("points");
 			int tier = researchObject.getInt("tier");
 			HashMap<ItemType, Integer> cost = new HashMap<>();
+			
 			if(researchObject.has("cost")) {
 				cost = loadItemTypeMap(researchObject.getJSONObject("cost"));
 			}
+			HashMap<BuildingType, Integer> buildingRequirement = new HashMap<>();
+//			if(researchObject.has("buildingRequirement")) {
+//				buildingRequirement = loadItemTypeMap(researchObject.getJSONObject("buildingRequirement"));
+//			}
 			LinkedList<String> reqs = new LinkedList<>();
 			if(researchObject.has("requirements")) {
 				JSONArray requirementArray = researchObject.getJSONArray("requirements");
@@ -396,7 +409,7 @@ public class Loader {
 					reqs.add(requirement);
 				}
 			}
-			ResearchType researchType = new ResearchType(researchName, imagePath, reqs, points, tier, cost);
+			ResearchType researchType = new ResearchType(researchName, imagePath, reqs, points, tier, cost, buildingRequirement);
 			researchTypeMap.put(researchName, researchType);
 			researchTypeList.add(researchType);
 		}

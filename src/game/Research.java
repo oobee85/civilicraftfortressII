@@ -85,6 +85,10 @@ public class Research implements Externalizable{
 		return type.cost;
 	}
 	
+	public HashMap<BuildingType, Integer> getBuildingRequirement(){
+		return type.buildingRequirement;
+	}
+	
 	@Override
 	public String toString() {
 		return Utils.getName(this);
