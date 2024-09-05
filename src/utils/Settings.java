@@ -27,6 +27,7 @@ public class Settings {
 	public static boolean AIR_MULTITHREADED = false;
 	public static boolean DEFAULT_TO_OPENGL = false;
 	public static boolean DEFAULT_TO_FPMODE = true;
+	public static boolean CUSTOM_MESHES = false;
 
 	public static int NUM_AI = 0;
 	public static int WORLD_WIDTH = 128;
@@ -61,6 +62,7 @@ public class Settings {
 		}
 	}
 	public static void fromFile() {
+		System.out.println("Loading settings from settings.ini");
 		HashMap<String, String> values = new HashMap<>();
 		try(BufferedReader reader = new BufferedReader(new FileReader(new File("settings.ini")))) {
 			reader.lines().forEach(line -> {

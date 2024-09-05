@@ -9,7 +9,7 @@ import networking.server.*;
 import ui.graphics.opengl.*;
 import world.*;
 
-public class Thing implements Serializable {
+public class Thing implements Serializable, Comparable<Thing> {
 	
 	private transient static int idCounter = 0;
 	private int id;
@@ -243,6 +243,10 @@ public class Thing implements Serializable {
 		return new LinkedList<String>(Arrays.asList(
 				String.format("HP=%.0f/%.0f", getHealth(), getMaxHealth())
 				));
+	}
+	@Override
+	public int compareTo(Thing o) {
+		return this.id - o.id;
 	}
 
 }

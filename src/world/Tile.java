@@ -1,6 +1,7 @@
 package world;
 
 import java.io.*;
+import java.security.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
@@ -599,5 +600,17 @@ public class Tile implements Externalizable {
 			return getLocation().equals(((Tile) obj).getLocation());
 		}
 		return false;
+	}
+	
+	public int getHash(int salt) {
+		final int prime = 197938439;
+	    int result = 1;
+	    result = prime * result + salt;
+	    result = ((result << 7) & 0xFFFFFFE0) | ((result >>> 25) & 0x0000001F);
+	    result = prime * result + getLocation().x();
+	    result = ((result << 3) & 0xFFFFFFE0) | ((result >>> 29) & 0x0000001F);
+	    result = prime * result + getLocation().y();
+	    result = ((result << 5) & 0xFFFFFFE0) | ((result >>> 27) & 0x0000001F);
+	    return result;
 	}
 }

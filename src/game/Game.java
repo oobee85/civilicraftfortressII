@@ -174,13 +174,15 @@ public class Game {
 		}
 		if (!factionTiles.isEmpty()) {
 			Tile targetTile = factionTiles.get((int) (Math.random() * factionTiles.size()));
-			for(Tile tile : world.getTilesRandomly()) {
+			for (int attempt = 0; attempt < 1000; attempt++) {
+				Tile tile = world.getRandomTile();
 				if (tile.getFaction().id() != World.NO_FACTION_ID) {
 					continue;
 				}
-				if (tile.distanceTo(targetTile) < howFarAwayStuffSpawn) {
-					return tile;
+				if (tile.distanceTo(targetTile) >= howFarAwayStuffSpawn) {
+					continue;
 				}
+				return tile;
 			}
 		}
 		return null;
@@ -188,7 +190,7 @@ public class Game {
 	
 	
 	private Tile getTargetTileForSpawns() {
-		Tile targetTile = world.getTilesRandomly().peek();
+		Tile targetTile = world.getRandomTile();
 
 		for (Faction faction : world.getFactions()) {
 			if (faction.getDifficulty() <= 0) {
@@ -208,7 +210,7 @@ public class Game {
 		return targetTile;
 	}
 	private void spawnScorpion() {
-		Optional<Tile> potential = world.getTilesRandomly().stream().filter(e -> 
+		Optional<Tile> potential = world.getTiles().stream().filter(e -> 
 				e.getTerrain() == Terrain.SAND 
 				&& e.getBuilding() == null
 				&& e.getPlant() == null
@@ -512,16 +514,13 @@ public class Game {
 	}
 	
 	public void spawnEverything() {
-		List<Tile> tiles = world.getTilesRandomly();
-		
-		Iterator<Tile> iterator = tiles.iterator();
 		for(UnitType type : Game.unitTypeList) {
 			if(type.name() == "TWIG") {
 				System.out.println("twig");
 				continue;
 			}
 			else {
-				world.spawnAnimal(type, iterator.next(), world.getFaction(World.NO_FACTION_ID), null);
+				world.spawnAnimal(type, world.getRandomTile(), world.getFaction(World.NO_FACTION_ID), null);
 			}
 			
 		}
@@ -595,13 +594,23 @@ public class Game {
 //		}
 	}
 	public void spawnCyclops() {
-		LinkedList<Tile> tiles = world.getTilesRandomly();
-		Tile tile = tiles.peek();
-		for(Tile t : tiles) {
-			if(t.getTerrain() == Terrain.ROCK && t.getLocation().x() > 3 && t.getLocation().y() > 3 && t.getLocation().x() < world.getWidth()-3 && t.getLocation().y() < world.getHeight()-3) {
-				tile = t;
-				break;
+		Tile tile = world.getRandomTile();
+		for (int attempt = 0; attempt < 100; attempt++) {
+			Tile t = world.getRandomTile();
+			if (t.getTerrain() != Terrain.ROCK) {
+				continue;
 			}
+
+			if (t.getLocation().x() <= 3 || t.getLocation().x() >= world.getWidth()-3) {
+				continue;
+			}
+
+			if (t.getLocation().y() <= 3 || t.getLocation().y() >= world.getHeight()-3) {
+				continue;
+			}
+
+			tile = t;
+			break;
 		}
 		spawnCyclops(tile);
 	}
@@ -893,7 +902,7 @@ public class Game {
 					System.out.println("Successuflly found start location");
 					break;
 				}else {
-					spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), (int) (Math.random()*world.getHeight())));
+					spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), (int) (rand.nextDouble()*world.getHeight())));
 				}
 			}
 //			while(!isValidSpawnLocation(spawnTile, minRadius)) {

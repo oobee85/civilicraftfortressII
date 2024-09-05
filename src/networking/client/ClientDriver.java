@@ -37,12 +37,12 @@ public class ClientDriver implements WindowListener {
 	}
 	
 	static {
+		Settings.fromFile();
 		Loader.loadResearchType(Game.researchTypeMap, Game.researchTypeList);
 		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
 		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);
 		Loader.loadPlantType(Game.plantTypeMap, Game.plantTypeList);
 		Loader.doMappings();
-		Settings.fromFile();
 	}
 	
 	public static void main(String[] args) {

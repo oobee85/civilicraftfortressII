@@ -33,7 +33,8 @@ public class Faction implements Externalizable {
 	private LinkedList<AttackedNotification> newAttacked = new LinkedList<>();
 	
 	private Set<Building> buildings = Collections.newSetFromMap(new ConcurrentHashMap<>());
-	private Set<Unit> units = Collections.newSetFromMap(new ConcurrentHashMap<>());
+	private SortedSet<Unit> units = new ConcurrentSkipListSet<>();
+//	private Set<Unit> units = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	
 	private int id;
 	private Color color;
@@ -108,7 +109,7 @@ public class Faction implements Externalizable {
 		units.remove(unit);
 	}
 	public Set<Unit> getUnits() {
-		return units;
+		return Collections.unmodifiableSet(units);
 	}
 	public void addBuilding(Building building) {
 		buildings.add(building);
@@ -117,7 +118,7 @@ public class Faction implements Externalizable {
 		buildings.remove(building);
 	}
 	public Set<Building> getBuildings() {
-		return buildings;
+		return Collections.unmodifiableSet(buildings);
 	}
 	
 	private void setColor(Color color) {
@@ -270,10 +271,10 @@ public class Faction implements Externalizable {
 	public Research getResearchTarget() {
 		return researchTarget;
 	}
-	public void setResearchTarget(ResearchType researchType) {
+	public boolean setResearchTarget(ResearchType researchType) {
 		Research research = researchMap.get(researchType.name);
 		if(!research.getRequirement().areRequirementsMet() || research.isCompleted()) {
-			return;
+			return false;
 		}
 		if(!research.isPayedFor()) {
 			if(canAfford(research.getCost()) && canAffordBuildingRequirement(research.getBuildingRequirement())) {
@@ -281,10 +282,11 @@ public class Faction implements Externalizable {
 				research.setPayedFor(true);
 			}
 			else {
-				return;
+				return false;
 			}
 		}
 		researchTarget = research;
+		return true;
 	}
 	
 	public void setupResearch() {
