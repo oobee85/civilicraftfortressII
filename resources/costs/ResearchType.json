@@ -8,7 +8,7 @@
 	{	
 		"name": "BRONZE_WORKING", 
 		"points": 300, "tier": 1,
-		"cost": {"FOOD": 200},
+		"cost": {"WOOD": 100},
 		"requirements": ["FARMING"],
 		"image": "Images/research/bronze_working.png"},
 	{
@@ -24,15 +24,33 @@
 		"requirements": ["IRON_WORKING"],
 		"image": "Images/research/armoring.png"},
 	{
+		"name": "TRAPPING", 
+		"points": 300, "tier": 1,
+		"cost": {"FOOD": 100}, 
+		"requirements": ["FARMING"],
+		"image": "Images/research/wheel.png"},
+	{
+		"name": "ANIMAL_HUSBANDRY", 
+		"points": 600, "tier": 2,
+		"cost": {"HORSE": 100}, 
+		"requirements": ["TRAPPING"],
+		"image": "Images/research/horseback_riding.png"},
+	{
+		"name": "DOMESTICATION", 
+		"points": 1200, "tier": 3,
+		"cost": {"FOOD": 400, "HORSE": 100}, 
+		"requirements": ["ANIMAL_HUSBANDRY"],
+		"image": "Images/research/chivalry.png"},
+	{
 		"name": "MASONRY", 
 		"points": 300, "tier": 1,
-		"cost": {"STONE": 200}, 
+		"cost": {"STONE": 100}, 
 		"requirements": ["FARMING"],
 		"image": "Images/research/masonry.png"},
 	{
 		"name": "MATHEMATICS",
 		"points": 600, "tier": 2,
-		"cost": {"STONE": 200, "WOOD": 200},
+		"cost": {"STONE": 200},
 		"requirements": ["MASONRY"],
 		"image": "Images/research/code_of_laws.png"},
 	{
@@ -42,28 +60,28 @@
 		"requirements": ["MATHEMATICS"],
 		"image": "Images/research/engineering.png"},
 	{
-		"name": "IRRIGATION", 
+		"name": "MYSTICISM", 
 		"points": 300, "tier": 1,
-		"cost": {"FOOD": 200}, 
+		"cost": {"FOOD": 100},
 		"requirements": ["FARMING"],
-		"image": "Images/research/wheel.png"},
+		"image": "Images/research/mysticism.png"},
 	{
-		"name": "ANIMAL_HUSBANDRY", 
+		"name": "WITCHCRAFT", 
 		"points": 600, "tier": 2,
-		"cost": {"FOOD": 400}, 
-		"requirements": ["IRRIGATION"],
-		"image": "Images/research/wheel.png"},
+		"cost": {"MAGIC": 100},
+		"requirements": ["MYSTICISM"],
+		"image": "Images/research/witchcraft.png"},
 	{
-		"name": "DOMESTICATION", 
+		"name": "NECROMANCY", 
 		"points": 1200, "tier": 3,
-		"cost": {"FOOD": 400, "HORSE": 50}, 
-		"requirements": ["ANIMAL_HUSBANDRY"],
-		"image": "Images/research/horseback_riding.png"},
+		"cost": {"MAGIC": 100},
+		"requirements": ["WITCHCRAFT"],
+		"image": "Images/research/shadowwordpain.png"},
 	{
 		"name": "CIVILIZATION", 
 		"points": 1200, "tier": 4,
 		"cost": {"STONE": 500}, 
-		"requirements": ["DOMESTICATION", "ENGINEERING", "ARMORING"],
+		"requirements": ["DOMESTICATION", "ENGINEERING", "ARMORING", "NECROMANCY"],
 		"image": "Images/research/monarchy.png"}
 	
 ]

@@ -9,6 +9,7 @@
 		"cost":{"WOOD":50},
 		"culture":0,
 		"attributes":["harvestable"],
+		"produces":{"FOOD": 5},
 		"health":80,
 		"effort":160
 	},
@@ -20,6 +21,7 @@
 		"cost":{"WOOD":100},
 		"culture":0,
 		"attributes":["harvestable"],
+		"produces":{"STONE": 5},
 		"research":"FARMING",
 		"health":100,
 		"effort":100
@@ -55,7 +57,7 @@
 		"info":"Produces basic combat units",
 		"image":"Images/buildings/barracks256.png",
 		"vision":1,
-		"cost":{"WOOD":150, "STONE":150},
+		"cost":{"WOOD":100},
 		"buildsunits":["WARRIOR","ARCHER","SPEARMAN","SWORDSMAN"],
 		"research":"BRONZE_WORKING",
 		"culture":0.5,
@@ -75,7 +77,7 @@
 		"inventory":{"maxstack":50},
 		"health":500,
 		"effort":500,
-		"research":"IRRIGATION"
+		"research":"MASONRY"
 	},
 	{
 		"name":"WINDMILL",
@@ -96,20 +98,20 @@
 		"info":"Trap a horse to breed horses. Build horse units.",
 		"image":"Images/buildings/stables.png",
 		"vision":1,
-		"cost":{"WOOD":500, "BRONZE_BAR":5},
+		"cost":{"WOOD":200},
 		"culture":0.5,
 		"buildsunits":["HORSEARCHER","KNIGHT","CHARIOT", "GRIFFIN"],
 		"inventory":{"maxstack":100},
-		"health":1000,
-		"effort":1000,
-		"research":"ANIMAL_HUSBANDRY"
+		"health":500,
+		"effort":500,
+		"research":"TRAPPING"
 	},
 	{
 		"name":"WATCHTOWER",
 		"info":"Provides vision",
 		"image":"Images/buildings/watchtower.png",
 		"vision":10,
-		"cost":{"WOOD":200, "STONE":200},
+		"cost":{"WOOD":100, "STONE":100, "BRONZE_BAR":5},
 		"culture":0.5,
 		"health":500,
 		"effort":500,
@@ -122,7 +124,7 @@
 		"mesh":"models/castle.ply",
 		"texture":"textures/pallet1.png",
 		"vision":5,
-		"cost":{"WOOD":500, "STONE":500},
+		"cost":{"WOOD":500, "STONE":500, "IRON_BAR":5},
 		"buildsunits":["WORKER", "MASON", "PRIEST", "CARAVAN"],
 		"culture":1,
 		"attributes":["castle"],
@@ -165,7 +167,7 @@
 		"image":"Images/buildings/workshop.png",
 		"mesh":"models/workshop.ply",
 		"vision":1,
-		"cost":{"WOOD":500, "IRON_BAR":10, "STONE":500},
+		"cost":{"WOOD":200, "STONE":200, "IRON_BAR":10},
 		"buildsunits":["LONGBOWMAN","CATAPULT","TREBUCHET", "SNIPER", "WIZARD"],
 		"culture":0.5,
 		"health":500,
@@ -185,14 +187,16 @@
 	},
 	{
 		"name":"RESEARCH_LAB",
-		"info":"Unlocks researches after iron working",
+		"info":"Produces Magic",
 		"image":"Images/buildings/research.png",
 		"vision":1,
-		"cost":{"WOOD":200, "IRON_BAR":5, "STONE":200},
+		"cost":{"WOOD":100, "STONE":100},
+		"attributes":["harvestable"],
+		"produces":{"MAGIC": 5},
 		"culture":0.5,
 		"health":500,
 		"effort":500,
-		"research":"IRON_WORKING"
+		"research":"FARMING"
 	},
 	{
 		"name":"STONE_ROAD",
@@ -302,7 +306,7 @@
 		"info":"Crafts items above adamant",
 		"image":"Images/buildings/hellforge.png",
 		"vision":1,
-		"cost":{"MITHRIL_BAR":20, "STONE":1000},
+		"cost":{"MITHRIL_BAR":20, "STONE":200},
 		"culture":0.5,
 		"health":1000,
 		"effort":1000,
@@ -313,11 +317,11 @@
 		"info":"Scorpions live here",
 		"image":"Images/buildings/scorpionDen.png",
 		"vision":1,
-		"cost":{"WOOD":200, "STONE":200},
+		"cost":{"WOOD":200, "STONE":200, "FOOD":200},
 		"buildsunits":["SCORPION"],
 		"culture":0,
-		"health":400,
-		"research":"CIVILIZATION",
+		"health":500,
+		"research":"DOMESTICATION",
 		"effort":500
 	}
 ]

@@ -70,7 +70,7 @@
 		"attackstyles":[
 			{"damage":15, "cooldown":30, "range":3, "minrange":1, "projectile":"ARROW"}
 		],
-		"research":"BRONZE_WORKING",
+		"research":"MASONRY",
 		"targeting":[{"type":"game.Unit"}]
 	},
 	{
@@ -137,26 +137,26 @@
 	},
 	{
 		"image":"Images/units/horseman.png",
-		"cost":{"MITHRIL_BAR":1,"HORSE":20,"FOOD":200},
-		"stats":{"movespeed":5,"buildtime":300,"health":300,"healspeed":50},
+		"cost":{"HORSE":25, "FOOD":100},
+		"stats":{"movespeed":5,"buildtime":300,"health":200,"healspeed":50},
 		"name":"HORSEMAN",
 		"attackstyles":[
 			{"damage":40, "cooldown":20, "range":1}
 		],
 		"attributes":["hostile"],
-		"research":"ANIMAL_HUSBANDRY",
+		"research":"TRAPPING",
 		"targeting":[{"type":"game.Unit"}]
 	},
 	{
 		"image":"Images/units/knight.png",
-		"cost":{"HORSE":50,"RUNE_SWORD":2,"FOOD":300},
-		"stats":{"movespeed":5,"buildtime":500,"health":700,"healspeed":50},
+		"cost":{"HORSE":100,"FOOD":400, "IRON_SWORD": 1},
+		"stats":{"movespeed":5,"buildtime":500,"health":500,"healspeed":50},
 		"name":"KNIGHT",
 		"attackstyles":[
 			{"damage":100, "cooldown":20, "range":1}
 		],
 		"attributes":["hostile"],
-		"research":"ARMORING",
+		"research":"ANIMAL_HUSBANDRY",
 		"targeting":[{"type":"game.Unit"}],
 	},
 	{
@@ -168,7 +168,7 @@
 			{"damage":100, "cooldown":50, "range":5, "minrange":1, "projectile":"WIZARD_BALL"},
 			
 		],
-		"research":"CIVILIZATION",
+		"research":"WITCHCRAFT",
 		"targeting":[
 			{"type":"game.Building"},
 			{"type":"game.Unit"}
@@ -178,7 +178,7 @@
 	{
 		"image":"Images/units/griffin.png",
 		"stats":{"movespeed":10,"buildtime":500,"health":500,"healspeed":50},
-		"cost":{"FOOD":1000},
+		"cost":{"FOOD":500},
 		"name":"GRIFFIN",
 		"attackstyles":[
 			{"damage":60, "cooldown":30, "range":1}
@@ -194,12 +194,12 @@
 	{
 		"image":"Images/units/priest.png",
 		"stats":{"movespeed":15,"buildtime":500,"health":100,"healspeed":50},
-		"cost":{"FOOD":200, "GOLD_BAR": 10},
+		"cost":{"FOOD":200, "GOLD_BAR": 5},
 		"name":"PRIEST",
 		"attackstyles":[
 	
 		],
-		"research":"CIVILIZATION",
+		"research":"MYSTICISM",
 		"targeting":[
 			
 		],
@@ -207,14 +207,14 @@
 	},
 	{
 		"image":"Images/units/horsearcher.png",
-		"cost":{"RUNITE_BAR":5,"HORSE":50,"FOOD":300},
+		"cost":{"MITHRIL_BAR":5,"HORSE":50,"FOOD":300},
 		"stats":{"movespeed":5,"buildtime":500,"health":500,"healspeed":50},
 		"name":"HORSEARCHER",
 		"attackstyles":[
 			{"damage":100, "cooldown":20, "range":3, "minrange":1, "projectile":"RUNE_ARROW"}
 		],
 		"attributes":["hostile"],
-		"research":"CIVILIZATION",
+		"research":"DOMESTICATION",
 		"targeting":[{"type":"game.Unit"}]
 	},
 	{

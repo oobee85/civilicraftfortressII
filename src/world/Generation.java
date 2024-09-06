@@ -282,6 +282,7 @@ public class Generation {
 
 	public static void generateResources(World world, Random rand) {
 		for(ResourceType resource : ResourceType.values()) {
+			// if current resource isnt an ore, skip
 			if (!resource.isOre()) {
 				continue;
 			}
@@ -290,9 +291,11 @@ public class Generation {
 			System.out.println("Tiles of " + resource.name() + ": " + numVeins);
 			
 			for(Tile tile : world.getTilesRandomly()) {
+				// if tile already has resource
 				if(tile.getResource() != null) {
 					continue;
 				}
+				// if tile cant support ore
 				if(!tile.canOre() ) {
 					continue;
 				}
