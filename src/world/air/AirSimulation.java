@@ -94,6 +94,7 @@ public class AirSimulation {
 			for (int i = 0; i < avgs.length; i++) {
 				avg.temp += avgs[i].temp;
 				avg.water += avgs[i].water;
+				
 			}
 		}
 		avg.temp /= world.getTiles().size();
@@ -225,7 +226,10 @@ public class AirSimulation {
 			//removes energy for ice and snow reflecting sun
 			if(tile.liquidType == LiquidType.ICE || tile.liquidType == LiquidType.ICE) {
 				double modifier = tile.liquidAmount / 10;
-				addedEnergy = addedEnergy - modifier;
+				if(modifier > 2) {
+					modifier = 2;
+				}
+				addedEnergy -= modifier;
 //				tile.addEnergy(-Math.log(Math.sqrt(Math.sqrt(tile.liquidAmount * modifier))));
 			}
 			
@@ -258,14 +262,15 @@ public class AirSimulation {
 				// if too much liquid on the ground, cant rain
 				if(tile.liquidAmount >= 5) {
 					amount = 0;
-				}
-				tile.getAir().addVolumeLiquid(-amount);
-				tile.liquidAmount += amount;
-				// snow takes up twice the volume of other liquids
-				if(isSnow == true) {
+				}else {
+					tile.getAir().addVolumeLiquid(-amount);
 					tile.liquidAmount += amount;
+					// snow takes up twice the volume of other liquids
+					if(isSnow == true) {
+						tile.liquidAmount += amount;
+					}
+	//				seasonEnergy += 0.01;
 				}
-//				seasonEnergy += 0.01;
 			}
 			
 			if(tile.getHeight() > 900 && averageWater < Constants.BALANCEWATER) {

@@ -481,6 +481,8 @@ public class Generation {
 			TileLoc next = queue.poll();
 			Tile tile = world.get(next);
 			tile.liquidAmount += 100;
+//			float height = tile.getHeight();
+//			tile.setHeight(height - 100);
 			volume -= 100;
 			queue.add(next);
 			for(Tile neighbor : tile.getNeighbors()) {

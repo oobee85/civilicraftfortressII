@@ -1371,7 +1371,7 @@ public class World {
 		System.out.println("Settling water for iterations: " + WATER_SETTLING_TICKS);
 		float averageWaterPerTile = AVERAGE_WATER_PER_TILE;
 		for (Tile t : this.getTiles()) {
-			if (t.liquidType != LiquidType.LAVA) {
+			if (t.liquidType != LiquidType.LAVA && t.getHeight() <= Constants.MAXHEIGHT/2.5) {
 				t.liquidAmount = averageWaterPerTile;
 				t.liquidType = LiquidType.WATER;
 			}
@@ -1385,7 +1385,7 @@ public class World {
 
 		Tile desertt = getRandomTile(worldRNG);
 		System.out.println("desert tile :" + desertt);
-		Generation.makeBiome(desertt, Terrain.SAND, 1000, 500, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
+		Generation.makeBiome(desertt, Terrain.SAND, 1000, 50, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
 		updateTerrainChange(true);
 		Generation.generateResources(this, worldRNG);
 		this.genPlants(worldRNG);
