@@ -1,87 +1,70 @@
 {
 "researches": [
-	{	
-		"name": "WARRIOR_CODE", 
+	{
+		"name": "FARMING",
 		"points": 300, "tier": 1,
-		"cost": {"WOOD": 100},
-		"image": "Images/research/warrior_code.png"},
+		"cost": {"WOOD": 200, "STONE": 200, "FOOD": 200},
+		"image": "Images/research/farming.png"},
 	{	
 		"name": "BRONZE_WORKING", 
 		"points": 300, "tier": 1,
-		"cost": {"STONE": 100},
+		"cost": {"FOOD": 200},
+		"requirements": ["FARMING"],
 		"image": "Images/research/bronze_working.png"},
 	{
 		"name": "IRON_WORKING", 
-		"points": 600, "tier": 1,
-		"cost": {"BRONZE_SWORD": 2}, 
-		"requirements": ["WARRIOR_CODE", "BRONZE_WORKING"],
-		"image": "Images/research/iron_working.png"},
-	{
-		"name": "WHEEL", 
-		"points": 300, "tier": 1,
-		"cost": {"FOOD": 200},
-		"image": "Images/research/wheel.png"},
-	{
-		"name": "MASONRY", 
-		"points": 600, "tier": 3,
-		"cost": {"STONE": 1000}, 
-		"requirements": ["WHEEL"],
-		"image": "Images/research/masonry.png"},
-		
-	{
-		"name": "FARMING",
-		"points": 500, "tier": 1,
-		"cost": {"WOOD": 200, "STONE": 200, "FOOD": 200}, 
-		"image": "Images/research/farming.png"},
-	{
-		"name": "MATHEMATICS", 
 		"points": 600, "tier": 2,
-		"cost": {"IRON_BAR": 10}, 
-		"requirements": ["BRONZE_WORKING", "WHEEL"],
-		"image": "Images/research/mathematics.png"},
-	
+		"cost": {"BRONZE_SWORD": 1}, 
+		"requirements": ["BRONZE_WORKING"],
+		"image": "Images/research/iron_working.png"},
 	{
 		"name": "ARMORING", 
 		"points": 1200, "tier": 3,
-		"cost": {"IRON_SWORD": 2}, 
+		"cost": {"IRON_SWORD": 1}, 
 		"requirements": ["IRON_WORKING"],
 		"image": "Images/research/armoring.png"},
 	{
-		"name": "HORSEBACK_RIDING", 
-		"points": 1200, "tier": 3,
-		"cost": {"HORSE": 25}, 
+		"name": "MASONRY", 
+		"points": 300, "tier": 1,
+		"cost": {"STONE": 200}, 
 		"requirements": ["FARMING"],
-		"image": "Images/research/horseback_riding.png"},
+		"image": "Images/research/masonry.png"},
 	{
-		"name": "CURRENCY", 
-		"points": 1200, "tier": 3,
-		"cost": {"FOOD": 500}, 
-		"requirements": ["FARMING", "MATHEMATICS"],
-		"image": "Images/itemicons/gold.png"},
+		"name": "MATHEMATICS",
+		"points": 600, "tier": 2,
+		"cost": {"STONE": 200, "WOOD": 200},
+		"requirements": ["MASONRY"],
+		"image": "Images/research/code_of_laws.png"},
 	{
 		"name": "ENGINEERING", 
 		"points": 1200, "tier": 3,
-		"cost": {"MITHRIL_BAR": 10}, 
-		"requirements": ["MASONRY", "MATHEMATICS"],
+		"cost": {"STONE": 200, "WOOD": 200},
+		"requirements": ["MATHEMATICS"],
 		"image": "Images/research/engineering.png"},
 	{
-		"name": "MYSTICISM", 
+		"name": "IRRIGATION", 
+		"points": 300, "tier": 1,
+		"cost": {"FOOD": 200}, 
+		"requirements": ["FARMING"],
+		"image": "Images/research/wheel.png"},
+	{
+		"name": "ANIMAL_HUSBANDRY", 
+		"points": 600, "tier": 2,
+		"cost": {"FOOD": 400}, 
+		"requirements": ["IRRIGATION"],
+		"image": "Images/research/wheel.png"},
+	{
+		"name": "DOMESTICATION", 
 		"points": 1200, "tier": 3,
-		"cost": {"STONE": 1500}, 
-		"requirements": ["MASONRY"],
-		"image": "Images/research/mysticism.png"},
-	
+		"cost": {"FOOD": 400, "HORSE": 50}, 
+		"requirements": ["ANIMAL_HUSBANDRY"],
+		"image": "Images/research/horseback_riding.png"},
 	{
-		"name": "CHIVALRY", 
-		"points": 1800, "tier": 3,
-		"cost": {"ADAMANTITE_BAR": 20}, 
-		"requirements": ["ARMORING", "HORSEBACK_RIDING"],
-		"image": "Images/research/chivalry.png"},
-	{
-		"name": "MONARCHY", 
-		"points": 1800, "tier": 3,
-		"cost": {"ADAMANTITE_BAR": 20}, 
-		"requirements": ["ENGINEERING", "CURRENCY", "MYSTICISM"],
+		"name": "CIVILIZATION", 
+		"points": 1200, "tier": 4,
+		"cost": {"STONE": 500}, 
+		"requirements": ["DOMESTICATION", "ENGINEERING", "ARMORING"],
 		"image": "Images/research/monarchy.png"}
+	
 ]
 }

@@ -64,10 +64,12 @@ public class ResearchView {
 			if (research.isCompleted()) {
 				button.setEnabled(false);
 				button.setVisible(true);
-			} else if(research.getTier() > 1 && !hasResearchLab) {
-				button.setEnabled(false);
-				button.setVisible(false);
-			} else if (req.areRequirementsMet()) {
+			} 
+//			else if(research.getTier() > 1) {
+////				button.setEnabled(false);
+////				button.setVisible(false);
+//			} 
+			else if (req.areRequirementsMet()) {
 				button.setEnabled(true);
 				button.setVisible(true);
 			} else if (req.areSecondLayerRequirementsMet()) {

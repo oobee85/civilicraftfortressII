@@ -158,25 +158,33 @@ public class AirSimulation {
 			
 			
 			// reduce energy if more than balancetemp
-			if(tile.getTemperature() >= (Constants.BALANCETEMP + 10)) {
+			if(tile.getTemperature() >= (Constants.BALANCETEMP + 15)) {
 				double modifier = (tile.getTemperature()/Constants.BALANCETEMP);
 				double heightRatio = tile.getHeight() / Constants.MAXHEIGHT;
 				addedEnergy -= (Math.sqrt(Math.abs(heightRatio * modifier)));
 //				System.out.println(addedEnergy);
 			}
 			if(tile.getTemperature() > (Constants.BALANCETEMP + 20) || tile.getAir().getTemperature() > (Constants.BALANCETEMP + 20)) {
-				addedEnergy -= 5;
+				double modifier = (tile.getTemperature()/Constants.BALANCETEMP) + 1;
+				if(modifier > 2) {
+					modifier = 2;
+				}
+				addedEnergy -= modifier;
 			}
 			
 			// add energy if less than balancetemp
-			if(tile.getTemperature() <= (Constants.BALANCETEMP - 10)) {
+			if(tile.getTemperature() <= (Constants.BALANCETEMP - 15)) {
 				double modifier = (tile.getTemperature()/Constants.BALANCETEMP);
 				double heightRatio = tile.getHeight() / Constants.MAXHEIGHT;
 				addedEnergy += (Math.sqrt(Math.abs(heightRatio * modifier)));
 //				System.out.println(addedEnergy);
 			}
 			if(tile.getTemperature() < (Constants.BALANCETEMP - 20) || tile.getAir().getTemperature() < (Constants.BALANCETEMP - 20)) {
-				addedEnergy += 5;
+				double modifier = (tile.getTemperature()/Constants.BALANCETEMP) + 1;
+				if(modifier > 2) {
+					modifier = 2;
+				}
+				addedEnergy += modifier;
 			}
 			
 			

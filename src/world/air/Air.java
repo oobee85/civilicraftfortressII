@@ -77,14 +77,21 @@ public class Air {
 		return volumeChange;
 	}
 	public void updateMaxVolume() {
-		if(temperature < Constants.FREEZETEMP) {
-			maxVolume = 0;
+		double a = 1.05659;
+		double b = 0.182333;
+		if(temperature <= Constants.FREEZETEMP) {
+			maxVolume = 0.25;
+			return;
 		}
-		if(temperature > Constants.FREEZETEMP - 10) {
-			maxVolume = (this.temperature - Constants.KELVINOFFSET)/4 + 3.5;
-		}else {
-			maxVolume = 1;
-		}
+		maxVolume = (((this.temperature - Constants.KELVINOFFSET) * a) / b) /25 ;
+//		if(temperature <= Constants.FREEZETEMP) {
+//			maxVolume = 0;
+//		}
+//		if(temperature > Constants.FREEZETEMP - 10) {
+//			maxVolume = (this.temperature - Constants.KELVINOFFSET)/4 + 3.5;
+//		}else {
+//			maxVolume = 1;
+//		}
 
 		
 	}

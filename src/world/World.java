@@ -821,14 +821,14 @@ public class World {
 			
 			
 			// RICHSOIL
-			if(tile.canPlant() && tile.liquidType == LiquidType.WATER && tile.liquidAmount >= 20) {
-				double threshold = 0;
-				threshold = Constants.CHANCE_TO_SWITCH_TERRAIN/500;
-				if(Math.random() < threshold) {
-					tile.setTerrain(Terrain.RICHSOIL);
-					tile.setTickLastTerrainChange(World.ticks);
-				}
-			}
+//			if(tile.canPlant() && tile.liquidType == LiquidType.WATER && tile.liquidAmount >= 20) {
+//				double threshold = 0;
+//				threshold = Constants.CHANCE_TO_SWITCH_TERRAIN/500;
+//				if(Math.random() < threshold) {
+//					tile.setTerrain(Terrain.RICHSOIL);
+//					tile.setTickLastTerrainChange(World.ticks);
+//				}
+//			}
 			
 			if(tile.checkTerrain(Terrain.RICHSOIL)) {
 				double threshold = 0;

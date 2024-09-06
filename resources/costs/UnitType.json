@@ -70,7 +70,7 @@
 		"attackstyles":[
 			{"damage":15, "cooldown":30, "range":3, "minrange":1, "projectile":"ARROW"}
 		],
-		"research":"WARRIOR_CODE",
+		"research":"BRONZE_WORKING",
 		"targeting":[{"type":"game.Unit"}]
 	},
 	{
@@ -94,7 +94,7 @@
 			{"damage":60, "cooldown":30, "range":6, "minrange":2, "projectile":"ARROW"}
 		],
 		"attributes":["hostile"],
-		"research":"ENGINEERING",
+		"research":"MATHEMATICS",
 		"targeting":[{"type":"game.Unit"}]
 	},
 	{
@@ -120,7 +120,7 @@
 			{"damage":600, "cooldown":100, "range":20, "minrange":5, "projectile":"FIREBALL_TREBUCHET"}
 		],
 		"attributes":["hostile"],
-		"research":"MONARCHY",
+		"research":"ENGINEERING",
 		"targeting":[{"type":"game.Unit"}]
 	},
 	{
@@ -132,7 +132,7 @@
 			{"damage":1000, "cooldown":200, "range":30, "minrange":1}
 		],
 		"attributes":["hostile"],
-		"research":"MONARCHY",
+		"research":"CIVILIZATION",
 		"targeting":[{"type":"game.Unit"}]
 	},
 	{
@@ -144,7 +144,7 @@
 			{"damage":40, "cooldown":20, "range":1}
 		],
 		"attributes":["hostile"],
-		"research":"HORSEBACK_RIDING",
+		"research":"ANIMAL_HUSBANDRY",
 		"targeting":[{"type":"game.Unit"}]
 	},
 	{
@@ -156,7 +156,7 @@
 			{"damage":100, "cooldown":20, "range":1}
 		],
 		"attributes":["hostile"],
-		"research":"CHIVALRY",
+		"research":"ARMORING",
 		"targeting":[{"type":"game.Unit"}],
 	},
 	{
@@ -168,7 +168,7 @@
 			{"damage":100, "cooldown":50, "range":5, "minrange":1, "projectile":"WIZARD_BALL"},
 			
 		],
-		"research":"MYSTICISM",
+		"research":"CIVILIZATION",
 		"targeting":[
 			{"type":"game.Building"},
 			{"type":"game.Unit"}
@@ -183,7 +183,7 @@
 		"attackstyles":[
 			{"damage":60, "cooldown":30, "range":1}
 		],
-		"research":"MYSTICISM",
+		"research":"DOMESTICATION",
 		"targeting":[
 			{"type":"game.Building"},
 			{"type":"game.Unit"}
@@ -199,7 +199,7 @@
 		"attackstyles":[
 	
 		],
-		"research":"MYSTICISM",
+		"research":"CIVILIZATION",
 		"targeting":[
 			
 		],
@@ -214,7 +214,7 @@
 			{"damage":100, "cooldown":20, "range":3, "minrange":1, "projectile":"RUNE_ARROW"}
 		],
 		"attributes":["hostile"],
-		"research":"CHIVALRY",
+		"research":"CIVILIZATION",
 		"targeting":[{"type":"game.Unit"}]
 	},
 	{

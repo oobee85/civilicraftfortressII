@@ -10,7 +10,8 @@
 		"culture":0,
 		"attributes":["harvestable"],
 		"health":80,
-		"effort":160},
+		"effort":160
+	},
 	{
 		"name":"MINE",
 		"info":"Workers mine stone from here",
@@ -19,8 +20,10 @@
 		"cost":{"WOOD":100},
 		"culture":0,
 		"attributes":["harvestable"],
+		"research":"FARMING",
 		"health":100,
-		"effort":100},
+		"effort":100
+	},
 	{
 		"name":"SAWMILL",
 		"info":"Workers deposit wood here",
@@ -30,8 +33,10 @@
 		"culture":0.1,
 		"attributes":["colony"],
 		"inventory":{"maxstack":500},
+		"research":"FARMING",
 		"health":200,
-		"effort":200},
+		"effort":200
+	},
 	{
 		"name":"QUARRY",
 		"info":"Workers can mine ores near here",
@@ -41,8 +46,10 @@
 		"culture":0.1,
 		"attributes":["colony"],
 		"inventory":{"maxstack":500},
+		"research":"FARMING",
 		"health":200,
-		"effort":200},
+		"effort":200
+	},
 	{
 		"name":"BARRACKS",
 		"info":"Produces basic combat units",
@@ -50,10 +57,11 @@
 		"vision":1,
 		"cost":{"WOOD":150, "STONE":150},
 		"buildsunits":["WARRIOR","ARCHER","SPEARMAN","SWORDSMAN"],
+		"research":"BRONZE_WORKING",
 		"culture":0.5,
 		"health":300,
-		"effort":300,
-		"research":"WARRIOR_CODE"},
+		"effort":300
+	},
 	{
 		"name":"GRANARY",
 		"info":"Increases unit supply. Produces some food.",
@@ -67,7 +75,8 @@
 		"inventory":{"maxstack":50},
 		"health":500,
 		"effort":500,
-		"research":"WHEEL"},
+		"research":"IRRIGATION"
+	},
 	{
 		"name":"WINDMILL",
 		"info":"Produces lots of food",
@@ -80,7 +89,8 @@
 		"inventory":{"maxstack":200},
 		"health":1000,
 		"effort":1000,
-		"research":"MATHEMATICS"},
+		"research":"MATHEMATICS"
+	},
 	{
 		"name":"STABLES",
 		"info":"Trap a horse to breed horses. Build horse units.",
@@ -92,18 +102,20 @@
 		"inventory":{"maxstack":100},
 		"health":1000,
 		"effort":1000,
-		"research":"FARMING"},
+		"research":"ANIMAL_HUSBANDRY"
+	},
 	{
 		"name":"WATCHTOWER",
 		"info":"Provides vision",
 		"image":"Images/buildings/watchtower.png",
 		"vision":10,
-		"cost":{"WOOD":500, "MITHRIL_BAR":5},
-		"culture":0.25,
-		"health":1000,
-		"effort":1000,
-		"research":"MYSTICISM"
-	}, {
+		"cost":{"WOOD":200, "STONE":200},
+		"culture":0.5,
+		"health":500,
+		"effort":500,
+		"research":"MASONRY"
+	},
+	{
 		"name":"CASTLE",
 		"info":"Produces workers",
 		"image":"Images/buildings/castle256.png",
@@ -117,35 +129,36 @@
 		"health":2000,
 		"effort":2000,
 		"research":"MASONRY",
-		"inventory":{"maxstack":10000},
-	}, {
+		"inventory":{"maxstack":10000}
+	}, 
+	{
 		"name":"NECROPOLIS",
 		"info":"Produces skeletons and other undead beings",
 		"image":"Images/buildings/necropolis.png",
 		"vision":6,
-		"cost":{"WOOD":2000, "STONE":5000},
+		"cost":{"WOOD":1000, "STONE":1000},
 		"buildsunits":["MASON", "SKELETON", "ICE_GIANT", "VAMPIRE"],
 		"culture":1,
 		"attributes":["castle"],
 		"health":3000,
 		"effort":3000,
-		"research":"MONARCHY",
-		"inventory":{"maxstack":10000},
-	}, {
+		"research":"ENGINEERING",
+		"inventory":{"maxstack":10000}
+	}, 
+	{
 		"name":"PORT",
 		"info":"Produces boats",
 		"image":"Images/buildings/port.png",
 		"vision":3,
-		"cost":{"WOOD":400, "STONE":200, "RUNITE_BAR":1},
+		"cost":{"WOOD":200, "STONE":200},
 		"buildsunits":["BOAT"],
 		"culture":1,
 		"attributes":[],
 		"resistances": {"COLD": 0, "DRY": 0, "WATER": 0},
 		"health":1000,
 		"effort":1000,
-		"research":"MONARCHY",
+		"research":"MATHEMATICS"
 	},
-	
 	{
 		"name":"WORKSHOP",
 		"info":"Produces advanced combat units",
@@ -157,7 +170,8 @@
 		"culture":0.5,
 		"health":500,
 		"effort":500,
-		"research":"MATHEMATICS"},
+		"research":"MATHEMATICS"
+	},
 	{
 		"name":"SMITHY",
 		"info":"Crafts items up to mithril",
@@ -167,7 +181,8 @@
 		"culture":0.5,
 		"health":500,
 		"effort":500,
-		"research":"BRONZE_WORKING"},
+		"research":"BRONZE_WORKING"
+	},
 	{
 		"name":"RESEARCH_LAB",
 		"info":"Unlocks researches after iron working",
@@ -177,7 +192,8 @@
 		"culture":0.5,
 		"health":500,
 		"effort":500,
-		"research":"IRON_WORKING"},
+		"research":"IRON_WORKING"
+	},
 	{
 		"name":"STONE_ROAD",
 		"mesh":"models/flatcube.obj",
@@ -190,7 +206,8 @@
 		"health":20,
 		"effort":20,
 		"attributes":["road"],
-		"research":"WHEEL"},
+		"research":"MASONRY"
+	},
 	{
 		"name":"BRICK_ROAD",
 		"mesh":"models/flatcube.obj",
@@ -198,12 +215,13 @@
 		"image":"Images/buildings/brick_road.png",
 		"vision":0,
 		"movespeed":1000,
-		"cost":{"STONE":100},
+		"cost":{"STONE":50},
 		"culture":0,
-		"health":400,
-		"effort":50,
+		"health":500,
+		"effort":100,
 		"attributes":["road"],
-		"research":"MONARCHY"},
+		"research":"ENGINEERING"
+	},
 	{
 		"name":"WALL_WOOD",
 		"info":"Blocks movement",
@@ -213,66 +231,72 @@
 		"culture":0.25,
 		"health":100,
 		"effort":100,
-		"attributes":["blocksmovement"]},
-	{
-		"name":"WALL_STONE",
-		"info":"Blocks movement",
-		"image":"Images/buildings/wall_stone.png",
-		"vision":1,
-		"cost":{"WOOD":200, "STONE":200},
-		"culture":0.25,
-		"health":1000,
-		"effort":200,
-		"attributes":["blocksmovement"],
-		"resistances": {"HEAT": 50},
-		"research":"MASONRY"},
-	{
-		"name":"WALL_BRICK",
-		"info":"Blocks movement",
-		"image":"Images/buildings/wall_brick.png",
-		"vision":1,
-		"cost":{"STONE":400, "ADAMANTITE_BAR":1},
-		"culture":0.25,
-		"health":5000,
-		"effort":500,
-		"attributes":["blocksmovement"],
-		"resistances": {"HEAT": 20},
-		"research":"ENGINEERING"},
+		"attributes":["blocksmovement"]
+	},
 	{
 		"name":"GATE_WOOD",
 		"info":"Blocks movement except for own faction",
 		"image":"Images/buildings/gate_wood.png",
 		"vision":1,
-		"cost":{"WOOD":200, "BRONZE_BAR":20, "STONE":200},
+		"cost":{"WOOD":200, "BRONZE_BAR":5},
 		"culture":0.5,
-		"health":75,
+		"health":100,
 		"effort":200,
 		"attributes":["blocksmovement", "gate"],
-		"research":"MASONRY"},
+		"research":"MASONRY"
+	},
+	{
+		"name":"WALL_STONE",
+		"info":"Blocks movement",
+		"image":"Images/buildings/wall_stone.png",
+		"vision":1,
+		"cost":{"WOOD":50, "STONE":100},
+		"culture":0.25,
+		"health":1000,
+		"effort":200,
+		"attributes":["blocksmovement"],
+		"resistances": {"HEAT": 50},
+		"research":"MASONRY"
+	},
 	{
 		"name":"GATE_STONE",
 		"info":"Blocks movement except for own faction",
 		"image":"Images/buildings/gate_stone.gif",
 		"vision":1,
-		"cost":{"WOOD":400, "MITHRIL_BAR":20, "STONE":400},
+		"cost":{"WOOD":100, "IRON_BAR":5, "STONE":200},
 		"culture":0.5,
 		"health":1000,
 		"effort":400,
 		"attributes":["blocksmovement", "gate"],
 		"resistances": {"HEAT": 50},
-		"research":"ENGINEERING"},
+		"research":"MATHEMATICS"
+	},
+	{
+		"name":"WALL_BRICK",
+		"info":"Blocks movement",
+		"image":"Images/buildings/wall_brick.png",
+		"vision":1,
+		"cost":{"STONE":200, "MITHRIL_BAR":5},
+		"culture":0.25,
+		"health":5000,
+		"effort":200,
+		"attributes":["blocksmovement"],
+		"resistances": {"HEAT": 100},
+		"research":"ENGINEERING"
+	},
 	{
 		"name":"GATE_BRICK",
 		"info":"Blocks movement except for own faction",
 		"image":"Images/buildings/gate_brick.png",
 		"vision":1,
-		"cost":{"WOOD":1000, "STONE":1000, "ADAMANTITE_BAR":20},
+		"cost":{"STONE":1000, "MITHRIL_BAR":10},
 		"culture":0.5,
-		"health":4000,
-		"effort":1000,
+		"health":5000,
+		"effort":400,
 		"attributes":["blocksmovement", "gate"],
 		"resistances": {"HEAT": 20},
-		"research":"MONARCHY"},
+		"research":"ENGINEERING"
+	},
 	{
 		"name":"HELLFORGE",
 		"info":"Crafts items above adamant",
@@ -283,7 +307,8 @@
 		"health":1000,
 		"effort":1000,
 		"research":"ARMORING"
-	}, {
+	}, 
+	{
 		"name":"SCORPION_DEN",
 		"info":"Scorpions live here",
 		"image":"Images/buildings/scorpionDen.png",
@@ -292,8 +317,8 @@
 		"buildsunits":["SCORPION"],
 		"culture":0,
 		"health":400,
-		"research":"MONARCHY",
+		"research":"CIVILIZATION",
 		"effort":500
-	},
+	}
 ]
 }
