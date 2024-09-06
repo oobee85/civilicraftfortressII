@@ -195,6 +195,11 @@ public class AirSimulation {
 				addedEnergy -= heightRatio;
 			}
 			
+			// remove some energy for sand
+			if(tile.getTerrain() == Terrain.SAND) {
+				addedEnergy += 1;
+			}
+			
 			
 //			int groundModEnergy = 0;
 			//adds energy for ground modifiers

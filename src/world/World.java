@@ -1385,7 +1385,7 @@ public class World {
 
 		Tile desertt = getRandomTile(worldRNG);
 		System.out.println("desert tile :" + desertt);
-		Generation.makeBiome(desertt, Terrain.SAND, 1000, Integer.MAX_VALUE, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
+		Generation.makeBiome(desertt, Terrain.SAND, 1000, 500, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
 		updateTerrainChange(true);
 		Generation.generateResources(this, worldRNG);
 		this.genPlants(worldRNG);
