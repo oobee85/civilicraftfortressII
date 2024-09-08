@@ -28,7 +28,7 @@ public class World {
 	
 	private LinkedList<Tile> tileList;
 	private ArrayList<Tile> tileArray;
-	private LinkedList<Tile> tileListRandom;
+	private ArrayList<Tile> tileListRandom;
 	
 	private static final int NUM_LIQUID_SIMULATION_PHASES = 9;
 	private ArrayList<ArrayList<Tile>> liquidSimulationPhases = new ArrayList<>(NUM_LIQUID_SIMULATION_PHASES);
@@ -60,7 +60,7 @@ public class World {
 		this.height = height;
 		tileList = new LinkedList<>();
 		tileArray = new ArrayList<>();
-		tileListRandom = new LinkedList<>();
+		tileListRandom = new ArrayList<>();
 		tiles = new Tile[width][height];
 		liquidSimulationPhases.clear();
 		for(int i = 0; i < NUM_LIQUID_SIMULATION_PHASES; i++) {
@@ -178,20 +178,21 @@ public class World {
 		return height;
 	}
 	
-	public LinkedList<Tile> getTiles() {
-		return tileList;
+	public List<Tile> getTiles() {
+		return Collections.unmodifiableList(tileList);
 	}
 	
 	private int currentTileSalt = 0;
-	public LinkedList<Tile> getTilesRandomly() {
+	public List<Tile> getTilesRandomly() {
 		currentTileSalt++;
-		Collections.sort(tileListRandom, new Comparator<Tile>() {
-			@Override
-			public int compare(Tile o1, Tile o2) {
-				return o1.getHash(currentTileSalt) - o2.getHash(currentTileSalt);
-			}
-		});
-		return tileListRandom;
+		Random rand = new Random(currentTileSalt);
+		for (int index = 0; index < tileListRandom.size(); index++) {
+			int randomIndex = rand.nextInt(tileListRandom.size());
+			Tile randomTile = tileListRandom.get(randomIndex);
+			tileListRandom.set(randomIndex, tileListRandom.get(index));
+			tileListRandom.set(index, randomTile);
+		}
+		return Collections.unmodifiableList(tileListRandom);
 	}
 
 	public Tile getRandomTile(Random rand) {
@@ -248,15 +249,15 @@ public class World {
 	public void rain() {
 		
 		//makes it so that it doesnt spawn the center of rain in deserts or on the volcano
-		Tile rainTile = this.getTilesRandomly().peek();
+		Tile rainTile = getRandomTile();
 		while(rainTile.getTerrain() == Terrain.SAND || rainTile.getTerrain() == Terrain.VOLCANO) {
-			rainTile = this.getTilesRandomly().peek();
+			rainTile = getRandomTile();
 		}
 		
 		int radius = (int) (Math.random()*20 + 10);
 		
 		List<Tile> rainTiles = Utils.getTilesInRadius(rainTile, this, radius);
-		TileLoc destination = getTilesRandomly().peek().getLocation();
+		TileLoc destination = getRandomTile().getLocation();
 		int dx = destination.x() - rainTile.getLocation().x();
 		int dy = destination.y() - rainTile.getLocation().y();
 		
@@ -1317,25 +1318,20 @@ public class World {
 			tile.setFaction(getFaction(NO_FACTION_ID));
 			tile.setHeight(heightMap[tile.getLocation().x()][tile.getLocation().y()]);
 		}
-		LinkedList<Tile> tiles = getTiles();
-		
-		
-		Collections.sort(tiles, new Comparator<Tile>() {
+		Collections.sort(tileList, new Comparator<Tile>() {
 			@Override
 			public int compare(Tile o1, Tile o2) {
 				return o1.getHeight() > o2.getHeight() ? 1 : -1;
 			}
 		});
 		
-		
-		
 		double rockpercentageLow = 0.01;
 		double grassPercentage = .50;
 		double dirtPercentage = .80;
 //		double rockpercentageHigh = 1;
-		double rockCutoffLow = tiles.get((int)(rockpercentageLow*tiles.size())).getHeight();
-		double grassCutoff = tiles.get((int)(grassPercentage*tiles.size())).getHeight();
-		double dirtCutoff = tiles.get((int)(dirtPercentage*tiles.size())).getHeight();
+		double rockCutoffLow = tileList.get((int)(rockpercentageLow*tileList.size())).getHeight();
+		double grassCutoff = tileList.get((int)(grassPercentage*tileList.size())).getHeight();
+		double dirtCutoff = tileList.get((int)(dirtPercentage*tileList.size())).getHeight();
 //		double rockCutoffHigh = tiles.get((int)(rockpercentageHigh*tiles.size())).getHeight();
 		
 		for(Tile tile : getTiles()) {

@@ -128,7 +128,7 @@ public class Animal extends Unit {
 		if(World.ticks > dontMigrateUntil && Math.random() < 0.1) {
 			Tile target;
 			if(getType().isMigratory())
-				target = world.getTilesRandomly().getFirst();
+				target = world.getRandomTile();
 			else 
 				target = getTile().getNeighbors().get((int)(Math.random()*getTile().getNeighbors().size()));
 			if(this.applyResistance(target.computeTileDanger()) <= 0.9) {

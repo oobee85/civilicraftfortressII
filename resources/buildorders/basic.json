@@ -3,47 +3,83 @@
 				"GATHERCOPPER", "GATHERIRON", "GATHERCOAL", "GATHERMITHRIL"],
 "phases": [
 	{
+		"order": 0,
+		"units": {
+			"WORKER": {"enough": 3},
+		},
+		"workerAssignments": {
+			"FORAGE": 1,
+		},
+	},
+	{
 		"order": 1,
 		"units": {
-			"WORKER": {"min": 0, "enough": 4, "max": 10}
+			"WORKER": {"enough": 6, "max": 10},
 		},
-		"researchRequired": ["FARMING"],
 		"workerAssignments": {
 			"FORAGE": 3,
 			"FARM": 4,
-			"CHOP": 2
-		}
+			"CHOP": 2,
+		},
 	},
 	{
 		"order": 2,
+		"researchRequired": ["FARMING"],
 		"units": {
-			"WORKER": {"min": 4, "enough": 8, "max": 12},
-			"WARRIOR": {"enough": 1, "max": 100},
+			"WORKER": {"enough": 6, "max": 10},
 		},
-		"researchRequired": ["BRONZE_WORKING"],
 		"workerAssignments": {
-			"FORAGE": 2,
+			"FORAGE": 3,
 			"FARM": 4,
-			"CHOP": 3
+			"CHOP": 2,
 		},
-		"buildings": {
-			"BARRACKS": {"min": 0, "enough": 1, "max": 1}
-		}
 	},
 	{
 		"order": 3,
+		"researchRequired": ["BRONZE_WORKING"],
+		"buildings": {
+			"BARRACKS": {"enough": 1, "max": 1},
+			"SMITHY": {"enough": 1, "max": 1},
+		},
 		"units": {
-			"WORKER": {"min": 8, "enough": 100},
-			"WARRIOR": {},
+			"WORKER": {"min": 4, "enough": 8, "max": 20},
+			"WARRIOR": {"enough": 1, "max": 100},
+			"CARAVAN": {"max": 1},
+			"SPEARMAN": {"enough": 1, "max": 1},
 		},
 		"workerAssignments": {
 			"FORAGE": 2,
-			"FARM": 68,
-			"CHOP": 30
+			"FARM": 6,
+			"CHOP": 3,
+			"GATHERSTONE": 1,
+			"GATHERSILVER": 1,
+			"GATHERCOPPER": 1,
 		},
-		"buildings": {
-			"BARRACKS": {"min": 0, "enough": 1, "max": 1}
-		}
 	},
+	{
+		"order": 4,
+		"researchRequired": ["IRON_WORKING"],
+		"buildings": {
+			"BARRACKS": {"enough": 1, "max": 1},
+			"SMITHY": {"enough": 1, "max": 1},
+		},
+		"units": {
+			"WORKER": {"min": 4, "enough": 12, "max": 50},
+			"WARRIOR": {"enough": 1, "max": 1},
+			"CARAVAN": {"max": 3},
+			"SPEARMAN": {"enough": 1, "max": 1},
+			"SWORDSMAN": {"enough": 1},
+		},
+		"workerAssignments": {
+			"FORAGE": .1,
+			"FARM": 12,
+			"CHOP": 3,
+			"GATHERSTONE": 1,
+			"GATHERSILVER": 1,
+			"GATHERCOPPER": 1,
+			"GATHERIRON": 1,
+			"GATHERCOAL": 1,
+		},
+	}
 ]
 }

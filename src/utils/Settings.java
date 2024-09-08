@@ -16,6 +16,7 @@ import java.util.Set;
 
 public class Settings {
 	public static boolean DEBUG;
+	public static boolean DEBUG_PRINT_AIR_ENERGY = false;
 	public static boolean SPAWN_EXTRA;
 	public static boolean CINEMATIC;
 	public static boolean SHOW_FPS = false;

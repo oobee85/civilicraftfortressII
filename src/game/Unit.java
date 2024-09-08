@@ -209,12 +209,12 @@ public class Unit extends Thing implements Serializable {
 		}
 		
 		if (World.ticks % ticksToCost == 0 && getFaction().usesItems()) {
-			if (getFaction().canAfford(ItemType.FOOD, 2)) {
-				getFaction().payCost(ItemType.FOOD, 2);
+			if (getFaction().canAfford(ItemType.FOOD, 1)) {
+				getFaction().payCost(ItemType.FOOD, 1);
 				starving = 0;
 			} else {
 				starving++;
-				int[] damage = DamageType.getZeroDamageArray();
+//				int[] damage = DamageType.getZeroDamageArray();
 				takeDamage(starving, DamageType.HUNGER);
 			}
 		}

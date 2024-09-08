@@ -14,7 +14,7 @@ public class AirSimulation {
 		void task(Tile t);
 	}
 	
-	private static void simulationWork(World world, LinkedList<Tile> tilesRandomOrder, SimulationTask task) {
+	private static void simulationWork(World world, List<Tile> tilesRandomOrder, SimulationTask task) {
 		if (!Settings.AIR_MULTITHREADED) {
 			for(Tile tile : tilesRandomOrder) {
 				task.task(tile);
@@ -102,7 +102,7 @@ public class AirSimulation {
 		return avg;
 	}
 	
-	public static void doAirSimulationStuff(World world, LinkedList<Tile> tilesRandomOrder, int width, int height) {
+	public static void doAirSimulationStuff(World world, List<Tile> tilesRandomOrder, int width, int height) {
 		
 		simulationWork(world, tilesRandomOrder, (tile) -> {
 			tile.updateAir();
@@ -328,7 +328,8 @@ public class AirSimulation {
 			
 			tile.updateEnergyToTemperature();
 			
-			if(tile.getLocation().x() == 5 
+			if(Settings.DEBUG_PRINT_AIR_ENERGY 
+					&& tile.getLocation().x() == 5 
 					&& tile.getLocation().y() == 5 
 					&& World.ticks % 100 == 1) {
 //				tile.setEnergy(21000);
@@ -340,7 +341,7 @@ public class AirSimulation {
 		
 	}
 	
-	public static void updateAirMovement(LinkedList<Tile> tiles, int worldWidth, int worldHeight) {
+	public static void updateAirMovement(List<Tile> tiles, int worldWidth, int worldHeight) {
 		if(World.ticks % Constants.TICKSTOUPDATEAIR == 0) {
 			return;
 		}

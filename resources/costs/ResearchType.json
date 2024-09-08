@@ -8,19 +8,19 @@
 	{	
 		"name": "BRONZE_WORKING", 
 		"points": 300, "tier": 1,
-		"cost": {"WOOD": 100},
+		"cost": {"BRONZE_BAR":8},
 		"requirements": ["FARMING"],
 		"image": "Images/research/bronze_working.png"},
 	{
 		"name": "IRON_WORKING", 
 		"points": 600, "tier": 2,
-		"cost": {"BRONZE_BAR":5,"WOOD":50}, 
+		"cost": {"IRON_BAR":8}, 
 		"requirements": ["BRONZE_WORKING"],
 		"image": "Images/research/iron_working.png"},
 	{
 		"name": "ARMORING", 
 		"points": 1200, "tier": 3,
-		"cost": {"IRON_BAR":5,"WOOD":50}, 
+		"cost": {"IRON_BAR":30}, 
 		"requirements": ["IRON_WORKING"],
 		"image": "Images/research/armoring.png"},
 	{

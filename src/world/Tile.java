@@ -602,15 +602,20 @@ public class Tile implements Externalizable {
 		return false;
 	}
 	
+	static int[] distro = new int[100];
 	public int getHash(int salt) {
-		final int prime = 197938439;
-	    int result = 1;
-	    result = prime * result + salt;
-	    result = ((result << 7) & 0xFFFFFFE0) | ((result >>> 25) & 0x0000001F);
-	    result = prime * result + getLocation().x();
-	    result = ((result << 3) & 0xFFFFFFE0) | ((result >>> 29) & 0x0000001F);
-	    result = prime * result + getLocation().y();
-	    result = ((result << 5) & 0xFFFFFFE0) | ((result >>> 27) & 0x0000001F);
-	    return result;
+		return String.format("%d,%d,%d", getLocation().x(), getLocation().y(), salt).hashCode();
+		
+//		final int prime = 197938439;
+//	    int result = 1;
+//	    result = result + prime * salt;
+//	    result = ((result << 7) & 0xFFFFFF80) | ((result >>> 25) & 0x0000007F);
+//	    result = result + prime * (getLocation().x() + salt);
+//	    result = ((result << 25) & 0xFE000000) | ((result >>> 7) & 0x01FFFFFF);
+//	    result = result + prime * (getLocation().y() + salt);
+//	    result = ((result << 5) & 0xFFFFFFE0) | ((result >>> 27) & 0x0000001F);
+//	    
+//	    distro[(int)(   (((double)result) / Integer.MAX_VALUE / 2 + 0.5)*distro.length    )]++;
+//	    return result;
 	}
 }

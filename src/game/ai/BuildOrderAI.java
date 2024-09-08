@@ -121,11 +121,11 @@ public class BuildOrderAI extends AIInterface {
 
 	@Override
 	public void aiTickLogic() {
-		boolean completedUnits = replentishUnits();
+		craftItems();
 		boolean completedResearch = research();
 		boolean completedBuilding = build();
+		boolean completedUnits = replentishUnits();
 		unitActions();
-		craftItems();
 		
 		
 		if (completedUnits && completedResearch && completedBuilding) {
@@ -137,13 +137,6 @@ public class BuildOrderAI extends AIInterface {
 	}
 	
 	private void craftItems() {
-//		if (faction.getInventory().getItemAmount(ItemType.BRONZE_SWORD) < 2) {
-//			commands.craftItem(faction, ItemType.BRONZE_SWORD, 1);
-//		}
-//		if (faction.getInventory().getItemAmount(ItemType.IRON_SWORD) < 1) {
-//			commands.craftItem(faction, ItemType.IRON_SWORD, 1);
-//		}
-
 		commands.craftItem(faction, ItemType.BRONZE_BAR, 1);
 		commands.craftItem(faction, ItemType.IRON_BAR, 1);
 	}
@@ -155,7 +148,7 @@ public class BuildOrderAI extends AIInterface {
 	List<Tile> mithrilTiles = new LinkedList<Tile>();
 	
 	private void phaseTransition(int newPhase) {
-		if (newPhase == 3) {
+		if (newPhase == 1) {
 			for (Tile t : world.getTiles()) {
 				if (t.getResource() == null) {
 					continue;
@@ -237,6 +230,7 @@ public class BuildOrderAI extends AIInterface {
 					bestTask = entry.getKey();
 				}
 			}
+			System.out.println("Assigning worker to " + bestTask);
 			return bestTask;
 		}
 		void removeDeadWorkers(Set<Integer> aliveWorkers) {
@@ -277,7 +271,6 @@ public class BuildOrderAI extends AIInterface {
 				if (p != null && p.isBuildAction()) {
 					continue;
 				}
-//				int taskIndex = 0;
 				WorkerTask task = counter.getTaskFor(unit.id());
 				boolean result = true;
 				switch (task) {
@@ -311,6 +304,7 @@ public class BuildOrderAI extends AIInterface {
 				}
 				
 				if (!result) {
+					System.out.println("Failed to do task: " + task);
 					counter.unassign(unit.id());
 				}
 			}
