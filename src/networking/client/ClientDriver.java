@@ -43,6 +43,7 @@ public class ClientDriver implements WindowListener {
 		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);
 		Loader.loadPlantType(Game.plantTypeMap, Game.plantTypeList);
 		Loader.doMappings();
+		Loader.loadBuildOrders();
 	}
 	
 	public static void main(String[] args) {

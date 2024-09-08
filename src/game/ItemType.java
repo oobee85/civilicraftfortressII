@@ -30,14 +30,6 @@ public enum ItemType {
 	ADAMANTITE_BAR("HELLFORGE",makeCosts(COAL,30, 	ADAMANTITE_ORE,5),	"Images/itemicons/adamantite_bar.png"),
 	RUNITE_BAR 	("HELLFORGE",  makeCosts(COAL,50, 	RUNITE_ORE,5),		"Images/itemicons/runite_bar.png"),
 	TITANIUM_BAR("HELLFORGE",  makeCosts(COAL,80, 	TITANIUM_ORE,5),	"Images/itemicons/titanium_bar.png"),
-	
-	BRONZE_SWORD("SMITHY",     makeCosts(WOOD,50, 	BRONZE_BAR,5),	"Images/itemicons/bronze_sword.png"),
-	IRON_SWORD 	("SMITHY",     makeCosts(WOOD,50, 	IRON_BAR,5),	"Images/itemicons/iron_sword.png"),
-	MITHRIL_SWORD("SMITHY",    makeCosts(WOOD,50, 	MITHRIL_BAR,5),	"Images/itemicons/mithril_sword.png"),
-	
-	ADAMANT_SWORD("HELLFORGE", makeCosts(WOOD,50, 	IRON_BAR,5,	ADAMANTITE_BAR,5),	"Images/itemicons/adamant_sword.png"),
-	RUNE_SWORD 	("HELLFORGE",  makeCosts(WOOD,50, 	IRON_BAR,5,	RUNITE_BAR,5),		"Images/itemicons/rune_sword.png"),
-	TITANIUM_SWORD("HELLFORGE",makeCosts(WOOD,50, 	IRON_BAR,5,	TITANIUM_BAR,5),	"Images/itemicons/titanium_sword.png"),
 	;
 	
 	private MipMap mipmap;

@@ -51,7 +51,7 @@
 	},
 	{
 		"image":"Images/units/spearman.png",
-		"cost":{"BRONZE_SWORD":1,"FOOD":100},
+		"cost":{"BRONZE_BAR":5,"WOOD":50,"FOOD":100},
 		"stats":{"movespeed":15,"buildtime":200,"health":300,"healspeed":50},
 		"name":"SPEARMAN",
 		"attackstyles":[
@@ -75,7 +75,7 @@
 	},
 	{
 		"image":"Images/units/swordsman.png",
-		"cost":{"IRON_SWORD":1,"FOOD":200},
+		"cost":{"IRON_BAR":5,"WOOD":50,"FOOD":200},
 		"stats":{"movespeed":10,"buildtime":200,"health":500,"healspeed":50},
 		"name":"SWORDSMAN",
 		"attackstyles":[
@@ -125,7 +125,7 @@
 	},
 	{
 		"image":"Images/units/sniper.png",
-		"cost":{"MITHRIL_SWORD":5,"ADAMANT_SWORD":5,"RUNE_SWORD":5,"TITANIUM_SWORD":10},
+		"cost":{"WOOD":1250,"IRON_BAR":100,"MITHRIL_BAR":25,"ADAMANTITE_BAR":25,"RUNITE_BAR":25,"TITANIUM_BAR":50},
 		"stats":{"movespeed":100,"buildtime":3000,"health":20,"healspeed":50},
 		"name":"SNIPER",
 		"attackstyles":[
@@ -149,7 +149,7 @@
 	},
 	{
 		"image":"Images/units/knight.png",
-		"cost":{"HORSE":100,"FOOD":400, "IRON_SWORD": 1},
+		"cost":{"HORSE":100,"FOOD":400, "IRON_BAR":5,"WOOD":50},
 		"stats":{"movespeed":5,"buildtime":500,"health":500,"healspeed":50},
 		"name":"KNIGHT",
 		"attackstyles":[
@@ -428,7 +428,7 @@
 	},
 	{
 		"image":"Images/units/skeleton.png",
-		"cost":{"BRONZE_SWORD":1,"FOOD":200},
+		"cost":{"BRONZE_BAR":5,"WOOD":50,"FOOD":200},
 		"stats":{"movespeed":20,"buildtime":100,"health":300,"healspeed":50},
 		"name":"SKELETON",
 		"attackstyles":[
@@ -458,7 +458,7 @@
 			{"type":"game.Unit", "faction":"PLAYER"},
 			{"type":"game.Unit"}
 		],
-		"loot":{"IRON_SWORD":2, "MITHRIL_BAR":5}
+		"loot":{"IRON_BAR":10, "MITHRIL_BAR":5}
 	},
 	{
 		"image":"Images/units/flamelet.png",

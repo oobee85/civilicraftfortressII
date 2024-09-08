@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 
 import game.*;
 import game.actions.PlannedAction;
+import game.ai.BuildOrderPhase.WorkerTask;
 import ui.CommandInterface;
 import utils.Utils;
 import world.*;
@@ -16,121 +17,107 @@ public class BuildOrderAI extends AIInterface {
 	private static final int MAX_BUILD_RADIUS = 10;
 	private static final int MAX_SEARCH_RADIUS = 40;
 
-	public enum WorkerTask {
-		FORAGE, FARM, CHOP, GATHERSTONE, GATHERSILVER, GATHERCOPPER, GATHERIRON, GATHERCOAL, GATHERMITHRIL
-	}
-	
-	private HashMap<Integer, Integer> assignedWorkerRoles = new HashMap<>();
-	private HashSet<Integer> workersStillAlive = new HashSet<>();
-	private LinkedList<Integer> deadWorkersToRemove = new LinkedList<>();
+
+	WorkerAssignmentCounter counter = new WorkerAssignmentCounter();
+	private HashSet<Integer> workersStillAlive = new HashSet<>(); // value is a worker Unit ID
 
 	public BuildOrderAI(CommandInterface commands, Faction faction, World world) {
 		super(commands, faction, world);
 	}
 	
-	class QuantityReq {
-		int min;
-		int enough;
-		int max;
-		public QuantityReq(int min, int enough, int max) {
-			this.min = min;
-			this.enough = enough;
-			this.max = max;
-		}
-	}
+//	class Phase {
+//		HashMap<UnitType, QuantityReq> unitReqs = new HashMap<UnitType, QuantityReq>();
+//		HashMap<BuildingType, QuantityReq> buildingReqs = new HashMap<BuildingType, QuantityReq>();
+//		LinkedList<ResearchType> requiredResearch = new LinkedList<ResearchType>();
+//		int[] workerAssignments = new int[WorkerTask.values().length];
+//	}
 	
-	class Phase {
-		HashMap<UnitType, QuantityReq> unitReqs = new HashMap<UnitType, QuantityReq>();
-		HashMap<BuildingType, QuantityReq> buildingReqs = new HashMap<BuildingType, QuantityReq>();
-		LinkedList<ResearchType> requiredResearch = new LinkedList<ResearchType>();
-		int[] workerAssignments = new int[WorkerTask.values().length];
-	}
 	
 	int currentPhase = 0;
-	Phase[] phases;
+	public static List<BuildOrderPhase> phases = new ArrayList<>();
 	
-	{
-		Phase phase0 = new Phase();
-		phase0.unitReqs.put(Game.unitTypeMap.get("WORKER"), new QuantityReq(0, 4, 10));
-		phase0.requiredResearch.add(Game.researchTypeMap.get("WARRIOR_CODE"));
-		phase0.workerAssignments = new int[] {3, 3, 4, 0, 0, 0, 0, 0, 0, 0};
-
-		Phase phase1 = new Phase();
-		phase1.unitReqs.put(Game.unitTypeMap.get("WORKER"), new QuantityReq(4, 8, 12));
-		phase1.buildingReqs.put(Game.buildingTypeMap.get("BARRACKS"), new QuantityReq(0, 1, 1));
-		phase1.workerAssignments = new int[] {3, 4, 5, 0, 0, 0, 0, 0, 0, 0};
-
-		Phase phase2 = new Phase();
-		phase2.unitReqs.put(Game.unitTypeMap.get("WORKER"), new QuantityReq(8, 15, 30));
-		phase2.unitReqs.put(Game.unitTypeMap.get("WARRIOR"), new QuantityReq(0, 5, 8));
-		phase2.unitReqs.put(Game.unitTypeMap.get("CARAVAN"), new QuantityReq(0, 1, 1));
-		phase2.buildingReqs.put(Game.buildingTypeMap.get("BARRACKS"), new QuantityReq(1, 1, 1));
-		phase2.requiredResearch.add(Game.researchTypeMap.get("BRONZE_WORKING"));
-		phase2.workerAssignments = new int[] {2, 16, 8, 4, 0, 0, 0, 0, 0, 0};
-
-		Phase phase3 = new Phase();
-		phase3.unitReqs.put(Game.unitTypeMap.get("WORKER"), new QuantityReq(8, 20, 34));
-		phase3.unitReqs.put(Game.unitTypeMap.get("WARRIOR"), new QuantityReq(0, 5, 5));
-		phase3.unitReqs.put(Game.unitTypeMap.get("CARAVAN"), new QuantityReq(0, 1, 1));
-		phase3.unitReqs.put(Game.unitTypeMap.get("ARCHER"), new QuantityReq(0, 2, 4));
-		phase3.unitReqs.put(Game.unitTypeMap.get("SPEARMAN"), new QuantityReq(0, 1, 4));
-		phase3.unitReqs.put(Game.unitTypeMap.get("SWORDSMAN"), new QuantityReq(0, 0, 5));
-		phase3.buildingReqs.put(Game.buildingTypeMap.get("BARRACKS"), new QuantityReq(1, 1, 1));
-		phase3.buildingReqs.put(Game.buildingTypeMap.get("SMITHY"), new QuantityReq(1, 1, 1));
-		phase3.requiredResearch.add(Game.researchTypeMap.get("IRON_WORKING"));
-		phase3.requiredResearch.add(Game.researchTypeMap.get("WHEEL"));
-		phase3.requiredResearch.add(Game.researchTypeMap.get("MASONRY"));
-		phase3.workerAssignments = new int[] {1, 16, 7, 2, 2, 2, 0, 0, 0, 0};
-
-		Phase phase4 = new Phase();
-		phase4.unitReqs.put(Game.unitTypeMap.get("WORKER"), new QuantityReq(10, 22, 36));
-		phase4.unitReqs.put(Game.unitTypeMap.get("MASON"), new QuantityReq(0, 8, 16));
-		phase4.unitReqs.put(Game.unitTypeMap.get("CARAVAN"), new QuantityReq(0, 1, 2));
-		phase4.unitReqs.put(Game.unitTypeMap.get("ARCHER"), new QuantityReq(0, 2, 10));
-		phase4.unitReqs.put(Game.unitTypeMap.get("SPEARMAN"), new QuantityReq(0, 0, 6));
-		phase4.unitReqs.put(Game.unitTypeMap.get("SWORDSMAN"), new QuantityReq(0, 1, 5));
-		phase4.buildingReqs.put(Game.buildingTypeMap.get("BARRACKS"), new QuantityReq(1, 1, 1));
-		phase4.buildingReqs.put(Game.buildingTypeMap.get("SMITHY"), new QuantityReq(1, 1, 1));
-//		phase4.buildingReqs.put(Game.buildingTypeMap.get("GRANARY"), new QuantityReq(1, 1, 1));
-		phase4.buildingReqs.put(Game.buildingTypeMap.get("RESEARCH_LAB"), new QuantityReq(1, 1, 1));
-		phase4.workerAssignments = new int[] {1, 19, 6, 2, 2, 2, 3, 1, 0};
-
-		Phase phase5 = new Phase();
-		phase5.unitReqs.put(Game.unitTypeMap.get("WORKER"), new QuantityReq(10, 24, 38));
-		phase5.unitReqs.put(Game.unitTypeMap.get("MASON"), new QuantityReq(0, 12, 22));
-		phase5.unitReqs.put(Game.unitTypeMap.get("CARAVAN"), new QuantityReq(0, 1, 2));
-		phase5.unitReqs.put(Game.unitTypeMap.get("ARCHER"), new QuantityReq(0, 2, 10));
-		phase5.unitReqs.put(Game.unitTypeMap.get("SPEARMAN"), new QuantityReq(0, 0, 6));
-		phase5.unitReqs.put(Game.unitTypeMap.get("SWORDSMAN"), new QuantityReq(0, 1, 5));
-		phase5.buildingReqs.put(Game.buildingTypeMap.get("BARRACKS"), new QuantityReq(1, 1, 1));
-		phase5.buildingReqs.put(Game.buildingTypeMap.get("SMITHY"), new QuantityReq(1, 1, 1));
-//		phase5.buildingReqs.put(Game.buildingTypeMap.get("GRANARY"), new QuantityReq(1, 1, 1));
-		phase5.buildingReqs.put(Game.buildingTypeMap.get("RESEARCH_LAB"), new QuantityReq(1, 1, 1));
-		phase5.requiredResearch.add(Game.researchTypeMap.get("MATHEMATICS"));
-		phase5.workerAssignments = new int[] {1, 22, 7, 1, 1, 3, 7, 3, 0};
-
-		Phase phase6 = new Phase();
-		phase6.unitReqs.put(Game.unitTypeMap.get("WORKER"), new QuantityReq(10, 26, 40));
-		phase6.unitReqs.put(Game.unitTypeMap.get("MASON"), new QuantityReq(0, 16, 30));
-		phase6.unitReqs.put(Game.unitTypeMap.get("CARAVAN"), new QuantityReq(0, 1, 3));
-		phase6.unitReqs.put(Game.unitTypeMap.get("ARCHER"), new QuantityReq(0, 0, 8));
-		phase6.unitReqs.put(Game.unitTypeMap.get("SPEARMAN"), new QuantityReq(0, 0, 5));
-		phase6.unitReqs.put(Game.unitTypeMap.get("SWORDSMAN"), new QuantityReq(0, 0, 12));
-		phase6.unitReqs.put(Game.unitTypeMap.get("LONGBOWMAN"), new QuantityReq(0, 1, 10));
-		phase6.unitReqs.put(Game.unitTypeMap.get("CATAPULT"), new QuantityReq(0, 1, 6));
-		phase4.unitReqs.put(Game.unitTypeMap.get("GRIFFIN"), new QuantityReq(0, 0, 4));
-		phase6.buildingReqs.put(Game.buildingTypeMap.get("BARRACKS"), new QuantityReq(1, 1, 1));
-		phase6.buildingReqs.put(Game.buildingTypeMap.get("SMITHY"), new QuantityReq(1, 1, 1));
-//		phase6.buildingReqs.put(Game.buildingTypeMap.get("GRANARY"), new QuantityReq(1, 1, 1));
-		phase6.buildingReqs.put(Game.buildingTypeMap.get("RESEARCH_LAB"), new QuantityReq(1, 1, 1));
-		phase6.buildingReqs.put(Game.buildingTypeMap.get("WORKSHOP"), new QuantityReq(1, 1, 1));
-		phase6.buildingReqs.put(Game.buildingTypeMap.get("STABLES"), new QuantityReq(1, 1, 1));
-		phase6.requiredResearch.add(Game.researchTypeMap.get("MYSTICISM"));
-		phase6.requiredResearch.add(Game.researchTypeMap.get("ENGINEERING"));
-		phase6.workerAssignments = new int[] {1, 28, 6, 1, 1, 3, 6, 4, 4};
-
-		phases = new Phase[] {phase0, phase1, phase2, phase3, phase4, phase5, phase6};
-	}
+//	{
+//		Phase phase0 = new Phase();
+//		phase0.unitReqs.put(Game.unitTypeMap.get("WORKER"), new QuantityReq(0, 4, 10));
+//		phase0.requiredResearch.add(Game.researchTypeMap.get("FARMING"));
+//		phase0.workerAssignments = new int[] {3, 3, 4, 0, 0, 0, 0, 0, 0, 0};
+//
+//		Phase phase1 = new Phase();
+//		phase1.unitReqs.put(Game.unitTypeMap.get("WORKER"), new QuantityReq(4, 8, 12));
+//		phase1.buildingReqs.put(Game.buildingTypeMap.get("BARRACKS"), new QuantityReq(0, 1, 1));
+//		phase1.workerAssignments = new int[] {3, 4, 5, 0, 0, 0, 0, 0, 0, 0};
+//
+//		Phase phase2 = new Phase();
+//		phase2.unitReqs.put(Game.unitTypeMap.get("WORKER"), new QuantityReq(8, 15, 30));
+//		phase2.unitReqs.put(Game.unitTypeMap.get("WARRIOR"), new QuantityReq(0, 5, 8));
+//		phase2.unitReqs.put(Game.unitTypeMap.get("CARAVAN"), new QuantityReq(0, 1, 1));
+//		phase2.buildingReqs.put(Game.buildingTypeMap.get("BARRACKS"), new QuantityReq(1, 1, 1));
+//		phase2.requiredResearch.add(Game.researchTypeMap.get("BRONZE_WORKING"));
+//		phase2.workerAssignments = new int[] {2, 16, 8, 4, 0, 0, 0, 0, 0, 0};
+//
+//		Phase phase3 = new Phase();
+//		phase3.unitReqs.put(Game.unitTypeMap.get("WORKER"), new QuantityReq(8, 20, 34));
+//		phase3.unitReqs.put(Game.unitTypeMap.get("WARRIOR"), new QuantityReq(0, 5, 5));
+//		phase3.unitReqs.put(Game.unitTypeMap.get("CARAVAN"), new QuantityReq(0, 1, 1));
+//		phase3.unitReqs.put(Game.unitTypeMap.get("ARCHER"), new QuantityReq(0, 2, 4));
+//		phase3.unitReqs.put(Game.unitTypeMap.get("SPEARMAN"), new QuantityReq(0, 1, 4));
+//		phase3.unitReqs.put(Game.unitTypeMap.get("SWORDSMAN"), new QuantityReq(0, 0, 5));
+//		phase3.buildingReqs.put(Game.buildingTypeMap.get("BARRACKS"), new QuantityReq(1, 1, 1));
+//		phase3.buildingReqs.put(Game.buildingTypeMap.get("SMITHY"), new QuantityReq(1, 1, 1));
+//		phase3.requiredResearch.add(Game.researchTypeMap.get("IRON_WORKING"));
+//		phase3.requiredResearch.add(Game.researchTypeMap.get("WHEEL"));
+//		phase3.requiredResearch.add(Game.researchTypeMap.get("MASONRY"));
+//		phase3.workerAssignments = new int[] {1, 16, 7, 2, 2, 2, 0, 0, 0, 0};
+//
+//		Phase phase4 = new Phase();
+//		phase4.unitReqs.put(Game.unitTypeMap.get("WORKER"), new QuantityReq(10, 22, 36));
+//		phase4.unitReqs.put(Game.unitTypeMap.get("MASON"), new QuantityReq(0, 8, 16));
+//		phase4.unitReqs.put(Game.unitTypeMap.get("CARAVAN"), new QuantityReq(0, 1, 2));
+//		phase4.unitReqs.put(Game.unitTypeMap.get("ARCHER"), new QuantityReq(0, 2, 10));
+//		phase4.unitReqs.put(Game.unitTypeMap.get("SPEARMAN"), new QuantityReq(0, 0, 6));
+//		phase4.unitReqs.put(Game.unitTypeMap.get("SWORDSMAN"), new QuantityReq(0, 1, 5));
+//		phase4.buildingReqs.put(Game.buildingTypeMap.get("BARRACKS"), new QuantityReq(1, 1, 1));
+//		phase4.buildingReqs.put(Game.buildingTypeMap.get("SMITHY"), new QuantityReq(1, 1, 1));
+////		phase4.buildingReqs.put(Game.buildingTypeMap.get("GRANARY"), new QuantityReq(1, 1, 1));
+//		phase4.buildingReqs.put(Game.buildingTypeMap.get("RESEARCH_LAB"), new QuantityReq(1, 1, 1));
+//		phase4.workerAssignments = new int[] {1, 19, 6, 2, 2, 2, 3, 1, 0};
+//
+//		Phase phase5 = new Phase();
+//		phase5.unitReqs.put(Game.unitTypeMap.get("WORKER"), new QuantityReq(10, 24, 38));
+//		phase5.unitReqs.put(Game.unitTypeMap.get("MASON"), new QuantityReq(0, 12, 22));
+//		phase5.unitReqs.put(Game.unitTypeMap.get("CARAVAN"), new QuantityReq(0, 1, 2));
+//		phase5.unitReqs.put(Game.unitTypeMap.get("ARCHER"), new QuantityReq(0, 2, 10));
+//		phase5.unitReqs.put(Game.unitTypeMap.get("SPEARMAN"), new QuantityReq(0, 0, 6));
+//		phase5.unitReqs.put(Game.unitTypeMap.get("SWORDSMAN"), new QuantityReq(0, 1, 5));
+//		phase5.buildingReqs.put(Game.buildingTypeMap.get("BARRACKS"), new QuantityReq(1, 1, 1));
+//		phase5.buildingReqs.put(Game.buildingTypeMap.get("SMITHY"), new QuantityReq(1, 1, 1));
+////		phase5.buildingReqs.put(Game.buildingTypeMap.get("GRANARY"), new QuantityReq(1, 1, 1));
+//		phase5.buildingReqs.put(Game.buildingTypeMap.get("RESEARCH_LAB"), new QuantityReq(1, 1, 1));
+//		phase5.requiredResearch.add(Game.researchTypeMap.get("MATHEMATICS"));
+//		phase5.workerAssignments = new int[] {1, 22, 7, 1, 1, 3, 7, 3, 0};
+//
+//		Phase phase6 = new Phase();
+//		phase6.unitReqs.put(Game.unitTypeMap.get("WORKER"), new QuantityReq(10, 26, 40));
+//		phase6.unitReqs.put(Game.unitTypeMap.get("MASON"), new QuantityReq(0, 16, 30));
+//		phase6.unitReqs.put(Game.unitTypeMap.get("CARAVAN"), new QuantityReq(0, 1, 3));
+//		phase6.unitReqs.put(Game.unitTypeMap.get("ARCHER"), new QuantityReq(0, 0, 8));
+//		phase6.unitReqs.put(Game.unitTypeMap.get("SPEARMAN"), new QuantityReq(0, 0, 5));
+//		phase6.unitReqs.put(Game.unitTypeMap.get("SWORDSMAN"), new QuantityReq(0, 0, 12));
+//		phase6.unitReqs.put(Game.unitTypeMap.get("LONGBOWMAN"), new QuantityReq(0, 1, 10));
+//		phase6.unitReqs.put(Game.unitTypeMap.get("CATAPULT"), new QuantityReq(0, 1, 6));
+//		phase4.unitReqs.put(Game.unitTypeMap.get("GRIFFIN"), new QuantityReq(0, 0, 4));
+//		phase6.buildingReqs.put(Game.buildingTypeMap.get("BARRACKS"), new QuantityReq(1, 1, 1));
+//		phase6.buildingReqs.put(Game.buildingTypeMap.get("SMITHY"), new QuantityReq(1, 1, 1));
+////		phase6.buildingReqs.put(Game.buildingTypeMap.get("GRANARY"), new QuantityReq(1, 1, 1));
+//		phase6.buildingReqs.put(Game.buildingTypeMap.get("RESEARCH_LAB"), new QuantityReq(1, 1, 1));
+//		phase6.buildingReqs.put(Game.buildingTypeMap.get("WORKSHOP"), new QuantityReq(1, 1, 1));
+//		phase6.buildingReqs.put(Game.buildingTypeMap.get("STABLES"), new QuantityReq(1, 1, 1));
+//		phase6.requiredResearch.add(Game.researchTypeMap.get("MYSTICISM"));
+//		phase6.requiredResearch.add(Game.researchTypeMap.get("ENGINEERING"));
+//		phase6.workerAssignments = new int[] {1, 28, 6, 1, 1, 3, 6, 4, 4};
+//
+//		phases = new Phase[] {phase0, phase1, phase2, phase3, phase4, phase5, phase6};
+//	}
 
 	@Override
 	public void aiTickLogic() {
@@ -142,7 +129,7 @@ public class BuildOrderAI extends AIInterface {
 		
 		
 		if (completedUnits && completedResearch && completedBuilding) {
-			if (currentPhase + 1 < phases.length) {
+			if (currentPhase + 1 < phases.size()) {
 				currentPhase++;
 				phaseTransition(currentPhase);
 			}
@@ -150,12 +137,12 @@ public class BuildOrderAI extends AIInterface {
 	}
 	
 	private void craftItems() {
-		if (faction.getInventory().getItemAmount(ItemType.BRONZE_SWORD) < 2) {
-			commands.craftItem(faction, ItemType.BRONZE_SWORD, 1);
-		}
-		if (faction.getInventory().getItemAmount(ItemType.IRON_SWORD) < 1) {
-			commands.craftItem(faction, ItemType.IRON_SWORD, 1);
-		}
+//		if (faction.getInventory().getItemAmount(ItemType.BRONZE_SWORD) < 2) {
+//			commands.craftItem(faction, ItemType.BRONZE_SWORD, 1);
+//		}
+//		if (faction.getInventory().getItemAmount(ItemType.IRON_SWORD) < 1) {
+//			commands.craftItem(faction, ItemType.IRON_SWORD, 1);
+//		}
 
 		commands.craftItem(faction, ItemType.BRONZE_BAR, 1);
 		commands.craftItem(faction, ItemType.IRON_BAR, 1);
@@ -192,11 +179,92 @@ public class BuildOrderAI extends AIInterface {
 		}
 	}
 	
-	private void unitActions() {
-		int[] workersAssigned = new int[WorkerTask.values().length];
-		for (Entry<Integer, Integer> preassigned : assignedWorkerRoles.entrySet()) {
-			workersAssigned[preassigned.getValue()]++;
+	class WorkerAssignmentCounter {
+		private HashMap<Integer, WorkerTask> unitidToTask = new HashMap<>(); // key is a worker Unit ID
+		private HashMap<WorkerTask, Integer> taskToCount = new HashMap<>();
+		
+		void countAssignments() {
+			taskToCount.clear();
+			for (Entry<Integer, WorkerTask> preassigned : unitidToTask.entrySet()) {
+				if (!taskToCount.containsKey(preassigned.getValue())) {
+					taskToCount.put(preassigned.getValue(), 0);
+				}
+				taskToCount.put(preassigned.getValue(), 1 + taskToCount.get(preassigned.getValue()));
+			}
 		}
+		private void increment(WorkerTask task, int amount) {
+			if (!taskToCount.containsKey(task)) {
+				taskToCount.put(task, 0);
+			}
+			taskToCount.put(task, amount + taskToCount.get(task));
+		}
+		int getCount(WorkerTask task) {
+			if (!taskToCount.containsKey(task)) {
+				return 0;
+			}
+			return taskToCount.get(task);
+		}
+		
+		void unassign(int unitid) {
+			WorkerTask task = unitidToTask.remove(unitid);
+			counter.increment(task, -1);
+		}
+		
+		WorkerTask getTaskFor(int id) {
+			if (unitidToTask.containsKey(id)) {
+				return unitidToTask.get(id);
+			}
+
+			WorkerTask task = chooseAssignment();
+			unitidToTask.put(id, task);
+			counter.increment(task, 1);
+			return task;
+		}
+		
+		WorkerTask chooseAssignment() {
+			WorkerTask bestTask = WorkerTask.CHOP;
+			double highestDifference = 0;
+			for (Entry<WorkerTask, Double> entry : phases.get(currentPhase).workerAssignments.entrySet()) {
+				double currentRatio = 0;
+				if (unitidToTask.size() > 0) {
+					currentRatio = (double)getCount(entry.getKey()) / unitidToTask.size();
+				}
+				System.out.println(String.format("Desired ratio for %s: %.1f%%, Current: %.1f%%",
+						entry.getKey(), 100*entry.getValue(), 100*currentRatio));
+				double difference = entry.getValue() - currentRatio;
+				if (difference >= highestDifference) {
+					highestDifference = difference;
+					bestTask = entry.getKey();
+				}
+			}
+			return bestTask;
+		}
+		void removeDeadWorkers(Set<Integer> aliveWorkers) {
+			LinkedList<Integer> deadWorkersToRemove = new LinkedList<>();
+			for (Integer id : unitidToTask.keySet()) {
+				if (!aliveWorkers.contains(id)) {
+					deadWorkersToRemove.add(id);
+				}
+			}
+			for (Integer id : deadWorkersToRemove) {
+				counter.unassign(id);
+			}
+		}
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder("Worker assignments: ");
+			for (Entry<WorkerTask, Integer> entry : taskToCount.entrySet()) {
+				if (entry.getValue() == 0) {
+					continue;
+				}
+				sb.append(String.format("%s: %d, ", entry.getKey(), entry.getValue()));
+			}
+			return sb.toString();
+		}
+	}
+	
+	private void unitActions() {
+		counter.countAssignments();
 		workersStillAlive.clear();
 		Iterator<Building> farmIterator = faction.getBuildings().iterator();
 		for(Unit unit : faction.getUnits()) {
@@ -209,22 +277,10 @@ public class BuildOrderAI extends AIInterface {
 				if (p != null && p.isBuildAction()) {
 					continue;
 				}
-				int taskIndex = 0;
-				if (assignedWorkerRoles.containsKey(unit.id())) {
-					taskIndex = assignedWorkerRoles.get(unit.id());
-				}
-				else {
-					while(workersAssigned[taskIndex] >= phases[currentPhase].workerAssignments[taskIndex]) {
-						taskIndex = taskIndex + 1;
-						if (taskIndex >= workersAssigned.length) {
-							taskIndex = 0;
-							break;
-						}
-					}
-					assignedWorkerRoles.put(unit.id(), taskIndex);
-					workersAssigned[taskIndex]++;
-				}
-				switch (WorkerTask.values()[taskIndex]) {
+//				int taskIndex = 0;
+				WorkerTask task = counter.getTaskFor(unit.id());
+				boolean result = true;
+				switch (task) {
 				case FARM:
 					handleFarmingWorker(unit, farmIterator);
 					break;
@@ -232,26 +288,30 @@ public class BuildOrderAI extends AIInterface {
 					handleChoppingWorker(unit);
 					break;
 				case FORAGE:
-					handleForagingWorker(unit);
+					result = handleForagingWorker(unit);
 					break;
 				case GATHERSTONE:
 					handleGatherStoneWorker(unit);
 					break;
 				case GATHERSILVER:
-					handleGatherMetalWorker(unit, silverTiles);
+					result = handleGatherMetalWorker(unit, silverTiles);
 					break;
 				case GATHERCOPPER:
-					handleGatherMetalWorker(unit, copperTiles);
+					result = handleGatherMetalWorker(unit, copperTiles);
 					break;
 				case GATHERIRON:
-					handleGatherMetalWorker(unit, ironTiles);
+					result = handleGatherMetalWorker(unit, ironTiles);
 					break;
 				case GATHERCOAL:
-					handleGatherMetalWorker(unit, coalTiles);
+					result = handleGatherMetalWorker(unit, coalTiles);
 					break;
 				case GATHERMITHRIL:
-					handleGatherMetalWorker(unit, mithrilTiles);
+					result = handleGatherMetalWorker(unit, mithrilTiles);
 					break;
+				}
+				
+				if (!result) {
+					counter.unassign(unit.id());
 				}
 			}
 			else if(unit.getType().isCaravan()) {
@@ -265,27 +325,20 @@ public class BuildOrderAI extends AIInterface {
 				}
 			}
 		}
-		for (Integer id : assignedWorkerRoles.keySet()) {
-			if (!workersStillAlive.contains(id)) {
-				deadWorkersToRemove.add(id);
-			}
-		}
-		for (Integer id : deadWorkersToRemove) {
-			assignedWorkerRoles.remove(id);
-		}
-		deadWorkersToRemove.clear();
-		System.out.print("Worker assignments: ");
-		for (int i = 0; i < workersAssigned.length; i++) {
-			System.out.print(WorkerTask.values()[i].name() + ": " + workersAssigned[i] + ", ");
-		}
+		counter.removeDeadWorkers(workersStillAlive);
+		System.out.println(counter);
 	}
 
-	private void handleGatherMetalWorker(Unit worker, List<Tile> tiles) {
+	private boolean handleGatherMetalWorker(Unit worker, List<Tile> tiles) {
+		if (tiles.size() == 0) {
+			return false;
+		}
 		Tile tile = tiles.get(worker.id() % tiles.size());
 		if(tile == null) {
-			return;
+			return false;
 		}
 		commands.planAction(worker, PlannedAction.harvestTile(tile), true);
+		return true;
 	}
 	
 	private void handleGatherStoneWorker(Unit worker) {
@@ -419,7 +472,7 @@ public class BuildOrderAI extends AIInterface {
 	
 	private boolean build() {
 		boolean completed = true;
-		for (Entry<BuildingType, QuantityReq> buildingReq : phases[currentPhase].buildingReqs.entrySet()) {
+		for (Entry<BuildingType, QuantityReq> buildingReq : phases.get(currentPhase).buildings.entrySet()) {
 
 			if (buildingQuantities[buildingReq.getKey().id()] < buildingReq.getValue().enough) {
 				completed = false;
@@ -464,7 +517,7 @@ public class BuildOrderAI extends AIInterface {
 	
 	private boolean research() {
 		boolean researchFinished = true;
-		ListIterator<ResearchType> iter = phases[currentPhase].requiredResearch.listIterator();
+		ListIterator<ResearchType> iter = phases.get(currentPhase).researches.listIterator();
 		while (iter.hasNext()) {
 			ResearchType type = iter.next();
 			if (faction.getResearch(type).isCompleted()) {
@@ -481,7 +534,7 @@ public class BuildOrderAI extends AIInterface {
 	
 	private boolean replentishUnits() {
 		boolean completed = true;
-		for (Entry<UnitType, QuantityReq> unitReq : phases[currentPhase].unitReqs.entrySet()) {
+		for (Entry<UnitType, QuantityReq> unitReq : phases.get(currentPhase).units.entrySet()) {
 			if (unitQuantities[unitReq.getKey().id()] < unitReq.getValue().enough) {
 				completed = false;
 			}

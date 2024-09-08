@@ -1,14 +1,15 @@
 package utils;
 
 import java.util.*;
-import java.util.Map.*;
+import java.util.Map.Entry;
 
 import org.json.*;
 
 import game.*;
+import game.ai.*;
 import game.components.*;
 import ui.graphics.opengl.*;
-import world.*;
+import world.PlantType;
 
 public class Loader {
 	private static HashMap<ItemType, Integer> loadItemTypeMap(JSONObject costObject) {
@@ -517,4 +518,97 @@ public class Loader {
 		}
 		return new TargetInfo(type, faction);
 	}
+	
+	
+	public static void loadBuildOrders() {
+		System.out.println("Loading Build Orders");
+		
+		String basicBuildOrder = Utils.readFile("buildorders/basic.json");
+		JSONObject obj = new JSONObject(basicBuildOrder);
+		JSONArray rolesArr = obj.getJSONArray("WORKER_ROLES");
+		String[] WORKER_ROLES = new String[rolesArr.length()];
+		for (int i = 0; i < rolesArr.length(); i++) {
+			WORKER_ROLES[i] = rolesArr.getString(i);
+		}
+		System.out.print("WORKER_ROLES: ");
+		for (String role : WORKER_ROLES) {
+			System.out.print(role + ", ");
+		}
+		System.out.println();
+		JSONArray arr = obj.getJSONArray("phases");
+		for (int i = 0; i < arr.length(); i++) {
+			JSONObject phaseObject = arr.getJSONObject(i);
+			int order = phaseObject.getInt("order");
+			BuildOrderPhase phase = new BuildOrderPhase(order);
+			
+			if (phaseObject.has("units")) {
+				JSONObject unitsObject = phaseObject.getJSONObject("units");
+				JSONArray keys = unitsObject.names();
+				for (int unitIndex = 0; unitIndex < keys.length(); unitIndex++) {
+					String unitType = keys.getString(unitIndex);
+					QuantityReq quantities = readQuantityReq(unitsObject.getJSONObject(unitType));
+					phase.units.put(Game.unitTypeMap.get(unitType), quantities);
+				}
+			}
+			
+			if (phaseObject.has("buildings")) {
+				JSONObject buildingsObject = phaseObject.getJSONObject("buildings");
+				JSONArray keys = buildingsObject.names();
+				for (int buildingIndex = 0; buildingIndex < keys.length(); buildingIndex++) {
+					String buildingsType = keys.getString(buildingIndex);
+					QuantityReq quantities = readQuantityReq(buildingsObject.getJSONObject(buildingsType));
+					phase.buildings.put(Game.buildingTypeMap.get(buildingsType), quantities);
+				}
+			}
+			
+			if (phaseObject.has("researchRequired")) {
+				JSONArray researchArr = phaseObject.getJSONArray("researchRequired");
+				for (int researchIndex = 0; researchIndex < researchArr.length(); researchIndex++) {
+					String researchName = researchArr.getString(researchIndex);
+					phase.researches.add(Game.researchTypeMap.get(researchName));
+				}
+			}
+
+			if (phaseObject.has("workerAssignments")) {
+				JSONObject workerObj = phaseObject.getJSONObject("workerAssignments");
+				JSONArray keys = workerObj.names();
+				int total = 0;
+				for (int taskIndex = 0; taskIndex < keys.length(); taskIndex++) {
+					String taskType = keys.getString(taskIndex);
+					double number = workerObj.getDouble(taskType);
+					total += number;
+					phase.workerAssignments.put(BuildOrderPhase.WorkerTask.valueOf(taskType), number);
+				}
+				for (Entry<BuildOrderPhase.WorkerTask, Double> entry : phase.workerAssignments.entrySet()) {
+					phase.workerAssignments.put(entry.getKey(), entry.getValue() / total);
+				}
+			}
+			
+			System.out.println(phase);
+			BuildOrderAI.phases.add(phase);
+		}
+		BuildOrderAI.phases.sort((a, b) -> {
+			return a.order - b.order;
+		});
+	}
+
+	private static QuantityReq readQuantityReq(JSONObject obj) {
+		int min = 0;
+		int enough = 0;
+		int max = 0;
+		if (obj.has("min")) {
+			min = obj.getInt("min");
+		}
+		if (obj.has("enough")) {
+			enough = obj.getInt("enough");
+		}
+		if (obj.has("max")) {
+			max = obj.getInt("max");
+		}
+		else {
+			max = Integer.MAX_VALUE;
+		}
+		return new QuantityReq(min, enough, max);
+	}
 }
+

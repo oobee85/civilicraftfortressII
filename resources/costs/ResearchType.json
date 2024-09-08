@@ -14,13 +14,13 @@
 	{
 		"name": "IRON_WORKING", 
 		"points": 600, "tier": 2,
-		"cost": {"BRONZE_SWORD": 1}, 
+		"cost": {"BRONZE_BAR":5,"WOOD":50}, 
 		"requirements": ["BRONZE_WORKING"],
 		"image": "Images/research/iron_working.png"},
 	{
 		"name": "ARMORING", 
 		"points": 1200, "tier": 3,
-		"cost": {"IRON_SWORD": 1}, 
+		"cost": {"IRON_BAR":5,"WOOD":50}, 
 		"requirements": ["IRON_WORKING"],
 		"image": "Images/research/armoring.png"},
 	{

@@ -114,9 +114,6 @@ public class GameViewOverlay extends JPanel {
 			},
 			new ItemType[] {
 					BRONZE_BAR, IRON_BAR, MITHRIL_BAR, GOLD_BAR, ADAMANTITE_BAR, RUNITE_BAR, TITANIUM_BAR
-			},
-			new ItemType[] {
-					BRONZE_SWORD, IRON_SWORD, MITHRIL_SWORD, ADAMANT_SWORD, RUNE_SWORD, TITANIUM_SWORD
 			}
 		};
 		for(int row = 0; row < columns.length; row++) {

@@ -328,7 +328,9 @@ public class AirSimulation {
 			
 			tile.updateEnergyToTemperature();
 			
-			if(tile.getLocation().x() == 5 && tile.getLocation().y() == 5 && World.ticks % 50 == 1) {
+			if(tile.getLocation().x() == 5 
+					&& tile.getLocation().y() == 5 
+					&& World.ticks % 100 == 1) {
 //				tile.setEnergy(21000);
 //				System.out.println(tile.getTemperature());
 				System.out.println("Energy: " + tile.getEnergy() + ", T: " + tile.getTemperature() + ", " + World.ticks + ", uT: " + averageTemp + ", uW: " + averageWater);
