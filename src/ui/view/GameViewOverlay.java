@@ -105,9 +105,9 @@ public class GameViewOverlay extends JPanel {
 			});
 			resourceIndicators[i] = button;
 		}
-		ItemType[][] columns = new ItemType[][] {
+		ItemType[][] rows = new ItemType[][] {
 			new ItemType[] {
-					FOOD, WOOD, STONE, COAL, HORSE
+					FOOD, WOOD, STONE, COAL, HORSE, MAGIC
 			},
 			new ItemType[] {
 					COPPER_ORE, SILVER_ORE, IRON_ORE, MITHRIL_ORE, GOLD_ORE, ADAMANTITE_ORE, RUNITE_ORE, TITANIUM_ORE
@@ -116,11 +116,11 @@ public class GameViewOverlay extends JPanel {
 					BRONZE_BAR, IRON_BAR, MITHRIL_BAR, GOLD_BAR, ADAMANTITE_BAR, RUNITE_BAR, TITANIUM_BAR
 			}
 		};
-		for(int row = 0; row < columns.length; row++) {
-			for(int column = 0; column < columns[row].length; column++) {
+		for(int row = 0; row < rows.length; row++) {
+			for(int column = 0; column < rows[row].length; column++) {
 				GridBagConstraints c = new GridBagConstraints();
 				c.gridx = column; c.gridy = row;
-				resourcePanel2.add(resourceIndicators[columns[row][column].ordinal()], c);
+				resourcePanel2.add(resourceIndicators[rows[row][column].ordinal()], c);
 			}
 		}
 	}

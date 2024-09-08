@@ -59,7 +59,7 @@
 		"vision":1,
 		"cost":{"WOOD":100},
 		"buildsunits":["WARRIOR","ARCHER","SPEARMAN","SWORDSMAN"],
-		"research":"BRONZE_WORKING",
+		"research":"FARMING",
 		"culture":0.5,
 		"health":300,
 		"effort":300
@@ -183,7 +183,7 @@
 		"culture":0.5,
 		"health":500,
 		"effort":500,
-		"research":"BRONZE_WORKING"
+		"research":"FARMING"
 	},
 	{
 		"name":"RESEARCH_LAB",
