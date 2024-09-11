@@ -3,7 +3,7 @@
 	{
 		"name": "FARMING",
 		"points": 300, "tier": 1,
-		"cost": {"WOOD": 200, "STONE": 200, "FOOD": 200},
+		"cost": {"WOOD": 200, "FOOD": 200},
 		"image": "Images/research/farming.png"},
 	{	
 		"name": "BRONZE_WORKING", 
@@ -26,7 +26,7 @@
 	{
 		"name": "TRAPPING", 
 		"points": 300, "tier": 1,
-		"cost": {"FOOD": 100}, 
+		"cost": {"WOOD": 200}, 
 		"requirements": ["FARMING"],
 		"image": "Images/research/wheel.png"},
 	{
@@ -62,7 +62,7 @@
 	{
 		"name": "MYSTICISM", 
 		"points": 300, "tier": 1,
-		"cost": {"FOOD": 100},
+		"cost": {"GOLD_BAR": 8},
 		"requirements": ["FARMING"],
 		"image": "Images/research/mysticism.png"},
 	{

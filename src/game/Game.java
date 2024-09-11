@@ -869,8 +869,8 @@ public class Game {
 		int index = 0;
 		for(PlayerInfo player : players) {
 			Faction newFaction = new Faction(player.getName(), true, true, player.getColor());
-			newFaction.getInventory().addItem(ItemType.WOOD, 200);
-			newFaction.getInventory().addItem(ItemType.STONE, 200);
+			newFaction.getInventory().addItem(ItemType.WOOD, 100);
+//			newFaction.getInventory().addItem(ItemType.STONE, 200);
 			newFaction.getInventory().addItem(ItemType.FOOD, 200);
 			world.addFaction(newFaction);
 			
