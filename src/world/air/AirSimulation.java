@@ -48,11 +48,19 @@ public class AirSimulation {
 	}
 	
 	private static void averagingHelper(Tile tile, AverageValues avg) {
+		if(tile.liquidAmount < 0) {
+			System.out.println("AAAAAAAAAAAAAA NEGATIVE LIQUIDS\n");
+		}
+		if(tile.getAir().getVolumeLiquid() < 0) {
+			System.out.println("AAAAAAAAAAAAAA NEGATIVE air LIQUIDS\n");
+		}
 		avg.temp += tile.getTemperature();
 		if(tile.liquidType == LiquidType.WATER 
-				|| tile.liquidType == LiquidType.ICE 
-				|| tile.liquidType == LiquidType.SNOW) {
+				|| tile.liquidType == LiquidType.ICE ) {
 			avg.water += tile.liquidAmount;
+		}
+		if(tile.liquidType == LiquidType.SNOW) {
+			avg.water += tile.liquidAmount/2;
 		}
 		avg.water += tile.getAir().getVolumeLiquid();
 	}
@@ -110,7 +118,7 @@ public class AirSimulation {
 		});
 		
 		AverageValues avg = computeAverageValues(world);
-
+		
 		simulationWork(world, tilesRandomOrder, (tile) -> {
 			AirSimulation.updateEnergy(tile, avg.temp, avg.water);
 			tile.updateEnergyToTemperature();
@@ -273,6 +281,7 @@ public class AirSimulation {
 				}
 			}
 			
+			// force add humidity on mountain top
 			if(tile.getHeight() > 900 && averageWater < Constants.BALANCEWATER) {
 				double addedMod = Constants.BALANCEWATER / averageWater - 1;
 //				tile.liquidAmount += addedMod;
@@ -372,6 +381,7 @@ public class AirSimulation {
 				double mypress = tileAir.getPressure();
 				double myvolume = tileAir.getVolumeLiquid();
 				double myenergy = tileAir.getEnergy();
+				double mymaxvolume = tileAir.getMaxVolumeLiquid();
 				
 				double opress = otherAir.getPressure();
 				double ovolume = otherAir.getVolumeLiquid();
@@ -398,7 +408,15 @@ public class AirSimulation {
 					energyTemp[otherLoc.x()][otherLoc.y()] += deltaE;
 					energyTemp[tileLoc.x()][tileLoc.y()] -= deltaE;
 					double deltaVol = Math.abs(myvolume - ovolume) / 1 /(tile.getNeighbors().size() + 1);
-
+					
+					if(deltaVol < 0) {
+						continue;
+					}
+//					if (ovolume - deltaVol > 0 && ovolume + deltaVol < mymaxvolume) {
+//						volumeTemp[otherLoc.x()][otherLoc.y()] += deltaVol;
+//						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltaVol;
+////						break;
+//					}
 					if (myvolume - deltaVol > 0 && ovolume + deltaVol < omaxvolume) {
 						volumeTemp[otherLoc.x()][otherLoc.y()] += deltaVol;
 						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltaVol;
