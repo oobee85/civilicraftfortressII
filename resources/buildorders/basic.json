@@ -3,7 +3,7 @@
 				"GATHERCOPPER", "GATHERIRON", "GATHERCOAL", "GATHERMITHRIL"],
 "phases": [
 	{
-		"order": 0,
+		"order": 00,
 		"units": {
 			"WORKER": {"enough": 6, "max": 7},
 		},
@@ -11,7 +11,7 @@
 			"CLOSEFORAGE": 1,
 		},
 	},{
-		"order": 1,
+		"order": 10,
 		"units": {
 			"WORKER": {"enough": 12, "max": 13},
 		},
@@ -20,10 +20,19 @@
 			"CHOP": 4,
 		},
 	},{
-		"order": 2,
+		"order": 20,
 		"researchRequired": ["FARMING"],
 		"units": {
-			"WORKER": {"enough": 24, "max": 24},
+			"WORKER": {"enough": 18, "max": 24},
+		},
+		"workerAssignments": {
+			"FARM": 3,
+			"CHOP": 3,
+		},
+	},{
+		"order": 25,
+		"units": {
+			"WORKER": {"enough": 24, "max": 48},
 		},
 		"workerAssignments": {
 			"FARM": 3,
@@ -31,7 +40,7 @@
 			"GATHERSTONE": 1,
 		},
 	},{
-		"order": 3,
+		"order": 30,
 		"researchRequired": ["BRONZE_WORKING"],
 		"buildings": {
 			"CASTLE": {"enough": 1, "max": 1},
@@ -40,7 +49,7 @@
 		},
 		"units": {
 			"WORKER": {"enough": 24, "max": 48},
-			"WARRIOR": {"enough": 1, "max": 1},
+			"WARRIOR": {"max": 1},
 		},
 		"workerAssignments": {
 			"FARM": 3,
@@ -51,52 +60,104 @@
 		},
 	},
 	{
-		"order": 4,
-		"researchRequired": ["BRONZE_WORKING"],
-		"buildings": {
-			"CASTLE": {"enough": 1, "max": 1},
-			"BARRACKS": {"enough": 1, "max": 1},
-			"SMITHY": {"enough": 1, "max": 1},
-		},
-		"units": {
-			"WORKER": {"min": 4, "enough": 8, "max": 20},
-			"WARRIOR": {"enough": 1, "max": 1},
-			"CARAVAN": {"max": 1},
-			"SPEARMAN": {"enough": 1, "max": 1},
-		},
-		"workerAssignments": {
-			"FORAGE": 2,
-			"FARM": 6,
-			"CHOP": 3,
-			"GATHERSTONE": 1,
-			"GATHERSILVER": 1,
-			"GATHERCOPPER": 1,
-		},
-	},
-	{
-		"order": 5,
+		"order": 40,
 		"researchRequired": ["IRON_WORKING"],
 		"buildings": {
 			"CASTLE": {"enough": 1, "max": 1},
-			"BARRACKS": {"enough": 1, "max": 1},
+			"BARRACKS": {"enough": 1, "max": 2},
 			"SMITHY": {"enough": 1, "max": 1},
 		},
 		"units": {
-			"WORKER": {"min": 4, "enough": 12, "max": 100},
+			"WORKER": {"max": 200},
 			"WARRIOR": {"max": 1},
 			"CARAVAN": {"max": 3},
-			"SPEARMAN": {"enough": 1, "max": 1},
-			"SWORDSMAN": {"enough": 1},
+			"SPEARMAN": {"max": 20},
+			"SWORDSMAN": {"max": 20},
 		},
 		"workerAssignments": {
-			"FORAGE": .1,
-			"FARM": 12,
-			"CHOP": 3,
+			"FARM": 3,
+			"CHOP": 2,
 			"GATHERSTONE": 1,
+			"GATHERSILVER": .1,
+			"GATHERCOPPER": .1,
+			"GATHERIRON": 1,
+			"GATHERCOAL": 3,
+		},
+	},
+	{
+		"order": 50,
+		"researchRequired": ["MASONRY"],
+		"buildings": {
+			"CASTLE": {"enough": 1, "max": 2},
+			"BARRACKS": {"enough": 1, "max": 10},
+			"SMITHY": {"enough": 1, "max": 1},
+		},
+		"units": {
+			"WORKER": {"max": 200},
+			"WARRIOR": {"max": 1},
+			"CARAVAN": {"max": 3},
+			"SPEARMAN": {"max": 20},
+			"SWORDSMAN": {"max": 20},
+		},
+		"workerAssignments": {
+			"FARM": 40,
+			"CHOP": 20,
+			"GATHERSTONE": 10,
 			"GATHERSILVER": 1,
 			"GATHERCOPPER": 1,
-			"GATHERIRON": 1,
-			"GATHERCOAL": 1,
+			"GATHERIRON": 10,
+			"GATHERCOAL": 30,
+		},
+	},
+	{
+		"order": 60,
+		"researchRequired": ["TRAPPING"],
+		"buildings": {
+			"CASTLE": {"enough": 1, "max": 3},
+			"BARRACKS": {"enough": 1, "max": 10},
+			"SMITHY": {"enough": 1, "max": 1},
+			"STONE_ROAD": {},
+		},
+		"units": {
+			"WORKER": {"max": 400},
+			"WARRIOR": {"max": 1},
+			"CARAVAN": {"max": 3},
+			"SPEARMAN": {"max": 20},
+			"SWORDSMAN": {"max": 20},
+		},
+		"workerAssignments": {
+			"FARM": 45,
+			"CHOP": 20,
+			"GATHERSTONE": 10,
+			"GATHERSILVER": 1,
+			"GATHERCOPPER": 1,
+			"GATHERIRON": 10,
+			"GATHERCOAL": 30,
+		},
+	},
+	{
+		"order": 60,
+		"buildings": {
+			"CASTLE": {"enough": 1, "max": 3},
+			"BARRACKS": {"enough": 1, "max": 10},
+			"SMITHY": {"enough": 1, "max": 1},
+			"STONE_ROAD": {},
+		},
+		"units": {
+			"WORKER": {"max": 400},
+			"WARRIOR": {"max": 1},
+			"CARAVAN": {"max": 3},
+			"SPEARMAN": {"max": 20},
+			"SWORDSMAN": {"max": 20},
+		},
+		"workerAssignments": {
+			"FARM": 45,
+			"CHOP": 20,
+			"GATHERSTONE": 10,
+			"GATHERSILVER": 1,
+			"GATHERCOPPER": 1,
+			"GATHERIRON": 10,
+			"GATHERCOAL": 30,
 		},
 	}
 ]

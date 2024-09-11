@@ -798,6 +798,9 @@ public final class Utils {
 			}
 			@Override
 			public void produceUnit(Building building, UnitType unitType) {
+				if (!building.getFaction().areRequirementsMet(unitType)) {
+					return;
+				}
 				if(building.getFaction().canAfford(unitType.getCost())) {
 					Unit unit = new Unit(unitType, building.getTile(), building.getFaction());
 					if (building.getTile().isBlocked(unit)) {

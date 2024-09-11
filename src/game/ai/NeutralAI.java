@@ -36,7 +36,7 @@ public class NeutralAI extends AIInterface {
 			if (!unit.isIdle()) {
 				continue;
 			}
-			if (buildingQuantities[Game.buildingTypeMap.get("SCORPION_DEN").id()] < 10) {
+			if (buildingQuantities[0][Game.buildingTypeMap.get("SCORPION_DEN").id()] < 10) {
 				List<Tile> nearby = Utils.getRingOfTiles(unit.getTile(), world, 10);
 				Collections.shuffle(nearby);
 				Optional<Tile> validNearby = nearby.stream()

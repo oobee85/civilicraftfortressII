@@ -13,7 +13,7 @@ public abstract class AIInterface {
 	protected final World world;
 
 	protected Building castle;
-	protected int[] buildingQuantities;
+	protected int[][] buildingQuantities;
 	protected int[] unitQuantities;
 	
 	
@@ -28,14 +28,18 @@ public abstract class AIInterface {
 			castle = null;
 		}
 		if (buildingQuantities == null) {
-			buildingQuantities = new int[Game.buildingTypeMap.size()];
+			buildingQuantities = new int[2][Game.buildingTypeMap.size()];
 		}
 		if (unitQuantities == null) {
 			unitQuantities = new int[Game.unitTypeMap.size()];
 		}
-		Arrays.fill(buildingQuantities, 0);
+		Arrays.fill(buildingQuantities[0], 0);
+		Arrays.fill(buildingQuantities[1], 0);
 		for(Building building : faction.getBuildings()) {
-			buildingQuantities[building.getType().id()]++;
+			buildingQuantities[0][building.getType().id()]++;
+			if (building.isBuilt()) {
+				buildingQuantities[1][building.getType().id()]++;
+			}
 			if(castle == null && building.getType().isCastle() && !building.isDead()) {
 				castle = building;
 			}

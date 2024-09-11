@@ -15,19 +15,20 @@ public class BuildOrderAI extends AIInterface {
 
 	public static final BuildingType FARM = Game.buildingTypeMap.get("FARM");
 	private static final int MAX_BUILD_RADIUS = 10;
-	private static final int CLOSE_FORAGE_RADIUS = 2;
+	private static final int CLOSE_FORAGE_RADIUS = 3;
 	private static final int FAR_FORAGE_RADIUS = 40;
 
-
-	WorkerAssignmentCounter counter = new WorkerAssignmentCounter();
+	private UnitManager unitManager;
 	private HashSet<Integer> workersStillAlive = new HashSet<>(); // value is a worker Unit ID
 
 	public BuildOrderAI(CommandInterface commands, Faction faction, World world) {
 		super(commands, faction, world);
+		unitManager = new UnitManager(phases.get(currentPhase).workerAssignments);
 	}
 	
 	int currentPhase = 0;
 	public static List<BuildOrderPhase> phases = new ArrayList<>();
+	
 	
 //	{
 //		Phase phase0 = new Phase();
@@ -117,8 +118,8 @@ public class BuildOrderAI extends AIInterface {
 		craftItems();
 		boolean completedResearch = research();
 		boolean completedBuilding = build();
-		boolean completedUnits = replentishUnits();
 		unitActions();
+		boolean completedUnits = replentishUnits();
 		
 		
 		if (completedUnits && completedResearch && completedBuilding) {
@@ -130,7 +131,7 @@ public class BuildOrderAI extends AIInterface {
 	}
 	
 	private void craftItems() {
-		commands.craftItem(faction, ItemType.BRONZE_BAR, 1);
+		commands.craftItem(faction, ItemType.BRONZE_BAR, 5);
 		commands.craftItem(faction, ItemType.IRON_BAR, 1);
 	}
 	
@@ -141,6 +142,8 @@ public class BuildOrderAI extends AIInterface {
 	LinkedList<Tile> mithrilTiles = new LinkedList<Tile>();
 	
 	private void phaseTransition(int newPhase) {
+		unitManager.newPhase(phases.get(newPhase).workerAssignments);
+		System.out.println("Transitioning to phase " + newPhase);
 		if (newPhase == 1) {
 			Unit w = new Unit(Game.unitTypeMap.get("WORKER"), world.getRandomTile(), faction);
 			for (Tile t : world.getTiles()) {
@@ -184,144 +187,51 @@ public class BuildOrderAI extends AIInterface {
 		}
 	}
 	
-	class WorkerAssignmentCounter {
-		private HashMap<Integer, WorkerTask> unitidToTask = new HashMap<>(); // key is a worker Unit ID
-		private HashMap<WorkerTask, Integer> taskToCount = new HashMap<>();
+	
+	class TileHeatmap {
+		private HashMap<Tile, Integer> steps = new HashMap<>();
 		
-		void countAssignments() {
-			taskToCount.clear();
-			for (Entry<Integer, WorkerTask> preassigned : unitidToTask.entrySet()) {
-				if (!taskToCount.containsKey(preassigned.getValue())) {
-					taskToCount.put(preassigned.getValue(), 0);
-				}
-				taskToCount.put(preassigned.getValue(), 1 + taskToCount.get(preassigned.getValue()));
+		public void steppedOn(Tile tile) {
+			if (!steps.containsKey(tile)) {
+				steps.put(tile, 0);
 			}
-		}
-		private void increment(WorkerTask task, int amount) {
-			if (!taskToCount.containsKey(task)) {
-				taskToCount.put(task, 0);
-			}
-			taskToCount.put(task, amount + taskToCount.get(task));
-		}
-		int getCount(WorkerTask task) {
-			if (!taskToCount.containsKey(task)) {
-				return 0;
-			}
-			return taskToCount.get(task);
+			steps.put(tile, 1 + steps.get(tile));
 		}
 		
-		void unassign(int unitid) {
-			WorkerTask task = unitidToTask.remove(unitid);
-			counter.increment(task, -1);
-		}
-		
-		WorkerTask getTaskFor(int id) {
-			if (unitidToTask.containsKey(id)) {
-				return unitidToTask.get(id);
-			}
-
-			WorkerTask task = chooseAssignment();
-			unitidToTask.put(id, task);
-			counter.increment(task, 1);
-			return task;
-		}
-		
-		WorkerTask chooseAssignment() {
-			WorkerTask bestTask = WorkerTask.CHOP;
-			double highestDifference = 0;
-			for (Entry<WorkerTask, Double> entry : phases.get(currentPhase).workerAssignments.entrySet()) {
-				double currentRatio = 0;
-				if (unitidToTask.size() > 0) {
-					currentRatio = (double)getCount(entry.getKey()) / unitidToTask.size();
-				}
-				System.out.println(String.format("Desired ratio for %s: %.1f%%, Current: %.1f%%",
-						entry.getKey(), 100*entry.getValue(), 100*currentRatio));
-				double difference = entry.getValue() - currentRatio;
-				if (difference >= highestDifference) {
-					highestDifference = difference;
-					bestTask = entry.getKey();
-				}
-			}
-			System.out.println("Assigning worker to " + bestTask);
-			return bestTask;
-		}
-		void removeDeadWorkers(Set<Integer> aliveWorkers) {
-			LinkedList<Integer> deadWorkersToRemove = new LinkedList<>();
-			for (Integer id : unitidToTask.keySet()) {
-				if (!aliveWorkers.contains(id)) {
-					deadWorkersToRemove.add(id);
-				}
-			}
-			for (Integer id : deadWorkersToRemove) {
-				counter.unassign(id);
-			}
-		}
-		@Override
-		public String toString() {
-			StringBuilder sb = new StringBuilder("Worker assignments: ");
-			for (Entry<WorkerTask, Integer> entry : taskToCount.entrySet()) {
-				if (entry.getValue() == 0) {
+		public Tile getMostSteppedOnWithoutRoad() {
+			Tile most = null;
+			int mostSteps = 0;
+			for (Entry<Tile, Integer> entry : steps.entrySet()) {
+				if (entry.getKey().hasRoad()) {
 					continue;
 				}
-				sb.append(String.format("%s: %d, ", entry.getKey(), entry.getValue()));
+				if (entry.getValue() >= mostSteps) {
+					most = entry.getKey();
+					mostSteps = entry.getValue();
+				}
 			}
-			return sb.toString();
+			return most;
 		}
 	}
 	
+	private TileHeatmap heatmap = new TileHeatmap();
 	private void unitActions() {
-		counter.countAssignments();
+
 		workersStillAlive.clear();
-		Iterator<Building> farmIterator = faction.getBuildings().iterator();
 		for(Unit unit : faction.getUnits()) {
+			if(!unit.isBuilder()) {
+				continue;
+			}
+			workersStillAlive.add(unit.id());
+			unitManager.checkIfMissionComplete(unit.id());
+		}
+		unitManager.removeDeadWorkers(workersStillAlive);
+
+		unitManager.countAssignments();
+		for(Unit unit : faction.getUnits()) {
+			heatmap.steppedOn(unit.getTile());
 			if(unit.isBuilder()) {
-				workersStillAlive.add(unit.id());
-				if(!unit.isAutoBuilding()) {
-					unit.setAutoBuild(true);
-				}
-				PlannedAction p = unit.getNextPlannedAction();
-				if (p != null && p.isBuildAction()) {
-					continue;
-				}
-				WorkerTask task = counter.getTaskFor(unit.id());
-				boolean result = true;
-				switch (task) {
-				case FARM:
-					handleFarmingWorker(unit, farmIterator);
-					break;
-				case CHOP:
-					handleChoppingWorker(unit);
-					break;
-				case CLOSEFORAGE:
-					result = handleForagingWorker(unit, CLOSE_FORAGE_RADIUS);
-					break;
-				case FORAGE:
-					result = handleForagingWorker(unit, FAR_FORAGE_RADIUS);
-					break;
-				case GATHERSTONE:
-					handleGatherStoneWorker(unit);
-					break;
-				case GATHERSILVER:
-					result = handleGatherMetalWorker(unit, silverTiles);
-					break;
-				case GATHERCOPPER:
-					result = handleGatherMetalWorker(unit, copperTiles);
-					break;
-				case GATHERIRON:
-					result = handleGatherMetalWorker(unit, ironTiles);
-					break;
-				case GATHERCOAL:
-					result = handleGatherMetalWorker(unit, coalTiles);
-					break;
-				case GATHERMITHRIL:
-					result = handleGatherMetalWorker(unit, mithrilTiles);
-					break;
-				}
-				
-				if (!result) {
-					System.out.println("Failed to do task: " + task);
-					counter.unassign(unit.id());
-				}
+				handleWorker(unit);
 			}
 			else if(unit.getType().isCaravan()) {
 				if (unit.isIdle()) {
@@ -334,9 +244,136 @@ public class BuildOrderAI extends AIInterface {
 				}
 			}
 		}
-		counter.removeDeadWorkers(workersStillAlive);
-//		System.out.println(counter);
 	}
+	
+	private void handleWorker(Unit worker) {
+//		if(!worker.isAutoBuilding()) {
+//			worker.setAutoBuild(true);
+//		}
+		Mission mission = unitManager.getMissionFor(worker.id());
+		if (mission != null) {
+//			System.out.println("Worker " + worker + " has mission " + mission);
+			mission.attempt(worker);
+			return;
+//			System.out.println("NON NULL MISSION");
+//			if (mission.attempt(worker)) {
+//				System.out.println("MISSION SUCCESS");
+//				return;
+//			}
+//			else {
+//				System.out.println("MISSION FAILED");
+//				unitManager.addMission(mission);
+//			}
+		}
+
+		WorkerTask task = unitManager.getTaskFor(worker.id());
+		boolean result = true;
+		switch (task) {
+		case FARM:
+			handleFarmingWorker(worker);
+			break;
+		case CHOP:
+			handleChoppingWorker(worker);
+			break;
+		case CLOSEFORAGE:
+			result = handleForagingWorker(worker, CLOSE_FORAGE_RADIUS);
+			break;
+		case FORAGE:
+			result = handleForagingWorker(worker, FAR_FORAGE_RADIUS);
+			break;
+		case GATHERSTONE:
+			handleGatherStoneWorker(worker);
+			break;
+		case GATHERSILVER:
+			result = handleGatherMetalWorker(worker, silverTiles);
+			break;
+		case GATHERCOPPER:
+			result = handleGatherMetalWorker(worker, copperTiles);
+			break;
+		case GATHERIRON:
+			result = handleGatherMetalWorker(worker, ironTiles);
+			break;
+		case GATHERCOAL:
+			result = handleGatherMetalWorker(worker, coalTiles);
+			break;
+		case GATHERMITHRIL:
+			result = handleGatherMetalWorker(worker, mithrilTiles);
+			break;
+		}
+		
+		if (!result) {
+//			System.out.println("Failed to do task: " + task);
+			unitManager.unassign(worker.id());
+		}
+	}
+	
+//	private boolean handleBuildRoadsWorker(Unit worker) {
+//		Tile mostSteps = heatmap.getMostSteppedOnWithoutRoad();
+//		if (mostSteps == null) {
+//			return false;
+//		}
+//
+//		Building building = checkCostAndBuild(Game.buildingTypeMap.get("STONE_ROAD"), worker, mostSteps);
+//		if(building == null) {
+//			return false;
+//		}
+//		
+//
+//		Mission build = new Mission() {
+//			Building building;
+//			
+//			@Override
+//			public String toString() {
+//				if (building == null) {
+//					return "Mission build " + type;
+//				}
+//				else {
+//					return "Mission build " + building;
+//				}
+//			}
+//			@Override
+//			public boolean isComplete() {
+//				return building != null && building.isBuilt();
+//			}
+//			
+//			@Override
+//			public boolean isStarted() {
+//				return building != null;
+//			}
+//			
+//			@Override
+//			public boolean isPossible() {
+//				return false;
+//			}
+//			
+//			@Override
+//			public boolean attempt(Unit unit) {
+//				if (building != null ) {
+//					PlannedAction action = unit.actionQueue.peek();
+//					if (action != null && action.target == building) {
+//						return true;
+//					}
+//					commands.planAction(unit, PlannedAction.buildOnTile(building.getTile(), false), true);
+//					return true;
+//				}
+//
+//				Tile chosenTile = getTargetTile(getHomeTile(unit), 1, MAX_BUILD_RADIUS, e -> {
+//					return !e.hasBuilding() && e.canBuild();
+//				});
+//				if (chosenTile == null) {
+//					return false;
+//				}
+//				if (!faction.canAfford(type.getCost())) {
+//					return false;
+//				}
+//				building = commands.planBuilding(unit, chosenTile, true, type);
+//				return building != null;
+//			}
+//		};
+//		unitManager.addUnstartedMission(build, type.toString());
+//		
+//		return true;
+//	}
 
 	private boolean handleGatherMetalWorker(Unit worker, List<Tile> tiles) {
 		if (tiles.size() == 0) {
@@ -454,53 +491,8 @@ public class BuildOrderAI extends AIInterface {
 	}
 	
 	
-	class FarmWorkerTracker {
-		private Map<Building, Unit> farmToWorker = new HashMap<>();
-		private Map<Unit, Building> workerToFarm = new HashMap<>();
-		
-		public void assignWorkerToFarm(Unit worker, Building farm) {
-			farmToWorker.put(farm, worker);
-			workerToFarm.put(worker, farm);
-		}
-
-		public Building getFarmForWorker(Unit worker, Iterator<Building> farmIterator) {
-			if (workerToFarm.containsKey(worker)) {
-				Building farm = workerToFarm.get(worker);
-				if (farm.isDead()) {
-					workerToFarm.remove(worker);
-					farmToWorker.remove(farm);
-				}
-				else {
-					return farm;
-				}
-			}
-			
-			while (farmIterator.hasNext()) {
-				Building building = farmIterator.next();
-				if (building.getType() != FARM) {
-					continue;
-				}
-				Building farm = building;
-				if (farmToWorker.containsKey(farm)) {
-					Unit existingWorker = farmToWorker.get(farm);
-					if (!existingWorker.isDead()) {
-						continue;
-					}
-					farmToWorker.remove(farm);
-					workerToFarm.remove(existingWorker);
-				}
-
-				assignWorkerToFarm(worker, farm);
-				return farm;
-			}
-			return null;
-		}
-		
-	}
-	
-	FarmWorkerTracker farmWorkerTracker = new FarmWorkerTracker();
-	private boolean handleFarmingWorker(Unit worker, Iterator<Building> farmIterator) {
-		Building farmNeedsWorker = farmWorkerTracker.getFarmForWorker(worker, farmIterator);
+	private boolean handleFarmingWorker(Unit worker) {
+		Building farmNeedsWorker = unitManager.getFarmForWorker(worker, faction.getBuildings());
 		if(farmNeedsWorker != null) {
 			finishBuildAndHarvest(worker, farmNeedsWorker);
 			return true;
@@ -517,7 +509,7 @@ public class BuildOrderAI extends AIInterface {
 		if (farm == null) {
 			return false;
 		}
-		farmWorkerTracker.assignWorkerToFarm(worker, farm);
+		unitManager.assignWorkerToFarm(worker, farm);
 		return true;
 	}
 	private Building buildAndHarvest(Unit unit, Tile tile, BuildingType type) {
@@ -541,13 +533,121 @@ public class BuildOrderAI extends AIInterface {
 	private boolean build() {
 		boolean completed = true;
 		for (Entry<BuildingType, QuantityReq> buildingReq : phases.get(currentPhase).buildings.entrySet()) {
-
-			if (buildingQuantities[buildingReq.getKey().id()] < buildingReq.getValue().enough) {
+			BuildingType type = buildingReq.getKey();
+			if (buildingQuantities[1][type.id()] < buildingReq.getValue().enough) {
 				completed = false;
 			}
-			if (buildingQuantities[buildingReq.getKey().id()] < buildingReq.getValue().max) {
-				tryToBuild(buildingReq.getKey());
+			if (buildingQuantities[0][type.id()] >= buildingReq.getValue().max) {
+				continue;
 			}
+			
+
+			Mission build;
+			if (type.isRoad()) {
+				build = new Mission() {
+					Building building;
+					
+					@Override
+					public String toString() {
+						if (building == null) {
+							return "Mission build " + type;
+						}
+						else {
+							return "Mission build " + building;
+						}
+					}
+					@Override
+					public boolean isComplete() {
+						return building != null && building.isBuilt();
+					}
+					
+					@Override
+					public boolean isStarted() {
+						return building != null;
+					}
+					
+					@Override
+					public boolean isPossible() {
+						return false;
+					}
+					
+					@Override
+					public boolean attempt(Unit unit) {
+						if (building != null ) {
+							PlannedAction action = unit.actionQueue.peek();
+							if (action != null && action.target == building) {
+								return true;
+							}
+							commands.planAction(unit, PlannedAction.buildOnTile(building.getTile(), true), true);
+							return true;
+						}
+						Tile chosenTile = heatmap.getMostSteppedOnWithoutRoad();
+						if (chosenTile == null) {
+							return false;
+						}
+						if (!faction.canAfford(type.getCost())) {
+							return false;
+						}
+						building = commands.planBuilding(unit, chosenTile, true, type);
+						return building != null;
+					}
+				};
+			}
+			else {
+				build = new Mission() {
+					Building building;
+					
+					@Override
+					public String toString() {
+						if (building == null) {
+							return "Mission build " + type;
+						}
+						else {
+							return "Mission build " + building;
+						}
+					}
+					@Override
+					public boolean isComplete() {
+						return building != null && building.isBuilt();
+					}
+					
+					@Override
+					public boolean isStarted() {
+						return building != null;
+					}
+					
+					@Override
+					public boolean isPossible() {
+						return false;
+					}
+					
+					@Override
+					public boolean attempt(Unit unit) {
+						if (building != null ) {
+							PlannedAction action = unit.actionQueue.peek();
+							if (action != null && action.target == building) {
+								return true;
+							}
+							commands.planAction(unit, PlannedAction.buildOnTile(building.getTile(), false), true);
+							return true;
+						}
+	
+						Tile chosenTile = getTargetTile(getHomeTile(unit), 1, MAX_BUILD_RADIUS, e -> {
+							return !e.hasBuilding() && e.canBuild();
+						});
+						if (chosenTile == null) {
+							return false;
+						}
+						if (!faction.canAfford(type.getCost())) {
+							return false;
+						}
+						building = commands.planBuilding(unit, chosenTile, true, type);
+						return building != null;
+					}
+				};
+			}
+			unitManager.addUnstartedMission(build, type.toString());
+//			unitManager.requestBuilding(buildingReq.getKey(), 1);
 		}	
 		return completed;
 	}
@@ -578,12 +678,11 @@ public class BuildOrderAI extends AIInterface {
 		if (!faction.canAfford(type.getCost())) {
 			return null;
 		}
-		Building b = commands.planBuilding(builder, tile, true, type);
-		buildingQuantities[type.id()]++;
-		return b;
+		return commands.planBuilding(builder, tile, true, type);
 	}
-	
+	HashMap<ItemType, Integer> researchCost;
 	private boolean research() {
+		researchCost = null;
 		boolean researchFinished = true;
 		ListIterator<ResearchType> iter = phases.get(currentPhase).researches.listIterator();
 		while (iter.hasNext()) {
@@ -596,19 +695,44 @@ public class BuildOrderAI extends AIInterface {
 			if(faction.setResearchTarget(type)) {
 				return researchFinished;
 			}
+			else {
+				researchCost = type.cost;
+			}
 		}
 		return researchFinished;
+	}
+	
+	private boolean ensureSaveForResearchCost(HashMap<ItemType, Integer> potentialCost) {
+		if (researchCost == null) {
+			return true;
+		}
+		for (Entry<ItemType, Integer> cost : potentialCost.entrySet()) {
+			if (!researchCost.containsKey(cost.getKey())) {
+				continue;
+			}
+			int potentialRemaining = faction.getInventory().getItemAmount(cost.getKey()) - cost.getValue();
+			if (potentialRemaining < researchCost.get(cost.getKey())) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	private boolean replentishUnits() {
 		boolean completed = true;
 		for (Entry<UnitType, QuantityReq> unitReq : phases.get(currentPhase).units.entrySet()) {
-			if (unitQuantities[unitReq.getKey().id()] < unitReq.getValue().enough) {
+			if (unitQuantities[unitReq.getKey().id()] >= unitReq.getValue().max) {
+				continue;
+			}
+			boolean enough = unitQuantities[unitReq.getKey().id()] > unitReq.getValue().enough;
+			if (!enough) {
 				completed = false;
 			}
-			if (unitQuantities[unitReq.getKey().id()] < unitReq.getValue().max) {
-				attemptToQueueUnit(unitReq.getKey());
+			if (enough && !ensureSaveForResearchCost(unitReq.getKey().getCost())) {
+				System.out.println("saving for research");
+				continue;
 			}
+			attemptToQueueUnit(unitReq.getKey());
 		}
 		return completed;
 	}

@@ -209,7 +209,7 @@ public class BasicAI extends AIInterface {
 	}
 	
 	private boolean wantsBarracks() {
-		int numBarracks = buildingQuantities[Game.buildingTypeMap.get("BARRACKS").id()];
+		int numBarracks = buildingQuantities[0][Game.buildingTypeMap.get("BARRACKS").id()];
 		return numBarracks < 1;
 	}
 	private boolean wantsWall() {
@@ -251,7 +251,7 @@ public class BasicAI extends AIInterface {
 		}
 		Building building = planBuilding(unit, tile, true, Game.buildingTypeMap.get("BARRACKS"));
 		if(building != null) {
-			buildingQuantities[Game.buildingTypeMap.get("BARRACKS").id()]++;
+			buildingQuantities[0][Game.buildingTypeMap.get("BARRACKS").id()]++;
 		}
 		return building != null;
 	}
@@ -328,7 +328,7 @@ public class BasicAI extends AIInterface {
 		boolean clearQueue = true;
 		if(building == null) {
 			building = planBuilding(unit, tile, true, type);
-			buildingQuantities[type.id()]++;
+			buildingQuantities[0][type.id()]++;
 			clearQueue = false;
 		}
 		else if(!building.isBuilt()) {

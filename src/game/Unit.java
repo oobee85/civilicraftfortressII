@@ -227,7 +227,7 @@ public class Unit extends Thing implements Serializable {
 	public PlannedAction getNextPlannedAction() {
 		while(!actionQueue.isEmpty()) {
 			PlannedAction plan = actionQueue.peek();
-			if(plan.isDone(this)) {
+			if(plan != null && plan.isDone(this)) {
 				actionQueue.poll();
 				onFinishedAction(plan);
 			}
