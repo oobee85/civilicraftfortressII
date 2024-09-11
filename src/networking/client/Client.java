@@ -356,7 +356,7 @@ public class Client {
 		if(gameInstance.world.getFactions().size() < worldInfo.getFactions().size()) {
 			for(int i = gameInstance.world.getFactions().size(); i < worldInfo.getFactions().size(); i++) {
 				Faction received = worldInfo.getFactions().get(i);
-				Faction faction = new Faction(received.name(), received.isPlayer(), received.usesItems(), received.color());
+				Faction faction = new Faction(received.name(), received.isPlayer(), received.usesItems(), received.usesResearch(), received.color());
 				gameInstance.world.addFaction(faction);
 			}
 		}

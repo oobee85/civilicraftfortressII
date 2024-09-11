@@ -89,7 +89,7 @@
 		"researchRequired": ["MASONRY"],
 		"buildings": {
 			"CASTLE": {"enough": 1, "max": 2},
-			"BARRACKS": {"enough": 1, "max": 10},
+			"BARRACKS": {"enough": 1, "max": 3},
 			"SMITHY": {"enough": 1, "max": 1},
 		},
 		"units": {
@@ -114,9 +114,8 @@
 		"researchRequired": ["TRAPPING", "MATHEMATICS"],
 		"buildings": {
 			"CASTLE": {"enough": 1, "max": 3},
-			"BARRACKS": {"enough": 1, "max": 10},
+			"BARRACKS": {"enough": 1, "max": 4},
 			"SMITHY": {"enough": 1, "max": 2},
-			"STONE_ROAD": {},
 		},
 		"units": {
 			"WORKER": {"max": 400},
@@ -140,10 +139,9 @@
 		"researchRequired": ["ENGINEERING"],
 		"buildings": {
 			"CASTLE": {"enough": 1, "max": 10},
-			"BARRACKS": {"enough": 1, "max": 10},
+			"BARRACKS": {"enough": 1, "max": 5},
 			"SMITHY": {"enough": 1, "max": 3},
 			"WORKSHOP": {"enough": 1, "max": 1},
-			"STONE_ROAD": {},
 		},
 		"units": {
 			"WORKER": {"max": 500},
@@ -169,10 +167,9 @@
 		"order": 80,
 		"buildings": {
 			"CASTLE": {"enough": 1, "max": 20},
-			"BARRACKS": {"enough": 1, "max": 10},
+			"BARRACKS": {"enough": 1, "max": 5},
 			"SMITHY": {"enough": 1, "max": 4},
-			"WORKSHOP": {"enough": 1, "max": 5},
-			"BRICK_ROAD": {},
+			"WORKSHOP": {"enough": 1, "max": 2},
 		},
 		"units": {
 			"WORKER": {"max": 800},
@@ -181,12 +178,12 @@
 			"SPEARMAN": {"max": 40},
 			"SWORDSMAN": {"max": 40},
 			"LONGBOWMAN": {"max": 40},
-			"CATAPULT": {"max": 20},
+			"CATAPULT": {"max": 10},
 			"TREBUCHET": {"max": 10},
 		},
 		"workerAssignments": {
 			"FARM": 80,
-			"CHOP": 20,
+			"CHOP": 25,
 			"GATHERSTONE": 10,
 			"GATHERSILVER": 1,
 			"GATHERCOPPER": 1,
@@ -199,24 +196,24 @@
 		"order": 90,
 		"buildings": {
 			"CASTLE": {"enough": 1, "max": 40},
-			"BARRACKS": {"enough": 1, "max": 10},
+			"BARRACKS": {"enough": 1, "max": 5},
 			"SMITHY": {"enough": 1, "max": 5},
 			"WORKSHOP": {"enough": 1, "max": 5},
-			"STONE_ROAD": {},
+			"BRICK_ROAD": {},
 		},
 		"units": {
 			"WORKER": {"max": 900},
 			"WARRIOR": {"max": 1},
 			"CARAVAN": {"max": 3},
-			"SPEARMAN": {"max": 40},
+			"SPEARMAN": {"max": 10},
 			"SWORDSMAN": {"max": 40},
 			"LONGBOWMAN": {"max": 40},
-			"CATAPULT": {"max": 20},
+			"CATAPULT": {"max": 10},
 			"TREBUCHET": {"max": 10},
 		},
 		"workerAssignments": {
 			"FARM": 80,
-			"CHOP": 20,
+			"CHOP": 30,
 			"GATHERSTONE": 10,
 			"GATHERSILVER": 1,
 			"GATHERCOPPER": 1,

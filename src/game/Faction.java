@@ -41,6 +41,7 @@ public class Faction implements Externalizable {
 	private Color borderColor;
 	private String name;
 	private boolean usesItems;
+	private boolean usesResearch;
 	private boolean usesBuildings;
 	private boolean isPlayer;
 	private double environmentalDifficulty = 1;
@@ -72,10 +73,10 @@ public class Faction implements Externalizable {
 	public Faction() {
 	}
 	
-	public Faction(String name, boolean isPlayer, boolean usesItems) {
-		this(name, isPlayer, usesItems, null);
+	public Faction(String name, boolean isPlayer, boolean usesItems, boolean usesResearch) {
+		this(name, isPlayer, usesItems, usesResearch, null);
 	}
-	public Faction(String name, boolean isPlayer, boolean usesItems, Color color) {
+	public Faction(String name, boolean isPlayer, boolean usesItems, boolean usesResearch, Color color) {
 		this.id = idCounter++;
 		if(color == null) {
 			this.setColor(idCounter < factionColors.length ? factionColors[idCounter] : factionColors[0]);
@@ -85,6 +86,7 @@ public class Faction implements Externalizable {
 		}
 		this.name = name;
 		this.usesItems = usesItems;
+		this.usesResearch = usesResearch;
 		this.isPlayer = isPlayer;
 		this.inventory = new Inventory();
 		setupResearch();
@@ -150,7 +152,7 @@ public class Faction implements Externalizable {
 		return name;
 	}
 	public static Faction getTempFaction() {
-		Faction temp = new Faction("temp", false, false);
+		Faction temp = new Faction("temp", false, false, false);
 		idCounter--;
 		return temp;
 	}
@@ -245,15 +247,27 @@ public class Faction implements Externalizable {
 		}
 	}
 	public boolean areRequirementsMet(UnitType type) {
+		if (!usesResearch) {
+			return true;
+		}
 		return unitResearchRequirements.get(type).areRequirementsMet();
 	}
 	public boolean areRequirementsMet(BuildingType type) {
+		if (!usesResearch) {
+			return true;
+		}
 		return buildingResearchRequirements.get(type).areRequirementsMet();
 	}
 	public boolean areRequirementsMet(ItemType type) {
+		if (!usesResearch) {
+			return true;
+		}
 		return craftResearchRequirements.get(type).areRequirementsMet();
 	}
 	public boolean areRequirementsMet(ResourceType type) {
+		if (!usesResearch) {
+			return true;
+		}
 		return resourceResearchRequirements.get(type).areRequirementsMet();
 	}
 	
@@ -366,6 +380,9 @@ public class Faction implements Externalizable {
 	
 	public boolean usesItems() {
 		return usesItems;
+	}
+	public boolean usesResearch() {
+		return usesResearch;
 	}
 	
 	public boolean usesBuildings() {

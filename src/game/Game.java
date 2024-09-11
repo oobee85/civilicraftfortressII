@@ -532,17 +532,17 @@ public class Game {
 	public void generateWorld(int width, int height, boolean easymode, List<PlayerInfo> players) {
 		initializeWorld(width, height);
 
-		Faction NO_FACTION = new Faction("NONE", false, false);
+		Faction NO_FACTION = new Faction("NONE", false, false, false);
 		world.addFaction(NO_FACTION);
 		
-		Faction CYCLOPS_FACTION = new Faction("CYCLOPS", false, true);
+		Faction CYCLOPS_FACTION = new Faction("CYCLOPS", false, true, false);
 		CYCLOPS_FACTION.getInventory().addItem(ItemType.FOOD, 50);
 		if(Settings.CINEMATIC) {
 			CYCLOPS_FACTION.getInventory().addItem(ItemType.FOOD, 5000);
 		}
 		world.addFaction(CYCLOPS_FACTION);
 		
-		Faction UNDEAD_FACTION = new Faction("UNDEAD", false, false);
+		Faction UNDEAD_FACTION = new Faction("UNDEAD", false, false, false);
 //		UNDEAD_FACTION.getInventory().addItem(ItemType.FOOD, 999999);
 		world.addFaction(UNDEAD_FACTION);
 		
@@ -896,7 +896,7 @@ public class Game {
 		List<Tile> validSpawnTiles = chooseSpawnTiles(players.size());
 		List<Tile> chosenSpawnTiles = new LinkedList<>();
 		for(PlayerInfo player : players) {
-			Faction newFaction = new Faction(player.getName(), true, true, player.getColor());
+			Faction newFaction = new Faction(player.getName(), true, true, true, player.getColor());
 			newFaction.getInventory().addItem(ItemType.WOOD, 100);
 //			newFaction.getInventory().addItem(ItemType.STONE, 200);
 			newFaction.getInventory().addItem(ItemType.FOOD, 200);

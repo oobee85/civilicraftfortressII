@@ -262,7 +262,7 @@ public class BuildOrderAI extends AIInterface {
 		if(!unit.isGuarding()) {
 			commands.setGuarding(unit, true);
 		}
-		if (unit.getMaxAttackRange() > 9) {
+		if (unit.getMaxAttackRange() > 19) {
 			attackNearestEnemyBuilding(unit);
 		}
 		else {
@@ -294,13 +294,18 @@ public class BuildOrderAI extends AIInterface {
 		boolean result = true;
 		switch (task) {
 		case FARM:
-			handleFarmingWorker(worker);
+			if (!handleFarmingWorker(worker)) {
+				handleChoppingWorker(worker);
+			}
 			break;
 		case CHOP:
 			handleChoppingWorker(worker);
 			break;
 		case CLOSEFORAGE:
 			result = handleForagingWorker(worker, CLOSE_FORAGE_RADIUS);
+			if (!result) {
+				handleChoppingWorker(worker);
+			}
 			break;
 		case FORAGE:
 			result = handleForagingWorker(worker, FAR_FORAGE_RADIUS);
@@ -345,8 +350,9 @@ public class BuildOrderAI extends AIInterface {
 	}
 	
 	private void handleGatherStoneWorker(Unit worker) {
-		Tile tile = getTargetTile(worker.getTile(), 1, FAR_FORAGE_RADIUS, e -> {
-			return e.getTerrain() == Terrain.ROCK;
+		Tile tile = getTargetTile(worker.getTile(), 0, FAR_FORAGE_RADIUS, e -> {
+			return e.getTerrain() == Terrain.ROCK 
+					&& (e.getBuilding() == null || !e.getBuilding().getType().isCastle()) ;
 		});
 		if(tile == null) {
 			return;
@@ -354,15 +360,22 @@ public class BuildOrderAI extends AIInterface {
 		commands.planAction(worker, PlannedAction.harvestTile(tile), true);
 	}
 	
+	private Building getRandomCompletedCastle() {
+		if (castles.isEmpty()) {
+			return castle;
+		}
+		return castles.get((int)(Math.random()*castles.size()));
+	}
+	
 	private boolean pickupResources(Unit unit) {
-		Tile tile = getTargetTile(unit.getTile(), 0, FAR_FORAGE_RADIUS, e -> {
+		Tile tile = getTargetTile(getHomeTile(unit), 0, FAR_FORAGE_RADIUS, e -> {
 			return !e.getInventory().isEmpty() && !e.isBlocked(unit);
 		});
 		if(tile == null) {
 			return false;
 		}
 		commands.planAction(unit, PlannedAction.moveTo(tile), true);
-		commands.planAction(unit, PlannedAction.deliver(castle), false);
+		commands.planAction(unit, PlannedAction.deliver(getRandomCompletedCastle()), false);
 		return true;
 	}
 	private Tile getHomeTile(Unit unit) {
