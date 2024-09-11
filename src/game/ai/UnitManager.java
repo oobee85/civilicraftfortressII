@@ -44,7 +44,7 @@ public class UnitManager {
 				return null;
 			}
 			specialMissions.put(id, missions.removeFirst());
-			System.out.println("Assigned worker " + id + " to " + specialMissions.get(id));
+//			System.out.println("Assigned worker " + id + " to " + specialMissions.get(id));
 		}
 		return specialMissions.get(id);
 	}
@@ -83,6 +83,9 @@ public class UnitManager {
 	public void unassign(int unitid) {
 		WorkerTask task = unitidToTask.remove(unitid);
 		increment(task, -1);
+		if (specialMissions.containsKey(unitid)) {
+			missions.add(specialMissions.remove(unitid));
+		}
 	}
 	
 	WorkerTask getTaskFor(int id) {
@@ -132,9 +135,6 @@ public class UnitManager {
 		}
 		for (Integer id : deadWorkersToRemove) {
 			unassign(id);
-			if (specialMissions.containsKey(id)) {
-				missions.add(specialMissions.remove(id));
-			}
 		}
 	}
 	@Override

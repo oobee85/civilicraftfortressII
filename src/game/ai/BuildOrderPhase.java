@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import game.*;
 
 public class BuildOrderPhase {
+	public static List<BuildOrderPhase> phases = new ArrayList<>();
 
 	public enum WorkerTask {
 		CLOSEFORAGE, FORAGE, FARM, CHOP, GATHERSTONE, GATHERSILVER, GATHERCOPPER, GATHERIRON, GATHERCOAL, GATHERMITHRIL
@@ -24,6 +25,22 @@ public class BuildOrderPhase {
 		buildings = new HashMap<>();
 		workerAssignments = new HashMap<>();
 	}
+	
+	public BuildOrderPhase(BuildOrderPhase copyFrom) {
+		this.order = copyFrom.order;
+		researches = new LinkedList<>(copyFrom.researches);
+		units = copyFrom.units;
+		buildings = copyFrom.buildings;
+		workerAssignments = copyFrom.workerAssignments;
+		finalize();
+	}
+	
+	public void finalize() {
+		units = Collections.unmodifiableMap(units);
+		buildings = Collections.unmodifiableMap(buildings);
+		workerAssignments = Collections.unmodifiableMap(workerAssignments);
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

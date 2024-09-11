@@ -584,10 +584,11 @@ public class Loader {
 				}
 			}
 			
+			phase.finalize();
 			System.out.println(phase);
-			BuildOrderAI.phases.add(phase);
+			BuildOrderPhase.phases.add(phase);
 		}
-		BuildOrderAI.phases.sort((a, b) -> {
+		BuildOrderPhase.phases.sort((a, b) -> {
 			return a.order - b.order;
 		});
 	}

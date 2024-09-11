@@ -1,6 +1,6 @@
 package game.ai;
 
-import java.util.Arrays;
+import java.util.*;
 
 import game.*;
 import ui.CommandInterface;
@@ -13,6 +13,7 @@ public abstract class AIInterface {
 	protected final World world;
 
 	protected Building castle;
+	protected List<Building> castles = new ArrayList<>();
 	protected int[][] buildingQuantities;
 	protected int[] unitQuantities;
 	
@@ -33,6 +34,7 @@ public abstract class AIInterface {
 		if (unitQuantities == null) {
 			unitQuantities = new int[Game.unitTypeMap.size()];
 		}
+		castles.clear();
 		Arrays.fill(buildingQuantities[0], 0);
 		Arrays.fill(buildingQuantities[1], 0);
 		for(Building building : faction.getBuildings()) {
@@ -40,8 +42,13 @@ public abstract class AIInterface {
 			if (building.isBuilt()) {
 				buildingQuantities[1][building.getType().id()]++;
 			}
-			if(castle == null && building.getType().isCastle() && !building.isDead()) {
-				castle = building;
+			if (building.getType().isCastle() && !building.isDead()) {
+				if (building.isBuilt()) {
+					castles.add(building);
+				}
+				if (castle == null || !castle.isBuilt()) {
+					castle = building;
+				}
 			}
 		}
 

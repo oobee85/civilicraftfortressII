@@ -14,7 +14,7 @@ import world.*;
 public class BuildOrderAI extends AIInterface {
 
 	public static final BuildingType FARM = Game.buildingTypeMap.get("FARM");
-	private static final int MAX_BUILD_RADIUS = 10;
+	private static final int MAX_BUILD_RADIUS = 40;
 	private static final int CLOSE_FORAGE_RADIUS = 3;
 	private static final int FAR_FORAGE_RADIUS = 40;
 
@@ -23,11 +23,17 @@ public class BuildOrderAI extends AIInterface {
 
 	public BuildOrderAI(CommandInterface commands, Faction faction, World world) {
 		super(commands, faction, world);
+		
+		phases = new ArrayList<>();
+		for (BuildOrderPhase phase : BuildOrderPhase.phases) {
+			phases.add(new BuildOrderPhase(phase));
+		}
+
 		unitManager = new UnitManager(phases.get(currentPhase).workerAssignments);
 	}
 	
 	int currentPhase = 0;
-	public static List<BuildOrderPhase> phases = new ArrayList<>();
+	public List<BuildOrderPhase> phases;
 	
 	
 //	{
@@ -131,8 +137,15 @@ public class BuildOrderAI extends AIInterface {
 	}
 	
 	private void craftItems() {
+		if (faction.getInventory().getItemAmount(ItemType.COAL) > 100) {
+			commands.craftItem(faction, ItemType.MITHRIL_BAR, 10);
+			commands.craftItem(faction, ItemType.IRON_BAR, 10);
+		}
+		else {
+			commands.craftItem(faction, ItemType.MITHRIL_BAR, 1);
+			commands.craftItem(faction, ItemType.IRON_BAR, 1);
+		}
 		commands.craftItem(faction, ItemType.BRONZE_BAR, 5);
-		commands.craftItem(faction, ItemType.IRON_BAR, 1);
 	}
 	
 	LinkedList<Tile> silverTiles = new LinkedList<Tile>();
@@ -140,10 +153,9 @@ public class BuildOrderAI extends AIInterface {
 	LinkedList<Tile> ironTiles = new LinkedList<Tile>();
 	LinkedList<Tile> coalTiles = new LinkedList<Tile>();
 	LinkedList<Tile> mithrilTiles = new LinkedList<Tile>();
-	
 	private void phaseTransition(int newPhase) {
 		unitManager.newPhase(phases.get(newPhase).workerAssignments);
-		System.out.println("Transitioning to phase " + newPhase);
+		System.out.println(faction + " transitioning to phase " + newPhase);
 		if (newPhase == 1) {
 			Unit w = new Unit(Game.unitTypeMap.get("WORKER"), world.getRandomTile(), faction);
 			for (Tile t : world.getTiles()) {
@@ -240,9 +252,21 @@ public class BuildOrderAI extends AIInterface {
 			}
 			else {
 				if (unit.isIdle()) {
-					attackTowardsNearestEnemy(unit);
+					handleCombatUnit(unit);
 				}
 			}
+		}
+	}
+
+	private void handleCombatUnit(Unit unit) {
+		if(!unit.isGuarding()) {
+			commands.setGuarding(unit, true);
+		}
+		if (unit.getMaxAttackRange() > 9) {
+			attackNearestEnemyBuilding(unit);
+		}
+		else {
+			attackTowardsNearestEnemy(unit);
 		}
 	}
 	
@@ -302,78 +326,11 @@ public class BuildOrderAI extends AIInterface {
 		}
 		
 		if (!result) {
-//			System.out.println("Failed to do task: " + task);
+			System.out.println(worker + "Failed to do task: " + task);
 			unitManager.unassign(worker.id());
 		}
 	}
 	
-//	private boolean handleBuildRoadsWorker(Unit worker) {
-//		Tile mostSteps = heatmap.getMostSteppedOnWithoutRoad();
-//		if (mostSteps == null) {
-//			return false;
-//		}
-//
-//		Building building = checkCostAndBuild(Game.buildingTypeMap.get("STONE_ROAD"), worker, mostSteps);
-//		if(building == null) {
-//			return false;
-//		}
-//		
-//
-//		Mission build = new Mission() {
-//			Building building;
-//			
-//			@Override
-//			public String toString() {
-//				if (building == null) {
-//					return "Mission build " + type;
-//				}
-//				else {
-//					return "Mission build " + building;
-//				}
-//			}
-//			@Override
-//			public boolean isComplete() {
-//				return building != null && building.isBuilt();
-//			}
-//			
-//			@Override
-//			public boolean isStarted() {
-//				return building != null;
-//			}
-//			
-//			@Override
-//			public boolean isPossible() {
-//				return false;
-//			}
-//			
-//			@Override
-//			public boolean attempt(Unit unit) {
-//				if (building != null ) {
-//					PlannedAction action = unit.actionQueue.peek();
-//					if (action != null && action.target == building) {
-//						return true;
-//					}
-//					commands.planAction(unit, PlannedAction.buildOnTile(building.getTile(), false), true);
-//					return true;
-//				}
-//
-//				Tile chosenTile = getTargetTile(getHomeTile(unit), 1, MAX_BUILD_RADIUS, e -> {
-//					return !e.hasBuilding() && e.canBuild();
-//				});
-//				if (chosenTile == null) {
-//					return false;
-//				}
-//				if (!faction.canAfford(type.getCost())) {
-//					return false;
-//				}
-//				building = commands.planBuilding(unit, chosenTile, true, type);
-//				return building != null;
-//			}
-//		};
-//		unitManager.addUnstartedMission(build, type.toString());
-//		
-//		return true;
-//	}
 
 	private boolean handleGatherMetalWorker(Unit worker, List<Tile> tiles) {
 		if (tiles.size() == 0) {
@@ -388,7 +345,7 @@ public class BuildOrderAI extends AIInterface {
 	}
 	
 	private void handleGatherStoneWorker(Unit worker) {
-		Tile tile = getTargetTile(worker.getTile(), 0, FAR_FORAGE_RADIUS, e -> {
+		Tile tile = getTargetTile(worker.getTile(), 1, FAR_FORAGE_RADIUS, e -> {
 			return e.getTerrain() == Terrain.ROCK;
 		});
 		if(tile == null) {
@@ -409,6 +366,9 @@ public class BuildOrderAI extends AIInterface {
 		return true;
 	}
 	private Tile getHomeTile(Unit unit) {
+		if (!castles.isEmpty()) {
+			return castles.get((int)(Math.random()*castles.size())).getTile();
+		}
 		if (castle != null) {
 			return castle.getTile();
 		}
@@ -423,11 +383,32 @@ public class BuildOrderAI extends AIInterface {
 		}
 		return world.getRandomTile();
 	}
-	
-	private void attackTowardsNearestEnemy(Unit unit) {
-		if(!unit.isGuarding()) {
-			commands.setGuarding(unit, true);
+
+	private void attackNearestEnemyBuilding(Unit unit) {
+		Tile homeTile = getHomeTile(unit);
+		
+		Building target = null;
+		int closestDistance = Integer.MAX_VALUE;
+		for (Building building : world.getBuildings()) {
+			if (building.getFaction().id() == faction.id()) {
+				continue;
+			}
+			if (building.getType().isRoad()) {
+				continue;
+			}
+			
+			int distance = building.getTile().distanceTo(homeTile);
+			if (distance < closestDistance) {
+				closestDistance = distance;
+				target = building;
+			}
 		}
+		if (target == null) {
+			return;
+		}
+		commands.planAction(unit, PlannedAction.attack(target), true);
+	}
+	private void attackTowardsNearestEnemy(Unit unit) {
 		Tile homeTile = getHomeTile(unit);
 
 		List<Tile> biggestRange = null;
@@ -543,135 +524,90 @@ public class BuildOrderAI extends AIInterface {
 			
 
 			Mission build;
+			TileSelector selector;
 			if (type.isRoad()) {
-				build = new Mission() {
-					Building building;
-					
-					@Override
-					public String toString() {
-						if (building == null) {
-							return "Mission build " + type;
-						}
-						else {
-							return "Mission build " + building;
-						}
-					}
-					@Override
-					public boolean isComplete() {
-						return building != null && building.isBuilt();
-					}
-					
-					@Override
-					public boolean isStarted() {
-						return building != null;
-					}
-					
-					@Override
-					public boolean isPossible() {
-						return false;
-					}
-					
-					@Override
-					public boolean attempt(Unit unit) {
-						if (building != null ) {
-							PlannedAction action = unit.actionQueue.peek();
-							if (action != null && action.target == building) {
-								return true;
-							}
-							commands.planAction(unit, PlannedAction.buildOnTile(building.getTile(), true), true);
-							return true;
-						}
-						Tile chosenTile = heatmap.getMostSteppedOnWithoutRoad();
-						if (chosenTile == null) {
-							return false;
-						}
-						if (!faction.canAfford(type.getCost())) {
-							return false;
-						}
-						building = commands.planBuilding(unit, chosenTile, true, type);
-						return building != null;
-					}
-				};
+				selector = (Unit unit) -> heatmap.getMostSteppedOnWithoutRoad();
 			}
 			else {
-				build = new Mission() {
-					Building building;
-					
-					@Override
-					public String toString() {
-						if (building == null) {
-							return "Mission build " + type;
-						}
-						else {
-							return "Mission build " + building;
-						}
-					}
-					@Override
-					public boolean isComplete() {
-						return building != null && building.isBuilt();
-					}
-					
-					@Override
-					public boolean isStarted() {
-						return building != null;
-					}
-					
-					@Override
-					public boolean isPossible() {
-						return false;
-					}
-					
-					@Override
-					public boolean attempt(Unit unit) {
-						if (building != null ) {
-							PlannedAction action = unit.actionQueue.peek();
-							if (action != null && action.target == building) {
-								return true;
+				if (type.isCastle()) {
+					int MINIMUM_CASTLE_SEPARATION = 10;
+					selector = (Unit unit) -> getTargetTile(getHomeTile(unit), MINIMUM_CASTLE_SEPARATION, MAX_BUILD_RADIUS*2, e -> {
+						for (Building castle : castles) {
+							if (castle.getTile().distanceTo(e) < MINIMUM_CASTLE_SEPARATION) {
+								return false;
 							}
-							commands.planAction(unit, PlannedAction.buildOnTile(building.getTile(), false), true);
+						}
+						return !e.hasBuilding() && e.canBuild();
+					});
+				}
+				else {
+					selector = (Unit unit) -> getTargetTile(getHomeTile(unit), 1, MAX_BUILD_RADIUS, e -> {
+						return !e.hasBuilding() && e.canBuild();
+					});
+				}
+			}
+			build = new Mission() {
+				Building building;
+				
+				@Override
+				public String toString() {
+					if (building == null) {
+						return "Mission build " + type;
+					}
+					else {
+						return "Mission build " + building;
+					}
+				}
+				@Override
+				public boolean isComplete() {
+					if (building != null 
+							&& building.getType().isRoad()) {
+						
+						if (building.getTile().hasRoad() && building.getTile().getRoad() != building) {
+							System.out.println("isComplete chosen tile already has road!");
+						}
+						
+					}
+					return building != null && building.isBuilt();
+				}
+				
+				@Override
+				public boolean isStarted() {
+					return building != null;
+				}
+				
+				@Override
+				public boolean isPossible() {
+					return false;
+				}
+				
+				@Override
+				public boolean attempt(Unit unit) {
+					if (building != null && !building.isBuilt() && building.isDead()) {
+						building = null;
+					}
+					if (building != null ) {
+						PlannedAction action = unit.actionQueue.peek();
+						if (action != null && action.target == building) {
 							return true;
 						}
-	
-						Tile chosenTile = getTargetTile(getHomeTile(unit), 1, MAX_BUILD_RADIUS, e -> {
-							return !e.hasBuilding() && e.canBuild();
-						});
-						if (chosenTile == null) {
-							return false;
-						}
-						if (!faction.canAfford(type.getCost())) {
-							return false;
-						}
-						building = commands.planBuilding(unit, chosenTile, true, type);
-						return building != null;
+						commands.planAction(unit, PlannedAction.buildOnTile(building.getTile(), building.getType().isRoad()), true);
+						return true;
 					}
-				};
-			}
+					Tile chosenTile = selector.selectTile(unit);
+					if (chosenTile == null) {
+						return false;
+					}
+					if (!faction.canAfford(type.getCost())) {
+						return false;
+					}
+					building = commands.planBuilding(unit, chosenTile, true, type);
+					return building != null;
+				}
+			};
 			unitManager.addUnstartedMission(build, type.toString());
-//			unitManager.requestBuilding(buildingReq.getKey(), 1);
 		}	
 		return completed;
-	}
-	
-	private void tryToBuild(BuildingType type) {
-		Unit chosenBuilder = null;
-		for (Unit unit : faction.getUnits()) {
-			if (unit.isBuilder() && unit.getBuildableBuildingTypes().contains(type)) {
-				chosenBuilder = unit;
-				break;
-			}
-		}
-		if (chosenBuilder == null) {
-			return;
-		}
-
-		Tile homeTile = getHomeTile(chosenBuilder);
-		Tile chosenTile = getTargetTile(homeTile, 1, MAX_BUILD_RADIUS, e -> {
-			return !e.hasBuilding() && e.canBuild();
-		});
-		if (chosenTile == null) {
-			return;
-		}
-		checkCostAndBuild(type, chosenBuilder, chosenTile);
 	}
 	
 	private Building checkCostAndBuild(BuildingType type, Unit builder, Tile tile) {
@@ -683,23 +619,29 @@ public class BuildOrderAI extends AIInterface {
 	HashMap<ItemType, Integer> researchCost;
 	private boolean research() {
 		researchCost = null;
-		boolean researchFinished = true;
+		boolean allResearchesFinished = true;
 		ListIterator<ResearchType> iter = phases.get(currentPhase).researches.listIterator();
-		while (iter.hasNext()) {
+//		for (ResearchType type : phases.get(currentPhase).researches) {
+		while(iter.hasNext()) {
 			ResearchType type = iter.next();
 			if (faction.getResearch(type).isCompleted()) {
+				System.out.println(faction + " research completed " + type);
 				iter.remove();
 				continue;
 			}
-			researchFinished = false;
+			allResearchesFinished = false;
+			if (faction.getResearchTarget() != null) {
+				continue;
+			}
 			if(faction.setResearchTarget(type)) {
-				return researchFinished;
+				System.out.println(faction + " started research " + type);
+				break;
 			}
 			else {
 				researchCost = type.cost;
 			}
 		}
-		return researchFinished;
+		return allResearchesFinished;
 	}
 	
 	private boolean ensureSaveForResearchCost(HashMap<ItemType, Integer> potentialCost) {
@@ -729,7 +671,6 @@ public class BuildOrderAI extends AIInterface {
 				completed = false;
 			}
 			if (enough && !ensureSaveForResearchCost(unitReq.getKey().getCost())) {
-				System.out.println("saving for research");
 				continue;
 			}
 			attemptToQueueUnit(unitReq.getKey());
