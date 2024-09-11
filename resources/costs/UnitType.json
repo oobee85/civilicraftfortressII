@@ -11,7 +11,8 @@
 		"name":"WORKER",
 		"inventory":{"maxstack":20},
 		"builds":["WALL_WOOD", "GATE_WOOD", "FARM", "MINE", "SAWMILL", "QUARRY", "BARRACKS",
-				"STABLES", "WATCHTOWER", "PORT", "WORKSHOP", "SMITHY"]
+				"STABLES", "WATCHTOWER", "PORT", "WORKSHOP", "SMITHY", "WALL_STONE", "GATE_STONE", "WALL_BRICK", "GATE_BRICK", "GRANARY", "WINDMILL",
+				 "CASTLE", "NECROPOLIS", "RESEARCH_LAB", "STONE_ROAD", "BRICK_ROAD", "HELLFORGE"]
 	},
 	{
 		"image":"Images/units/mason.png",
@@ -51,7 +52,7 @@
 	},
 	{
 		"image":"Images/units/spearman.png",
-		"cost":{"BRONZE_BAR":5,"WOOD":50,"FOOD":100},
+		"cost":{"BRONZE_BAR":2,"WOOD":50,"FOOD":100},
 		"stats":{"movespeed":15,"buildtime":200,"health":300,"healspeed":50},
 		"name":"SPEARMAN",
 		"attackstyles":[
@@ -63,8 +64,8 @@
 	},
 	{
 		"image":"Images/units/archer.png",
-		"cost":{"BRONZE_BAR":2,"FOOD":200},
-		"stats":{"movespeed":20,"buildtime":300,"health":100,"healspeed":50},
+		"cost":{"BRONZE_BAR":1,"FOOD":100},
+		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":50},
 		"name":"ARCHER",
 		"attributes":["hostile"],
 		"attackstyles":[
@@ -75,7 +76,7 @@
 	},
 	{
 		"image":"Images/units/swordsman.png",
-		"cost":{"IRON_BAR":5,"WOOD":50,"FOOD":200},
+		"cost":{"IRON_BAR":4,"WOOD":50,"FOOD":200},
 		"stats":{"movespeed":10,"buildtime":200,"health":500,"healspeed":50},
 		"name":"SWORDSMAN",
 		"attackstyles":[
@@ -87,8 +88,8 @@
 	},
 	{
 		"image":"Images/units/longbowman.png",
-		"cost":{"MITHRIL_BAR":5,"FOOD":300},
-		"stats":{"movespeed":20,"buildtime":400,"health":100,"healspeed":50},
+		"cost":{"IRON_BAR":4, "WOOD":100, "FOOD":200},
+		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":50},
 		"name":"LONGBOWMAN",
 		"attackstyles":[
 			{"damage":60, "cooldown":30, "range":6, "minrange":2, "projectile":"ARROW"}
@@ -101,8 +102,8 @@
 		"image":"Images/units/catapult.png",
 		"mesh":"models/catapult.ply",
 		"texture":"textures/pallet1.png",
-		"cost":{"WOOD":1000,"MITHRIL_BAR":5,"STONE":1000},
-		"stats":{"movespeed":40,"buildtime":1000,"health":200,"healspeed":100},
+		"cost":{"WOOD":1000,"IRON_BAR":20,"STONE":200},
+		"stats":{"movespeed":40,"buildtime":600,"health":200,"healspeed":100},
 		"name":"CATAPULT",
 		"attackstyles":[
 			{"damage":300, "cooldown":100, "range":10, "minrange":3, "projectile":"ROCK"}
@@ -113,8 +114,8 @@
 	},
 	{
 		"image":"Images/units/trebuchet.png",
-		"cost":{"RUNITE_BAR":10,"WOOD":1000,"STONE":2000},
-		"stats":{"movespeed":40,"buildtime":2000,"health":200,"healspeed":100},
+		"cost":{"MITHRIL_BAR":20,"WOOD":1000,"STONE":500},
+		"stats":{"movespeed":40,"buildtime":1000,"health":200,"healspeed":100},
 		"name":"TREBUCHET",
 		"attackstyles":[
 			{"damage":600, "cooldown":100, "range":20, "minrange":5, "projectile":"FIREBALL_TREBUCHET"}
@@ -149,8 +150,8 @@
 	},
 	{
 		"image":"Images/units/knight.png",
-		"cost":{"HORSE":100,"FOOD":400, "IRON_BAR":5,"WOOD":50},
-		"stats":{"movespeed":5,"buildtime":500,"health":500,"healspeed":50},
+		"cost":{"HORSE":200,"FOOD":400, "MITHRIL_BAR":5,"WOOD":100},
+		"stats":{"movespeed":5,"buildtime":600,"health":500,"healspeed":50},
 		"name":"KNIGHT",
 		"attackstyles":[
 			{"damage":100, "cooldown":20, "range":1}
@@ -207,8 +208,8 @@
 	},
 	{
 		"image":"Images/units/horsearcher.png",
-		"cost":{"MITHRIL_BAR":5,"HORSE":50,"FOOD":300},
-		"stats":{"movespeed":5,"buildtime":500,"health":500,"healspeed":50},
+		"cost":{"MITHRIL_BAR":5,"HORSE":100,"FOOD":300},
+		"stats":{"movespeed":5,"buildtime":600,"health":500,"healspeed":50},
 		"name":"HORSEARCHER",
 		"attackstyles":[
 			{"damage":100, "cooldown":20, "range":3, "minrange":1, "projectile":"RUNE_ARROW"}

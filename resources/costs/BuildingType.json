@@ -100,7 +100,7 @@
 		"vision":1,
 		"cost":{"WOOD":200},
 		"culture":0.5,
-		"buildsunits":["HORSEARCHER","KNIGHT","CHARIOT", "GRIFFIN"],
+		"buildsunits":["HORSEARCHER","KNIGHT","CHARIOT", "GRIFFIN", "HORSEMAN"],
 		"inventory":{"maxstack":100},
 		"health":500,
 		"effort":500,
