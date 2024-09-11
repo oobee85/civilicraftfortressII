@@ -864,9 +864,37 @@ public class Game {
 				&& tile.getHeight() >= Constants.MAXHEIGHT * 0.05;
 	}
 	
+	private List<Tile> chooseSpawnTiles(int numPlayers) {
+
+		ArrayList<Tile> allTiles = new ArrayList<>(world.getTiles().size());
+		allTiles.addAll(world.getTiles());
+		Collections.sort(allTiles, (Tile a, Tile b) -> {
+			return a.getHeight() > b.getHeight() ? 1 : -1;
+		});
+
+		List<Tile> validSpawns = new LinkedList<>();
+		int edgeofmapbuffer = 7;
+		for (int tileIndex = (int) (allTiles.size() * 0.5); tileIndex < (int) (allTiles.size() * 0.7); tileIndex++) {
+			Tile t = allTiles.get(tileIndex);
+			TileLoc l = t.getLocation();
+			if (l.x() < edgeofmapbuffer || l.x() >= world.getWidth() - edgeofmapbuffer) {
+				continue;
+			}
+			if (l.y() < edgeofmapbuffer || l.y() >= world.getHeight() - edgeofmapbuffer) {
+				continue;
+			}
+			if (!isValidSpawnLocation(t, 5)) {
+				continue;
+			}
+			validSpawns.add(t);
+		}
+		
+		return validSpawns;
+	}
+	
 	private void makeStartingCastleAndUnits(boolean easymode, List<PlayerInfo> players, Random rand) {
-		double spacePerPlayer = (double)world.getWidth()/players.size();
-		int index = 0;
+		List<Tile> validSpawnTiles = chooseSpawnTiles(players.size());
+		List<Tile> chosenSpawnTiles = new LinkedList<>();
 		for(PlayerInfo player : players) {
 			Faction newFaction = new Faction(player.getName(), true, true, player.getColor());
 			newFaction.getInventory().addItem(ItemType.WOOD, 100);
@@ -894,25 +922,39 @@ public class Game {
 			if(Settings.SPAWN_EXTRA) {
 				thingsToPlace.add(Game.buildingTypeMap.get("WINDMILL"));
 			}
-			Tile spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), (world.getHeight()/2)));
-			int minRadius = 5;
-			for(int i = 100; i > 0; i--) {
-				
-				if(isValidSpawnLocation(spawnTile, minRadius)) {
-					System.out.println("Successuflly found start location");
-					break;
-				}else {
-					spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), (int) (rand.nextDouble()*world.getHeight())));
-				}
+			
+			Tile spawnTile = null;
+			
+			if (chosenSpawnTiles.isEmpty()) {
+				spawnTile = validSpawnTiles.get((int)(Math.random()*validSpawnTiles.size()));
 			}
-//			while(!isValidSpawnLocation(spawnTile, minRadius)) {
-//				spawnTile = world.get(new TileLoc((int) (index*spacePerPlayer + spacePerPlayer/2), (int) (Math.random()*world.getHeight())));
-//				minRadius = Math.max(0, minRadius-1);
-//				if (minRadius == 0) {
-//					System.err.println("Failed to find a good spawn tile!");
-//					break;
-//				}
-//			};
+			else {
+				int maximumDistance = 0;
+				Tile bestTile = null;
+				
+				for (Tile tile : validSpawnTiles) {
+					TileLoc l = tile.getLocation();
+					// edge of map dist is doubled so that it doesnt matter as much
+					int minDistance = 2*Math.min(
+							Math.min(l.x(), world.getWidth() - l.x()),
+							Math.min(l.y(), world.getHeight() - l.y()));
+					for (Tile chosen : chosenSpawnTiles) {
+						int dist = chosen.distanceTo(tile);
+						if (dist < minDistance) {
+							minDistance = dist;
+						}
+					}
+
+					if (minDistance > maximumDistance) {
+						maximumDistance = minDistance;
+						bestTile = tile;
+					}
+				}
+				
+				spawnTile = bestTile;
+			}
+			validSpawnTiles.remove(spawnTile);
+			chosenSpawnTiles.add(spawnTile);
 			
 			System.out.println("Spawning " + player.getName() + " at " + spawnTile);
 			
@@ -969,7 +1011,6 @@ public class Game {
 					}
 				}
 			}
-			index++;
 			if(Settings.SPAWN_EXTRA) {
 				spawnExtraStuff(newFaction);
 			}

@@ -48,10 +48,10 @@ public class AirSimulation {
 	}
 	
 	private static void averagingHelper(Tile tile, AverageValues avg) {
-		if(tile.liquidAmount < 0) {
+		if(Settings.DEBUG_PRINT_AIR_ENERGY && tile.liquidAmount < 0) {
 			System.out.println("AAAAAAAAAAAAAA NEGATIVE LIQUIDS\n");
 		}
-		if(tile.getAir().getVolumeLiquid() < 0) {
+		if(Settings.DEBUG_PRINT_AIR_ENERGY && tile.getAir().getVolumeLiquid() < 0) {
 			System.out.println("AAAAAAAAAAAAAA NEGATIVE air LIQUIDS\n");
 		}
 		avg.temp += tile.getTemperature();

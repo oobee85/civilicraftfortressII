@@ -216,12 +216,13 @@ public class Client {
 					}
 					else {
 						// create and assign ai
-						if (ailist.size() % 2 == 0) {
-							ailist.add(new BuildOrderAI(localCommands, f, gameInstance.world));
-						}
-						else {
-							ailist.add(new BasicAI(localCommands, f, gameInstance.world));
-						}
+						ailist.add(new BuildOrderAI(localCommands, f, gameInstance.world));
+//						if (ailist.size() % 2 == 0) {
+//							ailist.add(new BuildOrderAI(localCommands, f, gameInstance.world));
+//						}
+//						else {
+//							ailist.add(new BasicAI(localCommands, f, gameInstance.world));
+//						}
 					}
 				}
 			}

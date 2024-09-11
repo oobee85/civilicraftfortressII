@@ -50,6 +50,7 @@ public class Settings {
 	}
 	
 	public static void toFile() {
+		System.out.println("Saving settings to settings.ini");
 		try (PrintWriter pw = new PrintWriter(new FileWriter(new File("settings.ini")))){
 			for(Field f : Settings.class.getFields()) {
 				try {

@@ -15,7 +15,8 @@ public class BuildOrderAI extends AIInterface {
 
 	public static final BuildingType FARM = Game.buildingTypeMap.get("FARM");
 	private static final int MAX_BUILD_RADIUS = 10;
-	private static final int MAX_SEARCH_RADIUS = 40;
+	private static final int CLOSE_FORAGE_RADIUS = 2;
+	private static final int FAR_FORAGE_RADIUS = 40;
 
 
 	WorkerAssignmentCounter counter = new WorkerAssignmentCounter();
@@ -24,14 +25,6 @@ public class BuildOrderAI extends AIInterface {
 	public BuildOrderAI(CommandInterface commands, Faction faction, World world) {
 		super(commands, faction, world);
 	}
-	
-//	class Phase {
-//		HashMap<UnitType, QuantityReq> unitReqs = new HashMap<UnitType, QuantityReq>();
-//		HashMap<BuildingType, QuantityReq> buildingReqs = new HashMap<BuildingType, QuantityReq>();
-//		LinkedList<ResearchType> requiredResearch = new LinkedList<ResearchType>();
-//		int[] workerAssignments = new int[WorkerTask.values().length];
-//	}
-	
 	
 	int currentPhase = 0;
 	public static List<BuildOrderPhase> phases = new ArrayList<>();
@@ -141,16 +134,20 @@ public class BuildOrderAI extends AIInterface {
 		commands.craftItem(faction, ItemType.IRON_BAR, 1);
 	}
 	
-	List<Tile> silverTiles = new LinkedList<Tile>();
-	List<Tile> copperTiles = new LinkedList<Tile>();
-	List<Tile> ironTiles = new LinkedList<Tile>();
-	List<Tile> coalTiles = new LinkedList<Tile>();
-	List<Tile> mithrilTiles = new LinkedList<Tile>();
+	LinkedList<Tile> silverTiles = new LinkedList<Tile>();
+	LinkedList<Tile> copperTiles = new LinkedList<Tile>();
+	LinkedList<Tile> ironTiles = new LinkedList<Tile>();
+	LinkedList<Tile> coalTiles = new LinkedList<Tile>();
+	LinkedList<Tile> mithrilTiles = new LinkedList<Tile>();
 	
 	private void phaseTransition(int newPhase) {
 		if (newPhase == 1) {
+			Unit w = new Unit(Game.unitTypeMap.get("WORKER"), world.getRandomTile(), faction);
 			for (Tile t : world.getTiles()) {
 				if (t.getResource() == null) {
+					continue;
+				}
+				if (t.isBlocked(w)) {
 					continue;
 				}
 				if (t.getResource().getType() == ResourceType.SILVER) {
@@ -168,7 +165,22 @@ public class BuildOrderAI extends AIInterface {
 				else if (t.getResource().getType() == ResourceType.MITHRIL) {
 					mithrilTiles.add(t);
 				}
+				sortAndRemoveAllBut(silverTiles, 5);
+				sortAndRemoveAllBut(copperTiles, 5);
+				sortAndRemoveAllBut(ironTiles, 5);
+				sortAndRemoveAllBut(coalTiles, 5);
+				sortAndRemoveAllBut(mithrilTiles, 5);
 			}
+		}
+	}
+	
+	private void sortAndRemoveAllBut(LinkedList<Tile> tiles, int numToKeep) {
+		Tile homeTile = getHomeTile(null);
+		Collections.sort(tiles, (Tile a, Tile b) -> {
+			return a.distanceTo(homeTile) - b.distanceTo(homeTile);
+		});
+		while(tiles.size() > numToKeep) {
+			tiles.removeLast();
 		}
 	}
 	
@@ -280,8 +292,11 @@ public class BuildOrderAI extends AIInterface {
 				case CHOP:
 					handleChoppingWorker(unit);
 					break;
+				case CLOSEFORAGE:
+					result = handleForagingWorker(unit, CLOSE_FORAGE_RADIUS);
+					break;
 				case FORAGE:
-					result = handleForagingWorker(unit);
+					result = handleForagingWorker(unit, FAR_FORAGE_RADIUS);
 					break;
 				case GATHERSTONE:
 					handleGatherStoneWorker(unit);
@@ -320,7 +335,7 @@ public class BuildOrderAI extends AIInterface {
 			}
 		}
 		counter.removeDeadWorkers(workersStillAlive);
-		System.out.println(counter);
+//		System.out.println(counter);
 	}
 
 	private boolean handleGatherMetalWorker(Unit worker, List<Tile> tiles) {
@@ -336,7 +351,7 @@ public class BuildOrderAI extends AIInterface {
 	}
 	
 	private void handleGatherStoneWorker(Unit worker) {
-		Tile tile = getTargetTile(worker.getTile(), 0, MAX_SEARCH_RADIUS, e -> {
+		Tile tile = getTargetTile(worker.getTile(), 0, FAR_FORAGE_RADIUS, e -> {
 			return e.getTerrain() == Terrain.ROCK;
 		});
 		if(tile == null) {
@@ -346,7 +361,7 @@ public class BuildOrderAI extends AIInterface {
 	}
 	
 	private boolean pickupResources(Unit unit) {
-		Tile tile = getTargetTile(unit.getTile(), 0, MAX_SEARCH_RADIUS, e -> {
+		Tile tile = getTargetTile(unit.getTile(), 0, FAR_FORAGE_RADIUS, e -> {
 			return !e.getInventory().isEmpty() && !e.isBlocked(unit);
 		});
 		if(tile == null) {
@@ -356,12 +371,27 @@ public class BuildOrderAI extends AIInterface {
 		commands.planAction(unit, PlannedAction.deliver(castle), false);
 		return true;
 	}
+	private Tile getHomeTile(Unit unit) {
+		if (castle != null) {
+			return castle.getTile();
+		}
+		if (unit != null) {
+			return unit.getTile();
+		}
+		for(Building b : faction.getBuildings()) {
+			return b.getTile();
+		}
+		for (Unit u : faction.getUnits()) {
+			return u.getTile();
+		}
+		return world.getRandomTile();
+	}
 	
 	private void attackTowardsNearestEnemy(Unit unit) {
 		if(!unit.isGuarding()) {
 			commands.setGuarding(unit, true);
 		}
-		Tile homeTile = (castle != null) ? castle.getTile() : unit.getTile();
+		Tile homeTile = getHomeTile(unit);
 
 		List<Tile> biggestRange = null;
 		for (int range = 0; range < 20; range++) {
@@ -394,8 +424,8 @@ public class BuildOrderAI extends AIInterface {
 		commands.planAction(unit, PlannedAction.attackMoveTo(randomTile), true);
 	}
 
-	private boolean handleForagingWorker(Unit unit) {
-		Tile tile = getTargetTile(unit.getTile(), 0, MAX_SEARCH_RADIUS, e -> {
+	private boolean handleForagingWorker(Unit unit, int radius) {
+		Tile tile = getTargetTile(unit.getTile(), 0, radius, e -> {
 			
 			return (e.getPlant() != null && e.getPlant().getType() != Game.plantTypeMap.get("TREE"))
 					|| e.getInventory().getItemAmount(ItemType.FOOD) > 0;
@@ -414,7 +444,7 @@ public class BuildOrderAI extends AIInterface {
 	}
 	
 	private void handleChoppingWorker(Unit worker) {
-		Tile tile = getTargetTile(worker.getTile(), 0, MAX_SEARCH_RADIUS, e -> {
+		Tile tile = getTargetTile(worker.getTile(), 0, FAR_FORAGE_RADIUS, e -> {
 			return e.getPlant() != null && e.getPlant().getType() == Game.plantTypeMap.get("TREE");
 		});
 		if(tile == null) {
@@ -423,36 +453,80 @@ public class BuildOrderAI extends AIInterface {
 		commands.planAction(worker, PlannedAction.harvest(tile.getPlant()), true);
 	}
 	
-	private void handleFarmingWorker(Unit worker, Iterator<Building> farmIterator) {
-		Building farm = null;
-		while (farmIterator.hasNext()) {
-			Building building = farmIterator.next();
-			if (building.getType() == FARM) {
-				farm = building;
-				break;
-			}
+	
+	class FarmWorkerTracker {
+		private Map<Building, Unit> farmToWorker = new HashMap<>();
+		private Map<Unit, Building> workerToFarm = new HashMap<>();
+		
+		public void assignWorkerToFarm(Unit worker, Building farm) {
+			farmToWorker.put(farm, worker);
+			workerToFarm.put(worker, farm);
 		}
 
-		if(farm != null) {
-			finishBuildAndHarvest(worker, farm);
-			return;
+		public Building getFarmForWorker(Unit worker, Iterator<Building> farmIterator) {
+			if (workerToFarm.containsKey(worker)) {
+				Building farm = workerToFarm.get(worker);
+				if (farm.isDead()) {
+					workerToFarm.remove(worker);
+					farmToWorker.remove(farm);
+				}
+				else {
+					return farm;
+				}
+			}
+			
+			while (farmIterator.hasNext()) {
+				Building building = farmIterator.next();
+				if (building.getType() != FARM) {
+					continue;
+				}
+				Building farm = building;
+				if (farmToWorker.containsKey(farm)) {
+					Unit existingWorker = farmToWorker.get(farm);
+					if (!existingWorker.isDead()) {
+						continue;
+					}
+					farmToWorker.remove(farm);
+					workerToFarm.remove(existingWorker);
+				}
+
+				assignWorkerToFarm(worker, farm);
+				return farm;
+			}
+			return null;
 		}
-		Tile homeTile = (castle != null) ? castle.getTile() : worker.getTile();
+		
+	}
+	
+	FarmWorkerTracker farmWorkerTracker = new FarmWorkerTracker();
+	private boolean handleFarmingWorker(Unit worker, Iterator<Building> farmIterator) {
+		Building farmNeedsWorker = farmWorkerTracker.getFarmForWorker(worker, farmIterator);
+		if(farmNeedsWorker != null) {
+			finishBuildAndHarvest(worker, farmNeedsWorker);
+			return true;
+		}
+		
+		Tile homeTile = getHomeTile(worker);
 		Tile chosenTile = getTargetTile(homeTile, 1, MAX_BUILD_RADIUS, e -> {
 			return !e.hasBuilding() && e.canBuild() && e.canPlant();
 		});
 		if(chosenTile == null) {
-			return;
+			return false;
 		}
-		buildAndHarvest(worker, chosenTile, FARM);
+		Building farm = buildAndHarvest(worker, chosenTile, FARM);
+		if (farm == null) {
+			return false;
+		}
+		farmWorkerTracker.assignWorkerToFarm(worker, farm);
+		return true;
 	}
-	private void buildAndHarvest(Unit unit, Tile tile, BuildingType type) {
+	private Building buildAndHarvest(Unit unit, Tile tile, BuildingType type) {
 		Building building = checkCostAndBuild(type, unit, tile);
 		if(building == null) {
-			return;
+			return null;
 		}
 		commands.planAction(unit, PlannedAction.harvest(building), false);
-		return;
+		return building;
 	}
 
 	private void finishBuildAndHarvest(Unit unit, Building harvestable) {
@@ -490,7 +564,7 @@ public class BuildOrderAI extends AIInterface {
 			return;
 		}
 
-		Tile homeTile = (castle != null) ? castle.getTile() : chosenBuilder.getTile();
+		Tile homeTile = getHomeTile(chosenBuilder);
 		Tile chosenTile = getTargetTile(homeTile, 1, MAX_BUILD_RADIUS, e -> {
 			return !e.hasBuilding() && e.canBuild();
 		});

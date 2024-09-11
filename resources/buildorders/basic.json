@@ -1,50 +1,66 @@
 {
-"WORKER_ROLES": ["FORAGE", "FARM", "CHOP", "GATHERSTONE", "GATHERSILVER", 
+"WORKER_ROLES": ["CLOSEFORAGE", "FORAGE", "FARM", "CHOP", "GATHERSTONE", "GATHERSILVER", 
 				"GATHERCOPPER", "GATHERIRON", "GATHERCOAL", "GATHERMITHRIL"],
 "phases": [
 	{
 		"order": 0,
 		"units": {
-			"WORKER": {"enough": 3},
+			"WORKER": {"enough": 6, "max": 7},
 		},
 		"workerAssignments": {
-			"FORAGE": 1,
+			"CLOSEFORAGE": 1,
 		},
-	},
-	{
+	},{
 		"order": 1,
 		"units": {
-			"WORKER": {"enough": 6, "max": 10},
+			"WORKER": {"enough": 12, "max": 13},
 		},
 		"workerAssignments": {
-			"FORAGE": 3,
-			"FARM": 4,
-			"CHOP": 2,
-			"GATHERSTONE": 1,
+			"FARM": 2,
+			"CHOP": 4,
 		},
-	},
-	{
+	},{
 		"order": 2,
 		"researchRequired": ["FARMING"],
 		"units": {
-			"WORKER": {"enough": 6, "max": 10},
+			"WORKER": {"enough": 24, "max": 24},
 		},
 		"workerAssignments": {
-			"FORAGE": 3,
-			"FARM": 4,
+			"FARM": 3,
 			"CHOP": 2,
+			"GATHERSTONE": 1,
 		},
-	},
-	{
+	},{
 		"order": 3,
 		"researchRequired": ["BRONZE_WORKING"],
 		"buildings": {
+			"CASTLE": {"enough": 1, "max": 1},
+			"SMITHY": {"enough": 1, "max": 1},
+			"BARRACKS": {"enough": 1, "max": 1},
+		},
+		"units": {
+			"WORKER": {"enough": 24, "max": 48},
+			"WARRIOR": {"enough": 1, "max": 1},
+		},
+		"workerAssignments": {
+			"FARM": 3,
+			"CHOP": 2,
+			"GATHERSTONE": 1,
+			"GATHERSILVER": 1,
+			"GATHERCOPPER": 1,
+		},
+	},
+	{
+		"order": 4,
+		"researchRequired": ["BRONZE_WORKING"],
+		"buildings": {
+			"CASTLE": {"enough": 1, "max": 1},
 			"BARRACKS": {"enough": 1, "max": 1},
 			"SMITHY": {"enough": 1, "max": 1},
 		},
 		"units": {
 			"WORKER": {"min": 4, "enough": 8, "max": 20},
-			"WARRIOR": {"enough": 1, "max": 100},
+			"WARRIOR": {"enough": 1, "max": 1},
 			"CARAVAN": {"max": 1},
 			"SPEARMAN": {"enough": 1, "max": 1},
 		},
@@ -58,15 +74,16 @@
 		},
 	},
 	{
-		"order": 4,
+		"order": 5,
 		"researchRequired": ["IRON_WORKING"],
 		"buildings": {
+			"CASTLE": {"enough": 1, "max": 1},
 			"BARRACKS": {"enough": 1, "max": 1},
 			"SMITHY": {"enough": 1, "max": 1},
 		},
 		"units": {
-			"WORKER": {"min": 4, "enough": 12, "max": 50},
-			"WARRIOR": {"enough": 1, "max": 1},
+			"WORKER": {"min": 4, "enough": 12, "max": 100},
+			"WARRIOR": {"max": 1},
 			"CARAVAN": {"max": 3},
 			"SPEARMAN": {"enough": 1, "max": 1},
 			"SWORDSMAN": {"enough": 1},
