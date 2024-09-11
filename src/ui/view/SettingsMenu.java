@@ -22,6 +22,9 @@ public class SettingsMenu {
 		content.setBackground(Color.black);
 		KButton backButton = KUIConstants.setupButton("Back", null, DebugView.DEBUG_BUTTON_SIZE);
 		backButton.addActionListener(backCallback);
+		backButton.addActionListener(e -> {
+			Settings.toFile();
+		});
 		content.add(backButton);
 	}
 	public JComponent createJComponentForField(Field f) {
