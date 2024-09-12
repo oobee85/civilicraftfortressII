@@ -898,7 +898,15 @@ public class Game {
 		ArrayList<Tile> allTiles = new ArrayList<>(world.getTiles().size());
 		allTiles.addAll(world.getTiles());
 		Collections.sort(allTiles, (Tile a, Tile b) -> {
-			return a.getHeight() > b.getHeight() ? 1 : -1;
+			if(a.getHeight() > b.getHeight()) {
+				return 1;
+			}
+			else if(a.getHeight() == b.getHeight()) {
+				return 0;
+			}else{
+				return -1;
+			}
+//			return a.getHeight() > b.getHeight() ? 1 : -1;
 		});
 
 		List<Tile> validSpawns = new LinkedList<>();

@@ -48,12 +48,12 @@ public class AirSimulation {
 	}
 	
 	private static void averagingHelper(Tile tile, AverageValues avg) {
-		if(Settings.DEBUG_PRINT_AIR_ENERGY && tile.liquidAmount < 0) {
-			System.out.println("AAAAAAAAAAAAAA NEGATIVE LIQUIDS\n");
-		}
-		if(Settings.DEBUG_PRINT_AIR_ENERGY && tile.getAir().getVolumeLiquid() < 0) {
-			System.out.println("AAAAAAAAAAAAAA NEGATIVE air LIQUIDS\n");
-		}
+//		if(Settings.DEBUG_PRINT_AIR_ENERGY && tile.liquidAmount < 0) {
+//			System.out.println("AAAAAAAAAAAAAA NEGATIVE LIQUIDS\n");
+//		}
+//		if(Settings.DEBUG_PRINT_AIR_ENERGY && tile.getAir().getVolumeLiquid() < 0) {
+//			System.out.println(" NEGATIVE air LIQUIDS");
+//		}
 		avg.temp += tile.getTemperature();
 		if(tile.liquidType == LiquidType.WATER 
 				|| tile.liquidType == LiquidType.ICE ) {
@@ -255,6 +255,9 @@ public class AirSimulation {
 			double maxVol = tile.getAir().getMaxVolumeLiquid();
 			boolean isSnow = false;
 			
+			if(tile.getAir().getVolumeLiquid() < 0) {
+				tile.getAir().setVolumeLiquid(0);
+			}
 			//does raining
 			if(tile.getAir().canRain() && tile.liquidType != LiquidType.LAVA) {
 				if(tile.liquidType != LiquidType.ICE && tile.liquidType != LiquidType.SNOW && tile.getTemperature() >= Constants.FREEZETEMP) {
@@ -270,7 +273,7 @@ public class AirSimulation {
 				// if too much liquid on the ground, cant rain
 				if(tile.liquidAmount >= 5) {
 					amount = 0;
-				}else {
+				}else if(tile.getAir().getVolumeLiquid() - amount >= 0){
 					tile.getAir().addVolumeLiquid(-amount);
 					tile.liquidAmount += amount;
 					// snow takes up twice the volume of other liquids
@@ -396,28 +399,31 @@ public class AirSimulation {
 				Direction attemptFlow = Direction.getDirection(tileLoc, otherLoc);
 //				double directionValue = Math.abs(oldFlow.deltay() + attemptFlow.deltay());
 				
-				// on: set flow to only move in 4 direction. off: flow move in any direction
-//				if (directionValue == 0.5 || directionValue == 2) {
 				
-				// IF CONDITIONS MET FOR TRANSFER
-				if(mypress > (opress) ) {
-					double deltaE = (double) ((myenergy - oenergy) / 1) /(tile.getNeighbors().size() + 1);
+				// IF CONDITIONS MET FOR TRANSFER TO OTHER TILE
+				if(mypress > opress ) {
+					double deltaE = (double) ((myenergy - oenergy)) /(tile.getNeighbors().size() + 1);
 					transferred += 1;
-					
+
+//					if(myvolume < 0) {
+//						System.out.println("NEGATIVE VOLUME");
+//					}
 					tileAir.setFlowDirection(attemptFlow);
 					energyTemp[otherLoc.x()][otherLoc.y()] += deltaE;
 					energyTemp[tileLoc.x()][tileLoc.y()] -= deltaE;
-					double deltaVol = Math.abs(myvolume - ovolume) / 1 /(tile.getNeighbors().size() + 1);
-					
-					if(deltaVol < 0) {
-						continue;
-					}
-//					if (ovolume - deltaVol > 0 && ovolume + deltaVol < mymaxvolume) {
-//						volumeTemp[otherLoc.x()][otherLoc.y()] += deltaVol;
-//						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltaVol;
-////						break;
+					double deltaVol = (double)Math.abs(myvolume - ovolume) /(tile.getNeighbors().size() + 1);
+//					if(myvolume - deltaVol < 0) {
+//						System.out.println("my negative VOLUME");
 //					}
-					if (myvolume - deltaVol > 0 && ovolume + deltaVol < omaxvolume) {
+//					if(ovolume - deltaVol < 0) {
+//						System.out.println("other negative VOLUME");
+//					}
+					
+//					if(myvolume - deltaVol > 0 || ovolume - deltaVol > 0 || myvolume + deltaVol < mymaxvolume || ovolume + deltaVol < omaxvolume) {
+//						System.out.println("returning ");
+//						return;
+//					}
+					if (myvolume - deltaVol >= 0 && ovolume + deltaVol < omaxvolume && ovolume - deltaVol >= 0 && myvolume + deltaVol < mymaxvolume) {
 						volumeTemp[otherLoc.x()][otherLoc.y()] += deltaVol;
 						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltaVol;
 //						break;

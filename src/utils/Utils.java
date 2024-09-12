@@ -425,7 +425,7 @@ public final class Utils {
 	public static double getAlphaOfLiquid(double amount) {
 		// 1 units of fluid is opaque, linearly becoming transparent at 0 units of fluid.
 //		amount = 1- (1/(1+amount));
-		double alpha = Math.sqrt(Math.max(Math.min(amount*0.1, 1), 0));
+		double alpha = Math.sqrt(Math.max(Math.min((amount-0.6)*0.1, 1), 0));
 		
 		return alpha;
 		//return 1 - (1 - alpha) * (1 - alpha);

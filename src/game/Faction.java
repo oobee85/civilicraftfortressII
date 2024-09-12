@@ -218,7 +218,7 @@ public class Faction implements Externalizable {
 
 	public boolean isBuildingSelected(BuildingType type) {
 		for(Building building : getBuildings()) {
-			if(building.isSelected() 
+			if(building.isSelected()
 					&& building.getFaction() == this 
 					&& building.getType() == type
 					&& building.isBuilt()) {

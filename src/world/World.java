@@ -831,13 +831,13 @@ public class World {
 //				}
 //			}
 			
-			if(tile.checkTerrain(Terrain.RICHSOIL)) {
-				double threshold = 0;
-				threshold = Constants.CHANCE_TO_SWITCH_TERRAIN/1000;
-				if(Math.random() < threshold) {
-					tile.setTerrain(Terrain.GRASS);
-				}
-			}
+//			if(tile.checkTerrain(Terrain.RICHSOIL)) {
+//				double threshold = 0;
+//				threshold = Constants.CHANCE_TO_SWITCH_TERRAIN/1000;
+//				if(Math.random() < threshold) {
+//					tile.setTerrain(Terrain.GRASS);
+//				}
+//			}
 			
 //			if(tile.liquidType == LiquidType.LAVA &&(tile.getTerrain() == Terrain.GRASS || tile.getTerrain() == Terrain.DIRT) && tile.liquidAmount >= 0.05) {
 //				if(Math.random() < CHANCE_TO_SWITCH_TERRAIN) {

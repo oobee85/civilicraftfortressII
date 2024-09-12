@@ -709,10 +709,14 @@ public class RenderingFunctions {
 		double alpha = Utils.getAlphaOfLiquid(tile.liquidAmount);
 //		 transparency liquids
 		Utils.setTransparency(g, alpha);
+//		if(tile.liquidType == LiquidType.WATER && tile.liquidAmount <= 0.6) {
+//			Utils.setTransparency(g, 0);
+//		}
+		
 		g.setColor(tile.liquidType.getMipMap().getColor(tileSize));
 		g.fillRect(drawx, drawy, tileSize, tileSize);
 		Utils.setTransparency(g, 1);
-
+		
 		int imageSize = (int) Math.min(Math.max(tileSize * tile.liquidAmount / 20, 1), tileSize);
 		g.setColor(tile.liquidType.getMipMap().getColor(tileSize));
 		g.fillRect(drawx + tileSize / 2 - imageSize / 2, drawy + tileSize / 2 - imageSize / 2, imageSize,
