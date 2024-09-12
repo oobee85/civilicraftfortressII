@@ -28,6 +28,8 @@ public class Building extends Thing implements Serializable {
 	private int remainingEffortToProduceUnit;
 	private transient Unit currentProducingUnit;
 	
+	private ItemType stablesCaptured;
+	
 	public Building(BuildingType buildingType, Tile tile, Faction faction) {
 		super(buildingType.getHealth(), buildingType.getMipMap(), buildingType.getMesh(), faction, tile);
 		this.remainingEffort = buildingType.getBuildingEffort();
@@ -57,6 +59,17 @@ public class Building extends Thing implements Serializable {
 			int[] tileDamage = tile.computeTileDamage();
 			for(int i = 0; i < tileDamage.length; i++) {
 				this.takeDamage(tileDamage[i], DamageType.values()[i]);
+			}
+		}
+
+		if(getType() == Game.buildingTypeMap.get("STABLES")) {
+			if (stablesCaptured == null) {
+				if (getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
+					stablesCaptured = ItemType.HORSE;
+				}
+				else if (getTile().hasUnit(Game.unitTypeMap.get("PIG"))) {
+					stablesCaptured = ItemType.FOOD;
+				}
 			}
 		}
 
@@ -98,12 +111,8 @@ public class Building extends Thing implements Serializable {
 			resetTimeToHarvest();
 		}
 		else if(getType() == Game.buildingTypeMap.get("STABLES")) {
-			if (getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
-				this.getInventory().addItem(ItemType.HORSE, 1);
-				resetTimeToHarvest();
-			}
-			if (getTile().hasUnit(Game.unitTypeMap.get("PIG"))) {
-				this.getInventory().addItem(ItemType.FOOD, 1);
+			if (stablesCaptured != null) {
+				this.getInventory().addItem(stablesCaptured, 1);
 				resetTimeToHarvest();
 			}
 		}

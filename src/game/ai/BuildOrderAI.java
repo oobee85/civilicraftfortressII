@@ -134,6 +134,14 @@ public class BuildOrderAI extends AIInterface {
 				phaseTransition(currentPhase);
 			}
 		}
+//		else {
+//			if (currentPhase > 6) {
+//				System.out.println(faction + " current phase: " + currentPhase
+//						+ ", completedResearch: " + completedResearch 
+//						+ ", completedBuilding: " + completedBuilding
+//						+ ", completedUnits: " + completedUnits);
+//			}
+//		}
 	}
 	
 	private void craftItems() {
@@ -154,6 +162,7 @@ public class BuildOrderAI extends AIInterface {
 	LinkedList<Tile> coalTiles = new LinkedList<Tile>();
 	LinkedList<Tile> mithrilTiles = new LinkedList<Tile>();
 	private void phaseTransition(int newPhase) {
+		heatmap.clear();
 		unitManager.newPhase(phases.get(newPhase).workerAssignments);
 		System.out.println(faction + " transitioning to phase " + newPhase);
 		if (newPhase == 1) {
@@ -203,6 +212,9 @@ public class BuildOrderAI extends AIInterface {
 	class TileHeatmap {
 		private HashMap<Tile, Integer> steps = new HashMap<>();
 		
+		public void clear() {
+			steps.clear();
+		}
 		public void steppedOn(Tile tile) {
 			if (!steps.containsKey(tile)) {
 				steps.put(tile, 0);
@@ -247,7 +259,7 @@ public class BuildOrderAI extends AIInterface {
 			}
 			else if(unit.getType().isCaravan()) {
 				if (unit.isIdle()) {
-					pickupResources(unit);
+					handleCaravan(unit);
 				}
 			}
 			else {
@@ -367,7 +379,12 @@ public class BuildOrderAI extends AIInterface {
 		return castles.get((int)(Math.random()*castles.size()));
 	}
 	
-	private boolean pickupResources(Unit unit) {
+	private boolean handleCaravan(Unit unit) {
+		Building stables = unitManager.getStablesForCaravan(unit, faction.getBuildings());
+		if (stables != null) {
+			commands.planAction(unit, PlannedAction.takeItemsFrom(stables), true);
+			return true;
+		}
 		Tile tile = getTargetTile(getHomeTile(unit), 0, FAR_FORAGE_RADIUS, e -> {
 			return !e.getInventory().isEmpty() && !e.isBlocked(unit);
 		});
@@ -535,6 +552,12 @@ public class BuildOrderAI extends AIInterface {
 				continue;
 			}
 			
+			if (type == Game.buildingTypeMap.get("BRICK_ROAD")) {
+				if (faction.getInventory().getItemAmount(ItemType.STONE) < 1000) {
+					continue;
+				}
+			}
+			
 
 			Mission build;
 			TileSelector selector;
@@ -551,6 +574,11 @@ public class BuildOrderAI extends AIInterface {
 							}
 						}
 						return !e.hasBuilding() && e.canBuild();
+					});
+				}
+				else if (type == Game.buildingTypeMap.get("STABLES")) {
+					selector = (Unit unit) -> getTargetTile(getHomeTile(unit), 1, MAX_BUILD_RADIUS, e -> {
+						return !e.hasBuilding() && e.canBuild() && e.hasUnit(Game.unitTypeMap.get("HORSE"));
 					});
 				}
 				else {
@@ -633,18 +661,18 @@ public class BuildOrderAI extends AIInterface {
 	private boolean research() {
 		researchCost = null;
 		boolean allResearchesFinished = true;
-		ListIterator<ResearchType> iter = phases.get(currentPhase).researches.listIterator();
-//		for (ResearchType type : phases.get(currentPhase).researches) {
-		while(iter.hasNext()) {
-			ResearchType type = iter.next();
+//		ListIterator<ResearchType> iter = phases.get(currentPhase).requiredResearches.listIterator();
+		for (ResearchType type : phases.get(currentPhase).requiredResearches) {
+//		while(iter.hasNext()) {
+//			ResearchType type = iter.next();
 			if (faction.getResearch(type).isCompleted()) {
-				System.out.println(faction + " research completed " + type);
-				iter.remove();
+//				System.out.println(faction + " research completed " + type);
+//				iter.remove();
 				continue;
 			}
 			allResearchesFinished = false;
 			if (faction.getResearchTarget() != null) {
-				continue;
+				break;
 			}
 			if(faction.setResearchTarget(type)) {
 				System.out.println(faction + " started research " + type);
@@ -652,6 +680,17 @@ public class BuildOrderAI extends AIInterface {
 			}
 			else {
 				researchCost = type.cost;
+			}
+		}
+		if (faction.getResearchTarget() == null) {
+			for (ResearchType type : phases.get(currentPhase).optionalResearches) {
+				if (faction.getResearch(type).isCompleted()) {
+					continue;
+				}
+				if(faction.setResearchTarget(type)) {
+					System.out.println(faction + " started research " + type);
+					break;
+				}
 			}
 		}
 		return allResearchesFinished;
@@ -679,7 +718,7 @@ public class BuildOrderAI extends AIInterface {
 			if (unitQuantities[unitReq.getKey().id()] >= unitReq.getValue().max) {
 				continue;
 			}
-			boolean enough = unitQuantities[unitReq.getKey().id()] > unitReq.getValue().enough;
+			boolean enough = unitQuantities[unitReq.getKey().id()] >= unitReq.getValue().enough;
 			if (!enough) {
 				completed = false;
 			}

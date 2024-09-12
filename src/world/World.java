@@ -137,10 +137,10 @@ public class World {
 		return territory.size();
 	}
 	public void addToTerritory(Tile tile) {
-		if(!territory.contains(tile)) {
-			territory.put(tile, tile.getFaction());
-		}
-		
+//		if(!territory.contains(tile)) {
+//			territory.put(tile, tile.getFaction());
+//		}
+		territory.put(tile, tile.getFaction());
 	}
 //	public void updateBorderTiles() {
 //		

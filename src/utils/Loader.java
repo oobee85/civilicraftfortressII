@@ -557,6 +557,10 @@ public class Loader {
 				for (int buildingIndex = 0; buildingIndex < keys.length(); buildingIndex++) {
 					String buildingsType = keys.getString(buildingIndex);
 					QuantityReq quantities = readQuantityReq(buildingsObject.getJSONObject(buildingsType));
+					BuildingType type = Game.buildingTypeMap.get(buildingsType);
+					if (type == null) {
+						System.err.println("INVALID JSON");
+					}
 					phase.buildings.put(Game.buildingTypeMap.get(buildingsType), quantities);
 				}
 			}
@@ -565,7 +569,15 @@ public class Loader {
 				JSONArray researchArr = phaseObject.getJSONArray("researchRequired");
 				for (int researchIndex = 0; researchIndex < researchArr.length(); researchIndex++) {
 					String researchName = researchArr.getString(researchIndex);
-					phase.researches.add(Game.researchTypeMap.get(researchName));
+					phase.requiredResearches.add(Game.researchTypeMap.get(researchName));
+				}
+			}
+			
+			if (phaseObject.has("researchOptional")) {
+				JSONArray researchArr = phaseObject.getJSONArray("researchOptional");
+				for (int researchIndex = 0; researchIndex < researchArr.length(); researchIndex++) {
+					String researchName = researchArr.getString(researchIndex);
+					phase.optionalResearches.add(Game.researchTypeMap.get(researchName));
 				}
 			}
 

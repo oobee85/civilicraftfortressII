@@ -13,14 +13,16 @@ public class BuildOrderPhase {
 	}
 	
 	public int order;
-	public List<ResearchType> researches;
+	public List<ResearchType> requiredResearches;
+	public List<ResearchType> optionalResearches;
 	public Map<UnitType, QuantityReq> units;
 	public Map<BuildingType, QuantityReq> buildings;
 	public Map<WorkerTask, Double> workerAssignments;
 	
 	public BuildOrderPhase(int order) {
 		this.order = order;
-		researches = new LinkedList<>();
+		requiredResearches = new LinkedList<>();
+		optionalResearches = new LinkedList<>();
 		units = new HashMap<>();
 		buildings = new HashMap<>();
 		workerAssignments = new HashMap<>();
@@ -28,7 +30,8 @@ public class BuildOrderPhase {
 	
 	public BuildOrderPhase(BuildOrderPhase copyFrom) {
 		this.order = copyFrom.order;
-		researches = new LinkedList<>(copyFrom.researches);
+		requiredResearches = new LinkedList<>(copyFrom.requiredResearches);
+		optionalResearches = new LinkedList<>(copyFrom.optionalResearches);
 		units = copyFrom.units;
 		buildings = copyFrom.buildings;
 		workerAssignments = copyFrom.workerAssignments;
@@ -46,7 +49,7 @@ public class BuildOrderPhase {
 		StringBuilder sb = new StringBuilder();
 		sb.append("BuildOrderPhase: " + order + " {\n");
 		sb.append("researches: ");
-		for (ResearchType type : researches) {
+		for (ResearchType type : requiredResearches) {
 			sb.append(type + ", ");
 		}
 		sb.append("\n");

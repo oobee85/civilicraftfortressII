@@ -110,7 +110,8 @@
 		],
 		"attributes":["hostile"],
 		"research":"MATHEMATICS",
-		"targeting":[{"type":"game.Unit"}]
+		"targeting":[{"type":"game.Unit"}],
+		"loot":{"WOOD":200}
 	},
 	{
 		"image":"Images/units/trebuchet.png",
@@ -122,7 +123,8 @@
 		],
 		"attributes":["hostile"],
 		"research":"ENGINEERING",
-		"targeting":[{"type":"game.Unit"}]
+		"targeting":[{"type":"game.Building"}],
+		"loot":{"WOOD":200}
 	},
 	{
 		"image":"Images/units/sniper.png",

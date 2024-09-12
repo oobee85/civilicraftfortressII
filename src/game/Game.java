@@ -235,19 +235,19 @@ public class Game {
 				continue;
 			}
 			Tile targetTile = getTargetTileForSpawns(faction);
-			while (influence > 12000) {
+			while (targetTile != null && influence > 12000) {
 				UnitType hard = EnemySpawns.getRandomHardType();
 				makeAnimal(targetTile, hard, 1);
 				influence -= hard.getCombatStats().getHealth()*4;
 			}
 			targetTile = getTargetTileForSpawns(faction);
-			while (influence > 7000) {
+			while (targetTile != null && influence > 7000) {
 				UnitType medium = EnemySpawns.getRandomMediumType();
 				makeAnimal(targetTile, medium, 1);
 				influence -= medium.getCombatStats().getHealth()*4;
 			}
 			targetTile = getTargetTileForSpawns(faction);
-			while (influence > 4000) {
+			while (targetTile != null && influence > 4000) {
 				UnitType easy = EnemySpawns.getRandomEasyType();
 				makeAnimal(targetTile, easy, 1);
 				influence -= easy.getCombatStats().getHealth()*4;
@@ -667,8 +667,11 @@ public class Game {
 		}
 	}
 
+	HashMap<Tile, Double> cultureInfluence;
 	public void buildingTick() {
-		
+		if (cultureInfluence == null) {
+			cultureInfluence = new HashMap<>();
+		}
 		for(Building building : world.getBuildings()) {
 			TileLoc loc = building.getTile().getLocation();
 			double culture = building.getCulture();
@@ -677,14 +680,40 @@ public class Game {
 			int r = (int)Math.ceil(radius);
 			for (int i = -r; i <= r; i++) {
 				for (int j = -r; j <= r; j++) {
-					int distance = loc.distanceTo(new TileLoc(loc.x() + i, loc.y() + j));
+					TileLoc targetLoc = new TileLoc(loc.x()+i, loc.y()+j);
+					Tile tile = world.get(targetLoc);
+					if (tile == null) {
+						continue;
+					}
+					int distance = loc.distanceTo(targetLoc);
 //					double distanceFromCenter = Math.sqrt(i*i + j*j);
-					if(distance < radius) {
-						Tile tile = world.get(new TileLoc(building.getTile().getLocation().x()+i, building.getTile().getLocation().y()+j));
-						if(tile != null && tile.getFaction() == world.getFaction(World.NO_FACTION_ID)) {
+					if(distance > radius) {
+						continue;
+					}
+					
+					double influence = radius == 0 ? culture : culture * (radius - distance) / radius;
+					
+					if (!cultureInfluence.containsKey(tile)) {
+						cultureInfluence.put(tile, 0.0);
+					}
+					double existingInfluence = cultureInfluence.get(tile);
+					
+					if (tile.getFaction() == building.getFaction()) {
+						if (influence > existingInfluence) {
+							cultureInfluence.put(tile, influence);
+						}
+					}
+					else if(tile.getFaction() == world.getFaction(World.NO_FACTION_ID)) {
+						tile.setFaction(building.getFaction());
+						world.addToTerritory(tile);
+						cultureInfluence.put(tile, influence);
+					}
+					else {
+						if (influence > 2 * existingInfluence) {
+							System.out.println(building + " has more than double influence on tile " + tile);
 							tile.setFaction(building.getFaction());
 							world.addToTerritory(tile);
-//							world.updateBorderTiles();
+							cultureInfluence.put(tile, influence);
 						}
 					}
 				}

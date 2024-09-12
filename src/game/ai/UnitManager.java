@@ -9,6 +9,7 @@ import game.ai.BuildOrderPhase.WorkerTask;
 public class UnitManager {
 
 	public static final BuildingType FARM = Game.buildingTypeMap.get("FARM");
+	public static final BuildingType STABLES = Game.buildingTypeMap.get("STABLES");
 
 	private Map<WorkerTask, Double> targetWorkerAssignmentRatios;
 	
@@ -19,6 +20,9 @@ public class UnitManager {
 
 	private Map<Building, Unit> farmToWorker = new HashMap<>();
 	private Map<Unit, Building> workerToFarm = new HashMap<>();
+	
+	private Map<Building, Unit> stablesToCaravan = new HashMap<>();
+	private Map<Unit, Building> caravanToStables = new HashMap<>();
 	
 	
 	public UnitManager(Map<WorkerTask, Double> initialTargetWorkerAssignmentRatios) {
@@ -150,7 +154,43 @@ public class UnitManager {
 	}
 
 	
-	
+
+	public void assignCaravanToStables(Unit caravan, Building stables) {
+		stablesToCaravan.put(stables, caravan);
+		caravanToStables.put(caravan, stables);
+	}
+
+	public Building getStablesForCaravan(Unit caravan, Set<Building> buildings) {
+		if (caravanToStables.containsKey(caravan)) {
+			Building stables = caravanToStables.get(caravan);
+			if (stables.isDead()) {
+				caravanToStables.remove(caravan);
+				stablesToCaravan.remove(stables);
+			}
+			else {
+				return stables;
+			}
+		}
+		
+		for (Building building : buildings) {
+			if (building.getType() != STABLES) {
+				continue;
+			}
+			Building stables = building;
+			if (stablesToCaravan.containsKey(stables)) {
+				Unit existingCaravan = stablesToCaravan.get(stables);
+				if (!existingCaravan.isDead()) {
+					continue;
+				}
+				stablesToCaravan.remove(stables);
+				caravanToStables.remove(existingCaravan);
+			}
+
+			assignCaravanToStables(caravan, stables);
+			return stables;
+		}
+		return null;
+	}
 	
 
 	
