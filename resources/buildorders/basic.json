@@ -39,6 +39,7 @@
 			"CHOP": 2,
 			"GATHERSTONE": 1,
 		},
+		
 	},{
 		"order": 30,
 		"researchRequired": ["BRONZE_WORKING"],

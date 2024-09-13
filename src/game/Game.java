@@ -1199,6 +1199,9 @@ public class Game {
 	}
 
 	private boolean canBuild(Unit unit, BuildingType bt, Tile tile) {
+		if(!unit.getFaction().areRequirementsMet(bt)) {
+			return false;
+		}
 		if(bt.isRoad() && tile.getRoad() != null) {
 			return false;
 		}
@@ -1221,8 +1224,8 @@ public class Game {
 			Building building = new Building(bt, tile, unit.getFaction());
 			world.addBuilding(building);
 			building.setPlanned(true);
-			// Start off planned buildings at 10% health
-			building.setHealth(bt.getHealth() * 0.1);
+			// Start off planned buildings at 1% health
+			building.setHealth(bt.getHealth() * 0.01);
 			if(bt.isRoad()) {
 				tile.setRoad(building);
 			}

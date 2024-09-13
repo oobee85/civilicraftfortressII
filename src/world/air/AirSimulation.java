@@ -151,7 +151,7 @@ public class AirSimulation {
 	
 	public static void updateEnergy(Tile tile, double averageTemp, double averageWater) {
 			
-//			blackBodyRadiation();
+			blackBodyRadiation(tile);
 //			updateEnergyToTemperature(tile);
 			
 			
@@ -175,8 +175,8 @@ public class AirSimulation {
 			}
 			if(tile.getTemperature() > (Constants.BALANCETEMP + 20) || tile.getAir().getTemperature() > (Constants.BALANCETEMP + 20)) {
 				double modifier = (tile.getTemperature()/Constants.BALANCETEMP) + 1;
-				if(modifier > 2) {
-					modifier = 2;
+				if(modifier > 3) {
+					modifier = 3;
 				}
 				addedEnergy -= modifier;
 			}
@@ -190,8 +190,8 @@ public class AirSimulation {
 			}
 			if(tile.getTemperature() < (Constants.BALANCETEMP - 20) || tile.getAir().getTemperature() < (Constants.BALANCETEMP - 20)) {
 				double modifier = (tile.getTemperature()/Constants.BALANCETEMP) + 1;
-				if(modifier > 2) {
-					modifier = 2;
+				if(modifier > 3) {
+					modifier = 3;
 				}
 				addedEnergy += modifier;
 			}
@@ -201,12 +201,12 @@ public class AirSimulation {
 			if(tile.getHeight() >= Constants.MAXHEIGHT /1.43) {
 //				double modifier = (tile.getTemperature()/World.BALANCETEMP);
 				double heightRatio = tile.getHeight() / Constants.MAXHEIGHT;
-				addedEnergy -= heightRatio;
+				addedEnergy -= heightRatio*2;
 			}
 			
-			// remove some energy for sand
+			// add some energy for sand
 			if(tile.getTerrain() == Terrain.SAND) {
-				addedEnergy += 1;
+				addedEnergy += 0.5;
 			}
 			
 			
@@ -266,14 +266,14 @@ public class AirSimulation {
 					tile.liquidType = LiquidType.SNOW;
 					isSnow = true;
 				}
-				double totalAmount = tile.liquidAmount + tile.getAir().getVolumeLiquid();
 				
 				
-				double amount = 0.01 * vol / maxVol;
+				double amount = 0.1 * vol / maxVol;
 				// if too much liquid on the ground, cant rain
-				if(tile.liquidAmount >= 5) {
-					amount = 0;
-				}else if(tile.getAir().getVolumeLiquid() - amount >= 0){
+//				if(tile.liquidAmount >= 5) {
+//					amount = 0;
+//				}else 
+				if(tile.getAir().getVolumeLiquid() - amount >= 0){
 					tile.getAir().addVolumeLiquid(-amount);
 					tile.liquidAmount += amount;
 					// snow takes up twice the volume of other liquids
@@ -285,8 +285,8 @@ public class AirSimulation {
 			}
 			
 			// force add humidity on mountain top
-			if(tile.getHeight() > 900 && averageWater < Constants.BALANCEWATER) {
-				double addedMod = Constants.BALANCEWATER / averageWater - 1;
+			if(tile.getHeight() > 700 && averageWater < Constants.BALANCEWATER) {
+				double addedMod = Constants.BALANCEWATER / averageWater/2;
 //				tile.liquidAmount += addedMod;
 				tile.getAir().addHumidity(addedMod);
 			}
@@ -333,10 +333,10 @@ public class AirSimulation {
 //			if(tile.getTemperature() >= 30) {
 //				seasonEnergy = 0;
 //			}
-			tile.getAir().addEnergy(seasonEnergy/2);
-			tile.getAir().addEnergy(addedEnergy/2);
-			tile.addEnergy(seasonEnergy/2);
-			tile.addEnergy(addedEnergy/2);
+			tile.getAir().addEnergy(seasonEnergy * 3/4);
+			tile.getAir().addEnergy(addedEnergy * 3/4);
+			tile.addEnergy(seasonEnergy/4);
+			tile.addEnergy(addedEnergy/4);
 			
 			tile.updateEnergyToTemperature();
 			
@@ -402,27 +402,15 @@ public class AirSimulation {
 				
 				// IF CONDITIONS MET FOR TRANSFER TO OTHER TILE
 				if(mypress > opress ) {
-					double deltaE = (double) ((myenergy - oenergy)) /(tile.getNeighbors().size() + 1);
+					double deltaE = (double) ((myenergy - oenergy)) /(tile.getNeighbors().size()/2 +2);
 					transferred += 1;
 
-//					if(myvolume < 0) {
-//						System.out.println("NEGATIVE VOLUME");
-//					}
 					tileAir.setFlowDirection(attemptFlow);
 					energyTemp[otherLoc.x()][otherLoc.y()] += deltaE;
 					energyTemp[tileLoc.x()][tileLoc.y()] -= deltaE;
-					double deltaVol = (double)Math.abs(myvolume - ovolume) /(tile.getNeighbors().size() + 1);
-//					if(myvolume - deltaVol < 0) {
-//						System.out.println("my negative VOLUME");
-//					}
-//					if(ovolume - deltaVol < 0) {
-//						System.out.println("other negative VOLUME");
-//					}
-					
-//					if(myvolume - deltaVol > 0 || ovolume - deltaVol > 0 || myvolume + deltaVol < mymaxvolume || ovolume + deltaVol < omaxvolume) {
-//						System.out.println("returning ");
-//						return;
-//					}
+					double deltaVol = (double)Math.abs(myvolume - ovolume) /(tile.getNeighbors().size()/2 +2);
+//					if (myvolume - deltaVol >= 0 && ovolume - deltaVol >= 0) {
+						
 					if (myvolume - deltaVol >= 0 && ovolume + deltaVol < omaxvolume && ovolume - deltaVol >= 0 && myvolume + deltaVol < mymaxvolume) {
 						volumeTemp[otherLoc.x()][otherLoc.y()] += deltaVol;
 						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltaVol;
@@ -430,7 +418,7 @@ public class AirSimulation {
 					}
 				}
 				
-				if (transferred >= 6) { // stops air from being transferred to multiple tiles
+				if (transferred >= 3) { // stops air from being transferred to multiple tiles
 //					continue;
 					break;
 				}

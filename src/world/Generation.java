@@ -372,11 +372,7 @@ public class Generation {
 				if(replaceable.contains(potential.getTerrain())) {
 					potential.setTerrain(newTerrain);
 					float height = potential.getHeight();
-					double heightChange = Math.random()*40;
-					potential.setHeight((float)(height + heightChange));
-					for(Tile neighbor: potential.getNeighbors()) {
-						neighbor.setHeight((float)(height + heightChange/10));
-					}
+					potential.setHeight((float)(height + (60 - potential.distanceTo(tile)*2)));
 					size--;
 				}
 			}

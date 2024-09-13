@@ -18,7 +18,7 @@ public class Constants {
 	public static final int MAXTEMP = 1273; // [K]
 	public static final int BALANCETEMP = 283; // [K]
 	public static final int FREEZETEMP = 273; // [K]
-	public static final int LETHALHOTTEMP = 311; // [K]
+	public static final int LETHALHOTTEMP = 333; // [K]
 	public static final int LETHALCOLDTEMP = 263; // [K]
 	public static final float FREEZING_TEMPURATURE = 0.33f;
 	public static final int BALANCEWATER = 10;
@@ -40,7 +40,7 @@ public class Constants {
 	public static final double BOLTZMANN = 1.380649e-23; // [J/K]
 	public static final double BOLTZMANNMODIFIED = 5.670374e-7; // [J/K]
 	public static final double DEFAULTENERGY = 28000;
-	
+//	public static final double DEFAULTENERGY = 55000;
 	
 	public static final double BUSH_RARITY = 0.005;
 	public static final double WATER_PLANT_RARITY = 0.05;
