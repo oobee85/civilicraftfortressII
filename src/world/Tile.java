@@ -430,9 +430,9 @@ public class Tile implements Externalizable {
 		if (building.isPlanned() == true) {
 			return false;
 		}
-		if (this.countUnitsOfFaction(u.getFaction()) != this.getUnits().size()) {
-			return true;
-		}
+//		if (this.countUnitsOfFaction(u.getFaction()) != this.getUnits().size()) {
+//			return true;
+//		}
 //		if(this.getBuilding().getFaction() != u.getFaction()) {
 //			return true;
 //		}
