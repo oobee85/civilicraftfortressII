@@ -72,10 +72,12 @@ public class ResearchView {
 			else if (req.areRequirementsMet()) {
 				button.setEnabled(true);
 				button.setVisible(true);
-			} else if (req.areSecondLayerRequirementsMet()) {
-				button.setEnabled(false);
-				button.setVisible(true);
-			} else {
+			} 
+//			else if (req.areSecondLayerRequirementsMet()) {
+//				button.setEnabled(false);
+//				button.setVisible(true);
+//			} 
+			else {
 				button.setEnabled(false);
 				button.setVisible(false);
 			}
