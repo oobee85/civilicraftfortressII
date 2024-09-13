@@ -436,6 +436,7 @@ public class GameView {
 				selectThing(summoned);
 			}
 		}
+		
 		// planning building
 		else if (state.leftClickAction == LeftClickAction.PLAN_BUILDING) {
 			Building plannedBuilding = null;
@@ -444,6 +445,7 @@ public class GameView {
 					Unit unit = (Unit) thing;
 					plannedBuilding = commandInterface.planBuilding(unit, tile, !shiftDown, state.selectedBuildingToPlan);
 				}
+				
 			}
 		}
 		// if a-click and the tile has a building or unit
@@ -453,7 +455,7 @@ public class GameView {
 		else if (state.leftClickAction == LeftClickAction.WANDER_AROUND) {
 			wanderCommand(state.selectedThings, tile, shiftDown);
 		}
-		// select units on tile
+		// select units or buildings on tile
 		else {
 			toggleSelectionForTile(tile, shiftDown || controlDown);
 		}
@@ -679,24 +681,76 @@ public class GameView {
 		}
 	}
 	private void toggleSelectionForTile(Tile tile, boolean addToSelection) {
+		boolean hasOnlyUnits = true;
+		boolean hasOnlyBuildings = true;
+		int size = state.selectedThings.size();
+		
+		// if selectedthings is empty
+		if(state.selectedThings.isEmpty()) {
+			hasOnlyUnits = false;
+			hasOnlyBuildings = false;
+			
+		}else {
+			for(Thing thing : state.selectedThings) {
+				if(thing instanceof Unit) {
+					hasOnlyBuildings = false;
+				}
+				if(thing instanceof Building) {
+					hasOnlyUnits = false;
+				}
+			}
+		}
+		
 		Thing thingToSelect = null;
-		for (Unit candidate : tile.getUnits()) {
-			if (candidate.getFaction() == state.faction) {
-				if(!candidate.isSelected()) {
-					thingToSelect = candidate;
-					if(candidate.isIdle()) {
-						break;
+		
+		
+		// only try to select unit if current  isnt only buildings
+		if(hasOnlyUnits == true || size < 2) {
+			// select unit, break on first idle unit selection
+			for(Unit unit : tile.getUnits()) {
+				if(unit.getFaction() == state.faction) {
+					if(unit.isSelected() == false) {
+						thingToSelect = unit;
+						if(unit.isIdle()) {
+							break;
+						}
 					}
 				}
 			}
 		}
-		if(thingToSelect == null) {
-			Building building = tile.getBuilding();
-			if (building != null && building.getFaction() == state.faction) {
-				deselectEverything();
-				thingToSelect = building;
+		if(hasOnlyBuildings == true || size < 2) {
+			if(thingToSelect == null) {
+				Building building = tile.getBuilding();
+				if (building != null && building.getFaction() == state.faction) {
+					thingToSelect = building;
+				}
 			}
 		}
+		
+		// special case
+		if(size >= 2 && addToSelection == false) {
+			Thing newSelect = null;
+			for(Unit unit : tile.getUnits()) {
+				if(unit.getFaction() == state.faction) {
+					if(unit.isSelected() == false) {
+						deselectEverything();
+						newSelect = unit;
+						if(unit.isIdle()) {
+							break;
+						}
+					}
+				}
+			}
+			if(newSelect == null) {
+				Building building = tile.getBuilding();
+				if (building != null && building.getFaction() == state.faction) {
+					deselectEverything();
+					newSelect = building;
+				}
+			}
+			thingToSelect = newSelect;
+		}
+		
 		if(!addToSelection) {
 			deselectEverything();
 		}
