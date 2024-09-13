@@ -805,6 +805,20 @@ public class World {
 					}
 				}
 			}
+			if(World.ticks % 25 == 0) {
+				if(tile.getModifier() != null && tile.getModifier().isHot()) {
+					if(tile.getPlant() != null && Math.random() > 0.75) {
+						for(Tile neighbor: tile.getNeighbors()) {
+							if(neighbor.getPlant() != null) {
+								if(neighbor.getModifier() == null) {
+									neighbor.replaceOrAddDurationModifier(tile.getModifier().getType(), tile.getModifier().timeLeft() + 100, worldData);
+								}
+							}
+						}
+					}
+				}
+			}
+			
 			
 			
 			//turns grass to dirt if tile has a cold liquid || the temperature is cold

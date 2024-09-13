@@ -5,8 +5,8 @@ import utils.Utils;
 
 public enum ProjectileType {
 
-		ARROW(2, "Images/projectiles/arrow.png", 1, null, 0),
-		RUNE_ARROW(2, "Images/projectiles/rune_arrow.png", 1, null, 0),
+		ARROW(1, "Images/projectiles/arrow.png", 1, null, 0),
+		RUNE_ARROW(1, "Images/projectiles/rune_arrow.png", 1, null, 0),
 		ROCK(3, "Images/itemicons/rock.png", 1, null, 0),
 		FIREBALL_TREBUCHET(3, "Images/projectiles/fireball.png", 2, null, 0),
 		

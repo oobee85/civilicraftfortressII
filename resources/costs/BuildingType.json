@@ -89,8 +89,8 @@
 		"cost":{"WOOD":500, "STONE":500, "IRON_BAR":10},
 		"culture":0.5,
 		"inventory":{"maxstack":200},
-		"health":1000,
-		"effort":1000,
+		"health":500,
+		"effort":500,
 		"research":"MATHEMATICS"
 	},
 	{
@@ -103,7 +103,7 @@
 		"buildsunits":["HORSEARCHER","KNIGHT","CHARIOT", "GRIFFIN", "HORSEMAN"],
 		"inventory":{"maxstack":100},
 		"health":500,
-		"effort":500,
+		"effort":250,
 		"research":"TRAPPING"
 	},
 	{
@@ -111,10 +111,10 @@
 		"info":"Provides vision",
 		"image":"Images/buildings/watchtower.png",
 		"vision":10,
-		"cost":{"WOOD":100, "STONE":100, "BRONZE_BAR":5},
+		"cost":{"WOOD":100, "STONE":100, "BRONZE_BAR":1},
 		"culture":0.5,
-		"health":500,
-		"effort":500,
+		"health":250,
+		"effort":250,
 		"research":"MASONRY"
 	},
 	{
@@ -124,7 +124,7 @@
 		"mesh":"models/castle.ply",
 		"texture":"textures/pallet1.png",
 		"vision":5,
-		"cost":{"WOOD":500, "STONE":500, "IRON_BAR":5},
+		"cost":{"WOOD":500, "STONE":500, "MITHRIL_BAR":5},
 		"buildsunits":["WORKER", "MASON", "PRIEST", "CARAVAN"],
 		"culture":1,
 		"attributes":["castle"],

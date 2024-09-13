@@ -76,7 +76,7 @@
 	},
 	{
 		"image":"Images/units/swordsman.png",
-		"cost":{"IRON_BAR":4,"WOOD":50,"FOOD":200},
+		"cost":{"IRON_BAR":4,"WOOD":100,"FOOD":200},
 		"stats":{"movespeed":10,"buildtime":200,"health":500,"healspeed":50},
 		"name":"SWORDSMAN",
 		"attackstyles":[
@@ -92,7 +92,7 @@
 		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":50},
 		"name":"LONGBOWMAN",
 		"attackstyles":[
-			{"damage":60, "cooldown":30, "range":6, "minrange":2, "projectile":"ARROW"}
+			{"damage":60, "cooldown":30, "range":6, "minrange":1, "projectile":"ARROW"}
 		],
 		"attributes":["hostile"],
 		"research":"MATHEMATICS",
@@ -102,7 +102,7 @@
 		"image":"Images/units/catapult.png",
 		"mesh":"models/catapult.ply",
 		"texture":"textures/pallet1.png",
-		"cost":{"WOOD":1000,"IRON_BAR":20,"STONE":200},
+		"cost":{"WOOD":500,"IRON_BAR":20,"STONE":250},
 		"stats":{"movespeed":40,"buildtime":600,"health":200,"healspeed":100},
 		"name":"CATAPULT",
 		"attackstyles":[
@@ -197,7 +197,7 @@
 	{
 		"image":"Images/units/priest.png",
 		"stats":{"movespeed":15,"buildtime":500,"health":100,"healspeed":50},
-		"cost":{"FOOD":200, "GOLD_BAR": 5},
+		"cost":{"FOOD":200, "GOLD_BAR": 4},
 		"name":"PRIEST",
 		"attackstyles":[
 	
