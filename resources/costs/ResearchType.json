@@ -19,8 +19,8 @@
 		"image": "Images/research/iron_working.png"},
 	{
 		"name": "ARMORING", 
-		"points": 1200, "tier": 3,
-		"cost": {"IRON_BAR":30}, 
+		"points": 600, "tier": 3,
+		"cost": {"IRON_BAR":8}, 
 		"requirements": ["IRON_WORKING"],
 		"image": "Images/research/armoring.png"},
 	{
@@ -37,7 +37,7 @@
 		"image": "Images/research/horseback_riding.png"},
 	{
 		"name": "DOMESTICATION", 
-		"points": 1200, "tier": 3,
+		"points": 600, "tier": 3,
 		"cost": {"FOOD": 400, "HORSE": 100}, 
 		"requirements": ["ANIMAL_HUSBANDRY"],
 		"image": "Images/research/chivalry.png"},
@@ -55,7 +55,7 @@
 		"image": "Images/research/code_of_laws.png"},
 	{
 		"name": "ENGINEERING", 
-		"points": 1200, "tier": 3,
+		"points": 600, "tier": 3,
 		"cost": {"STONE": 200, "WOOD": 200},
 		"requirements": ["MATHEMATICS"],
 		"image": "Images/research/engineering.png"},
@@ -73,7 +73,7 @@
 		"image": "Images/research/witchcraft.png"},
 	{
 		"name": "NECROMANCY", 
-		"points": 1200, "tier": 3,
+		"points": 600, "tier": 3,
 		"cost": {"MAGIC": 100},
 		"requirements": ["WITCHCRAFT"],
 		"image": "Images/research/shadowwordpain.png"},

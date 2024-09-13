@@ -23,9 +23,9 @@ public enum ItemType {
 	TITANIUM_ORE ( "Images/itemicons/titanium_ore.png"),
 	
 	BRONZE_BAR 	("SMITHY",     makeCosts(COPPER_ORE,5, SILVER_ORE, 5),	"Images/itemicons/bronze_bar.png"),
-	GOLD_BAR 	("SMITHY",     makeCosts(COAL,10, 	GOLD_ORE,5), 		"Images/itemicons/gold_bar.png"),
-	IRON_BAR 	("SMITHY",     makeCosts(COAL,15, 	IRON_ORE,5),		"Images/itemicons/iron_bar.png"),
-	MITHRIL_BAR ("SMITHY",     makeCosts(COAL,20, 	MITHRIL_ORE,5),	"Images/itemicons/mithril_bar.png"),
+	GOLD_BAR 	("SMITHY",     makeCosts(COAL,5, 	GOLD_ORE,5), 		"Images/itemicons/gold_bar.png"),
+	IRON_BAR 	("SMITHY",     makeCosts(COAL,10, 	IRON_ORE,5),		"Images/itemicons/iron_bar.png"),
+	MITHRIL_BAR ("SMITHY",     makeCosts(COAL,15, 	MITHRIL_ORE,5),	"Images/itemicons/mithril_bar.png"),
 	
 	ADAMANTITE_BAR("HELLFORGE",makeCosts(COAL,30, 	ADAMANTITE_ORE,5),	"Images/itemicons/adamantite_bar.png"),
 	RUNITE_BAR 	("HELLFORGE",  makeCosts(COAL,50, 	RUNITE_ORE,5),		"Images/itemicons/runite_bar.png"),

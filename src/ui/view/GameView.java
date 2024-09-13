@@ -684,7 +684,9 @@ public class GameView {
 			if (candidate.getFaction() == state.faction) {
 				if(!candidate.isSelected()) {
 					thingToSelect = candidate;
-					break;
+					if(candidate.isIdle()) {
+						break;
+					}
 				}
 			}
 		}

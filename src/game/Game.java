@@ -943,6 +943,8 @@ public class Game {
 			thingsToPlace.add(Game.buildingTypeMap.get("CASTLE"));
 			thingsToPlace.add(Game.unitTypeMap.get("WORKER"));
 			thingsToPlace.add(Game.plantTypeMap.get("BERRY"));
+			thingsToPlace.add(Game.plantTypeMap.get("BERRY"));
+			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
 			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
 			if(easymode || Settings.SPAWN_EXTRA) {
 				addResources(newFaction);

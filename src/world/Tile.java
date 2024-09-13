@@ -437,7 +437,7 @@ public class Tile implements Externalizable {
 //			return true;
 //		}
 		BuildingType bt = building.getType();
-		if (bt.blocksMovement()) {
+		if (bt.blocksMovement() && building.isBuilt()) {
 			if (bt.isGate() && u.getFaction() == building.getFaction()) {
 				return false;
 			}

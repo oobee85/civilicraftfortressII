@@ -132,7 +132,7 @@ public class PlannedAction {
 	public boolean inRange(Unit actor) {
 		int range = 0;
 		if(type == BUILD_BUILDING || type == BUILD_ROAD) {
-			range = 1;
+			range = 0;
 		}
 		else if(type == HARVEST) {
 			range = 0;

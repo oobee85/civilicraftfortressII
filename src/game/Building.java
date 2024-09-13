@@ -80,7 +80,25 @@ public class Building extends Thing implements Serializable {
 		// building builds units
 		if(remainingEffortToProduceUnit <= 0 && currentProducingUnit != null) {
 			Unit unit = getProducingUnit().remove();
-			unit.queuePlannedAction(PlannedAction.moveTo(getSpawnLocation()));
+			PlannedAction whatToDo = null;
+			if(unit.isBuilder()) {
+				Plant plant = getSpawnLocation().getPlant();
+				Building building = getSpawnLocation().getBuilding();
+				
+				if(plant != null && plant.getItem() != null) {// PLANT CASE
+					whatToDo = PlannedAction.harvest(plant);
+				}// BUILDING CASE
+				else if(building != null && building.getFactionID() == unit.getFactionID() && building.getType().isHarvestable()) {
+					whatToDo = PlannedAction.harvest(building);
+				}else if(building != null && building.getFactionID() == unit.getFactionID() && building.getType().isHarvestable()) {
+					
+				}
+				
+			}
+			if(whatToDo == null) {
+				whatToDo = PlannedAction.moveTo(getSpawnLocation());
+			}
+			unit.queuePlannedAction(whatToDo);
 			getTile().addUnit(unit);
 			world.addUnit(unit);
 			currentProducingUnit = null;
