@@ -102,6 +102,9 @@ public class BuildingType implements Serializable {
 	public boolean isHarvestable() {
 		return attributes.contains("harvestable");
 	}
+	public boolean isTrap() {
+		return attributes.contains("trap");
+	}
 	
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;

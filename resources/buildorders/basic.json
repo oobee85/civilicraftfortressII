@@ -48,7 +48,8 @@
 			"CASTLE": {"enough": 1, "max": 1},
 			"SMITHY": {"enough": 1, "max": 1},
 			"BARRACKS": {"enough": 1, "max": 1},
-			"STABLES": {"max": 3},
+			"STABLES": {"enough": 1, "max": 1},
+			"TRAP": {"max": 3},
 		},
 		"units": {
 			"WORKER": {"enough": 24, "max": 48},
@@ -70,7 +71,8 @@
 			"CASTLE": {"enough": 1, "max": 1},
 			"BARRACKS": {"enough": 1, "max": 2},
 			"SMITHY": {"enough": 1, "max": 1},
-			"STABLES": {"max": 3},
+			"STABLES": {"enough": 1, "max": 1},
+			"TRAP": {"max": 3},
 		},
 		"units": {
 			"WORKER": {"max": 200},
@@ -99,7 +101,8 @@
 			"CASTLE": {"enough": 1, "max": 2},
 			"BARRACKS": {"enough": 1, "max": 3},
 			"SMITHY": {"enough": 1, "max": 1},
-			"STABLES": {"max": 3},
+			"STABLES": {"enough": 1, "max": 1},
+			"TRAP": {"max": 3},
 		},
 		"units": {
 			"WORKER": {"max": 200},
@@ -128,7 +131,8 @@
 			"CASTLE": {"enough": 2, "max": 3},
 			"BARRACKS": {"enough": 1, "max": 4},
 			"SMITHY": {"enough": 1, "max": 2},
-			"STABLES": {"max": 3},
+			"STABLES": {"enough": 1, "max": 1},
+			"TRAP": {"max": 3},
 		},
 		"units": {
 			"WORKER": {"max": 400},
@@ -158,7 +162,8 @@
 			"BARRACKS": {"enough": 1, "max": 5},
 			"SMITHY": {"enough": 1, "max": 3},
 			"WORKSHOP": {"enough": 1, "max": 1},
-			"STABLES": {"max": 4},
+			"STABLES": {"enough": 1, "max": 2},
+			"TRAP": {"max": 4},
 		},
 		"units": {
 			"WORKER": {"max": 500},
@@ -192,7 +197,8 @@
 			"BARRACKS": {"enough": 1, "max": 5},
 			"SMITHY": {"enough": 1, "max": 4},
 			"WORKSHOP": {"enough": 1, "max": 2},
-			"STABLES": {"max": 5},
+			"STABLES": {"enough": 1, "max": 3},
+			"TRAP": {"max": 5},
 		},
 		"units": {
 			"WORKER": {"max": 800},
@@ -227,7 +233,8 @@
 			"BARRACKS": {"enough": 1, "max": 5},
 			"SMITHY": {"enough": 1, "max": 5},
 			"WORKSHOP": {"enough": 1, "max": 5},
-			"STABLES": {"max": 6},
+			"STABLES": {"enough": 1, "max": 5},
+			"TRAP": {"max": 6},
 			"BRICK_ROAD": {},
 		},
 		"units": {
@@ -262,7 +269,8 @@
 			"BARRACKS": {"enough": 1, "max": 5},
 			"SMITHY": {"enough": 1, "max": 5},
 			"WORKSHOP": {"enough": 1, "max": 5},
-			"STABLES": {"max": 6},
+			"STABLES": {"enough": 1, "max": 5},
+			"TRAP": {"max": 6},
 			"BRICK_ROAD": {},
 		},
 		"units": {

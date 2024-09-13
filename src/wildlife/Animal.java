@@ -169,8 +169,8 @@ public class Animal extends Unit {
 	
 	@Override
 	public boolean readyToMove() {
-		if(getTile().getBuilding() != null && 
-				getTile().getBuilding().getType() == Game.buildingTypeMap.get("STABLES")) {
+		// if animal is on a trap, it cannot move
+		if(getTile().getBuilding() != null && getTile().getBuilding().getType().isTrap()) {
 			return false;
 		}
 		return super.readyToMove();

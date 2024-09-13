@@ -61,17 +61,19 @@ public class Building extends Thing implements Serializable {
 				this.takeDamage(tileDamage[i], DamageType.values()[i]);
 			}
 		}
-
-		if(getType() == Game.buildingTypeMap.get("STABLES")) {
-			if (stablesCaptured == null) {
+		
+		// if building is a trap
+		if(getType().isTrap()) {
+			if (stablesCaptured == null) { // if theres no animal inside, skip
 				if (getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
 					stablesCaptured = ItemType.HORSE;
 				}
-				else if (getTile().hasUnit(Game.unitTypeMap.get("PIG"))) {
-					stablesCaptured = ItemType.FOOD;
-				}
+//				else if(!getTile().hasUnit(Game.unitTypeMap.get("HORSE"))){ // for some reason this makes it always give food
+//					stablesCaptured = ItemType.FOOD;
+//				}
 			}
 		}
+		
 
 		if(!isBuilt()) {
 			return;
@@ -130,7 +132,7 @@ public class Building extends Thing implements Serializable {
 //			this.getInventory().addItem(ItemType.FOOD, 5);
 			resetTimeToHarvest();
 		}
-		else if(getType() == Game.buildingTypeMap.get("STABLES")) {
+		else if(getType().isTrap()) {
 			if (stablesCaptured != null) {
 				this.getInventory().addItem(stablesCaptured, 1);
 				resetTimeToHarvest();

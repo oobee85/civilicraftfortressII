@@ -53,6 +53,19 @@
 		"effort":200
 	},
 	{
+		"name":"COLONY",
+		"info":"Workers nearby can deposit resources here",
+		"image":"Images/buildings/colony.png",
+		"vision":10,
+		"cost":{"WOOD":100, "STONE":100},
+		"culture":0.5,
+		"inventory":{"maxstack":1000},
+		"attributes":["colony"],
+		"health":500,
+		"effort":250,
+		"research":"FARMING"
+	},
+	{
 		"name":"BARRACKS",
 		"info":"Produces basic combat units",
 		"image":"Images/buildings/barracks256.png",
@@ -63,6 +76,32 @@
 		"culture":0.5,
 		"health":300,
 		"effort":300
+	},
+	{
+		"name":"STABLES",
+		"info":"Produces mounted combat units and animal units. Collect resources using trap building",
+		"image":"Images/buildings/stables.png",
+		"vision":1,
+		"cost":{"WOOD":200},
+		"culture":0.5,
+		"buildsunits":["HORSEARCHER","KNIGHT","CHARIOT", "GRIFFIN", "HORSEMAN"],
+		"inventory":{"maxstack":100},
+		"health":500,
+		"effort":250,
+		"research":"TRAPPING"
+	},
+	{
+		"name":"TRAP",
+		"info":"Trap animals to collect resources",
+		"image":"Images/buildings/trap.png",
+		"vision":1,
+		"cost":{"WOOD":100},
+		"culture":0.1,
+		"inventory":{"maxstack":100},
+		"attributes":["trap"],
+		"health":100,
+		"effort":100,
+		"research":"FARMING"
 	},
 	{
 		"name":"GRANARY",
@@ -94,23 +133,10 @@
 		"research":"MATHEMATICS"
 	},
 	{
-		"name":"STABLES",
-		"info":"Trap a horse to breed horses. Build horse units.",
-		"image":"Images/buildings/stables.png",
-		"vision":1,
-		"cost":{"WOOD":200},
-		"culture":0.5,
-		"buildsunits":["HORSEARCHER","KNIGHT","CHARIOT", "GRIFFIN", "HORSEMAN"],
-		"inventory":{"maxstack":100},
-		"health":500,
-		"effort":250,
-		"research":"TRAPPING"
-	},
-	{
 		"name":"WATCHTOWER",
 		"info":"Provides vision",
 		"image":"Images/buildings/watchtower.png",
-		"vision":10,
+		"vision":20,
 		"cost":{"WOOD":100, "STONE":100, "BRONZE_BAR":1},
 		"culture":0.5,
 		"health":250,
@@ -123,7 +149,7 @@
 		"image":"Images/buildings/castle256.png",
 		"mesh":"models/castle.ply",
 		"texture":"textures/pallet1.png",
-		"vision":5,
+		"vision":10,
 		"cost":{"WOOD":500, "STONE":500, "MITHRIL_BAR":5},
 		"buildsunits":["WORKER", "MASON", "PRIEST", "CARAVAN"],
 		"culture":1,

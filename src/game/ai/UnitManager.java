@@ -9,8 +9,8 @@ import game.ai.BuildOrderPhase.WorkerTask;
 public class UnitManager {
 
 	public static final BuildingType FARM = Game.buildingTypeMap.get("FARM");
-	public static final BuildingType STABLES = Game.buildingTypeMap.get("STABLES");
-
+	public static final BuildingType TRAP = Game.buildingTypeMap.get("TRAP");
+	
 	private Map<WorkerTask, Double> targetWorkerAssignmentRatios;
 	
 	private HashMap<Integer, Mission> specialMissions = new HashMap<>();
@@ -173,7 +173,7 @@ public class UnitManager {
 		}
 		
 		for (Building building : buildings) {
-			if (building.getType() != STABLES) {
+			if (building.getType() != TRAP) {
 				continue;
 			}
 			Building stables = building;
