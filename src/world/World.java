@@ -891,7 +891,7 @@ public class World {
 	
 	private void spreadPlants() {
 		
-		if(worldData.getPlants().size() >= 4000) {
+		if(worldData.getPlants().size() >= 2000) {
 			return;
 		}
 		for(Plant plant : worldData.getPlants()) {
@@ -900,7 +900,7 @@ public class World {
 				continue;
 			}
 			if(plant.getType() == Game.plantTypeMap.get("TREE")) {
-				if(Math.random() < 0.05) {
+				if(Math.random() < 0.1) {
 					for(Tile tile : plant.getTile().getNeighbors()) {
 						if(tile.getPlant() == null && tile.canGrow()) {
 							tile.setHasPlant(new Plant(plant.getType(), tile, getFaction(NO_FACTION_ID)));

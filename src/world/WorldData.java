@@ -1,6 +1,7 @@
 package world;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import game.*;
 import networking.server.*;
@@ -69,6 +70,13 @@ public class WorldData {
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
 		for (Building building : buildings) {
 			if (building.isDead() == true) {
+				
+				// iterate through buildings cost
+				for (Entry<ItemType, Integer> entry : building.getType().getCost().entrySet()) {
+					Item item = new Item(entry.getValue() / Constants.RATIO_BUILDING_RESOURCE_DROP, entry.getKey()); // add 1/5 of resources to tile inventory
+					building.getTile().getInventory().addItem(item);
+				}
+				
 				building.getFaction().removeBuilding(building);
 				ThingMapper.removed(building);
 				if(building == building.getTile().getRoad()) {
@@ -128,11 +136,29 @@ public class WorldData {
 	public LinkedList<Unit> getUnits() {
 		return units;
 	}
+	
 	public void filterDeadUnits() {
 		// UNITS
 		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
-		for (Unit unit : units) {
-			if (unit.isDead() == true) {
+		for (Unit unit : units) { // cycle through unit list
+			if (unit.isDead() == true) { // if the unit is dead
+				
+				// check if unit has inventory, and drop it
+				if(unit.getInventory() != null) {
+					for(Item item : unit.getInventory().getItems()) {
+						if(item != null) {
+							unit.getTile().getInventory().addItem(item);
+						}
+					}
+				}
+				// if unit has a deadItem to drop, drop to tile
+				for (Item item : unit.getType().getDeadItem()) {
+					if(item != null) {
+						unit.getTile().getInventory().addItem(item);
+					}
+				}
+				
+				
 				unit.getFaction().removeUnit(unit);
 				unit.getTile().removeUnit(unit);
 				ThingMapper.removed(unit);

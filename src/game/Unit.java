@@ -237,14 +237,17 @@ public class Unit extends Thing implements Serializable {
 		}
 		return null;
 	}
-
+	
 	@Override
 	public boolean takeDamage(int damage, DamageType type) {
 		boolean lethal = super.takeDamage(damage, type);
 		if (lethal) {
-			for (Item item : getType().getDeadItem()) {
-				getTile().getInventory().addItem(item);
-			}
+			// drop death items on death
+//			for (Item item : getType().getDeadItem()) {
+//				getTile().getInventory().addItem(item);
+//			}
+			
+			
 		}
 		return lethal;
 	}
