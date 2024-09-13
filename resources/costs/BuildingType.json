@@ -27,6 +27,19 @@
 		"effort":100
 	},
 	{
+		"name":"RESEARCH_LAB",
+		"info":"Workers harvest magic from here",
+		"image":"Images/buildings/research.png",
+		"vision":1,
+		"cost":{"GOLD_BAR":5},
+		"attributes":["harvestable"],
+		"produces":{"MAGIC": 5},
+		"research":"MYSTICISM",
+		"culture":0.1,
+		"health":100,
+		"effort":250
+	},
+	{
 		"name":"SAWMILL",
 		"info":"Workers deposit wood here",
 		"image":"Images/buildings/sawmill.gif",
@@ -206,19 +219,6 @@
 		"image":"Images/buildings/blacksmith.gif",
 		"vision":1,
 		"cost":{"WOOD":100, "STONE":100},
-		"culture":0.5,
-		"health":500,
-		"effort":500,
-		"research":"FARMING"
-	},
-	{
-		"name":"RESEARCH_LAB",
-		"info":"Produces Magic",
-		"image":"Images/buildings/research.png",
-		"vision":1,
-		"cost":{"WOOD":100, "STONE":100},
-		"attributes":["harvestable"],
-		"produces":{"MAGIC": 5},
 		"culture":0.5,
 		"health":500,
 		"effort":500,

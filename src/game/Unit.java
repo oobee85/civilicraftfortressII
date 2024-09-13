@@ -392,6 +392,7 @@ public class Unit extends Thing implements Serializable {
 			return;
 		}
 		
+		// harvest from farm
 		if (building.getType() == BasicAI.FARM) {
 			int modifier = 1;
 			if(building.getTile().getTerrain() == Terrain.RICHSOIL) {
@@ -407,13 +408,21 @@ public class Unit extends Thing implements Serializable {
 				building.setRemainingEffort(building.getType().getBuildingEffort());
 			}
 		}
+		// harvest from mine
 		else if (building.getType() == BasicAI.MINE) {
 			building.takeDamage(5, DamageType.PHYSICAL);
 			getInventory().addItem(ItemType.STONE, 5);
 			this.resetTimeToHarvest(5);
 			building.resetTimeToHarvest(this.timeToHarvest);
 		}
-
+		// harvest from research lab
+		else if (building.getType() == BasicAI.LAB) {
+			building.takeDamage(5, DamageType.PHYSICAL);
+			getInventory().addItem(ItemType.MAGIC, 5);
+			this.resetTimeToHarvest(5);
+			building.resetTimeToHarvest(this.timeToHarvest);
+		}
+		
 		if (getInventory().isFull()) {
 			action.setDone(true);
 		}

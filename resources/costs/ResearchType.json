@@ -28,19 +28,19 @@
 		"points": 300, "tier": 1,
 		"cost": {"WOOD": 200}, 
 		"requirements": ["FARMING"],
-		"image": "Images/research/wheel.png"},
+		"image": "Images/research/trapping.png"},
 	{
 		"name": "ANIMAL_HUSBANDRY", 
 		"points": 600, "tier": 2,
 		"cost": {"HORSE": 100}, 
 		"requirements": ["TRAPPING"],
-		"image": "Images/research/horseback_riding.png"},
+		"image": "Images/research/animal_husbandry.png"},
 	{
 		"name": "DOMESTICATION", 
 		"points": 600, "tier": 3,
 		"cost": {"FOOD": 400, "HORSE": 100}, 
 		"requirements": ["ANIMAL_HUSBANDRY"],
-		"image": "Images/research/chivalry.png"},
+		"image": "Images/research/domestication.png"},
 	{
 		"name": "MASONRY", 
 		"points": 300, "tier": 1,
@@ -52,7 +52,7 @@
 		"points": 600, "tier": 2,
 		"cost": {"STONE": 200},
 		"requirements": ["MASONRY"],
-		"image": "Images/research/code_of_laws.png"},
+		"image": "Images/research/mathematics.png"},
 	{
 		"name": "ENGINEERING", 
 		"points": 600, "tier": 3,
@@ -62,19 +62,19 @@
 	{
 		"name": "MYSTICISM", 
 		"points": 300, "tier": 1,
-		"cost": {"GOLD_BAR": 8},
+		"cost": {"GOLD_BAR": 5},
 		"requirements": ["FARMING"],
 		"image": "Images/research/mysticism.png"},
 	{
 		"name": "WITCHCRAFT", 
 		"points": 600, "tier": 2,
-		"cost": {"MAGIC": 100},
+		"cost": {"MAGIC": 60},
 		"requirements": ["MYSTICISM"],
 		"image": "Images/research/witchcraft.png"},
 	{
 		"name": "NECROMANCY", 
 		"points": 600, "tier": 3,
-		"cost": {"MAGIC": 100},
+		"cost": {"MAGIC": 200},
 		"requirements": ["WITCHCRAFT"],
 		"image": "Images/research/shadowwordpain.png"},
 	{
