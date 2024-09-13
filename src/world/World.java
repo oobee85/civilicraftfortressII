@@ -1253,7 +1253,7 @@ public class World {
 			}
 			// t.liquidType.getMinimumDamageAmount()
 			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < 4) {
-				if (Math.random() < tempDensity) {
+				if (rand.nextDouble() < tempDensity) {
 					makePlantVein(t, Game.plantTypeMap.get("TREE"), 30, rand);
 				}
 			}
