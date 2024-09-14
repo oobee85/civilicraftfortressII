@@ -684,6 +684,7 @@ public class GameView {
 		boolean hasOnlyUnits = true;
 		boolean hasOnlyBuildings = true;
 		int size = state.selectedThings.size();
+		Thing thingToSelect = null;
 		
 		// if selectedthings is empty
 		if(state.selectedThings.isEmpty()) {
@@ -701,7 +702,36 @@ public class GameView {
 			}
 		}
 		
-		Thing thingToSelect = null;
+		// double click selects all of same type
+		if(size == 1) {
+			Thing thing = state.selectedThings.peek();
+			// if click is on same tile as selected thing
+			if(thing.getTile().distanceTo(tile) == 0) { 
+				Position topLeft = new Position(state.mousePressLocation.getX(), state.mousePressLocation.getY());
+				Position botRight = new Position(state.mousePressLocation.getX(), state.mousePressLocation.getY());
+				
+				topLeft.x -= 20;
+				topLeft.y -= 20;
+				if(topLeft.x < 0) {
+					topLeft.x = 0;
+				}
+				if(topLeft.y < 0) {
+					topLeft.y = 0;
+				}
+				
+				botRight.x += 20;
+				botRight.y += 20;
+				if(botRight.x > game.world.getWidth()) {
+					botRight.x = game.world.getWidth();
+				}
+				if(botRight.y > game.world.getHeight()) {
+					botRight.y = game.world.getHeight();
+				}
+				selectInBox(topLeft, botRight, true);
+				return;
+			}
+		}
+		
 		
 		
 		// only try to select unit if current  isnt only buildings
@@ -764,31 +794,59 @@ public class GameView {
 		if (shiftEnabled == false && !controlEnabled) {
 			deselectEverything();
 		}
+		
+		boolean hasOnlyUnits = true;
+		boolean hasOnlyBuildings = true;
+		int size = state.selectedThings.size();
+		
+		// if selectedthings is empty
+		if(state.selectedThings.isEmpty()) {
+			hasOnlyUnits = false;
+			hasOnlyBuildings = false;
+			
+		}else {
+			for(Thing thing : state.selectedThings) {
+				if(thing instanceof Unit) {
+					hasOnlyBuildings = false;
+				}
+				if(thing instanceof Building) {
+					hasOnlyUnits = false;
+				}
+			}
+		}
+		
+		
+		
 		boolean selectedAUnit = false;
-		for (Tile tile : tiles) {
-			// goes through all the units on the tile and checks if they are selected
-			for (Unit candidate : tile.getUnits()) {
-				// clicking on tile w/o shift i.e only selects top unit
-				if (candidate.getFaction() == state.faction) {
-					selectThing(candidate);
-					selectedAUnit = true;
-					// shift enabled -> selects whole stack
-					// shift disabled -> selects top unit
-					if (!shiftEnabled && tiles.size() == 1) {
-						break;
+		if(hasOnlyBuildings == false) {
+			for (Tile tile : tiles) {
+				// goes through all the units on the tile and checks if they are selected
+				for (Unit candidate : tile.getUnits()) {
+					// clicking on tile w/o shift i.e only selects top unit
+					if (candidate.getFaction() == state.faction) {
+						selectThing(candidate);
+						selectedAUnit = true;
+						// shift enabled -> selects whole stack
+						// shift disabled -> selects top unit
+						if (!shiftEnabled && tiles.size() == 1) {
+							break;
+						}
 					}
 				}
 			}
 		}
-		if (!selectedAUnit) {
-			for (Tile tile : tiles) {
-				// selects the building on the tile
-				Building building = tile.getBuilding();
-				if (building != null && building.getFaction() == state.faction && tile.getUnitOfFaction(state.faction) == null) {
-					selectThing(building);
+		if(hasOnlyUnits == false) {
+			if (!selectedAUnit) {
+				for (Tile tile : tiles) {
+					// selects the building on the tile
+					Building building = tile.getBuilding();
+					if (building != null && building.getFaction() == state.faction && tile.getUnitOfFaction(state.faction) == null) {
+						selectThing(building);
+					}
 				}
 			}
 		}
+		
 	}
 
 	private void selectThing(Thing thing) {
