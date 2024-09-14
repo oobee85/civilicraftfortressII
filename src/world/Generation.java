@@ -15,7 +15,8 @@ import world.liquid.*;
 
 public class Generation {
 	
-	public static final long DEFAULT_SEED = 131313131313131313L;
+//	public static final long DEFAULT_SEED = 131313131313131313L;
+	public static final long DEFAULT_SEED = 69696969;
 	public static final int OREMULTIPLIER = 16384;
 
 	public static void addCliff(World world, float[][] heightmap, Random rand) {

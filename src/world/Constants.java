@@ -21,7 +21,7 @@ public class Constants {
 	public static final int LETHALHOTTEMP = 333; // [K]
 	public static final int LETHALCOLDTEMP = 263; // [K]
 	public static final float FREEZING_TEMPURATURE = 0.33f;
-	public static final int BALANCEWATER = 10;
+	public static final int BALANCEWATER = 3;
 	
 	public static final int MAXHEIGHT = 1000; // [m]
 	public static final int SEALEVEL = 300; // [m]

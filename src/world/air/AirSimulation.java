@@ -285,10 +285,10 @@ public class AirSimulation {
 			}
 			
 			// force add humidity on mountain top
-			if(tile.getHeight() > 700 && averageWater < Constants.BALANCEWATER) {
-				double addedMod = Constants.BALANCEWATER / averageWater/2;
-//				tile.liquidAmount += addedMod;
-				tile.getAir().addHumidity(addedMod);
+			if(tile.getHeight() > 500 && averageWater < Constants.BALANCEWATER) {
+				double addedMod = Constants.BALANCEWATER / averageWater/4;
+//				tile.liquidAmount += addedMod/2;
+				tile.getAir().addVolumeLiquid(addedMod);
 			}
 			
 //			double tempChange = averageTemp / tile.getTemperature();

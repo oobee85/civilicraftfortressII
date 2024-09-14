@@ -118,13 +118,26 @@ public class Unit extends Thing implements Serializable {
 	public double movePenaltyTo(Tile from, Tile to) {
 		double penalty = to.getTerrain().moveSpeed();
 
-		if (from.getRoad() != null && to.getRoad() != null && from.getRoad().isBuilt() && to.getRoad().isBuilt()) {
+		if (from.getRoad() != null && from.getRoad().isBuilt()) {
 			penalty = penalty / from.getRoad().getType().getSpeed();
+			penalty = 0;
+			
 		}
 		if (this.getUnitType().isFlying()) {
 			penalty = 0;
 		}
 		penalty += combatStats.getMoveSpeed();
+		if (from.getRoad() != null && from.getRoad().isBuilt()) {
+			if(from.getRoad().getType().name() == "BRICK_ROAD") {
+				if(!this.getUnitType().isFlying()) {
+					penalty = 5;
+					if(penalty - 10 > 0) {
+						
+					}
+					
+				}
+			}
+		}
 		return penalty;
 	}
 
