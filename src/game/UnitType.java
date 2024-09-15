@@ -3,6 +3,7 @@ import java.io.*;
 import java.util.*;
 
 import game.components.*;
+import networking.server.Server;
 import ui.graphics.opengl.*;
 import utils.*;
 import utils.Loader.*;
@@ -26,6 +27,7 @@ public class UnitType implements Serializable {
 	private transient final ArrayList<TargetingInfo> targetingInfo = new ArrayList<>();
 	private transient final LinkedList<AttackStyle> attackStyles;
 	private transient final boolean isDangerousToOwnTeam;
+	private transient final int powerLevel;
 	private transient final Set<GameComponent> components = new HashSet<>();
 
 	public UnitType(String name, String image, Mesh mesh, String textureFile, CombatStats cs, 
@@ -43,15 +45,36 @@ public class UnitType implements Serializable {
 		this.targetingInfoStrings = targeting;
 		this.attackStyles = attackStyles;
 		
-		boolean explosive = false;
+		this.isDangerousToOwnTeam = computeIsDangerousToOwnTeam();
+		this.powerLevel = computePowerLevel();
+	}
+	
+	private int computePowerLevel() {
+		int power = 0;
+		power += combatStats.getHealth();
+		power -= combatStats.getMoveSpeed();
+		for (AttackStyle att : attackStyles) {
+			int attackCooldown = att.getCooldown() == 0 ? 1 : att.getCooldown();
+			int dps = att.getDamage() * Server.MILLISECONDS_PER_TICK / attackCooldown;
+			power += dps;
+			power += att.getRange()*2;
+		}
+		return power;
+	}
+	
+	public int getPowerLevel() {
+		return powerLevel;
+	}
+
+	private boolean computeIsDangerousToOwnTeam() {
 		for (AttackStyle style : attackStyles) {
 			if (style.getProjectile() != null && style.getProjectile().isExplosive()) {
-				explosive = true;
-				break;
+				return true;
 			}
 		}
-		this.isDangerousToOwnTeam = explosive;
+		return false;
 	}
+	
 	public boolean isDangerousToOwnTeam() {
 		return isDangerousToOwnTeam;
 	}

@@ -22,8 +22,12 @@ public class UndeadAI extends AIInterface {
 		outerloop: for (int layer = 1; layer <= 16; layer++) {
 			int radius = layer;
 			boolean wallOrRoad = (radius % 2) == 0;
+			Tile home = worker.getTile();
+			if (castle != null) {
+				home = castle.getTile();
+			}
 			List<Tile> tileRing = Utils.getRingOfTiles(
-					castle.getTile(),
+					home,
 					world,
 					radius);
 			int buildEveryX = Math.max(layer / 4 + 2, 2);

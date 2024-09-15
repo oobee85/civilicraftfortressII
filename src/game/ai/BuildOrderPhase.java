@@ -16,6 +16,7 @@ public class BuildOrderPhase {
 	public List<ResearchType> requiredResearches;
 	public List<ResearchType> optionalResearches;
 	public Map<UnitType, QuantityReq> units;
+	public List<UnitType> orderedUnits;
 	public Map<BuildingType, QuantityReq> buildings;
 	public Map<WorkerTask, Double> workerAssignments;
 	
@@ -42,6 +43,17 @@ public class BuildOrderPhase {
 		units = Collections.unmodifiableMap(units);
 		buildings = Collections.unmodifiableMap(buildings);
 		workerAssignments = Collections.unmodifiableMap(workerAssignments);
+		
+		List<UnitType> orderedUnits = new ArrayList<>(units.keySet());
+		Collections.sort(orderedUnits, (UnitType a, UnitType b) -> {
+			return b.getPowerLevel() - a.getPowerLevel();
+		});
+		this.orderedUnits = Collections.unmodifiableList(orderedUnits);
+		
+		System.out.println("Final unit order:");
+		for (UnitType type : this.orderedUnits) {
+			System.out.println(type + ": " + type.getPowerLevel());
+		}
 	}
 	
 	@Override
