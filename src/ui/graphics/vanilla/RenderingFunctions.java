@@ -97,6 +97,9 @@ public class RenderingFunctions {
 	
 	public static void drawUnitQuantitySquares(RenderingState state, Tile tile, Point4 drawat) {
 		int[] numPerFaction = new int[state.world.getFactions().size()];
+		if (state.faction.id() >= numPerFaction.length) {
+			return;
+		}
 		for (Unit unit : tile.getUnits()) {
 			numPerFaction[unit.getFactionID()]++;
 		}
@@ -118,14 +121,6 @@ public class RenderingFunctions {
 		}
 	}
 	
-	public static void drawWeatherEvents(RenderingState state) {
-		for (WeatherEvent w : state.world.getWeatherEvents()) {
-			Point drawAt = getDrawingCoords(w.getTile().getLocation(), state.tileSize);
-			state.g.drawImage(WeatherEventType.RAIN.getMipMap().getImage(0), drawAt.x ,
-					drawAt.y, state.tileSize, state.tileSize, null);
-		}
-	}
-	
 	public static void drawProjectiles(RenderingState state) {
 		for (Projectile p : state.world.getData().getProjectiles()) {
 			int extra = (int) (state.tileSize * p.getExtraSize());
@@ -143,19 +138,22 @@ public class RenderingFunctions {
 	}
 	
 	public static void drawInventoryHealthBar(RenderingState state, Tile tile, Point drawat) {
-		if (tile.getRoad() != null) {
-			drawHealthBar(state, tile.getRoad());
-			drawHitsplat(state.g, tile.getRoad(), state.tileSize);
+		Building road = tile.getRoad();
+		if (road != null) {
+			drawHealthBar(state, road);
+			drawHitsplat(state.g, road, state.tileSize);
 		}
-		if (tile.getBuilding() != null) {
-			if(tile.getBuilding().hasInventory())
-				drawInventory(state.g, tile, tile.getBuilding().getInventory(), state.tileSize);
-			drawHealthBar(state, tile.getBuilding());
-			drawHitsplat(state.g, tile.getBuilding(), state.tileSize);
+		Building building = tile.getBuilding();
+		if (building != null) {
+			if(building.hasInventory())
+				drawInventory(state.g, tile, building.getInventory(), state.tileSize);
+			drawHealthBar(state, building);
+			drawHitsplat(state.g, building, state.tileSize);
 		}
-		if (tile.getPlant() != null) {
-			drawHealthBar(state, tile.getPlant());
-			drawHitsplat(state.g, tile.getPlant(), state.tileSize);
+		Plant plant = tile.getPlant();
+		if (plant != null) {
+			drawHealthBar(state, plant);
+			drawHitsplat(state.g, plant, state.tileSize);
 		}
 		for (Unit unit : tile.getUnits()) {
 			if(unit.hasInventory())

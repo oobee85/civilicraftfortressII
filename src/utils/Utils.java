@@ -548,17 +548,29 @@ public final class Utils {
 		return smoothed;
 	}
 	
-	public static WorldInfo extractWorldInfo(World world) {
-		ArrayList<Tile> tileInfos = new ArrayList<>(world.getTiles().size()); 
-		tileInfos.addAll(world.getTiles());
-		WorldInfo worldInfo = new WorldInfo(world.getWidth(), world.getHeight(), World.ticks, tileInfos.toArray(new Tile[0]));
-		worldInfo.getThings().addAll(world.getPlants());
-		worldInfo.getThings().addAll(world.getBuildings());
-		worldInfo.getThings().addAll(world.getUnits());
+	public static WorldInfo extractWorldInfo(World world, boolean everything, boolean units) {
+		Tile[] tileArray;
+		if (everything) {
+			ArrayList<Tile> tileInfos = new ArrayList<>(world.getTiles().size()); 
+			tileInfos.addAll(world.getTiles());
+			tileArray = tileInfos.toArray(new Tile[0]);
+		}
+		else {
+			tileArray = new Tile[0];
+		}
+		WorldInfo worldInfo = new WorldInfo(world.getWidth(), world.getHeight(), World.ticks, tileArray);
+		if (everything) {
+//			worldInfo.getThings().addAll(world.getPlants());
+//			worldInfo.getThings().add(world.getPlants().getFirst());
+//			worldInfo.getThings().addAll(world.getBuildings());
+			worldInfo.getFactions().addAll(world.getFactions());
+		}
+		if (units) {
+//			worldInfo.getThings().addAll(world.getUnits());
+		}
 		worldInfo.getThings().addAll(world.getData().clearDeadThings());
-		worldInfo.getFactions().addAll(world.getFactions());
+		worldInfo.addHitsplats(world.getData());
 		worldInfo.getProjectiles().addAll(world.getData().clearProjectilesToSend());
-		worldInfo.getWeatherEvents().addAll(world.getData().clearWeatherEventsToSend());
 		return worldInfo;
 	}
 

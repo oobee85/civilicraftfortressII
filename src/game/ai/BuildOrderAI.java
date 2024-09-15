@@ -17,6 +17,13 @@ public class BuildOrderAI extends AIInterface {
 	private static final int MAX_BUILD_RADIUS = 40;
 	private static final int CLOSE_FORAGE_RADIUS = 3;
 	private static final int FAR_FORAGE_RADIUS = 40;
+	
+	LinkedList<Tile> silverTiles = new LinkedList<Tile>();
+	LinkedList<Tile> copperTiles = new LinkedList<Tile>();
+	LinkedList<Tile> ironTiles = new LinkedList<Tile>();
+	LinkedList<Tile> coalTiles = new LinkedList<Tile>();
+	LinkedList<Tile> mithrilTiles = new LinkedList<Tile>();
+	ArrayList<Tile> tilesToDefend = new ArrayList<Tile>();
 
 	private UnitManager unitManager;
 	private HashSet<Integer> workersStillAlive = new HashSet<>(); // value is a worker Unit ID
@@ -155,12 +162,6 @@ public class BuildOrderAI extends AIInterface {
 		}
 		commands.craftItem(faction, ItemType.BRONZE_BAR, 5);
 	}
-	
-	LinkedList<Tile> silverTiles = new LinkedList<Tile>();
-	LinkedList<Tile> copperTiles = new LinkedList<Tile>();
-	LinkedList<Tile> ironTiles = new LinkedList<Tile>();
-	LinkedList<Tile> coalTiles = new LinkedList<Tile>();
-	LinkedList<Tile> mithrilTiles = new LinkedList<Tile>();
 	private void phaseTransition(int newPhase) {
 		heatmap.clear();
 		unitManager.newPhase(phases.get(newPhase).workerAssignments);
@@ -189,11 +190,17 @@ public class BuildOrderAI extends AIInterface {
 				else if (t.getResource().getType() == ResourceType.MITHRIL) {
 					mithrilTiles.add(t);
 				}
-				sortAndRemoveAllBut(silverTiles, 5);
-				sortAndRemoveAllBut(copperTiles, 5);
-				sortAndRemoveAllBut(ironTiles, 5);
-				sortAndRemoveAllBut(coalTiles, 5);
-				sortAndRemoveAllBut(mithrilTiles, 5);
+				sortAndRemoveAllBut(silverTiles, 50);
+				sortAndRemoveAllBut(copperTiles, 50);
+				sortAndRemoveAllBut(ironTiles, 50);
+				sortAndRemoveAllBut(coalTiles, 50);
+				sortAndRemoveAllBut(mithrilTiles, 50);
+
+				tilesToDefend.addAll(silverTiles);
+				tilesToDefend.addAll(copperTiles);
+				tilesToDefend.addAll(ironTiles);
+				tilesToDefend.addAll(coalTiles);
+				tilesToDefend.addAll(mithrilTiles);
 			}
 		}
 	}
@@ -270,6 +277,7 @@ public class BuildOrderAI extends AIInterface {
 		}
 	}
 
+	int alternateAttack = 0;
 	private void handleCombatUnit(Unit unit) {
 		if(!unit.isGuarding()) {
 			commands.setGuarding(unit, true);
@@ -278,7 +286,16 @@ public class BuildOrderAI extends AIInterface {
 			attackNearestEnemyBuilding(unit);
 		}
 		else {
-			attackTowardsNearestEnemy(unit);
+			if (alternateAttack % 5 == 0) {
+				attackTowardsNearestEnemy(unit);
+			}
+			else if (alternateAttack % 5 <= 2) {
+				defend(unit);
+			}
+			else {
+				attack(unit);
+			}
+			alternateAttack++;
 		}
 	}
 	
@@ -307,11 +324,15 @@ public class BuildOrderAI extends AIInterface {
 		switch (task) {
 		case FARM:
 			if (!handleFarmingWorker(worker)) {
-				handleChoppingWorker(worker);
+				if (!handleChoppingWorker(worker)) {
+					collectNearbyDroppedResources(worker);
+				}
 			}
 			break;
 		case CHOP:
-			handleChoppingWorker(worker);
+			if (!handleChoppingWorker(worker)) {
+				collectNearbyDroppedResources(worker);
+			}
 			break;
 		case CLOSEFORAGE:
 			result = handleForagingWorker(worker, CLOSE_FORAGE_RADIUS);
@@ -363,7 +384,7 @@ public class BuildOrderAI extends AIInterface {
 	
 	private void handleGatherStoneWorker(Unit worker) {
 		Tile tile = getTargetTile(worker.getTile(), 0, FAR_FORAGE_RADIUS, e -> {
-			return e.getTerrain() == Terrain.ROCK 
+			return e.getTerrain() == Terrain.ROCK && e.getResource() == null
 					&& (e.getBuilding() == null || !e.getBuilding().getType().isCastle()) ;
 		});
 		if(tile == null) {
@@ -385,6 +406,10 @@ public class BuildOrderAI extends AIInterface {
 			commands.planAction(unit, PlannedAction.takeItemsFrom(stables), true);
 			return true;
 		}
+		return collectNearbyDroppedResources(unit);
+	}
+	
+	private boolean collectNearbyDroppedResources(Unit unit) {
 		Tile tile = getTargetTile(getHomeTile(unit), 0, FAR_FORAGE_RADIUS, e -> {
 			return !e.getInventory().isEmpty() && !e.isBlocked(unit);
 		});
@@ -437,6 +462,52 @@ public class BuildOrderAI extends AIInterface {
 			return;
 		}
 		commands.planAction(unit, PlannedAction.attack(target), true);
+	}
+	
+	private void attack(Unit unit) {
+		Tile targetTile = null;
+		for (Unit u : world.getUnits()) {
+			if (u.getFactionID() != faction.id() && !u.getFaction().isNeutral()) {
+				targetTile = u.getTile();
+				if (Math.random() < 0.1) {
+					break;
+				}
+			}
+		}
+		if (targetTile == null) {
+			for (Building u : world.getBuildings()) {
+				if (u.getFactionID() != faction.id() && !u.getFaction().isNeutral()) {
+					targetTile = u.getTile();
+					if (Math.random() < 0.1) {
+						break;
+					}
+				}
+			}
+		}
+		commands.planAction(unit, PlannedAction.attackMoveTo(targetTile), true);
+	}
+	private void defend(Unit unit) {
+		// attack enemy in territory
+		for (Unit u : world.getUnits()) {
+			if (u.getFactionID() != faction.id()
+					&& !u.isBuilder() 
+					&& u.getTile().getFaction().id() == faction.id()) {
+				commands.planAction(unit, PlannedAction.attackMoveTo(u.getTile()), true);
+				return;
+			}
+		}
+		
+		// defend friendly unit or building
+		Tile t;
+		if (Math.random() < 0.5) {
+			Unit friendly = units.get((int) (Math.random() * units.size()));
+			t = friendly.getTile();
+		}
+		else {
+			Building friendly = buildings.get((int) (Math.random() * buildings.size()));
+			t = friendly.getTile();
+		}
+		commands.planAction(unit, PlannedAction.attackMoveTo(t), true);
 	}
 	private void attackTowardsNearestEnemy(Unit unit) {
 		Tile homeTile = getHomeTile(unit);
@@ -491,14 +562,21 @@ public class BuildOrderAI extends AIInterface {
 		return true;
 	}
 	
-	private void handleChoppingWorker(Unit worker) {
+	private boolean handleChoppingWorker(Unit worker) {
 		Tile tile = getTargetTile(worker.getTile(), 0, FAR_FORAGE_RADIUS, e -> {
-			return e.getPlant() != null && e.getPlant().getType() == Game.plantTypeMap.get("TREE");
+			Plant plant = e.getPlant();
+			return plant != null 
+					&& (plant.getType() == Game.plantTypeMap.get("TREE") || plant.getType() == Game.plantTypeMap.get("CACTUS"));
 		});
 		if(tile == null) {
-			return;
+			return false;
 		}
-		commands.planAction(worker, PlannedAction.harvest(tile.getPlant()), true);
+		Plant plant = tile.getPlant();
+		if (plant == null) {
+			return false;
+		}
+		commands.planAction(worker, PlannedAction.harvest(plant), true);
+		return true;
 	}
 	
 	
@@ -566,17 +644,19 @@ public class BuildOrderAI extends AIInterface {
 			}
 			else {
 				if (type.isCastle()) {
-					int MINIMUM_CASTLE_SEPARATION = 10;
+					int MINIMUM_CASTLE_SEPARATION = 12;
 					selector = (Unit unit) -> getTargetTile(getHomeTile(unit), MINIMUM_CASTLE_SEPARATION, MAX_BUILD_RADIUS*2, e -> {
-						for (Building castle : castles) {
-							if (castle.getTile().distanceTo(e) < MINIMUM_CASTLE_SEPARATION) {
+						for (Building building : buildings) {
+							if (building.getType().isCastle() 
+									&& !building.isDead()  
+									&& building.getTile().distanceTo(e) < MINIMUM_CASTLE_SEPARATION) {
 								return false;
 							}
 						}
 						return !e.hasBuilding() && e.canBuild();
 					});
 				}
-				else if (type == Game.buildingTypeMap.get("STABLES")) {
+				else if (type == Game.buildingTypeMap.get("TRAP")) {
 					selector = (Unit unit) -> getTargetTile(getHomeTile(unit), 1, MAX_BUILD_RADIUS, e -> {
 						return !e.hasBuilding() && e.canBuild() && e.hasUnit(Game.unitTypeMap.get("HORSE"));
 					});

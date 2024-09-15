@@ -9,7 +9,7 @@ import networking.server.*;
 import ui.graphics.opengl.*;
 import world.*;
 
-public class Thing implements Serializable, Comparable<Thing> {
+public class Thing implements Externalizable, Comparable<Thing> {
 	
 	private transient static int idCounter = 0;
 	private int id;
@@ -29,6 +29,29 @@ public class Thing implements Serializable, Comparable<Thing> {
 	private transient TexturedMesh mesh;
 	
 	private transient Hitsplat[] hitsplats = new Hitsplat[4];
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeInt(id);
+		out.writeInt(factionID);
+		out.writeDouble(maxHealth);
+		out.writeDouble(health);
+		out.writeBoolean(isDead);
+		tile.writeExternal(out);
+		
+	}
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		id = in.readInt();
+		factionID = in.readInt();
+		maxHealth = in.readDouble();
+		health = in.readDouble();
+		isDead = in.readBoolean();
+		tile = new Tile();
+		tile.readExternal(in);
+	}
+	
+	public Thing() {}
 	
 	public Thing(double maxHealth, MipMap mipmap, TexturedMesh hasMesh, Faction faction) {
 		health = maxHealth;

@@ -7,10 +7,24 @@ import game.*;
 import game.components.*;
 import utils.*;
 
-public class Plant extends Thing implements Serializable {
+public class Plant extends Thing implements Externalizable {
 
 	private PlantType plantType;
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		super.writeExternal(out);
+		out.writeObject(plantType);
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		super.readExternal(in);
+		plantType = (PlantType)in.readObject();
+	}
 	
+	public Plant() {}
+
 	public Plant(PlantType pt, Tile t, Faction faction) {
 		super(pt.getHealth(), pt.getMipMap(), pt.getMesh(), faction, t);
 		plantType = pt;

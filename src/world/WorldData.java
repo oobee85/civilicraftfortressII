@@ -22,41 +22,10 @@ public class WorldData {
 	private LinkedList<GroundModifier> groundModifiers = new LinkedList<GroundModifier>();
 	private LinkedList<GroundModifier> newGroundModifiers = new LinkedList<GroundModifier>();
 	
-	private LinkedList<WeatherEvent> weatherEvents = new LinkedList<WeatherEvent>();
-	private LinkedList<WeatherEvent> newWeatherEvents = new LinkedList<WeatherEvent>();
-	
 	// Stuff server keeps track of to send to clients
 	private LinkedList<Projectile> projectilesToSend = new LinkedList<>();
-	private LinkedList<WeatherEvent> weatherEventsToSend = new LinkedList<>();
 	private LinkedList<Thing> deadThings = new LinkedList<>();
 
-	public void addWeatherEvent(WeatherEvent newEvent) {
-		synchronized (newWeatherEvents) {
-			newWeatherEvents.add(newEvent);
-		}
-	}
-	public LinkedList<WeatherEvent> getWeatherEvents() {
-		return weatherEvents;
-	}
-	public void filterDeadWeatherEvents() {
-		LinkedList<WeatherEvent> weatherEventsNew = new LinkedList<WeatherEvent>();
-		for (WeatherEvent weather : weatherEvents) {
-			Tile tile = weather.getTile();
-			if(weather.isDead() == false) {
-				weatherEventsNew.add(weather);
-			} else {
-				tile.setWeather(null);
-			}
-		}
-		synchronized (newWeatherEvents) {
-			synchronized(weatherEventsToSend) {
-				weatherEventsToSend.addAll(newWeatherEvents);
-			}
-			weatherEventsNew.addAll(newWeatherEvents);
-			newWeatherEvents.clear();
-		}
-		weatherEvents = weatherEventsNew;
-	}
 	public void addBuilding(Building newBuilding) {
 		synchronized(newBuildings) {
 			newBuildings.add(newBuilding);
@@ -209,15 +178,6 @@ public class WorldData {
 		return copy;
 	}
 
-	public LinkedList<WeatherEvent> clearWeatherEventsToSend() {
-		LinkedList<WeatherEvent> copy = new LinkedList<>();
-		synchronized (weatherEventsToSend) {
-			copy.addAll(weatherEventsToSend);
-			weatherEventsToSend.clear();
-		}
-		return copy;
-	}
-
 	public void addGroundModifier(GroundModifier gm) {
 		synchronized (newGroundModifiers) {
 			newGroundModifiers.add(gm);
@@ -261,7 +221,6 @@ public class WorldData {
 				" \tbuildings: " 		+ buildings.size() + 
 				" \tplants: " 			+ plants.size() + 
 				" \tgroundModifiers: " 	+ groundModifiers.size() + 
-				" \tprojectiles: " 		+ getProjectiles().size() +
-				" \tweatherEvents: "	+ getWeatherEvents().size();
+				" \tprojectiles: " 		+ getProjectiles().size();
 	}
 }

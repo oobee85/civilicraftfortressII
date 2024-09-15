@@ -17,6 +17,9 @@ public abstract class AIInterface {
 	protected int[][] buildingQuantities;
 	protected int[] unitQuantities;
 	
+	protected List<Unit> units = new ArrayList<>();
+	protected List<Building> buildings = new ArrayList<>();
+	
 	
 	public AIInterface(CommandInterface commands, Faction faction, World world) {
 		this.commands = commands;
@@ -35,9 +38,12 @@ public abstract class AIInterface {
 			unitQuantities = new int[Game.unitTypeMap.size()];
 		}
 		castles.clear();
+		units.clear();
+		buildings.clear();
 		Arrays.fill(buildingQuantities[0], 0);
 		Arrays.fill(buildingQuantities[1], 0);
 		for(Building building : faction.getBuildings()) {
+			buildings.add(building);
 			buildingQuantities[0][building.getType().id()]++;
 			if (building.isBuilt()) {
 				buildingQuantities[1][building.getType().id()]++;
@@ -54,6 +60,7 @@ public abstract class AIInterface {
 
 		Arrays.fill(unitQuantities, 0);
 		for(Unit unit : faction.getUnits()) {
+			units.add(unit);
 			unitQuantities[unit.getType().id()]++;
 		}
 	}

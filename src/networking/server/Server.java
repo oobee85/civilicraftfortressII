@@ -141,8 +141,8 @@ public class Server {
 			players.add(connection.getPlayerInfo());
 		}
 		gameInstance.generateWorld(Settings.WORLD_WIDTH, Settings.WORLD_HEIGHT, false, players);
-		gui.getGameView().getDrawer().updateTerrainImages();
 		gui.setGameInstance(gameInstance);
+		gui.getGameView().getDrawer().updateTerrainImages();
 		startWorldNetworkingUpdateThread();
 
 		Game.DISABLE_NIGHT = true;
@@ -194,7 +194,7 @@ public class Server {
 						sendProjectilesAndDeadThings();
 					}
 					if(iteration % 100 == 0) {
-						System.out.println("skipped sends: " + skippedCount + "/" + (skippedCount + sentCount));
+						System.out.println("skipped sends (nothing to send): " + skippedCount + "/" + (skippedCount + sentCount));
 					}
 					iteration++;
 					iteration = iteration % 100;
@@ -209,27 +209,28 @@ public class Server {
 	
 	
 	private void sendFullWorld() {
-//		ArrayList<Tile> tileInfos = new ArrayList<>(gameInstance.world.getTiles().size()); 
-//		tileInfos.addAll(gameInstance.world.getTiles());
-//		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, tileInfos.toArray(new Tile[0]));
-//		worldInfo.getThings().addAll(gameInstance.world.getPlants());
-//		worldInfo.getThings().addAll(gameInstance.world.getBuildings());
-//		worldInfo.getThings().addAll(gameInstance.world.getUnits());
-//		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
-//		worldInfo.getFactions().addAll(gameInstance.world.getFactions());
-//		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
-		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world);
-		sendToAllConnections(worldInfo);
-		sendWhichFaction();
 //		saveToFile(worldInfo, "ser/everything_" + World.ticks + ".ser");
+		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, true, true);
+
+//		WorldInfo worldInfo = new WorldInfo(
+//				gameInstance.world.getWidth(),
+//				gameInstance.world.getHeight(),
+//				World.ticks, new Tile[0]);
+//		worldInfo.getFactions().addAll(gameInstance.world.getFactions());
+		sendToAllConnections(worldInfo);
+//		Temp t = new Temp(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, new Tile[0]);
+//		t.getThings().addAll(gameInstance.world.getBuildings());
+//		sendToAllConnections(t);
+		sendWhichFaction();
 	}
 
 	private void sendUnits() {
-		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, new Tile[0]);
-		worldInfo.getThings().addAll(gameInstance.world.getUnits());
-		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
-		worldInfo.addHitsplats(gameInstance.world.getData());
-		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
+		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, false, true);
+//		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, new Tile[0]);
+//		worldInfo.getThings().addAll(gameInstance.world.getUnits());
+//		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
+//		worldInfo.addHitsplats(gameInstance.world.getData());
+//		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
 		sendToAllConnections(worldInfo);
 //		saveToFile(worldInfo, "ser/units_" + World.ticks + ".ser");
 	}
@@ -237,10 +238,11 @@ public class Server {
 	private int skippedCount;
 	private int sentCount;
 	private void sendProjectilesAndDeadThings() {
-		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, new Tile[0]);
-		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
-		worldInfo.addHitsplats(gameInstance.world.getData());
-		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
+		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, false, false);
+//		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, new Tile[0]);
+//		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
+//		worldInfo.addHitsplats(gameInstance.world.getData());
+//		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
 		if(worldInfo.getThings().isEmpty() 
 				&& worldInfo.getHitsplats().isEmpty()
 				&& worldInfo.getProjectiles().isEmpty()) {

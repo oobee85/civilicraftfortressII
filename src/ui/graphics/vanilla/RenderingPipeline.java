@@ -47,7 +47,6 @@ public class RenderingPipeline {
 			
 			pipeline.steps.add(thingInventoryHealthBarHitsplat);
 			pipeline.steps.add(projectiles);
-			pipeline.steps.add(weatherEvents);
 			pipeline.steps.add(unitQuantitySquares);
 			if (mode == MapMode.FLOW2) {
 				pipeline.steps.add(airFlow2);
@@ -114,10 +113,6 @@ public class RenderingPipeline {
 	private static RenderingStep unitQuantitySquares = new RenderingStep(null, (state, tile, drawat) -> {
 		RenderingFunctions.drawUnitQuantitySquares(state, tile, drawat);
 	});
-	
-	private static RenderingStep weatherEvents = new RenderingStep(state -> {
-		RenderingFunctions.drawWeatherEvents(state);
-	}, null);
 	
 	private static RenderingStep projectiles = new RenderingStep(state -> {
 		RenderingFunctions.drawProjectiles(state);

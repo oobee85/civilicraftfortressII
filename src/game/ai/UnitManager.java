@@ -173,7 +173,7 @@ public class UnitManager {
 		}
 		
 		for (Building building : buildings) {
-			if (building.getType() != TRAP) {
+			if (building.getType().isCastle() || !building.hasInventory()) {
 				continue;
 			}
 			Building stables = building;

@@ -654,13 +654,10 @@ public class Unit extends Thing implements Serializable {
 		if (passiveAction == PlannedAction.GUARD) {
 			int range = Math.max(5, getMaxAttackRange());
 			for (Tile tile : Utils.getTilesInRadius(getTile(), world, range)) {
-				if (tile.getFaction() != getFaction()) {
-					continue;
-				}
 				for (Unit unit : tile.getUnits()) {
-					if (unit.getFaction() != this.getFaction() && 
-							unit.getType().isHostile() && 
-							unit != this) {
+					if (unit.shouldAggroOn(unit)
+							&& unit.getType().isHostile()
+							&& (!this.getType().isDangerousToOwnTeam() || unit.getTile().getFaction().id() != this.getFactionID())) {
 						prequeuePlannedAction(PlannedAction.attack(unit));
 						return;
 					}
@@ -673,25 +670,36 @@ public class Unit extends Thing implements Serializable {
 	private Thing getClosestEnemyInRange(World world) {
 		Thing closest = null;
 		int closestDistance = -1;
+		Thing closestBuilding = null;
+		int closestBuildingDistance = -1;
 		for (Tile tile : Utils.getTilesInRadius(getTile(), world, getMaxAttackRange()+1)) {
+			int dist = getTile().distanceTo(tile);
 			for (Unit unit : tile.getUnits()) {
 				if(!shouldAggroOn(unit)) {
 					continue;
 				}
-				int dist = getTile().distanceTo(unit.getTile());
 				if(closest == null || dist < closestDistance) {
 					closest = unit;
 					closestDistance = dist;
 				}
 			}
+			Building building = tile.getBuilding();
+			if (building != null && shouldAggroOn(building) 
+					&& (closestBuilding == null || dist < closestBuildingDistance)) {
+				closestBuilding = building;
+				closestBuildingDistance = dist;
+			}
+		}
+		if (closest == null) {
+			closest = closestBuilding;
 		}
 		return closest;
 	}
 	
 	private boolean shouldAggroOn(Thing potential) {
 		// TODO replace anywhere faction comparison is used to determine enemies
-		if(potential != this && potential.getFaction().isNeutral() 
-				|| potential.getFactionID() != this.getFactionID()) {
+		if(potential != this 
+				&& (potential.getFaction().isNeutral() || potential.getFactionID() != this.getFactionID())) {
 			return true;
 		}
 		return false;

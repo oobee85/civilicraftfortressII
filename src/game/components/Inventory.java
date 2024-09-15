@@ -1,11 +1,35 @@
 package game.components;
 
+import java.io.*;
+
 import game.*;
 
-public class Inventory extends GameComponent {
+public class Inventory extends GameComponent implements Externalizable {
 	
 	private int maxStack;
 	private Item[] items = new Item[ItemType.values().length];
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+//		System.out.println("writing inventory");
+		out.writeInt(maxStack);
+//		for (int index = 0; index < ItemType.values().length; index++) {
+//			System.out.println("writing " + items[index]);
+//			out.writeObject(items[index]);
+//		}
+		out.writeObject(items);
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+//		System.out.println("reading inventory");
+		maxStack = in.readInt();
+//		for (int index = 0; index < ItemType.values().length; index++) {
+//			items[index] = (Item)in.readObject();
+//			System.out.println("read " + items[index]);
+//		}
+		items = (Item[])in.readObject();
+	}
 	
 	public Inventory() {
 		this(Integer.MAX_VALUE);

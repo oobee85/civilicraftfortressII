@@ -386,15 +386,6 @@ public class Client {
 					0); // TODO serialize ticksUntilLanding
 			gameInstance.world.getData().addProjectile(newProjectile);
 		}
-		for(WeatherEvent weatherMessage : worldInfo.getWeatherEvents()) {
-			WeatherEvent newWeatherEvent = new WeatherEvent(
-					gameInstance.world.get(weatherMessage.getTile().getLocation()), 
-					gameInstance.world.get(weatherMessage.getTargetTile().getLocation()),
-//					weatherMessage.timeLeft(),
-					weatherMessage.getStrength(),
-					weatherMessage.getLiquidType());
-			gameInstance.world.getData().addWeatherEvent(newWeatherEvent);
-		}
 		for(Hitsplat hitsplat : worldInfo.getHitsplats()) {
 			Thing thing = things.get(hitsplat.getThingID());
 			if(thing != null) {
@@ -521,6 +512,9 @@ public class Client {
 		
 		Item[] itemsUpdate = factionUpdate.getInventory().getItems();
 		for(Item itemUpdate : itemsUpdate) {
+			if (itemUpdate == null) {
+				continue;
+			}
 			faction.getInventory().setAmount(itemUpdate.getType(), itemUpdate.getAmount());
 		}
 		
@@ -534,7 +528,7 @@ public class Client {
 			try {
 				while(true) {
 					Object message = connection.getMessage();
-//					System.err.println("processing message " + message);
+					System.err.println("processing message " + message);
 					if(message instanceof ServerMessage) {
 						ServerMessage serverMessage = (ServerMessage)message;
 						if(serverMessage.getServerMessageType() == ServerMessageType.LOBBY) {

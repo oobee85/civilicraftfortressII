@@ -7,19 +7,61 @@ import game.*;
 import utils.*;
 import world.*;
 
-public class WorldInfo implements Serializable {
+public class WorldInfo implements Externalizable {
 	
 	private static final HashSet<Hitsplat> sentHitsplats = new HashSet<>();
 
-	private final int width;
-	private final int height;
-	private final int tick;
-	private final Tile[] tileInfos;
-	private final HashSet<Thing> things;
-	private final LinkedList<Faction> factions;
-	private final LinkedList<Projectile> projectiles;
-	private final LinkedList<Hitsplat> hitsplats;
-	private final LinkedList<WeatherEvent> weatherEvents;
+	private int width;
+	private int height;
+	private int tick;
+	private Tile[] tileInfos;
+	private HashSet<Thing> things;
+	private LinkedList<Faction> factions;
+	private LinkedList<Projectile> projectiles;
+	private LinkedList<Hitsplat> hitsplats;
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeInt(width);
+		out.writeInt(height);
+		out.writeInt(tick);
+		out.writeObject(tileInfos);
+		out.writeInt(things.size());
+		for (Thing thing : things) {
+			thing.writeExternal(out);
+		}
+		out.writeInt(factions.size());
+		for (Faction faction : factions) {
+			faction.writeExternal(out);
+		}
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		width = in.readInt();
+		height = in.readInt();
+		tick = in.readInt();
+		tileInfos = (Tile[])in.readObject();
+		things = new HashSet<>();
+		factions = new LinkedList<>();
+		projectiles = new LinkedList<>();
+		hitsplats = new LinkedList<>();
+		int numThings = in.readInt();
+		for (int i = 0; i < numThings; i++) {
+			Thing thing = new Thing();
+			thing.readExternal(in);
+			things.add(thing);
+		}
+		int numFactions = in.readInt();
+		for (int i = 0; i < numFactions; i++) {
+			Faction faction = new Faction();
+			faction.readExternal(in);
+			factions.add(faction);
+		}
+	}
+	
+	public WorldInfo() {}
+
 	public WorldInfo(int width, int height, int tick, Tile[] tileInfos) {
 		this.width = width;
 		this.height = height;
@@ -29,7 +71,6 @@ public class WorldInfo implements Serializable {
 		factions = new LinkedList<>();
 		projectiles = new LinkedList<>();
 		hitsplats = new LinkedList<>();
-		weatherEvents = new LinkedList<>();
 	}
 	public void addHitsplats(WorldData worldData) {
 		LinkedList<Hitsplat> toadd = new LinkedList<>();
@@ -97,9 +138,6 @@ public class WorldInfo implements Serializable {
 	}
 	public LinkedList<Projectile> getProjectiles() {
 		return projectiles;
-	}
-	public LinkedList<WeatherEvent> getWeatherEvents() {
-		return weatherEvents;
 	}
 	@Override
 	public String toString() {

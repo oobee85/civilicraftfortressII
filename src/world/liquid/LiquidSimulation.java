@@ -105,14 +105,6 @@ public class LiquidSimulation {
 					tile.getModifier().finish();
 				}
 			}
-			double volume = tile.getAir().getVolumeLiquid();
-			if(tile.getWeather() != null) {
-				if(tile.getWeather().getStrength() > 0) {
-					volume += tile.getWeather().getStrength();
-				}
-				
-			}
-//			tile.getAir().setVolume(volume);
 			
 			double evaporation = tile.getEvaporation();
 			if(evaporation > 0 && tile.liquidAmount - evaporation >= 0 && tile.getAir().canRain() == false) {

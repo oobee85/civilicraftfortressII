@@ -51,7 +51,7 @@ public class World {
 	public static int nights = 0;
 	public static int days = 1;
 	public static int WATER_SETTLING_TICKS = 600;
-	public static float AVERAGE_WATER_PER_TILE = 10f;
+	public static float AVERAGE_WATER_PER_TILE = 3f;
 	public static volatile int ticks;
 	
 	public World(int width, int height) {
@@ -226,9 +226,6 @@ public class World {
 	}
 	public void addUnit(Unit newUnit) {
 		worldData.addUnit(newUnit);
-	}
-	public LinkedList<WeatherEvent> getWeatherEvents() {
-		return worldData.getWeatherEvents();
 	}
 	public void addPlant(Plant newPlant) {
 		worldData.addPlant(newPlant);
@@ -960,31 +957,6 @@ public class World {
 
 		}
 	}
-	public void doWeatherUpdate() {
-		for(WeatherEvent weather : worldData.getWeatherEvents()) {
-			weather.tick();
-			Tile tile = weather.getTile();
-			if(weather.getTargetTile() == null) {
-				continue;
-			}
-			if (weather.readyToMove()) {
-				weather.moveToTarget();
-			}
-			
-			if(tile.liquidType == LiquidType.LAVA) {
-				continue;
-			}
-			if(tile.liquidType != weather.getLiquidType() && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()/2) {
-				continue;
-			}
-			tile.liquidType = weather.getLiquidType();
-//			tile.liquidAmount += 0.1;
-//			weather.addStrength(-0.1);
-//			tile.getAir().addVolume(-0.1);
-			
-			
-		}
-	}
 	
 	public void doProjectileUpdates(boolean simulated) {
 
@@ -1064,7 +1036,6 @@ public class World {
 		
 		worldData.filterDeadUnits();
 		worldData.filterDeadGroundModifiers();
-		worldData.filterDeadWeatherEvents();
 		worldData.filterDeadBuildings();
 		worldData.filterDeadPlants();
 		worldData.filterDeadProjectiles();
@@ -1373,7 +1344,7 @@ public class World {
 		reseedTerrain(Generation.DEFAULT_SEED);
 
 		
-		int numTiles = width*height;
+//		int numTiles = width*height;
 //		Generation.makeLake(numTiles * 1, this, worldRNG);
 //		Generation.makeLake(numTiles * 1, this, worldRNG);
 //		Generation.makeLake(numTiles * 2, this, worldRNG);
@@ -1381,7 +1352,7 @@ public class World {
 		System.out.println("Settling water for iterations: " + WATER_SETTLING_TICKS);
 		float averageWaterPerTile = AVERAGE_WATER_PER_TILE;
 		for (Tile t : this.getTiles()) {
-			if (t.liquidType != LiquidType.LAVA && t.getHeight() <= Constants.MAXHEIGHT/2.5) {
+			if (t.liquidType != LiquidType.LAVA) {
 				t.liquidAmount = averageWaterPerTile;
 				t.liquidType = LiquidType.WATER;
 			}
@@ -1392,10 +1363,22 @@ public class World {
 		initializeAirSimulationStuff();
 		doAirSimulationStuff();
 		
-
-		Tile desertt = getRandomTile(worldRNG);
+		List<Tile> tiles = getTilesRandomly();
+		Tile desertt = tiles.get(0);
+		Terrain replaceTerrains[] = new Terrain[]{Terrain.GRASS, Terrain.DIRT};
+		outer: for (Tile t : tiles) {
+			for (Terrain terrain : replaceTerrains) {
+				if (t.getTerrain() == terrain) {
+					desertt = t;
+					break outer;
+				}
+			}
+		}
 		System.out.println("desert tile :" + desertt);
-		Generation.makeBiome(desertt, Terrain.SAND, numTiles * 5/80, 100, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
+		
+		int numDesertTiles = tiles.size() * 5/80;
+		Generation.makeBiome(desertt, Terrain.SAND, numDesertTiles, 100, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
+
 		updateTerrainChange(true);
 		Generation.generateResources(this, worldRNG);
 		this.genPlants(worldRNG);

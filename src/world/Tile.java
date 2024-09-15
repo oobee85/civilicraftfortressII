@@ -31,7 +31,6 @@ public class Tile implements Externalizable {
 	private Plant plant;
 	private Building building;
 	private Building road;
-	private WeatherEvent weather;
 	private Air air;
 	private Air air2;
 	
@@ -50,7 +49,9 @@ public class Tile implements Externalizable {
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 
 		height = in.readFloat();
-		air.setHumidity(in.readDouble());
+		air = new Air(height);
+		inventory = new Inventory();
+//		air.setHumidity(in.readDouble());
 //		air.setHumidity(humidity);
 //		air.setTemperature(this.getTemperature());
 		liquidAmount = in.readFloat();
@@ -69,7 +70,7 @@ public class Tile implements Externalizable {
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
 		out.writeFloat(height);
-		out.writeDouble(air.getHumidity());
+//		out.writeDouble(air.getHumidity());
 		out.writeFloat(liquidAmount);
 
 		location.writeExternal(out);
@@ -169,22 +170,6 @@ public class Tile implements Externalizable {
 		
 	}
 	
-	public void setWeather(WeatherEvent weatherEvent) {
-		weather = weatherEvent;
-	}
-
-	public void removeWeather() {
-		weather = null;
-	}
-
-	public WeatherEvent getWeather() {
-		return weather;
-	}
-
-	public boolean hasWeather() {
-		return weather != null;
-	}
-
 	public void setRoad(Building road) {
 		this.road = road;
 		turnRoad();

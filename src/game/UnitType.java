@@ -25,6 +25,7 @@ public class UnitType implements Serializable {
 	private transient final TargetInfo[] targetingInfoStrings;
 	private transient final ArrayList<TargetingInfo> targetingInfo = new ArrayList<>();
 	private transient final LinkedList<AttackStyle> attackStyles;
+	private transient final boolean isDangerousToOwnTeam;
 	private transient final Set<GameComponent> components = new HashSet<>();
 
 	public UnitType(String name, String image, Mesh mesh, String textureFile, CombatStats cs, 
@@ -41,6 +42,18 @@ public class UnitType implements Serializable {
 		this.deadItem = deadItem;
 		this.targetingInfoStrings = targeting;
 		this.attackStyles = attackStyles;
+		
+		boolean explosive = false;
+		for (AttackStyle style : attackStyles) {
+			if (style.getProjectile() != null && style.getProjectile().isExplosive()) {
+				explosive = true;
+				break;
+			}
+		}
+		this.isDangerousToOwnTeam = explosive;
+	}
+	public boolean isDangerousToOwnTeam() {
+		return isDangerousToOwnTeam;
 	}
 	public LinkedList<AttackStyle> getAttackStyles() {
 		return attackStyles;

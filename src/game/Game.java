@@ -40,7 +40,7 @@ public class Game {
 	}
 	
 	public void saveToFile() {
-		WorldInfo worldInfo = Utils.extractWorldInfo(world);
+		WorldInfo worldInfo = Utils.extractWorldInfo(world, true, true);
 		Utils.saveToFile(worldInfo, "save1.civ", false);
 	}
 	
@@ -95,7 +95,6 @@ public class Game {
 //		unitTick();
 
 		world.doProjectileUpdates(true);
-		world.doWeatherUpdate();
 	}
 
 	/**
@@ -898,15 +897,13 @@ public class Game {
 		ArrayList<Tile> allTiles = new ArrayList<>(world.getTiles().size());
 		allTiles.addAll(world.getTiles());
 		Collections.sort(allTiles, (Tile a, Tile b) -> {
-			if(a.getHeight() > b.getHeight()) {
+			if (a.getHeight() > b.getHeight()) {
 				return 1;
 			}
-			else if(a.getHeight() == b.getHeight()) {
-				return 0;
-			}else{
+			else if (a.getHeight() < b.getHeight()) {
 				return -1;
 			}
-//			return a.getHeight() > b.getHeight() ? 1 : -1;
+			return 0;
 		});
 
 		List<Tile> validSpawns = new LinkedList<>();
@@ -931,6 +928,10 @@ public class Game {
 	
 	private void makeStartingCastleAndUnits(boolean easymode, List<PlayerInfo> players, Random rand) {
 		List<Tile> validSpawnTiles = chooseSpawnTiles(players.size());
+		if (validSpawnTiles.isEmpty()) {
+			System.err.println("NO VALID SPAWN TILES");
+			return;
+		}
 		List<Tile> chosenSpawnTiles = new LinkedList<>();
 		for(PlayerInfo player : players) {
 			Faction newFaction = new Faction(player.getName(), true, true, true, player.getColor());

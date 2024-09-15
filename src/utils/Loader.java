@@ -597,7 +597,7 @@ public class Loader {
 			}
 			
 			phase.finalize();
-			System.out.println(phase);
+//			System.out.println(phase);
 			BuildOrderPhase.phases.add(phase);
 		}
 		BuildOrderPhase.phases.sort((a, b) -> {

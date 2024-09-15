@@ -54,10 +54,11 @@ public class Faction implements Externalizable {
 		this.setColor((Color)in.readObject());
 		name = in.readUTF();
 		usesItems = in.readBoolean();
+		usesResearch = in.readBoolean();
 		usesBuildings = in.readBoolean();
 		isPlayer = in.readBoolean();
 		researchTarget = (Research)in.readObject();
-//		items = (Item[])in.readObject();
+		inventory = (Inventory)in.readObject();
 	}
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
@@ -65,9 +66,11 @@ public class Faction implements Externalizable {
 		out.writeObject(color);
 		out.writeUTF(name);
 		out.writeBoolean(usesItems);
+		out.writeBoolean(usesResearch);
+		out.writeBoolean(usesBuildings);
 		out.writeBoolean(isPlayer);
 		out.writeObject(researchTarget);
-//		out.writeObject(items);
+		out.writeObject(inventory);
 	}
 	
 	public Faction() {
