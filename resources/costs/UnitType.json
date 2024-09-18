@@ -37,7 +37,7 @@
 			{"damage":0, "cooldown":60, "range":1}
 		],
 		"attributes":["caravan"],
-		"inventory":{"maxstack":400},
+		"inventory":{"maxstack":600},
 	},
 	{
 		"image":"Images/units/warrior.png",
@@ -82,6 +82,7 @@
 		"attackstyles":[
 			{"damage":40, "cooldown":20, "range":1}
 		],
+		"inventory":{"maxstack":5},
 		"attributes":["hostile"],
 		"research":"IRON_WORKING",
 		"targeting":[{"type":"game.Unit"}]
@@ -94,6 +95,7 @@
 		"attackstyles":[
 			{"damage":60, "cooldown":30, "range":6, "minrange":1, "projectile":"ARROW"}
 		],
+		"inventory":{"maxstack":5},
 		"attributes":["hostile"],
 		"research":"MATHEMATICS",
 		"targeting":[{"type":"game.Unit"}]
@@ -146,6 +148,7 @@
 		"attackstyles":[
 			{"damage":40, "cooldown":20, "range":1}
 		],
+		"inventory":{"maxstack":5},
 		"attributes":["hostile"],
 		"research":"TRAPPING",
 		"targeting":[{"type":"game.Unit"}]
@@ -158,6 +161,7 @@
 		"attackstyles":[
 			{"damage":100, "cooldown":20, "range":1}
 		],
+		"inventory":{"maxstack":5},
 		"attributes":["hostile"],
 		"research":"ANIMAL_HUSBANDRY",
 		"targeting":[{"type":"game.Unit"}],
@@ -169,7 +173,6 @@
 		"name":"WIZARD",
 		"attackstyles":[
 			{"damage":100, "cooldown":50, "range":5, "minrange":1, "projectile":"WIZARD_BALL"},
-			
 		],
 		"research":"WITCHCRAFT",
 		"targeting":[
@@ -200,8 +203,8 @@
 		"cost":{"FOOD":200, "GOLD_BAR": 4},
 		"name":"PRIEST",
 		"attackstyles":[
-	
 		],
+		"inventory":{"maxstack":5},
 		"research":"MYSTICISM",
 		"targeting":[
 			
@@ -216,6 +219,7 @@
 		"attackstyles":[
 			{"damage":100, "cooldown":20, "range":3, "minrange":1, "projectile":"RUNE_ARROW"}
 		],
+		"inventory":{"maxstack":5},
 		"attributes":["hostile"],
 		"research":"DOMESTICATION",
 		"targeting":[{"type":"game.Unit"}]
