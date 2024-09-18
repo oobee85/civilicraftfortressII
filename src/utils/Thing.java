@@ -21,7 +21,7 @@ public class Thing implements Serializable, Comparable<Thing> {
 	private TileLoc tileLoc;
 	private transient Tile tile;
 	
-	private transient HashMap<Class, GameComponent> components = new HashMap<>();
+	private transient HashMap<Class, GameComponent> components;
 
 	private transient Faction faction;
 	private transient int timeLastDamageTaken = -1000;
@@ -31,9 +31,12 @@ public class Thing implements Serializable, Comparable<Thing> {
 	
 	private transient Hitsplat[] hitsplats = new Hitsplat[4];
 
-	public Thing() {}
+	public Thing() {
+		components = new HashMap<>();
+	}
 	
 	public Thing(double maxHealth, MipMap mipmap, TexturedMesh hasMesh, Faction faction) {
+		this();
 		health = maxHealth;
 		this.maxHealth = maxHealth;
 		this.mipmap = mipmap;
@@ -80,10 +83,16 @@ public class Thing implements Serializable, Comparable<Thing> {
 	}
 	
 	public void addComponent(Class key, GameComponent component) {
+		if (components == null) {
+			components = new HashMap<>();
+		}
 		components.put(key, component.instance());
 	}
 	
 	public void replaceComponent(Class key, GameComponent component) {
+		if (components == null) {
+			components = new HashMap<>();
+		}
 		components.put(key, component);
 	}
 	

@@ -2,6 +2,7 @@ package networking.message;
 
 import java.io.*;
 
+import game.actions.PlannedAction;
 import utils.*;
 
 public class CommandMessage implements Externalizable {
@@ -15,6 +16,7 @@ public class CommandMessage implements Externalizable {
 	private String type = "";
 	private boolean clearQueue;
 	private int amount;
+	private PlannedAction action;
 	/** Used only by serialization */
 	public CommandMessage() {
 	}
@@ -131,6 +133,14 @@ public class CommandMessage implements Externalizable {
 		msg.clearQueue = enabled;
 		return msg;
 	}
+	public static CommandMessage makePlannedActionCommand(int thingID, PlannedAction action, boolean clearQueue) {
+		CommandMessage msg = new CommandMessage();
+		msg.thingID = thingID;
+		msg.action = action;
+		msg.command = CommandType.PLANNED_ACTION;
+		msg.clearQueue = clearQueue;
+		return msg;
+	}
 	
 
 	public CommandType getCommand() {
@@ -157,6 +167,9 @@ public class CommandMessage implements Externalizable {
 	public int getAmount() {
 		return amount;
 	}
+	public PlannedAction getPlannedAction() {
+		return action;
+	}
 	@Override
 	public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
 		command = CommandType.values()[input.readInt()];
@@ -168,6 +181,7 @@ public class CommandMessage implements Externalizable {
 		amount = input.readInt();
 		type = input.readUTF();
 		clearQueue = input.readBoolean();
+		action = (PlannedAction) input.readObject();
 	}
 	@Override
 	public void writeExternal(ObjectOutput output) throws IOException {
@@ -180,6 +194,7 @@ public class CommandMessage implements Externalizable {
 		output.writeInt(amount);
 		output.writeUTF(type);
 		output.writeBoolean(clearQueue);
+		output.writeObject(action);
 	}
 	
 	@Override
