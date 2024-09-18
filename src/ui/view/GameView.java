@@ -714,10 +714,11 @@ public class GameView {
 					
 					// if the thing is the same type as already selected unit
 					if(thing instanceof Unit && ((Unit)thing).getType() == unit.getType()) {
-						// if the unit is close enough
+						// if the unit is close enough select it
 						if(unit.getTile().distanceTo(tile) <= 20) {
-							selectThing(unit);
-							
+							if(unit != thing) {
+								selectThing(unit);
+							}
 						}
 					}
 					
@@ -726,10 +727,11 @@ public class GameView {
 				for(Building building : thing.getFaction().getBuildings()) {
 					// if the thing is the same type as already selected building
 					if(thing instanceof Building && ((Building)thing).getType() == building.getType()) {
-						// if the building is close enough
+						// if the building is close enough select it
 						if(building.getTile().distanceTo(tile) <= 20) {
-							selectThing(building);
-							
+							if(building != thing) {
+								selectThing(building);
+							}
 						}
 					}
 					
