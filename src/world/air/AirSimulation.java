@@ -64,12 +64,23 @@ public class AirSimulation {
 		}
 		avg.water += tile.getAir().getVolumeLiquid();
 		
-		if(tile.getPlant() != null && tile.getPlant().getType() == Game.plantTypeMap.get("BERRY")) {
-			avg.berries += 1;
+		// update plant values
+		if(tile.getPlant() != null) {
+			
+			if(tile.getPlant().getType() == Game.plantTypeMap.get("CATTAIL")) {
+				avg.berries += 1;
+			}
+			if(tile.getPlant().getType() == Game.plantTypeMap.get("CACTUS")) {
+				avg.tree += 1;
+			}
+			if(tile.getPlant().getType() == Game.plantTypeMap.get("BERRY")) {
+				avg.berries += 1;
+			}
+			if(tile.getPlant().getType() == Game.plantTypeMap.get("TREE")) {
+				avg.tree += 1;
+			}
 		}
-		if(tile.getPlant() != null && tile.getPlant().getType() == Game.plantTypeMap.get("TREE")) {
-			avg.tree += 1;
-		}
+		
 	}
 
 	private static AverageValues computeAverageValues(World world) {
@@ -356,7 +367,7 @@ public class AirSimulation {
 					&& World.ticks % 100 == 1) {
 //				tile.setEnergy(21000);
 //				System.out.println(tile.getTemperature());
-				System.out.println("Ticks: "+ World.ticks + ", uT: " + averageTemp + ", uW: " + averageWater + ", uBerry" + avgBerry + ", uTree" + avgTree);
+				System.out.println("Ticks: "+ World.ticks + ", uT: " + averageTemp + ", uW: " + averageWater + ", uBerry " + avgBerry + ", uTree " + avgTree);
 			}
 //			tile.setEnergy(energy);
 //			tile.addEnergy(joules);

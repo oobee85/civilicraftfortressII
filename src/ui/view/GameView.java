@@ -702,32 +702,39 @@ public class GameView {
 			}
 		}
 		
+		
 		// double click selects all of same type
 		if(size == 1) {
 			Thing thing = state.selectedThings.peek();
 			// if click is on same tile as selected thing
-			if(thing.getTile().distanceTo(tile) == 0) { 
-				Position topLeft = new Position(state.mousePressLocation.getX(), state.mousePressLocation.getY());
-				Position botRight = new Position(state.mousePressLocation.getX(), state.mousePressLocation.getY());
+			if(thing.getTile().distanceTo(tile) == 0) {
 				
-				topLeft.x -= 20;
-				topLeft.y -= 20;
-				if(topLeft.x < 0) {
-					topLeft.x = 0;
+				// cycle through the factions units
+				for(Unit unit : thing.getFaction().getUnits()) {
+					
+					// if the thing is the same type as already selected unit
+					if(thing instanceof Unit && ((Unit)thing).getType() == unit.getType()) {
+						// if the unit is close enough
+						if(unit.getTile().distanceTo(tile) <= 20) {
+							selectThing(unit);
+							
+						}
+					}
+					
 				}
-				if(topLeft.y < 0) {
-					topLeft.y = 0;
+				// cycle through the factions buildings
+				for(Building building : thing.getFaction().getBuildings()) {
+					// if the thing is the same type as already selected building
+					if(thing instanceof Building && ((Building)thing).getType() == building.getType()) {
+						// if the building is close enough
+						if(building.getTile().distanceTo(tile) <= 20) {
+							selectThing(building);
+							
+						}
+					}
+					
 				}
-				
-				botRight.x += 20;
-				botRight.y += 20;
-				if(botRight.x > game.world.getWidth()) {
-					botRight.x = game.world.getWidth();
-				}
-				if(botRight.y > game.world.getHeight()) {
-					botRight.y = game.world.getHeight();
-				}
-				selectInBox(topLeft, botRight, true);
+				// if we've experienced double click event, we have selected all nearby things and should return.
 				return;
 			}
 		}
