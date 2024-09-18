@@ -15,10 +15,8 @@ public class WorldData {
 	private LinkedList<Unit> newUnits = new LinkedList<Unit>();
 	private LinkedList<Building> buildings = new LinkedList<Building>();
 	private LinkedList<Building> newBuildings = new LinkedList<Building>();
-	
 	private LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
 	private LinkedList<Projectile> newProjectiles = new LinkedList<Projectile>();
-	
 	private LinkedList<GroundModifier> groundModifiers = new LinkedList<GroundModifier>();
 	private LinkedList<GroundModifier> newGroundModifiers = new LinkedList<GroundModifier>();
 	
