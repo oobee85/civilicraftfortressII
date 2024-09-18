@@ -6,7 +6,7 @@ import java.util.*;
 import ui.*;
 import utils.*;
 
-public class Research implements Externalizable{
+public class Research implements Externalizable {
 	
 	public static final String DEFAULT_RESEARCH_IMAGE_PATH = "Images/interfaces/tech.png";
 	

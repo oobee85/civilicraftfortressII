@@ -28,6 +28,7 @@ public class Faction implements Externalizable {
 	
 	private HashMap<String, Research> researchMap = new HashMap<>();
 	private Research researchTarget;
+	private Research latestCompletedResearch;
 	
 	private LinkedList<AttackedNotification> attacked = new LinkedList<>();
 	private LinkedList<AttackedNotification> newAttacked = new LinkedList<>();
@@ -58,6 +59,7 @@ public class Faction implements Externalizable {
 		usesBuildings = in.readBoolean();
 		isPlayer = in.readBoolean();
 		researchTarget = (Research)in.readObject();
+		latestCompletedResearch = (Research)in.readObject();
 		inventory = (Inventory)in.readObject();
 	}
 	@Override
@@ -70,6 +72,7 @@ public class Faction implements Externalizable {
 		out.writeBoolean(usesBuildings);
 		out.writeBoolean(isPlayer);
 		out.writeObject(researchTarget);
+		out.writeObject(latestCompletedResearch);
 		out.writeObject(inventory);
 	}
 	
@@ -278,6 +281,7 @@ public class Faction implements Externalizable {
 		if(researchTarget != null) {
 			researchTarget.spendResearch(points);
 			if(researchTarget.isCompleted()) {
+				latestCompletedResearch = researchTarget;
 				researchTarget = null;
 			}
 		}
@@ -287,6 +291,9 @@ public class Faction implements Externalizable {
 	}
 	public Research getResearchTarget() {
 		return researchTarget;
+	}
+	public Research getLatestCompletedResearch() {
+		return latestCompletedResearch;
 	}
 	public boolean setResearchTarget(ResearchType researchType) {
 		Research research = researchMap.get(researchType.name);
@@ -304,6 +311,10 @@ public class Faction implements Externalizable {
 		}
 		researchTarget = research;
 		return true;
+	}
+	
+	public void resetResearchTarget() {
+		researchTarget = null;
 	}
 	
 	public void setupResearch() {

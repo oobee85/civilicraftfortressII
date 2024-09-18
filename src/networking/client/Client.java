@@ -409,9 +409,7 @@ public class Client {
 		if(update instanceof Plant) {
 			Plant plantUpdate = (Plant)update;
 			PlantType type = plantUpdate.getType();
-			System.out.println(type);
 			TileLoc tileLoc = plantUpdate.getTileLocation();
-			System.out.println(tileLoc);
 			Plant newPlant = new Plant(
 					Game.plantTypeMap.get(type.name()), 
 					gameInstance.world.get(tileLoc),
@@ -507,10 +505,16 @@ public class Client {
 	private void factionUpdate(Faction factionUpdate) {
 		Faction faction = gameInstance.world.getFaction(factionUpdate.id());
 		
+		Research latestCompletedResearch = factionUpdate.getLatestCompletedResearch();
+		if(latestCompletedResearch != null) {
+			Research potentialTarget = faction.getResearch(latestCompletedResearch.type());
+			potentialTarget.setCompleted(latestCompletedResearch.isCompleted());
+			potentialTarget.setResearchPointsSpend(latestCompletedResearch.getPointsSpent());
+		}
+		
 		Research targetUpdate = factionUpdate.getResearchTarget();
 		if(targetUpdate != null) {
-			Research potentialTarget = faction.getResearch(factionUpdate.getResearchTarget().type());
-			potentialTarget.setType(targetUpdate.type());
+			Research potentialTarget = faction.getResearch(targetUpdate.type());
 			potentialTarget.setPayedFor(targetUpdate.isPayedFor());
 			potentialTarget.setCompleted(targetUpdate.isCompleted());
 			potentialTarget.setResearchPointsSpend(targetUpdate.getPointsSpent());
@@ -518,6 +522,10 @@ public class Client {
 				faction.setResearchTarget(potentialTarget.type());
 			}
 		}
+		else {
+			faction.resetResearchTarget();
+		}
+		
 		
 		Item[] itemsUpdate = factionUpdate.getInventory().getItems();
 		for(Item itemUpdate : itemsUpdate) {
@@ -537,7 +545,7 @@ public class Client {
 			try {
 				while(true) {
 					Object message = connection.getMessage();
-					System.err.println("processing message " + message);
+//					System.err.println("processing message " + message);
 					if(message instanceof ServerMessage) {
 						ServerMessage serverMessage = (ServerMessage)message;
 						if(serverMessage.getServerMessageType() == ServerMessageType.LOBBY) {
