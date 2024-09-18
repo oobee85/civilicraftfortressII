@@ -127,6 +127,11 @@ public class World {
 		return null;
 	}
 	public void addFaction(Faction faction) {
+//		for (Faction f : factions) {
+//			if (f.id() == faction.id()) {
+//				return;
+//			}
+//		}
 		factions.add(faction);
 	}
 	public ArrayList<Faction> getFactions() {

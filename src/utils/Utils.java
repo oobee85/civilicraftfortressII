@@ -560,13 +560,12 @@ public final class Utils {
 		}
 		WorldInfo worldInfo = new WorldInfo(world.getWidth(), world.getHeight(), World.ticks, tileArray);
 		if (everything) {
-//			worldInfo.getThings().addAll(world.getPlants());
-//			worldInfo.getThings().add(world.getPlants().getFirst());
-//			worldInfo.getThings().addAll(world.getBuildings());
+			worldInfo.getThings().addAll(world.getPlants());
+			worldInfo.getThings().addAll(world.getBuildings());
 			worldInfo.getFactions().addAll(world.getFactions());
 		}
 		if (units) {
-//			worldInfo.getThings().addAll(world.getUnits());
+			worldInfo.getThings().addAll(world.getUnits());
 		}
 		worldInfo.getThings().addAll(world.getData().clearDeadThings());
 		worldInfo.addHitsplats(world.getData());

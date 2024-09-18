@@ -216,7 +216,6 @@ public class Server {
 //				gameInstance.world.getWidth(),
 //				gameInstance.world.getHeight(),
 //				World.ticks, new Tile[0]);
-//		worldInfo.getFactions().addAll(gameInstance.world.getFactions());
 		sendToAllConnections(worldInfo);
 //		Temp t = new Temp(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, new Tile[0]);
 //		t.getThings().addAll(gameInstance.world.getBuildings());

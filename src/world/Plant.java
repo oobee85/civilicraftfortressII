@@ -7,21 +7,9 @@ import game.*;
 import game.components.*;
 import utils.*;
 
-public class Plant extends Thing implements Externalizable {
+public class Plant extends Thing implements Serializable {
 
 	private PlantType plantType;
-
-	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
-		super.writeExternal(out);
-		out.writeObject(plantType);
-	}
-
-	@Override
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-		super.readExternal(in);
-		plantType = (PlantType)in.readObject();
-	}
 	
 	public Plant() {}
 

@@ -26,13 +26,14 @@ public class WorldInfo implements Externalizable {
 		out.writeInt(height);
 		out.writeInt(tick);
 		out.writeObject(tileInfos);
-		out.writeInt(things.size());
-		for (Thing thing : things) {
-			thing.writeExternal(out);
-		}
 		out.writeInt(factions.size());
 		for (Faction faction : factions) {
 			faction.writeExternal(out);
+		}
+		out.writeInt(things.size());
+		for (Thing thing : things) {
+			out.writeObject(thing);
+//			thing.writeExternal(out);
 		}
 	}
 
@@ -46,17 +47,22 @@ public class WorldInfo implements Externalizable {
 		factions = new LinkedList<>();
 		projectiles = new LinkedList<>();
 		hitsplats = new LinkedList<>();
-		int numThings = in.readInt();
-		for (int i = 0; i < numThings; i++) {
-			Thing thing = new Thing();
-			thing.readExternal(in);
-			things.add(thing);
-		}
 		int numFactions = in.readInt();
 		for (int i = 0; i < numFactions; i++) {
 			Faction faction = new Faction();
 			faction.readExternal(in);
 			factions.add(faction);
+		}
+		int numThings = in.readInt();
+		for (int i = 0; i < numThings; i++) {
+			Thing thing = (Thing)in.readObject();
+//			SerializeThingTypes type = SerializeThingTypes.values()[in.readInt()];
+//			if (type == SerializeThingTypes.Plant) {
+//				Plant plant = new Plant();
+//				plant.readExternal(in);
+//				things.add(plant);
+//			}
+			things.add(thing);
 		}
 	}
 	

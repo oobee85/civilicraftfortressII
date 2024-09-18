@@ -18,7 +18,7 @@ public class Building extends Thing implements Serializable {
 	
 	private BuildingType buildingType;
 	private double remainingEffort;
-	private LinkedList<Unit> producingUnitList = new LinkedList<Unit>();
+	private LinkedList<Unit> producingUnitList = new LinkedList<Unit>(); // TODO need to review if this works over network
 	private double culture;
 	private transient Tile spawnLocation;
 	private transient double timeToHarvest;
@@ -28,7 +28,7 @@ public class Building extends Thing implements Serializable {
 	private int remainingEffortToProduceUnit;
 	private transient Unit currentProducingUnit;
 	
-	private ItemType stablesCaptured;
+	private transient ItemType stablesCaptured;
 	
 	public Building(BuildingType buildingType, Tile tile, Faction faction) {
 		super(buildingType.getHealth(), buildingType.getMipMap(), buildingType.getMesh(), faction, tile);

@@ -354,6 +354,7 @@ public class Client {
 			firstUpdate = true;
 		}
 		if(gameInstance.world.getFactions().size() < worldInfo.getFactions().size()) {
+			System.out.println("current ");
 			for(int i = gameInstance.world.getFactions().size(); i < worldInfo.getFactions().size(); i++) {
 				Faction received = worldInfo.getFactions().get(i);
 				Faction faction = new Faction(received.name(), received.isPlayer(), received.usesItems(), received.usesResearch(), received.color());
@@ -402,12 +403,18 @@ public class Client {
 		clientGUI.repaint();
 	}
 	private void createThing(Thing update) {
+		System.out.println("creating thing");
 		Thing newThing = null;
 		if(update instanceof Plant) {
+			System.out.println("creating plant");
 			Plant plantUpdate = (Plant)update;
+			PlantType type = plantUpdate.getType();
+			System.out.println(type);
+			TileLoc tileLoc = plantUpdate.getTileLocation();
+			System.out.println(tileLoc);
 			Plant newPlant = new Plant(
-					plantUpdate.getType(), 
-					gameInstance.world.get(plantUpdate.getTile().getLocation()), 
+					Game.plantTypeMap.get(type.name()), 
+					gameInstance.world.get(tileLoc),
 					gameInstance.world.getFaction(World.NO_FACTION_ID));
 			newThing = newPlant;
 			newPlant.getTile().setHasPlant(newPlant);
@@ -416,9 +423,10 @@ public class Client {
 		}
 		else if(update instanceof Building) {
 			Building buildingUpdate = (Building)update;
+			TileLoc tileLoc = buildingUpdate.getTileLocation();
 			Building newBuilding = new Building(
 					Game.buildingTypeMap.get(buildingUpdate.getType().name()), 
-					gameInstance.world.get(buildingUpdate.getTile().getLocation()), 
+					gameInstance.world.get(tileLoc), 
 					gameInstance.world.getFactions().get(buildingUpdate.getFactionID()));
 			newThing = newBuilding;
 			if(newBuilding.getType().isRoad()) {
@@ -432,9 +440,10 @@ public class Client {
 		}
 		else if(update instanceof Unit) {
 			Unit unitUpdate = (Unit)update;
+			TileLoc tileLoc = unitUpdate.getTileLocation();
 			Unit newUnit = new Unit(
 					Game.unitTypeMap.get(unitUpdate.getType().name()), 
-					gameInstance.world.get(unitUpdate.getTile().getLocation()), 
+					gameInstance.world.get(tileLoc), 
 					gameInstance.world.getFactions().get(unitUpdate.getFactionID()));
 			newThing = newUnit;
 			if(newUnit.getTile() != null) {
@@ -456,8 +465,8 @@ public class Client {
 		Tile movedFrom = null;
 		if(existing.getTile() != null && !existing.getTile().equals(update.getTile())) {
 			movedFrom = existing.getTile();
-		}
-		existing.setTile(gameInstance.world.get(update.getTile().getLocation()));
+		} 
+		existing.setTile(gameInstance.world.get(update.getTileLocation()));
 		if(existing instanceof Plant) {
 			Plant existingPlant = (Plant)existing;
 			Plant plantUpdate = (Plant)update;

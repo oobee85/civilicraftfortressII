@@ -9,7 +9,7 @@ import networking.server.*;
 import ui.graphics.opengl.*;
 import world.*;
 
-public class Thing implements Externalizable, Comparable<Thing> {
+public class Thing implements Serializable, Comparable<Thing> {
 	
 	private transient static int idCounter = 0;
 	private int id;
@@ -18,7 +18,8 @@ public class Thing implements Externalizable, Comparable<Thing> {
 	private double maxHealth;
 	private double health;
 	private boolean isDead;
-	private Tile tile;
+	private TileLoc tileLoc;
+	private transient Tile tile;
 	
 	private transient HashMap<Class, GameComponent> components = new HashMap<>();
 
@@ -30,27 +31,6 @@ public class Thing implements Externalizable, Comparable<Thing> {
 	
 	private transient Hitsplat[] hitsplats = new Hitsplat[4];
 
-	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeInt(id);
-		out.writeInt(factionID);
-		out.writeDouble(maxHealth);
-		out.writeDouble(health);
-		out.writeBoolean(isDead);
-		tile.writeExternal(out);
-		
-	}
-	@Override
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-		id = in.readInt();
-		factionID = in.readInt();
-		maxHealth = in.readDouble();
-		health = in.readDouble();
-		isDead = in.readBoolean();
-		tile = new Tile();
-		tile.readExternal(in);
-	}
-	
 	public Thing() {}
 	
 	public Thing(double maxHealth, MipMap mipmap, TexturedMesh hasMesh, Faction faction) {
@@ -64,7 +44,7 @@ public class Thing implements Externalizable, Comparable<Thing> {
 	}
 	public Thing(double maxHealth, MipMap mipmap, TexturedMesh hasMesh, Faction faction, Tile tile) {
 		this(maxHealth, mipmap, hasMesh, faction);
-		this.tile = tile;
+		setTile(tile);
 	}
 	
 	public TexturedMesh getMesh() {
@@ -248,10 +228,15 @@ public class Thing implements Externalizable, Comparable<Thing> {
 	
 	public void setTile(Tile tile) {
 		this.tile = tile;
+		this.tileLoc = tile.getLocation();
 	}
 	
 	public Tile getTile() {
 		return tile;
+	}
+	
+	public TileLoc getTileLocation() {
+		return tileLoc;
 	}
 	
 	public MipMap getMipMap() {

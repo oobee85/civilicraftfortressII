@@ -17,7 +17,7 @@ public class BuildingType implements Serializable {
 	private transient final int id;
 
 	private final String name;
-	private final String info;
+	private transient final String info;
 	private transient final int health;
 	private transient final MipMap mipmap;
 	private transient final TexturedMesh mesh;
@@ -32,7 +32,6 @@ public class BuildingType implements Serializable {
 	private transient final HashSet<UnitType> canProduceSet = new HashSet<>();
 	private transient HashMap<String, Image> roadImages;
 	private transient final Set<GameComponent> components = new HashSet<>();
-	
 
 	
 	public BuildingType(String name, String info, int hp, double buildingEffort, String texturePath, Mesh mesh, String textureFile, double cultureRate, int visionRadius, 
