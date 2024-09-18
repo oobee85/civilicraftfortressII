@@ -52,8 +52,8 @@
 	},
 	{
 		"image":"Images/units/spearman.png",
-		"cost":{"BRONZE_BAR":2,"WOOD":50,"FOOD":100},
-		"stats":{"movespeed":15,"buildtime":200,"health":300,"healspeed":50},
+		"cost":{"BRONZE_BAR":2,"WOOD":100,"FOOD":100},
+		"stats":{"movespeed":15,"buildtime":200,"health":500,"healspeed":50},
 		"name":"SPEARMAN",
 		"attackstyles":[
 			{"damage":30, "cooldown":30, "range":1}
@@ -76,8 +76,8 @@
 	},
 	{
 		"image":"Images/units/swordsman.png",
-		"cost":{"IRON_BAR":4,"WOOD":100,"FOOD":200},
-		"stats":{"movespeed":10,"buildtime":200,"health":500,"healspeed":50},
+		"cost":{"IRON_BAR":4,"WOOD":100,"FOOD":100},
+		"stats":{"movespeed":10,"buildtime":200,"health":300,"healspeed":50},
 		"name":"SWORDSMAN",
 		"attackstyles":[
 			{"damage":40, "cooldown":20, "range":1}
@@ -89,7 +89,7 @@
 	},
 	{
 		"image":"Images/units/longbowman.png",
-		"cost":{"IRON_BAR":4, "WOOD":100, "FOOD":200},
+		"cost":{"MITHRIL_BAR":4, "WOOD":100, "FOOD":100},
 		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":50},
 		"name":"LONGBOWMAN",
 		"attackstyles":[
@@ -104,7 +104,7 @@
 		"image":"Images/units/catapult.png",
 		"mesh":"models/catapult.ply",
 		"texture":"textures/pallet1.png",
-		"cost":{"WOOD":500,"IRON_BAR":20,"STONE":250},
+		"cost":{"WOOD":500,"MITHRIL_BAR":20,"STONE":250},
 		"stats":{"movespeed":40,"buildtime":600,"health":200,"healspeed":100},
 		"name":"CATAPULT",
 		"attackstyles":[
@@ -117,7 +117,7 @@
 	},
 	{
 		"image":"Images/units/trebuchet.png",
-		"cost":{"MITHRIL_BAR":20,"WOOD":1000,"STONE":500},
+		"cost":{"ADAMANTITE_BAR":20,"WOOD":1000,"STONE":500},
 		"stats":{"movespeed":40,"buildtime":1000,"health":200,"healspeed":100},
 		"name":"TREBUCHET",
 		"attackstyles":[
@@ -155,7 +155,7 @@
 	},
 	{
 		"image":"Images/units/knight.png",
-		"cost":{"HORSE":200,"FOOD":400, "MITHRIL_BAR":5,"WOOD":100},
+		"cost":{"HORSE":200,"FOOD":400, "ADAMANTITE_BAR":5,"WOOD":100},
 		"stats":{"movespeed":5,"buildtime":600,"health":500,"healspeed":50},
 		"name":"KNIGHT",
 		"attackstyles":[
@@ -184,12 +184,12 @@
 	{
 		"image":"Images/units/griffin.png",
 		"stats":{"movespeed":10,"buildtime":500,"health":500,"healspeed":50},
-		"cost":{"FOOD":500},
+		"cost":{"FOOD":500, "GRIFFIN": 100},
 		"name":"GRIFFIN",
 		"attackstyles":[
 			{"damage":60, "cooldown":30, "range":1}
 		],
-		"research":"DOMESTICATION",
+		"research":"ANIMAL_HUSBANDRY",
 		"targeting":[
 			{"type":"game.Building"},
 			{"type":"game.Unit"}
@@ -213,7 +213,7 @@
 	},
 	{
 		"image":"Images/units/horsearcher.png",
-		"cost":{"MITHRIL_BAR":5,"HORSE":100,"FOOD":300},
+		"cost":{"ADAMANTITE_BAR":5,"HORSE":100,"FOOD":300},
 		"stats":{"movespeed":5,"buildtime":600,"health":500,"healspeed":50},
 		"name":"HORSEARCHER",
 		"attackstyles":[
@@ -323,12 +323,13 @@
 	},
 	{
 		"image":"Images/units/vampire.png",
-		"cost":{"GOLD_BAR":10,"FOOD":100},
+		"cost":{"GOLD_BAR":10,"FOOD":100, "VAMPIRE": 100},
 		"stats":{"movespeed":15,"buildtime":300,"health":300,"healspeed":1},
 		"name":"VAMPIRE",
 		"attackstyles":[
 			{"damage":20, "cooldown":20, "range":1, "lifesteal":true}
 		],
+		"research":"DOMESTICATION",
 		"attributes":["flying","hostile"],
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"},
@@ -368,10 +369,12 @@
 	{
 		"image":"Images/units/ent.png",
 		"stats":{"movespeed":30,"buildtime":0,"health":500,"healspeed":10},
+		"cost":{"FOOD":300, "WOOD": 300, "ENT": 100},
 		"name":"ENT",
 		"attackstyles":[
 			{"damage":50, "cooldown":50, "range":1}
 		],
+		"research":"ANIMAL_HUSBANDRY",
 		"attributes":["hostile","delayedinvasion"],
 		"resistances": {"COLD": 0},
 		"targeting":[
@@ -384,10 +387,12 @@
 	{
 		"image":"Images/units/werewolf.png",
 		"stats":{"movespeed":10,"buildtime":0,"health":200,"healspeed":10},
+		"cost":{"FOOD":300, "WEREWOLF": 100},
 		"name":"WEREWOLF",
 		"attackstyles":[
 			{"damage":25, "cooldown":5, "range":1}
 		],
+		"research":"DOMESTICATION",
 		"attributes":["hostile"],
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"}
@@ -411,10 +416,12 @@
 	{
 		"image":"Images/units/wolf.png",
 		"stats":{"movespeed":20,"buildtime":0,"health":200,"healspeed":50},
+		"cost":{"FOOD":100, "WOLF": 100},
 		"name":"WOLF",
 		"attackstyles":[
 			{"damage":40, "cooldown":20, "range":1}
 		],
+		"research":"TRAPPING",
 		"attributes":["hostile"],
 		"resistances": {"COLD": 0},
 		"loot":{"FOOD":300}
@@ -591,7 +598,7 @@
 	},
 	{
 		"image":"Images/units/infernal.gif",
-		"stats":{"movespeed":15,"buildtime":0,"health":1000000,"healspeed":5},
+		"stats":{"movespeed":15,"buildtime":0,"health":100000,"healspeed":5},
 		"name":"INFERNAL",
 		"attackstyles":[
 			{"damage":100, "cooldown":5, "range":1}
@@ -602,7 +609,7 @@
 	},
 	{
 		"image":"Images/units/balrog.png",
-		"stats":{"movespeed":15,"buildtime":0,"health":1000000,"healspeed":5},
+		"stats":{"movespeed":15,"buildtime":0,"health":100000,"healspeed":5},
 		"name":"BALROG",
 		"attackstyles":[
 			{"damage":20, "cooldown":2, "range":1}

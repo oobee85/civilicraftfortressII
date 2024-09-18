@@ -65,12 +65,40 @@ public class Building extends Thing implements Serializable {
 		// if building is a trap
 		if(getType().isTrap()) {
 			if (stablesCaptured == null) { // if theres no animal inside, skip
+				
+				// special units which provide their respective resource
 				if (getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
 					stablesCaptured = ItemType.HORSE;
 				}
-//				else if(!getTile().hasUnit(Game.unitTypeMap.get("HORSE"))){ // for some reason this makes it always give food
-//					stablesCaptured = ItemType.FOOD;
-//				}
+				if (getTile().hasUnit(Game.unitTypeMap.get("ROC"))) {
+					stablesCaptured = ItemType.GRIFFIN;
+				}
+				if (getTile().hasUnit(Game.unitTypeMap.get("ENT"))) {
+					stablesCaptured = ItemType.ENT;
+				}
+				if (getTile().hasUnit(Game.unitTypeMap.get("VAMPIRE"))) {
+					stablesCaptured = ItemType.VAMPIRE;
+				}
+				if (getTile().hasUnit(Game.unitTypeMap.get("WEREWOLF"))) {
+					stablesCaptured = ItemType.WEREWOLF;
+				}
+				if (getTile().hasUnit(Game.unitTypeMap.get("WOLF"))) {
+					stablesCaptured = ItemType.WOLF;
+				}
+				
+				// non special units just give food
+				if (getTile().hasUnit(Game.unitTypeMap.get("PIG"))) {
+					stablesCaptured = ItemType.FOOD;
+				}
+				if (getTile().hasUnit(Game.unitTypeMap.get("COW"))) {
+					stablesCaptured = ItemType.FOOD;
+				}
+				if (getTile().hasUnit(Game.unitTypeMap.get("SHEEP"))) {
+					stablesCaptured = ItemType.FOOD;
+				}
+				if (getTile().hasUnit(Game.unitTypeMap.get("DEER"))) {
+					stablesCaptured = ItemType.FOOD;
+				}
 			}
 		}
 		
