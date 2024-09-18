@@ -10,8 +10,8 @@
 		"culture":0,
 		"attributes":["harvestable"],
 		"produces":{"FOOD": 5},
-		"health":80,
-		"effort":160
+		"health":50,
+		"effort":200
 	},
 	{
 		"name":"MINE",
@@ -23,8 +23,8 @@
 		"attributes":["harvestable"],
 		"produces":{"STONE": 5},
 		"research":"FARMING",
-		"health":100,
-		"effort":100
+		"health":50,
+		"effort":200
 	},
 	{
 		"name":"RESEARCH_LAB",
@@ -36,8 +36,8 @@
 		"produces":{"MAGIC": 5},
 		"research":"MYSTICISM",
 		"culture":0.1,
-		"health":100,
-		"effort":250
+		"health":50,
+		"effort":200
 	},
 	{
 		"name":"SAWMILL",
@@ -74,7 +74,7 @@
 		"culture":0.5,
 		"inventory":{"maxstack":1000},
 		"attributes":["colony"],
-		"health":500,
+		"health":1000,
 		"effort":250,
 		"research":"FARMING"
 	},
@@ -87,7 +87,7 @@
 		"buildsunits":["WARRIOR","ARCHER","SPEARMAN","SWORDSMAN"],
 		"research":"FARMING",
 		"culture":0.5,
-		"health":300,
+		"health":1000,
 		"effort":300
 	},
 	{
@@ -99,7 +99,7 @@
 		"culture":0.5,
 		"buildsunits":["HORSEARCHER","KNIGHT","CHARIOT", "GRIFFIN", "HORSEMAN"],
 		"inventory":{"maxstack":100},
-		"health":500,
+		"health":1000,
 		"effort":250,
 		"research":"TRAPPING"
 	},
@@ -127,7 +127,7 @@
 		"culture":0.25,
 		"attributes":["supply"],
 		"inventory":{"maxstack":50},
-		"health":500,
+		"health":1000,
 		"effort":500,
 		"research":"MASONRY"
 	},
@@ -141,7 +141,7 @@
 		"cost":{"WOOD":500, "STONE":500, "IRON_BAR":10},
 		"culture":0.5,
 		"inventory":{"maxstack":200},
-		"health":500,
+		"health":2000,
 		"effort":500,
 		"research":"MATHEMATICS"
 	},
@@ -152,7 +152,7 @@
 		"vision":20,
 		"cost":{"WOOD":100, "STONE":100, "BRONZE_BAR":1},
 		"culture":0.5,
-		"health":250,
+		"health":1000,
 		"effort":250,
 		"research":"MASONRY"
 	},
@@ -167,7 +167,7 @@
 		"buildsunits":["WORKER", "MASON", "PRIEST", "CARAVAN"],
 		"culture":1,
 		"attributes":["castle"],
-		"health":2000,
+		"health":10000,
 		"effort":2000,
 		"research":"MASONRY",
 		"inventory":{"maxstack":10000}
@@ -181,7 +181,7 @@
 		"buildsunits":["MASON", "SKELETON", "ICE_GIANT", "VAMPIRE"],
 		"culture":1,
 		"attributes":["castle"],
-		"health":3000,
+		"health":10000,
 		"effort":1000,
 		"research":"ENGINEERING",
 		"inventory":{"maxstack":10000}
@@ -196,7 +196,7 @@
 		"culture":1,
 		"attributes":[],
 		"resistances": {"COLD": 0, "DRY": 0, "WATER": 0},
-		"health":1000,
+		"health":2000,
 		"effort":1000,
 		"research":"MATHEMATICS"
 	},
@@ -209,7 +209,7 @@
 		"cost":{"WOOD":200, "STONE":200, "IRON_BAR":10},
 		"buildsunits":["LONGBOWMAN","CATAPULT","TREBUCHET", "SNIPER", "WIZARD"],
 		"culture":0.5,
-		"health":500,
+		"health":1000,
 		"effort":500,
 		"research":"MATHEMATICS"
 	},
@@ -220,7 +220,7 @@
 		"vision":1,
 		"cost":{"WOOD":100, "STONE":100},
 		"culture":0.5,
-		"health":500,
+		"health":1000,
 		"effort":500,
 		"research":"FARMING"
 	},
@@ -259,7 +259,7 @@
 		"vision":0,
 		"cost":{"WOOD":50},
 		"culture":0.25,
-		"health":100,
+		"health":500,
 		"effort":100,
 		"attributes":["blocksmovement"]
 	},
@@ -268,9 +268,9 @@
 		"info":"Blocks movement except for own faction",
 		"image":"Images/buildings/gate_wood.png",
 		"vision":1,
-		"cost":{"WOOD":200, "BRONZE_BAR":5},
+		"cost":{"WOOD":100, "BRONZE_BAR":5},
 		"culture":0.5,
-		"health":100,
+		"health":500,
 		"effort":200,
 		"attributes":["blocksmovement", "gate"],
 		"research":"MASONRY"
@@ -280,9 +280,9 @@
 		"info":"Blocks movement",
 		"image":"Images/buildings/wall_stone.png",
 		"vision":1,
-		"cost":{"WOOD":50, "STONE":100},
+		"cost":{"WOOD":50, "STONE":50},
 		"culture":0.25,
-		"health":1000,
+		"health":2000,
 		"effort":200,
 		"attributes":["blocksmovement"],
 		"resistances": {"HEAT": 50},
@@ -293,9 +293,9 @@
 		"info":"Blocks movement except for own faction",
 		"image":"Images/buildings/gate_stone.gif",
 		"vision":1,
-		"cost":{"WOOD":100, "IRON_BAR":5, "STONE":200},
+		"cost":{"WOOD":100, "IRON_BAR":5, "STONE":100},
 		"culture":0.5,
-		"health":1000,
+		"health":2000,
 		"effort":400,
 		"attributes":["blocksmovement", "gate"],
 		"resistances": {"HEAT": 50},
@@ -346,7 +346,7 @@
 		"cost":{"WOOD":200, "STONE":200, "FOOD":200},
 		"buildsunits":["SCORPION"],
 		"culture":0,
-		"health":500,
+		"health":1000,
 		"research":"DOMESTICATION",
 		"effort":500
 	}
