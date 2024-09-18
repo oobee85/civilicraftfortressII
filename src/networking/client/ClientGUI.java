@@ -303,9 +303,9 @@ public class ClientGUI {
 		
 		rootPanel.remove(mainMenuPanel);
 		rootPanel.add(ingamePanel);
-		resetFocus();
 		
 		topPanel.add(connectionControlsPanel, BorderLayout.NORTH);
+		resetFocus();
 		
 		rootPanel.revalidate();
 		rootPanel.repaint();

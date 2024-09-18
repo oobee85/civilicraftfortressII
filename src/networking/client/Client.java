@@ -269,6 +269,13 @@ public class Client {
 			clientGUI.connected(connection.getPanel());
 			clientGUI.getGameView().setCommandInterface(networkingCommands);
 			startReceiving();
+
+			clientGUI.repaint();
+			SwingUtilities.invokeLater(() -> {
+//				clientGUI.getGameView().centerViewOnTile(new TileLoc(Settings.WORLD_WIDTH/3, Settings.WORLD_HEIGHT/3), Settings.DEFAULT_TILE_SIZE);
+//				clientGUI.getGameView().recenterCameraOnPlayer();
+				clientGUI.getGameView().enableMouse();
+			});
 			
 		} catch (IOException e) {
 			e.printStackTrace();

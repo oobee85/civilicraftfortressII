@@ -135,6 +135,7 @@ public class GameView {
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				System.out.println("Dragged: " + e);
 				if(isFirstPerson()) {
 					return;
 				}
@@ -161,6 +162,7 @@ public class GameView {
 		MouseListener mouseListener = new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
+				System.out.println("release: " + e);
 				Point currentMouse = e.getPoint();
 				if (!state.draggingMouse) {
 					if (SwingUtilities.isRightMouseButton(e)) {
@@ -193,6 +195,7 @@ public class GameView {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				System.out.println("press: " + e);
 				state.previousMouse = e.getPoint();
 				if (SwingUtilities.isLeftMouseButton(e)) {
 					if (mouseCommandsEnabled) {
