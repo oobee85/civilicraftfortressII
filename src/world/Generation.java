@@ -372,8 +372,8 @@ public class Generation {
 			if(Math.abs(tile.getHeight() - potential.getHeight()) < maxHeightDifference) {
 				if(replaceable.contains(potential.getTerrain())) {
 					potential.setTerrain(newTerrain);
-					float height = potential.getHeight();
-					potential.setHeight((float)(height + (60 - potential.distanceTo(tile)*2)));
+//					float height = potential.getHeight();
+//					potential.setHeight((float)(height + (60 - potential.distanceTo(tile)*2)));
 					size--;
 				}
 			}

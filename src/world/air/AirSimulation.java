@@ -63,6 +63,13 @@ public class AirSimulation {
 			avg.water += tile.liquidAmount/2;
 		}
 		avg.water += tile.getAir().getVolumeLiquid();
+		
+		if(tile.getPlant() != null && tile.getPlant().getType() == Game.plantTypeMap.get("BERRY")) {
+			avg.berries += 1;
+		}
+		if(tile.getPlant() != null && tile.getPlant().getType() == Game.plantTypeMap.get("TREE")) {
+			avg.tree += 1;
+		}
 	}
 
 	private static AverageValues computeAverageValues(World world) {
@@ -102,11 +109,14 @@ public class AirSimulation {
 			for (int i = 0; i < avgs.length; i++) {
 				avg.temp += avgs[i].temp;
 				avg.water += avgs[i].water;
+				avg.berries += avgs[i].berries;
+				avg.tree += avgs[i].tree;
 				
 			}
 		}
 		avg.temp /= world.getTiles().size();
 		avg.water /= world.getTiles().size();
+	
 		return avg;
 	}
 	
@@ -120,7 +130,7 @@ public class AirSimulation {
 		AverageValues avg = computeAverageValues(world);
 		
 		simulationWork(world, tilesRandomOrder, (tile) -> {
-			AirSimulation.updateEnergy(tile, avg.temp, avg.water);
+			AirSimulation.updateEnergy(tile, avg.temp, avg.water, avg.berries, avg.tree);
 			tile.updateEnergyToTemperature();
 			AirSimulation.blackBodyRadiation(tile);
 			tile.updateEnergyToTemperature();
@@ -149,7 +159,7 @@ public class AirSimulation {
 		}
 	}
 	
-	public static void updateEnergy(Tile tile, double averageTemp, double averageWater) {
+	public static void updateEnergy(Tile tile, double averageTemp, double averageWater, double avgBerry, double avgTree) {
 			
 			blackBodyRadiation(tile);
 //			updateEnergyToTemperature(tile);
@@ -346,7 +356,7 @@ public class AirSimulation {
 					&& World.ticks % 100 == 1) {
 //				tile.setEnergy(21000);
 //				System.out.println(tile.getTemperature());
-				System.out.println("Energy: " + tile.getEnergy() + ", T: " + tile.getTemperature() + ", " + World.ticks + ", uT: " + averageTemp + ", uW: " + averageWater);
+				System.out.println("Ticks: "+ World.ticks + ", uT: " + averageTemp + ", uW: " + averageWater + ", uBerry" + avgBerry + ", uTree" + avgTree);
 			}
 //			tile.setEnergy(energy);
 //			tile.addEnergy(joules);

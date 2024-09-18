@@ -768,6 +768,7 @@ public class World {
 				}
 			}
 		}
+		spreadPlants();
 		
 		for(Tile tile : getTiles()) {
 			if(tile.getResource() != null) {
@@ -887,9 +888,13 @@ public class World {
 	}
 	
 	private void spreadPlants() {
-		
-		if(worldData.getPlants().size() >= 2000) {
+		int numPlants = worldData.getPlants().size();
+		if(numPlants >= 1800) {
 			return;
+		}
+		double valueForSpread = 0.0001;
+		if(numPlants <= 900) {
+			valueForSpread *= 10;
 		}
 		for(Plant plant : worldData.getPlants()) {
 			
@@ -897,7 +902,7 @@ public class World {
 				continue;
 			}
 			if(plant.getType() == Game.plantTypeMap.get("TREE")) {
-				if(Math.random() < 0.1) {
+				if(Math.random() < valueForSpread) {
 					for(Tile tile : plant.getTile().getNeighbors()) {
 						if(tile.getPlant() == null && tile.canGrow()) {
 							tile.setHasPlant(new Plant(plant.getType(), tile, getFaction(NO_FACTION_ID)));
@@ -908,7 +913,7 @@ public class World {
 				}
 			}
 			if(plant.getType() == Game.plantTypeMap.get("BERRY")) {
-				if(Math.random() < 0.01) {
+				if(Math.random() < valueForSpread) {
 					for(Tile tile : plant.getTile().getNeighbors()) {
 						if(tile.getPlant() == null && tile.canGrow()) {
 							tile.setHasPlant(new Plant(plant.getType(), tile, getFaction(NO_FACTION_ID)));
@@ -1377,7 +1382,7 @@ public class World {
 		System.out.println("desert tile :" + desertt);
 		
 		int numDesertTiles = tiles.size() * 5/80;
-		Generation.makeBiome(desertt, Terrain.SAND, numDesertTiles, 100, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
+		Generation.makeBiome(desertt, Terrain.SAND, numDesertTiles, 110, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
 
 		updateTerrainChange(true);
 		Generation.generateResources(this, worldRNG);
