@@ -135,7 +135,6 @@ public class GameView {
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				System.out.println("Dragged: " + e);
 				if(isFirstPerson()) {
 					return;
 				}
@@ -162,7 +161,6 @@ public class GameView {
 		MouseListener mouseListener = new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				System.out.println("release: " + e);
 				Point currentMouse = e.getPoint();
 				if (!state.draggingMouse) {
 					if (SwingUtilities.isRightMouseButton(e)) {
@@ -195,7 +193,6 @@ public class GameView {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				System.out.println("press: " + e);
 				state.previousMouse = e.getPoint();
 				if (SwingUtilities.isLeftMouseButton(e)) {
 					if (mouseCommandsEnabled) {
@@ -548,17 +545,19 @@ public class GameView {
 				}
 				
 				else if (unit.isBuilder()) {
+					System.out.println("right clicked with worker");
 					Building targetBuilding = targetTile.getBuilding();
 					if (targetBuilding == null) {
 						targetBuilding = targetTile.getRoad();
 					}
 					if (targetBuilding != null && 
-							targetBuilding.getFaction() == unit.getFaction() && 
+							targetBuilding.getFactionID() == unit.getFactionID() && 
 							targetBuilding.isBuilt() && 
 							targetBuilding.getType().isHarvestable()) {
 						commandInterface.planAction(unit, PlannedAction.harvest(targetBuilding), !shiftDown);
-					} else if (targetBuilding != null
-							&& (targetBuilding.getFaction() == unit.getFaction() || targetBuilding.getType().isRoad())
+					}
+					else if (targetBuilding != null
+							&& (targetBuilding.getFactionID() == unit.getFactionID() || targetBuilding.getType().isRoad())
 							&& !targetBuilding.isBuilt()) {
 						PlannedAction plan;
 						if (targetBuilding.getType().isHarvestable()) {

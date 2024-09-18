@@ -4,18 +4,21 @@ import utils.*;
 import world.*;
 import static game.actions.ActionType.*;
 
+import java.io.Serializable;
 import java.util.*;
 
 import game.*;
 
-public class PlannedAction {
+public class PlannedAction implements Serializable {
 	
-	public static final PlannedAction NOTHING = new PlannedAction(null, false);
-	public static final PlannedAction GUARD = new PlannedAction(null, false);
-	public static final PlannedAction BUILD = new PlannedAction(null, false);
+	public transient static final PlannedAction NOTHING = new PlannedAction(null, false);
+	public transient static final PlannedAction GUARD = new PlannedAction(null, false);
+	public transient static final PlannedAction BUILD = new PlannedAction(null, false);
 	
-	public final Tile targetTile;
-	public final Thing target;
+	public final TileLoc targetTileLoc;
+	public transient final Tile targetTile;
+	public final int targetID;
+	public transient final Thing target;
 	public final ActionType type;
 	
 	private boolean forceDone;
@@ -23,12 +26,23 @@ public class PlannedAction {
 	
 	private PlannedAction(PlannedAction copy) {
 		this.targetTile = copy.targetTile;
+		this.targetTileLoc = (this.targetTile == null) ? null : this.targetTile.getLocation();
 		this.target = copy.target;
+		this.targetID = (this.target == null) ? -1 : this.target.id();
+		this.type = copy.type;
+	}
+	private PlannedAction(PlannedAction copy, Thing target, Tile targetTile) {
+		this.targetTile = targetTile;
+		this.targetTileLoc = (this.targetTile == null) ? null : this.targetTile.getLocation();
+		this.target = target;
+		this.targetID = (this.target == null) ? -1 : this.target.id();
 		this.type = copy.type;
 	}
 	private PlannedAction(Tile targetTile, ActionType type) {
 		this.targetTile = targetTile;
+		this.targetTileLoc = (this.targetTile == null) ? null : this.targetTile.getLocation();
 		this.target = null;
+		this.targetID = (this.target == null) ? -1 : this.target.id();
 		this.type = type;
 	}
 	private PlannedAction(Tile targetTile, boolean isRoad) {
@@ -36,7 +50,9 @@ public class PlannedAction {
 	}
 	private PlannedAction(Tile targetTile, boolean isRoad, PlannedAction followup) {
 		this.targetTile = targetTile;
+		this.targetTileLoc = (this.targetTile == null) ? null : this.targetTile.getLocation();
 		this.target = null;
+		this.targetID = (this.target == null) ? -1 : this.target.id();
 		this.type = isRoad ? BUILD_ROAD : BUILD_BUILDING;
 		this.followup = followup;
 	}
@@ -49,13 +65,18 @@ public class PlannedAction {
 	}
 	private PlannedAction(Thing target, ActionType type, PlannedAction followup) {
 		this.targetTile = null;
+		this.targetTileLoc = (this.targetTile == null) ? null : this.targetTile.getLocation();
 		this.target = target;
+		this.targetID = (this.target == null) ? -1 : this.target.id();
 		this.type = type;
 		this.followup = followup;
 	}
 
 	public static PlannedAction makeCopy(PlannedAction original) {
 		return new PlannedAction(original);
+	}
+	public static PlannedAction makeCopy(PlannedAction original, Thing target, Tile targetTile) {
+		return new PlannedAction(original, target, targetTile);
 	}
 	public static PlannedAction eatPlant(Plant plant) {
 		return new PlannedAction(plant);

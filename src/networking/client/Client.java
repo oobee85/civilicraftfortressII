@@ -33,7 +33,6 @@ public class Client {
 	private HashMap<Integer, Thing> things = new HashMap<>();
 	
 	private ArrayList<AIInterface> ailist = new ArrayList<>();
-	private static final long AIDELAY = 1000;
 	
 	private volatile boolean isFastForwarding;
 	private volatile boolean isPaused;
@@ -177,7 +176,10 @@ public class Client {
 				localCommands.setGuarding(unit, enabled);
 			}
 			@Override
-			public void planAction(Unit unit, PlannedAction plan, boolean enabled) {
+			public void planAction(Unit unit, PlannedAction plan, boolean clearQueue) {
+				// TODO figure out clearQueue
+				sendMessage(CommandMessage.makePlannedActionCommand(unit.id(), plan, clearQueue));
+				localCommands.planAction(unit, plan, clearQueue);
 				// TODO figure out more generic networking stuff.
 			}
 			
@@ -217,12 +219,6 @@ public class Client {
 					else {
 						// create and assign ai
 						ailist.add(new BuildOrderAI(localCommands, f, gameInstance.world));
-//						if (ailist.size() % 2 == 0) {
-//							ailist.add(new BuildOrderAI(localCommands, f, gameInstance.world));
-//						}
-//						else {
-//							ailist.add(new BasicAI(localCommands, f, gameInstance.world));
-//						}
 					}
 				}
 			}
@@ -344,7 +340,7 @@ public class Client {
 					for(AIInterface ai : ailist) {
 						ai.tick();
 					}
-					Thread.sleep(AIDELAY);
+					Thread.sleep(Settings.AIDELAY);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -361,7 +357,6 @@ public class Client {
 			firstUpdate = true;
 		}
 		if(gameInstance.world.getFactions().size() < worldInfo.getFactions().size()) {
-			System.out.println("current ");
 			for(int i = gameInstance.world.getFactions().size(); i < worldInfo.getFactions().size(); i++) {
 				Faction received = worldInfo.getFactions().get(i);
 				Faction faction = new Faction(received.name(), received.isPlayer(), received.usesItems(), received.usesResearch(), received.color());
@@ -410,10 +405,8 @@ public class Client {
 		clientGUI.repaint();
 	}
 	private void createThing(Thing update) {
-		System.out.println("creating thing");
 		Thing newThing = null;
 		if(update instanceof Plant) {
-			System.out.println("creating plant");
 			Plant plantUpdate = (Plant)update;
 			PlantType type = plantUpdate.getType();
 			System.out.println(type);

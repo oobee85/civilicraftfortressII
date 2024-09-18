@@ -31,6 +31,7 @@ public class Settings {
 	public static boolean CUSTOM_MESHES = false;
 
 	public static int NUM_AI = 0;
+	public static int AIDELAY = 1000;
 	public static int WORLD_WIDTH = 128;
 	public static int WORLD_HEIGHT = 128;
 	public static int DEFAULT_TILE_SIZE = 45;

@@ -10,6 +10,7 @@ import javax.swing.Timer;
 
 import game.*;
 import game.actions.*;
+import game.ai.*;
 import networking.*;
 import networking.message.*;
 import ui.*;
@@ -30,6 +31,8 @@ public class Server {
 	private Game gameInstance;
 	private volatile boolean startedGame = false;
 	private volatile boolean madeWorld = false;
+
+	private ArrayList<AIInterface> ailist = new ArrayList<>();
 
 	public Server() {
 		
@@ -140,9 +143,32 @@ public class Server {
 		for (Connection connection : connections.keySet()) {
 			players.add(connection.getPlayerInfo());
 		}
+		Set<String> bots = new HashSet<>();
+		for(int i = 0; i < Settings.NUM_AI; i++) {
+			PlayerInfo bot = new PlayerInfo("Bot " + i, null);
+			players.add(bot);
+			bots.add(bot.getName());
+		}
 		gameInstance.generateWorld(Settings.WORLD_WIDTH, Settings.WORLD_HEIGHT, false, players);
 		gui.setGameInstance(gameInstance);
 		gui.getGameView().getDrawer().updateTerrainImages();
+
+		for(Faction f : gameInstance.world.getFactions()) {
+			if(f.isPlayer() && bots.contains(f.name())) {
+				ailist.add(new BuildOrderAI(gui.getCommandInterface(), f, gameInstance.world));
+			}
+		}
+		NeutralAI neutralAI = new NeutralAI(
+				gui.getCommandInterface(),
+				gameInstance.world.getFaction(World.NO_FACTION_ID),
+				gameInstance.world);
+		ailist.add(neutralAI);
+		UndeadAI undeadAI = new UndeadAI(
+				gui.getCommandInterface(),
+				gameInstance.world.getFaction(World.UNDEAD_FACTION_ID),
+				gameInstance.world);
+		ailist.add(undeadAI);
+		
 		startWorldNetworkingUpdateThread();
 
 		Game.DISABLE_NIGHT = true;
@@ -345,6 +371,18 @@ public class Server {
 				gui.getCommandInterface().setGuarding((Unit)thing, message.getClearQueue());
 			}
 		}
+		else if (message.getCommand() == CommandType.PLANNED_ACTION) {
+			if(thing instanceof Unit) {
+				PlannedAction action = message.getPlannedAction();
+				Thing target = ThingMapper.get(action.targetID);
+				Tile targetTile = (action.targetTileLoc == null) ? null : gameInstance.world.get(action.targetTileLoc);
+				PlannedAction mapped = PlannedAction.makeCopy(action, target, targetTile);
+				gui.getCommandInterface().planAction((Unit)thing, mapped, message.getClearQueue());
+			}
+			else {
+				System.err.println("planned action should not have a building as the acting thing");
+			}
+		}
 	}
 	
 	private void startGame() {
@@ -380,6 +418,20 @@ public class Server {
 			}
 		});
 		gameLoopThread.start();
+		
+		Thread aiThread = new Thread(() -> {
+			try {
+				while(true) {
+					for(AIInterface ai : ailist) {
+						ai.tick();
+					}
+					Thread.sleep(Settings.AIDELAY);
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
+		aiThread.start();
 	}
 	
 	public void startProcessing(Connection connection) {

@@ -107,7 +107,6 @@ public class World {
 			
 			
 		}
-		System.out.println("updating tiles");
 	}
 
 	public Faction getFaction(String name) {
