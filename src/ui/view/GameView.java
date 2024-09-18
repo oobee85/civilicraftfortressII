@@ -40,7 +40,8 @@ public class GameView {
 
 	private boolean summonPlayerControlled = true;
 	private boolean setSpawnWeather = false;
-
+	public int tickOfLastClick = 0;
+	
 	private final FillingLayeredPane panel;
 	private final JPanel overlayPanel;
 	private final Drawer vanillaDrawer;
@@ -66,7 +67,7 @@ public class GameView {
 		public TileLoc hoveredTile = new TileLoc(-1, -1);
 		public Position[] boxSelect = new Position[2];
 		public LeftClickAction leftClickAction = LeftClickAction.NONE;
-
+		
 		public boolean drawDebugStrings;
 		public MapMode mapMode = MapMode.TERRAIN_BIG;
 		
@@ -463,6 +464,8 @@ public class GameView {
 		if (!shiftDown) {
 			state.leftClickAction = LeftClickAction.NONE;
 		}
+		
+		tickOfLastClick = World.ticks;
 	}
 	
 	private void wanderCommand(ConcurrentLinkedQueue<Thing> selectedThings, Tile tile, boolean shiftEnabled) {
@@ -690,7 +693,6 @@ public class GameView {
 		if(state.selectedThings.isEmpty()) {
 			hasOnlyUnits = false;
 			hasOnlyBuildings = false;
-			
 		}else {
 			for(Thing thing : state.selectedThings) {
 				if(thing instanceof Unit) {
@@ -706,12 +708,13 @@ public class GameView {
 		// double click selects all of same type
 		if(size == 1) {
 			Thing thing = state.selectedThings.peek();
+			int tickDifference = World.ticks - tickOfLastClick;
+//			System.out.println("Double: " + World.ticks + ", " + tickOfLastClick + ", Tickdiff: " + tickDifference);
 			// if click is on same tile as selected thing
-			if(thing.getTile().distanceTo(tile) == 0) {
+			if(thing.getTile().distanceTo(tile) == 0 && tickDifference <= 2) {
 				
 				// cycle through the factions units
 				for(Unit unit : thing.getFaction().getUnits()) {
-					
 					// if the thing is the same type as already selected unit
 					if(thing instanceof Unit && ((Unit)thing).getType() == unit.getType()) {
 						// if the unit is close enough select it
@@ -757,6 +760,7 @@ public class GameView {
 				}
 			}
 		}
+		
 		if(hasOnlyBuildings == true || size < 2) {
 			if(thingToSelect == null) {
 				Building building = tile.getBuilding();
@@ -767,28 +771,28 @@ public class GameView {
 		}
 		
 		// special case
-		if(size >= 2 && addToSelection == false) {
-			Thing newSelect = null;
-			for(Unit unit : tile.getUnits()) {
-				if(unit.getFaction() == state.faction) {
-					if(unit.isSelected() == false) {
-						deselectEverything();
-						newSelect = unit;
-						if(unit.isIdle()) {
-							break;
-						}
-					}
-				}
-			}
-			if(newSelect == null) {
-				Building building = tile.getBuilding();
-				if (building != null && building.getFaction() == state.faction) {
-					deselectEverything();
-					newSelect = building;
-				}
-			}
-			thingToSelect = newSelect;
-		}
+//		if(size >= 2 && addToSelection == false) {
+//			Thing newSelect = null;
+//			for(Unit unit : tile.getUnits()) {
+//				if(unit.getFaction() == state.faction) {
+//					if(unit.isSelected() == false) {
+//						deselectEverything();
+//						newSelect = unit;
+//						if(unit.isIdle()) {
+//							break;
+//						}
+//					}
+//				}
+//			}
+//			if(newSelect == null) {
+//				Building building = tile.getBuilding();
+//				if (building != null && building.getFaction() == state.faction) {
+//					deselectEverything();
+//					newSelect = building;
+//				}
+//			}
+//			thingToSelect = newSelect;
+//		}
 		
 		if(!addToSelection) {
 			deselectEverything();
