@@ -63,7 +63,7 @@ public class Building extends Thing implements Serializable {
 		}
 		
 		// if building is a trap
-		if(getType().isTrap()) {
+		if(isBuilt() && getType().isTrap()) {
 			if (stablesCaptured == null) { // if theres no animal inside, skip
 				
 				// special units which provide their respective resource
