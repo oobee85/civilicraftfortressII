@@ -190,7 +190,7 @@ public class RenderingFunctions {
 		int draww = tileSize/4;
 		Point drawAt = getDrawingCoords(tile.getLocation(), tileSize);
 		drawAt.x += draww/2;
-		drawInventory(g, inventory, drawAt.x, drawAt.y, draww, draww);
+		drawInventory(g, inventory, drawAt.x, drawAt.y, draww, draww, tile);
 	}
 	
 	private static boolean shouldDrawHealthBar(int tileSize, Thing thing, TileLoc hoveredTile) {
@@ -754,7 +754,7 @@ public class RenderingFunctions {
 		Utils.setTransparency(g, 1);
 	}
 	
-	public static void drawInventory(Graphics g, Inventory inventory, int drawx, int drawy, int draww, int drawh) {
+	public static void drawInventory(Graphics g, Inventory inventory, int drawx, int drawy, int draww, int drawh, Tile tile) {
 		int numUnique = inventory.numUnique();
 		if(numUnique == 0) {
 			return;
@@ -763,14 +763,25 @@ public class RenderingFunctions {
 		int imageWidth = Math.max(draww, drawh) / rows;
 		int x = 0;
 		int y = 0;
+		// iterate through items on the tile
 		for (Item item : inventory.getItems()) {
 			if(item == null || item.getAmount() == 0) {
 				continue;
 			}
+			// draws the item on the ground
 			g.drawImage(item.getType().getMipMap().getImage(imageWidth), 
 					drawx + x*imageWidth,
 					drawy + y*imageWidth, 
 					imageWidth, imageWidth, null);
+			
+			if(tile.getBuilding() == null && tile.getUnits().peek() == null) {
+				// draws the number of items on the ground
+				g.drawString(""+item.getAmount(), drawx + x*imageWidth, drawy + y*imageWidth + 1/2*imageWidth);
+			}
+			
+			
+			
+			// iterate to next row
 			x++;
 			if(x >= rows) {
 				x = 0;

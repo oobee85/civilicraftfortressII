@@ -197,7 +197,8 @@ public class RenderingPipeline {
 					drawat.x + state.tileSize / 5,
 					drawat.y + state.tileSize / 5, 
 					state.tileSize * 3/5, 
-					state.tileSize * 3/5);
+					state.tileSize * 3/5,
+					tile);
 		}
 	});
 	

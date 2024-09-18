@@ -1020,13 +1020,17 @@ public class Game {
 					if (isValidSpawnTileForBuilding(current, type)) {
 						summonBuilding(current, type, newFaction);
 						thingType = null;
+						if(current.getPlant() != null) {
+							current.getPlant().setDead(true);
+						}
+						
 					}
 				}
 				else if(thingType instanceof PlantType) {
 					if(current.getTerrain().isPlantable(current.getTerrain()) 
 							&& current.getRoad() == null 
 							&& current.liquidAmount < current.liquidType.getMinimumDamageAmount() / 2
-							) {
+							&& current.hasBuilding() == false) {
 						world.makePlantVein(current, (PlantType)thingType, 2, rand);
 						thingType = null;
 					}

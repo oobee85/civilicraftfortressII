@@ -38,10 +38,13 @@ public class WorldData {
 		for (Building building : buildings) {
 			if (building.isDead() == true) {
 				
-				// iterate through buildings cost and drop percent of resources
+				// iterate through buildings cost and drop resources
 				for (Entry<ItemType, Integer> entry : building.getType().getCost().entrySet()) {
-					Item item = new Item(entry.getValue() / Constants.RATIO_BUILDING_RESOURCE_DROP, entry.getKey()); // add 1/5 of resources to tile inventory
-					building.getTile().getInventory().addItem(item);
+					if(!building.getType().isRoad()) {
+						Item item = new Item(entry.getValue() / Constants.RATIO_BUILDING_RESOURCE_DROP, entry.getKey()); // add 1/5 of resources to tile inventory
+						building.getTile().getInventory().addItem(item);
+					}
+					
 				}
 				
 				building.getFaction().removeBuilding(building);
