@@ -68,10 +68,16 @@ public class Game {
 	public void simulatedGameTick() {
 		// Do the things that can be simulated client-side for smoother game play
 		World.ticks++;
-		if(World.ticks%20 == 0) {
+		if(World.ticks % 20 == 0) {
 			updateTerritory();
 		}
-		LiquidSimulation.propogate(world);
+		if(World.ticks % 2 == 0) {
+			LiquidSimulation.propogate(world);
+			world.doAirSimulationStuff();
+//			world.updateTerrainChange(false); // not this
+			world.doProjectileUpdates(true);
+		}
+		
 		// Remove dead things
 		for(Unit unit : world.getUnits()) {
 			if(unit.isDead()) {
@@ -93,10 +99,10 @@ public class Game {
 		}
 		world.clearDeadAndAddNewThings();
 
-//		buildingTick();
-//		unitTick();
+		buildingTick();
+		unitTick();
 
-		world.doProjectileUpdates(true);
+		
 	}
 
 	/**

@@ -210,7 +210,7 @@ public class Server {
 			try {
 				int iteration = 0;
 				while(true) {
-					if(iteration % 20 == 0) {
+					if(iteration % 10 == 0) {
 						sendFullWorld();
 					}
 					else if(iteration % 3 == 0) {

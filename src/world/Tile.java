@@ -55,6 +55,7 @@ public class Tile implements Externalizable {
 //		air.setHumidity(humidity);
 //		air.setTemperature(this.getTemperature());
 		liquidAmount = in.readFloat();
+		energy = in.readDouble();
 
 		location = TileLoc.readFromExternal(in);
 
@@ -72,6 +73,7 @@ public class Tile implements Externalizable {
 		out.writeFloat(height);
 //		out.writeDouble(air.getHumidity());
 		out.writeFloat(liquidAmount);
+		out.writeDouble(this.energy);
 
 		location.writeExternal(out);
 
