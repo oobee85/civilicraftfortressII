@@ -35,7 +35,7 @@ public class Unit extends Thing implements Serializable {
 	private transient int starving;
 	
 	public Unit(UnitType unitType, Tile tile, Faction faction) {
-		super(unitType.getCombatStats().getHealth(), unitType.getMipMap(), unitType.getMesh(), faction, tile);
+		super(unitType.getCombatStats().getHealth(), unitType.getMipMap(), unitType.getMesh(), faction, tile, unitType.getInventoryStackSize());
 		this.unitType = unitType;
 		this.combatStats = unitType.getCombatStats();
 		this.timeToHeal = unitType.getCombatStats().getHealSpeed();

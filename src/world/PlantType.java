@@ -17,10 +17,11 @@ public class PlantType implements Serializable {
 	private transient final double rarity;
 	private transient final LinkedList<Item> harvestItems;
 	private transient final HashSet<String> attributes;
+	private transient final int inventoryStackSize;
 	private transient final Set<GameComponent> components = new HashSet<>();
 
 	public PlantType(String name, String image, Mesh mesh, String textureFile, 
-	                 double rare, double health, LinkedList<Item> harvestItems, HashSet<String> attributes){
+	                 double rare, double health, LinkedList<Item> harvestItems, HashSet<String> attributes, int inventoryStackSize){
 		this.name = name;
 		this.rarity = rare;
 		this.health = health;
@@ -28,6 +29,11 @@ public class PlantType implements Serializable {
 		this.mesh = new TexturedMesh(mesh, textureFile);
 		this.harvestItems = harvestItems;
 		this.attributes = attributes;
+		this.inventoryStackSize = inventoryStackSize;
+	}
+
+	public int getInventoryStackSize() {
+		return inventoryStackSize;
 	}
 	
 	// TODO remove desertresistant attribute and instead use whether or not the plant would take damage on the tile

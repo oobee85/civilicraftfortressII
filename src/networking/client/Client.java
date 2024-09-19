@@ -465,6 +465,7 @@ public class Client {
 			movedFrom = existing.getTile();
 		} 
 		existing.setTile(gameInstance.world.get(update.getTileLocation()));
+		existing.setInventory(update.getInventory());
 		if(existing instanceof Plant) {
 			Plant existingPlant = (Plant)existing;
 			Plant plantUpdate = (Plant)update;

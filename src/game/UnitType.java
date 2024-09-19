@@ -26,13 +26,15 @@ public class UnitType implements Serializable {
 	private transient final TargetInfo[] targetingInfoStrings;
 	private transient final ArrayList<TargetingInfo> targetingInfo = new ArrayList<>();
 	private transient final LinkedList<AttackStyle> attackStyles;
+	private transient final int inventoryStackSize;
 	private transient final boolean isDangerousToOwnTeam;
 	private transient final int powerLevel;
 	private transient final Set<GameComponent> components = new HashSet<>();
 
 	public UnitType(String name, String image, Mesh mesh, String textureFile, CombatStats cs, 
 	                HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, 
-	                LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles) {
+	                LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles,
+	                int inventoryStackSize) {
 		id = idCounter++;
 		this.name = name;
 		this.mipmap = new MipMap(image);
@@ -44,6 +46,7 @@ public class UnitType implements Serializable {
 		this.deadItem = deadItem;
 		this.targetingInfoStrings = targeting;
 		this.attackStyles = attackStyles;
+		this.inventoryStackSize = inventoryStackSize;
 		
 		this.isDangerousToOwnTeam = computeIsDangerousToOwnTeam();
 		this.powerLevel = computePowerLevel();
@@ -60,6 +63,10 @@ public class UnitType implements Serializable {
 			power += att.getRange()*2;
 		}
 		return power;
+	}
+
+	public int getInventoryStackSize() {
+		return inventoryStackSize;
 	}
 	
 	public int getPowerLevel() {

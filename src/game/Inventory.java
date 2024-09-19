@@ -1,10 +1,8 @@
-package game.components;
+package game;
 
 import java.io.*;
 
-import game.*;
-
-public class Inventory extends GameComponent implements Externalizable {
+public class Inventory implements Externalizable {
 	
 	private int maxStack;
 	private Item[] items = new Item[ItemType.values().length];
@@ -37,10 +35,6 @@ public class Inventory extends GameComponent implements Externalizable {
 	
 	public Inventory(int maxStack) {
 		this.maxStack = maxStack;
-	}
-	
-	public GameComponent instance() {
-		return new Inventory(maxStack);
 	}
 	
 	public void setMaxStack(int maxStack) {

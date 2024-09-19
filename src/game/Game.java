@@ -588,7 +588,7 @@ public class Game {
 				forWindmill,
 				Game.buildingTypeMap.get("WINDMILL"),
 				world.getFaction(World.UNDEAD_FACTION_ID));
-		windmill.replaceComponent(Inventory.class, world.getFaction(World.UNDEAD_FACTION_ID).getInventory());
+		windmill.setInventory(world.getFaction(World.UNDEAD_FACTION_ID).getInventory());
 		
 		
 //		for (TileLoc neighbor : neighbors) {
@@ -627,8 +627,8 @@ public class Game {
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("BARRACKS"), world.getFaction(World.CYCLOPS_FACTION_ID));
 		Thing windmill = summonBuilding(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("WINDMILL"), world.getFaction(World.CYCLOPS_FACTION_ID));
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()+1)), Game.buildingTypeMap.get("MINE"), world.getFaction(World.CYCLOPS_FACTION_ID));
-		granary.replaceComponent(Inventory.class, world.getFaction(World.CYCLOPS_FACTION_ID).getInventory());
-		windmill.replaceComponent(Inventory.class, world.getFaction(World.CYCLOPS_FACTION_ID).getInventory());
+		windmill.setInventory(world.getFaction(World.CYCLOPS_FACTION_ID).getInventory());
+		granary.setInventory(world.getFaction(World.CYCLOPS_FACTION_ID).getInventory());
 		//makes the walls
 		for(int i = 0; i < 5; i++) {
 			BuildingType type = Game.buildingTypeMap.get("WALL_WOOD");

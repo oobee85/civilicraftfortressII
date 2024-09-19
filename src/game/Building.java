@@ -31,7 +31,7 @@ public class Building extends Thing implements Serializable {
 	private transient ItemType stablesCaptured;
 	
 	public Building(BuildingType buildingType, Tile tile, Faction faction) {
-		super(buildingType.getHealth(), buildingType.getMipMap(), buildingType.getMesh(), faction, tile);
+		super(buildingType.getHealth(), buildingType.getMipMap(), buildingType.getMesh(), faction, tile, buildingType.getInventoryStackSize());
 		this.remainingEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
 		this.spawnLocation = tile;

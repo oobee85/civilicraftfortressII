@@ -7,7 +7,6 @@ import java.util.List;
 
 import game.*;
 import game.actions.*;
-import game.components.Inventory;
 import ui.*;
 import ui.utils.DrawingUtils;
 import utils.*;
@@ -345,9 +344,9 @@ public class RenderingFunctions {
 				}
 				// draw path
 				LinkedList<Tile> path = unit.getCurrentPath();
-				if (path != null && !path.isEmpty()) {
+				if (path != null) {
 					state.g.setColor(Color.green);
-					TileLoc prev = path.getFirst().getLocation();
+					TileLoc prev = unit.getTile().getLocation();
 					Point prevDrawAt = getDrawingCoords(prev, state.tileSize);
 					try {
 						for (Tile t : path) {
