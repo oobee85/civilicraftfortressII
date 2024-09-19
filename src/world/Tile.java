@@ -49,7 +49,8 @@ public class Tile implements Externalizable {
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 
 		height = in.readFloat();
-		air = new Air(height);
+//		air = new Air(height);
+		air = (Air)in.readObject();
 		inventory = new Inventory();
 //		air.setHumidity(in.readDouble());
 //		air.setHumidity(humidity);
@@ -71,10 +72,11 @@ public class Tile implements Externalizable {
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
 		out.writeFloat(height);
+		out.writeObject(air);
 //		out.writeDouble(air.getHumidity());
 		out.writeFloat(liquidAmount);
 		out.writeDouble(this.energy);
-
+		
 		location.writeExternal(out);
 
 		out.writeByte(liquidType.ordinal());

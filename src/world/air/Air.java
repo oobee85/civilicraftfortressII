@@ -1,9 +1,11 @@
 package world.air;
 
+import java.io.Serializable;
+
 import utils.Direction;
 import world.Constants;
 
-public class Air {
+public class Air implements Serializable {
 
 	private double humidity;
 	private double temperature;
@@ -15,7 +17,7 @@ public class Air {
 	
 	private double maxVolume;
 	private double volumeChange;
-	private Direction flowDirection;
+	private transient Direction flowDirection;
 	
 	
 	public Air(double height) {

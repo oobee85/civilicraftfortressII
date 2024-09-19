@@ -73,7 +73,7 @@ public class Game {
 		}
 		if(World.ticks % 2 == 0) {
 			LiquidSimulation.propogate(world);
-			world.doAirSimulationStuff();
+//			world.doAirSimulationStuff();
 //			world.updateTerrainChange(false); // not this
 			world.doProjectileUpdates(true);
 		}

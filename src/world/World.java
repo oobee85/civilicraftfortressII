@@ -96,8 +96,10 @@ public class World {
 				addToTerritory(tile);
 //				updateBorderTiles();
 			}
+			
 			tile.setHeight(info.getHeight());
-			tile.getAir().setHumidity(info.getAir().getHumidity());
+			tile.getAir().setHumidity(info.getAir().getVolumeLiquid());
+			tile.getAir().setEnergy(info.getEnergy());
 			tile.setResource(info.getResource());
 
 			tile.setTerrain(info.getTerrain());
