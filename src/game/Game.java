@@ -80,13 +80,15 @@ public class Game {
 				}
 			}
 			else {
-				unit.getTile().getInventory().clear();
+//				unit.getTile().getInventory().clear();
 				PlannedAction plan = unit.actionQueue.peek();
 				if(plan != null) {
 					if(plan.isDone(unit)) {
 						unit.actionQueue.poll();
 					}
 				}
+				
+				unit.updateSimulatedCurrentPath();
 			}
 		}
 		world.clearDeadAndAddNewThings();

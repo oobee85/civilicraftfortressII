@@ -21,8 +21,9 @@ public class Unit extends Thing implements Serializable {
 	private transient double timeToHeal;
 	private transient boolean isIdle;
 	private CombatStats combatStats;
-	private transient LinkedList<Tile> currentPath;
 	
+	private transient LinkedList<Tile> currentPath;
+
 	public transient ConcurrentLinkedDeque<PlannedAction> actionQueue = new ConcurrentLinkedDeque<>();
 	private transient PlannedAction passiveAction = PlannedAction.NOTHING;
 	
@@ -142,6 +143,11 @@ public class Unit extends Thing implements Serializable {
 	}
 
 	public boolean moveTo(Tile t) {
+		if (!readyToInvade() 
+				&& !t.getFaction().isNeutral()
+				&& t.getFaction().id() != getFactionID()) {
+			return false;
+		}
 		if (!readyToMove()) {
 			return false;
 		}
@@ -156,11 +162,8 @@ public class Unit extends Thing implements Serializable {
 		this.setTile(t);
 		return true;
 	}
-
-	public boolean moveTowards(Tile tile) {
-		if (tile == this.getTile()) {
-			return true;
-		}
+	
+	private boolean getPathTo(Tile tile) {
 		if (currentPath == null
 				|| currentPath.isEmpty()
 				|| currentPath.getLast() != tile
@@ -170,12 +173,17 @@ public class Unit extends Thing implements Serializable {
 		if (currentPath == null || currentPath.isEmpty()) {
 			return false;
 		}
-		Tile targetTile = currentPath.getFirst();
-		if (!readyToInvade() 
-				&& !targetTile.getFaction().isNeutral()
-				&& targetTile.getFaction().id() != getFactionID()) {
+		return true;
+	}
+
+	public boolean moveTowards(Tile tile) {
+		if (tile == this.getTile()) {
+			return true;
+		}
+		if (!getPathTo(tile)) {
 			return false;
 		}
+		Tile targetTile = currentPath.getFirst();
 		boolean success = this.moveTo(targetTile);
 		if (success) {
 			currentPath.removeFirst();
@@ -189,6 +197,24 @@ public class Unit extends Thing implements Serializable {
 
 	public LinkedList<Tile> getCurrentPath() {
 		return currentPath;
+	}
+	
+	public void updateSimulatedCurrentPath() {
+		PlannedAction p = getNextPlannedAction();
+		if (p == null) {
+			currentPath = null;
+			return;
+		}
+		if (currentPath != null && currentPath.contains(getTile())) {
+			while (!currentPath.isEmpty()) {
+				if (currentPath.removeFirst() == p.getTile()) {
+					break;
+				}
+			}
+		}
+		else {
+			getPathTo(p.getTile());
+		}
 	}
 	
 	public void updateState() {
@@ -556,6 +582,7 @@ public class Unit extends Thing implements Serializable {
 		}
 		PlannedAction plan = getNextPlannedAction();
 		if(plan == null) {
+			currentPath = null;
 			return;
 		}
 		Tile targetTile = plan.getTile();

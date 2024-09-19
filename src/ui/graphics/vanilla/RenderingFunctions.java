@@ -345,9 +345,9 @@ public class RenderingFunctions {
 				}
 				// draw path
 				LinkedList<Tile> path = unit.getCurrentPath();
-				if (path != null) {
+				if (path != null && !path.isEmpty()) {
 					state.g.setColor(Color.green);
-					TileLoc prev = unit.getTile().getLocation();
+					TileLoc prev = path.getFirst().getLocation();
 					Point prevDrawAt = getDrawingCoords(prev, state.tileSize);
 					try {
 						for (Tile t : path) {
