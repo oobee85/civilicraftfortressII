@@ -22,6 +22,7 @@ public class Thing implements Serializable, Comparable<Thing> {
 	private transient Tile tile;
 	
 	private transient HashMap<Class, GameComponent> components;
+	private Inventory inventory;
 
 	private transient Faction faction;
 	private transient int timeLastDamageTaken = -1000;
@@ -30,23 +31,19 @@ public class Thing implements Serializable, Comparable<Thing> {
 	private transient TexturedMesh mesh;
 	
 	private transient Hitsplat[] hitsplats = new Hitsplat[4];
-
-	public Thing() {
-		components = new HashMap<>();
-	}
 	
-	public Thing(double maxHealth, MipMap mipmap, TexturedMesh hasMesh, Faction faction) {
-		this();
+	public Thing(double maxHealth, MipMap mipmap, TexturedMesh hasMesh, Faction faction, Tile tile, int inventoryStackSize) {
+		components = new HashMap<>();
 		health = maxHealth;
 		this.maxHealth = maxHealth;
 		this.mipmap = mipmap;
 		this.mesh = hasMesh;
 		setFaction(faction);
 		this.id = idCounter++;
+		if (inventoryStackSize > 0) {
+			this.setInventory(new Inventory(inventoryStackSize));
+		}
 		ThingMapper.created(this);
-	}
-	public Thing(double maxHealth, MipMap mipmap, TexturedMesh hasMesh, Faction faction, Tile tile) {
-		this(maxHealth, mipmap, hasMesh, faction);
 		setTile(tile);
 	}
 	
@@ -106,11 +103,15 @@ public class Thing implements Serializable, Comparable<Thing> {
 	}
 	
 	public boolean hasInventory() {
-		return components.containsKey(Inventory.class);
+		return inventory != null;
 	}
 	
 	public Inventory getInventory() {
-		return (Inventory) components.get(Inventory.class);
+		return inventory;
+	}
+	
+	public void setInventory(Inventory i) {
+		this.inventory = i;
 	}
 
 	public int applyResistance(int damage, DamageType type) {

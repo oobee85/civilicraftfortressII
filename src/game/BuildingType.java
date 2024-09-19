@@ -28,6 +28,7 @@ public class BuildingType implements Serializable {
 	private transient final double buildingEffort;
 	private transient final HashMap <ItemType, Integer> cost;
 	private transient final HashSet<String> attributes;
+	private transient final int inventoryStackSize;
 	private transient final String[] canProduce;
 	private transient final HashSet<UnitType> canProduceSet = new HashSet<>();
 	private transient HashMap<String, Image> roadImages;
@@ -35,7 +36,7 @@ public class BuildingType implements Serializable {
 
 	
 	public BuildingType(String name, String info, int hp, double buildingEffort, String texturePath, Mesh mesh, String textureFile, double cultureRate, int visionRadius, 
-			String requirement, HashMap <ItemType, Integer> resourcesNeeded, String[] canProduce, double moveSpeedEnhancement, HashSet<String> attributes) {
+			String requirement, HashMap <ItemType, Integer> resourcesNeeded, String[] canProduce, double moveSpeedEnhancement, HashSet<String> attributes, int inventoryStackSize) {
 		id = idCounter++;
 		this.name = name;
 		this.info = info;
@@ -50,10 +51,15 @@ public class BuildingType implements Serializable {
 		this.visionRadius = visionRadius;
 		this.canProduce = canProduce;
 		this.attributes = attributes;
+		this.inventoryStackSize = inventoryStackSize;
 		
 		if(isRoad()) {
 			roadImages = ImageCreation.createRoadImages(texturePath);
 		}
+	}
+	
+	public int getInventoryStackSize() {
+		return inventoryStackSize;
 	}
 	
 	public Set<GameComponent> getComponents() {

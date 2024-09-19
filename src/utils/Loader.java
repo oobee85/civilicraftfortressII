@@ -41,15 +41,6 @@ public class Loader {
 			}
 			components.add(new DamageResistance(resistanceValues));
 		}
-		if(obj.has("inventory")) {
-			JSONObject inventoryProperties = obj.getJSONObject("inventory");
-			if(!inventoryProperties.has("maxstack")) {
-				System.err.println("ERROR inventory does not have maxstack defined.");
-				return null;
-			}
-			int maxStack = inventoryProperties.getInt("maxstack");
-			components.add(new Inventory(maxStack));
-		}
 		if (obj.has("builds")) {
 			JSONArray buildingTypesArray = obj.getJSONArray("builds");
 			String[] buildingTypeNames = new String[buildingTypesArray.length()];
@@ -103,8 +94,19 @@ public class Loader {
 				}
 			}
 
+			int inventoryStackSize = 0;
+			if(plantTypeObject.has("inventory")) {
+				JSONObject inventoryProperties = plantTypeObject.getJSONObject("inventory");
+				if(!inventoryProperties.has("maxstack")) {
+					System.err.println("ERROR inventory does not have maxstack defined.");
+					System.exit(0);
+				}
+				int maxStack = inventoryProperties.getInt("maxstack");
+				inventoryStackSize = maxStack;
+			}
+
 			Set<GameComponent> components = loadComponents(plantTypeObject);
-			PlantType plantType = new PlantType(name, image, mesh, textureFile, rarity, health, harvestItems, attributes);
+			PlantType plantType = new PlantType(name, image, mesh, textureFile, rarity, health, harvestItems, attributes, inventoryStackSize);
 			plantType.getComponents().addAll(components);
 			
 			plantTypeMap.put(name, plantType);
@@ -174,8 +176,20 @@ public class Loader {
 				}
 			}
 
+			int inventoryStackSize = 0;
+			if(buildingTypeObject.has("inventory")) {
+				JSONObject inventoryProperties = buildingTypeObject.getJSONObject("inventory");
+				if(!inventoryProperties.has("maxstack")) {
+					System.err.println("ERROR inventory does not have maxstack defined.");
+					System.exit(0);
+				}
+				int maxStack = inventoryProperties.getInt("maxstack");
+				inventoryStackSize = maxStack;
+			}
+
 			Set<GameComponent> components = loadComponents(buildingTypeObject);
-			BuildingType buildingType = new BuildingType(name, info, health, effort, image, mesh, textureFile, culture, vision, researchReq, cost, buildsunits, movespeed, attributes);
+			BuildingType buildingType = new BuildingType(name, info, health, effort, image, mesh, textureFile,
+					culture, vision, researchReq, cost, buildsunits, movespeed, attributes, inventoryStackSize);
 			buildingType.getComponents().addAll(components);
 			buildingTypeMap.put(name, buildingType);
 			buildingTypeList.add(buildingType);
@@ -304,8 +318,19 @@ public class Loader {
 					textureFile = unitTypeObject.getString("texture");
 				}
 			}
+			int inventoryStackSize = 0;
+			if(unitTypeObject.has("inventory")) {
+				JSONObject inventoryProperties = unitTypeObject.getJSONObject("inventory");
+				if(!inventoryProperties.has("maxstack")) {
+					System.err.println("ERROR inventory does not have maxstack defined.");
+					System.exit(0);
+				}
+				int maxStack = inventoryProperties.getInt("maxstack");
+				inventoryStackSize = maxStack;
+			}
 			Set<GameComponent> components = loadComponents(unitTypeObject);
-			UnitType unitType = new UnitType(name, image, mesh, textureFile, combatStats, attributes, researchReq, cost, items, targeting, attackStyles);
+			UnitType unitType = new UnitType(name, image, mesh, textureFile, combatStats, attributes,
+					researchReq, cost, items, targeting, attackStyles, inventoryStackSize);
 			unitType.getComponents().addAll(components);
 			unitTypeMap.put(name, unitType);
 			unitTypeList.add(unitType);
