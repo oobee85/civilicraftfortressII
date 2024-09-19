@@ -99,8 +99,8 @@ public class Game {
 		}
 		world.clearDeadAndAddNewThings();
 
-		buildingTick();
-		unitTick();
+//		buildingTick();
+//		unitTick();
 
 		
 	}
