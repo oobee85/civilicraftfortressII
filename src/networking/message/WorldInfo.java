@@ -26,6 +26,7 @@ public class WorldInfo implements Externalizable {
 		out.writeInt(height);
 		out.writeInt(tick);
 		out.writeObject(tileInfos);
+		out.writeObject(hitsplats);
 		out.writeInt(factions.size());
 		for (Faction faction : factions) {
 			faction.writeExternal(out);
@@ -43,10 +44,10 @@ public class WorldInfo implements Externalizable {
 		height = in.readInt();
 		tick = in.readInt();
 		tileInfos = (Tile[])in.readObject();
+		hitsplats = (LinkedList<Hitsplat>)in.readObject();
 		things = new HashSet<>();
 		factions = new LinkedList<>();
 		projectiles = new LinkedList<>();
-		hitsplats = new LinkedList<>();
 		int numFactions = in.readInt();
 		for (int i = 0; i < numFactions; i++) {
 			Faction faction = new Faction();
