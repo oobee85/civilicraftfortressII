@@ -52,7 +52,7 @@ public class RenderingPipeline {
 				pipeline.steps.add(airFlow2);
 			}
 
-//			pipeline.steps.add(fogOfWar);
+			pipeline.steps.add(fogOfWar);
 			pipeline.steps.add(target);
 			pipeline.steps.add(hoveredTiles);
 			pipeline.steps.add(plannedThing);
