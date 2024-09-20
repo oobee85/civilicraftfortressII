@@ -491,8 +491,8 @@ public class RenderingFunctions {
 		}
 	}
 	
-	public static void drawResource(Resource resource, Graphics2D g, int drawx, int drawy, int tileSize) {
-		g.drawImage(resource.getType().getMipMap().getImage(tileSize), 
+	public static void drawResource(ResourceType resource, Graphics2D g, int drawx, int drawy, int tileSize) {
+		g.drawImage(resource.getMipMap().getImage(tileSize), 
 				drawx, drawy, tileSize, tileSize, null);
 	}
 	

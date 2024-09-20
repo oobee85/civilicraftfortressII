@@ -1,84 +1,135 @@
 package world;
 
 import java.io.*;
-import java.security.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 
 import game.*;
-import game.components.*;
 import utils.*;
 import world.air.Air;
 import world.liquid.*;
 
 public class Tile implements Externalizable {
+	
+	private static final boolean AIR_NETWORKING = false;
+	private static final int NO_RESOURCE = -1;
 
 	private TileLoc location;
 	private float height;
 	private double energy;
 	private double temperature;
-	
 	public volatile float liquidAmount;
 	public volatile LiquidType liquidType;
-
 	private volatile Faction faction;
-
-	private Resource resource;
+	private ResourceType resource;
 	private Terrain terrain;
 	private GroundModifier modifier;
-
 	private Plant plant;
 	private Building building;
 	private Building road;
 	private Air air;
-	private Air air2;
-	
 	private int tickLastTerrainChange;
-	
 	private double precomputedBrightness;
-	
-
 	private ConcurrentLinkedDeque<Unit> units;
 	private ConcurrentLinkedQueue<Projectile> projectiles;
 	private Inventory inventory;
 
 	private List<Tile> neighborTiles = new LinkedList<Tile>();
+	
+	private Tile latestSentInfo;
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-
+		location = (TileLoc)in.readObject();
 		height = in.readFloat();
-		air = (Air)in.readObject();
 		inventory = (Inventory)in.readObject();
 		liquidAmount = in.readFloat();
-		energy = in.readDouble();
-
-		location = TileLoc.readFromExternal(in);
-
 		liquidType = LiquidType.values()[in.readByte()];
+		energy = in.readDouble();
 		terrain = Terrain.values()[in.readByte()];
 		faction = new Faction();
 		faction.setID(in.readByte());
-		resource = (Resource) in.readObject();
+		int resourceOrdinal = in.readInt();
+		if (resourceOrdinal == NO_RESOURCE) {
+			resource = null;
+		}
+		else {
+			resource = ResourceType.values()[resourceOrdinal];
+		}
 		modifier = (GroundModifier) in.readObject();
+		if (AIR_NETWORKING) {
+			air = (Air)in.readObject();
+		}
+		else {
+			air = new Air(height);
+		}
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
+		if (latestSentInfo == null) {
+			latestSentInfo = new Tile();
+			latestSentInfo.faction = new Faction();
+			latestSentInfo.inventory = new Inventory();
+			latestSentInfo.modifier = null;
+		}
+		out.writeObject(location);
+		latestSentInfo.location = location;
 		out.writeFloat(height);
-		out.writeObject(air);
+		latestSentInfo.height = height;
 		out.writeObject(inventory);
+		latestSentInfo.inventory.copyFrom(inventory);
 		out.writeFloat(liquidAmount);
-		out.writeDouble(this.energy);
-		
-		location.writeExternal(out);
-
+		latestSentInfo.liquidAmount = liquidAmount;
 		out.writeByte(liquidType.ordinal());
+		latestSentInfo.liquidType = liquidType;
+		out.writeDouble(energy);
+		latestSentInfo.energy = energy;
 		out.writeByte(terrain.ordinal());
+		latestSentInfo.terrain = terrain;
 		out.writeByte(faction.id());
-		out.writeObject(resource);
+		latestSentInfo.faction.setID(faction.id());
+		out.writeInt((resource == null) ? NO_RESOURCE : resource.ordinal());
+		latestSentInfo.resource = resource;
 		out.writeObject(modifier);
+		latestSentInfo.modifier = modifier;
+		if (AIR_NETWORKING) {
+			out.writeObject(air);
+//			latestSentInfo.air = air; TODO
+		}
+	}
+	
+	public boolean isChangedFromLatestSent() {
+		if (latestSentInfo == null) { 
+			return true;
+		}
+		if (height != latestSentInfo.height ||
+				terrain != latestSentInfo.terrain ||
+				faction.id() != latestSentInfo.faction.id() ||
+				resource != latestSentInfo.resource) {
+			return true;
+		}
+
+		if (Math.abs(liquidAmount - latestSentInfo.liquidAmount) > Settings.LIQUID_CHANGE_THRESHOLD
+				|| liquidType != latestSentInfo.liquidType) {
+			return true;
+		}
+		
+		GroundModifierType type = (modifier == null) ? null : modifier.getType();
+		GroundModifierType otherType = (latestSentInfo.modifier == null) ? null : latestSentInfo.modifier.getType();
+		if (type != otherType) {
+			return true;
+		}
+		
+		
+		if (inventory.isDifferent(latestSentInfo.inventory)) {
+			return true;
+		}
+		// TODO air
+		
+		// dont care if energy changes as it doesnt impact client rendering.
+		return false;
 	}
 	
 	public Tile() {
@@ -86,6 +137,7 @@ public class Tile implements Externalizable {
 	}
 
 	public Tile(TileLoc location, Terrain t) {
+		this();
 		this.location = location;
 		terrain = t;
 		liquidType = LiquidType.WATER;
@@ -207,11 +259,11 @@ public class Tile implements Externalizable {
 		this.faction = faction;
 	}
 
-	public void setResource(Resource resource) {
+	public void setResource(ResourceType resource) {
 		this.resource = resource;
 	}
 
-	public Resource getResource() {
+	public ResourceType getResource() {
 		return resource;
 	}
 
@@ -563,7 +615,7 @@ public class Tile implements Externalizable {
 		));
 		
 		if (getResource() != null) {
-			strings.add(String.format("ORE=%d", getResource().getYield()));
+			strings.add(getResource().name());
 		}
 
 		if (liquidType != LiquidType.DRY) {

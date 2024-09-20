@@ -499,8 +499,8 @@ public class Unit extends Thing implements Serializable {
 		if(readyToHarvest() && hasInventory()) {
 			//  figure out if harvest stone or ore
 			ItemType itemType = null;
-			if(tile.getResource() != null && getFaction().areRequirementsMet(tile.getResource().getType())) {
-				itemType = tile.getResource().getType().getItemType();
+			if(tile.getResource() != null && getFaction().areRequirementsMet(tile.getResource())) {
+				itemType = tile.getResource().getItemType();
 			}
 			else if(tile.getTerrain() == Terrain.ROCK) {
 				itemType = ItemType.STONE;

@@ -76,8 +76,7 @@ public class Faction implements Externalizable {
 		out.writeObject(inventory);
 	}
 	
-	public Faction() {
-	}
+	public Faction() { }
 	
 	public Faction(String name, boolean isPlayer, boolean usesItems, boolean usesResearch) {
 		this(name, isPlayer, usesItems, usesResearch, null);

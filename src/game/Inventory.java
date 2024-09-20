@@ -9,24 +9,21 @@ public class Inventory implements Externalizable {
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-//		System.out.println("writing inventory");
-		out.writeInt(maxStack);
-//		for (int index = 0; index < ItemType.values().length; index++) {
-//			System.out.println("writing " + items[index]);
-//			out.writeObject(items[index]);
-//		}
-		out.writeObject(items);
+		boolean emptyInventory = isEmpty();
+		out.writeBoolean(emptyInventory);
+		if (!emptyInventory) {
+			out.writeInt(maxStack);
+			out.writeObject(items);
+		}
 	}
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-//		System.out.println("reading inventory");
-		maxStack = in.readInt();
-//		for (int index = 0; index < ItemType.values().length; index++) {
-//			items[index] = (Item)in.readObject();
-//			System.out.println("read " + items[index]);
-//		}
-		items = (Item[])in.readObject();
+		boolean emptyInventory = in.readBoolean();
+		if (!emptyInventory) {
+			maxStack = in.readInt();
+			items = (Item[])in.readObject();
+		}
 	}
 	
 	public Inventory() {
@@ -35,6 +32,32 @@ public class Inventory implements Externalizable {
 	
 	public Inventory(int maxStack) {
 		this.maxStack = maxStack;
+	}
+	
+	public void copyFrom(Inventory other) {
+		this.maxStack = other.maxStack;
+
+		for (int index = 0; index < items.length; index++) {
+			if (other.items[index] == null) {
+				items[index] = null;
+			}
+			else {
+				setAmount(other.items[index].getType(), other.items[index].getAmount());
+			}
+		}
+	}
+	
+	public boolean isDifferent(Inventory other) {
+		if (this.maxStack != other.maxStack) {
+			return true;
+		}
+		for (int index = 0; index < items.length; index++) {
+			ItemType type = ItemType.values()[index];
+			if (getItemAmount(type) != other.getItemAmount(type)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void setMaxStack(int maxStack) {

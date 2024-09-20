@@ -1,7 +1,4 @@
 package world;
-import java.awt.*;
-
-import javax.swing.*;
 
 import game.ItemType;
 import utils.*;

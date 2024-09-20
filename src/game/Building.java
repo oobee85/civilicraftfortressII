@@ -187,7 +187,7 @@ public class Building extends Thing implements Serializable {
 	}
 	public void resetTimeToHarvest() {
 		if(getTile().getResource() != null) {
-			resetTimeToHarvest(getTile().getResource().getType().getTimeToHarvest());
+			resetTimeToHarvest(getTile().getResource().getTimeToHarvest());
 		}
 		else {
 			resetTimeToHarvest(baseTimeToHarvest);

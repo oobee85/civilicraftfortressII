@@ -164,7 +164,7 @@ public class RenderingPipeline {
 	
 	private static RenderingStep resource = new RenderingStep(null, (state, tile, drawat) -> {
 		if (tile.getResource() != null 
-				&& state.faction.areRequirementsMet(tile.getResource().getType())) {
+				&& state.faction.areRequirementsMet(tile.getResource())) {
 			RenderingFunctions.drawResource(tile.getResource(), state.g, 
 					drawat.x, drawat.y, state.tileSize);
 		}

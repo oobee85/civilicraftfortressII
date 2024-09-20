@@ -550,8 +550,12 @@ public final class Utils {
 	public static WorldInfo extractWorldInfo(World world, boolean everything, boolean units) {
 		Tile[] tileArray;
 		if (everything) {
-			ArrayList<Tile> tileInfos = new ArrayList<>(world.getTiles().size()); 
-			tileInfos.addAll(world.getTiles());
+			ArrayList<Tile> tileInfos = new ArrayList<>(world.getTiles().size());
+			for (Tile t : world.getTiles()) {
+				if (t.isChangedFromLatestSent()) {
+					tileInfos.add(t);
+				}
+			}
 			tileArray = tileInfos.toArray(new Tile[0]);
 		}
 		else {

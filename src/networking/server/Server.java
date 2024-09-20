@@ -235,39 +235,29 @@ public class Server {
 	
 	
 	private void sendFullWorld() {
-//		saveToFile(worldInfo, "ser/everything_" + World.ticks + ".ser");
+		long start = System.currentTimeMillis();
 		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, true, true);
-
-//		WorldInfo worldInfo = new WorldInfo(
-//				gameInstance.world.getWidth(),
-//				gameInstance.world.getHeight(),
-//				World.ticks, new Tile[0]);
 		sendToAllConnections(worldInfo);
-//		Temp t = new Temp(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, new Tile[0]);
-//		t.getThings().addAll(gameInstance.world.getBuildings());
-//		sendToAllConnections(t);
 		sendWhichFaction();
+		long delta = System.currentTimeMillis() - start;
+		
+		if (Settings.WRITE_NETWORK_PACKAGES_TO_FILE) {
+			Utils.saveToFile(worldInfo, "ser/everything_" + World.ticks + "_timespent_" + delta + "_tiles_" + worldInfo.getTileInfos().length + ".ser", false);
+		}
 	}
 
 	private void sendUnits() {
 		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, false, true);
-//		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, new Tile[0]);
-//		worldInfo.getThings().addAll(gameInstance.world.getUnits());
-//		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
-//		worldInfo.addHitsplats(gameInstance.world.getData());
-//		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
 		sendToAllConnections(worldInfo);
-//		saveToFile(worldInfo, "ser/units_" + World.ticks + ".ser");
+		if (Settings.WRITE_NETWORK_PACKAGES_TO_FILE) {
+			Utils.saveToFile(worldInfo, "ser/units_" + World.ticks + ".ser", false);
+		}
 	}
 	
 	private int skippedCount;
 	private int sentCount;
 	private void sendProjectilesAndDeadThings() {
 		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, false, false);
-//		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, new Tile[0]);
-//		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
-//		worldInfo.addHitsplats(gameInstance.world.getData());
-//		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
 		if(worldInfo.getThings().isEmpty() 
 				&& worldInfo.getHitsplats().isEmpty()
 				&& worldInfo.getProjectiles().isEmpty()) {
@@ -276,7 +266,9 @@ public class Server {
 		else {
 			sentCount++;
 			sendToAllConnections(worldInfo);
-	//		saveToFile(worldInfo, "ser/projectiles_" + World.ticks + ".ser");
+			if (Settings.WRITE_NETWORK_PACKAGES_TO_FILE) {
+				Utils.saveToFile(worldInfo, "ser/projectiles_" + World.ticks + ".ser", false);
+			}
 		}
 	}
 	

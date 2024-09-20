@@ -4,10 +4,7 @@ import java.awt.*;
 import java.io.*;
 import java.util.*;
 
-import javax.swing.*;
-
 import game.components.GameComponent;
-import ui.graphics.*;
 import utils.*;
 
 public class BuildingType implements Serializable {

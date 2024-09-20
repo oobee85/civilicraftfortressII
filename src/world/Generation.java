@@ -420,7 +420,7 @@ public class Generation {
 				// if ore is rare the tile must be able to support rare ore
 				
 				if(!resource.isRare() || potential.canSupportRareOre()) {
-					potential.setResource(new Resource(resource, potential));
+					potential.setResource(resource);
 					veinSize--;
 				}
 			}

@@ -91,19 +91,19 @@ public class BuildOrderAI extends AIInterface {
 				if (t.isBlocked(w)) {
 					continue;
 				}
-				if (t.getResource().getType() == ResourceType.SILVER) {
+				if (t.getResource() == ResourceType.SILVER) {
 					silverTiles.add(t);
 				}
-				else if (t.getResource().getType() == ResourceType.COPPER) {
+				else if (t.getResource() == ResourceType.COPPER) {
 					copperTiles.add(t);
 				}
-				else if (t.getResource().getType() == ResourceType.IRON) {
+				else if (t.getResource() == ResourceType.IRON) {
 					ironTiles.add(t);
 				}
-				else if (t.getResource().getType() == ResourceType.COAL) {
+				else if (t.getResource() == ResourceType.COAL) {
 					coalTiles.add(t);
 				}
-				else if (t.getResource().getType() == ResourceType.MITHRIL) {
+				else if (t.getResource() == ResourceType.MITHRIL) {
 					mithrilTiles.add(t);
 				}
 				sortAndRemoveAllBut(silverTiles, 50);

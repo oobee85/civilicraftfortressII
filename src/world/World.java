@@ -779,11 +779,6 @@ public class World {
 		spreadPlants();
 		
 		for(Tile tile : getTiles()) {
-			if(tile.getResource() != null) {
-				tile.getResource().tick(World.ticks);
-			}
-			
-			
 			if(World.ticks - tile.getTickLastTerrainChange() <= Constants.MIN_TIME_TO_SWITCH_TERRAIN) {
 				continue;
 			}
@@ -1127,7 +1122,7 @@ public class World {
 			if (tile.getPlant() != null) {
 				continue;
 			}
-			if (!tile.getResource().getType().isRare()) {
+			if (!tile.getResource().isRare()) {
 				continue;
 			}
 			Plant plant = new Plant(
@@ -1422,9 +1417,9 @@ public class World {
 			Color minimapColor = new Color(terrainColor.getRGB());
 			if (isVisible
 					&& tile.getResource() != null
-					&& faction.areRequirementsMet(tile.getResource().getType())) {
-				minimapColor = tile.getResource().getType().getMipMap().getColor(0);
-				terrainColor = tile.getResource().getType().getMipMap().getColor(0);
+					&& faction.areRequirementsMet(tile.getResource())) {
+				minimapColor = tile.getResource().getMipMap().getColor(0);
+				terrainColor = tile.getResource().getMipMap().getColor(0);
 			}
 			if (isVisible && tile.getRoad() != null) {
 				minimapColor = tile.getRoad().getType().getMipMap().getColor(0);

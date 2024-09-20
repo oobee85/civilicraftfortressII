@@ -26,6 +26,8 @@ public class Settings {
 	public static boolean DISABLE_WILDLIFE_SPAWNS = false;
 	public static boolean LIQUID_MULTITHREADED = true;
 	public static boolean AIR_MULTITHREADED = false;
+	public static boolean WRITE_NETWORK_PACKAGES_TO_FILE = false;
+	public static double LIQUID_CHANGE_THRESHOLD = 0.01;
 
 	public static int NUM_AI = 0;
 	public static int AIDELAY = 1000;
@@ -87,6 +89,9 @@ public class Settings {
 				}
 				else if(f.getType() == int.class) {
 					f.set(null, Integer.parseInt(value));
+				}
+				else if(f.getType() == double.class) {
+					f.set(null, Double.parseDouble(value));
 				}
 				else if(f.getType() == String.class) {
 					f.set(null, value);
