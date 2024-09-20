@@ -8,12 +8,8 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.*;
 
-import javax.imageio.*;
-
 import game.*;
 import game.actions.*;
-import networking.message.*;
-import networking.server.*;
 import ui.*;
 import ui.utils.DrawingUtils;
 import ui.view.TerrainGenView;
@@ -1538,7 +1534,7 @@ public class World {
 		return mapImages;
 	}
 	
-	private static final int KERNEL_SIZE = 27;
+	private static final int KERNEL_SIZE = 17;
 	private static final float[] kernelData = DrawingUtils.createSpreadingKernel(KERNEL_SIZE);
 	/**
 	 * computes all tile brightnesses and creates brightness image
@@ -1567,6 +1563,8 @@ public class World {
 		Kernel kernel = new Kernel(KERNEL_SIZE, KERNEL_SIZE, kernelData);
 		ConvolveOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_ZERO_FILL, null);
 		BufferedImage blurred = op.filter(rawImagePlusEdges, null);
+		blurred = op.filter(blurred, null);
+		blurred = op.filter(blurred, null);
 		blurred = blurred.getSubimage(KERNEL_SIZE/2, KERNEL_SIZE/2, rawImage.getWidth(), rawImage.getHeight());
 		blurred = ImageCreation.convertFromHexagonal(blurred);
 		for(Tile tile : getTiles()) {
@@ -1621,6 +1619,9 @@ public class World {
 		}
 		else {
 			ratio = 0.5 - 0.5 * (Constants.DAY_DURATION + Constants.NIGHT_DURATION - currentDayOffset) / Constants.TRANSITION_PERIOD;
+		}
+		if (Game.DISABLE_NIGHT) {
+			ratio = Math.max(ratio, 0.7);
 		}
 		precomputedDaylight = ratio;
 		precomputedDaylightTick = World.ticks;

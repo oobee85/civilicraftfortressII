@@ -81,11 +81,25 @@ public class ImageCreation {
 					image.getRGB(x*2 + 1, y*2 + yoff + 1),
 					image.getRGB(x*2, y*2 + yoff + 1),
 				};
-				int averagedRGB = getAverageRGB(values);
+				int averagedRGB = getMaxRGB(values);
 				normal.setRGB(x, y, averagedRGB);
 			}
 		}
 		return normal;
+	}
+	private static int getMaxRGB(int[] rgbValues) {
+		int[] avgValues = new int[4];
+		int finalVal = 0;
+		for(int i = 0; i < avgValues.length; i++) {
+			int offset = i*8;
+			for(int rgbValue : rgbValues) {
+				int val = (rgbValue >> offset) & 0xFF;
+				avgValues[i] = Math.max(finalVal, val);
+			}
+//			avgValues[i] /= rgbValues.length;
+			finalVal = finalVal | (avgValues[i] << offset);
+		}
+		return finalVal;
 	}
 	private static int getAverageRGB(int[] rgbValues) {
 		int[] avgValues = new int[4];

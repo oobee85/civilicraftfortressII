@@ -29,65 +29,6 @@ public class CommandMessage implements Externalizable {
 		msg.targetY = target.y();
 		return msg;
 	}
-	public static CommandMessage makeMoveToCommand(int thingID, TileLoc target, boolean clearQueue) {
-		CommandMessage msg = new CommandMessage();
-		msg.command = CommandType.MOVE_TO;
-		msg.thingID = thingID;
-		msg.targetX = target.x();
-		msg.targetY = target.y();
-		msg.clearQueue = clearQueue;
-		return msg;
-	}
-	public static CommandMessage makeAttackThingCommand(int thingID, int targetID, boolean clearQueue) {
-		CommandMessage msg = new CommandMessage();
-		msg.command = CommandType.ATTACK_THING;
-		msg.thingID = thingID;
-		msg.targetID = targetID;
-		msg.clearQueue = clearQueue;
-		return msg;
-	}
-	public static CommandMessage makeHarvestThingCommand(int thingID, int targetID, boolean clearQueue) {
-		CommandMessage msg = new CommandMessage();
-		msg.command = CommandType.HARVEST_THING;
-		msg.thingID = thingID;
-		msg.targetID = targetID;
-		msg.clearQueue = clearQueue;
-		return msg;
-	}
-	public static CommandMessage makeDeliverCommand(int thingID, int targetID, boolean clearQueue) {
-		CommandMessage msg = new CommandMessage();
-		msg.command = CommandType.DELIVER;
-		msg.thingID = thingID;
-		msg.targetID = targetID;
-		msg.clearQueue = clearQueue;
-		return msg;
-	}
-	public static CommandMessage makeTakeItemsCommand(int thingID, int targetID, boolean clearQueue) {
-		CommandMessage msg = new CommandMessage();
-		msg.command = CommandType.TAKEITEMS;
-		msg.thingID = thingID;
-		msg.targetID = targetID;
-		msg.clearQueue = clearQueue;
-		return msg;
-	}
-	public static CommandMessage makeBuildRoadCommand(int thingID, TileLoc target, boolean clearQueue) {
-		CommandMessage msg = new CommandMessage();
-		msg.command = CommandType.BUILD_ROAD;
-		msg.thingID = thingID;
-		msg.targetX = target.x();
-		msg.targetY = target.y();
-		msg.clearQueue = clearQueue;
-		return msg;
-	}
-	public static CommandMessage makeBuildBuildingCommand(int thingID, TileLoc target, boolean clearQueue) {
-		CommandMessage msg = new CommandMessage();
-		msg.command = CommandType.BUILD_BUILDING;
-		msg.thingID = thingID;
-		msg.targetX = target.x();
-		msg.targetY = target.y();
-		msg.clearQueue = clearQueue;
-		return msg;
-	}
 	public static CommandMessage makePlanBuildingCommand(int thingID, TileLoc target, boolean clearQueue, String buildingType) {
 		CommandMessage msg = new CommandMessage();
 		msg.command = CommandType.PLAN_BUILDING;
@@ -124,13 +65,6 @@ public class CommandMessage implements Externalizable {
 		msg.command = CommandType.PRODUCE_UNIT;
 		msg.thingID = thingID;
 		msg.type = unitType;
-		return msg;
-	}
-	public static CommandMessage makeSetGuardingCommand(int thingID, boolean enabled) {
-		CommandMessage msg = new CommandMessage();
-		msg.command = CommandType.SET_GUARDING;
-		msg.thingID = thingID;
-		msg.clearQueue = enabled;
 		return msg;
 	}
 	public static CommandMessage makePlannedActionCommand(int thingID, PlannedAction action, boolean clearQueue) {

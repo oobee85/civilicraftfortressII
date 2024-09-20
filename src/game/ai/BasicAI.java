@@ -394,9 +394,6 @@ public class BasicAI extends AIInterface {
 	}
 	
 	private boolean defend(Unit unit) {
-		if(!unit.isGuarding()) {
-			commands.setGuarding(unit, true);
-		}
 		Tile target = getTargetTile(castle.getTile(), MAX_SEARCH_RADIUS, e -> {
 			for(Unit u : e.getUnits()) {
 				if(u.getFactionID() != faction.id()) {

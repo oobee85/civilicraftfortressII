@@ -12,7 +12,5 @@ public interface CommandInterface {
 	public void craftItem(Faction faction, ItemType itemType, int amount);
 	public void produceUnit(Building building, UnitType unitType);
 	
-	public void setGuarding(Unit unit, boolean enabled);
-	
 	public void planAction(Unit unit, PlannedAction plan, boolean clearQueue);
 }

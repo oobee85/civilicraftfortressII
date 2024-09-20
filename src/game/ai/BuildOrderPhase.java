@@ -50,10 +50,10 @@ public class BuildOrderPhase {
 		});
 		this.orderedUnits = Collections.unmodifiableList(orderedUnits);
 		
-		System.out.println("Final unit order:");
-		for (UnitType type : this.orderedUnits) {
-			System.out.println(type + ": " + type.getPowerLevel());
-		}
+//		System.out.println("Final unit order:");
+//		for (UnitType type : this.orderedUnits) {
+//			System.out.println(type + ": " + type.getPowerLevel());
+//		}
 	}
 	
 	@Override

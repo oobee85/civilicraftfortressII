@@ -64,11 +64,9 @@ public class Unit extends Thing implements Serializable {
 		return passiveAction == PlannedAction.BUILD;
 	}
 	
-	public void setGuarding(boolean guarding) {
-		passiveAction = guarding ? PlannedAction.GUARD : PlannedAction.NOTHING;
-	}
 	public boolean isGuarding() {
-		return passiveAction == PlannedAction.GUARD;
+		PlannedAction plan = actionQueue.peek();
+		return plan != null && plan.type == ActionType.GUARD;
 	}
 	
 	public void setType(UnitType type) {
@@ -612,7 +610,6 @@ public class Unit extends Thing implements Serializable {
 		}
 		PlannedAction plan = getNextPlannedAction();
 		if(plan == null) {
-			doPassiveActions(world);
 			return false;
 		}
 
@@ -703,33 +700,7 @@ public class Unit extends Thing implements Serializable {
 			}
 			didSomething = attack(plan.target);
 		}
-		if (!didSomething) {
-			doPassiveActions(world);
-		}
 		return didSomething;
-	}
-	
-	/**
-	 * Passive actions aren't actual actions. They are just a way for the unit to 
-	 * automatically queue real actions when it is idling. For example, an idle warrior
-	 * set to guard mode will automatically queue an attack action when an enemy comes
-	 * within range.
-	 */
-	private void doPassiveActions(World world) {
-		if (passiveAction == PlannedAction.GUARD) {
-			int range = Math.max(5, getMaxAttackRange());
-			for (Tile tile : Utils.getTilesInRadius(getTile(), world, range)) {
-				for (Unit unit : tile.getUnits()) {
-					if (shouldAggroOn(unit)
-							&& unit.getType().isHostile()
-							&& (!getType().isDangerousToOwnTeam() || unit.getTile().getFaction().id() != getFactionID())) {
-						prequeuePlannedAction(PlannedAction.attack(unit));
-						return;
-					}
-				}
-			}
-		}
-		return;
 	}
 	
 	private Thing getClosestEnemyInRange(World world, Tile fromTile, int range) {
@@ -763,9 +734,22 @@ public class Unit extends Thing implements Serializable {
 	
 	private boolean shouldAggroOn(Thing potential) {
 		// TODO replace anywhere faction comparison is used to determine enemies
-		if(potential != this 
-				&& (potential.getFaction().isNeutral() || potential.getFactionID() != this.getFactionID())) {
+		if (potential == this) {
+			return false;
+		}
+		if (potential.getFactionID() != this.getFactionID()) {
 			return true;
+		}
+		if (potential.getFaction().isNeutral()) {
+			if (!(potential instanceof Unit)) {
+				// neutrals shouldnt attack other neutral buildings or plants
+				return false;
+			}
+			Unit u = (Unit) potential;
+			// dont attack neutrals of the same type
+			if (u.getType() != getType()) {
+				return true;
+			}
 		}
 		return false;
 	}
