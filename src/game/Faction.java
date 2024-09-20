@@ -207,7 +207,7 @@ public class Faction implements Externalizable {
 				visibility += 0.2;
 			}
 			else {
-				visibility += 2;
+				visibility += 3;
 			}
 		}
 		if (tile.getFaction() == this) {
