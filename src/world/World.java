@@ -8,12 +8,8 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.*;
 
-import javax.imageio.*;
-
 import game.*;
 import game.actions.*;
-import networking.message.*;
-import networking.server.*;
 import ui.*;
 import ui.utils.DrawingUtils;
 import ui.view.TerrainGenView;
@@ -1621,6 +1617,9 @@ public class World {
 		}
 		else {
 			ratio = 0.5 - 0.5 * (Constants.DAY_DURATION + Constants.NIGHT_DURATION - currentDayOffset) / Constants.TRANSITION_PERIOD;
+		}
+		if (Game.DISABLE_NIGHT) {
+			ratio = Math.max(ratio, 0.8);
 		}
 		precomputedDaylight = ratio;
 		precomputedDaylightTick = World.ticks;
