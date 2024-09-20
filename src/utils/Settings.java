@@ -26,7 +26,6 @@ public class Settings {
 	public static boolean DISABLE_WILDLIFE_SPAWNS = false;
 	public static boolean LIQUID_MULTITHREADED = true;
 	public static boolean AIR_MULTITHREADED = false;
-	public static boolean CUSTOM_MESHES = false;
 
 	public static int NUM_AI = 0;
 	public static int AIDELAY = 1000;
