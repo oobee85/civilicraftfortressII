@@ -1295,7 +1295,7 @@ public class World {
 		worldRNG = new Random(seed);
 		
 		
-		float[][] heightMap = Generation.generateHeightMap(seed, width, height);
+		float[][] heightMap = Generation.generateHeightMap(worldRNG, width, height);
 		Utils.normalize(heightMap, 0, 1);
 		volcano = Generation.makeVolcano(this, heightMap, seed);
 		Utils.normalize(heightMap, 0, 1000);

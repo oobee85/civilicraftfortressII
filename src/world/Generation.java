@@ -61,7 +61,7 @@ public class Generation {
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
 					map[y][x] += amplitude * OpenSimplex2S.noise2(
-							seed*octave, 
+							seed + octave, 
 							(y - offsety)*scaleMult*frequency,
 							(x - offsetx)*scaleMult*frequency
 							);
@@ -74,23 +74,23 @@ public class Generation {
 		return map;
 	}
 
-	public static float[][] generateHeightMap2(long seed, int width, int height) {
+	public static float[][] generateHeightMap2(Random seedGenerator, int width, int height) {
 		double[][] basic = generateMap2(
-				seed, width, height, 50,
+				seedGenerator.nextLong(), width, height, 50,
 				0, 1);
 
 		double[][] erosionMap = generateMap2(
-				seed + 12345678,width, height, 200,
+				seedGenerator.nextLong(),width, height, 200,
 				0, 1);
 		double[][] continentalMap = generateMap2(
-				seed + 9876123, width, height, 100,
+				seedGenerator.nextLong(), width, height, 100,
 				0, 1);
 		
 		double[][] canyons = generateMap2(
-				seed + 7621354378L, width, height, 100,
+				seedGenerator.nextLong(), width, height, 100,
 				-1, 1);
 		double[][] canyonPrevalence = generateMap2(
-				seed + 236189929L, width, height, 250,
+				seedGenerator.nextLong(), width, height, 250,
 				-1, 1);
 		
 		TerrainGenView.addMap(basic, "basic");
@@ -163,13 +163,13 @@ public class Generation {
 		}
 	}
 
-	public static float[][] generateHeightMap(long seed, int width, int height) {
+	public static float[][] generateHeightMap(Random seedGenerator, int width, int height) {
 		int power = 1;
 		while(power < width || power < height) {
 			power *= 2;
 		}
 		
-		float[][] heightMap = generateHeightMap2(seed, power, power);
+		float[][] heightMap = generateHeightMap2(seedGenerator, power, power);
 		float[][] croppedHeightMap = new float[width][height];
 		int croppedWidth = (power - width)/2;
 		int croppedHeight = (power - height)/2;
