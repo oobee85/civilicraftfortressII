@@ -6,7 +6,6 @@ import java.util.List;
 import game.*;
 import game.components.*;
 import networking.server.*;
-import ui.graphics.opengl.*;
 import world.*;
 
 public class Thing implements Serializable, Comparable<Thing> {
@@ -28,16 +27,14 @@ public class Thing implements Serializable, Comparable<Thing> {
 	private transient int timeLastDamageTaken = -1000;
 	private transient boolean isSelected;
 	private transient MipMap mipmap;
-	private transient TexturedMesh mesh;
 	
 	private transient Hitsplat[] hitsplats = new Hitsplat[4];
 	
-	public Thing(double maxHealth, MipMap mipmap, TexturedMesh hasMesh, Faction faction, Tile tile, int inventoryStackSize) {
+	public Thing(double maxHealth, MipMap mipmap, Faction faction, Tile tile, int inventoryStackSize) {
 		components = new HashMap<>();
 		health = maxHealth;
 		this.maxHealth = maxHealth;
 		this.mipmap = mipmap;
-		this.mesh = hasMesh;
 		setFaction(faction);
 		this.id = idCounter++;
 		if (inventoryStackSize > 0) {
@@ -45,10 +42,6 @@ public class Thing implements Serializable, Comparable<Thing> {
 		}
 		ThingMapper.created(this);
 		setTile(tile);
-	}
-	
-	public TexturedMesh getMesh() {
-		return mesh;
 	}
 	
 	public int id() {

@@ -8,7 +8,6 @@ import javax.swing.*;
 
 import game.components.GameComponent;
 import ui.graphics.*;
-import ui.graphics.opengl.*;
 import utils.*;
 
 public class BuildingType implements Serializable {
@@ -20,7 +19,6 @@ public class BuildingType implements Serializable {
 	private transient final String info;
 	private transient final int health;
 	private transient final MipMap mipmap;
-	private transient final TexturedMesh mesh;
 	private transient final double moveSpeedEnhancement;
 	private transient final int visionRadius;
 	private transient final String researchRequirement;
@@ -35,13 +33,12 @@ public class BuildingType implements Serializable {
 	private transient final Set<GameComponent> components = new HashSet<>();
 
 	
-	public BuildingType(String name, String info, int hp, double buildingEffort, String texturePath, Mesh mesh, String textureFile, double cultureRate, int visionRadius, 
+	public BuildingType(String name, String info, int hp, double buildingEffort, String texturePath, double cultureRate, int visionRadius, 
 			String requirement, HashMap <ItemType, Integer> resourcesNeeded, String[] canProduce, double moveSpeedEnhancement, HashSet<String> attributes, int inventoryStackSize) {
 		id = idCounter++;
 		this.name = name;
 		this.info = info;
 		mipmap = new MipMap(texturePath);
-		this.mesh = new TexturedMesh(mesh, textureFile);
 		this.researchRequirement = requirement;
 		this.health = hp;
 		this.cultureRate = cultureRate;
@@ -80,9 +77,6 @@ public class BuildingType implements Serializable {
 
 	public Image getRoadImage(String roadCorner) {
 		return roadImages.get(roadCorner);
-	}
-	public TexturedMesh getMesh() {
-		return mesh;
 	}
 	
 	public MipMap getMipMap() {

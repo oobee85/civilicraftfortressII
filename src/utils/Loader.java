@@ -8,7 +8,6 @@ import org.json.*;
 import game.*;
 import game.ai.*;
 import game.components.*;
-import ui.graphics.opengl.*;
 import world.PlantType;
 
 public class Loader {
@@ -16,14 +15,6 @@ public class Loader {
 		HashMap<ItemType, Integer> map = new HashMap<>();
 		for(String itemName : costObject.keySet()) {
 			map.put(ItemType.valueOf(itemName), costObject.getInt(itemName));
-		}
-		return map;
-	}
-	
-	private static HashMap<BuildingType, Integer> loadBuildingTypeMap(JSONObject costObject) {
-		HashMap<BuildingType, Integer> map = new HashMap<>();
-		for(String buildingName : costObject.keySet()) {
-//			map.put(BuildingType.valueOf(buildingName), costObject.getInt(buildingName));
 		}
 		return map;
 	}
@@ -75,17 +66,6 @@ public class Loader {
 				}
 			}
 
-			String textureFile = image;
-			Mesh mesh = MeshUtils.defaultPlant;
-			if(Settings.CUSTOM_MESHES && plantTypeObject.has("mesh")) {
-				String meshString = plantTypeObject.getString("mesh");
-				mesh = MeshUtils.getMeshByFileName(meshString);
-				
-				if(plantTypeObject.has("texture")) {
-					textureFile = plantTypeObject.getString("texture");
-				}
-			}
-
 			HashSet<String> attributes = new HashSet<>();
 			if(plantTypeObject.has("attributes")) {
 				JSONArray attributelist = plantTypeObject.getJSONArray("attributes");
@@ -106,7 +86,7 @@ public class Loader {
 			}
 
 			Set<GameComponent> components = loadComponents(plantTypeObject);
-			PlantType plantType = new PlantType(name, image, mesh, textureFile, rarity, health, harvestItems, attributes, inventoryStackSize);
+			PlantType plantType = new PlantType(name, image, rarity, health, harvestItems, attributes, inventoryStackSize);
 			plantType.getComponents().addAll(components);
 			
 			plantTypeMap.put(name, plantType);
@@ -165,17 +145,6 @@ public class Loader {
 				cost = loadItemTypeMap(buildingTypeObject.getJSONObject("cost"));
 			}
 			
-			String textureFile = image;
-			Mesh mesh = MeshUtils.defaultBuilding;
-			if(Settings.CUSTOM_MESHES && buildingTypeObject.has("mesh")) {
-				String meshString = buildingTypeObject.getString("mesh");
-				mesh = MeshUtils.getMeshByFileName(meshString);
-				
-				if(buildingTypeObject.has("texture")) {
-					textureFile = buildingTypeObject.getString("texture");
-				}
-			}
-
 			int inventoryStackSize = 0;
 			if(buildingTypeObject.has("inventory")) {
 				JSONObject inventoryProperties = buildingTypeObject.getJSONObject("inventory");
@@ -188,7 +157,7 @@ public class Loader {
 			}
 
 			Set<GameComponent> components = loadComponents(buildingTypeObject);
-			BuildingType buildingType = new BuildingType(name, info, health, effort, image, mesh, textureFile,
+			BuildingType buildingType = new BuildingType(name, info, health, effort, image,
 					culture, vision, researchReq, cost, buildsunits, movespeed, attributes, inventoryStackSize);
 			buildingType.getComponents().addAll(components);
 			buildingTypeMap.put(name, buildingType);
@@ -308,16 +277,6 @@ public class Loader {
 				}
 			}
 
-			String textureFile = image;
-			Mesh mesh = MeshUtils.defaultUnit;
-			if(Settings.CUSTOM_MESHES && unitTypeObject.has("mesh")) {
-				String meshString = unitTypeObject.getString("mesh");
-				mesh = MeshUtils.getMeshByFileName(meshString);
-				
-				if(unitTypeObject.has("texture")) {
-					textureFile = unitTypeObject.getString("texture");
-				}
-			}
 			int inventoryStackSize = 0;
 			if(unitTypeObject.has("inventory")) {
 				JSONObject inventoryProperties = unitTypeObject.getJSONObject("inventory");
@@ -329,7 +288,7 @@ public class Loader {
 				inventoryStackSize = maxStack;
 			}
 			Set<GameComponent> components = loadComponents(unitTypeObject);
-			UnitType unitType = new UnitType(name, image, mesh, textureFile, combatStats, attributes,
+			UnitType unitType = new UnitType(name, image, combatStats, attributes,
 					researchReq, cost, items, targeting, attackStyles, inventoryStackSize);
 			unitType.getComponents().addAll(components);
 			unitTypeMap.put(name, unitType);

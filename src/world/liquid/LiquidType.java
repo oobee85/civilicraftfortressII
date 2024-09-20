@@ -1,12 +1,7 @@
 package world.liquid;
 
 import java.awt.*;
-
-import javax.swing.*;
-
 import game.DamageType;
-import ui.graphics.*;
-import ui.graphics.opengl.*;
 import utils.*;
 
 public enum LiquidType {

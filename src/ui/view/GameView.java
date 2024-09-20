@@ -3,19 +3,14 @@ package ui.view;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
-
 import javax.swing.*;
-
-import com.jogamp.common.util.RunnableExecutor.*;
 
 import game.*;
 import game.actions.*;
 import ui.*;
 import ui.graphics.*;
-import ui.graphics.opengl.*;
 import ui.graphics.vanilla.*;
 import utils.*;
 import world.*;
@@ -39,7 +34,6 @@ public class GameView {
 	private Robot fpsMouseRobot;
 
 	private boolean summonPlayerControlled = true;
-	private boolean setSpawnWeather = false;
 	public int tickOfLastClick = 0;
 	
 	private final FillingLayeredPane panel;
@@ -654,9 +648,6 @@ public class GameView {
 	public void setSummonPlayerControlled(boolean playerControlled) {
 		summonPlayerControlled = playerControlled;
 	}
-	public void setSpawnWeather(boolean weather) {
-		setSpawnWeather = weather;
-	}
 
 	public void setBuildingToPlan(BuildingType buildingType) {
 		state.leftClickAction = LeftClickAction.PLAN_BUILDING;
@@ -797,7 +788,6 @@ public class GameView {
 		
 		boolean hasOnlyUnits = true;
 		boolean hasOnlyBuildings = true;
-		int size = state.selectedThings.size();
 		
 		// if selectedthings is empty
 		if(state.selectedThings.isEmpty()) {
@@ -814,8 +804,6 @@ public class GameView {
 				}
 			}
 		}
-		
-		
 		
 		boolean selectedAUnit = false;
 		if(hasOnlyBuildings == false) {

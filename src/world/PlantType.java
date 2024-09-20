@@ -5,14 +5,12 @@ import java.util.*;
 
 import game.*;
 import game.components.*;
-import ui.graphics.opengl.*;
 import utils.*;
 
 public class PlantType implements Serializable {
 	
 	private final String name;
 	private transient final MipMap mipmap;
-	private transient final TexturedMesh mesh;
 	private transient final double health;	
 	private transient final double rarity;
 	private transient final LinkedList<Item> harvestItems;
@@ -20,13 +18,12 @@ public class PlantType implements Serializable {
 	private transient final int inventoryStackSize;
 	private transient final Set<GameComponent> components = new HashSet<>();
 
-	public PlantType(String name, String image, Mesh mesh, String textureFile, 
+	public PlantType(String name, String image,
 	                 double rare, double health, LinkedList<Item> harvestItems, HashSet<String> attributes, int inventoryStackSize){
 		this.name = name;
 		this.rarity = rare;
 		this.health = health;
 		mipmap = new MipMap(image);
-		this.mesh = new TexturedMesh(mesh, textureFile);
 		this.harvestItems = harvestItems;
 		this.attributes = attributes;
 		this.inventoryStackSize = inventoryStackSize;
@@ -39,9 +36,6 @@ public class PlantType implements Serializable {
 	// TODO remove desertresistant attribute and instead use whether or not the plant would take damage on the tile
 	public boolean isDesertResistant() {
 		return attributes.contains("desertresistant");
-	}
-	public TexturedMesh getMesh() {
-		return mesh;
 	}
 	
 	public MipMap getMipMap() {

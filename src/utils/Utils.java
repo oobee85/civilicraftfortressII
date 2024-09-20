@@ -15,7 +15,6 @@ import game.*;
 import game.actions.*;
 import networking.message.*;
 import ui.*;
-import ui.graphics.opengl.maths.*;
 import world.*;
 import world.liquid.*;
 
@@ -701,10 +700,6 @@ public final class Utils {
 			rand += Math.random();
 		}
 		return rand / tries;
-	}
-	public static Vector2f getRandomDirection() {
-		double angle = Math.random()*Math.PI*2;
-		return new Vector2f((float)Math.sin(angle), (float)Math.cos(angle));
 	}
 
 	public static Position[] normalizeRectangle(Position one, Position two) {

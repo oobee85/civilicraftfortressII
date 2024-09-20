@@ -4,7 +4,6 @@ import java.util.*;
 
 import game.components.*;
 import networking.server.Server;
-import ui.graphics.opengl.*;
 import utils.*;
 import utils.Loader.*;
 
@@ -17,7 +16,6 @@ public class UnitType implements Serializable {
 	
 	private final String name;
 	private transient final MipMap mipmap;
-	private transient final TexturedMesh mesh;
 	private transient final CombatStats combatStats;
 	private transient final HashSet<String> attributes;
 	private transient final HashMap <ItemType, Integer> cost;
@@ -31,14 +29,13 @@ public class UnitType implements Serializable {
 	private transient final int powerLevel;
 	private transient final Set<GameComponent> components = new HashSet<>();
 
-	public UnitType(String name, String image, Mesh mesh, String textureFile, CombatStats cs, 
+	public UnitType(String name, String image, CombatStats cs, 
 	                HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, 
 	                LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles,
 	                int inventoryStackSize) {
 		id = idCounter++;
 		this.name = name;
 		this.mipmap = new MipMap(image);
-		this.mesh = new TexturedMesh(mesh, textureFile);
 		this.combatStats = cs;
 		this.attributes = attributes;
 		this.cost = resourcesNeeded;
@@ -139,10 +136,6 @@ public class UnitType implements Serializable {
 	
 	public Set<GameComponent> getComponents() {
 		return components;
-	}
-	
-	public TexturedMesh getMesh() {
-		return mesh;
 	}
 
 	public MipMap getMipMap() {
