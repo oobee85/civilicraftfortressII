@@ -171,7 +171,7 @@ public class RenderingFunctions {
 		for (Tile neighbor : tile.getNeighbors()) {
 			float heightDiff = (neighbor.getHeight() + neighbor.liquidAmount) 
 					- (tile.getHeight() + tile.liquidAmount) - 10;
-			int MAX_HEIGHT_DIFF = 50;
+			int MAX_HEIGHT_DIFF = 100;
 			if (heightDiff <= 2) {
 				continue;
 			}

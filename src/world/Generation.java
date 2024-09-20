@@ -17,7 +17,7 @@ import world.liquid.*;
 public class Generation {
 	
 //	public static final long DEFAULT_SEED = 131313131313131313L;
-	public static final long DEFAULT_SEED = 69696969;
+	public static final long DEFAULT_SEED = 1;
 	public static final int OREMULTIPLIER = 16384;
 
 	public static void addCliff(World world, float[][] heightmap, Random rand) {
@@ -32,109 +32,6 @@ public class Generation {
 			}
 		}
 		
-	}
-	
-	private static void addPixel(Random rand, int[][] start, int size) {
-		int x = rand.nextInt(size);
-		int y = rand.nextInt(size);
-		while(start[x][y] != 0) {
-			x = rand.nextInt(size);
-			y = rand.nextInt(size);
-		}
-		while(true) {
-			int neighborSum = 0;
-			if (x > 0) {
-				if (y > 0) {
-					neighborSum += start[x-1][y-1];
-				}
-				neighborSum += start[x-1][y];
-				if (y < size-1) {
-					neighborSum += start[x-1][y+1];
-				}
-			}
-			if (y > 0) {
-				neighborSum += start[x][y-1];
-			}
-			if (y < size-1) {
-				neighborSum += start[x][y+1];
-			}
-			if (x < size-1) {
-				if (y > 0) {
-					neighborSum += start[x+1][y-1];
-				}
-				neighborSum += start[x+1][y];
-				if (y < size-1) {
-					neighborSum += start[x+1][y+1];
-				}
-			}
-			if (neighborSum != 0) {
-				break;
-			}
-			int minx = (x > 0) ? -1 : 0;
-			int maxx = (x < size - 1) ? 1 : 0;
-			int deltax = rand.nextInt(1 + maxx - minx) + minx;
-			x += deltax;
-			int miny = (y > 0) ? -1 : 0;
-			int maxy = (y < size - 1) ? 1 : 0;
-			int deltay = rand.nextInt(1 + maxy - miny) + miny;
-			y += deltay;
-		}
-		start[x][y] += 1;
-	}
-	
-	public static double[][] generateMap3(
-			long seed,
-			int width,
-			int height,
-			double minValue,
-			double maxValue,
-			int numIterations) {
-		Random rand = new Random(seed);
-		double[][] map = new double[height][width];
-		
-		int size = 9;
-		int[][] start = new int[size][size];
-		start[size/2][size/2] = 1;
-		int iteration = 0;
-		HashMap<Integer, int[][]> old = new HashMap<>();
-		while (size < height && size < width && iteration < numIterations) {
-			for (int i = 0; i < size*size/6; i++) {
-				addPixel(rand, start, size);
-			}
-			old.put(size, start);
-
-
-			iteration++;
-			if (size*3 >= height || size*3 >= width || iteration >= numIterations) {
-				break;
-			}
-
-			size = size*3;
-			start = new int[size][size];
-			for (Entry<Integer, int[][]> oldstart : old.entrySet()) {
-				int oldsize = oldstart.getKey();
-				int offset = 0;
-				while(oldsize < size) {
-					offset += oldsize;
-					oldsize = oldsize*3;
-				}
-				for (int y = 0; y < oldstart.getKey(); y++) {
-					for (int x = 0; x < oldstart.getKey(); x++) {
-						start[y + offset][x + offset] = oldstart.getValue()[y][x];
-					}
-				}
-			}
-		}
-		
-		
-		for (int y = 0; y < height; y++) { 
-			for (int x = 0; x < width; x++) {
-				map[y][x] = start[(int)(size * y / height)][(int)(size * x / width)];
-			}
-		}
-
-		Utils.normalize(map, maxValue, minValue);
-		return map;
 	}
 
 	public static double[][] generateMap2(
@@ -196,15 +93,22 @@ public class Generation {
 		double[][] canyonPrevalence = generateMap2(
 				seedGenerator.nextLong(), width, height, 250,
 				-1, 1);
-		
+		SnowflakeGeneration snowflake = new SnowflakeGeneration();
+		double[][] mountainMap = snowflake.generate(seedGenerator.nextLong(), width, height, 0, 1);
 		TerrainGenView.addMap(basic, "basic");
 		TerrainGenView.addMap(erosionMap, "erosionMap");
 		TerrainGenView.addMap(continentalMap, "continentalMap");
 		TerrainGenView.addMap(canyons, "canyons");
 		TerrainGenView.addMap(canyonPrevalence, "canyonPrevalence");
+		TerrainGenView.addMap(mountainMap, "mountainMap");
 
+		double maximumDistanceFromCenter = Math.sqrt(width*width/4 + height*height/4) + 1;
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
+				double distanceFromCenter = Math.sqrt((x-width/2)*(x-width/2) + (y-height/2)*(y-height/2));
+				double distanceFromCenterRatio = distanceFromCenter / maximumDistanceFromCenter;
+				erosionMap[y][x] = erosionMap[y][x] * distanceFromCenterRatio;
+				
 				if (continentalMap[y][x] < .25) {
 					continentalMap[y][x] = .25;
 				}
@@ -235,6 +139,7 @@ public class Generation {
 //				erosionMap[y][x] = erosionMap[y][x] > 0.5 ? 1 : 0;
 			}
 		}
+		TerrainGenView.addMap(erosionMap, "erosionMapFromCenter");
 		TerrainGenView.addMap(continentalMap, "continentalMap2");
 		TerrainGenView.addMap(canyons, "canyons2");
 		TerrainGenView.addMap(canyonPrevalence, "canyonPrevalence2");
@@ -244,7 +149,8 @@ public class Generation {
 			for (int x = 0; x < width; x++) {
 				double h = basic[y][x] * continentalMap[y][x];
 				h = h - canyonPrevalence[y][x];
-				h = (h*h) *0 * (erosionMap[y][x]) + (h) * (1 - erosionMap[y][x]);
+				h = Math.max(h, Math.sqrt(mountainMap[y][x])*1.4);
+				h = (h*h) * 0 * (erosionMap[y][x]) + (h) * (1 - erosionMap[y][x]);
 //				if (erosionMap[y][x] > 0.5) {
 //					h = h*h;
 //				}
@@ -311,77 +217,77 @@ public class Generation {
 	public static TileLoc makeVolcano(World world, float[][] heightMap, Random seedGenerator) {
 		int x = world.getWidth()/2;
 		int y = world.getHeight()/2;
-		
-		double[][] peaks = Generation.generateMap2(
-				seedGenerator.nextLong(), world.getWidth(), world.getHeight(), 
-				40, 0, 1);
-		TerrainGenView.addMap(peaks, "volcano peaks");
-		TileLoc highestPeak = findHighest(peaks);
-		peaks = Generation.generateMap2(
-				seedGenerator.nextLong(), world.getWidth(), world.getHeight(), 
-				40, 0, 1, 
-				world.getHeight()/2 - highestPeak.y(), world.getWidth()/2 - highestPeak.x());
-
-		TerrainGenView.addMap(peaks, "volcano peaks2");
-		
-		float lavaRadius = 5;
-		float volcanoRadius = 10;
-		float mountainRadius = 20;
-		float mountainEdgeRadius = 30;
-		
-		double volcanoCraterPercent = .2;
-
-		for(Tile tile : world.getTiles()) {
-			int i =  tile.getLocation().x();
-			int j =  tile.getLocation().y();
-			int dx = i - x;
-			int dy = j - y;
-			float distanceFromCenter = (float) Math.sqrt(dx*dx + dy*dy);
-			if (distanceFromCenter > mountainEdgeRadius) {
-				continue;
-			}
-			if (peaks[i][j] > 1 - volcanoCraterPercent) {
-				double offset = peaks[i][j] - (1 - volcanoCraterPercent);
-				peaks[i][j] = peaks[i][j] - 5 * offset;
-				if (distanceFromCenter <= volcanoRadius) {
-					tile.setTerrain(Terrain.VOLCANO);
-				}
-			}
-		}
-//		for(int i = 0; i < world.getHeight(); i++) {
-//			for(int j = 0; j < world.getWidth(); j++) {
-//				if (peaks[i][j] > 1 - volcanoCraterPercent) {
-//					double offset = peaks[i][j] - (1 - volcanoCraterPercent);
-//					peaks[i][j] = peaks[i][j] - 5 * offset;
+//		
+//		double[][] peaks = Generation.generateMap2(
+//				seedGenerator.nextLong(), world.getWidth(), world.getHeight(), 
+//				40, 0, 1);
+//		TerrainGenView.addMap(peaks, "volcano peaks");
+//		TileLoc highestPeak = findHighest(peaks);
+//		peaks = Generation.generateMap2(
+//				seedGenerator.nextLong(), world.getWidth(), world.getHeight(), 
+//				40, 0, 1, 
+//				world.getHeight()/2 - highestPeak.y(), world.getWidth()/2 - highestPeak.x());
+//
+//		TerrainGenView.addMap(peaks, "volcano peaks2");
+//		
+//		float lavaRadius = 5;
+//		float volcanoRadius = 10;
+//		float mountainRadius = 20;
+//		float mountainEdgeRadius = 30;
+//		
+//		double volcanoCraterPercent = .2;
+//
+//		for(Tile tile : world.getTiles()) {
+//			int i =  tile.getLocation().x();
+//			int j =  tile.getLocation().y();
+//			int dx = i - x;
+//			int dy = j - y;
+//			float distanceFromCenter = (float) Math.sqrt(dx*dx + dy*dy);
+//			if (distanceFromCenter > mountainEdgeRadius) {
+//				continue;
+//			}
+//			if (peaks[i][j] > 1 - volcanoCraterPercent) {
+//				double offset = peaks[i][j] - (1 - volcanoCraterPercent);
+//				peaks[i][j] = peaks[i][j] - 5 * offset;
+//				if (distanceFromCenter <= volcanoRadius) {
+//					tile.setTerrain(Terrain.VOLCANO);
 //				}
 //			}
 //		}
-		TerrainGenView.addMap(peaks, "volcano peaks3");
-		
-		for(Tile tile : world.getTiles()) {
-			int i =  tile.getLocation().x();
-			int j =  (int) (tile.getLocation().y() + (i%2)*0.5f);
-			int dx = i - x;
-			int dy = j - y;
-			float distanceFromCenter = (float) Math.sqrt(dx*dx + dy*dy);
-			if (distanceFromCenter <= mountainRadius) {
-				heightMap[i][j] = (float) peaks[i][j];
-			}
-			else if(distanceFromCenter < mountainEdgeRadius) {
-				double ratio = (distanceFromCenter - mountainRadius) 
-						/ (mountainEdgeRadius - mountainRadius);
-				float interpolatedHeight = (float) (peaks[i][j] * (1 - ratio) 
-						+ heightMap[i][j] * ratio);
-				heightMap[i][j] = interpolatedHeight;
-			}
-
-			if(distanceFromCenter < mountainEdgeRadius) {
-				if(distanceFromCenter < lavaRadius) {
-					tile.liquidType = LiquidType.LAVA;
-					tile.liquidAmount = 15f;
-				}
-			}
-		}
+////		for(int i = 0; i < world.getHeight(); i++) {
+////			for(int j = 0; j < world.getWidth(); j++) {
+////				if (peaks[i][j] > 1 - volcanoCraterPercent) {
+////					double offset = peaks[i][j] - (1 - volcanoCraterPercent);
+////					peaks[i][j] = peaks[i][j] - 5 * offset;
+////				}
+////			}
+////		}
+//		TerrainGenView.addMap(peaks, "volcano peaks3");
+//		
+//		for(Tile tile : world.getTiles()) {
+//			int i =  tile.getLocation().x();
+//			int j =  (int) (tile.getLocation().y() + (i%2)*0.5f);
+//			int dx = i - x;
+//			int dy = j - y;
+//			float distanceFromCenter = (float) Math.sqrt(dx*dx + dy*dy);
+//			if (distanceFromCenter <= mountainRadius) {
+//				heightMap[i][j] = (float) peaks[i][j];
+//			}
+//			else if(distanceFromCenter < mountainEdgeRadius) {
+//				double ratio = (distanceFromCenter - mountainRadius) 
+//						/ (mountainEdgeRadius - mountainRadius);
+//				float interpolatedHeight = (float) (peaks[i][j] * (1 - ratio) 
+//						+ heightMap[i][j] * ratio);
+//				heightMap[i][j] = interpolatedHeight;
+//			}
+//
+//			if(distanceFromCenter < mountainEdgeRadius) {
+//				if(distanceFromCenter < lavaRadius) {
+//					tile.liquidType = LiquidType.LAVA;
+//					tile.liquidAmount = 15f;
+//				}
+//			}
+//		}
 		return new TileLoc(x, y);
 	}
 

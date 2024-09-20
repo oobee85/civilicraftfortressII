@@ -28,6 +28,7 @@ public class DebugView {
 	private static final ImageIcon SHADOW_WORD_DEATH = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/soyouhavechosendeath.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon SHADOW_WORD_PAIN = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/shadowwordpain.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/tech.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
+	private static final ImageIcon SETTINGS_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/settings.png"), DEBUG_BUTTON_SIZE.height-5, DEBUG_BUTTON_SIZE.height-5);
 
 	private JFrame settingsWindow;
 	private JFrame terrainGenWindow;
@@ -183,7 +184,7 @@ public class DebugView {
 			}
 		});
 
-		JButton settingsButton = KUIConstants.setupButton("Settings", null, DEBUG_BUTTON_SIZE);
+		JButton settingsButton = KUIConstants.setupButton("Settings", SETTINGS_ICON, DEBUG_BUTTON_SIZE);
 		settingsButton.addActionListener(e -> setupSettingsMenu() );
 
 		JButton terrainGenViewButton = KUIConstants.setupButton("TerrainGen", null, DEBUG_BUTTON_SIZE);

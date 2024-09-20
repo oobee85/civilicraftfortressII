@@ -34,6 +34,7 @@ public class Settings {
 	public static int WORLD_WIDTH = 128;
 	public static int WORLD_HEIGHT = 128;
 	public static int DEFAULT_TILE_SIZE = 45;
+	public static int NUM_ITERATIONS_SNOWFLAKE = 5;
 	
 	public static String DEFAULT_PLAYER_NAME = "Player";
 	public static int DEFAULT_PLAYER_COLOR = Color.red.getRGB();

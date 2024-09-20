@@ -1296,10 +1296,10 @@ public class World {
 		
 		
 		float[][] heightMap = Generation.generateHeightMap(worldRNG, width, height);
-		Utils.normalize(heightMap, 0, 1);
+//		Utils.normalize(heightMap, 0, 1);
 		volcano = Generation.makeVolcano(this, heightMap, worldRNG);
 		Utils.normalize(heightMap, 0, 1000);
-		heightMap = Utils.smoothingFilter(heightMap, 2, 2);
+		heightMap = Utils.smoothingFilter(heightMap, 1, 2);
 		TerrainGenView.addMap(heightMap, "finalheightMap");
 		Generation.addCliff(this, heightMap, worldRNG);
 
