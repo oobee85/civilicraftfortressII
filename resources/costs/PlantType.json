@@ -3,7 +3,6 @@
 	{
 		"name":"BERRY",
 		"image":"Images/plants/berry16.png",
-		"mesh":"models/cube.obj",
 		"health":200,
 		"rarity": 1,
 		"harvestitems":{"FOOD":5}
@@ -17,7 +16,6 @@
 	{
 		"name":"BERRY_DEPLETED",
 		"image":"Images/plants/berry_depleted16.png",
-		"mesh":"models/cube.obj",
 		"health":50,
 		"rarity": 0.2,
 		"harvestitems":{"FOOD":1}
@@ -25,8 +23,6 @@
 	{
 		"name":"CATTAIL",
 		"image":"Images/plants/cattail32.png",
-		"mesh":"models/cattail.ply",
-		"texture":"textures/pallet1.png",
 		"health":200,
 		"rarity": 1,
 		"resistances": {"DRY": 100, "WATER": 0},
@@ -35,7 +31,6 @@
 	{
 		"name":"TREE",
 		"image":"Images/plants/tree1.png",
-		"mesh":"models/square_tree.ply",
 		"health":500,
 		"rarity": 1,
 		"harvestitems":{"WOOD":2}

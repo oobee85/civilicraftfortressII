@@ -2,7 +2,6 @@
 "unittypes": [
 	{
 		"image":"Images/units/worker.png",
-		"mesh":"models/star.obj",
 		"cost":{"FOOD":50},
 		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":50},
 		"attackstyles":[
@@ -16,7 +15,6 @@
 	},
 	{
 		"image":"Images/units/mason.png",
-		"mesh":"models/star.obj",
 		"cost":{"FOOD":60},
 		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":50},
 		"attackstyles":[
@@ -102,8 +100,6 @@
 	},
 	{
 		"image":"Images/units/catapult.png",
-		"mesh":"models/catapult.ply",
-		"texture":"textures/pallet1.png",
 		"cost":{"WOOD":500,"MITHRIL_BAR":20,"STONE":250},
 		"stats":{"movespeed":40,"buildtime":600,"health":200,"healspeed":100},
 		"name":"CATAPULT",
@@ -238,8 +234,6 @@
 	},
 	{
 		"image":"Images/units/deer.png",
-		"mesh":"models/deer.ply",
-		"texture":"textures/pallet1.png",
 		"stats":{"movespeed":5,"buildtime":0,"health":200,"healspeed":50},
 		"name":"DEER",
 		"attackstyles":[
@@ -260,8 +254,6 @@
 	},
 	{
 		"image":"Images/units/pig.png",
-		"mesh":"models/pig.ply",
-		"texture":"textures/pallet1.png",
 		"stats":{"movespeed":30,"buildtime":0,"health":200,"healspeed":50},
 		"name":"PIG",
 		"attackstyles":[
@@ -272,8 +264,6 @@
 	},
 	{
 		"image":"Images/units/sheep.png",
-		"mesh":"models/sheep.ply",
-		"texture":"textures/pallet1.png",
 		"stats":{"movespeed":30,"buildtime":0,"health":200,"healspeed":50},
 		"name":"SHEEP",
 		"attackstyles":[
@@ -294,7 +284,6 @@
 	},
 	{
 		"image":"Images/units/fish2.png",
-		"mesh":"models/fish.ply",
 		"stats":{"movespeed":5,"buildtime":0,"health":10,"healspeed":50},
 		"name":"FISH",
 		"attackstyles":[
@@ -306,7 +295,6 @@
 	},
 	{
 		"image":"Images/units/dragon.png",
-		"mesh":"models/dragon.ply",
 		"stats":{"movespeed":5,"buildtime":0,"health":3000,"healspeed":10},
 		"name":"DRAGON",
 		"attackstyles":[
@@ -491,14 +479,12 @@
 	},
 	{
 		"image":"Images/units/waterspirit.png",
-		"mesh":"models/waterspirit.ply",
 		"stats":{"movespeed":25,"buildtime":0,"health":50,"healspeed":50},
 		"name":"WATER_SPIRIT",
 		"attributes":["migratory"]
 	},
 	{
 		"image":"Images/units/parasite.png",
-		"mesh":"models/parasite.ply",
 		"stats":{"movespeed":5,"buildtime":0,"health":1,"healspeed":50},
 		"name":"PARASITE",
 		"attackstyles":[
@@ -527,8 +513,6 @@
 	},
 	{
 		"image":"Images/units/bomb.png",
-		"mesh":"models/bomb.ply",
-		"texture":"textures/pallet1.png",
 		"stats":{"movespeed":25,"buildtime":0,"health":50,"healspeed":50},
 		"name":"BOMB",
 		"attackstyles":[
