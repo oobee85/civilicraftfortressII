@@ -46,6 +46,12 @@ public class WorldGenViewer {
 			regenerateMaps();
 			frame.repaint();
 		});
+
+		JButton generateButton2 = new JButton("Glom");
+		generateButton2.addActionListener(e -> {
+			regenerateMaps2();
+			frame.repaint();
+		});
 		
 		menuPanel = new JPanel();
 		viewPanel = new JPanel();
@@ -54,6 +60,7 @@ public class WorldGenViewer {
 		frame.add(viewPanel, BorderLayout.CENTER);
 		
 		menuPanel.add(generateButton);
+		menuPanel.add(generateButton2);
 		menuPanel.add(new JLabel("Seed"));
 		menuPanel.add(seedField);
 		menuPanel.add(new JLabel("Scale"));
@@ -82,14 +89,8 @@ public class WorldGenViewer {
 		}
 	}
 	
-	private void regenerateMaps() {
+	private void makeImage(double[][] map) {
 		mapImage1 = new BufferedImage(mapPanel1.getWidth(), mapPanel1.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-		double[][] map = Generation.generateMap2(
-				parseSeed(),
-				mapPanel1.getWidth(),
-				mapPanel1.getHeight(),
-				parseScale(),
-				-1, 1);
 		double max = -100;
 		double min = 100;
 		for (int y = 0; y < map.length; y++) {
@@ -103,6 +104,25 @@ public class WorldGenViewer {
 		}
 		System.out.println(max);
 		System.out.println(min);
+	}
+
+	private void regenerateMaps2() {
+		double[][] map = Generation.generateMap3(
+				parseSeed(),
+				mapPanel1.getWidth(),
+				mapPanel1.getHeight(),
+				-1, 1, parseScale());
+		makeImage(map);
+	}
+	
+	private void regenerateMaps() {
+		double[][] map = Generation.generateMap2(
+				parseSeed(),
+				mapPanel1.getWidth(),
+				mapPanel1.getHeight(),
+				parseScale(),
+				-1, 1);
+		makeImage(map);
 	}
 	
 	public static void main(String[] args) {

@@ -210,7 +210,7 @@ public class Unit extends Thing implements Serializable {
 		}
 		if (currentPath != null && currentPath.contains(getTile())) {
 			while (!currentPath.isEmpty()) {
-				if (currentPath.removeFirst() == p.getTile()) {
+				if (currentPath.removeFirst() == getTile()) {
 					break;
 				}
 			}

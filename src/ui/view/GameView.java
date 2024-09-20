@@ -71,22 +71,19 @@ public class GameView {
 		this.overlayPanel = overlay;
 		state = new GameViewState();
 		vanillaDrawer = new VanillaDrawer(game, state);
-		panel = new FillingLayeredPane() {
-			@Override
-			public void paintComponent(Graphics g) {
-				super.paintComponent(g);
-			}
-		};
+		panel = new FillingLayeredPane();
 		if(Settings.CINEMATIC) {
 			panel.setCursor(BLANK_CURSOR);
 		}
 		panel.setLayout(new BorderLayout());
 		panel.setBackground(Color.black);
-		panel.add(overlayPanel, BorderLayout.SOUTH);
+		if (overlayPanel != null) {
+			panel.add(overlayPanel, BorderLayout.SOUTH);
+		}
 		
-		vanillaDrawer.getDrawingCanvas().setFocusable(false);
-
-		switch3d(false);
+		drawingCanvas = vanillaDrawer.getDrawingCanvas();
+		drawingCanvas.setFocusable(false);
+		panel.add(drawingCanvas, BorderLayout.CENTER);
 		
 		this.game = game;
 		this.guiController = game.getGUIController();
@@ -245,14 +242,6 @@ public class GameView {
 		vanillaDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
 		vanillaDrawer.getDrawingCanvas().addMouseListener(mouseListener);
 		panel.addKeyListener(keyListener);
-	}
-	
-	public void switch3d(boolean activate3D) {
-		if(drawingCanvas != null) {
-			panel.remove(drawingCanvas);
-		}
-		drawingCanvas = vanillaDrawer.getDrawingCanvas();
-		panel.add(drawingCanvas);
 	}
 
 	public void setFaction(Faction faction) {
@@ -874,8 +863,12 @@ public class GameView {
 	 *  scaled to (tile.x * tileSize), ((tile.y + hexOffset)*tileSize) 
 	 */
 	private void centerViewOnPixel(Position pixel) {
+		int overlayh = 0;
+		if (overlayPanel != null) {
+			overlayh = overlayPanel.getHeight();
+		}
 		Position halfScreenOffset = new Position(panel.getWidth() / 2, 
-		                                         (panel.getHeight() - overlayPanel.getHeight()) / 2);
+		                                         (panel.getHeight() - overlayh) / 2);
 		state.viewOffset = pixel.subtract(halfScreenOffset);
 		panel.repaint();
 	}

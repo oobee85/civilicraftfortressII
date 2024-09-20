@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 
@@ -31,6 +32,109 @@ public class Generation {
 			}
 		}
 		
+	}
+	
+	private static void addPixel(Random rand, int[][] start, int size) {
+		int x = rand.nextInt(size);
+		int y = rand.nextInt(size);
+		while(start[x][y] != 0) {
+			x = rand.nextInt(size);
+			y = rand.nextInt(size);
+		}
+		while(true) {
+			int neighborSum = 0;
+			if (x > 0) {
+				if (y > 0) {
+					neighborSum += start[x-1][y-1];
+				}
+				neighborSum += start[x-1][y];
+				if (y < size-1) {
+					neighborSum += start[x-1][y+1];
+				}
+			}
+			if (y > 0) {
+				neighborSum += start[x][y-1];
+			}
+			if (y < size-1) {
+				neighborSum += start[x][y+1];
+			}
+			if (x < size-1) {
+				if (y > 0) {
+					neighborSum += start[x+1][y-1];
+				}
+				neighborSum += start[x+1][y];
+				if (y < size-1) {
+					neighborSum += start[x+1][y+1];
+				}
+			}
+			if (neighborSum != 0) {
+				break;
+			}
+			int minx = (x > 0) ? -1 : 0;
+			int maxx = (x < size - 1) ? 1 : 0;
+			int deltax = rand.nextInt(1 + maxx - minx) + minx;
+			x += deltax;
+			int miny = (y > 0) ? -1 : 0;
+			int maxy = (y < size - 1) ? 1 : 0;
+			int deltay = rand.nextInt(1 + maxy - miny) + miny;
+			y += deltay;
+		}
+		start[x][y] += 1;
+	}
+	
+	public static double[][] generateMap3(
+			long seed,
+			int width,
+			int height,
+			double minValue,
+			double maxValue,
+			int numIterations) {
+		Random rand = new Random(seed);
+		double[][] map = new double[height][width];
+		
+		int size = 9;
+		int[][] start = new int[size][size];
+		start[size/2][size/2] = 1;
+		int iteration = 0;
+		HashMap<Integer, int[][]> old = new HashMap<>();
+		while (size < height && size < width && iteration < numIterations) {
+			for (int i = 0; i < size*size/6; i++) {
+				addPixel(rand, start, size);
+			}
+			old.put(size, start);
+
+
+			iteration++;
+			if (size*3 >= height || size*3 >= width || iteration >= numIterations) {
+				break;
+			}
+
+			size = size*3;
+			start = new int[size][size];
+			for (Entry<Integer, int[][]> oldstart : old.entrySet()) {
+				int oldsize = oldstart.getKey();
+				int offset = 0;
+				while(oldsize < size) {
+					offset += oldsize;
+					oldsize = oldsize*3;
+				}
+				for (int y = 0; y < oldstart.getKey(); y++) {
+					for (int x = 0; x < oldstart.getKey(); x++) {
+						start[y + offset][x + offset] = oldstart.getValue()[y][x];
+					}
+				}
+			}
+		}
+		
+		
+		for (int y = 0; y < height; y++) { 
+			for (int x = 0; x < width; x++) {
+				map[y][x] = start[(int)(size * y / height)][(int)(size * x / width)];
+			}
+		}
+
+		Utils.normalize(map, maxValue, minValue);
+		return map;
 	}
 
 	public static double[][] generateMap2(
@@ -204,17 +308,17 @@ public class Generation {
 		return highestTile;
 	}
 	
-	public static TileLoc makeVolcano(World world, float[][] heightMap, long seed) {
+	public static TileLoc makeVolcano(World world, float[][] heightMap, Random seedGenerator) {
 		int x = world.getWidth()/2;
 		int y = world.getHeight()/2;
 		
 		double[][] peaks = Generation.generateMap2(
-				seed + 102983578L, world.getWidth(), world.getHeight(), 
+				seedGenerator.nextLong(), world.getWidth(), world.getHeight(), 
 				40, 0, 1);
 		TerrainGenView.addMap(peaks, "volcano peaks");
 		TileLoc highestPeak = findHighest(peaks);
 		peaks = Generation.generateMap2(
-				seed + 102983578L, world.getWidth(), world.getHeight(), 
+				seedGenerator.nextLong(), world.getWidth(), world.getHeight(), 
 				40, 0, 1, 
 				world.getHeight()/2 - highestPeak.y(), world.getWidth()/2 - highestPeak.x());
 

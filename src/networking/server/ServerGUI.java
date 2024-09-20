@@ -14,6 +14,7 @@ public class ServerGUI extends JPanel {
 
 //	private Server server;
 	private JLabel info;
+	private JPanel ingamePanel;
 	private GameView gameView;
 	private JPanel connectionPanelBar;
 	private HashSet<JPanel> connectionPanels = new HashSet<>();
@@ -33,16 +34,23 @@ public class ServerGUI extends JPanel {
 		topPanel.add(info, BorderLayout.NORTH);
 		topPanel.add(connectionPanelBar, BorderLayout.CENTER);
 		this.add(topPanel, BorderLayout.NORTH);
+		
+		ingamePanel = new JPanel();
+		ingamePanel.setLayout(new BorderLayout());
+		ingamePanel.setFocusable(false);
+		ingamePanel.setBackground(Color.red);
+		this.add(ingamePanel, BorderLayout.CENTER);
 	}
 	
 	public void setGameInstance(Game instance) {
 		if(gameView != null) {
 			this.remove(gameView.getPanel());
 		}
-		gameView = new GameView(instance, new JPanel());
+		gameView = new GameView(instance, null);
 		gameView.setCommandInterface(Utils.makeFunctionalCommandInterface(instance));
 		gameView.requestFocus();
-		this.add(gameView.getPanel(), BorderLayout.CENTER);
+		
+		ingamePanel.add(gameView.getPanel(), BorderLayout.CENTER);
 		revalidate();
 		repaint();
 	}
