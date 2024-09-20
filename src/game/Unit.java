@@ -697,9 +697,9 @@ public class Unit extends Thing implements Serializable {
 			int range = Math.max(5, getMaxAttackRange());
 			for (Tile tile : Utils.getTilesInRadius(getTile(), world, range)) {
 				for (Unit unit : tile.getUnits()) {
-					if (unit.shouldAggroOn(unit)
+					if (shouldAggroOn(unit)
 							&& unit.getType().isHostile()
-							&& (!this.getType().isDangerousToOwnTeam() || unit.getTile().getFaction().id() != this.getFactionID())) {
+							&& (!getType().isDangerousToOwnTeam() || unit.getTile().getFaction().id() != getFactionID())) {
 						prequeuePlannedAction(PlannedAction.attack(unit));
 						return;
 					}
