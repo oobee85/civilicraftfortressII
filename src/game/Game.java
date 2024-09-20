@@ -81,25 +81,20 @@ public class Game {
 		// Remove dead things
 		for(Unit unit : world.getUnits()) {
 			if(unit.isDead()) {
-				for (Item item : unit.getType().getDeadItem()) {
-					unit.getTile().getInventory().addItem(item.getType(), item.getAmount());
+				continue;
+			}
+			PlannedAction plan = unit.actionQueue.peek();
+			if(plan != null) {
+				if(plan.isDone(unit)) {
+					unit.actionQueue.poll();
 				}
 			}
-			else {
-//				unit.getTile().getInventory().clear();
-				PlannedAction plan = unit.actionQueue.peek();
-				if(plan != null) {
-					if(plan.isDone(unit)) {
-						unit.actionQueue.poll();
-					}
-				}
-				
-				unit.updateSimulatedCurrentPath();
-			}
+			
+			unit.updateSimulatedCurrentPath();
 		}
 		world.clearDeadAndAddNewThings();
 
-//		buildingTick();
+		buildingTick(true);
 //		unitTick();
 
 		
@@ -140,7 +135,7 @@ public class Game {
 
 		world.clearDeadAndAddNewThings();
 		
-		buildingTick();
+		buildingTick(false);
 		unitTick();
 		world.doProjectileUpdates(false);
 		if (World.ticks % Constants.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
@@ -673,59 +668,65 @@ public class Game {
 			}
 		}
 	}
+	
+	private void doBuildingCulture(Building b) {
+		TileLoc loc = b.getTile().getLocation();
+		double culture = b.getCulture();
+		double area = culture * Building.CULTURE_AREA_MULTIPLIER;
+		double radius = Math.sqrt(area);
+		int r = (int)Math.ceil(radius);
+		for (int i = -r; i <= r; i++) {
+			for (int j = -r; j <= r; j++) {
+				TileLoc targetLoc = new TileLoc(loc.x()+i, loc.y()+j);
+				Tile tile = world.get(targetLoc);
+				if (tile == null) {
+					continue;
+				}
+				int distance = loc.distanceTo(targetLoc);
+//				double distanceFromCenter = Math.sqrt(i*i + j*j);
+				if(distance > radius) {
+					continue;
+				}
+				
+				double influence = radius == 0 ? culture : culture * (radius - distance) / radius;
+				
+				if (!cultureInfluence.containsKey(tile)) {
+					cultureInfluence.put(tile, 0.0);
+				}
+				double existingInfluence = cultureInfluence.get(tile);
+				
+				if (tile.getFaction() == b.getFaction()) {
+					if (influence > existingInfluence) {
+						cultureInfluence.put(tile, influence);
+					}
+				}
+				else if(tile.getFaction() == world.getFaction(World.NO_FACTION_ID)) {
+					tile.setFaction(b.getFaction());
+					world.addToTerritory(tile);
+					cultureInfluence.put(tile, influence);
+				}
+				else {
+					if (influence > 2 * existingInfluence) {
+						System.out.println(b + " has more than double influence on tile " + tile);
+						tile.setFaction(b.getFaction());
+						world.addToTerritory(tile);
+						cultureInfluence.put(tile, influence);
+					}
+				}
+			}
+		}
+	}
 
 	HashMap<Tile, Double> cultureInfluence;
-	public void buildingTick() {
+	public void buildingTick(boolean simulated) {
 		if (cultureInfluence == null) {
 			cultureInfluence = new HashMap<>();
 		}
 		for(Building building : world.getBuildings()) {
-			TileLoc loc = building.getTile().getLocation();
-			double culture = building.getCulture();
-			double area = culture * Building.CULTURE_AREA_MULTIPLIER;
-			double radius = Math.sqrt(area);
-			int r = (int)Math.ceil(radius);
-			for (int i = -r; i <= r; i++) {
-				for (int j = -r; j <= r; j++) {
-					TileLoc targetLoc = new TileLoc(loc.x()+i, loc.y()+j);
-					Tile tile = world.get(targetLoc);
-					if (tile == null) {
-						continue;
-					}
-					int distance = loc.distanceTo(targetLoc);
-//					double distanceFromCenter = Math.sqrt(i*i + j*j);
-					if(distance > radius) {
-						continue;
-					}
-					
-					double influence = radius == 0 ? culture : culture * (radius - distance) / radius;
-					
-					if (!cultureInfluence.containsKey(tile)) {
-						cultureInfluence.put(tile, 0.0);
-					}
-					double existingInfluence = cultureInfluence.get(tile);
-					
-					if (tile.getFaction() == building.getFaction()) {
-						if (influence > existingInfluence) {
-							cultureInfluence.put(tile, influence);
-						}
-					}
-					else if(tile.getFaction() == world.getFaction(World.NO_FACTION_ID)) {
-						tile.setFaction(building.getFaction());
-						world.addToTerritory(tile);
-						cultureInfluence.put(tile, influence);
-					}
-					else {
-						if (influence > 2 * existingInfluence) {
-							System.out.println(building + " has more than double influence on tile " + tile);
-							tile.setFaction(building.getFaction());
-							world.addToTerritory(tile);
-							cultureInfluence.put(tile, influence);
-						}
-					}
-				}
+			if (!simulated) {
+				doBuildingCulture(building);
 			}
-			building.tick(world);
+			building.tick(world, simulated);
 		}
 	}
 	

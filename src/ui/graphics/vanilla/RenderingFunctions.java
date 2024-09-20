@@ -365,7 +365,7 @@ public class RenderingFunctions {
 				}
 				// draw destination flags
 				for (PlannedAction plan : unit.actionQueue) {
-					Tile targetTile = plan.targetTile == null ? (plan.target != null ? plan.target.getTile() : null) : plan.targetTile;
+					Tile targetTile = plan.getTile();
 					if (targetTile == null) {
 						continue;
 					}

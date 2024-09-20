@@ -363,7 +363,6 @@ public class Client {
 				gameInstance.world.addFaction(faction);
 			}
 		}
-		World.ticks = worldInfo.getTick();
 		gameInstance.world.updateTiles(worldInfo.getTileInfos());
 		if(worldInfo.getTileInfos().length > 0) {
 			tilesReceived = true;
@@ -555,7 +554,11 @@ public class Client {
 						}
 					}
 					else if(message instanceof WorldInfo) {
+//						System.out.println("Current client tick: " + World.ticks + ", tick received from server: " + ((WorldInfo)message).getTick());
+//						long start = System.currentTimeMillis();
 						worldInfoUpdate((WorldInfo)message);
+//						long delta = System.currentTimeMillis() - start;
+//						System.out.println("it took " + delta + "ms to process the WorldInfo");
 					}
 					else if(message instanceof Faction) {
 						factionUpdate((Faction)message);

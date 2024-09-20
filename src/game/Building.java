@@ -48,8 +48,12 @@ public class Building extends Thing implements Serializable {
 	public boolean isPlanned() {
 		return isPlanned;
 	}
-	public void tick(World world) {
+	public void tick(World world, boolean simulated) {
 		updateInProgressUnit();
+		if (simulated) {
+			// only thing client needs to simulate is unit progress
+			return;
+		}
 		if (timeToHarvest > 0) {
 			timeToHarvest -= 1;
 		}
