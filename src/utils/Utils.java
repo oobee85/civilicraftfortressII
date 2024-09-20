@@ -580,7 +580,7 @@ public final class Utils {
 		try(ObjectOutputStream objOut = new ObjectOutputStream(new FileOutputStream(filename, append))) {
 			objOut.writeObject(worldInfo);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			// missing folder is fine
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

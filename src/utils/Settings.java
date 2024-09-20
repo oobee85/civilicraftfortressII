@@ -27,7 +27,7 @@ public class Settings {
 	public static boolean LIQUID_MULTITHREADED = true;
 	public static boolean AIR_MULTITHREADED = false;
 	public static boolean WRITE_NETWORK_PACKAGES_TO_FILE = false;
-	public static double LIQUID_CHANGE_THRESHOLD = 0.01;
+	public static double LIQUID_CHANGE_THRESHOLD = 0.5;
 
 	public static int NUM_AI = 0;
 	public static int AIDELAY = 1000;
