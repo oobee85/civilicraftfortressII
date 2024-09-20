@@ -821,10 +821,6 @@ public final class Utils {
 				}
 			}
 			@Override
-			public void setGuarding(Unit unit, boolean enabled) {
-				unit.setGuarding(enabled);
-			}
-			@Override
 			public void planAction(Unit unit, PlannedAction plan, boolean clearQueue) {
 				if(clearQueue) {
 					unit.clearPlannedActions();

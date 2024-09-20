@@ -664,7 +664,7 @@ public class Game {
 					continue;
 				}
 				Animal cyclops = world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp, world.getFaction(World.CYCLOPS_FACTION_ID), null);
-				cyclops.setPassiveAction(PlannedAction.GUARD);
+				cyclops.queuePlannedAction(PlannedAction.guardTile(temp));
 			}
 		}
 	}

@@ -168,11 +168,6 @@ public class Client {
 				localCommands.produceUnit(building, unitType);
 			}
 			@Override
-			public void setGuarding(Unit unit, boolean enabled) {
-				sendMessage(CommandMessage.makeSetGuardingCommand(unit.id(), enabled));
-				localCommands.setGuarding(unit, enabled);
-			}
-			@Override
 			public void planAction(Unit unit, PlannedAction plan, boolean clearQueue) {
 				// TODO figure out clearQueue
 				sendMessage(CommandMessage.makePlannedActionCommand(unit.id(), plan, clearQueue));

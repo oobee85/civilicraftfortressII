@@ -195,9 +195,6 @@ public class BuildOrderAI extends AIInterface {
 
 	int alternateAttack = 0;
 	private void handleCombatUnit(Unit unit) {
-		if(!unit.isGuarding()) {
-			commands.setGuarding(unit, true);
-		}
 		if (unit.getMaxAttackRange() > 19) {
 			attackNearestEnemyBuilding(unit);
 		}
@@ -423,7 +420,7 @@ public class BuildOrderAI extends AIInterface {
 			Building friendly = buildings.get((int) (Math.random() * buildings.size()));
 			t = friendly.getTile();
 		}
-		commands.planAction(unit, PlannedAction.attackMoveTo(t), true);
+		commands.planAction(unit, PlannedAction.guardTile(t), true);
 	}
 	private void attackTowardsNearestEnemy(Unit unit) {
 		Tile homeTile = getHomeTile(unit);

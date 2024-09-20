@@ -3,6 +3,7 @@ package game.ai;
 import java.util.*;
 
 import game.*;
+import game.actions.PlannedAction;
 import ui.CommandInterface;
 import utils.*;
 import world.*;
@@ -15,6 +16,10 @@ public class NeutralAI extends AIInterface {
 
 	@Override
 	public void aiTickLogic() {
+		handleScorpions();
+	}
+	
+	private void handleScorpions() {
 		if (unitQuantities[Game.unitTypeMap.get("SCORPION").id()] < 20) {
 			for (Building building : faction.getBuildings()) {
 				if (building.getType() != Game.buildingTypeMap.get("SCORPION_DEN")) {
@@ -29,6 +34,7 @@ public class NeutralAI extends AIInterface {
 				commands.setBuildingRallyPoint(building, target);
 			}
 		}
+
 		for (Unit unit : faction.getUnits()) {
 			if (unit.getType() != Game.unitTypeMap.get("SCORPION")) {
 				continue;
@@ -48,9 +54,7 @@ public class NeutralAI extends AIInterface {
 					continue;
 				}
 			}
-			if (!unit.isGuarding()) {
-				commands.setGuarding(unit, true);
-			}
+			commands.planAction(unit, PlannedAction.guardTile(unit.getTile()), false);
 		}
 	}
 }

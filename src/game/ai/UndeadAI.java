@@ -3,6 +3,7 @@ package game.ai;
 import java.util.*;
 
 import game.*;
+import game.actions.PlannedAction;
 import ui.CommandInterface;
 import utils.*;
 import world.*;
@@ -72,11 +73,13 @@ public class UndeadAI extends AIInterface {
 	@Override
 	public void aiTickLogic() {
 		for (Unit unit : faction.getUnits()) {
-			if (unit.isBuilder() && unit.isIdle()) {
-				buildWalls(unit);
+			if (unit.isBuilder()) {
+				if (unit.isIdle()) {
+					buildWalls(unit);
+				}
 			}
 			else if(!unit.isGuarding()) {
-				commands.setGuarding(unit, true);
+				commands.planAction(unit, PlannedAction.guardTile(unit.getTile()), true);
 			}
 		}
 

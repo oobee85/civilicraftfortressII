@@ -5,14 +5,12 @@ import world.*;
 import static game.actions.ActionType.*;
 
 import java.io.Serializable;
-import java.util.*;
 
 import game.*;
 
 public class PlannedAction implements Serializable {
 	
 	public transient static final PlannedAction NOTHING = new PlannedAction(null, false);
-	public transient static final PlannedAction GUARD = new PlannedAction(null, false);
 	public transient static final PlannedAction BUILD = new PlannedAction(null, false);
 	
 	public final TileLoc targetTileLoc;
