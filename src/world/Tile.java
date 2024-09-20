@@ -25,7 +25,7 @@ public class Tile implements Externalizable {
 	private volatile Faction faction;
 
 	private Resource resource;
-	private Terrain terr;
+	private Terrain terrain;
 	private GroundModifier modifier;
 
 	private Plant plant;
@@ -49,19 +49,17 @@ public class Tile implements Externalizable {
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 
 		height = in.readFloat();
-		air = new Air(height);
-//		air = (Air)in.readObject();
-		inventory = new Inventory();
+		air = (Air)in.readObject();
+		inventory = (Inventory)in.readObject();
 		liquidAmount = in.readFloat();
 		energy = in.readDouble();
 
 		location = TileLoc.readFromExternal(in);
 
 		liquidType = LiquidType.values()[in.readByte()];
-		terr = Terrain.values()[in.readByte()];
+		terrain = Terrain.values()[in.readByte()];
 		faction = new Faction();
 		faction.setID(in.readByte());
-
 		resource = (Resource) in.readObject();
 		modifier = (GroundModifier) in.readObject();
 	}
@@ -69,33 +67,33 @@ public class Tile implements Externalizable {
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
 		out.writeFloat(height);
-//		out.writeObject(air);
+		out.writeObject(air);
+		out.writeObject(inventory);
 		out.writeFloat(liquidAmount);
 		out.writeDouble(this.energy);
 		
 		location.writeExternal(out);
 
 		out.writeByte(liquidType.ordinal());
-		out.writeByte(terr.ordinal());
+		out.writeByte(terrain.ordinal());
 		out.writeByte(faction.id());
-
 		out.writeObject(resource);
 		out.writeObject(modifier);
 	}
-
+	
 	public Tile() {
-
+		
 	}
 
 	public Tile(TileLoc location, Terrain t) {
 		this.location = location;
-		terr = t;
+		terrain = t;
 		liquidType = LiquidType.WATER;
 		liquidAmount = 0;
 		units = new ConcurrentLinkedDeque<Unit>();
 		projectiles = new ConcurrentLinkedQueue<Projectile>();
 		inventory = new Inventory();
-		this.energy = 100000;
+		this.energy = 30000;
 		air = new Air(this.height);
 		this.tickLastTerrainChange = -Constants.MIN_TIME_TO_SWITCH_TERRAIN;
 	}
@@ -351,7 +349,7 @@ public class Tile implements Externalizable {
 	}
 
 	public Terrain getTerrain() {
-		return terr;
+		return terrain;
 	}
 
 	public Faction getFaction() {
@@ -359,11 +357,11 @@ public class Tile implements Externalizable {
 	}
 
 	public boolean canBuild() {
-		return terr.isBuildable(terr) && liquidAmount < liquidType.getMinimumDamageAmount();
+		return terrain.isBuildable(terrain) && liquidAmount < liquidType.getMinimumDamageAmount();
 	}
 
 	public boolean canPlant() {
-		return terr.isPlantable(terr);
+		return terrain.isPlantable(terrain);
 	}
 	
 	public boolean canGrow() {
@@ -385,9 +383,9 @@ public class Tile implements Externalizable {
 			return true;
 		}
 		
-		if (this.air.getTemperature() < Constants.LETHALCOLDTEMP) { // -10 c
-			return true;
-		}
+//		if (this.air.getTemperature() < Constants.LETHALCOLDTEMP) { // -10 c
+//			return true;
+//		}
 		return false;
 	}
 	
@@ -395,14 +393,14 @@ public class Tile implements Externalizable {
 		if (liquidType == LiquidType.LAVA) {
 			return true;
 		}
-		if (this.air.getTemperature() > Constants.LETHALHOTTEMP) { // 37.8 c, 100f
-			return true;
-		}
+//		if (this.air.getTemperature() > Constants.LETHALHOTTEMP) { // 37.8 c, 100f
+//			return true;
+//		}
 		return false;
 	}
 
 	public boolean canOre() {
-		return terr.isOreable(terr);
+		return terrain.isOreable(terrain);
 	}
 
 	public boolean isBlocked(Unit u) {
@@ -481,15 +479,15 @@ public class Tile implements Externalizable {
 	}
 
 	public void setTerrain(Terrain t) {
-		terr = t;
+		terrain = t;
 	}
 
 	public boolean canSupportRareOre() {
-		return terr.canSupportRare(terr);
+		return terrain.canSupportRare(terrain);
 	}
 	
 	public boolean checkTerrain(Terrain t) {
-		return terr == t;
+		return terrain == t;
 	}
 
 	public TileLoc getLocation() {
@@ -498,8 +496,8 @@ public class Tile implements Externalizable {
 
 	public void setHeight(float newheight) {
 		height = newheight;
-		if (height > 1000) {
-			height = 1000;
+		if (height > Constants.MAXHEIGHT) {
+			height = Constants.MAXHEIGHT;
 		}
 	}
 

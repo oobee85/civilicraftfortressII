@@ -72,7 +72,7 @@ public class Game {
 			updateTerritory();
 		}
 		if(World.ticks % 2 == 0) {
-			LiquidSimulation.propogate(world);
+//			LiquidSimulation.propogate(world);
 //			world.doAirSimulationStuff();
 //			world.updateTerrainChange(false); // not this
 			world.doProjectileUpdates(true);

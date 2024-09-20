@@ -22,14 +22,28 @@ public class Air implements Serializable {
 	
 	public Air(double height) {
 		this.height = height;
-		this.maxVolume = 10;
+		this.maxVolume = 4;
 		this.volume = 1;
 		this.humidity = 0.0;
 		this.pressure = 760;
 		this.updateMaxVolume();
 		this.updateHumidity();
 		this.flowDirection = Direction.NONE;
-		this.energy = 0;
+		this.energy = 10000;
+	}
+	public void updateFromServer(Air updateFromServer) {
+		this.height = updateFromServer.height;
+		this.maxVolume = updateFromServer.maxVolume;
+		this.volume = updateFromServer.volume;
+		this.humidity = updateFromServer.humidity;
+		this.pressure = updateFromServer.pressure;
+		this.temperature = updateFromServer.temperature;
+		this.mass = updateFromServer.mass;
+		this.volumeChange = updateFromServer.volumeChange;
+		this.updateMaxVolume();
+		this.updateHumidity();
+		this.flowDirection = Direction.NONE;
+		this.energy = updateFromServer.energy;
 	}
 	public void updateHeight(double height) {
 		this.height = height;

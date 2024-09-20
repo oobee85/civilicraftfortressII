@@ -98,8 +98,10 @@ public class World {
 			}
 			
 			tile.setHeight(info.getHeight());
-			tile.getAir().setHumidity(info.getAir().getVolumeLiquid());
-			tile.getAir().setEnergy(info.getEnergy());
+			tile.getAir().updateFromServer(info.getAir());
+//			tile.getAir().setHumidity(info.getAir().getVolumeLiquid());
+//			tile.getAir().setVolumeLiquid(info.getAir().getVolumeLiquid());
+//			tile.getAir().setEnergy(info.getEnergy());
 			tile.setResource(info.getResource());
 
 			tile.setTerrain(info.getTerrain());

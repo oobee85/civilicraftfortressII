@@ -169,8 +169,9 @@ public class Animal extends Unit {
 	
 	@Override
 	public boolean readyToMove() {
+		// trap doesnt block even when its not completed
 		// if animal is on a trap, it cannot move
-		if(getTile().getBuilding() != null && getTile().getBuilding().isBuilt() && getTile().getBuilding().getType().isTrap()) {
+		if(getTile().getBuilding() != null && getTile().getBuilding().getType().isTrap()) {
 			return false;
 		}
 		return super.readyToMove();
