@@ -39,9 +39,12 @@ public class PlannedAction implements Serializable {
 		this.type = copy.type;
 	}
 	private PlannedAction(Tile targetTile, ActionType type) {
+		this(targetTile, null, type);
+	}
+	private PlannedAction(Tile targetTile, Thing target, ActionType type) {
 		this.targetTile = targetTile;
 		this.targetTileLoc = (this.targetTile == null) ? null : this.targetTile.getLocation();
-		this.target = null;
+		this.target = target;
 		this.targetID = (this.target == null) ? -1 : this.target.id();
 		this.type = type;
 	}
@@ -94,15 +97,12 @@ public class PlannedAction implements Serializable {
 		return new PlannedAction(target, ActionType.HARVEST);
 	}
 	public static PlannedAction takeItemsFrom(Thing target) {
-//		System.out.println("aaAAAAAAAAAAAAA");
 		return new PlannedAction(target, ActionType.TAKE_ITEMS);
 	}
 	public static PlannedAction deliver(Thing target) {
-//		System.out.println("FOLLOWUP");
 		return new PlannedAction(target, ActionType.DELIVER);
 	}
 	public static PlannedAction deliver(Thing target, PlannedAction followup) {
-//		System.out.println("FOLLOWUP2222222");
 		return new PlannedAction(target, ActionType.DELIVER, followup);
 	}
 	public static PlannedAction moveTo(Tile targetTile) {
@@ -111,11 +111,20 @@ public class PlannedAction implements Serializable {
 	public static PlannedAction attackMoveTo(Tile targetTile) {
 		return new PlannedAction(targetTile, ActionType.ATTACK_MOVE);
 	}
+	public static PlannedAction attackWithinRange(Tile targetTile, Thing target) {
+		return new PlannedAction(targetTile, target, ActionType.ATTACK_MOVE);
+	}
 	public static PlannedAction harvestTile(Tile targetTile) {
 		return new PlannedAction(targetTile, ActionType.HARVEST);
 	}
 	public static PlannedAction wanderAroundTile(Tile targetTile) {
 		return new PlannedAction(targetTile, ActionType.WANDER_AROUND);
+	}
+	public static PlannedAction guardTile(Tile targetTile) {
+		return new PlannedAction(targetTile, ActionType.GUARD);
+	}
+	public static PlannedAction tetheredAttack(Tile tetherTile, Thing target) {
+		return new PlannedAction(tetherTile, target, ActionType.TETHERED_ATTACK);
 	}
 	
 	public PlannedAction getFollowUp() {
@@ -162,7 +171,7 @@ public class PlannedAction implements Serializable {
 			range = 1;
 		}
 		
-		else if(type == ATTACK) {
+		else if(type == ATTACK || type == TETHERED_ATTACK) {
 			range = actor.getMaxAttackRange();
 		}
 		return actor.getTile().distanceTo(this.getTile()) <= range;
@@ -172,42 +181,46 @@ public class PlannedAction implements Serializable {
 		if(forceDone == true) {
 			return true;
 		}
-		if(type == MOVE) {
+		switch(type) {
+		case MOVE:
 			return actor.getTile() == targetTile;
-		}
-		else if(type == ATTACK) {
+		case ATTACK:
 			if(target != null) {
 				return target.isDead();
 			}
 			else {
 				return actor.getTile() == targetTile;
 			}
-		}
-		else if(type == BUILD_BUILDING) {
+		case TETHERED_ATTACK:
+			if(target != null) {
+				return target.isDead();
+			}
+			else {
+				return actor.getTile() == targetTile;
+			}
+		case BUILD_BUILDING:
 			return targetTile.getBuilding() == null 
-					|| targetTile.getBuilding().isDead() 
-					|| targetTile.getBuilding().isBuilt();
-		}
-		else if(type == BUILD_ROAD) {
+				|| targetTile.getBuilding().isDead() 
+				|| targetTile.getBuilding().isBuilt();
+		case BUILD_ROAD:
 			return targetTile.getRoad() == null 
-					|| targetTile.getRoad().isDead() 
-					|| targetTile.getRoad().isBuilt();
-		}
-		else if(type == HARVEST) {
+				|| targetTile.getRoad().isDead() 
+				|| targetTile.getRoad().isBuilt();
+		case HARVEST:
 			return actor.getInventory().isFull() 
 					|| (target != null && target.isDead());
-		}
-		else if(type == DELIVER) {
+		case DELIVER:
 			return actor.getTile() == targetTile;
-		}
-		else if(type == TAKE_ITEMS) {
+		case TAKE_ITEMS:
 			return actor.getTile() == targetTile;
-		}
-		else if(type == ATTACK_MOVE) {
+		case ATTACK_MOVE:
 			return actor.getTile() == targetTile;
-		}
-		else if(type == WANDER_AROUND) {
+		case WANDER_AROUND:
 			return false;
+		case GUARD:
+			return false;
+		case NO_TYPE:
+			break;
 		}
 		return actor.getTile() == targetTile;
 	}

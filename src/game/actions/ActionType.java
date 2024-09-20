@@ -11,7 +11,9 @@ public enum ActionType {
 	DELIVER,
 	TAKE_ITEMS,
 	WANDER_AROUND,
-	ATTACK_MOVE
+	ATTACK_MOVE,
+	GUARD,
+	TETHERED_ATTACK
 	;
 	
 	private ActionType() {

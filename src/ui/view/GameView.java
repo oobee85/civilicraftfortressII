@@ -227,7 +227,7 @@ public class GameView {
 				} else if (e.getKeyCode() == KeyEvent.VK_S) {
 					unitStop();
 				} else if (e.getKeyCode() == KeyEvent.VK_G) {
-					toggleGuarding();
+					state.leftClickAction = LeftClickAction.GUARD;
 				} else if (e.getKeyCode() == KeyEvent.VK_M) {
 					setBuildingToPlan(Game.buildingTypeMap.get("MINE"));
 				} else if (e.getKeyCode() == KeyEvent.VK_F) {
@@ -274,24 +274,6 @@ public class GameView {
 
 	public void toggleAutoBuild() {
 		game.toggleAutoBuild(state.selectedThings);
-	}
-
-	public void toggleGuarding() {
-		boolean foundNotGuarding = false;
-		for (Thing thing : state.selectedThings) {
-			if (thing instanceof Unit) {
-				Unit unit = (Unit) thing;
-				if (!unit.isGuarding()) {
-					foundNotGuarding = true;
-				}
-			}
-		}
-		for (Thing thing : state.selectedThings) {
-			if (thing instanceof Unit) {
-				Unit unit = (Unit) thing;
-				commandInterface.setGuarding(unit, foundNotGuarding);
-			}
-		}
 	}
 
 	public void setDrawDebugStrings(boolean enabled) {
@@ -363,6 +345,9 @@ public class GameView {
 		else if (state.leftClickAction == LeftClickAction.WANDER_AROUND) {
 			wanderCommand(state.selectedThings, tile, shiftDown);
 		}
+		else if (state.leftClickAction == LeftClickAction.GUARD) {
+			unitGuardTile(state.selectedThings, tile, shiftDown);
+		}
 		// select units or buildings on tile
 		else {
 			toggleSelectionForTile(tile, shiftDown || controlDown);
@@ -380,6 +365,24 @@ public class GameView {
 			if (thing instanceof Unit) {
 				Unit unit = (Unit) thing;
 				commandInterface.planAction(unit, PlannedAction.wanderAroundTile(tile), !shiftEnabled);
+			}
+		}
+	}
+
+	public void unitGuardTile(ConcurrentLinkedQueue<Thing> selectedThings, Tile tile, boolean shiftEnabled) {
+		for (Thing thing : selectedThings) {
+			if (thing instanceof Unit) {
+				Unit unit = (Unit) thing;
+				commandInterface.planAction(unit, PlannedAction.guardTile(tile), !shiftEnabled);
+			}
+		}
+	}
+	
+	public void unitGuardCurrentTile() {
+		for (Thing thing : state.selectedThings) {
+			if (thing instanceof Unit) {
+				Unit unit = (Unit) thing;
+				commandInterface.planAction(unit, PlannedAction.guardTile(unit.getTile()), !shiftDown);
 			}
 		}
 	}

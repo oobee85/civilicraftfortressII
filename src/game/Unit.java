@@ -15,6 +15,11 @@ public class Unit extends Thing implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * Unit cannot get further than this distance from guarded tile
+	 */
+	private static final int TETHERED_ATTACK_RANGE = 8; 
+	
 	private UnitType unitType;
 	private transient double timeToMove;
 	private transient double cooldownToDoAction;
@@ -313,43 +318,43 @@ public class Unit extends Thing implements Serializable {
 	 */
 	public boolean attack(Thing target) {
 		AttackStyle style = chooseAttack(target);
-		if(style != null) {
-			// actually do the attack
-			if(style.getProjectile() == null) {
-				double initialHP = target.getHealth();
-				//does cleave damage
-				if(this.getType().hasCleave()) {
-					for(Unit unit : target.getTile().getUnits()) {
-						unit.takeDamage(style.getDamage(), DamageType.PHYSICAL);
-					}
-				} 
-				else {
-					target.takeDamage(style.getDamage(), DamageType.PHYSICAL);
-				}
-				
-				double damageDealt = initialHP - (target.getHealth() < 0 ? 0 : target.getHealth());
-				if (style.isLifesteal() && !(target instanceof Building)) {
-					this.heal(damageDealt, true);
-				}
-				if (target instanceof Unit) {
-					((Unit) target).aggro(this);
-				}
-				//does cleave retaliation
-				if(this.getType().hasCleave()) {
-					for(Unit unit : target.getTile().getUnits()) {
-						if(unit.getFaction() != this.getFaction()) {
-							unit.aggro(this);
-						}
-					}
-				}
-			}
-			else {
-				AttackUtils.shoot(this, target, style);
-			}
-			resetTimeToAttack(style.getCooldown());
-			return true;
+		if(style == null) {
+			return false;
 		}
-		return false;
+		// actually do the attack
+		if(style.getProjectile() == null) {
+			double initialHP = target.getHealth();
+			//does cleave damage
+			if(this.getType().hasCleave()) {
+				for(Unit unit : target.getTile().getUnits()) {
+					unit.takeDamage(style.getDamage(), DamageType.PHYSICAL);
+				}
+			} 
+			else {
+				target.takeDamage(style.getDamage(), DamageType.PHYSICAL);
+			}
+			
+			double damageDealt = initialHP - (target.getHealth() < 0 ? 0 : target.getHealth());
+			if (style.isLifesteal() && !(target instanceof Building)) {
+				this.heal(damageDealt, true);
+			}
+			if (target instanceof Unit) {
+				((Unit) target).aggro(this);
+			}
+			//does cleave retaliation
+			if(this.getType().hasCleave()) {
+				for(Unit unit : target.getTile().getUnits()) {
+					if(unit.getFaction() != this.getFaction()) {
+						unit.aggro(this);
+					}
+				}
+			}
+		}
+		else {
+			AttackUtils.shoot(this, target, style);
+		}
+		resetTimeToAttack(style.getCooldown());
+		return true;
 	}
 
 	public void aggro(Unit attacker) {
@@ -587,6 +592,12 @@ public class Unit extends Thing implements Serializable {
 		}
 		Tile targetTile = plan.getTile();
 		if(targetTile != null && !plan.inRange(this)) {
+			if (plan.type == ActionType.TETHERED_ATTACK
+					&& targetTile.distanceTo(plan.targetTile) > TETHERED_ATTACK_RANGE + this.getMaxAttackRange()) {
+				// lose aggro if enemy is outside of tether range 
+				plan.setDone(true);
+				return;
+			}
 			moveTowards(targetTile);
 			// can't reach target so mark the plan as finished.
 			if(currentPath == null) {
@@ -619,9 +630,15 @@ public class Unit extends Thing implements Serializable {
 			}
 		}
 		else if(plan.type == ActionType.ATTACK_MOVE) {
-			Thing closestEnemy = getClosestEnemyInRange(world);
+			Thing closestEnemy = getClosestEnemyInRange(world, getTile(), getMaxAttackRange() + 1);
 			if(closestEnemy != null) {
 				prequeuePlannedAction(PlannedAction.attack(closestEnemy));
+			}
+		}
+		else if (plan.type == ActionType.GUARD) {
+			Thing closestEnemy = getClosestEnemyInRange(world, plan.targetTile, TETHERED_ATTACK_RANGE + getMaxAttackRange());
+			if(closestEnemy != null) {
+				prequeuePlannedAction(PlannedAction.tetheredAttack(plan.targetTile, closestEnemy));
 			}
 		}
 		
@@ -678,7 +695,13 @@ public class Unit extends Thing implements Serializable {
 			
 		}
 		else if(plan.type == ActionType.ATTACK && plan.target != null) {
-			didSomething = attack(plan.target);	
+			didSomething = attack(plan.target);
+		}
+		else if (plan.type == ActionType.TETHERED_ATTACK) {
+			if (plan.targetTile.distanceTo(plan.target.getTile()) > TETHERED_ATTACK_RANGE + this.getMaxAttackRange()) {
+				plan.setDone(true);
+			}
+			didSomething = attack(plan.target);
 		}
 		if (!didSomething) {
 			doPassiveActions(world);
@@ -709,15 +732,15 @@ public class Unit extends Thing implements Serializable {
 		return;
 	}
 	
-	private Thing getClosestEnemyInRange(World world) {
+	private Thing getClosestEnemyInRange(World world, Tile fromTile, int range) {
 		Thing closest = null;
 		int closestDistance = -1;
 		Thing closestBuilding = null;
 		int closestBuildingDistance = -1;
-		for (Tile tile : Utils.getTilesInRadius(getTile(), world, getMaxAttackRange()+1)) {
+		for (Tile tile : Utils.getTilesInRadius(fromTile, world, range)) {
 			int dist = getTile().distanceTo(tile);
 			for (Unit unit : tile.getUnits()) {
-				if(!shouldAggroOn(unit)) {
+				if(!shouldAggroOn(unit) || !unit.getType().isHostile()) {
 					continue;
 				}
 				if(closest == null || dist < closestDistance) {
