@@ -49,16 +49,11 @@ public class Building extends Thing implements Serializable {
 		return isPlanned;
 	}
 	public void tick(World world, boolean simulated) {
-		updateInProgressUnit();
-		if (simulated) {
-			// only thing client needs to simulate is unit progress
-			return;
-		}
 		if (timeToHarvest > 0) {
 			timeToHarvest -= 1;
 		}
 		
-		if (World.ticks % Constants.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
+		if (!simulated && World.ticks % Constants.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
 			Tile tile = getTile();
 			int[] tileDamage = tile.computeTileDamage();
 			for(int i = 0; i < tileDamage.length; i++) {
@@ -67,7 +62,7 @@ public class Building extends Thing implements Serializable {
 		}
 		
 		// if building is a trap
-		if(isBuilt() && getType().isTrap()) {
+		if(!simulated && isBuilt() && getType().isTrap()) {
 			if (stablesCaptured == null) { // if theres no animal inside, skip
 				
 				// special units which provide their respective resource
@@ -110,32 +105,45 @@ public class Building extends Thing implements Serializable {
 		if(!isBuilt()) {
 			return;
 		}
-		
-		// building builds units
-		if(remainingEffortToProduceUnit <= 0 && currentProducingUnit != null) {
-			Unit unit = getProducingUnit().remove();
-			PlannedAction whatToDo = null;
-			if(unit.isBuilder()) {
-				Plant plant = getSpawnLocation().getPlant();
-				Building building = getSpawnLocation().getBuilding();
-				
-				if(plant != null && plant.getItem() != null) {// PLANT CASE
-					whatToDo = PlannedAction.harvest(plant);
-				}// BUILDING CASE
-				else if(building != null && building.getFactionID() == unit.getFactionID() && building.getType().isHarvestable()) {
-					whatToDo = PlannedAction.harvest(building);
-				}else if(building != null && building.getFactionID() == unit.getFactionID() && building.getType().isHarvestable()) {
-					
+
+		// building produces units
+		if(currentProducingUnit == null && !producingUnitList.isEmpty()) {
+			currentProducingUnit = producingUnitList.peek();
+			remainingEffortToProduceUnit = currentProducingUnit.getType().getCombatStats().getTicksToBuild();
+		}
+		if (currentProducingUnit != null) {
+			remainingEffortToProduceUnit -= 1;
+			if(remainingEffortToProduceUnit <= 0) {
+				if (!simulated) {
+					Unit unit = getProducingUnit().remove();
+					PlannedAction whatToDo = null;
+					if(unit.isBuilder()) {
+						Plant plant = getSpawnLocation().getPlant();
+						Building building = getSpawnLocation().getBuilding();
+						
+						if(plant != null && plant.getItem() != null) {// PLANT CASE
+							whatToDo = PlannedAction.harvest(plant);
+						}// BUILDING CASE
+						else if(building != null && building.getFactionID() == unit.getFactionID() && building.getType().isHarvestable()) {
+							whatToDo = PlannedAction.harvest(building);
+						}else if(building != null && building.getFactionID() == unit.getFactionID() && building.getType().isHarvestable()) {
+							
+						}
+						
+					}
+					if(whatToDo == null) {
+						whatToDo = PlannedAction.moveTo(getSpawnLocation());
+					}
+					unit.queuePlannedAction(whatToDo);
+					getTile().addUnit(unit);
+					world.addUnit(unit);
 				}
-				
+				currentProducingUnit = null;
 			}
-			if(whatToDo == null) {
-				whatToDo = PlannedAction.moveTo(getSpawnLocation());
-			}
-			unit.queuePlannedAction(whatToDo);
-			getTile().addUnit(unit);
-			world.addUnit(unit);
-			currentProducingUnit = null;
+		}
+
+		if (simulated) {
+			return;
 		}
 
 		if(getType().isCastle()) {
@@ -195,21 +203,6 @@ public class Building extends Thing implements Serializable {
 	}
 	public void setProducingUnit(Unit producingUnit) {
 		this.producingUnitList.add(producingUnit);
-	}
-	private void updateInProgressUnit() {
-		if(!isBuilt()) {
-			return;
-		}
-		if(currentProducingUnit == null && !producingUnitList.isEmpty()) {
-			currentProducingUnit = producingUnitList.peek();
-			remainingEffortToProduceUnit = currentProducingUnit.getType().getCombatStats().getTicksToBuild();
-		}
-		if (currentProducingUnit != null) {
-			remainingEffortToProduceUnit -= 1;
-			if (remainingEffortToProduceUnit < 0) {
-				remainingEffortToProduceUnit = 0;
-			}
-		}
 	}
 	public int getRemainingEffortToProduceUnit() {
 		return remainingEffortToProduceUnit;

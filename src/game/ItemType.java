@@ -66,6 +66,34 @@ public enum ItemType {
 		return map;
 	}
 	
+	public static ResearchRequirement getResearchRequirementForCrafting(ItemType type, HashMap<String, Research> researchMap) {
+		ResearchRequirement req = new ResearchRequirement();
+
+		if (type == GOLD_BAR) {
+			req.addRequirement(researchMap.get("FARMING"));
+		}
+		else if (type == BRONZE_BAR) {
+			req.addRequirement(researchMap.get("FARMING"));
+		}
+		else if (type == IRON_BAR) {
+			req.addRequirement(researchMap.get("BRONZE_WORKING"));
+		}
+		else if (type == MITHRIL_BAR) {
+			req.addRequirement(researchMap.get("IRON_WORKING"));
+		}
+		else if (type == ADAMANTITE_BAR) {
+			req.addRequirement(researchMap.get("IRON_WORKING"));
+		}
+		else if (type == RUNITE_BAR) {
+			req.addRequirement(researchMap.get("IRON_WORKING"));
+		}
+		else if (type == TITANIUM_BAR) {
+			req.addRequirement(researchMap.get("IRON_WORKING"));
+		}
+		
+		return req;
+	}
+	
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;
 	}

@@ -75,17 +75,14 @@ public class Client {
 				if(building.getType().unitsCanProduceSet().size() > 0) {
 					clientGUI.manageProduceUnitTab(selected);
 				}
-				if (building.getType() == Game.buildingTypeMap.get("SMITHY")) {
-					clientGUI.manageBlacksmithTab(selected);
-				}
-				if (building.getType() == Game.buildingTypeMap.get("HELLFORGE")) {
+				if (building.getType() == Game.buildingTypeMap.get("SMITHY") 
+						|| building.getType() == Game.buildingTypeMap.get("HELLFORGE")) {
 					clientGUI.manageBlacksmithTab(selected);
 				}
 				InfoPanel infoPanel = new BuildingInfoPanel(building);
 				switchInfoPanel(infoPanel);
 				SwingUtilities.invokeLater(() -> {
 					infoPanel.addExplodeButton().addActionListener(e -> gameInstance.explode(building));
-//					infoPanel.addButton("Explode")
 				});
 			}
 			@Override

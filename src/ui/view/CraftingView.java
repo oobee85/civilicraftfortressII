@@ -63,23 +63,27 @@ public class CraftingView {
 	}
 	
 	public void updateButtons() {
-		boolean blacksmithSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("SMITHY"));
-		boolean hellforgeSelected = gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("HELLFORGE"));
+		boolean hasBlacksmith = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("SMITHY"));
+		boolean hasHellForge = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("HELLFORGE"));
 		for (int i = 0; i < ItemType.values().length; i++) {
 			ItemType type = ItemType.values()[i];
 			if (type.getCost() == null) {
 				continue;
 			}
 			JButton button = craftButtons[i];
-			if(gameView.getFaction().areRequirementsMet(type)
-					&& (Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("SMITHY") && blacksmithSelected)
-					|| (Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("HELLFORGE") && hellforgeSelected)) {
-				button.setEnabled(true);
+			if(gameView.getFaction().areRequirementsMet(type)) {
 				button.setVisible(true);
 			}
 			else {
-				button.setEnabled(false);
 				button.setVisible(false);
+			}
+			if (gameView.getFaction().canAfford(type.getCost()) &&
+					((Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("SMITHY") && hasBlacksmith)
+					|| (Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("HELLFORGE") && hasHellForge))) {
+				button.setEnabled(true);
+			}
+			else {
+				button.setEnabled(false);
 			}
 		}
 	}

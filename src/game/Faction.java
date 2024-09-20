@@ -235,16 +235,19 @@ public class Faction implements Externalizable {
 	
 	}
 	
-	public boolean hasResearchLab() {
-		BuildingType researchLabType = Game.buildingTypeMap.get("RESEARCH_LAB");
+	public boolean hasBuilding(BuildingType type) {
 		for(Building building : getBuildings()) {
 			if(building.getFaction() == this 
-					&& building.getType() == researchLabType
+					&& building.getType() == type
 					&& building.isBuilt()) {
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	public boolean hasResearchLab() {
+		return hasBuilding(Game.buildingTypeMap.get("RESEARCH_LAB"));
 	}
 	
 	public void researchEverything() {
@@ -344,11 +347,12 @@ public class Faction implements Externalizable {
 			unitResearchRequirements.put(type, req);
 		}
 		for(ItemType type : ItemType.values()) {
-			ResearchRequirement req = new ResearchRequirement();
+//			ResearchRequirement req = new ResearchRequirement();
 //			if(type.getResearchRequirement() != null) {
 //				Research typesRequirement = researches.get(type.getResearchRequirement());
 //				req.addRequirement(typesRequirement);
 //			}
+			ResearchRequirement req = ItemType.getResearchRequirementForCrafting(type, researchMap);
 			craftResearchRequirements.put(type, req);
 		}
 		for(ResourceType type : ResourceType.values()) {

@@ -66,7 +66,8 @@ public class ProduceUnitView {
 		for(Pair pair : unitButtons) {
 			boolean enabled = false;
 			boolean visible = false;
-			if (gameView.getFaction().areRequirementsMet(pair.unitType)) {
+			if (gameView.getFaction().areRequirementsMet(pair.unitType)
+					&& gameView.getFaction().canAfford(pair.unitType.getCost())) {
 				enabled = true;
 			}
 			for(BuildingType buildingType : Game.buildingTypeList) {

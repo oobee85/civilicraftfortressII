@@ -380,7 +380,7 @@ public class ClientGUI {
 		// disable building tab after setting all of the tabs up
 		manageBuildingTab(false);
 		manageProduceUnitTab(false);
-		manageBlacksmithTab(false);
+		tabbedPane.setEnabledAt(CRAFTING_TAB, false);
 		
 		rootPanel.revalidate();
 		rootPanel.repaint();
@@ -461,6 +461,6 @@ public class ClientGUI {
 		} else if (enabled == true) {
 			tabbedPane.setSelectedIndex(CRAFTING_TAB);
 		}
-		tabbedPane.setEnabledAt(CRAFTING_TAB, enabled);
+		tabbedPane.setEnabledAt(CRAFTING_TAB, true);
 	}
 }
