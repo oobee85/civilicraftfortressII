@@ -504,26 +504,48 @@ public class GameView {
 						commandInterface.planAction(unit, PlannedAction.harvestTile(targetTile), !shiftDown);
 					}
 					else {
+						
 						commandInterface.planAction(unit, PlannedAction.moveTo(targetTile), !shiftDown);
 					}
 
 				} else {
-					Thing targetThing = null;
+//					Thing targetThing = null;
+					Unit targetUnit = null;
+					Building targetBuilding = null;
+					Building targetBuildingDeliver = null;
 					for (Unit tempUnit : targetTile.getUnits()) {
 						if (tempUnit == unit) {
 							continue;
 						}
 						if (tempUnit.getFaction() != unit.getFaction()) {
-							targetThing = tempUnit;
+//							targetThing = tempUnit;
+							targetUnit = tempUnit;
 						}
 					}
-					if (targetThing == null && targetTile.getBuilding() != null
+					if (targetTile.getBuilding() != null
 							&& (targetTile.getBuilding().getFaction() != unit.getFaction())) {
-						targetThing = targetTile.getBuilding();
+						targetBuilding = targetTile.getBuilding();
 					}
-					if (targetThing != null) {
-						commandInterface.planAction(unit, PlannedAction.attack(targetThing), !shiftDown);
-					} else {
+					if (targetTile.getBuilding() != null) {
+						targetBuildingDeliver = targetTile.getBuilding();;
+					}
+					
+					
+					
+					
+					
+					if (targetUnit != null) {
+						commandInterface.planAction(unit, PlannedAction.attack(targetUnit), !shiftDown);
+					}else if(targetBuilding != null) {
+						commandInterface.planAction(unit, PlannedAction.attack(targetBuilding), !shiftDown);
+					
+					} else if(targetBuildingDeliver != null &&
+							targetBuildingDeliver.getFaction() == unit.getFaction() && 
+							targetBuildingDeliver.isBuilt() && 
+							targetBuildingDeliver.hasInventory()) {
+						commandInterface.planAction(unit, PlannedAction.deliver(targetBuildingDeliver), !shiftDown);
+					}else {
+						
 						commandInterface.planAction(unit, PlannedAction.moveTo(targetTile), !shiftDown);
 					}
 				}

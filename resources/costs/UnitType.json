@@ -323,11 +323,11 @@
 			{"type":"game.Unit", "faction":"PLAYER"},
 			{"type":"game.Unit"}
 		],
-		"loot":{"IRON_BAR":5}
+		"loot":{"IRON_BAR":10}
 	},
 	{
 		"image":"Images/units/roc.png",
-		"stats":{"movespeed":10,"buildtime":0,"health":400,"healspeed":10},
+		"stats":{"movespeed":10,"buildtime":300,"health":400,"healspeed":10},
 		"name":"ROC",
 		"attackstyles":[
 			{"damage":40, "cooldown":40, "range":1}
@@ -338,25 +338,25 @@
 		],
 		"attributes":["flying","hostile"],
 		"resistances": {"COLD": 0},
-		"loot":{"ADAMANTITE_ORE":10}
+		"loot":{"IRON_BAR":10}
 	},
 	{
 		"image":"Images/units/ogre.png",
-		"stats":{"movespeed":30,"buildtime":0,"health":750,"healspeed":5},
+		"stats":{"movespeed":30,"buildtime":300,"health":1000,"healspeed":5},
 		"name":"OGRE",
 		"attackstyles":[
-			{"damage":40, "cooldown":40, "range":1}
+			{"damage":60, "cooldown":30, "range":1}
 		],
 		"attributes":["hostile","delayedinvasion","cleave"],
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"}, 
 			{"type":"game.Building", "faction":"PLAYER"}
 		],
-		"loot":{"IRON_BAR":10}
+		"loot":{"IRON_BAR":10, "BRONZE_BAR":10}
 	},
 	{
 		"image":"Images/units/ent.png",
-		"stats":{"movespeed":30,"buildtime":0,"health":500,"healspeed":10},
+		"stats":{"movespeed":30,"buildtime":300,"health":500,"healspeed":10},
 		"cost":{"FOOD":300, "WOOD": 300, "ENT": 100},
 		"name":"ENT",
 		"attackstyles":[
@@ -374,7 +374,7 @@
 	},
 	{
 		"image":"Images/units/werewolf.png",
-		"stats":{"movespeed":10,"buildtime":0,"health":200,"healspeed":10},
+		"stats":{"movespeed":10,"buildtime":300,"health":200,"healspeed":10},
 		"cost":{"FOOD":300, "WEREWOLF": 100},
 		"name":"WEREWOLF",
 		"attackstyles":[
@@ -385,7 +385,7 @@
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"}
 		],
-		"loot":{"MITHRIL_BAR":5}
+		"loot":{"IRON_BAR":10}
 	},
 	{
 		"image":"Images/units/lavagolem.png",
@@ -399,11 +399,11 @@
 		"targeting":[
 			{"type":"MINE"}
 		],
-		"loot":{"COAL":500, "MITHRIL_ORE":10, "IRON_ORE":10, "ADAMANTITE_ORE":10}
+		"loot":{"COAL":500, "MITHRIL_ORE":25, "IRON_ORE":25, "ADAMANTITE_ORE":25}
 	},
 	{
 		"image":"Images/units/wolf.png",
-		"stats":{"movespeed":20,"buildtime":0,"health":200,"healspeed":50},
+		"stats":{"movespeed":20,"buildtime":300,"health":200,"healspeed":50},
 		"cost":{"FOOD":100, "WOLF": 100},
 		"name":"WOLF",
 		"attackstyles":[
@@ -412,7 +412,7 @@
 		"research":"TRAPPING",
 		"attributes":["hostile"],
 		"resistances": {"COLD": 0},
-		"loot":{"FOOD":300}
+		"loot":{"FOOD":300, "BRONZE_BAR": 5}
 	},
 	{
 		"image":"Images/units/cyclops.png",
@@ -426,7 +426,7 @@
 		"targeting":[
 			{"type":"SNIPER"}
 		],
-		"loot":{"ADAMANTITE_BAR":10}
+		"loot":{"ADAMANTITE_BAR":10, "IRON_BAR":10, "BRONZE_BAR":10}
 	},
 	{
 		"image":"Images/units/skeleton.png",
@@ -444,15 +444,15 @@
 			{"type":"game.Unit", "faction":"CYCLOPS"},
 			{"type":"game.Building", "faction":"CYCLOPS"}
 		],
-		"loot":{"BRONZE_BAR":2}
+		"loot":{"BRONZE_BAR":5}
 	},
 	{
 		"image":"Images/units/icegiant.png",
 		"cost":{"IRON_BAR":1,"MITHRIL_BAR":1,"FOOD":300},
-		"stats":{"movespeed":30,"buildtime":200,"health":800,"healspeed":10},
+		"stats":{"movespeed":30,"buildtime":200,"health":1000,"healspeed":10},
 		"name":"ICE_GIANT",
 		"attackstyles":[
-			{"damage":60, "cooldown":20, "range":1}
+			{"damage":200, "cooldown":50, "range":1}
 		],
 		"attributes":["hostile","delayedinvasion","cleave"],
 		"resistances": {"COLD": 0},
@@ -460,7 +460,7 @@
 			{"type":"game.Unit", "faction":"PLAYER"},
 			{"type":"game.Unit"}
 		],
-		"loot":{"IRON_BAR":10, "MITHRIL_BAR":10}
+		"loot":{"IRON_BAR":10, "MITHRIL_BAR":10, "BRONZE_BAR":10}
 	},
 	{
 		"image":"Images/units/flamelet.png",
@@ -475,7 +475,7 @@
 			{"type":"game.Building", "faction":"PLAYER"},
 			{"type":"game.Building"}
 		],
-		"loot":{"COAL":10}
+		"loot":{"COAL":50}
 	},
 	{
 		"image":"Images/units/waterspirit.png",
@@ -499,7 +499,7 @@
 	},
 	{
 		"image":"Images/units/firefly.png",
-		"stats":{"movespeed":25,"buildtime":0,"health":50,"healspeed":50},
+		"stats":{"movespeed":50,"buildtime":0,"health":50,"healspeed":50},
 		"name":"FIREFLY",
 		"attackstyles":[
 			{"damage":5, "cooldown":20, "range":1}
@@ -568,7 +568,7 @@
 	},
 	{
 		"image":"Images/units/termite.png",
-		"stats":{"movespeed":10,"buildtime":0,"health":100,"healspeed":5},
+		"stats":{"movespeed":5,"buildtime":0,"health":100,"healspeed":5},
 		"name":"TERMITE",
 		"attackstyles":[
 			{"damage":20, "cooldown":5, "range":1}
@@ -582,9 +582,11 @@
 	},
 	{
 		"image":"Images/units/infernal.gif",
-		"stats":{"movespeed":15,"buildtime":0,"health":100000,"healspeed":5},
+		"stats":{"movespeed":15,"buildtime":0,"health":100000,"healspeed":100},
 		"name":"INFERNAL",
 		"attackstyles":[
+			{"damage":1000, "cooldown":50, "range":20, "minrange":12, "projectile":"METEOR_WAVE"},
+			{"damage":200, "cooldown":25, "range":10, "minrange":3, "projectile":"FIRE_WAVE"},
 			{"damage":100, "cooldown":5, "range":1}
 		],
 		"attributes":["hostile"],
@@ -593,10 +595,10 @@
 	},
 	{
 		"image":"Images/units/balrog.png",
-		"stats":{"movespeed":15,"buildtime":0,"health":100000,"healspeed":5},
+		"stats":{"movespeed":15,"buildtime":0,"health":100000,"healspeed":100},
 		"name":"BALROG",
 		"attackstyles":[
-			{"damage":20, "cooldown":2, "range":1}
+			{"damage":40, "cooldown":2, "range":1}
 		],
 		"attributes":["hostile"],
 		"resistances": {"HEAT": 0},

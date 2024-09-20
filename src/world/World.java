@@ -812,7 +812,7 @@ public class World {
 						for(Tile neighbor: tile.getNeighbors()) {
 							if(neighbor.getPlant() != null) {
 								if(neighbor.getModifier() == null) {
-									neighbor.replaceOrAddDurationModifier(tile.getModifier().getType(), tile.getModifier().timeLeft() + 100, worldData);
+									neighbor.replaceOrAddDurationModifier(tile.getModifier().getType(), tile.getModifier().timeLeft() + 50, worldData);
 								}
 							}
 						}

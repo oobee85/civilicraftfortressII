@@ -5,7 +5,7 @@ import utils.*;
 
 public enum ResourceType {
 	
-	COPPER (100 , 5, 10, false, ItemType.COPPER_ORE, true, 3, "FARMING",
+	COPPER (100 , 10, 10, false, ItemType.COPPER_ORE, true, 3, "FARMING",
 			new String[] {"Images/resources/copper/ore_copper128.png"}),
 	SILVER ( 100, 10, 5, false, ItemType.SILVER_ORE, true, 3, "FARMING",
 			new String[] {"Images/resources/silver/ore_silver128.png"}),
@@ -34,11 +34,11 @@ public enum ResourceType {
 	
 	private MipMap mipmap;
 	private int remainingEffort;
-	private double numVeins;
 	private boolean isRare;
 	private ItemType itemType;
 	private boolean isOre;
 	private double timeToHarvest;
+	private double numVeins;
 	private int veinSize;
 	private String research;
 
