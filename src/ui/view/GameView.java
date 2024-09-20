@@ -30,18 +30,14 @@ public class GameView {
 	private boolean controlDown = false;
 	private boolean shiftDown = false;
 	private boolean[] pressedKeys = new boolean[600];
-	private Thread fpsMovementThread;
-	private Robot fpsMouseRobot;
 
 	private boolean summonPlayerControlled = true;
 	public int tickOfLastClick = 0;
 	
 	private final FillingLayeredPane panel;
 	private final JPanel overlayPanel;
-	private final Drawer vanillaDrawer;
-	private final Drawer glDrawer;
 	
-	private Drawer currentActiveDrawer;
+	private Drawer vanillaDrawer;
 	private Component drawingCanvas;
 	
 	private final GameViewState state;
@@ -51,7 +47,6 @@ public class GameView {
 		public long averageTickTime;
 		public volatile Position viewOffset = new Position(0, 0);
 		public volatile int volatileTileSize = Settings.DEFAULT_TILE_SIZE;
-		public boolean fpMode;
 		
 		public Point mousePressLocation;
 		public Point previousMouse;
@@ -76,16 +71,10 @@ public class GameView {
 		this.overlayPanel = overlay;
 		state = new GameViewState();
 		vanillaDrawer = new VanillaDrawer(game, state);
-		glDrawer = null;
-//		glDrawer = new GLDrawer(game, state);
 		panel = new FillingLayeredPane() {
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				if(currentActiveDrawer == glDrawer) {
-					// for some reason GLCanvas doesnt get repainted so do it manually here
-					drawingCanvas.paint(g);
-				}
 			}
 		};
 		if(Settings.CINEMATIC) {
@@ -95,7 +84,6 @@ public class GameView {
 		panel.setBackground(Color.black);
 		panel.add(overlayPanel, BorderLayout.SOUTH);
 		
-//		glDrawer.getDrawingCanvas().setFocusable(false);
 		vanillaDrawer.getDrawingCanvas().setFocusable(false);
 
 		switch3d(false);
@@ -107,32 +95,19 @@ public class GameView {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				// +1 is in -1 is out
-				currentActiveDrawer.zoomView(e.getWheelRotation(), e.getPoint().x, e.getPoint().y);
+				vanillaDrawer.zoomView(e.getWheelRotation(), e.getPoint().x, e.getPoint().y);
 			}
 		};
 		MouseMotionListener mouseMotionListener = new MouseMotionListener() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				Point currentMouse = e.getPoint();
-				
-				if(state.fpMode && is3d()) {
-					int dx = state.previousMouse.x - currentMouse.x;
-					int dy = state.previousMouse.y - currentMouse.y;
-					currentActiveDrawer.rotateView(dx, dy);
-					currentMouse = new Point(drawingCanvas.getWidth()/2,
-							drawingCanvas.getHeight()/2);
-					fpsMouseRobot.mouseMove(drawingCanvas.getLocationOnScreen().x + currentMouse.x, 
-							drawingCanvas.getLocationOnScreen().y + currentMouse.y);
-				}
-				mouseOver(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize));
+				mouseOver(vanillaDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize));
 				state.previousMouse = currentMouse;
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				if(isFirstPerson()) {
-					return;
-				}
 				Point currentMouse = e.getPoint();
 				int dx = state.previousMouse.x - currentMouse.x;
 				int dy = state.previousMouse.y - currentMouse.y;
@@ -140,17 +115,17 @@ public class GameView {
 				if (state.draggingMouse || Math.abs(dx) + Math.abs(dy) >= 10) {
 					state.draggingMouse = true;
 					if (rightMouseDown) {
-						currentActiveDrawer.shiftView(dx, dy);
+						vanillaDrawer.shiftView(dx, dy);
 					}
 					else if(state.middleMouseDown) {
-						currentActiveDrawer.rotateView(dx, dy);
+						vanillaDrawer.rotateView(dx, dy);
 					}
 					if (state.leftMouseDown) {
-						state.boxSelect[1] = currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize);
+						state.boxSelect[1] = vanillaDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize);
 					}
 					state.previousMouse = currentMouse;
 				}
-				mouseOver(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize));
+				mouseOver(vanillaDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize));
 			}
 		};
 		MouseListener mouseListener = new MouseListener() {
@@ -159,17 +134,17 @@ public class GameView {
 				Point currentMouse = e.getPoint();
 				if (!state.draggingMouse) {
 					if (SwingUtilities.isRightMouseButton(e)) {
-						rightClick(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize), shiftDown);
+						rightClick(vanillaDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize), shiftDown);
 					} else if (SwingUtilities.isLeftMouseButton(e)) {
 						if (mouseCommandsEnabled) {
-							leftClick(currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize), shiftDown);
+							leftClick(vanillaDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize), shiftDown);
 						}
 					}
 				} else {
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						if (mouseCommandsEnabled && state.leftMouseDown) {
-							state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.volatileTileSize);
-							state.boxSelect[1] = currentActiveDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize);
+							state.boxSelect[0] = vanillaDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.volatileTileSize);
+							state.boxSelect[1] = vanillaDrawer.getWorldCoordOfPixel(currentMouse, state.viewOffset, state.volatileTileSize);
 							selectInBox(state.boxSelect[0], state.boxSelect[1], shiftDown);
 						}
 					}
@@ -193,7 +168,7 @@ public class GameView {
 					if (mouseCommandsEnabled) {
 						state.leftMouseDown = true;
 						state.mousePressLocation = e.getPoint();
-						state.boxSelect[0] = currentActiveDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.volatileTileSize);
+						state.boxSelect[0] = vanillaDrawer.getWorldCoordOfPixel(state.mousePressLocation, state.viewOffset, state.volatileTileSize);
 					}
 				} else if (SwingUtilities.isRightMouseButton(e)) {
 					rightMouseDown = true;
@@ -237,94 +212,47 @@ public class GameView {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				pressedKeys[e.getKeyCode()] = true;
-				if(!isFirstPerson()) {
-					if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
-						controlDown = true;
-					} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
-						shiftDown = true;
-					} else if (e.getKeyCode() == KeyEvent.VK_A) {
-						if (e.isControlDown()) {
-							selectAllUnits();
-						} else {
-							state.leftClickAction = LeftClickAction.ATTACK;
-						}
-					} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-						deselectEverything();
-					} else if (e.getKeyCode() == KeyEvent.VK_S) {
-						unitStop();
-					} else if (e.getKeyCode() == KeyEvent.VK_G) {
-						toggleGuarding();
-					} else if (e.getKeyCode() == KeyEvent.VK_M) {
-						setBuildingToPlan(Game.buildingTypeMap.get("MINE"));
-					} else if (e.getKeyCode() == KeyEvent.VK_F) {
-						setBuildingToPlan(Game.buildingTypeMap.get("FARM"));
-					} else if (e.getKeyCode() == KeyEvent.VK_W) {
-						setBuildingToPlan(Game.buildingTypeMap.get("WALL_WOOD"));
-					} else if (e.getKeyCode() == KeyEvent.VK_B) {
-						setBuildingToPlan(Game.buildingTypeMap.get("BARRACKS"));
-					} else if (e.getKeyCode() == KeyEvent.VK_D) {
-						state.leftClickAction = LeftClickAction.WANDER_AROUND;
+				if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+					controlDown = true;
+				} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+					shiftDown = true;
+				} else if (e.getKeyCode() == KeyEvent.VK_A) {
+					if (e.isControlDown()) {
+						selectAllUnits();
+					} else {
+						state.leftClickAction = LeftClickAction.ATTACK;
 					}
+				} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+					deselectEverything();
+				} else if (e.getKeyCode() == KeyEvent.VK_S) {
+					unitStop();
+				} else if (e.getKeyCode() == KeyEvent.VK_G) {
+					toggleGuarding();
+				} else if (e.getKeyCode() == KeyEvent.VK_M) {
+					setBuildingToPlan(Game.buildingTypeMap.get("MINE"));
+				} else if (e.getKeyCode() == KeyEvent.VK_F) {
+					setBuildingToPlan(Game.buildingTypeMap.get("FARM"));
+				} else if (e.getKeyCode() == KeyEvent.VK_W) {
+					setBuildingToPlan(Game.buildingTypeMap.get("WALL_WOOD"));
+				} else if (e.getKeyCode() == KeyEvent.VK_B) {
+					setBuildingToPlan(Game.buildingTypeMap.get("BARRACKS"));
+				} else if (e.getKeyCode() == KeyEvent.VK_D) {
+					state.leftClickAction = LeftClickAction.WANDER_AROUND;
 				}
 			}
 		};
-//		glDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
-//		glDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
-//		glDrawer.getDrawingCanvas().addMouseListener(mouseListener);
 		vanillaDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
 		vanillaDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
 		vanillaDrawer.getDrawingCanvas().addMouseListener(mouseListener);
 		panel.addKeyListener(keyListener);
-		fpsMovementThread = new Thread(() -> {
-			try {
-				fpsMouseRobot = new Robot();
-			} catch (AWTException e2) {
-				e2.printStackTrace();
-			}
-			try {
-				while(true) {
-					if(isFirstPerson()) {
-						if(pressedKeys[KeyEvent.VK_W]) {
-							currentActiveDrawer.shiftView(0, 1);
-						}
-						if(pressedKeys[KeyEvent.VK_S]) {
-							currentActiveDrawer.shiftView(0, -1);
-						}
-						if(pressedKeys[KeyEvent.VK_A]) {
-							currentActiveDrawer.shiftView(-1, 0);
-						}
-						if(pressedKeys[KeyEvent.VK_D]) {
-							currentActiveDrawer.shiftView(1, 0);
-						}
-					}
-					Thread.sleep(33);
-				}
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
-		});
-		fpsMovementThread.start();
 	}
 	
 	public void switch3d(boolean activate3D) {
-		if(activate3D) {
-			currentActiveDrawer = glDrawer;
-		}
-		else {
-			currentActiveDrawer = vanillaDrawer;
-		}
 		if(drawingCanvas != null) {
 			panel.remove(drawingCanvas);
 		}
-		drawingCanvas = currentActiveDrawer.getDrawingCanvas();
+		drawingCanvas = vanillaDrawer.getDrawingCanvas();
 		panel.add(drawingCanvas);
-	}
-	public boolean is3d() {
-		return currentActiveDrawer == glDrawer;
-	}
-	
-	public boolean isFirstPerson() {
-		return is3d() && state.fpMode;
 	}
 
 	public void setFaction(Faction faction) {
@@ -906,7 +834,7 @@ public class GameView {
 	}
 
 	public void updateTerrainImages() {
-		currentActiveDrawer.updateTerrainImages();
+		vanillaDrawer.updateTerrainImages();
 	}
 	
 	public void setMapMode(MapMode mode) {
@@ -939,15 +867,15 @@ public class GameView {
 	 */
 	public void centerViewOnTile(TileLoc tileloc) {
 		Position worldPos = new Position(tileloc.x()+0.5, tileloc.y()+0.5);
-		Point pixel = currentActiveDrawer.getPixelOfWorldCoord(worldPos, state.volatileTileSize);
+		Point pixel = vanillaDrawer.getPixelOfWorldCoord(worldPos, state.volatileTileSize);
 		centerViewOnPixel(new Position(pixel.x, pixel.y));
 	}
 
 	public void centerViewOnTile(TileLoc tileloc, int tileSize) {
 		Position worldPos = new Position(tileloc.x()+0.5, tileloc.y()+0.5);
-		Point pixel = currentActiveDrawer.getPixelOfWorldCoord(worldPos, state.volatileTileSize);
+		Point pixel = vanillaDrawer.getPixelOfWorldCoord(worldPos, state.volatileTileSize);
 		centerViewOnPixel(new Position(pixel.x, pixel.y));
-		currentActiveDrawer.setZoomLevel(tileSize);
+		vanillaDrawer.setZoomLevel(tileSize);
 	}
 
 	/** moves camera to first building or first unit owned by the current active player.
@@ -994,7 +922,7 @@ public class GameView {
 	}
 	
 	public Drawer getDrawer() {
-		return currentActiveDrawer;
+		return vanillaDrawer;
 	}
 	
 	public void setPreviousTickTime(long time) {

@@ -118,15 +118,8 @@ public class MinimapView extends JPanel {
 		int y = MINIMAPBORDERWIDTH;
 		int w = getWidth() - 2 * MINIMAPBORDERWIDTH;
 		int h = getHeight() - 2 * MINIMAPBORDERWIDTH;
-		Graphics2D g2d = (Graphics2D)g;
 		g.translate(x + w/2, y + h/2);
-		if(gameView.is3d()) {
-			g2d.transform(AffineTransform.getScaleInstance(1, -1));
-		}
 		g.drawImage(gameView.getDrawer().getImageToDrawMinimap(), -w/2, -h/2, w, h, null);
-		if(gameView.is3d()) {
-			g2d.transform(AffineTransform.getScaleInstance(1, -1));
-		}
 		g.translate(-x - w/2, -y - h/2);
 		drawViewFrustrum(g, x, y, w, h);
 	}
