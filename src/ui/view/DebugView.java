@@ -158,17 +158,6 @@ public class DebugView {
 			toggleNight.setIcon(Game.DISABLE_NIGHT ? NIGHT_DISABLED_ICON : NIGHT_ENABLED_ICON);
 		});
 
-		JToggleButton toggleGL = KUIConstants.setupToggleButton(gameView.is3d() ? "3D" : "2D", null, DEBUG_BUTTON_SIZE);
-		toggleGL.addActionListener(e -> {
-			gameView.switch3d(!gameView.is3d());
-			toggleGL.setText(gameView.is3d() ? "3D" : "2D");
-		});
-
-		JButton enableFirstPerson = KUIConstants.setupButton("FP Mode", null, DEBUG_BUTTON_SIZE);
-		enableFirstPerson.addActionListener(e -> {
-			gameView.switchFirstPerson(true);
-		});
-
 		JButton exit = KUIConstants.setupButton("Exit", null, DEBUG_BUTTON_SIZE);
 		exit.addActionListener(e -> {
 			System.exit(0);
@@ -177,6 +166,7 @@ public class DebugView {
 		save.addActionListener(e -> {
 			gameView.getGameInstance().saveToFile();
 		});
+		save.setEnabled(false);
 		
 		JButton reseedButton = KUIConstants.setupButton("Reseed", null, DEBUG_BUTTON_SIZE);
 		reseedButton.addActionListener(e -> {
@@ -199,33 +189,31 @@ public class DebugView {
 		JButton terrainGenViewButton = KUIConstants.setupButton("TerrainGen", null, DEBUG_BUTTON_SIZE);
 		terrainGenViewButton.addActionListener(e -> setupTerrainGenView() );
 
+		scrollingPanel.add(exit);
+		scrollingPanel.add(settingsButton);
+		scrollingPanel.add(fastForward);
+		scrollingPanel.add(pauseGame);
+		scrollingPanel.add(setPlayerFaction);
+		scrollingPanel.add(debug);
 		for(JRadioButton button : mapModeButtons) {
 			scrollingPanel.add(button);
 		}
 		scrollingPanel.add(flipTable);
 		scrollingPanel.add(makeItRain);
 		scrollingPanel.add(makeItDry);
-		scrollingPanel.add(fastForward);
-		scrollingPanel.add(pauseGame);
 		scrollingPanel.add(eruptVolcano);
 		scrollingPanel.add(meteor);
 		scrollingPanel.add(unitEvents);
-		scrollingPanel.add(debug);
 		scrollingPanel.add(toggleNight);
 		scrollingPanel.add(addResources);
-		scrollingPanel.add(setPlayerFaction);
 		scrollingPanel.add(researchEverything);
 		scrollingPanel.add(raiseHeight);
 		scrollingPanel.add(increasePressure);
 		scrollingPanel.add(setTerritoryButton);
 		scrollingPanel.add(save); // doesnt currently work
-		scrollingPanel.add(exit);
-		scrollingPanel.add(toggleGL);
-		scrollingPanel.add(enableFirstPerson);
 		scrollingPanel.add(shadowWordDeath);
 		scrollingPanel.add(shadowWordPain);
 		scrollingPanel.add(reseedButton);
-		scrollingPanel.add(settingsButton);
 		scrollingPanel.add(terrainGenViewButton);
 	}
 	

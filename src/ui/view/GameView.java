@@ -78,11 +78,12 @@ public class GameView {
 		public ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
 	}
 
-	public GameView(Game game, boolean useOpenGL, JPanel overlay) {
+	public GameView(Game game, JPanel overlay) {
 		this.overlayPanel = overlay;
 		state = new GameViewState();
 		vanillaDrawer = new VanillaDrawer(game, state);
-		glDrawer = new GLDrawer(game, state);
+		glDrawer = null;
+//		glDrawer = new GLDrawer(game, state);
 		panel = new FillingLayeredPane() {
 			@Override
 			public void paintComponent(Graphics g) {
@@ -100,10 +101,10 @@ public class GameView {
 		panel.setBackground(Color.black);
 		panel.add(overlayPanel, BorderLayout.SOUTH);
 		
-		glDrawer.getDrawingCanvas().setFocusable(false);
+//		glDrawer.getDrawingCanvas().setFocusable(false);
 		vanillaDrawer.getDrawingCanvas().setFocusable(false);
 
-		switch3d(useOpenGL);
+		switch3d(false);
 		
 		this.game = game;
 		this.guiController = game.getGUIController();
@@ -230,11 +231,6 @@ public class GameView {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				pressedKeys[e.getKeyCode()] = false;
-				if(isFirstPerson()) {
-					if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-						switchFirstPerson(false);
-					}
-				}
 				if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
 					controlDown = false;
 				} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
@@ -278,9 +274,9 @@ public class GameView {
 				}
 			}
 		};
-		glDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
-		glDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
-		glDrawer.getDrawingCanvas().addMouseListener(mouseListener);
+//		glDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
+//		glDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
+//		glDrawer.getDrawingCanvas().addMouseListener(mouseListener);
 		vanillaDrawer.getDrawingCanvas().addMouseWheelListener(mouseWheelListener);
 		vanillaDrawer.getDrawingCanvas().addMouseMotionListener(mouseMotionListener);
 		vanillaDrawer.getDrawingCanvas().addMouseListener(mouseListener);
@@ -291,7 +287,6 @@ public class GameView {
 			} catch (AWTException e2) {
 				e2.printStackTrace();
 			}
-			switchFirstPerson(Settings.DEFAULT_TO_FPMODE);
 			try {
 				while(true) {
 					if(isFirstPerson()) {
@@ -332,16 +327,6 @@ public class GameView {
 	}
 	public boolean is3d() {
 		return currentActiveDrawer == glDrawer;
-	}
-	
-	public void switchFirstPerson(boolean enabled) {
-		state.fpMode = enabled;
-		if(state.fpMode) {
-			glDrawer.getDrawingCanvas().setCursor(BLANK_CURSOR);
-		}
-		else {
-			glDrawer.getDrawingCanvas().setCursor(Cursor.getDefaultCursor());
-		}
 	}
 	
 	public boolean isFirstPerson() {

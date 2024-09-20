@@ -38,7 +38,7 @@ public class TerrainObject extends GameObject {
 				if(includeLiquid) {
 					effectiveHeight += tile.liquidAmount - 2;
 				}
-				mesh.setVertexZ(vertexIndex, GLDrawer.tileHeightTo3dHeight(effectiveHeight));
+//				mesh.setVertexZ(vertexIndex, GLDrawer.tileHeightTo3dHeight(effectiveHeight));
 			}
 		}
 		mesh.updateNormals();
@@ -60,29 +60,29 @@ public class TerrainObject extends GameObject {
 					(tile.getLocation().y() + 0.5f)/world.getHeight());
 			ArrayList<Vertex> verts = new ArrayList<>();
 			ArrayList<Integer> vertIndices = new ArrayList<>();
-			Vector3f center = GLDrawer.tileLocTo3dCoords(tile.getLocation(), tile.getHeight());
-
-			vertices.add(new Vertex(center, white, textureCoord));
-			verts.add(vertices.get(vertices.size()-1));
-			vertIndices.add(vertices.size()-1);
-			vertices.add(new Vertex(center.add(-radius, 0, 0), white, textureCoord));
-			verts.add(vertices.get(vertices.size()-1));
-			vertIndices.add(vertices.size()-1);
-			vertices.add(new Vertex(center.add(-radius/2, -yoffset, 0), white, textureCoord));
-			verts.add(vertices.get(vertices.size()-1));
-			vertIndices.add(vertices.size()-1);
-			vertices.add(new Vertex(center.add(radius/2, -yoffset, 0), white, textureCoord));
-			verts.add(vertices.get(vertices.size()-1));
-			vertIndices.add(vertices.size()-1);
-			vertices.add(new Vertex(center.add(radius, 0, 0), white, textureCoord));
-			verts.add(vertices.get(vertices.size()-1));
-			vertIndices.add(vertices.size()-1);
-			vertices.add(new Vertex(center.add(radius/2, yoffset, 0), white, textureCoord));
-			verts.add(vertices.get(vertices.size()-1));
-			vertIndices.add(vertices.size()-1);
-			vertices.add(new Vertex(center.add(-radius/2, yoffset, 0), white, textureCoord));
-			verts.add(vertices.get(vertices.size()-1));
-			vertIndices.add(vertices.size()-1);
+//			Vector3f center = GLDrawer.tileLocTo3dCoords(tile.getLocation(), tile.getHeight());
+//
+//			vertices.add(new Vertex(center, white, textureCoord));
+//			verts.add(vertices.get(vertices.size()-1));
+//			vertIndices.add(vertices.size()-1);
+//			vertices.add(new Vertex(center.add(-radius, 0, 0), white, textureCoord));
+//			verts.add(vertices.get(vertices.size()-1));
+//			vertIndices.add(vertices.size()-1);
+//			vertices.add(new Vertex(center.add(-radius/2, -yoffset, 0), white, textureCoord));
+//			verts.add(vertices.get(vertices.size()-1));
+//			vertIndices.add(vertices.size()-1);
+//			vertices.add(new Vertex(center.add(radius/2, -yoffset, 0), white, textureCoord));
+//			verts.add(vertices.get(vertices.size()-1));
+//			vertIndices.add(vertices.size()-1);
+//			vertices.add(new Vertex(center.add(radius, 0, 0), white, textureCoord));
+//			verts.add(vertices.get(vertices.size()-1));
+//			vertIndices.add(vertices.size()-1);
+//			vertices.add(new Vertex(center.add(radius/2, yoffset, 0), white, textureCoord));
+//			verts.add(vertices.get(vertices.size()-1));
+//			vertIndices.add(vertices.size()-1);
+//			vertices.add(new Vertex(center.add(-radius/2, yoffset, 0), white, textureCoord));
+//			verts.add(vertices.get(vertices.size()-1));
+//			vertIndices.add(vertices.size()-1);
 			
 			locToHex.put(tile.getLocation(), vertIndices);
 			
@@ -213,13 +213,13 @@ public class TerrainObject extends GameObject {
 		int index = 0;
 		for(Tile tile : world.getTiles()) {
 			coordToVertex[tile.getLocation().y()][tile.getLocation().x()] = index;
-			Vector3f pos0 = GLDrawer.tileLocTo3dCoords(tile.getLocation(), tile.getHeight());
-			Vector3f ca = (tile.getLocation().x() % 2 == 0) ? c0 : c1;
-			Vector3f cb = (tile.getLocation().x() % 2 == 0) ? c2 : c3;
-			Vector3f c = (tile.getLocation().y() % 2 == 0) ? ca : cb;
-			Vector2f textureCoord = new Vector2f((float)tile.getLocation().x()/world.getWidth(), (float)tile.getLocation().y()/world.getHeight());
-			vertices[index] = new Vertex(pos0, c, textureCoord);
-			index++;
+//			Vector3f pos0 = GLDrawer.tileLocTo3dCoords(tile.getLocation(), tile.getHeight());
+//			Vector3f ca = (tile.getLocation().x() % 2 == 0) ? c0 : c1;
+//			Vector3f cb = (tile.getLocation().x() % 2 == 0) ? c2 : c3;
+//			Vector3f c = (tile.getLocation().y() % 2 == 0) ? ca : cb;
+//			Vector2f textureCoord = new Vector2f((float)tile.getLocation().x()/world.getWidth(), (float)tile.getLocation().y()/world.getHeight());
+//			vertices[index] = new Vertex(pos0, c, textureCoord);
+//			index++;
 		}
 		ArrayList<Integer> indicesList = new ArrayList<>();
 		index = 0;
