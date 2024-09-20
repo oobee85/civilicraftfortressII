@@ -40,7 +40,7 @@ public class Game {
 	}
 	
 	public void saveToFile() {
-		WorldInfo worldInfo = Utils.extractWorldInfo(world, true, true);
+		WorldInfo worldInfo = Utils.extractWorldInfo(world, true, true, false);
 		Utils.saveToFile(worldInfo, "save1.civ", false);
 	}
 	

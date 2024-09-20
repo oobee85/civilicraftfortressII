@@ -547,12 +547,12 @@ public final class Utils {
 		return smoothed;
 	}
 	
-	public static WorldInfo extractWorldInfo(World world, boolean everything, boolean units) {
+	public static WorldInfo extractWorldInfo(World world, boolean everything, boolean units, boolean onlyChangedTiles) {
 		Tile[] tileArray;
 		if (everything) {
 			ArrayList<Tile> tileInfos = new ArrayList<>(world.getTiles().size());
 			for (Tile t : world.getTiles()) {
-				if (t.isChangedFromLatestSent()) {
+				if (!onlyChangedTiles || t.isChangedFromLatestSent()) {
 					tileInfos.add(t);
 				}
 			}

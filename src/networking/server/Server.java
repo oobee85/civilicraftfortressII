@@ -35,10 +35,24 @@ public class Server {
 	private ArrayList<AIInterface> ailist = new ArrayList<>();
 
 	public Server() {
-		
+
 	}
 	public void setGUI(ServerGUI serverGUI) {
 		this.gui = serverGUI;
+
+		Game.DISABLE_NIGHT = true;
+		Timer repaintingThread = new Timer(500, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (gameInstance != null) {
+					gameInstance.getGUIController().updateGUI();
+				}
+				if (gui != null) {
+					gui.repaint();
+				}
+			}
+		});
+		repaintingThread.start();
 	}
 	
 	public void startAcceptingConnections() {
@@ -84,6 +98,10 @@ public class Server {
 			gui.lostConnection(connection.getPanel());
 			connections.remove(connection);
 		});
+		if (startedGame) {
+			connection.sendMessage(Utils.extractWorldInfo(gameInstance.world, true, true, false));
+			sendWhichFaction(connection);
+		}
 		gui.addedConnection(connection.getPanel());
 		connections.put(connection, true);
 		startProcessing(connection);
@@ -109,6 +127,7 @@ public class Server {
 	}
 	
 	private void makeWorld() {
+		gui.switchToGame();
 		madeWorld = true;
 		System.out.println("Making world");
 		gameInstance = new Game(new GUIController() {
@@ -171,14 +190,6 @@ public class Server {
 		
 		startWorldNetworkingUpdateThread();
 
-		Game.DISABLE_NIGHT = true;
-		Timer repaintingThread = new Timer(500, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.getGUIController().updateGUI();
-				gui.repaint();
-			}
-		});
 		Thread terrainImageThread = new Thread(() -> {
 			while (true) {
 				try {
@@ -192,16 +203,19 @@ public class Server {
 				}
 			}
 		});
-		repaintingThread.start();
 		terrainImageThread.start();
 	}
 	
-	private void sendWhichFaction() {
+	private void sendWhichFaction(Connection c) {
+		Faction f = gameInstance.world.getFaction(c.getPlayerInfo().getName());
+		if(f != null) {
+			c.sendMessage(f);
+		}
+	}
+	
+	private void sendAllFactions() {
 		for (Connection connection : connections.keySet()) {
-			Faction f = gameInstance.world.getFaction(connection.getPlayerInfo().getName());
-			if(f != null) {
-				connection.sendMessage(f);
-			}
+			sendWhichFaction(connection);
 		}
 	}
 	
@@ -233,12 +247,11 @@ public class Server {
 		worldNetworkingUpdateThread.start();
 	}
 	
-	
 	private void sendFullWorld() {
 		long start = System.currentTimeMillis();
-		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, true, true);
+		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, true, true, true);
 		sendToAllConnections(worldInfo);
-		sendWhichFaction();
+		sendAllFactions();
 		long delta = System.currentTimeMillis() - start;
 		
 		if (Settings.WRITE_NETWORK_PACKAGES_TO_FILE) {
@@ -247,7 +260,7 @@ public class Server {
 	}
 
 	private void sendUnits() {
-		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, false, true);
+		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, false, true, true);
 		sendToAllConnections(worldInfo);
 		if (Settings.WRITE_NETWORK_PACKAGES_TO_FILE) {
 			Utils.saveToFile(worldInfo, "ser/units_" + World.ticks + ".ser", false);
@@ -257,7 +270,7 @@ public class Server {
 	private int skippedCount;
 	private int sentCount;
 	private void sendProjectilesAndDeadThings() {
-		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, false, false);
+		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, false, false, true);
 		if(worldInfo.getThings().isEmpty() 
 				&& worldInfo.getHitsplats().isEmpty()
 				&& worldInfo.getProjectiles().isEmpty()) {

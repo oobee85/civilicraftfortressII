@@ -225,6 +225,7 @@ public class ClientGUI {
 
 		makeWorldButton = KUIConstants.setupButton("Make World", null, CONNECTION_MENU_BUTTON_SIZE);
 		makeWorldButton.addActionListener(e -> {
+			makeWorldButton.setEnabled(false);
 			client.sendMessage(new ClientMessage(ClientMessageType.MAKE_WORLD, null));
 			resetFocus();
 		});
@@ -232,6 +233,7 @@ public class ClientGUI {
 
 		startGameButton = KUIConstants.setupButton("Start Game", null, CONNECTION_MENU_BUTTON_SIZE);
 		startGameButton.addActionListener(e -> {
+			startGameButton.setEnabled(false);
 			client.sendMessage(new ClientMessage(ClientMessageType.START_GAME, null));
 			resetFocus();
 		});
