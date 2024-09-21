@@ -10,8 +10,10 @@ import java.util.Map.Entry;
 import javax.imageio.ImageIO;
 
 import game.*;
+import game.actions.PlannedAction;
 import ui.view.TerrainGenView;
 import utils.*;
+import wildlife.Animal;
 import world.liquid.*;
 
 public class Generation {
@@ -498,8 +500,42 @@ public class Generation {
 		}
 	}
 	public static void generateWildLife(World world) {
+		List<Tile> mines = new LinkedList<>();
+		for(Tile tile : world.getTilesRandomly()) {
+			if (tile.getResource() != null && tile.getResource().isOre()) {
+				boolean tooclose = false;
+				for (Tile mineTile : mines) {
+					if (tile.distanceTo(mineTile) < 8) {
+						tooclose = true;
+						break;
+					}
+				}
+				if (!tooclose) {
+					Thing mine = world.summonBuilding(tile, Game.buildingTypeMap.get("QUARRY"), world.getFaction(World.NO_FACTION_ID));
+					if (mine != null) {
+						mines.add(tile);
+					}
+				}
+			}
+		}
+		
+		for (Tile mine : mines) {
+			LinkedList<Tile> candidateTiles = new LinkedList<>();
+			for (Tile tile : Utils.getTilesInRadius(mine, world, 7)) {
+				if (tile != mine && tile.getResource() != null && tile.getResource().isOre()) {
+					candidateTiles.add(tile);
+				}
+			}
+			for (int i = 0; i < 4; i++) {
+				Animal dwarf = world.spawnAnimal(Game.unitTypeMap.get("DWARF"), mine, world.getFaction(World.NO_FACTION_ID), null);
+				Tile tile = candidateTiles.remove((int)(Math.random() * candidateTiles.size()));
+				dwarf.prequeuePlannedAction(PlannedAction.harvestTile(tile));
+			}
+		}
+		
 		for(Tile tile : world.getTilesRandomly()) {
 			TileLoc loc = tile.getLocation();
+			
 			if(Math.random() < 0.01) {
 				if(tile.checkTerrain(Terrain.GRASS) || tile.checkTerrain(Terrain.DIRT)) {
 					world.makeAnimal(Game.unitTypeMap.get("DEER"), world, loc);

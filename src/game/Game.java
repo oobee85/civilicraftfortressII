@@ -1114,22 +1114,7 @@ public class Game {
 		}
 	}
 	public Thing summonBuilding(Tile tile, BuildingType buildingType, Faction faction) {
-		if(tile == null) {
-			return null;
-		}
-		if(tile.getBuilding() != null) {
-			tile.getBuilding().setDead(true);
-		}
-		Building building = new Building(buildingType, tile, faction);
-		building.setRemainingEffort(0);
-		world.addBuilding(building);
-		if(buildingType.isRoad()) {
-			tile.setRoad(building);
-		}
-		else {
-			tile.setBuilding(building);
-		}
-		return building;
+		return world.summonBuilding(tile, buildingType, faction);
 	}
 	public Thing summonPlant(Tile tile, PlantType plantType, Faction faction) {
 		if(tile == null) {

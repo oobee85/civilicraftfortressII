@@ -611,8 +611,9 @@
 		"attackstyles":[
 			{"damage":30, "cooldown":30, "range":1}
 		],
-		"attributes":["hostile"],
-		"resistances": {"HEAT": 20}
+		"inventory":{"maxstack":1},
+		"builds":["MINE", "QUARRY"],
+		"resistances": {"HEAT": 20},
 	},
 	{
 		"image":"Images/units/scorpion.png",
