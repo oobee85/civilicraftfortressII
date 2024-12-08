@@ -107,8 +107,9 @@ public class Inventory implements Externalizable {
 		}
 		for(Item item: from.getItems()) {
 			if(item != null) {
-				int amountTaken = this.addItem(item.getType(), item.getAmount());
-				from.addItem(item.getType(), -amountTaken);
+				int amountToTake = this.maxStack - this.getItemAmount(item.getType());
+				this.addItem(item.getType(), amountToTake);
+				from.addItem(item.getType(), -amountToTake);
 			}
 		}
 	}

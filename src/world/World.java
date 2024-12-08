@@ -821,7 +821,7 @@ public class World {
 					}
 				}
 			}
-			if(World.ticks % 25 == 0) {
+			if(World.ticks % 50 == 0) {
 				if(tile.getModifier() != null && tile.getModifier().isHot()) {
 					if(tile.getPlant() != null && Math.random() > 0.85) {
 						for(Tile neighbor: tile.getNeighbors()) {

@@ -526,7 +526,7 @@ public class Generation {
 					candidateTiles.add(tile);
 				}
 			}
-			for (int i = 0; i < 4; i++) {
+			for (int i = 0; i < 4 && !candidateTiles.isEmpty(); i++) {
 				Animal dwarf = world.spawnAnimal(Game.unitTypeMap.get("DWARF"), mine, world.getFaction(World.NO_FACTION_ID), null);
 				Tile tile = candidateTiles.remove((int)(Math.random() * candidateTiles.size()));
 				dwarf.prequeuePlannedAction(PlannedAction.harvestTile(tile));
