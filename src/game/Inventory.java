@@ -107,9 +107,8 @@ public class Inventory implements Externalizable {
 		}
 		for(Item item: from.getItems()) {
 			if(item != null) {
-				int amountToTake = this.maxStack - this.getItemAmount(item.getType());
-				this.addItem(item.getType(), amountToTake);
-				from.addItem(item.getType(), -amountToTake);
+				int amountTaken = this.addItem(item.getType(), item.getAmount());
+				from.addItem(item.getType(), -amountTaken);
 			}
 		}
 	}
@@ -127,10 +126,12 @@ public class Inventory implements Externalizable {
 		}
 		Item item = items[type.ordinal()];
 		int amountToAdd = amount;
-		if(item.getAmount() + amount > maxStack) {
+		// if resulting amount is beyond the max stack, limit the amount we are adding
+		if(item.getAmount() + amountToAdd > maxStack) {
 			amountToAdd = maxStack - item.getAmount();
 		}
-		else if(item.getAmount() + amount < 0) {
+		// if resulting amount is negative, limit the amount we are removing
+		else if(item.getAmount() + amountToAdd < 0) {
 			amountToAdd = -item.getAmount();
 		}
 		item.addAmount(amountToAdd);
