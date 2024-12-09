@@ -430,12 +430,13 @@
 	},
 	{
 		"image":"Images/units/skeleton.png",
-		"cost":{"BRONZE_BAR":5,"WOOD":50,"FOOD":200},
+		"cost":{"WOOD":50,"FOOD":200},
 		"stats":{"movespeed":20,"buildtime":100,"health":300,"healspeed":50},
 		"name":"SKELETON",
 		"attackstyles":[
 			{"damage":10, "cooldown":20, "range":1}
 		],
+		"research":"NECROMANCY",
 		"attributes":["hostile","delayedinvasion"],
 		"resistances": {"COLD": 0},
 		"targeting":[

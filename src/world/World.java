@@ -105,7 +105,7 @@ public class World {
 			tile.liquidAmount = info.liquidAmount;
 			tile.liquidType = info.liquidType;
 			
-			
+			tile.getInventory().copyFrom(info.getInventory());
 		}
 	}
 
