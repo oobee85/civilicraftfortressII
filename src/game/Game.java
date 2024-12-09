@@ -479,7 +479,7 @@ public class Game {
 			if(x > 4 && x < world.getWidth() - 3) {
 				if(x % 6 == 0) {
 					tile = world.get(new TileLoc(x, world.getHeight() - 16));
-					spawnCyclops(tile);
+					spawnCyclopsFort(tile);
 					world.spawnAnimal(Game.unitTypeMap.get("OGRE"), tile, cyclops, null);
 					world.spawnAnimal(Game.unitTypeMap.get("TREBUCHET"), tile, cyclops, null);
 				}
@@ -490,7 +490,7 @@ public class Game {
 			if(x > 4 && x < world.getWidth() - 3) {
 				if(x % 6 == 3) {
 					tile = world.get(new TileLoc(x, world.getHeight() - 10));
-					spawnCyclops(tile);
+					spawnCyclopsFort(tile);
 					world.spawnAnimal(Game.unitTypeMap.get("OGRE"), tile, cyclops, null);
 					world.spawnAnimal(Game.unitTypeMap.get("TREBUCHET"), tile, cyclops, null);
 				}
@@ -501,7 +501,7 @@ public class Game {
 			if(x > 4 && x < world.getWidth() - 3) {
 				if(x % 6 == 0) {
 					tile = world.get(new TileLoc(x, world.getHeight() - 5));
-					spawnCyclops(tile);
+					spawnCyclopsFort(tile);
 					world.spawnAnimal(Game.unitTypeMap.get("OGRE"), tile, cyclops, null);
 					world.spawnAnimal(Game.unitTypeMap.get("TREBUCHET"), tile, cyclops, null);
 				}
@@ -557,10 +557,50 @@ public class Game {
 		spawnStartingEnemies();
 	}
 	public void spawnStartingEnemies() {
-		spawnCyclops();
+		spawnCyclopsFort();
 		spawnUndead();
-//		Tile targetTile = getTargetTileForSpawns();
-//		world.spawnOgre(targetTile);
+		makeDwarves(world);
+		// ent grove
+		// move dwarves here
+		// orc town?
+		// ogre swamp
+		// dragon cave/volcano
+	}
+	
+	private void makeDwarves(World world) {
+
+		List<Tile> mines = new LinkedList<>();
+		for(Tile tile : world.getTilesRandomly()) {
+			if (tile.getResource() != null && tile.getResource().isOre() && tile.getResource().isRare()) {
+				boolean tooclose = false;
+				for (Tile mineTile : mines) {
+					if (tile.distanceTo(mineTile) < 8) {
+						tooclose = true;
+						break;
+					}
+				}
+				if (!tooclose) {
+					Thing mine = world.summonBuilding(tile, Game.buildingTypeMap.get("QUARRY"), world.getFaction(World.NO_FACTION_ID));
+					if (mine != null) {
+						mines.add(tile);
+					}
+				}
+			}
+		}
+		
+		for (Tile mine : mines) {
+			LinkedList<Tile> candidateTiles = new LinkedList<>();
+			for (Tile tile : Utils.getTilesInRadius(mine, world, 7)) {
+				if (tile != mine && tile.getResource() != null && tile.getResource().isOre() && tile.getResource().isRare()) {
+					candidateTiles.add(tile);
+				}
+			}
+			for (int i = 0; i < 4 && !candidateTiles.isEmpty(); i++) {
+				Animal dwarf = world.spawnAnimal(Game.unitTypeMap.get("DWARF"), mine, world.getFaction(World.NO_FACTION_ID), null);
+				Tile tile = candidateTiles.remove((int)(Math.random() * candidateTiles.size()));
+				dwarf.prequeuePlannedAction(PlannedAction.harvestTile(tile));
+			}
+		}
 	}
 	public void spawnUndead() {
 		Tile highestTile = null;
@@ -595,28 +635,14 @@ public class Game {
 //			skeleton.setPassiveAction(PlannedAction.GUARD);
 //		}
 	}
-	public void spawnCyclops() {
-		Tile tile = world.getRandomTile();
-		for (int attempt = 0; attempt < 100; attempt++) {
-			Tile t = world.getRandomTile();
-			if (t.getTerrain() != Terrain.ROCK) {
-				continue;
+	public void spawnCyclopsFort() {
+		for (Tile t : world.getTiles()) {
+			if (t.getResource() == ResourceType.RUNITE) {
+				spawnCyclopsFort(t);
 			}
-
-			if (t.getLocation().x() <= 3 || t.getLocation().x() >= world.getWidth()-3) {
-				continue;
-			}
-
-			if (t.getLocation().y() <= 3 || t.getLocation().y() >= world.getHeight()-3) {
-				continue;
-			}
-
-			tile = t;
-			break;
 		}
-		spawnCyclops(tile);
 	}
-	public void spawnCyclops(Tile tile) {
+	private void spawnCyclopsFort(Tile tile) {
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y())), Game.buildingTypeMap.get("WATCHTOWER"), world.getFaction(World.CYCLOPS_FACTION_ID));
 		Thing granary = summonBuilding(world.get(new TileLoc(tile.getLocation().x()-1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("GRANARY"), world.getFaction(World.CYCLOPS_FACTION_ID));
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x()+1, tile.getLocation().y()-1)), Game.buildingTypeMap.get("BARRACKS"), world.getFaction(World.CYCLOPS_FACTION_ID));

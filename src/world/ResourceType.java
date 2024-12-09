@@ -18,7 +18,7 @@ public enum ResourceType {
 	IRON ( 100, 5, 8, false, ItemType.IRON_ORE, true, 4, "BRONZE_WORKING",
 			new String[] {"Images/resources/iron/ore_iron128.png"}),
 	
-	MITHRIL ( 100, 4, 8, false, ItemType.MITHRIL_ORE, true, 5, "IRON_WORKING",
+	MITHRIL ( 100, 4, 8, true, ItemType.MITHRIL_ORE, true, 5, "IRON_WORKING",
 			new String[] {"Images/resources/mithril/ore_mithril128.png"} ),
 	
 	ADAMANTITE (100, 2, 5, true, ItemType.ADAMANTITE_ORE, true, 7, "ARMORING",
