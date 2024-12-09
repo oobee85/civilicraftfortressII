@@ -179,7 +179,7 @@ public class Faction implements Externalizable {
 				influence += building.getMaxHealth() / 10;
 			}
 			else {
-				influence += building.getMaxHealth() / 2;
+				influence += building.getMaxHealth() / 5;
 			}
 		}
 		for (Unit unit : getUnits()) {

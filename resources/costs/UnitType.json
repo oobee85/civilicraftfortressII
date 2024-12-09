@@ -138,11 +138,11 @@
 	},
 	{
 		"image":"Images/units/horseman.png",
-		"cost":{"HORSE":25, "FOOD":100},
-		"stats":{"movespeed":5,"buildtime":300,"health":200,"healspeed":50},
+		"cost":{"HORSE":50, "FOOD":100},
+		"stats":{"movespeed":10,"buildtime":300,"health":200,"healspeed":50},
 		"name":"HORSEMAN",
 		"attackstyles":[
-			{"damage":40, "cooldown":20, "range":1}
+			{"damage":20, "cooldown":20, "range":1}
 		],
 		"inventory":{"maxstack":5},
 		"attributes":["hostile"],
