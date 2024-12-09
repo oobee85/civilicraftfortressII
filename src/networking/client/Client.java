@@ -485,9 +485,6 @@ public class Client {
 				movedFrom.removeUnit(existingUnit);
 				existingUnit.getTile().addUnit(existingUnit);
 			}
-			if(existingUnit.getTile() != null && existingUnit.getFaction().usesItems()) {
-				existingUnit.getTile().getInventory().clear();
-			}
 		}
 		if(existing.isDead()) {
 			things.remove(update.id());
