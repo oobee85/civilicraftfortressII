@@ -392,14 +392,14 @@
 		"stats":{"movespeed":30,"buildtime":0,"health":1000,"healspeed":10},
 		"name":"LAVAGOLEM",
 		"attackstyles":[
-			{"damage":150, "cooldown":50, "range":1}
+			{"damage":200, "cooldown":50, "range":1}
 		],
 		"attributes":["hostile","delayedinvasion"],
 		"resistances": {"HEAT": 0},
 		"targeting":[
 			{"type":"MINE"}
 		],
-		"loot":{"COAL":500, "MITHRIL_ORE":25, "IRON_ORE":25, "ADAMANTITE_ORE":25}
+		"loot":{"COAL":500, "MITHRIL_BAR":25, "IRON_BAR":25, "ADAMANTITE_BAR":25}
 	},
 	{
 		"image":"Images/units/wolf.png",
@@ -412,7 +412,7 @@
 		"research":"TRAPPING",
 		"attributes":["hostile"],
 		"resistances": {"COLD": 0},
-		"loot":{"FOOD":300, "BRONZE_BAR": 5}
+		"loot":{"FOOD":300, "BRONZE_BAR": 10}
 	},
 	{
 		"image":"Images/units/cyclops.png",
@@ -430,8 +430,8 @@
 	},
 	{
 		"image":"Images/units/skeleton.png",
-		"cost":{"WOOD":50,"FOOD":200},
-		"stats":{"movespeed":20,"buildtime":100,"health":300,"healspeed":50},
+		"cost":{"WOOD":50},
+		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":50},
 		"name":"SKELETON",
 		"attackstyles":[
 			{"damage":10, "cooldown":20, "range":1}
@@ -449,8 +449,8 @@
 	},
 	{
 		"image":"Images/units/icegiant.png",
-		"cost":{"IRON_BAR":1,"MITHRIL_BAR":1,"FOOD":300},
-		"stats":{"movespeed":30,"buildtime":200,"health":1000,"healspeed":10},
+		"cost":{"IRON_BAR":2,"MITHRIL_BAR":2,"FOOD":300},
+		"stats":{"movespeed":30,"buildtime":400,"health":1000,"healspeed":10},
 		"name":"ICE_GIANT",
 		"attackstyles":[
 			{"damage":200, "cooldown":50, "range":1}
@@ -461,7 +461,7 @@
 			{"type":"game.Unit", "faction":"PLAYER"},
 			{"type":"game.Unit"}
 		],
-		"loot":{"IRON_BAR":10, "MITHRIL_BAR":10, "BRONZE_BAR":10}
+		"loot":{"IRON_BAR":10, "MITHRIL_BAR":20, "BRONZE_BAR":10}
 	},
 	{
 		"image":"Images/units/flamelet.png",
@@ -614,7 +614,7 @@
 		],
 		"inventory":{"maxstack":1},
 		"builds":["MINE", "QUARRY"],
-		"resistances": {"HEAT": 20},
+		"resistances": {"HEAT": 20}
 	},
 	{
 		"image":"Images/units/scorpion.png",
@@ -626,7 +626,7 @@
 		],
 		"inventory":{"maxstack":1},
 		"attributes":["hostile"],
-		"loot":{"STONE":5},
+		"loot":{"STONE":50},
 		"builds":["SCORPION_DEN"]
 	}
 ]

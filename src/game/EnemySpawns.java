@@ -3,27 +3,30 @@ package game;
 public class EnemySpawns {
 	private static UnitType[] easyTypes = {
 			Game.unitTypeMap.get("WATER_SPIRIT"),
-			Game.unitTypeMap.get("FLAMELET"),
 			Game.unitTypeMap.get("FIREFLY"),
-			Game.unitTypeMap.get("WOLF"),
+			Game.unitTypeMap.get("FLAMELET"),
+			
 			Game.unitTypeMap.get("WARRIOR"),
+			Game.unitTypeMap.get("SKELETON"),
+			Game.unitTypeMap.get("WOLF"),
 	};
 
 	private static UnitType[] mediumTypes = {
-			Game.unitTypeMap.get("SKELETON"),
+			Game.unitTypeMap.get("TERMITE"),
 			Game.unitTypeMap.get("ENT"),
-			Game.unitTypeMap.get("ROC"),
-			Game.unitTypeMap.get("VAMPIRE"),
 			Game.unitTypeMap.get("OGRE"),
+			Game.unitTypeMap.get("ROC"),
+			Game.unitTypeMap.get("STONE_GOLEM"),
+			Game.unitTypeMap.get("VAMPIRE"),
+			Game.unitTypeMap.get("BOMB"),
+			
 	};
 
 	private static UnitType[] hardTypes = {
 			Game.unitTypeMap.get("WEREWOLF"),
-			Game.unitTypeMap.get("TERMITE"),
-			Game.unitTypeMap.get("BOMB"),
 			Game.unitTypeMap.get("LAVAGOLEM"),
 			Game.unitTypeMap.get("ICE_GIANT"),
-			Game.unitTypeMap.get("STONE_GOLEM"),
+			
 	};
 	
 	public static UnitType getRandomEasyType() {

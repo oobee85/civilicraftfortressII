@@ -233,23 +233,23 @@ public class Game {
 			faction.recomputeInfluence();
 			double influence = faction.getLastComputedInfluence();
 			System.out.println("Faction " + faction.name() + " influence = " + influence);
-			if (influence <= 5000) {
+			if (influence <= 3500) {
 				continue;
 			}
 			Tile targetTile = getTargetTileForSpawns(faction);
-			while (targetTile != null && influence > 15000) {
+			while (targetTile != null && influence > 20000) {
 				UnitType hard = EnemySpawns.getRandomHardType();
 				makeAnimal(targetTile, hard, 1);
 				influence -= hard.getCombatStats().getHealth()*5;
 			}
 			targetTile = getTargetTileForSpawns(faction);
-			while (targetTile != null && influence > 10000) {
+			while (targetTile != null && influence > 12000) {
 				UnitType medium = EnemySpawns.getRandomMediumType();
 				makeAnimal(targetTile, medium, 1);
 				influence -= medium.getCombatStats().getHealth()*5;
 			}
 			targetTile = getTargetTileForSpawns(faction);
-			while (targetTile != null && influence > 5000) {
+			while (targetTile != null && influence > 3500) {
 				UnitType easy = EnemySpawns.getRandomEasyType();
 				makeAnimal(targetTile, easy, 1);
 				influence -= easy.getCombatStats().getHealth()*5;
