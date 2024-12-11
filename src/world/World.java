@@ -1403,14 +1403,22 @@ public class World {
 		Generation.makeBiome(desertt, Terrain.SAND, numDesertTiles, 110, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
 		
 		Tile lowestTile = null;
+		Tile secondLowest = null;
 		for(Tile lt : getTiles()) {
-			if (lowestTile == null || lt.getHeight() > lowestTile.getHeight()) {
+			if(lowestTile == null || secondLowest == null) {
 				lowestTile = lt;
+				secondLowest = lt;
+			}
+			if (( lowestTile != null && lt.getHeight() < lowestTile.getHeight())) {
+				secondLowest = lowestTile;
+				lowestTile = lt;
+				
+				
 			}
 		}
 		
-		System.out.println("Ocean tile :" + lowestTile);
-		Generation.makeBiome(lowestTile, Terrain.OCEAN, numDesertTiles, 200, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
+		System.out.println("Ocean tile :" + secondLowest);
+		Generation.makeBiome(secondLowest, Terrain.OCEAN, 100, 200, new Terrain[]{Terrain.GRASS, Terrain.DIRT, Terrain.ROCK}, worldRNG);
 		
 		updateTerrainChange(true);
 		Generation.generateResources(this, worldRNG);

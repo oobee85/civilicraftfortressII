@@ -380,8 +380,9 @@ public class Generation {
 			if(Math.abs(tile.getHeight() - potential.getHeight()) < maxHeightDifference) {
 				if(replaceable.contains(potential.getTerrain())) {
 					if(newTerrain == Terrain.OCEAN) {
+						tile.setHeight(tile.getHeight());
 						tile.liquidType = LiquidType.WATER;
-						tile.liquidAmount += 100;
+						tile.liquidAmount += 200;
 					}else {
 						potential.setTerrain(newTerrain);
 					}
