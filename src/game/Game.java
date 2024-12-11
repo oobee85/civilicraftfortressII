@@ -640,6 +640,7 @@ public class Game {
 		for (Tile t : world.getTiles()) {
 			if (t.getResource() == ResourceType.RUNITE) {
 				spawnCyclopsFort(t);
+				break;
 			}
 		}
 	}
