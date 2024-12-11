@@ -1248,7 +1248,7 @@ public class World {
 			// t.liquidType.getMinimumDamageAmount()
 			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < 4) {
 				if (rand.nextDouble() < tempDensity) {
-					makePlantVein(t, Game.plantTypeMap.get("TREE"), 30, rand);
+					makePlantVein(t, Game.plantTypeMap.get("TREE"), 50, rand);
 				}
 			}
 		}
@@ -1401,7 +1401,17 @@ public class World {
 		
 		int numDesertTiles = tiles.size() * 5/80;
 		Generation.makeBiome(desertt, Terrain.SAND, numDesertTiles, 110, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
-
+		
+		Tile lowestTile = null;
+		for(Tile lt : getTiles()) {
+			if (lowestTile == null || lt.getHeight() > lowestTile.getHeight()) {
+				lowestTile = lt;
+			}
+		}
+		
+		System.out.println("Ocean tile :" + lowestTile);
+		Generation.makeBiome(lowestTile, Terrain.OCEAN, numDesertTiles, 200, new Terrain[]{Terrain.GRASS, Terrain.DIRT}, worldRNG);
+		
 		updateTerrainChange(true);
 		Generation.generateResources(this, worldRNG);
 		this.genPlants(worldRNG);

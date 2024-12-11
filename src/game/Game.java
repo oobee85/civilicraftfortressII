@@ -602,6 +602,7 @@ public class Game {
 			}
 		}
 	}
+	
 	public void spawnUndead() {
 		Tile highestTile = null;
 		for(Tile t : world.getTiles()) {

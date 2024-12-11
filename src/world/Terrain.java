@@ -11,6 +11,7 @@ public enum Terrain {
 		ROCK 		(2, 25, 0, new Point(0, 20), new String[] {"Images/terrain/rock16.png", "Images/terrain/rock128.png"}),
 		SAND 		(2, 15, 0, new Point(0, 1), new String[] {"Images/terrain/sand.png"}),
 		BURNED_GROUND (4, 10, 0.08, new Point(0, 20), new String[] {"Images/terrain/burnedground.png"}),
+		OCEAN		(4, 10, 0.08, new Point(0, 20), new String[] {"Images/terrain/burnedground.png"}), // placeholder terrain, used for ocean biome
 		;
 
 	private final double movePenalty;

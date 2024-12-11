@@ -82,13 +82,13 @@ public enum ItemType {
 			req.addRequirement(researchMap.get("IRON_WORKING"));
 		}
 		else if (type == ADAMANTITE_BAR) {
-			req.addRequirement(researchMap.get("IRON_WORKING"));
+			req.addRequirement(researchMap.get("ARMORING"));
 		}
 		else if (type == RUNITE_BAR) {
-			req.addRequirement(researchMap.get("IRON_WORKING"));
+			req.addRequirement(researchMap.get("ARMORING"));
 		}
 		else if (type == TITANIUM_BAR) {
-			req.addRequirement(researchMap.get("IRON_WORKING"));
+			req.addRequirement(researchMap.get("CIVILIZATION"));
 		}
 		
 		return req;
