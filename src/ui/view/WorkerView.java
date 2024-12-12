@@ -7,6 +7,7 @@ import java.util.*;
 import javax.swing.*;
 
 import game.*;
+import networking.client.ClientGUI;
 import ui.*;
 import ui.infopanels.*;
 import utils.*;
@@ -14,9 +15,6 @@ import utils.*;
 public class WorkerView {
 	private static final Dimension BUILDING_BUTTON_SIZE = new Dimension(150, 35);
 	private static final int BUILDING_ICON_SIZE = 25;
-	
-	private static final ImageIcon COLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/collapsed.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE);
-	private static final ImageIcon UNCOLLAPSED_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/uncollapsed.png"), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE);
 	
 	private class Pair {
 		public final JButton button;
@@ -26,19 +24,20 @@ public class WorkerView {
 			this.buildingType = buildingType;
 		}
 	}
-	private JPanel rootPanel;
+	private ScrollingPanel scrollingPanel;
 	private LinkedList<Pair> buildingButtons = new LinkedList<>();
 	private GameView gameView;
 	
 	public WorkerView(GameView gameView) {
 		this.gameView = gameView;
-		rootPanel = new JPanel();
-		rootPanel.setFocusable(false);
-		Pair[] buttons = populateBuildingTypeUI(rootPanel, 25);
+		scrollingPanel = new ScrollingPanel(new Dimension(ClientGUI.GUIWIDTH, 700));
+		scrollingPanel.setFocusable(false);
+		Pair[] buttons = populateBuildingTypeUI(scrollingPanel);
 		Collections.addAll(buildingButtons, buttons);
+		scrollingPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, (buildingButtons.size()/2) * (BUILDING_BUTTON_SIZE.height + 5)));
 	}
 
-	public Pair[] populateBuildingTypeUI(JPanel panel, int BUILDING_ICON_SIZE) {
+	public Pair[] populateBuildingTypeUI(JPanel panel) {
 		Pair[] pairs = new Pair[Game.buildingTypeList.size()];
 		for (int i = 0; i < Game.buildingTypeList.size(); i++) {
 			BuildingType type = Game.buildingTypeList.get(i);
@@ -95,6 +94,6 @@ public class WorkerView {
 	}
 	
 	public JPanel getRootPanel() {
-		return rootPanel;
+		return scrollingPanel.getRootPanel();
 	}
 }
