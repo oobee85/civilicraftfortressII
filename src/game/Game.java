@@ -737,7 +737,6 @@ public class Game {
 				}
 				else {
 					if (influence > 2 * existingInfluence) {
-						System.out.println(b + " has more than double influence on tile " + tile);
 						tile.setFaction(b.getFaction());
 						world.addToTerritory(tile);
 						cultureInfluence.put(tile, influence);
