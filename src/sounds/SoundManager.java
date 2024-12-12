@@ -15,7 +15,7 @@ public class SoundManager {
 	private static final Map<SoundEffect, Clip> sounds = new HashMap<>();
 	private static final String basePath = "sounds/";
 
-	public static LinkedBlockingQueue<SoundEffect> theSoundQueue = new LinkedBlockingQueue<SoundEffect>();
+	public static LinkedBlockingQueue<Sound> theSoundQueue = new LinkedBlockingQueue<Sound>();
 	
 	// theoretically loads a sound
 	public static void LoadSound(SoundEffect sound) {
@@ -36,8 +36,8 @@ public class SoundManager {
 	}
 	
 	// plays a sound
-	public static void PlaySound (SoundEffect sound) {
-		Clip clip = sounds.get(sound);
+	public static void PlaySound (Sound sound) {
+		Clip clip = sounds.get(sound.getSoundEffect());
 		
 		if(clip == null) {
 			System.out.println("playSound() clip is null");

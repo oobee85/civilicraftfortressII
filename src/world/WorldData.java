@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 
 import game.*;
 import networking.server.*;
+import sounds.Sound;
 import sounds.SoundEffect;
 import sounds.SoundManager;
 import utils.*;
@@ -130,7 +131,9 @@ public class WorldData {
 					}
 				}
 				// TODO ADD SOUND CLASS WHICH HAS ENUM AND SOME FACTION DATA ABOUT THE SOUND
-				SoundManager.theSoundQueue.add(SoundEffect.DEATH);
+//				SoundManager.theSoundQueue.add(SoundEffect.DEATH);
+				Sound sound = new Sound(SoundEffect.DEATH, unit.getFaction());
+				SoundManager.theSoundQueue.add(sound);
 				
 				unit.getFaction().removeUnit(unit);
 				unit.getTile().removeUnit(unit);

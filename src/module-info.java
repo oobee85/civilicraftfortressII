@@ -1,4 +1,4 @@
-open module _SettlersOfMightAndMagic {
+open module Civilization {
 
 	requires java.desktop;
 	requires json;

@@ -9,6 +9,7 @@ import javax.swing.*;
 
 import game.*;
 import game.actions.*;
+import sounds.Sound;
 import sounds.SoundEffect;
 import sounds.SoundManager;
 import ui.*;
@@ -93,12 +94,18 @@ public class GameView {
 		this.guiController = game.getGUIController();
 
 		
+		// the sound thread
 		Thread thread = new Thread(() -> {
 			while(true) {
-				SoundEffect theSound;
+				Sound theSound;
 				try {
 					theSound = SoundManager.theSoundQueue.take();
-					SoundManager.PlaySound(theSound);
+					
+					// check if the sound is dedicated to our faction
+					if(theSound.getFaction() == this.getFaction()) {
+						SoundManager.PlaySound(theSound);
+					}
+					
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -107,6 +114,7 @@ public class GameView {
 			
 			});
 		thread.start();
+		
 		
 		MouseWheelListener mouseWheelListener = new MouseWheelListener() {
 			@Override
@@ -343,9 +351,8 @@ public class GameView {
 				if (thing instanceof Unit) {
 					Unit unit = (Unit) thing;
 					plannedBuilding = commandInterface.planBuilding(unit, tile, !shiftDown, state.selectedBuildingToPlan);
-					
-					SoundManager.theSoundQueue.add(SoundEffect.BUILDINGPLANNED);
-//					SoundManager.PlaySound(SoundEffect.BUILDINGPLANNED);
+					Sound sound = new Sound(SoundEffect.BUILDINGPLANNED, unit.getFaction());
+					SoundManager.theSoundQueue.add(sound);
 				}
 				
 			}
