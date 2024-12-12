@@ -460,6 +460,7 @@ public class Unit extends Thing implements Serializable {
 				building.setHealth(1);
 				building.setRemainingEffort(building.getType().getBuildingEffort());
 			}
+			
 		}
 		// harvest from research lab
 		else if (building.getType() == BasicAI.LAB) {

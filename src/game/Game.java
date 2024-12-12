@@ -757,6 +757,13 @@ public class Game {
 				doBuildingCulture(building);
 			}
 			building.tick(world, simulated);
+			
+			if(building.isMoria() && building.isBuilt()) {
+				world.spawnExplosionCircle(building.getTile(), 3, 500);
+				world.spawnBalrog(building.getTile());
+				building.setMoria(false);
+				
+			}
 		}
 	}
 	
@@ -1248,7 +1255,32 @@ public class Game {
 		return true;
 
 	}
-
+	
+	
+	public boolean checkForAdjacentMines(Building building, boolean finishedBuilding) {
+		Tile tile = building.getTile();
+		int mineCount = 0;
+		if(finishedBuilding == false) {
+			mineCount ++;
+		}
+		for(Tile adjacent : tile.getNeighbors()) {
+			for(Tile t : adjacent.getNeighbors()) {
+				if (t.getBuilding() != null && t.getBuilding().getType() == Game.buildingTypeMap.get("MINE")) {
+					mineCount ++;
+				}
+			}
+			if (adjacent.getBuilding() != null && adjacent.getBuilding().getType() == Game.buildingTypeMap.get("MINE")) {
+				mineCount ++;
+			}
+		}
+		if(mineCount >= 19) {
+			building.setMoria(true);
+			return true;
+		}
+		return false;
+		
+	}
+	
 	public Building planBuilding(Unit unit, BuildingType bt, Tile tile) {
 		if(canBuild(unit, bt, tile) == true) {
 			unit.getFaction().payCost(bt.getCost());
@@ -1263,7 +1295,11 @@ public class Game {
 			else {
 				tile.setBuilding(building);
 			}
-
+			
+			if(checkForAdjacentMines(building, false) == true) {
+				Sound sound = new Sound(SoundEffect.TOODEEP, null);
+				SoundManager.theSoundQueue.add(sound);
+			}
 			return building;
 		}
 		else if(bt.isRoad() && tile.getRoad() != null) {

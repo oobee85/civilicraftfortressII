@@ -31,6 +31,8 @@ public class Building extends Thing implements Serializable {
 	private int remainingEffortToProduceUnit;
 	private transient Unit currentProducingUnit;
 	
+	private boolean isMoria = false;
+	
 	private transient ItemType stablesCaptured;
 	
 	public Building(BuildingType buildingType, Tile tile, Faction faction) {
@@ -185,6 +187,13 @@ public class Building extends Thing implements Serializable {
 				resetTimeToHarvest();
 			}
 		}
+	}
+	
+	public void setMoria(boolean moria) {
+		isMoria = moria;
+	}
+	public boolean isMoria() {
+		return isMoria;
 	}
 	public boolean readyToHarvest() {
 		return timeToHarvest <= 0;

@@ -10,6 +10,7 @@ public enum SoundEffect {
 	MELEECOMBAT ("MeleeCombat.wav"),
 	PLANTDEATH ("PlantDeath.wav"),
 	RESEARCHCOMPLETE ("ResearchComplete.wav"),
+	TOODEEP ("TheDwarvesDelved.wav"),
 	
 	;
 	

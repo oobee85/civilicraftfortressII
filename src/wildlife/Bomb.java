@@ -1,6 +1,9 @@
 package wildlife;
 
 import game.*;
+import sounds.Sound;
+import sounds.SoundEffect;
+import sounds.SoundManager;
 import ui.*;
 import utils.*;
 import world.*;
@@ -18,6 +21,9 @@ public class Bomb extends Animal {
 			super.takeDamage(damage, type);
 			world.spawnExplosionCircle(getTile(), 5, 500);
 			this.setDead(true);
+			
+			Sound sound = new Sound(SoundEffect.BOMBEXPLODE, null);
+			SoundManager.theSoundQueue.add(sound);
 		}
 		return true;
 	}

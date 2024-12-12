@@ -304,6 +304,9 @@ public class World {
 		eruptingUntil = ticks + (int)(Math.random()*100 + 50);
 		spawnAnimal(Game.unitTypeMap.get("BALROG"), get(volcano), getFaction(NO_FACTION_ID), null);
 	}
+	public void spawnBalrog(Tile t) {
+		spawnAnimal(Game.unitTypeMap.get("BALROG"), t, getFaction(NO_FACTION_ID), null);	
+	}
 	
 	public void spawnOgre(Tile target) {
 		Optional<Tile> tile = getTilesRandomly().stream().filter(e -> 
