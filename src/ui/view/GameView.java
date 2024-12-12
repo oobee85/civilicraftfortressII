@@ -32,6 +32,8 @@ public class GameView {
 	private boolean controlDown = false;
 	private boolean shiftDown = false;
 	private boolean[] pressedKeys = new boolean[600];
+	
+
 
 	private boolean summonPlayerControlled = true;
 	public int tickOfLastClick = 0;
@@ -90,6 +92,22 @@ public class GameView {
 		this.game = game;
 		this.guiController = game.getGUIController();
 
+		
+		Thread thread = new Thread(() -> {
+			while(true) {
+				SoundEffect theSound;
+				try {
+					theSound = SoundManager.theSoundQueue.take();
+					SoundManager.PlaySound(theSound);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
+			}
+			
+			});
+		thread.start();
+		
 		MouseWheelListener mouseWheelListener = new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -325,7 +343,9 @@ public class GameView {
 				if (thing instanceof Unit) {
 					Unit unit = (Unit) thing;
 					plannedBuilding = commandInterface.planBuilding(unit, tile, !shiftDown, state.selectedBuildingToPlan);
-					SoundManager.PlaySound(SoundEffect.BUILDINGPLANNED);
+					
+					SoundManager.theSoundQueue.add(SoundEffect.BUILDINGPLANNED);
+//					SoundManager.PlaySound(SoundEffect.BUILDINGPLANNED);
 				}
 				
 			}

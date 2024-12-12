@@ -6,14 +6,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.sound.sampled.*;
 
 public class SoundManager {
-	
+
 	private static final Map<SoundEffect, Clip> sounds = new HashMap<>();
 	private static final String basePath = "sounds/";
 
+	public static LinkedBlockingQueue<SoundEffect> theSoundQueue = new LinkedBlockingQueue<SoundEffect>();
 	
 	// theoretically loads a sound
 	public static void LoadSound(SoundEffect sound) {
@@ -47,8 +49,9 @@ public class SoundManager {
 //		}
 		clip.setFramePosition(0);
 		clip.start();
-		
-		
 	}
+//	public void addToQueue() {
+//		
+//	}
 
 }
