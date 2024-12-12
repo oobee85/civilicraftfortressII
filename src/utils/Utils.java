@@ -133,8 +133,8 @@ public final class Utils {
 	
 	public static String readFile(String filename) {
 		String fileContents = "";
-		BufferedReader br = new BufferedReader(new InputStreamReader(Utils.class.getClassLoader().getResourceAsStream(filename)));
-		try {
+	    try (InputStream in = Utils.class.getClassLoader().getResourceAsStream(filename);
+	        BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
 			StringBuilder builder = new StringBuilder();
 			String line;
 			while((line = br.readLine()) != null) {
