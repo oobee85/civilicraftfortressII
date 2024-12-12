@@ -102,7 +102,8 @@ public class GameView {
 					theSound = SoundManager.theSoundQueue.take();
 					
 					// check if the sound is dedicated to our faction
-					if(theSound.getFaction() == this.getFaction()) {
+					// if faction is null, then it plays for everyone, TODO make a dedicated way to do this
+					if(theSound.getFaction() == this.getFaction() || theSound.getFaction() == null) {
 						SoundManager.PlaySound(theSound);
 					}
 					

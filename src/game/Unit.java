@@ -8,6 +8,9 @@ import game.actions.*;
 import game.ai.*;
 import game.components.*;
 import game.pathfinding.*;
+import sounds.Sound;
+import sounds.SoundEffect;
+import sounds.SoundManager;
 import utils.*;
 import world.*;
 
@@ -751,10 +754,16 @@ public class Unit extends Thing implements Serializable {
 		// Special logic for delivery actions because the followup might be gone
 		if (finished.isDeliverAction() && finished.getFollowUp() != null) {
 			PlannedAction followup = finished.getFollowUp();
+			// if the current target plant has died, find a neighbor plant to harvest
 			if (followup.target != null && followup.target.isDead()) {
 				if (followup.target instanceof Plant) {
 					// if followup plan is dead, find a nearby similar plant
 					Plant newTarget = getNeighborPlantToHarvest(followup.getTile(), ((Plant)followup.target).getType());
+					
+					// TODO record when the plants death sound has been played and prevent other units from also playing the sound
+					Sound sound = new Sound(SoundEffect.PLANTDEATH, this.getFaction());
+					SoundManager.theSoundQueue.add(sound);
+					
 					if (newTarget != null) {
 						followup = PlannedAction.harvest(newTarget);
 					}

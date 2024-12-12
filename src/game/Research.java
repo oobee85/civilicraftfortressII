@@ -3,6 +3,9 @@ package game;
 import java.io.*;
 import java.util.*;
 
+import sounds.Sound;
+import sounds.SoundEffect;
+import sounds.SoundManager;
 import ui.*;
 import utils.*;
 
@@ -74,9 +77,11 @@ public class Research implements Externalizable {
 	public void spendResearch(int points) {
 		if(!isCompleted()) {
 			researchPointsSpent += points;
+			
 			if(researchPointsSpent >= type.requiredResearchPoints) {
 				isCompleted = true;
 				researchPointsSpent = type.requiredResearchPoints;
+				
 			}
 		}
 	}

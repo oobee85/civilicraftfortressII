@@ -2,13 +2,13 @@ package sounds;
 
 public enum SoundEffect {
 	
-	CASTLEUNITCREATION ("CastleUnitCreation.wav"),
+	UNITCREATION ("UnitCreation.wav"),
 	DEATH ("Death.wav"),
 	BUILDINGPLANNED ("BuildingPlanned.wav"),
 	BOMBEXPLODE ("BombExplode.wav"),
 	DIRTWALKING ("DirtWalking.wav"),
 	MELEECOMBAT ("MeleeCombat.wav"),
-	TREEDEATH ("TreeDeath.wav"),
+	PLANTDEATH ("PlantDeath.wav"),
 	RESEARCHCOMPLETE ("ResearchComplete.wav"),
 	
 	;

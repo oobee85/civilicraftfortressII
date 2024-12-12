@@ -29,7 +29,7 @@ public class SoundManager {
 			Clip clip = AudioSystem.getClip();
 			clip.open(audioStream);
 			sounds.put(sound, clip);
-		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+		} catch (UnsupportedAudioFileException | IOException | ExceptionInInitializerError | NullPointerException | LineUnavailableException e) {
 			System.out.println("Couldnt load sound: " + sound.getFileName());
 			e.printStackTrace();
 		}

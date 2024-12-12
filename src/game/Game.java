@@ -10,6 +10,7 @@ import java.util.*;
 
 import networking.message.*;
 import networking.server.*;
+import sounds.Sound;
 import sounds.SoundEffect;
 import sounds.SoundManager;
 import ui.*;
@@ -1213,6 +1214,8 @@ public class Game {
 		if(thing == null) {
 			return;
 		}
+		Sound sound = new Sound(SoundEffect.BOMBEXPLODE, null);
+		SoundManager.theSoundQueue.add(sound);
 		world.spawnExplosionCircle(thing.getTile(), 1, 1000000);
 	}
 	

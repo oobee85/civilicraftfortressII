@@ -17,6 +17,7 @@ public class Loader {
 	
 	
 	public static void loadSounds() {
+		System.out.println("Loading Sounds");
 		for(SoundEffect sound : SoundEffect.values()) {
 			SoundManager.LoadSound(sound);
 		}

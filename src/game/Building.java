@@ -9,6 +9,9 @@ import javax.swing.*;
 
 import game.actions.*;
 import game.components.GameComponent;
+import sounds.Sound;
+import sounds.SoundEffect;
+import sounds.SoundManager;
 import utils.*;
 import world.*;
 
@@ -137,6 +140,10 @@ public class Building extends Thing implements Serializable {
 					unit.queuePlannedAction(whatToDo);
 					getTile().addUnit(unit);
 					world.addUnit(unit);
+					
+					Sound sound = new Sound(SoundEffect.UNITCREATION, this.getFaction());
+					SoundManager.theSoundQueue.add(sound);
+					
 				}
 				currentProducingUnit = null;
 			}
