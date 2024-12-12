@@ -11,7 +11,8 @@
 		"name":"SHRUB",
 		"image":"Images/plants/shrub.png",
 		"health":200,
-		"rarity": 1
+		"rarity": 1,
+		"harvestitems":{"FOOD":2}
 	},
 	{
 		"name":"BERRY_DEPLETED",
@@ -31,7 +32,7 @@
 	{
 		"name":"TREE",
 		"image":"Images/plants/tree1.png",
-		"health":500,
+		"health":400,
 		"rarity": 1,
 		"harvestitems":{"WOOD":2}
 	},

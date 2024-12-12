@@ -44,6 +44,6 @@ public class Constants {
 	
 	public static final double BUSH_RARITY = 0.005;
 	public static final double WATER_PLANT_RARITY = 0.05;
-	public static final double FOREST_DENSITY = 0.005;
+	public static final double FOREST_DENSITY = 0.002;
 	public static final int RATIO_BUILDING_RESOURCE_DROP = 2; // resourceCost / RATIO_BUILDING_RESOURCE_DROP
 }

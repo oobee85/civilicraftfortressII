@@ -785,10 +785,9 @@ public class World {
 					continue;
 				}
 				
-				if(t.getTerrain() == Terrain.GRASS || p != null) {
-					t.setTerrain(Terrain.DIRT);
-					
-				}
+//				if(t.getTerrain() == Terrain.GRASS || p != null) {
+//					t.setTerrain(Terrain.DIRT);
+//				}
 			}
 		}
 		spreadPlants();
@@ -1248,7 +1247,7 @@ public class World {
 			// t.liquidType.getMinimumDamageAmount()
 			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < 4) {
 				if (rand.nextDouble() < tempDensity) {
-					makePlantVein(t, Game.plantTypeMap.get("TREE"), 50, rand);
+					makePlantVein(t, Game.plantTypeMap.get("TREE"), 150, rand);
 				}
 			}
 		}

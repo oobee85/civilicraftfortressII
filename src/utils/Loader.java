@@ -8,9 +8,20 @@ import org.json.*;
 import game.*;
 import game.ai.*;
 import game.components.*;
+import sounds.SoundEffect;
+import sounds.SoundManager;
 import world.PlantType;
 
 public class Loader {
+	
+	
+	
+	public static void loadSounds() {
+		for(SoundEffect sound : SoundEffect.values()) {
+			SoundManager.LoadSound(sound);
+		}
+	}
+	
 	private static HashMap<ItemType, Integer> loadItemTypeMap(JSONObject costObject) {
 		HashMap<ItemType, Integer> map = new HashMap<>();
 		for(String itemName : costObject.keySet()) {

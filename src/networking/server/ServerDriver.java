@@ -26,6 +26,7 @@ public class ServerDriver {
 
 	static {
 		Settings.fromFile();
+		Loader.loadSounds();
 		Loader.loadResearchType(Game.researchTypeMap, Game.researchTypeList);
 		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
 		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);

@@ -9,6 +9,8 @@ import javax.swing.*;
 
 import game.*;
 import game.actions.*;
+import sounds.SoundEffect;
+import sounds.SoundManager;
 import ui.*;
 import ui.graphics.*;
 import ui.graphics.vanilla.*;
@@ -323,6 +325,7 @@ public class GameView {
 				if (thing instanceof Unit) {
 					Unit unit = (Unit) thing;
 					plannedBuilding = commandInterface.planBuilding(unit, tile, !shiftDown, state.selectedBuildingToPlan);
+					SoundManager.PlaySound(SoundEffect.BUILDINGPLANNED);
 				}
 				
 			}

@@ -16,6 +16,8 @@ import game.ai.*;
 import networking.*;
 import networking.message.*;
 import networking.server.*;
+import sounds.SoundEffect;
+import sounds.SoundManager;
 import ui.*;
 import ui.infopanels.*;
 import utils.*;
@@ -63,6 +65,7 @@ public class Client {
 						infoPanel.addButton("MakeRoads").addActionListener(e -> clientGUI.getGameView().workerRoad(Game.buildingTypeMap.get("STONE_ROAD")));
 						infoPanel.addButton("AutoBuild").addActionListener(e -> clientGUI.getGameView().toggleAutoBuild());
 						infoPanel.addButton("Guard").addActionListener(e -> clientGUI.getGameView().unitGuardCurrentTile());
+						
 					});
 				}
 			}
@@ -72,6 +75,9 @@ public class Client {
 			}
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {
+				
+//				SoundManager.PlaySound(SoundEffect.SELECT);
+				
 				if(building.getType().unitsCanProduceSet().size() > 0) {
 					clientGUI.manageProduceUnitTab(selected);
 				}

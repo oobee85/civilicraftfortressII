@@ -10,6 +10,8 @@ import java.util.*;
 
 import networking.message.*;
 import networking.server.*;
+import sounds.SoundEffect;
+import sounds.SoundManager;
 import ui.*;
 import utils.*;
 import wildlife.*;
@@ -1259,6 +1261,7 @@ public class Game {
 			else {
 				tile.setBuilding(building);
 			}
+
 			return building;
 		}
 		else if(bt.isRoad() && tile.getRoad() != null) {
@@ -1271,6 +1274,7 @@ public class Game {
 				return tile.getBuilding();
 			}
 		}
+		
 		return null;
 	}
 	
