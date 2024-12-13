@@ -37,6 +37,7 @@ public class World {
 	public static final int NO_FACTION_ID = 0;
 	public static final int CYCLOPS_FACTION_ID = 1;
 	public static final int UNDEAD_FACTION_ID = 2;
+	public static final int BALROG_FACTION_ID = 3;
 	private ArrayList<Faction> factions = new ArrayList<>();
 	
 	private WorldData worldData;
@@ -305,7 +306,7 @@ public class World {
 		spawnAnimal(Game.unitTypeMap.get("BALROG"), get(volcano), getFaction(NO_FACTION_ID), null);
 	}
 	public void spawnBalrog(Tile t) {
-		spawnAnimal(Game.unitTypeMap.get("BALROG"), t, getFaction(NO_FACTION_ID), null);	
+		spawnAnimal(Game.unitTypeMap.get("BALROG"), t, getFaction(BALROG_FACTION_ID), null);	
 	}
 	
 	public void spawnOgre(Tile target) {

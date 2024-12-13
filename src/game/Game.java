@@ -546,10 +546,14 @@ public class Game {
 			CYCLOPS_FACTION.getInventory().addItem(ItemType.FOOD, 5000);
 		}
 		world.addFaction(CYCLOPS_FACTION);
+	
 		
 		Faction UNDEAD_FACTION = new Faction("UNDEAD", false, false, false);
 //		UNDEAD_FACTION.getInventory().addItem(ItemType.FOOD, 999999);
 		world.addFaction(UNDEAD_FACTION);
+		
+		Faction BALROG_FACTION = new Faction("BALROG", false, false, false);
+		world.addFaction(BALROG_FACTION);
 		
 		AttackUtils.world = world;
 		world.generateWorld();
@@ -759,9 +763,13 @@ public class Game {
 			building.tick(world, simulated);
 			
 			if(building.isMoria() && building.isBuilt()) {
-				world.spawnExplosionCircle(building.getTile(), 3, 500);
-				world.spawnBalrog(building.getTile());
+				Tile t = building.getTile();
+				world.spawnExplosionCircle(t, 3, 500);
+				world.spawnBalrog(t);
 				building.setMoria(false);
+//				world.territory.put(t, world.getFaction("BALROG_FACTION"));
+//				world.getFaction(world.BALROG_FACTION_ID)
+				
 				
 			}
 		}
