@@ -4,30 +4,26 @@ import java.awt.Image;
 
 public enum Direction {
 	
-	NORTH		(0, -1, "Images/interfaces/flow/arrow_north.png", "Images/interfaces/flow/up2.gif"),
-	NORTHEAST	(1, 0.5, "Images/interfaces/flow/arrow_upright.png", "Images/interfaces/flow/upright6.gif"),
-	NORTHWEST	(-1, 0.5, "Images/interfaces/flow/arrow_upleft.png", "Images/interfaces/flow/upleft3.gif"),
-	
-	SOUTH		(0, 1, "Images/interfaces/flow/arrow_bot.png", "Images/interfaces/flow/down2.gif"),
-	SOUTHEAST	(1, -0.5, "Images/interfaces/flow/arrow_botright.png", "Images/interfaces/flow/botright3.gif"),
-	SOUTHWEST	(-1, -0.5, "Images/interfaces/flow/arrow_botleft.png", "Images/interfaces/flow/botleft2.gif"),
-	
-	UP(0, 0, "Images/interfaces/flow/arrow_up.png", "Images/interfaces/flow/up.gif"),
-	DOWN(0, 0, "Images/interfaces/flow/arrow_down.png", "Images/interfaces/flow/down.gif"),
-	NONE(0, 0, "Images/interfaces/flow/arrow_none.png", "Images/interfaces/flow/none.png")
-	
+	NONE		(0, 0, "C", "Images/interfaces/flow/arrow_none.png", "Images/interfaces/flow/none.png"),
+	NORTH		(0, -1, "N", "Images/interfaces/flow/arrow_north.png", "Images/interfaces/flow/up2.gif"),
+	NORTHEAST	(1, -0.5, "NE", "Images/interfaces/flow/arrow_upright.png", "Images/interfaces/flow/upright6.gif"),
+	SOUTHEAST	(1, 0.5, "SE", "Images/interfaces/flow/arrow_botright.png", "Images/interfaces/flow/botright3.gif"),
+	SOUTH		(0, 1, "S", "Images/interfaces/flow/arrow_bot.png", "Images/interfaces/flow/down2.gif"),
+	SOUTHWEST	(-1, 0.5, "SW", "Images/interfaces/flow/arrow_botleft.png", "Images/interfaces/flow/botleft2.gif"),
+	NORTHWEST	(-1, -0.5, "NW", "Images/interfaces/flow/arrow_upleft.png", "Images/interfaces/flow/upleft3.gif"),
 	;
-	
 	
 	public static final String ALL_DIRECTIONS = NORTH.toString() + NORTHEAST.toString() + SOUTHEAST.toString() + SOUTH.toString() + SOUTHWEST.toString() + NORTHWEST.toString();
 	
 	private double deltax;
 	private double deltay;
+	private String shortname;
 	private Image image;
 	private Image arrowImage;
-	private Direction(double deltax, double deltay, String arrowImageString, String imageString) {
+	private Direction(double deltax, double deltay, String shortname, String arrowImageString, String imageString) {
 		this.deltax = deltax;
 		this.deltay = deltay;
+		this.shortname = shortname;
 		this.arrowImage = Utils.loadImage(arrowImageString);
 		this.image = Utils.loadImage(imageString);
 //		this.image = Utils.loadImage("Images/interfaces/flow/upright6.gif");
@@ -48,6 +44,10 @@ public enum Direction {
 	@Override
 	public String toString() {
 		return this.name().toLowerCase();
+	}
+	
+	public String getShortName() {
+		return shortname;
 	}
 	
 	public static Direction getDirection(TileLoc from, TileLoc to) {

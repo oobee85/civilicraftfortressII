@@ -50,6 +50,9 @@ public class BuildingType implements Serializable {
 		if(isRoad()) {
 			roadImages = ImageCreation.createRoadImages(texturePath);
 		}
+		if(blocksMovement()) {
+			
+		}
 	}
 	
 	public int getInventoryStackSize() {

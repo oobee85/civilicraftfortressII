@@ -37,15 +37,30 @@ public class ClientDriver implements WindowListener {
 	}
 	
 	static {
-		
+		Profiler.start();
 		Settings.fromFile();
+		Profiler.end("Load Settings");
+		Profiler.start();
 		Loader.loadSounds();
+		Profiler.end("Load Sounds");
+		Profiler.start();
 		Loader.loadResearchType(Game.researchTypeMap, Game.researchTypeList);
+		Profiler.end("Load Researches");
+		Profiler.start();
 		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
+		Profiler.end("Load UnitTypes");
+		Profiler.start();
 		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);
+		Profiler.end("Load BuildingTypes");
+		Profiler.start();
 		Loader.loadPlantType(Game.plantTypeMap, Game.plantTypeList);
+		Profiler.end("Load Plants");
+		Profiler.start();
 		Loader.doMappings();
+		Profiler.end("Do Mappings");
 		Loader.loadBuildOrders();
+
+		Profiler.printLog();
 	}
 	
 	public static void main(String[] args) {
