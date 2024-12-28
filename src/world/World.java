@@ -1173,6 +1173,16 @@ public class World {
 //					worldData.addPlant(tile.getPlant());
 				}
 			}
+//			if(tile.checkTerrain(Terrain.GRASS) && tile.getRoad() == null && tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 && rand.nextDouble() < Constants.BUSH_RARITY) {
+//				double o = rand.nextDouble();
+//				if(o < Game.plantTypeMap.get("FLOWER").getRarity()) {
+//					makePlantVein(tile, Game.plantTypeMap.get("FLOWER"), 3, rand);
+//	//				Plant p = new Plant(PlantType.BERRY, tile, getFaction(NO_FACTION_ID));
+//	//				tile.setHasPlant(p);
+//	//				worldData.addPlant(tile.getPlant());
+//				}
+//			}
+			
 			if(tile.checkTerrain(Terrain.DIRT) 
 					&& tile.getRoad() == null 
 					&& tile.liquidAmount < tile.liquidType.getMinimumDamageAmount() / 2 

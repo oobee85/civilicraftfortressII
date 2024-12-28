@@ -10,6 +10,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.sound.sampled.*;
 
+import ui.graphics.vanilla.VanillaDrawer;
+import utils.TileLoc;
+
 public class SoundManager {
 
 	private static final Map<SoundEffect, Clip> sounds = new HashMap<>();
@@ -47,9 +50,18 @@ public class SoundManager {
 //		if(clip.isRunning()) {
 //			clip.stop();
 //		}
+		
+		
+//		if(sound.getTile() != null) {
+//			TileLoc tileLoc = sound.getTile().getLocation();
+//			VanillaDrawer.getVisibleTileBounds();
+//		}
+		
 		clip.setFramePosition(0);
 		clip.start();
 	}
+	
+	
 //	public void addToQueue() {
 //		
 //	}

@@ -180,6 +180,20 @@
 		"inventory":{"maxstack":10000}
 	}, 
 	{
+		"name":"MORIA",
+		"info":"The dwarves delved too greedily and too deep.",
+		"image":"Images/buildings/moria.png",
+		"vision":10,
+		"cost":{"WOOD":1000, "STONE":1000},
+		"buildsunits":["BALROG", "SKELETON"],
+		"culture":1,
+		"attributes":["castle"],
+		"health":10000,
+		"effort":10000,
+		"resistances": {"HEAT": 1000},
+		"inventory":{"maxstack":10000}
+	}, 
+	{
 		"name":"PORT",
 		"info":"Produces boats",
 		"image":"Images/buildings/port.png",
@@ -226,7 +240,7 @@
 		"cost":{"STONE":10},
 		"culture":0,
 		"health":20,
-		"effort":20,
+		"effort":100,
 		"attributes":["road"],
 		"research":"MASONRY"
 	},
@@ -238,7 +252,7 @@
 		"movespeed":6,
 		"cost":{"STONE":50},
 		"culture":0,
-		"health":500,
+		"health":200,
 		"effort":100,
 		"attributes":["road"],
 		"research":"ENGINEERING"

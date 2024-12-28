@@ -49,6 +49,12 @@
 		"image":"Images/plants/moss16.png",
 		"health":50,
 		"rarity":1
+	},
+	{
+		"name":"FLOWER",
+		"image":"Images/plants/flower.png",
+		"health":50,
+		"rarity":1
 	}
 ]
 }
