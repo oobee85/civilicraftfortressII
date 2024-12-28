@@ -14,6 +14,7 @@ public class Sound {
 	public Sound(SoundEffect sound, Faction faction) {
 		this.sound = sound;
 		this.faction = faction;
+		this.tile = null;
 	}
 	public Sound(SoundEffect sound, Faction faction, Tile tile) {
 		this.sound = sound;

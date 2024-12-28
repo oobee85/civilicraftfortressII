@@ -51,6 +51,8 @@ public class Faction implements Externalizable {
 	private double environmentalDifficulty = 1;
 	private int influence;
 	
+	private int tickOfLastDamageTaken = 0;
+	
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {

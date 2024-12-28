@@ -807,7 +807,7 @@ public class Game {
 			ItemType crafting = canCraft.get((int) (Math.random() * canCraft.size()));
 			building.getFaction().craftItem(crafting, 1);
 			building.resetTimeToProduce();
-			Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction());
+			Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile());
 			SoundManager.theSoundQueue.add(sound);
 		}
 
@@ -1270,7 +1270,7 @@ public class Game {
 		if (thing == null) {
 			return;
 		}
-		Sound sound = new Sound(SoundEffect.BOMBEXPLODE, null);
+		Sound sound = new Sound(SoundEffect.BOMBEXPLODE, null, thing.getTile());
 		SoundManager.theSoundQueue.add(sound);
 		world.spawnExplosionCircle(thing.getTile(), 1, 1000000);
 	}

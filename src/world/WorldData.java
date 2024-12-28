@@ -132,7 +132,7 @@ public class WorldData {
 				}
 				// TODO ADD SOUND CLASS WHICH HAS ENUM AND SOME FACTION DATA ABOUT THE SOUND
 //				SoundManager.theSoundQueue.add(SoundEffect.DEATH);
-				Sound sound = new Sound(SoundEffect.DEATH, unit.getFaction());
+				Sound sound = new Sound(SoundEffect.DEATH, unit.getFaction(), unit.getTile());
 				SoundManager.theSoundQueue.add(sound);
 				
 				unit.getFaction().removeUnit(unit);

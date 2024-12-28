@@ -105,10 +105,13 @@ public class GameView {
 					// if faction is null, then it plays for everyone, TODO make a dedicated way to do this
 					Position screentile = vanillaDrawer.getWorldCoordOfPixel(new Point(0, 0), state.viewOffset, state.volatileTileSize);
 					TileLoc screenloc = new TileLoc(screentile.getIntX(), screentile.getIntY());
-					System.out.println("screen loc: " + screenloc);
+//					System.out.println("screen loc: " + screenloc);
 					if (theSound.getTile() != null) {
 						int distance = theSound.getTile().getLocation().distanceTo(screenloc);
-						System.out.println("distance to sound: " + distance);
+						float volume = (float)(-0.8f * (float)(distance));
+						SoundManager.setVolume(theSound, volume);
+//						System.out.println("volume: " + volume);
+//						System.out.println("distance to sound: " + distance);
 					}
 					if(theSound.getFaction() == this.getFaction() || theSound.getFaction() == null) {
 						SoundManager.PlaySound(theSound);
@@ -359,7 +362,7 @@ public class GameView {
 				if (thing instanceof Unit) {
 					Unit unit = (Unit) thing;
 					plannedBuilding = commandInterface.planBuilding(unit, tile, !shiftDown, state.selectedBuildingToPlan);
-					Sound sound = new Sound(SoundEffect.BUILDINGPLANNED, unit.getFaction());
+					Sound sound = new Sound(SoundEffect.BUILDINGPLANNED, unit.getFaction(), tile);
 					SoundManager.theSoundQueue.add(sound);
 				}
 				
