@@ -104,7 +104,9 @@ public class GameView {
 					// check if the sound is dedicated to our faction
 					// if faction is null, then it plays for everyone, TODO make a dedicated way to do this
 					Position screentile = vanillaDrawer.getWorldCoordOfPixel(new Point(0, 0), state.viewOffset, state.volatileTileSize);
-					TileLoc screenloc = new TileLoc(screentile.getIntX(), screentile.getIntY());
+					int widthOfScreen = (int) Math.sqrt(vanillaDrawer.getVisibleTileBounds().length);
+//					
+					TileLoc screenloc = new TileLoc(screentile.getIntX() + 13, screentile.getIntY() + 13);
 //					System.out.println("screen loc: " + screenloc);
 					if (theSound.getTile() != null) {
 						int distance = theSound.getTile().getLocation().distanceTo(screenloc);

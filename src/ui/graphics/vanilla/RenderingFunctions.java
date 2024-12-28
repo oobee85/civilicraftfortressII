@@ -169,8 +169,8 @@ public class RenderingFunctions {
 		state.g.setColor(Color.black);
 		
 		for (Tile neighbor : tile.getNeighbors()) {
-			float heightDiff = (neighbor.getHeight() + neighbor.liquidAmount) 
-					- (tile.getHeight() + tile.liquidAmount) - 10;
+			float heightDiff = (neighbor.getHeight() ) 
+					- (tile.getHeight() ) - 10;
 			int MAX_HEIGHT_DIFF = 100;
 			if (heightDiff <= 1) {
 				continue;
