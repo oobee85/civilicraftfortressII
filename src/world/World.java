@@ -508,6 +508,9 @@ public class World {
 		if(tile.getBuilding() != null) {
 			tile.getBuilding().setDead(true);
 		}
+		if(tile.getPlant() != null) {
+			tile.getPlant().setDead(true);
+		}
 		Building building = new Building(buildingType, tile, faction);
 		building.setRemainingEffort(0);
 		addBuilding(building);
@@ -1232,7 +1235,7 @@ public class World {
 				search.add(ti);
 			}
 			if(type == Game.plantTypeMap.get("TREE")) {
-				if ((potential.canPlant() || type.isDesertResistant()) && potential.getPlant() == null ) {
+				if ((potential.canPlant() || type.isDesertResistant()) && potential.liquidAmount < 0.5 && potential.getPlant() == null ) {
 					Plant plant = new Plant(type, potential, getFaction(NO_FACTION_ID));
 					potential.setHasPlant(plant);
 					worldData.addPlant(plant);
@@ -1259,7 +1262,7 @@ public class World {
 //				tempDensity /= 2;
 			}
 			// t.liquidType.getMinimumDamageAmount()
-			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < 4) {
+			if (t.canPlant() && t.getRoad() == null && t.liquidAmount < 1) {
 				if (rand.nextDouble() < tempDensity) {
 					makePlantVein(t, Game.plantTypeMap.get("TREE"), 150, rand);
 				}
