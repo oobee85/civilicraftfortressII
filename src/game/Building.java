@@ -26,6 +26,8 @@ public class Building extends Thing implements Serializable {
 	private transient Tile spawnLocation;
 	private transient double timeToHarvest;
 	private transient double baseTimeToHarvest = 20;
+	private transient double timeToProduce;
+	private transient double baseTimeToProduce = 100;
 	private boolean isPlanned;
 
 	private int remainingEffortToProduceUnit;
@@ -41,6 +43,7 @@ public class Building extends Thing implements Serializable {
 		this.buildingType = buildingType;
 		this.spawnLocation = tile;
 		this.timeToHarvest = baseTimeToHarvest;
+		this.timeToProduce = baseTimeToProduce;
 		this.isPlanned = false;
 		setRoadCorner(Direction.ALL_DIRECTIONS);
 		for(GameComponent c : buildingType.getComponents()) {
@@ -56,6 +59,9 @@ public class Building extends Thing implements Serializable {
 	public void tick(World world, boolean simulated) {
 		if (timeToHarvest > 0) {
 			timeToHarvest -= 1;
+		}
+		if (timeToProduce > 0) {
+			timeToProduce -= 1;
 		}
 		
 		if (!simulated && World.ticks % Constants.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
@@ -110,6 +116,8 @@ public class Building extends Thing implements Serializable {
 		if(!isBuilt()) {
 			return;
 		}
+		
+		
 
 		// building produces units
 		if(currentProducingUnit == null && !producingUnitList.isEmpty()) {
@@ -208,6 +216,15 @@ public class Building extends Thing implements Serializable {
 		else {
 			resetTimeToHarvest(baseTimeToHarvest);
 		}	
+	}
+	public boolean readyToProduce() {
+		return timeToProduce <= 0;
+	}
+	public void resetTimeToProduce(double timeToProduce) {
+		this.timeToProduce = timeToProduce;
+	}
+	public void resetTimeToProduce() {
+		this.timeToProduce = this.baseTimeToProduce;
 	}
 	public Tile getSpawnLocation() {
 		return spawnLocation;

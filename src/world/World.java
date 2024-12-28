@@ -1339,10 +1339,12 @@ public class World {
 		double rockpercentageLow = 0.01;
 		double grassPercentage = .50;
 		double dirtPercentage = .80;
+		double highlowrockpercentage = .85;
 //		double rockpercentageHigh = 1;
 		double rockCutoffLow = tileList.get((int)(rockpercentageLow*tileList.size())).getHeight();
 		double grassCutoff = tileList.get((int)(grassPercentage*tileList.size())).getHeight();
 		double dirtCutoff = tileList.get((int)(dirtPercentage*tileList.size())).getHeight();
+		double lowrockCutoff = tileList.get((int)(highlowrockpercentage*tileList.size())).getHeight();
 //		double rockCutoffHigh = tiles.get((int)(rockpercentageHigh*tiles.size())).getHeight();
 		
 		for(Tile tile : getTiles()) {
@@ -1358,6 +1360,9 @@ public class World {
 			}
 			else if (tile.getHeight() < dirtCutoff) {
 				t = Terrain.DIRT;
+			}
+			else if (tile.getHeight() < lowrockCutoff) {
+				t = Terrain.LOWROCK;
 			}
 			else {
 				t = Terrain.ROCK;
@@ -1421,7 +1426,7 @@ public class World {
 		}
 		
 		System.out.println("Ocean tile :" + secondLowest);
-		Generation.makeBiome(secondLowest, Terrain.OCEAN, 100, 200, new Terrain[]{Terrain.GRASS, Terrain.DIRT, Terrain.ROCK}, worldRNG);
+		Generation.makeBiome(secondLowest, Terrain.OCEAN, 100, 200, new Terrain[]{Terrain.GRASS, Terrain.DIRT, Terrain.LOWROCK, Terrain.ROCK}, worldRNG);
 		
 		updateTerrainChange(true);
 		Generation.generateResources(this, worldRNG);

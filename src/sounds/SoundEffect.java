@@ -11,7 +11,7 @@ public enum SoundEffect {
 	PLANTDEATH ("PlantDeath.wav"),
 	RESEARCHCOMPLETE ("ResearchComplete.wav"),
 	TOODEEP ("TheDwarvesDelved.wav"),
-	
+	SMITHYPRODUCE ("smithy_produce.wav"),
 	;
 	
 	private String name;

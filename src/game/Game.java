@@ -762,6 +762,10 @@ public class Game {
 			}
 			building.tick(world, simulated);
 			
+			if(building.getType().isSmithy() && building.readyToProduce()) {
+				haveSmithyProduceBar(building);
+			}
+			
 			if(building.isMoria() && building.isBuilt()) {
 				Tile t = building.getTile();
 				world.spawnExplosionCircle(t, 3, 500);
@@ -774,7 +778,28 @@ public class Game {
 			}
 		}
 	}
-	
+	private void haveSmithyProduceBar(Building building) {
+		// if building is smithy // if smithy is ready to produce
+		
+		final ItemType[] craftableItems = new ItemType[] {ItemType.BRONZE_BAR, ItemType.IRON_BAR, ItemType.GOLD_BAR, ItemType.MITHRIL_BAR, ItemType.ADAMANTITE_BAR, ItemType.RUNITE_BAR, ItemType.TITANIUM_BAR};
+		List<ItemType> canCraft = new ArrayList<>();
+		
+		// go through craftable bars and add affordable ones to a new list
+		for (ItemType item : craftableItems) {
+			if(building.getFaction().canAfford(item, 1) == true) {
+				canCraft.add(item);
+			}
+		}
+		if(!canCraft.isEmpty()) {
+			ItemType crafting = canCraft.get((int) (Math.random()*canCraft.size()));
+			building.getFaction().craftItem(crafting, 1);
+			building.resetTimeToProduce();
+			Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction());
+			SoundManager.theSoundQueue.add(sound);
+		}
+		
+		
+	}
 	
 	public void flipTable() {
 		float minheight = Integer.MAX_VALUE;

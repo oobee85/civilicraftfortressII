@@ -207,13 +207,14 @@
 	},
 	{
 		"name":"SMITHY",
-		"info":"Crafts items up to mithril",
+		"info":"Turns ore into refined bars",
 		"image":"Images/buildings/blacksmith.gif",
 		"vision":1,
 		"cost":{"WOOD":100, "STONE":100},
 		"culture":0.5,
-		"health":1000,
+		"health":500,
 		"effort":500,
+		"attributes":["smithy"],
 		"research":"FARMING"
 	},
 	{
