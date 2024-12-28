@@ -129,13 +129,13 @@ public class Unit extends Thing implements Serializable {
 		}
 		double terrainPenalty = to.getTerrain().moveSpeed();
 		double elevationPenalty = Math.abs(to.getHeight() - from.getHeight());
-		elevationPenalty = elevationPenalty * elevationPenalty / 200;
+		elevationPenalty = elevationPenalty * elevationPenalty / 100;
 		if (from.getRoad() != null && from.getRoad().isBuilt()) {
 			terrainPenalty = terrainPenalty / from.getRoad().getType().getSpeed();
 			unitPenalty = unitPenalty / from.getRoad().getType().getSpeed();
 			
 			if (to.getRoad() != null && to.getRoad().isBuilt()) {
-				elevationPenalty = elevationPenalty / from.getRoad().getType().getSpeed(); 
+				elevationPenalty /= (from.getRoad().getType().getSpeed() / 2); 
 			}
 		}
 		return terrainPenalty + unitPenalty + elevationPenalty;

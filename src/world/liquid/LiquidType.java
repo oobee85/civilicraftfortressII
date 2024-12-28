@@ -13,7 +13,7 @@ public enum LiquidType {
 				0.1f, 0.0005f, 0.005f, 1f, 1f, 0.1f, false, DamageType.HEAT),
 		ICE(new String[] {"Images/liquid/ice.png"}, "Images/liquid/ice.png",
 				0f, 10000f, 10000f, 0.05f, 6f, 0f, true, DamageType.COLD),
-		SNOW(new String[] {"Images/liquid/snow128.png"}, "Images/liquid/snow128.png",
+		SNOW(new String[] {"Images/liquid/snow.png"}, "Images/liquid/snow.png",
 				0f, 1f, 1f, 0.05f, 6f, 0f, true, DamageType.COLD),
 //				0.1f, 0.9f, 1f, 1f, 1f, 0.1f, true, DamageType.COLD),
 		

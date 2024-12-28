@@ -172,10 +172,10 @@ public class RenderingFunctions {
 			float heightDiff = (neighbor.getHeight() + neighbor.liquidAmount) 
 					- (tile.getHeight() + tile.liquidAmount) - 10;
 			int MAX_HEIGHT_DIFF = 100;
-			if (heightDiff <= 2) {
+			if (heightDiff <= 1) {
 				continue;
 			}
-			double gradientRatio = Math.min(heightDiff, MAX_HEIGHT_DIFF) / MAX_HEIGHT_DIFF;
+			double gradientRatio = Math.min(heightDiff, MAX_HEIGHT_DIFF) / (MAX_HEIGHT_DIFF / 5);
 			int offset = (int) (gradientRatio * state.tileSize / 2);
 			drawGradientBorderBetween(
 					state.g, tile.getLocation(), neighbor.getLocation(),

@@ -1361,9 +1361,9 @@ public class World {
 			else if (tile.getHeight() < dirtCutoff) {
 				t = Terrain.DIRT;
 			}
-			else if (tile.getHeight() < lowrockCutoff) {
-				t = Terrain.LOWROCK;
-			}
+//			else if (tile.getHeight() < lowrockCutoff) {
+//				t = Terrain.LOWROCK;
+//			}
 			else {
 				t = Terrain.ROCK;
 			}
@@ -1426,7 +1426,7 @@ public class World {
 		}
 		
 		System.out.println("Ocean tile :" + secondLowest);
-		Generation.makeBiome(secondLowest, Terrain.OCEAN, 100, 200, new Terrain[]{Terrain.GRASS, Terrain.DIRT, Terrain.LOWROCK, Terrain.ROCK}, worldRNG);
+//		Generation.makeBiome(secondLowest, Terrain.OCEAN, 100, 200, new Terrain[]{Terrain.GRASS, Terrain.DIRT, Terrain.LOWROCK, Terrain.ROCK}, worldRNG);
 		
 		updateTerrainChange(true);
 		Generation.generateResources(this, worldRNG);
