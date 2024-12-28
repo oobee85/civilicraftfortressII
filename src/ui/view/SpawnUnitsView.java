@@ -6,6 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import game.*;
+import networking.client.ClientGUI;
 import ui.*;
 import ui.infopanels.*;
 import utils.*;
@@ -15,13 +16,14 @@ public class SpawnUnitsView {
 	
 	public static final Dimension SPAWN_BUTTON_SIZE = new Dimension(30, 30);
 
-	private JPanel rootPanel;
+//	private JPanel rootPanel;
+	private ScrollingPanel scrollingPanel;
 	private GameView gameView;
 	
 	public SpawnUnitsView(GameView gameView) {
 		this.gameView = gameView;
-		rootPanel = new JPanel();
-		rootPanel.setFocusable(false);
+		scrollingPanel = new ScrollingPanel(new Dimension(ClientGUI.GUIWIDTH, 500)); // 500 is height of scroll
+		scrollingPanel.setFocusable(false);
 		
 		setupButtons();
 	}
@@ -49,7 +51,7 @@ public class SpawnUnitsView {
 					gameView.getGameInstance().getGUIController().popInfoPanel();
 				}
 			});
-			rootPanel.add(button);
+			scrollingPanel.add(button);
 		}
 		for (int i = 0; i < Game.buildingTypeList.size(); i++) {
 			BuildingType type = Game.buildingTypeList.get(i);
@@ -74,7 +76,7 @@ public class SpawnUnitsView {
 				}
 			});
 //			buildingButtons[i] = button;
-			rootPanel.add(button);
+			scrollingPanel.add(button);
 		}
 		for (int i = 0; i < Game.plantTypeList.size(); i++) {
 			PlantType type = Game.plantTypeList.get(i);
@@ -98,23 +100,23 @@ public class SpawnUnitsView {
 					gameView.getGameInstance().getGUIController().popInfoPanel();
 				}
 			});
-			rootPanel.add(button);
+			scrollingPanel.add(button);
 		}
 		JToggleButton toggle = KUIConstants.setupToggleButton("Non-playerControlled", null, null);
 		toggle.addActionListener(e -> {
 			toggle.setText(!toggle.isSelected() ? "Non-playerControlled" : "playerControlled");
 			gameView.setSummonPlayerControlled(!toggle.isSelected());
 		});
-		rootPanel.add(toggle);
+		scrollingPanel.add(toggle);
 		JToggleButton spawnWeather = KUIConstants.setupToggleButton("Non-spawnWeather", null, null);
 		spawnWeather.addActionListener(e -> {
 			spawnWeather.setText(!spawnWeather.isSelected() ? "Non-spawnWeather" : "spawnWeather");
 			gameView.setSummonPlayerControlled(!spawnWeather.isSelected());
 		});
-		rootPanel.add(spawnWeather);
+		scrollingPanel.add(spawnWeather);
 	}
 
 	public JPanel getRootPanel() {
-		return rootPanel;
+		return scrollingPanel.getRootPanel();
 	}
 }

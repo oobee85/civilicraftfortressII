@@ -12,7 +12,7 @@
 		"image":"Images/plants/shrub.png",
 		"health":200,
 		"rarity": 1,
-		"harvestitems":{"FOOD":2}
+		"harvestitems":{"FOOD":2, "WOOD":2}
 	},
 	{
 		"name":"BERRY_DEPLETED",

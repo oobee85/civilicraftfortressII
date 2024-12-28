@@ -1448,6 +1448,59 @@ public class World {
 		System.out.println("Finished generating " + width + "x" + height + " world with " + tileList.size() + " tiles.");
 	}
 	
+	private int[][] tileShade;
+	private static final int MAX_SHADE = 40;
+	
+	private void computeDiagonalShade(int sx, int sy, int[][] tileShade, int shadeAngle, int numx, int numy) {
+		System.out.println("Diagonal start x,y: " + sx + ", " + sy);
+		
+		float previousHeight = tiles[sx][sy].getHeight();
+		int prevx = sx;
+		int prevy = sy;
+		
+		for (int offset = 1; sx + offset < numx; offset++) {
+			int x = sx + offset;
+			int y = sy + offset/2;
+			if (x >= numx || y >= numy) {
+				break;
+			}
+//			height -= shadeAngle;
+			float currentHeight = tiles[x][y].getHeight();
+			if (currentHeight > previousHeight + shadeAngle) {
+				tileShade[prevx][prevy] = Math.max(-MAX_SHADE, Math.min(tileShade[prevx][prevy], -2*(int)Math.sqrt(currentHeight - (previousHeight + shadeAngle))/2));
+			}
+			else if (currentHeight < previousHeight - shadeAngle) {
+				tileShade[x][y] = Math.min(MAX_SHADE, Math.max(tileShade[x][y], 2*(int)Math.sqrt((previousHeight - shadeAngle) - currentHeight)));
+			}
+			prevx = x;
+			prevy = y;
+			previousHeight = currentHeight;
+		}
+	}
+	
+	private void computeVerticalShade(int sx, int sy, int[][] tileShade, int shadeAngle, int numx, int numy) {
+		float previousHeight = tiles[sx][sy].getHeight();
+		int prevx = sx;
+		int prevy = sy;
+		for (int offset = 1; offset < numy; offset++) {
+			int x = sx;
+			int y = sy + offset;
+			if (x >= numx || y >= numy) {
+				break;
+			}
+			float currentHeight = tiles[x][y].getHeight();
+			if (currentHeight > previousHeight + shadeAngle) {
+				tileShade[prevx][prevy] = Math.max(-MAX_SHADE, Math.min(tileShade[prevx][prevy], -2*(int)Math.sqrt(currentHeight - (previousHeight + shadeAngle))/2));
+			}
+			else if (currentHeight < previousHeight - shadeAngle) {
+				tileShade[x][y] = Math.min(MAX_SHADE, Math.max(tileShade[x][y], 2*(int)Math.sqrt((previousHeight - shadeAngle) - currentHeight)));
+			}
+			prevx = x;
+			prevy = y;
+			previousHeight = currentHeight;
+		}
+	}
+	
 	public BufferedImage[] createTerrainImage(Faction faction) {
 		BufferedImage[] mapImages = new BufferedImage[MapMode.values().length];
 		mapImages[MapMode.LIGHT.ordinal()] = computeTileBrightness(faction);
@@ -1458,6 +1511,21 @@ public class World {
 		BufferedImage bigTerrainImage = new BufferedImage(terrainImage.getWidth()*2, terrainImage.getHeight()*2+1, terrainImage.getType());
 		BufferedImage fogOfWarImageBig = new BufferedImage(terrainImage.getWidth()*2, terrainImage.getHeight()*2+1, terrainImage.getType());
 
+		if (tileShade == null) {
+			int numx = tiles.length;
+			int numy = tiles[0].length;
+			tileShade = new int[numx][numy];
+			int shadeAngle = 0;
+			for (int sx = 0; sx < numx || sx < numy; sx++) {
+				if (sx % 2 == 0 && sx < numx) {
+					computeDiagonalShade(sx, 0, tileShade, shadeAngle, numx, numy);
+				}
+				if (sx < numy) {
+					computeDiagonalShade(0, sx, tileShade, shadeAngle, numx, numy);
+				}
+				computeVerticalShade(sx, 0, tileShade, shadeAngle, numx, numy);
+			}
+		}
 		double daylight = getDaylight();
 		double brightnessHardCutoff = 0.5 - daylight*0.3;
 		double brightnessSoftCutoff = 1 - daylight*0.7;
@@ -1518,8 +1586,13 @@ public class World {
 			Color fogOfWarTerrainColor = Utils.blendColors(terrainColor, Color.black, daylight);
 			terrainColor = Utils.blendColors(terrainColor, fogOfWarTerrainColor, tilebrightness);
 
-			Color fogOfWarMinimapColor = Utils.blendColors(minimapColor, Color.black, daylight);
-			minimapColor = Utils.blendColors(minimapColor, fogOfWarMinimapColor, tilebrightness);
+//			Color fogOfWarMinimapColor = Utils.blendColors(minimapColor, Color.black, daylight);
+//			minimapColor = Utils.blendColors(minimapColor, fogOfWarMinimapColor, tilebrightness);
+			int shade = tileShade[tile.getLocation().x()][tile.getLocation().y()];
+			minimapColor = new Color(
+					Math.min(255, Math.max(0, minimapColor.getRed() - shade)),
+					Math.min(255, Math.max(0, minimapColor.getGreen() - shade)),
+					Math.min(255, Math.max(0, minimapColor.getBlue() - shade)));
 			
 			minimapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), minimapColor.getRGB());
 			terrainImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), terrainColor.getRGB());
