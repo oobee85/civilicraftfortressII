@@ -23,12 +23,10 @@ public class Balrog extends Animal {
 			if(getTile().getModifier().getType() != GroundModifierType.FIRE) {
 				this.getTile().getModifier().finish();
 				makeFlame(world);
-			}
-			else {
+			}else {
 				this.getTile().replaceOrAddDurationModifier(GroundModifierType.FIRE, 100, world.getData());
 			}
-		}
-		else {
+		}else {
 			makeFlame(world);
 		}
 	}

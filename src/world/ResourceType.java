@@ -5,28 +5,29 @@ import utils.*;
 
 public enum ResourceType {
 	
-	COPPER (100 , 10, 10, false, ItemType.COPPER_ORE, true, 3, "FARMING",
+	//   effort numV Vsize Rare? minH maxH
+	COPPER (100 , 12, 10, false, 0, 250, ItemType.COPPER_ORE, true, 5, "FARMING",
 			new String[] {"Images/resources/copper/ore_copper128.png"}),
-	SILVER ( 100, 10, 5, false, ItemType.SILVER_ORE, true, 3, "FARMING",
+	SILVER ( 100, 12, 5, false, 0, 250, ItemType.SILVER_ORE, true, 5, "FARMING",
 			new String[] {"Images/resources/silver/ore_silver128.png"}),
-	GOLD   ( 100, 5, 8, false, ItemType.GOLD_ORE, true, 6, "FARMING",
+	GOLD   ( 100, 5, 8, false, 0, 350, ItemType.GOLD_ORE, true, 10, "FARMING",
 			new String[] {"Images/resources/gold/ore_gold128.png"} ),
 	
 	
-	COAL ( 100 , 10, 5, false, ItemType.COAL, true, 2, "BRONZE_WORKING",
+	COAL ( 100 , 10, 5, false, 0, 500, ItemType.COAL, true, 5, "BRONZE_WORKING",
 			new String[] {"Images/resources/ore_coal128.png"}),
-	IRON ( 100, 5, 8, false, ItemType.IRON_ORE, true, 4, "BRONZE_WORKING",
+	IRON ( 100, 5, 8, false, 0, 500, ItemType.IRON_ORE, true, 5, "BRONZE_WORKING",
 			new String[] {"Images/resources/iron/ore_iron128.png"}),
 	
-	MITHRIL ( 100, 4, 8, true, ItemType.MITHRIL_ORE, true, 5, "IRON_WORKING",
+	MITHRIL ( 100, 4, 8, true, 350, 1000, ItemType.MITHRIL_ORE, true, 10, "IRON_WORKING",
 			new String[] {"Images/resources/mithril/ore_mithril128.png"} ),
 	
-	ADAMANTITE (100, 2, 5, true, ItemType.ADAMANTITE_ORE, true, 7, "ARMORING",
+	ADAMANTITE (100, 2, 5, true, 500, 800, ItemType.ADAMANTITE_ORE, true, 15, "ARMORING",
 			new String[] {"Images/resources/adamantite/ore_adamant128.png"} ),
 	
-	RUNITE  ( 100 , 1, 5, true, ItemType.RUNITE_ORE, true, 8,"CIVILIZATION",
+	RUNITE  ( 100 , 1, 5, true, 500, 1000, ItemType.RUNITE_ORE, true, 15,"CIVILIZATION",
 			new String[] {"Images/resources/runite/ore_rune128.png"}),
-	TITANIUM ( 100, 1, 3, true, ItemType.TITANIUM_ORE, true, 10, "CIVILIZATION",
+	TITANIUM ( 100, 1, 3, true, 500, 1000, ItemType.TITANIUM_ORE, true, 15, "CIVILIZATION",
 			new String[] {"Images/resources/titanium/ore_titanium128.png"} ),
 	
 	;
@@ -41,8 +42,10 @@ public enum ResourceType {
 	private double numVeins;
 	private int veinSize;
 	private String research;
+	private int minHeight;
+	private int maxHeight;
 
-	ResourceType(int y, double numVeins, int veinSize, boolean rare, ItemType itemType, boolean isOre, double timeToHarvest, String research, String[] images){
+	ResourceType(int y, double numVeins, int veinSize, boolean rare, int minHeightLevel, int maxHeightLevel, ItemType itemType, boolean isOre, double timeToHarvest, String research, String[] images){
 		remainingEffort = y;
 		this.numVeins = numVeins;
 		this.isRare = rare;
@@ -52,6 +55,8 @@ public enum ResourceType {
 		this.isOre = isOre;
 		this.timeToHarvest = timeToHarvest;
 		this.research = research;
+		this.minHeight = minHeightLevel;
+		this.maxHeight = maxHeightLevel;
 	}
 	
 	public String getResearchRequirement() {
@@ -85,7 +90,12 @@ public enum ResourceType {
 	public ItemType getItemType() {
 		return itemType;
 	}
-
+	public int getMinHeight() {
+		return minHeight;
+	}
+	public int getMaxHeight() {
+		return maxHeight;
+	}
 	public MipMap getMipMap() {
 		return mipmap;
 	}

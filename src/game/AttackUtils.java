@@ -1,5 +1,8 @@
 package game;
 
+import sounds.Sound;
+import sounds.SoundEffect;
+import sounds.SoundManager;
 import utils.*;
 import world.*;
 
@@ -14,11 +17,18 @@ public class AttackUtils {
 		}
 		if(style.getProjectile() == ProjectileType.FIRE_WAVE) {
 			fireWave(unit, target, style);
+			Sound sound = new Sound(SoundEffect.FIREWAVE, null, unit.getTile());
+			SoundManager.theSoundQueue.add(sound);
 			return;
 		}
 		Projectile p = new Projectile(style.getProjectile(), unit.getTile(), target.getTile(), unit, style.getDamage());
 		unit.getTile().addProjectile(p);
 		world.getData().addProjectile(p);
+		if(p.isArrow()) {
+			Sound sound = new Sound(SoundEffect.ARROWLOOSE, null, unit.getTile());
+			SoundManager.theSoundQueue.add(sound);
+		}
+		
 	}
 	public static void fireWave(Unit unit, Thing target, AttackStyle style) {
 		Tile targetTile = target.getTile();

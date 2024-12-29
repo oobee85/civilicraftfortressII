@@ -308,6 +308,10 @@ public class Generation {
 				if(tile.getResource() != null) {
 					continue;
 				}
+				// is the tiles height within range of ores spawn range
+				if(tile.getHeight() < resource.getMinHeight() || tile.getHeight() > resource.getMaxHeight()) {
+					continue;
+				}
 				// if tile cant support ore
 				if(!tile.canOre() ) {
 					continue;
@@ -427,9 +431,11 @@ public class Generation {
 				if(visited.containsKey(ti)) {
 					continue;
 				}
+				
 				visited.put(ti, ti.getLocation().distanceTo(t.getLocation()) + rand.nextDouble()*10);
 				search.add(ti);
 			}
+			
 			
 			if(resource.isOre() && potential.canOre()  && potential.getResource() == null) {
 				potential.setResource(resource);

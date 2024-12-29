@@ -33,7 +33,7 @@ public class SoundManager {
 			clip.open(audioStream);
 			sounds.put(sound, clip);
 		} catch (UnsupportedAudioFileException | IOException | ExceptionInInitializerError | NullPointerException | LineUnavailableException e) {
-			System.out.println("Couldnt load sound: " + sound.getFileName());
+			System.err.println("Couldnt load sound: " + sound.getFileName());
 			e.printStackTrace();
 		}
 	}

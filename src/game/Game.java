@@ -656,18 +656,19 @@ public class Game {
 	}
 
 	private void spawnCyclopsFort(Tile tile) {
+		Faction cyclopsFaction = world.getFaction(World.CYCLOPS_FACTION_ID);
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y())),
-				Game.buildingTypeMap.get("WATCHTOWER"), world.getFaction(World.CYCLOPS_FACTION_ID));
+				Game.buildingTypeMap.get("WATCHTOWER"), cyclopsFaction);
 		Thing granary = summonBuilding(world.get(new TileLoc(tile.getLocation().x() - 1, tile.getLocation().y() - 1)),
-				Game.buildingTypeMap.get("GRANARY"), world.getFaction(World.CYCLOPS_FACTION_ID));
+				Game.buildingTypeMap.get("GRANARY"), cyclopsFaction);
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x() + 1, tile.getLocation().y() - 1)),
-				Game.buildingTypeMap.get("BARRACKS"), world.getFaction(World.CYCLOPS_FACTION_ID));
+				Game.buildingTypeMap.get("BARRACKS"), cyclopsFaction);
 		Thing windmill = summonBuilding(world.get(new TileLoc(tile.getLocation().x() + 1, tile.getLocation().y() + 1)),
-				Game.buildingTypeMap.get("WINDMILL"), world.getFaction(World.CYCLOPS_FACTION_ID));
+				Game.buildingTypeMap.get("WINDMILL"), cyclopsFaction);
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x() - 1, tile.getLocation().y() + 1)),
-				Game.buildingTypeMap.get("MINE"), world.getFaction(World.CYCLOPS_FACTION_ID));
-		windmill.setInventory(world.getFaction(World.CYCLOPS_FACTION_ID).getInventory());
-		granary.setInventory(world.getFaction(World.CYCLOPS_FACTION_ID).getInventory());
+				Game.buildingTypeMap.get("MINE"), cyclopsFaction);
+		windmill.setInventory(cyclopsFaction.getInventory());
+		granary.setInventory(cyclopsFaction.getInventory());
 		// makes the walls
 		for (int i = 0; i < 5; i++) {
 			BuildingType type = Game.buildingTypeMap.get("WALL_WOOD");
@@ -676,9 +677,9 @@ public class Game {
 			}
 			Tile wall;
 			wall = world.get(new TileLoc(tile.getLocation().x() + 3, tile.getLocation().y() - 2 + i));
-			summonBuilding(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
+			summonBuilding(wall, type, cyclopsFaction);
 			wall = world.get(new TileLoc(tile.getLocation().x() - 3, tile.getLocation().y() - 2 + i));
-			summonBuilding(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
+			summonBuilding(wall, type, cyclopsFaction);
 		}
 		for (int i = 1; i < 6; i++) {
 			BuildingType type = Game.buildingTypeMap.get("WALL_WOOD");
@@ -694,11 +695,11 @@ public class Game {
 			yoffset /= 2;
 
 			wall = world.get(new TileLoc(tile.getLocation().x() - 3 + i, tile.getLocation().y() - 2 - yoffset));
-			summonBuilding(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
+			summonBuilding(wall, type, cyclopsFaction);
 
 			yoffset = yoffset + (tile.getLocation().x() + i) % 2 - 2 - (tile.getLocation().x() % 2);
 			wall = world.get(new TileLoc(tile.getLocation().x() - 3 + i, tile.getLocation().y() + 4 + yoffset));
-			summonBuilding(wall, type, world.getFaction(World.CYCLOPS_FACTION_ID));
+			summonBuilding(wall, type, cyclopsFaction);
 		}
 
 		for (int i = -1; i < 2; i++) {
@@ -707,9 +708,9 @@ public class Game {
 				if (temp == null) {
 					continue;
 				}
-				Animal cyclops = world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp,
-						world.getFaction(World.CYCLOPS_FACTION_ID), null);
-				cyclops.queuePlannedAction(PlannedAction.guardTile(temp));
+				Animal cyclops = world.spawnAnimal(Game.unitTypeMap.get("CYCLOPS"), temp, cyclopsFaction, null);
+				// Makes the cyclopses attack anything in range of the cyclops fort home tile
+				cyclops.queuePlannedAction(PlannedAction.guardTile(tile));
 			}
 		}
 	}
@@ -784,10 +785,14 @@ public class Game {
 	private void generateMoria(Building building) {
 		Tile tile = building.getTile();
 		world.spawnExplosionCircle(tile, 3, 500);
-		world.spawnBalrog(tile);
-		tile.setFaction(world.getFaction("BALROG"));
+		Faction balrogFaction = world.getFaction(World.BALROG_FACTION_ID);
+
+		Animal balrog = world.spawnAnimal(Game.unitTypeMap.get("BALROG"), tile, balrogFaction, null);
+		balrog.queuePlannedAction(PlannedAction.guardTile(tile));
+		
+		tile.setFaction(balrogFaction);
 		building.setMoria(false);
-		world.summonBuilding(tile, buildingTypeMap.get("MORIA"), world.getFaction("BALROG"));
+		world.summonBuilding(tile, buildingTypeMap.get("MORIA"), balrogFaction);
 	}
 
 	private void haveSmithyProduceBar(Building building) {

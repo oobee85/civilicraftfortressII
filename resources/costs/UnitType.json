@@ -28,7 +28,7 @@
 	},
 	{
 		"image":"Images/units/chariot.png",
-		"cost":{"WOOD":50,"FOOD":100},
+		"cost":{"WOOD":100,"FOOD":100},
 		"stats":{"movespeed":10,"buildtime":200,"health":100,"healspeed":50},
 		"name":"CARAVAN",
 		"attackstyles":[
@@ -50,7 +50,7 @@
 	},
 	{
 		"image":"Images/units/spearman.png",
-		"cost":{"BRONZE_BAR":2,"WOOD":100,"FOOD":100},
+		"cost":{"BRONZE_BAR":2,"WOOD":100,"FOOD":200},
 		"stats":{"movespeed":15,"buildtime":200,"health":500,"healspeed":50},
 		"name":"SPEARMAN",
 		"attackstyles":[
@@ -62,7 +62,7 @@
 	},
 	{
 		"image":"Images/units/archer.png",
-		"cost":{"BRONZE_BAR":1,"FOOD":100},
+		"cost":{"BRONZE_BAR":1,"FOOD":200},
 		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":50},
 		"name":"ARCHER",
 		"attributes":["hostile"],
@@ -74,7 +74,7 @@
 	},
 	{
 		"image":"Images/units/swordsman.png",
-		"cost":{"IRON_BAR":4,"WOOD":100,"FOOD":100},
+		"cost":{"IRON_BAR":4,"WOOD":100,"FOOD":200},
 		"stats":{"movespeed":10,"buildtime":200,"health":300,"healspeed":50},
 		"name":"SWORDSMAN",
 		"attackstyles":[

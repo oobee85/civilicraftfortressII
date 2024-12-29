@@ -153,7 +153,12 @@ public class Projectile implements Externalizable {
 	public ProjectileType getType() {
 		return type;
 	}
-	
+	public boolean isArrow() {
+		if(this.getType() == ProjectileType.ARROW || this.getType() == ProjectileType.RUNE_ARROW) {
+			return true;
+		}
+		return false;
+	}
 	public String toString() {
 		return type.toString();
 	}

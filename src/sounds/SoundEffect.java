@@ -7,11 +7,16 @@ public enum SoundEffect {
 	BUILDINGPLANNED ("BuildingPlanned.wav"),
 	BOMBEXPLODE ("BombExplode.wav"),
 	DIRTWALKING ("DirtWalking.wav"),
-	MELEECOMBAT ("MeleeCombat.wav"),
 	PLANTDEATH ("PlantDeath.wav"),
 	RESEARCHCOMPLETE ("ResearchComplete.wav"),
 	TOODEEP ("TheDwarvesDelved.wav"),
 	SMITHYPRODUCE ("smithy_produce.wav"),
+	MELEEATTACK("melee_attack.wav"),
+	MOVEDIRT("melee_move.wav"),
+	ARROWDIRT("arrow_dirt.wav"),
+	ARROWLOOSE("arrow_loose.wav"),
+	FIREWAVE("fire_wave.wav"),
+	CLEAVEMELEEATTACK("cleave_melee_attack.wav"),
 	;
 	
 	private String name;

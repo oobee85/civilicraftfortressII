@@ -89,6 +89,8 @@ public class WorldData {
 				ThingMapper.removed(plant);
 				plant.getTile().setHasPlant(null);
 				addDeadThing(plant);
+				Sound sound = new Sound(SoundEffect.PLANTDEATH, null, plant.getTile());
+				SoundManager.theSoundQueue.add(sound);
 			} else {
 				plantsCopy.add(plant);
 			}
@@ -163,6 +165,10 @@ public class WorldData {
 		for(Projectile projectile : projectiles) {
 			if(projectile.reachedTarget()) {
 				projectile.getTile().removeProjectile(projectile);
+				if(projectile.isArrow()) {
+					Sound sound = new Sound(SoundEffect.ARROWDIRT, null, projectile.getTile());
+					SoundManager.theSoundQueue.add(sound);
+				}
 			} else {
 				projectilesNew.add(projectile);
 			}

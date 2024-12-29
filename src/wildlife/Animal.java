@@ -143,15 +143,21 @@ public class Animal extends Unit {
 		if(!wantsToEat()) {
 			return;
 		}
+		if(getType().isHostile() == false) {
+			return;
+		}
 		if(getType().isHostile() == true) {
-			Unit iveGotYouInMySights = null;
-			if(!units.isEmpty()) {
-				iveGotYouInMySights = units.get((int) (units.size()*Math.random()));
-			}
-			if(iveGotYouInMySights != this) {
-				clearPlannedActions();
-				queuePlannedAction(PlannedAction.attack(iveGotYouInMySights));
-			}
+//			Unit targetToAttack = null;
+			
+			
+//			Unit iveGotYouInMySights = null;
+//			if(!units.isEmpty()) {
+//				iveGotYouInMySights = units.get((int) (units.size()*Math.random()));
+//			}
+//			if(iveGotYouInMySights != this) {
+//				clearPlannedActions();
+//				queuePlannedAction(PlannedAction.attack(iveGotYouInMySights));
+//			}
 		}
 		else {
 //			if(getTile().getPlant() != null) {
@@ -178,12 +184,19 @@ public class Animal extends Unit {
 	}
 	
 	public boolean wantsToAttack() {
+//		if(getType().getTargetingInfo().isEmpty() == false) {
+//			
+//		}
 		return !getType().getTargetingInfo().isEmpty();
 	}
 	
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		for(TargetingInfo targetType : getType().getTargetingInfo()) {
+			
+			// get the thing to target
 			Thing target = targetType.getValidTargetFor(this, units, buildings);
+			
+			// sets the planned action to attack the target
 			if(target != null) {
 				clearPlannedActions();
 				queuePlannedAction(PlannedAction.attack(target));

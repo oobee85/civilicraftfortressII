@@ -322,11 +322,16 @@ public class Unit extends Thing implements Serializable {
 			if(this.getType().hasCleave()) {
 				for(Unit unit : target.getTile().getUnits()) {
 					unit.takeDamage(style.getDamage(), DamageType.PHYSICAL);
+					Sound sound = new Sound(SoundEffect.CLEAVEMELEEATTACK, null, this.getTile());
+					SoundManager.theSoundQueue.add(sound);
 				}
 			} 
 			else {
 				target.takeDamage(style.getDamage(), DamageType.PHYSICAL);
+				Sound sound = new Sound(SoundEffect.MELEEATTACK, null, this.getTile());
+				SoundManager.theSoundQueue.add(sound);
 			}
+			
 			
 			double damageDealt = initialHP - (target.getHealth() < 0 ? 0 : target.getHealth());
 			if (style.isLifesteal() && !(target instanceof Building)) {
@@ -594,6 +599,8 @@ public class Unit extends Thing implements Serializable {
 				return;
 			}
 			moveTowards(targetTile);
+			Sound sound = new Sound(SoundEffect.MOVEDIRT, this.getFaction(), this.getTile());
+			SoundManager.theSoundQueue.add(sound);
 			// can't reach target so mark the plan as finished.
 			if(currentPath == null) {
 				plan.setDone(true);
@@ -761,9 +768,7 @@ public class Unit extends Thing implements Serializable {
 					// if followup plan is dead, find a nearby similar plant
 					Plant newTarget = getNeighborPlantToHarvest(followup.getTile(), ((Plant)followup.target).getType());
 					
-					// TODO record when the plants death sound has been played and prevent other units from also playing the sound
-					Sound sound = new Sound(SoundEffect.PLANTDEATH, this.getFaction());
-					SoundManager.theSoundQueue.add(sound);
+					
 					
 					if (newTarget != null) {
 						followup = PlannedAction.harvest(newTarget);
