@@ -295,11 +295,12 @@ public class Generation {
 
 	public static void generateResources(World world, Random rand) {
 		for(ResourceType resource : ResourceType.values()) {
-			// if current resource isnt an ore, skip
-			if (!resource.isOre()) {
-				continue;
-			}
 			int numVeins = (int)(world.getWidth() * world.getHeight() * resource.getNumVeins() / OREMULTIPLIER);
+			
+//			// if current resource isnt an ore, skip
+//			if (!resource.isOre()) {
+//				continue;
+//			}
 			
 			System.out.println("Tiles of " + resource.name() + ": " + numVeins);
 			
@@ -308,18 +309,33 @@ public class Generation {
 				if(tile.getResource() != null) {
 					continue;
 				}
+				
+				
 				// is the tiles height within range of ores spawn range
 				if(tile.getHeight() < resource.getMinHeight() || tile.getHeight() > resource.getMaxHeight()) {
 					continue;
 				}
-				// if tile cant support ore
-				if(!tile.canOre() ) {
+				
+				// if tile cant support ore and the resource isnt an ore
+				if(!tile.canOre() && resource == ResourceType.CLAY) {
+					ArrayList<Terrain> terrainList = new ArrayList<Terrain>();
+					terrainList.add(Terrain.DIRT);
+					terrainList.add(Terrain.GRASS);
+					makeResourceVein(tile, resource, resource.getVeinSize(), rand, terrainList);
+					if(--numVeins <= 0) {
+						break;
+					}
 					continue;
 				}
-				makeOreVein(tile, resource, resource.getVeinSize(), rand);
-				if(--numVeins <= 0) {
-					break;
+				// if tile can support ore and resource is ore
+				if(tile.canOre() && resource.isOre()) {
+					makeOreVein(tile, resource, resource.getVeinSize(), rand);
+					if(--numVeins <= 0) {
+						break;
+					}
+					continue;
 				}
+				
 			}
 		}
 		// scatter some random rocks around
@@ -403,7 +419,54 @@ public class Generation {
 		
 		
 	}
-
+	public static void makeResourceVein(Tile t, ResourceType resource, int veinSize, Random rand, ArrayList<Terrain> terrainList) {
+		HashMap<Tile, Double> visited = new HashMap<>();
+		
+		PriorityQueue<Tile> search = new PriorityQueue<>((x, y) ->  { 
+			double distancex = visited.get(x);
+			double distancey = visited.get(y);
+			if(distancey < distancex) {
+				return 1;
+			}
+			else if(distancey > distancex) {
+				return -1;
+			}
+			else {
+				return 0;
+			}
+		});
+		visited.put(t, 0.0);
+		search.add(t);
+		
+		while(veinSize > 0 && !search.isEmpty()) {
+			Tile potential = search.poll();
+			
+			for(Tile ti : potential.getNeighbors()) {
+				if(visited.containsKey(ti)) {
+					continue;
+				}
+				
+				visited.put(ti, ti.getLocation().distanceTo(t.getLocation()) + rand.nextDouble()*10);
+				search.add(ti);
+			}
+			
+			for(Terrain terrain: terrainList) {
+				if(potential.getTerrain() != terrain) {
+					continue;
+				}
+				if(potential.getTerrain() == terrain) {
+					if(potential.getResource() == null) {
+						potential.setResource(resource);
+						veinSize--;
+					}
+				}
+			}
+			
+		}
+		
+		
+		
+	}
 	
 	public static void makeOreVein(Tile t, ResourceType resource, int veinSize, Random rand) {
 		HashMap<Tile, Double> visited = new HashMap<>();

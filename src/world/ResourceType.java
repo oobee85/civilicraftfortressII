@@ -5,6 +5,9 @@ import utils.*;
 
 public enum ResourceType {
 	
+	CLAY (100 , 20, 10, false, 0, 250, ItemType.CLAY, true, 5, "FARMING",
+			new String[] {"Images/resources/clay_ore.png"}),
+	
 	//   effort numV Vsize Rare? minH maxH
 	COPPER (100 , 12, 10, false, 0, 250, ItemType.COPPER_ORE, true, 5, "FARMING",
 			new String[] {"Images/resources/copper/ore_copper128.png"}),

@@ -18,16 +18,19 @@ public enum ItemType {
 	WEREWOLF ( "Images/units/werewolf.png"),
 	WOLF ( "Images/units/wolf.png"),
 	
+	CLAY     ( "Images/itemicons/clay.png"),
 	COAL ( "Images/itemicons/coal.png"),
 	COPPER_ORE ( "Images/itemicons/copper_ore.png"),
 	SILVER_ORE ( "Images/itemicons/silver_ore.png"),
 	GOLD_ORE ( "Images/itemicons/gold_ore.png"),
 	IRON_ORE ( "Images/itemicons/iron_ore.png"),
 	MITHRIL_ORE ( "Images/itemicons/mithril_ore.png"),
+	
 	ADAMANTITE_ORE ( "Images/itemicons/adamantite_ore.png"),
 	RUNITE_ORE ( "Images/itemicons/runite_ore.png"),
 	TITANIUM_ORE ( "Images/itemicons/titanium_ore.png"),
 	
+	BRICK 	   	   ("SMITHY",     makeCosts(CLAY,5),	"Images/itemicons/brick.png"),
 	BRONZE_BAR 	   ("SMITHY",     makeCosts(COPPER_ORE,5, SILVER_ORE, 5),	"Images/itemicons/bronze_bar.png"),
 	GOLD_BAR 	   ("SMITHY",     makeCosts(GOLD_ORE, 10), 				"Images/itemicons/gold_bar.png"),
 	IRON_BAR 	   ("SMITHY",     makeCosts(COAL,10, 	IRON_ORE,10),		"Images/itemicons/iron_bar.png"),
