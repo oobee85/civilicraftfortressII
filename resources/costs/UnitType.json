@@ -106,7 +106,7 @@
 		"attackstyles":[
 			{"damage":300, "cooldown":100, "range":10, "minrange":3, "projectile":"ROCK"}
 		],
-		"attributes":["hostile"],
+		"attributes":["hostile", "wheeled"],
 		"research":"MATHEMATICS",
 		"targeting":[{"type":"game.Unit"}],
 		"loot":{"WOOD":200}
@@ -119,7 +119,7 @@
 		"attackstyles":[
 			{"damage":600, "cooldown":100, "range":20, "minrange":5, "projectile":"FIREBALL_TREBUCHET"}
 		],
-		"attributes":["hostile"],
+		"attributes":["hostile", "wheeled"],
 		"research":"ENGINEERING",
 		"targeting":[{"type":"game.Building"}],
 		"loot":{"WOOD":200}

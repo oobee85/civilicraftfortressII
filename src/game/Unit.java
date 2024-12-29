@@ -155,7 +155,25 @@ public class Unit extends Thing implements Serializable {
 		}
 		double penalty = movePenaltyTo(this.getTile(), t);
 		timeToMove += penalty;
-
+		
+		if(this.getType().isWheeled()) {
+			Sound sound = new Sound(SoundEffect.WHEELEDUNITMOVE, this.getFaction(), this.getTile());
+			SoundManager.theSoundQueue.add(sound);
+		}else {
+			if(this.getTile().isPlantable()) {
+				Sound sound = new Sound(SoundEffect.MOVEDIRT, this.getFaction(), this.getTile());
+				SoundManager.theSoundQueue.add(sound);
+			}else if(this.getTile().isRocky()) {
+				Sound sound = new Sound(SoundEffect.MOVEDIRT, this.getFaction(), this.getTile());
+				SoundManager.theSoundQueue.add(sound);
+//				SoundManager.setVolume(sound, 5f);
+			}else {
+				Sound sound = new Sound(SoundEffect.MOVEDIRT, this.getFaction(), this.getTile());
+				SoundManager.theSoundQueue.add(sound);
+			}
+		}
+		
+		
 		getTile().removeUnit(this);
 		t.addUnit(this);
 		this.setTile(t);
@@ -599,8 +617,10 @@ public class Unit extends Thing implements Serializable {
 				return;
 			}
 			moveTowards(targetTile);
-			Sound sound = new Sound(SoundEffect.MOVEDIRT, this.getFaction(), this.getTile());
-			SoundManager.theSoundQueue.add(sound);
+			
+			
+			
+			
 			// can't reach target so mark the plan as finished.
 			if(currentPath == null) {
 				plan.setDone(true);

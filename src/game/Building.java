@@ -34,6 +34,7 @@ public class Building extends Thing implements Serializable {
 	private transient Unit currentProducingUnit;
 	
 	private boolean isMoria = false;
+	private int amountHarvested = 0;
 	
 	private transient ItemType stablesCaptured;
 	
@@ -151,7 +152,7 @@ public class Building extends Thing implements Serializable {
 					getTile().addUnit(unit);
 					world.addUnit(unit);
 					
-					Sound sound = new Sound(SoundEffect.UNITCREATION, this.getFaction());
+					Sound sound = new Sound(SoundEffect.UNITCREATION, this.getFaction(), this.getTile());
 					SoundManager.theSoundQueue.add(sound);
 					
 				}
@@ -193,6 +194,13 @@ public class Building extends Thing implements Serializable {
 			if (stablesCaptured != null) {
 				this.getInventory().addItem(stablesCaptured, 1);
 				resetTimeToHarvest();
+				amountHarvested ++;
+				// every 50 harvests, play sound
+				if(amountHarvested % 50 == 0) {
+					Sound sound = new Sound(SoundEffect.TRAPCOW, this.getFaction(), this.getTile());
+					SoundManager.theSoundQueue.add(sound);
+				}
+				
 			}
 		}
 	}
@@ -277,6 +285,7 @@ public class Building extends Thing implements Serializable {
 	public boolean isBuilt() {
 		return remainingEffort <= 0;
 	}
+
 	public BuildingType getType() {
 		return buildingType;
 	}

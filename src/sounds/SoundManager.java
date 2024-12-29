@@ -47,15 +47,10 @@ public class SoundManager {
 			return;
 		}
 		// if already playing, stop and then restart, TODO might not want this
-//		if(clip.isRunning()) {
-//			clip.stop();
-//		}
+		if(clip.isRunning()) {
+			clip.stop();
+		}
 		
-		
-//		if(sound.getTile() != null) {
-//			TileLoc tileLoc = sound.getTile().getLocation();
-//			VanillaDrawer.getVisibleTileBounds();
-//		}
 		
 		clip.setFramePosition(0);
 		clip.start();

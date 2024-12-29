@@ -24,8 +24,15 @@ public class AttackUtils {
 		Projectile p = new Projectile(style.getProjectile(), unit.getTile(), target.getTile(), unit, style.getDamage());
 		unit.getTile().addProjectile(p);
 		world.getData().addProjectile(p);
-		if(p.isArrow()) {
+		if(p.isHeavyProjectile()) {
+			Sound sound = new Sound(SoundEffect.PROJECTILELAUNCHHEAVY, null, unit.getTile());
+			SoundManager.theSoundQueue.add(sound);
+		}else
+		if(p.isLightProjectile() && p.getType() != ProjectileType.BULLET) {
 			Sound sound = new Sound(SoundEffect.ARROWLOOSE, null, unit.getTile());
+			SoundManager.theSoundQueue.add(sound);
+		}else {
+			Sound sound = new Sound(SoundEffect.PROJECTILEIMPACTGENERIC, null, unit.getTile());
 			SoundManager.theSoundQueue.add(sound);
 		}
 		

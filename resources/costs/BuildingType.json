@@ -7,7 +7,7 @@
 		"vision":1,
 		"cost":{"WOOD":50},
 		"culture":0,
-		"attributes":["harvestable"],
+		"attributes":["harvestable", "wood"],
 		"produces":{"FOOD": 5},
 		"health":50,
 		"effort":200
@@ -19,7 +19,7 @@
 		"vision":1,
 		"cost":{"WOOD":100},
 		"culture":0,
-		"attributes":["harvestable"],
+		"attributes":["harvestable", "stone"],
 		"produces":{"STONE": 5},
 		"research":"FARMING",
 		"health":50,
@@ -31,7 +31,7 @@
 		"image":"Images/buildings/research.png",
 		"vision":1,
 		"cost":{"GOLD_BAR":5},
-		"attributes":["harvestable"],
+		"attributes":["harvestable", "wood"],
 		"produces":{"MAGIC": 5},
 		"research":"MYSTICISM",
 		"culture":0.1,
@@ -45,7 +45,7 @@
 		"vision":10,
 		"cost":{"WOOD":100, "STONE":100},
 		"culture":0.1,
-		"attributes":["colony"],
+		"attributes":["colony", "wood"],
 		"inventory":{"maxstack":500},
 		"research":"FARMING",
 		"health":200,
@@ -58,7 +58,7 @@
 		"vision":10,
 		"cost":{"WOOD":100, "STONE":100},
 		"culture":0.1,
-		"attributes":["colony"],
+		"attributes":["colony", "stone"],
 		"inventory":{"maxstack":500},
 		"research":"FARMING",
 		"health":200,
@@ -72,7 +72,7 @@
 		"cost":{"WOOD":100, "STONE":100},
 		"culture":0.5,
 		"inventory":{"maxstack":1000},
-		"attributes":["colony"],
+		"attributes":["colony", "wood"],
 		"health":2000,
 		"effort":500,
 		"research":"FARMING"
@@ -86,6 +86,7 @@
 		"buildsunits":["WARRIOR","ARCHER","SPEARMAN","SWORDSMAN"],
 		"research":"FARMING",
 		"culture":0.5,
+		"attributes":["wood"],
 		"health":1000,
 		"effort":300
 	},
@@ -98,6 +99,7 @@
 		"culture":0.5,
 		"buildsunits":["HORSEARCHER","KNIGHT","CHARIOT", "GRIFFIN", "HORSEMAN", "ENT", "WEREWOLF", "WOLF", "VAMPIRE"],
 		"inventory":{"maxstack":100},
+		"attributes":["wood"],
 		"health":1000,
 		"effort":300,
 		"research":"TRAPPING"
@@ -110,7 +112,7 @@
 		"cost":{"WOOD":100},
 		"culture":0.1,
 		"inventory":{"maxstack":50},
-		"attributes":["trap"],
+		"attributes":["trap", "wood"],
 		"health":100,
 		"effort":200,
 		"research":"FARMING"
@@ -122,7 +124,7 @@
 		"vision":1,
 		"cost":{"WOOD":100, "STONE":100, "BRONZE_BAR":5},
 		"culture":0.25,
-		"attributes":["supply"],
+		"attributes":["supply", "wood"],
 		"inventory":{"maxstack":50},
 		"health":1000,
 		"effort":500,
@@ -136,6 +138,7 @@
 		"cost":{"WOOD":300, "STONE":300, "IRON_BAR":10},
 		"culture":0.5,
 		"inventory":{"maxstack":200},
+		"attributes":["stone"],
 		"health":2000,
 		"effort":500,
 		"research":"MATHEMATICS"
@@ -146,6 +149,7 @@
 		"image":"Images/buildings/watchtower.png",
 		"vision":50,
 		"cost":{"WOOD":50, "STONE":50, "BRONZE_BAR":1},
+		"attributes":["stone"],
 		"culture":0.5,
 		"health":1000,
 		"effort":250,
@@ -159,7 +163,7 @@
 		"cost":{"WOOD":500, "STONE":500, "BRICK":100, "MITHRIL_BAR":5},
 		"buildsunits":["WORKER", "MASON", "PRIEST", "CARAVAN"],
 		"culture":1,
-		"attributes":["castle"],
+		"attributes":["castle", "stone"],
 		"health":10000,
 		"effort":2000,
 		"research":"MASONRY",
@@ -173,7 +177,7 @@
 		"cost":{"WOOD":1000, "STONE":1000},
 		"buildsunits":["MASON", "SKELETON", "ICE_GIANT", "VAMPIRE"],
 		"culture":1,
-		"attributes":["castle"],
+		"attributes":["castle", "stone"],
 		"health":10000,
 		"effort":1000,
 		"research":"ENGINEERING",
@@ -187,7 +191,7 @@
 		"cost":{"WOOD":1000, "STONE":1000},
 		"buildsunits":["BALROG", "SKELETON"],
 		"culture":1,
-		"attributes":["castle"],
+		"attributes":["castle", "stone"],
 		"health":10000,
 		"effort":10000,
 		"resistances": {"HEAT": 1000},
@@ -201,7 +205,7 @@
 		"cost":{"WOOD":200, "STONE":200},
 		"buildsunits":["BOAT"],
 		"culture":1,
-		"attributes":[],
+		"attributes":["wood"],
 		"resistances": {"COLD": 0, "DRY": 0, "WATER": 0},
 		"health":2000,
 		"effort":1000,
@@ -214,6 +218,7 @@
 		"vision":1,
 		"cost":{"WOOD":200, "STONE":200, "IRON_BAR":10},
 		"buildsunits":["LONGBOWMAN","CATAPULT","TREBUCHET", "SNIPER", "WIZARD"],
+		"attributes":["wood"],
 		"culture":0.5,
 		"health":2000,
 		"effort":500,
@@ -228,7 +233,7 @@
 		"culture":0.5,
 		"health":500,
 		"effort":500,
-		"attributes":["smithy"],
+		"attributes":["smithy", "stone"],
 		"research":"FARMING"
 	},
 	{
@@ -241,7 +246,7 @@
 		"culture":0,
 		"health":20,
 		"effort":100,
-		"attributes":["road"],
+		"attributes":["road", "stone"],
 		"research":"MASONRY"
 	},
 	{
@@ -254,7 +259,7 @@
 		"culture":0,
 		"health":200,
 		"effort":100,
-		"attributes":["road"],
+		"attributes":["road", "stone"],
 		"research":"ENGINEERING"
 	},
 	{
@@ -266,7 +271,7 @@
 		"culture":0.25,
 		"health":500,
 		"effort":100,
-		"attributes":["blocksmovement"]
+		"attributes":["blocksmovement", "wood"]
 	},
 	{
 		"name":"GATE_WOOD",
@@ -277,7 +282,7 @@
 		"culture":0.5,
 		"health":500,
 		"effort":200,
-		"attributes":["blocksmovement", "gate"],
+		"attributes":["blocksmovement", "gate", "wood"],
 		"research":"MASONRY"
 	},
 	{
@@ -289,7 +294,7 @@
 		"culture":0.25,
 		"health":2000,
 		"effort":200,
-		"attributes":["blocksmovement"],
+		"attributes":["blocksmovement", "wood"],
 		"resistances": {"HEAT": 50},
 		"research":"MASONRY"
 	},
@@ -302,7 +307,7 @@
 		"culture":0.5,
 		"health":2000,
 		"effort":400,
-		"attributes":["blocksmovement", "gate"],
+		"attributes":["blocksmovement", "gate", "stone"],
 		"resistances": {"HEAT": 50},
 		"research":"MATHEMATICS"
 	},
@@ -315,7 +320,7 @@
 		"culture":0.25,
 		"health":10000,
 		"effort":400,
-		"attributes":["blocksmovement"],
+		"attributes":["blocksmovement", "stone"],
 		"resistances": {"HEAT": 100},
 		"research":"ENGINEERING"
 	},
@@ -328,7 +333,7 @@
 		"culture":0.5,
 		"health":10000,
 		"effort":400,
-		"attributes":["blocksmovement", "gate"],
+		"attributes":["blocksmovement", "gate", "stone"],
 		"resistances": {"HEAT": 20},
 		"research":"ENGINEERING"
 	},
@@ -338,6 +343,7 @@
 		"image":"Images/buildings/hellforge.png",
 		"vision":1,
 		"cost":{"MITHRIL_BAR":10, "IRON_BAR":10, "BRONZE_BAR":10, "STONE":200},
+		"attributes":["stone"],
 		"culture":0.5,
 		"health":1000,
 		"effort":1000,
@@ -350,6 +356,7 @@
 		"vision":1,
 		"cost":{"WOOD":200, "STONE":200, "FOOD":200},
 		"buildsunits":["SCORPION"],
+		"attributes":["stone"],
 		"culture":0,
 		"health":1000,
 		"research":"DOMESTICATION",

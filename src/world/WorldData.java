@@ -63,6 +63,21 @@ public class WorldData {
 					}
 				}
 				addDeadThing(building);
+				
+				
+				if(building.getType().isWoodConstruction()) {
+					Sound sound = new Sound(SoundEffect.BUILDINGWOODDEATH, null, building.getTile());
+					SoundManager.theSoundQueue.add(sound);
+				}else 
+				if(building.getType().isStoneConstruction()) {
+					Sound sound = new Sound(SoundEffect.BUILDINGSTONEDEATH, null, building.getTile());
+					SoundManager.theSoundQueue.add(sound);
+				}else {
+					Sound sound = new Sound(SoundEffect.BUILDINGWOODDEATH, null, building.getTile());
+					SoundManager.theSoundQueue.add(sound);
+				}
+				
+				
 			} else {
 				buildingsNew.add(building);
 			}
@@ -132,7 +147,6 @@ public class WorldData {
 						unit.getTile().getInventory().addItem(item);
 					}
 				}
-				// TODO ADD SOUND CLASS WHICH HAS ENUM AND SOME FACTION DATA ABOUT THE SOUND
 //				SoundManager.theSoundQueue.add(SoundEffect.DEATH);
 				Sound sound = new Sound(SoundEffect.DEATH, unit.getFaction(), unit.getTile());
 				SoundManager.theSoundQueue.add(sound);
@@ -165,8 +179,16 @@ public class WorldData {
 		for(Projectile projectile : projectiles) {
 			if(projectile.reachedTarget()) {
 				projectile.getTile().removeProjectile(projectile);
-				if(projectile.isArrow()) {
-					Sound sound = new Sound(SoundEffect.ARROWDIRT, null, projectile.getTile());
+				
+				if(projectile.isHeavyProjectile()) {
+					Sound sound = new Sound(SoundEffect.PROJECTILEIMPACTHEAVY, null, projectile.getTile());
+					SoundManager.theSoundQueue.add(sound);
+				}else
+				if(projectile.isLightProjectile()) {
+					Sound sound = new Sound(SoundEffect.PROJECTILEIMPACTLIGHT, null, projectile.getTile());
+					SoundManager.theSoundQueue.add(sound);
+				}else {
+					Sound sound = new Sound(SoundEffect.PROJECTILEIMPACTGENERIC, null, projectile.getTile());
 					SoundManager.theSoundQueue.add(sound);
 				}
 			} else {

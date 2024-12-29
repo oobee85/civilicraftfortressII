@@ -153,8 +153,14 @@ public class Projectile implements Externalizable {
 	public ProjectileType getType() {
 		return type;
 	}
-	public boolean isArrow() {
-		if(this.getType() == ProjectileType.ARROW || this.getType() == ProjectileType.RUNE_ARROW) {
+	public boolean isLightProjectile() {
+		if(this.getType() == ProjectileType.ARROW || this.getType() == ProjectileType.RUNE_ARROW || this.getType() == ProjectileType.BULLET) {
+			return true;
+		}
+		return false;
+	}
+	public boolean isHeavyProjectile() {
+		if(this.getType() == ProjectileType.ROCK_STONE_GOLEM || this.getType() == ProjectileType.ROCK || this.getType() == ProjectileType.FIREBALL_TREBUCHET) {
 			return true;
 		}
 		return false;

@@ -416,6 +416,23 @@ public class Tile implements Externalizable {
 		return terrain.isPlantable(terrain);
 	}
 	
+	// returns true if the terrain can support plants, regardless of weather
+	public boolean isPlantable() {
+		if(this.terrain == Terrain.DIRT || this.terrain == Terrain.GRASS) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+	// returns true of terrain is kind of rocky
+	public boolean isRocky() {
+		if(this.terrain == Terrain.ROCK || this.terrain == Terrain.VOLCANO) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+	
 	public boolean canGrow() {
 		if (isCold() || isHot()) {
 			return false;
