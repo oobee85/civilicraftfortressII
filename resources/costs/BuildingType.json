@@ -74,7 +74,7 @@
 		"inventory":{"maxstack":1000},
 		"attributes":["colony"],
 		"health":2000,
-		"effort":250,
+		"effort":500,
 		"research":"FARMING"
 	},
 	{
@@ -99,7 +99,7 @@
 		"buildsunits":["HORSEARCHER","KNIGHT","CHARIOT", "GRIFFIN", "HORSEMAN", "ENT", "WEREWOLF", "WOLF", "VAMPIRE"],
 		"inventory":{"maxstack":100},
 		"health":1000,
-		"effort":250,
+		"effort":300,
 		"research":"TRAPPING"
 	},
 	{
@@ -109,10 +109,10 @@
 		"vision":1,
 		"cost":{"WOOD":100},
 		"culture":0.1,
-		"inventory":{"maxstack":100},
+		"inventory":{"maxstack":50},
 		"attributes":["trap"],
 		"health":100,
-		"effort":100,
+		"effort":200,
 		"research":"FARMING"
 	},
 	{

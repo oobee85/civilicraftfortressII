@@ -28,14 +28,14 @@ public enum ItemType {
 	RUNITE_ORE ( "Images/itemicons/runite_ore.png"),
 	TITANIUM_ORE ( "Images/itemicons/titanium_ore.png"),
 	
-	BRONZE_BAR 	("SMITHY",     makeCosts(COPPER_ORE,5, SILVER_ORE, 5),	"Images/itemicons/bronze_bar.png"),
-	GOLD_BAR 	("SMITHY",     makeCosts(GOLD_ORE, 10), 				"Images/itemicons/gold_bar.png"),
-	IRON_BAR 	("SMITHY",     makeCosts(COAL,10, 	IRON_ORE,10),		"Images/itemicons/iron_bar.png"),
-	MITHRIL_BAR ("SMITHY",     makeCosts(COAL,20, 	MITHRIL_ORE,20),	"Images/itemicons/mithril_bar.png"),
+	BRONZE_BAR 	   ("SMITHY",     makeCosts(COPPER_ORE,5, SILVER_ORE, 5),	"Images/itemicons/bronze_bar.png"),
+	GOLD_BAR 	   ("SMITHY",     makeCosts(GOLD_ORE, 10), 				"Images/itemicons/gold_bar.png"),
+	IRON_BAR 	   ("SMITHY",     makeCosts(COAL,10, 	IRON_ORE,10),		"Images/itemicons/iron_bar.png"),
+	MITHRIL_BAR    ("SMITHY",     makeCosts(COAL,20, 	MITHRIL_ORE,20),	"Images/itemicons/mithril_bar.png"),
 	
-	ADAMANTITE_BAR("SMITHY",makeCosts(COAL,40, 	ADAMANTITE_ORE,40),	"Images/itemicons/adamantite_bar.png"),
-	RUNITE_BAR 	("SMITHY",  makeCosts(COAL,80, 	RUNITE_ORE,80),		"Images/itemicons/runite_bar.png"),
-	TITANIUM_BAR("SMITHY",  makeCosts(COAL,160, 	TITANIUM_ORE,160),	"Images/itemicons/titanium_bar.png"),
+	ADAMANTITE_BAR ("SMITHY",  makeCosts(COAL,40, 	ADAMANTITE_ORE,40),	"Images/itemicons/adamantite_bar.png"),
+	RUNITE_BAR 	   ("SMITHY",  makeCosts(COAL,80, 	RUNITE_ORE,80),		"Images/itemicons/runite_bar.png"),
+	TITANIUM_BAR   ("SMITHY",  makeCosts(COAL,160, 	TITANIUM_ORE,160),	"Images/itemicons/titanium_bar.png"),
 	;
 	
 	private MipMap mipmap;

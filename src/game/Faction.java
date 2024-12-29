@@ -392,13 +392,13 @@ public class Faction implements Externalizable {
 	public void craftItem(ItemType type, int amount) {
 		BuildingType requiredBuilding = Game.buildingTypeMap.get(type.getBuilding());
 		for(Building building : getBuildings()) {
-			if(building.getType() == requiredBuilding && building.getFaction() == this) {
+//			if(building.getType() == requiredBuilding && building.getFaction() == this) {
 				for(int i = 0; i < amount && canAfford(type.getCost()); i++) {
 					payCost(type.getCost());
 					inventory.addItem(type, 1);
 				}
 				return;
-			}
+//			}
 		}
 	}
 	

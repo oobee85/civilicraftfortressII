@@ -138,7 +138,7 @@
 	},
 	{
 		"image":"Images/units/horseman.png",
-		"cost":{"HORSE":50, "FOOD":100},
+		"cost":{"HORSE":50, "FOOD":200},
 		"stats":{"movespeed":10,"buildtime":300,"health":200,"healspeed":50},
 		"name":"HORSEMAN",
 		"attackstyles":[
