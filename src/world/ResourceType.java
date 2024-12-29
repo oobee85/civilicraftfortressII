@@ -5,10 +5,11 @@ import utils.*;
 
 public enum ResourceType {
 	
-	CLAY (100 , 20, 10, false, 0, 250, ItemType.CLAY, true, 5, "FARMING",
+	CLAY (100 , 10, 5, false, 0, 200, ItemType.CLAY, true, 10, "FARMING",
 			new String[] {"Images/resources/clay_ore.png"}),
 	
-	//   effort numV Vsize Rare? minH maxH
+	//		    numVeins  isRare?   maxHeight
+	//   effort     Veinsize   minHeight                      ticksHarvest
 	COPPER (100 , 12, 10, false, 0, 250, ItemType.COPPER_ORE, true, 5, "FARMING",
 			new String[] {"Images/resources/copper/ore_copper128.png"}),
 	SILVER ( 100, 12, 5, false, 0, 250, ItemType.SILVER_ORE, true, 5, "FARMING",

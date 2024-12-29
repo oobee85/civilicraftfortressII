@@ -30,7 +30,7 @@ public enum ItemType {
 	RUNITE_ORE ( "Images/itemicons/runite_ore.png"),
 	TITANIUM_ORE ( "Images/itemicons/titanium_ore.png"),
 	
-	BRICK 	   	   ("SMITHY",     makeCosts(CLAY,5),	"Images/itemicons/brick.png"),
+	BRICK 	   	   ("SMITHY",     makeCosts(CLAY,10),	"Images/itemicons/brick.png"),
 	BRONZE_BAR 	   ("SMITHY",     makeCosts(COPPER_ORE,5, SILVER_ORE, 5),	"Images/itemicons/bronze_bar.png"),
 	GOLD_BAR 	   ("SMITHY",     makeCosts(GOLD_ORE, 10), 				"Images/itemicons/gold_bar.png"),
 	IRON_BAR 	   ("SMITHY",     makeCosts(COAL,10, 	IRON_ORE,10),		"Images/itemicons/iron_bar.png"),
