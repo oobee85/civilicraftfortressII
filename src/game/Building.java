@@ -46,7 +46,7 @@ public class Building extends Thing implements Serializable {
 		this.timeToHarvest = baseTimeToHarvest;
 		this.timeToProduce = baseTimeToProduce;
 		this.isPlanned = false;
-		setRoadCorner(Direction.ALL_DIRECTIONS);
+//		setRoadCorner(Direction.ALL_DIRECTIONS);
 		for(GameComponent c : buildingType.getComponents()) {
 			this.addComponent(c.getClass(), c);
 		}
@@ -301,16 +301,16 @@ public class Building extends Thing implements Serializable {
 		}
 		return strings;
 	}
-	public void setRoadCorner(String roadCorner) {
-		if(!getType().isRoad()) {
-			return;
-		}
+	public void setTiledImage(int tileBitmap) {
+//		if(!getType().isRoad()) {
+//			return;
+//		}
 		
 		// Images/buildings/wall_brick.png is a placeholder image so mipmap doesnt fail to load
 		MipMap mipmap = new MipMap("Images/buildings/wall_brick.png") {
 			@Override
 			public Image getImage(int size) {
-				return getType().getRoadImage(roadCorner);
+				return getType().getTiledImage(tileBitmap);
 			}
 			@Override
 			public Image getShadow(int size) {

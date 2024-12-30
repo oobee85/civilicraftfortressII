@@ -16,6 +16,7 @@ public class BuildingType implements Serializable {
 	private transient final String info;
 	private transient final int health;
 	private transient final MipMap mipmap;
+	private transient final HashMap<Integer, Image> tiledImages;
 	private transient final double moveSpeedEnhancement;
 	private transient final int visionRadius;
 	private transient final String researchRequirement;
@@ -26,12 +27,15 @@ public class BuildingType implements Serializable {
 	private transient final int inventoryStackSize;
 	private transient final String[] canProduce;
 	private transient final HashSet<UnitType> canProduceSet = new HashSet<>();
-	private transient HashMap<String, Image> roadImages;
+//	private transient HashMap<String, Image> roadImages;
 	private transient final Set<GameComponent> components = new HashSet<>();
 
 	
-	public BuildingType(String name, String info, int hp, double buildingEffort, String texturePath, double cultureRate, int visionRadius, 
-			String requirement, HashMap <ItemType, Integer> resourcesNeeded, String[] canProduce, double moveSpeedEnhancement, HashSet<String> attributes, int inventoryStackSize) {
+	public BuildingType(String name, String info, int hp, double buildingEffort,
+			String texturePath, String tiledImageFolder, double cultureRate, int visionRadius, 
+			String requirement, HashMap <ItemType, Integer> resourcesNeeded,
+			String[] canProduce, double moveSpeedEnhancement, HashSet<String> attributes,
+			int inventoryStackSize) {
 		id = idCounter++;
 		this.name = name;
 		this.info = info;
@@ -47,8 +51,13 @@ public class BuildingType implements Serializable {
 		this.attributes = attributes;
 		this.inventoryStackSize = inventoryStackSize;
 		
-		if(isRoad()) {
-			roadImages = ImageCreation.createRoadImages(texturePath);
+//		if(isRoad()) {
+//			roadImages = ImageCreation.createRoadImages(texturePath);
+//		}
+
+		this.tiledImages = (tiledImageFolder == null) ? null : Utils.loadTiledImages(tiledImageFolder);
+		if (this.tiledImages != null) {
+			System.out.println("loaded " + tiledImageFolder);
 		}
 	}
 	
@@ -72,8 +81,16 @@ public class BuildingType implements Serializable {
 		return cultureRate;
 	}
 
-	public Image getRoadImage(String roadCorner) {
-		return roadImages.get(roadCorner);
+//	public Image getRoadImage(String roadCorner) {
+//		return roadImages.get(roadCorner);
+//	}
+	
+	public boolean isTiledImage() {
+		return tiledImages != null;
+	}
+	
+	public Image getTiledImage(int tileBitmap) {
+		return tiledImages.get(tileBitmap);
 	}
 	
 	public MipMap getMipMap() {

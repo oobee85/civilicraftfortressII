@@ -34,64 +34,12 @@ public class PlantType implements Serializable {
 		this.name = name;
 		this.rarity = rare;
 		this.health = health;
-		mipmap = new MipMap(image);
+		this.mipmap = new MipMap(image);
 		this.harvestItems = harvestItems;
 		this.attributes = attributes;
 		this.inventoryStackSize = inventoryStackSize;
 		
-		if (tiledImageFolder == null) {
-			tiledImages = null;
-		}
-		else {
-			tiledImages = new HashMap<>();
-			
-			for (int i = 1; i < Utils.MAX_TILED_BITMAP; i+=2) {
-				int bits = i;
-
-				boolean northwest = (bits & Direction.NORTHWEST.tilingBit) != 0;
-				boolean northeast = (bits & Direction.NORTHEAST.tilingBit) != 0;
-				boolean southeast = (bits & Direction.SOUTHEAST.tilingBit) != 0;
-				boolean southwest = (bits & Direction.SOUTHWEST.tilingBit) != 0;
-				boolean mirrored = false;
-				if ((northwest && !northeast)
-							|| ((northwest == northeast) && (southwest && !southeast))) {
-		            mirrored = true;
-		            bits = (bits & Direction.NONE.tilingBit)
-		            		| (bits & Direction.NORTH.tilingBit)
-		            		| (northwest ? Direction.NORTHEAST.tilingBit : 0)
-		            		| (southwest ? Direction.SOUTHEAST.tilingBit : 0)
-		            		| (bits & Direction.SOUTH.tilingBit)
-		            		| (southeast ? Direction.SOUTHWEST.tilingBit : 0)
-		            		| (northeast ? Direction.NORTHWEST.tilingBit : 0);
-		            
-		            // 0x93 = 64 (29) + 16 (13) + 8 (5) + 4 (1) + 1;
-		            // CENTER NE SE S NW
-//		            bits = (bits & Direction.NONE.tilingBit)
-//		            		| (bits & Direction.NORTH.tilingBit)
-//		            		| (bits & Direction.NORTHWEST.tilingBit)
-//		            		| (bits & Direction.SOUTHWEST.tilingBit)
-//		            		| (bits & Direction.SOUTH.tilingBit)
-//		            		| (bits & Direction.SOUTHEAST.tilingBit)
-//		            		| (bits & Direction.NORTHEAST.tilingBit);
-		            System.out.println("Mirrored " + i + " to  " + bits);
-				}
-				
-				String filename = tiledImageFolder + "/" + bits + ".png";
-				Image tiledImage = Utils.loadImage(filename);
-				
-				if (mirrored) {
-					BufferedImage buf = Utils.toBufferedImage(tiledImage);
-					
-					BufferedImage mirroredImage = new BufferedImage(buf.getWidth(), buf.getHeight(), buf.getType());
-					Graphics g = mirroredImage.getGraphics();
-					g.drawImage(buf, buf.getWidth(), 0, -buf.getWidth(), buf.getHeight(), null);
-					g.dispose();
-					
-					tiledImage = mirroredImage;
-				}
-				tiledImages.put(i, tiledImage);
-			}
-		}
+		this.tiledImages = (tiledImageFolder == null) ? null : Utils.loadTiledImages(tiledImageFolder);
 	}
 	
 	public boolean isTiledImage() {

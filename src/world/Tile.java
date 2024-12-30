@@ -227,39 +227,41 @@ public class Tile implements Externalizable {
 			neighbor.turnRoad();
 		}
 	}
-
-	private void turnRoad() {
-		if (getRoad() == null) {
-			return;
-		}
-		Set<Direction> directions = new HashSet<>();
-		TileLoc loc = getLocation();
-		for (Tile t : getNeighbors()) {
-			if (t.getRoad() == null)
-				continue;
-			Direction d = Direction.getDirection(loc, t.getLocation());
-			if (d != null)
-				directions.add(d);
-		}
-		String s = "";
-		for (Direction d : Direction.values()) {
-			if (directions.contains(d)) {
-				s += d;
-			}
-		}
-		if (s.equals("")) {
-			for (Direction d : Direction.values()) {
-				s += d;
-			}
-		}
-		getRoad().setRoadCorner(s);
-	}
 	
 	private static final Direction[] tilingDirections = new Direction[] {
 			Direction.NONE,
 			Direction.NORTH, Direction.NORTHEAST, Direction.SOUTHEAST,
 			Direction.SOUTH, Direction.SOUTHWEST, Direction.NORTHWEST
 	};
+
+	private void turnRoad() {
+		if (getRoad() == null) {
+			return;
+		}
+		if (!this.getRoad().getType().isTiledImage()) {
+			return;
+		}
+		Set<Direction> directions = new HashSet<>();
+		directions.add(Direction.NONE);
+		TileLoc loc = getLocation();
+		for (Tile t : getNeighbors()) {
+			if (t.getRoad() == null) {
+				continue;
+			}
+			Direction d = Direction.getDirection(loc, t.getLocation());
+			if (d != null)
+				directions.add(d);
+		}
+		int tileBitmap = 0;
+		int bit = 1;
+		for (Direction d : tilingDirections) {
+			if (directions.contains(d)) {
+				tileBitmap += bit;
+			}
+			bit *= 2;
+		}
+		getRoad().setTiledImage(tileBitmap);
+	}
 	private void turnTree() {
 		if (getPlant() == null) {
 			return;

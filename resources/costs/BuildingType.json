@@ -240,6 +240,7 @@
 		"name":"STONE_ROAD",
 		"info":"Increases movement speed",
 		"image":"Images/buildings/stone_road.png",
+		"tiledImages":"Images/buildings/roadTileset",
 		"vision":0,
 		"movespeed":3,
 		"cost":{"STONE":10},

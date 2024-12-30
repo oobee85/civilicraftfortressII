@@ -8,7 +8,7 @@ public enum Terrain {
 		DIRT  		  (1, 5, 0, new Point(1, 10), new String[] {"Images/terrain/dirt.png", "Images/terrain/dirt128.png", "Images/terrain/dirt512.png"}),
 		RICHSOIL      (1, 5, 0, new Point(1, 10), new String[] {"Images/terrain/richsoil.png"}),
 		VOLCANO 	  (4, 30, 0.1, new Point(0, 20), new String[] {"Images/terrain/volcano16.png", "Images/terrain/volcano128.png", "Images/terrain/magma512.png"}),
-		ROCK 		  (2, 10, 0, new Point(0, 20), new String[] {"Images/terrain/rock16.png", "Images/terrain/rock16.png"}),
+		ROCK 		  (2, 10, 0, new Point(0, 20), new String[] {"Images/terrain/rock16_lowcontrast.png"}),
 		LOWROCK 	  (2, 25, 0, new Point(0, 20), new String[] {"Images/terrain/rock16.png"}),
 		SAND 		  (2, 20, 0, new Point(0, 1), new String[] {"Images/terrain/sand.png"}),
 		BURNED_GROUND (4, 10, 0.08, new Point(0, 20), new String[] {"Images/terrain/burnedground.png"}),

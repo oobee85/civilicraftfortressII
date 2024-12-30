@@ -118,7 +118,8 @@ public class Loader {
 			
 			String name = buildingTypeObject.getString("name");
 			String image = buildingTypeObject.getString("image");
-
+			String tiledImageFolder = buildingTypeObject.has("tiledImages") ? buildingTypeObject.getString("tiledImages") : null;
+			
 			double culture = buildingTypeObject.getDouble("culture");
 			int health = buildingTypeObject.getInt("health");
 			int vision = buildingTypeObject.getInt("vision");
@@ -170,7 +171,7 @@ public class Loader {
 			}
 
 			Set<GameComponent> components = loadComponents(buildingTypeObject);
-			BuildingType buildingType = new BuildingType(name, info, health, effort, image,
+			BuildingType buildingType = new BuildingType(name, info, health, effort, image, tiledImageFolder,
 					culture, vision, researchReq, cost, buildsunits, movespeed, attributes, inventoryStackSize);
 			buildingType.getComponents().addAll(components);
 			buildingTypeMap.put(name, buildingType);
