@@ -1662,8 +1662,6 @@ public class World {
 		return mapImages;
 	}
 	
-	private static final int KERNEL_SIZE = 17;
-	private static final float[] kernelData = DrawingUtils.createSpreadingKernel(KERNEL_SIZE);
 	/**
 	 * computes all tile brightnesses and creates brightness image
 	 */
@@ -1671,35 +1669,21 @@ public class World {
 		int w = getWidth();
 		int h = getHeight();
 		BufferedImage rawImage = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_GRAY);
-		for(Tile tile : getTiles() ) {
-			double playerBrightness = faction.computeVisibilityOfTile(tile);
-			byte brightnessByte = (byte) Math.max(0, Math.min(255, playerBrightness*128));
-			int rgb = (brightnessByte << 24) |  (brightnessByte << 16) | (brightnessByte << 8) | brightnessByte;
-			rawImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), rgb);
+		for (Unit unit : faction.getUnits()) {
+			int radius = 11;
+			for (Tile visible : Utils.getTilesInRadius(unit.getTile(), this, radius)) {
+				rawImage.setRGB(visible.getLocation().x(), visible.getLocation().y(), 0xFF);
+				visible.setBrightness(1);
+			}
 		}
-		rawImage = ImageCreation.convertToHexagonal(rawImage);
-		
-		// Add KERNEL_SIZE/2 buffer on every edge so that it can convolve
-		// the whole image
-		BufferedImage rawImagePlusEdges = new BufferedImage(
-				rawImage.getWidth() + KERNEL_SIZE,
-				rawImage.getHeight() + KERNEL_SIZE,
-				rawImage.getType());
-		Graphics g = rawImagePlusEdges.getGraphics();
-		g.drawImage(rawImage, KERNEL_SIZE/2, KERNEL_SIZE/2, null);
-		g.dispose();
-		Kernel kernel = new Kernel(KERNEL_SIZE, KERNEL_SIZE, kernelData);
-		ConvolveOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_ZERO_FILL, null);
-		BufferedImage blurred = op.filter(rawImagePlusEdges, null);
-		blurred = op.filter(blurred, null);
-		blurred = op.filter(blurred, null);
-		blurred = blurred.getSubimage(KERNEL_SIZE/2, KERNEL_SIZE/2, rawImage.getWidth(), rawImage.getHeight());
-		blurred = ImageCreation.convertFromHexagonal(blurred);
-		for(Tile tile : getTiles()) {
-			int brightness = blurred.getRGB(tile.getLocation().x(), tile.getLocation().y()) & 0xFF;
-			tile.setBrightness(Math.max(0, Math.min(1.0, (brightness) / 128.0)));
+		for (Building building : faction.getBuildings()) {
+			int radius = building.getType().getVisionRadius();
+			for (Tile visible : Utils.getTilesInRadius(building.getTile(), this, radius)) {
+				rawImage.setRGB(visible.getLocation().x(), visible.getLocation().y(), 0xFF);
+				visible.setBrightness(1);
+			}
 		}
-		return blurred;
+		return ImageCreation.convertToHexagonal(rawImage);
 	}
 
 	public int ticksUntilDay() {
