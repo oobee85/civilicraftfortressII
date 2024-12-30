@@ -771,7 +771,8 @@ public class Game {
 				doBuildingCulture(building);
 			}
 			building.tick(world, simulated);
-
+			
+			// smithy produces bars
 			if (building.getType().isSmithy() && building.readyToProduce()) {
 				haveSmithyProduceBar(building);
 			}

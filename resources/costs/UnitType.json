@@ -125,6 +125,21 @@
 		"loot":{"WOOD":200}
 	},
 	{
+		"image":"Images/units/siege_tower.png",
+		"cost":{"ADAMANTITE_BAR":20,"WOOD":1000,"STONE":500},
+		"stats":{"movespeed":40,"buildtime":1000,"health":200,"healspeed":100},
+		"name":"SIEGE TOWER",
+		"attackstyles":[
+			{"damage":0, "cooldown":1000, "range":0, "minrange":0}
+		],
+		"attributes":["hostile", "wheeled", "siegetower"],
+		"research":"ENGINEERING",
+		"targeting":[
+			{"type":"WALL"},
+			{"type":"game.Building"}],
+		"loot":{"WOOD":200}
+	},
+	{
 		"image":"Images/units/sniper.png",
 		"cost":{"WOOD":1250,"IRON_BAR":100,"MITHRIL_BAR":25,"ADAMANTITE_BAR":25,"RUNITE_BAR":25,"TITANIUM_BAR":50},
 		"stats":{"movespeed":100,"buildtime":3000,"health":20,"healspeed":50},

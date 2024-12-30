@@ -22,7 +22,7 @@ public class SpawnUnitsView {
 	
 	public SpawnUnitsView(GameView gameView) {
 		this.gameView = gameView;
-		scrollingPanel = new ScrollingPanel(new Dimension(ClientGUI.GUIWIDTH, 500)); // 500 is height of scroll
+		scrollingPanel = new ScrollingPanel(new Dimension((int) (ClientGUI.GUIWIDTH - SPAWN_BUTTON_SIZE.getWidth()), 500)); // 500 is height of scroll
 		scrollingPanel.setFocusable(false);
 		
 		setupButtons();

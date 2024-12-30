@@ -262,6 +262,34 @@ public class Tile implements Externalizable {
 		}
 		getRoad().setTiledImage(tileBitmap);
 	}
+	private void turnBuilding() {
+		if (getBuilding() == null) {
+			return;
+		}
+		if (!this.getBuilding().getType().isTiledImage()) {
+			return;
+		}
+		Set<Direction> directions = new HashSet<>();
+		directions.add(Direction.NONE);
+		TileLoc loc = getLocation();
+		for (Tile t : getNeighbors()) {
+			if (t.getBuilding() == null) {
+				continue;
+			}
+			Direction d = Direction.getDirection(loc, t.getLocation());
+			if (d != null)
+				directions.add(d);
+		}
+		int tileBitmap = 0;
+		int bit = 1;
+		for (Direction d : tilingDirections) {
+			if (directions.contains(d)) {
+				tileBitmap += bit;
+			}
+			bit *= 2;
+		}
+		getBuilding().setTiledImage(tileBitmap);
+	}
 	private void turnTree() {
 		if (getPlant() == null) {
 			return;
@@ -381,6 +409,10 @@ public class Tile implements Externalizable {
 
 	public void setBuilding(Building b) {
 		building = b;
+		turnBuilding();
+		for (Tile neighbor : getNeighbors()) {
+			neighbor.turnBuilding();
+		}
 	}
 
 	public void setModifier(GroundModifier gm) {
@@ -533,7 +565,24 @@ public class Tile implements Externalizable {
 //			return true;
 //		}
 		BuildingType bt = building.getType();
-		if (bt.blocksMovement() && building.isBuilt()) {
+		if (bt.blocksMovement() && building.isBuilt()) { // if building is a wall and is finished building
+			
+			// check if neighboring tiles have siege tower
+			for(Tile t: this.getNeighbors()) { // iterate through tiles neighbors
+				for(Unit un: t.units) { // iterate through units on the neighbors
+					if(u.getFaction() == un.getFaction()) { // check if unit on neighbor is current units faction
+						if(u.getTile() == un.getTile()) { // check if both units are on the same tile
+							if(un.getType().isSiegeTower()) { // check if unit on neighbor is siege tower
+								return false;
+							}
+						}
+						
+					}
+					
+				}
+			}
+			
+			// if its a gate
 			if (bt.isGate() && u.getFaction() == building.getFaction()) {
 				return false;
 			}

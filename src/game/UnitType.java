@@ -127,6 +127,9 @@ public class UnitType implements Serializable {
 	public boolean isWheeled() {
 		return attributes.contains("wheeled");
 	}
+	public boolean isSiegeTower() {
+		return attributes.contains("siegetower");
+	}
 	public boolean hasCleave() {
 		return attributes.contains("cleave");
 	}
