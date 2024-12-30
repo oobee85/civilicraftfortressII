@@ -31,7 +31,8 @@
 	},
 	{
 		"name":"TREE",
-		"image":"Images/plants/treeTilesetCustom/T______.png",
+		"image":"Images/plants/treeTilesetCustom/1.png",
+		"tiledImages":"Images/plants/treeTilesetCustom",
 		"health":400,
 		"rarity": 1,
 		"harvestitems":{"WOOD":2}

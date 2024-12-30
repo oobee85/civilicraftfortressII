@@ -1217,10 +1217,6 @@ public class Game {
 		Plant plant = new Plant(plantType, tile, faction);
 		world.addPlant(plant);
 		tile.setHasPlant(plant);
-		tile.turnTree();
-		for (Tile neighbor : tile.getNeighbors()) {
-			neighbor.turnTree();
-		}
 		return plant;
 
 	}

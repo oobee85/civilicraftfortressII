@@ -34,6 +34,7 @@ public class Plant extends Thing implements Serializable {
 	
 
 	public void setTiledImage(int tileBitmap) {
+//		System.out.println("Setting tree tiled image to " + tileBitmap);
 		// Images/buildings/wall_brick.png is a placeholder image so mipmap doesnt fail to load
 		MipMap mipmap = new MipMap("Images/buildings/wall_brick.png") {
 			@Override

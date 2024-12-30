@@ -1236,6 +1236,7 @@ public class World {
 					Plant plant = new Plant(type, potential, getFaction(NO_FACTION_ID));
 					potential.setHasPlant(plant);
 					worldData.addPlant(plant);
+//					potential.turnTree();
 					veinSize--;
 				}
 			}else
@@ -1248,7 +1249,6 @@ public class World {
 				veinSize--;
 			}
 		}
-
 	}
 
 	public void makeForest(Random rand) {
@@ -1265,6 +1265,11 @@ public class World {
 				}
 			}
 		}
+		
+//		worldData.filterDeadPlants();
+//		for (Plant plant : worldData.getPlants()) {
+//			plant.getTile().turnTree();
+//		}
 		
 	}
 	

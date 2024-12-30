@@ -152,7 +152,7 @@ public final class Utils {
 	
 	public static final ImageIcon resizeImageIcon(ImageIcon icon, int width, int height) {
 		int scalingMode = java.awt.Image.SCALE_SMOOTH;
-		if(icon.getDescription().equals(IMAGEICON_ANIMATED)) {
+		if(icon.getDescription() != null && icon.getDescription().equals(IMAGEICON_ANIMATED)) {
 			scalingMode = java.awt.Image.SCALE_DEFAULT;
 		}
 		return new ImageIcon(icon.getImage().getScaledInstance(width, height, scalingMode));

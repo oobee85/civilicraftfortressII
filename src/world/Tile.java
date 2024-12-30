@@ -260,7 +260,7 @@ public class Tile implements Externalizable {
 			Direction.NORTH, Direction.NORTHEAST, Direction.SOUTHEAST,
 			Direction.SOUTH, Direction.SOUTHWEST, Direction.NORTHWEST
 	};
-	public void turnTree() {
+	private void turnTree() {
 		if (getPlant() == null) {
 			return;
 		}
@@ -310,6 +310,11 @@ public class Tile implements Externalizable {
 
 	public void setHasPlant(Plant p) {
 		plant = p;
+
+		this.turnTree();
+		for (Tile neighbor : getNeighbors()) {
+			neighbor.turnTree();
+		}
 	}
 
 	public Unit getUnitOfFaction(Faction faction) {
