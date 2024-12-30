@@ -65,6 +65,7 @@ public class Loader {
 
 			String name = plantTypeObject.getString("name");
 			String image = plantTypeObject.getString("image");
+			String tiledImageFolder = plantTypeObject.has("tiledImages") ? plantTypeObject.getString("tiledImages") : null;
 			int health = plantTypeObject.getInt("health");
 			double rarity = plantTypeObject.getDouble("rarity");
 //			String itemString = plantTypeObject.getString("harvestitem");
@@ -98,7 +99,7 @@ public class Loader {
 			}
 
 			Set<GameComponent> components = loadComponents(plantTypeObject);
-			PlantType plantType = new PlantType(name, image, rarity, health, harvestItems, attributes, inventoryStackSize);
+			PlantType plantType = new PlantType(name, image, tiledImageFolder, rarity, health, harvestItems, attributes, inventoryStackSize);
 			plantType.getComponents().addAll(components);
 			
 			plantTypeMap.put(name, plantType);

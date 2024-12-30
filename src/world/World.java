@@ -1566,6 +1566,13 @@ public class World {
 				terrainColor = Utils.blendColors(tile.getFaction().color(), terrainColor, 0.03);
 			}
 
+			int shadedRelief = tileShade[tile.getLocation().x()][tile.getLocation().y()];
+			
+			terrainColor = new Color(
+					Math.min(255, Math.max(0, terrainColor.getRed() - shadedRelief)),
+					Math.min(255, Math.max(0, terrainColor.getGreen() - shadedRelief)),
+					Math.min(255, Math.max(0, terrainColor.getBlue() - shadedRelief)));
+
 			if (tilebrightness > brightnessSoftCutoff) {
 				tilebrightness = 1;
 			}
@@ -1583,16 +1590,14 @@ public class World {
 					(int) (terrainColor.getBlue() * daylight),
 					alphaValue).getRGB();
 
+			
 			Color fogOfWarTerrainColor = Utils.blendColors(terrainColor, Color.black, daylight);
 			terrainColor = Utils.blendColors(terrainColor, fogOfWarTerrainColor, tilebrightness);
 
-//			Color fogOfWarMinimapColor = Utils.blendColors(minimapColor, Color.black, daylight);
-//			minimapColor = Utils.blendColors(minimapColor, fogOfWarMinimapColor, tilebrightness);
-			int shade = tileShade[tile.getLocation().x()][tile.getLocation().y()];
 			minimapColor = new Color(
-					Math.min(255, Math.max(0, minimapColor.getRed() - shade)),
-					Math.min(255, Math.max(0, minimapColor.getGreen() - shade)),
-					Math.min(255, Math.max(0, minimapColor.getBlue() - shade)));
+					Math.min(255, Math.max(0, minimapColor.getRed() - shadedRelief)),
+					Math.min(255, Math.max(0, minimapColor.getGreen() - shadedRelief)),
+					Math.min(255, Math.max(0, minimapColor.getBlue() - shadedRelief)));
 			
 			minimapImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), minimapColor.getRGB());
 			terrainImage.setRGB(tile.getLocation().x(), tile.getLocation().y(), terrainColor.getRGB());

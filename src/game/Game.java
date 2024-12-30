@@ -1217,6 +1217,10 @@ public class Game {
 		Plant plant = new Plant(plantType, tile, faction);
 		world.addPlant(plant);
 		tile.setHasPlant(plant);
+		tile.turnTree();
+		for (Tile neighbor : tile.getNeighbors()) {
+			neighbor.turnTree();
+		}
 		return plant;
 
 	}
@@ -1275,7 +1279,7 @@ public class Game {
 		if (thing == null) {
 			return;
 		}
-		Sound sound = new Sound(SoundEffect.BOMBEXPLODE, null, thing.getTile());
+		Sound sound = new Sound(SoundEffect.EXPLOSION, null, thing.getTile());
 		SoundManager.theSoundQueue.add(sound);
 		world.spawnExplosionCircle(thing.getTile(), 1, 1000000);
 	}

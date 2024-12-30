@@ -64,6 +64,14 @@ public class KUIConstants {
 		setComponentAttributes(b, size);
 		return b;
 	}
+	public static <T> void setupComboBox(JComboBox<T> box, Dimension size) {
+//		box.set
+//		KToggleButton b = new KToggleButton(text, icon);
+//		box.setMargin(zeroMargin);
+//		box.setHorizontalAlignment(SwingConstants.LEFT);
+		setComponentAttributes(box, size);
+//		return b;
+	}
 	public static JRadioButton setupRadioButton(String text, Icon icon, Dimension size) {
 		JRadioButton b = new KRadioButton(text, icon);
 		b.setMargin(zeroMargin);

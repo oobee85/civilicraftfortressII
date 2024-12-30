@@ -276,6 +276,8 @@ public class GameView {
 					setBuildingToPlan(Game.buildingTypeMap.get("BARRACKS"));
 				} else if (e.getKeyCode() == KeyEvent.VK_D) {
 					state.leftClickAction = LeftClickAction.WANDER_AROUND;
+				} else if (e.getKeyCode() == KeyEvent.VK_H) {
+					deselectHalf();
 				}
 			}
 		};
@@ -832,6 +834,34 @@ public class GameView {
 		} else if (thing instanceof Plant) {
 			guiController.selectedPlant((Plant) thing, true);
 		}
+	}
+	public void deselectHalf() {
+		int numberThingsHalf = state.selectedThings.size() / 2;
+		int currentDeselected = 0;
+		for (Thing thing : state.selectedThings) {
+			if (thing != null) {
+				thing.setSelected(false);
+				if(currentDeselected >= numberThingsHalf) {
+					break;
+				}
+				if (thing instanceof Unit) {
+					guiController.selectedUnit((Unit) thing, false);
+					currentDeselected ++;
+				}
+				if (thing instanceof Building) {
+					guiController.selectedBuilding((Building) thing, false);
+					currentDeselected ++;
+				}
+				if (thing instanceof Plant) {
+					guiController.selectedPlant((Plant) thing, false);
+					currentDeselected ++;
+				}
+
+			}
+			state.selectedThings.remove(thing);
+		}
+//		state.selectedThings.clear();
+		state.leftClickAction = LeftClickAction.NONE;
 	}
 
 	public void deselectEverything() {

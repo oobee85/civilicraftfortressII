@@ -254,6 +254,43 @@ public class Tile implements Externalizable {
 		}
 		getRoad().setRoadCorner(s);
 	}
+	
+	private static final Direction[] tilingDirections = new Direction[] {
+			Direction.NONE,
+			Direction.NORTH, Direction.NORTHEAST, Direction.SOUTHEAST,
+			Direction.SOUTH, Direction.SOUTHWEST, Direction.NORTHWEST
+	};
+	public void turnTree() {
+		if (getPlant() == null) {
+			return;
+		}
+		if (!this.getPlant().getType().isTiledImage()) {
+			return;
+		}
+		Set<Direction> directions = new HashSet<>();
+		directions.add(Direction.NONE);
+		TileLoc loc = getLocation();
+		for (Tile t : getNeighbors()) {
+			if (t.getPlant() == null) {
+				continue;
+			}
+			if (t.getPlant().getType() != this.getPlant().getType()) {
+				continue;
+			}
+			Direction d = Direction.getDirection(loc, t.getLocation());
+			if (d != null)
+				directions.add(d);
+		}
+		int tileBitmap = 0;
+		int bit = 1;
+		for (Direction d : tilingDirections) {
+			if (directions.contains(d)) {
+				tileBitmap += bit;
+			}
+			bit *= 2;
+		}
+		getPlant().setTiledImage(tileBitmap);
+	}
 
 	public void setFaction(Faction faction) {
 		this.faction = faction;

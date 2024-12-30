@@ -50,13 +50,13 @@
 	{
 		"name": "MATHEMATICS",
 		"points": 600, "tier": 2,
-		"cost": {"STONE": 200},
+		"cost": {"BRICK": 100},
 		"requirements": ["MASONRY"],
 		"image": "Images/research/mathematics.png"},
 	{
 		"name": "ENGINEERING", 
 		"points": 600, "tier": 3,
-		"cost": {"STONE": 200, "WOOD": 200},
+		"cost": {"BRICK": 500, "WOOD": 500},
 		"requirements": ["MATHEMATICS"],
 		"image": "Images/research/engineering.png"},
 	{
@@ -80,7 +80,7 @@
 	{
 		"name": "CIVILIZATION", 
 		"points": 1200, "tier": 4,
-		"cost": {"STONE": 500}, 
+		"cost": {"BRICK": 500, "ADAMANTITE_BAR": 10}, 
 		"requirements": ["DOMESTICATION", "ENGINEERING", "ARMORING", "NECROMANCY"],
 		"image": "Images/research/monarchy.png"}
 	

@@ -7,34 +7,35 @@ public enum SoundEffect {
 	SMITHYPRODUCE ("smithy_produce.wav"),
 	TRAPCOW("trap.wav"),
 	
-	
-	BOMBEXPLODE ("explosion.wav"),
+	EXPLOSION ("explosion.wav"),
 	RESEARCHCOMPLETE ("ResearchComplete.wav"),
 	TOODEEP ("TheDwarvesDelved.wav"),
 	
 	DIRTWALKING ("DirtWalking.wav"),
-	MOVEDIRT("melee_move.wav"),
-	MOVESTONE("walk_stone.wav"),
+	MOVE_DIRT("melee_move.wav"),
+	MOVE_STONE("walk_stone.wav"),
+	MOVE_WHEELED("wheeled_unit_move.wav"),
 	
 	
+	PROJECTILE_LAUNCH_FIRE("projectile_launch_fire.wav"),
+	PROJECTILE_LAUNCH_LIGHT("projectile_launch_light.wav"),
+	PROJECTILE_LAUNCH_HEAVY("projectile_launch_heavy.wav"),
+	PROJECTILE_LAUNCH_BULLET("projectile_launch_bullet.wav"),
+	
+	PROJECTILE_IMPACT_GENERIC("projectile_impact_generic.wav"),
+	PROJECTILE_IMPACT_LIGHT("projectile_impact_light.wav"),
+	PROJECTILE_IMPACT_HEAVY("projectile_impact_heavy.wav"),
+	PROJECTILE_IMPACT_BULLET("projectile_impact_bullet.wav"),
+	
+	ATTACK_MELEE_GENERIC("attack_melee_generic.wav"),
+	ATTACK_MELEE_HEAVY("attack_melee_heavy.wav"),
+	
+	DEATH_UNIT ("death_unit.wav"),
+	DEATH_PLANT ("death_plant.wav"),
+	BUILDING_STONE_DEATH("building_stone_death.wav"),
+	BUILDING_WOOD_DEATH("building_wood_death.wav"),
 	
 	
-	PROJECTILEIMPACTGENERIC("arrow_dirt.wav"),
-	ARROWLOOSE("arrow_loose.wav"),
-	FIREWAVE("fire_wave.wav"),
-	PROJECTILELAUNCHHEAVY("projectile_launch_heavy.wav"),
-	PROJECTILEIMPACTHEAVY("projectile_impact_heavy.wav"),
-	PROJECTILEIMPACTLIGHT("projectile_impact_light.wav"),
-	
-	MELEEATTACK("melee_attack.wav"),
-	CLEAVEMELEEATTACK("cleave_melee_attack.wav"),
-	
-	DEATH ("Death.wav"),
-	PLANTDEATH ("PlantDeath.wav"),
-	BUILDINGSTONEDEATH("building_stone_death.wav"),
-	BUILDINGWOODDEATH("building_wood_death.wav"),
-	
-	WHEELEDUNITMOVE("wheeled_unit_move.wav"),
 	;
 	
 	private String name;

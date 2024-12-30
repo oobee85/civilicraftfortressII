@@ -18,27 +18,27 @@ public enum ItemType {
 	WEREWOLF ( "Images/units/werewolf.png"),
 	WOLF ( "Images/units/wolf.png"),
 	
-	CLAY     ( "Images/itemicons/clay.png"),
-	COAL ( "Images/itemicons/coal.png"),
+	CLAY       ( "Images/itemicons/clay.png"),
+	COAL       ( "Images/itemicons/coal.png"),
 	COPPER_ORE ( "Images/itemicons/copper_ore.png"),
 	SILVER_ORE ( "Images/itemicons/silver_ore.png"),
-	GOLD_ORE ( "Images/itemicons/gold_ore.png"),
-	IRON_ORE ( "Images/itemicons/iron_ore.png"),
-	MITHRIL_ORE ( "Images/itemicons/mithril_ore.png"),
+	GOLD_ORE   ( "Images/itemicons/gold_ore.png"),
+	IRON_ORE   ( "Images/itemicons/iron_ore.png"),
+	MITHRIL_ORE( "Images/itemicons/mithril_ore.png"),
 	
 	ADAMANTITE_ORE ( "Images/itemicons/adamantite_ore.png"),
 	RUNITE_ORE ( "Images/itemicons/runite_ore.png"),
 	TITANIUM_ORE ( "Images/itemicons/titanium_ore.png"),
 	
-	BRICK 	   	   ("SMITHY",     makeCosts(CLAY,10),	"Images/itemicons/brick.png"),
+	BRICK 	   	   ("SMITHY",     makeCosts(CLAY,50),	"Images/itemicons/brick.png"),
 	BRONZE_BAR 	   ("SMITHY",     makeCosts(COPPER_ORE,5, SILVER_ORE, 5),	"Images/itemicons/bronze_bar.png"),
 	GOLD_BAR 	   ("SMITHY",     makeCosts(GOLD_ORE, 10), 				"Images/itemicons/gold_bar.png"),
 	IRON_BAR 	   ("SMITHY",     makeCosts(COAL,10, 	IRON_ORE,10),		"Images/itemicons/iron_bar.png"),
 	MITHRIL_BAR    ("SMITHY",     makeCosts(COAL,20, 	MITHRIL_ORE,20),	"Images/itemicons/mithril_bar.png"),
 	
-	ADAMANTITE_BAR ("SMITHY",  makeCosts(COAL,40, 	ADAMANTITE_ORE,40),	"Images/itemicons/adamantite_bar.png"),
-	RUNITE_BAR 	   ("SMITHY",  makeCosts(COAL,80, 	RUNITE_ORE,80),		"Images/itemicons/runite_bar.png"),
-	TITANIUM_BAR   ("SMITHY",  makeCosts(COAL,160, 	TITANIUM_ORE,160),	"Images/itemicons/titanium_bar.png"),
+	ADAMANTITE_BAR ("SMITHY",  makeCosts(COAL,50, 	ADAMANTITE_ORE,50),	"Images/itemicons/adamantite_bar.png"),
+	RUNITE_BAR 	   ("SMITHY",  makeCosts(COAL,100, 	RUNITE_ORE,100),		"Images/itemicons/runite_bar.png"),
+	TITANIUM_BAR   ("SMITHY",  makeCosts(COAL,100, 	TITANIUM_ORE,100),	"Images/itemicons/titanium_bar.png"),
 	;
 	
 	private MipMap mipmap;

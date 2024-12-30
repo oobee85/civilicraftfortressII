@@ -1,5 +1,7 @@
 package world;
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 
@@ -11,6 +13,7 @@ public class PlantType implements Serializable {
 	
 	private final String name;
 	private transient final MipMap mipmap;
+	private transient final HashMap<Integer, Image> tiledImages;
 	private transient final double health;	
 	private transient final double rarity;
 	private transient final LinkedList<Item> harvestItems;
@@ -18,8 +21,9 @@ public class PlantType implements Serializable {
 	private transient final int inventoryStackSize;
 	private transient final Set<GameComponent> components = new HashSet<>();
 
-	public PlantType(String name, String image,
-	                 double rare, double health, LinkedList<Item> harvestItems, HashSet<String> attributes, int inventoryStackSize){
+	public PlantType(String name, String image, String tiledImageFolder,
+	                 double rare, double health,
+	                 LinkedList<Item> harvestItems, HashSet<String> attributes, int inventoryStackSize){
 		this.name = name;
 		this.rarity = rare;
 		this.health = health;
@@ -27,6 +31,26 @@ public class PlantType implements Serializable {
 		this.harvestItems = harvestItems;
 		this.attributes = attributes;
 		this.inventoryStackSize = inventoryStackSize;
+		
+		if (tiledImageFolder == null) {
+			tiledImages = null;
+		}
+		else {
+			tiledImages = new HashMap<>();
+			
+			for (int i = 0; i < Utils.MAX_TILED_BITMAP; i++) {
+				String filename = tiledImageFolder + "/" + i + ".png";
+				tiledImages.put(i, Utils.loadImage(filename));
+			}
+		}
+	}
+	
+	public boolean isTiledImage() {
+		return tiledImages != null;
+	}
+	
+	public Image getTiledImage(int tileBitmap) {
+		return tiledImages.get(tileBitmap);
 	}
 
 	public int getInventoryStackSize() {

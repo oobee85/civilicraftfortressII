@@ -159,7 +159,7 @@
 		"name":"CASTLE",
 		"info":"Produces workers",
 		"image":"Images/buildings/castle256.png",
-		"vision":10,
+		"vision":30,
 		"cost":{"WOOD":500, "STONE":500, "BRICK":100, "MITHRIL_BAR":5},
 		"buildsunits":["WORKER", "MASON", "PRIEST", "CARAVAN"],
 		"culture":1,

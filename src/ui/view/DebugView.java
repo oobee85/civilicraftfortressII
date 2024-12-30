@@ -44,20 +44,18 @@ public class DebugView {
 	
 	private void setupButtons() {
 		
-		ButtonGroup group = new ButtonGroup();
-		LinkedList<JRadioButton> mapModeButtons = new LinkedList<>();
+		JComboBox<MapMode> mapModeComboBox = new JComboBox<MapMode>();
+		KUIConstants.setupComboBox(mapModeComboBox, DEBUG_BUTTON_SIZE);
 		for(MapMode mode : MapMode.values()) {
 			if(mode == MapMode.MINIMAP) {
 				continue;
 			}
-			JRadioButton button = KUIConstants.setupRadioButton(Utils.getNiceName(mode.toString()), null, DEBUG_BUTTON_SIZE);
-			button.addActionListener(e -> {
-				gameView.setMapMode(mode);
-			});
-			group.add(button);
-			mapModeButtons.add(button);
+			mapModeComboBox.addItem(mode);
 		}
-		mapModeButtons.getFirst().setSelected(true);
+		
+		mapModeComboBox.addActionListener(e -> {
+			gameView.setMapMode((MapMode)mapModeComboBox.getSelectedItem());
+		});
 
 		JToggleButton flipTable = KUIConstants.setupToggleButton("Flip Table", null, DEBUG_BUTTON_SIZE);
 		flipTable.addActionListener(e -> {
@@ -196,18 +194,16 @@ public class DebugView {
 		scrollingPanel.add(pauseGame);
 		scrollingPanel.add(setPlayerFaction);
 		scrollingPanel.add(debug);
-		for(JRadioButton button : mapModeButtons) {
-			scrollingPanel.add(button);
-		}
+		scrollingPanel.add(mapModeComboBox);
+		scrollingPanel.add(toggleNight);
+		scrollingPanel.add(addResources);
+		scrollingPanel.add(researchEverything);
 		scrollingPanel.add(flipTable);
 		scrollingPanel.add(makeItRain);
 		scrollingPanel.add(makeItDry);
 		scrollingPanel.add(eruptVolcano);
 		scrollingPanel.add(meteor);
 		scrollingPanel.add(unitEvents);
-		scrollingPanel.add(toggleNight);
-		scrollingPanel.add(addResources);
-		scrollingPanel.add(researchEverything);
 		scrollingPanel.add(raiseHeight);
 		scrollingPanel.add(increasePressure);
 		scrollingPanel.add(setTerritoryButton);

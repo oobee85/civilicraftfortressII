@@ -21,6 +21,7 @@ import world.liquid.*;
 public final class Utils {
 
 	public static final String IMAGEICON_ANIMATED = "GIF";
+	public static final int MAX_TILED_BITMAP = 2 * 2 * 2 * 2 * 2 * 2 * 2;
 	
 	public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	

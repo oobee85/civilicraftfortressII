@@ -22,7 +22,7 @@ public class Bomb extends Animal {
 			world.spawnExplosionCircle(getTile(), 5, 500);
 			this.setDead(true);
 			
-			Sound sound = new Sound(SoundEffect.BOMBEXPLODE, null);
+			Sound sound = new Sound(SoundEffect.EXPLOSION, null);
 			SoundManager.theSoundQueue.add(sound);
 		}
 		return true;

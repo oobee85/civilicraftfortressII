@@ -201,7 +201,7 @@ public class Faction implements Externalizable {
 		double visibility = 0;
 		for (Unit u : tile.getUnits()) {
 			if (u.getFaction() == this) {
-				visibility += 1;
+				visibility += 10;
 			}
 		}
 		if (tile.getBuilding() != null 
@@ -214,6 +214,7 @@ public class Faction implements Externalizable {
 			else {
 				visibility += 3;
 			}
+			visibility += tile.getBuilding().getType().getVisionRadius();
 		}
 		if (tile.getFaction() == this) {
 			visibility += 0.2;
