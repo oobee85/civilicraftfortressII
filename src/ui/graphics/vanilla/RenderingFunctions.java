@@ -702,7 +702,95 @@ public class RenderingFunctions {
 		g.setPaint(originalPaint);
 	}
 	
+	private static void drawPolygonLiquid(Tile tile, Graphics g, int drawx, int drawy, int tileSize, RenderingState state) {
+
+		int centerTileX = drawx + tileSize/2;
+		int centerTileY = drawy + tileSize/2;
+		int maxWater = 20;
+		int halfTileEdge = tileSize/2;
+		
+		int myTileWaterAmount = Math.min(halfTileEdge, Math.max(0, (int)(halfTileEdge * tile.liquidAmount / maxWater)));
+		
+		int[] neighborAmounts = new int[Direction.values().length];
+		for (Tile neighbor : tile.getNeighbors()) {
+			Direction d = Direction.getDirection(tile.getLocation(), neighbor.getLocation());
+			neighborAmounts[d.ordinal()] = Math.min(halfTileEdge, Math.max(0, (int)(halfTileEdge * neighbor.liquidAmount / maxWater)));
+		}
+		
+		
+		final int numPoints = 12;
+		int[] xpoints = new int[numPoints];
+		int[] ypoints = new int[numPoints];
+		
+		// NW top
+		xpoints[0] = centerTileX - myTileWaterAmount;
+		ypoints[0] = centerTileY - myTileWaterAmount;
+		
+		// N
+		xpoints[1] = centerTileX;
+		ypoints[1] = centerTileY - myTileWaterAmount;
+		
+		// NE top
+		xpoints[2] = centerTileX + myTileWaterAmount;
+		ypoints[2] = centerTileY - myTileWaterAmount;
+		
+		if (neighborAmounts[Direction.NORTH.ordinal()] > 0) {
+			ypoints[0] = centerTileY - halfTileEdge;
+			ypoints[1] = centerTileY - halfTileEdge;
+			ypoints[2] = centerTileY - halfTileEdge;
+		}
+		
+		// NE center
+		xpoints[3] = centerTileX + myTileWaterAmount;
+		ypoints[3] = centerTileY - myTileWaterAmount/2;
+		
+		// NE bottom
+		xpoints[4] = centerTileX + myTileWaterAmount;
+		ypoints[4] = centerTileY;
+
+		if (neighborAmounts[Direction.NORTHEAST.ordinal()] > 0) {
+			xpoints[2] = centerTileX + halfTileEdge;
+			xpoints[3] = centerTileX + halfTileEdge;
+			xpoints[4] = centerTileX + halfTileEdge;
+		}
+
+		// SE center
+		xpoints[5] = centerTileX + myTileWaterAmount;
+		ypoints[5] = centerTileY + myTileWaterAmount/2;
+
+		// SE bottom
+		xpoints[6] = centerTileX + myTileWaterAmount;
+		ypoints[6] = centerTileY + myTileWaterAmount;
+
+		// S
+		xpoints[7] = centerTileX;
+		ypoints[7] = centerTileY + myTileWaterAmount;
+
+		// SW bottom
+		xpoints[8] = centerTileX - myTileWaterAmount;
+		ypoints[8] = centerTileY + myTileWaterAmount;
+
+		// SW center
+		xpoints[9] = centerTileX - myTileWaterAmount;
+		ypoints[9] = centerTileY + myTileWaterAmount/2;
+
+		// SW top
+		xpoints[10] = centerTileX - myTileWaterAmount;
+		ypoints[10] = centerTileY;
+
+		// NW center
+		xpoints[11] = centerTileX - myTileWaterAmount;
+		ypoints[11] = centerTileY - myTileWaterAmount/2;
+		
+
+		g.setColor(tile.liquidType.getMipMap().getColor(tileSize));
+		g.fillPolygon(xpoints, ypoints, numPoints);
+		
+	}
+	
 	public static void drawLiquid(Tile tile, Graphics g, int drawx, int drawy, int tileSize, RenderingState state) {
+//		drawPolygonLiquid(tile, g, drawx, drawy, tileSize, state);
+
 		double alpha = Utils.getAlphaOfLiquid(tile.liquidAmount);
 //		 transparency liquids
 		Utils.setTransparency(g, alpha);
