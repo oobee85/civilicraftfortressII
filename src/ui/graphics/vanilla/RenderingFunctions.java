@@ -709,113 +709,189 @@ public class RenderingFunctions {
 		int maxWater = 20;
 		int halfTileEdge = tileSize/2;
 		
-		int myTileWaterAmount = Math.min(halfTileEdge, Math.max(0, (int)(halfTileEdge * tile.liquidAmount / maxWater)));
 		
-		int[] neighborAmounts = new int[Direction.values().length];
-		for (Tile neighbor : tile.getNeighbors()) {
-			Direction d = Direction.getDirection(tile.getLocation(), neighbor.getLocation());
-			neighborAmounts[d.ordinal()] = Math.min(halfTileEdge, Math.max(0, (int)(halfTileEdge * neighbor.liquidAmount / maxWater)));
+		for (int layer = 0; layer <= 3; layer++) {
+			int waterLevelOffset = layer * 7;
+			Color baseColor = tile.liquidType.getMipMap().getColor(tileSize);
+			if (layer == 3) {
+				baseColor = baseColor.darker();
+			}
+			if (layer == 0 || layer == 1) {
+				baseColor = baseColor.brighter();
+				Utils.setTransparency(g, (4.0 + layer)/6);
+			}
+		
+			int myTileWaterAmount = Math.max(0, (int)(halfTileEdge * (tile.liquidAmount-waterLevelOffset) / maxWater));
+			if (myTileWaterAmount == 0) {
+				continue;
+			}
+			int[] neighborAmounts = new int[Direction.values().length];
+			for (Tile neighbor : tile.getNeighbors()) {
+				Direction d = Direction.getDirection(tile.getLocation(), neighbor.getLocation());
+				neighborAmounts[d.ordinal()] = Math.max(0, (int)(halfTileEdge * (neighbor.liquidAmount-waterLevelOffset) / maxWater));
+			}
+			
+			
+			final int numPoints = 12;
+			int[] xpoints = new int[numPoints];
+			int[] ypoints = new int[numPoints];
+			
+			int xoffset = 0;
+			int yoffset = 0;
+			
+			// NW top
+			xpoints[11] = centerTileX - myTileWaterAmount*3/4;
+			ypoints[11] = centerTileY - myTileWaterAmount*3/4;
+			
+			// N
+			xpoints[0] = centerTileX;
+			ypoints[0] = centerTileY - myTileWaterAmount;
+			
+			// NE top
+			xpoints[1] = centerTileX + myTileWaterAmount*3/4;
+			ypoints[1] = centerTileY - myTileWaterAmount*2/3;
+			
+			// NE center
+			xpoints[2] = centerTileX + myTileWaterAmount*2/3;
+			ypoints[2] = centerTileY - myTileWaterAmount*3/4;
+			
+			// NE bottom
+			xpoints[3] = centerTileX + myTileWaterAmount;
+			ypoints[3] = centerTileY;
+	
+			// SE center
+			xpoints[4] = centerTileX + myTileWaterAmount*2/3;
+			ypoints[4] = centerTileY + myTileWaterAmount*3/4;
+	
+			// SE bottom
+			xpoints[5] = centerTileX + myTileWaterAmount*3/4;
+			ypoints[5] = centerTileY + myTileWaterAmount*2/3;
+	
+			// S
+			xpoints[6] = centerTileX;
+			ypoints[6] = centerTileY + myTileWaterAmount;
+	
+			// SW bottom
+			xpoints[7] = centerTileX - myTileWaterAmount*3/4;
+			ypoints[7] = centerTileY + myTileWaterAmount*2/3;
+	
+			// SW center
+			xpoints[8] = centerTileX - myTileWaterAmount*2/3;
+			ypoints[8] = centerTileY + myTileWaterAmount*3/4;
+	
+			// SW top
+			xpoints[9] = centerTileX - myTileWaterAmount;
+			ypoints[9] = centerTileY;
+	
+			// NW center
+			xpoints[10] = centerTileX - myTileWaterAmount*2/3;
+			ypoints[10] = centerTileY - myTileWaterAmount*2/3;
+
+			int MINX = drawx;
+			int MINY = drawy;
+			int MAXX = drawx + tileSize;
+			int MAXY = drawy + tileSize;
+			if (neighborAmounts[Direction.NORTH.ordinal()] > 0) {
+				int avg = (myTileWaterAmount + neighborAmounts[Direction.NORTH.ordinal()])/2;
+				xpoints[11] = centerTileX - avg;
+				ypoints[11] = MINY;
+				ypoints[0] = MINY;
+				xpoints[1] = centerTileX + avg;
+				ypoints[1] = MINY;
+			}
+			if (neighborAmounts[Direction.NORTHEAST.ordinal()] > 0) {
+				int avg = (myTileWaterAmount + neighborAmounts[Direction.NORTHEAST.ordinal()])/2;
+				xpoints[1] = MAXX;
+				ypoints[1] = Math.min(ypoints[1], drawy + tileSize/4 - avg/2);
+				xpoints[2] = MAXX;
+				ypoints[2] = drawy + tileSize/4;
+				xpoints[3] = MAXX;
+				ypoints[3] = drawy + tileSize/4 + avg/2;
+			}
+			if (neighborAmounts[Direction.SOUTHEAST.ordinal()] > 0) {
+				int avg = (myTileWaterAmount + neighborAmounts[Direction.SOUTHEAST.ordinal()])/2;
+				xpoints[3] = MAXX;
+				ypoints[3] = Math.min(ypoints[1], drawy + tileSize*3/4 - avg/2);
+				xpoints[4] = MAXX;
+				ypoints[4] = drawy + tileSize*3/4;
+				xpoints[5] = MAXX;
+				ypoints[5] = drawy + tileSize*3/4 + avg/2;
+			}
+			if (neighborAmounts[Direction.SOUTH.ordinal()] > 0) {
+				int avg = (myTileWaterAmount + neighborAmounts[Direction.SOUTH.ordinal()])/2;
+				xpoints[5] = Math.max(xpoints[5], centerTileX + avg);
+				ypoints[5] = MAXY;
+				ypoints[6] = MAXY;
+				xpoints[7] = centerTileX - avg;
+				ypoints[7] = MAXY;
+			}
+			if (neighborAmounts[Direction.SOUTHWEST.ordinal()] > 0) {
+				int avg = (myTileWaterAmount + neighborAmounts[Direction.SOUTHWEST.ordinal()])/2;
+				xpoints[7] = MINX;
+				ypoints[7] = Math.max(ypoints[7], drawy + tileSize*3/4 + avg/2);
+				xpoints[8] = MINX;
+				ypoints[8] = drawy + tileSize*3/4;
+				xpoints[9] = MINX;
+				ypoints[9] = drawy + tileSize*3/4 - avg/2;
+			}
+			if (neighborAmounts[Direction.NORTHWEST.ordinal()] > 0) {
+				int avg = (myTileWaterAmount + neighborAmounts[Direction.NORTHWEST.ordinal()])/2;
+				xpoints[9] = MINX;
+				ypoints[9] = Math.min(ypoints[9], drawy + tileSize/4 + avg/2);
+				xpoints[10] = MINX;
+				ypoints[10] = drawy + tileSize/4;
+				xpoints[11] = MINX;
+				ypoints[11] = Math.min(ypoints[11], drawy + tileSize/4 - avg/2);
+			}
+			
+			
+			for (int i = 0; i < numPoints; i++) {
+//				xpoints[i] += xoffset;
+				xpoints[i] = xpoints[i] < drawx ? drawx : xpoints[i];
+				xpoints[i] = xpoints[i] > drawx + tileSize ? drawx + tileSize : xpoints[i];
+	
+//				ypoints[i] += yoffset;
+				ypoints[i] = ypoints[i] < drawy ? drawy : ypoints[i];
+				ypoints[i] = ypoints[i] > drawy + tileSize ? drawy + tileSize : ypoints[i];
+			}
+	
+			g.setColor(baseColor);
+			g.fillPolygon(xpoints, ypoints, numPoints);
+
+			if (layer == 0 || layer == 1) {
+				Utils.setTransparency(g, 1);
+			}
 		}
-		
-		
-		final int numPoints = 12;
-		int[] xpoints = new int[numPoints];
-		int[] ypoints = new int[numPoints];
-		
-		// NW top
-		xpoints[0] = centerTileX - myTileWaterAmount;
-		ypoints[0] = centerTileY - myTileWaterAmount;
-		
-		// N
-		xpoints[1] = centerTileX;
-		ypoints[1] = centerTileY - myTileWaterAmount;
-		
-		// NE top
-		xpoints[2] = centerTileX + myTileWaterAmount;
-		ypoints[2] = centerTileY - myTileWaterAmount;
-		
-		if (neighborAmounts[Direction.NORTH.ordinal()] > 0) {
-			ypoints[0] = centerTileY - halfTileEdge;
-			ypoints[1] = centerTileY - halfTileEdge;
-			ypoints[2] = centerTileY - halfTileEdge;
-		}
-		
-		// NE center
-		xpoints[3] = centerTileX + myTileWaterAmount;
-		ypoints[3] = centerTileY - myTileWaterAmount/2;
-		
-		// NE bottom
-		xpoints[4] = centerTileX + myTileWaterAmount;
-		ypoints[4] = centerTileY;
-
-		if (neighborAmounts[Direction.NORTHEAST.ordinal()] > 0) {
-			xpoints[2] = centerTileX + halfTileEdge;
-			xpoints[3] = centerTileX + halfTileEdge;
-			xpoints[4] = centerTileX + halfTileEdge;
-		}
-
-		// SE center
-		xpoints[5] = centerTileX + myTileWaterAmount;
-		ypoints[5] = centerTileY + myTileWaterAmount/2;
-
-		// SE bottom
-		xpoints[6] = centerTileX + myTileWaterAmount;
-		ypoints[6] = centerTileY + myTileWaterAmount;
-
-		// S
-		xpoints[7] = centerTileX;
-		ypoints[7] = centerTileY + myTileWaterAmount;
-
-		// SW bottom
-		xpoints[8] = centerTileX - myTileWaterAmount;
-		ypoints[8] = centerTileY + myTileWaterAmount;
-
-		// SW center
-		xpoints[9] = centerTileX - myTileWaterAmount;
-		ypoints[9] = centerTileY + myTileWaterAmount/2;
-
-		// SW top
-		xpoints[10] = centerTileX - myTileWaterAmount;
-		ypoints[10] = centerTileY;
-
-		// NW center
-		xpoints[11] = centerTileX - myTileWaterAmount;
-		ypoints[11] = centerTileY - myTileWaterAmount/2;
-		
-
-		g.setColor(tile.liquidType.getMipMap().getColor(tileSize));
-		g.fillPolygon(xpoints, ypoints, numPoints);
-		
 	}
 	
 	public static void drawLiquid(Tile tile, Graphics g, int drawx, int drawy, int tileSize, RenderingState state) {
-//		drawPolygonLiquid(tile, g, drawx, drawy, tileSize, state);
+		drawPolygonLiquid(tile, g, drawx, drawy, tileSize, state);
 
-		double alpha = Utils.getAlphaOfLiquid(tile.liquidAmount);
-//		 transparency liquids
-		Utils.setTransparency(g, alpha);
-//		if(tile.liquidType == LiquidType.WATER && tile.liquidAmount <= 0.6) {
-//			Utils.setTransparency(g, 0);
+//		double alpha = Utils.getAlphaOfLiquid(tile.liquidAmount);
+////		 transparency liquids
+//		Utils.setTransparency(g, alpha);
+////		if(tile.liquidType == LiquidType.WATER && tile.liquidAmount <= 0.6) {
+////			Utils.setTransparency(g, 0);
+////		}
+//		
+//		g.setColor(tile.liquidType.getMipMap().getColor(tileSize));
+//		g.fillRect(drawx, drawy, tileSize, tileSize);
+//		Utils.setTransparency(g, 1);
+//		
+//		int imageSize = (int) Math.min(Math.max(tileSize * tile.liquidAmount / 20, 1), tileSize);
+//		g.setColor(tile.liquidType.getMipMap().getColor(tileSize));
+//		g.fillRect(drawx + tileSize / 2 - imageSize / 2, drawy + tileSize / 2 - imageSize / 2, imageSize,
+//				imageSize);
+//		g.drawImage(tile.liquidType.getMipMap().getImage(tileSize), drawx + tileSize / 2 - imageSize / 2,
+//				drawy + tileSize / 2 - imageSize / 2, imageSize, imageSize, null);
+//		
+//		if(tile.liquidType == LiquidType.WATER) {
+//			alpha = Utils.getAlphaDepthOfLiquid(tile.liquidAmount);
+//			g.setColor(Color.BLACK);
+//			Utils.setTransparency(g, alpha);
+//			g.fillRect(drawx, drawy, tileSize, tileSize);
+//			Utils.setTransparency(g, 1);
 //		}
-		
-		g.setColor(tile.liquidType.getMipMap().getColor(tileSize));
-		g.fillRect(drawx, drawy, tileSize, tileSize);
-		Utils.setTransparency(g, 1);
-		
-		int imageSize = (int) Math.min(Math.max(tileSize * tile.liquidAmount / 20, 1), tileSize);
-		g.setColor(tile.liquidType.getMipMap().getColor(tileSize));
-		g.fillRect(drawx + tileSize / 2 - imageSize / 2, drawy + tileSize / 2 - imageSize / 2, imageSize,
-				imageSize);
-		g.drawImage(tile.liquidType.getMipMap().getImage(tileSize), drawx + tileSize / 2 - imageSize / 2,
-				drawy + tileSize / 2 - imageSize / 2, imageSize, imageSize, null);
-		
-		if(tile.liquidType == LiquidType.WATER) {
-			alpha = Utils.getAlphaDepthOfLiquid(tile.liquidAmount);
-			g.setColor(Color.BLACK);
-			Utils.setTransparency(g, alpha);
-			g.fillRect(drawx, drawy, tileSize, tileSize);
-			Utils.setTransparency(g, 1);
-		}
 		
 
 		// The idea is to draw some sort of reflection in the water but

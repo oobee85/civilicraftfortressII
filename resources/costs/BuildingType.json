@@ -271,7 +271,7 @@
 		"movespeed":3,
 		"cost":{"WOOD":500},
 		"culture":0,
-		"health":500,
+		"health":1000,
 		"effort":1000,
 		"attributes":["road", "wood", "bridge"],
 		"resistances": {"WATER": 0},
