@@ -28,7 +28,7 @@ public class ImageCreation {
 	
 	public static HashMap<String, Image> createRoadImages(String roadtilefile) {
 		HashMap<String, Image> roadImages = new HashMap<String, Image>();
-		BufferedImage roadtile = Utils.toBufferedImage(Utils.loadImage(roadtilefile));
+		BufferedImage roadtile = Utils.toBufferedImage(Utils.loadImage(roadtilefile), false);
 		int width = roadtile.getWidth();
 		int height = roadtile.getHeight();
 

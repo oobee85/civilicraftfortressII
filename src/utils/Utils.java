@@ -160,7 +160,7 @@ public final class Utils {
 			Image tiledImage = Utils.loadImage(filename);
 			
 			if (mirrored) {
-				BufferedImage buf = Utils.toBufferedImage(tiledImage);
+				BufferedImage buf = Utils.toBufferedImage(tiledImage, false);
 				
 				BufferedImage mirroredImage = new BufferedImage(buf.getWidth(), buf.getHeight(), buf.getType());
 				Graphics g = mirroredImage.getGraphics();
@@ -206,11 +206,11 @@ public final class Utils {
 	 * @param img The Image to be converted
 	 * @return The converted BufferedImage
 	 */
-	public static BufferedImage toBufferedImage(Image img) {
+	public static BufferedImage toBufferedImage(Image img, boolean requireNewDataBuffer) {
 		if (img == null) {
-			return toBufferedImage(Utils.getDefaultSkin());
+			return toBufferedImage(Utils.getDefaultSkin(), true);
 		}
-		if (img instanceof BufferedImage) {
+		if (!requireNewDataBuffer && img instanceof BufferedImage) {
 			return (BufferedImage) img;
 		}
 
@@ -227,7 +227,7 @@ public final class Utils {
 	}
 	
 	public static ImageIcon shadowFilter(ImageIcon icon) {
-		BufferedImage image = toBufferedImage(icon.getImage());
+		BufferedImage image = toBufferedImage(icon.getImage(), true);
 		Color blank = new Color(0, 0, 0, 0);
 		for(int x = 0; x < image.getWidth(); x++) {
 			for(int y = 0; y < image.getHeight(); y++) {
@@ -245,7 +245,7 @@ public final class Utils {
 	}
 	
 	public static ImageIcon sunShadowFilter(ImageIcon icon, double shear) {
-		BufferedImage image = toBufferedImage(icon.getImage());
+		BufferedImage image = toBufferedImage(icon.getImage(), true);
 		Color blank = new Color(0, 0, 0, 0);
 		for(int x = 0; x < image.getWidth(); x++) {
 			for(int y = 0; y < image.getHeight(); y++) {
@@ -268,7 +268,8 @@ public final class Utils {
 	}
 	
 	public static ImageIcon highlightFilter(ImageIcon icon, Color color) {
-		BufferedImage image = toBufferedImage(icon.getImage());
+		BufferedImage image = toBufferedImage(icon.getImage(), true);
+		
 		Color blank = new Color(0, 0, 0, 0);
 		for(int x = 0; x < image.getWidth(); x++) {
 			for(int y = 0; y < image.getHeight(); y++) {
@@ -338,7 +339,7 @@ public final class Utils {
 	public static HashMap<Terrain, Color> computeTerrainAverageColor() {
 		HashMap<Terrain, Color> terrainColors = new HashMap<>();
 		for(Terrain t : Terrain.values()) {
-			BufferedImage image = Utils.toBufferedImage(t.getImage(0));
+			BufferedImage image = Utils.toBufferedImage(t.getImage(0), false);
 			int sumr = 0;
 			int sumg = 0;
 			int sumb = 0;

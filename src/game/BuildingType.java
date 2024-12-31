@@ -16,7 +16,7 @@ public class BuildingType implements Serializable {
 	private transient final String info;
 	private transient final int health;
 	private transient final MipMap mipmap;
-	private transient final HashMap<Integer, Image> tiledImages;
+	private transient final TiledMipmap tiledMipmap;
 	private transient final double moveSpeedEnhancement;
 	private transient final int visionRadius;
 	private transient final String researchRequirement;
@@ -55,10 +55,7 @@ public class BuildingType implements Serializable {
 //			roadImages = ImageCreation.createRoadImages(texturePath);
 //		}
 
-		this.tiledImages = (tiledImageFolder == null) ? null : Utils.loadTiledImages(tiledImageFolder);
-		if (this.tiledImages != null) {
-			System.out.println("loaded " + tiledImageFolder);
-		}
+		this.tiledMipmap = tiledImageFolder == null ? null : new TiledMipmap(tiledImageFolder);
 	}
 	
 	public int getInventoryStackSize() {
@@ -86,11 +83,11 @@ public class BuildingType implements Serializable {
 //	}
 	
 	public boolean isTiledImage() {
-		return tiledImages != null;
+		return tiledMipmap != null;
 	}
 	
-	public Image getTiledImage(int tileBitmap) {
-		return tiledImages.get(tileBitmap);
+	public MipMap getTiledImage(int tileBitmap) {
+		return tiledMipmap.get(tileBitmap);
 	}
 	
 	public MipMap getMipMap() {

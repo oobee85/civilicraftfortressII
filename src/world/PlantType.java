@@ -1,8 +1,5 @@
 package world;
 
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,15 +9,15 @@ import java.util.Set;
 import game.Item;
 import game.ItemType;
 import game.components.GameComponent;
-import utils.Direction;
 import utils.MipMap;
+import utils.TiledMipmap;
 import utils.Utils;
 
 public class PlantType implements Serializable {
 	
 	private final String name;
 	private transient final MipMap mipmap;
-	private transient final HashMap<Integer, Image> tiledImages;
+	private transient final TiledMipmap tiledMipmap;
 	private transient final double health;	
 	private transient final double rarity;
 	private transient final LinkedList<Item> harvestItems;
@@ -39,15 +36,15 @@ public class PlantType implements Serializable {
 		this.attributes = attributes;
 		this.inventoryStackSize = inventoryStackSize;
 		
-		this.tiledImages = (tiledImageFolder == null) ? null : Utils.loadTiledImages(tiledImageFolder);
+		this.tiledMipmap = tiledImageFolder == null ? null : new TiledMipmap(tiledImageFolder);
 	}
 	
 	public boolean isTiledImage() {
-		return tiledImages != null;
+		return tiledMipmap != null;
 	}
 	
-	public Image getTiledImage(int tileBitmap) {
-		return tiledImages.get(tileBitmap);
+	public MipMap getTiledMipmap(int tileBitmap) {
+		return tiledMipmap.get(tileBitmap);
 	}
 
 	public int getInventoryStackSize() {

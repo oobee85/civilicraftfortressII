@@ -410,9 +410,9 @@ public class RenderingFunctions {
 	public static void drawPlannedThing(RenderingState state) {
 		BufferedImage bI = null;
 		if (state.gameViewState.leftClickAction == LeftClickAction.PLAN_BUILDING) {
-			bI = Utils.toBufferedImage(state.gameViewState.selectedBuildingToPlan.getMipMap().getImage(state.tileSize));
+			bI = Utils.toBufferedImage(state.gameViewState.selectedBuildingToPlan.getMipMap().getImage(state.tileSize), false);
 		} else if (state.gameViewState.leftClickAction == LeftClickAction.SPAWN_THING) {
-			bI = Utils.toBufferedImage(Utils.getImageFromThingType(state.gameViewState.selectedThingToSpawn).getImage(state.tileSize));
+			bI = Utils.toBufferedImage(Utils.getImageFromThingType(state.gameViewState.selectedThingToSpawn).getImage(state.tileSize), false);
 		}
 		if (bI != null) {
 			Utils.setTransparency(state.g, 0.5f);
@@ -799,7 +799,7 @@ public class RenderingFunctions {
 					null);
 		}
 		
-		BufferedImage bI = Utils.toBufferedImage(building.getMipMap().getImage(0));
+		BufferedImage bI = Utils.toBufferedImage(building.getMipMap().getImage(0), false);
 		if (building.isBuilt() == false) {
 			// draws the transparent version
 			Utils.setTransparency(g, 0.5f);

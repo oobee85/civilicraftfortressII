@@ -15,6 +15,28 @@ public class MipMap {
 	private final int[] mipmapSizes;
 	
 	private final Color[] avgColors;
+	
+	public MipMap(Image image) {
+		int numFiles = 1;
+		
+		mipmaps = new ImageIcon[numFiles];
+		mipmapSizes = new int[numFiles];
+		avgColors = new Color[numFiles];
+		shadows = new ImageIcon[numFiles];
+		sunShadows = new ImageIcon[numFiles][NUM_SUN_SHADOWS];
+		highlights = new ImageIcon[numFiles];
+		int index = 0;
+		mipmaps[index] = new ImageIcon(image);
+		mipmapSizes[index] = mipmaps[index].getIconWidth();
+		avgColors[index] = Utils.getAverageColor(Utils.toBufferedImage(mipmaps[index].getImage(), false));
+		shadows[index] = Utils.shadowFilter(mipmaps[index]);
+		highlights[index] = Utils.highlightFilter(mipmaps[index], HIGHLIGHT_COLOR);
+		for (int shearIndex = 0; shearIndex < sunShadows[index].length; shearIndex++) {
+			double shear = 3.3 / NUM_SUN_SHADOWS * (shearIndex - (sunShadows[index].length-1.0)/2.0);
+			shear = shear * shear * (shear >= 0 ? 1 : -1);
+			sunShadows[index][shearIndex] = Utils.sunShadowFilter(mipmaps[index], shear);
+		}
+	}
 
 	public MipMap(String[] paths) {
 		int numFiles = paths.length;
@@ -33,14 +55,14 @@ public class MipMap {
 				mipmaps[index].setDescription(Utils.IMAGEICON_ANIMATED);
 			}
 			mipmapSizes[index] = mipmaps[index].getIconWidth();
-			avgColors[index] = Utils.getAverageColor(Utils.toBufferedImage(mipmaps[index].getImage()));
+			avgColors[index] = Utils.getAverageColor(Utils.toBufferedImage(mipmaps[index].getImage(), false));
 			shadows[index] = Utils.shadowFilter(mipmaps[index]);
+			highlights[index] = Utils.highlightFilter(mipmaps[index], HIGHLIGHT_COLOR);
 			for (int shearIndex = 0; shearIndex < sunShadows[index].length; shearIndex++) {
 				double shear = 3.3 / NUM_SUN_SHADOWS * (shearIndex - (sunShadows[index].length-1.0)/2.0);
 				shear = shear * shear * (shear >= 0 ? 1 : -1);
 				sunShadows[index][shearIndex] = Utils.sunShadowFilter(mipmaps[index], shear);
 			}
-			highlights[index] = Utils.highlightFilter(mipmaps[index], HIGHLIGHT_COLOR);
 
 			index++;
 		}
