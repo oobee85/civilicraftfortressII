@@ -16,13 +16,12 @@ public class SpawnUnitsView {
 	
 	public static final Dimension SPAWN_BUTTON_SIZE = new Dimension(30, 30);
 
-//	private JPanel rootPanel;
 	private ScrollingPanel scrollingPanel;
 	private GameView gameView;
 	
 	public SpawnUnitsView(GameView gameView) {
 		this.gameView = gameView;
-		scrollingPanel = new ScrollingPanel(new Dimension((int) (ClientGUI.GUIWIDTH - SPAWN_BUTTON_SIZE.getWidth()), 500)); // 500 is height of scroll
+		scrollingPanel = new ScrollingPanel(new Dimension((int) (ClientGUI.GUIWIDTH - SPAWN_BUTTON_SIZE.getWidth()), 400));
 		scrollingPanel.setFocusable(false);
 		
 		setupButtons();
@@ -75,7 +74,6 @@ public class SpawnUnitsView {
 					gameView.getGameInstance().getGUIController().popInfoPanel();
 				}
 			});
-//			buildingButtons[i] = button;
 			scrollingPanel.add(button);
 		}
 		for (int i = 0; i < Game.plantTypeList.size(); i++) {
