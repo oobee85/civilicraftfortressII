@@ -592,7 +592,14 @@ public class Tile implements Externalizable {
 	}
 	
 	private boolean hasBridgeOrPort() {
-		return hasBuilding() && getBuilding().getType() == Game.buildingTypeMap.get("PORT");
+		if(hasBuilding() && getBuilding().getType() == Game.buildingTypeMap.get("PORT")) {
+			return true;
+		}
+		if(this.getRoad() != null && this.getRoad().getType().isBridge()) {
+			return true;
+		}
+		return false;
+		
 	}
 
 	public double[] computeTileDanger() {

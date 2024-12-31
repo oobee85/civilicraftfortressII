@@ -264,6 +264,20 @@
 		"research":"ENGINEERING"
 	},
 	{
+		"name":"BRIDGE",
+		"info":"Removes elevation movement penalty and liquid movement penalty",
+		"image":"Images/buildings/bridge.png",
+		"vision":0,
+		"movespeed":3,
+		"cost":{"WOOD":500},
+		"culture":0,
+		"health":500,
+		"effort":1000,
+		"attributes":["road", "wood", "bridge"],
+		"resistances": {"WATER": 0},
+		"research":"ENGINEERING"
+	},
+	{
 		"name":"WALL_WOOD",
 		"info":"Blocks movement",
 		"image":"Images/buildings/wall_wood.png",

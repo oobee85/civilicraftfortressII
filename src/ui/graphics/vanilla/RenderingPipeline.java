@@ -39,6 +39,7 @@ public class RenderingPipeline {
 			pipeline.steps.add(gradientShading);
 			pipeline.steps.add(liquids);
 			pipeline.steps.add(sunShadows);
+			pipeline.steps.add(bridges);
 			pipeline.steps.add(modifiers);
 			pipeline.steps.add(tileInventory);
 			pipeline.steps.add(plants);
@@ -212,6 +213,11 @@ public class RenderingPipeline {
 
 	private static RenderingStep roads = new RenderingStep(null, (state, tile, drawat) -> {
 		if (tile.getRoad() != null) {
+			RenderingFunctions.drawBuilding(tile.getRoad(), state.g, drawat.x, drawat.y, state.tileSize);
+		}
+	});
+	private static RenderingStep bridges = new RenderingStep(null, (state, tile, drawat) -> {
+		if (tile.getRoad() != null && tile.getRoad().getType().isBridge()) {
 			RenderingFunctions.drawBuilding(tile.getRoad(), state.g, drawat.x, drawat.y, state.tileSize);
 		}
 	});

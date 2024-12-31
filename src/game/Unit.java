@@ -128,6 +128,11 @@ public class Unit extends Thing implements Serializable {
 			return unitPenalty;
 		}
 		double terrainPenalty = to.getTerrain().moveSpeed();
+		if(to.getPlant() != null && to.getPlant().getType() == Game.plantTypeMap.get("TREE")) {
+			terrainPenalty += 15;
+		}
+		double liquidPenalty = to.liquidAmount;
+		
 		double elevationPenalty = Math.abs(to.getHeight() - from.getHeight());
 		elevationPenalty = elevationPenalty * elevationPenalty / 100;
 		if (from.getRoad() != null && from.getRoad().isBuilt()) {
@@ -136,9 +141,14 @@ public class Unit extends Thing implements Serializable {
 			
 			if (to.getRoad() != null && to.getRoad().isBuilt()) {
 				elevationPenalty /= (from.getRoad().getType().getSpeed() / 2); 
+				if(to.getRoad().getType().isBridge() || from.getRoad().getType().isBridge()) {
+					elevationPenalty = 0;
+					liquidPenalty = 0;
+				}
 			}
+			
 		}
-		return terrainPenalty + unitPenalty + elevationPenalty;
+		return terrainPenalty + unitPenalty + elevationPenalty + liquidPenalty;
 	}
 
 	public boolean moveTo(Tile t) {

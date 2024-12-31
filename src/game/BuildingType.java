@@ -127,6 +127,9 @@ public class BuildingType implements Serializable {
 	public boolean isWoodConstruction() {
 		return attributes.contains("wood");
 	}
+	public boolean isBridge() {
+		return attributes.contains("bridge");
+	}
 	
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;
