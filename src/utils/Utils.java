@@ -244,7 +244,7 @@ public final class Utils {
 		return new ImageIcon(image);
 	}
 	
-	public static ImageIcon sunShadowFilter(ImageIcon icon, double shear) {
+	public static ImageIcon sunShadowFilter(ImageIcon icon, double shear, double squish) {
 		BufferedImage image = toBufferedImage(icon.getImage(), true);
 		Color blank = new Color(0, 0, 0, 0);
 		for(int x = 0; x < image.getWidth(); x++) {
@@ -262,7 +262,7 @@ public final class Utils {
 		Graphics2D g = sheared.createGraphics();
 		g.transform(AffineTransform.getShearInstance(shear, 0));
 		g.translate(-image.getWidth() * shear, 0);
-		g.drawImage(image, image.getWidth()/2, 0, null);
+		g.drawImage(image, image.getWidth()/2, (int)(image.getHeight()*squish), image.getWidth(), (int)(image.getHeight()*(1-squish)), null);
 		g.dispose();
 		return new ImageIcon(sheared);
 	}

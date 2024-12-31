@@ -7,6 +7,7 @@ public class MipMap {
 	
 	private static final Color HIGHLIGHT_COLOR = Color.yellow;
 	public static final int NUM_SUN_SHADOWS = 10;
+	private static final double SUN_SHADOW_SQUISH_FACTOR = 0.4; 
 
 	private final ImageIcon[] mipmaps;
 	private final ImageIcon[] shadows;
@@ -34,7 +35,8 @@ public class MipMap {
 		for (int shearIndex = 0; shearIndex < sunShadows[index].length; shearIndex++) {
 			double shear = 3.3 / NUM_SUN_SHADOWS * (shearIndex - (sunShadows[index].length-1.0)/2.0);
 			shear = shear * shear * (shear >= 0 ? 1 : -1);
-			sunShadows[index][shearIndex] = Utils.sunShadowFilter(mipmaps[index], shear);
+			double squish = SUN_SHADOW_SQUISH_FACTOR - Math.abs(shearIndex - sunShadows[index].length/2)*2*SUN_SHADOW_SQUISH_FACTOR/sunShadows[index].length;
+			sunShadows[index][shearIndex] = Utils.sunShadowFilter(mipmaps[index], shear, squish);
 		}
 	}
 
@@ -61,7 +63,8 @@ public class MipMap {
 			for (int shearIndex = 0; shearIndex < sunShadows[index].length; shearIndex++) {
 				double shear = 3.3 / NUM_SUN_SHADOWS * (shearIndex - (sunShadows[index].length-1.0)/2.0);
 				shear = shear * shear * (shear >= 0 ? 1 : -1);
-				sunShadows[index][shearIndex] = Utils.sunShadowFilter(mipmaps[index], shear);
+				double squish = SUN_SHADOW_SQUISH_FACTOR - Math.abs(shearIndex - sunShadows[index].length/2)*2*SUN_SHADOW_SQUISH_FACTOR/sunShadows[index].length;
+				sunShadows[index][shearIndex] = Utils.sunShadowFilter(mipmaps[index], shear, squish);
 			}
 
 			index++;
