@@ -81,8 +81,7 @@ public class Client {
 				if(building.getType().unitsCanProduceSet().size() > 0) {
 					clientGUI.manageProduceUnitTab(selected);
 				}
-				if (building.getType() == Game.buildingTypeMap.get("SMITHY") 
-						|| building.getType() == Game.buildingTypeMap.get("HELLFORGE")) {
+				if (building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
 					clientGUI.manageBlacksmithTab(selected);
 				}
 				InfoPanel infoPanel = new BuildingInfoPanel(building);

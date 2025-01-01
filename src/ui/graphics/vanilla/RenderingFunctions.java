@@ -169,13 +169,12 @@ public class RenderingFunctions {
 		state.g.setColor(Color.black);
 		
 		for (Tile neighbor : tile.getNeighbors()) {
-			float heightDiff = (neighbor.getHeight() ) 
-					- (tile.getHeight() ) - 10;
-			int MAX_HEIGHT_DIFF = 100;
+			float heightDiff = (neighbor.getHeight() - tile.getHeight() ) - 10;
+			int MAX_HEIGHT_DIFF = 50;
 			if (heightDiff <= 1) {
 				continue;
 			}
-			double gradientRatio = Math.min(heightDiff, MAX_HEIGHT_DIFF) / (MAX_HEIGHT_DIFF / 5);
+			double gradientRatio = Math.min(heightDiff, MAX_HEIGHT_DIFF) / (MAX_HEIGHT_DIFF);
 			int offset = (int) (gradientRatio * state.tileSize / 2);
 			drawGradientBorderBetween(
 					state.g, tile.getLocation(), neighbor.getLocation(),
@@ -710,22 +709,27 @@ public class RenderingFunctions {
 		int halfTileEdge = tileSize/2;
 		
 		
-		for (int layer = 0; layer <= 3; layer++) {
-			int waterLevelOffset = layer * 7;
+		for (int layer = 0; layer <= 2; layer++) {
+			int waterLevelOffset = layer * 10;
 			Color baseColor = tile.liquidType.getMipMap().getColor(tileSize);
-			if (layer == 3) {
+			if (layer == 2) {
 				baseColor = baseColor.darker();
-			}
-			if (layer == 0 || layer == 1) {
-				baseColor = baseColor.brighter();
-				Utils.setTransparency(g, (4.0 + layer)/6);
 			}
 		
 			int myTileWaterAmount = Math.max(0, (int)(halfTileEdge * (tile.liquidAmount-waterLevelOffset) / maxWater));
+
+			if (layer == 0 || layer == 1) {
+//				baseColor = baseColor.brighter();
+				Utils.setTransparency(g, Math.min(1.0, 1.0*myTileWaterAmount/halfTileEdge));
+			}
+
 			if (myTileWaterAmount == 0) {
 				continue;
 			}
 			int[] neighborAmounts = new int[Direction.values().length];
+			for (int i = 0; i < neighborAmounts.length; i++) {
+				neighborAmounts[i] = tileSize/2;
+			}
 			for (Tile neighbor : tile.getNeighbors()) {
 				Direction d = Direction.getDirection(tile.getLocation(), neighbor.getLocation());
 				neighborAmounts[d.ordinal()] = Math.max(0, (int)(halfTileEdge * (neighbor.liquidAmount-waterLevelOffset) / maxWater));
@@ -738,54 +742,71 @@ public class RenderingFunctions {
 			
 			int xoffset = 0;
 			int yoffset = 0;
+//			int totalNeighborLiquid = 0;
+//			
+//			for (int i = 0; i < 6; i++) {
+//				if (neighborAmounts[i] > 0) {
+//					totalNeighborLiquid = neighborAmounts[i];
+//					xoffset += Direction.values()[i].deltax()*neighborAmounts[i];
+//					yoffset += Direction.values()[i].deltay()*neighborAmounts[i];
+//				}
+//			}
+//			if (totalNeighborLiquid > 0) {
+//				totalNeighborLiquid += myTileWaterAmount;
+//				xoffset = tileSize * xoffset / totalNeighborLiquid / 2;
+//				yoffset = tileSize * yoffset / totalNeighborLiquid / 2;
+//			}
+			xoffset += centerTileX;
+			yoffset += centerTileY;
 			
-			// NW top
-			xpoints[11] = centerTileX - myTileWaterAmount*3/4;
-			ypoints[11] = centerTileY - myTileWaterAmount*3/4;
+			for (int i = 0; i < numPoints; i++) {
+				xpoints[i] = xoffset;
+				ypoints[i] = yoffset;
+			}
+			
+//			// NW top
+			xpoints[11] -= myTileWaterAmount*3/4;
+			ypoints[11] -= myTileWaterAmount*3/4;
 			
 			// N
-			xpoints[0] = centerTileX;
-			ypoints[0] = centerTileY - myTileWaterAmount;
+			ypoints[0] -= myTileWaterAmount;
 			
 			// NE top
-			xpoints[1] = centerTileX + myTileWaterAmount*3/4;
-			ypoints[1] = centerTileY - myTileWaterAmount*2/3;
+			xpoints[1] += myTileWaterAmount*3/4;
+			ypoints[1] -= myTileWaterAmount*2/3;
 			
 			// NE center
-			xpoints[2] = centerTileX + myTileWaterAmount*2/3;
-			ypoints[2] = centerTileY - myTileWaterAmount*3/4;
+			xpoints[2] += myTileWaterAmount*2/3;
+			ypoints[2] -= myTileWaterAmount*3/4;
 			
 			// NE bottom
-			xpoints[3] = centerTileX + myTileWaterAmount;
-			ypoints[3] = centerTileY;
+			xpoints[3] += myTileWaterAmount;
 	
 			// SE center
-			xpoints[4] = centerTileX + myTileWaterAmount*2/3;
-			ypoints[4] = centerTileY + myTileWaterAmount*3/4;
+			xpoints[4] += myTileWaterAmount*2/3;
+			ypoints[4] += myTileWaterAmount*3/4;
 	
 			// SE bottom
-			xpoints[5] = centerTileX + myTileWaterAmount*3/4;
-			ypoints[5] = centerTileY + myTileWaterAmount*2/3;
+			xpoints[5] += myTileWaterAmount*3/4;
+			ypoints[5] += myTileWaterAmount*2/3;
 	
 			// S
-			xpoints[6] = centerTileX;
-			ypoints[6] = centerTileY + myTileWaterAmount;
+			ypoints[6] += myTileWaterAmount;
 	
 			// SW bottom
-			xpoints[7] = centerTileX - myTileWaterAmount*3/4;
-			ypoints[7] = centerTileY + myTileWaterAmount*2/3;
+			xpoints[7] -= myTileWaterAmount*3/4;
+			ypoints[7] += myTileWaterAmount*2/3;
 	
 			// SW center
-			xpoints[8] = centerTileX - myTileWaterAmount*2/3;
-			ypoints[8] = centerTileY + myTileWaterAmount*3/4;
+			xpoints[8] -= myTileWaterAmount*2/3;
+			ypoints[8] += myTileWaterAmount*3/4;
 	
 			// SW top
-			xpoints[9] = centerTileX - myTileWaterAmount;
-			ypoints[9] = centerTileY;
+			xpoints[9] -= myTileWaterAmount;
 	
 			// NW center
-			xpoints[10] = centerTileX - myTileWaterAmount*2/3;
-			ypoints[10] = centerTileY - myTileWaterAmount*2/3;
+			xpoints[10] -= myTileWaterAmount*2/3;
+			ypoints[10] -= myTileWaterAmount*3/4;
 
 			int MINX = drawx;
 			int MINY = drawy;
@@ -811,7 +832,7 @@ public class RenderingFunctions {
 			if (neighborAmounts[Direction.SOUTHEAST.ordinal()] > 0) {
 				int avg = (myTileWaterAmount + neighborAmounts[Direction.SOUTHEAST.ordinal()])/2;
 				xpoints[3] = MAXX;
-				ypoints[3] = Math.min(ypoints[1], drawy + tileSize*3/4 - avg/2);
+				ypoints[3] = Math.min(ypoints[3], drawy + tileSize*3/4 - avg/2);
 				xpoints[4] = MAXX;
 				ypoints[4] = drawy + tileSize*3/4;
 				xpoints[5] = MAXX;

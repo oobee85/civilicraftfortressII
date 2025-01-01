@@ -30,7 +30,7 @@ public class CraftingView {
 	public void setupButtons() {
 		for (int i = 0; i < ItemType.values().length; i++) {
 			final ItemType type = ItemType.values()[i];
-			if (type.getCost() == null) {
+			if (!isCraftableItem(type)) {
 				continue;
 			}
 			KButton button = KUIConstants.setupButton(type.toString(),
@@ -62,12 +62,18 @@ public class CraftingView {
 		}
 	}
 	
+	private boolean isCraftableItem(ItemType type) {
+		return type.getCost() != null
+				&& Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("RESEARCH_LAB");
+	}
+	
 	public void updateButtons() {
 		boolean hasBlacksmith = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("SMITHY"));
 		boolean hasHellForge = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("HELLFORGE"));
+		boolean hasResearchLab = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("RESEARCH_LAB"));
 		for (int i = 0; i < ItemType.values().length; i++) {
 			ItemType type = ItemType.values()[i];
-			if (type.getCost() == null) {
+			if (!isCraftableItem(type)) {
 				continue;
 			}
 			JButton button = craftButtons[i];
@@ -77,9 +83,7 @@ public class CraftingView {
 			else {
 				button.setVisible(false);
 			}
-			if (gameView.getFaction().canAfford(type.getCost()) &&
-					((Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("SMITHY") && hasBlacksmith)
-					|| (Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("HELLFORGE") && hasHellForge))) {
+			if (gameView.getFaction().canAfford(type.getCost()) && hasResearchLab) {
 				button.setEnabled(true);
 			}
 			else {

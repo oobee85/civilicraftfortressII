@@ -29,6 +29,7 @@ public class Unit extends Thing implements Serializable {
 	private transient double timeToHeal;
 	private transient boolean isIdle;
 	private CombatStats combatStats;
+	private AttackStyle attackStyle;
 	
 	private transient LinkedList<Tile> currentPath;
 
@@ -48,6 +49,7 @@ public class Unit extends Thing implements Serializable {
 		this.combatStats = unitType.getCombatStats();
 		this.timeToHeal = unitType.getCombatStats().getHealSpeed();
 		this.isIdle = false;
+//		this.attackStyle = this.getType().getAttackStyles()
 		for(GameComponent c : unitType.getComponents()) {
 			this.addComponent(c.getClass(), c);
 		}
@@ -346,6 +348,8 @@ public class Unit extends Thing implements Serializable {
 		// actually do the attack
 		if(style.getProjectile() == null) {
 			double initialHP = target.getHealth();
+			style.mergeAttackStyle(this.getFaction().getUpgradedAttackStyle()); // merge attack styles
+			
 			//does cleave damage
 			if(this.getType().hasCleave()) {
 				for(Unit unit : target.getTile().getUnits()) {

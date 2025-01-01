@@ -39,6 +39,14 @@ public enum ItemType {
 	ADAMANTITE_BAR ("SMITHY",  makeCosts(COAL,50, 	ADAMANTITE_ORE,50),	"Images/itemicons/adamantite_bar.png"),
 	RUNITE_BAR 	   ("SMITHY",  makeCosts(COAL,100, 	RUNITE_ORE,100),		"Images/itemicons/runite_bar.png"),
 	TITANIUM_BAR   ("SMITHY",  makeCosts(COAL,100, 	TITANIUM_ORE,100),	"Images/itemicons/titanium_bar.png"),
+	
+	BETTER_WEAPONS   ("RESEARCH_LAB",  makeCosts(WOOD,500),	"Images/interfaces/attackspeedold.png"),
+	IMPROVED_SPARRING   ("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/attackspeedold.png"),
+	SHIELDS   ("RESEARCH_LAB",  makeCosts(WOOD,500),	"Images/interfaces/attackspeedold.png"),
+	MEDICINE   ("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/attackspeedold.png"),
+	
+	
+	
 	;
 	
 	private MipMap mipmap;

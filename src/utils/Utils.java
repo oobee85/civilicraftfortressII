@@ -849,6 +849,12 @@ public final class Utils {
 			@Override
 			public void craftItem(Faction faction, ItemType itemType, int amount) {
 				faction.craftItem(itemType, amount);
+				if(itemType == ItemType.MEDICINE || itemType == ItemType.BETTER_WEAPONS || itemType == ItemType.IMPROVED_SPARRING || itemType == ItemType.SHIELDS) {
+					faction.updateUpgradedAttackStyle(itemType);
+					faction.updateUpgradedCombatStats(itemType);
+				}
+				
+				
 			}
 			@Override
 			public void produceUnit(Building building, UnitType unitType) {
@@ -860,6 +866,7 @@ public final class Utils {
 					if (building.getTile().isBlocked(unit)) {
 						return;
 					}
+					unit.getCombatStats().mergeCombatStats(building.getFaction().getUpgradedCombatStats());
 					building.getFaction().payCost(unitType.getCost());
 					building.setProducingUnit(unit);
 				}

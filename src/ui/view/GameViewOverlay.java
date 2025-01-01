@@ -105,6 +105,8 @@ public class GameViewOverlay extends JPanel {
 			});
 			resourceIndicators[i] = button;
 		}
+		
+		// inventory rows
 		ItemType[][] rows = new ItemType[][] {
 			new ItemType[] {
 					FOOD, WOOD, STONE, HORSE, MAGIC, CLAY, BRICK

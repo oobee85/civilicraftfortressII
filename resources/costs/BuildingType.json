@@ -26,7 +26,7 @@
 		"effort":200
 	},
 	{
-		"name":"RESEARCH_LAB",
+		"name":"MAGIC",
 		"info":"Workers harvest magic from here",
 		"image":"Images/buildings/research.png",
 		"vision":1,
@@ -103,6 +103,19 @@
 		"health":1000,
 		"effort":500,
 		"research":"TRAPPING"
+	},
+	{
+		"name":"RESEARCH_LAB",
+		"info":"Allows for upgrades for units to be bought",
+		"image":"Images/buildings/thelab.png",
+		"vision":1,
+		"cost":{"WOOD":200, "STONE":200},
+		"culture":0.5,
+		"inventory":{"maxstack":100},
+		"attributes":["stone", "crafting"],
+		"health":1000,
+		"effort":500,
+		"research":"MASONRY"
 	},
 	{
 		"name":"TRAP",

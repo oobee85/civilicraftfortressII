@@ -52,6 +52,8 @@ public class Faction implements Externalizable {
 	private int influence;
 	
 	private int tickOfLastDamageTaken = 0;
+	private CombatStats upgradedCombatStats = new CombatStats(0, 0, 0, 0);
+	private AttackStyle upgradedAttackStyle = new AttackStyle(0, 0, 0, false, 0, null);
 	
 
 	@Override
@@ -172,6 +174,32 @@ public class Faction implements Externalizable {
 	}
 	public boolean isPlayer() {
 		return isPlayer;
+	}
+	public void updateUpgradedCombatStats(ItemType itemType) {
+		if(itemType == ItemType.SHIELDS) {
+			this.upgradedCombatStats.addHealth(100);
+		}
+		if(itemType == ItemType.MEDICINE) {
+			this.upgradedCombatStats.addTicksToHeal(-50);
+		}
+		for(Unit unit: this.getUnits()) {
+			unit.getType().getCombatStats().mergeCombatStats(this.upgradedCombatStats);
+		}
+	}
+	public void updateUpgradedAttackStyle(ItemType itemType) {
+		if(itemType == ItemType.BETTER_WEAPONS) {
+			this.upgradedAttackStyle.addDamage(25);
+		}
+		if(itemType == ItemType.IMPROVED_SPARRING) {
+			this.upgradedAttackStyle.addCooldown(-5);
+		}
+		
+	}
+	public CombatStats getUpgradedCombatStats() {
+		return upgradedCombatStats;
+	}
+	public AttackStyle getUpgradedAttackStyle() {
+		return upgradedAttackStyle;
 	}
 	
 	public void recomputeInfluence() {

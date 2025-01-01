@@ -112,6 +112,12 @@ public class BuildingType implements Serializable {
 	public boolean isSmithy() {
 		return attributes.contains("smithy");
 	}
+	public boolean isCrafting() {
+		return attributes.contains("crafting");
+	}
+	public boolean isAutomaticCrafting() {
+		return attributes.contains("automatic");
+	}
 	public boolean isHarvestable() {
 		return attributes.contains("harvestable");
 	}
