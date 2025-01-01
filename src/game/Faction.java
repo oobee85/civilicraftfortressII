@@ -182,6 +182,12 @@ public class Faction implements Externalizable {
 		if(itemType == ItemType.MEDICINE) {
 			this.upgradedCombatStats.addTicksToHeal(-50);
 		}
+		if(itemType == ItemType.BETTER_FORMATIONS) {
+			this.upgradedCombatStats.addMoveSpeed(-5);
+		}
+		if(itemType == ItemType.FASTER_TRAINING) {
+			this.upgradedCombatStats.addTicksToBuild(-50);
+		}
 		for(Unit unit: this.getUnits()) {
 			unit.getType().getCombatStats().mergeCombatStats(this.upgradedCombatStats);
 		}
@@ -192,6 +198,9 @@ public class Faction implements Externalizable {
 		}
 		if(itemType == ItemType.IMPROVED_SPARRING) {
 			this.upgradedAttackStyle.addCooldown(-5);
+		}
+		if(itemType == ItemType.UNDYING_ARMY) {
+			this.upgradedAttackStyle.addLifesteal(true);;
 		}
 		
 	}

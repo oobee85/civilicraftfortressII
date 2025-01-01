@@ -345,28 +345,29 @@ public class Unit extends Thing implements Serializable {
 		if(style == null) {
 			return false;
 		}
+		int attackCooldown = style.getCooldown() + this.getFaction().getUpgradedAttackStyle().getCooldown();
+		boolean unitHasLifesteal = style.isLifesteal() || this.getFaction().getUpgradedAttackStyle().isLifesteal();
 		// actually do the attack
 		if(style.getProjectile() == null) {
 			double initialHP = target.getHealth();
-			style.mergeAttackStyle(this.getFaction().getUpgradedAttackStyle()); // merge attack styles
-			
+			int damage = style.getDamage() + this.getFaction().getUpgradedAttackStyle().getDamage(); // merge attack styles
 			//does cleave damage
 			if(this.getType().hasCleave()) {
 				for(Unit unit : target.getTile().getUnits()) {
-					unit.takeDamage(style.getDamage(), DamageType.PHYSICAL);
+					unit.takeDamage(damage, DamageType.PHYSICAL);
 					Sound sound = new Sound(SoundEffect.ATTACK_MELEE_HEAVY, null, this.getTile());
 					SoundManager.theSoundQueue.add(sound);
 				}
 			} 
 			else {
-				target.takeDamage(style.getDamage(), DamageType.PHYSICAL);
+				target.takeDamage(damage, DamageType.PHYSICAL);
 				Sound sound = new Sound(SoundEffect.ATTACK_MELEE_GENERIC, null, this.getTile());
 				SoundManager.theSoundQueue.add(sound);
 			}
 			
 			
 			double damageDealt = initialHP - (target.getHealth() < 0 ? 0 : target.getHealth());
-			if (style.isLifesteal() && !(target instanceof Building)) {
+			if (unitHasLifesteal && !(target instanceof Building)) {
 				this.heal(damageDealt, true);
 			}
 			if (target instanceof Unit) {
@@ -384,7 +385,7 @@ public class Unit extends Thing implements Serializable {
 		else {
 			AttackUtils.shoot(this, target, style);
 		}
-		resetTimeToAttack(style.getCooldown());
+		resetTimeToAttack(attackCooldown);
 		return true;
 	}
 

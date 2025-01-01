@@ -866,7 +866,8 @@ public final class Utils {
 					if (building.getTile().isBlocked(unit)) {
 						return;
 					}
-					unit.getCombatStats().mergeCombatStats(building.getFaction().getUpgradedCombatStats());
+//					unit.getCombatStats().mergeCombatStats(building.getFaction().getUpgradedCombatStats());
+					unit.getCombatStats().addTicksToBuild(building.getFaction().getUpgradedCombatStats().getTicksToBuild());
 					building.getFaction().payCost(unitType.getCost());
 					building.setProducingUnit(unit);
 				}

@@ -168,6 +168,14 @@ public class RenderingFunctions {
 		Utils.setTransparency(state.g, regularShadowTransparency);
 		state.g.setColor(Color.black);
 		
+//		float[] neighborHeights = new float[Direction.values().length];
+//		for (Tile neighbor : tile.getNeighbors()) {
+//			Direction dir = Direction.getDirection(tile.getLocation(), neighbor.getLocation());
+//			neighborHeights[dir.ordinal()] = neighbor.getHeight();
+//		}
+//		
+//		
+		
 		for (Tile neighbor : tile.getNeighbors()) {
 			float heightDiff = (neighbor.getHeight() - tile.getHeight() ) - 10;
 			int MAX_HEIGHT_DIFF = 50;
@@ -886,7 +894,9 @@ public class RenderingFunctions {
 	}
 	
 	public static void drawLiquid(Tile tile, Graphics g, int drawx, int drawy, int tileSize, RenderingState state) {
-		drawPolygonLiquid(tile, g, drawx, drawy, tileSize, state);
+//		drawPolygonLiquid(tile, g, drawx, drawy, tileSize, state);
+		
+		DrawLiquids.drawPolygonLiquid2(tile, g, drawx, drawy, tileSize, state);
 
 //		double alpha = Utils.getAlphaOfLiquid(tile.liquidAmount);
 ////		 transparency liquids

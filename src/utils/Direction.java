@@ -18,7 +18,13 @@ public enum Direction {
 	
 	;
 	
+
 	
+	public static final Direction[] TILING_DIRECTIONS = new Direction[] {
+			Direction.NONE,
+			Direction.NORTH, Direction.NORTHEAST, Direction.SOUTHEAST,
+			Direction.SOUTH, Direction.SOUTHWEST, Direction.NORTHWEST
+	};
 	public static final String ALL_DIRECTIONS = NORTH.toString() + NORTHEAST.toString() + SOUTHEAST.toString() + SOUTH.toString() + SOUTHWEST.toString() + NORTHWEST.toString();
 	
 	private double deltax;

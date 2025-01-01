@@ -227,12 +227,6 @@ public class Tile implements Externalizable {
 			neighbor.turnRoad();
 		}
 	}
-	
-	private static final Direction[] tilingDirections = new Direction[] {
-			Direction.NONE,
-			Direction.NORTH, Direction.NORTHEAST, Direction.SOUTHEAST,
-			Direction.SOUTH, Direction.SOUTHWEST, Direction.NORTHWEST
-	};
 
 	private void turnRoad() {
 		if (getRoad() == null) {
@@ -254,7 +248,7 @@ public class Tile implements Externalizable {
 		}
 		int tileBitmap = 0;
 		int bit = 1;
-		for (Direction d : tilingDirections) {
+		for (Direction d : Direction.TILING_DIRECTIONS) {
 			if (directions.contains(d)) {
 				tileBitmap += bit;
 			}
@@ -282,7 +276,7 @@ public class Tile implements Externalizable {
 		}
 		int tileBitmap = 0;
 		int bit = 1;
-		for (Direction d : tilingDirections) {
+		for (Direction d : Direction.TILING_DIRECTIONS) {
 			if (directions.contains(d)) {
 				tileBitmap += bit;
 			}
@@ -313,7 +307,7 @@ public class Tile implements Externalizable {
 		}
 		int tileBitmap = 0;
 		int bit = 1;
-		for (Direction d : tilingDirections) {
+		for (Direction d : Direction.TILING_DIRECTIONS) {
 			if (directions.contains(d)) {
 				tileBitmap += bit;
 			}

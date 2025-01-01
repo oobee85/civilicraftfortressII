@@ -44,8 +44,9 @@ public enum ItemType {
 	IMPROVED_SPARRING   ("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/attackspeedold.png"),
 	SHIELDS   ("RESEARCH_LAB",  makeCosts(WOOD,500),	"Images/interfaces/attackspeedold.png"),
 	MEDICINE   ("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/attackspeedold.png"),
-	
-	
+	BETTER_FORMATIONS   ("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/attackspeedold.png"),
+	FASTER_TRAINING   ("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/attackspeedold.png"),
+	UNDYING_ARMY   ("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/attackspeedold.png"),
 	
 	;
 	

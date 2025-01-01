@@ -123,7 +123,7 @@ public class Building extends Thing implements Serializable {
 		// building produces units
 		if(currentProducingUnit == null && !producingUnitList.isEmpty()) {
 			currentProducingUnit = producingUnitList.peek();
-			remainingEffortToProduceUnit = currentProducingUnit.getType().getCombatStats().getTicksToBuild();
+			remainingEffortToProduceUnit = currentProducingUnit.getCombatStats().getTicksToBuild();
 		}
 		if (currentProducingUnit != null) {
 			remainingEffortToProduceUnit -= 1;

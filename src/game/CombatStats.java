@@ -44,7 +44,6 @@ public class CombatStats implements Serializable {
 	public void addTicksToHeal(int ticks) {
 		this.ticksToHeal += ticks;
 	}
-	
 	public void mergeCombatStats(CombatStats other) {
 		this.health += other.getHealth();
 		this.moveSpeed += other.getMoveSpeed();
