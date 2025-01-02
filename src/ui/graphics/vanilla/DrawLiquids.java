@@ -378,9 +378,11 @@ public class DrawLiquids {
 			for (int i = 0; i < amounts.length; i++) {
 				reducedAmounts[i] = Math.max(0, amounts[i] - depth);
 			}
-			Utils.setTransparency(g, 0.5);
+			int scale = 20;
+			double alpha = Math.min(0.5, reducedAmounts[NONE.ordinal()]*2/scale);
+			Utils.setTransparency(g, alpha);
 			g.setColor(color);
-			drawWaterLayer(tile, g, drawx, drawy, tileSize, reducedAmounts, 20);
+			drawWaterLayer(tile, g, drawx, drawy, tileSize, reducedAmounts, scale);
 			Utils.setTransparency(g, 1);
 		}
 	}
