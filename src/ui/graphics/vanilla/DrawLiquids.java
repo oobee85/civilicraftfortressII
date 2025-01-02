@@ -1,5 +1,6 @@
 package ui.graphics.vanilla;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
 
@@ -58,70 +59,36 @@ public class DrawLiquids {
 		}
 		return new Polygon(xpoints, ypoints, xpoints.length);
 	}
-
 	
-	public static void drawPolygonLiquid2(Tile tile, Graphics g, int drawx, int drawy, int tileSize, RenderingState state) {
-		Utils.setTransparency(g, 0.5);
-		int scale = 20;
-		int[] amounts = new int[Direction.values().length];
-		for (int i = 0; i < amounts.length; i++) {
-			amounts[i] = 9999;
+	private static void drawWaterLayer(Tile tile, Graphics g, int drawx, int drawy, int tileSize, float[] amounts, int scale) {
+		if ((int)(amounts[NONE.ordinal()] * tileSize/scale) <= 0) {
+			return;
 		}
-		for (Tile neighbor : tile.getNeighbors()) {
-			Direction d = Direction.getDirection(tile.getLocation(), neighbor.getLocation());
-			amounts[d.ordinal()] = (int) neighbor.liquidAmount * tileSize / scale;
-		}
-		amounts[NONE.ordinal()] = (int) tile.liquidAmount * tileSize / scale;
 		
-		int[] avgs = new int[amounts.length];
+		int[] neighborAmount = new int[amounts.length];
 		int[] avgsFull = new int[amounts.length];
 		int[] avgsHalf = new int[amounts.length];
 		for (int i = 0; i < amounts.length; i++) {
-			avgs[i] = (amounts[NONE.ordinal()] + amounts[i])/2;
+			neighborAmount[i] = (int) (amounts[i]*tileSize/scale);
+			
+			int avg = (int)((amounts[NONE.ordinal()] + amounts[i])*tileSize/2/scale);
 
-			avgsFull[i] = Math.min(avgs[i], tileSize);
-			avgsHalf[i] = Math.min(avgs[i]/2, tileSize/2);
+			avgsFull[i] = Math.min(avg, tileSize);
+			avgsHalf[i] = Math.min(avg/2, tileSize/2);
 		}
-		
-		
-		
+
 		int bitmap = 0;
 		for (Direction d : TILING_DIRECTIONS) {
-			if (amounts[d.ordinal()] != 0) {
+			if (neighborAmount[d.ordinal()] > 0) {
 				bitmap |= d.tilingBit;
 			}
 		}
 
-		g.setColor(tile.liquidType.getMipMap().getColor(tileSize));
 //		 only liquid on tile and not neighbors
 		if (bitmap == NONE.tilingBit 
-				|| amounts[NONE.ordinal()] > 0
+//				|| amounts[NONE.ordinal()] > 0
 				) {
-			g.fillPolygon(makeCircle(drawx + tileSize/2, drawy + tileSize/2, amounts[NONE.ordinal()], drawx, drawy, tileSize));
-		}
-		
-		if (bitmap == (NONE.tilingBit | NORTH.tilingBit)) {
-			g.fillPolygon(makeCircle(drawx + tileSize/2, drawy, amounts[NONE.ordinal()], drawx, drawy, tileSize));
-		}
-		
-		if (bitmap == (NONE.tilingBit | NORTHEAST.tilingBit)) {
-			g.fillPolygon(makeCircle(drawx + tileSize, drawy + tileSize/4, amounts[NONE.ordinal()], drawx, drawy, tileSize));
-		}
-		
-		if (bitmap == (NONE.tilingBit | SOUTHEAST.tilingBit)) {
-			g.fillPolygon(makeCircle(drawx + tileSize, drawy + tileSize*3/4, amounts[NONE.ordinal()], drawx, drawy, tileSize));
-		}
-		
-		if (bitmap == (NONE.tilingBit | SOUTH.tilingBit)) {
-			g.fillPolygon(makeCircle(drawx + tileSize/2, drawy + tileSize, amounts[NONE.ordinal()], drawx, drawy, tileSize));
-		}
-		
-		if (bitmap == (NONE.tilingBit | SOUTHWEST.tilingBit)) {
-			g.fillPolygon(makeCircle(drawx, drawy + tileSize*3/4, amounts[NONE.ordinal()], drawx, drawy, tileSize));
-		}
-		
-		if (bitmap == (NONE.tilingBit | NORTHWEST.tilingBit)) {
-			g.fillPolygon(makeCircle(drawx, drawy + tileSize/4, amounts[NONE.ordinal()], drawx, drawy, tileSize));
+			g.fillPolygon(makeCircle(drawx + tileSize/2, drawy + tileSize/2, avgsHalf[NONE.ordinal()], drawx, drawy, tileSize));
 		}
 		
 		if (bitmap == (NONE.tilingBit | NORTH.tilingBit | NORTHEAST.tilingBit)) {
@@ -246,8 +213,480 @@ public class DrawLiquids {
 				| SOUTH.tilingBit | SOUTHWEST.tilingBit)) {
 			g.fillPolygon(draw3and1side(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTH));
 		}
+
+		if (bitmap == (NONE.tilingBit | NORTH.tilingBit | NORTHWEST.tilingBit
+				| SOUTHEAST.tilingBit | SOUTHWEST.tilingBit)) {
+			g.fillPolygon(draw3and1sideB(drawx, drawy, tileSize, avgsFull, avgsHalf, SOUTHEAST));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTH.tilingBit | NORTHEAST.tilingBit
+				| SOUTHEAST.tilingBit | SOUTHWEST.tilingBit)) {
+			g.fillPolygon(draw3and1sideB(drawx, drawy, tileSize, avgsFull, avgsHalf, SOUTHWEST));
+		}
+
+		if (bitmap == (NONE.tilingBit | SOUTH.tilingBit | NORTHWEST.tilingBit
+				| NORTHEAST.tilingBit | SOUTHWEST.tilingBit)) {
+			g.fillPolygon(draw3and1sideB(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTHEAST));
+		}
+
+		if (bitmap == (NONE.tilingBit | SOUTH.tilingBit | NORTHWEST.tilingBit
+				| NORTHEAST.tilingBit | SOUTHEAST.tilingBit)) {
+			g.fillPolygon(draw3and1sideB(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTHWEST));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTH.tilingBit | NORTHWEST.tilingBit
+				| SOUTH.tilingBit | SOUTHEAST.tilingBit)) {
+			g.fillPolygon(draw2and2side(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTHWEST));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTH.tilingBit | NORTHEAST.tilingBit
+				| SOUTH.tilingBit | SOUTHWEST.tilingBit)) {
+			g.fillPolygon(draw2and2side(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTHEAST));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTHWEST.tilingBit | SOUTHWEST.tilingBit
+				| NORTHEAST.tilingBit | SOUTHEAST.tilingBit)) {
+			g.fillPolygon(draw2and2sideB(drawx, drawy, tileSize, avgsFull, avgsHalf));
+		}
+
+		if (bitmap == (NONE.tilingBit | SOUTHWEST.tilingBit | NORTH.tilingBit
+				| SOUTHEAST.tilingBit)) {
+			g.fillPolygon(draw1and1and1side(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTH));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTHWEST.tilingBit | SOUTH.tilingBit
+				| NORTHEAST.tilingBit)) {
+			g.fillPolygon(draw1and1and1side(drawx, drawy, tileSize, avgsFull, avgsHalf, SOUTH));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTHWEST.tilingBit | NORTH.tilingBit
+				| SOUTHEAST.tilingBit)) {
+			g.fillPolygon(draw2and1side(drawx, drawy, tileSize, avgsFull, avgsHalf, SOUTHEAST));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTHEAST.tilingBit | NORTH.tilingBit
+				| SOUTHWEST.tilingBit)) {
+			g.fillPolygon(draw2and1side(drawx, drawy, tileSize, avgsFull, avgsHalf, SOUTHWEST));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTHEAST.tilingBit | SOUTH.tilingBit
+				| SOUTHWEST.tilingBit)) {
+			g.fillPolygon(draw2and1side(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTHEAST));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTHWEST.tilingBit | SOUTH.tilingBit
+				| SOUTHEAST.tilingBit)) {
+			g.fillPolygon(draw2and1side(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTHWEST));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTHWEST.tilingBit | NORTH.tilingBit
+				| SOUTH.tilingBit)) {
+			g.fillPolygon(draw2and1sideB(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTHWEST));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTHEAST.tilingBit | NORTH.tilingBit
+				| SOUTH.tilingBit)) {
+			g.fillPolygon(draw2and1sideB(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTHEAST));
+		}
+
+		if (bitmap == (NONE.tilingBit | SOUTHWEST.tilingBit | NORTH.tilingBit
+				| SOUTH.tilingBit)) {
+			g.fillPolygon(draw2and1sideB(drawx, drawy, tileSize, avgsFull, avgsHalf, SOUTHWEST));
+		}
+
+		if (bitmap == (NONE.tilingBit | SOUTHEAST.tilingBit | NORTH.tilingBit
+				| SOUTH.tilingBit)) {
+			g.fillPolygon(draw2and1sideB(drawx, drawy, tileSize, avgsFull, avgsHalf, SOUTHEAST));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTH.tilingBit | SOUTHWEST.tilingBit)) {
+			g.fillPolygon(draw1and1side(drawx, drawy, tileSize, avgsFull, avgsHalf, SOUTHWEST));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTH.tilingBit | SOUTHEAST.tilingBit)) {
+			g.fillPolygon(draw1and1side(drawx, drawy, tileSize, avgsFull, avgsHalf, SOUTHEAST));
+		}
+
+		if (bitmap == (NONE.tilingBit | SOUTH.tilingBit | NORTHWEST.tilingBit)) {
+			g.fillPolygon(draw1and1side(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTHWEST));
+		}
+
+		if (bitmap == (NONE.tilingBit | SOUTH.tilingBit | NORTHEAST.tilingBit)) {
+			g.fillPolygon(draw1and1side(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTHEAST));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTHWEST.tilingBit | NORTHEAST.tilingBit)) {
+			g.fillPolygon(draw1and1sideB(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTHWEST));
+		}
+
+		if (bitmap == (NONE.tilingBit | SOUTHWEST.tilingBit | SOUTHEAST.tilingBit)) {
+			g.fillPolygon(draw1and1sideB(drawx, drawy, tileSize, avgsFull, avgsHalf, SOUTHWEST));
+		}
+
+		if (bitmap == (NONE.tilingBit | NORTH.tilingBit | SOUTH.tilingBit)) {
+			g.fillPolygon(draw1and1sideC(drawx, drawy, tileSize, avgsFull, avgsHalf));
+		}
+
 		
-		Utils.setTransparency(g, 1);
+		if (bitmap == (NONE.tilingBit | NORTH.tilingBit)) {
+			g.fillPolygon(draw1side(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTH));
+		}
+		
+		if (bitmap == (NONE.tilingBit | SOUTH.tilingBit)) {
+			g.fillPolygon(draw1side(drawx, drawy, tileSize, avgsFull, avgsHalf, SOUTH));
+		}
+		
+		if (bitmap == (NONE.tilingBit | NORTHEAST.tilingBit)) {
+			g.fillPolygon(draw1sideB(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTHEAST));
+		}
+		
+		if (bitmap == (NONE.tilingBit | SOUTHEAST.tilingBit)) {
+			g.fillPolygon(draw1sideB(drawx, drawy, tileSize, avgsFull, avgsHalf, SOUTHEAST));
+		}
+		
+		if (bitmap == (NONE.tilingBit | SOUTHWEST.tilingBit)) {
+			g.fillPolygon(draw1sideB(drawx, drawy, tileSize, avgsFull, avgsHalf, SOUTHWEST));
+		}
+		
+		if (bitmap == (NONE.tilingBit | NORTHWEST.tilingBit)) {
+			g.fillPolygon(draw1sideB(drawx, drawy, tileSize, avgsFull, avgsHalf, NORTHWEST));
+		}		
+	}
+
+	
+	public static void drawPolygonLiquid2(Tile tile, Graphics g, int drawx, int drawy, int tileSize, RenderingState state) {
+		
+		float[] amounts = new float[Direction.values().length];
+		float myamount = tile.liquidAmount;
+//		float myamount = tile.liquidAmount * tileSize / scale;
+		amounts[NONE.ordinal()] = myamount;
+		for (int i = 0; i < amounts.length; i++) {
+			amounts[i] = myamount; // default out of bounds neighbors to same amount
+		}
+		for (Tile neighbor : tile.getNeighbors()) {
+			Direction d = Direction.getDirection(tile.getLocation(), neighbor.getLocation());
+			amounts[d.ordinal()] = neighbor.liquidAmount;
+//			amounts[d.ordinal()] = neighbor.liquidAmount * tileSize / scale;
+		}
+		for (int layer = 0; layer <= 2; layer++) {
+			int depth = layer*10;
+			Color color = tile.liquidType.getMipMap().getColor(tileSize);
+			if (layer == 2) {
+				color = color.darker();
+			}
+			float[] reducedAmounts = new float[amounts.length];
+			for (int i = 0; i < amounts.length; i++) {
+				reducedAmounts[i] = Math.max(0, amounts[i] - depth);
+			}
+			Utils.setTransparency(g, 0.5);
+			g.setColor(color);
+			drawWaterLayer(tile, g, drawx, drawy, tileSize, reducedAmounts, 20);
+			Utils.setTransparency(g, 1);
+		}
+	}
+	private static Polygon draw1sideB(int drawx, int drawy, int tileSize, 
+			int[] avgsFull, int[] avgsHalf, Direction shortSide) {
+
+		int startx = shortSide.deltax() < 0 ? drawx : drawx + tileSize;
+		int mx = shortSide.deltax() < 0 ? 1 : -1;
+
+		int starty = shortSide.deltay() < 0 ? drawy : drawy + tileSize;
+		int endy = shortSide.deltay() > 0 ? drawy : drawy + tileSize;
+		int my = shortSide.deltay() < 0 ? 1 : -1;
+
+		return new Polygon(new int[] {
+				startx,
+				startx + mx*avgsFull[NONE.ordinal()],
+				startx + mx*avgsFull[NONE.ordinal()],
+				startx,
+		}, new int[] {
+				(starty*3 + endy)/4 - my*avgsHalf[shortSide.ordinal()]/2,
+				(starty*3 + endy)/4 - my*avgsHalf[NONE.ordinal()]/2,
+				(starty*3 + endy)/4 + my*avgsFull[NONE.ordinal()]*3/4,
+				(starty*3 + endy)/4 + my*avgsHalf[shortSide.ordinal()]/2,
+		}, 4);
+	}
+	private static Polygon draw1side(int drawx, int drawy, int tileSize, 
+			int[] avgsFull, int[] avgsHalf, Direction longSide) {
+		
+		int starty = longSide.deltay() < 0 ? drawy : drawy + tileSize;
+		int my = longSide.deltay() < 0 ? 1 : -1;
+
+		return new Polygon(new int[] {
+				drawx + tileSize/2 + avgsHalf[longSide.ordinal()],
+//				drawx + tileSize/2 + avgsHalf[NONE.ordinal()],
+				drawx + tileSize/2 + avgsHalf[NONE.ordinal()],
+				drawx + tileSize/2 - avgsHalf[NONE.ordinal()],
+//				drawx + tileSize/2 - avgsHalf[NONE.ordinal()],
+				drawx + tileSize/2 - avgsHalf[longSide.ordinal()],
+		}, new int[] {
+				starty,
+//				starty + my*avgsHalf[NONE.ordinal()]/2,
+				starty + my*avgsFull[NONE.ordinal()],
+				starty + my*avgsFull[NONE.ordinal()],
+//				starty + my*avgsHalf[NONE.ordinal()]/2,
+				starty,
+		}, 4);
+		
+	}
+	private static Polygon draw1and1sideC(int drawx, int drawy, int tileSize, 
+			int[] avgsFull, int[] avgsHalf) {
+
+		return new Polygon(new int[] {
+				drawx + tileSize/2 + avgsHalf[NORTH.ordinal()],
+				drawx + tileSize/2 + avgsHalf[NONE.ordinal()],
+				drawx + tileSize/2 + avgsHalf[SOUTH.ordinal()],
+				drawx + tileSize/2 - avgsHalf[SOUTH.ordinal()],
+				drawx + tileSize/2 - avgsHalf[NONE.ordinal()],
+				drawx + tileSize/2 - avgsHalf[NORTH.ordinal()],
+		}, new int[] {
+				drawy,
+				drawy + tileSize/2,
+				drawy + tileSize,
+				drawy + tileSize,
+				drawy + tileSize/2,
+				drawy,
+		}, 6);
+		
+		
+	}
+	private static Polygon draw1and1sideB(int drawx, int drawy, int tileSize, 
+			int[] avgsFull, int[] avgsHalf, Direction westSide) {
+		
+		int starty = westSide.deltay() < 0 ? drawy : drawy + tileSize;
+		int endy = westSide.deltay() > 0 ? drawy : drawy + tileSize;
+		int my = westSide.deltay() < 0 ? 1 : -1;
+		
+		Direction eastSide = westSide.deltay() < 0 ? NORTHEAST : SOUTHEAST;
+
+		return new Polygon(new int[] {
+				drawx + tileSize/2 + avgsHalf[NONE.ordinal()],
+				drawx + tileSize,
+				drawx + tileSize,
+				drawx + tileSize/2,
+				drawx,
+				drawx,
+				drawx + tileSize/2 - avgsHalf[NONE.ordinal()],
+		}, new int[] {
+				(starty + endy)/2 + my*avgsHalf[NONE.ordinal()],
+				(starty*3 + endy)/4 + my*avgsHalf[eastSide.ordinal()]/2,
+				(starty*3 + endy)/4 - my*avgsHalf[eastSide.ordinal()]/2,
+				(starty + endy)/2 - my*avgsHalf[NONE.ordinal()],
+				(starty*3 + endy)/4 - my*avgsHalf[westSide.ordinal()]/2,
+				(starty*3 + endy)/4 + my*avgsHalf[westSide.ordinal()]/2,
+				(starty + endy)/2 + my*avgsHalf[NONE.ordinal()],
+		}, 7);
+	}
+	private static Polygon draw1and1side(int drawx, int drawy, int tileSize, 
+			int[] avgsFull, int[] avgsHalf, Direction shortSide) {
+
+		int startx = shortSide.deltax() < 0 ? drawx : drawx + tileSize;
+		int endx = shortSide.deltax() > 0 ? drawx : drawx + tileSize;
+		int mx = shortSide.deltax() < 0 ? 1 : -1;
+		int starty = shortSide.deltay() > 0 ? drawy : drawy + tileSize;
+		int endy = shortSide.deltay() < 0 ? drawy : drawy + tileSize;
+		int my = shortSide.deltay() > 0 ? 1 : -1;
+		
+		Direction longSide = shortSide.deltay() > 0 ? NORTH : SOUTH;
+		
+		return new Polygon(new int[] {
+				(startx + endx)/2 + mx*avgsHalf[longSide.ordinal()],
+				(startx + endx)/2 + mx*avgsHalf[NONE.ordinal()],
+				startx,
+				startx,
+				(startx + endx)/2 - mx*avgsHalf[NONE.ordinal()],
+				(startx + endx)/2 - mx*avgsHalf[longSide.ordinal()],
+		}, new int[] {
+				starty,
+				(starty + endy)/2 + my*avgsHalf[NONE.ordinal()],
+				(starty + endy*3)/4 + my*avgsHalf[shortSide.ordinal()]/2,
+				(starty + endy*3)/4 - my*avgsHalf[shortSide.ordinal()]/2,
+				(starty + endy)/2 - my*avgsHalf[NONE.ordinal()]/2,
+				starty,
+		}, 6);
+	}
+	private static Polygon draw2and1sideB(int drawx, int drawy, int tileSize, 
+			int[] avgsFull, int[] avgsHalf, Direction shortInside) {
+		
+		int startx = shortInside.deltax() < 0 ? drawx : drawx + tileSize;
+		int endx = shortInside.deltax() > 0 ? drawx : drawx + tileSize;
+		int mx = shortInside.deltax() < 0 ? 1 : -1;
+		int starty = shortInside.deltay() < 0 ? drawy : drawy + tileSize;
+		int endy = shortInside.deltay() > 0 ? drawy : drawy + tileSize;
+		int my = shortInside.deltay() < 0 ? 1 : -1;
+		
+		Direction longInside = shortInside.deltay() > 0 ? NORTH : SOUTH;
+		Direction longSolo = shortInside.deltay() < 0 ? SOUTH : NORTH;
+
+		return new Polygon(new int[] {
+				startx,
+				startx + mx*avgsFull[longInside.ordinal()],
+				(startx + endx)/2 + mx*avgsHalf[NONE.ordinal()],
+				(startx + endx)/2 + mx*avgsHalf[longSolo.ordinal()],
+				(startx + endx)/2 - mx*avgsHalf[longSolo.ordinal()],
+				(startx + endx)/2 - mx*avgsHalf[NONE.ordinal()],
+				startx,
+		}, new int[] {
+				starty,
+				starty,
+				(starty + endy)/2,
+				endy,
+				endy,
+				(starty + endy)/2 + my*avgsHalf[NONE.ordinal()]/2,
+				starty + my*avgsHalf[shortInside.ordinal()],
+		}, 7);
+	}
+	private static Polygon draw2and1side(int drawx, int drawy, int tileSize, 
+			int[] avgsFull, int[] avgsHalf, Direction shortSolo) {
+		
+		int startx = shortSolo.deltax() > 0 ? drawx : drawx + tileSize;
+		int endx = shortSolo.deltax() < 0 ? drawx : drawx + tileSize;
+		int mx = shortSolo.deltax() > 0 ? 1 : -1;
+		int starty = shortSolo.deltay() > 0 ? drawy : drawy + tileSize;
+		int endy = shortSolo.deltay() < 0 ? drawy : drawy + tileSize;
+		int my = shortSolo.deltay() > 0 ? 1 : -1;
+		
+		Direction longEdge = shortSolo.deltay() > 0 ? NORTH : SOUTH;
+		Direction shortEdge = (shortSolo.deltay() > 0) 
+				? (shortSolo.deltax() > 0 ? NORTHWEST : NORTHEAST) 
+						: (shortSolo.deltax() > 0 ? SOUTHWEST : SOUTHEAST);
+
+		return new Polygon(new int[] {
+				startx + mx*avgsFull[longEdge.ordinal()],
+				(startx + endx)/2 + mx*avgsHalf[NONE.ordinal()],
+				endx,
+				endx,
+				(startx + endx)/2 - mx*avgsHalf[NONE.ordinal()],
+				startx,
+				startx,
+		}, new int[] {
+				starty,
+				(starty + endy)/2 - my*avgsHalf[NONE.ordinal()],
+				(starty + endy*3)/4 - my*avgsHalf[shortSolo.ordinal()]/2,
+				(starty + endy*3)/4 + my*avgsHalf[shortSolo.ordinal()]/2,
+				(starty + endy)/2 + my*avgsHalf[NONE.ordinal()],
+				starty + my*avgsHalf[shortEdge.ordinal()],
+				starty,
+		}, 7);
+	}
+	private static Polygon draw1and1and1side(int drawx, int drawy, int tileSize, 
+			int[] avgsFull, int[] avgsHalf, Direction inside) {
+		Direction easternInside = (inside == NORTH) ? SOUTHEAST : NORTHEAST;
+		Direction westernInside = (inside == NORTH) ? SOUTHWEST: NORTHWEST;
+
+		int starty = (inside.deltay() < 0) ? drawy : drawy + tileSize;
+		int endy = (inside.deltay() > 0) ? drawy : drawy + tileSize;
+		int my = (inside.deltay() < 0) ? 1 : -1;
+		
+		return new Polygon(new int[] {
+				drawx + tileSize/2 + avgsHalf[inside.ordinal()],
+				drawx + tileSize/2 + avgsHalf[NONE.ordinal()],
+				drawx + tileSize,
+				drawx + tileSize,
+				drawx + tileSize/2,
+				drawx,
+				drawx,
+				drawx + tileSize/2 - avgsHalf[NONE.ordinal()],
+				drawx + tileSize/2 - avgsHalf[inside.ordinal()],
+		}, new int[] {
+				starty,
+				(starty + endy)/2 - my*avgsHalf[NONE.ordinal()],
+				(starty + endy*3)/4 - my*avgsHalf[easternInside.ordinal()]/2,
+				(starty + endy*3)/4 + my*avgsHalf[easternInside.ordinal()]/2,
+				(starty + endy)/2 + my*avgsHalf[NONE.ordinal()],
+				(starty + endy*3)/4 + my*avgsHalf[westernInside.ordinal()]/2,
+				(starty + endy*3)/4 - my*avgsHalf[westernInside.ordinal()]/2,
+				(starty + endy)/2 - my*avgsHalf[NONE.ordinal()],
+				starty,
+		}, 9);
+	}
+	private static Polygon draw2and2sideB(int drawx, int drawy, int tileSize, 
+			int[] avgsFull, int[] avgsHalf) {
+		return new Polygon(new int[] {
+				drawx,
+				drawx + tileSize/2,
+				drawx + tileSize,
+				drawx + tileSize,
+				drawx + tileSize/2,
+				drawx,
+		}, new int[] {
+				drawy + tileSize/2 - avgsHalf[NORTHWEST.ordinal()],
+				drawy + tileSize/2 - avgsHalf[NONE.ordinal()],
+				drawy + tileSize/2 - avgsHalf[NORTHEAST.ordinal()],
+				drawy + tileSize/2 + avgsHalf[SOUTHEAST.ordinal()],
+				drawy + tileSize/2 + avgsHalf[NONE.ordinal()],
+				drawy + tileSize/2 + avgsHalf[SOUTHWEST.ordinal()],
+		}, 6);
+	}
+	private static Polygon draw2and2side(int drawx, int drawy, int tileSize, 
+			int[] avgsFull, int[] avgsHalf, Direction topInside) {
+		Direction bottomInside = (topInside == NORTHWEST) ? SOUTHEAST : SOUTHWEST;
+		int startx = (topInside == NORTHWEST) ? drawx : drawx + tileSize;
+		int endx = (topInside == NORTHEAST) ? drawx : drawx + tileSize;
+		int mx = (topInside == NORTHWEST) ? 1 : -1;
+		return new Polygon(new int[] {
+				startx,
+				startx,
+				startx + mx*avgsFull[NORTH.ordinal()],
+				(startx + endx)/2 + mx*avgsHalf[NONE.ordinal()],
+				endx,
+				endx,
+				endx - mx*avgsFull[SOUTH.ordinal()],
+				(startx + endx)/2 - mx*avgsHalf[NONE.ordinal()],
+		}, new int[] {
+				drawy + avgsHalf[topInside.ordinal()],
+				drawy,
+				drawy,
+				drawy + tileSize/2 - avgsHalf[NONE.ordinal()],
+				drawy + tileSize - avgsHalf[bottomInside.ordinal()],
+				drawy + tileSize,
+				drawy + tileSize,
+				drawy + tileSize/2 + avgsHalf[NONE.ordinal()],
+		}, 8);
+	}
+	private static Polygon draw3and1sideB(int drawx, int drawy, int tileSize, 
+			int[] avgsFull, int[] avgsHalf, Direction soloSide) {
+		
+		Direction shortEdge = NONE;
+		Direction longEdge = soloSide.deltay() > 0 ? NORTH : SOUTH;
+		int startx = soloSide.deltax() > 0 ? drawx : drawx + tileSize;
+		int endx = soloSide.deltax() < 0 ? drawx : drawx + tileSize;
+		int mx = soloSide.deltax() > 0 ? 1 : -1;
+		
+		int starty = soloSide.deltay() > 0 ? drawy : drawy + tileSize;
+		int endy = soloSide.deltay() < 0 ? drawy : drawy + tileSize;
+		int my = soloSide.deltay() > 0 ? 1 : -1;
+		
+		if (soloSide == SOUTHEAST) {
+			shortEdge = SOUTHWEST;
+		}
+		else if (soloSide == SOUTHWEST) {
+			shortEdge = SOUTHEAST;
+		}
+		else if (soloSide == NORTHEAST) {
+			shortEdge = NORTHWEST;
+		}
+		else if(soloSide == NORTHWEST) {
+			shortEdge = NORTHEAST;
+		}
+
+		return new Polygon(new int[] {
+				startx,
+				startx,
+				startx + mx*avgsFull[longEdge.ordinal()],
+				(startx + endx)/2 + mx*avgsHalf[NONE.ordinal()],
+				endx,
+				endx,
+				(startx + endx)/2 - mx*avgsHalf[NONE.ordinal()],
+		}, new int[] {
+				(starty + endy)/2 + my*avgsHalf[shortEdge.ordinal()],
+				starty,
+				starty,
+				(starty + endy)/2 - my*avgsHalf[NONE.ordinal()],
+				(starty + endy*3)/4 - my*avgsHalf[soloSide.ordinal()]/2,
+				(starty + endy*3)/4 + my*avgsHalf[soloSide.ordinal()]/2,
+				(starty + endy)/2 + my*avgsHalf[NONE.ordinal()],
+		}, 7);
 	}
 	private static Polygon draw3and1side(int drawx, int drawy, int tileSize, 
 			int[] avgsFull, int[] avgsHalf, Direction soloSide) {
