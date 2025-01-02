@@ -36,7 +36,7 @@ public class Building extends Thing implements Serializable {
 	private boolean isMoria = false;
 	private int amountHarvested = 0;
 	
-	private transient ItemType stablesCaptured;
+	private transient ArrayList<ItemType> stablesCaptured = new ArrayList<ItemType>();
 	
 	public Building(BuildingType buildingType, Tile tile, Faction faction) {
 		super(buildingType.getHealth(), buildingType.getMipMap(), faction, tile, buildingType.getInventoryStackSize());
@@ -75,40 +75,40 @@ public class Building extends Thing implements Serializable {
 		
 		// if building is a trap
 		if(!simulated && isBuilt() && getType().isTrap()) {
-			if (stablesCaptured == null) { // if theres no animal inside, skip
-				
+//			if (stablesCaptured == null) { // if theres no animal inside, skip
+			if (stablesCaptured != null && stablesCaptured.isEmpty()) { // if theres no animal inside, skip
 				// special units which provide their respective resource
 				if (getTile().hasUnit(Game.unitTypeMap.get("HORSE"))) {
-					stablesCaptured = ItemType.HORSE;
+					stablesCaptured.add(ItemType.HORSE);
 				}
 				if (getTile().hasUnit(Game.unitTypeMap.get("ROC"))) {
-					stablesCaptured = ItemType.GRIFFIN;
+					stablesCaptured.add(ItemType.GRIFFIN);
 				}
 				if (getTile().hasUnit(Game.unitTypeMap.get("ENT"))) {
-					stablesCaptured = ItemType.ENT;
+					stablesCaptured.add(ItemType.ENT);
 				}
 				if (getTile().hasUnit(Game.unitTypeMap.get("VAMPIRE"))) {
-					stablesCaptured = ItemType.VAMPIRE;
+					stablesCaptured.add(ItemType.VAMPIRE);
 				}
 				if (getTile().hasUnit(Game.unitTypeMap.get("WEREWOLF"))) {
-					stablesCaptured = ItemType.WEREWOLF;
+					stablesCaptured.add(ItemType.WEREWOLF);
 				}
 				if (getTile().hasUnit(Game.unitTypeMap.get("WOLF"))) {
-					stablesCaptured = ItemType.WOLF;
+					stablesCaptured.add(ItemType.WOLF);
 				}
 				
 				// non special units just give food
 				if (getTile().hasUnit(Game.unitTypeMap.get("PIG"))) {
-					stablesCaptured = ItemType.FOOD;
+					stablesCaptured.add(ItemType.FOOD);
 				}
 				if (getTile().hasUnit(Game.unitTypeMap.get("COW"))) {
-					stablesCaptured = ItemType.FOOD;
+					stablesCaptured.add(ItemType.FOOD);
 				}
 				if (getTile().hasUnit(Game.unitTypeMap.get("SHEEP"))) {
-					stablesCaptured = ItemType.FOOD;
+					stablesCaptured.add(ItemType.FOOD);
 				}
 				if (getTile().hasUnit(Game.unitTypeMap.get("DEER"))) {
-					stablesCaptured = ItemType.FOOD;
+					stablesCaptured.add(ItemType.FOOD);
 				}
 			}
 		}
@@ -191,8 +191,8 @@ public class Building extends Thing implements Serializable {
 			resetTimeToHarvest();
 		}
 		else if(getType().isTrap()) {
-			if (stablesCaptured != null) {
-				this.getInventory().addItem(stablesCaptured, 1);
+			for(ItemType itemType: stablesCaptured) {
+				this.getInventory().addItem(itemType, 1);
 				resetTimeToHarvest();
 				amountHarvested ++;
 				// every 50 harvests, play sound
@@ -202,6 +202,7 @@ public class Building extends Thing implements Serializable {
 				}
 				
 			}
+			stablesCaptured.clear();
 		}
 	}
 	
