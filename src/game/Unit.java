@@ -131,15 +131,22 @@ public class Unit extends Thing implements Serializable {
 		}
 		double terrainPenalty = to.getTerrain().moveSpeed();
 		if(to.getPlant() != null && to.getPlant().getType() == Game.plantTypeMap.get("TREE")) {
+			if(this.getType().isWheeled()) {
+				terrainPenalty += 15;
+			}
 			terrainPenalty += 15;
 		}
 		double liquidPenalty = to.liquidAmount;
 		
 		double elevationPenalty = Math.abs(to.getHeight() - from.getHeight());
 		elevationPenalty = elevationPenalty * elevationPenalty / 100;
+		if(this.getType().isWheeled()) {
+			terrainPenalty += elevationPenalty/5; // height dif of 100 is 20 delay
+		}
 		if (from.getRoad() != null && from.getRoad().isBuilt()) {
 			terrainPenalty = terrainPenalty / from.getRoad().getType().getSpeed();
 			unitPenalty = unitPenalty / from.getRoad().getType().getSpeed();
+			
 			
 			if (to.getRoad() != null && to.getRoad().isBuilt()) {
 				elevationPenalty /= (from.getRoad().getType().getSpeed() / 2); 

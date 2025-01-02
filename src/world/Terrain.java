@@ -4,9 +4,9 @@ import java.awt.*;
 import utils.*;
 
 public enum Terrain {
-		GRASS 		  (1, 5, 0, new Point(10, 20), new String[] {"Images/terrain/grass16_lowcontrast.png"}),
-		DIRT  		  (1, 5, 0, new Point(1, 10), new String[] {"Images/terrain/dirt16_lowcontrast.png"}),
-		RICHSOIL      (1, 5, 0, new Point(1, 10), new String[] {"Images/terrain/richsoil.png"}),
+		GRASS 		  (1, 0, 0, new Point(10, 20), new String[] {"Images/terrain/grass16_lowcontrast.png"}),
+		DIRT  		  (1, 0, 0, new Point(1, 10), new String[] {"Images/terrain/dirt16_lowcontrast.png"}),
+		RICHSOIL      (1, 0, 0, new Point(1, 10), new String[] {"Images/terrain/richsoil.png"}),
 		VOLCANO 	  (4, 30, 0.1, new Point(0, 20), new String[] {"Images/terrain/volcano16.png", "Images/terrain/volcano128.png", "Images/terrain/magma512.png"}),
 		ROCK 		  (2, 10, 0, new Point(0, 20), new String[] {"Images/terrain/rock16_lowcontrast.png"}),
 		LOWROCK 	  (2, 25, 0, new Point(0, 20), new String[] {"Images/terrain/rock16.png"}),
