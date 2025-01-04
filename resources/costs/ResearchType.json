@@ -80,7 +80,7 @@
 	{
 		"name": "CIVILIZATION", 
 		"points": 1200, "tier": 4,
-		"cost": {"BRICK": 500, "ADAMANTITE_BAR": 10}, 
+		"cost": {"BRICK": 1000, "ADAMANTITE_BAR": 10}, 
 		"requirements": ["DOMESTICATION", "ENGINEERING", "ARMORING", "NECROMANCY"],
 		"image": "Images/research/monarchy.png"}
 	

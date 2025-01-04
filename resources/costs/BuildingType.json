@@ -239,7 +239,7 @@
 	},
 	{
 		"name":"SMITHY",
-		"info":"Turns ore into refined bars",
+		"info":"Turns ore and other resources into refined products.",
 		"image":"Images/buildings/blacksmith.gif",
 		"vision":1,
 		"cost":{"WOOD":100, "STONE":100},
