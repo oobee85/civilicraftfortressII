@@ -175,12 +175,13 @@ public class Faction implements Externalizable {
 	public boolean isPlayer() {
 		return isPlayer;
 	}
+	
 	public void updateUpgradedCombatStats(ItemType itemType) {
 		if(itemType == ItemType.SHIELDS) {
 			this.upgradedCombatStats.addHealth(100);
 		}
 		if(itemType == ItemType.MEDICINE) {
-			this.upgradedCombatStats.addTicksToHeal(-50);
+			this.upgradedCombatStats.addTicksToHeal(-25);
 		}
 		if(itemType == ItemType.BETTER_FORMATIONS) {
 			this.upgradedCombatStats.addMoveSpeed(-5);

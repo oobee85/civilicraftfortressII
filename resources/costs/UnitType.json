@@ -3,7 +3,7 @@
 	{
 		"image":"Images/units/worker.png",
 		"cost":{"FOOD":50},
-		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":50},
+		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":200},
 		"attackstyles":[
 			{"damage":0, "cooldown":60, "range":1}
 		],
@@ -16,7 +16,7 @@
 	{
 		"image":"Images/units/mason.png",
 		"cost":{"FOOD":60},
-		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":50},
+		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":200},
 		"attackstyles":[
 			{"damage":0, "cooldown":60, "range":1}
 		],
@@ -29,7 +29,7 @@
 	{
 		"image":"Images/units/chariot.png",
 		"cost":{"WOOD":100,"FOOD":100},
-		"stats":{"movespeed":10,"buildtime":200,"health":100,"healspeed":50},
+		"stats":{"movespeed":10,"buildtime":200,"health":100,"healspeed":200},
 		"name":"CARAVAN",
 		"attackstyles":[
 			{"damage":0, "cooldown":60, "range":1}
@@ -40,7 +40,7 @@
 	{
 		"image":"Images/units/warrior.png",
 		"cost":{"WOOD":100,"FOOD":100},
-		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":50},
+		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":200},
 		"name":"WARRIOR",
 		"attackstyles":[
 			{"damage":10, "cooldown":30, "range":1}
@@ -51,7 +51,7 @@
 	{
 		"image":"Images/units/spearman.png",
 		"cost":{"BRONZE_BAR":2,"WOOD":100,"FOOD":200},
-		"stats":{"movespeed":15,"buildtime":200,"health":500,"healspeed":50},
+		"stats":{"movespeed":15,"buildtime":200,"health":500,"healspeed":200},
 		"name":"SPEARMAN",
 		"attackstyles":[
 			{"damage":30, "cooldown":30, "range":1}
@@ -63,7 +63,7 @@
 	{
 		"image":"Images/units/archer.png",
 		"cost":{"BRONZE_BAR":1,"FOOD":200},
-		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":50},
+		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":200},
 		"name":"ARCHER",
 		"attributes":["hostile"],
 		"attackstyles":[
@@ -75,7 +75,7 @@
 	{
 		"image":"Images/units/swordsman.png",
 		"cost":{"IRON_BAR":4,"WOOD":100,"FOOD":200},
-		"stats":{"movespeed":10,"buildtime":200,"health":300,"healspeed":50},
+		"stats":{"movespeed":10,"buildtime":200,"health":300,"healspeed":200},
 		"name":"SWORDSMAN",
 		"attackstyles":[
 			{"damage":40, "cooldown":20, "range":1}
@@ -88,7 +88,7 @@
 	{
 		"image":"Images/units/longbowman.png",
 		"cost":{"MITHRIL_BAR":4, "WOOD":100, "FOOD":100},
-		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":50},
+		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":200},
 		"name":"LONGBOWMAN",
 		"attackstyles":[
 			{"damage":60, "cooldown":30, "range":6, "minrange":1, "projectile":"ARROW"}
@@ -101,7 +101,7 @@
 	{
 		"image":"Images/units/catapult.png",
 		"cost":{"WOOD":500,"MITHRIL_BAR":20,"STONE":250},
-		"stats":{"movespeed":40,"buildtime":600,"health":200,"healspeed":100},
+		"stats":{"movespeed":40,"buildtime":600,"health":200,"healspeed":200},
 		"name":"CATAPULT",
 		"attackstyles":[
 			{"damage":300, "cooldown":100, "range":10, "minrange":3, "projectile":"ROCK"}
@@ -114,7 +114,7 @@
 	{
 		"image":"Images/units/trebuchet.png",
 		"cost":{"ADAMANTITE_BAR":20,"WOOD":1000,"STONE":500},
-		"stats":{"movespeed":40,"buildtime":1000,"health":200,"healspeed":100},
+		"stats":{"movespeed":40,"buildtime":1000,"health":200,"healspeed":200},
 		"name":"TREBUCHET",
 		"attackstyles":[
 			{"damage":600, "cooldown":100, "range":20, "minrange":5, "projectile":"FIREBALL_TREBUCHET"}
@@ -127,7 +127,7 @@
 	{
 		"image":"Images/units/siege_tower.png",
 		"cost":{"ADAMANTITE_BAR":20,"WOOD":1000,"STONE":500},
-		"stats":{"movespeed":40,"buildtime":1000,"health":200,"healspeed":100},
+		"stats":{"movespeed":40,"buildtime":1000,"health":200,"healspeed":200},
 		"name":"SIEGE TOWER",
 		"attackstyles":[
 			{"damage":0, "cooldown":1000, "range":0, "minrange":0}
@@ -142,7 +142,7 @@
 	{
 		"image":"Images/units/sniper.png",
 		"cost":{"WOOD":1250,"IRON_BAR":100,"MITHRIL_BAR":25,"ADAMANTITE_BAR":25,"RUNITE_BAR":25,"TITANIUM_BAR":50},
-		"stats":{"movespeed":100,"buildtime":3000,"health":20,"healspeed":50},
+		"stats":{"movespeed":100,"buildtime":3000,"health":20,"healspeed":200},
 		"name":"SNIPER",
 		"attackstyles":[
 			{"damage":1000, "cooldown":200, "range":30, "minrange":1}
@@ -154,7 +154,7 @@
 	{
 		"image":"Images/units/horseman.png",
 		"cost":{"HORSE":50, "FOOD":200},
-		"stats":{"movespeed":10,"buildtime":300,"health":200,"healspeed":50},
+		"stats":{"movespeed":10,"buildtime":300,"health":200,"healspeed":200},
 		"name":"HORSEMAN",
 		"attackstyles":[
 			{"damage":20, "cooldown":20, "range":1}
@@ -167,7 +167,7 @@
 	{
 		"image":"Images/units/knight.png",
 		"cost":{"HORSE":200,"FOOD":400, "ADAMANTITE_BAR":5,"WOOD":100},
-		"stats":{"movespeed":5,"buildtime":600,"health":500,"healspeed":50},
+		"stats":{"movespeed":5,"buildtime":600,"health":500,"healspeed":200},
 		"name":"KNIGHT",
 		"attackstyles":[
 			{"damage":100, "cooldown":20, "range":1}
@@ -179,7 +179,7 @@
 	},
 	{
 		"image":"Images/units/wizard.png",
-		"stats":{"movespeed":15,"buildtime":1000,"health":200,"healspeed":50},
+		"stats":{"movespeed":15,"buildtime":1000,"health":200,"healspeed":200},
 		"cost":{"FOOD":200, "GOLD_BAR": 25},
 		"name":"WIZARD",
 		"attackstyles":[
@@ -194,7 +194,7 @@
 	},
 	{
 		"image":"Images/units/griffin.png",
-		"stats":{"movespeed":10,"buildtime":500,"health":500,"healspeed":50},
+		"stats":{"movespeed":10,"buildtime":500,"health":500,"healspeed":200},
 		"cost":{"FOOD":500, "GRIFFIN": 100},
 		"name":"GRIFFIN",
 		"attackstyles":[
@@ -210,7 +210,7 @@
 	},
 	{
 		"image":"Images/units/priest.png",
-		"stats":{"movespeed":15,"buildtime":500,"health":100,"healspeed":50},
+		"stats":{"movespeed":15,"buildtime":500,"health":100,"healspeed":200},
 		"cost":{"FOOD":200, "GOLD_BAR": 4},
 		"name":"PRIEST",
 		"attackstyles":[
@@ -225,7 +225,7 @@
 	{
 		"image":"Images/units/horsearcher.png",
 		"cost":{"ADAMANTITE_BAR":5,"HORSE":100,"FOOD":300},
-		"stats":{"movespeed":5,"buildtime":600,"health":500,"healspeed":50},
+		"stats":{"movespeed":5,"buildtime":600,"health":500,"healspeed":200},
 		"name":"HORSEARCHER",
 		"attackstyles":[
 			{"damage":100, "cooldown":20, "range":3, "minrange":1, "projectile":"RUNE_ARROW"}
@@ -249,7 +249,7 @@
 	},
 	{
 		"image":"Images/units/deer.png",
-		"stats":{"movespeed":5,"buildtime":0,"health":200,"healspeed":50},
+		"stats":{"movespeed":5,"buildtime":0,"health":200,"healspeed":200},
 		"name":"DEER",
 		"attackstyles":[
 			{"damage":5, "cooldown":40, "range":1}
@@ -259,7 +259,7 @@
 	},
 	{
 		"image":"Images/units/horse.png",
-		"stats":{"movespeed":5,"buildtime":0,"health":200,"healspeed":50},
+		"stats":{"movespeed":5,"buildtime":0,"health":200,"healspeed":200},
 		"name":"HORSE",
 		"attackstyles":[
 			{"damage":5, "cooldown":40, "range":1}
@@ -269,7 +269,7 @@
 	},
 	{
 		"image":"Images/units/pig.png",
-		"stats":{"movespeed":30,"buildtime":0,"health":200,"healspeed":50},
+		"stats":{"movespeed":30,"buildtime":0,"health":200,"healspeed":200},
 		"name":"PIG",
 		"attackstyles":[
 			{"damage":10, "cooldown":40, "range":1}
@@ -279,7 +279,7 @@
 	},
 	{
 		"image":"Images/units/sheep.png",
-		"stats":{"movespeed":30,"buildtime":0,"health":200,"healspeed":50},
+		"stats":{"movespeed":30,"buildtime":0,"health":200,"healspeed":200},
 		"name":"SHEEP",
 		"attackstyles":[
 			{"damage":5, "cooldown":40, "range":1}
@@ -289,7 +289,7 @@
 	},
 	{
 		"image":"Images/units/cow.png",
-		"stats":{"movespeed":30,"buildtime":0,"health":200,"healspeed":50},
+		"stats":{"movespeed":30,"buildtime":0,"health":200,"healspeed":200},
 		"name":"COW",
 		"attackstyles":[
 			{"damage":10, "cooldown":40, "range":1}
@@ -299,7 +299,7 @@
 	},
 	{
 		"image":"Images/units/fish2.png",
-		"stats":{"movespeed":5,"buildtime":0,"health":10,"healspeed":50},
+		"stats":{"movespeed":5,"buildtime":0,"health":10,"healspeed":200},
 		"name":"FISH",
 		"attackstyles":[
 			{"damage":1, "cooldown":40, "range":1}
@@ -310,7 +310,7 @@
 	},
 	{
 		"image":"Images/units/dragon.png",
-		"stats":{"movespeed":5,"buildtime":0,"health":3000,"healspeed":10},
+		"stats":{"movespeed":5,"buildtime":0,"health":3000,"healspeed":200},
 		"name":"DRAGON",
 		"attackstyles":[
 			{"damage":120, "cooldown":30, "range":4, "minrange":1, "projectile":"FIREBREATH"},
@@ -327,7 +327,7 @@
 	{
 		"image":"Images/units/vampire.png",
 		"cost":{"GOLD_BAR":10,"FOOD":100, "VAMPIRE": 100},
-		"stats":{"movespeed":15,"buildtime":300,"health":300,"healspeed":1},
+		"stats":{"movespeed":15,"buildtime":300,"health":300,"healspeed":2},
 		"name":"VAMPIRE",
 		"attackstyles":[
 			{"damage":20, "cooldown":20, "range":1, "lifesteal":true}

@@ -40,19 +40,20 @@ public enum ItemType {
 	RUNITE_BAR 	   ("SMITHY",  makeCosts(COAL,100, 	RUNITE_ORE,100),		"Images/itemicons/runite_bar.png"),
 	TITANIUM_BAR   ("SMITHY",  makeCosts(COAL,100, 	TITANIUM_ORE,100),	"Images/itemicons/titanium_bar.png"),
 	
-	BETTER_WEAPONS   ("RESEARCH_LAB",  makeCosts(WOOD,500),	"Images/interfaces/attackspeedold.png"),
-	IMPROVED_SPARRING   ("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/attackspeedold.png"),
-	SHIELDS   ("RESEARCH_LAB",  makeCosts(WOOD,500),	"Images/interfaces/attackspeedold.png"),
-	MEDICINE   ("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/attackspeedold.png"),
-	BETTER_FORMATIONS   ("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/attackspeedold.png"),
-	FASTER_TRAINING   ("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/attackspeedold.png"),
-	UNDYING_ARMY   ("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/attackspeedold.png"),
+	BETTER_WEAPONS   ("RESEARCH_LAB",  makeCosts(WOOD,2000),	"Images/interfaces/upgrades/better_weapons.png", "Increases attack damage of all units by : 25"),
+	IMPROVED_SPARRING   ("RESEARCH_LAB",  makeCosts(FOOD,2000),	"Images/interfaces/upgrades/improved_sparring.png", "Decreases attack delay of all units by : 5"),
+	SHIELDS   ("RESEARCH_LAB",  makeCosts(WOOD,2000),	"Images/interfaces/upgrades/shields.png", "Increases health of all units by : 100"),
+	MEDICINE   ("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/upgrades/medicine.png", "Decreases ticks to heal of all units by : 25"),
+	BETTER_FORMATIONS   ("RESEARCH_LAB",  makeCosts(FOOD,2000),	"Images/interfaces/upgrades/better_formations.png", "Decreases ticks to move of all units by : 5"),
+	FASTER_TRAINING   ("RESEARCH_LAB",  makeCosts(FOOD,2000),	"Images/interfaces/upgrades/faster_training.png", "Decreases the ticks to produce units by : 50"),
+	UNDYING_ARMY   ("RESEARCH_LAB",  makeCosts(FOOD,10000),	"Images/interfaces/upgrades/undying_army.png", "Gives all units lifesteal"),
 	
 	;
 	
 	private MipMap mipmap;
 	private HashMap <ItemType, Integer> cost;
 	private String building;
+	private String description;
 
 	ItemType(String s) {
 		 this.mipmap = new MipMap(s);
@@ -62,6 +63,12 @@ public enum ItemType {
 		this(s);
 		this.cost = resourcesNeeded;
 		this.building = building;
+	}
+	ItemType(String building, HashMap <ItemType, Integer> resourcesNeeded, String s, String description) {
+		this(s);
+		this.cost = resourcesNeeded;
+		this.building = building;
+		this.description = description;
 	}
 	
 	/**
@@ -78,6 +85,9 @@ public enum ItemType {
 		return map;
 	}
 	
+	public String getDescription() {
+		return this.description; 
+	}
 	public static ResearchRequirement getResearchRequirementForCrafting(ItemType type, HashMap<String, Research> researchMap) {
 		ResearchRequirement req = new ResearchRequirement();
 

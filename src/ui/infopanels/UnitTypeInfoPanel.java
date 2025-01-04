@@ -78,6 +78,8 @@ public class UnitTypeInfoPanel extends InfoPanel {
 			y += ITEM_ICON_SIZE + gap;
 		}
 	}
+	
+	
 	public static void drawInventory(Graphics g, Inventory inventory, int x, int y) {
 		int fontSize = g.getFont().getSize();
 		int gap = 1;
