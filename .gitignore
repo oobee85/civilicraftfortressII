@@ -1,5 +1,6 @@
 *.class
 bin/
+jre/
 .metadata
 .settings/
 *.jar
