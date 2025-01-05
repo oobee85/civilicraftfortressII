@@ -1,5 +1,5 @@
 open module Civilization {
 
 	requires java.desktop;
-	requires json;
+	requires org.json;
 }
