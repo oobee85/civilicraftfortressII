@@ -54,6 +54,7 @@ public class Faction implements Externalizable {
 	private int tickOfLastDamageTaken = 0;
 	private CombatStats upgradedCombatStats = new CombatStats(0, 0, 0, 0);
 	private AttackStyle upgradedAttackStyle = new AttackStyle(0, 0, 0, false, 0, null);
+	private int upgradedProjectileDamage = 0;
 	
 
 	@Override
@@ -203,6 +204,9 @@ public class Faction implements Externalizable {
 		if(itemType == ItemType.UNDYING_ARMY) {
 			this.upgradedAttackStyle.addLifesteal(true);;
 		}
+		if(itemType == ItemType.BROADHEADS) {
+			this.upgradedProjectileDamage += 25;
+		}
 		
 	}
 	public CombatStats getUpgradedCombatStats() {
@@ -210,6 +214,9 @@ public class Faction implements Externalizable {
 	}
 	public AttackStyle getUpgradedAttackStyle() {
 		return upgradedAttackStyle;
+	}
+	public int getUpgradedProjectileDamage() {
+		return upgradedProjectileDamage;
 	}
 	
 	public void recomputeInfluence() {

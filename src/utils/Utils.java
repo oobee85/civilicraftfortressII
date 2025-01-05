@@ -849,7 +849,7 @@ public final class Utils {
 			@Override
 			public void craftItem(Faction faction, ItemType itemType, int amount) {
 				faction.craftItem(itemType, amount);
-				if(itemType == ItemType.MEDICINE || itemType == ItemType.BETTER_WEAPONS || itemType == ItemType.IMPROVED_SPARRING || itemType == ItemType.SHIELDS) {
+				if(itemType == ItemType.MEDICINE || itemType == ItemType.BETTER_WEAPONS || itemType == ItemType.IMPROVED_SPARRING || itemType == ItemType.SHIELDS || itemType == ItemType.BETTER_FORMATIONS || itemType == ItemType.FASTER_TRAINING || itemType == ItemType.UNDYING_ARMY || itemType == ItemType.BROADHEADS) {
 					faction.updateUpgradedAttackStyle(itemType);
 					faction.updateUpgradedCombatStats(itemType);
 				}

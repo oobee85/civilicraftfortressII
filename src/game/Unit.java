@@ -390,6 +390,7 @@ public class Unit extends Thing implements Serializable {
 			}
 		}
 		else {
+//			style.addDamage(this.getFaction().getUpgradedProjectileDamage());
 			AttackUtils.shoot(this, target, style);
 		}
 		resetTimeToAttack(attackCooldown);

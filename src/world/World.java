@@ -1021,24 +1021,26 @@ public class World {
 				}
 			}
 			if(!simulated && projectile.reachedTarget()) {
+				int updatedDamage = projectile.getSource().getFaction().getUpgradedProjectileDamage() + projectile.getDamage();
+				
 				if(projectile.getType().isExplosive()) {
 //					if(projectile.getType().getRadius() <= 2) {
 //						spawnExplosion(projectile.getTile(), projectile.getType().getRadius(), projectile.getDamage(), DamageType.HEAT);
 //					}else {
-						spawnExplosionCircle(projectile.getTile(), projectile.getType().getRadius(), projectile.getDamage());
+						spawnExplosionCircle(projectile.getTile(), projectile.getType().getRadius(), updatedDamage);
 //					}
 					
 				} 
 				else {
 					for(Unit unit : projectile.getTile().getUnits()) {
-						unit.takeDamage(projectile.getDamage(), DamageType.PHYSICAL);
+						unit.takeDamage(updatedDamage, DamageType.PHYSICAL);
 						unit.aggro(projectile.getSource());
 					}
 					if(projectile.getTile().getPlant() != null) {
-						projectile.getTile().getPlant().takeDamage(projectile.getDamage(), DamageType.PHYSICAL);
+						projectile.getTile().getPlant().takeDamage(updatedDamage, DamageType.PHYSICAL);
 					}
 					if(projectile.getTile().hasBuilding() == true) {
-						projectile.getTile().getBuilding().takeDamage(projectile.getDamage(), DamageType.PHYSICAL);
+						projectile.getTile().getBuilding().takeDamage(updatedDamage, DamageType.PHYSICAL);
 					}
 				}
 				if(projectile.getType() == ProjectileType.METEOR) {

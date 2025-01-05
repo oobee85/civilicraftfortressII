@@ -46,6 +46,7 @@ public enum ItemType {
 	BETTER_FORMATIONS   ("RESEARCH_LAB",  makeCosts(FOOD,2000),	"Images/interfaces/upgrades/better_formations.png", "Decreases ticks to move of all units by : 5"),
 	FASTER_TRAINING   	("RESEARCH_LAB",  makeCosts(FOOD,2000),	"Images/interfaces/upgrades/faster_training.png", "Decreases the ticks to produce units by : 50"),
 	UNDYING_ARMY   		("RESEARCH_LAB",  makeCosts(FOOD,10000),"Images/interfaces/upgrades/undying_army.png", "Gives all units lifesteal"),
+	BROADHEADS   		("RESEARCH_LAB",  makeCosts(BRONZE_BAR, 100),"Images/interfaces/upgrades/broadheads.png", "Increases damage of all projectiles by : 25"),
 	
 	;
 	
