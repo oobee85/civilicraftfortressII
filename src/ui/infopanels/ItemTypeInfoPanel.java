@@ -35,7 +35,10 @@ public class ItemTypeInfoPanel extends InfoPanel {
 //			statsString += "    " + showing.getCultureRate() + " culture";
 //		}*/
 //		g.drawString(statsString, 5, bottomY - offset);
-		g.drawString(showing.getDescription(), 5, bottomY);
+		String description = showing.getDescription();
+		if (description != null) {
+			g.drawString(description, 5, bottomY);
+		}
 		
 	}
 }

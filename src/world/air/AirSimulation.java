@@ -14,7 +14,7 @@ public class AirSimulation {
 		void task(Tile t);
 	}
 	
-	private static void simulationWork(World world, List<Tile> tilesRandomOrder, SimulationTask task) {
+	private static void parallelizedSimulationWork(World world, List<Tile> tilesRandomOrder, SimulationTask task) {
 		if (!Settings.AIR_MULTITHREADED) {
 			for(Tile tile : tilesRandomOrder) {
 				task.task(tile);
@@ -133,14 +133,14 @@ public class AirSimulation {
 	
 	public static void doAirSimulationStuff(World world, List<Tile> tilesRandomOrder, int width, int height) {
 		
-		simulationWork(world, tilesRandomOrder, (tile) -> {
+		parallelizedSimulationWork(world, tilesRandomOrder, (tile) -> {
 			tile.updateAir();
 			tile.updateEnergyToTemperature();
 		});
 		
 		AverageValues avg = computeAverageValues(world);
 		
-		simulationWork(world, tilesRandomOrder, (tile) -> {
+		parallelizedSimulationWork(world, tilesRandomOrder, (tile) -> {
 			AirSimulation.updateEnergy(tile, avg.temp, avg.water, avg.berries, avg.tree);
 			tile.updateEnergyToTemperature();
 			AirSimulation.blackBodyRadiation(tile);
@@ -148,7 +148,7 @@ public class AirSimulation {
 		});
 
 		AirSimulation.updateAirMovement(tilesRandomOrder, width, height);
-		simulationWork(world, tilesRandomOrder, (tile) -> {
+		parallelizedSimulationWork(world, tilesRandomOrder, (tile) -> {
 			tile.updateEnergyToTemperature();
 		});
 	}

@@ -357,7 +357,7 @@ public class DrawLiquids {
 	public static void drawPolygonLiquid2(Tile tile, Graphics g, int drawx, int drawy, int tileSize, RenderingState state) {
 		
 		float[] amounts = new float[Direction.values().length];
-		float myamount = tile.liquidAmount;
+		float myamount = tile.runningAverageLiquidAmount;
 //		float myamount = tile.liquidAmount * tileSize / scale;
 		amounts[NONE.ordinal()] = myamount;
 		for (int i = 0; i < amounts.length; i++) {
@@ -517,7 +517,7 @@ public class DrawLiquids {
 		int endy = shortInside.deltay() > 0 ? drawy : drawy + tileSize;
 		int my = shortInside.deltay() < 0 ? 1 : -1;
 		
-		Direction longInside = shortInside.deltay() > 0 ? NORTH : SOUTH;
+		Direction longInside = shortInside.deltay() > 0 ? SOUTH : NORTH;
 		Direction longSolo = shortInside.deltay() < 0 ? SOUTH : NORTH;
 
 		return new Polygon(new int[] {
@@ -693,9 +693,6 @@ public class DrawLiquids {
 	private static Polygon draw3and1side(int drawx, int drawy, int tileSize, 
 			int[] avgsFull, int[] avgsHalf, Direction soloSide) {
 		
-		int tile1stHalf = avgsFull[NONE.ordinal()] > tileSize/2 ? tileSize/2 : avgsFull[NONE.ordinal()];
-		int tile2ndHalf = avgsFull[NONE.ordinal()];
-		
 		int starty = soloSide.deltay() > 0 ? drawy : drawy + tileSize;
 		int endy = soloSide.deltay() < 0 ? drawy : drawy + tileSize;
 		int my = soloSide.deltay() > 0 ? 1 : -1;
@@ -704,32 +701,24 @@ public class DrawLiquids {
 		Direction westDir = soloSide.deltay() > 0 ? NORTHWEST : SOUTHWEST;
 
 		return new Polygon(new int[] {
-				drawx + tileSize,
-				drawx + tileSize,
-				drawx + tileSize - tile1stHalf*2 + tile2ndHalf,
-				drawx + tileSize/2 + avgsHalf[NONE.ordinal()],
-				drawx + tileSize/2 + avgsHalf[NONE.ordinal()],
 				drawx + tileSize/2 + avgsHalf[soloSide.ordinal()],
+				drawx + tileSize/2 + avgsHalf[NONE.ordinal()],
+				drawx + tileSize,
+				drawx + tileSize,
+				drawx,
+				drawx,
+				drawx + tileSize/2 - avgsHalf[NONE.ordinal()],
 				drawx + tileSize/2 - avgsHalf[soloSide.ordinal()],
-				drawx + tileSize/2 - avgsHalf[NONE.ordinal()],
-				drawx + tileSize/2 - avgsHalf[NONE.ordinal()],
-				drawx + tile1stHalf*2 - tile2ndHalf,
-				drawx,
-				drawx,
 		}, new int[] {
-				starty,
+				endy,
+				(starty + endy)/2 + my*avgsHalf[NONE.ordinal()]/2,
 				starty + my*avgsHalf[eastDir.ordinal()],
-				starty + my*tile1stHalf,
-				starty + my*tile2ndHalf,
-				(starty + endy*3)/4,
-				starty + my*tileSize,
-				starty + my*tileSize,
-				(starty + endy*3)/4,
-				starty + my*tile2ndHalf,
-				starty + my*tile1stHalf,
-				starty + my*avgsHalf[westDir.ordinal()],
 				starty,
-		}, 12);
+				starty,
+				starty + my*avgsHalf[westDir.ordinal()],
+				(starty + endy)/2 + my*avgsHalf[NONE.ordinal()]/2,
+				endy,
+		}, 8);
 	}
 	private static Polygon draw4sideB(int drawx, int drawy, int tileSize, 
 			int[] avgsFull, int[] avgsHalf, Direction whichSide) {

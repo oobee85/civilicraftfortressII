@@ -20,6 +20,7 @@ public class Tile implements Externalizable {
 	private double energy;
 	private double temperature;
 	public volatile float liquidAmount;
+	public volatile float runningAverageLiquidAmount;
 	public volatile LiquidType liquidType;
 	private volatile Faction faction;
 	private ResourceType resource;
@@ -211,7 +212,7 @@ public class Tile implements Externalizable {
 		if(this.liquidType == LiquidType.WATER && this.getTemperature() > Constants.FREEZETEMP && this.getAir().canRain() == false) {
 			
 //			evaporation = (Math.exp(this.getTemperature()/50) /(2*this.liquidAmount));
-			evaporation = ( 0.01*(this.getTemperature() - Constants.KELVINOFFSET)*this.liquidAmount );
+			evaporation = ( 0.01*(this.getTemperature() - Constants.KELVINOFFSET)*Math.min(2, this.liquidAmount) );
 //			liquidAmount -= evaporation;
 		}
 		

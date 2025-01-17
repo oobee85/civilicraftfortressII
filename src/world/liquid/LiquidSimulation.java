@@ -43,8 +43,9 @@ public class LiquidSimulation {
 //			System.out.println("Total " + LiquidType.values()[i].name() + ": " + totals[i]);
 //		}
 		for(Tile tile : world.getTiles()) {
-			liquidAmountsTemp[tile.getLocation().x()][tile.getLocation().y()] = world.get(tile.getLocation()).liquidAmount;
-			liquidTypesTemp[tile.getLocation().x()][tile.getLocation().y()] = world.get(tile.getLocation()).liquidType;
+			tile.runningAverageLiquidAmount = (tile.runningAverageLiquidAmount*9 + tile.liquidAmount)/10;
+			liquidAmountsTemp[tile.getLocation().x()][tile.getLocation().y()] = tile.liquidAmount;
+			liquidTypesTemp[tile.getLocation().x()][tile.getLocation().y()] = tile.liquidType;
 		}
 //		for(int x = 0; x < world.getWidth(); x++) {
 //			for(int y = 0; y < world.getHeight(); y++) {
@@ -62,7 +63,8 @@ public class LiquidSimulation {
 					final int end = Math.min(chunkIndex + chunkSize, tiles.size());
 					Future<?> future = Utils.executorService.submit(() -> {
 						for(int i = start; i < end; i++) {
-							propogate(tiles.get(i), world);
+							Tile tile = tiles.get(i);
+							propogate(tile, world);
 						}
 					});
 					futures.add(future);
@@ -170,7 +172,7 @@ public class LiquidSimulation {
 			LiquidType mytype = liquidTypesTemp[x][y];
 			
 			float oh = otherTile.getHeight();
-			float ov = world.get(other).liquidAmount;
+			float ov = liquidAmountsTemp[other.x()][other.y()];
 			
 			if(myh + myv < oh + ov) {
 				float delta = (oh + ov) - (myh + myv);
@@ -180,7 +182,7 @@ public class LiquidSimulation {
 					change = ov;
 				}
 				if(otype == mytype || mytype == LiquidType.DRY || (otype.isWater && mytype.isWater)) {
-					if(change < otype.selfSurfaceTension) { 
+					if(mytype == LiquidType.DRY && change < otype.selfSurfaceTension) {
 						change = 0;
 					}
 					// disabled erosion due to making it hard to parallelize

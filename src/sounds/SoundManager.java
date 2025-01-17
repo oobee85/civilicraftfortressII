@@ -1,9 +1,6 @@
 package sounds;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -26,7 +23,8 @@ public class SoundManager {
 			return;
 		}
 		try (InputStream stream = SoundManager.class.getClassLoader().getResourceAsStream(basePath + sound.getFileName()); 
-				AudioInputStream audioStream = AudioSystem.getAudioInputStream(stream);
+				BufferedInputStream buf = new BufferedInputStream(stream);
+				AudioInputStream audioStream = AudioSystem.getAudioInputStream(buf);
 				) {
 			
 			Clip clip = AudioSystem.getClip();
