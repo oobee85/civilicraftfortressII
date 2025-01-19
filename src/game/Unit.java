@@ -847,7 +847,7 @@ public class Unit extends Thing implements Serializable {
 	private boolean buildBuilding(Building building) {
 		building.expendEffort(1);
 		if (building.getRemainingEffort() > 0) {
-			building.heal(building.getMaxHealth() / building.getRemainingEffort(), false);
+			building.heal(building.getMaxHealth() / building.getTotalEffort(), false);
 		}
 		if (building.getRemainingEffort() < building.getTotalEffort()) {
 			building.setPlanned(false);
