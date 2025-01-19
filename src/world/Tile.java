@@ -502,6 +502,13 @@ public class Tile implements Externalizable {
 			return false;
 		}
 	}
+	public boolean isRoughTerrain() {
+		if(this.terrain == Terrain.ROCK || this.terrain == Terrain.VOLCANO || this.terrain == Terrain.SAND) {
+			return true;
+		}else {
+			return false;
+		}
+	}
 	
 	public boolean canGrow() {
 		if (isCold() || isHot()) {

@@ -21,6 +21,7 @@ public class Building extends Thing implements Serializable {
 	
 	private BuildingType buildingType;
 	private double remainingEffort;
+	private double totalEffort;
 	private LinkedList<Unit> producingUnitList = new LinkedList<Unit>(); // TODO need to review if this works over network
 	private double culture;
 	private transient Tile spawnLocation;
@@ -41,6 +42,7 @@ public class Building extends Thing implements Serializable {
 	public Building(BuildingType buildingType, Tile tile, Faction faction) {
 		super(buildingType.getHealth(), buildingType.getMipMap(), faction, tile, buildingType.getInventoryStackSize());
 		this.remainingEffort = buildingType.getBuildingEffort();
+		this.totalEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
 		this.spawnLocation = tile;
 		this.timeToHarvest = baseTimeToHarvest;
@@ -129,8 +131,10 @@ public class Building extends Thing implements Serializable {
 			remainingEffortToProduceUnit -= 1;
 			if(remainingEffortToProduceUnit <= 0) {
 				if (!simulated) {
+					
 					Unit unit = getProducingUnit().remove();
 					PlannedAction whatToDo = null;
+					
 					if(unit.isBuilder()) {
 						Plant plant = getSpawnLocation().getPlant();
 						Building building = getSpawnLocation().getBuilding();
@@ -139,9 +143,10 @@ public class Building extends Thing implements Serializable {
 							whatToDo = PlannedAction.harvest(plant);
 						}// BUILDING CASE
 						else if(building != null && building.getFactionID() == unit.getFactionID() && building.getType().isHarvestable()) {
+							// if building is harvestable
 							whatToDo = PlannedAction.harvest(building);
 						}else if(building != null && building.getFactionID() == unit.getFactionID() && building.getType().isHarvestable()) {
-							
+							// if building is not harvestable
 						}
 						
 					}
@@ -280,8 +285,21 @@ public class Building extends Thing implements Serializable {
 	public double getRemainingEffort() {
 		return remainingEffort;
 	}
+	public void setTotalEffort(double totalEffort) {
+		this.totalEffort = totalEffort;
+	}
+	public double getTotalEffort() {
+		return this.totalEffort;
+	}
 	public void setRemainingEffort(double effort) {
 		remainingEffort = effort;
+//		remainingEffort = updateEffortBasedOnTileConditions(effort);
+	}
+	private double updateEffortBasedOnTileConditions(double effort) {
+		if(this.getTile().getPlant() != null) {
+			effort += this.getTile().getPlant().getHealth();
+		}
+		return effort;
 	}
 	public boolean isBuilt() {
 		return remainingEffort <= 0;

@@ -1178,7 +1178,7 @@ public class Game {
 			}
 		}
 		if (windmill != null) {
-			windmill.setRemainingEffort(windmill.getType().getBuildingEffort());
+			windmill.setRemainingEffort(0);
 			windmill.setPlanned(true);
 		}
 	}
@@ -1337,9 +1337,22 @@ public class Game {
 	}
 
 	public Building planBuilding(Unit unit, BuildingType bt, Tile tile) {
-		if (canBuild(unit, bt, tile) == true) {
+		if (canBuild(unit, bt, tile) == true) { // if the unit can build it
 			unit.getFaction().payCost(bt.getCost());
 			Building building = new Building(bt, tile, unit.getFaction());
+			double totalEffort = bt.getBuildingEffort();
+			if(tile.getPlant() != null) { // if tile has a plant on it, increase the time to build
+				totalEffort += (tile.getPlant().getMaxHealth() / 4);
+			}
+			if(tile.isRoughTerrain()) { // if tile is sand, rock, increase cost to build by 10%
+				totalEffort += bt.getBuildingEffort() *  0.1;
+			}
+			totalEffort += tile.getHeight() / 100; // increase cost by height
+			totalEffort += tile.liquidAmount; // increase cost by liquid
+			
+			building.setRemainingEffort(totalEffort);
+			building.setTotalEffort(totalEffort);
+			
 			world.addBuilding(building);
 			building.setPlanned(true);
 			// Start off planned buildings at 1% health

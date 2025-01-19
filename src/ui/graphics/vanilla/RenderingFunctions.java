@@ -1002,7 +1002,7 @@ public class RenderingFunctions {
 			g2d.drawImage(bI, drawx, drawy, tileSize, tileSize, null);
 			Utils.setTransparency(g, 1f);
 			// draws the partial image
-			double percentDone = 1 - building.getRemainingEffort() / building.getType().getBuildingEffort();
+			double percentDone = 1 - building.getRemainingEffort() / building.getTotalEffort();
 			int imageRatio = Math.max(1, (int) (bI.getHeight() * percentDone));
 			int partialHeight = Math.max(1, (int) (tileSize * percentDone));
 			bI = bI.getSubimage(0, bI.getHeight() - imageRatio, bI.getWidth(), imageRatio);

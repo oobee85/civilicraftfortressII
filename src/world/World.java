@@ -1021,7 +1021,11 @@ public class World {
 				}
 			}
 			if(!simulated && projectile.reachedTarget()) {
-				int updatedDamage = projectile.getSource().getFaction().getUpgradedProjectileDamage() + projectile.getDamage();
+				int updatedDamage = projectile.getDamage();
+				if(projectile.getSource() != null && projectile.getSource().getFaction() != null) {
+					updatedDamage += projectile.getSource().getFaction().getUpgradedProjectileDamage();
+					
+				}
 				
 				if(projectile.getType().isExplosive()) {
 //					if(projectile.getType().getRadius() <= 2) {

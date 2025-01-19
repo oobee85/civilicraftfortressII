@@ -825,15 +825,15 @@ public final class Utils {
 				}
 				if(unit.isBuilder() && unit.getBuildableBuildingTypes().contains(buildingType)) {
 					Building plannedBuilding = game.planBuilding(unit, buildingType, target);
-					if(plannedBuilding != null) {
-						if(plannedBuilding.getType().isHarvestable()) {
-							PlannedAction followup = PlannedAction.harvest(plannedBuilding);
-							unit.queuePlannedAction(PlannedAction.buildOnTile(target, buildingType.isRoad(), followup));
-						}
-						else {
-							unit.queuePlannedAction(PlannedAction.buildOnTile(target, buildingType.isRoad()));
-						}
+					// if building is planned, and is harvestable, should queue harvest action
+					if(plannedBuilding != null && plannedBuilding.getType().isHarvestable()) {
+						PlannedAction followup = PlannedAction.harvest(plannedBuilding);
+						unit.queuePlannedAction(PlannedAction.buildOnTile(target, buildingType.isRoad(), followup));
 					}
+					else {
+						unit.queuePlannedAction(PlannedAction.buildOnTile(target, buildingType.isRoad()));
+					}
+					
 					return plannedBuilding;
 				}
 				return null;
