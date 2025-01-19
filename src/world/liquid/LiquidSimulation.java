@@ -114,6 +114,10 @@ public class LiquidSimulation {
 				tile.liquidAmount -= evaporation;
 //				tile.getAir().addHumidity(evaporation);
 			}
+			// the drain removes water
+			if(tile.getBuilding() != null && tile.getBuilding().getType().isDrain()) {
+				tile.liquidAmount -= 0.5;
+			}
 			
 		}
 		//Utils.normalize(heightMap);

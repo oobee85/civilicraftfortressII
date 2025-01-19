@@ -213,6 +213,7 @@ public class Tile implements Externalizable {
 			
 //			evaporation = (Math.exp(this.getTemperature()/50) /(2*this.liquidAmount));
 			evaporation = ( 0.01*(this.getTemperature() - Constants.KELVINOFFSET)*Math.min(2, this.liquidAmount) );
+			
 //			liquidAmount -= evaporation;
 		}
 		
@@ -601,14 +602,16 @@ public class Tile implements Externalizable {
 			return true;
 		}
 		return false;
-		
+	}
+	private boolean hasDrain() {
+		return (hasBuilding() && getBuilding().getType().isDrain());
 	}
 
 	public double[] computeTileDanger() {
 		double[] damage = new double[DamageType.values().length];
 		if (liquidAmount > liquidType.getMinimumDamageAmount()) {
-			// Don't take water damage if there is a port or bridge
-			if(!(liquidType.isWater() && hasBridgeOrPort())) {
+			// Don't take water damage if there is a port or bridge or drain
+			if(!(liquidType.isWater() && (hasBridgeOrPort() || hasDrain()))) {
 				damage[liquidType.getDamageType().ordinal()] += liquidAmount * liquidType.getDamage();
 			}
 		}

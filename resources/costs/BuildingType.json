@@ -394,14 +394,14 @@
 	{
 		"name":"DRAIN",
 		"info":"Drains out water",
-		"image":"Images/buildings/scorpionDen.png",
+		"image":"Images/buildings/drain.png",
 		"vision":1,
-		"cost":{"WOOD":200, "STONE":200},
-		"attributes":["stone", "bridge"],
+		"cost":{"WOOD":500, "STONE":500},
+		"attributes":["stone", "bridge", "drain"],
 		"culture":0,
 		"health":500,
 		"research":"MASONRY",
-		"effort":500
+		"effort":1000
 	}
 ]
 }
