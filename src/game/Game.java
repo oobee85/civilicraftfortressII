@@ -944,6 +944,10 @@ public class Game {
 					road.setRemainingEffort(0);
 					t.setRoad(road);
 					world.addBuilding(road);
+					if(t.getPlant() != null) {
+						t.getPlant().setDead(true);
+						t.getPlant().setRemoved(true);
+					}
 				}
 			}
 		}
@@ -1123,6 +1127,7 @@ public class Game {
 						summonBuilding(current, type, newFaction);
 						thingType = null;
 						if (current.getPlant() != null) {
+							current.getPlant().setRemoved(true);
 							current.getPlant().setDead(true);
 						}
 
@@ -1213,6 +1218,7 @@ public class Game {
 			return null;
 		}
 		if (tile.getPlant() != null) {
+			tile.getPlant().setRemoved(true);
 			tile.getPlant().setDead(true);
 		}
 		Plant plant = new Plant(plantType, tile, faction);

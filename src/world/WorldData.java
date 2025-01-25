@@ -64,18 +64,20 @@ public class WorldData {
 				}
 				addDeadThing(building);
 				
-				
-				if(building.getType().isWoodConstruction()) {
-					Sound sound = new Sound(SoundEffect.BUILDING_WOOD_DEATH, null, building.getTile());
-					SoundManager.theSoundQueue.add(sound);
-				}else 
-				if(building.getType().isStoneConstruction()) {
-					Sound sound = new Sound(SoundEffect.BUILDING_STONE_DEATH, null, building.getTile());
-					SoundManager.theSoundQueue.add(sound);
-				}else {
-					Sound sound = new Sound(SoundEffect.BUILDING_WOOD_DEATH, null, building.getTile());
-					SoundManager.theSoundQueue.add(sound);
+				if(building.isRemoved() == false) {
+					if(building.getType().isWoodConstruction()) {
+						Sound sound = new Sound(SoundEffect.BUILDING_WOOD_DEATH, null, building.getTile());
+						SoundManager.theSoundQueue.add(sound);
+					}else 
+					if(building.getType().isStoneConstruction()) {
+						Sound sound = new Sound(SoundEffect.BUILDING_STONE_DEATH, null, building.getTile());
+						SoundManager.theSoundQueue.add(sound);
+					}else {
+						Sound sound = new Sound(SoundEffect.BUILDING_WOOD_DEATH, null, building.getTile());
+						SoundManager.theSoundQueue.add(sound);
+					}
 				}
+				
 				
 				
 			} else {
@@ -104,8 +106,12 @@ public class WorldData {
 				ThingMapper.removed(plant);
 				plant.getTile().setHasPlant(null);
 				addDeadThing(plant);
-				Sound sound = new Sound(SoundEffect.DEATH_PLANT, null, plant.getTile());
-				SoundManager.theSoundQueue.add(sound);
+				// removed is a similar thing to
+				if(plant.isRemoved() == false) {
+					Sound sound = new Sound(SoundEffect.DEATH_PLANT, null, plant.getTile());
+					SoundManager.theSoundQueue.add(sound);
+				}
+				
 			} else {
 				plantsCopy.add(plant);
 			}
@@ -148,8 +154,11 @@ public class WorldData {
 					}
 				}
 //				SoundManager.theSoundQueue.add(SoundEffect.DEATH);
-				Sound sound = new Sound(SoundEffect.DEATH_UNIT, unit.getFaction(), unit.getTile());
-				SoundManager.theSoundQueue.add(sound);
+				if(unit.isRemoved() == false) {
+					Sound sound = new Sound(SoundEffect.DEATH_UNIT, unit.getFaction(), unit.getTile());
+					SoundManager.theSoundQueue.add(sound);
+				}
+				
 				
 				unit.getFaction().removeUnit(unit);
 				unit.getTile().removeUnit(unit);

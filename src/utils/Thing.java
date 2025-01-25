@@ -17,6 +17,7 @@ public class Thing implements Serializable, Comparable<Thing> {
 	private double maxHealth;
 	private double health;
 	private boolean isDead;
+	private boolean isRemoved;
 	private TileLoc tileLoc;
 	private transient Tile tile;
 	
@@ -42,6 +43,7 @@ public class Thing implements Serializable, Comparable<Thing> {
 		}
 		ThingMapper.created(this);
 		setTile(tile);
+		this.isRemoved = false;
 	}
 	
 	public int id() {
@@ -67,7 +69,15 @@ public class Thing implements Serializable, Comparable<Thing> {
 	public void setDead(boolean state) {
 		isDead = state;
 	}
+	// setting removed doesnt play sound when it dies
+	public void setRemoved(boolean state) {
+		isRemoved = state;
+	}
 	
+	// if thing is removed, it wont play sound when dying
+	public boolean isRemoved() {
+		return isRemoved;
+	}
 	public boolean isDead() {
 		return health <= 0 || isDead;
 	}

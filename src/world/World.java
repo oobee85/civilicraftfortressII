@@ -504,9 +504,11 @@ public class World {
 		}
 		if(tile.getBuilding() != null) {
 			tile.getBuilding().setDead(true);
+			tile.getBuilding().setRemoved(true);
 		}
 		if(tile.getPlant() != null) {
 			tile.getPlant().setDead(true);
+			tile.getPlant().setRemoved(true);
 		}
 		Building building = new Building(buildingType, tile, faction);
 		building.setRemainingEffort(0);

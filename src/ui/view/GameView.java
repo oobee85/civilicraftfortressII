@@ -110,7 +110,7 @@ public class GameView {
 //					System.out.println("screen loc: " + screenloc);
 					if (theSound.getTile() != null) {
 						int distance = theSound.getTile().getLocation().distanceTo(screenloc);
-						float volume = (float)(-1.3f * (float)(distance));
+						float volume = (float)(-1.5f * (float)(distance));
 						SoundManager.setVolume(theSound, volume);
 //						System.out.println("volume: " + volume);
 //						System.out.println("distance to sound: " + distance);
