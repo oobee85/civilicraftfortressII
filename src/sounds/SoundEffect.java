@@ -35,6 +35,18 @@ public enum SoundEffect {
 	BUILDING_STONE_DEATH("building_stone_death.wav"),
 	BUILDING_WOOD_DEATH("building_wood_death.wav"),
 	
+	COMBAT1 ("music/combat1.wav"),
+	COMBAT2 ("music/combat2.wav"),
+	COMBAT3 ("music/combat3.wav"),
+	COMBAT4 ("music/combat4.wav"),
+	
+	explore1 ("music/explore1.wav"),
+	explore2 ("music/explore2.wav"),
+	explore3 ("music/explore3.wav"),
+	explore4 ("music/explore4.wav"),
+	
+	tense1 ("music/tense1.wav"),
+	
 	
 	;
 	

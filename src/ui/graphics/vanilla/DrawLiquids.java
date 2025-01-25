@@ -355,7 +355,7 @@ public class DrawLiquids {
 
 	
 	public static void drawPolygonLiquid2(Tile tile, Graphics g, int drawx, int drawy, int tileSize, RenderingState state) {
-		
+		Color c = g.getColor();
 		float[] amounts = new float[Direction.values().length];
 		float myamount = tile.runningAverageLiquidAmount;
 //		float myamount = tile.liquidAmount * tileSize / scale;
@@ -380,11 +380,14 @@ public class DrawLiquids {
 			}
 			int scale = 20;
 			double alpha = Math.min(0.5, reducedAmounts[NONE.ordinal()]*2/scale);
+			
 			Utils.setTransparency(g, alpha);
 			g.setColor(color);
 			drawWaterLayer(tile, g, drawx, drawy, tileSize, reducedAmounts, scale);
 			Utils.setTransparency(g, 1);
+			
 		}
+		g.setColor(c);
 	}
 	private static Polygon draw1sideB(int drawx, int drawy, int tileSize, 
 			int[] avgsFull, int[] avgsHalf, Direction shortSide) {

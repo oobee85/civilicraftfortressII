@@ -772,10 +772,12 @@ public class Game {
 			}
 			building.tick(world, simulated);
 			
-			// smithy produces bars
-			if (building.getType().isSmithy() && building.readyToProduce()) {
-				haveSmithyProduceBar(building);
+			if(building.getType().isCrafting() && building.readyToProduce()) {
+				haveBuildingProduceItem(building);
+				
+				
 			}
+			
 
 			if (building.isMoria() && building.isBuilt()) {
 				generateMoria(building);
@@ -796,6 +798,58 @@ public class Game {
 		world.summonBuilding(tile, buildingTypeMap.get("MORIA"), balrogFaction);
 	}
 
+	private void haveBuildingProduceItem(Building building) {
+		if(building == null) {
+			return;
+		}
+		
+		final ItemType[] forgeItems = new ItemType[] { ItemType.BRONZE_BAR, ItemType.IRON_BAR, ItemType.GOLD_BAR,
+				ItemType.MITHRIL_BAR, ItemType.ADAMANTITE_BAR, ItemType.RUNITE_BAR, ItemType.TITANIUM_BAR, ItemType.BRICK};
+		
+		final ItemType[] lumberItems = new ItemType[] { ItemType.SWORD, ItemType.BOW, ItemType.SHIELD,
+				};
+		
+		List<ItemType> canCraft = new ArrayList<>();
+		
+		// if building is smithy, craft from forgeItems
+		if(building.getType().isSmithy()) {
+			// go through craftable bars and add affordable ones to a new list
+			for (ItemType item : forgeItems) {
+				if (building.getFaction().canAfford(item, 1) == true) {
+					canCraft.add(item);
+				}
+			}
+		}
+		
+		// if building is lumberYard, craft from lumberItems
+		if(building.getType().isLumber()) {
+			// go through craftable bars and add affordable ones to a new list
+			for (ItemType item : lumberItems) {
+				if (building.getFaction().canAfford(item, 1) == true) {
+					canCraft.add(item);
+				}
+			}
+		}
+		
+		// randomly select item from crafting list to craft
+		if (!canCraft.isEmpty()) {
+			ItemType crafting = canCraft.get((int) (Math.random() * canCraft.size()));
+			building.getFaction().craftItem(crafting, 1);
+			building.resetTimeToProduce();
+			
+			// decide what sound to play
+			if(building.getType().isSmithy()) {
+				Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile());
+				SoundManager.theSoundQueue.add(sound);
+			}
+			if(building.getType().isLumber()) {
+				Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile());
+				SoundManager.theSoundQueue.add(sound);
+			}
+		}
+		
+	}
+	
 	private void haveSmithyProduceBar(Building building) {
 		// if building is smithy // if smithy is ready to produce
 

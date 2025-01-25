@@ -116,7 +116,7 @@ public class GameView {
 //						System.out.println("distance to sound: " + distance);
 					}
 					if(theSound.getFaction() == this.getFaction() || theSound.getFaction() == null) {
-						SoundManager.PlaySound(theSound);
+						SoundManager.playSound(theSound);
 					}
 					
 				} catch (InterruptedException e) {

@@ -611,7 +611,7 @@ public class Tile implements Externalizable {
 		double[] damage = new double[DamageType.values().length];
 		if (liquidAmount > liquidType.getMinimumDamageAmount()) {
 			// Don't take water damage if there is a port or bridge or drain
-			if(!(liquidType.isWater() && (hasBridgeOrPort() || hasDrain()))) {
+			if(!(liquidType == LiquidType.WATER && (hasBridgeOrPort() || hasDrain()))) {
 				damage[liquidType.getDamageType().ordinal()] += liquidAmount * liquidType.getDamage();
 			}
 		}

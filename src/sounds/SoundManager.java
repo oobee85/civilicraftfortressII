@@ -17,8 +17,10 @@ public class SoundManager {
 
 	public static LinkedBlockingQueue<Sound> theSoundQueue = new LinkedBlockingQueue<Sound>();
 	
-	// theoretically loads a sound
-	public static void LoadSound(SoundEffect sound) {
+	
+	
+	// loads a sound
+	public static void loadSound(SoundEffect sound) {
 		if(sounds.containsKey(sound)) {
 			return;
 		}
@@ -36,8 +38,33 @@ public class SoundManager {
 		}
 	}
 	
+	public static void playSoundWithEnd(Sound sound) {
+		Clip clip = sounds.get(sound.getSoundEffect());
+		if(clip == null) {
+			System.out.println("playSound() clip is null");
+			return;
+		}
+		
+		clip.addLineListener(event -> {
+            if (event.getType() == LineEvent.Type.STOP) {
+//                System.out.println("Sound finished playing.");
+            	
+                clip.close(); // Close the clip when done
+            }
+        });
+		
+		// if already playing, stop and then restart, TODO might not want this
+		if(clip.isRunning()) {
+			clip.stop();
+		}
+		
+		
+		clip.setFramePosition(0);
+		clip.start();
+	}
+	
 	// plays a sound
-	public static void PlaySound (Sound sound) {
+	public static void playSound(Sound sound) {
 		Clip clip = sounds.get(sound.getSoundEffect());
 		
 		if(clip == null) {

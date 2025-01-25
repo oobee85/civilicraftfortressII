@@ -109,13 +109,16 @@ public class GameViewOverlay extends JPanel {
 		// inventory rows
 		ItemType[][] rows = new ItemType[][] {
 			new ItemType[] {
-					FOOD, WOOD, STONE, HORSE, MAGIC, CLAY, BRICK
+					FOOD, WOOD, STONE, HORSE, MAGIC, CLAY
 			},
 			new ItemType[] {
 					COPPER_ORE, SILVER_ORE, IRON_ORE, MITHRIL_ORE, GOLD_ORE, ADAMANTITE_ORE, RUNITE_ORE, TITANIUM_ORE
 			},
 			new ItemType[] {
 					COAL, BRONZE_BAR, IRON_BAR, MITHRIL_BAR, GOLD_BAR, ADAMANTITE_BAR, RUNITE_BAR, TITANIUM_BAR
+			},
+			new ItemType[] {
+					SWORD, SHIELD, BOW, BRICK
 			}
 		};
 		for(int row = 0; row < rows.length; row++) {

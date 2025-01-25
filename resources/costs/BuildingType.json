@@ -40,16 +40,15 @@
 	},
 	{
 		"name":"SAWMILL",
-		"info":"Workers deposit wood here",
+		"info":"Produces more complicated wooden items.",
 		"image":"Images/buildings/sawmill.gif",
 		"vision":10,
-		"cost":{"WOOD":100, "STONE":100},
+		"cost":{"WOOD":500, "STONE":100},
 		"culture":0.1,
-		"attributes":["colony", "wood"],
-		"inventory":{"maxstack":500},
+		"attributes":["wood", "crafting", "lumber"],
 		"research":"FARMING",
-		"health":200,
-		"effort":200
+		"health":1000,
+		"effort":1000
 	},
 	{
 		"name":"QUARRY",
@@ -246,8 +245,20 @@
 		"culture":0.5,
 		"health":500,
 		"effort":500,
-		"attributes":["smithy", "stone"],
+		"attributes":["smithy", "stone", "crafting"],
 		"research":"FARMING"
+	},
+	{
+		"name":"BRICKWORKS",
+		"info":"Turns clay into brick materials",
+		"image":"Images/buildings/blacksmith.gif",
+		"vision":1,
+		"cost":{"WOOD":1000, "STONE":1000},
+		"culture":0.5,
+		"health":2000,
+		"effort":2000,
+		"attributes":["brick", "stone", "crafting"],
+		"research":"MASONRY"
 	},
 	{
 		"name":"STONE_ROAD",

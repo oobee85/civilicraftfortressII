@@ -970,6 +970,7 @@ public class RenderingFunctions {
 			
 			if(tile.getBuilding() == null && tile.getUnits().peek() == null) {
 				// draws the number of items on the ground
+				g.setFont(new Font("SansSerif", Font.BOLD, 12));
 				g.drawString(""+item.getAmount(), drawx + x*imageWidth, drawy + y*imageWidth + 1/2*imageWidth);
 			}
 			

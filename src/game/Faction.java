@@ -436,16 +436,48 @@ public class Faction implements Externalizable {
 	}
 	
 	public void craftItem(ItemType type, int amount) {
-		BuildingType requiredBuilding = Game.buildingTypeMap.get(type.getBuilding());
-		for(Building building : getBuildings()) {
-//			if(building.getType() == requiredBuilding && building.getFaction() == this) {
-				for(int i = 0; i < amount && canAfford(type.getCost()); i++) {
-					payCost(type.getCost());
-					inventory.addItem(type, 1);
-				}
-				return;
-//			}
+		
+		for(int i = 0; i < amount && canAfford(type.getCost()); i++) {
+			payCost(type.getCost());
+			inventory.addItem(type, 1);
 		}
+		
+		
+		if(type == ItemType.MEDICINE || type == ItemType.BETTER_WEAPONS || type == ItemType.IMPROVED_SPARRING || type == ItemType.SHIELDS || type == ItemType.BETTER_FORMATIONS || type == ItemType.FASTER_TRAINING || type == ItemType.UNDYING_ARMY || type == ItemType.BROADHEADS) {
+			
+//			int itemCount = 1;
+//			for(Item item: this.getInventory().getItems()) {
+//				ItemType type1 = item.getType();
+//				if(type1 == ItemType.MEDICINE || type1 == ItemType.BETTER_WEAPONS || type1 == ItemType.IMPROVED_SPARRING || type1 == ItemType.SHIELDS || type1 == ItemType.BETTER_FORMATIONS || type1 == ItemType.FASTER_TRAINING || type1 == ItemType.UNDYING_ARMY || type1 == ItemType.BROADHEADS) {
+//					itemCount ++;
+//				}
+//			}
+			HashMap<ItemType, Integer> hashMap = type.getCost();
+			
+			// <bronze bar, 100>
+			// <copper, 10>, <silver, 10>
+			// <copper, 20>, <silver, 20>
+			// for(ItemType type : bronze.getCost().keySet())
+			// int number = type.get(type) * 2;
+			// bronze.getCost().put(<type, number>)
+
+			 for(ItemType asdf : hashMap.keySet()) {
+				 int number = hashMap.get(asdf) * 2;
+				 hashMap.put(asdf, number);
+			 }
+				 
+			 
+			
+//			cost.put(type, cost.get()*itemCount);
+			
+			if(canAfford(hashMap)) {
+				this.updateUpgradedAttackStyle(type);
+				this.updateUpgradedCombatStats(type);
+			}
+			
+		}
+		
+		return;
 	}
 	
 	public boolean usesItems() {
