@@ -1,0 +1,648 @@
+{
+"unittypes": [
+	{
+		"image":"Images/units/worker.png",
+		"cost":{"FOOD":50},
+		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":200},
+		"attackstyles":[
+			{"damage":0, "cooldown":60, "range":1}
+		],
+		"name":"WORKER",
+		"inventory":{"maxstack":20},
+		"builds":["WALL_WOOD", "GATE_WOOD", "FARM", "MINE", "BARRACKS", "TRAP", "COLONY","STABLES", "WORKSHOP", "SMITHY",
+				 "WATCHTOWER", "PORT", "WALL_STONE", "GATE_STONE", "WALL_BRICK", "GATE_BRICK", "GRANARY", "WINDMILL",
+				 "CASTLE", "NECROPOLIS", "RESEARCH_LAB", "STONE_ROAD", "BRICK_ROAD", "BRIDGE", "HELLFORGE"]
+	},
+	{
+		"image":"Images/units/mason.png",
+		"cost":{"FOOD":60},
+		"stats":{"movespeed":20,"buildtime":100,"health":100,"healspeed":200},
+		"attackstyles":[
+			{"damage":0, "cooldown":60, "range":1}
+		],
+		"name":"MASON",
+		"research":"MASONRY",
+		"inventory":{"maxstack":30},
+		"builds":["WALL_STONE", "GATE_STONE", "WALL_BRICK", "GATE_BRICK", "MINE", "QUARRY", "GRANARY", "WINDMILL",
+				"WATCHTOWER", "CASTLE", "NECROPOLIS", "RESEARCH_LAB", "STONE_ROAD", "BRICK_ROAD", "HELLFORGE"]
+	},
+	{
+		"image":"Images/units/chariot.png",
+		"cost":{"WOOD":100,"FOOD":100},
+		"stats":{"movespeed":10,"buildtime":200,"health":100,"healspeed":200},
+		"name":"CARAVAN",
+		"attackstyles":[
+			{"damage":0, "cooldown":60, "range":1}
+		],
+		"attributes":["caravan"],
+		"inventory":{"maxstack":600},
+	},
+	{
+		"image":"Images/units/warrior.png",
+		"cost":{"WOOD":100,"FOOD":100},
+		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":200},
+		"name":"WARRIOR",
+		"attackstyles":[
+			{"damage":10, "cooldown":30, "range":1}
+		],
+		"attributes":["hostile"],
+		"targeting":[{"type":"game.Unit"}]
+	},
+	{
+		"image":"Images/units/spearman.png",
+		"cost":{"BRONZE_BAR":2,"WOOD":100,"FOOD":200},
+		"stats":{"movespeed":15,"buildtime":200,"health":500,"healspeed":200},
+		"name":"SPEARMAN",
+		"attackstyles":[
+			{"damage":30, "cooldown":30, "range":1}
+		],
+		"attributes":["hostile"],
+		"research":"BRONZE_WORKING",
+		"targeting":[{"type":"game.Unit"}]
+	},
+	{
+		"image":"Images/units/archer.png",
+		"cost":{"BRONZE_BAR":1,"FOOD":200},
+		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":200},
+		"name":"ARCHER",
+		"attributes":["hostile"],
+		"attackstyles":[
+			{"damage":15, "cooldown":30, "range":3, "minrange":1, "projectile":"ARROW"}
+		],
+		"research":"MASONRY",
+		"targeting":[{"type":"game.Unit"}]
+	},
+	{
+		"image":"Images/units/swordsman.png",
+		"cost":{"IRON_BAR":4,"WOOD":100,"FOOD":200},
+		"stats":{"movespeed":10,"buildtime":200,"health":300,"healspeed":200},
+		"name":"SWORDSMAN",
+		"attackstyles":[
+			{"damage":40, "cooldown":20, "range":1}
+		],
+		"inventory":{"maxstack":5},
+		"attributes":["hostile"],
+		"research":"IRON_WORKING",
+		"targeting":[{"type":"game.Unit"}]
+	},
+	{
+		"image":"Images/units/longbowman.png",
+		"cost":{"MITHRIL_BAR":4, "WOOD":100, "FOOD":100},
+		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":200},
+		"name":"LONGBOWMAN",
+		"attackstyles":[
+			{"damage":60, "cooldown":30, "range":6, "minrange":1, "projectile":"ARROW"}
+		],
+		"inventory":{"maxstack":5},
+		"attributes":["hostile"],
+		"research":"MATHEMATICS",
+		"targeting":[{"type":"game.Unit"}]
+	},
+	{
+		"image":"Images/units/catapult.png",
+		"cost":{"WOOD":500,"MITHRIL_BAR":20,"STONE":250},
+		"stats":{"movespeed":40,"buildtime":600,"health":200,"healspeed":200},
+		"name":"CATAPULT",
+		"attackstyles":[
+			{"damage":300, "cooldown":100, "range":10, "minrange":3, "projectile":"ROCK"}
+		],
+		"attributes":["hostile", "wheeled"],
+		"research":"MATHEMATICS",
+		"targeting":[{"type":"game.Unit"}],
+		"loot":{"WOOD":200}
+	},
+	{
+		"image":"Images/units/trebuchet.png",
+		"cost":{"ADAMANTITE_BAR":20,"WOOD":1000,"STONE":500},
+		"stats":{"movespeed":40,"buildtime":1000,"health":200,"healspeed":200},
+		"name":"TREBUCHET",
+		"attackstyles":[
+			{"damage":600, "cooldown":100, "range":20, "minrange":5, "projectile":"FIREBALL_TREBUCHET"}
+		],
+		"attributes":["hostile", "wheeled"],
+		"research":"ENGINEERING",
+		"targeting":[{"type":"game.Building"}],
+		"loot":{"WOOD":200}
+	},
+	{
+		"image":"Images/units/siege_tower.png",
+		"cost":{"ADAMANTITE_BAR":20,"WOOD":1000,"STONE":500},
+		"stats":{"movespeed":40,"buildtime":1000,"health":200,"healspeed":200},
+		"name":"SIEGE TOWER",
+		"attackstyles":[
+			{"damage":0, "cooldown":1000, "range":0, "minrange":0}
+		],
+		"attributes":["hostile", "wheeled", "siegetower"],
+		"research":"ENGINEERING",
+		"targeting":[
+			{"type":"WALL"},
+			{"type":"game.Building"}],
+		"loot":{"WOOD":200}
+	},
+	{
+		"image":"Images/units/sniper.png",
+		"cost":{"WOOD":1250,"IRON_BAR":100,"MITHRIL_BAR":25,"ADAMANTITE_BAR":25,"RUNITE_BAR":25,"TITANIUM_BAR":50},
+		"stats":{"movespeed":100,"buildtime":3000,"health":20,"healspeed":200},
+		"name":"SNIPER",
+		"attackstyles":[
+			{"damage":1000, "cooldown":200, "range":30, "minrange":1}
+		],
+		"attributes":["hostile"],
+		"research":"CIVILIZATION",
+		"targeting":[{"type":"game.Unit"}]
+	},
+	{
+		"image":"Images/units/horseman.png",
+		"cost":{"HORSE":50, "FOOD":200},
+		"stats":{"movespeed":10,"buildtime":300,"health":200,"healspeed":200},
+		"name":"HORSEMAN",
+		"attackstyles":[
+			{"damage":20, "cooldown":20, "range":1}
+		],
+		"inventory":{"maxstack":5},
+		"attributes":["hostile"],
+		"research":"TRAPPING",
+		"targeting":[{"type":"game.Unit"}]
+	},
+	{
+		"image":"Images/units/knight.png",
+		"cost":{"HORSE":200,"FOOD":400, "ADAMANTITE_BAR":5,"WOOD":100},
+		"stats":{"movespeed":5,"buildtime":600,"health":500,"healspeed":200},
+		"name":"KNIGHT",
+		"attackstyles":[
+			{"damage":100, "cooldown":20, "range":1}
+		],
+		"inventory":{"maxstack":5},
+		"attributes":["hostile"],
+		"research":"ANIMAL_HUSBANDRY",
+		"targeting":[{"type":"game.Unit"}],
+	},
+	{
+		"image":"Images/units/wizard.png",
+		"stats":{"movespeed":15,"buildtime":1000,"health":200,"healspeed":200},
+		"cost":{"FOOD":200, "GOLD_BAR": 25},
+		"name":"WIZARD",
+		"attackstyles":[
+			{"damage":100, "cooldown":50, "range":5, "minrange":1, "projectile":"WIZARD_BALL"},
+		],
+		"research":"WITCHCRAFT",
+		"targeting":[
+			{"type":"game.Building"},
+			{"type":"game.Unit"}
+		],
+		"attributes":["hostile"],
+	},
+	{
+		"image":"Images/units/griffin.png",
+		"stats":{"movespeed":10,"buildtime":500,"health":500,"healspeed":200},
+		"cost":{"FOOD":500, "GRIFFIN": 100},
+		"name":"GRIFFIN",
+		"attackstyles":[
+			{"damage":60, "cooldown":30, "range":1}
+		],
+		"research":"ANIMAL_HUSBANDRY",
+		"targeting":[
+			{"type":"game.Building"},
+			{"type":"game.Unit"}
+		],
+		"attributes":["hostile", "flying"],
+		"resistances": {"COLD": 0}
+	},
+	{
+		"image":"Images/units/priest.png",
+		"stats":{"movespeed":15,"buildtime":500,"health":100,"healspeed":200},
+		"cost":{"FOOD":200, "GOLD_BAR": 4},
+		"name":"PRIEST",
+		"attackstyles":[
+		],
+		"inventory":{"maxstack":5},
+		"research":"MYSTICISM",
+		"targeting":[
+			
+		],
+		"attributes":["healer"],
+	},
+	{
+		"image":"Images/units/horsearcher.png",
+		"cost":{"ADAMANTITE_BAR":5,"HORSE":100,"FOOD":300},
+		"stats":{"movespeed":5,"buildtime":600,"health":500,"healspeed":200},
+		"name":"HORSEARCHER",
+		"attackstyles":[
+			{"damage":100, "cooldown":20, "range":3, "minrange":1, "projectile":"RUNE_ARROW"}
+		],
+		"inventory":{"maxstack":5},
+		"attributes":["hostile"],
+		"research":"DOMESTICATION",
+		"targeting":[{"type":"game.Unit"}]
+	},
+	{
+		"image":"Images/units/boat.png",
+		"cost":{"RUNITE_BAR":10,"WOOD":500,"FOOD":400},
+		"stats":{"movespeed":10,"buildtime":1000,"health":2000,"healspeed":400},
+		"name":"BOAT",
+		"attackstyles":[
+			{"damage":200, "cooldown":100, "range":6, "minrange":1, "projectile":"ROCK"}
+		],
+		"attributes":["aquatic"],
+		"resistances": {"COLD": 0, "DRY": 10000, "WATER": 0},
+		"loot":{"WOOD":250, "RUNITE_BAR":2}
+	},
+	{
+		"image":"Images/units/deer.png",
+		"stats":{"movespeed":5,"buildtime":0,"health":200,"healspeed":200},
+		"name":"DEER",
+		"attackstyles":[
+			{"damage":5, "cooldown":40, "range":1}
+		],
+		"attributes":["migratory"],
+		"loot":{"FOOD":200}
+	},
+	{
+		"image":"Images/units/horse.png",
+		"stats":{"movespeed":5,"buildtime":0,"health":200,"healspeed":200},
+		"name":"HORSE",
+		"attackstyles":[
+			{"damage":5, "cooldown":40, "range":1}
+		],
+		"attributes":["migratory"],
+		"loot":{"FOOD":200}
+	},
+	{
+		"image":"Images/units/pig.png",
+		"stats":{"movespeed":30,"buildtime":0,"health":200,"healspeed":200},
+		"name":"PIG",
+		"attackstyles":[
+			{"damage":10, "cooldown":40, "range":1}
+		],
+		"attributes":["migratory"],
+		"loot":{"FOOD":100}
+	},
+	{
+		"image":"Images/units/sheep.png",
+		"stats":{"movespeed":30,"buildtime":0,"health":200,"healspeed":200},
+		"name":"SHEEP",
+		"attackstyles":[
+			{"damage":5, "cooldown":40, "range":1}
+		],
+		"resistances": {"COLD": 0},
+		"loot":{"FOOD":100}
+	},
+	{
+		"image":"Images/units/cow.png",
+		"stats":{"movespeed":30,"buildtime":0,"health":200,"healspeed":200},
+		"name":"COW",
+		"attackstyles":[
+			{"damage":10, "cooldown":40, "range":1}
+		],
+		"attributes":["migratory"],
+		"loot":{"FOOD":100}
+	},
+	{
+		"image":"Images/units/fish2.png",
+		"stats":{"movespeed":5,"buildtime":0,"health":10,"healspeed":200},
+		"name":"FISH",
+		"attackstyles":[
+			{"damage":1, "cooldown":40, "range":1}
+		],
+		"attributes":["aquatic"],
+		"resistances": {"COLD": 0, "DRY": 100, "WATER": 0},
+		"loot":{"FOOD":100}
+	},
+	{
+		"image":"Images/units/dragon.png",
+		"stats":{"movespeed":5,"buildtime":0,"health":3000,"healspeed":200},
+		"name":"DRAGON",
+		"attackstyles":[
+			{"damage":120, "cooldown":30, "range":4, "minrange":1, "projectile":"FIREBREATH"},
+			{"damage":50, "cooldown":30, "range":1}
+		],
+		"attributes":["flying","hostile","cleave"],
+		"resistances": {"COLD": 0, "HEAT": 0},
+		"loot":{"RUNITE_BAR":20, "TITANIUM_BAR":10},
+		"targeting":[
+			{"type":"game.Unit"},
+			{"type":"game.Building"}
+		],
+	},
+	{
+		"image":"Images/units/vampire.png",
+		"cost":{"GOLD_BAR":10,"FOOD":100, "VAMPIRE": 100},
+		"stats":{"movespeed":15,"buildtime":300,"health":300,"healspeed":2},
+		"name":"VAMPIRE",
+		"attackstyles":[
+			{"damage":20, "cooldown":20, "range":1, "lifesteal":true}
+		],
+		"research":"DOMESTICATION",
+		"attributes":["flying","hostile"],
+		"targeting":[
+			{"type":"game.Unit", "faction":"PLAYER"},
+			{"type":"game.Unit"}
+		],
+		"loot":{"IRON_BAR":10}
+	},
+	{
+		"image":"Images/units/roc.png",
+		"stats":{"movespeed":10,"buildtime":300,"health":400,"healspeed":10},
+		"name":"ROC",
+		"attackstyles":[
+			{"damage":40, "cooldown":40, "range":1}
+		],
+		"targeting":[ 
+			{"type":"game.Building", "faction":"PLAYER"},
+			{"type":"game.Unit"}
+		],
+		"attributes":["flying","hostile"],
+		"resistances": {"COLD": 0},
+		"loot":{"IRON_BAR":10}
+	},
+	{
+		"image":"Images/units/ogre.png",
+		"stats":{"movespeed":30,"buildtime":300,"health":1000,"healspeed":5},
+		"name":"OGRE",
+		"attackstyles":[
+			{"damage":60, "cooldown":30, "range":1}
+		],
+		"attributes":["hostile","delayedinvasion","cleave"],
+		"targeting":[
+			{"type":"game.Unit", "faction":"PLAYER"}, 
+			{"type":"game.Building", "faction":"PLAYER"}
+		],
+		"loot":{"IRON_BAR":10, "BRONZE_BAR":10}
+	},
+	{
+		"image":"Images/units/ent.png",
+		"stats":{"movespeed":30,"buildtime":300,"health":500,"healspeed":10},
+		"cost":{"FOOD":300, "WOOD": 300, "ENT": 100},
+		"name":"ENT",
+		"attackstyles":[
+			{"damage":50, "cooldown":50, "range":1}
+		],
+		"research":"ANIMAL_HUSBANDRY",
+		"attributes":["hostile","delayedinvasion"],
+		"resistances": {"COLD": 0},
+		"targeting":[
+			{"type":"SAWMILL"}, 
+			{"type":"game.Unit", "faction":"PLAYER"}, 
+			{"type":"game.Building", "faction":"PLAYER"}
+		],
+		"loot":{"WOOD":1000}
+	},
+	{
+		"image":"Images/units/werewolf.png",
+		"stats":{"movespeed":10,"buildtime":300,"health":200,"healspeed":10},
+		"cost":{"FOOD":300, "WEREWOLF": 100},
+		"name":"WEREWOLF",
+		"attackstyles":[
+			{"damage":25, "cooldown":5, "range":1}
+		],
+		"research":"DOMESTICATION",
+		"attributes":["hostile"],
+		"targeting":[
+			{"type":"game.Unit", "faction":"PLAYER"}
+		],
+		"loot":{"IRON_BAR":10}
+	},
+	{
+		"image":"Images/units/lavagolem.png",
+		"stats":{"movespeed":30,"buildtime":0,"health":1000,"healspeed":10},
+		"name":"LAVAGOLEM",
+		"attackstyles":[
+			{"damage":200, "cooldown":50, "range":1}
+		],
+		"attributes":["hostile","delayedinvasion"],
+		"resistances": {"HEAT": 0},
+		"targeting":[
+			{"type":"MINE"}
+		],
+		"loot":{"COAL":500, "MITHRIL_BAR":25, "IRON_BAR":25, "ADAMANTITE_BAR":25}
+	},
+	{
+		"image":"Images/units/wolf.png",
+		"stats":{"movespeed":20,"buildtime":300,"health":200,"healspeed":50},
+		"cost":{"FOOD":100, "WOLF": 100},
+		"name":"WOLF",
+		"attackstyles":[
+			{"damage":40, "cooldown":20, "range":1}
+		],
+		"research":"TRAPPING",
+		"attributes":["hostile"],
+		"resistances": {"COLD": 0},
+		"loot":{"FOOD":300, "BRONZE_BAR": 10}
+	},
+	{
+		"image":"Images/units/cyclops.png",
+		"stats":{"movespeed":30,"buildtime":0,"health":500,"healspeed":10},
+		"name":"CYCLOPS",
+		"attackstyles":[
+			{"damage":80, "cooldown":40, "range":6, "minrange":2, "projectile":"ROCK"},
+			{"damage":40, "cooldown":40, "range":1}
+		],
+		"attributes":["hostile"],
+		"targeting":[
+			{"type":"SNIPER"}
+		],
+		"loot":{"ADAMANTITE_BAR":10, "IRON_BAR":10, "BRONZE_BAR":10}
+	},
+	{
+		"image":"Images/units/skeleton.png",
+		"cost":{"WOOD":50},
+		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":50},
+		"name":"SKELETON",
+		"attackstyles":[
+			{"damage":10, "cooldown":20, "range":1}
+		],
+		"research":"NECROMANCY",
+		"attributes":["hostile","delayedinvasion"],
+		"resistances": {"COLD": 0},
+		"targeting":[
+			{"type":"game.Unit", "faction":"PLAYER"},
+			{"type":"game.Building", "faction":"PLAYER"},
+			{"type":"game.Unit", "faction":"CYCLOPS"},
+			{"type":"game.Building", "faction":"CYCLOPS"}
+		],
+		"loot":{"BRONZE_BAR":5}
+	},
+	{
+		"image":"Images/units/icegiant.png",
+		"cost":{"IRON_BAR":2,"MITHRIL_BAR":2,"FOOD":300},
+		"stats":{"movespeed":30,"buildtime":400,"health":1000,"healspeed":10},
+		"name":"ICE_GIANT",
+		"attackstyles":[
+			{"damage":200, "cooldown":50, "range":1}
+		],
+		"attributes":["hostile","delayedinvasion","cleave"],
+		"resistances": {"COLD": 0},
+		"targeting":[
+			{"type":"game.Unit", "faction":"PLAYER"},
+			{"type":"game.Unit"}
+		],
+		"loot":{"IRON_BAR":10, "MITHRIL_BAR":20, "BRONZE_BAR":10}
+	},
+	{
+		"image":"Images/units/flamelet.png",
+		"stats":{"movespeed":25,"buildtime":0,"health":50,"healspeed":50},
+		"name":"FLAMELET",
+		"attackstyles":[
+			{"damage":1, "cooldown":30, "range":1, "projectile":"FIREBREATH"}
+		],
+		"attributes":["hostile"],
+		"resistances": {"HEAT": 0},
+		"targeting":[
+			{"type":"game.Building", "faction":"PLAYER"},
+			{"type":"game.Building"}
+		],
+		"loot":{"COAL":50}
+	},
+	{
+		"image":"Images/units/waterspirit.png",
+		"stats":{"movespeed":25,"buildtime":0,"health":50,"healspeed":50},
+		"name":"WATER_SPIRIT",
+		"attributes":["migratory"]
+	},
+	{
+		"image":"Images/units/parasite.png",
+		"stats":{"movespeed":5,"buildtime":0,"health":1,"healspeed":50},
+		"name":"PARASITE",
+		"attackstyles":[
+			{"damage":1, "cooldown":10, "range":0}
+		],
+		"attributes":["hostile"],
+		"resistances": {"HEAT": 0},
+		"targeting":[
+			{"type":"game.Unit", "faction":"PLAYER"},
+			{"type":"game.Unit", "faction":"CYCLOPS"}
+		]
+	},
+	{
+		"image":"Images/units/firefly.png",
+		"stats":{"movespeed":50,"buildtime":0,"health":50,"healspeed":50},
+		"name":"FIREFLY",
+		"attackstyles":[
+			{"damage":5, "cooldown":20, "range":1}
+		],
+		"attributes":["flying", "hostile"],
+		"targeting":[
+			{"type":"game.Building", "faction":"PLAYER"},
+			{"type":"game.Unit", "faction":"PLAYER"},
+			{"type":"game.Unit", "faction":"CYCLOPS"}
+		]
+	},
+	{
+		"image":"Images/units/bomb.png",
+		"stats":{"movespeed":25,"buildtime":0,"health":50,"healspeed":50},
+		"name":"BOMB",
+		"attackstyles":[
+			{"damage":1, "cooldown":10, "range":0}
+		],
+		"attributes":["hostile"],
+		"targeting":[
+			{"type":"WALL_WOOD"},
+			{"type":"WALL_STONE"},
+			{"type":"WALL_BRICK"},
+			{"type":"game.Building", "faction":"PLAYER"},
+			{"type":"game.Building", "faction":"CYCLOPS"}
+		]
+	},
+	{
+		"image":"Images/units/trader.png",
+		"stats":{"movespeed":15,"buildtime":0,"health":500,"healspeed":50},
+		"name":"TRADER",
+		"attackstyles":[
+			{"damage":40, "cooldown":20, "range":1}
+		],
+		"loot":{"GOLD_ORE":50}
+	},
+	{
+		"image":"Images/units/twig.png",
+		"stats":{"movespeed":0,"buildtime":0,"health":1000,"healspeed":0},
+		"name":"TWIG",
+		"attackstyles":[
+			{"damage":0, "cooldown":0, "range":100}
+		],
+		"attributes":["flying"],
+		"resistances": {"COLD": 0, "HEAT": 0},
+		"targeting":[{"type":"game.Unit"}]
+	},
+	{
+		"image":"Images/units/stonegolem.png",
+		"stats":{"movespeed":30,"buildtime":0,"health":1000,"healspeed":50},
+		"name":"STONE_GOLEM",
+		"attackstyles":[
+			{"damage":200, "cooldown":50, "range":6, "minrange":3, "projectile":"ROCK_STONE_GOLEM"},
+			{"damage":100, "cooldown":50, "range":1}
+		],
+		"attributes":["hostile","delayedinvasion"],
+		"resistances": {"COLD": 0, "HEAT": 0},
+		"targeting":[
+			{"type":"GATE_BRICK"},
+			{"type":"GATE_STONE"},
+			{"type":"GATE_WOOD"},
+			{"type":"game.Building", "faction":"PLAYER"},
+			{"type":"game.Building", "faction":"CYCLOPS"}
+		],
+		"loot":{"STONE":1000}
+	},
+	{
+		"image":"Images/units/termite.png",
+		"stats":{"movespeed":5,"buildtime":0,"health":100,"healspeed":5},
+		"name":"TERMITE",
+		"attackstyles":[
+			{"damage":20, "cooldown":5, "range":1}
+		],
+		"targeting":[
+			{"type":"WALL"},
+			{"type":"game.Building"}
+		],
+		"attributes":["hostile"],
+		"loot":{"WOOD":100}
+	},
+	{
+		"image":"Images/units/infernal.gif",
+		"stats":{"movespeed":15,"buildtime":0,"health":100000,"healspeed":100},
+		"name":"INFERNAL",
+		"attackstyles":[
+			{"damage":1000, "cooldown":50, "range":20, "minrange":12, "projectile":"METEOR_WAVE"},
+			{"damage":200, "cooldown":25, "range":10, "minrange":3, "projectile":"FIRE_WAVE"},
+			{"damage":100, "cooldown":5, "range":1}
+		],
+		"attributes":["hostile"],
+		"resistances": {"HEAT": 0},
+		"loot":{"TITANIUM_ORE":100, "RUNITE_ORE":100}
+	},
+	{
+		"image":"Images/units/balrog.png",
+		"stats":{"movespeed":15,"buildtime":0,"health":100000,"healspeed":100},
+		"name":"BALROG",
+		"attackstyles":[
+			{"damage":40, "cooldown":2, "range":1}
+		],
+		"attributes":["hostile"],
+		"resistances": {"HEAT": 0},
+		"loot":{"TITANIUM_ORE":100, "RUNITE_ORE":100}
+	},
+	{
+		"image":"Images/units/dwarf.png",
+		"stats":{"movespeed":30,"buildtime":150,"health":600,"healspeed":5},
+		"name":"DWARF",
+		"attackstyles":[
+			{"damage":30, "cooldown":30, "range":1}
+		],
+		"inventory":{"maxstack":1},
+		"builds":["MINE", "QUARRY"],
+		"resistances": {"HEAT": 20}
+	},
+	{
+		"image":"Images/units/scorpion.png",
+		"cost":{"FOOD":100},
+		"stats":{"movespeed":20,"buildtime":300,"health":100,"healspeed":50},
+		"name":"SCORPION",
+		"attackstyles":[
+			{"damage":10, "cooldown":30, "range":1}
+		],
+		"inventory":{"maxstack":1},
+		"attributes":["hostile"],
+		"loot":{"STONE":50},
+		"builds":["SCORPION_DEN"]
+	}
+]
+}

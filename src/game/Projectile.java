@@ -1,29 +1,25 @@
 package game;
 
-import java.awt.Color;
-import java.awt.Image;
 import java.io.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.ImageIcon;
-
-import ui.*;
 import utils.*;
 import world.*;
 
-public class Projectile implements HasImage, Externalizable {
+public class Projectile implements Externalizable {
 
 	private ProjectileType type;
 	private Tile targetTile;
 	private double timeToMove;
 	private Tile tile;
-	private HasImage hasImage;
 	
 	private Unit source;
 	private int damage;
 	private int totalDistance;
+	private boolean fromGround;
+	private int ticksUntilLanding;
 	public int currentHeight = 0;
 
 	@Override
@@ -32,6 +28,7 @@ public class Projectile implements HasImage, Externalizable {
 		targetTile = new Tile(TileLoc.readFromExternal(in), Terrain.DIRT);
 		tile = new Tile(TileLoc.readFromExternal(in), Terrain.DIRT);
 		damage = in.readInt();
+		fromGround = in.readBoolean();
 	}
 
 	@Override
@@ -40,6 +37,7 @@ public class Projectile implements HasImage, Externalizable {
 		targetTile.getLocation().writeExternal(out);
 		tile.getLocation().writeExternal(out);
 		out.writeInt(damage);
+		out.writeBoolean(fromGround);
 	}
 	
 	/** used by Externalizable interface */
@@ -47,15 +45,20 @@ public class Projectile implements HasImage, Externalizable {
 		
 	}
 	
-	public Projectile(ProjectileType type, Tile tile, Tile targetTile, Unit source, int damage) {
+	public Projectile(ProjectileType type, Tile tile, Tile targetTile, Unit source, int damage, boolean fromGround, int ticksUntilLanding) {
 		this.type = type;
 		this.tile = tile;
-		this.hasImage = type;
 		this.targetTile = targetTile;
 		this.source = source;
 		this.timeToMove = type.getSpeed();
 		this.damage = damage;
+		this.fromGround = fromGround;
+		this.ticksUntilLanding = ticksUntilLanding;
 		totalDistance = tile.getLocation().distanceTo(targetTile.getLocation());
+		updateCurrentHeight(totalDistance);
+	}
+	public Projectile(ProjectileType type, Tile tile, Tile targetTile, Unit source, int damage) {
+		this(type, tile, targetTile, source, damage, true, 0);
 	}
 	
 	public int getDamage() {
@@ -82,6 +85,9 @@ public class Projectile implements HasImage, Externalizable {
 		if(timeToMove > 0) {
 			timeToMove -= 1;
 		}
+		if(ticksUntilLanding > 0) {
+			ticksUntilLanding -= 1;
+		}
 	}
 	
 	private void moveTo(Tile t) {
@@ -107,10 +113,18 @@ public class Projectile implements HasImage, Externalizable {
 		}
 		moveTo(nextTile);
 		resetTimeToMove();
-		currentHeight = (int) (nextDistance * (totalDistance - nextDistance)*type.getSpeed());
+		updateCurrentHeight(nextDistance);
+	}
+	private void updateCurrentHeight(int nextDistance) {
+		if(fromGround) {
+			currentHeight = (int) (nextDistance * (totalDistance - nextDistance)*type.getSpeed() + ticksUntilLanding*3);
+		}
+		else {
+			currentHeight = nextDistance + ticksUntilLanding*3;
+		}
 	}
 	public boolean reachedTarget() {
-		return this.targetTile == this.tile;
+		return this.targetTile == this.tile && ticksUntilLanding <= 0;
 	}
 	public void setTile(Tile t) {
 		this.tile = t;
@@ -127,6 +141,9 @@ public class Projectile implements HasImage, Externalizable {
 	public void resetTimeToMove() {
 		timeToMove = type.getSpeed();
 	}
+	public boolean getFromGround() {
+		return fromGround;
+	}
 	public Tile getTargetTile() {
 		return targetTile;
 	}
@@ -136,25 +153,20 @@ public class Projectile implements HasImage, Externalizable {
 	public ProjectileType getType() {
 		return type;
 	}
-	
+	public boolean isLightProjectile() {
+		if(this.getType() == ProjectileType.ARROW || this.getType() == ProjectileType.RUNE_ARROW || this.getType() == ProjectileType.BULLET) {
+			return true;
+		}
+		return false;
+	}
+	public boolean isHeavyProjectile() {
+		if(this.getType() == ProjectileType.ROCK_STONE_GOLEM || this.getType() == ProjectileType.ROCK || this.getType() == ProjectileType.FIREBALL_TREBUCHET) {
+			return true;
+		}
+		return false;
+	}
 	public String toString() {
 		return type.toString();
-	}
-	public Image getImage(int size) {
-		return hasImage.getImage(size);
-	}
-	public Image getShadow(int size) {
-		return hasImage.getShadow(size);
-	}
-	@Override
-	public Image getHighlight(int size) {
-		return hasImage.getHighlight(size);
-	}
-	public ImageIcon getImageIcon(int size) {
-		return hasImage.getImageIcon(size);
-	}
-	public Color getColor(int size) {
-		return hasImage.getColor(size);
 	}
 	
 	public List<String> getDebugStrings() {
@@ -162,7 +174,4 @@ public class Projectile implements HasImage, Externalizable {
 				String.format("TTM=%.0f", getTimeToMove())
 				));
 	}
-	
-	
-	
 }

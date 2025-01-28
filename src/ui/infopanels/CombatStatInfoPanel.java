@@ -12,11 +12,11 @@ import utils.Utils;
 public class CombatStatInfoPanel extends InfoPanel{
 
 	private CombatStats showing;
-	private static final Image attackImage = Utils.loadImage("resources/Images/interfaces/attack.png");
-	private static final Image attackspeedImage = Utils.loadImage("resources/Images/interfaces/attackspeed.png");
-	private static final Image visionImage = Utils.loadImage("resources/Images/interfaces/vision.png");
-	private static final Image movespeedImage = Utils.loadImage("resources/Images/interfaces/movespeed.png");
-	private static final Image healthImage = Utils.loadImage("resources/Images/interfaces/redhitsplat.png");
+	private static final Image attackImage = Utils.loadImage("Images/interfaces/attack.png");
+	private static final Image attackspeedImage = Utils.loadImage("Images/interfaces/attackspeed.png");
+	private static final Image visionImage = Utils.loadImage("Images/interfaces/vision.png");
+	private static final Image movespeedImage = Utils.loadImage("Images/interfaces/movespeed.png");
+	private static final Image healthImage = Utils.loadImage("Images/interfaces/redhitsplat.png");
 	
 	public CombatStatInfoPanel(CombatStats showing) {
 		super(showing.toString(), attackImage);
@@ -28,16 +28,6 @@ public class CombatStatInfoPanel extends InfoPanel{
 		int fontSize = g.getFont().getSize();
 		int iconSize = 20;
 		int gap = 2;
-//		g.drawImage(attackImage, x, y, iconSize, iconSize, null);
-//		g.drawString(stats.getAttack() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
-//		
-//		y += iconSize + gap;
-//		g.drawImage(attackspeedImage, x, y, iconSize, iconSize, null);
-//		g.drawString(stats.getAttackSpeed() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
-//
-//		y += iconSize + gap;
-//		g.drawImage(visionImage, x, y, iconSize, iconSize, null);
-//		g.drawString(stats.getAttackRadius() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
 
 		y += iconSize + gap;
 		g.drawImage(movespeedImage, x, y, iconSize, iconSize, null);

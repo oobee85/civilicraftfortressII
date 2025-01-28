@@ -1,15 +1,18 @@
 package game;
-import java.awt.Color;
-import java.awt.Image;
 import java.io.*;
 import java.util.*;
 
-import javax.swing.ImageIcon;
-
+import game.components.*;
+import networking.server.Server;
 import utils.*;
 import utils.Loader.*;
 
-public class UnitType implements HasImage, Serializable {
+public class UnitType implements Serializable {
+	
+	public transient static final HashMap <ItemType, Integer> EMPTY_COST = new HashMap <>();
+
+	private transient static int idCounter = 0;
+	private transient final int id;
 	
 	private final String name;
 	private transient final MipMap mipmap;
@@ -21,8 +24,16 @@ public class UnitType implements HasImage, Serializable {
 	private transient final TargetInfo[] targetingInfoStrings;
 	private transient final ArrayList<TargetingInfo> targetingInfo = new ArrayList<>();
 	private transient final LinkedList<AttackStyle> attackStyles;
+	private transient final int inventoryStackSize;
+	private transient final boolean isDangerousToOwnTeam;
+	private transient final int powerLevel;
+	private transient final Set<GameComponent> components = new HashSet<>();
 
-	public UnitType(String name, String image, CombatStats cs, HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles) {
+	public UnitType(String name, String image, CombatStats cs, 
+	                HashSet<String> attributes, String researchNeeded, HashMap<ItemType, Integer> resourcesNeeded, 
+	                LinkedList<Item> deadItem, TargetInfo[] targeting, LinkedList<AttackStyle> attackStyles,
+	                int inventoryStackSize) {
+		id = idCounter++;
 		this.name = name;
 		this.mipmap = new MipMap(image);
 		this.combatStats = cs;
@@ -32,6 +43,44 @@ public class UnitType implements HasImage, Serializable {
 		this.deadItem = deadItem;
 		this.targetingInfoStrings = targeting;
 		this.attackStyles = attackStyles;
+		this.inventoryStackSize = inventoryStackSize;
+		
+		this.isDangerousToOwnTeam = computeIsDangerousToOwnTeam();
+		this.powerLevel = computePowerLevel();
+	}
+	
+	private int computePowerLevel() {
+		int power = 0;
+		power += combatStats.getHealth();
+		power -= combatStats.getMoveSpeed();
+		for (AttackStyle att : attackStyles) {
+			int attackCooldown = att.getCooldown() == 0 ? 1 : att.getCooldown();
+			int dps = att.getDamage() * Server.MILLISECONDS_PER_TICK / attackCooldown;
+			power += dps;
+			power += att.getRange()*2;
+		}
+		return power;
+	}
+
+	public int getInventoryStackSize() {
+		return inventoryStackSize;
+	}
+	
+	public int getPowerLevel() {
+		return powerLevel;
+	}
+
+	private boolean computeIsDangerousToOwnTeam() {
+		for (AttackStyle style : attackStyles) {
+			if (style.getProjectile() != null && style.getProjectile().isExplosive()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean isDangerousToOwnTeam() {
+		return isDangerousToOwnTeam;
 	}
 	public LinkedList<AttackStyle> getAttackStyles() {
 		return attackStyles;
@@ -66,20 +115,20 @@ public class UnitType implements HasImage, Serializable {
 	public boolean isHerbivore() {
 		return attributes.contains("herbivore");
 	}
-	public boolean isColdResist() {
-		return attributes.contains("coldresistant");
-	}
-	public boolean isFireResist() {
-		return attributes.contains("fireresistant");
-	}
 	public boolean isMigratory() {
 		return attributes.contains("migratory");
 	}
-	public boolean isBuilder() {
-		return attributes.contains("builder");
-	}
 	public boolean isHealer() {
 		return attributes.contains("healer");
+	}
+	public boolean isCaravan() {
+		return attributes.contains("caravan");
+	}
+	public boolean isWheeled() {
+		return attributes.contains("wheeled");
+	}
+	public boolean isSiegeTower() {
+		return attributes.contains("siegetower");
 	}
 	public boolean hasCleave() {
 		return attributes.contains("cleave");
@@ -90,27 +139,17 @@ public class UnitType implements HasImage, Serializable {
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;
 	}
-
-	@Override
-	public Image getImage(int size) {
-		return mipmap.getImage(size);
-	}
-	@Override
-	public Image getShadow(int size) {
-		return mipmap.getShadow(size);
-	}
-	@Override
-	public Image getHighlight(int size) {
-		return mipmap.getHighlight(size);
+	
+	public Set<GameComponent> getComponents() {
+		return components;
 	}
 
-	@Override
-	public ImageIcon getImageIcon(int size) {
-		return mipmap.getImageIcon(size);
+	public MipMap getMipMap() {
+		return mipmap;
 	}
-	@Override
-	public Color getColor(int size) {
-		return mipmap.getColor(size);
+	
+	public int id() {
+		return id;
 	}
 
 	@Override

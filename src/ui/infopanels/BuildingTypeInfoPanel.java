@@ -11,7 +11,7 @@ public class BuildingTypeInfoPanel extends InfoPanel {
 	private Faction faction;
 
 	public BuildingTypeInfoPanel(BuildingType showing, Faction faction) {
-		super(showing.toString(), showing.getImage(DEFAULT_IMAGE_SIZE));
+		super(showing.toString(), showing.getMipMap().getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
 		this.faction = faction;
 	}
@@ -37,13 +37,13 @@ public class BuildingTypeInfoPanel extends InfoPanel {
 		}
 		
 		int offset = g.getFont().getSize();
-		int bottomY = getHeight() - offset/2;
+		int bottomY = getHeight() - offset/3;
 		g.setColor(Color.black);
 		String statsString = showing.getHealth() + " health";
 		if(showing.getCultureRate() > 0) {
 			statsString += "    " + showing.getCultureRate() + " culture";
 		}
-		g.drawString(statsString, getImageSize(), bottomY - offset);
-		g.drawString(showing.info(), getImageSize(), bottomY);
+		g.drawString(statsString, 5, bottomY - offset);
+		g.drawString(showing.info(), 5, bottomY);
 	}
 }

@@ -1,6 +1,5 @@
 package networking.server;
 
-import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
@@ -10,6 +9,8 @@ import java.util.concurrent.*;
 import javax.swing.Timer;
 
 import game.*;
+import game.actions.*;
+import game.ai.*;
 import networking.*;
 import networking.message.*;
 import ui.*;
@@ -19,7 +20,6 @@ import world.*;
 
 public class Server {
 	public static final int PORT = 25565;
-	public static final PlayerInfo DEFAULT_PLAYER_INFO = new PlayerInfo("Player", Color.red);
 	
 	private ConcurrentHashMap<Connection, Boolean> connections = new ConcurrentHashMap<>();
 	private Thread thread;
@@ -32,11 +32,27 @@ public class Server {
 	private volatile boolean startedGame = false;
 	private volatile boolean madeWorld = false;
 
+	private ArrayList<AIInterface> ailist = new ArrayList<>();
+
 	public Server() {
-		
+
 	}
 	public void setGUI(ServerGUI serverGUI) {
 		this.gui = serverGUI;
+
+		Game.DISABLE_NIGHT = true;
+		Timer repaintingThread = new Timer(500, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (gameInstance != null) {
+					gameInstance.getGUIController().updateGUI();
+				}
+				if (gui != null) {
+					gui.repaint();
+				}
+			}
+		});
+		repaintingThread.start();
 	}
 	
 	public void startAcceptingConnections() {
@@ -82,6 +98,10 @@ public class Server {
 			gui.lostConnection(connection.getPanel());
 			connections.remove(connection);
 		});
+		if (startedGame) {
+			connection.sendMessage(Utils.extractWorldInfo(gameInstance.world, true, true, false));
+			sendWhichFaction(connection);
+		}
 		gui.addedConnection(connection.getPanel());
 		connections.put(connection, true);
 		startProcessing(connection);
@@ -107,6 +127,7 @@ public class Server {
 	}
 	
 	private void makeWorld() {
+		gui.switchToGame();
 		madeWorld = true;
 		System.out.println("Making world");
 		gameInstance = new Game(new GUIController() {
@@ -116,6 +137,8 @@ public class Server {
 			public void selectedUnit(Unit unit, boolean selected) {}
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {}
+			@Override
+			public void selectedPlant(Plant plant, boolean selected) {}
 			@Override
 			public void changedFaction(Faction faction) {}
 			@Override
@@ -133,24 +156,40 @@ public class Server {
 			@Override
 			public void setFastForwarding(boolean enabled) { }
 			@Override
-			public void setRaiseTerrain(boolean enabled) { }
+			public void setPauseGame(boolean enabled) { }
 		});
 		LinkedList<PlayerInfo> players = new LinkedList<>();
 		for (Connection connection : connections.keySet()) {
 			players.add(connection.getPlayerInfo());
 		}
-		gameInstance.generateWorld(128, 128, false, players);
+		Set<String> bots = new HashSet<>();
+		for(int i = 0; i < Settings.NUM_AI; i++) {
+			PlayerInfo bot = new PlayerInfo("Bot " + i, null);
+			players.add(bot);
+			bots.add(bot.getName());
+		}
+		gameInstance.generateWorld(Settings.WORLD_WIDTH, Settings.WORLD_HEIGHT, false, players);
 		gui.setGameInstance(gameInstance);
+		gui.getGameView().getDrawer().updateTerrainImages();
+
+		for(Faction f : gameInstance.world.getFactions()) {
+			if(f.isPlayer() && bots.contains(f.name())) {
+				ailist.add(new BuildOrderAI(gui.getCommandInterface(), f, gameInstance.world));
+			}
+		}
+		NeutralAI neutralAI = new NeutralAI(
+				gui.getCommandInterface(),
+				gameInstance.world.getFaction(World.NO_FACTION_ID),
+				gameInstance.world);
+		ailist.add(neutralAI);
+		UndeadAI undeadAI = new UndeadAI(
+				gui.getCommandInterface(),
+				gameInstance.world.getFaction(World.UNDEAD_FACTION_ID),
+				gameInstance.world);
+		ailist.add(undeadAI);
+		
 		startWorldNetworkingUpdateThread();
 
-		Game.DISABLE_NIGHT = true;
-		Timer repaintingThread = new Timer(500, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				gameInstance.getGUIController().updateGUI();
-				gui.repaint();
-			}
-		});
 		Thread terrainImageThread = new Thread(() -> {
 			while (true) {
 				try {
@@ -164,16 +203,19 @@ public class Server {
 				}
 			}
 		});
-		repaintingThread.start();
 		terrainImageThread.start();
 	}
 	
-	private void sendWhichFaction() {
+	private void sendWhichFaction(Connection c) {
+		Faction f = gameInstance.world.getFaction(c.getPlayerInfo().getName());
+		if(f != null) {
+			c.sendMessage(f);
+		}
+	}
+	
+	private void sendAllFactions() {
 		for (Connection connection : connections.keySet()) {
-			Faction f = gameInstance.world.getFaction(connection.getPlayerInfo().getName());
-			if(f != null) {
-				connection.sendMessage(f);
-			}
+			sendWhichFaction(connection);
 		}
 	}
 	
@@ -192,7 +234,7 @@ public class Server {
 						sendProjectilesAndDeadThings();
 					}
 					if(iteration % 100 == 0) {
-						System.out.println("skipped sends: " + skippedCount + "/" + (skippedCount + sentCount));
+						System.out.println("skipped sends (nothing to send): " + skippedCount + "/" + (skippedCount + sentCount));
 					}
 					iteration++;
 					iteration = iteration % 100;
@@ -205,40 +247,30 @@ public class Server {
 		worldNetworkingUpdateThread.start();
 	}
 	
-	
 	private void sendFullWorld() {
-//		ArrayList<Tile> tileInfos = new ArrayList<>(gameInstance.world.getTiles().size()); 
-//		tileInfos.addAll(gameInstance.world.getTiles());
-//		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, tileInfos.toArray(new Tile[0]));
-//		worldInfo.getThings().addAll(gameInstance.world.getPlants());
-//		worldInfo.getThings().addAll(gameInstance.world.getBuildings());
-//		worldInfo.getThings().addAll(gameInstance.world.getUnits());
-//		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
-//		worldInfo.getFactions().addAll(gameInstance.world.getFactions());
-//		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
-		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world);
+		long start = System.currentTimeMillis();
+		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, true, true, true);
 		sendToAllConnections(worldInfo);
-		sendWhichFaction();
-//		saveToFile(worldInfo, "ser/everything_" + World.ticks + ".ser");
+		sendAllFactions();
+		long delta = System.currentTimeMillis() - start;
+		
+		if (Settings.WRITE_NETWORK_PACKAGES_TO_FILE) {
+			Utils.saveToFile(worldInfo, "ser/everything_" + World.ticks + "_timespent_" + delta + "_tiles_" + worldInfo.getTileInfos().length + ".ser", false);
+		}
 	}
 
 	private void sendUnits() {
-		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, new Tile[0]);
-		worldInfo.getThings().addAll(gameInstance.world.getUnits());
-		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
-		worldInfo.addHitsplats(gameInstance.world.getData());
-		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
+		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, false, true, true);
 		sendToAllConnections(worldInfo);
-//		saveToFile(worldInfo, "ser/units_" + World.ticks + ".ser");
+		if (Settings.WRITE_NETWORK_PACKAGES_TO_FILE) {
+			Utils.saveToFile(worldInfo, "ser/units_" + World.ticks + ".ser", false);
+		}
 	}
 	
 	private int skippedCount;
 	private int sentCount;
 	private void sendProjectilesAndDeadThings() {
-		WorldInfo worldInfo = new WorldInfo(gameInstance.world.getWidth(), gameInstance.world.getHeight(), World.ticks, new Tile[0]);
-		worldInfo.getThings().addAll(gameInstance.world.getData().clearDeadThings());
-		worldInfo.addHitsplats(gameInstance.world.getData());
-		worldInfo.getProjectiles().addAll(gameInstance.world.getData().clearProjectilesToSend());
+		WorldInfo worldInfo = Utils.extractWorldInfo(gameInstance.world, false, false, true);
 		if(worldInfo.getThings().isEmpty() 
 				&& worldInfo.getHitsplats().isEmpty()
 				&& worldInfo.getProjectiles().isEmpty()) {
@@ -247,7 +279,9 @@ public class Server {
 		else {
 			sentCount++;
 			sendToAllConnections(worldInfo);
-	//		saveToFile(worldInfo, "ser/projectiles_" + World.ticks + ".ser");
+			if (Settings.WRITE_NETWORK_PACKAGES_TO_FILE) {
+				Utils.saveToFile(worldInfo, "ser/projectiles_" + World.ticks + ".ser", false);
+			}
 		}
 	}
 	
@@ -263,45 +297,13 @@ public class Server {
 				}
 			}
 		}
-		else if(message.getCommand() == CommandType.MOVE_TO) {
-			if(thing instanceof Unit) {
-				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
-				if(targetTile != null) {
-					gui.getCommandInterface().moveTo((Unit)thing, targetTile, message.getClearQueue());
-				}
-			}
-		}
-		else if(message.getCommand() == CommandType.ATTACK_THING) {
-			if(thing instanceof Unit) {
-				Thing target = ThingMapper.get(message.getTargetID());
-				if(target != null) {
-					gui.getCommandInterface().attackThing((Unit)thing, target, message.getClearQueue());
-				}
-			}
-		}
-		else if(message.getCommand() == CommandType.BUILD_ROAD) {
-			if(thing instanceof Unit) {
-				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
-				if(targetTile != null) {
-					gui.getCommandInterface().buildThing((Unit)thing, targetTile, true, message.getClearQueue());
-				}
-			}
-		}
-		else if(message.getCommand() == CommandType.BUILD_BUILDING) {
-			if(thing instanceof Unit) {
-				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
-				if(targetTile != null) {
-					gui.getCommandInterface().buildThing((Unit)thing, targetTile, false, message.getClearQueue());
-				}
-			}
-		}
 		else if(message.getCommand() == CommandType.PLAN_BUILDING) {
 			if(thing instanceof Unit) {
 				Thing target = ThingMapper.get(message.getTargetID());
 				Tile targetTile = gameInstance.world.get(message.getTargetLocation());
 				BuildingType buildingType = Game.buildingTypeMap.get(message.getType());
 				if(target != null) {
-					gui.getCommandInterface().buildThing((Unit)thing, target.getTile(), buildingType.isRoad(), message.getClearQueue());
+					gui.getCommandInterface().planAction((Unit)thing, PlannedAction.buildOnTile(target.getTile(), buildingType.isRoad()), message.getClearQueue());
 				}
 				if(targetTile != null) {
 					gui.getCommandInterface().planBuilding((Unit)thing, targetTile, message.getClearQueue(), buildingType);
@@ -337,9 +339,16 @@ public class Server {
 				}
 			}
 		}
-		else if(message.getCommand() == CommandType.SET_GUARDING) {
+		else if (message.getCommand() == CommandType.PLANNED_ACTION) {
 			if(thing instanceof Unit) {
-				gui.getCommandInterface().setGuarding((Unit)thing, message.getClearQueue());
+				PlannedAction action = message.getPlannedAction();
+				Thing target = ThingMapper.get(action.targetID);
+				Tile targetTile = (action.targetTileLoc == null) ? null : gameInstance.world.get(action.targetTileLoc);
+				PlannedAction mapped = PlannedAction.makeCopy(action, target, targetTile);
+				gui.getCommandInterface().planAction((Unit)thing, mapped, message.getClearQueue());
+			}
+			else {
+				System.err.println("planned action should not have a building as the acting thing");
 			}
 		}
 	}
@@ -353,7 +362,7 @@ public class Server {
 					gameInstance.gameTick();
 					gameInstance.getGUIController().updateGUI();
 					long elapsed = System.currentTimeMillis() - start;
-					gui.getGameView().previousTickTime = elapsed;
+					gui.getGameView().setPreviousTickTime(elapsed);
 					if(World.ticks % 200 == 1) {
 						System.out.println("time elapsed for tick: " + elapsed + "ms");
 					}
@@ -377,6 +386,20 @@ public class Server {
 			}
 		});
 		gameLoopThread.start();
+		
+		Thread aiThread = new Thread(() -> {
+			try {
+				while(true) {
+					for(AIInterface ai : ailist) {
+						ai.tick();
+					}
+					Thread.sleep(Settings.AIDELAY);
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
+		aiThread.start();
 	}
 	
 	public void startProcessing(Connection connection) {

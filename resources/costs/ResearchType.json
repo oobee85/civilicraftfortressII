@@ -1,0 +1,88 @@
+{
+"researches": [
+	{
+		"name": "FARMING",
+		"points": 300, "tier": 1,
+		"cost": {"WOOD": 200, "FOOD": 200},
+		"image": "Images/research/farming.png"},
+	{	
+		"name": "BRONZE_WORKING", 
+		"points": 300, "tier": 1,
+		"cost": {"BRONZE_BAR":8},
+		"requirements": ["FARMING"],
+		"image": "Images/research/bronze_working.png"},
+	{
+		"name": "IRON_WORKING", 
+		"points": 600, "tier": 2,
+		"cost": {"IRON_BAR":8}, 
+		"requirements": ["BRONZE_WORKING"],
+		"image": "Images/research/iron_working.png"},
+	{
+		"name": "ARMORING", 
+		"points": 600, "tier": 3,
+		"cost": {"IRON_BAR":8}, 
+		"requirements": ["IRON_WORKING"],
+		"image": "Images/research/armoring.png"},
+	{
+		"name": "TRAPPING", 
+		"points": 300, "tier": 1,
+		"cost": {"WOOD": 200}, 
+		"requirements": ["FARMING"],
+		"image": "Images/research/trapping.png"},
+	{
+		"name": "ANIMAL_HUSBANDRY", 
+		"points": 600, "tier": 2,
+		"cost": {"HORSE": 100}, 
+		"requirements": ["TRAPPING"],
+		"image": "Images/research/animal_husbandry.png"},
+	{
+		"name": "DOMESTICATION", 
+		"points": 600, "tier": 3,
+		"cost": {"FOOD": 400, "HORSE": 100}, 
+		"requirements": ["ANIMAL_HUSBANDRY"],
+		"image": "Images/research/domestication.png"},
+	{
+		"name": "MASONRY", 
+		"points": 300, "tier": 1,
+		"cost": {"STONE": 100}, 
+		"requirements": ["FARMING"],
+		"image": "Images/research/masonry.png"},
+	{
+		"name": "MATHEMATICS",
+		"points": 600, "tier": 2,
+		"cost": {"BRICK": 100},
+		"requirements": ["MASONRY"],
+		"image": "Images/research/mathematics.png"},
+	{
+		"name": "ENGINEERING", 
+		"points": 600, "tier": 3,
+		"cost": {"BRICK": 500, "WOOD": 500},
+		"requirements": ["MATHEMATICS"],
+		"image": "Images/research/engineering.png"},
+	{
+		"name": "MYSTICISM", 
+		"points": 300, "tier": 1,
+		"cost": {"GOLD_BAR": 5},
+		"requirements": ["FARMING"],
+		"image": "Images/research/mysticism.png"},
+	{
+		"name": "WITCHCRAFT", 
+		"points": 600, "tier": 2,
+		"cost": {"MAGIC": 60},
+		"requirements": ["MYSTICISM"],
+		"image": "Images/research/witchcraft.png"},
+	{
+		"name": "NECROMANCY", 
+		"points": 600, "tier": 3,
+		"cost": {"MAGIC": 200},
+		"requirements": ["WITCHCRAFT"],
+		"image": "Images/research/shadowwordpain.png"},
+	{
+		"name": "CIVILIZATION", 
+		"points": 1200, "tier": 4,
+		"cost": {"BRICK": 1000, "ADAMANTITE_BAR": 10}, 
+		"requirements": ["DOMESTICATION", "ENGINEERING", "ARMORING", "NECROMANCY"],
+		"image": "Images/research/monarchy.png"}
+	
+]
+}

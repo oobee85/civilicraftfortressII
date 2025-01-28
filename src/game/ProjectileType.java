@@ -1,30 +1,24 @@
 package game;
 
-import java.awt.Color;
-import java.awt.Image;
-
-import javax.swing.ImageIcon;
-
-import utils.HasImage;
 import utils.MipMap;
 import utils.Utils;
 
+public enum ProjectileType {
 
-
-public enum ProjectileType implements HasImage {
-
-		ARROW(2, "resources/Images/projectiles/arrow.png", 1, null, 0),
-		RUNE_ARROW(2, "resources/Images/projectiles/rune_arrow.png", 1, null, 0),
-		ROCK(3, "resources/Images/itemicons/rock.png", 1, null, 0),
-		FIREBALL_TREBUCHET(3, "resources/Images/projectiles/fireball.png", 2, null, 0),
+		ARROW(1, "Images/projectiles/arrow.png", 1, null, 0),
+		RUNE_ARROW(1, "Images/projectiles/rune_arrow.png", 1, null, 0),
+		ROCK(3, "Images/itemicons/rock.png", 1, null, 0),
+		FIREBALL_TREBUCHET(3, "Images/projectiles/fireball.png", 2, null, 0),
 		
-		ROCK_STONE_GOLEM(5, "resources/Images/itemicons/rock.png", 1, null, 0),
-		FIREBALL_DRAGON(3, "resources/Images/projectiles/fireball2.png", 2, null, 0),
-		BULLET(0, "resources/Images/projectiles/bullet.png", 1, null, 0),
-		FIRE_WAVE(6, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 100),
-		METEOR_WAVE(4, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 1000),
-		WIZARD_BALL(2, "resources/Images/projectiles/fireball2.png", 4, null, 100),
-		FIREBREATH(3, "resources/Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 10),
+		ROCK_STONE_GOLEM(5, "Images/itemicons/rock.png", 1, null, 0),
+		FIREBALL_DRAGON(3, "Images/projectiles/fireball2.png", 2, null, 0),
+		BULLET(0, "Images/projectiles/bullet.png", 1, null, 0),
+		FIRE_WAVE(6, "Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 100),
+		METEOR_WAVE(4, "Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 1000),
+		METEOR(10, "Images/projectiles/comet.png", 20, null, 1000),
+		LAVA_BALL(1, "Images/liquid/lavaanim32.gif", 1, null, 0),
+		WIZARD_BALL(2, "Images/projectiles/fireball2.png", 4, null, 100),
+		FIREBREATH(3, "Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 10),
 	;
 	
 	private MipMap mipmap;
@@ -56,27 +50,9 @@ public enum ProjectileType implements HasImage {
 	public double getSpeed() {
 		return speed;
 	}
-	@Override
-	public Image getImage(int size) {
-		return mipmap.getImage(size);
-	}
-	@Override
-	public Image getShadow(int size) {
-		return mipmap.getShadow(size);
-	}
-	@Override
-	public Image getHighlight(int size) {
-		return mipmap.getHighlight(size);
-	}
-
-	@Override
-	public ImageIcon getImageIcon(int size) {
-		return mipmap.getImageIcon(size);
-	}
-
-	@Override
-	public Color getColor(int size) {
-		return mipmap.getColor(size);
+	
+	public MipMap getMipMap() {
+		return mipmap;
 	}
 
 	@Override

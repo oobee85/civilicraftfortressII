@@ -10,7 +10,7 @@ public class UnitInfoPanel extends InfoPanel {
 	Unit showing;
 
 	public UnitInfoPanel(Unit showing) {
-		super(showing.toString(), showing.getImage(DEFAULT_IMAGE_SIZE));
+		super(showing.getType().toString(), showing.getMipMap().getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
 	}
 	
@@ -24,9 +24,12 @@ public class UnitInfoPanel extends InfoPanel {
 		
 		g.setFont(KUIConstants.infoFontTiny);
 		int hpbarHeight = g.getFont().getSize();
-		String hpstring =  String.format("%d/%d",(int)showing.getHealth(), (int)showing.getCombatStats().getHealth());
-		KUIConstants.drawProgressBar(g, Color.green, Color.red, Color.black, showing.getHealth()/showing.getCombatStats().getHealth(), hpstring, 0, getHeight()-hpbarHeight, getWidth() - 85, hpbarHeight);
+		String hpstring =  String.format("%d/%d",(int)showing.getHealth(), (int)showing.getMaxHealth());
+		KUIConstants.drawProgressBar(g, Color.green, Color.red, Color.black, showing.getHealth()/showing.getMaxHealth(), hpstring, 0, getHeight()-hpbarHeight, getWidth() - 85, hpbarHeight);
 
 		UnitTypeInfoPanel.drawCombatStats(g, showing.getType(), getWidth() - 100, 4);
+
+		if(showing.hasInventory())
+			UnitTypeInfoPanel.drawInventory(g, showing.getInventory(), 2, EXPLODE_BUTTON_SIZE + 2);
 	}
 }

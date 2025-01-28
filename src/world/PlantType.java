@@ -1,61 +1,67 @@
 package world;
 
-import java.awt.*;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
-import javax.swing.*;
-
+import game.Item;
 import game.ItemType;
-import utils.*;
+import game.components.GameComponent;
+import utils.MipMap;
+import utils.TiledMipmap;
+import utils.Utils;
 
-public enum PlantType implements HasImage {
+public class PlantType implements Serializable {
 	
-	BERRY ( new String[] {"resources/Images/plants/berry16.png", "resources/Images/plants/berry128.png"} , 1.0, 50, false, ItemType.FOOD),
-	BERRY_DEPLETED ( new String[] {"resources/Images/plants/berry_depleted16.png", "resources/Images/plants/berry_depleted128.png"} , 0.2, 1, false, null),
-	CATTAIL ( new String[] {"resources/Images/plants/cattail32.png"} , 1.0, 50, true, ItemType.FOOD),
-	FOREST1 ( new String[] {"resources/Images/plants/tree1.png"}, 1, 100, false, ItemType.WOOD),
-//	FOREST2 ( new String[] {"resources/Images/plants/tree2.png"}, 1, 50)
-	;
-	
-    private double rarity;
-    private MipMap mipmap;
-    private double health;	
-    private boolean aquatic;
-    private ItemType itemType;
-    
-	PlantType( String[] s, double rare, double health, boolean aquatic, ItemType itemType){
-		rarity = rare;
+	private final String name;
+	private transient final MipMap mipmap;
+	private transient final TiledMipmap tiledMipmap;
+	private transient final double health;	
+	private transient final double rarity;
+	private transient final LinkedList<Item> harvestItems;
+	private transient final HashSet<String> attributes;
+	private transient final int inventoryStackSize;
+	private transient final Set<GameComponent> components = new HashSet<>();
+
+	public PlantType(String name, String image, String tiledImageFolder,
+	                 double rare, double health,
+	                 LinkedList<Item> harvestItems, HashSet<String> attributes, int inventoryStackSize){
+		this.name = name;
+		this.rarity = rare;
 		this.health = health;
-		this.aquatic = aquatic;
-		mipmap = new MipMap(s);
-		this.itemType = itemType;
+		this.mipmap = new MipMap(image);
+		this.harvestItems = harvestItems;
+		this.attributes = attributes;
+		this.inventoryStackSize = inventoryStackSize;
+		
+		this.tiledMipmap = tiledImageFolder == null ? null : new TiledMipmap(tiledImageFolder);
 	}
 	
-	@Override
-	public Image getImage(int size) {
-		return mipmap.getImage(size);
+	public boolean isTiledImage() {
+		return tiledMipmap != null;
+	}
+	
+	public MipMap getTiledMipmap(int tileBitmap) {
+		return tiledMipmap.get(tileBitmap);
 	}
 
-	@Override
-	public Image getShadow(int size) {
-		return mipmap.getShadow(size);
+	public int getInventoryStackSize() {
+		return inventoryStackSize;
 	}
-	@Override
-	public Image getHighlight(int size) {
-		return mipmap.getHighlight(size);
+	
+	// TODO remove desertresistant attribute and instead use whether or not the plant would take damage on the tile
+	public boolean isDesertResistant() {
+		return attributes.contains("desertresistant");
+	}
+	
+	public MipMap getMipMap() {
+		return mipmap;
 	}
 
-	@Override
-	public ImageIcon getImageIcon(int size) {
-		return mipmap.getImageIcon(size);
-	}
-
-	@Override
-	public Color getColor(int size) {
-		return mipmap.getColor(size);
-	}
-    
-	public ItemType getItem() {
-		return itemType;
+	public LinkedList<Item> getItem() {
+		return harvestItems;
 	}
 	public double getHealth() {
 		return health;
@@ -63,10 +69,16 @@ public enum PlantType implements HasImage {
 	public double getRarity() {
 		return rarity;
 	}
-	public boolean isAquatic() {
-		return aquatic;
+	public Set<GameComponent> getComponents() {
+		return components;
 	}
-
+	
+	public HashMap<ItemType, Integer> getCost(){
+		return null;
+	}
+	public String name() {
+		return name;
+	}
 	@Override
 	public String toString() {
 		return Utils.getName(this);

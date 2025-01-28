@@ -1,37 +1,28 @@
 package utils;
 
-import java.io.*;
-import java.net.*;
 import java.util.*;
-import java.util.Map.*;
+import java.util.Map.Entry;
 
 import org.json.*;
 
 import game.*;
-import ui.*;
-import world.*;
+import game.ai.*;
+import game.components.*;
+import sounds.SoundEffect;
+import sounds.SoundManager;
+import world.PlantType;
 
 public class Loader {
-	private static String readFile(String filename) {
-		String researchCosts = "";
-//		URL path = Utils.class.getClassLoader().getResource(filename);
-		BufferedReader br = new BufferedReader(new InputStreamReader(Utils.class.getClassLoader().getResourceAsStream(filename)));
-		try {
-//		try (BufferedReader br = new BufferedReader(new FileReader(path.getPath()))) {
-			StringBuilder builder = new StringBuilder();
-			String line;
-			while((line = br.readLine()) != null) {
-//				line = line.replaceAll("\\s+","");
-				builder.append(line + "\n");
-			}
-			researchCosts = builder.toString();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+	
+	
+	
+	public static void loadSounds() {
+		System.out.println("Loading Sounds");
+		for(SoundEffect sound : SoundEffect.values()) {
+			SoundManager.loadSound(sound);
 		}
-		return researchCosts;
 	}
+	
 	private static HashMap<ItemType, Integer> loadItemTypeMap(JSONObject costObject) {
 		HashMap<ItemType, Integer> map = new HashMap<>();
 		for(String itemName : costObject.keySet()) {
@@ -40,10 +31,86 @@ public class Loader {
 		return map;
 	}
 	
-	public static void loadBuildingType(HashMap<String, BuildingType> buildingTypeMap, ArrayList<BuildingType> buildingTypeList) {
+	public static Set<GameComponent> loadComponents(JSONObject obj) {
+		Set<GameComponent> components = new HashSet<>();
 
-		String buildingTypeString = readFile("resources/costs/BuildingType.json");
-//		System.out.println("Loaded :" + buildingTypeString);
+		if(obj.has("resistances")) {
+			JSONObject resistances = obj.getJSONObject("resistances");
+			int[] resistanceValues = DamageResistance.getDefaultResistance();
+			for(String typeString : resistances.keySet()) {
+				int value = resistances.getInt(typeString);
+				DamageType type = DamageType.valueOf(typeString);
+				resistanceValues[type.ordinal()] = value;
+			}
+			components.add(new DamageResistance(resistanceValues));
+		}
+		if (obj.has("builds")) {
+			JSONArray buildingTypesArray = obj.getJSONArray("builds");
+			String[] buildingTypeNames = new String[buildingTypesArray.length()];
+			for (int i = 0; i < buildingTypesArray.length(); i++) {
+				buildingTypeNames[i] = buildingTypesArray.getString(i);
+			}
+			components.add(new Builder(buildingTypeNames));
+		}
+		return components;
+	}
+	
+	public static void loadPlantType(HashMap<String, PlantType> plantTypeMap, ArrayList<PlantType> plantTypeList) {
+		System.out.println("Loading Plants");
+		String plantTypeString = Utils.readFile("costs/PlantType.json");
+		JSONObject obj = new JSONObject(plantTypeString);
+		JSONArray arr = obj.getJSONArray("planttypes");
+		for (int i = 0; i < arr.length(); i++) {
+			JSONObject plantTypeObject = arr.getJSONObject(i);
+
+			String name = plantTypeObject.getString("name");
+			String image = plantTypeObject.getString("image");
+			String tiledImageFolder = plantTypeObject.has("tiledImages") ? plantTypeObject.getString("tiledImages") : null;
+			int health = plantTypeObject.getInt("health");
+			double rarity = plantTypeObject.getDouble("rarity");
+//			String itemString = plantTypeObject.getString("harvestitem");
+//			ItemType itemType = ItemType.valueOf(itemString);
+			
+			LinkedList<Item> harvestItems = new LinkedList<>();
+			if(plantTypeObject.has("harvestitems")) {
+				HashMap<ItemType, Integer> loot = loadItemTypeMap(plantTypeObject.getJSONObject("harvestitems"));
+				for(Entry<ItemType, Integer> entry : loot.entrySet()) {
+					harvestItems.add(new Item(entry.getValue(), entry.getKey()));
+				}
+			}
+
+			HashSet<String> attributes = new HashSet<>();
+			if(plantTypeObject.has("attributes")) {
+				JSONArray attributelist = plantTypeObject.getJSONArray("attributes");
+				for(int j = 0; j < attributelist.length(); j++) {
+					attributes.add(attributelist.getString(j));
+				}
+			}
+
+			int inventoryStackSize = 0;
+			if(plantTypeObject.has("inventory")) {
+				JSONObject inventoryProperties = plantTypeObject.getJSONObject("inventory");
+				if(!inventoryProperties.has("maxstack")) {
+					System.err.println("ERROR inventory does not have maxstack defined.");
+					System.exit(0);
+				}
+				int maxStack = inventoryProperties.getInt("maxstack");
+				inventoryStackSize = maxStack;
+			}
+
+			Set<GameComponent> components = loadComponents(plantTypeObject);
+			PlantType plantType = new PlantType(name, image, tiledImageFolder, rarity, health, harvestItems, attributes, inventoryStackSize);
+			plantType.getComponents().addAll(components);
+			
+			plantTypeMap.put(name, plantType);
+			plantTypeList.add(plantType);
+		}
+		
+	}
+	
+	public static void loadBuildingType(HashMap<String, BuildingType> buildingTypeMap, ArrayList<BuildingType> buildingTypeList) {
+		System.out.println("Loading Buildings");
+		String buildingTypeString = Utils.readFile("costs/BuildingType.json");
 		JSONObject obj = new JSONObject(buildingTypeString);
 		JSONArray arr = obj.getJSONArray("buildingtypes");
 		for (int i = 0; i < arr.length(); i++) {
@@ -51,7 +118,8 @@ public class Loader {
 			
 			String name = buildingTypeObject.getString("name");
 			String image = buildingTypeObject.getString("image");
-
+			String tiledImageFolder = buildingTypeObject.has("tiledImages") ? buildingTypeObject.getString("tiledImages") : null;
+			
 			double culture = buildingTypeObject.getDouble("culture");
 			int health = buildingTypeObject.getInt("health");
 			int vision = buildingTypeObject.getInt("vision");
@@ -91,7 +159,21 @@ public class Loader {
 				cost = loadItemTypeMap(buildingTypeObject.getJSONObject("cost"));
 			}
 			
-			BuildingType buildingType = new BuildingType(name, info, health, effort, image, culture, vision, researchReq, cost, buildsunits, movespeed, attributes);
+			int inventoryStackSize = 0;
+			if(buildingTypeObject.has("inventory")) {
+				JSONObject inventoryProperties = buildingTypeObject.getJSONObject("inventory");
+				if(!inventoryProperties.has("maxstack")) {
+					System.err.println("ERROR inventory does not have maxstack defined.");
+					System.exit(0);
+				}
+				int maxStack = inventoryProperties.getInt("maxstack");
+				inventoryStackSize = maxStack;
+			}
+
+			Set<GameComponent> components = loadComponents(buildingTypeObject);
+			BuildingType buildingType = new BuildingType(name, info, health, effort, image, tiledImageFolder,
+					culture, vision, researchReq, cost, buildsunits, movespeed, attributes, inventoryStackSize);
+			buildingType.getComponents().addAll(components);
 			buildingTypeMap.put(name, buildingType);
 			buildingTypeList.add(buildingType);
 		}
@@ -151,8 +233,8 @@ public class Loader {
 //		}
 	}
 	public static void loadUnitType(HashMap<String, UnitType> unitTypeMap, ArrayList<UnitType> unitTypeList) {
-		String unitTypeString = readFile("resources/costs/UnitType.json");
-//		System.out.println("Loaded :" + unitTypeString);
+		System.out.println("Loading Units");
+		String unitTypeString = Utils.readFile("costs/UnitType.json");
 		JSONObject obj = new JSONObject(unitTypeString);
 		JSONArray arr = obj.getJSONArray("unittypes");
 		for (int i = 0; i < arr.length(); i++) {
@@ -168,7 +250,7 @@ public class Loader {
 			int buildtime = statsObject.getInt("buildtime");
 			CombatStats combatStats = new CombatStats(health, movespeed, buildtime, healspeed);
 			
-			HashSet<String> attributes = new HashSet<>();;
+			HashSet<String> attributes = new HashSet<>();
 			if(unitTypeObject.has("attributes")) {
 				JSONArray attributelist = unitTypeObject.getJSONArray("attributes");
 				for(int j = 0; j < attributelist.length(); j++) {
@@ -181,7 +263,7 @@ public class Loader {
 				researchReq = unitTypeObject.getString("research");
 			}
 			
-			HashMap<ItemType, Integer> cost = null;
+			HashMap<ItemType, Integer> cost = UnitType.EMPTY_COST;
 			if(unitTypeObject.has("cost")) {
 				cost = loadItemTypeMap(unitTypeObject.getJSONObject("cost"));
 			}
@@ -208,14 +290,23 @@ public class Loader {
 					attackStyles.add(parseAttackStyleFromJSON(attackStyleList.getJSONObject(j)));
 				}
 			}
-			
-			UnitType unitType = new UnitType(name, image, combatStats, attributes, researchReq, cost, items, targeting, attackStyles);
+
+			int inventoryStackSize = 0;
+			if(unitTypeObject.has("inventory")) {
+				JSONObject inventoryProperties = unitTypeObject.getJSONObject("inventory");
+				if(!inventoryProperties.has("maxstack")) {
+					System.err.println("ERROR inventory does not have maxstack defined.");
+					System.exit(0);
+				}
+				int maxStack = inventoryProperties.getInt("maxstack");
+				inventoryStackSize = maxStack;
+			}
+			Set<GameComponent> components = loadComponents(unitTypeObject);
+			UnitType unitType = new UnitType(name, image, combatStats, attributes,
+					researchReq, cost, items, targeting, attackStyles, inventoryStackSize);
+			unitType.getComponents().addAll(components);
 			unitTypeMap.put(name, unitType);
 			unitTypeList.add(unitType);
-
-			if(unitType.isDelayedInvasion()) {
-				System.out.println(unitType + " has delayed invasion");
-			}
 		}
 	}
 	
@@ -287,8 +378,8 @@ public class Loader {
 	}
 	
 	public static void loadResearchType(HashMap<String, ResearchType> researchTypeMap, ArrayList<ResearchType> researchTypeList) {
-		HashMap<Research, LinkedList<String>> researchRequirements = new HashMap<>();
-		String researchCosts = readFile("resources/costs/ResearchType.json");
+		System.out.println("Loading Researches");
+		String researchCosts = Utils.readFile("costs/ResearchType.json");
 		JSONObject obj = new JSONObject(researchCosts);
 		JSONArray arr = obj.getJSONArray("researches");
 		for (int i = 0; i < arr.length(); i++) {
@@ -301,9 +392,14 @@ public class Loader {
 			int points = researchObject.getInt("points");
 			int tier = researchObject.getInt("tier");
 			HashMap<ItemType, Integer> cost = new HashMap<>();
+			
 			if(researchObject.has("cost")) {
 				cost = loadItemTypeMap(researchObject.getJSONObject("cost"));
 			}
+			HashMap<BuildingType, Integer> buildingRequirement = new HashMap<>();
+//			if(researchObject.has("buildingRequirement")) {
+//				buildingRequirement = loadItemTypeMap(researchObject.getJSONObject("buildingRequirement"));
+//			}
 			LinkedList<String> reqs = new LinkedList<>();
 			if(researchObject.has("requirements")) {
 				JSONArray requirementArray = researchObject.getJSONArray("requirements");
@@ -312,13 +408,14 @@ public class Loader {
 					reqs.add(requirement);
 				}
 			}
-			ResearchType researchType = new ResearchType(researchName, imagePath, reqs, points, tier, cost);
+			ResearchType researchType = new ResearchType(researchName, imagePath, reqs, points, tier, cost, buildingRequirement);
 			researchTypeMap.put(researchName, researchType);
 			researchTypeList.add(researchType);
 		}
 	}
 	
 	public static void doMappings() {
+		System.out.println("Doing Mappings");
 		for(BuildingType type : Game.buildingTypeList) {
 			for(String unittypestring : type.unitsCanProduce()) {
 				type.unitsCanProduceSet().add(Game.unitTypeMap.get(unittypestring));
@@ -340,6 +437,15 @@ public class Loader {
 			if(type.getResearchRequirement() != null) {
 				ResearchType researchReq = Game.researchTypeMap.get(type.getResearchRequirement());
 				researchReq.unlocks.add(Utils.getNiceName(type.name()));
+			}
+			for (GameComponent c : type.getComponents()) {
+				if (c instanceof Builder) {
+					Builder builder = (Builder)c;
+					Set<BuildingType> buildingTypes = builder.getBuildingTypeSet();
+					for (String buildingTypeName : builder.getBuildingTypeNames()) {
+						buildingTypes.add(Game.buildingTypeMap.get(buildingTypeName));
+					}
+				}
 			}
 		}
 	}
@@ -410,4 +516,110 @@ public class Loader {
 		}
 		return new TargetInfo(type, faction);
 	}
+	
+	
+	public static void loadBuildOrders() {
+		System.out.println("Loading Build Orders");
+		
+		String basicBuildOrder = Utils.readFile("buildorders/basic.json");
+		JSONObject obj = new JSONObject(basicBuildOrder);
+		JSONArray rolesArr = obj.getJSONArray("WORKER_ROLES");
+		String[] WORKER_ROLES = new String[rolesArr.length()];
+		for (int i = 0; i < rolesArr.length(); i++) {
+			WORKER_ROLES[i] = rolesArr.getString(i);
+		}
+		System.out.print("WORKER_ROLES: ");
+		for (String role : WORKER_ROLES) {
+			System.out.print(role + ", ");
+		}
+		System.out.println();
+		JSONArray arr = obj.getJSONArray("phases");
+		for (int i = 0; i < arr.length(); i++) {
+			JSONObject phaseObject = arr.getJSONObject(i);
+			int order = phaseObject.getInt("order");
+			BuildOrderPhase phase = new BuildOrderPhase(order);
+			
+			if (phaseObject.has("units")) {
+				JSONObject unitsObject = phaseObject.getJSONObject("units");
+				JSONArray keys = unitsObject.names();
+				for (int unitIndex = 0; unitIndex < keys.length(); unitIndex++) {
+					String unitType = keys.getString(unitIndex);
+					QuantityReq quantities = readQuantityReq(unitsObject.getJSONObject(unitType));
+					phase.units.put(Game.unitTypeMap.get(unitType), quantities);
+				}
+			}
+			
+			if (phaseObject.has("buildings")) {
+				JSONObject buildingsObject = phaseObject.getJSONObject("buildings");
+				JSONArray keys = buildingsObject.names();
+				for (int buildingIndex = 0; buildingIndex < keys.length(); buildingIndex++) {
+					String buildingsType = keys.getString(buildingIndex);
+					QuantityReq quantities = readQuantityReq(buildingsObject.getJSONObject(buildingsType));
+					BuildingType type = Game.buildingTypeMap.get(buildingsType);
+					if (type == null) {
+						System.err.println("INVALID JSON");
+					}
+					phase.buildings.put(Game.buildingTypeMap.get(buildingsType), quantities);
+				}
+			}
+			
+			if (phaseObject.has("researchRequired")) {
+				JSONArray researchArr = phaseObject.getJSONArray("researchRequired");
+				for (int researchIndex = 0; researchIndex < researchArr.length(); researchIndex++) {
+					String researchName = researchArr.getString(researchIndex);
+					phase.requiredResearches.add(Game.researchTypeMap.get(researchName));
+				}
+			}
+			
+			if (phaseObject.has("researchOptional")) {
+				JSONArray researchArr = phaseObject.getJSONArray("researchOptional");
+				for (int researchIndex = 0; researchIndex < researchArr.length(); researchIndex++) {
+					String researchName = researchArr.getString(researchIndex);
+					phase.optionalResearches.add(Game.researchTypeMap.get(researchName));
+				}
+			}
+
+			if (phaseObject.has("workerAssignments")) {
+				JSONObject workerObj = phaseObject.getJSONObject("workerAssignments");
+				JSONArray keys = workerObj.names();
+				int total = 0;
+				for (int taskIndex = 0; taskIndex < keys.length(); taskIndex++) {
+					String taskType = keys.getString(taskIndex);
+					double number = workerObj.getDouble(taskType);
+					total += number;
+					phase.workerAssignments.put(BuildOrderPhase.WorkerTask.valueOf(taskType), number);
+				}
+				for (Entry<BuildOrderPhase.WorkerTask, Double> entry : phase.workerAssignments.entrySet()) {
+					phase.workerAssignments.put(entry.getKey(), entry.getValue() / total);
+				}
+			}
+			
+			phase.finalize();
+//			System.out.println(phase);
+			BuildOrderPhase.phases.add(phase);
+		}
+		BuildOrderPhase.phases.sort((a, b) -> {
+			return a.order - b.order;
+		});
+	}
+
+	private static QuantityReq readQuantityReq(JSONObject obj) {
+		int min = 0;
+		int enough = 0;
+		int max = 0;
+		if (obj.has("min")) {
+			min = obj.getInt("min");
+		}
+		if (obj.has("enough")) {
+			enough = obj.getInt("enough");
+		}
+		if (obj.has("max")) {
+			max = obj.getInt("max");
+		}
+		else {
+			max = Integer.MAX_VALUE;
+		}
+		return new QuantityReq(min, enough, max);
+	}
 }
+

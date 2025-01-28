@@ -3,12 +3,15 @@ package game;
 import java.io.*;
 import java.util.*;
 
+import sounds.Sound;
+import sounds.SoundEffect;
+import sounds.SoundManager;
 import ui.*;
 import utils.*;
 
-public class Research implements Externalizable{
+public class Research implements Externalizable {
 	
-	public static final String DEFAULT_RESEARCH_IMAGE_PATH = "resources/Images/interfaces/tech.png";
+	public static final String DEFAULT_RESEARCH_IMAGE_PATH = "Images/interfaces/tech.png";
 	
 	private ResearchType type;
 	
@@ -74,15 +77,21 @@ public class Research implements Externalizable{
 	public void spendResearch(int points) {
 		if(!isCompleted()) {
 			researchPointsSpent += points;
+			
 			if(researchPointsSpent >= type.requiredResearchPoints) {
 				isCompleted = true;
 				researchPointsSpent = type.requiredResearchPoints;
+				
 			}
 		}
 	}
 
 	public HashMap<ItemType, Integer> getCost(){
 		return type.cost;
+	}
+	
+	public HashMap<BuildingType, Integer> getBuildingRequirement(){
+		return type.buildingRequirement;
 	}
 	
 	@Override

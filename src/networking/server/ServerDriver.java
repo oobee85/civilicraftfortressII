@@ -3,7 +3,6 @@ package networking.server;
 import javax.swing.*;
 
 import game.*;
-import ui.*;
 import utils.*;
 
 public class ServerDriver {
@@ -26,13 +25,18 @@ public class ServerDriver {
 	}
 
 	static {
+		Settings.fromFile();
+		Loader.loadSounds();
 		Loader.loadResearchType(Game.researchTypeMap, Game.researchTypeList);
 		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
 		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);
+		Loader.loadPlantType(Game.plantTypeMap, Game.plantTypeList);
 		Loader.doMappings();
+		Loader.loadBuildOrders();
 	}
 
 	public static void main(String[] args) {
+		Settings.fromCmdArgs(args);
 //		EventQueue.invokeLater(() -> {
 //			try {
 //				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

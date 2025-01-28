@@ -9,7 +9,7 @@ import utils.*;
 
 public class InfoPanel extends JPanel {
 	
-	private static final Icon EXPLODE_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/units/bomb.png"), 18, 18);
+	private static final Icon EXPLODE_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/units/bomb.png"), 18, 18);
 	public static final int DEFAULT_IMAGE_SIZE = 100;
 	
 	private int imageSize = DEFAULT_IMAGE_SIZE;
@@ -43,8 +43,9 @@ public class InfoPanel extends JPanel {
 		return button;
 	}
 	
+	public static final int EXPLODE_BUTTON_SIZE = 28;
 	public JButton addExplodeButton() {
-		Dimension size = new Dimension(28, 28);
+		Dimension size = new Dimension(EXPLODE_BUTTON_SIZE, EXPLODE_BUTTON_SIZE);
 		JButton button = KUIConstants.setupButton("", EXPLODE_ICON, size);
 		button.setFont(KUIConstants.buttonFontMini);
 		this.setLayout(null);

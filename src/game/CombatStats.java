@@ -1,7 +1,6 @@
 package game;
 
 import java.io.*;
-import java.util.*;
 
 public class CombatStats implements Serializable {
 
@@ -9,38 +8,17 @@ public class CombatStats implements Serializable {
 	private int moveSpeed;
 	private int ticksToBuild;
 	private int ticksToHeal;
-	private transient ArrayList<Integer> stats = new ArrayList<Integer>();
-	private transient LinkedList<String> strings = new LinkedList<String>();
 	
-	/**
-	 * @param health
-	 * @param attack
-	 * @param moveSpeed
-	 * @param attackRadius
-	 * @param attackSpeed
-	 * @param ticksToBuild
-	 * @param ticksToHeal
-	**/
 	public CombatStats(int health, int moveSpeed, int ticksToBuild, int ticksToHeal) {
 		this.health = health;
 		this.moveSpeed = moveSpeed;
 		this.ticksToBuild = ticksToBuild;
 		this.ticksToHeal = ticksToHeal;	
-		strings.add("health");
-		strings.add("moveSpeed");
-		strings.add("ticksToBuild");
-		strings.add("ticksToHeal");
-		stats.add(health);
-		stats.add(moveSpeed);
-		stats.add(ticksToBuild);
-		stats.add(ticksToHeal);
 	}
-	public LinkedList<String> getStrings() {
-		return strings;
-	}
-	public ArrayList<Integer> getStats() {
-		return stats;
-	}
+	/** DO NOT USE THIS to get max health of an individual unit. 
+	 *  Use Thing::getMaxHealth() instead since it might 
+	 *  get increased or decreased during the unit's lifetime.
+	 **/
 	public int getHealth() {
 		return health;
 	}
@@ -53,53 +31,24 @@ public class CombatStats implements Serializable {
 	public int getHealSpeed() {
 		return ticksToHeal;
 	}
-	public int getStat(String s) {
-		if(s.equals("health")) {
-			return health;
-		}
-		if(s.equals("moveSpeed")) {
-			return moveSpeed;
-		}
-		if(s.equals("ticksToBuild")) {
-			return ticksToBuild;
-		}
-		if(s.equals("ticksToHeal")) {
-			return ticksToHeal;
-		}
-		return 0;
+	
+	public void addHealth(int health) {
+		this.health += health;
 	}
-	public void add(String s, int i) {
-		if(s.equals("health")) {
-			health =+ i;
-		}
-		if(s.equals("moveSpeed")) {
-			moveSpeed =- i;
-		}
-		if(s.equals("ticksToBuild")) {
-			ticksToBuild =- i;
-		}
-		if(s.equals("ticksToHeal")) {
-			ticksToHeal =- i;
-		}
-		
+	public void addMoveSpeed(int speed) {
+		this.moveSpeed += speed;
 	}
-	public void set(CombatStats cs) {
-		this.health = cs.getHealth();
-		this.moveSpeed = cs.getMoveSpeed();
-		this.ticksToBuild = cs.getTicksToBuild();
-		this.ticksToHeal = cs.getHealSpeed();
+	public void addTicksToBuild(int ticks) {
+		this.ticksToBuild += ticks;
 	}
-	public void combine(CombatStats cs) {
-		this.health += cs.getHealth();
-		this.moveSpeed -= cs.getMoveSpeed();
-		this.ticksToBuild -= cs.getTicksToBuild();
-		this.ticksToHeal -= cs.getHealSpeed();
+	public void addTicksToHeal(int ticks) {
+		this.ticksToHeal += ticks;
 	}
-	public void subtract(CombatStats cs) {
-		this.health -= cs.getHealth();
-		this.moveSpeed += cs.getMoveSpeed();
-		this.ticksToBuild += cs.getTicksToBuild();
-		this.ticksToHeal += cs.getHealSpeed();
+	public void mergeCombatStats(CombatStats other) {
+		this.health += other.getHealth();
+		this.moveSpeed += other.getMoveSpeed();
+		this.ticksToBuild += other.getTicksToBuild();
+		this.ticksToHeal += other.getHealSpeed();
 	}
 	
 	@Override

@@ -1,5 +1,7 @@
 package utils;
 import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.io.*;
 import java.net.*;
@@ -10,14 +12,52 @@ import java.util.concurrent.*;
 import javax.swing.*;
 
 import game.*;
-import game.liquid.*;
+import game.actions.*;
 import networking.message.*;
 import ui.*;
 import world.*;
+import world.liquid.*;
 
 public final class Utils {
+
+	public static final String IMAGEICON_ANIMATED = "GIF";
+	public static final int MAX_TILED_BITMAP = 2 * 2 * 2 * 2 * 2 * 2 * 2;
 	
 	public static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	
+	public static int stringWidth(String text, Font font) {
+	  FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, true);
+	  return (int)(font.getStringBounds(text, frc).getWidth());
+	}
+	
+	public static MipMap getImageFromThingType(Object thingType) {
+		if(thingType instanceof UnitType) {
+			return ((UnitType)thingType).getMipMap();
+		}
+		else if(thingType instanceof BuildingType) {
+			return ((BuildingType)thingType).getMipMap();
+		}
+		else if(thingType instanceof PlantType) {
+			return ((PlantType)thingType).getMipMap();
+		}
+		return null;
+	}
+
+	public static String loadFileAsString(String path) {
+		StringBuilder result = new StringBuilder();
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(Utils.class.getResourceAsStream(path)))) {
+			String line = "";
+			while((line = reader.readLine()) != null) {
+				result.append(line).append("\n");
+			}
+		}
+		catch (IOException e) {
+			System.err.println("ERROR: Failed to read file at " + path);
+			e.printStackTrace();
+		}
+		return result.toString();
+	}
+	
 	
 	public static String getName(Object o) {
 		// TODO use map to record these so I can just lookup
@@ -92,10 +132,72 @@ public final class Utils {
 		}
 	}
 	
+	public static final HashMap<Integer, Image> loadTiledImages(String tiledImageFolder) {
+
+		HashMap<Integer, Image> tiledImages = new HashMap<>();
+		
+		for (int i = 1; i < Utils.MAX_TILED_BITMAP; i+=2) {
+			int bits = i;
+
+			boolean northwest = (bits & Direction.NORTHWEST.tilingBit) != 0;
+			boolean northeast = (bits & Direction.NORTHEAST.tilingBit) != 0;
+			boolean southeast = (bits & Direction.SOUTHEAST.tilingBit) != 0;
+			boolean southwest = (bits & Direction.SOUTHWEST.tilingBit) != 0;
+			boolean mirrored = false;
+			if ((northwest && !northeast)
+						|| ((northwest == northeast) && (southwest && !southeast))) {
+	            mirrored = true;
+	            bits = (bits & Direction.NONE.tilingBit)
+	            		| (bits & Direction.NORTH.tilingBit)
+	            		| (northwest ? Direction.NORTHEAST.tilingBit : 0)
+	            		| (southwest ? Direction.SOUTHEAST.tilingBit : 0)
+	            		| (bits & Direction.SOUTH.tilingBit)
+	            		| (southeast ? Direction.SOUTHWEST.tilingBit : 0)
+	            		| (northeast ? Direction.NORTHWEST.tilingBit : 0);
+			}
+			
+			String filename = tiledImageFolder + "/" + bits + ".png";
+			Image tiledImage = Utils.loadImage(filename);
+			
+			if (mirrored) {
+				BufferedImage buf = Utils.toBufferedImage(tiledImage, false);
+				
+				BufferedImage mirroredImage = new BufferedImage(buf.getWidth(), buf.getHeight(), buf.getType());
+				Graphics g = mirroredImage.getGraphics();
+				g.drawImage(buf, buf.getWidth(), 0, -buf.getWidth(), buf.getHeight(), null);
+				g.dispose();
+				
+				tiledImage = mirroredImage;
+			}
+			tiledImages.put(i, tiledImage);
+		}
+		return tiledImages;
+	}
+	
+	public static String readFile(String filename) {
+		String fileContents = "";
+	    try (InputStream in = Utils.class.getClassLoader().getResourceAsStream(filename);
+	        BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+			StringBuilder builder = new StringBuilder();
+			String line;
+			while((line = br.readLine()) != null) {
+				builder.append(line + "\n");
+			}
+			fileContents = builder.toString();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return fileContents;
+	}
+	
 	public static final ImageIcon resizeImageIcon(ImageIcon icon, int width, int height) {
-		Image image = icon.getImage(); // transform it 
-		Image newimg = image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
-		return new ImageIcon(newimg);  // transform it back
+		int scalingMode = java.awt.Image.SCALE_SMOOTH;
+		if(icon.getDescription() != null && icon.getDescription().equals(IMAGEICON_ANIMATED)) {
+			scalingMode = java.awt.Image.SCALE_DEFAULT;
+		}
+		return new ImageIcon(icon.getImage().getScaledInstance(width, height, scalingMode));
 	}
 
 	/**
@@ -104,8 +206,11 @@ public final class Utils {
 	 * @param img The Image to be converted
 	 * @return The converted BufferedImage
 	 */
-	public static BufferedImage toBufferedImage(Image img) {
-		if (img instanceof BufferedImage) {
+	public static BufferedImage toBufferedImage(Image img, boolean requireNewDataBuffer) {
+		if (img == null) {
+			return toBufferedImage(Utils.getDefaultSkin(), true);
+		}
+		if (!requireNewDataBuffer && img instanceof BufferedImage) {
 			return (BufferedImage) img;
 		}
 
@@ -122,7 +227,7 @@ public final class Utils {
 	}
 	
 	public static ImageIcon shadowFilter(ImageIcon icon) {
-		BufferedImage image = toBufferedImage(icon.getImage());
+		BufferedImage image = toBufferedImage(icon.getImage(), true);
 		Color blank = new Color(0, 0, 0, 0);
 		for(int x = 0; x < image.getWidth(); x++) {
 			for(int y = 0; y < image.getHeight(); y++) {
@@ -139,8 +244,32 @@ public final class Utils {
 		return new ImageIcon(image);
 	}
 	
+	public static ImageIcon sunShadowFilter(ImageIcon icon, double shear, double squish) {
+		BufferedImage image = toBufferedImage(icon.getImage(), true);
+		Color blank = new Color(0, 0, 0, 0);
+		for(int x = 0; x < image.getWidth(); x++) {
+			for(int y = 0; y < image.getHeight(); y++) {
+				Color c = new Color(image.getRGB(x, y), true);
+				if(c.getAlpha() > 0.1) {
+					image.setRGB(x, y, new Color(0, 0, 0, c.getAlpha()).getRGB());
+				}
+				else {
+					image.setRGB(x, y, blank.getRGB());
+				}
+			}
+		}
+		BufferedImage sheared = new BufferedImage(image.getWidth()*2, image.getHeight(), image.getType());
+		Graphics2D g = sheared.createGraphics();
+		g.transform(AffineTransform.getShearInstance(shear, 0));
+		g.translate(-image.getWidth() * shear, 0);
+		g.drawImage(image, image.getWidth()/2, (int)(image.getHeight()*squish), image.getWidth(), (int)(image.getHeight()*(1-squish)), null);
+		g.dispose();
+		return new ImageIcon(sheared);
+	}
+	
 	public static ImageIcon highlightFilter(ImageIcon icon, Color color) {
-		BufferedImage image = toBufferedImage(icon.getImage());
+		BufferedImage image = toBufferedImage(icon.getImage(), true);
+		
 		Color blank = new Color(0, 0, 0, 0);
 		for(int x = 0; x < image.getWidth(); x++) {
 			for(int y = 0; y < image.getHeight(); y++) {
@@ -206,6 +335,29 @@ public final class Utils {
 		}
 		return new Color(sumr/total, sumg/total, sumb/total);
 	}
+	
+	public static HashMap<Terrain, Color> computeTerrainAverageColor() {
+		HashMap<Terrain, Color> terrainColors = new HashMap<>();
+		for(Terrain t : Terrain.values()) {
+			BufferedImage image = Utils.toBufferedImage(t.getImage(0), false);
+			int sumr = 0;
+			int sumg = 0;
+			int sumb = 0;
+			for(int i = 0; i < image.getWidth(); i++) {
+				for(int j = 0; j < image.getHeight(); j++) {
+					Color c = new Color(image.getRGB(i, j));
+					sumr += c.getRed();
+					sumg += c.getGreen();
+					sumb += c.getBlue();
+				}
+			}
+			int totalNumPixels = image.getWidth()*image.getHeight();
+			Color average = new Color(sumr/totalNumPixels, sumg/totalNumPixels, sumb/totalNumPixels);
+			terrainColors.put(t, average);
+		}
+		return terrainColors;
+	}
+	
 	
 
 //	public Driver() {
@@ -295,16 +447,73 @@ public final class Utils {
 				(int) (top.getBlue()*alpha + bottom.getBlue()*beta)
 				);
 	}
+
+	/**
+	 * Interpolates between min and max depending on ratio.
+	 * ratio gets bounded between 0 and 1
+	 */
+	public static int lerp(int min, int max, double ratio) {
+		ratio = Math.max(Math.min(ratio, 1), 0);
+		max = Math.max(max, min);
+		return (int) (min + (max - min) * ratio);
+	}
+	
+	public static void clearBufferedImageTo(Graphics2D g, Color color, int w, int h) {
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OUT));
+		g.setColor(color);
+		g.fillRect(0, 0, w, h);
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+	}
 	
 	public static double getAlphaOfLiquid(double amount) {
 		// 1 units of fluid is opaque, linearly becoming transparent at 0 units of fluid.
-		double alpha = Math.max(Math.min(amount*12 - 0.2, 1), 0);
-		return alpha*alpha;
+//		amount = 1- (1/(1+amount));
+		double alpha = Math.sqrt(Math.max(Math.min((amount-0.6)*0.1, 1), 0));
+		
+		return alpha;
 		//return 1 - (1 - alpha) * (1 - alpha);
 	}
 	
+	public static double getAlphaDepthOfLiquid(double amount) {
+		double alpha = Math.sqrt(Math.max(Math.min(amount*0.01, 1), 0)) / 2;
+		return alpha*alpha;
+	}
 
-	public static void normalize(float[][] data) {
+	public static void normalize(double[][] data, float upper, float inner) {
+		double minValue = data[0][0];
+		double maxValue = data[0][0];
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				minValue = data[i][j] < minValue ? data[i][j] : minValue;
+				maxValue = data[i][j] > maxValue ? data[i][j] : maxValue;
+			}
+		}
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				double ratio = (data[i][j] - minValue) / (maxValue - minValue);
+				data[i][j] = ratio * (upper-inner) + inner;
+			}
+		}
+	}
+	public static void normalize(double[][] data, double upper, double inner) {
+		double minValue = data[0][0];
+		double maxValue = data[0][0];
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				minValue = data[i][j] < minValue ? data[i][j] : minValue;
+				maxValue = data[i][j] > maxValue ? data[i][j] : maxValue;
+			}
+		}
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				double ratio = (data[i][j] - minValue) / (maxValue - minValue);
+				data[i][j] = ratio * (upper-inner) + inner;
+			}
+		}
+	}
+	public static void normalize(float[][] data, float low, float high) {
+		
+		
 		float minValue = data[0][0];
 		float maxValue = data[0][0];
 		for (int i = 0; i < data.length; i++) {
@@ -313,13 +522,24 @@ public final class Utils {
 				maxValue = data[i][j] > maxValue ? data[i][j] : maxValue;
 			}
 		}
-		System.out.println("Min Terrain Gen Value: " + minValue + ", Max value: " + maxValue);
+		System.out.println("Before normalize Min Terrain Gen Value: " + minValue + ", Max value: " + maxValue);
 		// Normalize the heightMap to be between 0 and 1
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < data[0].length; j++) {
 				data[i][j] = (data[i][j] - minValue) / (maxValue - minValue);
+//				data[i][j] = data[i][j] * upper;
+				data[i][j] = data[i][j] * (high-low) + low;
 			}
 		}
+		minValue = data[0][0];
+		maxValue = data[0][0];
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				minValue = data[i][j] < minValue ? data[i][j] : minValue;
+				maxValue = data[i][j] > maxValue ? data[i][j] : maxValue;
+			}
+		}
+		System.out.println("After normalize Min Terrain Gen Value: " + minValue + ", Max value: " + maxValue);
 	}
 	/**
 	 * 
@@ -371,17 +591,32 @@ public final class Utils {
 		return smoothed;
 	}
 	
-	public static WorldInfo extractWorldInfo(World world) {
-		ArrayList<Tile> tileInfos = new ArrayList<>(world.getTiles().size()); 
-		tileInfos.addAll(world.getTiles());
-		WorldInfo worldInfo = new WorldInfo(world.getWidth(), world.getHeight(), World.ticks, tileInfos.toArray(new Tile[0]));
-		worldInfo.getThings().addAll(world.getPlants());
-		worldInfo.getThings().addAll(world.getBuildings());
-		worldInfo.getThings().addAll(world.getUnits());
+	public static WorldInfo extractWorldInfo(World world, boolean everything, boolean units, boolean onlyChangedTiles) {
+		Tile[] tileArray;
+		if (everything) {
+			ArrayList<Tile> tileInfos = new ArrayList<>(world.getTiles().size());
+			for (Tile t : world.getTiles()) {
+				if (!onlyChangedTiles || t.isChangedFromLatestSent()) {
+					tileInfos.add(t);
+				}
+			}
+			tileArray = tileInfos.toArray(new Tile[0]);
+		}
+		else {
+			tileArray = new Tile[0];
+		}
+		WorldInfo worldInfo = new WorldInfo(world.getWidth(), world.getHeight(), World.ticks, tileArray);
+		if (everything) {
+			worldInfo.getThings().addAll(world.getPlants());
+			worldInfo.getThings().addAll(world.getBuildings());
+			worldInfo.getFactions().addAll(world.getFactions());
+		}
+		if (units) {
+			worldInfo.getThings().addAll(world.getUnits());
+		}
 		worldInfo.getThings().addAll(world.getData().clearDeadThings());
-		worldInfo.getFactions().addAll(world.getFactions());
+		worldInfo.addHitsplats(world.getData());
 		worldInfo.getProjectiles().addAll(world.getData().clearProjectilesToSend());
-		worldInfo.getWeatherEvents().addAll(world.getData().clearWeatherEventsToSend());
 		return worldInfo;
 	}
 
@@ -389,7 +624,7 @@ public final class Utils {
 		try(ObjectOutputStream objOut = new ObjectOutputStream(new FileOutputStream(filename, append))) {
 			objOut.writeObject(worldInfo);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			// missing folder is fine
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -418,25 +653,87 @@ public final class Utils {
 		return tile.getNeighbors();
 	}
 	public static List<Tile> getTilesInRadius(Tile tile, World world, double radius) {
-		int maxr = (int) Math.ceil(radius);
-		TileLoc center = tile.getLocation();
-		int mini = (int) Math.max(0, center.x()-maxr);
-		int maxi = (int) Math.min(world.getWidth()-1, center.x()+maxr);
-		int minj = (int) Math.max(0, center.y()-maxr);
-		int maxj = (int) Math.min(world.getHeight()-1, center.y()+maxr);
+		LinkedList<TileLoc> ring = new LinkedList<>();
+		for(int r = 0; r <= radius; r++) {
+			Utils.getRingOfTileLocs(tile.getLocation(), world, r, ring);
+		}
 		LinkedList<Tile> tiles = new LinkedList<>();
-		for(int i = mini; i <= maxi; i++) {
-			for(int j = minj; j <= maxj; j++) {
-				TileLoc otherLoc = new TileLoc(i, j);
-				Tile otherTile = world.get(otherLoc);
-				if(otherTile != null) {
-					if(center.euclideanDistance(otherLoc) <= radius) {
-						tiles.add(otherTile);
-					}
-				}
+		for(TileLoc loc : ring) {
+			Tile t = world.get(loc);
+			if(t != null) {
+				tiles.add(t);
 			}
 		}
 		return tiles;
+	}
+	public static List<Tile> getRingOfTiles(Tile center, World world, int radius) {
+		LinkedList<TileLoc> ring = new LinkedList<>();
+		Utils.getRingOfTileLocs(center.getLocation(), world, radius, ring);
+		LinkedList<Tile> tiles = new LinkedList<>();
+		for(TileLoc loc : ring) {
+			Tile t = world.get(loc);
+			if(t != null) {
+				tiles.add(t);
+			}
+		}
+		return tiles;
+	}
+	private static void getRingOfTileLocs(TileLoc center, World world, int radius, List<TileLoc> ring) {
+		// top corner
+		ring.add(new TileLoc(center.x(), center.y() - radius));
+		if(radius == 0) {
+			return;
+		}
+		// top right edge
+		for(int i = 1; i < radius; i++) {
+			int minusyoffset = radius - i/2;
+			if(center.x()%2 == 1 && i%2 == 1) {
+				minusyoffset -= 1;
+			}
+			ring.add(new TileLoc(center.x()+i, center.y() - minusyoffset));
+		}
+		// right edge
+		for(int i = radius; i >= 0; i--) {
+			int y = center.y() + radius/2 - i;
+			if(radius%2 == 1 && center.x()%2 == 1) {
+				y += 1;
+			}
+			ring.add(new TileLoc(center.x()+radius, y));
+		}
+		// bottom right edge
+		for(int i = radius - 1; i >= 1; i--) {
+			int yoffset = radius - i/2;
+			if(center.x()%2 == 0 && i%2 == 1) {
+				yoffset -= 1;
+			}
+			ring.add(new TileLoc(center.x()+i, center.y() + yoffset));
+		}
+		// bottom corner
+		ring.add(new TileLoc(center.x(), center.y() + radius));
+		// bottom left edge
+		for(int i = 1; i < radius; i++) {
+			int yoffset = radius - i/2;
+			if(center.x()%2 == 0 && i%2 == 1) {
+				yoffset -= 1;
+			}
+			ring.add(new TileLoc(center.x()-i, center.y() + yoffset));
+		}
+		// left edge
+		for(int i = 0; i < radius+1; i++) {
+			int y = center.y() + radius/2 - i;
+			if(radius%2 == 1 && center.x()%2 == 1) {
+				y += 1;
+			}
+			ring.add(new TileLoc(center.x()-radius, y));
+		}
+		// top left edge
+		for(int i = radius - 1; i >= 1; i--) {
+			int minusyoffset = radius - i/2;
+			if(center.x()%2 == 1 && i%2 == 1) {
+				minusyoffset -= 1;
+			}
+			ring.add(new TileLoc(center.x()-i, center.y() - minusyoffset));
+		}
 	}
 	public static double getRandomNormal(int tries) {
 		double rand = 0;
@@ -444,6 +741,75 @@ public final class Utils {
 			rand += Math.random();
 		}
 		return rand / tries;
+	}
+	public static float getRandomNormalF(int tries) {
+		float rand = 0;
+		for (int i = 0; i < tries; i++) {
+			rand += Math.random();
+		}
+		return rand / tries;
+	}
+
+	public static Position[] normalizeRectangle(Position one, Position two) {
+		double x = Math.min(one.x, two.x);
+		double y = Math.min(one.y, two.y);
+		double width = Math.abs(one.x - two.x);
+		double height = Math.abs(one.y - two.y);
+		return new Position[] { new Position(x, y), new Position(x + width, y + height) };
+	}
+
+	public static List<Tile> getTilesBetween(World world, Position cornerOne, Position cornerTwo) {
+		int leftEdge = Math.min(cornerOne.getIntX(), cornerTwo.getIntX());
+		int rightEdge = Math.max(cornerOne.getIntX(), cornerTwo.getIntX());
+		int topEvenY = cornerOne.getIntY();
+		int topOddY = cornerOne.getIntY();
+		if (cornerOne.getIntX() % 2 == 0) {
+			if (cornerOne.y - cornerOne.getIntY() < 0.5f) {
+				topOddY = cornerOne.getIntY() - 1;
+			}
+		}
+		else {
+			if (cornerOne.y - cornerOne.getIntY() >= 0.5f) {
+				topEvenY = cornerOne.getIntY() + 1;
+			}
+		}
+		int botEvenY = cornerTwo.getIntY();
+		int botOddY = cornerTwo.getIntY();
+		if (cornerTwo.getIntX() % 2 == 0) {
+			if (cornerTwo.y - cornerTwo.getIntY() < 0.5f) {
+				botOddY = cornerTwo.getIntY() - 1;
+			}
+		}
+		else {
+			if (cornerTwo.y - cornerTwo.getIntY() >= 0.5f) {
+				botEvenY = cornerTwo.getIntY() + 1;
+			}
+		}
+		
+		if (topEvenY > botEvenY) {
+			int temp = topEvenY;
+			topEvenY = botEvenY;
+			botEvenY = temp;
+		}
+		if (topOddY > botOddY) {
+			int temp = topOddY;
+			topOddY = botOddY;
+			botOddY = temp;
+		}
+		
+		LinkedList<Tile> tiles = new LinkedList<>();
+		for (int i = leftEdge; i <= rightEdge; i++) {
+			int minj = i % 2 == 0 ? topEvenY : topOddY;
+			int maxj = i % 2 == 0 ? botEvenY : botOddY;
+			for (int j = minj; j <= maxj; j++) {
+				TileLoc otherLoc = new TileLoc(i, j);
+				Tile otherTile = world.get(otherLoc);
+				if (otherTile != null) {
+					tiles.add(otherTile);
+				}
+			}
+		}
+		return tiles;
 	}
 	
 	public static CommandInterface makeFunctionalCommandInterface(Game game) {
@@ -453,36 +819,21 @@ public final class Utils {
 				building.setRallyPoint(rallyPoint);
 			}
 			@Override
-			public void moveTo(Unit unit, Tile target, boolean clearQueue) {
-				if(clearQueue) {
-					unit.clearPlannedActions();
-				}
-				unit.queuePlannedAction(new PlannedAction(target));
-			}
-			@Override
-			public void attackThing(Unit unit, Thing target, boolean clearQueue) {
-				if(clearQueue) {
-					unit.clearPlannedActions();
-				}
-				unit.queuePlannedAction(new PlannedAction(target));
-			}
-			@Override
-			public void buildThing(Unit unit, Tile target, boolean isRoad, boolean clearQueue) {
-				if(clearQueue) {
-					unit.clearPlannedActions();
-				}
-				unit.queuePlannedAction(new PlannedAction(target, isRoad));
-			}
-			@Override
 			public Building planBuilding(Unit unit, Tile target, boolean clearQueue, BuildingType buildingType) {
 				if(clearQueue) {
 					unit.clearPlannedActions();
 				}
-				if(unit.getType().isBuilder()) {
+				if(unit.isBuilder() && unit.getBuildableBuildingTypes().contains(buildingType)) {
 					Building plannedBuilding = game.planBuilding(unit, buildingType, target);
-					if(plannedBuilding != null) {
-						unit.queuePlannedAction(new PlannedAction(target, buildingType.isRoad()));
+					// if building is planned, and is harvestable, should queue harvest action
+					if(plannedBuilding != null && plannedBuilding.getType().isHarvestable()) {
+						PlannedAction followup = PlannedAction.harvest(plannedBuilding);
+						unit.queuePlannedAction(PlannedAction.buildOnTile(target, buildingType.isRoad(), followup));
 					}
+					else {
+						unit.queuePlannedAction(PlannedAction.buildOnTile(target, buildingType.isRoad()));
+					}
+					
 					return plannedBuilding;
 				}
 				return null;
@@ -501,18 +852,26 @@ public final class Utils {
 			}
 			@Override
 			public void produceUnit(Building building, UnitType unitType) {
+				if (!building.getFaction().areRequirementsMet(unitType)) {
+					return;
+				}
 				if(building.getFaction().canAfford(unitType.getCost())) {
 					Unit unit = new Unit(unitType, building.getTile(), building.getFaction());
 					if (building.getTile().isBlocked(unit)) {
 						return;
 					}
+//					unit.getCombatStats().mergeCombatStats(building.getFaction().getUpgradedCombatStats());
+					unit.getCombatStats().addTicksToBuild(building.getFaction().getUpgradedCombatStats().getTicksToBuild());
 					building.getFaction().payCost(unitType.getCost());
 					building.setProducingUnit(unit);
 				}
 			}
 			@Override
-			public void setGuarding(Unit unit, boolean enabled) {
-				unit.setGuarding(enabled);
+			public void planAction(Unit unit, PlannedAction plan, boolean clearQueue) {
+				if(clearQueue) {
+					unit.clearPlannedActions();
+				}
+				unit.queuePlannedAction(plan);
 			}
 		};
 	}

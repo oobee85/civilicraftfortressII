@@ -3,14 +3,14 @@ package wildlife;
 import java.util.*;
 
 import game.*;
-import ui.*;
+import game.actions.*;
 import utils.*;
 import world.*;
 
 public class Animal extends Unit {
 	private static final int TARGETING_COOLDOWN = 10;
 	
-	private int migratingUntil;
+	private int dontMigrateUntil;
 	private int nextTimeToChooseTarget;
 	private int whenToInvade;
 	
@@ -37,6 +37,9 @@ public class Animal extends Unit {
 	
 	@Override
 	public void planActions(World world) {
+		if (!isIdle()) {
+			return;
+		}
 		chooseWhatToEat(world.getUnits());
 		if(wantsToAttack() && getTarget() == null && World.ticks >= nextTimeToChooseTarget) {
 			chooseWhatToAttack(world.getUnits(), world.getBuildings());
@@ -78,24 +81,26 @@ public class Animal extends Unit {
 			return;
 		}
 		// Try to avoid danger
-		Tile best = getTile();
-		double currentDanger = computeDanger(best);
-		double bestDanger = currentDanger;
-		for(Tile t : getTile().getNeighbors()) {
-			if(t.isBlocked(this)) {
-				continue;
+		double currentDanger = this.applyResistance(getTile().computeTileDanger());
+		if(currentDanger >= 0.9) {
+			Tile best = getTile();
+			double bestDanger = currentDanger;
+			for(Tile t : getTile().getNeighbors()) {
+				if(t.isBlocked(this)) {
+					continue;
+				}
+				double danger = this.applyResistance(t.computeTileDanger());
+				if(danger < bestDanger) {
+					best = t;
+					bestDanger = danger;
+				}
 			}
-			double danger = computeDanger(t);
-			if(danger < bestDanger) {
-				best = t;
-				bestDanger = danger;
+			if(bestDanger < currentDanger) {
+				if(best != getTile()) {
+					queuePlannedAction(PlannedAction.moveTo(best));
+					return;
+				}
 			}
-		}
-		if(bestDanger < currentDanger && currentDanger >= 0.9) {
-			if(best != getTile()) {
-				queuePlannedAction(new PlannedAction(best));
-			}
-			return;
 		}
 		// Try to stay next to same species
 		if(Math.random() < 0.1) {
@@ -112,29 +117,24 @@ public class Animal extends Unit {
 					bestHerdAmount = herdAmount;
 				}
 			}
-			if(bestHerdAmount > currentHerdAmount && computeDanger(bestHerd) < 1) {
+			if(bestHerdAmount > currentHerdAmount && this.applyResistance(bestHerd.computeTileDanger()) < 1) {
 				if(bestHerd != getTile()) {
-					queuePlannedAction(new PlannedAction(bestHerd));
+					queuePlannedAction(PlannedAction.moveTo(bestHerd));
 					return;
 				}
 			}
 		}
-		// Migrate according to the season
-		if(getType().isMigratory() && World.ticks > migratingUntil && Math.random() < 0.1) {
-			double season = Season.getSeason4();
-			Tile migrationTarget = null;
-			// heading into winter
-			if(season > 0.4 && season < 0.8 && getTile().getLocation().y() < world.getHeight()/2) {
-				migrationTarget = world.get(new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y() + (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4)));
-			}
-			// heading into summer
-			else if(season > 1.4 && season < 1.8 && getTile().getLocation().y() > world.getHeight()/2) {
-				migrationTarget = world.get(new TileLoc((int)(Math.random() * world.getWidth()), getTile().getLocation().y() - (int)(Math.random()*world.getHeight()/4 + world.getHeight()/4)));
-			}
-			if(migrationTarget != null) {
-//				System.out.println(this.getType() + " at " + this.getTile() + " migrating to " + migrationTarget);
-				migratingUntil = World.ticks + Season.SEASON_DURATION/2;
-				queuePlannedAction(new PlannedAction(migrationTarget));
+		// Go to a random tile
+		if(World.ticks > dontMigrateUntil && Math.random() < 0.1) {
+			Tile target;
+			if(getType().isMigratory())
+				target = world.getRandomTile();
+			else 
+				target = getTile().getNeighbors().get((int)(Math.random()*getTile().getNeighbors().size()));
+			if(this.applyResistance(target.computeTileDanger()) <= 0.9) {
+				dontMigrateUntil = World.ticks + (int)((2 + Math.random()*4) * Constants.DAY_DURATION);
+				queuePlannedAction(PlannedAction.moveTo(target));
+				return;
 			}
 		}
 	}
@@ -143,48 +143,63 @@ public class Animal extends Unit {
 		if(!wantsToEat()) {
 			return;
 		}
+		if(getType().isHostile() == false) {
+			return;
+		}
 		if(getType().isHostile() == true) {
-			Unit iveGotYouInMySights = null;
-			if(!units.isEmpty()) {
-				iveGotYouInMySights = units.get((int) (units.size()*Math.random()));
-			}
-			if(iveGotYouInMySights != this) {
-				clearPlannedActions();
-				queuePlannedAction(new PlannedAction(iveGotYouInMySights));
-			}
+//			Unit targetToAttack = null;
+			
+			
+//			Unit iveGotYouInMySights = null;
+//			if(!units.isEmpty()) {
+//				iveGotYouInMySights = units.get((int) (units.size()*Math.random()));
+//			}
+//			if(iveGotYouInMySights != this) {
+//				clearPlannedActions();
+//				queuePlannedAction(PlannedAction.attack(iveGotYouInMySights));
+//			}
 		}
 		else {
-			if(getTile().getPlant() != null) {
-				queuePlannedAction(new PlannedAction(getTile().getPlant()));
-			}
-			else {
-				for(Tile neighbor : getTile().getNeighbors()) {
-					if(neighbor.getPlant() != null) {
-						queuePlannedAction(new PlannedAction(neighbor.getPlant()));
-					}
-				}
-			}
+//			if(getTile().getPlant() != null) {
+//				queuePlannedAction(PlannedAction.eatPlant(getTile().getPlant()));
+//			}
+//			else {
+//				for(Tile neighbor : getTile().getNeighbors()) {
+//					if(neighbor.getPlant() != null) {
+//						queuePlannedAction(PlannedAction.eatPlant(neighbor.getPlant()));
+//					}
+//				}
+//			}
 		}
 	}
 	
 	@Override
 	public boolean readyToMove() {
-		if(getTile().getBuilding() != null && getTile().getBuilding().getType() == Game.buildingTypeMap.get("FARM")) {
+		// trap doesnt block even when its not completed
+		// if animal is on a trap, it cannot move
+		if(getTile().getBuilding() != null && getTile().getBuilding().getType().isTrap()) {
 			return false;
 		}
 		return super.readyToMove();
 	}
 	
 	public boolean wantsToAttack() {
+//		if(getType().getTargetingInfo().isEmpty() == false) {
+//			
+//		}
 		return !getType().getTargetingInfo().isEmpty();
 	}
 	
 	public void chooseWhatToAttack(LinkedList<Unit> units, LinkedList<Building> buildings) {
 		for(TargetingInfo targetType : getType().getTargetingInfo()) {
+			
+			// get the thing to target
 			Thing target = targetType.getValidTargetFor(this, units, buildings);
+			
+			// sets the planned action to attack the target
 			if(target != null) {
 				clearPlannedActions();
-				queuePlannedAction(new PlannedAction(target));
+				queuePlannedAction(PlannedAction.attack(target));
 				return;
 			}
 		}
@@ -192,6 +207,6 @@ public class Animal extends Unit {
 	
 	public double getMoveChance() {
 		return getType().getCombatStats().getMoveSpeed()*0.02 
-				+ 0.8*(1 - getHealth()/super.getType().getCombatStats().getHealth());
+				+ 0.8*(1 - getHealth()/getMaxHealth());
 	}
 }

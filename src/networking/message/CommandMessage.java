@@ -2,6 +2,7 @@ package networking.message;
 
 import java.io.*;
 
+import game.actions.PlannedAction;
 import utils.*;
 
 public class CommandMessage implements Externalizable {
@@ -15,6 +16,7 @@ public class CommandMessage implements Externalizable {
 	private String type = "";
 	private boolean clearQueue;
 	private int amount;
+	private PlannedAction action;
 	/** Used only by serialization */
 	public CommandMessage() {
 	}
@@ -25,41 +27,6 @@ public class CommandMessage implements Externalizable {
 		msg.thingID = thingID;
 		msg.targetX = target.x();
 		msg.targetY = target.y();
-		return msg;
-	}
-	public static CommandMessage makeMoveToCommand(int thingID, TileLoc target, boolean clearQueue) {
-		CommandMessage msg = new CommandMessage();
-		msg.command = CommandType.MOVE_TO;
-		msg.thingID = thingID;
-		msg.targetX = target.x();
-		msg.targetY = target.y();
-		msg.clearQueue = clearQueue;
-		return msg;
-	}
-	public static CommandMessage makeAttackThingCommand(int thingID, int targetID, boolean clearQueue) {
-		CommandMessage msg = new CommandMessage();
-		msg.command = CommandType.ATTACK_THING;
-		msg.thingID = thingID;
-		msg.targetID = targetID;
-		msg.clearQueue = clearQueue;
-		return msg;
-	}
-	public static CommandMessage makeBuildRoadCommand(int thingID, TileLoc target, boolean clearQueue) {
-		CommandMessage msg = new CommandMessage();
-		msg.command = CommandType.BUILD_ROAD;
-		msg.thingID = thingID;
-		msg.targetX = target.x();
-		msg.targetY = target.y();
-		msg.clearQueue = clearQueue;
-		return msg;
-	}
-	public static CommandMessage makeBuildBuildingCommand(int thingID, TileLoc target, boolean clearQueue) {
-		CommandMessage msg = new CommandMessage();
-		msg.command = CommandType.BUILD_BUILDING;
-		msg.thingID = thingID;
-		msg.targetX = target.x();
-		msg.targetY = target.y();
-		msg.clearQueue = clearQueue;
 		return msg;
 	}
 	public static CommandMessage makePlanBuildingCommand(int thingID, TileLoc target, boolean clearQueue, String buildingType) {
@@ -100,11 +67,12 @@ public class CommandMessage implements Externalizable {
 		msg.type = unitType;
 		return msg;
 	}
-	public static CommandMessage makeSetGuardingCommand(int thingID, boolean enabled) {
+	public static CommandMessage makePlannedActionCommand(int thingID, PlannedAction action, boolean clearQueue) {
 		CommandMessage msg = new CommandMessage();
-		msg.command = CommandType.SET_GUARDING;
 		msg.thingID = thingID;
-		msg.clearQueue = enabled;
+		msg.action = action;
+		msg.command = CommandType.PLANNED_ACTION;
+		msg.clearQueue = clearQueue;
 		return msg;
 	}
 	
@@ -133,6 +101,9 @@ public class CommandMessage implements Externalizable {
 	public int getAmount() {
 		return amount;
 	}
+	public PlannedAction getPlannedAction() {
+		return action;
+	}
 	@Override
 	public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
 		command = CommandType.values()[input.readInt()];
@@ -144,6 +115,7 @@ public class CommandMessage implements Externalizable {
 		amount = input.readInt();
 		type = input.readUTF();
 		clearQueue = input.readBoolean();
+		action = (PlannedAction) input.readObject();
 	}
 	@Override
 	public void writeExternal(ObjectOutput output) throws IOException {
@@ -156,6 +128,7 @@ public class CommandMessage implements Externalizable {
 		output.writeInt(amount);
 		output.writeUTF(type);
 		output.writeBoolean(clearQueue);
+		output.writeObject(action);
 	}
 	
 	@Override

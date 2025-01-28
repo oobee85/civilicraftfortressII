@@ -27,42 +27,42 @@ public class AttackStyle {
 	public int getDamage() {
 		return damage;
 	}
-
 	public int getRange() {
 		return range;
 	}
-
 	public int getMinRange() {
 		return minRange;
 	}
-
 	public boolean isLifesteal() {
 		return lifesteal;
 	}
-
 	public int getCooldown() {
 		return cooldown;
 	}
-
-//	public boolean isHasProjectile() {
-//		return hasProjectile;
-//	}
-//
-//	public String getProjectileImage() {
-//		return projectileImage;
-//	}
-//
-//	public String getProjectileGroundModifier() {
-//		return projectileGroundModifier;
-//	}
-//
-//	public int getExplosionRadius() {
-//		return explosionRadius;
-//	}
-//
-//	public int getProjectileSpeed() {
-//		return projectileSpeed;
-//	}
+	
+	public void addDamage(int damage) {
+		this.damage += damage;
+	}
+	public void addRange(int range) {
+		this.range += range;
+	}
+	public void addMinRange(int minRange) {
+		this.minRange += minRange;
+	}
+	public void addLifesteal(boolean lifesteal) {
+		this.lifesteal = lifesteal;
+	}
+	public void addCooldown(int cooldown) {
+		this.cooldown += cooldown;
+	}
+	
+	public void mergeAttackStyle(AttackStyle other) {
+		this.damage += other.getDamage();
+		this.range += other.getRange();
+		this.minRange += other.getMinRange();
+		this.lifesteal = this.lifesteal || other.lifesteal;
+		this.cooldown += other.getCooldown();
+	}
 
 	public ProjectileType getProjectile() {
 		return projectile;

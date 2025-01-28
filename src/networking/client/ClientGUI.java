@@ -4,14 +4,16 @@ import java.awt.*;
 import java.net.*;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import game.*;
 import networking.message.*;
 import networking.server.*;
-import networking.view.*;
 import ui.*;
+import ui.view.*;
 import utils.*;
-import world.*;
+import static ui.KUIConstants.MAIN_MENU_BUTTON_SIZE;
 
 public class ClientGUI {
 	
@@ -20,19 +22,18 @@ public class ClientGUI {
 	public static final int GUIWIDTH = 350;
 
 	private static final int TAB_ICON_SIZE = 25;
-	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/tech.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private static final ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/building.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private static final ImageIcon PRODUCE_UNIT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/barracks.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private static final ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/crafting.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private static final ImageIcon SPAWN_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/spawn_tab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
-	private static final ImageIcon DEBUG_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/debugtab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/tech.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/building.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon PRODUCE_UNIT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/barracks.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/crafting.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon SPAWN_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/spawn_tab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon DEBUG_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/debugtab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	
-	private static final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(200, 40);
 	private static final Dimension CONNECTION_MENU_BUTTON_SIZE = new Dimension(120, 30);
 
-	private static final ImageIcon AZURE_LOGO = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/azurelogo.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
-	private static final ImageIcon LAN_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/lan_icon.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
-	private static final ImageIcon SINGLE_PLAYER_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("resources/Images/interfaces/single_player_icon.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
+	private static final ImageIcon AZURE_LOGO = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/azurelogo.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
+	private static final ImageIcon LAN_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/lan_icon.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
+	private static final ImageIcon SINGLE_PLAYER_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/single_player_icon.png"), MAIN_MENU_BUTTON_SIZE.height, MAIN_MENU_BUTTON_SIZE.height);
 	
 	
 	private Client client;
@@ -40,6 +41,8 @@ public class ClientGUI {
 	private JPanel rootPanel;
 	
 	private JPanel mainMenuPanel;
+	private JPanel menuButtonPanel;
+	private JPanel mainMenuImagePanel;
 	private JPanel ingamePanel;
 	
 	private JPanel topPanel;
@@ -48,7 +51,6 @@ public class ClientGUI {
 	private JPanel connectionControlsPanel;
 	private JPanel lobbyInfo;
 	private JTextField nameTextField;
-	private Color selectedColor = Server.DEFAULT_PLAYER_INFO.getColor();
 	
 	private JButton makeWorldButton;
 	private JButton startGameButton;
@@ -134,16 +136,24 @@ public class ClientGUI {
 		});
 		
 		Dimension colorButtonSize = new Dimension(MAIN_MENU_BUTTON_SIZE.height + 8, MAIN_MENU_BUTTON_SIZE.height);
-		nameTextField = KUIConstants.setupTextField(Server.DEFAULT_PLAYER_INFO.getName(), new Dimension(MAIN_MENU_BUTTON_SIZE.width - colorButtonSize.width, MAIN_MENU_BUTTON_SIZE.height));
+		nameTextField = KUIConstants.setupTextField(Settings.DEFAULT_PLAYER_NAME, new Dimension(MAIN_MENU_BUTTON_SIZE.width - colorButtonSize.width, MAIN_MENU_BUTTON_SIZE.height));
 		nameTextField.setToolTipText("Choose your faction's name");
+		nameTextField.getDocument().addDocumentListener(new DocumentListener() {
+			@Override public void removeUpdate(DocumentEvent e) { changedUpdate(e); }
+			@Override public void insertUpdate(DocumentEvent e) { changedUpdate(e); }
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				Settings.DEFAULT_PLAYER_NAME = nameTextField.getText();
+			}
+		});
 		KButton colorButton = KUIConstants.setupButton("", null, colorButtonSize);
 		colorButton.setToolTipText("Choose your faction's color");
-		colorButton.setBorder(BorderFactory.createLineBorder(selectedColor, 10));
+		colorButton.setBorder(BorderFactory.createLineBorder(new Color(Settings.DEFAULT_PLAYER_COLOR), 10));
 		colorButton.addActionListener(e -> {
 			Color newColor = JColorChooser.showDialog(rootPanel, "Choose Color", colorButton.getBackground());
 			if(newColor != null) {
-				selectedColor = newColor;
-				colorButton.setBorder(BorderFactory.createLineBorder(selectedColor, 10));
+				Settings.DEFAULT_PLAYER_COLOR = newColor.getRGB();
+				colorButton.setBorder(BorderFactory.createLineBorder(new Color(Settings.DEFAULT_PLAYER_COLOR), 10));
 			}
 			resetFocus();
 		});
@@ -154,8 +164,14 @@ public class ClientGUI {
 		playerInfoPanel.add(nameTextField);
 		playerInfoPanel.add(colorButton);
 		
+		KButton settingsMenuButton = KUIConstants.setupButton("Settings", null, MAIN_MENU_BUTTON_SIZE);
+		settingsMenuButton.setHorizontalAlignment(SwingConstants.CENTER);
+		settingsMenuButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		settingsMenuButton.addActionListener(e -> {
+			switchToSettingsMenu();
+		});
 		
-		JPanel menuButtonPanel = new JPanel();
+		menuButtonPanel = new JPanel();
 		menuButtonPanel.setOpaque(false);
 		menuButtonPanel.setLayout(new BoxLayout(menuButtonPanel, BoxLayout.Y_AXIS));
 		menuButtonPanel.setFocusable(false);
@@ -167,7 +183,7 @@ public class ClientGUI {
 		menuButtonPanel.add(singlePlayer);
 		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
 		menuButtonPanel.add(loadGameButton);
-		if(Game.DEBUG) {
+		if(Settings.DEBUG) {
 			menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
 			menuButtonPanel.add(startLocalHostButton);
 		}
@@ -176,10 +192,15 @@ public class ClientGUI {
 		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
 		menuButtonPanel.add(ipTextField);
 		menuButtonPanel.add(startButton);
+
+		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		menuButtonPanel.add(settingsMenuButton);
+		menuButtonPanel.add(Box.createRigidArea(new Dimension(0, padding)));
+		
 		menuButtonPanel.add(Box.createVerticalGlue());
 		
 		mainMenuPanel.add(menuButtonPanel, BorderLayout.CENTER);
-		JPanel mainMenuImagePanel = new MainMenuImageView();
+		mainMenuImagePanel = new MainMenuImageView();
 		mainMenuPanel.add(mainMenuImagePanel, BorderLayout.SOUTH);
 
 		rootPanel.add(mainMenuPanel, BorderLayout.CENTER);
@@ -204,6 +225,7 @@ public class ClientGUI {
 
 		makeWorldButton = KUIConstants.setupButton("Make World", null, CONNECTION_MENU_BUTTON_SIZE);
 		makeWorldButton.addActionListener(e -> {
+			makeWorldButton.setEnabled(false);
 			client.sendMessage(new ClientMessage(ClientMessageType.MAKE_WORLD, null));
 			resetFocus();
 		});
@@ -211,6 +233,7 @@ public class ClientGUI {
 
 		startGameButton = KUIConstants.setupButton("Start Game", null, CONNECTION_MENU_BUTTON_SIZE);
 		startGameButton.addActionListener(e -> {
+			startGameButton.setEnabled(false);
 			client.sendMessage(new ClientMessage(ClientMessageType.START_GAME, null));
 			resetFocus();
 		});
@@ -241,11 +264,33 @@ public class ClientGUI {
 	}
 	
 	public PlayerInfo getPlayerInfo() {
-		return new PlayerInfo(nameTextField.getText(), selectedColor);
+		return new PlayerInfo(nameTextField.getText(), new Color(Settings.DEFAULT_PLAYER_COLOR));
 	}
 	
 	public void worldReceived() {
 		startGameButton.setEnabled(true);
+	}
+	
+	public void switchToMainMenu() {
+		mainMenuPanel.removeAll();
+		mainMenuPanel.add(menuButtonPanel, BorderLayout.CENTER);
+		mainMenuPanel.add(mainMenuImagePanel, BorderLayout.SOUTH);
+		resetFocus();
+		
+		rootPanel.revalidate();
+		rootPanel.repaint();
+	}
+	
+	public void switchToSettingsMenu() {
+		SettingsMenu settingsMenu = new SettingsMenu(e -> switchToMainMenu());
+		settingsMenu.addControlFor(Settings.class);
+		mainMenuPanel.removeAll();
+		mainMenuPanel.add(settingsMenu.getContentPanel(), BorderLayout.CENTER);
+		mainMenuPanel.add(mainMenuImagePanel, BorderLayout.SOUTH);
+		resetFocus();
+		
+		rootPanel.revalidate();
+		rootPanel.repaint();
 	}
 	
 	public void startedSinglePlayer() {
@@ -260,9 +305,9 @@ public class ClientGUI {
 		
 		rootPanel.remove(mainMenuPanel);
 		rootPanel.add(ingamePanel);
-		resetFocus();
 		
 		topPanel.add(connectionControlsPanel, BorderLayout.NORTH);
+		resetFocus();
 		
 		rootPanel.revalidate();
 		rootPanel.repaint();
@@ -287,19 +332,16 @@ public class ClientGUI {
 	}
 	public void setGameInstance(Game instance) {
 		if(gameView != null) {
-			ingamePanel.remove(gameView);
+			ingamePanel.remove(gameView.getPanel());
 		}
-		gameView = new GameView(instance);
+		gameViewOverlay = new GameViewOverlay(instance.getGUIController());
+		gameView = new GameView(instance, gameViewOverlay);
 		MinimapView minimapView = new MinimapView(gameView);
 		minimapView.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, ClientGUI.GUIWIDTH));
 		gameView.requestFocus();
-		gameViewOverlay = new GameViewOverlay(instance.getGUIController());
-		gameView.setLayout(new BorderLayout());
-		gameView.add(gameViewOverlay, BorderLayout.CENTER);
-		ingamePanel.add(gameView, BorderLayout.CENTER);
+		ingamePanel.add(gameView.getPanel(), BorderLayout.CENTER);
 		sidePanel.add(minimapView, BorderLayout.NORTH);
 		
-
 		infoPanelView = new InfoPanelView();
 		JPanel infoPanelViewRoot = infoPanelView.getRootPanel();
 		infoPanelViewRoot.setBackground(instance.getBackgroundColor());
@@ -327,7 +369,7 @@ public class ClientGUI {
 		CRAFTING_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, craftingView.getRootPanel(), "Craft items", CRAFTING_TAB);
 		
-		if(Game.DEBUG) {
+		if(Settings.DEBUG) {
 			SpawnUnitsView spawnUnitsView = new SpawnUnitsView(gameView);
 			SPAWN_UNITS_TAB = tabbedPane.getTabCount();
 			tabbedPane.insertTab(null, SPAWN_TAB_ICON, spawnUnitsView.getRootPanel(), "Summon units for testing", SPAWN_UNITS_TAB);
@@ -340,7 +382,7 @@ public class ClientGUI {
 		// disable building tab after setting all of the tabs up
 		manageBuildingTab(false);
 		manageProduceUnitTab(false);
-		manageBlacksmithTab(false);
+		tabbedPane.setEnabledAt(CRAFTING_TAB, false);
 		
 		rootPanel.revalidate();
 		rootPanel.repaint();
@@ -352,6 +394,7 @@ public class ClientGUI {
 	}
 	
 	public void repaint() {
+		rootPanel.revalidate();
 		rootPanel.repaint();
 	}
 	
@@ -420,7 +463,6 @@ public class ClientGUI {
 		} else if (enabled == true) {
 			tabbedPane.setSelectedIndex(CRAFTING_TAB);
 		}
-		tabbedPane.setEnabledAt(CRAFTING_TAB, enabled);
+		tabbedPane.setEnabledAt(CRAFTING_TAB, true);
 	}
-
 }

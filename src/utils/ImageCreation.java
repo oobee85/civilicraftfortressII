@@ -28,7 +28,7 @@ public class ImageCreation {
 	
 	public static HashMap<String, Image> createRoadImages(String roadtilefile) {
 		HashMap<String, Image> roadImages = new HashMap<String, Image>();
-		BufferedImage roadtile = Utils.toBufferedImage(Utils.loadImage(roadtilefile));
+		BufferedImage roadtile = Utils.toBufferedImage(Utils.loadImage(roadtilefile), false);
 		int width = roadtile.getWidth();
 		int height = roadtile.getHeight();
 
@@ -68,5 +68,51 @@ public class ImageCreation {
 		}
 		g.dispose();
 		return hex;
+	}
+	public static BufferedImage convertFromHexagonal(BufferedImage image) {
+		BufferedImage normal = new BufferedImage(image.getWidth()/2, image.getHeight()/2, image.getType());
+		Graphics2D g = normal.createGraphics();
+		for(int x = 0; x < normal.getWidth(); x++) {
+			for(int y = 0; y < normal.getHeight(); y++) {
+				int yoff = x%2;
+				int[] values = new int[] {
+					image.getRGB(x*2, y*2 + yoff),
+					image.getRGB(x*2 + 1, y*2 + yoff),
+					image.getRGB(x*2 + 1, y*2 + yoff + 1),
+					image.getRGB(x*2, y*2 + yoff + 1),
+				};
+				int averagedRGB = getMaxRGB(values);
+				normal.setRGB(x, y, averagedRGB);
+			}
+		}
+		return normal;
+	}
+	private static int getMaxRGB(int[] rgbValues) {
+		int[] avgValues = new int[4];
+		int finalVal = 0;
+		for(int i = 0; i < avgValues.length; i++) {
+			int offset = i*8;
+			for(int rgbValue : rgbValues) {
+				int val = (rgbValue >> offset) & 0xFF;
+				avgValues[i] = Math.max(finalVal, val);
+			}
+//			avgValues[i] /= rgbValues.length;
+			finalVal = finalVal | (avgValues[i] << offset);
+		}
+		return finalVal;
+	}
+	private static int getAverageRGB(int[] rgbValues) {
+		int[] avgValues = new int[4];
+		int finalVal = 0;
+		for(int i = 0; i < avgValues.length; i++) {
+			int offset = i*8;
+			for(int rgbValue : rgbValues) {
+				int val = (rgbValue >> offset) & 0xFF;
+				avgValues[i] += val;
+			}
+			avgValues[i] /= rgbValues.length;
+			finalVal = finalVal | (avgValues[i] << offset);
+		}
+		return finalVal;
 	}
 }

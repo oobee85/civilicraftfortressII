@@ -3,7 +3,6 @@ package game.pathfinding;
 import java.util.*;
 
 import game.*;
-import ui.*;
 import world.*;
 
 public class Pathfinding {
@@ -15,8 +14,13 @@ public class Pathfinding {
 			return bestTilePath;
 		}
 		if(startingTile.getLocation().distanceTo(targetTile.getLocation()) == 1) {
-			bestTilePath.add(targetTile);
-			return bestTilePath;
+			if (targetTile.isBlocked(unit)) {
+				return null;
+			}
+			else {
+				bestTilePath.add(targetTile);
+				return bestTilePath;
+			}
 		}
 		PriorityQueue<Node> search = new PriorityQueue<>((x, y) -> {
 			int speed = unit.getUnitType().getCombatStats().getMoveSpeed();
@@ -191,7 +195,6 @@ public class Pathfinding {
 			if(neighbor.isBlocked(unit)) {
 				continue;
 			}
-			double tiledamage = neighbor.computeTileDamage(unit);
 			double cost = currentNode.cost;
 			double movePenalty = 0;
 			if(forward) {
@@ -201,8 +204,9 @@ public class Pathfinding {
 				movePenalty = unit.movePenaltyTo(neighbor, currentTile);
 			}
 			cost += movePenalty;
-			if(tiledamage >= 1) {
-				cost += tiledamage*movePenalty*10;
+			double danger = unit.applyResistance(neighbor.computeTileDanger());
+			if(danger >= 1) {
+				cost += danger*movePenalty*10;
 			}
 			// if tile not visited, or the cost can be improved
 			if(!visited.containsKey(neighbor) || cost < visited.get(neighbor).cost) {

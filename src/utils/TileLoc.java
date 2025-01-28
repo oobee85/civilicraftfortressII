@@ -12,6 +12,7 @@ public class TileLoc implements Externalizable {
 		this.x = x;
 		this.y = y;
 	}
+	
 	@Override
 	public String toString() {
 		return String.format("(%d, %d)", x, y);
@@ -20,11 +21,27 @@ public class TileLoc implements Externalizable {
 		return new TileLoc(x + other.x, y + other.y);
 	}
 	@Override
-	public boolean equals(Object other) {
-		if(other instanceof TileLoc) {
-			return x == ((TileLoc)other).x && y == ((TileLoc)other).y;
-		}
-		return false;
+	public int hashCode() {
+		final int prime = 9973;
+		int result = 1;
+		result = prime * result + x;
+		result = prime * result + y;
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TileLoc other = (TileLoc) obj;
+		if (x != other.x)
+			return false;
+		if (y != other.y)
+			return false;
+		return true;
 	}
 	
 	public int distanceTo(TileLoc other) {
@@ -52,7 +69,11 @@ public class TileLoc implements Externalizable {
 		return deltax + extraY;
 	}
 	public double euclideanDistance(TileLoc other) {
-		return Math.sqrt((this.x - other.x)*(this.x - other.x) + (this.y - other.y)*(this.y - other.y));
+		double myy = (this.x % 2 == 0) ? this.y : this.y + 0.5;
+		double othery = (other.x % 2 == 0) ? other.y : other.y + 0.5;
+		double deltay = myy - othery;
+		double deltax = this.x - other.x; 
+		return Math.sqrt(deltax*deltax + deltay*deltay);
 	}
 	public int x() {
 		return x;

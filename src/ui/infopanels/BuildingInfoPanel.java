@@ -10,7 +10,7 @@ public class BuildingInfoPanel extends InfoPanel {
 	Building showing;
 
 	public BuildingInfoPanel(Building showing) {
-		super(showing.toString(), showing.getImage(DEFAULT_IMAGE_SIZE));
+		super(showing.getType().toString(), showing.getMipMap().getImage(DEFAULT_IMAGE_SIZE));
 		this.showing = showing;
 	}
 	@Override
@@ -30,18 +30,19 @@ public class BuildingInfoPanel extends InfoPanel {
 		
 		
 		if(showing.getProducingUnit().peek() != null) {
+			Unit inProgress = showing.getProducingUnit().peek();
 			y += lineHeight/2;
 			int x = getImageSize();
 			int progressBarHeight = 30;
 			int buffer = 1;
 			int imageSize = progressBarHeight - 2*buffer;
-			g.drawImage(showing.getProducingUnit().peek().getImage(imageSize), x + buffer, y + buffer, imageSize, imageSize, null);
+			g.drawImage(inProgress.getMipMap().getImage(imageSize), x + buffer, y + buffer, imageSize, imageSize, null);
 			
 			
-			int totalEffort = showing.getProducingUnit().peek().getType().getCombatStats().getTicksToBuild();
+			int totalEffort = inProgress.getType().getCombatStats().getTicksToBuild();
 			int expendedEffort = totalEffort - showing.getRemainingEffortToProduceUnit();
 			double completedRatio = 1.0 * expendedEffort / totalEffort;
-			String progressString = String.format("%s %d/%d", showing.getProducingUnit().peek(), expendedEffort, totalEffort);
+			String progressString = String.format("%s %d/%d", inProgress.getUnitType(), expendedEffort, totalEffort);
 			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progressString, x + progressBarHeight, y, getWidth() - x - progressBarHeight - 10, progressBarHeight);
 			
 			y += progressBarHeight;
@@ -54,7 +55,7 @@ public class BuildingInfoPanel extends InfoPanel {
 						first = false;
 						continue;
 					}
-					g.drawImage(unit.getImage(imageSize), x + buffer + offset, y + buffer, imageSize, imageSize, null);
+					g.drawImage(unit.getMipMap().getImage(imageSize), x + buffer + offset, y + buffer, imageSize, imageSize, null);
 					offset += imageSize + buffer;
 				}
 			}
@@ -64,5 +65,8 @@ public class BuildingInfoPanel extends InfoPanel {
 		int hpbarHeight = g.getFont().getSize();
 		String hpstring =  String.format("%d/%d",(int)showing.getHealth(), (int)showing.getType().getHealth());
 		KUIConstants.drawProgressBar(g, Color.green, Color.red, Color.black, showing.getHealth()/showing.getType().getHealth(), hpstring, 0, getHeight()-hpbarHeight, getWidth(), hpbarHeight);
+		
+		if(showing.hasInventory())
+			UnitTypeInfoPanel.drawInventory(g, showing.getInventory(), 2, EXPLODE_BUTTON_SIZE + 2);
 	}
 }

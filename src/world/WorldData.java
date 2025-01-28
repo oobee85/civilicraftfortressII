@@ -1,9 +1,13 @@
 package world;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import game.*;
 import networking.server.*;
+import sounds.Sound;
+import sounds.SoundEffect;
+import sounds.SoundManager;
 import utils.*;
 
 public class WorldData {
@@ -14,48 +18,15 @@ public class WorldData {
 	private LinkedList<Unit> newUnits = new LinkedList<Unit>();
 	private LinkedList<Building> buildings = new LinkedList<Building>();
 	private LinkedList<Building> newBuildings = new LinkedList<Building>();
-	
 	private LinkedList<Projectile> projectiles = new LinkedList<Projectile>();
 	private LinkedList<Projectile> newProjectiles = new LinkedList<Projectile>();
-	
 	private LinkedList<GroundModifier> groundModifiers = new LinkedList<GroundModifier>();
 	private LinkedList<GroundModifier> newGroundModifiers = new LinkedList<GroundModifier>();
 	
-	private LinkedList<WeatherEvent> weatherEvents = new LinkedList<WeatherEvent>();
-	private LinkedList<WeatherEvent> newWeatherEvents = new LinkedList<WeatherEvent>();
-	
 	// Stuff server keeps track of to send to clients
 	private LinkedList<Projectile> projectilesToSend = new LinkedList<>();
-	private LinkedList<WeatherEvent> weatherEventsToSend = new LinkedList<>();
 	private LinkedList<Thing> deadThings = new LinkedList<>();
 
-	public void addWeatherEvent(WeatherEvent newEvent) {
-		synchronized (newWeatherEvents) {
-			newWeatherEvents.add(newEvent);
-		}
-	}
-	public LinkedList<WeatherEvent> getWeatherEvents() {
-		return weatherEvents;
-	}
-	public void filterDeadWeatherEvents() {
-		LinkedList<WeatherEvent> weatherEventsNew = new LinkedList<WeatherEvent>();
-		for (WeatherEvent weather : weatherEvents) {
-			Tile tile = weather.getTile();
-			if(weather.isDead() == false) {
-				weatherEventsNew.add(weather);
-			} else {
-				tile.setWeather(null);
-			}
-		}
-		synchronized (newWeatherEvents) {
-			synchronized(weatherEventsToSend) {
-				weatherEventsToSend.addAll(newWeatherEvents);
-			}
-			weatherEventsNew.addAll(newWeatherEvents);
-			newWeatherEvents.clear();
-		}
-		weatherEvents = weatherEventsNew;
-	}
 	public void addBuilding(Building newBuilding) {
 		synchronized(newBuildings) {
 			newBuildings.add(newBuilding);
@@ -69,6 +40,16 @@ public class WorldData {
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
 		for (Building building : buildings) {
 			if (building.isDead() == true) {
+				
+				// iterate through buildings cost and drop resources
+				for (Entry<ItemType, Integer> entry : building.getType().getCost().entrySet()) {
+					if(!building.getType().isRoad()) {
+						Item item = new Item(entry.getValue() / Constants.RATIO_BUILDING_RESOURCE_DROP, entry.getKey()); // add 1/5 of resources to tile inventory
+						building.getTile().getInventory().addItem(item);
+					}
+					
+				}
+				
 				building.getFaction().removeBuilding(building);
 				ThingMapper.removed(building);
 				if(building == building.getTile().getRoad()) {
@@ -82,6 +63,23 @@ public class WorldData {
 					}
 				}
 				addDeadThing(building);
+				
+				if(building.isRemoved() == false) {
+					if(building.getType().isWoodConstruction()) {
+						Sound sound = new Sound(SoundEffect.BUILDING_WOOD_DEATH, null, building.getTile());
+						SoundManager.theSoundQueue.add(sound);
+					}else 
+					if(building.getType().isStoneConstruction()) {
+						Sound sound = new Sound(SoundEffect.BUILDING_STONE_DEATH, null, building.getTile());
+						SoundManager.theSoundQueue.add(sound);
+					}else {
+						Sound sound = new Sound(SoundEffect.BUILDING_WOOD_DEATH, null, building.getTile());
+						SoundManager.theSoundQueue.add(sound);
+					}
+				}
+				
+				
+				
 			} else {
 				buildingsNew.add(building);
 			}
@@ -108,6 +106,12 @@ public class WorldData {
 				ThingMapper.removed(plant);
 				plant.getTile().setHasPlant(null);
 				addDeadThing(plant);
+				// removed is a similar thing to
+				if(plant.isRemoved() == false) {
+					Sound sound = new Sound(SoundEffect.DEATH_PLANT, null, plant.getTile());
+					SoundManager.theSoundQueue.add(sound);
+				}
+				
 			} else {
 				plantsCopy.add(plant);
 			}
@@ -123,15 +127,40 @@ public class WorldData {
 		synchronized(newUnits) {
 			newUnits.add(unit);
 		}
+		unit.getFaction().addUnit(unit);
 	}
 	public LinkedList<Unit> getUnits() {
 		return units;
 	}
+	
 	public void filterDeadUnits() {
 		// UNITS
 		LinkedList<Unit> unitsNew = new LinkedList<Unit>();
-		for (Unit unit : units) {
-			if (unit.isDead() == true) {
+		for (Unit unit : units) { // cycle through unit list
+			if (unit.isDead() == true) { // if the unit is dead
+				
+				// check if unit has inventory, and drop it
+				if(unit.getInventory() != null) {
+					for(Item item : unit.getInventory().getItems()) {
+						if(item != null) {
+							unit.getTile().getInventory().addItem(item);
+						}
+					}
+				}
+				// if unit has a deadItem to drop, drop to tile
+				for (Item item : unit.getType().getDeadItem()) {
+					if(item != null) {
+						unit.getTile().getInventory().addItem(item);
+					}
+				}
+//				SoundManager.theSoundQueue.add(SoundEffect.DEATH);
+				if(unit.isRemoved() == false) {
+					Sound sound = new Sound(SoundEffect.DEATH_UNIT, unit.getFaction(), unit.getTile());
+					SoundManager.theSoundQueue.add(sound);
+				}
+				
+				
+				unit.getFaction().removeUnit(unit);
 				unit.getTile().removeUnit(unit);
 				ThingMapper.removed(unit);
 				addDeadThing(unit);
@@ -159,6 +188,18 @@ public class WorldData {
 		for(Projectile projectile : projectiles) {
 			if(projectile.reachedTarget()) {
 				projectile.getTile().removeProjectile(projectile);
+				
+				if(projectile.isHeavyProjectile()) {
+					Sound sound = new Sound(SoundEffect.PROJECTILE_IMPACT_HEAVY, null, projectile.getTile());
+					SoundManager.theSoundQueue.add(sound);
+				}else
+				if(projectile.isLightProjectile()) {
+					Sound sound = new Sound(SoundEffect.PROJECTILE_IMPACT_LIGHT, null, projectile.getTile());
+					SoundManager.theSoundQueue.add(sound);
+				}else {
+					Sound sound = new Sound(SoundEffect.PROJECTILE_IMPACT_GENERIC, null, projectile.getTile());
+					SoundManager.theSoundQueue.add(sound);
+				}
 			} else {
 				projectilesNew.add(projectile);
 			}
@@ -177,15 +218,6 @@ public class WorldData {
 		synchronized (projectilesToSend) {
 			copy.addAll(projectilesToSend);
 			projectilesToSend.clear();
-		}
-		return copy;
-	}
-
-	public LinkedList<WeatherEvent> clearWeatherEventsToSend() {
-		LinkedList<WeatherEvent> copy = new LinkedList<>();
-		synchronized (weatherEventsToSend) {
-			copy.addAll(weatherEventsToSend);
-			weatherEventsToSend.clear();
 		}
 		return copy;
 	}
@@ -233,7 +265,6 @@ public class WorldData {
 				" \tbuildings: " 		+ buildings.size() + 
 				" \tplants: " 			+ plants.size() + 
 				" \tgroundModifiers: " 	+ groundModifiers.size() + 
-				" \tprojectiles: " 		+ getProjectiles().size() +
-				" \tweatherEvents: "	+ getWeatherEvents().size();
+				" \tprojectiles: " 		+ getProjectiles().size();
 	}
 }

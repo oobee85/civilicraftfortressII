@@ -1,5 +1,6 @@
 package networking;
 
+import java.awt.Color;
 import java.io.*;
 import java.net.*;
 import java.util.concurrent.*;
@@ -8,7 +9,8 @@ import javax.swing.*;
 
 import networking.callbacks.*;
 import networking.server.*;
-import networking.view.*;
+import ui.view.*;
+import utils.Settings;
 
 public class Connection {
 
@@ -20,7 +22,7 @@ public class Connection {
 	
 	private DisconnectCallback disconnectCallback;
 	
-	private PlayerInfo playerInfo = Server.DEFAULT_PLAYER_INFO;
+	private PlayerInfo playerInfo = new PlayerInfo(Settings.DEFAULT_PLAYER_NAME, new Color(Settings.DEFAULT_PLAYER_COLOR));
 
 	private LinkedBlockingQueue<Object> messagesToSend = new LinkedBlockingQueue<Object>();
 	private LinkedBlockingQueue<Object> receivedMessages = new LinkedBlockingQueue<Object>();

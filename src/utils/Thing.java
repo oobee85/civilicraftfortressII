@@ -1,43 +1,49 @@
 package utils;
-import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
 
-import javax.swing.*;
-
 import game.*;
+import game.components.*;
 import networking.server.*;
 import world.*;
 
-public class Thing implements HasImage, Serializable {
+public class Thing implements Serializable, Comparable<Thing> {
 	
 	private transient static int idCounter = 0;
 	private int id;
 
-	private transient Faction faction;
 	private int factionID;
 	private double maxHealth;
 	private double health;
 	private boolean isDead;
-	private transient int timeLastDamageTaken = -1000;
-	private Tile tile;
-	private transient boolean isSelected;
+	private boolean isRemoved;
+	private TileLoc tileLoc;
+	private transient Tile tile;
 	
-	private transient HasImage hasImage;
+	private transient HashMap<Class, GameComponent> components;
+	private Inventory inventory;
+
+	private transient Faction faction;
+	private transient int timeLastDamageTaken = -1000;
+	private transient boolean isSelected;
+	private transient MipMap mipmap;
+	
 	private transient Hitsplat[] hitsplats = new Hitsplat[4];
 	
-	public Thing(double maxHealth, HasImage hasImage, Faction faction) {
+	public Thing(double maxHealth, MipMap mipmap, Faction faction, Tile tile, int inventoryStackSize) {
+		components = new HashMap<>();
 		health = maxHealth;
 		this.maxHealth = maxHealth;
-		this.hasImage = hasImage;
+		this.mipmap = mipmap;
 		setFaction(faction);
 		this.id = idCounter++;
+		if (inventoryStackSize > 0) {
+			this.setInventory(new Inventory(inventoryStackSize));
+		}
 		ThingMapper.created(this);
-	}
-	public Thing(double maxHealth, HasImage hasImage, Faction faction, Tile tile) {
-		this(maxHealth, hasImage, faction);
-		this.tile = tile;
+		setTile(tile);
+		this.isRemoved = false;
 	}
 	
 	public int id() {
@@ -45,10 +51,6 @@ public class Thing implements HasImage, Serializable {
 	}
 	public void setID(int id) {
 		this.id = id;
-	}
-	
-	public void setImage(HasImage hasImage) {
-		this.hasImage = hasImage;
 	}
 	
 	public Faction getFaction() {
@@ -67,21 +69,84 @@ public class Thing implements HasImage, Serializable {
 	public void setDead(boolean state) {
 		isDead = state;
 	}
+	// setting removed doesnt play sound when it dies
+	public void setRemoved(boolean state) {
+		isRemoved = state;
+	}
 	
+	// if thing is removed, it wont play sound when dying
+	public boolean isRemoved() {
+		return isRemoved;
+	}
 	public boolean isDead() {
 		return health <= 0 || isDead;
 	}
+	
+	public void addComponent(Class key, GameComponent component) {
+		if (components == null) {
+			components = new HashMap<>();
+		}
+		components.put(key, component.instance());
+	}
+	
+	public void replaceComponent(Class key, GameComponent component) {
+		if (components == null) {
+			components = new HashMap<>();
+		}
+		components.put(key, component);
+	}
+	
+	public boolean isBuilder() {
+		return components.containsKey(Builder.class);
+	}
+	
+	public Set<BuildingType> getBuildableBuildingTypes() {
+		Builder builder = (Builder) components.get(Builder.class);
+		return builder.getBuildingTypeSet();
+	}
+	
+	public boolean hasInventory() {
+		return inventory != null;
+	}
+	
+	public Inventory getInventory() {
+		return inventory;
+	}
+	
+	public void setInventory(Inventory i) {
+		this.inventory = i;
+	}
+
+	public int applyResistance(int damage, DamageType type) {
+		if(components.containsKey(DamageResistance.class)) {
+			return ((DamageResistance)components.get(DamageResistance.class)).applyResistance(damage, type);
+		}
+		else {
+			return DamageResistance.applyDefaultResistance(damage, type);
+		}
+	}
+	public double applyResistance(double[] danger) {
+		if(components.containsKey(DamageResistance.class)) {
+			return ((DamageResistance)components.get(DamageResistance.class)).applyResistance(danger);
+		}
+		else {
+			return DamageResistance.applyDefaultResistance(danger);
+		}
+	}
+	
+	
 	/**
 	 * @return true if this is lethal damage, false otherwise
 	 */
-	public boolean takeDamage(int damage) {
+	public boolean takeDamage(int damage, DamageType type) {
 		boolean before = isDead();
-		health -= damage;
-		if(damage != 0) {
+		int totalDamage = applyResistance(damage, type);
+		health -= totalDamage;
+		if(totalDamage != 0) {
 			timeLastDamageTaken = World.ticks;
 			getFaction().gotAttacked(getTile());
+			addHitsplat(totalDamage);
 		}
-		addHitsplat(damage);
 		// Return true if isDead changed from false to true.
 		return !before && isDead();
 	}
@@ -91,18 +156,21 @@ public class Thing implements HasImage, Serializable {
 	}
 	
 	public void heal(double healing, boolean hitsplat) {
-		int roundedHealing = (int)Math.ceil(healing);
-		double tempHealing = roundedHealing;
-		if((health + healing) > this.maxHealth) {
-			tempHealing = this.maxHealth - health;
+		if (health == maxHealth) {
+			return;
 		}
-		int finalHealing = (int)tempHealing;
-		health += finalHealing;
-		if(finalHealing != 0) {
+		int oldHealth = (int)health;
+		health += healing;
+		if (health > maxHealth) {
+			health = maxHealth;
+		}
+		// Check if health increased to the next int
+		int amountHealed = (int)health - oldHealth;
+		if (amountHealed >= 1) {
 			timeLastDamageTaken = World.ticks;
-		}
-		if(hitsplat == true && finalHealing > 0) {
-			addHitsplat(-finalHealing);
+			if(hitsplat == true && amountHealed >= 1) {
+				addHitsplat(-amountHealed);
+			}
 		}
 	}
 	private void addHitsplat(int damage) {
@@ -164,46 +232,42 @@ public class Thing implements HasImage, Serializable {
 	public Hitsplat[] getHitsplatList() {
 		return hitsplats;
 	}
-	public void setIsSelected(boolean select) {
-		isSelected = select;
+	public void setSelected(boolean isSelected) {
+		this.isSelected = isSelected;
 	}
-	public boolean getIsSelected() {
+	public boolean isSelected() {
 		return isSelected;
 	}
 	
 	public void setTile(Tile tile) {
 		this.tile = tile;
+		this.tileLoc = tile.getLocation();
 	}
 	
 	public Tile getTile() {
 		return tile;
 	}
 	
-	@Override
-	public Image getImage(int size) {
-		return hasImage.getImage(size);
+	public TileLoc getTileLocation() {
+		return tileLoc;
 	}
-	@Override
-	public Image getShadow(int size) {
-		return hasImage.getShadow(size);
+	
+	public MipMap getMipMap() {
+		return mipmap;
 	}
-	@Override
-	public Image getHighlight(int size) {
-		return hasImage.getHighlight(size);
-	}
-	@Override
-	public ImageIcon getImageIcon(int size) {
-		return hasImage.getImageIcon(size);
-	}
-	@Override
-	public Color getColor(int size) {
-		return hasImage.getColor(size);
+	
+	public void setMipMap(MipMap mipmap) {
+		this.mipmap = mipmap;
 	}
 	
 	public List<String> getDebugStrings() {
 		return new LinkedList<String>(Arrays.asList(
 				String.format("HP=%.0f/%.0f", getHealth(), getMaxHealth())
 				));
+	}
+	@Override
+	public int compareTo(Thing o) {
+		return this.id - o.id;
 	}
 
 }

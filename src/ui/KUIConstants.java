@@ -5,6 +5,8 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import utils.Utils;
+
 public class KUIConstants {
 
 	public static final Color NORMAL_COLOR = new Color(240, 240, 240);
@@ -14,6 +16,8 @@ public class KUIConstants {
 	public static final Color NORMAL_TEXT_COLOR = Color.black;
 	public static final Color SELECTED_TEXT_COLOR = Color.white;
 	public static final Color DISABLED_TEXT_COLOR = new Color(50, 50, 50);
+
+	public static final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(200, 40);
 	
 
 
@@ -38,6 +42,14 @@ public class KUIConstants {
 	public static final Border massiveBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(5, 5, 5, 5));
 	public static final Border tinyBorder = BorderFactory.createLineBorder(Color.GRAY, 1);
 	
+	
+	public static void resizeToFitContent(JComponent component, String text) {
+	  int extra = component.getInsets().left + component.getInsets().right + 5;
+	  Dimension newSize = new Dimension(Utils.stringWidth(text, component.getFont()) + extra, component.getPreferredSize().height);
+	  component.setPreferredSize(newSize);
+	  component.setMaximumSize(newSize);
+	  component.setMinimumSize(newSize);
+	}
 	public static KButton setupButton(String text, Icon icon, Dimension size) {
 		KButton b = new KButton(text, icon);
 		b.setMargin(zeroMargin);
@@ -47,6 +59,21 @@ public class KUIConstants {
 	}
 	public static KToggleButton setupToggleButton(String text, Icon icon, Dimension size) {
 		KToggleButton b = new KToggleButton(text, icon);
+		b.setMargin(zeroMargin);
+		b.setHorizontalAlignment(SwingConstants.LEFT);
+		setComponentAttributes(b, size);
+		return b;
+	}
+	public static <T> void setupComboBox(JComboBox<T> box, Dimension size) {
+//		box.set
+//		KToggleButton b = new KToggleButton(text, icon);
+//		box.setMargin(zeroMargin);
+//		box.setHorizontalAlignment(SwingConstants.LEFT);
+		setComponentAttributes(box, size);
+//		return b;
+	}
+	public static JRadioButton setupRadioButton(String text, Icon icon, Dimension size) {
+		JRadioButton b = new KRadioButton(text, icon);
 		b.setMargin(zeroMargin);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
 		setComponentAttributes(b, size);
@@ -62,7 +89,7 @@ public class KUIConstants {
 		return b;
 	}
 	public static JTextField setupTextField(String text, Dimension size) {
-		JTextField b = new JTextField(text, 20);
+		JTextField b = new JTextField(text);
 		b.setHorizontalAlignment(SwingConstants.LEFT);
 		setComponentAttributes(b, size);
 		b.setOpaque(true);

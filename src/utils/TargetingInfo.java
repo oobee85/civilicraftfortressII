@@ -41,6 +41,7 @@ public class TargetingInfo {
 				if((targetUnitType != null && potentialTarget.getType() != targetUnitType) || potentialTarget == animal) {
 					continue;
 				}
+				// found valid target, break out of loop
 				if(doesFactionSatify(animal.getFaction(), potentialTarget.getFaction())) {
 					target = potentialTarget;
 					if(Math.random() < 0.05) {

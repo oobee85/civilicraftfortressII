@@ -4,26 +4,35 @@ import java.awt.*;
 import utils.*;
 
 public enum Terrain {
-		GRASS 		(1, 4, 0, new String[] {"resources/Images/terrain/grass16.png", "resources/Images/terrain/grass128.png", "resources/Images/terrain/grass512.png"}),
-		DIRT  		(0.5, 4, 0, new String[] {"resources/Images/terrain/dirt16.png", "resources/Images/terrain/dirt128.png", "resources/Images/terrain/dirt512.png"}),
-		VOLCANO 	(4, 12, 0.1, new String[] {"resources/Images/terrain/volcano16.png", "resources/Images/terrain/volcano128.png", "resources/Images/terrain/magma512.png"}),
-		ROCK 		(2, 8, 0, new String[] {"resources/Images/terrain/rock16.png", "resources/Images/terrain/rock128.png"}),
-		SAND 		(2, 5, 0, new String[] {"resources/Images/terrain/sand.png"}),
-		BURNED_GROUND (4, 10, 0.08, new String[] {"resources/Images/terrain/burnedground.png"}),
+		GRASS 		  (1, 0, 0, new Point(10, 20), new String[] {"Images/terrain/grass16_lowcontrast.png"}),
+		DIRT  		  (1, 0, 0, new Point(1, 10), new String[] {"Images/terrain/dirt16_lowcontrast.png"}),
+		RICHSOIL      (1, 0, 0, new Point(1, 10), new String[] {"Images/terrain/richsoil.png"}),
+		VOLCANO 	  (4, 30, 0.1, new Point(0, 20), new String[] {"Images/terrain/volcano16.png", "Images/terrain/volcano128.png", "Images/terrain/magma512.png"}),
+		ROCK 		  (2, 10, 0, new Point(0, 20), new String[] {"Images/terrain/rock16_lowcontrast.png"}),
+		LOWROCK 	  (2, 25, 0, new Point(0, 20), new String[] {"Images/terrain/rock16.png"}),
+		SAND 		  (2, 20, 0, new Point(0, 1), new String[] {"Images/terrain/sand.png"}),
+		BURNED_GROUND (4, 10, 0.08, new Point(0, 20), new String[] {"Images/terrain/burnedground.png"}),
+		OCEAN		  (4, 10, 0.08, new Point(0, 20), new String[] {"Images/terrain/burnedground.png"}), // placeholder terrain, used for ocean biome
 		;
 
 	private final double movePenalty;
 	private final double roadCost;
 	private final double brightness;
 	private MipMap mipmap;
+	private Point minMax;
 
-	Terrain(double roadCost, double speedPenalty, double brightness, String[] s) {
+	Terrain(double roadCost, double speedPenalty, double brightness, Point minmax, String[] s) {
 		this.movePenalty = speedPenalty;
 		this.roadCost = roadCost;
 		this.brightness = brightness;
+		this.minMax = minmax;
 		mipmap = new MipMap(s);
 	}
 	
+	
+	public Point getMinMax() {
+		return minMax;
+	}
 	public double getRoadCost() {
 		return roadCost;
 	}

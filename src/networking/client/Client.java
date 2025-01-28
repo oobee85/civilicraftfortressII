@@ -5,16 +5,19 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.Timer;
 
 import game.*;
-import game.liquid.*;
+import game.actions.*;
+import game.ai.*;
 import networking.*;
 import networking.message.*;
 import networking.server.*;
-import networking.view.*;
+import sounds.SoundEffect;
+import sounds.SoundManager;
 import ui.*;
 import ui.infopanels.*;
 import utils.*;
@@ -22,7 +25,6 @@ import world.*;
 
 public class Client {
 
-	
 	private Connection connection;
 	private ClientGUI clientGUI;
 
@@ -32,8 +34,10 @@ public class Client {
 	private volatile Object updatedTerrain = new Object();
 	private HashMap<Integer, Thing> things = new HashMap<>();
 	
+	private ArrayList<AIInterface> ailist = new ArrayList<>();
+	
 	private volatile boolean isFastForwarding;
-	private volatile boolean isRaiseTerrain;
+	private volatile boolean isPaused;
 
 	public Client() {
 		gameInstance = new Game(new GUIController() {
@@ -50,7 +54,7 @@ public class Client {
 			@Override
 			public void selectedUnit(Unit unit, boolean selected) {
 				clientGUI.getGameViewOverlay().selectedUnit(unit, selected);
-				if(unit.getType().isBuilder()) {
+				if(unit.isBuilder()) {
 					clientGUI.manageBuildingTab(selected);
 				}
 				if(selected) {
@@ -60,36 +64,30 @@ public class Client {
 						infoPanel.addExplodeButton().addActionListener(e -> gameInstance.explode(unit));
 						infoPanel.addButton("MakeRoads").addActionListener(e -> clientGUI.getGameView().workerRoad(Game.buildingTypeMap.get("STONE_ROAD")));
 						infoPanel.addButton("AutoBuild").addActionListener(e -> clientGUI.getGameView().toggleAutoBuild());
-						infoPanel.addButton("SetHarvesting").addActionListener(e -> clientGUI.getGameView().setHarvesting());
-						infoPanel.addButton("Guard").addActionListener(e -> clientGUI.getGameView().toggleGuarding());
+						infoPanel.addButton("Guard").addActionListener(e -> clientGUI.getGameView().unitGuardCurrentTile());
+						
 					});
 				}
 			}
 			@Override
+			public void selectedPlant(Plant plant, boolean selected) {
+				
+			}
+			@Override
 			public void selectedBuilding(Building building, boolean selected) {
-				if (building.getType() == Game.buildingTypeMap.get("BARRACKS")) {
+				
+//				SoundManager.PlaySound(SoundEffect.SELECT);
+				
+				if(building.getType().unitsCanProduceSet().size() > 0) {
 					clientGUI.manageProduceUnitTab(selected);
 				}
-				if (building.getType() == Game.buildingTypeMap.get("STABLES")) {
-					clientGUI.manageProduceUnitTab(selected);
-				}
-				if (building.getType() == Game.buildingTypeMap.get("CASTLE")) {
-					clientGUI.manageProduceUnitTab(selected);
-				}
-				if (building.getType() == Game.buildingTypeMap.get("WORKSHOP")) {
-					clientGUI.manageProduceUnitTab(selected);
-				}
-				if (building.getType() == Game.buildingTypeMap.get("BLACKSMITH")) {
-					clientGUI.manageBlacksmithTab(selected);
-				}
-				if (building.getType() == Game.buildingTypeMap.get("HELLFORGE")) {
+				if (building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
 					clientGUI.manageBlacksmithTab(selected);
 				}
 				InfoPanel infoPanel = new BuildingInfoPanel(building);
 				switchInfoPanel(infoPanel);
 				SwingUtilities.invokeLater(() -> {
 					infoPanel.addExplodeButton().addActionListener(e -> gameInstance.explode(building));
-//					infoPanel.addButton("Explode")
 				});
 			}
 			@Override
@@ -127,8 +125,8 @@ public class Client {
 				isFastForwarding = enabled;
 			}
 			@Override
-			public void setRaiseTerrain(boolean enabled) {
-				isRaiseTerrain = enabled;
+			public void setPauseGame(boolean enabled) {
+				isPaused = enabled;
 			}
 		});
 		localCommands = Utils.makeFunctionalCommandInterface(gameInstance);
@@ -138,30 +136,20 @@ public class Client {
 				sendMessage(CommandMessage.makeSetRallyPointCommand(building.id(), rallyPoint.getLocation()));
 				localCommands.setBuildingRallyPoint(building, rallyPoint);
 			}
-			@Override
-			public void moveTo(Unit unit, Tile target, boolean clearQueue) {
-				sendMessage(CommandMessage.makeMoveToCommand(unit.id(), target.getLocation(), clearQueue));
-				localCommands.moveTo(unit, target, clearQueue);
-			}
-			@Override
-			public void attackThing(Unit unit, Thing target, boolean clearQueue) {
-				sendMessage(CommandMessage.makeAttackThingCommand(unit.id(), target.id(), clearQueue));
-				localCommands.attackThing(unit, target, clearQueue);
-			}
-			@Override
-			public void buildThing(Unit unit, Tile target, boolean isRoad, boolean clearQueue) {
-				if(isRoad) {
-					sendMessage(CommandMessage.makeBuildRoadCommand(unit.id(), target.getLocation(), clearQueue));
-				}
-				else {
-					sendMessage(CommandMessage.makeBuildBuildingCommand(unit.id(), target.getLocation(), clearQueue));
-				}
-				localCommands.buildThing(unit, target, isRoad, clearQueue);
-			}
+//			@Override
+//			public void buildThing(Unit unit, Tile target, boolean isRoad, boolean clearQueue) {
+//				if(isRoad) {
+//					sendMessage(CommandMessage.makeBuildRoadCommand(unit.id(), target.getLocation(), clearQueue));
+//				}
+//				else {
+//					sendMessage(CommandMessage.makeBuildBuildingCommand(unit.id(), target.getLocation(), clearQueue));
+//				}
+//				localCommands.buildThing(unit, target, isRoad, clearQueue);
+//			}
 			@Override
 			public Building planBuilding(Unit unit, Tile target, boolean clearQueue, BuildingType buildingType) {
 				sendMessage(CommandMessage.makePlanBuildingCommand(unit.id(), target.getLocation(), clearQueue, buildingType.name()));
-				localCommands.moveTo(unit, target, clearQueue);
+				localCommands.planAction(unit, PlannedAction.moveTo(target), clearQueue);
 				return null;
 			}
 			@Override
@@ -185,10 +173,13 @@ public class Client {
 				localCommands.produceUnit(building, unitType);
 			}
 			@Override
-			public void setGuarding(Unit unit, boolean enabled) {
-				sendMessage(CommandMessage.makeSetGuardingCommand(unit.id(), enabled));
-				localCommands.setGuarding(unit, enabled);
+			public void planAction(Unit unit, PlannedAction plan, boolean clearQueue) {
+				// TODO figure out clearQueue
+				sendMessage(CommandMessage.makePlannedActionCommand(unit.id(), plan, clearQueue));
+				localCommands.planAction(unit, plan, clearQueue);
+				// TODO figure out more generic networking stuff.
 			}
+			
 		};
 	}
 	
@@ -202,32 +193,55 @@ public class Client {
 	}
 	
 	public void setupSinglePlayer(boolean createWorld) {
-		clientGUI.getGameView().setCommandInterface(localCommands);
-		if(createWorld) {
-			gameInstance.generateWorld(128, 128, false, Arrays.asList(clientGUI.getPlayerInfo()));
-		}
-		for(Faction f : gameInstance.world.getFactions()) {
-			if(f.isPlayer()) {
-				gameInstance.getGUIController().changedFaction(f);
-				break;
+		clientGUI.startedSinglePlayer();
+		Thread t = new Thread(() -> {
+			clientGUI.getGameView().setCommandInterface(localCommands);
+			if(createWorld) {
+				LinkedList<PlayerInfo> players = new LinkedList<>();
+				players.add(clientGUI.getPlayerInfo());
+				for(int i = 0; i < Settings.NUM_AI; i++) {
+					players.add(new PlayerInfo("Bot " + i, null));
+				}
+				clientGUI.getGameView().centerViewOnTile(new TileLoc(Settings.WORLD_WIDTH/10, Settings.WORLD_HEIGHT/10), 10);
+				gameInstance.generateWorld(Settings.WORLD_WIDTH, Settings.WORLD_HEIGHT, false, players);
+				clientGUI.getGameView().getDrawer().updateTerrainImages();
 			}
-		}
-
-		SwingUtilities.invokeLater(() -> {
-			clientGUI.startedSinglePlayer();
-//			frame.remove(mainMenuPanel);
-//			mainMenuPanel = null;
+			boolean assignedPlayer = false;
+			for(Faction f : gameInstance.world.getFactions()) {
+				if(f.isPlayer()) {
+					if(!assignedPlayer) {
+						gameInstance.getGUIController().changedFaction(f);
+						assignedPlayer = true;
+					}
+					else {
+						// create and assign ai
+						ailist.add(new BuildOrderAI(localCommands, f, gameInstance.world));
+					}
+				}
+			}
+			NeutralAI neutralAI = new NeutralAI(
+					localCommands,
+					gameInstance.world.getFaction(World.NO_FACTION_ID),
+					gameInstance.world);
+			ailist.add(neutralAI);
+			UndeadAI undeadAI = new UndeadAI(
+					localCommands,
+					gameInstance.world.getFaction(World.UNDEAD_FACTION_ID),
+					gameInstance.world);
+			ailist.add(undeadAI);
 			
-//			frame.getContentPane().add(gamepanel, BorderLayout.CENTER);
-//			frame.getContentPane().add(guiSplitter, BorderLayout.EAST);
-//			frame.pack();
-//			
-//			gamepanel.centerViewOn(gameInstance.world.buildings.getLast().getTile(), 50, gamepanel.getWidth(), gamepanel.getHeight());
-//			gamepanel.requestFocusInWindow();
-//			gamepanel.requestFocus();
-			clientGUI.repaint();
-			startLocalGameLoopThread(false);
+
+//			SwingUtilities.invokeLater(() -> {
+				clientGUI.repaint();
+				startLocalGameLoopThread(false);
+				SwingUtilities.invokeLater(() -> {
+					clientGUI.getGameView().centerViewOnTile(new TileLoc(Settings.WORLD_WIDTH/3, Settings.WORLD_HEIGHT/3), Settings.DEFAULT_TILE_SIZE);
+					clientGUI.getGameView().recenterCameraOnPlayer();
+					clientGUI.getGameView().enableMouse();
+				});
+//			});
 		});
+		t.start();
 	}
 	public void sendMessage(Object message) {
 		connection.sendMessage(message);
@@ -248,6 +262,13 @@ public class Client {
 			clientGUI.connected(connection.getPanel());
 			clientGUI.getGameView().setCommandInterface(networkingCommands);
 			startReceiving();
+
+			clientGUI.repaint();
+			SwingUtilities.invokeLater(() -> {
+//				clientGUI.getGameView().centerViewOnTile(new TileLoc(Settings.WORLD_WIDTH/3, Settings.WORLD_HEIGHT/3), Settings.DEFAULT_TILE_SIZE);
+//				clientGUI.getGameView().recenterCameraOnPlayer();
+				clientGUI.getGameView().enableMouse();
+			});
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -266,12 +287,18 @@ public class Client {
 		Thread gameLoopThread = new Thread(() -> {
 			while (true) {
 				try {
+					
+					
 					long start = System.currentTimeMillis();
-					if(simulated) {
-						gameInstance.simulatedGameTick();
-					}
-					else {
-						gameInstance.gameTick();
+					
+					// IF PAUSED BUTTON PRESSED BUT NOT
+					if(!isPaused) {
+						if(simulated) {
+							gameInstance.simulatedGameTick();
+						}
+						else {
+							gameInstance.gameTick();
+						}
 					}
 					gameInstance.world.getData().clearDeadThings();
 					gameInstance.world.getData().clearProjectilesToSend();
@@ -279,9 +306,9 @@ public class Client {
 						updatedTerrain.notify();
 					}
 					long elapsed = System.currentTimeMillis() - start;
-					clientGUI.getGameView().previousTickTime = elapsed;
+					clientGUI.getGameView().setPreviousTickTime(elapsed);
 					if(World.ticks % 200 == 1) {
-						System.out.println("time elapsed for tick: " + elapsed + "ms");
+//						System.out.println("time elapsed for tick: " + elapsed + "ms");
 					}
 					long sleeptime = millisPerTick - elapsed;
 					if(sleeptime > 0 && !isFastForwarding) {
@@ -303,6 +330,20 @@ public class Client {
 			}
 		});
 		gameLoopThread.start();
+		
+		Thread aiThread = new Thread(() -> {
+			try {
+				while(true) {
+					for(AIInterface ai : ailist) {
+						ai.tick();
+					}
+					Thread.sleep(Settings.AIDELAY);
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
+		aiThread.start();
 	}
 	private boolean tilesReceived;
 	private void worldInfoUpdate(WorldInfo worldInfo) {
@@ -315,11 +356,10 @@ public class Client {
 		if(gameInstance.world.getFactions().size() < worldInfo.getFactions().size()) {
 			for(int i = gameInstance.world.getFactions().size(); i < worldInfo.getFactions().size(); i++) {
 				Faction received = worldInfo.getFactions().get(i);
-				Faction faction = new Faction(received.name(), received.isPlayer(), received.usesItems(), received.color());
+				Faction faction = new Faction(received.name(), received.isPlayer(), received.usesItems(), received.usesResearch(), received.color());
 				gameInstance.world.addFaction(faction);
 			}
 		}
-		World.ticks = worldInfo.getTick();
 		gameInstance.world.updateTiles(worldInfo.getTileInfos());
 		if(worldInfo.getTileInfos().length > 0) {
 			tilesReceived = true;
@@ -340,17 +380,10 @@ public class Client {
 					gameInstance.world.get(projectileMessage.getTile().getLocation()), 
 					gameInstance.world.get(projectileMessage.getTargetTile().getLocation()), 
 					null, 
-					projectileMessage.getDamage());
+					projectileMessage.getDamage(),
+					projectileMessage.getFromGround(),
+					0); // TODO serialize ticksUntilLanding
 			gameInstance.world.getData().addProjectile(newProjectile);
-		}
-		for(WeatherEvent weatherMessage : worldInfo.getWeatherEvents()) {
-			WeatherEvent newWeatherEvent = new WeatherEvent(
-					gameInstance.world.get(weatherMessage.getTile().getLocation()), 
-					gameInstance.world.get(weatherMessage.getTargetTile().getLocation()),
-					weatherMessage.timeLeft(),
-					weatherMessage.getStrength(),
-					weatherMessage.getLiquidType());
-			gameInstance.world.getData().addWeatherEvent(newWeatherEvent);
 		}
 		for(Hitsplat hitsplat : worldInfo.getHitsplats()) {
 			Thing thing = things.get(hitsplat.getThingID());
@@ -371,9 +404,11 @@ public class Client {
 		Thing newThing = null;
 		if(update instanceof Plant) {
 			Plant plantUpdate = (Plant)update;
+			PlantType type = plantUpdate.getType();
+			TileLoc tileLoc = plantUpdate.getTileLocation();
 			Plant newPlant = new Plant(
-					plantUpdate.getPlantType(), 
-					gameInstance.world.get(plantUpdate.getTile().getLocation()), 
+					Game.plantTypeMap.get(type.name()), 
+					gameInstance.world.get(tileLoc),
 					gameInstance.world.getFaction(World.NO_FACTION_ID));
 			newThing = newPlant;
 			newPlant.getTile().setHasPlant(newPlant);
@@ -382,9 +417,10 @@ public class Client {
 		}
 		else if(update instanceof Building) {
 			Building buildingUpdate = (Building)update;
+			TileLoc tileLoc = buildingUpdate.getTileLocation();
 			Building newBuilding = new Building(
 					Game.buildingTypeMap.get(buildingUpdate.getType().name()), 
-					gameInstance.world.get(buildingUpdate.getTile().getLocation()), 
+					gameInstance.world.get(tileLoc), 
 					gameInstance.world.getFactions().get(buildingUpdate.getFactionID()));
 			newThing = newBuilding;
 			if(newBuilding.getType().isRoad()) {
@@ -398,9 +434,10 @@ public class Client {
 		}
 		else if(update instanceof Unit) {
 			Unit unitUpdate = (Unit)update;
+			TileLoc tileLoc = unitUpdate.getTileLocation();
 			Unit newUnit = new Unit(
 					Game.unitTypeMap.get(unitUpdate.getType().name()), 
-					gameInstance.world.get(unitUpdate.getTile().getLocation()), 
+					gameInstance.world.get(tileLoc), 
 					gameInstance.world.getFactions().get(unitUpdate.getFactionID()));
 			newThing = newUnit;
 			if(newUnit.getTile() != null) {
@@ -413,7 +450,7 @@ public class Client {
 			newThing.setID(update.id());
 		}
 	}
-	
+
 	private void updateThing(Thing existing, Thing update) {
 		existing.setFaction(gameInstance.world.getFactions().get(update.getFactionID()));
 		existing.setMaxHealth(update.getMaxHealth());
@@ -422,12 +459,13 @@ public class Client {
 		Tile movedFrom = null;
 		if(existing.getTile() != null && !existing.getTile().equals(update.getTile())) {
 			movedFrom = existing.getTile();
-		}
-		existing.setTile(gameInstance.world.get(update.getTile().getLocation()));
+		} 
+		existing.setTile(gameInstance.world.get(update.getTileLocation()));
+		existing.setInventory(update.getInventory());
 		if(existing instanceof Plant) {
 			Plant existingPlant = (Plant)existing;
 			Plant plantUpdate = (Plant)update;
-			existingPlant.setPlantType(plantUpdate.getPlantType());
+			existingPlant.setType(plantUpdate.getType());
 		}
 		else if(update instanceof Building) {
 			Building existingBuilding = (Building)existing;
@@ -452,9 +490,6 @@ public class Client {
 				movedFrom.removeUnit(existingUnit);
 				existingUnit.getTile().addUnit(existingUnit);
 			}
-			if(existingUnit.getTile() != null && existingUnit.getFaction().usesItems()) {
-				existingUnit.getTile().getItems().clear();
-			}
 		}
 		if(existing.isDead()) {
 			things.remove(update.id());
@@ -464,10 +499,16 @@ public class Client {
 	private void factionUpdate(Faction factionUpdate) {
 		Faction faction = gameInstance.world.getFaction(factionUpdate.id());
 		
+		Research latestCompletedResearch = factionUpdate.getLatestCompletedResearch();
+		if(latestCompletedResearch != null) {
+			Research potentialTarget = faction.getResearch(latestCompletedResearch.type());
+			potentialTarget.setCompleted(latestCompletedResearch.isCompleted());
+			potentialTarget.setResearchPointsSpend(latestCompletedResearch.getPointsSpent());
+		}
+		
 		Research targetUpdate = factionUpdate.getResearchTarget();
 		if(targetUpdate != null) {
-			Research potentialTarget = faction.getResearch(factionUpdate.getResearchTarget().type());
-			potentialTarget.setType(targetUpdate.type());
+			Research potentialTarget = faction.getResearch(targetUpdate.type());
 			potentialTarget.setPayedFor(targetUpdate.isPayedFor());
 			potentialTarget.setCompleted(targetUpdate.isCompleted());
 			potentialTarget.setResearchPointsSpend(targetUpdate.getPointsSpent());
@@ -475,10 +516,17 @@ public class Client {
 				faction.setResearchTarget(potentialTarget.type());
 			}
 		}
+		else {
+			faction.resetResearchTarget();
+		}
 		
-		Item[] itemsUpdate = factionUpdate.getItems();
+		
+		Item[] itemsUpdate = factionUpdate.getInventory().getItems();
 		for(Item itemUpdate : itemsUpdate) {
-			faction.setAmount(itemUpdate.getType(), itemUpdate.getAmount());
+			if (itemUpdate == null) {
+				continue;
+			}
+			faction.getInventory().setAmount(itemUpdate.getType(), itemUpdate.getAmount());
 		}
 		
 		if(clientGUI.getGameView().getFaction() != faction) {
@@ -500,7 +548,11 @@ public class Client {
 						}
 					}
 					else if(message instanceof WorldInfo) {
+//						System.out.println("Current client tick: " + World.ticks + ", tick received from server: " + ((WorldInfo)message).getTick());
+//						long start = System.currentTimeMillis();
 						worldInfoUpdate((WorldInfo)message);
+//						long delta = System.currentTimeMillis() - start;
+//						System.out.println("it took " + delta + "ms to process the WorldInfo");
 					}
 					else if(message instanceof Faction) {
 						factionUpdate((Faction)message);

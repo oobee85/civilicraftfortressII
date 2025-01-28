@@ -3,9 +3,9 @@ package wildlife;
 import java.util.*;
 
 import game.*;
-import game.liquid.*;
 import ui.*;
 import world.*;
+import world.liquid.*;
 
 public class WaterSpirit extends Animal {
 
