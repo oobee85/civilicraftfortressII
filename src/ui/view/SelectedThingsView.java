@@ -30,105 +30,36 @@ class SelectedButtonSizes {
 	}
 }
 
-public class GameViewOverlay extends JPanel {
+public class SelectedThingsView extends JPanel {
 
-	private static final int RESOURCE_ICON_SIZE = 21;
-	private static final Dimension RESOURCE_BUTTON_SIZE = new Dimension(80, 25);
-	
 	private static final SelectedButtonSizes[] selectedButtonSizes = new SelectedButtonSizes[] {
-			new SelectedButtonSizes(40, 5, 5, 2),
-			new SelectedButtonSizes(30, 4, 3, 3),
-			new SelectedButtonSizes(25, 3, 2, 4),
+			new SelectedButtonSizes(42, 5, 5, 1),
+			new SelectedButtonSizes(24, 3, 2, 2),
+			new SelectedButtonSizes(17, 2, 0, 3),
 	};
 	
 	private GUIController guiController;
-	private Faction faction;
 	
-	private JPanel resourcePanel2;
-	private ScrollingPanel selectedUnitsPanel;
+	private JPanel selectedUnitsPanel;
 	private SelectedButtonSizes currentUnitButtonSize = selectedButtonSizes[0];
 	private WrapLayout selectedUnitsPanelLayout;
 	
 	private HashMap<Thing, JButton> selectedButtons = new HashMap<>();
 
-	private KButton[] resourceIndicators = new KButton[ItemType.values().length];
-	private boolean[] resourceIndicatorsDiscovered = new boolean[ItemType.values().length];
-	
-	public GameViewOverlay(GUIController guiController) {
+	public SelectedThingsView(GUIController guiController) {
 		this.guiController = guiController;
 		this.setFocusable(false);
-		resourcePanel2 = new JPanel();
-		resourcePanel2.setLayout(new GridBagLayout());
-		resourcePanel2.setOpaque(false);
-		
-		selectedUnitsPanel = new ScrollingPanel(null);
+
+		selectedUnitsPanel = new JPanel();
 		selectedUnitsPanelLayout = new WrapLayout(FlowLayout.CENTER, 5, 5);
 		selectedUnitsPanel.setLayout(selectedUnitsPanelLayout);
 		selectedUnitsPanel.setFocusable(false);
 		
 		this.setLayout(new BorderLayout());
-		this.add(resourcePanel2, BorderLayout.WEST);
-		this.add(selectedUnitsPanel.getRootPanel(), BorderLayout.CENTER);
-		this.setPreferredSize(new Dimension(0, 100));
-		setupButtons();
+		this.add(selectedUnitsPanel, BorderLayout.CENTER);
+		this.setPreferredSize(new Dimension(0, 52));
 	}
 	
-	public void setupButtons() {
-		for (int i = 0; i < ItemType.values().length; i++) {
-			ItemType type = ItemType.values()[i];
-			KButton button = KUIConstants.setupButton("",
-					Utils.resizeImageIcon(type.getMipMap().getImageIcon(0), RESOURCE_ICON_SIZE, RESOURCE_ICON_SIZE),
-					RESOURCE_BUTTON_SIZE);
-			button.setEnabled(false);
-			button.setVisible(false);
-			if(type.getCost() != null) {
-				button.addActionListener(e -> {
-					int amount = 1;
-					if((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
-						amount = 10;
-					}
-					guiController.tryToCraftItem(type, amount);
-				});
-			}
-			button.addRightClickActionListener(e -> {
-				guiController.switchInfoPanel(new ItemTypeInfoPanel(type, faction));
-			});
-			button.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					guiController.pushInfoPanel(new ItemTypeInfoPanel(type, faction));
-				}
-				@Override
-				public void mouseExited(MouseEvent e) {
-					guiController.popInfoPanel();
-				}
-			});
-			resourceIndicators[i] = button;
-		}
-		
-		// inventory rows
-		ItemType[][] rows = new ItemType[][] {
-			new ItemType[] {
-					FOOD, WOOD, STONE, HORSE, MAGIC, CLAY
-			},
-			new ItemType[] {
-					COPPER_ORE, SILVER_ORE, IRON_ORE, MITHRIL_ORE, GOLD_ORE, ADAMANTITE_ORE, RUNITE_ORE, TITANIUM_ORE
-			},
-			new ItemType[] {
-					COAL, BRONZE_BAR, IRON_BAR, MITHRIL_BAR, GOLD_BAR, ADAMANTITE_BAR, RUNITE_BAR, TITANIUM_BAR
-			},
-			new ItemType[] {
-					SWORD, SHIELD, BOW, BRICK
-			}
-		};
-		for(int row = 0; row < rows.length; row++) {
-			for(int column = 0; column < rows[row].length; column++) {
-				GridBagConstraints c = new GridBagConstraints();
-				c.gridx = column; c.gridy = row;
-				resourcePanel2.add(resourceIndicators[rows[row][column].ordinal()], c);
-			}
-		}
-	}
 	
 	private void updateSelectedButtonSizes(SelectedButtonSizes targetSize) {
 		if(targetSize == currentUnitButtonSize) {
@@ -173,18 +104,6 @@ public class GameViewOverlay extends JPanel {
 		}
 	}
 	
-	public void updateItems() {
-		if(faction != null) {
-			for (int i = 0; i < ItemType.values().length; i++) {
-				int amount = faction.getInventory().getItemAmount(ItemType.values()[i]);
-				resourceIndicators[i].setText("" + amount);
-				resourceIndicators[i].setVisible(resourceIndicatorsDiscovered[i] || amount > 0);
-				if(amount > 0) {
-					resourceIndicatorsDiscovered[i] = true;
-				}
-			}
-		}
-	}
 	private JButton setupUnitButton(Unit unit) {
 		KButton button = new KButton(null, Utils.resizeImageIcon(unit.getMipMap().getImageIcon(10), currentUnitButtonSize.imageSize, currentUnitButtonSize.imageSize)) {
 			@Override
@@ -212,12 +131,5 @@ public class GameViewOverlay extends JPanel {
 			}
 		});
 		return button;
-	}
-	
-	public void changeFaction(Faction faction) {
-		this.faction = faction;
-		for(int i = 0; i < resourceIndicatorsDiscovered.length; i++) {
-			resourceIndicatorsDiscovered[i] = false;
-		}
 	}
 }

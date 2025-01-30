@@ -56,7 +56,8 @@ public class ClientGUI {
 	private JButton startGameButton;
 
 	private GameView gameView;
-	private GameViewOverlay gameViewOverlay;
+	private SelectedThingsView gameViewOverlay;
+	private ResourceView resourceView;
 	private InfoPanelView infoPanelView;
 
 	private JTabbedPane tabbedPane;
@@ -334,8 +335,9 @@ public class ClientGUI {
 		if(gameView != null) {
 			ingamePanel.remove(gameView.getPanel());
 		}
-		gameViewOverlay = new GameViewOverlay(instance.getGUIController());
-		gameView = new GameView(instance, gameViewOverlay);
+		gameViewOverlay = new SelectedThingsView(instance.getGUIController());
+		resourceView = new ResourceView(instance.getGUIController());
+		gameView = new GameView(instance, gameViewOverlay, resourceView);
 		MinimapView minimapView = new MinimapView(gameView);
 		minimapView.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, ClientGUI.GUIWIDTH));
 		gameView.requestFocus();
@@ -402,8 +404,11 @@ public class ClientGUI {
 		return rootPanel;
 	}
 	
-	public GameViewOverlay getGameViewOverlay() {
+	public SelectedThingsView getGameViewOverlay() {
 		return gameViewOverlay;
+	}
+	public ResourceView getResourceView() {
+		return resourceView;
 	}
 	public GameView getGameView() {
 		return gameView;
@@ -464,5 +469,10 @@ public class ClientGUI {
 			tabbedPane.setSelectedIndex(CRAFTING_TAB);
 		}
 		tabbedPane.setEnabledAt(CRAFTING_TAB, true);
+	}
+	
+	public void changedFaction(Faction faction) {
+		getGameView().setFaction(faction);
+		getResourceView().changeFaction(faction);
 	}
 }
