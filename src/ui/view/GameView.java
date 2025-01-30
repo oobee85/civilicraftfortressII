@@ -40,7 +40,6 @@ public class GameView {
 	public int tickOfLastClick = 0;
 	
 	private final FillingLayeredPane panel;
-	private final JPanel overlayPanel;
 	
 	private Drawer vanillaDrawer;
 	private Component drawingCanvas;
@@ -72,8 +71,7 @@ public class GameView {
 		public ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
 	}
 
-	public GameView(Game game, JPanel overlay) {
-		this.overlayPanel = overlay;
+	public GameView(Game game, JPanel overlayPanel, JPanel resourceView) {
 		state = new GameViewState();
 		vanillaDrawer = new VanillaDrawer(game, state);
 		panel = new FillingLayeredPane();
@@ -82,6 +80,9 @@ public class GameView {
 		}
 		panel.setLayout(new BorderLayout());
 		panel.setBackground(Color.black);
+		if (resourceView != null) {
+			panel.add(resourceView, BorderLayout.NORTH);
+		}
 		if (overlayPanel != null) {
 			panel.add(overlayPanel, BorderLayout.SOUTH);
 		}
@@ -936,12 +937,8 @@ public class GameView {
 	 *  scaled to (tile.x * tileSize), ((tile.y + hexOffset)*tileSize) 
 	 */
 	private void centerViewOnPixel(Position pixel) {
-		int overlayh = 0;
-		if (overlayPanel != null) {
-			overlayh = overlayPanel.getHeight();
-		}
-		Position halfScreenOffset = new Position(panel.getWidth() / 2, 
-		                                         (panel.getHeight() - overlayh) / 2);
+		Position halfScreenOffset = new Position(drawingCanvas.getWidth() / 2, 
+		                                         (drawingCanvas.getHeight()) / 2);
 		state.viewOffset = pixel.subtract(halfScreenOffset);
 		panel.repaint();
 	}

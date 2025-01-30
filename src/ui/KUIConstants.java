@@ -35,6 +35,7 @@ public class KUIConstants {
 	public static final Font buttonFont = new Font(fontName, Font.PLAIN, 17);
 	public static final Font buttonFontSmall = new Font(fontName, Font.PLAIN, 14);
 	public static final Font buttonFontMini = new Font(fontName, Font.PLAIN, 13);
+	public static final Font buttonFontMinimini = new Font(fontName, Font.PLAIN, 12);
 	
 
 	public static final Insets zeroMargin = new Insets(0, 0, 0, 0);

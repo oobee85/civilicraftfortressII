@@ -44,7 +44,7 @@ public class Client {
 			@Override
 			public void updateGUI() {
 				if(gameInstance.world != null) {
-					clientGUI.getGameViewOverlay().updateItems();
+					clientGUI.getResourceView().updateItems();
 					clientGUI.getWorkerView().updateButtons();
 					clientGUI.getResearchView().updateButtons();
 					clientGUI.getProduceUnitView().updateButtons();
@@ -92,8 +92,7 @@ public class Client {
 			}
 			@Override
 			public void changedFaction(Faction faction) {
-				clientGUI.getGameView().setFaction(faction);
-				clientGUI.getGameViewOverlay().changeFaction(faction);
+				clientGUI.changedFaction(faction);
 				System.out.println("CHANGED FACTION TO " + faction);
 			}
 			@Override
