@@ -56,7 +56,7 @@ public class ClientGUI {
 	private JButton startGameButton;
 
 	private GameView gameView;
-	private GameViewOverlay gameViewOverlay;
+	private SelectedThingsView gameViewOverlay;
 	private ResourceView resourceView;
 	private InfoPanelView infoPanelView;
 
@@ -335,7 +335,7 @@ public class ClientGUI {
 		if(gameView != null) {
 			ingamePanel.remove(gameView.getPanel());
 		}
-		gameViewOverlay = new GameViewOverlay(instance.getGUIController());
+		gameViewOverlay = new SelectedThingsView(instance.getGUIController());
 		resourceView = new ResourceView(instance.getGUIController());
 		gameView = new GameView(instance, gameViewOverlay, resourceView);
 		MinimapView minimapView = new MinimapView(gameView);
@@ -404,7 +404,7 @@ public class ClientGUI {
 		return rootPanel;
 	}
 	
-	public GameViewOverlay getGameViewOverlay() {
+	public SelectedThingsView getGameViewOverlay() {
 		return gameViewOverlay;
 	}
 	public ResourceView getResourceView() {

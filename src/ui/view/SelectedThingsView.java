@@ -30,7 +30,7 @@ class SelectedButtonSizes {
 	}
 }
 
-public class GameViewOverlay extends JPanel {
+public class SelectedThingsView extends JPanel {
 
 	private static final SelectedButtonSizes[] selectedButtonSizes = new SelectedButtonSizes[] {
 			new SelectedButtonSizes(42, 5, 5, 1),
@@ -46,7 +46,7 @@ public class GameViewOverlay extends JPanel {
 	
 	private HashMap<Thing, JButton> selectedButtons = new HashMap<>();
 
-	public GameViewOverlay(GUIController guiController) {
+	public SelectedThingsView(GUIController guiController) {
 		this.guiController = guiController;
 		this.setFocusable(false);
 

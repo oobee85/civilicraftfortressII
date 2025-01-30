@@ -71,7 +71,7 @@ public class GameView {
 		public ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
 	}
 
-	public GameView(Game game, JPanel overlayPanel, JPanel resourceView) {
+	public GameView(Game game, JPanel selectedThingsPanel, JPanel resourceView) {
 		state = new GameViewState();
 		vanillaDrawer = new VanillaDrawer(game, state);
 		panel = new FillingLayeredPane();
@@ -83,8 +83,8 @@ public class GameView {
 		if (resourceView != null) {
 			panel.add(resourceView, BorderLayout.NORTH);
 		}
-		if (overlayPanel != null) {
-			panel.add(overlayPanel, BorderLayout.SOUTH);
+		if (selectedThingsPanel != null) {
+			panel.add(selectedThingsPanel, BorderLayout.SOUTH);
 		}
 		
 		drawingCanvas = vanillaDrawer.getDrawingCanvas();
