@@ -898,6 +898,9 @@ public class Unit extends Thing implements Serializable {
 		}
 		return null;
 	}
+	public boolean getIsHarvesting() {
+		return isHarvesting;
+	}
 
 	public UnitType getType() {
 		return unitType;

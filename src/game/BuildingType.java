@@ -22,6 +22,10 @@ public class BuildingType implements Serializable {
 	private transient final String researchRequirement;
 	private transient final double cultureRate;
 	private transient final double buildingEffort;
+	private transient final double effort_to_produce_item;
+	private transient final double base_effort_to_produce_item;
+	private transient final double effort_to_produce_harvest;
+	private transient final double base_effort_to_produce_harvest;
 	private transient final HashMap <ItemType, Integer> cost;
 	private transient final HashSet<String> attributes;
 	private transient final int inventoryStackSize;
@@ -35,7 +39,7 @@ public class BuildingType implements Serializable {
 			String texturePath, String tiledImageFolder, double cultureRate, int visionRadius, 
 			String requirement, HashMap <ItemType, Integer> resourcesNeeded,
 			String[] canProduce, double moveSpeedEnhancement, HashSet<String> attributes,
-			int inventoryStackSize) {
+			int inventoryStackSize, double effort_to_produce_item, double effort_to_produce_harvest) {
 		id = idCounter++;
 		this.name = name;
 		this.info = info;
@@ -45,17 +49,33 @@ public class BuildingType implements Serializable {
 		this.cultureRate = cultureRate;
 		this.moveSpeedEnhancement = moveSpeedEnhancement;
 		this.buildingEffort = buildingEffort;
+		this.effort_to_produce_item = effort_to_produce_item;
+		this.effort_to_produce_harvest = effort_to_produce_harvest;
 		this.cost = resourcesNeeded;
 		this.visionRadius = visionRadius;
 		this.canProduce = canProduce;
 		this.attributes = attributes;
 		this.inventoryStackSize = inventoryStackSize;
+		this.base_effort_to_produce_item = 100;
+		this.base_effort_to_produce_harvest = 20;
 		
 //		if(isRoad()) {
 //			roadImages = ImageCreation.createRoadImages(texturePath);
 //		}
 
 		this.tiledMipmap = tiledImageFolder == null ? null : new TiledMipmap(tiledImageFolder);
+	}
+	public double getEffortToProduceItem() {
+		if(effort_to_produce_item <= 0 ) {
+			return base_effort_to_produce_item;
+		}
+		return effort_to_produce_item;
+	}
+	public double getEffortToProduceHarvest() {
+		if(effort_to_produce_harvest <= 0) {
+			return base_effort_to_produce_harvest;
+		}
+		return effort_to_produce_harvest;
 	}
 	
 	public int getInventoryStackSize() {

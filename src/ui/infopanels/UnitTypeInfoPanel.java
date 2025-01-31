@@ -27,8 +27,21 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		this.faction = faction;
 	}
 	
-	public static void drawCombatStats(Graphics g, UnitType unitType, int x, int y) {
+	public static void drawCombatStats(Graphics g, UnitType unitType, Faction faction, int x, int y) {
+		
 		CombatStats stats = unitType.getCombatStats();
+		int moveSpeed = stats.getMoveSpeed();
+		int health = stats.getHealth();
+		AttackStyle styleUpgrades = null;
+		
+		if(faction != null) {
+			CombatStats upgrades = faction.getUpgradedCombatStats();
+			styleUpgrades = faction.getUpgradedAttackStyle();
+			moveSpeed += upgrades.getMoveSpeed();
+			health += upgrades.getHealth();
+		}
+		
+		
 		g.setFont(KUIConstants.combatStatsFont);
 		g.setColor(Color.black);
 		int fontSize = g.getFont().getSize();
@@ -36,28 +49,41 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		int gap = 2;
 		int xoffset = (int) (iconSize*2.5);
 		
+		
 		g.drawImage(movespeedImage, x, y, iconSize, iconSize, null);
-		g.drawString(stats.getMoveSpeed() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
+		g.drawString(moveSpeed + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
 		
 //		y += iconSize + gap;
 		g.drawImage(healthImage, x + xoffset, y, iconSize, iconSize, null);
-		g.drawString(stats.getHealth() + "", x + iconSize + gap + xoffset, y + iconSize/2 + fontSize/3);
+		g.drawString(health + "", x + iconSize + gap + xoffset, y + iconSize/2 + fontSize/3);
 		
 		for(AttackStyle style : unitType.getAttackStyles()) {
+			int damage = style.getDamage();
+			int cooldown = style.getCooldown();
+			int range = style.getRange();
+			int minRange = style.getMinRange();
+			
+			if(styleUpgrades != null) {
+				damage +=  styleUpgrades.getDamage();
+				cooldown +=  styleUpgrades.getCooldown();
+				range += styleUpgrades.getRange();
+				minRange += styleUpgrades.getMinRange();
+			}
+			
 			y += iconSize + gap;
 			g.drawRect(x, y-1, + 2*iconSize + 4*gap + xoffset, 2*(iconSize + gap));
 			
 			g.drawImage(attackspeedImage, x , y, iconSize, iconSize, null);
-			g.drawString(style.getCooldown() + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
+			g.drawString(cooldown + "", x + iconSize + gap, y + iconSize/2 + fontSize/3);
 			
 			g.drawImage(attackImage, x + xoffset, y, iconSize, iconSize, null);
-			g.drawString(style.getDamage() + "", x + iconSize + gap + xoffset, y + iconSize/2 + fontSize/3);
+			g.drawString(damage + "", x + iconSize + gap + xoffset, y + iconSize/2 + fontSize/3);
 
 			y += iconSize + gap;
 			g.drawImage(visionImage, x, y, iconSize, iconSize, null);
-			String rangeStr = style.getRange() + "";
+			String rangeStr = range + "";
 			if(style.getMinRange() > 0) {
-				rangeStr = style.getMinRange() +"-" + rangeStr;
+				rangeStr = minRange +"-" + rangeStr;
 			}
 			g.drawString(rangeStr, x + iconSize + gap, y + iconSize/2 + fontSize/3);
 		}
@@ -113,6 +139,6 @@ public class UnitTypeInfoPanel extends InfoPanel {
 		if(showing.getCost() != null) {
 			drawCosts(g, showing.getCost(), x, y + 6, faction);
 		}
-		drawCombatStats(g, showing, getWidth() - 100, 4);
+		drawCombatStats(g, showing, faction, getWidth() - 100, 4);
 	}
 }

@@ -10,7 +10,9 @@
 		"attributes":["harvestable", "wood"],
 		"produces":{"FOOD": 5},
 		"health":50,
-		"effort":200
+		"effort_to_build":200,
+		"effort_to_produce_harvest":50,
+		"effort_to_produce_item":-1
 	},
 	{
 		"name":"MINE",
@@ -23,7 +25,9 @@
 		"produces":{"STONE": 5},
 		"research":"FARMING",
 		"health":50,
-		"effort":200
+		"effort_to_build":200,
+		"effort_to_produce_harvest":50,
+		"effort_to_produce_item":-1
 	},
 	{
 		"name":"MAGIC",
@@ -36,7 +40,9 @@
 		"research":"MYSTICISM",
 		"culture":0.1,
 		"health":50,
-		"effort":200
+		"effort_to_build":200,
+		"effort_to_produce_harvest":50,
+		"effort_to_produce_item":-1
 	},
 	{
 		"name":"SAWMILL",
@@ -48,7 +54,10 @@
 		"attributes":["wood", "crafting", "lumber"],
 		"research":"FARMING",
 		"health":1000,
-		"effort":1000
+		"effort_to_build":1000,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":200
+		
 	},
 	{
 		"name":"QUARRY",
@@ -61,7 +70,9 @@
 		"inventory":{"maxstack":500},
 		"research":"FARMING",
 		"health":200,
-		"effort":200
+		"effort_to_build":200,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1
 	},
 	{
 		"name":"COLONY",
@@ -73,8 +84,11 @@
 		"inventory":{"maxstack":1000},
 		"attributes":["colony", "wood"],
 		"health":2000,
-		"effort":500,
-		"research":"FARMING"
+		"research":"FARMING",
+		"effort_to_build":500,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1
+		
 	},
 	{
 		"name":"BARRACKS",
@@ -87,7 +101,9 @@
 		"culture":0.5,
 		"attributes":["wood"],
 		"health":1000,
-		"effort":500
+		"effort_to_build":500,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1
 	},
 	{
 		"name":"STABLES",
@@ -99,9 +115,11 @@
 		"buildsunits":["HORSEARCHER","KNIGHT","CHARIOT", "GRIFFIN", "HORSEMAN", "ENT", "WEREWOLF", "WOLF", "VAMPIRE"],
 		"inventory":{"maxstack":100},
 		"attributes":["wood"],
+		"research":"TRAPPING",
 		"health":1000,
-		"effort":500,
-		"research":"TRAPPING"
+		"effort_to_build":500,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1
 	},
 	{
 		"name":"RESEARCH_LAB",
@@ -112,9 +130,11 @@
 		"culture":0.5,
 		"inventory":{"maxstack":100},
 		"attributes":["stone", "crafting"],
+		"research":"MASONRY",
 		"health":1000,
-		"effort":500,
-		"research":"MASONRY"
+		"effort_to_build":500,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1
 	},
 	{
 		"name":"TRAP",
@@ -125,9 +145,11 @@
 		"culture":0.1,
 		"inventory":{"maxstack":50},
 		"attributes":["trap", "wood"],
+		"research":"FARMING",
 		"health":100,
-		"effort":200,
-		"research":"FARMING"
+		"effort_to_build":200,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1
 	},
 	{
 		"name":"GRANARY",
@@ -137,10 +159,12 @@
 		"cost":{"WOOD":100, "STONE":100, "BRONZE_BAR":5},
 		"culture":0.25,
 		"attributes":["supply", "wood"],
+		"research":"MASONRY",
 		"inventory":{"maxstack":50},
 		"health":1000,
-		"effort":500,
-		"research":"MASONRY"
+		"effort_to_build":500,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1
 	},
 	{
 		"name":"WINDMILL",
@@ -151,9 +175,11 @@
 		"culture":0.5,
 		"inventory":{"maxstack":200},
 		"attributes":["stone"],
+		"research":"MATHEMATICS",
 		"health":2000,
-		"effort":500,
-		"research":"MATHEMATICS"
+		"effort_to_build":500,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1
 	},
 	{
 		"name":"WATCHTOWER",
@@ -162,10 +188,12 @@
 		"vision":50,
 		"cost":{"WOOD":50, "STONE":50, "BRONZE_BAR":1},
 		"attributes":["stone"],
+		"research":"MASONRY",
 		"culture":0.5,
 		"health":1000,
-		"effort":250,
-		"research":"MASONRY"
+		"effort_to_build":250,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1
 	},
 	{
 		"name":"CASTLE",
@@ -176,10 +204,12 @@
 		"buildsunits":["WORKER", "MASON", "PRIEST", "CARAVAN"],
 		"culture":1,
 		"attributes":["castle", "stone"],
-		"health":10000,
-		"effort":2000,
 		"research":"MASONRY",
-		"inventory":{"maxstack":10000}
+		"inventory":{"maxstack":10000},
+		"health":10000,
+		"effort_to_build":2000,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1
 	}, 
 	{
 		"name":"NECROPOLIS",
@@ -191,7 +221,9 @@
 		"culture":1,
 		"attributes":["castle", "stone"],
 		"health":10000,
-		"effort":1000,
+		"effort_to_build":1000,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1,
 		"research":"ENGINEERING",
 		"inventory":{"maxstack":10000}
 	}, 
@@ -205,7 +237,9 @@
 		"culture":1,
 		"attributes":["castle", "stone"],
 		"health":10000,
-		"effort":10000,
+		"effort_to_build":10000,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1,
 		"resistances": {"HEAT": 1000},
 		"inventory":{"maxstack":10000}
 	}, 
@@ -220,7 +254,9 @@
 		"attributes":["wood"],
 		"resistances": {"COLD": 0, "DRY": 0, "WATER": 0},
 		"health":2000,
-		"effort":1000,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1,
+		"effort_to_build":1000,
 		"research":"MATHEMATICS"
 	},
 	{
@@ -233,7 +269,9 @@
 		"attributes":["wood"],
 		"culture":0.5,
 		"health":2000,
-		"effort":500,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1,
+		"effort_to_build":500,
 		"research":"MATHEMATICS"
 	},
 	{
@@ -244,7 +282,9 @@
 		"cost":{"WOOD":100, "STONE":100},
 		"culture":0.5,
 		"health":500,
-		"effort":500,
+		"effort_to_build":500,
+		"effort_to_produce_item":200,
+		"effort_to_produce_harvest":-1,
 		"attributes":["smithy", "stone", "crafting"],
 		"research":"FARMING"
 	},
@@ -256,7 +296,9 @@
 		"cost":{"WOOD":1000, "STONE":1000},
 		"culture":0.5,
 		"health":2000,
-		"effort":2000,
+		"effort_to_build":2000,
+		"effort_to_produce_item":200,
+		"effort_to_produce_harvest":-1,
 		"attributes":["brick", "stone", "crafting"],
 		"research":"MASONRY"
 	},
@@ -270,7 +312,9 @@
 		"cost":{"STONE":10},
 		"culture":0,
 		"health":20,
-		"effort":100,
+		"effort_to_build":100,
+		"effort_to_produce_item":-1,
+		"effort_to_produce_harvest":-1,
 		"attributes":["road", "stone"],
 		"research":"MASONRY"
 	},
@@ -283,7 +327,9 @@
 		"cost":{"BRICK":10},
 		"culture":0,
 		"health":200,
-		"effort":100,
+		"effort_to_build":100,
+		"effort_to_produce_item":-1,
+		"effort_to_produce_harvest":-1,
 		"attributes":["road", "stone"],
 		"research":"ENGINEERING"
 	},
@@ -296,7 +342,9 @@
 		"cost":{"WOOD":500},
 		"culture":0,
 		"health":1000,
-		"effort":1000,
+		"effort_to_build":1000,
+		"effort_to_produce_item":-1,
+		"effort_to_produce_harvest":-1,
 		"attributes":["road", "wood", "bridge"],
 		"resistances": {"WATER": 0},
 		"research":"ENGINEERING"
@@ -310,7 +358,9 @@
 		"cost":{"WOOD":50},
 		"culture":0.25,
 		"health":500,
-		"effort":100,
+		"effort_to_build":100,
+		"effort_to_produce_item":-1,
+		"effort_to_produce_harvest":-1,
 		"attributes":["blocksmovement", "wood"]
 	},
 	{
@@ -321,7 +371,9 @@
 		"cost":{"WOOD":100, "BRONZE_BAR":5},
 		"culture":0.5,
 		"health":500,
-		"effort":200,
+		"effort_to_build":200,
+		"effort_to_produce_item":-1,
+		"effort_to_produce_harvest":-1,
 		"attributes":["blocksmovement", "gate", "wood"],
 		"research":"MASONRY"
 	},
@@ -333,7 +385,9 @@
 		"cost":{"WOOD":50, "STONE":50},
 		"culture":0.25,
 		"health":2000,
-		"effort":200,
+		"effort_to_build":200,
+		"effort_to_produce_item":-1,
+		"effort_to_produce_harvest":-1,
 		"attributes":["blocksmovement", "wood"],
 		"resistances": {"HEAT": 50},
 		"research":"MASONRY"
@@ -346,7 +400,9 @@
 		"cost":{"WOOD":100, "IRON_BAR":5, "STONE":100},
 		"culture":0.5,
 		"health":2000,
-		"effort":400,
+		"effort_to_build":400,
+		"effort_to_produce_item":-1,
+		"effort_to_produce_harvest":-1,
 		"attributes":["blocksmovement", "gate", "stone"],
 		"resistances": {"HEAT": 50},
 		"research":"MATHEMATICS"
@@ -359,7 +415,9 @@
 		"cost":{"BRICK":100, "MITHRIL_BAR":5},
 		"culture":0.25,
 		"health":10000,
-		"effort":400,
+		"effort_to_build":400,
+		"effort_to_produce_item":-1,
+		"effort_to_produce_harvest":-1,
 		"attributes":["blocksmovement", "stone"],
 		"resistances": {"HEAT": 100},
 		"research":"ENGINEERING"
@@ -372,7 +430,9 @@
 		"cost":{"BRICK":100, "MITHRIL_BAR":10},
 		"culture":0.5,
 		"health":10000,
-		"effort":400,
+		"effort_to_build":400,
+		"effort_to_produce_item":-1,
+		"effort_to_produce_harvest":-1,
 		"attributes":["blocksmovement", "gate", "stone"],
 		"resistances": {"HEAT": 20},
 		"research":"ENGINEERING"
@@ -386,7 +446,9 @@
 		"attributes":["stone"],
 		"culture":0.5,
 		"health":1000,
-		"effort":1000,
+		"effort_to_build":1000,
+		"effort_to_produce_item":-1,
+		"effort_to_produce_harvest":-1,
 		"research":"ARMORING"
 	}, 
 	{
@@ -400,7 +462,9 @@
 		"culture":0,
 		"health":1000,
 		"research":"DOMESTICATION",
-		"effort":500
+		"effort_to_build":500,
+		"effort_to_produce_item":-1,
+		"effort_to_produce_harvest":-1
 	},
 	{
 		"name":"DRAIN",
@@ -412,7 +476,9 @@
 		"culture":0,
 		"health":500,
 		"research":"MASONRY",
-		"effort":1000
+		"effort_to_build":1000,
+		"effort_to_produce_item":-1,
+		"effort_to_produce_harvest":-1
 	}
 ]
 }

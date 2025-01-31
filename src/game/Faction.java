@@ -196,7 +196,7 @@ public class Faction implements Externalizable {
 	}
 	public void updateUpgradedAttackStyle(ItemType itemType) {
 		if(itemType == ItemType.BETTER_WEAPONS) {
-			this.upgradedAttackStyle.addDamage(25);
+			this.upgradedAttackStyle.addDamage(15);
 		}
 		if(itemType == ItemType.IMPROVED_SPARRING) {
 			this.upgradedAttackStyle.addCooldown(-5);
@@ -205,7 +205,7 @@ public class Faction implements Externalizable {
 			this.upgradedAttackStyle.addLifesteal(true);;
 		}
 		if(itemType == ItemType.BROADHEADS) {
-			this.upgradedProjectileDamage += 25;
+			this.upgradedProjectileDamage += 15;
 		}
 		
 	}
@@ -437,6 +437,8 @@ public class Faction implements Externalizable {
 	
 	public void craftItem(ItemType type, int amount) {
 		
+		
+		// buy the item
 		for(int i = 0; i < amount && canAfford(type.getCost()); i++) {
 			payCost(type.getCost());
 			inventory.addItem(type, 1);
@@ -445,25 +447,33 @@ public class Faction implements Externalizable {
 		
 		if(type == ItemType.MEDICINE || type == ItemType.BETTER_WEAPONS || type == ItemType.IMPROVED_SPARRING || type == ItemType.SHIELDS || type == ItemType.BETTER_FORMATIONS || type == ItemType.FASTER_TRAINING || type == ItemType.UNDYING_ARMY || type == ItemType.BROADHEADS) {
 			
-//			int itemCount = 1;
-//			for(Item item: this.getInventory().getItems()) {
-//				ItemType type1 = item.getType();
-//				if(type1 == ItemType.MEDICINE || type1 == ItemType.BETTER_WEAPONS || type1 == ItemType.IMPROVED_SPARRING || type1 == ItemType.SHIELDS || type1 == ItemType.BETTER_FORMATIONS || type1 == ItemType.FASTER_TRAINING || type1 == ItemType.UNDYING_ARMY || type1 == ItemType.BROADHEADS) {
-//					itemCount ++;
-//				}
-//			}
-			HashMap<ItemType, Integer> hashMap = type.getCost();
-			
+			int costMultiplier = 1;
+			// iterate through inventory
+			for(Item item: this.inventory.getItems()) {
+				if(item == null) {
+					continue;
+				}
+				ItemType type2 = item.getType();
+				if(type2 != type) {
+					continue;
+				}
+				// if item in inventory is an upgrade
+				if(type2 == ItemType.MEDICINE || type2 == ItemType.BETTER_WEAPONS || type2 == ItemType.IMPROVED_SPARRING || type2 == ItemType.SHIELDS || type2 == ItemType.BETTER_FORMATIONS || type2 == ItemType.FASTER_TRAINING || type2 == ItemType.UNDYING_ARMY || type2 == ItemType.BROADHEADS) {
+					int itemAmount = item.getAmount();
+					costMultiplier += itemAmount; // add amount to the cost
+					break;
+				}
+			}
 			// <bronze bar, 100>
 			// <copper, 10>, <silver, 10>
 			// <copper, 20>, <silver, 20>
 			// for(ItemType type : bronze.getCost().keySet())
 			// int number = type.get(type) * 2;
 			// bronze.getCost().put(<type, number>)
-
-			 for(ItemType asdf : hashMap.keySet()) {
-				 int number = hashMap.get(asdf) * 2;
-				 hashMap.put(asdf, number);
+			HashMap<ItemType, Integer> hashMap = type.getCost();
+			 for(ItemType itemType : hashMap.keySet()) {
+				 int cost = hashMap.get(itemType) * 2;
+				 hashMap.put(itemType, cost);
 			 }
 				 
 			 
@@ -476,6 +486,8 @@ public class Faction implements Externalizable {
 			}
 			
 		}
+		
+		
 		
 		return;
 	}
