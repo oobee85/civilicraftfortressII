@@ -287,6 +287,10 @@ public class GameView {
 		vanillaDrawer.getDrawingCanvas().addMouseListener(mouseListener);
 		panel.addKeyListener(keyListener);
 	}
+	
+	public void setLeftClickAction(LeftClickAction action) {
+		state.leftClickAction = action;
+	}
 
 	public void setFaction(Faction faction) {
 		System.out.println("setting faction to " + faction);
@@ -377,6 +381,9 @@ public class GameView {
 		else if (state.leftClickAction == LeftClickAction.ATTACK) {
 			attackCommand(state.selectedThings, tile, shiftDown, true);
 		}
+		else if (state.leftClickAction == LeftClickAction.MOVE) {
+			moveCommand(state.selectedThings, tile, shiftDown);
+		}
 		else if (state.leftClickAction == LeftClickAction.WANDER_AROUND) {
 			wanderCommand(state.selectedThings, tile, shiftDown);
 		}
@@ -418,6 +425,15 @@ public class GameView {
 			if (thing instanceof Unit) {
 				Unit unit = (Unit) thing;
 				commandInterface.planAction(unit, PlannedAction.guardTile(unit.getTile()), !shiftDown);
+			}
+		}
+	}
+	
+	private void moveCommand(ConcurrentLinkedQueue<Thing> selectedThings, Tile tile, boolean shiftEnabled) {
+		for (Thing thing : selectedThings) {
+			if (thing instanceof Unit) {
+				Unit unit = (Unit) thing;
+				commandInterface.planAction(unit, PlannedAction.moveTo(tile), !shiftEnabled);
 			}
 		}
 	}

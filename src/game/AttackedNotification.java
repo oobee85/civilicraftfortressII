@@ -1,6 +1,5 @@
 package game;
 
-import ui.*;
 import world.*;
 
 public class AttackedNotification {
