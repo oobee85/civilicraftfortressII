@@ -75,6 +75,20 @@
 		"effort_to_produce_item":-1
 	},
 	{
+		"name":"SMITHY",
+		"info":"Turns ore and other resources into refined products.",
+		"image":"Images/buildings/blacksmith.gif",
+		"vision":1,
+		"cost":{"WOOD":100, "STONE":100},
+		"culture":0.5,
+		"health":500,
+		"effort_to_build":500,
+		"effort_to_produce_item":300,
+		"effort_to_produce_harvest":-1,
+		"attributes":["smithy", "stone", "crafting"],
+		"research":"FARMING"
+	},
+	{
 		"name":"COLONY",
 		"info":"Workers nearby can deposit resources here",
 		"image":"Images/buildings/colony.png",
@@ -273,34 +287,6 @@
 		"effort_to_produce_item":-1,
 		"effort_to_build":500,
 		"research":"MATHEMATICS"
-	},
-	{
-		"name":"SMITHY",
-		"info":"Turns ore and other resources into refined products.",
-		"image":"Images/buildings/blacksmith.gif",
-		"vision":1,
-		"cost":{"WOOD":100, "STONE":100},
-		"culture":0.5,
-		"health":500,
-		"effort_to_build":500,
-		"effort_to_produce_item":200,
-		"effort_to_produce_harvest":-1,
-		"attributes":["smithy", "stone", "crafting"],
-		"research":"FARMING"
-	},
-	{
-		"name":"BRICKWORKS",
-		"info":"Turns clay into brick materials",
-		"image":"Images/buildings/blacksmith.gif",
-		"vision":1,
-		"cost":{"WOOD":1000, "STONE":1000},
-		"culture":0.5,
-		"health":2000,
-		"effort_to_build":2000,
-		"effort_to_produce_item":200,
-		"effort_to_produce_harvest":-1,
-		"attributes":["brick", "stone", "crafting"],
-		"research":"MASONRY"
 	},
 	{
 		"name":"STONE_ROAD",
