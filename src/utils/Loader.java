@@ -123,7 +123,9 @@ public class Loader {
 			double culture = buildingTypeObject.getDouble("culture");
 			int health = buildingTypeObject.getInt("health");
 			int vision = buildingTypeObject.getInt("vision");
-			double effort = buildingTypeObject.getDouble("effort");
+			double effort = buildingTypeObject.getDouble("effort_to_build");
+			double effort_to_produce_item = buildingTypeObject.getDouble("effort_to_produce_item");
+			double effort_to_produce_harvest = buildingTypeObject.getDouble("effort_to_produce_harvest");
 			double movespeed = 1;
 			if(buildingTypeObject.has("movespeed")) {
 				movespeed = buildingTypeObject.getDouble("movespeed");
@@ -172,7 +174,8 @@ public class Loader {
 
 			Set<GameComponent> components = loadComponents(buildingTypeObject);
 			BuildingType buildingType = new BuildingType(name, info, health, effort, image, tiledImageFolder,
-					culture, vision, researchReq, cost, buildsunits, movespeed, attributes, inventoryStackSize);
+					culture, vision, researchReq, cost, buildsunits, movespeed, attributes, inventoryStackSize,
+					effort_to_produce_item, effort_to_produce_harvest);
 			buildingType.getComponents().addAll(components);
 			buildingTypeMap.put(name, buildingType);
 			buildingTypeList.add(buildingType);

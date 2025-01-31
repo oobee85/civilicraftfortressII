@@ -1,12 +1,15 @@
 package game;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Inventory implements Externalizable {
 	
 	private int maxStack;
 	private Item[] items = new Item[ItemType.values().length];
-
+	private List<Item> upgradeList = new ArrayList<>();
+	
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
 		boolean emptyInventory = isEmpty();

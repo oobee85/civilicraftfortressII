@@ -1036,8 +1036,10 @@ public class RenderingFunctions {
 		if (unit.isSelected()) {
 			state.g.drawImage(unit.getMipMap().getHighlight(size), drawatx, drawaty, size, size, null);
 		}
+		
+		
 		state.g.drawImage(unit.getMipMap().getImage(size), drawatx, drawaty, size, size, null);
-
+		
 		if (unit.isGuarding() == true) {
 			state.g.drawImage(GUARD_ICON, drawatx + size / 4, drawaty + size / 4, size / 2, size / 2, null);
 		}
@@ -1058,7 +1060,14 @@ public class RenderingFunctions {
 			if (action != null) {
 				Image image = getIconForAction(action);
 				if (image != null) {
+					// if worker is on a harvestable building and is harvesting, dont draw it.
+//					if(unit.getTile().getBuilding() != null && unit.getTile().getBuilding().getType().isHarvestable() && unit.isBuilder()) {
+//					}else {
+//						
+//					}
 					state.g.drawImage(image, drawatx, drawaty, size, size, null);
+					
+					
 				}
 			}
 		}
@@ -1121,7 +1130,11 @@ public class RenderingFunctions {
 			}
 			UnitDrawLoc drawLoc = computeUnitDrawLoc(drawat, counter, total, state.tileSize);
 //			drawUnitImage(state.g, drawLoc.x, drawLoc.y, drawLoc.size, unit);
+			
+			
+
 			drawFunc.draw(state, drawLoc.x, drawLoc.y, drawLoc.size, unit);
+			
 		}
 	}
 	

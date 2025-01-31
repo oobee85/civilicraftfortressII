@@ -26,9 +26,9 @@ public class Building extends Thing implements Serializable {
 	private double culture;
 	private transient Tile spawnLocation;
 	private transient double timeToHarvest;
-	private transient double baseTimeToHarvest = 20;
+	private transient double baseTimeToHarvest;
 	private transient double timeToProduce;
-	private transient double baseTimeToProduce = 100;
+	private transient double baseTimeToProduce;
 	private boolean isPlanned;
 
 	private int remainingEffortToProduceUnit;
@@ -45,8 +45,10 @@ public class Building extends Thing implements Serializable {
 		this.totalEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
 		this.spawnLocation = tile;
-		this.timeToHarvest = baseTimeToHarvest;
-		this.timeToProduce = baseTimeToProduce;
+		this.timeToHarvest = buildingType.getEffortToProduceHarvest();
+		this.baseTimeToHarvest = buildingType.getEffortToProduceHarvest();
+		this.timeToProduce = buildingType.getEffortToProduceItem();
+		this.baseTimeToProduce = buildingType.getEffortToProduceItem();
 		this.isPlanned = false;
 //		setRoadCorner(Direction.ALL_DIRECTIONS);
 		for(GameComponent c : buildingType.getComponents()) {
@@ -294,12 +296,6 @@ public class Building extends Thing implements Serializable {
 	public void setRemainingEffort(double effort) {
 		remainingEffort = effort;
 //		remainingEffort = updateEffortBasedOnTileConditions(effort);
-	}
-	private double updateEffortBasedOnTileConditions(double effort) {
-		if(this.getTile().getPlant() != null) {
-			effort += this.getTile().getPlant().getHealth();
-		}
-		return effort;
 	}
 	public boolean isBuilt() {
 		return remainingEffort <= 0;

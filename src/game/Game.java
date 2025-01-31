@@ -375,8 +375,11 @@ public class Game {
 //		}
 //	}
 	public void addResources(Faction faction) {
-		for (ItemType itemType : ItemType.values()) {
-			faction.getInventory().addItem(itemType, 1000);
+		for (ItemType type : ItemType.values()) {
+			if(type == ItemType.MEDICINE || type == ItemType.BETTER_WEAPONS || type == ItemType.IMPROVED_SPARRING || type == ItemType.SHIELDS || type == ItemType.BETTER_FORMATIONS || type == ItemType.FASTER_TRAINING || type == ItemType.UNDYING_ARMY || type == ItemType.BROADHEADS) {
+				continue;
+			}
+			faction.getInventory().addItem(type, 1000);
 		}
 
 	}
