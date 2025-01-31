@@ -27,7 +27,7 @@ public class UnitInfoPanel extends InfoPanel {
 		String hpstring =  String.format("%d/%d",(int)showing.getHealth(), (int)showing.getMaxHealth());
 		KUIConstants.drawProgressBar(g, Color.green, Color.red, Color.black, showing.getHealth()/showing.getMaxHealth(), hpstring, 0, getHeight()-hpbarHeight, getWidth() - 85, hpbarHeight);
 
-		UnitTypeInfoPanel.drawCombatStats(g, showing.getType(), showing.getFaction(), getWidth() - 100, 4);
+		UnitTypeInfoPanel.drawCombatStats(g, showing.getType(), showing.getFaction(), getWidth() - 150, 4);
 
 		if(showing.hasInventory())
 			UnitTypeInfoPanel.drawInventory(g, showing.getInventory(), 2, EXPLODE_BUTTON_SIZE + 2);
