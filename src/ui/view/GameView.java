@@ -420,15 +420,6 @@ public class GameView {
 		}
 	}
 	
-	public void unitGuardCurrentTile() {
-		for (Thing thing : state.selectedThings) {
-			if (thing instanceof Unit) {
-				Unit unit = (Unit) thing;
-				commandInterface.planAction(unit, PlannedAction.guardTile(unit.getTile()), !shiftDown);
-			}
-		}
-	}
-	
 	private void moveCommand(ConcurrentLinkedQueue<Thing> selectedThings, Tile tile, boolean shiftEnabled) {
 		for (Thing thing : selectedThings) {
 			if (thing instanceof Unit) {

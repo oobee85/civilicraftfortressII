@@ -86,11 +86,7 @@ public class RenderingPipeline {
 	}, null);
 	
 	private static RenderingStep target = new RenderingStep(state -> {
-		if (state.gameViewState.leftClickAction == LeftClickAction.ATTACK
-				|| state.gameViewState.leftClickAction == LeftClickAction.GUARD
-				|| state.gameViewState.leftClickAction == LeftClickAction.WANDER_AROUND) {
-			RenderingFunctions.drawTarget(state, state.gameViewState.hoveredTile);
-		}
+		RenderingFunctions.drawLeftClickCursor(state, state.gameViewState.hoveredTile);
 	}, null);
 	
 	private static RenderingStep debugStrings = new RenderingStep(state -> {
