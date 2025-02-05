@@ -16,7 +16,8 @@ public class SoundManager {
 	private static final String basePath = "sounds/";
 
 	public static LinkedBlockingQueue<Sound> theSoundQueue = new LinkedBlockingQueue<Sound>();
-	
+	public static LinkedBlockingQueue<SoundEffect> theMusicEffectQueue = new LinkedBlockingQueue<SoundEffect>();
+	public static LinkedBlockingQueue<Sound> theMusicQueue = new LinkedBlockingQueue<Sound>();
 	
 	
 	// loads a sound
@@ -37,11 +38,26 @@ public class SoundManager {
 			e.printStackTrace();
 		}
 	}
+	public static boolean isSoundRunning(Sound sound) {
+		if(sound == null) {
+			return false;
+		}
+		Clip clip = sounds.get(sound.getSoundEffect());
+		if(clip == null) {
+			System.err.println("isSoundRunning() clip is null");
+			return false;
+		}
+		
+		return clip.isActive();
+	}
+	public static Clip getClip(Sound sound) {
+		return sounds.get(sound.getSoundEffect());
+	}
 	
 	public static void playSoundWithEnd(Sound sound) {
 		Clip clip = sounds.get(sound.getSoundEffect());
 		if(clip == null) {
-			System.out.println("playSound() clip is null");
+			System.err.println("playSound() clip is null");
 			return;
 		}
 		
@@ -54,9 +70,9 @@ public class SoundManager {
         });
 		
 		// if already playing, stop and then restart, TODO might not want this
-		if(clip.isRunning()) {
-			clip.stop();
-		}
+//		if(clip.isRunning()) {
+//			clip.stop();
+//		}
 		
 		
 		clip.setFramePosition(0);

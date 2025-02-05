@@ -183,12 +183,15 @@ public class Faction implements Externalizable {
 		}
 		if(itemType == ItemType.MEDICINE) {
 			this.upgradedCombatStats.addTicksToHeal(-25);
+			
 		}
 		if(itemType == ItemType.BETTER_FORMATIONS) {
 			this.upgradedCombatStats.addMoveSpeed(-5);
+			
 		}
 		if(itemType == ItemType.FASTER_TRAINING) {
 			this.upgradedCombatStats.addTicksToBuild(-50);
+			
 		}
 		for(Unit unit: this.getUnits()) {
 			unit.getType().getCombatStats().mergeCombatStats(this.upgradedCombatStats);
@@ -200,9 +203,10 @@ public class Faction implements Externalizable {
 		}
 		if(itemType == ItemType.IMPROVED_SPARRING) {
 			this.upgradedAttackStyle.addCooldown(-5);
+			
 		}
 		if(itemType == ItemType.UNDYING_ARMY) {
-			this.upgradedAttackStyle.addLifesteal(true);;
+			this.upgradedAttackStyle.setLifesteal(true);;
 		}
 		if(itemType == ItemType.BROADHEADS) {
 			this.upgradedProjectileDamage += 15;
@@ -442,7 +446,7 @@ public class Faction implements Externalizable {
 		for(int i = 0; i < amount && canAfford(type.getCost()); i++) {
 			payCost(type.getCost());
 			inventory.addItem(type, 1);
-		}
+		
 		
 		
 		if(type == ItemType.MEDICINE || type == ItemType.BETTER_WEAPONS || type == ItemType.IMPROVED_SPARRING || type == ItemType.SHIELDS || type == ItemType.BETTER_FORMATIONS || type == ItemType.FASTER_TRAINING || type == ItemType.UNDYING_ARMY || type == ItemType.BROADHEADS) {
@@ -486,7 +490,7 @@ public class Faction implements Externalizable {
 			}
 			
 		}
-		
+		}
 		
 		
 		return;

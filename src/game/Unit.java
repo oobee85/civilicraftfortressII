@@ -47,7 +47,7 @@ public class Unit extends Thing implements Serializable {
 		super(unitType.getCombatStats().getHealth(), unitType.getMipMap(), faction, tile, unitType.getInventoryStackSize());
 		this.unitType = unitType;
 		this.combatStats = unitType.getCombatStats();
-		this.timeToHeal = unitType.getCombatStats().getHealSpeed();
+		this.timeToHeal = unitType.getCombatStats().getTicksToHeal();
 		this.isIdle = false;
 //		this.attackStyle = this.getType().getAttackStyles()
 		for(GameComponent c : unitType.getComponents()) {
@@ -935,7 +935,7 @@ public class Unit extends Thing implements Serializable {
 	}
 
 	public void resetTimeToHeal() {
-		timeToHeal = combatStats.getHealSpeed();
+		timeToHeal = combatStats.getTicksToHeal();
 	}
 
 	public boolean isIdle() {

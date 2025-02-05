@@ -5,6 +5,8 @@ import java.awt.event.*;
 import java.awt.image.*;
 import java.util.List;
 import java.util.concurrent.*;
+
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 
 import game.*;
@@ -111,8 +113,8 @@ public class GameView {
 //					System.out.println("screen loc: " + screenloc);
 					if (theSound.getTile() != null) {
 						int distance = theSound.getTile().getLocation().distanceTo(screenloc);
-						float volume = (float)(-1.5f * (float)(distance));
-						SoundManager.setVolume(theSound, volume);
+						float volume = (float)(-1.7f * (float)(distance));
+						SoundManager.setVolume(theSound, volume - 0.5f);
 //						System.out.println("volume: " + volume);
 //						System.out.println("distance to sound: " + distance);
 					}
@@ -123,6 +125,24 @@ public class GameView {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+				
+				
+//				Sound theMusic;
+//				try {
+//				    while ((theMusic = SoundManager.theMusicQueue.take()) != null) {
+//				        SoundManager.playSoundWithEnd(theMusic);
+//
+//				        // Wait until the sound finishes playing before moving to the next
+//				        Clip clip = SoundManager.getClip(theMusic);
+//				        if (clip != null) {
+//				            while (clip.isActive()) { // isActive() ensures it's really done
+//				                Thread.sleep(5000); // Small delay to avoid CPU overuse
+//				            }
+//				        }
+//				    }
+//				} catch (InterruptedException e) {
+//				    e.printStackTrace();
+//				}
 				
 			}
 			

@@ -49,11 +49,24 @@ public class AttackStyle {
 	public void addMinRange(int minRange) {
 		this.minRange += minRange;
 	}
-	public void addLifesteal(boolean lifesteal) {
-		this.lifesteal = lifesteal;
-	}
 	public void addCooldown(int cooldown) {
 		this.cooldown += cooldown;
+	}
+	
+	public void setDamage(int damage) {
+		this.damage = damage;
+	}
+	public void setRange(int range) {
+		this.range = range;
+	}
+	public void setMinRange(int minRange) {
+		this.minRange = minRange;
+	}
+	public void setLifesteal(boolean lifesteal) {
+		this.lifesteal = lifesteal;
+	}
+	public void setCooldown(int cooldown) {
+		this.cooldown = cooldown;
 	}
 	
 	public void mergeAttackStyle(AttackStyle other) {

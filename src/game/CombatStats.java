@@ -28,7 +28,7 @@ public class CombatStats implements Serializable {
 	public int getTicksToBuild() {
 		return ticksToBuild;
 	}
-	public int getHealSpeed() {
+	public int getTicksToHeal() {
 		return ticksToHeal;
 	}
 	
@@ -44,11 +44,25 @@ public class CombatStats implements Serializable {
 	public void addTicksToHeal(int ticks) {
 		this.ticksToHeal += ticks;
 	}
+	
+	public void setHealth(int health) {
+		this.health = health;
+	}
+	public void setMoveSpeed(int speed) {
+		this.moveSpeed = speed;
+	}
+	public void setTicksToBuild(int ticks) {
+		this.ticksToBuild = ticks;
+	}
+	public void setTicksToHeal(int ticks) {
+		this.ticksToHeal = ticks;
+	}
+	
 	public void mergeCombatStats(CombatStats other) {
 		this.health += other.getHealth();
 		this.moveSpeed += other.getMoveSpeed();
 		this.ticksToBuild += other.getTicksToBuild();
-		this.ticksToHeal += other.getHealSpeed();
+		this.ticksToHeal += other.getTicksToHeal();
 	}
 	
 	@Override

@@ -238,7 +238,7 @@
 	{
 		"image":"Images/units/boat.png",
 		"cost":{"RUNITE_BAR":10,"WOOD":500,"FOOD":400},
-		"stats":{"movespeed":10,"buildtime":1000,"health":2000,"healspeed":400},
+		"stats":{"movespeed":20,"buildtime":1000,"health":2000,"healspeed":400},
 		"name":"BOAT",
 		"attackstyles":[
 			{"damage":200, "cooldown":100, "range":6, "minrange":1, "projectile":"ROCK"}
@@ -249,7 +249,7 @@
 	},
 	{
 		"image":"Images/units/deer.png",
-		"stats":{"movespeed":5,"buildtime":0,"health":200,"healspeed":200},
+		"stats":{"movespeed":10,"buildtime":0,"health":200,"healspeed":200},
 		"name":"DEER",
 		"attackstyles":[
 			{"damage":5, "cooldown":40, "range":1}
@@ -259,7 +259,7 @@
 	},
 	{
 		"image":"Images/units/horse.png",
-		"stats":{"movespeed":5,"buildtime":0,"health":200,"healspeed":200},
+		"stats":{"movespeed":10,"buildtime":0,"health":200,"healspeed":200},
 		"name":"HORSE",
 		"attackstyles":[
 			{"damage":5, "cooldown":40, "range":1}
@@ -299,7 +299,7 @@
 	},
 	{
 		"image":"Images/units/fish2.png",
-		"stats":{"movespeed":5,"buildtime":0,"health":10,"healspeed":200},
+		"stats":{"movespeed":10,"buildtime":0,"health":10,"healspeed":200},
 		"name":"FISH",
 		"attackstyles":[
 			{"damage":1, "cooldown":40, "range":1}
