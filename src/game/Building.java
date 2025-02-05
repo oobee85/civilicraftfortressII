@@ -23,6 +23,7 @@ public class Building extends Thing implements Serializable {
 	private double remainingEffort;
 	private double totalEffort;
 	private LinkedList<Unit> producingUnitList = new LinkedList<Unit>(); // TODO need to review if this works over network
+	private LinkedList<Item> producingItemList = new LinkedList<Item>();
 	private double culture;
 	private transient Tile spawnLocation;
 	private transient double timeToHarvest;
@@ -116,14 +117,9 @@ public class Building extends Thing implements Serializable {
 				}
 			}
 		}
-		
-
 		if(!isBuilt()) {
 			return;
 		}
-		
-		
-
 		// building produces units
 		if(currentProducingUnit == null && !producingUnitList.isEmpty()) {
 			currentProducingUnit = producingUnitList.peek();
@@ -268,6 +264,12 @@ public class Building extends Thing implements Serializable {
 	
 	public LinkedList<Unit> getProducingUnit() {
 		return producingUnitList;
+	}
+	public void addProducingItem(Item producingItem) {
+		this.producingItemList.add(producingItem);
+	}
+	public LinkedList<Item> getProducingItem() {
+		return producingItemList;
 	}
 	public double getCulture() {
 		return culture;

@@ -8,6 +8,7 @@ import org.json.*;
 import game.*;
 import game.ai.*;
 import game.components.*;
+import sounds.Sound;
 import sounds.SoundEffect;
 import sounds.SoundManager;
 import world.PlantType;
@@ -20,6 +21,12 @@ public class Loader {
 		System.out.println("Loading Sounds");
 		for(SoundEffect sound : SoundEffect.values()) {
 			SoundManager.loadSound(sound);
+			if(sound.getIsMusic()) {
+				SoundManager.theMusicEffectQueue.add(sound);
+				Sound theMusic = new Sound(sound, null);
+				SoundManager.theMusicQueue.add(theMusic);
+			}
+			
 		}
 	}
 	

@@ -1111,6 +1111,8 @@ public class Game {
 			thingsToPlace.add(Game.plantTypeMap.get("BERRY"));
 			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
 			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
+			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
+			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
 			if (easymode || Settings.SPAWN_EXTRA) {
 				addResources(newFaction);
 				thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
