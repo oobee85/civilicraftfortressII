@@ -70,13 +70,15 @@ public class ClientGUI {
 	private int RESEARCH_TAB;
 	private int WORKER_TAB;
 	private int PRODUCE_UNIT_TAB;
-	private int CRAFTING_TAB;
+	private int CRAFTING_TAB; // for crafting upgrades manually
+	private int CRAFTING_FOCUS_TAB; // for selecting crafting for autocrafters
 	private int SPAWN_UNITS_TAB;
 	private int DEBUG_TAB;
 	private ResearchView researchView;
 	private WorkerView workerView;
 	private ProduceUnitView produceUnitView;
 	private CraftingView craftingView;
+	private CraftingFocusView craftingFocusView;
 	
 	public ClientGUI() {
 		rootPanel = new JPanel();
@@ -387,6 +389,12 @@ public class ClientGUI {
 		CRAFTING_TAB = tabbedPane.getTabCount();
 		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, craftingView.getRootPanel(), "Craft items", CRAFTING_TAB);
 		
+		craftingFocusView = new CraftingFocusView(gameView);
+		CRAFTING_FOCUS_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, craftingFocusView.getRootPanel(), "Select Items to focus", CRAFTING_FOCUS_TAB);
+		
+		
+		
 		if(Settings.DEBUG) {
 			SpawnUnitsView spawnUnitsView = new SpawnUnitsView(gameView);
 			SPAWN_UNITS_TAB = tabbedPane.getTabCount();
@@ -478,13 +486,22 @@ public class ClientGUI {
 		}
 	}
 
-	public void manageBlacksmithTab(boolean enabled) {
+	public void manageCraftUpgradesTab(boolean enabled) {
 		if (enabled == false && tabbedPane.getSelectedIndex() == CRAFTING_TAB) {
 			tabbedPane.setSelectedIndex(0);
 		} else if (enabled == true) {
 			tabbedPane.setSelectedIndex(CRAFTING_TAB);
 		}
 		tabbedPane.setEnabledAt(CRAFTING_TAB, true);
+	}
+	
+	public void manageCraftingFocusTab(boolean enabled) {
+		if (enabled == false && tabbedPane.getSelectedIndex() == CRAFTING_FOCUS_TAB) {
+			tabbedPane.setSelectedIndex(0);
+		} else if (enabled == true) {
+			tabbedPane.setSelectedIndex(CRAFTING_FOCUS_TAB);
+		}
+		tabbedPane.setEnabledAt(CRAFTING_FOCUS_TAB, true);
 	}
 
 	public void changedFaction(Faction faction) {
@@ -497,7 +514,11 @@ public class ClientGUI {
 			manageProduceUnitTab(selected);
 		}
 		if (building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
-			manageBlacksmithTab(selected);
+			manageCraftUpgradesTab(selected);
+		}
+		if (building.getType() == Game.buildingTypeMap.get("SMITHY") || building.getType() == Game.buildingTypeMap.get("QUARRY")
+				|| building.getType() == Game.buildingTypeMap.get("SAWMILL")) {
+			manageCraftingFocusTab(selected);
 		}
 		InfoPanel infoPanel = new BuildingInfoPanel(building);
 		getInfoPanelView().switchInfoPanel(infoPanel);

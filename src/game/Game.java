@@ -805,12 +805,12 @@ public class Game {
 		}
 		
 		final ItemType[] forgeItems = new ItemType[] { ItemType.BRONZE_BAR, ItemType.IRON_BAR, ItemType.GOLD_BAR,
-				ItemType.MITHRIL_BAR, ItemType.ADAMANTITE_BAR, ItemType.RUNITE_BAR, ItemType.TITANIUM_BAR};
-		
+				ItemType.MITHRIL_BAR, ItemType.ADAMANTITE_BAR, ItemType.RUNITE_BAR, ItemType.TITANIUM_BAR
+				};
 		final ItemType[] lumberItems = new ItemType[] { ItemType.SWORD, ItemType.BOW, ItemType.SHIELD,
 				};
 		final ItemType[] stoneItems = new ItemType[] { ItemType.BRICK,
-		};
+				};
 		
 		List<ItemType> canCraft = new ArrayList<>();
 		if(building.getType() == buildingTypeMap.get("SMITHY")) {
