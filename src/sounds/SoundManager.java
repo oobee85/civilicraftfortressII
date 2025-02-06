@@ -98,7 +98,7 @@ public class SoundManager {
 		clip.start();
 	}
 	
-	// sound, -5.0f [dB]
+	// sound, -5.0f [dB]	// 0 - 1
 	public static void setVolume(Sound sound, float volume) {
 	    Clip clip = sounds.get(sound.getSoundEffect());
 	    try {
@@ -107,10 +107,14 @@ public class SoundManager {
 			
 			e.printStackTrace();
 		}
+	    float volumedB = (float) (20 * Math.log(volume/0.5));
+	    volumedB *= 2;
+	    
 	    if (clip != null && clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
 	        FloatControl volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-	        volume = Math.max(volumeControl.getMinimum(), Math.min(volume, volumeControl.getMaximum())); // Clamp value
-	        volumeControl.setValue(volume);
+	        volumedB = Math.max(volumeControl.getMinimum(), Math.min(volumedB, volumeControl.getMaximum())); // Clamp value
+	        
+	        volumeControl.setValue(volumedB);
 	    } else {
 	        System.err.println("Volume control not supported for sound: " + sound);
 	    }

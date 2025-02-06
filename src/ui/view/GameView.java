@@ -113,8 +113,11 @@ public class GameView {
 //					System.out.println("screen loc: " + screenloc);
 					if (theSound.getTile() != null) {
 						int distance = theSound.getTile().getLocation().distanceTo(screenloc);
-						float volume = (float)(-1.7f * (float)(distance));
-						SoundManager.setVolume(theSound, volume - 1f);
+						float volume = 1 - (float)(distance)/20;
+						if(distance >= 20) {
+							volume = 0;
+						}
+						SoundManager.setVolume(theSound, (float)(volume * 0.5));
 //						System.out.println("volume: " + volume);
 //						System.out.println("distance to sound: " + distance);
 					}
@@ -137,7 +140,8 @@ public class GameView {
 						if(World.ticks > 0) {
 							theMusic = SoundManager.theMusicQueue.take();
 							if(theMusic != null) {
-								SoundManager.setVolume(theMusic, -5f);
+//								SoundManager.setVolume(theMusic, -7f);
+								SoundManager.setVolume(theMusic, 0.5f);
 								SoundManager.playSoundWithEnd(theMusic, semaphore);
 								semaphore.acquire();
 							}
@@ -286,9 +290,10 @@ public class GameView {
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 					deselectEverything();
-				} else if (e.getKeyCode() == KeyEvent.VK_S) {
+				} else if (e.getKeyCode() == KeyEvent.VK_H) {
 					unitStop();
-				} else if (e.getKeyCode() == KeyEvent.VK_G) {
+				} 
+				else if (e.getKeyCode() == KeyEvent.VK_G) {
 					state.leftClickAction = LeftClickAction.GUARD;
 				} else if (e.getKeyCode() == KeyEvent.VK_M) {
 					setBuildingToPlan(Game.buildingTypeMap.get("MINE"));
@@ -300,7 +305,7 @@ public class GameView {
 					setBuildingToPlan(Game.buildingTypeMap.get("BARRACKS"));
 				} else if (e.getKeyCode() == KeyEvent.VK_D) {
 					state.leftClickAction = LeftClickAction.WANDER_AROUND;
-				} else if (e.getKeyCode() == KeyEvent.VK_H) {
+				} else if (e.getKeyCode() == KeyEvent.VK_S) {
 					deselectHalf();
 				}
 			}
@@ -330,6 +335,9 @@ public class GameView {
 				commandInterface.stop((Unit) thing);
 			}
 		}
+	}
+	private void unitSplit() {
+		
 	}
 
 	public void toggleAutoBuild() {

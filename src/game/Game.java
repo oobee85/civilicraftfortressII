@@ -777,8 +777,6 @@ public class Game {
 			
 			if(building.getType().isCrafting() && building.readyToProduce()) {
 				haveBuildingProduceItem(building);
-				
-				
 			}
 			
 
@@ -807,15 +805,15 @@ public class Game {
 		}
 		
 		final ItemType[] forgeItems = new ItemType[] { ItemType.BRONZE_BAR, ItemType.IRON_BAR, ItemType.GOLD_BAR,
-				ItemType.MITHRIL_BAR, ItemType.ADAMANTITE_BAR, ItemType.RUNITE_BAR, ItemType.TITANIUM_BAR, ItemType.BRICK};
+				ItemType.MITHRIL_BAR, ItemType.ADAMANTITE_BAR, ItemType.RUNITE_BAR, ItemType.TITANIUM_BAR};
 		
 		final ItemType[] lumberItems = new ItemType[] { ItemType.SWORD, ItemType.BOW, ItemType.SHIELD,
 				};
+		final ItemType[] stoneItems = new ItemType[] { ItemType.BRICK,
+		};
 		
 		List<ItemType> canCraft = new ArrayList<>();
-		
-		// if building is smithy, craft from forgeItems
-		if(building.getType().isSmithy()) {
+		if(building.getType() == buildingTypeMap.get("SMITHY")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : forgeItems) {
 				if (building.getFaction().canAfford(item, 1) == true) {
@@ -823,11 +821,17 @@ public class Game {
 				}
 			}
 		}
-		
-		// if building is lumberYard, craft from lumberItems
-		if(building.getType().isLumber()) {
+		if(building.getType() == buildingTypeMap.get("SAWMILL")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : lumberItems) {
+				if (building.getFaction().canAfford(item, 1) == true) {
+					canCraft.add(item);
+				}
+			}
+		}
+		if(building.getType() == buildingTypeMap.get("QUARRY")) {
+			// go through craftable bars and add affordable ones to a new list
+			for (ItemType item : stoneItems) {
 				if (building.getFaction().canAfford(item, 1) == true) {
 					canCraft.add(item);
 				}
