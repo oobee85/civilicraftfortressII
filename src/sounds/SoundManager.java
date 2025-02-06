@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 import javax.sound.sampled.*;
 
@@ -48,23 +49,23 @@ public class SoundManager {
 			return false;
 		}
 		
-		return clip.isActive();
+		return clip.isRunning();
 	}
 	public static Clip getClip(Sound sound) {
 		return sounds.get(sound.getSoundEffect());
 	}
 	
-	public static void playSoundWithEnd(Sound sound) {
+	public static void playSoundWithEnd(Sound sound, Semaphore semaphore) {
 		Clip clip = sounds.get(sound.getSoundEffect());
 		if(clip == null) {
 			System.err.println("playSound() clip is null");
 			return;
 		}
-		
+		semaphore.drainPermits();
 		clip.addLineListener(event -> {
             if (event.getType() == LineEvent.Type.STOP) {
 //                System.out.println("Sound finished playing.");
-            	
+            	semaphore.release();
                 clip.close(); // Close the clip when done
             }
         });

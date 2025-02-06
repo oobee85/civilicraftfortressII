@@ -125,29 +125,27 @@ public class GameView {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				
-				
-//				Sound theMusic;
-//				try {
-//				    while ((theMusic = SoundManager.theMusicQueue.take()) != null) {
-//				        SoundManager.playSoundWithEnd(theMusic);
-//
-//				        // Wait until the sound finishes playing before moving to the next
-//				        Clip clip = SoundManager.getClip(theMusic);
-//				        if (clip != null) {
-//				            while (clip.isActive()) { // isActive() ensures it's really done
-//				                Thread.sleep(5000); // Small delay to avoid CPU overuse
-//				            }
-//				        }
-//				    }
-//				} catch (InterruptedException e) {
-//				    e.printStackTrace();
-//				}
-				
 			}
-			
-			});
+		});
 		thread.start();
+		Thread threadMusic = new Thread(() -> {
+				Sound theMusic;
+				try {
+					Semaphore semaphore = new Semaphore(0);
+					while(true) {
+						theMusic = SoundManager.theMusicQueue.take();
+						if(theMusic != null) {
+							SoundManager.playSoundWithEnd(theMusic, semaphore);
+							semaphore.acquire();
+						}
+					}
+			
+				} catch (InterruptedException e) {
+				    e.printStackTrace();
+				}
+			
+		});
+		threadMusic.start();
 		
 		
 		MouseWheelListener mouseWheelListener = new MouseWheelListener() {
