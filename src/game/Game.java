@@ -842,11 +842,11 @@ public class Game {
 			
 			// decide what sound to play
 			if(building.getType().isSmithy()) {
-				Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile());
+				Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile(), 1f);
 				SoundManager.theSoundQueue.add(sound);
 			}
 			if(building.getType().isLumber()) {
-				Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile());
+				Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile(), 1f);
 				SoundManager.theSoundQueue.add(sound);
 			}
 		}
@@ -870,7 +870,7 @@ public class Game {
 			ItemType crafting = canCraft.get((int) (Math.random() * canCraft.size()));
 			building.getFaction().craftItem(crafting, 1);
 			building.resetTimeToProduce();
-			Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile());
+			Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile(), 1f);
 			SoundManager.theSoundQueue.add(sound);
 		}
 
@@ -1341,7 +1341,7 @@ public class Game {
 		if (thing == null) {
 			return;
 		}
-		Sound sound = new Sound(SoundEffect.EXPLOSION, null, thing.getTile());
+		Sound sound = new Sound(SoundEffect.EXPLOSION, null, thing.getTile(), 1f);
 		SoundManager.theSoundQueue.add(sound);
 		world.spawnExplosionCircle(thing.getTile(), 1, 1000000);
 	}
@@ -1429,7 +1429,7 @@ public class Game {
 			}
 
 			if (checkForAdjacentMines(building, false) == true) {
-				Sound sound = new Sound(SoundEffect.TOODEEP, null);
+				Sound sound = new Sound(SoundEffect.TOODEEP, null, 1f);
 				SoundManager.theSoundQueue.add(sound);
 			}
 			return building;

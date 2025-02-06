@@ -66,14 +66,14 @@ public class WorldData {
 				
 				if(building.isRemoved() == false) {
 					if(building.getType().isWoodConstruction()) {
-						Sound sound = new Sound(SoundEffect.BUILDING_WOOD_DEATH, null, building.getTile());
+						Sound sound = new Sound(SoundEffect.BUILDING_WOOD_DEATH, null, building.getTile(), 1f);
 						SoundManager.theSoundQueue.add(sound);
 					}else 
 					if(building.getType().isStoneConstruction()) {
-						Sound sound = new Sound(SoundEffect.BUILDING_STONE_DEATH, null, building.getTile());
+						Sound sound = new Sound(SoundEffect.BUILDING_STONE_DEATH, null, building.getTile(), 1f);
 						SoundManager.theSoundQueue.add(sound);
 					}else {
-						Sound sound = new Sound(SoundEffect.BUILDING_WOOD_DEATH, null, building.getTile());
+						Sound sound = new Sound(SoundEffect.BUILDING_WOOD_DEATH, null, building.getTile(), 1f);
 						SoundManager.theSoundQueue.add(sound);
 					}
 				}
@@ -108,7 +108,7 @@ public class WorldData {
 				addDeadThing(plant);
 				// removed is a similar thing to
 				if(plant.isRemoved() == false) {
-					Sound sound = new Sound(SoundEffect.DEATH_PLANT, null, plant.getTile());
+					Sound sound = new Sound(SoundEffect.DEATH_PLANT, null, plant.getTile(), 1f);
 					SoundManager.theSoundQueue.add(sound);
 				}
 				
@@ -155,7 +155,7 @@ public class WorldData {
 				}
 //				SoundManager.theSoundQueue.add(SoundEffect.DEATH);
 				if(unit.isRemoved() == false) {
-					Sound sound = new Sound(SoundEffect.DEATH_UNIT, unit.getFaction(), unit.getTile());
+					Sound sound = new Sound(SoundEffect.DEATH_UNIT, unit.getFaction(), unit.getTile(), 1f);
 					SoundManager.theSoundQueue.add(sound);
 				}
 				
@@ -190,14 +190,14 @@ public class WorldData {
 				projectile.getTile().removeProjectile(projectile);
 				
 				if(projectile.isHeavyProjectile()) {
-					Sound sound = new Sound(SoundEffect.PROJECTILE_IMPACT_HEAVY, null, projectile.getTile());
+					Sound sound = new Sound(SoundEffect.PROJECTILE_IMPACT_HEAVY, null, projectile.getTile(), 1f);
 					SoundManager.theSoundQueue.add(sound);
 				}else
 				if(projectile.isLightProjectile()) {
-					Sound sound = new Sound(SoundEffect.PROJECTILE_IMPACT_LIGHT, null, projectile.getTile());
+					Sound sound = new Sound(SoundEffect.PROJECTILE_IMPACT_LIGHT, null, projectile.getTile(), 1f);
 					SoundManager.theSoundQueue.add(sound);
 				}else {
-					Sound sound = new Sound(SoundEffect.PROJECTILE_IMPACT_GENERIC, null, projectile.getTile());
+					Sound sound = new Sound(SoundEffect.PROJECTILE_IMPACT_GENERIC, null, projectile.getTile(), 1f);
 					SoundManager.theSoundQueue.add(sound);
 				}
 			} else {
