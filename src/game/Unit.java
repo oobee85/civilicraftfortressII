@@ -176,18 +176,18 @@ public class Unit extends Thing implements Serializable {
 		timeToMove += penalty;
 		
 		if(this.getType().isWheeled()) {
-			Sound sound = new Sound(SoundEffect.MOVE_WHEELED, this.getFaction(), this.getTile());
+			Sound sound = new Sound(SoundEffect.MOVE_WHEELED, this.getFaction(), this.getTile(), 1f);
 			SoundManager.theSoundQueue.add(sound);
 		}else {
 			if(this.getTile().isPlantable()) {
-				Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile());
+				Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile(), 1f);
 				SoundManager.theSoundQueue.add(sound);
 			}else if(this.getTile().isRocky()) {
-				Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile());
+				Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile(), 1f);
 				SoundManager.theSoundQueue.add(sound);
 //				SoundManager.setVolume(sound, 5f);
 			}else {
-				Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile());
+				Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile(), 1f);
 				SoundManager.theSoundQueue.add(sound);
 			}
 		}
@@ -362,13 +362,13 @@ public class Unit extends Thing implements Serializable {
 			if(this.getType().hasCleave()) {
 				for(Unit unit : target.getTile().getUnits()) {
 					unit.takeDamage(damage, DamageType.PHYSICAL);
-					Sound sound = new Sound(SoundEffect.ATTACK_MELEE_HEAVY, null, this.getTile());
+					Sound sound = new Sound(SoundEffect.ATTACK_MELEE_HEAVY, null, this.getTile(), 1f);
 					SoundManager.theSoundQueue.add(sound);
 				}
 			} 
 			else {
 				target.takeDamage(damage, DamageType.PHYSICAL);
-				Sound sound = new Sound(SoundEffect.ATTACK_MELEE_GENERIC, null, this.getTile());
+				Sound sound = new Sound(SoundEffect.ATTACK_MELEE_GENERIC, null, this.getTile(), 1f);
 				SoundManager.theSoundQueue.add(sound);
 			}
 			

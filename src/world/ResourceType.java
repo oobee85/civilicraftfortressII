@@ -5,7 +5,7 @@ import utils.*;
 
 public enum ResourceType {
 	
-	CLAY (100 , 10, 5, false, 0, 200, ItemType.CLAY, true, 10, "FARMING",
+	CLAY (100 , 10, 5, false, 0, 100, ItemType.CLAY, true, 10, "FARMING",
 			new String[] {"Images/resources/clay_ore.png"}),
 	
 	//		    numVeins  isRare?   maxHeight

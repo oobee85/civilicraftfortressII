@@ -23,7 +23,7 @@ public class Loader {
 			SoundManager.loadSound(sound);
 			if(sound.getIsMusic()) {
 				SoundManager.theMusicEffectQueue.add(sound);
-				Sound theMusic = new Sound(sound, null);
+				Sound theMusic = new Sound(sound, null, 1f);
 				SoundManager.theMusicQueue.add(theMusic);
 			}
 			

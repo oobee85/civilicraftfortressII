@@ -340,7 +340,7 @@ public class Faction implements Externalizable {
 			if(researchTarget.isCompleted()) {
 				latestCompletedResearch = researchTarget;
 				researchTarget = null;
-				Sound sound = new Sound(SoundEffect.RESEARCHCOMPLETE, this);
+				Sound sound = new Sound(SoundEffect.RESEARCHCOMPLETE, this, 1f);
 				SoundManager.theSoundQueue.add(sound);
 			}
 		}

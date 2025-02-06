@@ -113,7 +113,7 @@ public class GameView {
 					if (theSound.getTile() != null) {
 						int distance = theSound.getTile().getLocation().distanceTo(screenloc);
 						float volume = (float)(-1.7f * (float)(distance));
-						SoundManager.setVolume(theSound, volume - 0.5f);
+						SoundManager.setVolume(theSound, volume - 1f);
 //						System.out.println("volume: " + volume);
 //						System.out.println("distance to sound: " + distance);
 					}
@@ -127,16 +127,21 @@ public class GameView {
 			}
 		});
 		thread.start();
+		
 		Thread threadMusic = new Thread(() -> {
 				Sound theMusic;
 				try {
 					Semaphore semaphore = new Semaphore(0);
 					while(true) {
-						theMusic = SoundManager.theMusicQueue.take();
-						if(theMusic != null) {
-							SoundManager.playSoundWithEnd(theMusic, semaphore);
-							semaphore.acquire();
+						if(World.ticks > 0) {
+							theMusic = SoundManager.theMusicQueue.take();
+							if(theMusic != null) {
+								SoundManager.setVolume(theMusic, -5f);
+								SoundManager.playSoundWithEnd(theMusic, semaphore);
+								semaphore.acquire();
+							}
 						}
+						
 					}
 			
 				} catch (InterruptedException e) {
@@ -384,7 +389,7 @@ public class GameView {
 				if (thing instanceof Unit) {
 					Unit unit = (Unit) thing;
 					plannedBuilding = commandInterface.planBuilding(unit, tile, !shiftDown, state.selectedBuildingToPlan);
-					Sound sound = new Sound(SoundEffect.BUILDINGPLANNED, unit.getFaction(), tile);
+					Sound sound = new Sound(SoundEffect.BUILDINGPLANNED, unit.getFaction(), tile, 1f);
 					SoundManager.theSoundQueue.add(sound);
 				}
 				

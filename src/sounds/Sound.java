@@ -12,13 +12,13 @@ public class Sound {
 	private boolean isMusic;
 	
 
-	public Sound(SoundEffect sound, Faction faction) {
+	public Sound(SoundEffect sound, Faction faction, float baseVolume) {
 		this.sound = sound;
 		this.faction = faction;
 		this.tile = null;
 		this.isMusic = sound.getIsMusic();
 	}
-	public Sound(SoundEffect sound, Faction faction, Tile tile) {
+	public Sound(SoundEffect sound, Faction faction, Tile tile, float baseVolume) {
 		this.sound = sound;
 		this.faction = faction;
 		this.tile = tile;

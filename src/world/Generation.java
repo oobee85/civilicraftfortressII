@@ -318,14 +318,18 @@ public class Generation {
 				
 				// if tile cant support ore and the resource isnt an ore
 				if(!tile.canOre() && resource == ResourceType.CLAY) {
-					ArrayList<Terrain> terrainList = new ArrayList<Terrain>();
-					terrainList.add(Terrain.DIRT);
-					terrainList.add(Terrain.GRASS);
-					makeResourceVein(tile, resource, resource.getVeinSize(), rand, terrainList);
-					if(--numVeins <= 0) {
-						break;
+					// if the tile height is within range of the spawn height
+					if(tile.getHeight() >= resource.getMinHeight() && tile.getHeight() <= resource.getMaxHeight()) {
+						ArrayList<Terrain> terrainList = new ArrayList<Terrain>();
+						terrainList.add(Terrain.DIRT);
+						terrainList.add(Terrain.GRASS);
+						makeResourceVein(tile, resource, resource.getVeinSize(), rand, terrainList);
+						if(--numVeins <= 0) {
+							break;
+						}
+						continue;
 					}
-					continue;
+					
 				}
 				// if tile can support ore and resource is ore
 				if(tile.canOre() && resource.isOre()) {
