@@ -1,6 +1,12 @@
 package ui;
 
-public enum LeftClickAction {
+import javax.swing.Icon;
 
-	NONE, SPAWN_THING, PLAN_BUILDING, ATTACK, WEATHER, PRESSURE, SET_TERRITORY, WANDER_AROUND, GUARD;
+public enum LeftClickAction {
+	NONE, SPAWN_THING, PLAN_BUILDING, MOVE, ATTACK, WEATHER, PRESSURE, SET_TERRITORY, WANDER_AROUND, GUARD;
+	
+//	final Icon icon;
+//	private LeftClickAction() {
+//		
+//	}
 }

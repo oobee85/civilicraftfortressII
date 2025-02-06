@@ -1,6 +1,7 @@
 package networking.client;
 
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.net.*;
 
 import javax.swing.*;
@@ -11,8 +12,11 @@ import game.*;
 import networking.message.*;
 import networking.server.*;
 import ui.*;
+import ui.infopanels.*;
 import ui.view.*;
 import utils.*;
+import world.Plant;
+
 import static ui.KUIConstants.MAIN_MENU_BUTTON_SIZE;
 
 public class ClientGUI {
@@ -56,9 +60,12 @@ public class ClientGUI {
 	private JButton startGameButton;
 
 	private GameView gameView;
-	private GameViewOverlay gameViewOverlay;
+	private SelectedThingsView gameViewOverlay;
+	private ResourceView resourceView;
 	private InfoPanelView infoPanelView;
 
+	private JPanel actionsParentPanel;
+	private ActionsView actionsView;
 	private JTabbedPane tabbedPane;
 	private int RESEARCH_TAB;
 	private int WORKER_TAB;
@@ -93,6 +100,11 @@ public class ClientGUI {
 		sidePanel.setLayout(new BorderLayout());
 		sidePanel.setFocusable(false);
 		sidePanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, 0));
+		
+		actionsParentPanel = new JPanel();
+		actionsParentPanel.setLayout(new BorderLayout());
+		actionsParentPanel.setFocusable(false);
+		actionsParentPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, 0));
 
 		ingamePanel.add(topPanel, BorderLayout.NORTH);
 		ingamePanel.add(sidePanel, BorderLayout.EAST);
@@ -334,8 +346,9 @@ public class ClientGUI {
 		if(gameView != null) {
 			ingamePanel.remove(gameView.getPanel());
 		}
-		gameViewOverlay = new GameViewOverlay(instance.getGUIController());
-		gameView = new GameView(instance, gameViewOverlay);
+		gameViewOverlay = new SelectedThingsView(instance.getGUIController());
+		resourceView = new ResourceView(instance.getGUIController());
+		gameView = new GameView(instance, gameViewOverlay, resourceView);
 		MinimapView minimapView = new MinimapView(gameView);
 		minimapView.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, ClientGUI.GUIWIDTH));
 		gameView.requestFocus();
@@ -351,7 +364,12 @@ public class ClientGUI {
 		tabbedPane = new JTabbedPane();
 		tabbedPane.setFocusable(false);
 		tabbedPane.setFont(KUIConstants.buttonFontSmall);
-		sidePanel.add(tabbedPane, BorderLayout.CENTER);
+		
+		actionsView = new ActionsView(getGameView());
+
+		actionsParentPanel.add(actionsView, BorderLayout.NORTH);
+		actionsParentPanel.add(tabbedPane, BorderLayout.CENTER);
+		sidePanel.add(actionsParentPanel, BorderLayout.CENTER);
 		
 		researchView = new ResearchView(gameView);
 		RESEARCH_TAB = tabbedPane.getTabCount();
@@ -402,8 +420,11 @@ public class ClientGUI {
 		return rootPanel;
 	}
 	
-	public GameViewOverlay getGameViewOverlay() {
+	public SelectedThingsView getGameViewOverlay() {
 		return gameViewOverlay;
+	}
+	public ResourceView getResourceView() {
+		return resourceView;
 	}
 	public GameView getGameView() {
 		return gameView;
@@ -464,5 +485,48 @@ public class ClientGUI {
 			tabbedPane.setSelectedIndex(CRAFTING_TAB);
 		}
 		tabbedPane.setEnabledAt(CRAFTING_TAB, true);
+	}
+
+	public void changedFaction(Faction faction) {
+		getGameView().setFaction(faction);
+		getResourceView().changeFaction(faction);
+	}
+
+	public void selectedBuilding(Building building, boolean selected) {
+		if(building.getType().unitsCanProduceSet().size() > 0) {
+			manageProduceUnitTab(selected);
+		}
+		if (building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
+			manageBlacksmithTab(selected);
+		}
+		InfoPanel infoPanel = new BuildingInfoPanel(building);
+		getInfoPanelView().switchInfoPanel(infoPanel);
+		SwingUtilities.invokeLater(() -> {
+			infoPanel.addExplodeButton().addActionListener(e -> gameView.getGameInstance().explode(building));
+		});
+	}
+
+	public void selectedUnit(Unit unit, boolean selected) {
+		getGameViewOverlay().selectedUnit(unit, selected);
+		actionsView.selectedUnit(unit, selected);
+		
+		if(unit.isBuilder()) {
+			manageBuildingTab(selected);
+		}
+		if(selected) {
+			UnitInfoPanel infoPanel = new UnitInfoPanel(unit);
+			getInfoPanelView().switchInfoPanel(infoPanel);
+			SwingUtilities.invokeLater(() -> {
+				infoPanel.addExplodeButton().addActionListener(e -> gameView.getGameInstance().explode(unit));
+			});
+		}
+	}
+	
+	public void updateViews() {
+		getResourceView().updateItems();
+		getWorkerView().updateButtons();
+		getResearchView().updateButtons();
+		getProduceUnitView().updateButtons();
+		getCraftingView().updateButtons();
 	}
 }

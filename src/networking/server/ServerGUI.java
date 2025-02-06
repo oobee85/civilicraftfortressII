@@ -104,7 +104,7 @@ public class ServerGUI extends JPanel {
 		if(gameView != null) {
 			ingamePanel.remove(gameView.getPanel());
 		}
-		gameView = new GameView(instance, null);
+		gameView = new GameView(instance, null, null);
 		gameView.setCommandInterface(Utils.makeFunctionalCommandInterface(instance));
 		gameView.requestFocus();
 		

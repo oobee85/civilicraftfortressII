@@ -40,7 +40,6 @@ public class GameView {
 	public int tickOfLastClick = 0;
 	
 	private final FillingLayeredPane panel;
-	private final JPanel overlayPanel;
 	
 	private Drawer vanillaDrawer;
 	private Component drawingCanvas;
@@ -72,8 +71,7 @@ public class GameView {
 		public ConcurrentLinkedQueue<Thing> selectedThings = new ConcurrentLinkedQueue<Thing>();
 	}
 
-	public GameView(Game game, JPanel overlay) {
-		this.overlayPanel = overlay;
+	public GameView(Game game, JPanel selectedThingsPanel, JPanel resourceView) {
 		state = new GameViewState();
 		vanillaDrawer = new VanillaDrawer(game, state);
 		panel = new FillingLayeredPane();
@@ -82,8 +80,11 @@ public class GameView {
 		}
 		panel.setLayout(new BorderLayout());
 		panel.setBackground(Color.black);
-		if (overlayPanel != null) {
-			panel.add(overlayPanel, BorderLayout.SOUTH);
+		if (resourceView != null) {
+			panel.add(resourceView, BorderLayout.NORTH);
+		}
+		if (selectedThingsPanel != null) {
+			panel.add(selectedThingsPanel, BorderLayout.SOUTH);
 		}
 		
 		drawingCanvas = vanillaDrawer.getDrawingCanvas();
@@ -286,6 +287,10 @@ public class GameView {
 		vanillaDrawer.getDrawingCanvas().addMouseListener(mouseListener);
 		panel.addKeyListener(keyListener);
 	}
+	
+	public void setLeftClickAction(LeftClickAction action) {
+		state.leftClickAction = action;
+	}
 
 	public void setFaction(Faction faction) {
 		System.out.println("setting faction to " + faction);
@@ -376,6 +381,9 @@ public class GameView {
 		else if (state.leftClickAction == LeftClickAction.ATTACK) {
 			attackCommand(state.selectedThings, tile, shiftDown, true);
 		}
+		else if (state.leftClickAction == LeftClickAction.MOVE) {
+			moveCommand(state.selectedThings, tile, shiftDown);
+		}
 		else if (state.leftClickAction == LeftClickAction.WANDER_AROUND) {
 			wanderCommand(state.selectedThings, tile, shiftDown);
 		}
@@ -412,11 +420,11 @@ public class GameView {
 		}
 	}
 	
-	public void unitGuardCurrentTile() {
-		for (Thing thing : state.selectedThings) {
+	private void moveCommand(ConcurrentLinkedQueue<Thing> selectedThings, Tile tile, boolean shiftEnabled) {
+		for (Thing thing : selectedThings) {
 			if (thing instanceof Unit) {
 				Unit unit = (Unit) thing;
-				commandInterface.planAction(unit, PlannedAction.guardTile(unit.getTile()), !shiftDown);
+				commandInterface.planAction(unit, PlannedAction.moveTo(tile), !shiftEnabled);
 			}
 		}
 	}
@@ -936,12 +944,8 @@ public class GameView {
 	 *  scaled to (tile.x * tileSize), ((tile.y + hexOffset)*tileSize) 
 	 */
 	private void centerViewOnPixel(Position pixel) {
-		int overlayh = 0;
-		if (overlayPanel != null) {
-			overlayh = overlayPanel.getHeight();
-		}
-		Position halfScreenOffset = new Position(panel.getWidth() / 2, 
-		                                         (panel.getHeight() - overlayh) / 2);
+		Position halfScreenOffset = new Position(drawingCanvas.getWidth() / 2, 
+		                                         (drawingCanvas.getHeight()) / 2);
 		state.viewOffset = pixel.subtract(halfScreenOffset);
 		panel.repaint();
 	}

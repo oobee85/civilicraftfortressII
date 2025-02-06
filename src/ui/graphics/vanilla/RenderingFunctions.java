@@ -15,6 +15,9 @@ import world.liquid.LiquidType;
 
 public class RenderingFunctions {
 	private static final Image TARGET_IMAGE = Utils.loadImage("Images/interfaces/ivegotyouinmysights.png");
+	private static final Image ATTACK_CURSOR_ICON = Utils.loadImage("Images/interfaces/mouse_cursors/attack_icon.png");
+	private static final Image DEFEND_CURSOR_ICON = Utils.loadImage("Images/interfaces/mouse_cursors/defend_icon.png");
+	private static final Image MOVE_CURSOR_ICON = Utils.loadImage("Images/interfaces/mouse_cursors/move_icon.png");
 	private static final Image RALLY_POINT_IMAGE = Utils.loadImage("Images/interfaces/queuelocation.png");
 	private static final Image FLAG = Utils.loadImage("Images/interfaces/flag.png");
 	private static final Image BUILD_ICON = Utils.loadImage("Images/interfaces/building.gif");
@@ -31,11 +34,26 @@ public class RenderingFunctions {
 
 	private static final Font DAMAGE_FONT = new Font("Comic Sans MS", Font.BOLD, 14);
 
-	public static void drawTarget(RenderingState state, TileLoc tileLoc) {
+	public static void drawLeftClickCursor(RenderingState state, TileLoc tileLoc) {
+		Image cursorImage = TARGET_IMAGE;
+		switch (state.gameViewState.leftClickAction) {
+			case ATTACK:
+				cursorImage = ATTACK_CURSOR_ICON;
+				break;
+			case GUARD:
+				cursorImage = DEFEND_CURSOR_ICON;
+				break;
+			case MOVE:
+				cursorImage = MOVE_CURSOR_ICON;
+				break;
+			default:
+				return;
+		}
+		
 		Point drawAt = getDrawingCoords(tileLoc, state.tileSize);
 		int w = (int) (state.tileSize * 8 / 10);
 		int hi = (int) (state.tileSize * 8 / 10);
-		state.g.drawImage(TARGET_IMAGE, drawAt.x + state.tileSize * 1 / 10, drawAt.y + state.tileSize * 1 / 10, w, hi, null);
+		state.g.drawImage(cursorImage, drawAt.x + state.tileSize * 1 / 10, drawAt.y + state.tileSize * 1 / 10, w, hi, null);
 	}
 	
 	public static void drawAirFlow(RenderingState state, boolean arrows, Tile tile, Point drawat) {

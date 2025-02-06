@@ -44,30 +44,12 @@ public class Client {
 			@Override
 			public void updateGUI() {
 				if(gameInstance.world != null) {
-					clientGUI.getGameViewOverlay().updateItems();
-					clientGUI.getWorkerView().updateButtons();
-					clientGUI.getResearchView().updateButtons();
-					clientGUI.getProduceUnitView().updateButtons();
-					clientGUI.getCraftingView().updateButtons();
+					clientGUI.updateViews();
 				}
 			}
 			@Override
 			public void selectedUnit(Unit unit, boolean selected) {
-				clientGUI.getGameViewOverlay().selectedUnit(unit, selected);
-				if(unit.isBuilder()) {
-					clientGUI.manageBuildingTab(selected);
-				}
-				if(selected) {
-					UnitInfoPanel infoPanel = new UnitInfoPanel(unit);
-					switchInfoPanel(infoPanel);
-					SwingUtilities.invokeLater(() -> {
-						infoPanel.addExplodeButton().addActionListener(e -> gameInstance.explode(unit));
-						infoPanel.addButton("MakeRoads").addActionListener(e -> clientGUI.getGameView().workerRoad(Game.buildingTypeMap.get("STONE_ROAD")));
-						infoPanel.addButton("AutoBuild").addActionListener(e -> clientGUI.getGameView().toggleAutoBuild());
-						infoPanel.addButton("Guard").addActionListener(e -> clientGUI.getGameView().unitGuardCurrentTile());
-						
-					});
-				}
+				clientGUI.selectedUnit(unit, selected);
 			}
 			@Override
 			public void selectedPlant(Plant plant, boolean selected) {
@@ -75,25 +57,11 @@ public class Client {
 			}
 			@Override
 			public void selectedBuilding(Building building, boolean selected) {
-				
-//				SoundManager.PlaySound(SoundEffect.SELECT);
-				
-				if(building.getType().unitsCanProduceSet().size() > 0) {
-					clientGUI.manageProduceUnitTab(selected);
-				}
-				if (building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
-					clientGUI.manageBlacksmithTab(selected);
-				}
-				InfoPanel infoPanel = new BuildingInfoPanel(building);
-				switchInfoPanel(infoPanel);
-				SwingUtilities.invokeLater(() -> {
-					infoPanel.addExplodeButton().addActionListener(e -> gameInstance.explode(building));
-				});
+				clientGUI.selectedBuilding(building, selected);
 			}
 			@Override
 			public void changedFaction(Faction faction) {
-				clientGUI.getGameView().setFaction(faction);
-				clientGUI.getGameViewOverlay().changeFaction(faction);
+				clientGUI.changedFaction(faction);
 				System.out.println("CHANGED FACTION TO " + faction);
 			}
 			@Override
