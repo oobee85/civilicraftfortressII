@@ -31,6 +31,7 @@ public enum ItemType {
 	TITANIUM_ORE 	( "Images/itemicons/titanium_ore.png"),
 	
 	BRICK 	   	   ("QUARRY",  makeCosts(CLAY,50),						"Images/itemicons/brick.png"),
+	
 	BRONZE_BAR 	   ("SMITHY",  makeCosts(COPPER_ORE,5, SILVER_ORE, 5),	"Images/itemicons/bronze_bar.png"),
 	GOLD_BAR 	   ("SMITHY",  makeCosts(GOLD_ORE, 10), 				"Images/itemicons/gold_bar.png"),
 	IRON_BAR 	   ("SMITHY",  makeCosts(COAL,10, 	IRON_ORE,10),		"Images/itemicons/iron_bar.png"),
@@ -50,7 +51,7 @@ public enum ItemType {
 	BETTER_FORMATIONS   ("RESEARCH_LAB",  makeCosts(SHIELD,25),	"Images/interfaces/upgrades/better_formations.png", "Decreases ticks to move of all units by : 5"),
 	FASTER_TRAINING   	("RESEARCH_LAB",  makeCosts(FOOD,500),	"Images/interfaces/upgrades/faster_training.png", "Decreases the ticks to produce units by : 50"),
 	UNDYING_ARMY   		("RESEARCH_LAB",  makeCosts(FOOD,10000),"Images/interfaces/upgrades/undying_army.png", "Gives all units lifesteal"),
-	BROADHEADS   		("RESEARCH_LAB",  makeCosts(BOW, 25),"Images/interfaces/upgrades/broadheads.png", "Increases damage of all projectiles by : 25"),
+	BROADHEADS   		("RESEARCH_LAB",  makeCosts(BOW, 25),	"Images/interfaces/upgrades/broadheads.png", "Increases damage of all projectiles by : 25"),
 	
 	;
 	
