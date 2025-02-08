@@ -824,7 +824,7 @@ public class Game {
 					continue;
 				}
 				if (faction.canAfford(item.getCost()) == true) {
-					System.out.println("Adding item: " + item.name());
+//					System.out.println("Adding item: " + item.name());
 					canCraft.add(item);
 
 				}
@@ -835,11 +835,11 @@ public class Game {
 			for (ItemType item : lumberItems) {
 				// if the item is not in the craftItemFocus list
 				if(!faction.getToggleCraftItemFocusList().contains(item)) {
-					System.out.println("Item not focused: " + item.name());
+//					System.out.println("Item not focused: " + item.name());
 					continue;
 				}
 				if (faction.canAfford(item.getCost()) == true) {
-					System.out.println("Adding item: " + item.name());
+//					System.out.println("Adding item: " + item.name());
 					canCraft.add(item);
 				}
 			}
@@ -852,7 +852,7 @@ public class Game {
 					continue;
 				}
 				if (faction.canAfford(item.getCost()) == true) {
-					System.out.println("Adding item: " + item.name());
+//					System.out.println("Adding item: " + item.name());
 					canCraft.add(item);
 				}
 			}
@@ -866,7 +866,7 @@ public class Game {
 				
 				faction.craftItem(crafting, 1);
 				building.resetTimeToProduce();
-				System.out.println("crafting item: " + crafting.name());
+//				System.out.println("crafting item: " + crafting.name());
 				
 				// decide what sound to play
 				if(building.getType() == buildingTypeMap.get("SMITHY")) {

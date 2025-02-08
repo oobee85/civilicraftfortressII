@@ -520,6 +520,7 @@ public class Faction implements Externalizable {
 		return usesBuildings;
 	}
 	
+	
 	public boolean canAfford(HashMap<ItemType, Integer> cost) {
 		if(usesItems) {
 			for (Entry<ItemType, Integer> entry : cost.entrySet()) {
@@ -549,7 +550,7 @@ public class Faction implements Externalizable {
 		}
 		return true;
 	}
-	public boolean canAfford(ItemType type, int quantity) {
+	public boolean factionHasThisItem(ItemType type, int quantity) {
 		return !usesItems ||  this.inventory.getItemAmount(type) >= quantity;
 	}
 	
@@ -560,7 +561,8 @@ public class Faction implements Externalizable {
 			}
 		}
 	}
-	public void payCost(ItemType type, int quantity) {
+	
+	public void removeThisItemFromFaction(ItemType type, int quantity) {
 		if(usesItems) {
 			this.inventory.addItem(type, -quantity);
 		}

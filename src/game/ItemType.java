@@ -44,6 +44,8 @@ public enum ItemType {
 	SHIELD   ("SAWMILL",  makeCosts(WOOD,100),	"Images/itemicons/shield.png"),
 	BOW		 ("SAWMILL",  makeCosts(WOOD,100),	"Images/itemicons/bow.png"),
 	
+	BREAD	("GRANARY",  makeCosts(FOOD,100),	"Images/itemicons/bow.png"),
+	
 	BETTER_WEAPONS   	("RESEARCH_LAB",  makeCosts(SWORD,25),	"Images/interfaces/upgrades/better_weapons.png", "Increases attack damage of all units by : 25"),
 	IMPROVED_SPARRING   ("RESEARCH_LAB",  makeCosts(SWORD,25),	"Images/interfaces/upgrades/improved_sparring.png", "Decreases attack delay of all units by : 5"),
 	SHIELDS   			("RESEARCH_LAB",  makeCosts(SHIELD,25),	"Images/interfaces/upgrades/shields.png", "Increases health of all units by : 100"),

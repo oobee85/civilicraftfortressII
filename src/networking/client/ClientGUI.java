@@ -32,6 +32,9 @@ public class ClientGUI {
 	private static final ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/crafting.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon SPAWN_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/spawn_tab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon DEBUG_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/debugtab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon CRAFTING_FOCUS_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/focus.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+
+
 	
 	private static final Dimension CONNECTION_MENU_BUTTON_SIZE = new Dimension(120, 30);
 
@@ -391,7 +394,7 @@ public class ClientGUI {
 		
 		craftingFocusView = new CraftingFocusView(gameView);
 		CRAFTING_FOCUS_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, craftingFocusView.getRootPanel(), "Select Items to focus", CRAFTING_FOCUS_TAB);
+		tabbedPane.insertTab(null, CRAFTING_FOCUS_TAB_ICON, craftingFocusView.getRootPanel(), "Select Items to focus", CRAFTING_FOCUS_TAB);
 		
 		
 		

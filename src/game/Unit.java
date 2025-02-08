@@ -284,8 +284,8 @@ public class Unit extends Thing implements Serializable {
 		}
 		
 		if (World.ticks % ticksToCost == 0 && getFaction().usesItems()) {
-			if (getFaction().canAfford(ItemType.FOOD, 1)) {
-				getFaction().payCost(ItemType.FOOD, 1);
+			if (getFaction().factionHasThisItem(ItemType.FOOD, 1)) {
+				getFaction().removeThisItemFromFaction(ItemType.FOOD, 1);
 				starving = 0;
 			} else {
 				starving++;
