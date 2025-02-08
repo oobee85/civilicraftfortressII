@@ -775,8 +775,10 @@ public class Game {
 			}
 			building.tick(world, simulated);
 			
-			if(building.getType().isCrafting() && building.readyToProduce()) {
-				haveBuildingProduceItem(building);
+			if(World.ticks % 2 == 0) {
+				if(building.getType().isCrafting() && building.readyToProduce()) {
+					haveBuildingProduceItem(building);
+				}
 			}
 			
 
@@ -821,7 +823,8 @@ public class Game {
 				if(!faction.getToggleCraftItemFocusList().contains(item)) {
 					continue;
 				}
-				if (building.getFaction().canAfford(item, 1) == true) {
+				if (faction.canAfford(item.getCost()) == true) {
+					System.out.println("Adding item: " + item.name());
 					canCraft.add(item);
 
 				}
@@ -832,9 +835,11 @@ public class Game {
 			for (ItemType item : lumberItems) {
 				// if the item is not in the craftItemFocus list
 				if(!faction.getToggleCraftItemFocusList().contains(item)) {
+					System.out.println("Item not focused: " + item.name());
 					continue;
 				}
-				if (building.getFaction().canAfford(item, 1) == true) {
+				if (faction.canAfford(item.getCost()) == true) {
+					System.out.println("Adding item: " + item.name());
 					canCraft.add(item);
 				}
 			}
@@ -846,7 +851,8 @@ public class Game {
 				if(!faction.getToggleCraftItemFocusList().contains(item)) {
 					continue;
 				}
-				if (building.getFaction().canAfford(item, 1) == true) {
+				if (faction.canAfford(item.getCost()) == true) {
+					System.out.println("Adding item: " + item.name());
 					canCraft.add(item);
 				}
 			}
@@ -854,45 +860,55 @@ public class Game {
 		
 		// randomly select item from crafting list to craft
 		if (!canCraft.isEmpty()) {
-			ItemType crafting = canCraft.get((int) (Math.random() * canCraft.size()));
-			building.getFaction().craftItem(crafting, 1);
-			building.resetTimeToProduce();
 			
-			// decide what sound to play
-			if(building.getType().isSmithy()) {
-				Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile(), 1f);
-				SoundManager.theSoundQueue.add(sound);
-			}
-			if(building.getType().isLumber()) {
-				Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile(), 1f);
-				SoundManager.theSoundQueue.add(sound);
-			}
+			ItemType crafting = canCraft.get((int) (Math.random() * canCraft.size()));
+//			if(faction.canAfford(crafting, 1)) {
+				
+				faction.craftItem(crafting, 1);
+				building.resetTimeToProduce();
+				System.out.println("crafting item: " + crafting.name());
+				
+				// decide what sound to play
+				if(building.getType() == buildingTypeMap.get("SMITHY")) {
+					Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile(), 1f);
+					SoundManager.theSoundQueue.add(sound);
+				}
+				if(building.getType() == buildingTypeMap.get("QUARRY")) {
+					Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile(), 1f);
+					SoundManager.theSoundQueue.add(sound);
+				}
+				if(building.getType() == buildingTypeMap.get("SAWMILL")) {
+					Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile(), 1f);
+					SoundManager.theSoundQueue.add(sound);
+				}
+//			}
+			
 		}
 		
 	}
 	
-	private void haveSmithyProduceBar(Building building) {
-		// if building is smithy // if smithy is ready to produce
-
-		final ItemType[] craftableItems = new ItemType[] { ItemType.BRONZE_BAR, ItemType.IRON_BAR, ItemType.GOLD_BAR,
-				ItemType.MITHRIL_BAR, ItemType.ADAMANTITE_BAR, ItemType.RUNITE_BAR, ItemType.TITANIUM_BAR, ItemType.BRICK};
-		List<ItemType> canCraft = new ArrayList<>();
-
-		// go through craftable bars and add affordable ones to a new list
-		for (ItemType item : craftableItems) {
-			if (building.getFaction().canAfford(item, 1) == true) {
-				canCraft.add(item);
-			}
-		}
-		if (!canCraft.isEmpty()) {
-			ItemType crafting = canCraft.get((int) (Math.random() * canCraft.size()));
-			building.getFaction().craftItem(crafting, 1);
-			building.resetTimeToProduce();
-			Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile(), 1f);
-			SoundManager.theSoundQueue.add(sound);
-		}
-
-	}
+//	private void haveSmithyProduceBar(Building building) {
+//		// if building is smithy // if smithy is ready to produce
+//
+//		final ItemType[] craftableItems = new ItemType[] { ItemType.BRONZE_BAR, ItemType.IRON_BAR, ItemType.GOLD_BAR,
+//				ItemType.MITHRIL_BAR, ItemType.ADAMANTITE_BAR, ItemType.RUNITE_BAR, ItemType.TITANIUM_BAR, ItemType.BRICK};
+//		List<ItemType> canCraft = new ArrayList<>();
+//
+//		// go through craftable bars and add affordable ones to a new list
+//		for (ItemType item : craftableItems) {
+//			if (building.getFaction().canAfford(item, 1) == true) {
+//				canCraft.add(item);
+//			}
+//		}
+//		if (!canCraft.isEmpty()) {
+//			ItemType crafting = canCraft.get((int) (Math.random() * canCraft.size()));
+//			building.getFaction().craftItem(crafting, 1);
+//			building.resetTimeToProduce();
+//			Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile(), 1f);
+//			SoundManager.theSoundQueue.add(sound);
+//		}
+//
+//	}
 
 	public void flipTable() {
 		float minheight = Integer.MAX_VALUE;

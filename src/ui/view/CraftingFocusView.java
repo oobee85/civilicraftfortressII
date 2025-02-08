@@ -52,11 +52,11 @@ public class CraftingFocusView {
 //				gameView.getGameInstance().getGUIController().toggleCraftItemFocus(type);
 				
 				
-//				if(button.getEnabled() == true) {
-//					button.setEnabled(false);
-//				}else {
-//					button.setEnabled(true);
-//				}
+				if(button.isEnabled() == true) {
+					button.setEnabled(false);
+				}else {
+					button.setEnabled(true);
+				}
 //				button.setEnabled(!button.getEnabled());
 			});
 //			button.addRightClickActionListener(e -> {

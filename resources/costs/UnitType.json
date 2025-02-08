@@ -9,7 +9,7 @@
 		],
 		"name":"WORKER",
 		"inventory":{"maxstack":20},
-		"builds":["WALL_WOOD", "GATE_WOOD", "FARM", "MINE", "BARRACKS", "TRAP", "COLONY","STABLES", "WORKSHOP", "SMITHY",
+		"builds":["WALL_WOOD", "GATE_WOOD", "FARM", "MINE", "BARRACKS", "TRAP", "COLONY","STABLES", "WORKSHOP", "SMITHY", "QUARRY", "SAWMILL",
 				 "WATCHTOWER", "PORT", "WALL_STONE", "GATE_STONE", "WALL_BRICK", "GATE_BRICK", "GRANARY", "WINDMILL",
 				 "CASTLE", "NECROPOLIS", "RESEARCH_LAB", "STONE_ROAD", "BRICK_ROAD", "BRIDGE", "HELLFORGE"]
 	},
@@ -35,7 +35,7 @@
 			{"damage":0, "cooldown":60, "range":1}
 		],
 		"attributes":["caravan"],
-		"inventory":{"maxstack":600},
+		"inventory":{"maxstack":600}
 	},
 	{
 		"image":"Images/units/warrior.png",
@@ -175,7 +175,7 @@
 		"inventory":{"maxstack":5},
 		"attributes":["hostile"],
 		"research":"ANIMAL_HUSBANDRY",
-		"targeting":[{"type":"game.Unit"}],
+		"targeting":[{"type":"game.Unit"}]
 	},
 	{
 		"image":"Images/units/wizard.png",
@@ -183,14 +183,14 @@
 		"cost":{"FOOD":200, "GOLD_BAR": 25},
 		"name":"WIZARD",
 		"attackstyles":[
-			{"damage":100, "cooldown":50, "range":5, "minrange":1, "projectile":"WIZARD_BALL"},
+			{"damage":100, "cooldown":50, "range":5, "minrange":1, "projectile":"WIZARD_BALL"}
 		],
 		"research":"WITCHCRAFT",
 		"targeting":[
 			{"type":"game.Building"},
 			{"type":"game.Unit"}
 		],
-		"attributes":["hostile"],
+		"attributes":["hostile"]
 	},
 	{
 		"image":"Images/units/griffin.png",
@@ -220,7 +220,7 @@
 		"targeting":[
 			
 		],
-		"attributes":["healer"],
+		"attributes":["healer"]
 	},
 	{
 		"image":"Images/units/horsearcher.png",
@@ -275,7 +275,7 @@
 			{"damage":10, "cooldown":40, "range":1}
 		],
 		"attributes":["migratory"],
-		"loot":{"FOOD":100}
+		"loot":{"FOOD":400}
 	},
 	{
 		"image":"Images/units/sheep.png",
@@ -285,7 +285,7 @@
 			{"damage":5, "cooldown":40, "range":1}
 		],
 		"resistances": {"COLD": 0},
-		"loot":{"FOOD":100}
+		"loot":{"FOOD":200}
 	},
 	{
 		"image":"Images/units/cow.png",
@@ -295,7 +295,7 @@
 			{"damage":10, "cooldown":40, "range":1}
 		],
 		"attributes":["migratory"],
-		"loot":{"FOOD":100}
+		"loot":{"FOOD":500}
 	},
 	{
 		"image":"Images/units/fish2.png",
@@ -322,7 +322,7 @@
 		"targeting":[
 			{"type":"game.Unit"},
 			{"type":"game.Building"}
-		],
+		]
 	},
 	{
 		"image":"Images/units/vampire.png",
@@ -338,11 +338,11 @@
 			{"type":"game.Unit", "faction":"PLAYER"},
 			{"type":"game.Unit"}
 		],
-		"loot":{"IRON_BAR":10}
+		"loot":{"IRON_BAR":10, "MITHRIL_BAR":10}
 	},
 	{
 		"image":"Images/units/roc.png",
-		"stats":{"movespeed":10,"buildtime":300,"health":400,"healspeed":10},
+		"stats":{"movespeed":15,"buildtime":300,"health":400,"healspeed":10},
 		"name":"ROC",
 		"attackstyles":[
 			{"damage":40, "cooldown":40, "range":1}
@@ -367,7 +367,7 @@
 			{"type":"game.Unit", "faction":"PLAYER"}, 
 			{"type":"game.Building", "faction":"PLAYER"}
 		],
-		"loot":{"IRON_BAR":10, "BRONZE_BAR":10}
+		"loot":{"IRON_BAR":20, "BRONZE_BAR":20, "COAL":200}
 	},
 	{
 		"image":"Images/units/ent.png",
@@ -382,8 +382,9 @@
 		"resistances": {"COLD": 0},
 		"targeting":[
 			{"type":"SAWMILL"}, 
-			{"type":"game.Unit", "faction":"PLAYER"}, 
-			{"type":"game.Building", "faction":"PLAYER"}
+			{"type":"WALL_WOOD", "faction":"PLAYER"},
+			{"type":"game.Building", "faction":"PLAYER"},
+			{"type":"game.Unit", "faction":"PLAYER"}
 		],
 		"loot":{"WOOD":1000}
 	},
@@ -400,7 +401,7 @@
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"}
 		],
-		"loot":{"IRON_BAR":10}
+		"loot":{"IRON_BAR":20}
 	},
 	{
 		"image":"Images/units/lavagolem.png",
@@ -427,7 +428,7 @@
 		"research":"TRAPPING",
 		"attributes":["hostile"],
 		"resistances": {"COLD": 0},
-		"loot":{"FOOD":300, "BRONZE_BAR": 10}
+		"loot":{"FOOD":500, "BRONZE_BAR": 5}
 	},
 	{
 		"image":"Images/units/cyclops.png",
@@ -441,7 +442,7 @@
 		"targeting":[
 			{"type":"SNIPER"}
 		],
-		"loot":{"ADAMANTITE_BAR":10, "IRON_BAR":10, "BRONZE_BAR":10}
+		"loot":{"MITHRIL_BAR":10, "IRON_BAR":10, "BRONZE_BAR":10}
 	},
 	{
 		"image":"Images/units/skeleton.png",
@@ -476,7 +477,7 @@
 			{"type":"game.Unit", "faction":"PLAYER"},
 			{"type":"game.Unit"}
 		],
-		"loot":{"IRON_BAR":10, "MITHRIL_BAR":20, "BRONZE_BAR":10}
+		"loot":{"IRON_BAR":10, "MITHRIL_BAR":20, "BRONZE_BAR":10, "ADAMANTITE_BAR":10}
 	},
 	{
 		"image":"Images/units/flamelet.png",
@@ -594,7 +595,7 @@
 			{"type":"game.Building"}
 		],
 		"attributes":["hostile"],
-		"loot":{"WOOD":100}
+		"loot":{"WOOD":100, "IRON_BAR":1}
 	},
 	{
 		"image":"Images/units/infernal.gif",
@@ -637,11 +638,11 @@
 		"stats":{"movespeed":20,"buildtime":300,"health":100,"healspeed":50},
 		"name":"SCORPION",
 		"attackstyles":[
-			{"damage":10, "cooldown":30, "range":1}
+			{"damage":15, "cooldown":30, "range":1}
 		],
 		"inventory":{"maxstack":1},
 		"attributes":["hostile"],
-		"loot":{"STONE":50},
+		"loot":{"STONE":50, "BRONZE_BAR":2},
 		"builds":["SCORPION_DEN"]
 	}
 ]

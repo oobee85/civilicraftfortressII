@@ -184,7 +184,7 @@ public class Faction implements Externalizable {
 			this.upgradedCombatStats.addHealth(100);
 		}
 		if(itemType == ItemType.MEDICINE) {
-			this.upgradedCombatStats.addTicksToHeal(-25);
+			this.upgradedCombatStats.addTicksToHeal(-10);
 			
 		}
 		if(itemType == ItemType.BETTER_FORMATIONS) {

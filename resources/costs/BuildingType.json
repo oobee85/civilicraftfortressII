@@ -44,49 +44,21 @@
 		"effort_to_produce_harvest":50,
 		"effort_to_produce_item":-1
 	},
+	
 	{
-		"name":"SAWMILL",
-		"info":"Produces more complicated wooden items.",
-		"image":"Images/buildings/sawmill.gif",
-		"vision":10,
-		"cost":{"WOOD":400, "STONE":400},
-		"culture":0.1,
-		"attributes":["wood", "crafting"],
-		"research":"FARMING",
-		"health":1000,
-		"effort_to_build":1000,
-		"effort_to_produce_harvest":-1,
-		"effort_to_produce_item":300
-		
-	},
-	{
-		"name":"QUARRY",
-		"info":"Workers can mine ores near here",
-		"image":"Images/buildings/quarry.png",
-		"vision":10,
-		"cost":{"WOOD":400, "STONE":400},
-		"culture":0.1,
-		"attributes":["crafting", "stone"],
-		"inventory":{"maxstack":500},
-		"research":"FARMING",
-		"health":1000,
-		"effort_to_build":1000,
-		"effort_to_produce_harvest":-1,
-		"effort_to_produce_item":300
-	},
-	{
-		"name":"SMITHY",
-		"info":"Turns ore and other resources into refined products.",
-		"image":"Images/buildings/blacksmith.gif",
+		"name":"TRAP",
+		"info":"Trap animals to collect resources",
+		"image":"Images/buildings/trap.png",
 		"vision":1,
-		"cost":{"WOOD":100, "STONE":100},
-		"culture":0.5,
-		"health":1000,
-		"effort_to_build":1000,
-		"effort_to_produce_item":300,
+		"cost":{"WOOD":100},
+		"culture":0.1,
+		"inventory":{"maxstack":50},
+		"attributes":["trap", "wood"],
+		"research":"FARMING",
+		"health":100,
+		"effort_to_build":200,
 		"effort_to_produce_harvest":-1,
-		"attributes":["smithy", "stone", "crafting"],
-		"research":"FARMING"
+		"effort_to_produce_item":-1
 	},
 	{
 		"name":"COLONY",
@@ -104,6 +76,7 @@
 		"effort_to_produce_item":-1
 		
 	},
+	
 	{
 		"name":"BARRACKS",
 		"info":"Produces basic combat units",
@@ -118,6 +91,22 @@
 		"effort_to_build":500,
 		"effort_to_produce_harvest":-1,
 		"effort_to_produce_item":-1
+	},
+	
+	{
+		"name":"WORKSHOP",
+		"info":"Produces advanced combat units",
+		"image":"Images/buildings/workshop.png",
+		"vision":1,
+		"cost":{"WOOD":200, "STONE":200, "IRON_BAR":10},
+		"buildsunits":["LONGBOWMAN","CATAPULT","TREBUCHET", "SNIPER", "WIZARD"],
+		"attributes":["wood"],
+		"culture":0.5,
+		"health":2000,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":-1,
+		"effort_to_build":500,
+		"research":"MATHEMATICS"
 	},
 	{
 		"name":"STABLES",
@@ -150,20 +139,51 @@
 		"effort_to_produce_harvest":-1,
 		"effort_to_produce_item":-1
 	},
+	
 	{
-		"name":"TRAP",
-		"info":"Trap animals to collect resources",
-		"image":"Images/buildings/trap.png",
+		"name":"SMITHY",
+		"info":"Turns ore and other resources into refined products.",
+		"image":"Images/buildings/blacksmith.gif",
 		"vision":1,
-		"cost":{"WOOD":100},
-		"culture":0.1,
-		"inventory":{"maxstack":50},
-		"attributes":["trap", "wood"],
-		"research":"FARMING",
-		"health":100,
-		"effort_to_build":200,
+		"cost":{"WOOD":100, "STONE":100},
+		"culture":0.5,
+		"health":1000,
+		"effort_to_build":1000,
+		"effort_to_produce_item":300,
 		"effort_to_produce_harvest":-1,
-		"effort_to_produce_item":-1
+		"attributes":["smithy", "stone", "crafting"],
+		"research":"FARMING"
+	},
+	
+	{
+		"name":"SAWMILL",
+		"info":"Produces more complicated wooden items.",
+		"image":"Images/buildings/sawmill.gif",
+		"vision":10,
+		"cost":{"WOOD":400, "STONE":400},
+		"culture":0.1,
+		"attributes":["wood", "crafting"],
+		"research":"FARMING",
+		"health":1000,
+		"effort_to_build":1000,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":300
+		
+	},
+	{
+		"name":"QUARRY",
+		"info":"Workers can mine ores near here",
+		"image":"Images/buildings/quarry.png",
+		"vision":10,
+		"cost":{"WOOD":400, "STONE":400},
+		"culture":0.1,
+		"attributes":["crafting", "stone"],
+		"inventory":{"maxstack":500},
+		"research":"FARMING",
+		"health":1000,
+		"effort_to_build":1000,
+		"effort_to_produce_harvest":-1,
+		"effort_to_produce_item":300
 	},
 	{
 		"name":"GRANARY",
@@ -274,21 +294,6 @@
 		"research":"MATHEMATICS"
 	},
 	{
-		"name":"WORKSHOP",
-		"info":"Produces advanced combat units",
-		"image":"Images/buildings/workshop.png",
-		"vision":1,
-		"cost":{"WOOD":200, "STONE":200, "IRON_BAR":10},
-		"buildsunits":["LONGBOWMAN","CATAPULT","TREBUCHET", "SNIPER", "WIZARD"],
-		"attributes":["wood"],
-		"culture":0.5,
-		"health":2000,
-		"effort_to_produce_harvest":-1,
-		"effort_to_produce_item":-1,
-		"effort_to_build":500,
-		"research":"MATHEMATICS"
-	},
-	{
 		"name":"STONE_ROAD",
 		"info":"Increases movement speed",
 		"image":"Images/buildings/stone_road.png",
@@ -301,7 +306,7 @@
 		"effort_to_build":100,
 		"effort_to_produce_item":-1,
 		"effort_to_produce_harvest":-1,
-		"attributes":["road", "stone"],
+		"attributes":["road"],
 		"research":"MASONRY"
 	},
 	{
@@ -316,7 +321,7 @@
 		"effort_to_build":100,
 		"effort_to_produce_item":-1,
 		"effort_to_produce_harvest":-1,
-		"attributes":["road", "stone"],
+		"attributes":["road"],
 		"research":"ENGINEERING"
 	},
 	{
@@ -400,8 +405,8 @@
 		"vision":1,
 		"cost":{"BRICK":100, "MITHRIL_BAR":5},
 		"culture":0.25,
-		"health":10000,
-		"effort_to_build":400,
+		"health":100000,
+		"effort_to_build":500,
 		"effort_to_produce_item":-1,
 		"effort_to_produce_harvest":-1,
 		"attributes":["blocksmovement", "stone"],
@@ -415,12 +420,12 @@
 		"vision":1,
 		"cost":{"BRICK":100, "MITHRIL_BAR":10},
 		"culture":0.5,
-		"health":10000,
-		"effort_to_build":400,
+		"health":100000, 
+		"effort_to_build":500,
 		"effort_to_produce_item":-1,
 		"effort_to_produce_harvest":-1,
 		"attributes":["blocksmovement", "gate", "stone"],
-		"resistances": {"HEAT": 20},
+		"resistances": {"HEAT": 100},
 		"research":"ENGINEERING"
 	},
 	{
