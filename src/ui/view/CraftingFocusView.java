@@ -38,6 +38,7 @@ public class CraftingFocusView {
 					BUILDING_BUTTON_SIZE);
 			
 			button.setSelected(false);
+			button.setEnabled(false);
 			button.addActionListener(e -> {
 
 //				if(button.isSelected() == true) {
@@ -100,8 +101,10 @@ public class CraftingFocusView {
 			if(button != null) {
 				if(isCraftingFocusItem(type) == true) {
 					button.setVisible(true);
+					button.setEnabled(true);
 				}else {
 					button.setVisible(false);
+					button.setEnabled(false);
 				}
 //				button.setText(button.isVisible() ? "Enable buildings to craft this item" : "");
 //				toggleNight.setIcon(button.isVisible() ? NIGHT_DISABLED_ICON : NIGHT_ENABLED_ICON);

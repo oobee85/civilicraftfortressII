@@ -112,12 +112,15 @@ public class GameView {
 					TileLoc screenloc = new TileLoc(screentile.getIntX() + 13, screentile.getIntY() + 13);
 //					System.out.println("screen loc: " + screenloc);
 					if (theSound.getTile() != null) {
+						
 						int distance = theSound.getTile().getLocation().distanceTo(screenloc);
-						float volume = 1 - (float)(distance)/40;
-						if(distance >= 40) {
-							volume = 0;
-						}
-						SoundManager.setVolume(theSound, (float)(volume * 0.6));
+						
+						double linearVolume = Math.max(0, 10 - (10.0 / 40.0) * distance);
+//						float volume = 1 - (float)(distance)/40;
+//						if(distance >= 40) {
+//							volume = 0;
+//						}
+						SoundManager.setVolume(theSound, (float)(linearVolume));
 //						System.out.println("volume: " + volume);
 //						System.out.println("distance to sound: " + distance);
 					}
@@ -141,7 +144,7 @@ public class GameView {
 							theMusic = SoundManager.theMusicQueue.take();
 							if(theMusic != null) {
 //								SoundManager.setVolume(theMusic, -7f);
-								SoundManager.setVolume(theMusic, 0.5f);
+								SoundManager.setVolume(theMusic, 6f);
 								SoundManager.playSoundWithEnd(theMusic, semaphore);
 								semaphore.acquire();
 							}

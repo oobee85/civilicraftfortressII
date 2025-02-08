@@ -107,14 +107,31 @@ public class SoundManager {
 			
 			e.printStackTrace();
 		}
-	    float volumedB = (float) (20 * Math.log(volume/0.5));
-	    volumedB *= 2;
+//	    float volumedB = (float) (20 * Math.log(volume/0.5));
+//	    volumedB *= 2;
+	    
+	    
+	    
 	    
 	    if (clip != null && clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
 	        FloatControl volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+	        
+	     // Convert linear scale (0-10) to dB
+	        double minGain = volumeControl.getMinimum();  // Typically around -80 dB
+	        double maxGain = volumeControl.getMaximum();  // Typically around 6 dB
+	        double volumedB;
+
+	        if (volume <= 0) {
+	            volumedB = minGain; // Mute if volume is 0
+	        } else {
+	            double normalizedVolume = volume / 10.0; // Convert to 0 - 10 range
+	            volumedB = 20.0 * Math.log10(normalizedVolume);
+	            volumedB = Math.max(minGain, Math.min(volumedB, maxGain)); // Ensure it's within valid dB range
+	        }
+	        
 	        volumedB = Math.max(volumeControl.getMinimum(), Math.min(volumedB, volumeControl.getMaximum())); // Clamp value
 	        
-	        volumeControl.setValue(volumedB);
+	        volumeControl.setValue((float)volumedB);
 	    } else {
 	        System.err.println("Volume control not supported for sound: " + sound);
 	    }
