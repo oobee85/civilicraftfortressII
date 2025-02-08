@@ -17,6 +17,7 @@ public interface GUIController {
 	public void pressedSelectedUnitPortrait(Unit unit);
 	public void tryToCraftItem(ItemType type, int amount);
 	public void research(ResearchType researchType);
+	public void toggleCraftItemFocus(ItemType type);
 
 	public void setFastForwarding(boolean enabled);
 	public void setPauseGame(boolean enabled);

@@ -63,8 +63,7 @@ public class CraftingView {
 	}
 	
 	private boolean isCraftableItem(ItemType type) {
-		return type.getCost() != null
-				&& Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("RESEARCH_LAB");
+		return type.getCost() != null && Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("RESEARCH_LAB");
 	}
 	
 	public void updateButtons() {

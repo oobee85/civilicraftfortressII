@@ -851,6 +851,11 @@ public final class Utils {
 				faction.craftItem(itemType, amount);
 			}
 			@Override
+			public void toggleCraftItemFocus(Faction faction, ItemType itemType) {
+				faction.toggleCraftItemFocus(itemType);
+				
+			}
+			@Override
 			public void produceUnit(Building building, UnitType unitType) {
 				if (!building.getFaction().areRequirementsMet(unitType)) {
 					return;
@@ -873,6 +878,7 @@ public final class Utils {
 				}
 				unit.queuePlannedAction(plan);
 			}
+			
 		};
 	}
 }

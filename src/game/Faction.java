@@ -3,6 +3,7 @@ package game;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.Map.*;
 import java.util.concurrent.*;
 
@@ -50,6 +51,7 @@ public class Faction implements Externalizable {
 	private boolean isPlayer;
 	private double environmentalDifficulty = 1;
 	private int influence;
+	private List<ItemType> toggleCraftItemFocusList = new ArrayList<>();
 	
 	private int tickOfLastDamageTaken = 0;
 	private CombatStats upgradedCombatStats = new CombatStats(0, 0, 0, 0);
@@ -437,6 +439,17 @@ public class Faction implements Externalizable {
 		attacked.addAll(newAttacked);
 		newAttacked.clear();
 		attacked = attackedNew;
+	}
+	
+	public void toggleCraftItemFocus(ItemType type) {
+		if(toggleCraftItemFocusList.contains(type)) {
+			toggleCraftItemFocusList.remove(type);
+		}else {
+			toggleCraftItemFocusList.add(type);
+		}
+	}
+	public List<ItemType> getToggleCraftItemFocusList() {
+		return toggleCraftItemFocusList;
 	}
 	
 	public void craftItem(ItemType type, int amount) {

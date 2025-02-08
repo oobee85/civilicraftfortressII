@@ -813,17 +813,27 @@ public class Game {
 				};
 		
 		List<ItemType> canCraft = new ArrayList<>();
+		Faction faction = building.getFaction();
 		if(building.getType() == buildingTypeMap.get("SMITHY")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : forgeItems) {
+				// if the item is not in the craftItemFocus list
+				if(!faction.getToggleCraftItemFocusList().contains(item)) {
+					continue;
+				}
 				if (building.getFaction().canAfford(item, 1) == true) {
 					canCraft.add(item);
+
 				}
 			}
 		}
 		if(building.getType() == buildingTypeMap.get("SAWMILL")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : lumberItems) {
+				// if the item is not in the craftItemFocus list
+				if(!faction.getToggleCraftItemFocusList().contains(item)) {
+					continue;
+				}
 				if (building.getFaction().canAfford(item, 1) == true) {
 					canCraft.add(item);
 				}
@@ -832,6 +842,10 @@ public class Game {
 		if(building.getType() == buildingTypeMap.get("QUARRY")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : stoneItems) {
+				// if the item is not in the craftItemFocus list
+				if(!faction.getToggleCraftItemFocusList().contains(item)) {
+					continue;
+				}
 				if (building.getFaction().canAfford(item, 1) == true) {
 					canCraft.add(item);
 				}

@@ -456,6 +456,9 @@ public class ClientGUI {
 	public CraftingView getCraftingView() {
 		return craftingView;
 	}
+	public CraftingFocusView getCraftingFocusView() {
+		return craftingFocusView;
+	}
 
 	public void manageBuildingTab(boolean enabled) {
 		if (enabled == false && tabbedPane.getSelectedIndex() == WORKER_TAB) {
@@ -549,5 +552,6 @@ public class ClientGUI {
 		getResearchView().updateButtons();
 		getProduceUnitView().updateButtons();
 		getCraftingView().updateButtons();
+		getCraftingFocusView().updateButtons();
 	}
 }

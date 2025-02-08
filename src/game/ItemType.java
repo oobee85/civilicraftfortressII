@@ -30,7 +30,7 @@ public enum ItemType {
 	RUNITE_ORE 		( "Images/itemicons/runite_ore.png"),
 	TITANIUM_ORE 	( "Images/itemicons/titanium_ore.png"),
 	
-	BRICK 	   	   ("SMITHY",  makeCosts(CLAY,50),						"Images/itemicons/brick.png"),
+	BRICK 	   	   ("QUARRY",  makeCosts(CLAY,50),						"Images/itemicons/brick.png"),
 	BRONZE_BAR 	   ("SMITHY",  makeCosts(COPPER_ORE,5, SILVER_ORE, 5),	"Images/itemicons/bronze_bar.png"),
 	GOLD_BAR 	   ("SMITHY",  makeCosts(GOLD_ORE, 10), 				"Images/itemicons/gold_bar.png"),
 	IRON_BAR 	   ("SMITHY",  makeCosts(COAL,10, 	IRON_ORE,10),		"Images/itemicons/iron_bar.png"),
@@ -39,9 +39,9 @@ public enum ItemType {
 	RUNITE_BAR 	   ("SMITHY",  makeCosts(COAL,100, 	RUNITE_ORE,100),	"Images/itemicons/runite_bar.png"),
 	TITANIUM_BAR   ("SMITHY",  makeCosts(COAL,100, 	TITANIUM_ORE,100),	"Images/itemicons/titanium_bar.png"),
 	
-	SWORD  	 ("SMITHY",  makeCosts(WOOD,100),	"Images/itemicons/sword.png"),
-	SHIELD   ("SMITHY",  makeCosts(WOOD,100),	"Images/itemicons/shield.png"),
-	BOW		 ("SMITHY",  makeCosts(WOOD,100),	"Images/itemicons/bow.png"),
+	SWORD  	 ("SAWMILL",  makeCosts(WOOD,100),	"Images/itemicons/sword.png"),
+	SHIELD   ("SAWMILL",  makeCosts(WOOD,100),	"Images/itemicons/shield.png"),
+	BOW		 ("SAWMILL",  makeCosts(WOOD,100),	"Images/itemicons/bow.png"),
 	
 	BETTER_WEAPONS   	("RESEARCH_LAB",  makeCosts(SWORD,25),	"Images/interfaces/upgrades/better_weapons.png", "Increases attack damage of all units by : 25"),
 	IMPROVED_SPARRING   ("RESEARCH_LAB",  makeCosts(SWORD,25),	"Images/interfaces/upgrades/improved_sparring.png", "Decreases attack delay of all units by : 5"),

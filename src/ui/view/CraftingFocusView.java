@@ -17,7 +17,7 @@ public class CraftingFocusView {
 	private static final int BUILDING_ICON_SIZE = 25;
 
 	private JPanel rootPanel;
-	private JButton[] craftButtons = new JButton[ItemType.values().length];
+	private JButton[] craftFocusButtons = new JButton[ItemType.values().length];
 	private GameView gameView;
 	
 	public CraftingFocusView(GameView gameView) {
@@ -28,69 +28,68 @@ public class CraftingFocusView {
 	}
 	
 	public void setupButtons() {
-//		for (int i = 0; i < ItemType.values().length; i++) {
-//			final ItemType type = ItemType.values()[i];
-//			if (!isCraftableItem(type)) {
-//				continue;
-//			}
-//			KButton button = KUIConstants.setupButton(type.toString(),
-//					Utils.resizeImageIcon(type.getMipMap().getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
-//					BUILDING_BUTTON_SIZE);
-//			button.setEnabled(false);
-//			button.addActionListener(e -> {
-//				int amount = 1;
-////				if((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
-////					amount = 10;
-////				}
-//				gameView.getGameInstance().getGUIController().tryToCraftItem(type, amount);
-//			});
-//			button.addRightClickActionListener(e -> {
-//				gameView.getGameInstance().getGUIController().switchInfoPanel(new ItemTypeInfoPanel(type, gameView.getFaction()));
-//			});
-//			button.addMouseListener(new MouseAdapter() {
-//				@Override
-//				public void mouseEntered(MouseEvent e) {
-//					gameView.getGameInstance().getGUIController().pushInfoPanel(new ItemTypeInfoPanel(type, gameView.getFaction()));
-//				}
-//				@Override
-//				public void mouseExited(MouseEvent e) {
-//					gameView.getGameInstance().getGUIController().popInfoPanel();
-//				}
-//			});
-//			craftButtons[i] = button;
-//			rootPanel.add(button);
-//		}
+		for (int i = 0; i < ItemType.values().length; i++) {
+			final ItemType type = ItemType.values()[i];
+			if (!isCraftingFocusItem(type)) {
+				continue;
+			}
+			KButton button = KUIConstants.setupButton(type.toString(),
+					Utils.resizeImageIcon(type.getMipMap().getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
+					BUILDING_BUTTON_SIZE);
+			button.setEnabled(false);
+			button.addActionListener(e -> {
+				gameView.getGameInstance().getGUIController().toggleCraftItemFocus(type);
+//				button.setBackground(Color.GRAY);
+			});
+			button.addRightClickActionListener(e -> {
+				gameView.getGameInstance().getGUIController().switchInfoPanel(new ItemTypeInfoPanel(type, gameView.getFaction()));
+			});
+			button.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					gameView.getGameInstance().getGUIController().pushInfoPanel(new ItemTypeInfoPanel(type, gameView.getFaction()));
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {
+					gameView.getGameInstance().getGUIController().popInfoPanel();
+				}
+			});
+			craftFocusButtons[i] = button;
+			rootPanel.add(button);
+		}
 	}
 	
-	private boolean isCraftableItem(ItemType type) {
-		return type.getCost() != null
-				&& Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("RESEARCH_LAB");
+	// different function from craftingView
+	private boolean isCraftingFocusItem(ItemType type) {
+		if(type.getCost() == null) {
+			return false;
+		}
+		if(Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("SAWMILL")) {
+			return true;
+		}
+		if(Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("QUARRY")) {
+			return true;
+		}
+		if(Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("SMITHY")) {
+			return true;
+		}
+		return false;
 	}
 	
 	public void updateButtons() {
-		boolean hasSawmill = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("SAWMILL"));
-		boolean hasQuarry = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("HELLFORGE"));
-		boolean hasSmithy = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("SMITHY"));
+//		boolean hasSawmill = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("SAWMILL"));
+//		boolean hasQuarry = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("QUARRY"));
+//		boolean hasSmithy = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("SMITHY"));
 		
-//		for (int i = 0; i < ItemType.values().length; i++) {
-//			ItemType type = ItemType.values()[i];
-//			if (!isCraftableItem(type)) {
-//				continue;
-//			}
-//			JButton button = craftButtons[i];
-//			if(gameView.getFaction().areRequirementsMet(type)) {
-//				button.setVisible(true);
-//			}
-//			else {
-//				button.setVisible(false);
-//			}
-//			if (gameView.getFaction().canAfford(type.getCost()) && hasResearchLab) {
-//				button.setEnabled(true);
-//			}
-//			else {
-//				button.setEnabled(false);
-//			}
-//		}
+		for (int i = 0; i < ItemType.values().length; i++) {
+			ItemType type = ItemType.values()[i];
+			JButton button = craftFocusButtons[i];
+			if(button != null) {
+				button.setEnabled(isCraftingFocusItem(type));
+			}
+			
+			
+		}
 	}
 	
 	public JPanel getRootPanel() {

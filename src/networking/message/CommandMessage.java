@@ -75,6 +75,13 @@ public class CommandMessage implements Externalizable {
 		msg.clearQueue = clearQueue;
 		return msg;
 	}
+	public static Object makeToggleItemFocusCommand(int factionID, String itemType) {
+		CommandMessage msg = new CommandMessage();
+		msg.command = CommandType.TOGGLE_CRAFT_ITEM;
+		msg.type = itemType;
+		msg.faction = factionID;
+		return msg;
+	}
 	
 
 	public CommandType getCommand() {
@@ -135,4 +142,6 @@ public class CommandMessage implements Externalizable {
 	public String toString() {
 		return command.name() + " " + thingID + " " + getTargetLocation() + " " + targetID;
 	}
+
+	
 }

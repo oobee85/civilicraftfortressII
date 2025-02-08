@@ -157,6 +157,8 @@ public class Server {
 			public void setFastForwarding(boolean enabled) { }
 			@Override
 			public void setPauseGame(boolean enabled) { }
+			@Override
+			public void toggleCraftItemFocus(ItemType type) {}
 		});
 		LinkedList<PlayerInfo> players = new LinkedList<>();
 		for (Connection connection : connections.keySet()) {
