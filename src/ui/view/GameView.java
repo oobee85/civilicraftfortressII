@@ -117,7 +117,7 @@ public class GameView {
 						if(distance >= 40) {
 							volume = 0;
 						}
-						SoundManager.setVolume(theSound, (float)(volume * 0.8));
+						SoundManager.setVolume(theSound, (float)(volume * 0.6));
 //						System.out.println("volume: " + volume);
 //						System.out.println("distance to sound: " + distance);
 					}

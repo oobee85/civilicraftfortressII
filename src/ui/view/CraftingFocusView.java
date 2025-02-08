@@ -17,7 +17,7 @@ public class CraftingFocusView {
 	private static final int BUILDING_ICON_SIZE = 25;
 
 	private JPanel rootPanel;
-	private JButton[] craftFocusButtons = new JButton[ItemType.values().length];
+	private JToggleButton[] craftFocusButtons = new JToggleButton[ItemType.values().length];
 	private GameView gameView;
 	
 	public CraftingFocusView(GameView gameView) {
@@ -33,27 +33,44 @@ public class CraftingFocusView {
 			if (!isCraftingFocusItem(type)) {
 				continue;
 			}
-			KButton button = KUIConstants.setupButton(type.toString(),
+			JToggleButton button = KUIConstants.setupToggleButton(type.toString(),
 					Utils.resizeImageIcon(type.getMipMap().getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
 					BUILDING_BUTTON_SIZE);
-			button.setEnabled(false);
+			
+			button.setSelected(false);
 			button.addActionListener(e -> {
+
+//				if(button.isSelected() == true) {
+//					button.setEnabled(false);
+//				}else {
+//					button.setEnabled(true);
+//				}
+				
 				gameView.getGameInstance().getGUIController().toggleCraftItemFocus(type);
-//				button.setBackground(Color.GRAY);
+//			button.addActionListener(e -> {
+//				gameView.getGameInstance().getGUIController().toggleCraftItemFocus(type);
+				
+				
+//				if(button.getEnabled() == true) {
+//					button.setEnabled(false);
+//				}else {
+//					button.setEnabled(true);
+//				}
+//				button.setEnabled(!button.getEnabled());
 			});
-			button.addRightClickActionListener(e -> {
-				gameView.getGameInstance().getGUIController().switchInfoPanel(new ItemTypeInfoPanel(type, gameView.getFaction()));
-			});
-			button.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					gameView.getGameInstance().getGUIController().pushInfoPanel(new ItemTypeInfoPanel(type, gameView.getFaction()));
-				}
-				@Override
-				public void mouseExited(MouseEvent e) {
-					gameView.getGameInstance().getGUIController().popInfoPanel();
-				}
-			});
+//			button.addRightClickActionListener(e -> {
+//				gameView.getGameInstance().getGUIController().switchInfoPanel(new ItemTypeInfoPanel(type, gameView.getFaction()));
+//			});
+//			button.addMouseListener(new MouseAdapter() {
+//				@Override
+//				public void mouseEntered(MouseEvent e) {
+//					gameView.getGameInstance().getGUIController().pushInfoPanel(new ItemTypeInfoPanel(type, gameView.getFaction()));
+//				}
+//				@Override
+//				public void mouseExited(MouseEvent e) {
+//					gameView.getGameInstance().getGUIController().popInfoPanel();
+//				}
+//			});
 			craftFocusButtons[i] = button;
 			rootPanel.add(button);
 		}
@@ -77,15 +94,17 @@ public class CraftingFocusView {
 	}
 	
 	public void updateButtons() {
-//		boolean hasSawmill = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("SAWMILL"));
-//		boolean hasQuarry = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("QUARRY"));
-//		boolean hasSmithy = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("SMITHY"));
-		
 		for (int i = 0; i < ItemType.values().length; i++) {
 			ItemType type = ItemType.values()[i];
-			JButton button = craftFocusButtons[i];
+			JToggleButton button = craftFocusButtons[i];
 			if(button != null) {
-				button.setEnabled(isCraftingFocusItem(type));
+				if(isCraftingFocusItem(type) == true) {
+					button.setVisible(true);
+				}else {
+					button.setVisible(false);
+				}
+//				button.setText(button.isVisible() ? "Enable buildings to craft this item" : "");
+//				toggleNight.setIcon(button.isVisible() ? NIGHT_DISABLED_ICON : NIGHT_ENABLED_ICON);
 			}
 			
 			
