@@ -443,6 +443,18 @@ public class Unit extends Thing implements Serializable {
 		}
 		return bestBuilding;
 	}
+	public Tile getNeighborResourceToHarvest(Tile oldTile, ResourceType type) {
+		Tile target = null;
+		for(Tile tile: oldTile.getNeighbors()) {
+			if(tile.getResource() == type) {
+				target = tile;
+				if(Math.random() < 0.3) {
+					break;
+				}
+			}
+		}
+		return target;
+	}
 	public Plant getNeighborPlantToHarvest(Tile oldTile, PlantType type) {
 		Plant target = null;
 		for(Tile tile: oldTile.getNeighbors()) {
@@ -547,7 +559,7 @@ public class Unit extends Thing implements Serializable {
 			ItemType itemType = null;
 			if(tile.getResource() != null && getFaction().areRequirementsMet(tile.getResource())) {
 				itemType = tile.getResource().getItemType();
-				System.out.println("Remaining Amount: "+ tile.getRemainingResourceAmount());
+//				System.out.println("Remaining Amount: "+ tile.getRemainingResourceAmount());
 				tile.subtractRemainingResourceAmount(1);
 			}
 			else if(tile.getTerrain() == Terrain.ROCK) {
@@ -706,10 +718,12 @@ public class Unit extends Thing implements Serializable {
 				didSomething = true;
 			}
 		}
+		// harvest resource
 		else if(plan.isHarvestAction() && isBuilder() && plan.targetTile != null) {
 			this.doHarvest(plan.targetTile, plan);
 			didSomething = true;
 		}
+		// harvest building
 		else if(plan.isHarvestAction() && 
 				isBuilder() && 
 				plan.target != null && 
@@ -724,6 +738,7 @@ public class Unit extends Thing implements Serializable {
 			this.doTake(plan, plan.target);
 			didSomething = true;
 		}
+		// harvest plant
 		else if(plan.isHarvestAction() && 
 				isBuilder() && 
 				plan.target != null && 
@@ -807,6 +822,19 @@ public class Unit extends Thing implements Serializable {
 		// Special logic for delivery actions because the followup might be gone
 		if (finished.isDeliverAction() && finished.getFollowUp() != null) {
 			PlannedAction followup = finished.getFollowUp();
+			if(followup.target != null && followup.getTile().getResource() == null) {
+				if (followup.target instanceof Plant == false) {
+					
+					Tile newTarget = getNeighborResourceToHarvest(followup.getTile(), (ResourceType)followup.target.getTile().getResource());
+					if (newTarget != null) {
+						followup = PlannedAction.harvestTile(newTarget);
+					}
+					else {
+						// failed to find similar resource
+						return;
+					}
+				}
+			}else
 			// if the current target plant has died, find a neighbor plant to harvest
 			if (followup.target != null && followup.target.isDead()) {
 				if (followup.target instanceof Plant) {

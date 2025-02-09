@@ -115,7 +115,7 @@ public class GameView {
 						
 						int distance = theSound.getTile().getLocation().distanceTo(screenloc);
 						
-						double linearVolume = Math.max(0, 10 - (10.0 / 30.0) * distance);
+						double linearVolume = Math.max(0, 10 - (10.0 / 30.0) * distance)-1;
 //						float volume = 1 - (float)(distance)/40;
 //						if(distance >= 40) {
 //							volume = 0;
