@@ -461,7 +461,7 @@ public class Faction implements Externalizable {
 			inventory.addItem(type, 1);
 		
 		
-		if(Game.buildingTypeMap.get(type.getBuilding()).isUpgrader()) {
+		if(Game.buildingTypeMap.get(type.getBuilding()).isUpgrading()) {
 			
 //		}
 //		if(type == ItemType.MEDICINE || type == ItemType.BETTER_WEAPONS || type == ItemType.IMPROVED_SPARRING || type == ItemType.SHIELDS || type == ItemType.BETTER_FORMATIONS || type == ItemType.FASTER_TRAINING || type == ItemType.UNDYING_ARMY || type == ItemType.BROADHEADS) {
@@ -477,7 +477,7 @@ public class Faction implements Externalizable {
 					continue;
 				}
 				// if item in inventory is an upgrade
-				if(Game.buildingTypeMap.get(type2.getBuilding()).isUpgrader()) {
+				if(Game.buildingTypeMap.get(type2.getBuilding()).isUpgrading()) {
 //				if(type2 == ItemType.MEDICINE || type2 == ItemType.BETTER_WEAPONS || type2 == ItemType.IMPROVED_SPARRING || type2 == ItemType.SHIELDS || type2 == ItemType.BETTER_FORMATIONS || type2 == ItemType.FASTER_TRAINING || type2 == ItemType.UNDYING_ARMY || type2 == ItemType.BROADHEADS) {
 					int itemAmount = item.getAmount();
 					costMultiplier += itemAmount; // add amount to the cost
