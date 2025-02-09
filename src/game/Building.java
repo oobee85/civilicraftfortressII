@@ -1,11 +1,8 @@
 package game;
 
-import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
-
-import javax.swing.*;
 
 import game.actions.*;
 import game.components.GameComponent;

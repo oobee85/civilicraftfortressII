@@ -6,6 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import game.*;
+import networking.client.ClientGUI;
 import ui.*;
 import ui.infopanels.*;
 import utils.*;
@@ -23,7 +24,9 @@ public class CraftingFocusView {
 	public CraftingFocusView(GameView gameView) {
 		this.gameView = gameView;
 		rootPanel = new JPanel();
+		rootPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, 500));
 		rootPanel.setFocusable(false);
+		rootPanel.setBackground(Color.magenta);
 		setupButtons();
 	}
 	
@@ -98,12 +101,14 @@ public class CraftingFocusView {
 	}
 	
 	public void updateButtons() {
+		int numVisible = 0;
 		for (int i = 0; i < ItemType.values().length; i++) {
 			ItemType type = ItemType.values()[i];
 			JToggleButton button = craftFocusButtons[i];
 			if(button != null) {
 				if(isCraftingFocusItem(type) == true) {
 					button.setVisible(true);
+					numVisible++;
 					button.setEnabled(true);
 				}else {
 					button.setVisible(false);
@@ -115,6 +120,10 @@ public class CraftingFocusView {
 			
 			
 		}
+		int numrows = (numVisible+1) / 2;
+		int defaultFlowLayoutOffset = 5;
+		int rowheight = BUILDING_BUTTON_SIZE.height + defaultFlowLayoutOffset;
+		rootPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, rowheight * numrows + defaultFlowLayoutOffset));
 	}
 	
 	public JPanel getRootPanel() {

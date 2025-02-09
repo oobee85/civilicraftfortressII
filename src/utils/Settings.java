@@ -38,6 +38,8 @@ public class Settings {
 	
 	public static String DEFAULT_PLAYER_NAME = "Player";
 	public static int DEFAULT_PLAYER_COLOR = Color.red.getRGB();
+	
+	public static int VOLUME = 50;
 
 	public static void fromCmdArgs(String[] args) {
 		Set<String> flags = new HashSet<>();

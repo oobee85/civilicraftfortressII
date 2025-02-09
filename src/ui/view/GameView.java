@@ -102,6 +102,14 @@ public class GameView {
 			while(true) {
 				Sound theSound;
 				try {
+					if (Settings.VOLUME > 100) {
+						Settings.VOLUME = 100;
+					}
+					if (Settings.VOLUME < 0) {
+						Settings.VOLUME = 0;
+					}
+					SoundManager.updateGlobalVolume(Settings.VOLUME);
+					
 					theSound = SoundManager.theSoundQueue.take();
 					
 					// check if the sound is dedicated to our faction
@@ -383,18 +391,11 @@ public class GameView {
 			Thing summoned = game.summonThing(tile, state.selectedThingToSpawn,
 					summonPlayerControlled ? state.faction : game.world.getFaction(World.NO_FACTION_ID));
 			if (summoned != null && summoned.getFaction() == state.faction) {
-				if (!shiftDown) {
-					deselectEverything();
-				}
-				selectThing(summoned);
+				selectThing(summoned, shiftDown);
 			}
 			if (state.selectedThingToSpawn instanceof Plant) {
-				if (!shiftDown) {
-					deselectEverything();
-				}
 				summoned = game.summonThing(tile, state.selectedThingToSpawn, game.world.getFaction(World.NO_FACTION_ID));
-
-				selectThing(summoned);
+				selectThing(summoned, shiftDown);
 			}
 		}
 		
@@ -865,6 +866,13 @@ public class GameView {
 		}
 		
 	}
+	
+	public void selectThing(Thing thing, boolean keepOtherSelection) {
+		if (!keepOtherSelection) {
+			deselectEverything();
+		}
+		selectThing(thing);
+	}
 
 	private void selectThing(Thing thing) {
 		thing.setSelected(true);
@@ -946,13 +954,23 @@ public class GameView {
 
 	private void deselectOtherThings(Thing keep) {
 		for (Thing thing : state.selectedThings) {
+			if (thing == keep) {
+				continue;
+			}
 			thing.setSelected(false);
 			if (thing instanceof Unit) {
 				guiController.selectedUnit((Unit) thing, false);
 			}
+			else if (thing instanceof Building) {
+				guiController.selectedBuilding((Building) thing, false);
+			}
+			else if (thing instanceof Plant) {
+				guiController.selectedPlant((Plant) thing, false);
+			}
 		}
 		state.selectedThings.clear();
-		selectThing(keep);
+		state.selectedThings.add(keep);
+//		selectThing(keep);
 	}
 	
 	/**
