@@ -40,19 +40,19 @@ public enum ItemType {
 	RUNITE_BAR 	   ("SMITHY",  makeCosts(COAL,100, 	RUNITE_ORE,100),	"Images/itemicons/runite_bar.png"),
 	TITANIUM_BAR   ("SMITHY",  makeCosts(COAL,100, 	TITANIUM_ORE,100),	"Images/itemicons/titanium_bar.png"),
 	
-	SWORD  	 ("SAWMILL",  makeCosts(WOOD,100),	"Images/itemicons/sword.png"),
-	SHIELD   ("SAWMILL",  makeCosts(WOOD,100),	"Images/itemicons/shield.png"),
+	SWORD  	 ("SAWMILL",  makeCosts(WOOD,100, BRONZE_BAR, 5),	"Images/itemicons/sword.png"),
+	SHIELD   ("SAWMILL",  makeCosts(WOOD,100, BRONZE_BAR, 1),	"Images/itemicons/shield.png"),
 	BOW		 ("SAWMILL",  makeCosts(WOOD,100),	"Images/itemicons/bow.png"),
 	
-	BREAD	("GRANARY",  makeCosts(FOOD,100),	"Images/itemicons/bow.png"),
+	BREAD	("GRANARY",  makeCosts(FOOD,100),	"Images/itemicons/farming.png"),
 	
 	BETTER_WEAPONS   	("RESEARCH_LAB",  makeCosts(SWORD,25),	"Images/interfaces/upgrades/better_weapons.png", "Increases attack damage of all units by : 25"),
 	IMPROVED_SPARRING   ("RESEARCH_LAB",  makeCosts(SWORD,25),	"Images/interfaces/upgrades/improved_sparring.png", "Decreases attack delay of all units by : 5"),
 	SHIELDS   			("RESEARCH_LAB",  makeCosts(SHIELD,25),	"Images/interfaces/upgrades/shields.png", "Increases health of all units by : 100"),
-	MEDICINE   			("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/upgrades/medicine.png", "Decreases ticks to heal of all units by : 10"),
+	MEDICINE   			("RESEARCH_LAB",  makeCosts(BREAD,25),	"Images/interfaces/upgrades/medicine.png", "Decreases ticks to heal of all units by : 10"),
 	BETTER_FORMATIONS   ("RESEARCH_LAB",  makeCosts(SHIELD,25),	"Images/interfaces/upgrades/better_formations.png", "Decreases ticks to move of all units by : 5"),
-	FASTER_TRAINING   	("RESEARCH_LAB",  makeCosts(FOOD,1000),	"Images/interfaces/upgrades/faster_training.png", "Decreases the ticks to produce units by : 50"),
-	UNDYING_ARMY   		("RESEARCH_LAB",  makeCosts(FOOD,10000),"Images/interfaces/upgrades/undying_army.png", "Gives all units lifesteal"),
+	FASTER_TRAINING   	("RESEARCH_LAB",  makeCosts(BREAD,25),	"Images/interfaces/upgrades/faster_training.png", "Decreases the ticks to produce units by : 50"),
+	UNDYING_ARMY   		("RESEARCH_LAB",  makeCosts(BREAD,200),"Images/interfaces/upgrades/undying_army.png", "Gives all units lifesteal"),
 	BROADHEADS   		("RESEARCH_LAB",  makeCosts(BOW, 25),	"Images/interfaces/upgrades/broadheads.png", "Increases damage of all projectiles by : 25"),
 	
 	;

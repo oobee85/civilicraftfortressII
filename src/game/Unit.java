@@ -547,6 +547,8 @@ public class Unit extends Thing implements Serializable {
 			ItemType itemType = null;
 			if(tile.getResource() != null && getFaction().areRequirementsMet(tile.getResource())) {
 				itemType = tile.getResource().getItemType();
+				System.out.println("Remaining Amount: "+ tile.getRemainingResourceAmount());
+				tile.subtractRemainingResourceAmount(1);
 			}
 			else if(tile.getTerrain() == Terrain.ROCK) {
 				itemType = ItemType.STONE;

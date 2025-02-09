@@ -293,7 +293,7 @@ public class GameView {
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 					deselectEverything();
-				} else if (e.getKeyCode() == KeyEvent.VK_H) {
+				} else if (e.getKeyCode() == KeyEvent.VK_S) {
 					unitStop();
 				} 
 				else if (e.getKeyCode() == KeyEvent.VK_G) {
@@ -308,7 +308,7 @@ public class GameView {
 					setBuildingToPlan(Game.buildingTypeMap.get("BARRACKS"));
 				} else if (e.getKeyCode() == KeyEvent.VK_D) {
 					state.leftClickAction = LeftClickAction.WANDER_AROUND;
-				} else if (e.getKeyCode() == KeyEvent.VK_S) {
+				} else if (e.getKeyCode() == KeyEvent.VK_H) {
 					deselectHalf();
 				}
 			}

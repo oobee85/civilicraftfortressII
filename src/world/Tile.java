@@ -35,6 +35,7 @@ public class Tile implements Externalizable {
 	private ConcurrentLinkedDeque<Unit> units;
 	private ConcurrentLinkedQueue<Projectile> projectiles;
 	private Inventory inventory;
+	private int remainingResourceAmount;
 
 	private List<Tile> neighborTiles = new LinkedList<Tile>();
 	
@@ -57,7 +58,9 @@ public class Tile implements Externalizable {
 		}
 		else {
 			resource = ResourceType.values()[resourceOrdinal];
+			remainingResourceAmount = resource.getResourceAmount();
 		}
+		
 		modifier = (GroundModifier) in.readObject();
 		if (AIR_NETWORKING) {
 			air = (Air)in.readObject();
@@ -93,6 +96,8 @@ public class Tile implements Externalizable {
 		latestSentInfo.faction.setID(faction.id());
 		out.writeInt((resource == null) ? NO_RESOURCE : resource.ordinal());
 		latestSentInfo.resource = resource;
+//		out.writeInt(resource.getResourceAmount());
+//		latestSentInfo.remainingResourceAmount = resource.getResourceAmount();
 		out.writeObject(modifier);
 		latestSentInfo.modifier = modifier;
 		if (AIR_NETWORKING) {
@@ -163,6 +168,12 @@ public class Tile implements Externalizable {
 //		double asdfg = asd / Kgair;
 //		return asdfg;
 
+	}
+	public int getRemainingResourceAmount() {
+		return remainingResourceAmount;
+	}
+	public void subtractRemainingResourceAmount(int amount) {
+		remainingResourceAmount -= amount;
 	}
 	public void setEnergy(double energy) {
 		this.energy = energy;
@@ -324,6 +335,9 @@ public class Tile implements Externalizable {
 
 	public void setResource(ResourceType resource) {
 		this.resource = resource;
+		if(resource != null) {
+			this.remainingResourceAmount = resource.getResourceAmount();
+		}
 	}
 
 	public ResourceType getResource() {

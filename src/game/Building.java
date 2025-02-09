@@ -47,7 +47,7 @@ public class Building extends Thing implements Serializable {
 		this.buildingType = buildingType;
 		this.spawnLocation = tile;
 		this.timeToHarvest = buildingType.getEffortToProduceHarvest();
-		this.baseTimeToHarvest = buildingType.getEffortToProduceHarvest();
+		this.baseTimeToHarvest = buildingType.getEffortToProduceHarvest(); // 20
 		this.timeToProduce = buildingType.getEffortToProduceItem();
 		this.baseTimeToProduce = buildingType.getEffortToProduceItem();
 		this.isPlanned = false;
@@ -179,18 +179,12 @@ public class Building extends Thing implements Serializable {
 			getFaction().getInventory().addItem(ItemType.FOOD, 1);
 			resetTimeToHarvest();
 		}
-//		else if(getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
-//			getFaction().spendResearch(10);
-//			resetTimeToHarvest();
-//		}
 		else if(getType() == Game.buildingTypeMap.get("GRANARY")) {
 			getFaction().getInventory().addItem(ItemType.FOOD, 2);
-//			this.getInventory().addItem(ItemType.FOOD, 1);
 			resetTimeToHarvest();
 		}
 		else if(getType() == Game.buildingTypeMap.get("WINDMILL")) {
 			getFaction().getInventory().addItem(ItemType.FOOD, 5);
-//			this.getInventory().addItem(ItemType.FOOD, 5);
 			resetTimeToHarvest();
 		}
 		else if(getType().isTrap()) {
@@ -222,12 +216,12 @@ public class Building extends Thing implements Serializable {
 		this.timeToHarvest = timeToHarvest;
 	}
 	public void resetTimeToHarvest() {
-		if(getTile().getResource() != null) {
-			resetTimeToHarvest(getTile().getResource().getTimeToHarvest());
-		}
-		else {
-			resetTimeToHarvest(baseTimeToHarvest);
-		}	
+//		if(getTile().getResource() != null) {
+//			resetTimeToHarvest(getTile().getResource().getTimeToHarvest());
+//		}
+//		else {
+		resetTimeToHarvest(baseTimeToHarvest);
+//		}	
 	}
 	public boolean readyToProduce() {
 		return timeToProduce <= 0;

@@ -791,14 +791,18 @@ public class World {
 					continue;
 				}
 				
-//				if(t.getTerrain() == Terrain.GRASS || p != null) {
-//					t.setTerrain(Terrain.DIRT);
-//				}
 			}
 		}
 		spreadPlants();
 		
 		for(Tile tile : getTiles()) {
+			
+			if(tile.getResource() != null) {
+				if(tile.getRemainingResourceAmount() <= 0) {
+					tile.setResource(null);
+				}
+				
+			}
 			if(World.ticks - tile.getTickLastTerrainChange() <= Constants.MIN_TIME_TO_SWITCH_TERRAIN) {
 				continue;
 			}

@@ -82,15 +82,18 @@ public class CraftingFocusView {
 		if(type.getCost() == null) {
 			return false;
 		}
-		if(Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("SAWMILL")) {
+		if(Game.buildingTypeMap.get(type.getBuilding()).isCrafting()) {
 			return true;
 		}
-		if(Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("QUARRY")) {
-			return true;
-		}
-		if(Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("SMITHY")) {
-			return true;
-		}
+//		if(Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("SAWMILL")) {
+//			return true;
+//		}
+//		if(Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("QUARRY")) {
+//			return true;
+//		}
+//		if(Game.buildingTypeMap.get(type.getBuilding()) == Game.buildingTypeMap.get("SMITHY")) {
+//			return true;
+//		}
 		return false;
 	}
 	

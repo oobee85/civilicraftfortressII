@@ -813,9 +813,16 @@ public class Game {
 				};
 		final ItemType[] stoneItems = new ItemType[] { ItemType.BRICK,
 				};
+		final ItemType[] foodItems = new ItemType[] { ItemType.BREAD,
+		};
+//		final ItemType[] craftableItems = new ItemType[] { ItemType.BRONZE_BAR, ItemType.IRON_BAR, ItemType.GOLD_BAR,
+//				ItemType.MITHRIL_BAR, ItemType.ADAMANTITE_BAR, ItemType.RUNITE_BAR, ItemType.TITANIUM_BAR, ItemType.SWORD, 
+//				ItemType.BOW, ItemType.SHIELD, ItemType.BRICK, ItemType.BREAD,
+//		};
 		
 		List<ItemType> canCraft = new ArrayList<>();
 		Faction faction = building.getFaction();
+		
 		if(building.getType() == buildingTypeMap.get("SMITHY")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : forgeItems) {
@@ -847,6 +854,19 @@ public class Game {
 		if(building.getType() == buildingTypeMap.get("QUARRY")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : stoneItems) {
+				// if the item is not in the craftItemFocus list
+				if(!faction.getToggleCraftItemFocusList().contains(item)) {
+					continue;
+				}
+				if (faction.canAfford(item.getCost()) == true) {
+//					System.out.println("Adding item: " + item.name());
+					canCraft.add(item);
+				}
+			}
+		}
+		if(building.getType() == buildingTypeMap.get("GRANARY")) {
+			// go through craftable bars and add affordable ones to a new list
+			for (ItemType item : foodItems) {
 				// if the item is not in the craftItemFocus list
 				if(!faction.getToggleCraftItemFocusList().contains(item)) {
 					continue;

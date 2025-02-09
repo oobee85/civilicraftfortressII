@@ -132,7 +132,7 @@
 		"cost":{"WOOD":200, "STONE":200},
 		"culture":0.5,
 		"inventory":{"maxstack":100},
-		"attributes":["stone", "crafting"],
+		"attributes":["stone", "upgrade"],
 		"research":"MASONRY",
 		"health":1000,
 		"effort_to_build":500,
@@ -190,15 +190,15 @@
 		"info":"Produces food and automatically deposits into factions inventory.",
 		"image":"Images/buildings/granary.png",
 		"vision":1,
-		"cost":{"WOOD":100, "STONE":100, "BRONZE_BAR":5},
+		"cost":{"WOOD":200, "STONE":200, "BRONZE_BAR":5},
 		"culture":0.25,
-		"attributes":["supply", "wood"],
+		"attributes":["crafting", "supply", "wood"],
 		"research":"MASONRY",
 		"inventory":{"maxstack":50},
 		"health":1000,
 		"effort_to_build":500,
 		"effort_to_produce_harvest":-1,
-		"effort_to_produce_item":-1
+		"effort_to_produce_item":300
 	},
 	{
 		"name":"WINDMILL",
