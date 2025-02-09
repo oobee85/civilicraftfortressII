@@ -19,9 +19,9 @@ public class Bomb extends Animal {
 	public boolean takeDamage(int damage, DamageType type) {
 		if(!isDead()) {
 			super.takeDamage(damage, type);
+		}
+		if(isDead()) {
 			world.spawnExplosionCircle(getTile(), 5, 500);
-			this.setDead(true);
-			
 			Sound sound = new Sound(SoundEffect.EXPLOSION, null, 1f);
 			SoundManager.theSoundQueue.add(sound);
 		}
@@ -30,10 +30,11 @@ public class Bomb extends Animal {
 	
 	@Override
 	public boolean attack(Thing target) {
-		if(target.getTile().getLocation().distanceTo(getTile().getLocation()) == 0) {
-			takeDamage(1, DamageType.PHYSICAL);
-			return true;
-		}
+		this.takeDamage(1000, DamageType.PHYSICAL);
+//		if(target.getTile().getLocation().distanceTo(getTile().getLocation()) == 0) {
+//			takeDamage(100, DamageType.PHYSICAL);
+//			return true;
+//		}
 		return false;
 	
 	}

@@ -55,7 +55,7 @@
 		"inventory":{"maxstack":50},
 		"attributes":["trap", "wood"],
 		"research":"FARMING",
-		"health":100,
+		"health":200,
 		"effort_to_build":200,
 		"effort_to_produce_harvest":-1,
 		"effort_to_produce_item":-1
@@ -87,7 +87,7 @@
 		"research":"FARMING",
 		"culture":0.5,
 		"attributes":["wood"],
-		"health":1000,
+		"health":500,
 		"effort_to_build":500,
 		"effort_to_produce_harvest":-1,
 		"effort_to_produce_item":-1
@@ -102,7 +102,7 @@
 		"buildsunits":["LONGBOWMAN","CATAPULT","TREBUCHET", "SNIPER", "WIZARD"],
 		"attributes":["wood"],
 		"culture":0.5,
-		"health":2000,
+		"health":500,
 		"effort_to_produce_harvest":-1,
 		"effort_to_produce_item":-1,
 		"effort_to_build":500,
@@ -119,7 +119,7 @@
 		"inventory":{"maxstack":100},
 		"attributes":["wood"],
 		"research":"TRAPPING",
-		"health":1000,
+		"health":500,
 		"effort_to_build":500,
 		"effort_to_produce_harvest":-1,
 		"effort_to_produce_item":-1
@@ -147,9 +147,9 @@
 		"vision":1,
 		"cost":{"WOOD":100, "STONE":100},
 		"culture":0.5,
-		"health":1000,
+		"health":500,
 		"effort_to_build":1000,
-		"effort_to_produce_item":300,
+		"effort_to_produce_item":200,
 		"effort_to_produce_harvest":-1,
 		"attributes":["smithy", "stone", "crafting"],
 		"research":"FARMING"
@@ -164,10 +164,10 @@
 		"culture":0.1,
 		"attributes":["wood", "crafting"],
 		"research":"FARMING",
-		"health":1000,
+		"health":500,
 		"effort_to_build":1000,
 		"effort_to_produce_harvest":-1,
-		"effort_to_produce_item":300
+		"effort_to_produce_item":200
 		
 	},
 	{
@@ -180,10 +180,10 @@
 		"attributes":["crafting", "stone"],
 		"inventory":{"maxstack":500},
 		"research":"FARMING",
-		"health":1000,
+		"health":500,
 		"effort_to_build":1000,
 		"effort_to_produce_harvest":-1,
-		"effort_to_produce_item":300
+		"effort_to_produce_item":200
 	},
 	{
 		"name":"GRANARY",
@@ -195,10 +195,10 @@
 		"attributes":["crafting", "supply", "wood"],
 		"research":"MASONRY",
 		"inventory":{"maxstack":50},
-		"health":1000,
+		"health":500,
 		"effort_to_build":500,
 		"effort_to_produce_harvest":-1,
-		"effort_to_produce_item":300
+		"effort_to_produce_item":200
 	},
 	{
 		"name":"WINDMILL",

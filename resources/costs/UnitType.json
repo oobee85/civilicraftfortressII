@@ -533,7 +533,7 @@
 		"stats":{"movespeed":25,"buildtime":0,"health":50,"healspeed":50},
 		"name":"BOMB",
 		"attackstyles":[
-			{"damage":1, "cooldown":10, "range":0}
+			{"damage":1, "cooldown":10, "range":1}
 		],
 		"attributes":["hostile"],
 		"targeting":[

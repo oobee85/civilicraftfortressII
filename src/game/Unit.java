@@ -822,19 +822,19 @@ public class Unit extends Thing implements Serializable {
 		// Special logic for delivery actions because the followup might be gone
 		if (finished.isDeliverAction() && finished.getFollowUp() != null) {
 			PlannedAction followup = finished.getFollowUp();
-			if(followup.target != null && followup.getTile().getResource() == null) {
-				if (followup.target instanceof Plant == false) {
-					
-					Tile newTarget = getNeighborResourceToHarvest(followup.getTile(), (ResourceType)followup.target.getTile().getResource());
-					if (newTarget != null) {
-						followup = PlannedAction.harvestTile(newTarget);
-					}
-					else {
-						// failed to find similar resource
-						return;
-					}
-				}
-			}else
+//			if(followup.target != null && followup.getTile().getResource() == null) {
+//				if (followup.target instanceof Plant == false) {
+//					
+//					Tile newTarget = getNeighborResourceToHarvest(followup.getTile()(ResourceType)followup.target.getTile().getResource());
+//					if (newTarget != null) {
+//						followup = PlannedAction.harvestTile(newTarget);
+//					}
+//					else {
+//						// failed to find similar resource
+//						return;
+//					}
+//				}
+//			}else
 			// if the current target plant has died, find a neighbor plant to harvest
 			if (followup.target != null && followup.target.isDead()) {
 				if (followup.target instanceof Plant) {
