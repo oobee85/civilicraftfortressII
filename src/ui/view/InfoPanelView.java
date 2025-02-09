@@ -38,7 +38,6 @@ public class InfoPanelView {
 	private void setInfoPanel(JPanel newInfo) {
 		SwingUtilities.invokeLater(() -> {
 			rootPanel.removeAll();
-			newInfo.setOpaque(false);
 			rootPanel.add(newInfo, BorderLayout.CENTER);
 			rootPanel.validate();
 		});

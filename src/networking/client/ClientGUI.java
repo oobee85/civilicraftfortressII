@@ -26,6 +26,7 @@ public class ClientGUI {
 	public static final int GUIWIDTH = 350;
 
 	private static final int TAB_ICON_SIZE = 25;
+	private static final ImageIcon OVERVIEW_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/overview.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon RESEARCH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/tech.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon WORKER_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/building.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon PRODUCE_UNIT_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/barracks.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
@@ -67,14 +68,14 @@ public class ClientGUI {
 	private ResourceView resourceView;
 	private InfoPanelView infoPanelView;
 
-	private JPanel actionsParentPanel;
+//	private JPanel actionsParentPanel;
 	private ActionsView actionsView;
 	private JTabbedPane tabbedPane;
 	private int RESEARCH_TAB;
-	private int WORKER_TAB;
-	private int PRODUCE_UNIT_TAB;
-	private int CRAFTING_TAB; // for crafting upgrades manually
-	private int CRAFTING_FOCUS_TAB; // for selecting crafting for autocrafters
+	private int ACTIONS_TAB;
+//	private int CRAFTING_FOCUS_TAB; // for selecting crafting for autocrafters
+//	private int PRODUCE_UNIT_TAB;
+//	private int CRAFTING_TAB;
 	private int SPAWN_UNITS_TAB;
 	private int DEBUG_TAB;
 	private ResearchView researchView;
@@ -82,6 +83,8 @@ public class ClientGUI {
 	private ProduceUnitView produceUnitView;
 	private CraftingView craftingView;
 	private CraftingFocusView craftingFocusView;
+	private KButton idleWorkerButton;
+	private KButton idleUnitButton;
 	
 	public ClientGUI() {
 		rootPanel = new JPanel();
@@ -106,10 +109,10 @@ public class ClientGUI {
 		sidePanel.setFocusable(false);
 		sidePanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, 0));
 		
-		actionsParentPanel = new JPanel();
-		actionsParentPanel.setLayout(new BorderLayout());
-		actionsParentPanel.setFocusable(false);
-		actionsParentPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, 0));
+//		actionsParentPanel = new JPanel();
+//		actionsParentPanel.setLayout(new BorderLayout());
+//		actionsParentPanel.setFocusable(false);
+//		actionsParentPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, 0));
 
 		ingamePanel.add(topPanel, BorderLayout.NORTH);
 		ingamePanel.add(sidePanel, BorderLayout.EAST);
@@ -372,29 +375,99 @@ public class ClientGUI {
 		
 		actionsView = new ActionsView(getGameView());
 
-		actionsParentPanel.add(actionsView, BorderLayout.NORTH);
-		actionsParentPanel.add(tabbedPane, BorderLayout.CENTER);
-		sidePanel.add(actionsParentPanel, BorderLayout.CENTER);
+//		actionsParentPanel.add(actionsView, BorderLayout.NORTH);
+//		actionsParentPanel.add(tabbedPane, BorderLayout.CENTER);
+//		sidePanel.add(actionsParentPanel, BorderLayout.CENTER);
+		sidePanel.add(tabbedPane, BorderLayout.CENTER);
+		
+		JPanel overviewTab = new JPanel();
+		overviewTab.setLayout(new GridBagLayout());
+		overviewTab.setFocusable(false);
+		overviewTab.setBackground(Color.red);
+		int OVERVIEW_TAB = tabbedPane.getTabCount();
+		tabbedPane.addTab(null, OVERVIEW_TAB_ICON, overviewTab, "Overview");
+
+		GridBagConstraints cs = new GridBagConstraints();
+		idleWorkerButton = KUIConstants.setupButton("Idle Workers (?)", null, new Dimension(160, 30));
+		idleWorkerButton.addActionListener(e -> {
+			Unit worker = gameView.getFaction().getIdleWorker();
+			if (worker != null) {
+				gameView.selectThing(worker, false);
+			}
+		});
+		cs.gridx = 0;
+		cs.gridy = 0;
+		cs.weightx = 1;
+		cs.anchor = GridBagConstraints.FIRST_LINE_START;
+		overviewTab.add(idleWorkerButton, cs);
+		idleUnitButton = KUIConstants.setupButton("Idle Units (?)", null, new Dimension(160, 30));
+		idleUnitButton.addActionListener(e -> {
+			Unit unit = gameView.getFaction().getIdleNonworker();
+			if (unit != null) {
+				gameView.selectThing(unit, false);
+			}
+		});
+		cs.gridx = 0;
+		cs.gridy = 1;
+		overviewTab.add(idleUnitButton, cs);
+		
+		KButton gotoResearchButton = KUIConstants.setupButton("Research", RESEARCH_TAB_ICON, new Dimension(160, 30));
+		gotoResearchButton.addActionListener(e -> tabbedPane.setSelectedIndex(RESEARCH_TAB));
+		cs.gridx = 0;
+		cs.gridy = 2;
+		overviewTab.add(gotoResearchButton, cs);
+
+		cs.gridx = 0;
+		cs.gridy = 3;
+		cs.gridwidth = 6;
+		cs.gridheight = 3;
+		cs.weighty = 1;
+		cs.fill = GridBagConstraints.BOTH;
+		
+		overviewTab.add(new JPanel(), cs);
+		cs.weighty = 0;
+		cs.gridwidth = 1;
+		cs.gridheight = 1;
+		cs.fill = 0;
+		
+
+		if(Settings.DEBUG) {
+			KButton gotoSpawnUnitsButton = KUIConstants.setupButton("", SPAWN_TAB_ICON, new Dimension(35, 30));
+			gotoSpawnUnitsButton.addActionListener(e -> tabbedPane.setSelectedIndex(SPAWN_UNITS_TAB));
+			cs.gridx = 4;
+			cs.gridy = 6;
+			cs.weightx = 0;
+			cs.anchor = GridBagConstraints.LAST_LINE_END;
+			overviewTab.add(gotoSpawnUnitsButton, cs);
+
+			KButton gotoDebugViewButton = KUIConstants.setupButton("", DEBUG_TAB_ICON, new Dimension(35, 30));
+			gotoDebugViewButton.addActionListener(e -> tabbedPane.setSelectedIndex(DEBUG_TAB));
+			cs.gridx = 5;
+			cs.gridy = 6;
+			cs.weightx = 0;
+			cs.anchor = GridBagConstraints.LAST_LINE_END;
+			overviewTab.add(gotoDebugViewButton, cs);
+		}
 		
 		researchView = new ResearchView(gameView);
 		RESEARCH_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab(null, RESEARCH_TAB_ICON, researchView.getRootPanel(), "Research new technologies");
 
 		workerView = new WorkerView(gameView);
-		WORKER_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab(null, WORKER_TAB_ICON, workerView.getRootPanel(), "Build buildings with workers", WORKER_TAB);
+		ACTIONS_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab(null, WORKER_TAB_ICON, actionsView.getRootPanel(), "Actions", ACTIONS_TAB);
 
 		produceUnitView = new ProduceUnitView(gameView);
-		PRODUCE_UNIT_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab(null, PRODUCE_UNIT_TAB_ICON, produceUnitView.getRootPanel(), "Make units from castles, barracks, workshops, or stables", PRODUCE_UNIT_TAB);
+//		PRODUCE_UNIT_TAB = tabbedPane.getTabCount();
+//		tabbedPane.insertTab(null, PRODUCE_UNIT_TAB_ICON, produceUnitView.getRootPanel(), "Make units from castles, barracks, workshops, or stables", PRODUCE_UNIT_TAB);
 
 		craftingView = new CraftingView(gameView);
-		CRAFTING_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, craftingView.getRootPanel(), "Craft items", CRAFTING_TAB);
+//		CRAFTING_TAB = tabbedPane.getTabCount();
+//		tabbedPane.insertTab(null, BLACKSMITH_TAB_ICON, craftingView.getRootPanel(), "Craft items", CRAFTING_TAB);
 		
 		craftingFocusView = new CraftingFocusView(gameView);
-		CRAFTING_FOCUS_TAB = tabbedPane.getTabCount();
-		tabbedPane.insertTab(null, CRAFTING_FOCUS_TAB_ICON, craftingFocusView.getRootPanel(), "Select Items to focus", CRAFTING_FOCUS_TAB);
+//		CRAFTING_FOCUS_TAB = tabbedPane.getTabCount();
+//		tabbedPane.insertTab(null, CRAFTING_FOCUS_TAB_ICON, craftingFocusView.getRootPanel(), "Select Items to focus", CRAFTING_FOCUS_TAB);
 		
 		
 		
@@ -409,9 +482,11 @@ public class ClientGUI {
 		}
 		
 		// disable building tab after setting all of the tabs up
-		manageBuildingTab(false);
-		manageProduceUnitTab(false);
-		tabbedPane.setEnabledAt(CRAFTING_TAB, false);
+//		manageBuildingTab(false);
+//		manageProduceUnitTab(false);
+//		tabbedPane.setEnabledAt(CRAFTING_TAB, false);
+		
+		actionsView.addViews(produceUnitView, craftingView, workerView, craftingFocusView);
 		
 		rootPanel.revalidate();
 		rootPanel.repaint();
@@ -463,52 +538,52 @@ public class ClientGUI {
 		return craftingFocusView;
 	}
 
-	public void manageBuildingTab(boolean enabled) {
-		if (enabled == false && tabbedPane.getSelectedIndex() == WORKER_TAB) {
+	public void manageActionsTab(boolean enabled) {
+		if (enabled == false && tabbedPane.getSelectedIndex() == ACTIONS_TAB) {
 			tabbedPane.setSelectedIndex(0);
 		} else if (enabled == true) {
-			tabbedPane.setSelectedIndex(WORKER_TAB);
+			tabbedPane.setSelectedIndex(ACTIONS_TAB);
 		}
-		tabbedPane.setEnabledAt(WORKER_TAB, enabled);
+		tabbedPane.setEnabledAt(ACTIONS_TAB, enabled);
 	}
 	
-	public void manageProduceUnitTab(boolean enabled) {
-		if(enabled) {
-			tabbedPane.setEnabledAt(PRODUCE_UNIT_TAB, enabled);
-			tabbedPane.setSelectedIndex(PRODUCE_UNIT_TAB);
-		}
-		else {
-			if(gameView.getGameInstance().world != null) {
-				if(!(gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("CASTLE"))
-						|| gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("BARRACKS"))
-						|| gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("STABLES"))
-						|| gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("WORKSHOP")))) {
-					if(tabbedPane.getSelectedIndex() == PRODUCE_UNIT_TAB) {
-						tabbedPane.setSelectedIndex(0);
-					}
-				}
-			}
-			tabbedPane.setEnabledAt(PRODUCE_UNIT_TAB, false);
-		}
-	}
+//	public void manageProduceUnitTab(boolean enabled) {
+//		if(enabled) {
+//			tabbedPane.setEnabledAt(PRODUCE_UNIT_TAB, enabled);
+//			tabbedPane.setSelectedIndex(PRODUCE_UNIT_TAB);
+//		}
+//		else {
+//			if(gameView.getGameInstance().world != null) {
+//				if(!(gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("CASTLE"))
+//						|| gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("BARRACKS"))
+//						|| gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("STABLES"))
+//						|| gameView.getFaction().isBuildingSelected(Game.buildingTypeMap.get("WORKSHOP")))) {
+//					if(tabbedPane.getSelectedIndex() == PRODUCE_UNIT_TAB) {
+//						tabbedPane.setSelectedIndex(0);
+//					}
+//				}
+//			}
+//			tabbedPane.setEnabledAt(PRODUCE_UNIT_TAB, false);
+//		}
+//	}
 
-	public void manageCraftUpgradesTab(boolean enabled) {
-		if (enabled == false && tabbedPane.getSelectedIndex() == CRAFTING_TAB) {
-			tabbedPane.setSelectedIndex(0);
-		} else if (enabled == true) {
-			tabbedPane.setSelectedIndex(CRAFTING_TAB);
-		}
-		tabbedPane.setEnabledAt(CRAFTING_TAB, true);
-	}
-	
-	public void manageCraftingFocusTab(boolean enabled) {
-		if (enabled == false && tabbedPane.getSelectedIndex() == CRAFTING_FOCUS_TAB) {
-			tabbedPane.setSelectedIndex(0);
-		} else if (enabled == true) {
-			tabbedPane.setSelectedIndex(CRAFTING_FOCUS_TAB);
-		}
-		tabbedPane.setEnabledAt(CRAFTING_FOCUS_TAB, true);
-	}
+//	public void manageCraftUpgradesTab(boolean enabled) {
+//		if (enabled == false && tabbedPane.getSelectedIndex() == CRAFTING_TAB) {
+//			tabbedPane.setSelectedIndex(0);
+//		} else if (enabled == true) {
+//			tabbedPane.setSelectedIndex(CRAFTING_TAB);
+//		}
+//		tabbedPane.setEnabledAt(CRAFTING_TAB, true);
+//	}
+//	
+//	public void manageCraftingFocusTab(boolean enabled) {
+//		if (enabled == false && tabbedPane.getSelectedIndex() == CRAFTING_FOCUS_TAB) {
+//			tabbedPane.setSelectedIndex(0);
+//		} else if (enabled == true) {
+//			tabbedPane.setSelectedIndex(CRAFTING_FOCUS_TAB);
+//		}
+//		tabbedPane.setEnabledAt(CRAFTING_FOCUS_TAB, true);
+//	}
 
 	public void changedFaction(Faction faction) {
 		getGameView().setFaction(faction);
@@ -516,31 +591,39 @@ public class ClientGUI {
 	}
 
 	public void selectedBuilding(Building building, boolean selected) {
-		if(building.getType().unitsCanProduceSet().size() > 0) {
-			manageProduceUnitTab(selected);
+		updateViews();
+		manageActionsTab(actionsView.selectedBuilding(building, selected));
+//		if(building.getType().unitsCanProduceSet().size() > 0) {
+//			manageProduceUnitTab(selected);
+//		}
+//		if (building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
+//			manageBlacksmithTab(selected);
+//		}
+		if(selected) {
+			InfoPanel infoPanel = new BuildingInfoPanel(building);
+			getInfoPanelView().switchInfoPanel(infoPanel);
+			SwingUtilities.invokeLater(() -> {
+				infoPanel.addExplodeButton().addActionListener(e -> gameView.getGameInstance().explode(building));
+			});
 		}
-		if (building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
-			manageCraftUpgradesTab(selected);
-		}
-		if (building.getType() == Game.buildingTypeMap.get("SMITHY") || building.getType() == Game.buildingTypeMap.get("QUARRY")
-				|| building.getType() == Game.buildingTypeMap.get("SAWMILL")) {
-			manageCraftingFocusTab(selected);
-		}
-		InfoPanel infoPanel = new BuildingInfoPanel(building);
-		getInfoPanelView().switchInfoPanel(infoPanel);
-		SwingUtilities.invokeLater(() -> {
-			infoPanel.addExplodeButton().addActionListener(e -> gameView.getGameInstance().explode(building));
-		});
+// 			TODO fix this
+//		if (building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
+//			manageCraftUpgradesTab(selected);
+//		}
+		// TODO fix this
+//		if (building.getType() == Game.buildingTypeMap.get("SMITHY") || building.getType() == Game.buildingTypeMap.get("QUARRY")
+//				|| building.getType() == Game.buildingTypeMap.get("SAWMILL")) {
+//			manageCraftingFocusTab(selected);
+//		}
 	}
 
 	public void selectedUnit(Unit unit, boolean selected) {
+		updateViews();
 		getGameViewOverlay().selectedUnit(unit, selected);
-		actionsView.selectedUnit(unit, selected);
+		manageActionsTab(actionsView.selectedUnit(unit, selected));
 		
-		if(unit.isBuilder()) {
-			manageBuildingTab(selected);
-		}
 		if(selected) {
+//			manageActionsTab(selected);
 			UnitInfoPanel infoPanel = new UnitInfoPanel(unit);
 			getInfoPanelView().switchInfoPanel(infoPanel);
 			SwingUtilities.invokeLater(() -> {
@@ -550,6 +633,22 @@ public class ClientGUI {
 	}
 	
 	public void updateViews() {
+		int idleWorkers = 0;
+		int idleNonworkers = 0;
+		for (Unit unit : gameView.getFaction().getUnits()) {
+			if (unit.isIdle()) {
+				if (unit.isBuilder()) {
+					idleWorkers++;
+				}
+				else {
+					idleNonworkers++;
+				}
+			}
+		}
+		
+		idleWorkerButton.setText("Idle Workers (" + idleWorkers + ")");
+		idleUnitButton.setText("Idle Units (" + idleNonworkers + ")");
+		
 		getResourceView().updateItems();
 		getWorkerView().updateButtons();
 		getResearchView().updateButtons();

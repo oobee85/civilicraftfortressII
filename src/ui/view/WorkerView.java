@@ -24,17 +24,19 @@ public class WorkerView {
 			this.buildingType = buildingType;
 		}
 	}
-	private ScrollingPanel scrollingPanel;
+//	private ScrollingPanel scrollingPanel;
+	private JPanel rootPanel;
 	private LinkedList<Pair> buildingButtons = new LinkedList<>();
 	private GameView gameView;
 	
 	public WorkerView(GameView gameView) {
 		this.gameView = gameView;
-		scrollingPanel = new ScrollingPanel(new Dimension(ClientGUI.GUIWIDTH, 700));
-		scrollingPanel.setFocusable(false);
-		Pair[] buttons = populateBuildingTypeUI(scrollingPanel);
+//		scrollingPanel = new ScrollingPanel(new Dimension(ClientGUI.GUIWIDTH, 700));
+		rootPanel = new JPanel();
+		rootPanel.setFocusable(false);
+		Pair[] buttons = populateBuildingTypeUI(rootPanel);
 		Collections.addAll(buildingButtons, buttons);
-		scrollingPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, (buildingButtons.size()/2) * (BUILDING_BUTTON_SIZE.height + 5)));
+		rootPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, (buildingButtons.size()/2) * (BUILDING_BUTTON_SIZE.height + 5)));
 	}
 
 	public Pair[] populateBuildingTypeUI(JPanel panel) {
@@ -69,6 +71,7 @@ public class WorkerView {
 	}
 	
 	public void updateButtons() {
+		int numVisible = 0;
 		for(Pair pair : buildingButtons) {
 			boolean enabled = false;
 			boolean visible = false;
@@ -90,10 +93,18 @@ public class WorkerView {
 			}
 			pair.button.setEnabled(enabled);
 			pair.button.setVisible(visible);
+			if (visible) {
+				numVisible++;
+			}
 		}
+		int numrows = (numVisible+1) / 2;
+		int defaultFlowLayoutOffset = 10;
+		int rowheight = BUILDING_BUTTON_SIZE.height + defaultFlowLayoutOffset;
+		rootPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, rowheight * numrows + defaultFlowLayoutOffset));
 	}
 	
 	public JPanel getRootPanel() {
-		return scrollingPanel.getRootPanel();
+//		return scrollingPanel.getRootPanel();
+		return rootPanel;
 	}
 }

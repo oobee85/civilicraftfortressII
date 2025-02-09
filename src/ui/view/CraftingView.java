@@ -6,6 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import game.*;
+import networking.client.ClientGUI;
 import ui.*;
 import ui.infopanels.*;
 import utils.*;
@@ -23,7 +24,9 @@ public class CraftingView {
 	public CraftingView(GameView gameView) {
 		this.gameView = gameView;
 		rootPanel = new JPanel();
+		rootPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, 500));
 		rootPanel.setFocusable(false);
+		rootPanel.setBackground(Color.green);
 		setupButtons();
 	}
 	
@@ -67,9 +70,8 @@ public class CraftingView {
 	}
 	
 	public void updateButtons() {
-		boolean hasBlacksmith = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("SMITHY"));
-		boolean hasHellForge = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("HELLFORGE"));
 		boolean hasResearchLab = gameView.getFaction().hasBuilding(Game.buildingTypeMap.get("RESEARCH_LAB"));
+		int numVisible = 0;
 		for (int i = 0; i < ItemType.values().length; i++) {
 			ItemType type = ItemType.values()[i];
 			if (!isCraftableItem(type)) {
@@ -78,6 +80,7 @@ public class CraftingView {
 			JButton button = craftButtons[i];
 			if(gameView.getFaction().areRequirementsMet(type)) {
 				button.setVisible(true);
+				numVisible++;
 			}
 			else {
 				button.setVisible(false);
@@ -89,6 +92,11 @@ public class CraftingView {
 				button.setEnabled(false);
 			}
 		}
+
+		int numrows = (numVisible+1) / 2;
+		int defaultFlowLayoutOffset = 5;
+		int rowheight = BUILDING_BUTTON_SIZE.height + defaultFlowLayoutOffset;
+		rootPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, rowheight * numrows + defaultFlowLayoutOffset));
 	}
 	
 	public JPanel getRootPanel() {

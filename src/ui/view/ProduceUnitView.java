@@ -1,17 +1,21 @@
 package ui.view;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
 import javax.swing.*;
 
 import game.*;
+import networking.client.ClientGUI;
 import ui.*;
 import ui.infopanels.*;
+import ui.utils.WrapLayout;
 import utils.*;
 import world.*;
 
 public class ProduceUnitView {
+	private static final Dimension PRODUCE_UNIT_BUTTON_SIZE = new Dimension(150, 35);
 
 	private class Pair {
 		public final JButton button;
@@ -29,7 +33,10 @@ public class ProduceUnitView {
 	public ProduceUnitView(GameView gameView) {
 		this.gameView = gameView;
 		rootPanel = new JPanel();
+//		rootPanel.setLayout(new WrapLayout(WrapLayout.LEFT, 5, 5));
+		rootPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, 200));
 		rootPanel.setFocusable(false);
+		rootPanel.setBackground(Color.blue);
 		Pair[] buttons = populateUnitTypeUI(rootPanel, 25);
 		Collections.addAll(unitButtons, buttons);
 	}
@@ -39,7 +46,7 @@ public class ProduceUnitView {
 		for(int i = 0; i < Game.unitTypeList.size(); i++) {
 			UnitType type = Game.unitTypeList.get(i);
 			KButton button = KUIConstants.setupButton("Build " + type.toString(),
-					Utils.resizeImageIcon(type.getMipMap().getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), null);
+					Utils.resizeImageIcon(type.getMipMap().getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE), PRODUCE_UNIT_BUTTON_SIZE);
 			button.addActionListener(e -> {
 				gameView.tryToBuildUnit(type);
 			});
@@ -63,6 +70,7 @@ public class ProduceUnitView {
 	}
 	
 	public void updateButtons() {
+		int numVisible = 0;
 		for(Pair pair : unitButtons) {
 			boolean enabled = false;
 			boolean visible = false;
@@ -79,7 +87,14 @@ public class ProduceUnitView {
 			}
 			pair.button.setEnabled(enabled);
 			pair.button.setVisible(visible);
+			if (visible) {
+				numVisible++;
+			}
 		}
+		int numrows = (numVisible+1) / 2;
+		int defaultFlowLayoutOffset = 5;
+		int rowheight = PRODUCE_UNIT_BUTTON_SIZE.height + defaultFlowLayoutOffset;
+		rootPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, rowheight * numrows + defaultFlowLayoutOffset));
 	}
 	
 	public JPanel getRootPanel() {

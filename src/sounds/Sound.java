@@ -10,18 +10,20 @@ public class Sound {
 	private Faction faction;
 	private Tile tile;
 	private boolean isMusic;
-	
+	private float baseVolume;
 
 	public Sound(SoundEffect sound, Faction faction, float baseVolume) {
 		this.sound = sound;
 		this.faction = faction;
 		this.tile = null;
 		this.isMusic = sound.getIsMusic();
+		this.baseVolume = baseVolume;
 	}
 	public Sound(SoundEffect sound, Faction faction, Tile tile, float baseVolume) {
 		this.sound = sound;
 		this.faction = faction;
 		this.tile = tile;
+		this.baseVolume = baseVolume;
 	}
 	
 	public Faction getFaction() {
@@ -37,4 +39,11 @@ public class Sound {
 		return this.isMusic;
 	}
 	
+	public void updateVolume(float newBaseVolume) {
+		this.baseVolume = newBaseVolume;
+	}
+	
+	public float getVolume() {
+		return this.baseVolume;
+	}
 }

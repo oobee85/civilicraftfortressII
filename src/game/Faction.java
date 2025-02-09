@@ -128,6 +128,7 @@ public class Faction implements Externalizable {
 	public Set<Unit> getUnits() {
 		return Collections.unmodifiableSet(units);
 	}
+
 	public void addBuilding(Building building) {
 		buildings.add(building);
 	}
@@ -177,6 +178,24 @@ public class Faction implements Externalizable {
 	}
 	public boolean isPlayer() {
 		return isPlayer;
+	}
+	
+	public Unit getIdleWorker() {
+		for (Unit unit : getUnits()) {
+			if (unit.isIdle() && unit.isBuilder()) {
+				return unit;
+			}
+		}
+		return null;
+	}
+	
+	public Unit getIdleNonworker() {
+		for (Unit unit : getUnits()) {
+			if (unit.isIdle() && !unit.isBuilder()) {
+				return unit;
+			}
+		}
+		return null;
 	}
 	
 	public void updateUpgradedCombatStats(ItemType itemType) {
