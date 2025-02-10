@@ -533,9 +533,9 @@ public class Tile implements Externalizable {
 		if (canPlant() == false) {
 			return false;
 		}
-		if(this.hasBuilding() || this.hasRoad()) {
-			return false;
-		}
+//		if(this.hasBuilding() && !this.hasRoad()) {
+//			return false;
+//		}
 		if(this.liquidAmount >= this.liquidType.getMinimumDamageAmount()) {
 			return false;
 		}

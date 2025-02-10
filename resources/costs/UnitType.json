@@ -338,7 +338,7 @@
 			{"type":"game.Unit", "faction":"PLAYER"},
 			{"type":"game.Unit"}
 		],
-		"loot":{"IRON_BAR":10, "MITHRIL_BAR":10}
+		"loot":{"IRON_BAR":10, "MITHRIL_BAR":20}
 	},
 	{
 		"image":"Images/units/roc.png",
@@ -353,7 +353,7 @@
 		],
 		"attributes":["flying","hostile"],
 		"resistances": {"COLD": 0},
-		"loot":{"IRON_BAR":10}
+		"loot":{"IRON_BAR":50}
 	},
 	{
 		"image":"Images/units/ogre.png",
@@ -367,7 +367,7 @@
 			{"type":"game.Unit", "faction":"PLAYER"}, 
 			{"type":"game.Building", "faction":"PLAYER"}
 		],
-		"loot":{"IRON_BAR":20, "BRONZE_BAR":20, "COAL":200}
+		"loot":{"IRON_BAR":20, "BRONZE_BAR":20, "COAL":600}
 	},
 	{
 		"image":"Images/units/ent.png",
@@ -386,12 +386,12 @@
 			{"type":"game.Building", "faction":"PLAYER"},
 			{"type":"game.Unit", "faction":"PLAYER"}
 		],
-		"loot":{"WOOD":1000}
+		"loot":{"WOOD":2000}
 	},
 	{
 		"image":"Images/units/werewolf.png",
 		"stats":{"movespeed":10,"buildtime":300,"health":200,"healspeed":10},
-		"cost":{"FOOD":300, "WEREWOLF": 100},
+		"cost":{"FOOD":300, "WEREWOLF": 100, "SILVER_ORE": 20},
 		"name":"WEREWOLF",
 		"attackstyles":[
 			{"damage":25, "cooldown":5, "range":1}
@@ -401,7 +401,7 @@
 		"targeting":[
 			{"type":"game.Unit", "faction":"PLAYER"}
 		],
-		"loot":{"IRON_BAR":20}
+		"loot":{"IRON_BAR":40}
 	},
 	{
 		"image":"Images/units/lavagolem.png",
@@ -416,12 +416,12 @@
 			{"type":"MINE"},
 			{"type":"game.Unit", "faction":"PLAYER"}
 		],
-		"loot":{"COAL":500, "MITHRIL_BAR":25, "IRON_BAR":25, "ADAMANTITE_BAR":25}
+		"loot":{"COAL":1000, "MITHRIL_BAR":25, "IRON_BAR":25, "ADAMANTITE_BAR":25, "BRONZE_BAR":25}
 	},
 	{
 		"image":"Images/units/wolf.png",
 		"stats":{"movespeed":20,"buildtime":300,"health":200,"healspeed":50},
-		"cost":{"FOOD":100, "WOLF": 100},
+		"cost":{"FOOD":100, "WOLF": 100, "BRONZE_BAR": 1},
 		"name":"WOLF",
 		"attackstyles":[
 			{"damage":40, "cooldown":20, "range":1}
@@ -481,7 +481,7 @@
 			{"type":"game.Unit", "faction":"PLAYER"},
 			{"type":"game.Unit"}
 		],
-		"loot":{"IRON_BAR":10, "MITHRIL_BAR":20, "BRONZE_BAR":10, "ADAMANTITE_BAR":10}
+		"loot":{"IRON_BAR":30, "MITHRIL_BAR":30, "BRONZE_BAR":30, "ADAMANTITE_BAR":30}
 	},
 	{
 		"image":"Images/units/flamelet.png",
@@ -572,7 +572,7 @@
 	},
 	{
 		"image":"Images/units/stonegolem.png",
-		"stats":{"movespeed":30,"buildtime":0,"health":1000,"healspeed":50},
+		"stats":{"movespeed":30,"buildtime":0,"health":2000,"healspeed":50},
 		"name":"STONE_GOLEM",
 		"attackstyles":[
 			{"damage":200, "cooldown":50, "range":6, "minrange":3, "projectile":"ROCK_STONE_GOLEM"},
@@ -586,7 +586,7 @@
 			{"type":"game.Building", "faction":"PLAYER"},
 			{"type":"game.Building", "faction":"CYCLOPS"}
 		],
-		"loot":{"STONE":1000}
+		"loot":{"STONE":2000, "IRON_BAR":30, "MITHRIL_BAR":30, "BRONZE_BAR":30, "ADAMANTITE_BAR":30}
 	},
 	{
 		"image":"Images/units/termite.png",
@@ -601,7 +601,7 @@
 			{"type":"game.Building"}
 		],
 		"attributes":["hostile"],
-		"loot":{"WOOD":100, "IRON_BAR":1}
+		"loot":{"WOOD":100, "IRON_BAR":5}
 	},
 	{
 		"image":"Images/units/infernal.gif",
@@ -648,7 +648,7 @@
 		],
 		"inventory":{"maxstack":1},
 		"attributes":["hostile"],
-		"loot":{"STONE":50, "BRONZE_BAR":2},
+		"loot":{"STONE":100, "BRONZE_BAR":1, "WOOD":100 , "FOOD":100},
 		"builds":["SCORPION_DEN"]
 	}
 ]

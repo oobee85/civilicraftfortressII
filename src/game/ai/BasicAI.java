@@ -160,9 +160,9 @@ public class BasicAI extends AIInterface {
 				return;
 			}
 			if(amountOfFoodMissing() > 0) {
-				if(irrigate(worker)) {
-					return;
-				}
+//				if(irrigate(worker)) {
+//					return;
+//				}
 			}
 			if(forage(worker, MAX_SEARCH_RADIUS)) {
 				return;
@@ -310,9 +310,9 @@ public class BasicAI extends AIInterface {
 					&& e.getBuilding().getType() == FARM
 					&& !hasOtherWorker;
 		});
-		if(existingIrrigation != null) {
-			return null != buildAndHarvest(unit, existingIrrigation, FARM);
-		}
+//		if(existingIrrigation != null) {
+//			return null != buildAndHarvest(unit, existingIrrigation, FARM);
+//		}
 		
 		// otherwise build a new irrigation nearby
 		Tile tile = getTargetTile(castle.getTile(), 1, MAX_BUILD_RADIUS, e -> {
@@ -336,9 +336,9 @@ public class BasicAI extends AIInterface {
 			commands.planAction(unit, PlannedAction.buildOnTile(tile, false), true);
 			clearQueue = false;
 		}
-		if(building != null) {
-			commands.planAction(unit, PlannedAction.harvest(tile.getBuilding()), clearQueue);
-		}
+//		if(building != null) {
+//			commands.planAction(unit, PlannedAction.harvest(tile.getBuilding()), clearQueue);
+//		}
 		return building;
 	}
 	
