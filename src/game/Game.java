@@ -775,11 +775,11 @@ public class Game {
 			}
 			building.tick(world, simulated);
 			
-			if(World.ticks % 2 == 0) {
-				if(building.getType().isCrafting() && building.readyToCraft()) {
-					haveBuildingProduceItem(building);
-				}
+//			if(World.ticks % 1 == 0) {
+			if(building.getType().isCrafting() && building.readyToCraft()) {
+				haveBuildingProduceItem(building);
 			}
+//			}
 			
 
 			if (building.isMoria() && building.isBuilt()) {

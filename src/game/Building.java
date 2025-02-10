@@ -224,6 +224,9 @@ public class Building extends Thing implements Serializable {
 	
 	// for crafting items automatically
 	public boolean readyToCraft() {
+		if(isBuilt() == false) {
+			return false;
+		}
 		return timeToCraft <= 0;
 	}
 	public void setTimeToCraft(double timeToCraft) {

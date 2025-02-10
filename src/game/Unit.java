@@ -174,21 +174,25 @@ public class Unit extends Thing implements Serializable {
 		}
 		double penalty = movePenaltyTo(this.getTile(), t);
 		timeToMove += penalty;
-		
-		if(this.getType().isWheeled()) {
-			Sound sound = new Sound(SoundEffect.MOVE_WHEELED, this.getFaction(), this.getTile(), 1f);
-			SoundManager.theSoundQueue.add(sound);
-		}else {
-			if(this.getTile().isPlantable()) {
-				Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile(), 1f);
+		// workers dont play walking sound, gets annoying when theres tons going around
+		if(this.getType() == Game.unitTypeMap.get("WORKER")) {
+			
+		}else { //all other unit walking sounds
+			if(this.getType().isWheeled()) {
+				Sound sound = new Sound(SoundEffect.MOVE_WHEELED, this.getFaction(), this.getTile(), 1f);
 				SoundManager.theSoundQueue.add(sound);
-			}else if(this.getTile().isRocky()) {
-				Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile(), 1f);
-				SoundManager.theSoundQueue.add(sound);
-//				SoundManager.setVolume(sound, 5f);
 			}else {
-				Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile(), 1f);
-				SoundManager.theSoundQueue.add(sound);
+				if(this.getTile().isPlantable()) {
+					Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile(), 1f);
+					SoundManager.theSoundQueue.add(sound);
+				}else if(this.getTile().isRocky()) {
+					Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile(), 1f);
+					SoundManager.theSoundQueue.add(sound);
+	//				SoundManager.setVolume(sound, 5f);
+				}else {
+					Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile(), 1f);
+					SoundManager.theSoundQueue.add(sound);
+				}
 			}
 		}
 		
