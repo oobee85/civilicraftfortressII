@@ -213,6 +213,9 @@ public class Building extends Thing implements Serializable {
 	
 	// for producing items, like food
 	public boolean readyToProduce() {
+		if(isBuilt() == false) {
+			return false;
+		}
 		return timeToProduce <= 0;
 	}
 	public void setTimeToProduce(double timeToProduce) {

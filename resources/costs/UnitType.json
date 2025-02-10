@@ -51,7 +51,7 @@
 	{
 		"image":"Images/units/spearman.png",
 		"cost":{"BRONZE_BAR":2,"WOOD":100,"FOOD":200},
-		"stats":{"movespeed":15,"buildtime":200,"health":500,"healspeed":200},
+		"stats":{"movespeed":20,"buildtime":200,"health":500,"healspeed":200},
 		"name":"SPEARMAN",
 		"attackstyles":[
 			{"damage":30, "cooldown":30, "range":1}
@@ -63,7 +63,7 @@
 	{
 		"image":"Images/units/archer.png",
 		"cost":{"BRONZE_BAR":1,"FOOD":200},
-		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":200},
+		"stats":{"movespeed":20,"buildtime":200,"health":200,"healspeed":200},
 		"name":"ARCHER",
 		"attributes":["hostile"],
 		"attackstyles":[
@@ -75,7 +75,7 @@
 	{
 		"image":"Images/units/swordsman.png",
 		"cost":{"IRON_BAR":4,"WOOD":100,"FOOD":200},
-		"stats":{"movespeed":10,"buildtime":200,"health":300,"healspeed":200},
+		"stats":{"movespeed":20,"buildtime":200,"health":500,"healspeed":200},
 		"name":"SWORDSMAN",
 		"attackstyles":[
 			{"damage":40, "cooldown":20, "range":1}
@@ -87,8 +87,8 @@
 	},
 	{
 		"image":"Images/units/longbowman.png",
-		"cost":{"MITHRIL_BAR":4, "WOOD":100, "FOOD":100},
-		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":200},
+		"cost":{"MITHRIL_BAR":2, "WOOD":100, "FOOD":100},
+		"stats":{"movespeed":20,"buildtime":200,"health":200,"healspeed":200},
 		"name":"LONGBOWMAN",
 		"attackstyles":[
 			{"damage":60, "cooldown":30, "range":6, "minrange":1, "projectile":"ARROW"}
@@ -154,7 +154,7 @@
 	{
 		"image":"Images/units/horseman.png",
 		"cost":{"HORSE":50, "FOOD":200},
-		"stats":{"movespeed":10,"buildtime":300,"health":200,"healspeed":200},
+		"stats":{"movespeed":10,"buildtime":300,"health":100,"healspeed":200},
 		"name":"HORSEMAN",
 		"attackstyles":[
 			{"damage":20, "cooldown":20, "range":1}
@@ -166,7 +166,7 @@
 	},
 	{
 		"image":"Images/units/knight.png",
-		"cost":{"HORSE":200,"FOOD":400, "ADAMANTITE_BAR":5,"WOOD":100},
+		"cost":{"HORSE":100,"FOOD":400, "ADAMANTITE_BAR":5,"WOOD":100},
 		"stats":{"movespeed":5,"buildtime":600,"health":500,"healspeed":200},
 		"name":"KNIGHT",
 		"attackstyles":[
@@ -179,7 +179,7 @@
 	},
 	{
 		"image":"Images/units/wizard.png",
-		"stats":{"movespeed":15,"buildtime":1000,"health":200,"healspeed":200},
+		"stats":{"movespeed":20,"buildtime":1000,"health":200,"healspeed":200},
 		"cost":{"FOOD":200, "GOLD_BAR": 25},
 		"name":"WIZARD",
 		"attackstyles":[
@@ -381,7 +381,7 @@
 		"attributes":["hostile","delayedinvasion"],
 		"resistances": {"COLD": 0},
 		"targeting":[
-			{"type":"SAWMILL"}, 
+			{"type":"FARM", "faction":"PLAYER"},
 			{"type":"WALL_WOOD", "faction":"PLAYER"},
 			{"type":"game.Building", "faction":"PLAYER"},
 			{"type":"game.Unit", "faction":"PLAYER"}
@@ -414,6 +414,7 @@
 		"resistances": {"HEAT": 0},
 		"targeting":[
 			{"type":"MINE"}
+			{"type":"game.Unit", "faction":"PLAYER"}
 		],
 		"loot":{"COAL":500, "MITHRIL_BAR":25, "IRON_BAR":25, "ADAMANTITE_BAR":25}
 	},
@@ -427,6 +428,9 @@
 		],
 		"research":"TRAPPING",
 		"attributes":["hostile"],
+		"targeting":[
+			{"type":"game.Unit", "faction":"PLAYER"}
+		],
 		"resistances": {"COLD": 0},
 		"loot":{"FOOD":500, "BRONZE_BAR": 5}
 	},
@@ -489,6 +493,7 @@
 		"attributes":["hostile"],
 		"resistances": {"HEAT": 0},
 		"targeting":[
+			{"type":"FARM", "faction":"PLAYER"},
 			{"type":"game.Building", "faction":"PLAYER"},
 			{"type":"game.Building"}
 		],
@@ -523,6 +528,7 @@
 		],
 		"attributes":["flying", "hostile"],
 		"targeting":[
+			{"type":"TRAP", "faction":"PLAYER"},
 			{"type":"game.Building", "faction":"PLAYER"},
 			{"type":"game.Unit", "faction":"PLAYER"},
 			{"type":"game.Unit", "faction":"CYCLOPS"}
@@ -575,7 +581,6 @@
 		"attributes":["hostile","delayedinvasion"],
 		"resistances": {"COLD": 0, "HEAT": 0},
 		"targeting":[
-			{"type":"GATE_BRICK"},
 			{"type":"GATE_STONE"},
 			{"type":"GATE_WOOD"},
 			{"type":"game.Building", "faction":"PLAYER"},
@@ -592,6 +597,7 @@
 		],
 		"targeting":[
 			{"type":"WALL"},
+			{"type":"FARM", "faction":"PLAYER"},
 			{"type":"game.Building"}
 		],
 		"attributes":["hostile"],
