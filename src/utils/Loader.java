@@ -168,6 +168,11 @@ public class Loader {
 				cost = loadItemTypeMap(buildingTypeObject.getJSONObject("cost"));
 			}
 			
+			HashMap<ItemType, Integer> itemProduced = null;
+			if(buildingTypeObject.has("produces")) {
+				itemProduced = loadItemTypeMap(buildingTypeObject.getJSONObject("produces"));
+			}
+			
 			int inventoryStackSize = 0;
 			if(buildingTypeObject.has("inventory")) {
 				JSONObject inventoryProperties = buildingTypeObject.getJSONObject("inventory");
@@ -181,7 +186,7 @@ public class Loader {
 
 			Set<GameComponent> components = loadComponents(buildingTypeObject);
 			BuildingType buildingType = new BuildingType(name, info, health, effort, image, tiledImageFolder,
-					culture, vision, researchReq, cost, buildsunits, movespeed, attributes, inventoryStackSize,
+					culture, vision, researchReq, cost, itemProduced, buildsunits, movespeed, attributes, inventoryStackSize,
 					effort_to_produce_item, effort_to_produce_harvest);
 			buildingType.getComponents().addAll(components);
 			buildingTypeMap.put(name, buildingType);

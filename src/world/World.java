@@ -787,7 +787,7 @@ public class World {
 					p.takeDamage((int)p.getHealth(), DamageType.PHYSICAL);
 					worldData.addDeadThing(p);
 				}
-				if(building.getType().isHarvestable() == false) {
+				if(building.getType().isProducing() == false) {
 					continue;
 				}
 				

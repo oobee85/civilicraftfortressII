@@ -826,7 +826,7 @@ public final class Utils {
 				if(unit.isBuilder() && unit.getBuildableBuildingTypes().contains(buildingType)) {
 					Building plannedBuilding = game.planBuilding(unit, buildingType, target);
 					// if building is planned, and is harvestable, should queue harvest action
-					if(plannedBuilding != null && plannedBuilding.getType().isHarvestable()) {
+					if(plannedBuilding != null && plannedBuilding.getType().isProducing()) {
 						PlannedAction followup = PlannedAction.harvest(plannedBuilding);
 						unit.queuePlannedAction(PlannedAction.buildOnTile(target, buildingType.isRoad(), followup));
 					}

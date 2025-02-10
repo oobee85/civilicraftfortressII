@@ -27,6 +27,7 @@ public class BuildingType implements Serializable {
 	private transient final double effort_to_produce_harvest;
 	private transient final double base_effort_to_produce_harvest;
 	private transient final HashMap <ItemType, Integer> cost;
+	private transient final HashMap <ItemType, Integer> itemProduced;
 	private transient final HashSet<String> attributes;
 	private transient final int inventoryStackSize;
 	private transient final String[] canProduce;
@@ -37,7 +38,7 @@ public class BuildingType implements Serializable {
 	
 	public BuildingType(String name, String info, int hp, double buildingEffort,
 			String texturePath, String tiledImageFolder, double cultureRate, int visionRadius, 
-			String requirement, HashMap <ItemType, Integer> resourcesNeeded,
+			String requirement, HashMap <ItemType, Integer> resourcesNeeded, HashMap <ItemType, Integer> itemProduced,
 			String[] canProduce, double moveSpeedEnhancement, HashSet<String> attributes,
 			int inventoryStackSize, double effort_to_produce_item, double effort_to_produce_harvest) {
 		id = idCounter++;
@@ -52,6 +53,7 @@ public class BuildingType implements Serializable {
 		this.effort_to_produce_item = effort_to_produce_item;
 		this.effort_to_produce_harvest = effort_to_produce_harvest;
 		this.cost = resourcesNeeded;
+		this.itemProduced = itemProduced;
 		this.visionRadius = visionRadius;
 		this.canProduce = canProduce;
 		this.attributes = attributes;
@@ -98,10 +100,6 @@ public class BuildingType implements Serializable {
 		return cultureRate;
 	}
 
-//	public Image getRoadImage(String roadCorner) {
-//		return roadImages.get(roadCorner);
-//	}
-	
 	public boolean isTiledImage() {
 		return tiledMipmap != null;
 	}
@@ -141,11 +139,11 @@ public class BuildingType implements Serializable {
 	public boolean isUpgrading() {
 		return attributes.contains("upgrade");
 	}
-	public boolean isAutomaticCrafting() {
-		return attributes.contains("automatic");
-	}
 	public boolean isHarvestable() {
 		return attributes.contains("harvestable");
+	}
+	public boolean isProducing() {
+		return attributes.contains("producing");
 	}
 	public boolean isTrap() {
 		return attributes.contains("trap");
@@ -165,6 +163,9 @@ public class BuildingType implements Serializable {
 	
 	public HashMap<ItemType, Integer> getCost(){
 		return cost;
+	}
+	public HashMap<ItemType, Integer> getProduced(){
+		return itemProduced;
 	}
 	
 	public double getBuildingEffort() {

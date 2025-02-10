@@ -776,7 +776,7 @@ public class Game {
 			building.tick(world, simulated);
 			
 			if(World.ticks % 2 == 0) {
-				if(building.getType().isCrafting() && building.readyToProduce()) {
+				if(building.getType().isCrafting() && building.readyToCraft()) {
 					haveBuildingProduceItem(building);
 				}
 			}
@@ -885,7 +885,7 @@ public class Game {
 //			if(faction.canAfford(crafting, 1)) {
 				
 				faction.craftItem(crafting, 1);
-				building.resetTimeToProduce();
+				building.resetTimeToCraft();
 //				System.out.println("crafting item: " + crafting.name());
 				
 				// decide what sound to play

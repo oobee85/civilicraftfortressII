@@ -2,7 +2,7 @@ package game;
 
 import java.io.*;
 import java.util.*;
-import java.util.List;
+import java.util.Map.Entry;
 
 import game.actions.*;
 import game.components.GameComponent;
@@ -23,10 +23,10 @@ public class Building extends Thing implements Serializable {
 	private LinkedList<Item> producingItemList = new LinkedList<Item>();
 	private double culture;
 	private transient Tile spawnLocation;
-	private transient double timeToHarvest;
-	private transient double baseTimeToHarvest;
 	private transient double timeToProduce;
 	private transient double baseTimeToProduce;
+	private transient double timeToCraft;
+	private transient double baseTimeToCraft;
 	private boolean isPlanned;
 
 	private int remainingEffortToProduceUnit;
@@ -43,10 +43,10 @@ public class Building extends Thing implements Serializable {
 		this.totalEffort = buildingType.getBuildingEffort();
 		this.buildingType = buildingType;
 		this.spawnLocation = tile;
-		this.timeToHarvest = buildingType.getEffortToProduceHarvest();
-		this.baseTimeToHarvest = buildingType.getEffortToProduceHarvest(); // 20
-		this.timeToProduce = buildingType.getEffortToProduceItem();
-		this.baseTimeToProduce = buildingType.getEffortToProduceItem();
+		this.timeToProduce = buildingType.getEffortToProduceHarvest();
+		this.baseTimeToProduce = buildingType.getEffortToProduceHarvest(); // 20
+		this.timeToCraft = buildingType.getEffortToProduceItem();
+		this.baseTimeToCraft = buildingType.getEffortToProduceItem();
 		this.isPlanned = false;
 //		setRoadCorner(Direction.ALL_DIRECTIONS);
 		for(GameComponent c : buildingType.getComponents()) {
@@ -60,11 +60,11 @@ public class Building extends Thing implements Serializable {
 		return isPlanned;
 	}
 	public void tick(World world, boolean simulated) {
-		if (timeToHarvest > 0) {
-			timeToHarvest -= 1;
-		}
 		if (timeToProduce > 0) {
 			timeToProduce -= 1;
+		}
+		if (timeToCraft > 0) {
+			timeToCraft -= 1;
 		}
 		
 		if (!simulated && World.ticks % Constants.TICKS_PER_ENVIRONMENTAL_DAMAGE == 0) {
@@ -140,7 +140,7 @@ public class Building extends Thing implements Serializable {
 						else if(building != null && building.getFactionID() == unit.getFactionID() && building.getType().isHarvestable()) {
 							// if building is harvestable
 							whatToDo = PlannedAction.harvest(building);
-						}else if(building != null && building.getFactionID() == unit.getFactionID() && building.getType().isHarvestable()) {
+						}else if(building != null && building.getFactionID() == unit.getFactionID() && !building.getType().isHarvestable()) {
 							// if building is not harvestable
 						}
 						
@@ -167,27 +167,31 @@ public class Building extends Thing implements Serializable {
 		if(getType().isCastle()) {
 			getFaction().getInventory().takeAll(this.getInventory());
 		}
-
-		if(!readyToHarvest() ) {
+		
+		BuildingType type = this.getType();
+		if(!readyToProduce() ) {
 			return;
 		}
-		if(getType() == Game.buildingTypeMap.get("CASTLE")) {
-			getFaction().spendResearch(10);
-			getFaction().getInventory().addItem(ItemType.FOOD, 1);
-			resetTimeToHarvest();
+		if(type.isProducing()) {
+			if(type.getProduced() == null) {
+				System.err.println("Building.java tick() Building.getProduced() is null: " + type.name());
+			}
+			Faction faction = this.getFaction();
+			// produce items
+			for (Entry<ItemType, Integer> entry : type.getProduced().entrySet()) {
+				faction.getInventory().addItem(entry.getKey(), entry.getValue());
+			}
+			
+			if(type == Game.buildingTypeMap.get("CASTLE")) {
+				getFaction().spendResearch(10);
+			}
+			resetTimeToProduce();
 		}
-		else if(getType() == Game.buildingTypeMap.get("GRANARY")) {
-			getFaction().getInventory().addItem(ItemType.FOOD, 2);
-			resetTimeToHarvest();
-		}
-		else if(getType() == Game.buildingTypeMap.get("WINDMILL")) {
-			getFaction().getInventory().addItem(ItemType.FOOD, 5);
-			resetTimeToHarvest();
-		}
-		else if(getType().isTrap()) {
+		
+		if(getType().isTrap()) {
 			for(ItemType itemType: stablesCaptured) {
 				this.getInventory().addItem(itemType, 1);
-				resetTimeToHarvest();
+				resetTimeToProduce();
 				amountHarvested ++;
 				// every 50 harvests, play sound
 				if(amountHarvested % 50 == 0) {
@@ -206,29 +210,29 @@ public class Building extends Thing implements Serializable {
 	public boolean isMoria() {
 		return isMoria;
 	}
-	public boolean readyToHarvest() {
-		return timeToHarvest <= 0;
-	}
-	public void resetTimeToHarvest(double timeToHarvest) {
-		this.timeToHarvest = timeToHarvest;
-	}
-	public void resetTimeToHarvest() {
-//		if(getTile().getResource() != null) {
-//			resetTimeToHarvest(getTile().getResource().getTimeToHarvest());
-//		}
-//		else {
-		resetTimeToHarvest(baseTimeToHarvest);
-//		}	
-	}
+	
+	// for producing items, like food
 	public boolean readyToProduce() {
 		return timeToProduce <= 0;
 	}
-	public void resetTimeToProduce(double timeToProduce) {
+	public void setTimeToProduce(double timeToProduce) {
 		this.timeToProduce = timeToProduce;
 	}
 	public void resetTimeToProduce() {
 		this.timeToProduce = this.baseTimeToProduce;
 	}
+	
+	// for crafting items automatically
+	public boolean readyToCraft() {
+		return timeToCraft <= 0;
+	}
+	public void setTimeToCraft(double timeToCraft) {
+		this.timeToCraft = timeToCraft;
+	}
+	public void resetTimeToCraft() {
+		this.timeToCraft = this.baseTimeToCraft;
+	}
+	
 	public Tile getSpawnLocation() {
 		return spawnLocation;
 	}
@@ -256,12 +260,12 @@ public class Building extends Thing implements Serializable {
 	public LinkedList<Unit> getProducingUnit() {
 		return producingUnitList;
 	}
-	public void addProducingItem(Item producingItem) {
-		this.producingItemList.add(producingItem);
-	}
-	public LinkedList<Item> getProducingItem() {
-		return producingItemList;
-	}
+//	public void addProducingItem(Item producingItem) {
+//		this.producingItemList.add(producingItem);
+//	}
+//	public LinkedList<Item> getProducingItem() {
+//		return producingItemList;
+//	}
 	public double getCulture() {
 		return culture;
 	}

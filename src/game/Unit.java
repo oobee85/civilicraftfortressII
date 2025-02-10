@@ -484,7 +484,7 @@ public class Unit extends Thing implements Serializable {
 			return;
 		}
 		
-		if (!readyToHarvest() || !hasInventory() || !building.readyToHarvest()) {
+		if (!readyToHarvest() || !hasInventory() || !building.readyToProduce()) {
 			return;
 		}
 		
@@ -497,7 +497,7 @@ public class Unit extends Thing implements Serializable {
 			building.takeDamage(5 * modifier, DamageType.PHYSICAL);
 			getInventory().addItem(ItemType.FOOD, 5 * modifier);
 			this.resetTimeToHarvest(4);
-			building.resetTimeToHarvest(this.timeToHarvest);
+			building.setTimeToProduce(this.timeToHarvest);
 			// set up followup action
 			if (building.isDead()) {
 				building.setPlanned(true);
@@ -510,7 +510,7 @@ public class Unit extends Thing implements Serializable {
 			building.takeDamage(5, DamageType.PHYSICAL);
 			getInventory().addItem(ItemType.STONE, 5);
 			this.resetTimeToHarvest(5);
-			building.resetTimeToHarvest(this.timeToHarvest);
+			building.setTimeToProduce(this.timeToHarvest);
 			
 			// set up followup action
 			if (building.isDead()) {
@@ -525,7 +525,7 @@ public class Unit extends Thing implements Serializable {
 			building.takeDamage(5, DamageType.PHYSICAL);
 			getInventory().addItem(ItemType.MAGIC, 5);
 			this.resetTimeToHarvest(5);
-			building.resetTimeToHarvest(this.timeToHarvest);
+			building.setTimeToProduce(this.timeToHarvest);
 			
 			// set up followup action
 			if (building.isDead()) {
@@ -705,6 +705,7 @@ public class Unit extends Thing implements Serializable {
 		}
 		boolean didSomething = false;
 		if(plan.isBuildRoadAction() && isBuilder()) {
+			// when road finishes, worker doesn't die
 			Building tobuild = plan.getTile().getRoad();
 			if(tobuild != null) {
 				didSomething = true;
@@ -712,9 +713,13 @@ public class Unit extends Thing implements Serializable {
 			}
 		}
 		else if(plan.isBuildBuildingAction() && isBuilder()) {
-			Building tobuild = plan.getTile().getBuilding();
-			if(tobuild != null) {
-				buildBuilding(tobuild);
+			Building toBuild = plan.getTile().getBuilding();
+			if(toBuild != null) {
+				// when the building finishes, the worker dies
+				boolean finishedBuilding = buildBuilding(toBuild);
+				if(finishedBuilding && toBuild.getType().isProducing()) {
+					this.setDead(true);
+				}
 				didSomething = true;
 			}
 		}
@@ -728,7 +733,7 @@ public class Unit extends Thing implements Serializable {
 				isBuilder() && 
 				plan.target != null && 
 				plan.target instanceof Building && 
-				((Building)plan.target).getType().isHarvestable()) {
+				((Building)plan.target).getType().isProducing()) {
 			this.doHarvestBuilding((Building)plan.target, plan);
 			didSomething = true;
 		}

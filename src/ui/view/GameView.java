@@ -540,14 +540,14 @@ public class GameView {
 					if (targetBuilding != null && 
 							targetBuilding.getFactionID() == unit.getFactionID() && 
 							targetBuilding.isBuilt() && 
-							targetBuilding.getType().isHarvestable()) {
+							targetBuilding.getType().isProducing()) {
 						commandInterface.planAction(unit, PlannedAction.harvest(targetBuilding), !shiftDown);
 					}
 					else if (targetBuilding != null
 							&& (targetBuilding.getFactionID() == unit.getFactionID() || targetBuilding.getType().isRoad())
 							&& !targetBuilding.isBuilt()) {
 						PlannedAction plan;
-						if (targetBuilding.getType().isHarvestable()) {
+						if (targetBuilding.getType().isProducing()) {
 							plan = PlannedAction.buildOnTile(
 									targetBuilding.getTile(),
 									targetBuilding.getType().isRoad(),
