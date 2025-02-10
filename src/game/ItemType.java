@@ -30,19 +30,19 @@ public enum ItemType {
 	RUNITE_ORE 		( "Images/itemicons/runite_ore.png"),
 	TITANIUM_ORE 	( "Images/itemicons/titanium_ore.png"),
 	
-	BRICK 	   	   ("QUARRY",  makeCosts(CLAY,1),						"Images/itemicons/brick.png"),
+	BRICK 	   	   ("QUARRY",  makeCosts(CLAY,2),						"Images/itemicons/brick.png"),
 	
 	BRONZE_BAR 	   ("SMITHY",  makeCosts(COPPER_ORE,5, SILVER_ORE, 5),	"Images/itemicons/bronze_bar.png"),
 	GOLD_BAR 	   ("SMITHY",  makeCosts(GOLD_ORE, 10), 				"Images/itemicons/gold_bar.png"),
 	IRON_BAR 	   ("SMITHY",  makeCosts(COAL,10, 	IRON_ORE,10),		"Images/itemicons/iron_bar.png"),
 	MITHRIL_BAR    ("SMITHY",  makeCosts(COAL,20, 	MITHRIL_ORE,20),	"Images/itemicons/mithril_bar.png"),
 	ADAMANTITE_BAR ("SMITHY",  makeCosts(COAL,50, 	ADAMANTITE_ORE,50),	"Images/itemicons/adamantite_bar.png"),
-	RUNITE_BAR 	   ("SMITHY",  makeCosts(COAL,100, 	RUNITE_ORE,100),	"Images/itemicons/runite_bar.png"),
-	TITANIUM_BAR   ("SMITHY",  makeCosts(COAL,100, 	TITANIUM_ORE,100),	"Images/itemicons/titanium_bar.png"),
+	RUNITE_BAR 	   ("SMITHY",  makeCosts(COAL,50, 	RUNITE_ORE,50),		"Images/itemicons/runite_bar.png"),
+	TITANIUM_BAR   ("SMITHY",  makeCosts(COAL,50, 	TITANIUM_ORE,50),	"Images/itemicons/titanium_bar.png"),
 	
-	SWORD  	 ("SAWMILL",  makeCosts(WOOD,50, BRONZE_BAR, 1),	"Images/itemicons/sword.png"),
-	SHIELD   ("SAWMILL",  makeCosts(WOOD,50, BRONZE_BAR, 1),	"Images/itemicons/shield.png"),
-	BOW		 ("SAWMILL",  makeCosts(WOOD,50),	"Images/itemicons/bow.png"),
+	SWORD  	 ("SAWMILL",  makeCosts(WOOD,100, BRONZE_BAR, 1),	"Images/itemicons/sword.png"),
+	SHIELD   ("SAWMILL",  makeCosts(WOOD,100, BRONZE_BAR, 1),	"Images/itemicons/shield.png"),
+	BOW		 ("SAWMILL",  makeCosts(WOOD,100, BRONZE_BAR, 1),	"Images/itemicons/bow.png"),
 	
 	BREAD	("GRANARY",  makeCosts(FOOD,50),	"Images/itemicons/farming.png"),
 	

@@ -11,9 +11,9 @@ public class AttackUtils {
 
 	public static void shoot(Unit unit, Thing target, AttackStyle style) {
 		for(Unit u : target.getTile().getUnits()) {
-			if(target.getTile().getThingOfFaction(unit.getFaction()) != null && u.getFaction() != unit.getFaction()) {
-				return;
-			}
+//			if(target.getTile().getThingOfFaction(unit.getFaction()) != null && u.getFaction() != unit.getFaction()) {
+//				return;
+//			}
 		}
 		if(style.getProjectile() == ProjectileType.FIRE_WAVE) {
 			fireWave(unit, target, style);

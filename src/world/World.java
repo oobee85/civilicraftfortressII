@@ -694,7 +694,7 @@ public class World {
 		}
 		//if the humidity is more than the max terrain humidity
 		if (tile.getAir().getHumidity() > terrain.getMinMax().y ) {
-			if (terrain == Terrain.DIRT && tile.canGrow() && numGrassNeighbor >= 3) {
+			if (terrain == Terrain.DIRT && numGrassNeighbor >= 3) {
 				tile.setTerrain(Terrain.GRASS);
 				tile.setTickLastTerrainChange(World.ticks);
 				
@@ -854,7 +854,7 @@ public class World {
 //				}
 //			}
 			
-			if(terrain == Terrain.GRASS && tile.canGrow() == false && Math.random() < Constants.CHANCE_TO_SWITCH_TERRAIN/1000) {
+			if(terrain == Terrain.GRASS && Math.random() < Constants.CHANCE_TO_SWITCH_TERRAIN/1000) {
 				tile.setTerrain(Terrain.DIRT);
 				tile.setTickLastTerrainChange(World.ticks);
 			}

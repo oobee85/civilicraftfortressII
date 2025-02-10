@@ -254,7 +254,7 @@ public class Faction implements Externalizable {
 				influence += building.getMaxHealth() / 15;
 			}
 			else {
-				influence += building.getMaxHealth() / 5;
+				influence += building.getMaxHealth() / 4;
 			}
 		}
 		for (Unit unit : getUnits()) {

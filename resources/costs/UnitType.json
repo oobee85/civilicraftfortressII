@@ -35,7 +35,7 @@
 			{"damage":0, "cooldown":60, "range":1}
 		],
 		"attributes":["caravan"],
-		"inventory":{"maxstack":600}
+		"inventory":{"maxstack":1000}
 	},
 	{
 		"image":"Images/units/warrior.png",
@@ -180,7 +180,7 @@
 	{
 		"image":"Images/units/wizard.png",
 		"stats":{"movespeed":20,"buildtime":1000,"health":200,"healspeed":200},
-		"cost":{"FOOD":200, "GOLD_BAR": 25},
+		"cost":{"FOOD":200, "GOLD_BAR": 25, "MAGIC": 50},
 		"name":"WIZARD",
 		"attackstyles":[
 			{"damage":100, "cooldown":50, "range":5, "minrange":1, "projectile":"WIZARD_BALL"}
@@ -211,7 +211,7 @@
 	{
 		"image":"Images/units/priest.png",
 		"stats":{"movespeed":15,"buildtime":500,"health":100,"healspeed":200},
-		"cost":{"FOOD":200, "GOLD_BAR": 4},
+		"cost":{"FOOD":200, "GOLD_BAR": 5},
 		"name":"PRIEST",
 		"attackstyles":[
 		],
@@ -413,7 +413,7 @@
 		"attributes":["hostile","delayedinvasion"],
 		"resistances": {"HEAT": 0},
 		"targeting":[
-			{"type":"MINE"}
+			{"type":"MINE"},
 			{"type":"game.Unit", "faction":"PLAYER"}
 		],
 		"loot":{"COAL":500, "MITHRIL_BAR":25, "IRON_BAR":25, "ADAMANTITE_BAR":25}

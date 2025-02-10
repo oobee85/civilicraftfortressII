@@ -674,9 +674,9 @@ public class Game {
 		granary.setInventory(cyclopsFaction.getInventory());
 		// makes the walls
 		for (int i = 0; i < 5; i++) {
-			BuildingType type = Game.buildingTypeMap.get("WALL_WOOD");
+			BuildingType type = Game.buildingTypeMap.get("WALL_STONE");
 			if (i == 2) {
-				type = Game.buildingTypeMap.get("GATE_WOOD");
+				type = Game.buildingTypeMap.get("GATE_STONE");
 			}
 			Tile wall;
 			wall = world.get(new TileLoc(tile.getLocation().x() + 3, tile.getLocation().y() - 2 + i));
@@ -685,9 +685,9 @@ public class Game {
 			summonBuilding(wall, type, cyclopsFaction);
 		}
 		for (int i = 1; i < 6; i++) {
-			BuildingType type = Game.buildingTypeMap.get("WALL_WOOD");
+			BuildingType type = Game.buildingTypeMap.get("WALL_STONE");
 			if (i == 3) {
-				type = Game.buildingTypeMap.get("GATE_WOOD");
+				type = Game.buildingTypeMap.get("GATE_STONE");
 			}
 			Tile wall;
 			int yoffset = i;

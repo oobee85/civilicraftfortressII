@@ -361,7 +361,12 @@ public class Unit extends Thing implements Serializable {
 		// actually do the attack
 		if(style.getProjectile() == null) {
 			double initialHP = target.getHealth();
-			int damage = style.getDamage() + this.getFaction().getUpgradedAttackStyle().getDamage(); // merge attack styles
+			int damage = style.getDamage();
+			if(this.getType() == Game.unitTypeMap.get("WORKER")) {
+				// dont add buffed attack style if its a worker
+			}else {
+				damage += + this.getFaction().getUpgradedAttackStyle().getDamage(); // merge attack styles
+			}
 			//does cleave damage
 			if(this.getType().hasCleave()) {
 				for(Unit unit : target.getTile().getUnits()) {
@@ -473,7 +478,7 @@ public class Unit extends Thing implements Serializable {
 	}
 	
 	public void doHarvestBuilding(Building building, PlannedAction action) {
-		if (building.isDead()) {
+		if (building.isDead() || !building.getType().isHarvestable()) {
 			action.setDone(true);
 			return;
 		}
@@ -493,51 +498,51 @@ public class Unit extends Thing implements Serializable {
 		}
 		
 		// harvest from farm
-		if (building.getType() == BasicAI.FARM) {
-			int modifier = 1;
-//			if(building.getTile().canGrow() == false) {
-//				modifier /= 2;
+//		if (building.getType() == BasicAI.FARM) {
+//			int modifier = 1;
+////			if(building.getTile().canGrow() == false) {
+////				modifier /= 2;
+////			}
+//			building.takeDamage(5 * modifier, DamageType.PHYSICAL);
+//			getInventory().addItem(ItemType.FOOD, 5 * modifier);
+//			this.resetTimeToHarvest(4);
+//			building.setTimeToProduce(this.timeToHarvest);
+//			// set up followup action
+//			if (building.isDead()) {
+//				building.setPlanned(true);
+//				building.setHealth(1);
+//				building.setRemainingEffort(building.getType().getBuildingEffort());
 //			}
-			building.takeDamage(5 * modifier, DamageType.PHYSICAL);
-			getInventory().addItem(ItemType.FOOD, 5 * modifier);
-			this.resetTimeToHarvest(4);
-			building.setTimeToProduce(this.timeToHarvest);
-			// set up followup action
-			if (building.isDead()) {
-				building.setPlanned(true);
-				building.setHealth(1);
-				building.setRemainingEffort(building.getType().getBuildingEffort());
-			}
-		}
-		// harvest from mine
-		else if (building.getType() == BasicAI.MINE) {
-			building.takeDamage(5, DamageType.PHYSICAL);
-			getInventory().addItem(ItemType.STONE, 5);
-			this.resetTimeToHarvest(5);
-			building.setTimeToProduce(this.timeToHarvest);
-			
-			// set up followup action
-			if (building.isDead()) {
-				building.setPlanned(true);
-				building.setHealth(1);
-				building.setRemainingEffort(building.getType().getBuildingEffort());
-			}
-			
-		}
-		// harvest from research lab
-		else if (building.getType() == BasicAI.LAB) {
-			building.takeDamage(5, DamageType.PHYSICAL);
-			getInventory().addItem(ItemType.MAGIC, 5);
-			this.resetTimeToHarvest(5);
-			building.setTimeToProduce(this.timeToHarvest);
-			
-			// set up followup action
-			if (building.isDead()) {
-				building.setPlanned(true);
-				building.setHealth(1);
-				building.setRemainingEffort(building.getType().getBuildingEffort());
-			}
-		}
+//		}
+//		// harvest from mine
+//		else if (building.getType() == BasicAI.MINE) {
+//			building.takeDamage(5, DamageType.PHYSICAL);
+//			getInventory().addItem(ItemType.STONE, 5);
+//			this.resetTimeToHarvest(5);
+//			building.setTimeToProduce(this.timeToHarvest);
+//			
+//			// set up followup action
+//			if (building.isDead()) {
+//				building.setPlanned(true);
+//				building.setHealth(1);
+//				building.setRemainingEffort(building.getType().getBuildingEffort());
+//			}
+//			
+//		}
+//		// harvest from research lab
+//		else if (building.getType() == BasicAI.LAB) {
+//			building.takeDamage(5, DamageType.PHYSICAL);
+//			getInventory().addItem(ItemType.MAGIC, 5);
+//			this.resetTimeToHarvest(5);
+//			building.setTimeToProduce(this.timeToHarvest);
+//			
+//			// set up followup action
+//			if (building.isDead()) {
+//				building.setPlanned(true);
+//				building.setHealth(1);
+//				building.setRemainingEffort(building.getType().getBuildingEffort());
+//			}
+//		}
 		
 		if (getInventory().isFull()) {
 			action.setDone(true);
@@ -557,6 +562,7 @@ public class Unit extends Thing implements Serializable {
 			}
 		}
 	}
+	
 	public void doHarvest(Tile tile, PlannedAction action) {
 		if(readyToHarvest() && hasInventory()) {
 			//  figure out if harvest stone or ore
@@ -571,7 +577,7 @@ public class Unit extends Thing implements Serializable {
 			}
 			if(itemType != null) {
 				getInventory().addItem(itemType, 1);
-				this.resetTimeToHarvest(2.5);
+				this.resetTimeToHarvest(2.5); // much slower to harvest from tile
 				if(getInventory().isFull()) {
 					action.setDone(true);
 				}
@@ -737,7 +743,7 @@ public class Unit extends Thing implements Serializable {
 				isBuilder() && 
 				plan.target != null && 
 				plan.target instanceof Building && 
-				((Building)plan.target).getType().isProducing()) {
+				((Building)plan.target).getType().isHarvestable()) {
 			this.doHarvestBuilding((Building)plan.target, plan);
 			didSomething = true;
 		}
@@ -898,7 +904,7 @@ public class Unit extends Thing implements Serializable {
 	public void doPassiveThings(World world) {
 		// Workers building stuff
 		if (isBuilder()) {
-			//worker harvesting
+			//worker harvesting plant
 			if(readyToHarvest() && isHarvesting == true && this.getTile().getPlant() != null) {
 				for(Item item: this.getTile().getPlant().getItem()) {
 					ItemType itemType = item.getType();

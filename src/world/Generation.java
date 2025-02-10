@@ -318,6 +318,9 @@ public class Generation {
 				
 				// if tile cant support ore and the resource isnt an ore
 				if(!tile.canOre() && resource == ResourceType.CLAY) {
+					if(tile.getTerrain() == Terrain.ROCK) {
+						break;
+					}
 					// if the tile height is within range of the spawn height
 					if(tile.getHeight() >= resource.getMinHeight() && tile.getHeight() <= resource.getMaxHeight()) {
 						ArrayList<Terrain> terrainList = new ArrayList<Terrain>();
