@@ -40,7 +40,6 @@ public class Game {
 
 	public Game(GUIController guiController) {
 		this.guiController = guiController;
-		Loader.doTargetingMappings();
 	}
 
 	public void saveToFile() {

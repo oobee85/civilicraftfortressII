@@ -44,19 +44,23 @@ public class Loader {
 		
 		Loader.doMappings();
 		Loader.loadBuildOrders();
+		Loader.doTargetingMappings();
 	}
 	
 	public static void loadSounds() {
 		System.out.println("Loading Sounds");
+		long startTime = System.currentTimeMillis();
 		for(SoundEffect sound : SoundEffect.values()) {
-			SoundManager.loadSound(sound);
-			if(sound.getIsMusic()) {
-				SoundManager.theMusicEffectQueue.add(sound);
-				Sound theMusic = new Sound(sound, null, 1f);
-				SoundManager.theMusicQueue.add(theMusic);
-			}
-			
+			Utils.executorService.submit(() -> {
+				SoundManager.loadSound(sound);
+				if(sound.getIsMusic()) {
+					SoundManager.theMusicEffectQueue.add(sound);
+					Sound theMusic = new Sound(sound, null, 1f);
+					SoundManager.theMusicQueue.add(theMusic);
+				}
+			});
 		}
+		System.out.println("Sounds loaded in " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	
 	private static HashMap<ItemType, Integer> loadItemTypeMap(JSONObject costObject) {
@@ -93,6 +97,7 @@ public class Loader {
 	
 	public static void loadPlantType(HashMap<String, PlantType> plantTypeMap, ArrayList<PlantType> plantTypeList) {
 		System.out.println("Loading Plants");
+		long startTime = System.currentTimeMillis();
 		String plantTypeString = Utils.readFile("costs/PlantType.json");
 		JSONObject obj = new JSONObject(plantTypeString);
 		JSONArray arr = obj.getJSONArray("planttypes");
@@ -141,11 +146,13 @@ public class Loader {
 			plantTypeMap.put(name, plantType);
 			plantTypeList.add(plantType);
 		}
-		
+
+		System.out.println("PlantTypes loaded in " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	
 	public static void loadBuildingType(HashMap<String, BuildingType> buildingTypeMap, ArrayList<BuildingType> buildingTypeList) {
 		System.out.println("Loading Buildings");
+		long startTime = System.currentTimeMillis();
 		String buildingTypeString = Utils.readFile("costs/BuildingType.json");
 		JSONObject obj = new JSONObject(buildingTypeString);
 		JSONArray arr = obj.getJSONArray("buildingtypes");
@@ -221,6 +228,7 @@ public class Loader {
 			buildingTypeMap.put(name, buildingType);
 			buildingTypeList.add(buildingType);
 		}
+		System.out.println("BuildingTypes loaded in " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	public static void writeBuildingTypes() {
 //		JSONObject obj = new JSONObject();
@@ -278,6 +286,7 @@ public class Loader {
 	}
 	public static void loadUnitType(HashMap<String, UnitType> unitTypeMap, ArrayList<UnitType> unitTypeList) {
 		System.out.println("Loading Units");
+		long startTime = System.currentTimeMillis();
 		String unitTypeString = Utils.readFile("costs/UnitType.json");
 		JSONObject obj = new JSONObject(unitTypeString);
 		JSONArray arr = obj.getJSONArray("unittypes");
@@ -352,6 +361,7 @@ public class Loader {
 			unitTypeMap.put(name, unitType);
 			unitTypeList.add(unitType);
 		}
+		System.out.println("UnitTypes loaded in " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	
 	public static void writeUnitTypes() {
@@ -423,6 +433,7 @@ public class Loader {
 	
 	public static void loadResearchType(HashMap<String, ResearchType> researchTypeMap, ArrayList<ResearchType> researchTypeList) {
 		System.out.println("Loading Researches");
+		long startTime = System.currentTimeMillis();
 		String researchCosts = Utils.readFile("costs/ResearchType.json");
 		JSONObject obj = new JSONObject(researchCosts);
 		JSONArray arr = obj.getJSONArray("researches");
@@ -456,10 +467,12 @@ public class Loader {
 			researchTypeMap.put(researchName, researchType);
 			researchTypeList.add(researchType);
 		}
+		System.out.println("ResearchTypes loaded in " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	
 	public static void doMappings() {
 		System.out.println("Doing Mappings");
+		long startTime = System.currentTimeMillis();
 		for(BuildingType type : Game.buildingTypeList) {
 			for(String unittypestring : type.unitsCanProduce()) {
 				type.unitsCanProduceSet().add(Game.unitTypeMap.get(unittypestring));
@@ -492,8 +505,10 @@ public class Loader {
 				}
 			}
 		}
+		System.out.println("Mappings completed in " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	public static void doTargetingMappings() {
+		long startTime = System.currentTimeMillis();
 		for(UnitType type : Game.unitTypeList) {
 			if(type.getTargetingInfoStrings() != null) {
 				for(TargetInfo targetingInfo : type.getTargetingInfoStrings()) {
@@ -523,6 +538,7 @@ public class Loader {
 				}
 			}
 		}
+		System.out.println("TargetingMappings completed in " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	public static class TargetInfo {
 		public final String type;
@@ -564,6 +580,7 @@ public class Loader {
 	
 	public static void loadBuildOrders() {
 		System.out.println("Loading Build Orders");
+		long startTime = System.currentTimeMillis();
 		
 		String basicBuildOrder = Utils.readFile("buildorders/basic.json");
 		JSONObject obj = new JSONObject(basicBuildOrder);
@@ -645,6 +662,7 @@ public class Loader {
 		BuildOrderPhase.phases.sort((a, b) -> {
 			return a.order - b.order;
 		});
+		System.out.println("BuildOrders loaded in " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 
 	private static QuantityReq readQuantityReq(JSONObject obj) {

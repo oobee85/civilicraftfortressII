@@ -9,7 +9,8 @@ public class TiledMipmap {
 	private final HashMap<Integer, MipMap> mipmaps;
 	
 	public TiledMipmap(String imagepath) {
-		this.mipmaps = loadTiledImages(imagepath);
+		this.mipmaps = new HashMap<>();
+		Utils.executorService.submit(() -> loadTiledImages(imagepath, this.mipmaps));
 	}
 	
 	public MipMap get(int tileBitmap) {
@@ -17,10 +18,7 @@ public class TiledMipmap {
 	}
 	
 
-	private static final HashMap<Integer, MipMap> loadTiledImages(String tiledImageFolder) {
-
-		HashMap<Integer, MipMap> tiledImages = new HashMap<>();
-		
+	private static final HashMap<Integer, MipMap> loadTiledImages(String tiledImageFolder, HashMap<Integer, MipMap> tiledImages) {
 		for (int i = 1; i < Utils.MAX_TILED_BITMAP; i+=2) {
 			int bits = i;
 
