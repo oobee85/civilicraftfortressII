@@ -1,5 +1,6 @@
 package utils;
 import java.awt.*;
+import java.util.concurrent.Future;
 
 import javax.swing.*;
 
@@ -7,137 +8,123 @@ public class MipMap {
 	
 	private static final Color HIGHLIGHT_COLOR = Color.yellow;
 	public static final int NUM_SUN_SHADOWS = 10;
-	private static final double SUN_SHADOW_SQUISH_FACTOR = 0.4; 
-
-	private final ImageIcon[] mipmaps;
-	private final ImageIcon[] shadows;
-	private final ImageIcon[][] sunShadows;
-	private final ImageIcon[] highlights;
-	private final int[] mipmapSizes;
+	private static final double SUN_SHADOW_SQUISH_FACTOR = 0.4;
 	
-	private final Color[] avgColors;
+	private class ImageData {
+		int imageSize;
+		Color avgColor;
+		ImageIcon image;
+		ImageIcon shadow;
+		ImageIcon[] sunShadows;
+		ImageIcon highlight;
+		
+		public ImageData() {
+			imageSize = 1;
+			avgColor = Color.magenta;
+			image = Utils.getDefaultSkinImageIcon();
+			shadow = Utils.getDefaultSkinImageIcon();
+			highlight = Utils.getDefaultSkinImageIcon();
+			sunShadows = new ImageIcon[NUM_SUN_SHADOWS];
+			for (int shearIndex = 0; shearIndex < sunShadows.length; shearIndex++) {
+				sunShadows[shearIndex] = Utils.getDefaultSkinImageIcon();
+			}
+		}
+	}
+
+	public ImageData makeDataFromImage(ImageIcon image) {
+		ImageData data = new ImageData();
+		data.image = image;
+		data.imageSize = data.image.getIconWidth();
+		data.avgColor = Utils.getAverageColor(Utils.toBufferedImage(data.image.getImage(), false));
+		data.shadow = Utils.shadowFilter(data.image);
+		data.highlight = Utils.highlightFilter(data.image, HIGHLIGHT_COLOR);
+		data.sunShadows = new ImageIcon[NUM_SUN_SHADOWS];
+		for (int shearIndex = 0; shearIndex < data.sunShadows.length; shearIndex++) {
+			double shear = 3.3 / NUM_SUN_SHADOWS * (shearIndex - (data.sunShadows.length-1.0)/2.0);
+			shear = shear * shear * (shear >= 0 ? 1 : -1);
+			double squish = SUN_SHADOW_SQUISH_FACTOR - Math.abs(shearIndex - data.sunShadows.length/2)*2*SUN_SHADOW_SQUISH_FACTOR/data.sunShadows.length;
+			data.sunShadows[shearIndex] = Utils.sunShadowFilter(data.image, shear, squish);
+		}
+		return data;
+	}
+
+	public ImageData makeDataFromImage(Image image) {
+		return makeDataFromImage(new ImageIcon(image));
+	}
+	
+	private final ImageData[] data;
 	
 	public MipMap(Image image) {
-		int numFiles = 1;
-		
-		mipmaps = new ImageIcon[numFiles];
-		mipmapSizes = new int[numFiles];
-		avgColors = new Color[numFiles];
-		shadows = new ImageIcon[numFiles];
-		sunShadows = new ImageIcon[numFiles][NUM_SUN_SHADOWS];
-		highlights = new ImageIcon[numFiles];
-		int index = 0;
-		mipmaps[index] = new ImageIcon(image);
-		mipmapSizes[index] = mipmaps[index].getIconWidth();
-		avgColors[index] = Utils.getAverageColor(Utils.toBufferedImage(mipmaps[index].getImage(), false));
-		shadows[index] = Utils.shadowFilter(mipmaps[index]);
-		highlights[index] = Utils.highlightFilter(mipmaps[index], HIGHLIGHT_COLOR);
-		for (int shearIndex = 0; shearIndex < sunShadows[index].length; shearIndex++) {
-			double shear = 3.3 / NUM_SUN_SHADOWS * (shearIndex - (sunShadows[index].length-1.0)/2.0);
-			shear = shear * shear * (shear >= 0 ? 1 : -1);
-			double squish = SUN_SHADOW_SQUISH_FACTOR - Math.abs(shearIndex - sunShadows[index].length/2)*2*SUN_SHADOW_SQUISH_FACTOR/sunShadows[index].length;
-			sunShadows[index][shearIndex] = Utils.sunShadowFilter(mipmaps[index], shear, squish);
-		}
+		data = new ImageData[1];
+		data[0] = makeDataFromImage(image);
 	}
 
 	public MipMap(String[] paths) {
-		int numFiles = paths.length;
-		
-		mipmaps = new ImageIcon[numFiles];
-		mipmapSizes = new int[numFiles];
-		avgColors = new Color[numFiles];
-		shadows = new ImageIcon[numFiles];
-		sunShadows = new ImageIcon[numFiles][NUM_SUN_SHADOWS];
-		highlights = new ImageIcon[numFiles];
-		int index = 0;
-		for (String s : paths) {
-			mipmaps[index] = Utils.loadImageIcon(s);
-			if(s.endsWith(".gif")) {
-				// resizing animated imageicon is different from static
-				mipmaps[index].setDescription(Utils.IMAGEICON_ANIMATED);
-			}
-			mipmapSizes[index] = mipmaps[index].getIconWidth();
-			avgColors[index] = Utils.getAverageColor(Utils.toBufferedImage(mipmaps[index].getImage(), false));
-			shadows[index] = Utils.shadowFilter(mipmaps[index]);
-			highlights[index] = Utils.highlightFilter(mipmaps[index], HIGHLIGHT_COLOR);
-			for (int shearIndex = 0; shearIndex < sunShadows[index].length; shearIndex++) {
-				double shear = 3.3 / NUM_SUN_SHADOWS * (shearIndex - (sunShadows[index].length-1.0)/2.0);
-				shear = shear * shear * (shear >= 0 ? 1 : -1);
-				double squish = SUN_SHADOW_SQUISH_FACTOR - Math.abs(shearIndex - sunShadows[index].length/2)*2*SUN_SHADOW_SQUISH_FACTOR/sunShadows[index].length;
-				sunShadows[index][shearIndex] = Utils.sunShadowFilter(mipmaps[index], shear, squish);
-			}
-
-			index++;
-		}
+		this(paths, null);
 	}
 	public MipMap(String[] paths, Color[] averageColor) {
-		this(paths);
-		int index = 0;
-		for (String s : paths) {
-			avgColors[index] = averageColor[index];
-			index++;
+		int numFiles = paths.length;
+		data = new ImageData[numFiles];
+
+		// INITIALIZE IMAGES WITH DEFAULT MAGENTA SQUARES
+		for (int i = 0; i < data.length; i++) {
+			data[i] = new ImageData();
 		}
+
+		// LOAD THE ACTUAL IMAGES IN ANOTHER THREAD
+		Utils.executorService.submit(() -> {
+			int index = 0;
+			for (String s : paths) {
+				final int myIndex = index;
+				ImageIcon image = Utils.loadImageIcon(s);
+				if(s.endsWith(".gif")) {
+					// resizing animated imageicon is different from static
+					image.setDescription(Utils.IMAGEICON_ANIMATED);
+				}
+				
+				data[myIndex] = makeDataFromImage(image);
+				
+				if (averageColor != null) {
+					data[myIndex].avgColor = averageColor[myIndex];
+				}
+				index++;
+			}
+		});
 	}
 	
 	public MipMap(String path) {
 		this(new String[] {path});
 	}
+	
+	private ImageData getRelevantSizeImageData(int size) {
+		// Get the first ImageData that is larger than the tile size
+		for (int i = 0; i < data.length; i++) {
+			if (data[i].imageSize > size) {
+				return data[i];
+			}
+		}
+		return data[data.length - 1];
+	}
 
 	public Image getImage(int size) {
-		// Get the first mipmap that is larger than the tile size
-		for (int i = 0; i < mipmapSizes.length; i++) {
-			if (mipmapSizes[i] > size) {
-				return mipmaps[i].getImage();
-			}
-		}
-		return mipmaps[mipmaps.length - 1].getImage();
+		return getRelevantSizeImageData(size).image.getImage();
 	}
 	public Image getShadow(int size) {
-		// Get the first mipmap that is larger than the tile size
-		for (int i = 0; i < mipmapSizes.length; i++) {
-			if (mipmapSizes[i] > size) {
-				return shadows[i].getImage();
-			}
-		}
-		return shadows[shadows.length - 1].getImage();
+		return getRelevantSizeImageData(size).shadow.getImage();
 	}
 	public Image getSunShadow(int size, int sun) {
-		// Get the first mipmap that is larger than the tile size
-		for (int i = 0; i < mipmapSizes.length; i++) {
-			if (mipmapSizes[i] > size) {
-				return sunShadows[i][sun].getImage();
-			}
-		}
-		return sunShadows[shadows.length - 1][sun].getImage();
+		return getRelevantSizeImageData(size).sunShadows[sun].getImage();
 	}
 
 	public Image getHighlight(int size) {
-		// Get the first mipmap that is larger than the tile size
-		for (int i = 0; i < mipmapSizes.length; i++) {
-			if (mipmapSizes[i] > size) {
-				return highlights[i].getImage();
-			}
-		}
-		return highlights[highlights.length - 1].getImage();
+		return getRelevantSizeImageData(size).highlight.getImage();
 	}
 
 	public ImageIcon getImageIcon(int size) {
-		// Get the first mipmap that is larger than the tile size
-		for (int i = 0; i < mipmapSizes.length; i++) {
-			if (mipmapSizes[i] > size) {
-				return mipmaps[i];
-			}
-		}
-		return mipmaps[mipmaps.length - 1];
+		return getRelevantSizeImageData(size).image;
 	}
 
 	public Color getColor(int size) {
-		// Get the first mipmap that is larger than the tile size
-		for (int i = 0; i < mipmapSizes.length; i++) {
-			if (mipmapSizes[i] > size) {
-				return avgColors[i];
-			}
-		}
-		return avgColors[avgColors.length - 1];
+		return getRelevantSizeImageData(size).avgColor;
 	}
 }

@@ -98,17 +98,29 @@ public final class Utils {
 		return rawName.toLowerCase().replace('_', ' ');
 	}
 
+	private static Image DEFAULT_SKIN = null;
 	public static final Image getDefaultSkin() {
-		BufferedImage temp = new BufferedImage(64, 64, BufferedImage.TYPE_3BYTE_BGR);
-		Graphics2D g = (Graphics2D)temp.getGraphics();
-		g.setColor(Color.magenta);
-		g.fillRect(0, 0, temp.getWidth(), temp.getHeight());
-		g.setColor(Color.red);
-		g.setStroke(new BasicStroke(5));
-		g.drawLine(0, 0, temp.getWidth(), temp.getHeight());
-		g.drawLine(temp.getWidth(), 0, 0, temp.getHeight());
-		g.dispose();
-		return temp;
+		if (DEFAULT_SKIN == null) {
+			BufferedImage temp = new BufferedImage(64, 64, BufferedImage.TYPE_3BYTE_BGR);
+			Graphics2D g = (Graphics2D)temp.getGraphics();
+			g.setColor(Color.magenta);
+			g.fillRect(0, 0, temp.getWidth(), temp.getHeight());
+			g.setColor(Color.red);
+			g.setStroke(new BasicStroke(5));
+			g.drawLine(0, 0, temp.getWidth(), temp.getHeight());
+			g.drawLine(temp.getWidth(), 0, 0, temp.getHeight());
+			g.dispose();
+			DEFAULT_SKIN = temp;
+		}
+		return DEFAULT_SKIN;
+	}
+
+	private static ImageIcon DEFAULT_SKIN_ICON = null;
+	public static final ImageIcon getDefaultSkinImageIcon() {
+		if (DEFAULT_SKIN_ICON == null) {
+			DEFAULT_SKIN_ICON = new ImageIcon(getDefaultSkin());
+		}
+		return DEFAULT_SKIN_ICON;
 	}
 
 	public static final ImageIcon loadImageIcon(String filename) {
@@ -118,7 +130,7 @@ public final class Utils {
 		}
 		else {
 			System.err.println("FAILED TO LOAD FILE " + filename);
-			return new ImageIcon(getDefaultSkin());
+			return getDefaultSkinImageIcon();
 		}
 	}
 	

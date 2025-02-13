@@ -24,18 +24,8 @@ public class ServerDriver {
 		server.startAcceptingConnections();
 	}
 
-	static {
-		Settings.fromFile();
-		Loader.loadSounds();
-		Loader.loadResearchType(Game.researchTypeMap, Game.researchTypeList);
-		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
-		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);
-		Loader.loadPlantType(Game.plantTypeMap, Game.plantTypeList);
-		Loader.doMappings();
-		Loader.loadBuildOrders();
-	}
-
 	public static void main(String[] args) {
+		Loader.loadAssets();
 		Settings.fromCmdArgs(args);
 //		EventQueue.invokeLater(() -> {
 //			try {

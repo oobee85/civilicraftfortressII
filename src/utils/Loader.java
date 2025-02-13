@@ -2,6 +2,7 @@ package utils;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.*;
 
 import org.json.*;
 
@@ -15,7 +16,35 @@ import world.PlantType;
 
 public class Loader {
 	
-	
+	public static void loadAssets() {
+		Settings.fromFile();
+
+		ArrayList<Future<?>> loadTasks = new ArrayList<>(10);
+		loadTasks.add(Utils.executorService.submit(()
+				-> Loader.loadSounds()));
+		loadTasks.add(Utils.executorService.submit(()
+				-> Loader.loadResearchType(Game.researchTypeMap, Game.researchTypeList)));
+		loadTasks.add(Utils.executorService.submit(()
+				-> Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList)));
+		loadTasks.add(Utils.executorService.submit(()
+				-> Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList)));
+		loadTasks.add(Utils.executorService.submit(()
+				-> Loader.loadPlantType(Game.plantTypeMap, Game.plantTypeList)));
+		
+		System.out.println("Waiting on load tasks to complete");
+		for (Future<?> task : loadTasks) {
+			try {
+				task.get();
+			} catch (ExecutionException | InterruptedException e) {
+				e.printStackTrace();
+				System.err.println("FAILED TO COMPLETE ASSET LOADING TASK");
+				System.exit(0);
+			}
+		}
+		
+		Loader.doMappings();
+		Loader.loadBuildOrders();
+	}
 	
 	public static void loadSounds() {
 		System.out.println("Loading Sounds");

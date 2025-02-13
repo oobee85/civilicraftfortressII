@@ -3,6 +3,7 @@ package networking.client;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -36,19 +37,10 @@ public class ClientDriver implements WindowListener {
 		frame.setVisible(true);
 	}
 	
-	static {
-		
-		Settings.fromFile();
-		Loader.loadSounds();
-		Loader.loadResearchType(Game.researchTypeMap, Game.researchTypeList);
-		Loader.loadUnitType(Game.unitTypeMap, Game.unitTypeList);
-		Loader.loadBuildingType(Game.buildingTypeMap, Game.buildingTypeList);
-		Loader.loadPlantType(Game.plantTypeMap, Game.plantTypeList);
-		Loader.doMappings();
-		Loader.loadBuildOrders();
-	}
-	
 	public static void main(String[] args) {
+
+		long start = System.currentTimeMillis();
+		Loader.loadAssets();
 		Settings.fromCmdArgs(args);
 		EventQueue.invokeLater(() -> {
 			try {
@@ -59,6 +51,8 @@ public class ClientDriver implements WindowListener {
 		});
 		ClientDriver driver = new ClientDriver();
 		driver.start();
+		long end = System.currentTimeMillis();
+		System.out.println((end - start) + "ms to start up the game");
 	}
 
 	@Override
