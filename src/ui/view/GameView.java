@@ -1028,18 +1028,42 @@ public class GameView {
 	/** moves camera to first building or first unit owned by the current active player.
 	*/
 	public void recenterCameraOnPlayer() {
+//		Unit idleBuilder = null;
+		// centers on selected unit first
+		for(Unit unit : state.faction.getUnits()) {
+			if(unit.isSelected()) {
+				GameView.this.centerViewOnTile(unit.getTile().getLocation());
+				return;
+			}
+			// sets idle builder during the same loop
+//			if(idleBuilder == null && unit.isBuilder() && unit.isIdle()) {
+//				idleBuilder = unit;
+//			}
+		}
+		// centers on selected building first
+		for(Building building : state.faction.getBuildings()) {
+			if(building.isSelected()) {
+				GameView.this.centerViewOnTile(building.getTile().getLocation());
+				return;
+			}
+			
+		}
+		
+		// centers on idle builder next
 		for(Unit unit : state.faction.getUnits()) {
 			if(unit.isBuilder() && unit.isIdle()) {
 				GameView.this.centerViewOnTile(unit.getTile().getLocation());
 				return;
 			}
 		}
+		
+		
+		// centers on castle
 		for(Building building : state.faction.getBuildings()) {
 			if(building.getType().isCastle()) {
 				GameView.this.centerViewOnTile(building.getTile().getLocation());
 				return;
 			}
-			
 		}
 		
 	}
