@@ -8,7 +8,6 @@ import java.util.Map.*;
 import java.util.concurrent.*;
 
 import game.components.*;
-import sounds.Sound;
 import sounds.SoundEffect;
 import sounds.SoundManager;
 import utils.*;
@@ -361,8 +360,7 @@ public class Faction implements Externalizable {
 			if(researchTarget.isCompleted()) {
 				latestCompletedResearch = researchTarget;
 				researchTarget = null;
-				Sound sound = new Sound(SoundEffect.RESEARCHCOMPLETE, this, 1f);
-				SoundManager.theSoundQueue.add(sound);
+				SoundManager.queueSoundEffect(SoundEffect.RESEARCHCOMPLETE);
 			}
 		}
 	}

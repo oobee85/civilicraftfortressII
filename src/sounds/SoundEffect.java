@@ -46,6 +46,8 @@ public enum SoundEffect {
 	COMBAT2 ("music/combat2.wav", true),
 	COMBAT3 ("music/combat3.wav", true),
 	COMBAT4 ("music/combat4.wav", true),
+
+	mushroomwizard ("music/mushroomwizard.wav", true),
 	
 	
 	

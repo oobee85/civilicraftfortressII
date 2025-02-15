@@ -9,7 +9,6 @@ import org.json.*;
 import game.*;
 import game.ai.*;
 import game.components.*;
-import sounds.Sound;
 import sounds.SoundEffect;
 import sounds.SoundManager;
 import world.PlantType;
@@ -51,15 +50,16 @@ public class Loader {
 		System.out.println("Loading Sounds");
 		long startTime = System.currentTimeMillis();
 		for(SoundEffect sound : SoundEffect.values()) {
-			Utils.executorService.submit(() -> {
-				SoundManager.loadSound(sound);
-				if(sound.getIsMusic()) {
-					SoundManager.theMusicEffectQueue.add(sound);
-					Sound theMusic = new Sound(sound, null, 1f);
-					SoundManager.theMusicQueue.add(theMusic);
-				}
-			});
+			SoundManager.loadSound(sound);
+//				if(sound.getIsMusic()) {
+//					SoundManager.theMusicEffectQueue.add(sound);
+//					Sound theMusic = new Sound(sound, null, 1f);
+//					SoundManager.theMusicQueue.add(theMusic);
+//				}
 		}
+
+//		SoundManager.queueSoundEffect(SoundEffect.mushroomwizard);
+
 		System.out.println("Sounds loaded in " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	

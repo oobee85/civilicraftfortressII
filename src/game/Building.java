@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 
 import game.actions.*;
 import game.components.GameComponent;
-import sounds.Sound;
 import sounds.SoundEffect;
 import sounds.SoundManager;
 import utils.*;
@@ -152,8 +151,7 @@ public class Building extends Thing implements Serializable {
 					getTile().addUnit(unit);
 					world.addUnit(unit);
 					
-					Sound sound = new Sound(SoundEffect.UNITCREATION, this.getFaction(), this.getTile(), 1f);
-					SoundManager.theSoundQueue.add(sound);
+					SoundManager.queueSoundEffect(SoundEffect.UNITCREATION, this.getTile().getLocation());
 					
 				}
 				currentProducingUnit = null;
@@ -195,8 +193,7 @@ public class Building extends Thing implements Serializable {
 				amountHarvested ++;
 				// every 50 harvests, play sound
 				if(amountHarvested % 50 == 0) {
-					Sound sound = new Sound(SoundEffect.TRAPCOW, this.getFaction(), this.getTile(), 1f);
-					SoundManager.theSoundQueue.add(sound);
+					SoundManager.queueSoundEffect(SoundEffect.TRAPCOW, this.getTile().getLocation());
 				}
 				
 			}

@@ -2,166 +2,189 @@ package sounds;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.*;
 
 import javax.sound.sampled.*;
 
-import ui.graphics.vanilla.VanillaDrawer;
 import utils.*;
 
 public class SoundManager {
-
-	private static final Map<SoundEffect, Clip> sounds = new HashMap<>();
+	
 	private static final String basePath = "sounds/";
-
-	public static LinkedBlockingQueue<Sound> theSoundQueue = new LinkedBlockingQueue<Sound>();
-	public static LinkedBlockingQueue<SoundEffect> theMusicEffectQueue = new LinkedBlockingQueue<SoundEffect>();
-	public static LinkedBlockingQueue<Sound> theMusicQueue = new LinkedBlockingQueue<Sound>();
+	private static final Map<SoundEffect, Future<byte[]>> soundData = new HashMap<>();
 	
+	private static LinkedBlockingQueue<Sound2> queuedUpSoundEffects = new LinkedBlockingQueue<>();
+	private static LinkedList<PlayingSound> readyToPlay = new LinkedList<>();
+	private static Set<PlayingSound> currentlyPlayingSounds = new HashSet<>();
+	private static Map<SoundEffect, LinkedList<Clip>> previouslyUsedClips = new HashMap<>();
+	public static void queueSoundEffect(SoundEffect soundEffect) {
+		queueSoundEffect(soundEffect, null);
+	}
+	public static void queueSoundEffect(SoundEffect soundEffect, TileLoc sourceLocation) {
+		Sound2 sound = new Sound2(soundEffect, sourceLocation);
+		queuedUpSoundEffects.add(sound);
+	}
 	
-	private static LinkedList<Sound> playedSounds = new LinkedList<>();
+	// one thread to pull sounds off queue and create the clip
+	public static void startJukeboxThread(VolumeQueryInterface volume) {
+		Thread jukeboxThread = new Thread(() -> {
+			while(true) {
+				try {
+					Sound2 toPlay = queuedUpSoundEffects.take();
+					if (previouslyUsedClips.containsKey(toPlay.getSoundEffect())) {
+						LinkedList<Clip> usedClips = previouslyUsedClips.get(toPlay.getSoundEffect());
+						if (!usedClips.isEmpty()) {
+							Clip usedClip = usedClips.removeFirst();
+							readyToPlay.addLast(new PlayingSound(toPlay.getSoundEffect(), toPlay.getSourceLocation(), usedClip));
+							continue;
+						}
+					}
+					Future<byte[]> futureBytes = soundData.get(toPlay.getSoundEffect());
+					byte[] data = futureBytes.get();
+					AudioInputStream audioStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(data));
+					Clip clip = AudioSystem.getClip();
+					clip.open(audioStream);
+					readyToPlay.addLast(new PlayingSound(toPlay.getSoundEffect(), toPlay.getSourceLocation(), clip));
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (LineUnavailableException e) {
+					e.printStackTrace();
+				} catch (UnsupportedAudioFileException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		jukeboxThread.start();
+	}
+	// another thread to 
+	//		- start sound clips
+	// 		- update volume based on current camera position & global volume setting
+	//		- remove sounds that have finished
+	public static void startVolumeUpdateThread(VolumeQueryInterface volume) {
+		ArrayList<PlayingSound> finished = new ArrayList<>(20);
+		Thread volumeUpdateThread = new Thread(() -> {
+			while(true) {
+				while(!readyToPlay.isEmpty()) {
+					PlayingSound ready = readyToPlay.removeFirst();
+					setVolumeOnClip(ready.getClip(), ready.getSourceLocation(), volume);
+					ready.getClip().setFramePosition(0);
+					ready.getClip().start();
+					currentlyPlayingSounds.add(ready);
+				}
+				for (PlayingSound playing : currentlyPlayingSounds) {
+					setVolumeOnClip(playing.getClip(), playing.getSourceLocation(), volume);
+					if (!playing.getClip().isRunning()
+							&& playing.getClip().getFramePosition() == playing.getClip().getFrameLength()) {
+						finished.add(playing);
+						if (!previouslyUsedClips.containsKey(playing.getSoundEffect())) {
+							previouslyUsedClips.put(playing.getSoundEffect(), new LinkedList<Clip>());
+						}
+						previouslyUsedClips.get(playing.getSoundEffect()).addLast(playing.getClip());
+					}
+				}
+				currentlyPlayingSounds.removeAll(finished);
+				finished.clear();
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		volumeUpdateThread.start();
+	}
 	
 	// loads a sound
 	public static void loadSound(SoundEffect sound) {
-		if(sounds.containsKey(sound)) {
+		if(soundData.containsKey(sound)) {
+			System.err.println("ERROR trying to load the same sound again! " + sound.getFileName());
 			return;
 		}
-		try (InputStream stream = SoundManager.class.getClassLoader().getResourceAsStream(basePath + sound.getFileName()); 
-				BufferedInputStream buf = new BufferedInputStream(stream);
-				AudioInputStream audioStream = AudioSystem.getAudioInputStream(buf);
-				) {
-			
-			Clip clip = AudioSystem.getClip();
-			clip.open(audioStream);
-			sounds.put(sound, clip);
-		} catch (UnsupportedAudioFileException | IOException | ExceptionInInitializerError | NullPointerException | LineUnavailableException e) {
-			System.err.println("Couldnt load sound: " + sound.getFileName());
-			e.printStackTrace();
-		}
-	}
-
-	public static Clip getClip(Sound sound) {
-		return sounds.get(sound.getSoundEffect());
-	}
-
-	public static boolean isSoundRunning(Sound sound) {
-		Clip clip = getClip(sound);
-		if(clip == null) {
-			System.err.println("isSoundRunning() clip is null");
-			return false;
-		}
-		
-		return clip.isRunning();
-	}
-
-	public static void playSoundWithEnd(Sound sound, Semaphore semaphore) {
-		Clip clip = getClip(sound);
-		if(clip == null) {
-			System.err.println("playSound() clip is null");
-			return;
-		}
-		semaphore.drainPermits();
-		clip.addLineListener(event -> {
-            if (event.getType() == LineEvent.Type.STOP) {
-//                System.out.println("Sound finished playing.");
-            	semaphore.release();
-                clip.close(); // Close the clip when done
-            }
-        });
-		
-		// if already playing, stop and then restart, TODO might not want this
-//		if(clip.isRunning()) {
-//			clip.stop();
-//		}
-		
-		clip.setFramePosition(0);
-		clip.start();
-		playedSounds.add(sound);
-	}
-	
-	// plays a sound
-	public static void playSound(Sound sound) {
-		Clip clip = getClip(sound);
-		
-		if(clip == null) {
-			System.out.println("playSound() clip is null");
-			return;
-		}
-		// if already playing, stop and then restart, TODO might not want this
-		if(clip.isRunning()) {
-			clip.stop();
-		}
-		
-		clip.setFramePosition(0);
-		clip.start();
-		playedSounds.add(sound);
-	}
-	
-	private static float globalVolume;
-	public static void updateGlobalVolume(int newGlobalVolumeD) {
-		float newGlobalVolume = newGlobalVolumeD;
-		if (globalVolume == newGlobalVolume) {
-			return;
-		}
-		globalVolume = newGlobalVolume;
-		for (Sound sound : playedSounds) {
-			Clip clip = sounds.get(sound.getSoundEffect());
-			if (clip.isOpen()) {
-			    setVolumeOnClip(clip, sound.getVolume(), globalVolume);
+		Future<byte[]> futureBytes =  Utils.executorService.submit(() -> {
+			try (InputStream stream = SoundManager.class.getClassLoader().getResourceAsStream(basePath + sound.getFileName())) {
+//				soundData.put(sound, stream.readAllBytes());
+				return stream.readAllBytes();
+			} catch (IOException e) {
+				System.err.println("Couldnt load sound: " + sound.getFileName());
+				e.printStackTrace();
 			}
-		}
+			return new byte[0];
+		});
+		soundData.put(sound, futureBytes);
 	}
-	
-	private static void setVolumeOnClip(Clip clip, float baseVolume, float globalVolume) {
-		float mixedVolume = globalVolume * baseVolume / 100;
-	    if (clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-	        FloatControl volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-	        
-	     // Convert linear scale (0-10) to dB
-	        double minGain = volumeControl.getMinimum();  // Typically around -80 dB
-	        double maxGain = volumeControl.getMaximum();  // Typically around 6 dB
-	        double volumedB;
-	
-	        if (mixedVolume <= 0) {
-	            volumedB = minGain; // Mute if volume is 0
-	        } else {
-	            double normalizedVolume = mixedVolume / 10.0; // Convert to 0 - 10 range
-	            volumedB = 20.0 * Math.log10(normalizedVolume);
-	            volumedB = Math.max(minGain, Math.min(volumedB, maxGain)); // Ensure it's within valid dB range
-	        }
-	        
-	        volumedB = Math.max(volumeControl.getMinimum(), Math.min(volumedB, volumeControl.getMaximum())); // Clamp value
-	        
-	        volumeControl.setValue((float)volumedB);
-	    } else {
-	        System.err.println("Volume control not supported for clip: " + clip);
-	    }
-	}
-	
-	// sound, -5.0f [dB]	// 0 - 1
-	public static void setVolume(Sound sound, float volume) {
-	    Clip clip = sounds.get(sound.getSoundEffect());
 
-	    if (clip == null) {
-	        System.err.println("Tried to set volume on null clip");
+	
+	private static TileLoc getClosestScreenLoc(TileLoc sourceTile, TileLoc screenTopLeft, TileLoc screenBottomRight) {
+    	int closestX = sourceTile.x();
+    	if (sourceTile.x() < screenTopLeft.x()) {
+    		closestX = screenTopLeft.x();
+    	}
+    	else if (sourceTile.x() > screenBottomRight.x()) {
+    		closestX = screenBottomRight.x();
+    	}
+    	
+    	int closestY = sourceTile.y();
+    	if (sourceTile.y() < screenTopLeft.y()) {
+    		closestY = screenTopLeft.y();
+    	}
+    	else if (sourceTile.y() > screenBottomRight.y()) {
+    		closestY = screenBottomRight.y();
+    	}
+    	
+    	return new TileLoc(closestX, closestY);
+    }
+	
+	private static void setVolumeOnClip(Clip clip, TileLoc sourceTile, VolumeQueryInterface volume) {
+	    if (!clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+	        System.err.println("Volume control not supported for clip: " + clip);
 	        return;
 	    }
-
-	    try {
-			clip.open();
-		} catch (LineUnavailableException e) {
-			e.printStackTrace();
-		}
-//	    float volumedB = (float) (20 * Math.log(volume/0.5));
-//	    volumedB *= 2;
 	    
-	    setVolumeOnClip(clip, volume, globalVolume);
-	}
-	
-	
-//	public void addToQueue() {
-//		
-//	}
+	    float globalVolume = volume.getGlobalSoundVolume();
+	    
+	    if (globalVolume < 0f || globalVolume > 1f) {
+	    	System.err.println("INVALID GLOBAL VOLUME: " + globalVolume);
+	    	return;
+	    }
+	    
+	    float distanceVolume = 1f;
+	    float zoomLevelMultiplier = 1f;
+	    
+	    if (sourceTile != null) {
+	    	TileLoc screenTopLeft = volume.getScreenTopLeftLocation();
+	    	TileLoc screenBottomRight = volume.getScreenBottomRightLocation();
+	    	
+	    	int screenDiagonal = screenTopLeft.distanceTo(screenBottomRight);
+	    	zoomLevelMultiplier = 1f - screenDiagonal/120f;
+	    	int maxDistanceToHear = (screenDiagonal);
+	    	if (maxDistanceToHear < 1) {
+	    		distanceVolume = 0f;
+	    	}
+	    	else {
+		    	TileLoc closestLocOnScreen = getClosestScreenLoc(sourceTile, screenTopLeft, screenBottomRight);
+		    	float distanceFromScreen = (float) closestLocOnScreen.euclideanDistance(sourceTile);
+		    	distanceVolume = (maxDistanceToHear - distanceFromScreen) / maxDistanceToHear;
+		    	distanceVolume = (distanceVolume < 0) ? 0 : distanceVolume;
+	    	}
+	    }
 
+	    FloatControl volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+
+	    float mixedVolume = globalVolume * distanceVolume * zoomLevelMultiplier;
+	    
+	    // square mixedVolume to have a more natural feeling volume control
+	    mixedVolume = mixedVolume * mixedVolume;
+        
+        float minGain = volumeControl.getMinimum();  // Typically around -80 dB
+        float maxGain = volumeControl.getMaximum();  // Typically around 6 dB
+        maxGain = 0;
+        
+        float linearInterpolatedGain = minGain + (maxGain - minGain) * mixedVolume;
+        
+        volumeControl.setValue(linearInterpolatedGain);
+	}
 }

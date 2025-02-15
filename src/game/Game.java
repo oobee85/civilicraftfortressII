@@ -11,7 +11,6 @@ import java.util.*;
 
 import networking.message.*;
 import networking.server.*;
-import sounds.Sound;
 import sounds.SoundEffect;
 import sounds.SoundManager;
 import ui.*;
@@ -889,16 +888,13 @@ public class Game {
 				
 				// decide what sound to play
 				if(building.getType() == buildingTypeMap.get("SMITHY")) {
-					Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile(), 1f);
-					SoundManager.theSoundQueue.add(sound);
+					SoundManager.queueSoundEffect(SoundEffect.SMITHYPRODUCE, building.getTileLocation());
 				}
 				if(building.getType() == buildingTypeMap.get("QUARRY")) {
-					Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile(), 1f);
-					SoundManager.theSoundQueue.add(sound);
+					SoundManager.queueSoundEffect(SoundEffect.SMITHYPRODUCE, building.getTileLocation());
 				}
 				if(building.getType() == buildingTypeMap.get("SAWMILL")) {
-					Sound sound = new Sound(SoundEffect.SMITHYPRODUCE, building.getFaction(), building.getTile(), 1f);
-					SoundManager.theSoundQueue.add(sound);
+					SoundManager.queueSoundEffect(SoundEffect.SMITHYPRODUCE, building.getTileLocation());
 				}
 //			}
 			
@@ -1394,8 +1390,7 @@ public class Game {
 		if (thing == null) {
 			return;
 		}
-		Sound sound = new Sound(SoundEffect.EXPLOSION, null, thing.getTile(), 1f);
-		SoundManager.theSoundQueue.add(sound);
+		SoundManager.queueSoundEffect(SoundEffect.EXPLOSION, thing.getTileLocation());
 		world.spawnExplosionCircle(thing.getTile(), 1, 1000000);
 	}
 
@@ -1482,8 +1477,7 @@ public class Game {
 			}
 
 			if (checkForAdjacentMines(building, false) == true) {
-				Sound sound = new Sound(SoundEffect.TOODEEP, null, 1f);
-				SoundManager.theSoundQueue.add(sound);
+				SoundManager.queueSoundEffect(SoundEffect.TOODEEP);
 			}
 			return building;
 		} else if (bt.isRoad() && tile.getRoad() != null) {

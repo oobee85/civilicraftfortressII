@@ -8,7 +8,6 @@ import game.actions.*;
 import game.ai.*;
 import game.components.*;
 import game.pathfinding.*;
-import sounds.Sound;
 import sounds.SoundEffect;
 import sounds.SoundManager;
 import utils.*;
@@ -179,20 +178,10 @@ public class Unit extends Thing implements Serializable {
 			
 		}else { //all other unit walking sounds
 			if(this.getType().isWheeled()) {
-				Sound sound = new Sound(SoundEffect.MOVE_WHEELED, this.getFaction(), this.getTile(), 1f);
-				SoundManager.theSoundQueue.add(sound);
-			}else {
-				if(this.getTile().isPlantable()) {
-					Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile(), 1f);
-					SoundManager.theSoundQueue.add(sound);
-				}else if(this.getTile().isRocky()) {
-					Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile(), 1f);
-					SoundManager.theSoundQueue.add(sound);
-	//				SoundManager.setVolume(sound, 5f);
-				}else {
-					Sound sound = new Sound(SoundEffect.MOVE_DIRT, this.getFaction(), this.getTile(), 1f);
-					SoundManager.theSoundQueue.add(sound);
-				}
+				SoundManager.queueSoundEffect(SoundEffect.MOVE_WHEELED, this.getTile().getLocation());
+			}
+			else {
+				SoundManager.queueSoundEffect(SoundEffect.MOVE_DIRT, this.getTile().getLocation());
 			}
 		}
 		
@@ -371,14 +360,12 @@ public class Unit extends Thing implements Serializable {
 			if(this.getType().hasCleave()) {
 				for(Unit unit : target.getTile().getUnits()) {
 					unit.takeDamage(damage, DamageType.PHYSICAL);
-					Sound sound = new Sound(SoundEffect.ATTACK_MELEE_HEAVY, null, this.getTile(), 1f);
-					SoundManager.theSoundQueue.add(sound);
+					SoundManager.queueSoundEffect(SoundEffect.ATTACK_MELEE_HEAVY, this.getTile().getLocation());
 				}
 			} 
 			else {
 				target.takeDamage(damage, DamageType.PHYSICAL);
-				Sound sound = new Sound(SoundEffect.ATTACK_MELEE_GENERIC, null, this.getTile(), 1f);
-				SoundManager.theSoundQueue.add(sound);
+				SoundManager.queueSoundEffect(SoundEffect.ATTACK_MELEE_GENERIC, this.getTile().getLocation());
 			}
 			
 			

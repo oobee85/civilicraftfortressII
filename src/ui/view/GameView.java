@@ -11,9 +11,7 @@ import javax.swing.*;
 
 import game.*;
 import game.actions.*;
-import sounds.Sound;
-import sounds.SoundEffect;
-import sounds.SoundManager;
+import sounds.*;
 import ui.*;
 import ui.graphics.*;
 import ui.graphics.vanilla.*;
@@ -96,76 +94,101 @@ public class GameView {
 		this.game = game;
 		this.guiController = game.getGUIController();
 
-		
-		// the sound thread
-		Thread thread = new Thread(() -> {
-			while(true) {
-				Sound theSound;
-				try {
-					if (Settings.VOLUME > 100) {
-						Settings.VOLUME = 100;
-					}
-					if (Settings.VOLUME < 0) {
-						Settings.VOLUME = 0;
-					}
-					SoundManager.updateGlobalVolume(Settings.VOLUME);
-					
-					theSound = SoundManager.theSoundQueue.take();
-					
-					// check if the sound is dedicated to our faction
-					// if faction is null, then it plays for everyone, TODO make a dedicated way to do this
-					Position screentile = vanillaDrawer.getWorldCoordOfPixel(new Point(0, 0), state.viewOffset, state.volatileTileSize);
-					int widthOfScreen = (int) Math.sqrt(vanillaDrawer.getVisibleTileBounds().length);
-//					
-					TileLoc screenloc = new TileLoc(screentile.getIntX() + 13, screentile.getIntY() + 13);
-//					System.out.println("screen loc: " + screenloc);
-					if (theSound.getTile() != null) {
-						
-						int distance = theSound.getTile().getLocation().distanceTo(screenloc);
-						
-						double linearVolume = Math.max(0, 10 - (10.0 / 30.0) * distance)-2;
-//						float volume = 1 - (float)(distance)/40;
-//						if(distance >= 40) {
-//							volume = 0;
-//						}
-						SoundManager.setVolume(theSound, (float)(linearVolume));
-//						System.out.println("volume: " + volume);
-//						System.out.println("distance to sound: " + distance);
-					}
-					if(theSound.getFaction() == this.getFaction() || theSound.getFaction() == null) {
-						SoundManager.playSound(theSound);
-					}
-					
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+		VolumeQueryInterface volume = new VolumeQueryInterface() {
+			@Override
+			public TileLoc getScreenTopLeftLocation() {
+				int centerX = vanillaDrawer.getDrawingCanvas().getWidth()/2;
+				int centerY = vanillaDrawer.getDrawingCanvas().getHeight()/2;
+				Position centerPos = vanillaDrawer.getWorldCoordOfPixel(new Point(0, 0), state.viewOffset, state.volatileTileSize);
+				TileLoc loc = new TileLoc(centerPos.getIntX(), centerPos.getIntY());
+				return loc;
 			}
-		});
-		thread.start();
-		
-		Thread threadMusic = new Thread(() -> {
-				Sound theMusic;
-				try {
-					Semaphore semaphore = new Semaphore(0);
-					while(true) {
-						if(World.ticks > 0) {
-							theMusic = SoundManager.theMusicQueue.take();
-							if(theMusic != null) {
-//								SoundManager.setVolume(theMusic, -7f);
-								SoundManager.setVolume(theMusic, 6f);
-								SoundManager.playSoundWithEnd(theMusic, semaphore);
-								semaphore.acquire();
-							}
-						}
-						
-					}
+
+			@Override
+			public TileLoc getScreenBottomRightLocation() {
+				int width = vanillaDrawer.getDrawingCanvas().getWidth();
+				int height = vanillaDrawer.getDrawingCanvas().getHeight();
+				Position centerPos = vanillaDrawer.getWorldCoordOfPixel(new Point(width, height), state.viewOffset, state.volatileTileSize);
+				TileLoc loc = new TileLoc(centerPos.getIntX(), centerPos.getIntY());
+				return loc;
+			}
 			
-				} catch (InterruptedException e) {
-				    e.printStackTrace();
-				}
-			
-		});
-		threadMusic.start();
+			@Override
+			public float getGlobalSoundVolume() {
+				int volumeSetting = (Settings.VOLUME > 100) ? 100 : ((Settings.VOLUME < 0 ? 0 : Settings.VOLUME));
+				return volumeSetting / 100f;
+			}
+		};
+		SoundManager.startJukeboxThread(volume);
+		SoundManager.startVolumeUpdateThread(volume);
+//		// the sound thread
+//		Thread thread = new Thread(() -> {
+//			while(true) {
+//				try {
+//					if (Settings.VOLUME > 100) {
+//						Settings.VOLUME = 100;
+//					}
+//					if (Settings.VOLUME < 0) {
+//						Settings.VOLUME = 0;
+//					}
+//					SoundManager.updateGlobalVolume(Settings.VOLUME);
+//					
+//					Sound theSound = SoundManager.theSoundQueue.take();
+//					
+//					// check if the sound is dedicated to our faction
+//					// if faction is null, then it plays for everyone, TODO make a dedicated way to do this
+//					Position screentile = vanillaDrawer.getWorldCoordOfPixel(new Point(0, 0), state.viewOffset, state.volatileTileSize);
+//					int widthOfScreen = (int) Math.sqrt(vanillaDrawer.getVisibleTileBounds().length);
+////					
+//					TileLoc screenloc = new TileLoc(screentile.getIntX() + 13, screentile.getIntY() + 13);
+////					System.out.println("screen loc: " + screenloc);
+//					if (theSound.getTile() != null) {
+//						
+//						int distance = theSound.getTile().getLocation().distanceTo(screenloc);
+//						
+//						double linearVolume = Math.max(0, 10 - (10.0 / 30.0) * distance)-2;
+////						float volume = 1 - (float)(distance)/40;
+////						if(distance >= 40) {
+////							volume = 0;
+////						}
+//						SoundManager.setVolume(theSound, (float)(linearVolume));
+////						System.out.println("volume: " + volume);
+////						System.out.println("distance to sound: " + distance);
+//					}
+//					if(theSound.getFaction() == this.getFaction() || theSound.getFaction() == null) {
+//						SoundManager.playSound(theSound);
+//					}
+//					
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//		thread.start();
+//		
+//		Thread threadMusic = new Thread(() -> {
+//				Sound theMusic;
+//				try {
+//					Semaphore semaphore = new Semaphore(0);
+//					while(true) {
+//						if(World.ticks > 0) {
+//							theMusic = SoundManager.theMusicQueue.take();
+//							if(theMusic != null) {
+////								SoundManager.setVolume(theMusic, -7f);
+//								SoundManager.setVolume(theMusic, 6f);
+//								SoundManager.playSoundWithEnd(theMusic, semaphore);
+//								semaphore.acquire();
+//							}
+//						}
+//						
+//					}
+//			
+//				} catch (InterruptedException e) {
+//				    e.printStackTrace();
+//				}
+//			
+//		});
+//		threadMusic.start();
 		
 		
 		MouseWheelListener mouseWheelListener = new MouseWheelListener() {
@@ -406,8 +429,7 @@ public class GameView {
 				if (thing instanceof Unit) {
 					Unit unit = (Unit) thing;
 					plannedBuilding = commandInterface.planBuilding(unit, tile, !shiftDown, state.selectedBuildingToPlan);
-					Sound sound = new Sound(SoundEffect.BUILDINGPLANNED, unit.getFaction(), tile, 1f);
-					SoundManager.theSoundQueue.add(sound);
+					SoundManager.queueSoundEffect(SoundEffect.BUILDINGPLANNED, tile.getLocation());
 				}
 				
 			}

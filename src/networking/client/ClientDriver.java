@@ -51,8 +51,7 @@ public class ClientDriver implements WindowListener {
 		});
 		ClientDriver driver = new ClientDriver();
 		driver.start();
-		long end = System.currentTimeMillis();
-		System.out.println((end - start) + "ms to start up the game");
+		System.out.println((System.currentTimeMillis() - start) + "ms to start up the game");
 	}
 
 	@Override

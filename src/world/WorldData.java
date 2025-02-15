@@ -5,7 +5,6 @@ import java.util.Map.Entry;
 
 import game.*;
 import networking.server.*;
-import sounds.Sound;
 import sounds.SoundEffect;
 import sounds.SoundManager;
 import utils.*;
@@ -66,15 +65,13 @@ public class WorldData {
 				
 				if(building.isRemoved() == false) {
 					if(building.getType().isWoodConstruction()) {
-						Sound sound = new Sound(SoundEffect.BUILDING_WOOD_DEATH, null, building.getTile(), 1f);
-						SoundManager.theSoundQueue.add(sound);
-					}else 
-					if(building.getType().isStoneConstruction()) {
-						Sound sound = new Sound(SoundEffect.BUILDING_STONE_DEATH, null, building.getTile(), 1f);
-						SoundManager.theSoundQueue.add(sound);
-					}else {
-						Sound sound = new Sound(SoundEffect.BUILDING_WOOD_DEATH, null, building.getTile(), 1f);
-						SoundManager.theSoundQueue.add(sound);
+						SoundManager.queueSoundEffect(SoundEffect.BUILDING_WOOD_DEATH, building.getTileLocation());
+					}
+					else if(building.getType().isStoneConstruction()) {
+						SoundManager.queueSoundEffect(SoundEffect.BUILDING_STONE_DEATH, building.getTileLocation());
+					}
+					else {
+						SoundManager.queueSoundEffect(SoundEffect.BUILDING_WOOD_DEATH, building.getTileLocation());
 					}
 				}
 				
@@ -108,8 +105,7 @@ public class WorldData {
 				addDeadThing(plant);
 				// removed is a similar thing to
 				if(plant.isRemoved() == false) {
-					Sound sound = new Sound(SoundEffect.DEATH_PLANT, null, plant.getTile(), 1f);
-					SoundManager.theSoundQueue.add(sound);
+					SoundManager.queueSoundEffect(SoundEffect.DEATH_PLANT, plant.getTileLocation());
 				}
 				
 			} else {
@@ -155,8 +151,7 @@ public class WorldData {
 				}
 //				SoundManager.theSoundQueue.add(SoundEffect.DEATH);
 				if(unit.isRemoved() == false) {
-					Sound sound = new Sound(SoundEffect.DEATH_UNIT, unit.getFaction(), unit.getTile(), 1f);
-					SoundManager.theSoundQueue.add(sound);
+					SoundManager.queueSoundEffect(SoundEffect.DEATH_UNIT, unit.getTileLocation());
 				}
 				
 				
@@ -190,15 +185,13 @@ public class WorldData {
 				projectile.getTile().removeProjectile(projectile);
 				
 				if(projectile.isHeavyProjectile()) {
-					Sound sound = new Sound(SoundEffect.PROJECTILE_IMPACT_HEAVY, null, projectile.getTile(), 1f);
-					SoundManager.theSoundQueue.add(sound);
-				}else
-				if(projectile.isLightProjectile()) {
-					Sound sound = new Sound(SoundEffect.PROJECTILE_IMPACT_LIGHT, null, projectile.getTile(), 1f);
-					SoundManager.theSoundQueue.add(sound);
-				}else {
-					Sound sound = new Sound(SoundEffect.PROJECTILE_IMPACT_GENERIC, null, projectile.getTile(), 1f);
-					SoundManager.theSoundQueue.add(sound);
+					SoundManager.queueSoundEffect(SoundEffect.PROJECTILE_IMPACT_HEAVY, projectile.getTile().getLocation());
+				}
+				else if(projectile.isLightProjectile()) {
+					SoundManager.queueSoundEffect(SoundEffect.PROJECTILE_IMPACT_LIGHT, projectile.getTile().getLocation());
+				}
+				else {
+					SoundManager.queueSoundEffect(SoundEffect.PROJECTILE_IMPACT_GENERIC, projectile.getTile().getLocation());
 				}
 			} else {
 				projectilesNew.add(projectile);

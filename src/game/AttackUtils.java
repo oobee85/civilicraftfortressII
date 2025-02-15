@@ -1,6 +1,5 @@
 package game;
 
-import sounds.Sound;
 import sounds.SoundEffect;
 import sounds.SoundManager;
 import utils.*;
@@ -17,23 +16,20 @@ public class AttackUtils {
 		}
 		if(style.getProjectile() == ProjectileType.FIRE_WAVE) {
 			fireWave(unit, target, style);
-			Sound sound = new Sound(SoundEffect.PROJECTILE_LAUNCH_FIRE, null, unit.getTile(), 1f);
-			SoundManager.theSoundQueue.add(sound);
+			SoundManager.queueSoundEffect(SoundEffect.PROJECTILE_LAUNCH_FIRE, unit.getTile().getLocation());
 			return;
 		}
 		Projectile p = new Projectile(style.getProjectile(), unit.getTile(), target.getTile(), unit, style.getDamage());
 		unit.getTile().addProjectile(p);
 		world.getData().addProjectile(p);
 		if(p.isHeavyProjectile()) {
-			Sound sound = new Sound(SoundEffect.PROJECTILE_LAUNCH_HEAVY, null, unit.getTile(), 1f);
-			SoundManager.theSoundQueue.add(sound);
-		}else
-		if(p.isLightProjectile() && p.getType() != ProjectileType.BULLET) {
-			Sound sound = new Sound(SoundEffect.PROJECTILE_LAUNCH_LIGHT, null, unit.getTile(), 1f);
-			SoundManager.theSoundQueue.add(sound);
-		}else {
-			Sound sound = new Sound(SoundEffect.PROJECTILE_IMPACT_GENERIC, null, unit.getTile(), 1f);
-			SoundManager.theSoundQueue.add(sound);
+			SoundManager.queueSoundEffect(SoundEffect.PROJECTILE_LAUNCH_HEAVY, unit.getTile().getLocation());
+		}
+		else if(p.isLightProjectile() && p.getType() != ProjectileType.BULLET) {
+			SoundManager.queueSoundEffect(SoundEffect.PROJECTILE_LAUNCH_LIGHT, unit.getTile().getLocation());
+		}
+		else {
+			SoundManager.queueSoundEffect(SoundEffect.PROJECTILE_IMPACT_GENERIC, unit.getTile().getLocation());
 		}
 		
 	}

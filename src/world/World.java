@@ -1469,7 +1469,6 @@ public class World {
 	private static final int MAX_SHADE = 40;
 	
 	private void computeDiagonalShade(int sx, int sy, int[][] tileShade, int shadeAngle, int numx, int numy) {
-		System.out.println("Diagonal start x,y: " + sx + ", " + sy);
 		
 		float previousHeight = tiles[sx][sy].getHeight();
 		int prevx = sx;
