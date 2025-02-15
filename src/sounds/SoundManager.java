@@ -67,6 +67,9 @@ public class SoundManager {
 	public static void startVolumeUpdateThread(VolumeQueryInterface volume) {
 		ArrayList<PlayingSound> finished = new ArrayList<>(20);
 		Thread volumeUpdateThread = new Thread(() -> {
+			float previousGlobalVolume = -1f;
+			TileLoc previousTopLeft = null;
+			TileLoc previousBottomRight = null;
 			while(true) {
 				while(!readyToPlay.isEmpty()) {
 					PlayingSound ready = readyToPlay.removeFirst();
@@ -75,19 +78,31 @@ public class SoundManager {
 					ready.getClip().start();
 					currentlyPlayingSounds.add(ready);
 				}
-				for (PlayingSound playing : currentlyPlayingSounds) {
-					setVolumeOnClip(playing.getClip(), playing.getSourceLocation(), volume);
-					if (!playing.getClip().isRunning()
-							&& playing.getClip().getFramePosition() == playing.getClip().getFrameLength()) {
-						finished.add(playing);
-						if (!previouslyUsedClips.containsKey(playing.getSoundEffect())) {
-							previouslyUsedClips.put(playing.getSoundEffect(), new LinkedList<Clip>());
+				float globalVol = volume.getGlobalSoundVolume();
+				TileLoc topLeft = volume.getScreenTopLeftLocation();
+				TileLoc bottomRight = volume.getScreenBottomRightLocation();
+				boolean volumeChanged = (globalVol != previousGlobalVolume) 
+						|| !topLeft.equals(previousTopLeft)
+						|| !bottomRight.equals(previousBottomRight);
+				previousGlobalVolume = globalVol;
+				previousTopLeft = topLeft;
+				previousBottomRight = bottomRight;
+				
+				if (volumeChanged) {
+					for (PlayingSound playing : currentlyPlayingSounds) {
+						setVolumeOnClip(playing.getClip(), playing.getSourceLocation(), volume);
+						if (!playing.getClip().isRunning()
+								&& playing.getClip().getFramePosition() == playing.getClip().getFrameLength()) {
+							finished.add(playing);
+							if (!previouslyUsedClips.containsKey(playing.getSoundEffect())) {
+								previouslyUsedClips.put(playing.getSoundEffect(), new LinkedList<Clip>());
+							}
+							previouslyUsedClips.get(playing.getSoundEffect()).addLast(playing.getClip());
 						}
-						previouslyUsedClips.get(playing.getSoundEffect()).addLast(playing.getClip());
 					}
+					currentlyPlayingSounds.removeAll(finished);
+					finished.clear();
 				}
-				currentlyPlayingSounds.removeAll(finished);
-				finished.clear();
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
