@@ -4,21 +4,20 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import ui.KButton;
-import ui.KToggleButton;
-import ui.KUIConstants;
+import networking.client.ClientGUI;
+import ui.*;
 import utils.Settings;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 
 public class SettingsMenu {
 	
-	private JPanel content;
+	private ScrollingPanel content;
 	
-	public SettingsMenu(ActionListener backCallback) {
-		content = new JPanel();
+	public SettingsMenu(ActionListener backCallback, Dimension parentSize) {
+		content = new ScrollingPanel(new Dimension(parentSize.width, 700));
 		content.setBackground(Color.black);
 		KButton backButton = KUIConstants.setupButton("Back", null, DebugView.DEBUG_BUTTON_SIZE);
 		backButton.addActionListener(backCallback);
@@ -92,6 +91,6 @@ public class SettingsMenu {
 	}
 	
 	public JPanel getContentPanel() {
-		return content;
+		return content.getRootPanel();
 	}
 }

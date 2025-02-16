@@ -302,7 +302,7 @@ public class ClientGUI {
 	}
 	
 	public void switchToSettingsMenu() {
-		SettingsMenu settingsMenu = new SettingsMenu(e -> switchToMainMenu());
+		SettingsMenu settingsMenu = new SettingsMenu(e -> switchToMainMenu(), mainMenuPanel.getSize());
 		settingsMenu.addControlFor(Settings.class);
 		mainMenuPanel.removeAll();
 		mainMenuPanel.add(settingsMenu.getContentPanel(), BorderLayout.CENTER);

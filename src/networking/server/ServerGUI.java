@@ -84,7 +84,7 @@ public class ServerGUI extends JPanel {
 	}
 	
 	public void switchToSettingsMenu() {
-		SettingsMenu settingsMenu = new SettingsMenu(e -> switchToMainMenu());
+		SettingsMenu settingsMenu = new SettingsMenu(e -> switchToMainMenu(), menuButtonPanel.getSize());
 		settingsMenu.addControlFor(Settings.class);
 		menuButtonPanel.removeAll();
 		menuButtonPanel.add(settingsMenu.getContentPanel(), BorderLayout.CENTER);

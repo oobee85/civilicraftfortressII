@@ -262,7 +262,8 @@ public class DebugView {
 			settingsWindow = new JFrame("Settings");
 			settingsWindow.setLocationRelativeTo(null);
 			settingsWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			settingsWindow.setSize(500, 500);
+			Dimension size = new Dimension(500, 500);
+			settingsWindow.setSize(size);
 			settingsWindow.addWindowListener(new WindowListener() {
 				@Override
 				public void windowClosing(WindowEvent e) {
@@ -278,7 +279,7 @@ public class DebugView {
 			SettingsMenu settingsMenu = new SettingsMenu(ee -> {
 				settingsWindow.dispose();
 				settingsWindow = null;
-			});
+			}, size);
 			settingsMenu.addControlFor(Settings.class);
 			settingsWindow.add(settingsMenu.getContentPanel());
 			settingsWindow.setVisible(true);

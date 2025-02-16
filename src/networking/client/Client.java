@@ -218,6 +218,7 @@ public class Client {
 					clientGUI.getGameView().enableMouse();
 				});
 //			});
+				SoundManager.startMusic();
 		});
 		t.start();
 	}

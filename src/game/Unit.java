@@ -174,16 +174,16 @@ public class Unit extends Thing implements Serializable {
 		double penalty = movePenaltyTo(this.getTile(), t);
 		timeToMove += penalty;
 		// workers dont play walking sound, gets annoying when theres tons going around
-		if(this.getType() == Game.unitTypeMap.get("WORKER")) {
-			
-		}else { //all other unit walking sounds
-			if(this.getType().isWheeled()) {
-				SoundManager.queueSoundEffect(SoundEffect.MOVE_WHEELED, this.getTile().getLocation());
-			}
-			else {
-				SoundManager.queueSoundEffect(SoundEffect.MOVE_DIRT, this.getTile().getLocation());
-			}
-		}
+//		if(this.getType() == Game.unitTypeMap.get("WORKER")) {
+//			
+//		}else { //all other unit walking sounds
+//			if(this.getType().isWheeled()) {
+//				SoundManager.queueSoundEffect(SoundEffect.MOVE_WHEELED, this.getTile().getLocation());
+//			}
+//			else {
+//				SoundManager.queueSoundEffect(SoundEffect.MOVE_DIRT, this.getTile().getLocation());
+//			}
+//		}
 		
 		
 		getTile().removeUnit(this);

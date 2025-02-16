@@ -51,14 +51,9 @@ public class Loader {
 		long startTime = System.currentTimeMillis();
 		for(SoundEffect sound : SoundEffect.values()) {
 			SoundManager.loadSound(sound);
-//				if(sound.getIsMusic()) {
-//					SoundManager.theMusicEffectQueue.add(sound);
-//					Sound theMusic = new Sound(sound, null, 1f);
-//					SoundManager.theMusicQueue.add(theMusic);
-//				}
 		}
 
-//		SoundManager.queueSoundEffect(SoundEffect.mushroomwizard);
+		SoundManager.initializeMusicQueue();
 
 		System.out.println("Sounds loaded in " + (System.currentTimeMillis() - startTime) + "ms");
 	}
