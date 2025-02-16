@@ -1,23 +1,20 @@
 package networking.client;
 
+import static ui.KUIConstants.MAIN_MENU_BUTTON_SIZE;
+
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.net.*;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.event.*;
 
 import game.*;
 import networking.message.*;
-import networking.server.*;
+import networking.server.PlayerInfo;
 import ui.*;
 import ui.infopanels.*;
 import ui.view.*;
 import utils.*;
-import world.Plant;
-
-import static ui.KUIConstants.MAIN_MENU_BUTTON_SIZE;
 
 public class ClientGUI {
 	
@@ -416,6 +413,21 @@ public class ClientGUI {
 		cs.gridx = 0;
 		cs.gridy = 2;
 		overviewTab.add(gotoResearchButton, cs);
+		
+		// TODO add research in progress view
+		
+
+		cs.gridx = 0;
+		cs.gridy = 4;
+		cs.weightx = 1;
+		cs.weighty = 1;
+		KSlider volumeSlider = new KSlider(0, 100);
+		volumeSlider.setPreferredSize(new Dimension(160, 30));
+		volumeSlider.setValue(Settings.VOLUME);
+		volumeSlider.addChangeListener(e -> {
+			Settings.VOLUME = volumeSlider.getValue();
+		});
+		overviewTab.add(volumeSlider, cs);
 
 		cs.gridx = 0;
 		cs.gridy = 3;
@@ -423,8 +435,8 @@ public class ClientGUI {
 		cs.gridheight = 3;
 		cs.weighty = 1;
 		cs.fill = GridBagConstraints.BOTH;
-		
 		overviewTab.add(new JPanel(), cs);
+
 		cs.weighty = 0;
 		cs.gridwidth = 1;
 		cs.gridheight = 1;
