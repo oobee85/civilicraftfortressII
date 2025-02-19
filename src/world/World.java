@@ -502,7 +502,8 @@ public class World {
 		if(tile == null) {
 			return null;
 		}
-		if(tile.getBuilding() != null) {
+		
+		if(tile.getBuilding() != null && !buildingType.isRoad()) {
 			tile.getBuilding().setDead(true);
 			tile.getBuilding().setRemoved(true);
 		}
