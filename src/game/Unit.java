@@ -559,9 +559,9 @@ public class Unit extends Thing implements Serializable {
 //				System.out.println("Remaining Amount: "+ tile.getRemainingResourceAmount());
 				tile.subtractRemainingResourceAmount(1);
 			}
-			else if(tile.getTerrain() == Terrain.ROCK) {
-				itemType = ItemType.STONE;
-			}
+//			else if(tile.getTerrain() == Terrain.ROCK) {
+//				itemType = ItemType.STONE;
+//			}
 			if(itemType != null) {
 				getInventory().addItem(itemType, 1);
 				this.resetTimeToHarvest(2.5); // much slower to harvest from tile

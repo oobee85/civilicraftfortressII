@@ -132,7 +132,6 @@ public class AirSimulation {
 	}
 	
 	public static void doAirSimulationStuff(World world, List<Tile> tilesRandomOrder, int width, int height) {
-		
 		parallelizedSimulationWork(world, tilesRandomOrder, (tile) -> {
 			tile.updateAir();
 			tile.updateEnergyToTemperature();
@@ -142,15 +141,18 @@ public class AirSimulation {
 		
 		parallelizedSimulationWork(world, tilesRandomOrder, (tile) -> {
 			AirSimulation.updateEnergy(tile, avg.temp, avg.water, avg.berries, avg.tree);
-			tile.updateEnergyToTemperature();
-			AirSimulation.blackBodyRadiation(tile);
-			tile.updateEnergyToTemperature();
+//			tile.updateEnergyToTemperature();
+//			AirSimulation.blackBodyRadiation(tile);
+//			tile.updateEnergyToTemperature();
 		});
 
-		AirSimulation.updateAirMovement(tilesRandomOrder, width, height);
-		parallelizedSimulationWork(world, tilesRandomOrder, (tile) -> {
-			tile.updateEnergyToTemperature();
-		});
+
+		AirSimulation.updateAirMovement(world);
+//		parallelizedSimulationWork(world, tilesRandomOrder, (tile) -> {
+//			tile.updateAir();
+//			tile.updateEnergyToTemperature();
+//		});
+
 	}
 	
 	public static void blackBodyRadiation(Tile tile) {
@@ -174,7 +176,7 @@ public class AirSimulation {
 			
 			blackBodyRadiation(tile);
 //			updateEnergyToTemperature(tile);
-			
+			tile.updateEnergyToTemperature();
 			
 			//adds energy for water
 //			if(tile.liquidType == LiquidType.WATER && tile.liquidAmount >= tile.liquidType.getMinimumDamageAmount()) {
@@ -345,8 +347,8 @@ public class AirSimulation {
 //			}else {
 //				tile.addEnergy(seasonEnergy);
 //			}
+//			tile.updateEnergyToTemperature();
 			
-			tile.updateEnergyToTemperature();
 //			blackBodyRadiation();
 			
 //			tile.addEnergy(seasonEnergy);
@@ -373,89 +375,115 @@ public class AirSimulation {
 //			tile.addEnergy(joules);
 		
 	}
+	public static void updateAirTileNeighbors(Tile tile) {
+		TileLoc tileLoc = tile.getLocation();
+		Air tileAir = tile.getAir();
+		double mypress = tileAir.getPressure();
+		double myvolume = tileAir.getVolumeLiquid();
+		double myenergy = tileAir.getEnergy();
+		double mymaxvolume = tileAir.getMaxVolumeLiquid();
+		
+		tileAir.setFlowDirection(Direction.NONE);
+		int transferred = 0;
+		int amountOfNeighbors = tile.getNeighbors().size()/2 +2;
+		
+		for(Tile otherTile : tile.getNeighbors()) {
+			TileLoc otherLoc = otherTile.getLocation();
+			Air otherAir = otherTile.getAir();
+			double opress = otherAir.getPressure();
+			double ovolume = otherAir.getVolumeLiquid();
+			double oenergy = otherAir.getEnergy();
+			double omaxvolume = otherAir.getMaxVolumeLiquid();
+
+			
+			
+			// PREVENTS AIRFLOW DIRECTIONS FROM CHANGING RAPIDLY
+//			Direction oldFlow = tileAir.getFlowDirection();
+//			double directionValue = Math.abs(oldFlow.deltay() + attemptFlow.deltay());
+			
+			
+			// IF CONDITIONS MET FOR TRANSFER TO OTHER TILE
+			if(mypress > opress ) {
+				double deltaE = (double) ((myenergy - oenergy)) /(amountOfNeighbors);
+				transferred += 1;
+				
+				Direction attemptFlow = Direction.getDirection(tileLoc, otherLoc);
+				tileAir.setFlowDirection(attemptFlow);
+				
+//				tileAir[otherLoc.x()][otherLoc.y()] += deltaE;
+				oenergy += deltaE;
+				myenergy -= deltaE;
+				otherAir.setEnergy(oenergy);
+				
+				double deltaVol = (double)Math.abs(myvolume - ovolume) /(amountOfNeighbors);
+				
+				if (myvolume - deltaVol >= 0 && ovolume + deltaVol < omaxvolume && ovolume - deltaVol >= 0 && myvolume + deltaVol < mymaxvolume) {
+					ovolume += deltaVol;
+					myvolume -= deltaVol;
+					otherAir.setVolumeLiquid(ovolume);
+					
+//					break;
+				}
+			}
+			
+			if (transferred >= 3) { // stops air from being transferred to multiple tiles
+//				continue;
+				break;
+			}
+
+		}
+		// after checking all neighbors, update current tile
+		tileAir.setEnergy(myenergy);
+		tileAir.setVolumeLiquid(myvolume);
+		
+	}
 	
-	public static void updateAirMovement(List<Tile> tiles, int worldWidth, int worldHeight) {
+	
+	public static void updateAirMovement(World world) {
 		if(World.ticks % Constants.TICKSTOUPDATEAIR == 0) {
 			return;
 		}
-		double totalMass = 0;
-		double [][] pressureTemp = new double[worldWidth][worldHeight];
-		double [][] volumeTemp = new double[worldWidth][worldHeight];
-//		double [][] humidityTemp = new double[worldWidth][worldHeight];
-		double [][] energyTemp = new double[worldWidth][worldHeight];
-		for(Tile t: tiles) {
-			pressureTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getPressure();
-			volumeTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getVolumeLiquid();
-//			humidityTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getVolumeLiquid();
-			energyTemp[t.getLocation().x()][t.getLocation().y()] = t.getAir().getEnergy();
-		}
-		
-		for(Tile tile: tiles) {
-			TileLoc tileLoc = tile.getLocation();
-			Air tileAir = tile.getAir();
-			tileAir.setFlowDirection(Direction.NONE);
-			
-			int transferred = 0;
-			
-			
-			for(Tile otherTile : tile.getNeighbors()) {
-				TileLoc otherLoc = otherTile.getLocation();
-				Air otherAir = otherTile.getAir();
-				
-				double mypress = tileAir.getPressure();
-				double myvolume = tileAir.getVolumeLiquid();
-				double myenergy = tileAir.getEnergy();
-				double mymaxvolume = tileAir.getMaxVolumeLiquid();
-				
-				double opress = otherAir.getPressure();
-				double ovolume = otherAir.getVolumeLiquid();
-				double oenergy = otherAir.getEnergy();
-				double omaxvolume = otherAir.getMaxVolumeLiquid();
-
-				
-				
-				// PREVENTS AIRFLOW DIRECTIONS FROM CHANGING RAPIDLY
-				
-				Direction oldFlow = tileAir.getFlowDirection();
-				Direction attemptFlow = Direction.getDirection(tileLoc, otherLoc);
-//				double directionValue = Math.abs(oldFlow.deltay() + attemptFlow.deltay());
-				
-				
-				// IF CONDITIONS MET FOR TRANSFER TO OTHER TILE
-				if(mypress > opress ) {
-					double deltaE = (double) ((myenergy - oenergy)) /(tile.getNeighbors().size()/2 +2);
-					transferred += 1;
-
-					tileAir.setFlowDirection(attemptFlow);
-					energyTemp[otherLoc.x()][otherLoc.y()] += deltaE;
-					energyTemp[tileLoc.x()][tileLoc.y()] -= deltaE;
-					double deltaVol = (double)Math.abs(myvolume - ovolume) /(tile.getNeighbors().size()/2 +2);
-//					if (myvolume - deltaVol >= 0 && ovolume - deltaVol >= 0) {
-						
-					if (myvolume - deltaVol >= 0 && ovolume + deltaVol < omaxvolume && ovolume - deltaVol >= 0 && myvolume + deltaVol < mymaxvolume) {
-						volumeTemp[otherLoc.x()][otherLoc.y()] += deltaVol;
-						volumeTemp[tileLoc.x()][tileLoc.y()] -= deltaVol;
-//						break;
+//		Profiler.start2();
+		if(Settings.AIR_MULTITHREADED) {
+			for(ArrayList<Tile> tiles : world.getLiquidSimulationPhases()) {
+				int chunkSize = Math.max(1, tiles.size()/world.getWidth());
+				ArrayList<Future<?>> futures = new ArrayList<>();
+				for(int chunkIndex = 0; chunkIndex < tiles.size(); chunkIndex+=chunkSize) {
+					final int start = chunkIndex;
+					final int end = Math.min(chunkIndex + chunkSize, tiles.size());
+					Future<?> future = Utils.executorService.submit(() -> {
+						for(int i = start; i < end; i++) {
+							Tile tile = tiles.get(i);
+							updateAirTileNeighbors(tile);
+						}
+					});
+					futures.add(future);
+				}
+				try {
+					for(Future<?> future : futures) {
+						future.get();
 					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
 				}
-				
-				if (transferred >= 3) { // stops air from being transferred to multiple tiles
-//					continue;
-					break;
-				}
-
 			}
 		}
-
-		for(Tile t: tiles) {
-			Air air = t.getAir();
-			air.setEnergy(energyTemp[t.getLocation().x()][t.getLocation().y()]);
-//			t.setHumidity(energyTemp[t.getLocation().x()][t.getLocation().y()]);
-			air.setVolumeLiquid(volumeTemp[t.getLocation().x()][t.getLocation().y()]);
-//			t.setEnergy(energyTemp[t.getLocation().x()][t.getLocation().y()]);
-//			totalMass += t.getAir().getVolumeLiquid();
+		else {
+			for(Tile tile : world.getTiles()) {
+				updateAirTileNeighbors(tile);
+			}
 		}
-//		System.out.println(totalMass);
+//		Profiler.end2("Better way");
+//		
+//		Profiler.start2();
+//		
+//		for(Tile tile: world.getTiles()) {
+//			updateAirTileNeighbors(tile);
+//		}
+//		Profiler.end2("worse way");
+		
 	}
 	
 	

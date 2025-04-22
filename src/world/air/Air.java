@@ -30,6 +30,7 @@ public class Air implements Serializable {
 		this.updateHumidity();
 		this.flowDirection = Direction.NONE;
 		this.energy = 10000;
+		this.temperature = 23;
 	}
 	public void updateFromServer(Air updateFromServer) {
 		this.height = updateFromServer.height;

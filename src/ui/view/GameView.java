@@ -544,6 +544,7 @@ public class GameView {
 					else if (targetBuilding != null && 
 							targetBuilding.getFaction() == unit.getFaction() && 
 							targetBuilding.isBuilt() && 
+							!targetBuilding.getType().isCastle() && // shouldnt try to take items from castle. this breaks deliver
 							targetBuilding.hasInventory()) {
 //						System.out.println("taking items, caravan");
 						commandInterface.planAction(unit, PlannedAction.takeItemsFrom(targetBuilding), !shiftDown);
@@ -589,7 +590,7 @@ public class GameView {
 						commandInterface.planAction(unit, PlannedAction.deliver(targetBuilding), !shiftDown);
 					}
 					else if (targetBuilding != null && targetBuilding.getFaction() == unit.getFaction()
-							&& targetBuilding.isBuilt() && targetBuilding.hasInventory()) {
+							&& targetBuilding.isBuilt() && targetBuilding.hasInventory() && !targetBuilding.getType().isCastle()) {
 //						System.out.println("taking items, builder");
 						commandInterface.planAction(unit, PlannedAction.takeItemsFrom(targetBuilding), !shiftDown);
 					}

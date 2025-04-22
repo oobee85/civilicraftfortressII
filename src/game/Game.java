@@ -116,7 +116,11 @@ public class Game {
 			updateTerritory();
 			world.growMoss();
 		}
-
+		
+//		if(World.ticks % 10 == 0) {
+//			Profiler.printLog();
+//		}
+		
 		boolean everyOther = false;
 		if (everyOther) {
 			if (World.ticks % 2 == 0) {
