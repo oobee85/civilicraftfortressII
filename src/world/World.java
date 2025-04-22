@@ -798,6 +798,12 @@ public class World {
 		
 		for(Tile tile : getTiles()) {
 			
+			if(World.ticks % 30 == 0) {
+				if(!tile.getInventory().isEmpty()) {
+					tile.getInventory().decayItems();
+				}
+			}
+			
 			if(tile.getResource() != null) {
 				if(tile.getRemainingResourceAmount() <= 0) {
 					tile.setResource(null);

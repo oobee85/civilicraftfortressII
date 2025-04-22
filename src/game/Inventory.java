@@ -115,6 +115,14 @@ public class Inventory implements Externalizable {
 			}
 		}
 	}
+	public void decayItems() {
+		for(Item item : items) {
+			if(item != null && item.getAmount() > 0) {
+				item.addAmount(-1);
+			}
+			
+		}
+	}
 	public boolean isEmpty() {
 		for(Item item: items) {
 			if(item != null && item.getAmount() != 0) {
