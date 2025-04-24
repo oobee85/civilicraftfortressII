@@ -1366,7 +1366,7 @@ public class World {
 		Collections.sort(tileList, new Comparator<Tile>() {
 			@Override
 			public int compare(Tile o1, Tile o2) {
-				return o1.getHeight() > o2.getHeight() ? 1 : -1;
+				return o1.getHeight() > o2.getHeight() ? 1 : (o1.getHeight() < o2.getHeight() ? -1 : 0);
 			}
 		});
 		

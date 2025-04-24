@@ -531,13 +531,13 @@ public class Unit extends Thing implements Serializable {
 //			}
 //		}
 		
-		if (getInventory().isFull()) {
-			action.setDone(true);
-		}
+//		if (getInventory().isFull()) {
+//			action.setDone(true);
+//		}
 	}
 	
 	public void doHarvest(Plant plant, PlannedAction action) {
-		if(readyToHarvest() && hasInventory()) {
+		if(readyToHarvest() && isBuilder() && hasInventory()) {
 			plant.takeDamage(2, DamageType.PHYSICAL);
 			for(Item item: plant.getItem()) {
 				getInventory().addItem(item.getType(), item.getAmount());
@@ -551,7 +551,7 @@ public class Unit extends Thing implements Serializable {
 	}
 	
 	public void doHarvest(Tile tile, PlannedAction action) {
-		if(readyToHarvest() && hasInventory()) {
+		if(readyToHarvest() && isBuilder() && hasInventory()) {
 			//  figure out if harvest stone or ore
 			ItemType itemType = null;
 			if(tile.getResource() != null && getFaction().areRequirementsMet(tile.getResource())) {
@@ -572,7 +572,8 @@ public class Unit extends Thing implements Serializable {
 		}
 	}
 	public void doTake(PlannedAction action, Thing target) {
-		if(this.hasInventory()) {
+		// only collect from building if unit is a builder or a caravan
+		if((this.isBuilder() || this.getType().isCaravan()) && this.hasInventory()) {
 			this.getInventory().takeAll(target.getInventory());
 		}
 		action.setDone(true);
@@ -701,6 +702,7 @@ public class Unit extends Thing implements Serializable {
 			return false;
 		}
 		boolean didSomething = false;
+		boolean isBuilder = isBuilder();
 		if(plan.isBuildRoadAction() && isBuilder()) {
 			// when road finishes, worker doesn't die
 			Building tobuild = plan.getTile().getRoad();

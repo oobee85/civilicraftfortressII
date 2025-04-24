@@ -783,7 +783,6 @@ public class Game {
 			}
 //			}
 			
-
 			if (building.isMoria() && building.isBuilt()) {
 				generateMoria(building);
 

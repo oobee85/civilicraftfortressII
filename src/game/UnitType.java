@@ -103,6 +103,10 @@ public class UnitType implements Serializable {
 	public LinkedList<Item> getDeadItem() {
 		return deadItem;
 	}
+	
+	public boolean isBuilder() {
+		return attributes.contains("builder");
+	}
 	public boolean isAquatic() {
 		return attributes.contains("aquatic");
 	}

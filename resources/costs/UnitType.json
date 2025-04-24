@@ -9,6 +9,7 @@
 		],
 		"name":"WORKER",
 		"inventory":{"maxstack":20},
+		"attributes":["builder"],
 		"builds":["WALL_WOOD", "GATE_WOOD", "FARM", "MINE", "BARRACKS", "TRAP", "COLONY","STABLES", "WORKSHOP", "SMITHY", "QUARRY", "SAWMILL",
 				 "WATCHTOWER", "PORT", "WALL_STONE", "GATE_STONE", "WALL_BRICK", "GATE_BRICK", "GRANARY", "WINDMILL",
 				 "CASTLE", "NECROPOLIS", "RESEARCH_LAB", "STONE_ROAD", "BRICK_ROAD", "BRIDGE", "HELLFORGE"]
@@ -22,6 +23,7 @@
 		],
 		"name":"MASON",
 		"research":"MASONRY",
+		"attributes":["builder"],
 		"inventory":{"maxstack":30},
 		"builds":["WALL_STONE", "GATE_STONE", "WALL_BRICK", "GATE_BRICK", "MINE", "QUARRY", "GRANARY", "WINDMILL",
 				"WATCHTOWER", "CASTLE", "NECROPOLIS", "RESEARCH_LAB", "STONE_ROAD", "BRICK_ROAD", "HELLFORGE"]
@@ -45,6 +47,7 @@
 		"attackstyles":[
 			{"damage":10, "cooldown":30, "range":1}
 		],
+		"inventory":{"maxstack":100},
 		"attributes":["hostile"],
 		"targeting":[{"type":"game.Unit"}]
 	},
@@ -56,6 +59,7 @@
 		"attackstyles":[
 			{"damage":30, "cooldown":30, "range":1}
 		],
+		"inventory":{"maxstack":100},
 		"attributes":["hostile"],
 		"research":"BRONZE_WORKING",
 		"targeting":[{"type":"game.Unit"}]
@@ -69,6 +73,7 @@
 		"attackstyles":[
 			{"damage":15, "cooldown":30, "range":3, "minrange":1, "projectile":"ARROW"}
 		],
+		"inventory":{"maxstack":100},
 		"research":"MASONRY",
 		"targeting":[{"type":"game.Unit"}]
 	},
@@ -80,7 +85,8 @@
 		"attackstyles":[
 			{"damage":40, "cooldown":20, "range":1}
 		],
-		"inventory":{"maxstack":5},
+		
+		"inventory":{"maxstack":100},
 		"attributes":["hostile"],
 		"research":"IRON_WORKING",
 		"targeting":[{"type":"game.Unit"}]
@@ -93,7 +99,7 @@
 		"attackstyles":[
 			{"damage":60, "cooldown":30, "range":6, "minrange":1, "projectile":"ARROW"}
 		],
-		"inventory":{"maxstack":5},
+		"inventory":{"maxstack":100},
 		"attributes":["hostile"],
 		"research":"MATHEMATICS",
 		"targeting":[{"type":"game.Unit"}]
@@ -159,7 +165,8 @@
 		"attackstyles":[
 			{"damage":20, "cooldown":20, "range":1}
 		],
-		"inventory":{"maxstack":5},
+		
+		"inventory":{"maxstack":100},
 		"attributes":["hostile"],
 		"research":"TRAPPING",
 		"targeting":[{"type":"game.Unit"}]
@@ -172,7 +179,7 @@
 		"attackstyles":[
 			{"damage":100, "cooldown":20, "range":1}
 		],
-		"inventory":{"maxstack":5},
+		"inventory":{"maxstack":100},
 		"attributes":["hostile"],
 		"research":"ANIMAL_HUSBANDRY",
 		"targeting":[{"type":"game.Unit"}]
@@ -185,6 +192,7 @@
 		"attackstyles":[
 			{"damage":100, "cooldown":50, "range":5, "minrange":1, "projectile":"WIZARD_BALL"}
 		],
+		"inventory":{"maxstack":100},
 		"research":"WITCHCRAFT",
 		"targeting":[
 			{"type":"game.Building"},
@@ -200,6 +208,7 @@
 		"attackstyles":[
 			{"damage":60, "cooldown":30, "range":1}
 		],
+		"inventory":{"maxstack":100},
 		"research":"ANIMAL_HUSBANDRY",
 		"targeting":[
 			{"type":"game.Building"},
@@ -230,7 +239,7 @@
 		"attackstyles":[
 			{"damage":100, "cooldown":20, "range":3, "minrange":1, "projectile":"RUNE_ARROW"}
 		],
-		"inventory":{"maxstack":5},
+		"inventory":{"maxstack":100},
 		"attributes":["hostile"],
 		"research":"DOMESTICATION",
 		"targeting":[{"type":"game.Unit"}]
@@ -635,6 +644,7 @@
 			{"damage":30, "cooldown":30, "range":1}
 		],
 		"inventory":{"maxstack":1},
+		"attributes":["builder"],
 		"builds":["MINE", "QUARRY"],
 		"resistances": {"HEAT": 20}
 	},
@@ -647,7 +657,7 @@
 			{"damage":15, "cooldown":30, "range":1}
 		],
 		"inventory":{"maxstack":1},
-		"attributes":["hostile"],
+		"attributes":["hostile", "builder"],
 		"loot":{"STONE":100, "BRONZE_BAR":1, "WOOD":100 , "FOOD":100},
 		"builds":["SCORPION_DEN"]
 	}
