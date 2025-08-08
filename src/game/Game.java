@@ -571,6 +571,9 @@ public class Game {
 
 	public void spawnStartingEnemies() {
 		spawnCyclopsFort();
+		spawnDesertRuins();
+		spawnLabyrinthRuins();
+		spawnForestRuins(2);
 		spawnUndead();
 		makeDwarves(world);
 		// ent grove
@@ -653,13 +656,280 @@ public class Game {
 
 	public void spawnCyclopsFort() {
 		for (Tile t : world.getTiles()) {
-			if (t.getResource() == ResourceType.RUNITE) {
+			if (t.getResource() == ResourceType.IRON) {
 				spawnCyclopsFort(t);
 				break;
 			}
 		}
 	}
+	public void spawnDesertRuins() {
+		for (Tile t : world.getTilesRandomly()) {
+			if(t.getTerrain() != Terrain.SAND) {
+				continue;
+			}else {
+				spawnDesertRuins(t);
+				return;
+			}
+		}
+	}
+	public void spawnLabyrinthRuins() {
+		for (Tile t : world.getTilesRandomly()) {
+			if(t.getTerrain() != Terrain.GRASS) {
+				continue;
+			}else {
+				spawnLabyrinthRuins(t, (5+((int)Math.random()*5)));
+				return;
+			}
+		}
+	}
+	public void spawnForestRuins(int number) {
+		int spawned = 0;
+		for (Tile t : world.getTilesRandomly()) {
+			if(t.getPlant() != null && t.getPlant().getType() == Game.plantTypeMap.get("TREE")) {
+				int numNeighborWithNOTree = 0;
+				for(Tile neighbor : t.getNeighbors()) {
+					if(neighbor.getPlant() != null && neighbor.getPlant().getType() != Game.plantTypeMap.get("TREE")) {
+						numNeighborWithNOTree ++;
+						break;
+					}
+				}
+				if(numNeighborWithNOTree == 0) {
+					if(spawned < number) {
+						spawnForestRuins(t);
+						spawned ++;
+					}else {
+						return;
+					}
+					
+					//return;
+				}
+			}
+		}
+	}
+	
+	private void spawnForestRuins(Tile tile) {
+		Faction factionId = world.getFaction(World.NO_FACTION_ID);
+		// makes the wall
+		BuildingType type = Game.buildingTypeMap.get("WALL_WOOD");
+		BuildingType chest = Game.buildingTypeMap.get("TREASURE");
+		for (int i = 0; i < (4+((int)(Math.random()+0.5))); i++) {
+			Tile wall;
+			if(Math.random() > 0.5) {
+				wall = world.get(new TileLoc(tile.getLocation().x() + 3, tile.getLocation().y() - 2 + i));
+				summonBuilding(wall, type, factionId);
+				if(wall != null) {
+					wall.getBuilding().setImmuneToLiquidDamage(true);
+				}
+			}
+			if(Math.random() > 0.5) {
+				wall = world.get(new TileLoc(tile.getLocation().x() - 3, tile.getLocation().y() - 2 + i));
+				summonBuilding(wall, type, factionId);
+				if(wall != null) {
+					wall.getBuilding().setImmuneToLiquidDamage(true);
+				}
+			}
+		}
+		for (int i = 1; i < (5+((int)(Math.random()+0.5))); i++) {
+			
+			Tile wall;
+			int yoffset = i;
+			if (i > (3+(int)Math.random()+0.5)) {
+				yoffset = (5 - yoffset);
+			}
+			yoffset += tile.getLocation().x() % 2;
+			yoffset /= 2;
+			
+			if(Math.random() > 0.5) {
+				wall = world.get(new TileLoc(tile.getLocation().x() - 3 + i, tile.getLocation().y() - 2 - yoffset));
+				summonBuilding(wall, type, factionId);
+				if(wall != null) {
+					wall.getBuilding().setImmuneToLiquidDamage(true);
+				}
+				
+			}
+			yoffset = yoffset + (tile.getLocation().x() + i) % 2 - 2 - (tile.getLocation().x() % 2);
+			wall = world.get(new TileLoc(tile.getLocation().x() - 3 + i, tile.getLocation().y() + 4 + yoffset));
+			summonBuilding(wall, type, factionId);
+			if(wall != null) {
+				wall.getBuilding().setImmuneToLiquidDamage(true);
+			}
+		}
+		summonBuilding(tile, chest, factionId);
+		tile.getBuilding().getInventory().addItem(ItemType.MITHRIL_BAR, 10);
+		tile.getBuilding().getInventory().addItem(ItemType.IRON_BAR, 20);
+		tile.getBuilding().getInventory().addItem(ItemType.BRONZE_BAR, 40);
+	}
+	
+	private void spawnLabyrinthRuins(Tile origin, int size) {
+	    Faction factionId = world.getFaction(World.NO_FACTION_ID);
+	    BuildingType wallType = Game.buildingTypeMap.get("WALL_STONE");
+	    BuildingType chestType = Game.buildingTypeMap.get("TREASURE");
 
+	    int gridSize = size * 2 + 1;
+	    boolean[][] visited = new boolean[size][size];
+	    Set<TileLoc> pathTiles = new HashSet<>();
+
+	    int startX = origin.getLocation().x();
+	    int startY = origin.getLocation().y();
+
+	    // Start at random cell
+	    int startCellX = (int)(Math.random() * size);
+	    int startCellY = (int)(Math.random() * size);
+
+	    // Carve maze and track path tiles
+	    TileLoc entrance = carveMaze(startCellX, startCellY, visited, size, startX, startY, pathTiles);
+
+	    // Place walls where there is no path
+	    for (int y = 0; y < gridSize; y++) {
+	        for (int x = 0; x < gridSize; x++) {
+	            TileLoc loc = new TileLoc(startX + x, startY + y);
+	            if (!pathTiles.contains(loc)) {
+	                Tile wallTile = world.get(loc);
+	                summonBuilding(wallTile, wallType, factionId);
+	                wallTile.getBuilding().setImmuneToLiquidDamage(true);
+	            }
+	        }
+	    }
+
+	    // Create entrance
+	    clearWallAtBorder(entrance, size, startX, startY);
+
+	    // Find farthest tile and place chest
+	    TileLoc chestTileLoc = findFarthestPathTile(entrance, pathTiles);
+	    //clearWallAtBorder(chestTileLoc, size, startX, startY); // Ensure it's accessible
+	    Tile chestTile = world.get(chestTileLoc);
+	    summonBuilding(chestTile, chestType, factionId);
+	    chestTile.getBuilding().setImmuneToLiquidDamage(true);
+	    chestTile.getBuilding().getInventory().addItem(ItemType.IRON_BAR, 100);
+	    chestTile.getBuilding().getInventory().addItem(ItemType.BRONZE_BAR, 100);
+	}
+
+	private TileLoc carveMaze(int cx, int cy, boolean[][] visited, int size, int startX, int startY,
+							Set<TileLoc> pathTiles) {
+		visited[cy][cx] = true;
+		
+		int tileX = startX + cx * 2 + 1;
+		int tileY = startY + cy * 2 + 1;
+		TileLoc current = new TileLoc(tileX, tileY);
+		pathTiles.add(current);
+		
+		TileLoc entrance = current; // First cell visited is entrance
+		
+		int[][] directions = { {0, -1}, {1, 0}, {0, 1}, {-1, 0} };
+		List<int[]> dirList = Arrays.asList(directions);
+		Collections.shuffle(dirList);
+		
+		for (int[] dir : dirList) {
+			int nx = cx + dir[0];
+			int ny = cy + dir[1];
+			
+			if (nx >= 0 && ny >= 0 && nx < size && ny < size && !visited[ny][nx]) {
+				int wallX = tileX + dir[0];
+				int wallY = tileY + dir[1];
+				pathTiles.add(new TileLoc(wallX, wallY));
+				carveMaze(nx, ny, visited, size, startX, startY, pathTiles);
+			}
+		}
+		
+		return entrance;
+	}
+
+	private TileLoc findFarthestPathTile(TileLoc start, Set<TileLoc> pathTiles) {
+	    Set<TileLoc> visited = new HashSet<>();
+	    Queue<TileLoc> queue = new LinkedList<>();
+	    queue.add(start);
+	    visited.add(start);
+
+	    TileLoc farthest = start;
+
+	    int[][] directions = { {0, -1}, {1, 0}, {0, 1}, {-1, 0} };
+
+	    while (!queue.isEmpty()) {
+	        TileLoc current = queue.poll();
+	        farthest = current;
+
+	        for (int[] dir : directions) {
+	            TileLoc neighbor = new TileLoc(current.x() + dir[0], current.y() + dir[1]);
+	            if (pathTiles.contains(neighbor) && !visited.contains(neighbor)) {
+	                visited.add(neighbor);
+	                queue.add(neighbor);
+	            }
+	        }
+	    }
+
+	    return farthest;
+	}
+
+
+	private void clearWallAtBorder(TileLoc pathTile, int size, int startX, int startY) {
+	    int x = pathTile.x();
+	    int y = pathTile.y();
+
+	    TileLoc exitLoc = null;
+
+	    if (x == startX + 1) {
+	        exitLoc = new TileLoc(x - 1, y); // Left edge
+	    } else if (x == startX + size * 2 - 1) {
+	        exitLoc = new TileLoc(x + 1, y); // Right edge
+	    } else if (y == startY + 1) {
+	        exitLoc = new TileLoc(x, y - 1); // Top edge
+	    } else if (y == startY + size * 2 - 1) {
+	        exitLoc = new TileLoc(x, y + 1); // Bottom edge
+	    }
+
+	    if (exitLoc != null) {
+	        // Remove wall if it exists
+	        Tile t = world.get(exitLoc);
+	        if(t.getBuilding() != null) {
+	        	t.getBuilding().setDead(true);
+	        }
+	    }
+	}
+
+
+	
+	private void spawnDesertRuins(Tile tile) {
+		Faction factionId = world.getFaction(World.NO_FACTION_ID);
+		BuildingType chest = Game.buildingTypeMap.get("TREASURE");
+		BuildingType type = Game.buildingTypeMap.get("WALL_STONE");
+		// makes the walls
+		for (int i = 0; i < (4+((int)(Math.random()+0.5))); i++) {
+			
+			Tile wall;
+			if(Math.random() > 0.5) {
+				wall = world.get(new TileLoc(tile.getLocation().x() + 3, tile.getLocation().y() - 2 + i));
+				summonBuilding(wall, type, factionId);
+			}
+			if(Math.random() > 0.5) {
+				wall = world.get(new TileLoc(tile.getLocation().x() - 3, tile.getLocation().y() - 2 + i));
+				summonBuilding(wall, type, factionId);
+			}
+		}
+		for (int i = 1; i < (5+((int)(Math.random()+0.5))); i++) {
+			Tile wall;
+			int yoffset = i;
+			if (i > (3+(int)Math.random()+0.5)) {
+				yoffset = (5 - yoffset);
+			}
+			yoffset += tile.getLocation().x() % 2;
+			yoffset /= 2;
+			
+			if(Math.random() > 0.5) {
+				wall = world.get(new TileLoc(tile.getLocation().x() - 3 + i, tile.getLocation().y() - 2 - yoffset));
+				summonBuilding(wall, type, factionId);
+			}
+			yoffset = yoffset + (tile.getLocation().x() + i) % 2 - 2 - (tile.getLocation().x() % 2);
+			wall = world.get(new TileLoc(tile.getLocation().x() - 3 + i, tile.getLocation().y() + 4 + yoffset));
+			summonBuilding(wall, type, factionId);
+		}
+		
+		summonBuilding(tile, chest, factionId);
+		tile.getBuilding().getInventory().addItem(ItemType.MITHRIL_BAR, 10);
+		tile.getBuilding().getInventory().addItem(ItemType.IRON_BAR, 20);
+		tile.getBuilding().getInventory().addItem(ItemType.BRONZE_BAR, 40);
+		
+	}
+	
 	private void spawnCyclopsFort(Tile tile) {
 		Faction cyclopsFaction = world.getFaction(World.CYCLOPS_FACTION_ID);
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y())),

@@ -623,6 +623,12 @@ public class Tile implements Externalizable {
 		}
 		return false;
 	}
+	private boolean hasBuildingImmuneWaterDamage() {
+		if(this.getBuilding() != null && this.getBuilding().isImmuneToLiquidDamage()) {
+			return true;
+		}
+		return false;
+	}
 	private boolean hasDrain() {
 		return (hasBuilding() && getBuilding().getType().isDrain());
 	}
@@ -631,9 +637,10 @@ public class Tile implements Externalizable {
 		double[] damage = new double[DamageType.values().length];
 		if (liquidAmount > liquidType.getMinimumDamageAmount()) {
 			// Don't take water damage if there is a port or bridge or drain
-			if(!(liquidType == LiquidType.WATER && (hasBridgeOrPort() || hasDrain()))) {
+			if(!(liquidType == LiquidType.WATER && (hasBridgeOrPort() || hasDrain() || hasBuildingImmuneWaterDamage()))) {
 				damage[liquidType.getDamageType().ordinal()] += liquidAmount * liquidType.getDamage();
 			}
+			
 		}
 		else {
 			damage[DamageType.DRY.ordinal()] += 1;

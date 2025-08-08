@@ -27,7 +27,8 @@ public class Building extends Thing implements Serializable {
 	private transient double timeToCraft;
 	private transient double baseTimeToCraft;
 	private boolean isPlanned;
-
+	private boolean isImmuneToLiquidDamage = false;
+	
 	private int remainingEffortToProduceUnit;
 	private transient Unit currentProducingUnit;
 	
@@ -47,6 +48,7 @@ public class Building extends Thing implements Serializable {
 		this.timeToCraft = buildingType.getEffortToProduceItem();
 		this.baseTimeToCraft = buildingType.getEffortToProduceItem();
 		this.isPlanned = false;
+		
 //		setRoadCorner(Direction.ALL_DIRECTIONS);
 		for(GameComponent c : buildingType.getComponents()) {
 			this.addComponent(c.getClass(), c);
@@ -200,7 +202,12 @@ public class Building extends Thing implements Serializable {
 			stablesCaptured.clear();
 		}
 	}
-	
+	public void setImmuneToLiquidDamage(boolean value) {
+		this.isImmuneToLiquidDamage = value;
+	}
+	public boolean isImmuneToLiquidDamage() {
+		return this.isImmuneToLiquidDamage;
+	}
 	public void setMoria(boolean moria) {
 		isMoria = moria;
 	}

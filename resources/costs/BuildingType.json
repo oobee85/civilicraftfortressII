@@ -76,7 +76,19 @@
 		"effort_to_produce_harvest":10,
 		"effort_to_produce_item":-1
 	},
-	
+	{
+		"name":"TREASURE",
+		"info":"Stores long lost treasure",
+		"image":"Images/buildings/treasure.png",
+		"vision":5,
+		"cost":{"WOOD":300},
+		"inventory":{"maxstack":10000},
+		"health":200,
+		"culture":0.1,
+		"effort_to_build":100,
+		"effort_to_produce_harvest":10,
+		"effort_to_produce_item":-1
+	},
 	{
 		"name":"TRAP",
 		"info":"Trap animals to collect resources",

@@ -39,6 +39,14 @@ public class WorldData {
 		LinkedList<Building> buildingsNew = new LinkedList<Building>();
 		for (Building building : buildings) {
 			if (building.isDead() == true) {
+				// check if building has inventory, and drop it
+				if(building.getInventory() != null) {
+					for(Item item : building.getInventory().getItems()) {
+						if(item != null) {
+							building.getTile().getInventory().addItem(item);
+						}
+					}
+				}
 				
 				// iterate through buildings cost and drop resources
 				for (Entry<ItemType, Integer> entry : building.getType().getCost().entrySet()) {
