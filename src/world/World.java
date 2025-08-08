@@ -48,6 +48,7 @@ public class World {
 	public static int nights = 0;
 	public static int days = 1;
 	public static int WATER_SETTLING_TICKS = 600;
+	public static float WATER_SETTLING_MINIMUM_CHANGE_THRESHOLD = 0.04f;
 	public static float AVERAGE_WATER_PER_TILE = 3f;
 	public static volatile int ticks;
 	
@@ -1422,8 +1423,15 @@ public class World {
 				t.liquidType = LiquidType.WATER;
 			}
 		}
+		int numTiles = this.getTiles().size();
 		for(int i = 0; i < WATER_SETTLING_TICKS; i++) {
-			LiquidSimulation.propogate(this);
+			float liquidAmountChanged = LiquidSimulation.propogate(this, true);
+			float liquidChangedPerTile = liquidAmountChanged / numTiles;
+			if (liquidChangedPerTile < WATER_SETTLING_MINIMUM_CHANGE_THRESHOLD) {
+				System.out.println("Ending water settling at iteration " + i + " with average "
+									+ liquidChangedPerTile + " liquid amount changed per tile");
+				break;
+			}
 		}
 		initializeAirSimulationStuff();
 		doAirSimulationStuff();

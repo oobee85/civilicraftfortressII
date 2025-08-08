@@ -124,13 +124,13 @@ public class Game {
 		boolean everyOther = false;
 		if (everyOther) {
 			if (World.ticks % 2 == 0) {
-				LiquidSimulation.propogate(world);
+				LiquidSimulation.propogate(world, false);
 			} else if (World.ticks % 2 == 1) {
 				world.doAirSimulationStuff();
 				world.updateTerrainChange(false);
 			}
 		} else {
-			LiquidSimulation.propogate(world);
+			LiquidSimulation.propogate(world, false);
 			world.doAirSimulationStuff();
 			world.updateTerrainChange(false);
 		}
