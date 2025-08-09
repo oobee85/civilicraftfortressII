@@ -19,6 +19,9 @@ import world.air.*;
 import world.liquid.*;
 
 public class World {
+
+	public static final int TERRAIN_HEIGHT_MINIMUM = 0;
+	public static final int TERRAIN_HEIGHT_MAXIMUM = 1000;
 	
 	public Random worldRNG = new Random(Generation.DEFAULT_SEED);
 	
@@ -1355,7 +1358,7 @@ public class World {
 		float[][] heightMap = Generation.generateHeightMap(worldRNG, width, height);
 //		Utils.normalize(heightMap, 0, 1);
 		volcano = Generation.makeVolcano(this, heightMap, worldRNG);
-		Utils.normalize(heightMap, 0, 1000);
+		Utils.normalize(heightMap, TERRAIN_HEIGHT_MINIMUM, TERRAIN_HEIGHT_MAXIMUM);
 		heightMap = Utils.smoothingFilter(heightMap, 1, 2);
 		TerrainGenView.addMap(heightMap, "finalheightMap");
 		Generation.addCliff(this, heightMap, worldRNG);

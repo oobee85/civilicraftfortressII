@@ -34,7 +34,11 @@ public enum SoundEffect {
 	DEATH_PLANT ("death_plant.wav", false),
 	BUILDING_STONE_DEATH("building_stone_death.wav", false),
 	BUILDING_WOOD_DEATH("building_wood_death.wav", false),
-	
+
+	BACKGROUND_MUSIC_GRASS ("music/grass.wav", true),
+	BACKGROUND_MUSIC_DIRT ("music/dirt.wav", true),
+	BACKGROUND_MUSIC_ROUGH ("music/rough.wav", true),
+	BACKGROUND_MUSIC_UNDERGROUND ("music/underground.wav", true),
 	explore1 ("music/explore1.wav", true),
 	explore2 ("music/explore2.wav", true),
 	explore3 ("music/explore3.wav", true),
