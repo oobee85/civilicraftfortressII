@@ -504,7 +504,7 @@ public class World {
 		world.get(loc).addUnit(animal);
 	}
 
-	public Thing summonBuilding(Tile tile, BuildingType buildingType, Faction faction) {
+	public Building summonBuilding(Tile tile, BuildingType buildingType, Faction faction) {
 		if(tile == null) {
 			return null;
 		}

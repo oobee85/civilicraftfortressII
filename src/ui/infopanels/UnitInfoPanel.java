@@ -30,6 +30,6 @@ public class UnitInfoPanel extends InfoPanel {
 		UnitTypeInfoPanel.drawCombatStats(g, showing.getType(), showing.getFaction(), getWidth() - 150, 4);
 
 		if(showing.hasInventory())
-			UnitTypeInfoPanel.drawInventory(g, showing.getInventory(), 2, EXPLODE_BUTTON_SIZE + 2);
+			UnitTypeInfoPanel.drawInventory(g, showing.getInventory(), 2, 2);
 	}
 }

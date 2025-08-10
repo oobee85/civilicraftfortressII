@@ -1066,8 +1066,12 @@ public class Game {
 	                    // Leave a gap for the path
 	                    if (!(x == dx[gapDirection] * size && y == dy[gapDirection] * size)) {
 	                        Tile wallTile = world.get(new TileLoc(cx + x, cy + y));
-	                        summonBuilding(wallTile, wallType, factionId);
-	                        wallTile.getBuilding().setImmuneToLiquidDamage(true);
+	                        if (wallTile == null) {
+	                        	// out of bounds
+	                        	continue;
+	                        }
+	                        Building summonedWall = summonBuilding(wallTile, wallType, factionId);
+	                        summonedWall.setImmuneToLiquidDamage(true);
 	                    }
 	                }
 	            }
@@ -1855,7 +1859,7 @@ public class Game {
 		}
 	}
 
-	public Thing summonBuilding(Tile tile, BuildingType buildingType, Faction faction) {
+	public Building summonBuilding(Tile tile, BuildingType buildingType, Faction faction) {
 		return world.summonBuilding(tile, buildingType, faction);
 	}
 
@@ -1924,12 +1928,11 @@ public class Game {
 		}
 	}
 
-	public void explode(Thing thing) {
-		if (thing == null) {
-			return;
+	public void explode(ConcurrentLinkedQueue<Thing> selectedThings) {
+		for (Thing thing : selectedThings) {
+			SoundManager.queueSoundEffect(SoundEffect.EXPLOSION, thing.getTileLocation());
+			world.spawnExplosionCircle(thing.getTile(), 1, 1000000);
 		}
-		SoundManager.queueSoundEffect(SoundEffect.EXPLOSION, thing.getTileLocation());
-		world.spawnExplosionCircle(thing.getTile(), 1, 1000000);
 	}
 
 	private void unitTick() {
