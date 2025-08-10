@@ -38,6 +38,8 @@ public class World {
 	public static final int CYCLOPS_FACTION_ID = 1;
 	public static final int UNDEAD_FACTION_ID = 2;
 	public static final int BALROG_FACTION_ID = 3;
+	public static final int ELVES_FACTION_ID = 4;
+	public static final int DWARVES_FACTION_ID = 5;
 	private ArrayList<Faction> factions = new ArrayList<>();
 	
 	private WorldData worldData;

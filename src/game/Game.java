@@ -574,6 +574,7 @@ public class Game {
 		spawnDesertRuins();
 		spawnLabyrinthRuins();
 		spawnForestRuins(2);
+		spawnAbandonedCastle();
 		spawnUndead();
 		makeDwarves(world);
 		// ent grove
@@ -677,10 +678,21 @@ public class Game {
 			if(t.getTerrain() != Terrain.GRASS) {
 				continue;
 			}else {
-				spawnLabyrinthRuins(t, (5+((int)Math.random()*5)));
+				spawnLabyrinthRuins(t, (5+((int)(Math.random()*5))));
 				return;
 			}
 		}
+	}
+	public void spawnAbandonedCastle() {
+		for (Tile t : world.getTilesRandomly()) {
+			if(t.getTerrain() != Terrain.GRASS) {
+				continue;
+			}else {
+				generateAbandonedCastle(t, (2+((int)(Math.random()*2))));
+				return;
+			}
+		}
+		
 	}
 	public void spawnForestRuins(int number) {
 		int spawned = 0;
@@ -755,9 +767,8 @@ public class Game {
 			}
 		}
 		summonBuilding(tile, chest, factionId);
-		tile.getBuilding().getInventory().addItem(ItemType.MITHRIL_BAR, 10);
-		tile.getBuilding().getInventory().addItem(ItemType.IRON_BAR, 20);
-		tile.getBuilding().getInventory().addItem(ItemType.BRONZE_BAR, 40);
+		addLootItemsToBuilding(tile, 1);
+		tile.getBuilding().setImmuneToLiquidDamage(true);
 	}
 	
 	private void spawnLabyrinthRuins(Tile origin, int size) {
@@ -793,15 +804,61 @@ public class Game {
 
 	    // Create entrance
 	    clearWallAtBorder(entrance, size, startX, startY);
-
+	    
+	    
 	    // Find farthest tile and place chest
 	    TileLoc chestTileLoc = findFarthestPathTile(entrance, pathTiles);
 	    //clearWallAtBorder(chestTileLoc, size, startX, startY); // Ensure it's accessible
 	    Tile chestTile = world.get(chestTileLoc);
 	    summonBuilding(chestTile, chestType, factionId);
+	    addLootItemsToBuilding(chestTile, 3);
 	    chestTile.getBuilding().setImmuneToLiquidDamage(true);
-	    chestTile.getBuilding().getInventory().addItem(ItemType.IRON_BAR, 100);
-	    chestTile.getBuilding().getInventory().addItem(ItemType.BRONZE_BAR, 100);
+	    
+	 // Spawn random chests along the path
+	    spawnRandomChests(pathTiles, entrance, chestType, factionId, 0.05); // 5% chance
+	}
+	
+	private void addLootItemsToBuilding(Tile t, int lootLevel) {
+		if(t.getBuilding() == null) {
+			System.out.println("addLootItemsToBuilding() building is null");
+			return;
+		}
+		int itemAmount = 10 + (int) (Math.random()*10);
+		if(lootLevel == 1) {
+			t.getBuilding().getInventory().addItem(ItemType.BRONZE_BAR, itemAmount*2);
+			t.getBuilding().getInventory().addItem(ItemType.IRON_BAR, itemAmount);
+			t.getBuilding().getInventory().addItem(ItemType.COAL, itemAmount*5);
+			t.getBuilding().getInventory().addItem(ItemType.WOOD, itemAmount*10);
+			t.getBuilding().getInventory().addItem(ItemType.FOOD, itemAmount*10);
+		}
+		if(lootLevel == 2) {
+			t.getBuilding().getInventory().addItem(ItemType.IRON_BAR, itemAmount*2);
+			t.getBuilding().getInventory().addItem(ItemType.MITHRIL_BAR, itemAmount);
+			t.getBuilding().getInventory().addItem(ItemType.GOLD_BAR, itemAmount*2);
+			t.getBuilding().getInventory().addItem(ItemType.COAL, itemAmount*10);
+			t.getBuilding().getInventory().addItem(ItemType.WOOD, itemAmount*50);
+			t.getBuilding().getInventory().addItem(ItemType.FOOD, itemAmount*50);
+		}
+		if(lootLevel == 3) {
+			t.getBuilding().getInventory().addItem(ItemType.BETTER_WEAPONS, itemAmount/2);
+			t.getBuilding().getInventory().addItem(ItemType.IMPROVED_SPARRING, itemAmount/2);
+			t.getBuilding().getInventory().addItem(ItemType.BETTER_FORMATIONS, itemAmount/2);
+			t.getBuilding().getInventory().addItem(ItemType.BRICK, itemAmount*10);
+			t.getBuilding().getInventory().addItem(ItemType.MEDICINE, itemAmount/2);
+		}
+		
+	}
+	
+	private void spawnRandomChests(Set<TileLoc> pathTiles, TileLoc entrance, BuildingType chestType, Faction factionId, double chance) {
+	    for (TileLoc loc : pathTiles) {
+	        if (!loc.equals(entrance) && Math.random() < chance) {
+	        	Tile t = world.get(loc);
+	        	
+	            summonBuilding(t, chestType, factionId);
+	            addLootItemsToBuilding(t, 1);
+	            t.getBuilding().setImmuneToLiquidDamage(true);
+	        }
+	    }
 	}
 
 	private TileLoc carveMaze(int cx, int cy, boolean[][] visited, int size, int startX, int startY,
@@ -885,6 +942,48 @@ public class Game {
 	        }
 	    }
 	}
+	
+	private void generateAbandonedCastle(Tile center, int rings) {
+	    Faction factionId = world.getFaction(World.NO_FACTION_ID);
+	    BuildingType wallType = Game.buildingTypeMap.get("WALL_STONE");
+	    BuildingType chestType = Game.buildingTypeMap.get("TREASURE");
+
+	    int cx = center.getLocation().x();
+	    int cy = center.getLocation().y();
+
+	    // Alternate path opening side per ring
+	    int[] dx = { 0, 1, 0, -1 }; // Up, Right, Down, Left
+	    int[] dy = { -1, 0, 1, 0 };
+
+	    int gapDirection = 0; // Start with opening on top side
+
+	    for (int r = 1; r <= rings; r++) {
+	        int size = r * 2; // Distance from center to wall in tiles
+
+	        // Draw the square ring
+	        for (int x = -size; x <= size; x++) {
+	            for (int y = -size; y <= size; y++) {
+	                // Only draw perimeter of the square
+	                if (Math.abs(x) == size || Math.abs(y) == size) {
+	                    // Leave a gap for the path
+	                    if (!(x == dx[gapDirection] * size && y == dy[gapDirection] * size)) {
+	                        Tile wallTile = world.get(new TileLoc(cx + x, cy + y));
+	                        summonBuilding(wallTile, wallType, factionId);
+	                        wallTile.getBuilding().setImmuneToLiquidDamage(true);
+	                    }
+	                }
+	            }
+	        }
+
+	        // Alternate direction for the next ring's gap
+	        gapDirection = (gapDirection + 1) % 4;
+	    }
+
+	    // Place chest or throne room at the center
+	    summonBuilding(center, chestType, factionId);
+	    addLootItemsToBuilding(center, 3);
+	    center.getBuilding().setImmuneToLiquidDamage(true);
+	}
 
 
 	
@@ -924,9 +1023,8 @@ public class Game {
 		}
 		
 		summonBuilding(tile, chest, factionId);
-		tile.getBuilding().getInventory().addItem(ItemType.MITHRIL_BAR, 10);
-		tile.getBuilding().getInventory().addItem(ItemType.IRON_BAR, 20);
-		tile.getBuilding().getInventory().addItem(ItemType.BRONZE_BAR, 40);
+		addLootItemsToBuilding(tile, 1);
+		tile.getBuilding().setImmuneToLiquidDamage(true);
 		
 	}
 	
