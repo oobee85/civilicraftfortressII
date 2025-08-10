@@ -21,7 +21,7 @@ public class LiquidSimulation {
 	
 	// idea: create constant arraylist of positions, initialize it once, then every time simply use a random permutation to access all elements randomly.
 	
-	public static void propogate(World world) {
+	public static float propogate(World world, boolean countDelta) {
 		if(liquidAmountsTemp == null || liquidAmountsTemp.length != world.getWidth() || liquidAmountsTemp[0].length != world.getHeight()) {
 			liquidAmountsTemp = new float[world.getWidth()][world.getHeight()];
 		}
@@ -29,6 +29,8 @@ public class LiquidSimulation {
 			liquidTypesTemp = new LiquidType[world.getWidth()][world.getHeight()];
 		}
 		
+		float totalDelta = 0f;
+
 //		float[] totals = new float[LiquidType.values().length];
 //		for(int x = 0; x < world.length; x++) {
 //			for(int y = 0; y < world.length; y++) {
@@ -89,6 +91,7 @@ public class LiquidSimulation {
 		for(Tile tile : world.getTiles()) {
 			int x = tile.getLocation().x();
 			int y = tile.getLocation().y();
+			float liquidAmountBefore = tile.liquidAmount;
 			tile.liquidAmount = Math.max(liquidAmountsTemp[x][y] * 0.9999f - 0.00001f, 0);
 			if(tile.liquidAmount == 0) {
 				tile.liquidType = LiquidType.DRY;
@@ -118,9 +121,13 @@ public class LiquidSimulation {
 			if(tile.getBuilding() != null && tile.getBuilding().getType().isDrain()) {
 				tile.liquidAmount -= 0.5;
 			}
-			
+
+			if (countDelta) {
+				totalDelta += Math.abs(liquidAmountBefore - tile.liquidAmount);
+			}
 		}
 		//Utils.normalize(heightMap);
+		return totalDelta;
 	}
 	private static void propogate(Tile tile, World world) {
 		TileLoc current = tile.getLocation();

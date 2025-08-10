@@ -19,6 +19,9 @@ import world.air.*;
 import world.liquid.*;
 
 public class World {
+
+	public static final int TERRAIN_HEIGHT_MINIMUM = 0;
+	public static final int TERRAIN_HEIGHT_MAXIMUM = 1000;
 	
 	public Random worldRNG = new Random(Generation.DEFAULT_SEED);
 	
@@ -50,6 +53,7 @@ public class World {
 	public static int nights = 0;
 	public static int days = 1;
 	public static int WATER_SETTLING_TICKS = 600;
+	public static float WATER_SETTLING_MINIMUM_CHANGE_THRESHOLD = 0.04f;
 	public static float AVERAGE_WATER_PER_TILE = 3f;
 	public static volatile int ticks;
 	
@@ -1356,7 +1360,7 @@ public class World {
 		float[][] heightMap = Generation.generateHeightMap(worldRNG, width, height);
 //		Utils.normalize(heightMap, 0, 1);
 		volcano = Generation.makeVolcano(this, heightMap, worldRNG);
-		Utils.normalize(heightMap, 0, 1000);
+		Utils.normalize(heightMap, TERRAIN_HEIGHT_MINIMUM, TERRAIN_HEIGHT_MAXIMUM);
 		heightMap = Utils.smoothingFilter(heightMap, 1, 2);
 		TerrainGenView.addMap(heightMap, "finalheightMap");
 		Generation.addCliff(this, heightMap, worldRNG);
@@ -1424,8 +1428,15 @@ public class World {
 				t.liquidType = LiquidType.WATER;
 			}
 		}
+		int numTiles = this.getTiles().size();
 		for(int i = 0; i < WATER_SETTLING_TICKS; i++) {
-			LiquidSimulation.propogate(this);
+			float liquidAmountChanged = LiquidSimulation.propogate(this, true);
+			float liquidChangedPerTile = liquidAmountChanged / numTiles;
+			if (liquidChangedPerTile < WATER_SETTLING_MINIMUM_CHANGE_THRESHOLD) {
+				System.out.println("Ending water settling at iteration " + i + " with average "
+									+ liquidChangedPerTile + " liquid amount changed per tile");
+				break;
+			}
 		}
 		initializeAirSimulationStuff();
 		doAirSimulationStuff();

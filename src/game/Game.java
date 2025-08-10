@@ -124,13 +124,13 @@ public class Game {
 		boolean everyOther = false;
 		if (everyOther) {
 			if (World.ticks % 2 == 0) {
-				LiquidSimulation.propogate(world);
+				LiquidSimulation.propogate(world, false);
 			} else if (World.ticks % 2 == 1) {
 				world.doAirSimulationStuff();
 				world.updateTerrainChange(false);
 			}
 		} else {
-			LiquidSimulation.propogate(world);
+			LiquidSimulation.propogate(world, false);
 			world.doAirSimulationStuff();
 			world.updateTerrainChange(false);
 		}
@@ -588,20 +588,26 @@ public class Game {
 
 		List<Tile> mines = new LinkedList<>();
 		for (Tile tile : world.getTilesRandomly()) {
-			if (tile.getResource() != null && tile.getResource().isOre() && tile.getResource().isRare()) {
-				boolean tooclose = false;
-				for (Tile mineTile : mines) {
-					if (tile.distanceTo(mineTile) < 8) {
-						tooclose = true;
-						break;
-					}
+			// dwarves only spawn on rare ores that are above 1/3 the map height
+			if (tile.getResource() == null
+					|| !tile.getResource().isOre()
+					|| !tile.getResource().isRare()
+					|| tile.getHeight() < (World.TERRAIN_HEIGHT_MAXIMUM - World.TERRAIN_HEIGHT_MINIMUM)/3) {
+				continue;
+			}
+
+			boolean tooclose = false;
+			for (Tile mineTile : mines) {
+				if (tile.distanceTo(mineTile) < 8) {
+					tooclose = true;
+					break;
 				}
-				if (!tooclose) {
-					Thing mine = world.summonBuilding(tile, Game.buildingTypeMap.get("QUARRY"),
-							world.getFaction(World.NO_FACTION_ID));
-					if (mine != null) {
-						mines.add(tile);
-					}
+			}
+			if (!tooclose) {
+				Thing mine = world.summonBuilding(tile, Game.buildingTypeMap.get("QUARRY"),
+						world.getFaction(World.NO_FACTION_ID));
+				if (mine != null) {
+					mines.add(tile);
 				}
 			}
 		}

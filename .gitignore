@@ -17,3 +17,5 @@ lib/jogamp-all-platforms
 animation/
 maps/
 imageAdjustmentOutput/
+*.zip
+desktop.ini
