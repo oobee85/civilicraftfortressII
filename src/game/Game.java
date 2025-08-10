@@ -575,6 +575,7 @@ public class Game {
 		spawnLabyrinthRuins();
 		spawnForestRuins(2);
 		spawnAbandonedCastle();
+		generateStronghold();
 		spawnUndead();
 		makeDwarves(world);
 		// ent grove
@@ -695,6 +696,17 @@ public class Game {
 				continue;
 			}else {
 				generateAbandonedCastle(t, (2+((int)(Math.random()*2))));
+				return;
+			}
+		}
+		
+	}
+	public void generateStronghold() {
+		for (Tile t : world.getTilesRandomly()) {
+			if(t.getTerrain() != Terrain.GRASS) {
+				continue;
+			}else {
+				generateHallwayWithDeadEnds(t, 6, 2, 5);
 				return;
 			}
 		}
@@ -939,6 +951,21 @@ public class Game {
 	    } else if (y == startY + size * 2 - 1) {
 	        exitLoc = new TileLoc(x, y + 1); // Bottom edge
 	    }
+	    
+	    
+	    // If not at border, find the nearest border tile connected to pathTile
+	    if (exitLoc == null) {
+	        // Look in four directions until we hit the border
+	        if (pathTile.x() > startX + 1) {
+	            exitLoc = new TileLoc(startX, y); // Left border
+	        } else if (pathTile.x() < startX + size * 2 - 1) {
+	            exitLoc = new TileLoc(startX + size * 2, y); // Right border
+	        } else if (pathTile.y() > startY + 1) {
+	            exitLoc = new TileLoc(x, startY); // Top border
+	        } else if (pathTile.y() < startY + size * 2 - 1) {
+	            exitLoc = new TileLoc(x, startY + size * 2); // Bottom border
+	        }
+	    }
 
 	    if (exitLoc != null) {
 	        // Remove wall if it exists
@@ -1033,6 +1060,75 @@ public class Game {
 		tile.getBuilding().setImmuneToLiquidDamage(true);
 		
 	}
+	public void generateHallwayWithDeadEnds(Tile start, int hallwayLength, int branchLength, int nBranches) {
+	    int startX = start.getLocation().x();
+	    int startY = start.getLocation().y();
+
+	    // Central hallway
+	    for (int x = startX; x < startX + hallwayLength; x++) {
+	        TileLoc loc = new TileLoc(x, startY);
+	        Tile tile = world.get(loc);
+	        if (tile.getBuilding() != null) {
+	            tile.getBuilding().setDead(true);
+	        }
+	        placeWallIfEmpty(new TileLoc(x, startY - 1)); // wall above hallway
+	        placeWallIfEmpty(new TileLoc(x, startY + 1)); // wall below hallway
+	    }
+
+	    // Branches
+	    int spacing = hallwayLength / (nBranches + 1);
+	    for (int i = 1; i <= nBranches; i++) {
+	        int branchX = startX + i * spacing;
+
+	        // Upper branch
+	        for (int y = startY - 1; y >= startY - branchLength; y--) {
+	            TileLoc loc = new TileLoc(branchX, y);
+	            Tile tile = world.get(loc);
+	            if (tile.getBuilding() != null) {
+	                tile.getBuilding().setDead(true);
+	            }
+	            // Add side walls for branch
+	            placeWallIfEmpty(new TileLoc(branchX - 1, y));
+	            placeWallIfEmpty(new TileLoc(branchX + 1, y));
+	        }
+	        // Cap the end of branch
+	        placeWallIfEmpty(new TileLoc(branchX, startY - branchLength - 1));
+
+	        // Lower branch
+	        for (int y = startY + 1; y <= startY + branchLength; y++) {
+	            TileLoc loc = new TileLoc(branchX, y);
+	            Tile tile = world.get(loc);
+	            if (tile.getBuilding() != null) {
+	                tile.getBuilding().setDead(true);
+	            }
+	            // Add side walls for branch
+	            placeWallIfEmpty(new TileLoc(branchX - 1, y));
+	            placeWallIfEmpty(new TileLoc(branchX + 1, y));
+	        }
+	        // Cap the end of branch
+	        placeWallIfEmpty(new TileLoc(branchX, startY + branchLength + 1));
+	    }
+
+	    // Close ends of hallway
+	    placeWallIfEmpty(new TileLoc(startX - 1, startY));
+	    placeWallIfEmpty(new TileLoc(startX + hallwayLength, startY));
+	    placeWallIfEmpty(new TileLoc(startX - 1, startY - 1));
+	    placeWallIfEmpty(new TileLoc(startX - 1, startY + 1));
+	    placeWallIfEmpty(new TileLoc(startX + hallwayLength, startY - 1));
+	    placeWallIfEmpty(new TileLoc(startX + hallwayLength, startY + 1));
+	}
+
+	// Places a wall if no building exists at that location
+	private void placeWallIfEmpty(TileLoc loc) {
+		Faction factionID = world.getFaction(World.NO_FACTION_ID);
+		BuildingType type = Game.buildingTypeMap.get("WALL_STONE");
+	    Tile tile = world.get(loc);
+	    if (tile != null && tile.getBuilding() == null) {
+	    	summonBuilding(tile, type, factionID);
+	    }
+	}
+
+
 	
 	private void spawnCyclopsFort(Tile tile) {
 		Faction cyclopsFaction = world.getFaction(World.CYCLOPS_FACTION_ID);
