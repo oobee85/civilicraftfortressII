@@ -40,6 +40,8 @@ public class Settings {
 	public static int DEFAULT_PLAYER_COLOR = Color.red.getRGB();
 	
 	public static int VOLUME = 50;
+	public static int VOLUME_MUSIC = 100;
+	public static int VOLUME_EFFECTS = 100;
 
 	public static void fromCmdArgs(String[] args) {
 		Set<String> flags = new HashSet<>();

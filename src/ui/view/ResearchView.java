@@ -1,22 +1,32 @@
 package ui.view;
 
-import java.awt.event.*;
-import java.util.*;
-import java.util.Map.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 
-import game.*;
-import ui.*;
-import ui.infopanels.*;
-import utils.*;
-import world.*;
+import game.Game;
+import game.Research;
+import game.ResearchRequirement;
+import game.ResearchType;
+import ui.KButton;
+import ui.KUIConstants;
+import ui.infopanels.ResearchInfoPanel;
+import utils.Utils;
 
 public class ResearchView {
 
 	private static final int RESEARCH_ICON_SIZE = 25;
 
 	private JPanel rootPanel;
+	private JPanel progressPanel;
+	private JPanel buttonsPanel;
 	private GameView gameView;
 
 	private HashMap<JButton, ResearchType> researchButtons = new HashMap<>();
@@ -25,10 +35,21 @@ public class ResearchView {
 		rootPanel = new JPanel();
 		rootPanel.setFocusable(false);
 		
+		progressPanel = new ResearchProgressView(gameView);
+		progressPanel.setPreferredSize(KUIConstants.MAIN_MENU_BUTTON_SIZE);
+		
+		buttonsPanel = new JPanel();
+		buttonsPanel.setFocusable(false);
+		
+		rootPanel.setLayout(new BorderLayout());
+		rootPanel.add(buttonsPanel, BorderLayout.CENTER);
+		rootPanel.add(progressPanel, BorderLayout.NORTH);
+		
 		this.gameView = gameView;
 		setup();
 	}
 	private void setup() {
+		
 		for (int i = 0; i < Game.researchTypeList.size(); i++) {
 			ResearchType researchType = Game.researchTypeList.get(i);
 			KButton button = KUIConstants.setupButton(researchType.toString(),
@@ -51,7 +72,7 @@ public class ResearchView {
 				}
 			});
 			researchButtons.put(button, researchType);
-			rootPanel.add(button);
+			buttonsPanel.add(button);
 		}
 	}
 	

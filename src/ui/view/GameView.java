@@ -118,6 +118,18 @@ public class GameView {
 				int volumeSetting = (Settings.VOLUME > 100) ? 100 : ((Settings.VOLUME < 0 ? 0 : Settings.VOLUME));
 				return volumeSetting / 100f;
 			}
+			
+			@Override
+			public float getMusicSoundVolume() {
+				int volumeSetting = (Settings.VOLUME_MUSIC > 100) ? 100 : ((Settings.VOLUME_MUSIC < 0 ? 0 : Settings.VOLUME_MUSIC));
+				return volumeSetting / 100f;
+			}
+			
+			@Override
+			public float getEffectsSoundVolume() {
+				int volumeSetting = (Settings.VOLUME_EFFECTS > 100) ? 100 : ((Settings.VOLUME_EFFECTS < 0 ? 0 : Settings.VOLUME_EFFECTS));
+				return volumeSetting / 100f;
+			}
 		};
 		SoundManager.startJukeboxThread(volume);
 		SoundManager.startVolumeUpdateThread(volume);

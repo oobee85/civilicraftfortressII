@@ -30,6 +30,7 @@ public class ClientGUI {
 	private static final ImageIcon BLACKSMITH_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/crafting.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon SPAWN_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/spawn_tab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon DEBUG_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/debugtab.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
+	private static final ImageIcon SETTINGS_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/settings.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 	private static final ImageIcon CRAFTING_FOCUS_TAB_ICON = Utils.resizeImageIcon(Utils.loadImageIcon("Images/interfaces/focus.png"), TAB_ICON_SIZE, TAB_ICON_SIZE);
 
 
@@ -380,11 +381,37 @@ public class ClientGUI {
 		JPanel overviewTab = new JPanel();
 		overviewTab.setLayout(new GridBagLayout());
 		overviewTab.setFocusable(false);
-		overviewTab.setBackground(Color.red);
 		int OVERVIEW_TAB = tabbedPane.getTabCount();
 		tabbedPane.addTab(null, OVERVIEW_TAB_ICON, overviewTab, "Overview");
 
 		GridBagConstraints cs = new GridBagConstraints();
+
+		
+		// FILL BOTTOM
+		cs.gridheight = 3;
+		cs.weightx = 1;
+		cs.weighty = 1;
+		cs.fill = GridBagConstraints.BOTH;
+		cs.gridy = 6;
+		cs.gridx = 0;
+		JPanel fill = new JPanel();
+		fill.setFocusable(false);
+		overviewTab.add(fill, cs);
+
+		cs.gridx = 1;
+		JPanel fill2 = new JPanel();
+		fill2.setFocusable(false);
+		overviewTab.add(fill2, cs);
+
+		cs.weightx = 0;
+		cs.weighty = 0.1;
+		cs.gridwidth = 1;
+		cs.gridheight = 1;
+		cs.fill = 0;
+
+		///////////// ROW 0 /////////////
+		cs.gridy = 0;
+
 		idleWorkerButton = KUIConstants.setupButton("Idle Workers (?)", null, new Dimension(160, 30));
 		idleWorkerButton.addActionListener(e -> {
 			Unit worker = gameView.getFaction().getIdleWorker();
@@ -393,10 +420,8 @@ public class ClientGUI {
 			}
 		});
 		cs.gridx = 0;
-		cs.gridy = 0;
-		cs.weightx = 1;
-		cs.anchor = GridBagConstraints.FIRST_LINE_START;
 		overviewTab.add(idleWorkerButton, cs);
+
 		idleUnitButton = KUIConstants.setupButton("Idle Units (?)", null, new Dimension(160, 30));
 		idleUnitButton.addActionListener(e -> {
 			Unit unit = gameView.getFaction().getIdleNonworker();
@@ -404,62 +429,31 @@ public class ClientGUI {
 				gameView.selectThing(unit, false);
 			}
 		});
-		cs.gridx = 0;
-		cs.gridy = 1;
+		cs.gridx = 1;
 		overviewTab.add(idleUnitButton, cs);
-		
+
+		///////////// ROW 1 /////////////
+		cs.gridy = 1;
+
 		KButton gotoResearchButton = KUIConstants.setupButton("Research", RESEARCH_TAB_ICON, new Dimension(160, 30));
 		gotoResearchButton.addActionListener(e -> tabbedPane.setSelectedIndex(RESEARCH_TAB));
 		cs.gridx = 0;
-		cs.gridy = 2;
 		overviewTab.add(gotoResearchButton, cs);
 		
-		// TODO add research in progress view
-		
+		///////////// ROW 2 /////////////
+		cs.gridy = 2;
 
+		JPanel researchProgress = new ResearchProgressView(gameView);
 		cs.gridx = 0;
-		cs.gridy = 4;
-		cs.weightx = 1;
-		cs.weighty = 1;
-		KSlider volumeSlider = new KSlider(0, 100);
-		volumeSlider.setPreferredSize(new Dimension(160, 30));
-		volumeSlider.setValue(Settings.VOLUME);
-		volumeSlider.addChangeListener(e -> {
-			Settings.VOLUME = volumeSlider.getValue();
-		});
-		overviewTab.add(volumeSlider, cs);
-
-		cs.gridx = 0;
-		cs.gridy = 3;
-		cs.gridwidth = 6;
-		cs.gridheight = 3;
-		cs.weighty = 1;
-		cs.fill = GridBagConstraints.BOTH;
-		overviewTab.add(new JPanel(), cs);
-
+		cs.gridwidth = 2;
+		cs.ipady = 30;
 		cs.weighty = 0;
-		cs.gridwidth = 1;
-		cs.gridheight = 1;
+		cs.fill = GridBagConstraints.BOTH;
+		overviewTab.add(researchProgress, cs);
 		cs.fill = 0;
-		
-
-		if(Settings.DEBUG) {
-			KButton gotoSpawnUnitsButton = KUIConstants.setupButton("", SPAWN_TAB_ICON, new Dimension(35, 30));
-			gotoSpawnUnitsButton.addActionListener(e -> tabbedPane.setSelectedIndex(SPAWN_UNITS_TAB));
-			cs.gridx = 4;
-			cs.gridy = 6;
-			cs.weightx = 0;
-			cs.anchor = GridBagConstraints.LAST_LINE_END;
-			overviewTab.add(gotoSpawnUnitsButton, cs);
-
-			KButton gotoDebugViewButton = KUIConstants.setupButton("", DEBUG_TAB_ICON, new Dimension(35, 30));
-			gotoDebugViewButton.addActionListener(e -> tabbedPane.setSelectedIndex(DEBUG_TAB));
-			cs.gridx = 5;
-			cs.gridy = 6;
-			cs.weightx = 0;
-			cs.anchor = GridBagConstraints.LAST_LINE_END;
-			overviewTab.add(gotoDebugViewButton, cs);
-		}
+		cs.gridwidth = 1;
+		cs.ipady = 0;
+		cs.weighty = 0.1;
 		
 		researchView = new ResearchView(gameView);
 		RESEARCH_TAB = tabbedPane.getTabCount();
@@ -481,7 +475,9 @@ public class ClientGUI {
 //		CRAFTING_FOCUS_TAB = tabbedPane.getTabCount();
 //		tabbedPane.insertTab(null, CRAFTING_FOCUS_TAB_ICON, craftingFocusView.getRootPanel(), "Select Items to focus", CRAFTING_FOCUS_TAB);
 		
-		
+		InGameSettingsView settings = new InGameSettingsView();
+		int SETTINGS_TAB = tabbedPane.getTabCount();
+		tabbedPane.insertTab(null, SETTINGS_TAB_ICON, settings.getRootPanel(), "Settings", SETTINGS_TAB);
 		
 		if(Settings.DEBUG) {
 			SpawnUnitsView spawnUnitsView = new SpawnUnitsView(gameView);

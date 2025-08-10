@@ -167,15 +167,15 @@ public class VanillaDrawer extends Drawer {
 					selectionRectangle.height);
 			g2d.setStroke(stroke);
 		}
-		if (state.faction != null && state.faction.getResearchTarget() != null && !state.faction.getResearchTarget().isCompleted()) {
-			g.setFont(KUIConstants.infoFont);
-			double completedRatio = 1.0 * state.faction.getResearchTarget().getPointsSpent()
-					/ state.faction.getResearchTarget().getRequiredPoints();
-			String progress = String.format(state.faction.getResearchTarget() + " %d/%d",
-					state.faction.getResearchTarget().getPointsSpent(), state.faction.getResearchTarget().getRequiredPoints());
-			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress,
-					canvas.getWidth() - canvas.getWidth() / 3 - 4, 4, canvas.getWidth() / 3, 30);
-		}
+//		if (state.faction != null && state.faction.getResearchTarget() != null && !state.faction.getResearchTarget().isCompleted()) {
+//			g.setFont(KUIConstants.infoFont);
+//			double completedRatio = 1.0 * state.faction.getResearchTarget().getPointsSpent()
+//					/ state.faction.getResearchTarget().getRequiredPoints();
+//			String progress = String.format(state.faction.getResearchTarget() + " %d/%d",
+//					state.faction.getResearchTarget().getPointsSpent(), state.faction.getResearchTarget().getRequiredPoints());
+//			KUIConstants.drawProgressBar(g, Color.blue, Color.gray, Color.white, completedRatio, progress,
+//					canvas.getWidth() - canvas.getWidth() / 3 - 4, 4, canvas.getWidth() / 3, 30);
+//		}
 		if (!Settings.CINEMATIC) {
 			g.setFont(KUIConstants.infoFont);
 			int x = 10;

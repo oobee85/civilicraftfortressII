@@ -579,7 +579,6 @@ public class Game {
 		spawnUndead();
 		makeDwarves(world);
 		// ent grove
-		// move dwarves here
 		// orc town?
 		// ogre swamp
 		// dragon cave/volcano

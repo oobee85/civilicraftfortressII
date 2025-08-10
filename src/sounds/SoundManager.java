@@ -121,29 +121,37 @@ public class SoundManager {
 		ArrayList<PlayingSound> finished = new ArrayList<>(20);
 		Thread volumeUpdateThread = new Thread(() -> {
 			float previousGlobalVolume = -1f;
+			float previousMusicVolume = -1f;
+			float previousEffectsVolume = -1f;
 			TileLoc previousTopLeft = null;
 			TileLoc previousBottomRight = null;
 			while(true) {
 				while(!readyToPlay.isEmpty()) {
 					PlayingSound ready = readyToPlay.removeFirst();
-					setVolumeOnClip(ready.getClip(), ready.getSourceLocation(), volume);
+					setVolumeOnClip(ready.getClip(), ready.getSourceLocation(), volume, ready.getSoundEffect().getIsMusic());
 					ready.getClip().setFramePosition(0);
 					ready.getClip().start();
 					currentlyPlayingSounds.add(ready);
 				}
 				float globalVol = volume.getGlobalSoundVolume();
+				float musicVol = volume.getMusicSoundVolume();
+				float effectsVol = volume.getEffectsSoundVolume();
 				TileLoc topLeft = volume.getScreenTopLeftLocation();
 				TileLoc bottomRight = volume.getScreenBottomRightLocation();
-				boolean volumeChanged = (globalVol != previousGlobalVolume) 
+				boolean volumeChanged = (globalVol != previousGlobalVolume)
+						|| (musicVol != previousMusicVolume)
+						|| (effectsVol != previousEffectsVolume)
 						|| !topLeft.equals(previousTopLeft)
 						|| !bottomRight.equals(previousBottomRight);
 				previousGlobalVolume = globalVol;
+				previousMusicVolume = musicVol;
+				previousEffectsVolume = effectsVol;
 				previousTopLeft = topLeft;
 				previousBottomRight = bottomRight;
 				
 				if (volumeChanged) {
 					for (PlayingSound playing : currentlyPlayingSounds) {
-						setVolumeOnClip(playing.getClip(), playing.getSourceLocation(), volume);
+						setVolumeOnClip(playing.getClip(), playing.getSourceLocation(), volume, playing.getSoundEffect().getIsMusic());
 						if (!playing.getClip().isRunning()
 								&& playing.getClip().getFramePosition() == playing.getClip().getFrameLength()) {
 							finished.add(playing);
@@ -156,6 +164,7 @@ public class SoundManager {
 					currentlyPlayingSounds.removeAll(finished);
 					finished.clear();
 				}
+
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
@@ -206,7 +215,7 @@ public class SoundManager {
     	return new TileLoc(closestX, closestY);
     }
 	
-	private static void setVolumeOnClip(Clip clip, TileLoc sourceTile, VolumeQueryInterface volume) {
+	private static void setVolumeOnClip(Clip clip, TileLoc sourceTile, VolumeQueryInterface volume, boolean isMusic) {
 	    if (!clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
 	        System.err.println("Volume control not supported for clip: " + clip);
 	        return;
@@ -218,6 +227,15 @@ public class SoundManager {
 	    	System.err.println("INVALID GLOBAL VOLUME: " + globalVolume);
 	    	return;
 	    }
+	    
+	    float specificVolume = isMusic ? volume.getMusicSoundVolume() : volume.getEffectsSoundVolume();
+
+	    if (specificVolume < 0f || specificVolume > 1f) {
+	    	System.err.println("INVALID SPECIFIC VOLUME: " + specificVolume);
+	    	return;
+	    }
+	    
+	    globalVolume = globalVolume * specificVolume;
 	    
 	    float distanceVolume = 1f;
 	    float zoomLevelMultiplier = 1f;
