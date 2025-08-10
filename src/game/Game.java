@@ -576,7 +576,9 @@ public class Game {
 		spawnForestRuins(2);
 		spawnAbandonedCastle();
 		generateStronghold();
+		spawnSquareRoom(3);
 		spawnUndead();
+		
 		makeDwarves(world);
 		// ent grove
 		// orc town?
@@ -700,6 +702,24 @@ public class Game {
 		}
 		
 	}
+	
+	public void spawnSquareRoom(int number) {
+		int spawned = 0;
+		for (Tile t : world.getTilesRandomly()) {
+			if(t.getTerrain() != Terrain.GRASS) {
+				continue;
+			}else {
+				if(spawned < number) {
+					generateSquareRoom(t, (2+((int)(Math.random()*2))));
+					spawned ++;
+				}else {
+					return;
+				}
+			}
+		}
+		
+	}
+	
 	public void generateStronghold() {
 		for (Tile t : world.getTilesRandomly()) {
 			if(t.getTerrain() != Terrain.GRASS) {
@@ -788,6 +808,48 @@ public class Game {
 		tile.getBuilding().setImmuneToLiquidDamage(true);
 	}
 	
+	private void generateSquareRoom(Tile center, int r) {
+	    int centerX = center.getLocation().x();
+	    int centerY = center.getLocation().y();
+	    Faction factionId = world.getFaction(World.NO_FACTION_ID);
+	    BuildingType type = Game.buildingTypeMap.get("WALL_WOOD");
+		BuildingType chest = Game.buildingTypeMap.get("TREASURE");
+		boolean placedEntrance = false;
+		Tile previousTile = null;
+	    for (int y = centerY - r; y <= centerY + r; y++) {
+	        for (int x = centerX - r; x <= centerX + r; x++) {
+	            TileLoc loc = new TileLoc(x, y);
+	            Tile tile = world.get(loc);
+	            previousTile = tile;
+	    	    if(placedEntrance == false && Math.random() > 0.1) {
+	        		placedEntrance = true;
+	        		continue;
+	        	}
+	            // Determine if this tile is a perimeter wall
+	            boolean isWall = (x == centerX - r || x == centerX + r ||
+	                              y == centerY - r || y == centerY + r);
+
+	            if (tile != null) {
+	                if (isWall) {
+	                    // Place wall
+	                	summonBuilding(tile, type, factionId);
+	                	tile.getBuilding().setImmuneToLiquidDamage(true);
+	                } else {
+
+	                }
+	            }
+	        }
+	    }
+	    // if we havent placed an entrance by the end, place it on previous wall
+	    if(placedEntrance == false && previousTile != null && previousTile.getBuilding() != null) {
+	    	previousTile.getBuilding().setDead(true);
+	    }
+	    
+	    summonBuilding(center, chest, factionId);
+	    center.getBuilding().setImmuneToLiquidDamage(true);
+	    addLootItemsToBuilding(center, 1);
+	}
+	
 	private void spawnLabyrinthRuins(Tile origin, int size) {
 	    Faction factionId = world.getFaction(World.NO_FACTION_ID);
 	    BuildingType wallType = Game.buildingTypeMap.get("WALL_STONE");
@@ -806,12 +868,12 @@ public class Game {
 
 	    // Carve maze and track path tiles
 	    TileLoc entrance = carveMaze(startCellX, startCellY, visited, size, startX, startY, pathTiles);
-
 	    // Place walls where there is no path
 	    for (int y = 0; y < gridSize; y++) {
 	        for (int x = 0; x < gridSize; x++) {
 	            TileLoc loc = new TileLoc(startX + x, startY + y);
 	            if (!pathTiles.contains(loc)) {
+	     
 	                Tile wallTile = world.get(loc);
 	                summonBuilding(wallTile, wallType, factionId);
 	                wallTile.getBuilding().setImmuneToLiquidDamage(true);
@@ -838,6 +900,10 @@ public class Game {
 	private void addLootItemsToBuilding(Tile t, int lootLevel) {
 		if(t.getBuilding() == null) {
 			System.out.println("addLootItemsToBuilding() building is null");
+			return;
+		}
+		if(t.getBuilding().getInventory() == null) {
+			System.out.println("addLootItemsToBuilding() inventory is null");
 			return;
 		}
 		int itemAmount = 10 + (int) (Math.random()*10);
