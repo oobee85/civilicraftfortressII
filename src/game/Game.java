@@ -722,10 +722,10 @@ public class Game {
 	
 	public void generateStronghold() {
 		for (Tile t : world.getTilesRandomly()) {
-			if(t.getTerrain() != Terrain.GRASS) {
+			if(t.getTerrain() != Terrain.DIRT) {
 				continue;
 			}else {
-				generateHallwayWithDeadEnds(t, 6, 2, 5);
+				generateSpineWithRibs(t, 10, 4);
 				return;
 			}
 		}
@@ -906,6 +906,7 @@ public class Game {
 			System.out.println("addLootItemsToBuilding() inventory is null");
 			return;
 		}
+		Faction factionId = world.getFaction(World.NO_FACTION_ID);
 		int itemAmount = 10 + (int) (Math.random()*10);
 		if(lootLevel == 1) {
 			t.getBuilding().getInventory().addItem(ItemType.BRONZE_BAR, itemAmount*2);
@@ -913,6 +914,8 @@ public class Game {
 			t.getBuilding().getInventory().addItem(ItemType.COAL, itemAmount*5);
 			t.getBuilding().getInventory().addItem(ItemType.WOOD, itemAmount*10);
 			t.getBuilding().getInventory().addItem(ItemType.FOOD, itemAmount*10);
+//			summonUnit(t, Game.unitTypeMap.get("SPEARMAN"), factionId);
+//			summonUnit(t, Game.unitTypeMap.get("WARRIOR"), factionId);
 		}
 		if(lootLevel == 2) {
 			t.getBuilding().getInventory().addItem(ItemType.IRON_BAR, itemAmount*2);
@@ -921,6 +924,9 @@ public class Game {
 			t.getBuilding().getInventory().addItem(ItemType.COAL, itemAmount*10);
 			t.getBuilding().getInventory().addItem(ItemType.WOOD, itemAmount*50);
 			t.getBuilding().getInventory().addItem(ItemType.FOOD, itemAmount*50);
+//			summonUnit(t, Game.unitTypeMap.get("SWORDSMAN"), factionId);
+//			summonUnit(t, Game.unitTypeMap.get("SPEARMAN"), factionId);
+//			summonUnit(t, Game.unitTypeMap.get("HORSEMAN"), factionId);
 		}
 		if(lootLevel == 3) {
 			t.getBuilding().getInventory().addItem(ItemType.BETTER_WEAPONS, itemAmount/2);
@@ -928,6 +934,8 @@ public class Game {
 			t.getBuilding().getInventory().addItem(ItemType.BETTER_FORMATIONS, itemAmount/2);
 			t.getBuilding().getInventory().addItem(ItemType.BRICK, itemAmount*10);
 			t.getBuilding().getInventory().addItem(ItemType.MEDICINE, itemAmount/2);
+//			summonUnit(t, Game.unitTypeMap.get("OGRE"), factionId);
+//			summonUnit(t, Game.unitTypeMap.get("SWORDSMAN"), factionId);
 		}
 		
 	}
@@ -1125,73 +1133,114 @@ public class Game {
 		tile.getBuilding().setImmuneToLiquidDamage(true);
 		
 	}
-	public void generateHallwayWithDeadEnds(Tile start, int hallwayLength, int branchLength, int nBranches) {
+	private void generateSpineWithRibs(Tile start, int spineLength, int ribLength) {
 	    int startX = start.getLocation().x();
 	    int startY = start.getLocation().y();
+	    Faction factionId = world.getFaction(World.NO_FACTION_ID);
+	    BuildingType wallType = Game.buildingTypeMap.get("WALL_STONE");
+	    BuildingType chest = Game.buildingTypeMap.get("TREASURE");
 
-	    // Central hallway
-	    for (int x = startX; x < startX + hallwayLength; x++) {
-	        TileLoc loc = new TileLoc(x, startY);
-	        Tile tile = world.get(loc);
-	        if (tile.getBuilding() != null) {
-	            tile.getBuilding().setDead(true);
+//	    Tile previousWallTile = null;
+
+	    // Loop along the spine
+	    for (int i = 0; i <= spineLength; i++) {
+	        int x = startX + i;
+	        
+	        if(i == spineLength) {
+	        	Tile endOfSpine = world.get(new TileLoc(x, startY));
+	        	summonBuilding(endOfSpine, wallType, factionId);
+	        	endOfSpine.getBuilding().setImmuneToLiquidDamage(true);
 	        }
-	        placeWallIfEmpty(new TileLoc(x, startY - 1)); // wall above hallway
-	        placeWallIfEmpty(new TileLoc(x, startY + 1)); // wall below hallway
+	        
+	        // wall at the end of rib path
+	        if(i % 2 == 1) {
+	        	Tile ribWallAbove = world.get(new TileLoc(x, startY - ribLength));
+		        Tile ribWallBelow = world.get(new TileLoc(x, startY + ribLength));
+	        	summonBuilding(ribWallAbove, wallType, factionId);
+	        	ribWallAbove.getBuilding().setImmuneToLiquidDamage(true);
+	        	summonBuilding(ribWallBelow, wallType, factionId);
+	        	ribWallBelow.getBuilding().setImmuneToLiquidDamage(true);
+	        	
+	        	Tile treasureAbove = world.get(new TileLoc(x, startY - ribLength+1));
+		        Tile treasureBelow = world.get(new TileLoc(x, startY + ribLength-1));
+	        	summonBuilding(treasureAbove, chest, factionId);
+	    		addLootItemsToBuilding(treasureAbove, 1);
+	    		treasureAbove.getBuilding().setImmuneToLiquidDamage(true);
+	    		
+	    		summonBuilding(treasureBelow, chest, factionId);
+	    		addLootItemsToBuilding(treasureBelow, 1);
+	    		treasureBelow.getBuilding().setImmuneToLiquidDamage(true);
+	    		
+	        	continue;
+	        }
+	        for(int y = 1; y <= ribLength; y++) {
+	        	// Place spine walls above/below the walkway
+		        Tile wallAbove = world.get(new TileLoc(x, startY - y));
+		        Tile wallBelow = world.get(new TileLoc(x, startY + y));
+		        if (wallAbove != null) {
+		            summonBuilding(wallAbove, wallType, factionId);
+		            wallAbove.getBuilding().setImmuneToLiquidDamage(true);
+//		            previousWallTile = wallAbove;
+		        }
+		        if (wallBelow != null) {
+		            summonBuilding(wallBelow, wallType, factionId);
+		            wallBelow.getBuilding().setImmuneToLiquidDamage(true);
+//		            previousWallTile = wallBelow;
+		        }
+	        }
+	        
+
+	        // Random entrance in spine wall
+//	        if (!placedEntrance && Math.random() > 0.8) {
+//	            placedEntrance = true;
+//	            if (previousWallTile != null && previousWallTile.getBuilding() != null) {
+//	                previousWallTile.getBuilding().setDead(true);
+//	            }
+//	        }
+
+	        // Create UPWARD rib (walkable)
+//	        for (int j = 1; j <= ribLength; j++) {
+//	            int ry = startY - j; // rib path tile
+//	            // Side walls for the rib path
+//	            Tile leftWall = world.get(new TileLoc(x - 1, ry));
+//	            Tile rightWall = world.get(new TileLoc(x + 1, ry));
+//	            if (leftWall != null) {
+//	                summonBuilding(leftWall, wallType, factionId);
+//	                leftWall.getBuilding().setImmuneToLiquidDamage(true);
+//	            }
+//	            if (rightWall != null) {
+//	                summonBuilding(rightWall, wallType, factionId);
+//	                rightWall.getBuilding().setImmuneToLiquidDamage(true);
+//	            }
+//	        }
+
+	        // Create DOWNWARD rib (walkable)
+//	        for (int j = 1; j <= ribLength; j++) {
+//	            int ry = startY + j; // rib path tile
+//	            // Side walls for the rib path
+//	            Tile leftWall = world.get(new TileLoc(x - 1, ry));
+//	            Tile rightWall = world.get(new TileLoc(x + 1, ry));
+//	            if (leftWall != null) {
+//	                summonBuilding(leftWall, wallType, factionId);
+//	                leftWall.getBuilding().setImmuneToLiquidDamage(true);
+//	            }
+//	            if (rightWall != null) {
+//	                summonBuilding(rightWall, wallType, factionId);
+//	                rightWall.getBuilding().setImmuneToLiquidDamage(true);
+//	            }
+//	        }
 	    }
 
-	    // Branches
-	    int spacing = hallwayLength / (nBranches + 1);
-	    for (int i = 1; i <= nBranches; i++) {
-	        int branchX = startX + i * spacing;
-
-	        // Upper branch
-	        for (int y = startY - 1; y >= startY - branchLength; y--) {
-	            TileLoc loc = new TileLoc(branchX, y);
-	            Tile tile = world.get(loc);
-	            if (tile.getBuilding() != null) {
-	                tile.getBuilding().setDead(true);
-	            }
-	            // Add side walls for branch
-	            placeWallIfEmpty(new TileLoc(branchX - 1, y));
-	            placeWallIfEmpty(new TileLoc(branchX + 1, y));
-	        }
-	        // Cap the end of branch
-	        placeWallIfEmpty(new TileLoc(branchX, startY - branchLength - 1));
-
-	        // Lower branch
-	        for (int y = startY + 1; y <= startY + branchLength; y++) {
-	            TileLoc loc = new TileLoc(branchX, y);
-	            Tile tile = world.get(loc);
-	            if (tile.getBuilding() != null) {
-	                tile.getBuilding().setDead(true);
-	            }
-	            // Add side walls for branch
-	            placeWallIfEmpty(new TileLoc(branchX - 1, y));
-	            placeWallIfEmpty(new TileLoc(branchX + 1, y));
-	        }
-	        // Cap the end of branch
-	        placeWallIfEmpty(new TileLoc(branchX, startY + branchLength + 1));
-	    }
-
-	    // Close ends of hallway
-	    placeWallIfEmpty(new TileLoc(startX - 1, startY));
-	    placeWallIfEmpty(new TileLoc(startX + hallwayLength, startY));
-	    placeWallIfEmpty(new TileLoc(startX - 1, startY - 1));
-	    placeWallIfEmpty(new TileLoc(startX - 1, startY + 1));
-	    placeWallIfEmpty(new TileLoc(startX + hallwayLength, startY - 1));
-	    placeWallIfEmpty(new TileLoc(startX + hallwayLength, startY + 1));
+	    // If we didn't place an entrance, remove last wall
+//	    if (!placedEntrance && previousWallTile != null && previousWallTile.getBuilding() != null) {
+//	        previousWallTile.getBuilding().setDead(true);
+//	    }
 	}
 
-	// Places a wall if no building exists at that location
-	private void placeWallIfEmpty(TileLoc loc) {
-		Faction factionID = world.getFaction(World.NO_FACTION_ID);
-		BuildingType type = Game.buildingTypeMap.get("WALL_STONE");
-	    Tile tile = world.get(loc);
-	    if (tile != null && tile.getBuilding() == null) {
-	    	summonBuilding(tile, type, factionID);
-	    }
-	}
+
+
+
+
 
 
 	
@@ -1199,6 +1248,12 @@ public class Game {
 		Faction cyclopsFaction = world.getFaction(World.CYCLOPS_FACTION_ID);
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y())),
 				Game.buildingTypeMap.get("WATCHTOWER"), cyclopsFaction);
+		Building building = (Building) summonBuilding(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y()+1)), 
+				Game.buildingTypeMap.get("WATCHTOWER"), cyclopsFaction);
+		
+		building.setImmuneToLiquidDamage(true);
+	    addLootItemsToBuilding(building.getTile(), 3);
+	    
 		Thing granary = summonBuilding(world.get(new TileLoc(tile.getLocation().x() - 1, tile.getLocation().y() - 1)),
 				Game.buildingTypeMap.get("GRANARY"), cyclopsFaction);
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x() + 1, tile.getLocation().y() - 1)),

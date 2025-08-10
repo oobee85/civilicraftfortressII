@@ -12,7 +12,7 @@ public enum ProjectileType {
 		
 		ROCK_STONE_GOLEM(5, "Images/itemicons/rock.png", 1, null, 0),
 		FIREBALL_DRAGON(3, "Images/projectiles/fireball2.png", 2, null, 0),
-		BULLET(0, "Images/projectiles/bullet.png", 1, null, 0),
+		BULLET(1, "Images/projectiles/bullet.png", 1, null, 0),
 		FIRE_WAVE(6, "Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 100),
 		METEOR_WAVE(4, "Images/ground_modifiers/fire.gif", 1, GroundModifierType.FIRE, 1000),
 		METEOR(10, "Images/projectiles/comet.png", 20, null, 1000),

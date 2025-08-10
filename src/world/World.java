@@ -804,7 +804,7 @@ public class World {
 		
 		for(Tile tile : getTiles()) {
 			
-			if(World.ticks % 30 == 0) {
+			if(World.ticks % 50 == 0) {
 				if(!tile.getInventory().isEmpty()) {
 					tile.getInventory().decayItems();
 				}
@@ -1219,8 +1219,13 @@ public class World {
 			}
 			//tile.liquidType.WATER &&
 			//generates water plants
-			if( rand.nextDouble() < Constants.WATER_PLANT_RARITY) {
+			double waterPlant = rand.nextDouble();
+			if(tile.getTerrain() == Terrain.SAND) {
+				waterPlant /= 2;
+			}
+			if( waterPlant < Constants.WATER_PLANT_RARITY) {
 				double o = rand.nextDouble();
+				
 				if(tile.liquidType == LiquidType.WATER && tile.liquidAmount > tile.liquidType.getMinimumDamageAmount()  && o < Game.plantTypeMap.get("CATTAIL").getRarity()) {
 					Plant p = new Plant(Game.plantTypeMap.get("CATTAIL"), tile, getFaction(NO_FACTION_ID));
 					tile.setHasPlant(p);
