@@ -610,9 +610,6 @@ public class ClientGUI {
 		if(selected) {
 			InfoPanel infoPanel = new BuildingInfoPanel(building);
 			getInfoPanelView().switchInfoPanel(infoPanel);
-			SwingUtilities.invokeLater(() -> {
-				infoPanel.addExplodeButton().addActionListener(e -> gameView.getGameInstance().explode(building));
-			});
 		}
 // 			TODO fix this
 //		if (building.getType() == Game.buildingTypeMap.get("RESEARCH_LAB")) {
@@ -631,12 +628,8 @@ public class ClientGUI {
 		manageActionsTab(actionsView.selectedUnit(unit, selected));
 		
 		if(selected) {
-//			manageActionsTab(selected);
 			UnitInfoPanel infoPanel = new UnitInfoPanel(unit);
 			getInfoPanelView().switchInfoPanel(infoPanel);
-			SwingUtilities.invokeLater(() -> {
-				infoPanel.addExplodeButton().addActionListener(e -> gameView.getGameInstance().explode(unit));
-			});
 		}
 	}
 	

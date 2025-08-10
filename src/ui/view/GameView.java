@@ -382,12 +382,13 @@ public class GameView {
 			}
 		}
 	}
-	private void unitSplit() {
-		
-	}
 
 	public void toggleAutoBuild() {
 		game.toggleAutoBuild(state.selectedThings);
+	}
+	
+	public void explodeSelected() {
+		game.explode(state.selectedThings);
 	}
 
 	public void setDrawDebugStrings(boolean enabled) {

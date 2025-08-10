@@ -43,16 +43,16 @@ public class InfoPanel extends JPanel {
 		return button;
 	}
 	
-	public static final int EXPLODE_BUTTON_SIZE = 28;
-	public JButton addExplodeButton() {
-		Dimension size = new Dimension(EXPLODE_BUTTON_SIZE, EXPLODE_BUTTON_SIZE);
-		JButton button = KUIConstants.setupButton("", EXPLODE_ICON, size);
-		button.setFont(KUIConstants.buttonFontMini);
-		this.setLayout(null);
-		this.add(button);
-		button.setBounds(0, 0, size.width, size.height);
-		return button;
-	}
+//	public static final int EXPLODE_BUTTON_SIZE = 28;
+//	public JButton addExplodeButton() {
+//		Dimension size = new Dimension(EXPLODE_BUTTON_SIZE, EXPLODE_BUTTON_SIZE);
+//		JButton button = KUIConstants.setupButton("", EXPLODE_ICON, size);
+//		button.setFont(KUIConstants.buttonFontMini);
+//		this.setLayout(null);
+//		this.add(button);
+//		button.setBounds(0, 0, size.width, size.height);
+//		return button;
+//	}
 	
 	@Override
 	public void paintComponent(Graphics g) {

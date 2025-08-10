@@ -10,6 +10,7 @@ import game.*;
 import networking.client.ClientGUI;
 import ui.*;
 import ui.utils.WrapLayout;
+import utils.Settings;
 import utils.Utils;
 
 public class ActionsView {
@@ -19,15 +20,21 @@ public class ActionsView {
 	public static final ImageIcon MOVE_ICON = Utils.resizeImageIcon(
 			Utils.loadImageIcon("Images/interfaces/mouse_cursors/move_icon.png"), 
 			ACTION_BUTTON_SIZE.height, ACTION_BUTTON_SIZE.height);
+
 	public static final ImageIcon ATTACK_ICON = Utils.resizeImageIcon(
 			Utils.loadImageIcon("Images/interfaces/mouse_cursors/attack_icon.png"), 
 			ACTION_BUTTON_SIZE.height, ACTION_BUTTON_SIZE.height);
+
 	public static final ImageIcon DEFEND_ICON = Utils.resizeImageIcon(
 			Utils.loadImageIcon("Images/interfaces/mouse_cursors/defend_icon.png"), 
 			ACTION_BUTTON_SIZE.height, ACTION_BUTTON_SIZE.height);
-	
+
+	private static final ImageIcon EXPLODE_ICON = Utils.resizeImageIcon(
+			Utils.loadImageIcon("Images/units/bomb.png"),
+			ACTION_BUTTON_SIZE.height, ACTION_BUTTON_SIZE.height);
+
+
 	private ScrollingPanel scrollingPanel;
-	
 	
 	private KButton moveButton;
 	private KButton attackButton;
@@ -35,6 +42,7 @@ public class ActionsView {
 //	private KButton autoBuildButton;
 	private KButton guardButton;
 	private KButton wanderButton;
+	private KButton explodeButton;
 	private JPanel actionButtonPanel;
 	private WorkerView workerView;
 	private ProduceUnitView produceUnitView;
@@ -58,10 +66,6 @@ public class ActionsView {
 		
 		scrollingPanel.add(actionButtonPanel);
 
-//		JPanel looseButtons = new JPanel();
-//		looseButtons.setFocusable(false);
-//		looseButtons.setLayout(new WrapLayout(FlowLayout.LEFT, 5, 5));
-
 		moveButton = addActionButton("Move", MOVE_ICON,
 				e -> gameView.setLeftClickAction(LeftClickAction.MOVE));
 		attackButton = addActionButton("Attack", ATTACK_ICON,
@@ -75,9 +79,12 @@ public class ActionsView {
 		wanderButton = addActionButton("Wander", null,
 				e -> gameView.setLeftClickAction(LeftClickAction.WANDER_AROUND));
 		
-		
-//		this.setLayout(new BorderLayout());
-//		this.add(looseButtons, BorderLayout.CENTER);
+		explodeButton = addActionButton("Explode", EXPLODE_ICON,
+			e -> {
+				if (Settings.DEBUG) {
+					gameView.explodeSelected();
+				}
+			});
 	}
 	
 	public void addViews(
@@ -86,32 +93,21 @@ public class ActionsView {
 			WorkerView workerView,
 			CraftingFocusView craftingFocusView) {
 		
-//		JPanel views = new JPanel();
-//		views.setFocusable(false);
-//		views.setLayout(new BorderLayout());
-		
-		// TODO fix layout
 		this.produceUnitView = produceUnitView;
 		this.produceUnitView.getRootPanel().setVisible(false);
 		scrollingPanel.add(this.produceUnitView.getRootPanel());
-//		scrollingPanel.add(this.produceUnitView.getRootPanel(), BorderLayout.NORTH);
 		
 		this.craftingView = craftingView;
 		this.craftingView.getRootPanel().setVisible(false);
 		scrollingPanel.add(this.craftingView.getRootPanel());
-//		scrollingPanel.add(this.craftingView.getRootPanel(), BorderLayout.CENTER);
 		
 		this.craftingFocusView = craftingFocusView;
 		this.craftingFocusView.getRootPanel().setVisible(false);
 		scrollingPanel.add(this.craftingFocusView.getRootPanel());
-//		scrollingPanel.add(this.craftingFocusView.getRootPanel(), BorderLayout.SOUTH);
 		
 		this.workerView = workerView;
 		this.workerView.getRootPanel().setVisible(false);
 		scrollingPanel.add(this.workerView.getRootPanel());
-//		scrollingPanel.add(this.workerView.getRootPanel(), BorderLayout.SOUTH);
-		
-//		this.add(views, BorderLayout.SOUTH);
 	}
 	
 	private KButton addActionButton(String text, Icon icon, ActionListener a) {
@@ -152,37 +148,19 @@ public class ActionsView {
 			}
 		}
 		
-		boolean move = false;
-		boolean attack = false;
-		boolean guard = false;
-		boolean wander = false;
-		if (!selectedUnits.isEmpty()) {
-			move = true;
-			wander = true;
-		}
+		int totalSelectedThings = selectedUnits.size() + selectedBuildings.size();
 		
-		if (!selectedNonBuilders.isEmpty()) {
-			attack = true;
-			guard = true;
-		}
-		
-		moveButton.setVisible(move);
-		attackButton.setVisible(attack);
-		guardButton.setVisible(guard);
-		wanderButton.setVisible(wander);
-		
-		int numVisible = (move ? 1 : 0) + (attack ? 1 : 0) + (guard ? 1 : 0) + (wander ? 1 : 0);
-		int numrows = (numVisible+1) / 3;
-		int defaultFlowLayoutOffset = 5;
-		int rowheight = ACTION_BUTTON_SIZE.height + defaultFlowLayoutOffset;
-		actionButtonPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, rowheight * numrows + defaultFlowLayoutOffset));
+		moveButton.setVisible(!selectedUnits.isEmpty());
+		wanderButton.setVisible(!selectedUnits.isEmpty());
+		attackButton.setVisible(!selectedNonBuilders.isEmpty());
+		guardButton.setVisible(!selectedNonBuilders.isEmpty());
+		explodeButton.setVisible(Settings.DEBUG && (totalSelectedThings > 0));
 		
 		workerView.getRootPanel().setVisible(!selectedBuilders.isEmpty());
 
 		updateHeight();
 		
-		return !selectedUnits.isEmpty() 
-				|| !selectedBuildings.isEmpty();
+		return totalSelectedThings > 0;
 	}
 	
 	public boolean selectedBuilding(Building building, boolean selected) {
@@ -216,18 +194,33 @@ public class ActionsView {
 				selectedCraftingFocusBuildings.remove(building);
 			}
 		}
-		
+
+		int totalSelectedThings = selectedUnits.size() + selectedBuildings.size();
+
+		explodeButton.setVisible(Settings.DEBUG && (totalSelectedThings > 0));
 		produceUnitView.getRootPanel().setVisible(!selectedProducingBuildings.isEmpty());
 		craftingView.getRootPanel().setVisible(!selectedCraftUpgradesBuildings.isEmpty());
 		craftingFocusView.getRootPanel().setVisible(!selectedCraftingFocusBuildings.isEmpty());
 
 		updateHeight();
 		
-		return !selectedUnits.isEmpty() 
-				|| !selectedBuildings.isEmpty();
+		return totalSelectedThings > 0;
 	}
 	
 	private void updateHeight() {
+
+		int numVisible = 0;
+		for (Component c : actionButtonPanel.getComponents()) {
+			if (c.isVisible()) {
+				numVisible++;
+			}
+		}
+		int numrows = (numVisible+2) / 3;
+		int defaultFlowLayoutOffset = 5;
+		int rowheight = ACTION_BUTTON_SIZE.height + defaultFlowLayoutOffset;
+		actionButtonPanel.setPreferredSize(new Dimension(ClientGUI.GUIWIDTH, rowheight * numrows + defaultFlowLayoutOffset));
+		
+
 		int totalHeight = 80;
 		if (produceUnitView.getRootPanel().isVisible()) {
 			totalHeight += produceUnitView.getRootPanel().getPreferredSize().height;
