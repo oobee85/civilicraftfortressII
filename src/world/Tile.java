@@ -283,6 +283,9 @@ public class Tile implements Externalizable {
 			if (t.getBuilding() == null) {
 				continue;
 			}
+			if(!t.getBuilding().getType().blocksMovement()) {
+				continue;
+			}
 			Direction d = Direction.getDirection(loc, t.getLocation());
 			if (d != null)
 				directions.add(d);

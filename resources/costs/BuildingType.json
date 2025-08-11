@@ -387,6 +387,7 @@
 		"name":"WALL_STONE",
 		"info":"Blocks movement",
 		"image":"Images/buildings/wall_stone.png",
+		"tiledImages":"Images/buildings/stonewallTileset",
 		"vision":1,
 		"cost":{"WOOD":50, "STONE":50},
 		"culture":0.25,
