@@ -418,6 +418,7 @@
 		"name":"WALL_BRICK",
 		"info":"Blocks movement",
 		"image":"Images/buildings/wall_brick.png",
+		"tiledImages":"Images/buildings/brickwallTileset",
 		"vision":1,
 		"cost":{"BRICK":500, "MITHRIL_BAR":5},
 		"culture":0.25,
