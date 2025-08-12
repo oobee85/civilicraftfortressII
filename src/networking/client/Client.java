@@ -326,20 +326,9 @@ public class Client {
 	}
 	private boolean tilesReceived;
 	private void worldInfoUpdate(WorldInfo worldInfo) {
-		boolean firstUpdate = false;
-		if(gameInstance.world == null) {
-			gameInstance.initializeWorld(worldInfo.getWidth(), worldInfo.getHeight());
-			clientGUI.worldReceived();
-			firstUpdate = true;
-		}
-		if(gameInstance.world.getFactions().size() < worldInfo.getFactions().size()) {
-			for(int i = gameInstance.world.getFactions().size(); i < worldInfo.getFactions().size(); i++) {
-				Faction received = worldInfo.getFactions().get(i);
-				Faction faction = new Faction(received.name(), received.isPlayer(), received.usesItems(), received.usesResearch(), received.color());
-				gameInstance.world.addFaction(faction);
-			}
-		}
-		gameInstance.world.updateTiles(worldInfo.getTileInfos());
+
+		boolean firstUpdate = gameInstance.worldInfoUpdate(worldInfo, null, things);
+
 		if(worldInfo.getTileInfos().length > 0) {
 			tilesReceived = true;
 		}
@@ -347,30 +336,6 @@ public class Client {
 			return;
 		}
 		
-		for(Thing update : worldInfo.getThings()) {
-			if(!things.containsKey(update.id())) {
-				createThing(update);
-			}
-			updateThing(things.get(update.id()), update);
-		}
-		for(Projectile projectileMessage : worldInfo.getProjectiles()) {
-			Projectile newProjectile = new Projectile(
-					projectileMessage.getType(), 
-					gameInstance.world.get(projectileMessage.getTile().getLocation()), 
-					gameInstance.world.get(projectileMessage.getTargetTile().getLocation()), 
-					null, 
-					projectileMessage.getDamage(),
-					projectileMessage.getFromGround(),
-					0); // TODO serialize ticksUntilLanding
-			gameInstance.world.getData().addProjectile(newProjectile);
-		}
-		for(Hitsplat hitsplat : worldInfo.getHitsplats()) {
-			Thing thing = things.get(hitsplat.getThingID());
-			if(thing != null) {
-				thing.getHitsplatList()[hitsplat.getSquare()] = hitsplat;
-				thing.takeFakeDamage();
-			}
-		}
 		synchronized (updatedTerrain) {
 			updatedTerrain.notify();
 		}
@@ -378,101 +343,6 @@ public class Client {
 			startLocalGameLoopThread(true);
 		}
 		clientGUI.repaint();
-	}
-	private void createThing(Thing update) {
-		Thing newThing = null;
-		if(update instanceof Plant) {
-			Plant plantUpdate = (Plant)update;
-			PlantType type = plantUpdate.getType();
-			TileLoc tileLoc = plantUpdate.getTileLocation();
-			Plant newPlant = new Plant(
-					Game.plantTypeMap.get(type.name()), 
-					gameInstance.world.get(tileLoc),
-					gameInstance.world.getFaction(World.NO_FACTION_ID));
-			newThing = newPlant;
-			newPlant.getTile().setHasPlant(newPlant);
-			things.put(update.id(), newPlant);
-			gameInstance.world.addPlant(newPlant);
-		}
-		else if(update instanceof Building) {
-			Building buildingUpdate = (Building)update;
-			TileLoc tileLoc = buildingUpdate.getTileLocation();
-			Building newBuilding = new Building(
-					Game.buildingTypeMap.get(buildingUpdate.getType().name()), 
-					gameInstance.world.get(tileLoc), 
-					gameInstance.world.getFactions().get(buildingUpdate.getFactionID()));
-			newThing = newBuilding;
-			if(newBuilding.getType().isRoad()) {
-				newBuilding.getTile().setRoad(newBuilding);
-			}
-			else {
-				newBuilding.getTile().setBuilding(newBuilding);
-			}
-			things.put(update.id(), newBuilding);
-			gameInstance.world.addBuilding(newBuilding);
-		}
-		else if(update instanceof Unit) {
-			Unit unitUpdate = (Unit)update;
-			TileLoc tileLoc = unitUpdate.getTileLocation();
-			Unit newUnit = new Unit(
-					Game.unitTypeMap.get(unitUpdate.getType().name()), 
-					gameInstance.world.get(tileLoc), 
-					gameInstance.world.getFactions().get(unitUpdate.getFactionID()));
-			newThing = newUnit;
-			if(newUnit.getTile() != null) {
-				newUnit.getTile().addUnit(newUnit);
-			}
-			things.put(update.id(), newUnit);
-			gameInstance.world.addUnit(newUnit);
-		}
-		if(newThing != null) {
-			newThing.setID(update.id());
-		}
-	}
-
-	private void updateThing(Thing existing, Thing update) {
-		existing.setFaction(gameInstance.world.getFactions().get(update.getFactionID()));
-		existing.setMaxHealth(update.getMaxHealth());
-		existing.setHealth(update.getHealth());
-		existing.setDead(update.isDead());
-		Tile movedFrom = null;
-		if(existing.getTile() != null && !existing.getTile().equals(update.getTile())) {
-			movedFrom = existing.getTile();
-		} 
-		existing.setTile(gameInstance.world.get(update.getTileLocation()));
-		existing.setInventory(update.getInventory());
-		if(existing instanceof Plant) {
-			Plant existingPlant = (Plant)existing;
-			Plant plantUpdate = (Plant)update;
-			existingPlant.setType(plantUpdate.getType());
-		}
-		else if(update instanceof Building) {
-			Building existingBuilding = (Building)existing;
-			Building buildingUpdate = (Building)update;
-			existingBuilding.setType(Game.buildingTypeMap.get(buildingUpdate.getType().name()));
-			existingBuilding.setRemainingEffort(buildingUpdate.getRemainingEffort());
-			existingBuilding.setCulture(buildingUpdate.getCulture());
-			existingBuilding.setPlanned(buildingUpdate.isPlanned());
-			existingBuilding.setRemainingEffortToProduceUnit(buildingUpdate.getRemainingEffortToProduceUnit());
-			existingBuilding.getProducingUnit().clear();
-			for(Unit u : buildingUpdate.getProducingUnit()) {
-				u.setType(Game.unitTypeMap.get(u.getType().name()));
-			}
-			existingBuilding.getProducingUnit().addAll(buildingUpdate.getProducingUnit());
-		}
-		else if(update instanceof Unit) {
-			Unit existingUnit = (Unit)existing;
-			Unit unitUpdate = (Unit)update;
-			existingUnit.setType(Game.unitTypeMap.get(unitUpdate.getType().name()));
-			existingUnit.setCombatStats(unitUpdate.getCombatStats());
-			if(movedFrom != null) {
-				movedFrom.removeUnit(existingUnit);
-				existingUnit.getTile().addUnit(existingUnit);
-			}
-		}
-		if(existing.isDead()) {
-			things.remove(update.id());
-		}
 	}
 	
 	private void factionUpdate(Faction factionUpdate) {

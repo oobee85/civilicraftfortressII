@@ -46,6 +46,181 @@ public class Game {
 		Utils.saveToFile(worldInfo, "save1.civ", false);
 	}
 
+	public void loadFromFile() {
+		WorldInfo loadedInfo = Utils.loadFromFile("save1.civ");
+		System.out.println("Loaded file save1.civ");
+		HashMap<Integer, Thing> thingIds = new HashMap<>();
+		World newWorld = new World(loadedInfo.getWidth(), loadedInfo.getHeight());
+		worldInfoUpdate(loadedInfo, newWorld, thingIds);
+		world = newWorld;
+	}
+
+	/**
+	 * @return true if this is the first update received. (World was null before and now is initialized)
+	 */
+	public boolean worldInfoUpdate(WorldInfo worldInfo, World worldToUpdate, HashMap<Integer, Thing> thingIds) {
+		boolean firstUpdate = false;
+		if (worldToUpdate == null) {
+			worldToUpdate = world;
+			if(worldToUpdate == null) {
+				worldToUpdate = new World(worldInfo.getWidth(), worldInfo.getHeight());
+				world = worldToUpdate;
+				firstUpdate = true;
+			}
+		}
+		System.out.println("worldToUpdate factions:");
+		for (Faction f : worldToUpdate.getFactions()) {
+			System.out.println("\t" + f);
+		}
+		System.out.println("worldInfo factions:");
+		for (Faction f : worldInfo.getFactions()) {
+			System.out.println("\t" + f);
+		}
+		if(worldToUpdate.getFactions().size() < worldInfo.getFactions().size()) {
+			for(int i = worldToUpdate.getFactions().size(); i < worldInfo.getFactions().size(); i++) {
+				Faction received = worldInfo.getFactions().get(i);
+				Faction faction = new Faction(received.name(), received.isPlayer(), received.usesItems(), received.usesResearch(), received.color());
+				faction.setID(received.id());
+				worldToUpdate.addFaction(faction);
+			}
+		}
+		System.out.println("worldToUpdate factions after:");
+		for (Faction f : worldToUpdate.getFactions()) {
+			System.out.println("\t" + f);
+		}
+		worldToUpdate.updateTiles(worldInfo.getTileInfos());
+		
+		for(Thing update : worldInfo.getThings()) {
+			if(!thingIds.containsKey(update.id())) {
+				Thing createdThing = createThing(update, worldToUpdate);
+				if (createdThing != null) {
+					thingIds.put(update.id(), createdThing);
+				}
+			}
+			if (updateThing(thingIds.get(update.id()), update, worldToUpdate)) {
+				// The thing is now dead and should be removed
+				thingIds.remove(update.id());
+			}
+		}
+		for(Projectile projectileMessage : worldInfo.getProjectiles()) {
+			Projectile newProjectile = new Projectile(
+					projectileMessage.getType(), 
+					worldToUpdate.get(projectileMessage.getTile().getLocation()), 
+					worldToUpdate.get(projectileMessage.getTargetTile().getLocation()), 
+					null, 
+					projectileMessage.getDamage(),
+					projectileMessage.getFromGround(),
+					0); // TODO serialize ticksUntilLanding
+			worldToUpdate.getData().addProjectile(newProjectile);
+		}
+		for(Hitsplat hitsplat : worldInfo.getHitsplats()) {
+			Thing thing = thingIds.get(hitsplat.getThingID());
+			if(thing != null) {
+				thing.getHitsplatList()[hitsplat.getSquare()] = hitsplat;
+				thing.takeFakeDamage();
+			}
+		}
+		return firstUpdate;
+	}
+
+	/**
+	 * @return returns the created Thing or null if didn't create one
+	 */
+	private Thing createThing(Thing update, World worldToUpdate) {
+		Thing newThing = null;
+		if(update instanceof Plant) {
+			Plant plantUpdate = (Plant)update;
+			PlantType type = plantUpdate.getType();
+			TileLoc tileLoc = plantUpdate.getTileLocation();
+			Plant newPlant = new Plant(
+					Game.plantTypeMap.get(type.name()), 
+					worldToUpdate.get(tileLoc),
+					worldToUpdate.getFaction(World.NO_FACTION_ID));
+			newThing = newPlant;
+			newPlant.getTile().setHasPlant(newPlant);
+			worldToUpdate.addPlant(newPlant);
+		}
+		else if(update instanceof Building) {
+			Building buildingUpdate = (Building)update;
+			TileLoc tileLoc = buildingUpdate.getTileLocation();
+			Building newBuilding = new Building(
+					Game.buildingTypeMap.get(buildingUpdate.getType().name()), 
+					worldToUpdate.get(tileLoc), 
+					worldToUpdate.getFactions().get(buildingUpdate.getFactionID()));
+			newThing = newBuilding;
+			if(newBuilding.getType().isRoad()) {
+				newBuilding.getTile().setRoad(newBuilding);
+			}
+			else {
+				newBuilding.getTile().setBuilding(newBuilding);
+			}
+			worldToUpdate.addBuilding(newBuilding);
+		}
+		else if(update instanceof Unit) {
+			Unit unitUpdate = (Unit)update;
+			TileLoc tileLoc = unitUpdate.getTileLocation();
+			Unit newUnit = new Unit(
+					Game.unitTypeMap.get(unitUpdate.getType().name()), 
+					worldToUpdate.get(tileLoc), 
+					worldToUpdate.getFactions().get(unitUpdate.getFactionID()));
+			newThing = newUnit;
+			if(newUnit.getTile() != null) {
+				newUnit.getTile().addUnit(newUnit);
+			}
+			worldToUpdate.addUnit(newUnit);
+		}
+		if(newThing != null) {
+			newThing.setID(update.id());
+		}
+		return newThing;
+	}
+
+	/**
+	 * @return true if the thing is now dead and should be removed from the ID map
+	 */
+	private boolean updateThing(Thing existing, Thing update, World worldToUpdate) {
+		existing.setFaction(worldToUpdate.getFactions().get(update.getFactionID()));
+		existing.setMaxHealth(update.getMaxHealth());
+		existing.setHealth(update.getHealth());
+		existing.setDead(update.isDead());
+		Tile movedFrom = null;
+		if(existing.getTile() != null && !existing.getTile().equals(update.getTile())) {
+			movedFrom = existing.getTile();
+		} 
+		existing.setTile(worldToUpdate.get(update.getTileLocation()));
+		existing.setInventory(update.getInventory());
+		if(existing instanceof Plant) {
+			Plant existingPlant = (Plant)existing;
+			Plant plantUpdate = (Plant)update;
+			existingPlant.setType(plantUpdate.getType());
+		}
+		else if(update instanceof Building) {
+			Building existingBuilding = (Building)existing;
+			Building buildingUpdate = (Building)update;
+			existingBuilding.setType(Game.buildingTypeMap.get(buildingUpdate.getType().name()));
+			existingBuilding.setRemainingEffort(buildingUpdate.getRemainingEffort());
+			existingBuilding.setCulture(buildingUpdate.getCulture());
+			existingBuilding.setPlanned(buildingUpdate.isPlanned());
+			existingBuilding.setRemainingEffortToProduceUnit(buildingUpdate.getRemainingEffortToProduceUnit());
+			existingBuilding.getProducingUnit().clear();
+			for(Unit u : buildingUpdate.getProducingUnit()) {
+				u.setType(Game.unitTypeMap.get(u.getType().name()));
+			}
+			existingBuilding.getProducingUnit().addAll(buildingUpdate.getProducingUnit());
+		}
+		else if(update instanceof Unit) {
+			Unit existingUnit = (Unit)existing;
+			Unit unitUpdate = (Unit)update;
+			existingUnit.setType(Game.unitTypeMap.get(unitUpdate.getType().name()));
+			existingUnit.setCombatStats(unitUpdate.getCombatStats());
+			if(movedFrom != null) {
+				movedFrom.removeUnit(existingUnit);
+				existingUnit.getTile().addUnit(existingUnit);
+			}
+		}
+		return update.isDead();
+	}
+
 	public void meteorAndVolcanoEvents() {
 		if (World.days > 10 && Math.random() < 0.00001) {
 			meteorStrike();
@@ -536,12 +711,8 @@ public class Game {
 		}
 	}
 
-	public void initializeWorld(int width, int height) {
-		world = new World(width, height);
-	}
-
 	public void generateWorld(int width, int height, boolean easymode, List<PlayerInfo> players) {
-		initializeWorld(width, height);
+		world = new World(width, height);
 
 		Faction NO_FACTION = new Faction("NONE", false, false, false);
 		world.addFaction(NO_FACTION);

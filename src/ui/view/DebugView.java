@@ -165,7 +165,15 @@ public class DebugView {
 		save.addActionListener(e -> {
 			gameView.getGameInstance().saveToFile();
 		});
-		save.setEnabled(false);
+		save.setEnabled(true);
+		
+		JButton load = KUIConstants.setupButton("Load", null, DEBUG_BUTTON_SIZE);
+		load.addActionListener(e -> {
+			Faction current = gameView.getFaction();
+			gameView.getGameInstance().loadFromFile();
+			gameView.setFaction(gameView.getGameInstance().world.getFactions().get(current.id()));
+		});
+		load.setEnabled(true);
 		
 		JButton reseedButton = KUIConstants.setupButton("Reseed", null, DEBUG_BUTTON_SIZE);
 		reseedButton.addActionListener(e -> {
@@ -207,7 +215,8 @@ public class DebugView {
 		scrollingPanel.add(raiseHeight);
 		scrollingPanel.add(increasePressure);
 		scrollingPanel.add(setTerritoryButton);
-		scrollingPanel.add(save); // doesnt currently work
+		scrollingPanel.add(save);
+		scrollingPanel.add(load);
 		scrollingPanel.add(shadowWordDeath);
 		scrollingPanel.add(shadowWordPain);
 		scrollingPanel.add(reseedButton);
