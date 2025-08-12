@@ -40,11 +40,11 @@ public enum ItemType {
 	RUNITE_BAR 	   ("SMITHY",  makeCosts(COAL,50, 	RUNITE_ORE,50),		"Images/itemicons/runite_bar.png"),
 	TITANIUM_BAR   ("SMITHY",  makeCosts(COAL,50, 	TITANIUM_ORE,50),	"Images/itemicons/titanium_bar.png"),
 	
-	SWORD  	 ("SAWMILL",  makeCosts(WOOD,100, BRONZE_BAR, 1),	"Images/itemicons/sword.png"),
-	SHIELD   ("SAWMILL",  makeCosts(WOOD,100, BRONZE_BAR, 1),	"Images/itemicons/shield.png"),
-	BOW		 ("SAWMILL",  makeCosts(WOOD,100, BRONZE_BAR, 1),	"Images/itemicons/bow.png"),
+	SWORD  	 ("SAWMILL",  makeCosts(WOOD,100, BRONZE_BAR, 2),	"Images/itemicons/sword.png"),
+	SHIELD   ("SAWMILL",  makeCosts(WOOD,100, BRONZE_BAR, 2),	"Images/itemicons/shield.png"),
+	BOW		 ("SAWMILL",  makeCosts(WOOD,100, BRONZE_BAR, 2),	"Images/itemicons/bow.png"),
 	
-	BREAD	("GRANARY",  makeCosts(FOOD,50),	"Images/itemicons/farming.png"),
+	BREAD	("GRANARY",  makeCosts(FOOD,100),	"Images/itemicons/farming.png"),
 	
 	BETTER_WEAPONS   	("RESEARCH_LAB",  makeCosts(SWORD,20),	"Images/interfaces/upgrades/better_weapons.png", "Increases attack damage of all units by : 25"),
 	IMPROVED_SPARRING   ("RESEARCH_LAB",  makeCosts(SWORD,20),	"Images/interfaces/upgrades/improved_sparring.png", "Decreases attack delay of all units by : 5"),

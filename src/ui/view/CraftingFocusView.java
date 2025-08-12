@@ -42,6 +42,12 @@ public class CraftingFocusView {
 			
 			button.setSelected(true);
 			button.setEnabled(true);
+//			String name = type.toString();
+//			if(name == "SWORD" || name == "BOW" || name == "SHIELD") {
+//				button.setSelected(false);
+//				button.setEnabled(false);
+//			}
+			
 			button.addActionListener(e -> {
 
 //				if(button.isSelected() == true) {
