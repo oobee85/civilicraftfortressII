@@ -40,7 +40,7 @@ public class CraftingFocusView {
 					Utils.resizeImageIcon(type.getMipMap().getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
 					BUILDING_BUTTON_SIZE);
 			
-			button.setSelected(true);
+			button.setSelected(gameView.getFaction().getToggleCraftItemFocusList()[i]);
 			button.setEnabled(true);
 //			String name = type.toString();
 //			if(name == "SWORD" || name == "BOW" || name == "SHIELD") {
