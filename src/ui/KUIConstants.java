@@ -65,6 +65,11 @@ public class KUIConstants {
 		setComponentAttributes(b, size);
 		return b;
 	}
+	public static KSlider setupSlider(String text, ImageIcon icon, Dimension size, int min, int max) {
+		KSlider b = new KSlider(min, max, text, icon);
+		setComponentAttributes(b, size);
+		return b;
+	}
 	public static <T> void setupComboBox(JComboBox<T> box, Dimension size) {
 //		box.set
 //		KToggleButton b = new KToggleButton(text, icon);

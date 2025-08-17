@@ -14,12 +14,17 @@ public class KSlider extends JPanel implements MouseListener, MouseMotionListene
 	private int value;
 	private String label;
 	private ArrayList<ChangeListener> listeners = new ArrayList<>();
-	
+	private ImageIcon icon;
+
 	public KSlider(int min, int max, String label) {
+		this(min, max, label, null);
+	}
+	public KSlider(int min, int max, String label, ImageIcon icon) {
 		this.min = min;
 		this.max = max;
 		this.value = 0;
 		this.label = label;
+		this.icon = icon;
 		this.setFocusable(false);
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
@@ -63,6 +68,10 @@ public class KSlider extends JPanel implements MouseListener, MouseMotionListene
 		g.drawString(formatted, 5, 2 + g.getFont().getSize());
 		g.setColor(Color.black);
 		g.drawString(formatted, this.getWidth() - 5 - labelWidth, this.getHeight() - 2);
+		
+		if (icon != null) {
+			g.drawImage(icon.getImage(), getWidth() - icon.getIconWidth(), 0, null);
+		}
 	}
 
 	private void adjustValueBasedOnMouseClick(Point p) {

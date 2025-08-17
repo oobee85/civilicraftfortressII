@@ -1,16 +1,13 @@
 package ui.view;
 
 import java.awt.*;
-import java.awt.event.*;
 
 import javax.swing.*;
 
 import game.*;
 import networking.client.ClientGUI;
 import ui.*;
-import ui.infopanels.*;
 import utils.*;
-import world.*;
 
 public class CraftingFocusView {
 	
@@ -18,7 +15,7 @@ public class CraftingFocusView {
 	private static final int BUILDING_ICON_SIZE = 25;
 
 	private JPanel rootPanel;
-	private JToggleButton[] craftFocusButtons = new JToggleButton[ItemType.values().length];
+	private KSlider[] craftFocusButtons = new KSlider[ItemType.values().length];
 	private GameView gameView;
 	
 	public CraftingFocusView(GameView gameView) {
@@ -36,38 +33,45 @@ public class CraftingFocusView {
 			if (!isCraftingFocusItem(type)) {
 				continue;
 			}
-			JToggleButton button = KUIConstants.setupToggleButton(type.toString(),
+//			KSlider volumeSliderMusic = new KSlider(0, 100, "Music Volume %d%%");
+			KSlider slider = KUIConstants.setupSlider("%d " + type.toString(),
 					Utils.resizeImageIcon(type.getMipMap().getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
-					BUILDING_BUTTON_SIZE);
-			
-			button.setSelected(gameView.getFaction().getToggleCraftItemFocusList()[i]);
-			button.setEnabled(true);
+					BUILDING_BUTTON_SIZE,
+					0, Faction.MAX_CRAFTING_SLIDER_VALUE);
+//			JToggleButton button = KUIConstants.setupToggleButton(type.toString(),
+//					Utils.resizeImageIcon(type.getMipMap().getImageIcon(0), BUILDING_ICON_SIZE, BUILDING_ICON_SIZE),
+//					BUILDING_BUTTON_SIZE);
+			slider.setValue(Faction.DEFAULT_CRAFTING_SLIDER_VALUE);
+			slider.setEnabled(true);
 //			String name = type.toString();
 //			if(name == "SWORD" || name == "BOW" || name == "SHIELD") {
 //				button.setSelected(false);
 //				button.setEnabled(false);
 //			}
-			
-			button.addActionListener(e -> {
 
-//				if(button.isSelected() == true) {
+			slider.addChangeListener(e -> {
+				gameView.getGameInstance().getGUIController().toggleCraftItemFocus(type, slider.getValue());
+			});
+//			button.addActionListener(e -> {
+//
+////				if(button.isSelected() == true) {
+////					button.setEnabled(false);
+////				}else {
+////					button.setEnabled(true);
+////				}
+//				
+//				gameView.getGameInstance().getGUIController().toggleCraftItemFocus(type);
+////			button.addActionListener(e -> {
+////				gameView.getGameInstance().getGUIController().toggleCraftItemFocus(type);
+//				
+//				
+//				if(button.isEnabled() == true) {
 //					button.setEnabled(false);
 //				}else {
 //					button.setEnabled(true);
 //				}
-				
-				gameView.getGameInstance().getGUIController().toggleCraftItemFocus(type);
-//			button.addActionListener(e -> {
-//				gameView.getGameInstance().getGUIController().toggleCraftItemFocus(type);
-				
-				
-				if(button.isEnabled() == true) {
-					button.setEnabled(false);
-				}else {
-					button.setEnabled(true);
-				}
-//				button.setEnabled(!button.getEnabled());
-			});
+////				button.setEnabled(!button.getEnabled());
+//			});
 //			button.addRightClickActionListener(e -> {
 //				gameView.getGameInstance().getGUIController().switchInfoPanel(new ItemTypeInfoPanel(type, gameView.getFaction()));
 //			});
@@ -81,8 +85,8 @@ public class CraftingFocusView {
 //					gameView.getGameInstance().getGUIController().popInfoPanel();
 //				}
 //			});
-			craftFocusButtons[i] = button;
-			rootPanel.add(button);
+			craftFocusButtons[i] = slider;
+			rootPanel.add(slider);
 		}
 	}
 	
@@ -110,7 +114,7 @@ public class CraftingFocusView {
 		int numVisible = 0;
 		for (int i = 0; i < ItemType.values().length; i++) {
 			ItemType type = ItemType.values()[i];
-			JToggleButton button = craftFocusButtons[i];
+			KSlider button = craftFocusButtons[i];
 			if(button != null) {
 				if(isCraftingFocusItem(type) == true) {
 					button.setVisible(true);

@@ -10,10 +10,14 @@ import java.util.concurrent.*;
 import game.components.*;
 import sounds.SoundEffect;
 import sounds.SoundManager;
+import ui.view.CraftingFocusView;
 import utils.*;
 import world.*;
 
 public class Faction implements Externalizable {
+
+	public static final int MAX_CRAFTING_SLIDER_VALUE = 1000;
+	public static final int DEFAULT_CRAFTING_SLIDER_VALUE = MAX_CRAFTING_SLIDER_VALUE/2;
 	
 	private static final Color[] factionColors = new Color[] { 
 			Color.lightGray, Color.blue, Color.green.darker(), Color.pink, 
@@ -52,7 +56,7 @@ public class Faction implements Externalizable {
 	private int influence;
 //	private List<ItemType> toggleCraftItemFocusList = new ArrayList<>();
 	
-	private final boolean craftItemFocusList[] = new boolean[ItemType.values().length]; 
+	private final int craftItemFocusList[] = new int[ItemType.values().length]; 
 	
 	private int tickOfLastDamageTaken = 0;
 	private CombatStats upgradedCombatStats = new CombatStats(0, 0, 0, 0);
@@ -109,7 +113,7 @@ public class Faction implements Externalizable {
 		
 		// By default try to craft all items
 		for (int itemIndex = 0; itemIndex < craftItemFocusList.length; itemIndex++) {
-			craftItemFocusList[itemIndex] = true;
+			craftItemFocusList[itemIndex] = DEFAULT_CRAFTING_SLIDER_VALUE;
 		}
 	}
 	
@@ -465,12 +469,19 @@ public class Faction implements Externalizable {
 		attacked = attackedNew;
 	}
 	
-	public void toggleCraftItemFocus(ItemType type) {
-		craftItemFocusList[type.ordinal()] = !craftItemFocusList[type.ordinal()];
+	public void toggleCraftItemFocus(ItemType type, int targetAmount) {
+		craftItemFocusList[type.ordinal()] = targetAmount;
 	}
-	public boolean[] getToggleCraftItemFocusList() {
-		return craftItemFocusList;
+	public boolean wantsMore(ItemType item) {
+		if (craftItemFocusList[item.ordinal()] == MAX_CRAFTING_SLIDER_VALUE) {
+			return true;
+		}
+		if (getInventory().getItemAmount(item) < craftItemFocusList[item.ordinal()]) {
+			return true;
+		}
+		return false;
 	}
+	
 	
 	public void craftItem(ItemType type, int amount) {
 		

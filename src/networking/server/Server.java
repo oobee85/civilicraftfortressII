@@ -158,7 +158,7 @@ public class Server {
 			@Override
 			public void setPauseGame(boolean enabled) { }
 			@Override
-			public void toggleCraftItemFocus(ItemType type) {}
+			public void toggleCraftItemFocus(ItemType type, int targetAmount) {}
 		});
 		LinkedList<PlayerInfo> players = new LinkedList<>();
 		for (Connection connection : connections.keySet()) {

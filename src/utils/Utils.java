@@ -863,8 +863,8 @@ public final class Utils {
 				faction.craftItem(itemType, amount);
 			}
 			@Override
-			public void toggleCraftItemFocus(Faction faction, ItemType itemType) {
-				faction.toggleCraftItemFocus(itemType);
+			public void toggleCraftItemFocus(Faction faction, ItemType itemType, int targetAmount) {
+				faction.toggleCraftItemFocus(itemType, targetAmount);
 				
 			}
 			@Override

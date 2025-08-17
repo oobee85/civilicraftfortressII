@@ -85,8 +85,8 @@ public class Client {
 				clientGUI.getGameView().getCommandInterface().craftItem(clientGUI.getGameView().getFaction(), type, amount);
 			}
 			@Override
-			public void toggleCraftItemFocus(ItemType type) {
-				clientGUI.getGameView().getCommandInterface().toggleCraftItemFocus(clientGUI.getGameView().getFaction(), type);
+			public void toggleCraftItemFocus(ItemType type, int targetAmount) {
+				clientGUI.getGameView().getCommandInterface().toggleCraftItemFocus(clientGUI.getGameView().getFaction(), type, targetAmount);
 			}
 			@Override
 			public void research(ResearchType researchType) {
@@ -152,9 +152,9 @@ public class Client {
 				// TODO figure out more generic networking stuff.
 			}
 			@Override
-			public void toggleCraftItemFocus(Faction faction, ItemType itemType) {
+			public void toggleCraftItemFocus(Faction faction, ItemType itemType, int targetAmount) {
 				sendMessage(CommandMessage.makeToggleItemFocusCommand(faction.id(), itemType.name()));
-				localCommands.toggleCraftItemFocus(faction, itemType);
+				localCommands.toggleCraftItemFocus(faction, itemType, targetAmount);
 				
 			}
 			

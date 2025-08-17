@@ -10,7 +10,7 @@ public interface CommandInterface {
 	public void stop(Unit unit);
 	public void research(Faction faction, ResearchType researchType);
 	public void craftItem(Faction faction, ItemType itemType, int amount);
-	public void toggleCraftItemFocus(Faction faction, ItemType itemType);
+	public void toggleCraftItemFocus(Faction faction, ItemType itemType, int targetAmount);
 	public void produceUnit(Building building, UnitType unitType);
 	
 	public void planAction(Unit unit, PlannedAction plan, boolean clearQueue);

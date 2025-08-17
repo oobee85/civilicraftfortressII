@@ -1565,8 +1565,7 @@ public class Game {
 		if(building.getType() == buildingTypeMap.get("SMITHY")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : forgeItems) {
-				// If this item is toggled off then skip
-				if (!faction.getToggleCraftItemFocusList()[item.ordinal()]) {
+				if (!faction.wantsMore(item)) {
 					continue;
 				}
 				if (faction.canAfford(item.getCost()) == true) {
@@ -1577,8 +1576,7 @@ public class Game {
 		if(building.getType() == buildingTypeMap.get("SAWMILL")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : lumberItems) {
-				// If this item is toggled off then skip
-				if (!faction.getToggleCraftItemFocusList()[item.ordinal()]) {
+				if (!faction.wantsMore(item)) {
 					continue;
 				}
 				if (faction.canAfford(item.getCost()) == true) {
@@ -1589,8 +1587,7 @@ public class Game {
 		if(building.getType() == buildingTypeMap.get("QUARRY")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : stoneItems) {
-				// If this item is toggled off then skip
-				if (!faction.getToggleCraftItemFocusList()[item.ordinal()]) {
+				if (!faction.wantsMore(item)) {
 					continue;
 				}
 				if (faction.canAfford(item.getCost()) == true) {
@@ -1601,8 +1598,7 @@ public class Game {
 		if(building.getType() == buildingTypeMap.get("GRANARY")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : foodItems) {
-				// If this item is toggled off then skip
-				if (!faction.getToggleCraftItemFocusList()[item.ordinal()]) {
+				if (!faction.wantsMore(item)) {
 					continue;
 				}
 				if (faction.canAfford(item.getCost()) == true) {
