@@ -50,7 +50,9 @@ public class Faction implements Externalizable {
 	private boolean isPlayer;
 	private double environmentalDifficulty = 1;
 	private int influence;
-	private List<ItemType> toggleCraftItemFocusList = new ArrayList<>();
+//	private List<ItemType> toggleCraftItemFocusList = new ArrayList<>();
+	
+	private final boolean craftItemFocusList[] = new boolean[ItemType.values().length]; 
 	
 	private int tickOfLastDamageTaken = 0;
 	private CombatStats upgradedCombatStats = new CombatStats(0, 0, 0, 0);
@@ -104,6 +106,11 @@ public class Faction implements Externalizable {
 		this.isPlayer = isPlayer;
 		this.inventory = new Inventory();
 		setupResearch();
+		
+		// By default try to craft all items
+		for (int itemIndex = 0; itemIndex < craftItemFocusList.length; itemIndex++) {
+			craftItemFocusList[itemIndex] = true;
+		}
 	}
 	
 	public boolean inRangeColony(Unit unit, Tile targetTile) {
@@ -459,14 +466,10 @@ public class Faction implements Externalizable {
 	}
 	
 	public void toggleCraftItemFocus(ItemType type) {
-		if(toggleCraftItemFocusList.contains(type)) {
-			toggleCraftItemFocusList.remove(type);
-		}else {
-			toggleCraftItemFocusList.add(type);
-		}
+		craftItemFocusList[type.ordinal()] = !craftItemFocusList[type.ordinal()];
 	}
-	public List<ItemType> getToggleCraftItemFocusList() {
-		return toggleCraftItemFocusList;
+	public boolean[] getToggleCraftItemFocusList() {
+		return craftItemFocusList;
 	}
 	
 	public void craftItem(ItemType type, int amount) {

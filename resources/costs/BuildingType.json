@@ -214,7 +214,7 @@
 	},
 	{
 		"name":"QUARRY",
-		"info":"Workers can mine ores near here",
+		"info":"Makes bricks",
 		"image":"Images/buildings/quarry.png",
 		"vision":10,
 		"cost":{"WOOD":200, "STONE":200},

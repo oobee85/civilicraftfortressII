@@ -1562,27 +1562,23 @@ public class Game {
 		if(building.getType() == buildingTypeMap.get("SMITHY")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : forgeItems) {
-				// if the item is not in the craftItemFocus list
-				if(!faction.getToggleCraftItemFocusList().contains(item)) {
+				// If this item is toggled off then skip
+				if (!faction.getToggleCraftItemFocusList()[item.ordinal()]) {
 					continue;
 				}
 				if (faction.canAfford(item.getCost()) == true) {
-//					System.out.println("Adding item: " + item.name());
 					canCraft.add(item);
-
 				}
 			}
 		}
 		if(building.getType() == buildingTypeMap.get("SAWMILL")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : lumberItems) {
-				// if the item is not in the craftItemFocus list
-				if(!faction.getToggleCraftItemFocusList().contains(item)) {
-//					System.out.println("Item not focused: " + item.name());
+				// If this item is toggled off then skip
+				if (!faction.getToggleCraftItemFocusList()[item.ordinal()]) {
 					continue;
 				}
 				if (faction.canAfford(item.getCost()) == true) {
-//					System.out.println("Adding item: " + item.name());
 					canCraft.add(item);
 				}
 			}
@@ -1590,12 +1586,11 @@ public class Game {
 		if(building.getType() == buildingTypeMap.get("QUARRY")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : stoneItems) {
-				// if the item is not in the craftItemFocus list
-				if(!faction.getToggleCraftItemFocusList().contains(item)) {
+				// If this item is toggled off then skip
+				if (!faction.getToggleCraftItemFocusList()[item.ordinal()]) {
 					continue;
 				}
 				if (faction.canAfford(item.getCost()) == true) {
-//					System.out.println("Adding item: " + item.name());
 					canCraft.add(item);
 				}
 			}
@@ -1603,12 +1598,11 @@ public class Game {
 		if(building.getType() == buildingTypeMap.get("GRANARY")) {
 			// go through craftable bars and add affordable ones to a new list
 			for (ItemType item : foodItems) {
-				// if the item is not in the craftItemFocus list
-				if(!faction.getToggleCraftItemFocusList().contains(item)) {
+				// If this item is toggled off then skip
+				if (!faction.getToggleCraftItemFocusList()[item.ordinal()]) {
 					continue;
 				}
 				if (faction.canAfford(item.getCost()) == true) {
-//					System.out.println("Adding item: " + item.name());
 					canCraft.add(item);
 				}
 			}
