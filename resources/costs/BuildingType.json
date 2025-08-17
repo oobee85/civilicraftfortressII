@@ -2,7 +2,7 @@
 "buildingtypes":[
 	{
 		"name":"FARM",
-		"info":"Workers harvest food from here",
+		"info":"Produces food: consumes a worker when built",
 		"image":"Images/buildings/irrigation.gif",
 		"vision":1,
 		"cost":{"WOOD":50},
@@ -16,7 +16,7 @@
 	},
 	{
 		"name":"MINE",
-		"info":"Workers mine stone from here",
+		"info":"Produces stone: consumes a worker when built",
 		"image":"Images/buildings/mine256.png",
 		"vision":1,
 		"cost":{"WOOD":100},
@@ -31,7 +31,7 @@
 	},
 	{
 		"name":"MAGIC",
-		"info":"Workers harvest magic from here",
+		"info":"Produces magic: consumes a worker when built",
 		"image":"Images/buildings/research.png",
 		"vision":1,
 		"cost":{"GOLD_BAR":10},
@@ -46,7 +46,7 @@
 	},
 	{
 		"name":"GRANARY",
-		"info":"Produces food and automatically deposits into factions inventory.",
+		"info":"Produces large amounts of food",
 		"image":"Images/buildings/granary.png",
 		"vision":1,
 		"cost":{"WOOD":200, "STONE":200, "BRONZE_BAR":5},
@@ -62,7 +62,7 @@
 	},
 	{
 		"name":"WINDMILL",
-		"info":"Produces lots of food and deposits into factions inventory",
+		"info":"Produces enourmous amounts of food",
 		"image":"Images/buildings/ancientwindmill.gif",
 		"vision":5,
 		"cost":{"WOOD":300, "STONE":300, "IRON_BAR":10},
@@ -106,7 +106,7 @@
 	},
 	{
 		"name":"COLONY",
-		"info":"Workers nearby can deposit resources here",
+		"info":"Workers deposit items: transfer items to your castle using a caravan",
 		"image":"Images/buildings/colony.png",
 		"vision":10,
 		"cost":{"WOOD":100, "STONE":100},
@@ -152,7 +152,7 @@
 	},
 	{
 		"name":"STABLES",
-		"info":"Produces mounted combat units and animal units. Collect resources using trap building",
+		"info":"Produces animal units. Collect resources using trap building",
 		"image":"Images/buildings/stables.png",
 		"vision":1,
 		"cost":{"WOOD":200},
@@ -168,7 +168,7 @@
 	},
 	{
 		"name":"RESEARCH_LAB",
-		"info":"Allows for upgrades for units to be bought",
+		"info":"Allows upgrades for units",
 		"image":"Images/buildings/thelab.png",
 		"vision":1,
 		"cost":{"WOOD":500, "STONE":500},
@@ -184,7 +184,7 @@
 	
 	{
 		"name":"SMITHY",
-		"info":"Turns ore and other resources into refined products.",
+		"info":"Turns ore into refined bars.",
 		"image":"Images/buildings/blacksmith.gif",
 		"vision":1,
 		"cost":{"WOOD":100, "STONE":100},
@@ -199,7 +199,7 @@
 	
 	{
 		"name":"SAWMILL",
-		"info":"Produces more complicated wooden items.",
+		"info":"Converts wood into more complicated items",
 		"image":"Images/buildings/sawmill.gif",
 		"vision":10,
 		"cost":{"WOOD":200, "STONE":200},
@@ -214,7 +214,7 @@
 	},
 	{
 		"name":"QUARRY",
-		"info":"Workers can mine ores near here",
+		"info":"Converts clay into more complicated items",
 		"image":"Images/buildings/quarry.png",
 		"vision":10,
 		"cost":{"WOOD":200, "STONE":200},
@@ -242,7 +242,7 @@
 	},
 	{
 		"name":"CASTLE",
-		"info":"Produces workers",
+		"info":"Main hub for your kingdom",
 		"image":"Images/buildings/castle256.png",
 		"vision":30,
 		"cost":{"WOOD":500, "STONE":500, "BRICK":100, "MITHRIL_BAR":5},
@@ -309,7 +309,7 @@
 	},
 	{
 		"name":"STONE_ROAD",
-		"info":"Increases movement speed",
+		"info":"Reduces movement penalty of rough terrain",
 		"image":"Images/buildings/stone_road.png",
 		"tiledImages":"Images/buildings/roadTileset",
 		"vision":0,
@@ -326,7 +326,7 @@
 	},
 	{
 		"name":"BRICK_ROAD",
-		"info":"Increases movement speed more",
+		"info":"Eliminates movement penalty of rough terrain",
 		"image":"Images/buildings/brick_road.png",
 		"vision":0,
 		"movespeed":6,
@@ -371,7 +371,7 @@
 	},
 	{
 		"name":"GATE_WOOD",
-		"info":"Blocks movement except for own faction",
+		"info":"Allows friendly units to pass through",
 		"image":"Images/buildings/gate_wood.png",
 		"vision":1,
 		"cost":{"WOOD":100, "STONE":100, "BRONZE_BAR":5},
@@ -401,7 +401,7 @@
 	},
 	{
 		"name":"GATE_STONE",
-		"info":"Blocks movement except for own faction",
+		"info":"Allows friendly units to pass through",
 		"image":"Images/buildings/gate_stone.gif",
 		"vision":1,
 		"cost":{"WOOD":100, "IRON_BAR":5, "STONE":100},
@@ -432,7 +432,7 @@
 	},
 	{
 		"name":"GATE_BRICK",
-		"info":"Blocks movement except for own faction",
+		"info":"Allows friendly units to pass through",
 		"image":"Images/buildings/gate_brick.png",
 		"vision":1,
 		"cost":{"BRICK":500, "MITHRIL_BAR":10},

@@ -34,15 +34,27 @@ public class CombatStats implements Serializable {
 	
 	public void addHealth(int health) {
 		this.health += health;
+		if(this.health < 1) {
+			this.health = 1;
+		}
 	}
 	public void addMoveSpeed(int speed) {
 		this.moveSpeed += speed;
+		if(this.moveSpeed < 1) {
+			this.moveSpeed = 1;
+		}
 	}
 	public void addTicksToBuild(int ticks) {
 		this.ticksToBuild += ticks;
+		if(this.ticksToBuild < 1) {
+			this.ticksToBuild = 1;
+		}
 	}
 	public void addTicksToHeal(int ticks) {
 		this.ticksToHeal += ticks;
+		if(this.ticksToHeal < 1) {
+			this.ticksToHeal = 1;
+		}
 	}
 	
 	public void setHealth(int health) {
@@ -63,6 +75,18 @@ public class CombatStats implements Serializable {
 		this.moveSpeed += other.getMoveSpeed();
 		this.ticksToBuild += other.getTicksToBuild();
 		this.ticksToHeal += other.getTicksToHeal();
+		if(this.health < 1) {
+			this.health = 1;
+		}
+		if(this.moveSpeed < 1) {
+			this.moveSpeed = 1;
+		}
+		if(this.ticksToBuild < 1) {
+			this.ticksToBuild = 1;
+		}
+		if(this.ticksToHeal < 1) {
+			this.ticksToHeal = 1;
+		}
 	}
 	
 	@Override

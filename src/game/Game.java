@@ -1024,6 +1024,10 @@ public class Game {
 
 	    // Carve maze and track path tiles
 	    TileLoc entrance = carveMaze(startCellX, startCellY, visited, size, startX, startY, pathTiles);
+	    
+	 // Create entrance
+	    Tile entranceTile = clearWallAtBorder(entrance, size, startX, startY);
+	    
 	    // Place walls where there is no path
 	    for (int y = 0; y < gridSize; y++) {
 	        for (int x = 0; x < gridSize; x++) {
@@ -1031,21 +1035,21 @@ public class Game {
 	            if (!pathTiles.contains(loc)) {
 	     
 	                Tile wallTile = world.get(loc);
-	                summonBuilding(wallTile, wallType, factionId, true, 0);
-	                
+	                if(wallTile != entranceTile) {
+	                	summonBuilding(wallTile, wallType, factionId, true, 0);
+	                }
 	            }
 	        }
 	    }
 
-	    // Create entrance
-	    clearWallAtBorder(entrance, size, startX, startY);
+	    
 	    
 	    
 	    // Find farthest tile and place chest
 	    TileLoc chestTileLoc = findFarthestPathTile(entrance, pathTiles);
 	    //clearWallAtBorder(chestTileLoc, size, startX, startY); // Ensure it's accessible
 	    Tile chestTile = world.get(chestTileLoc);
-	    Building b = summonBuilding(chestTile, chestType, factionId, true, 3);
+	    summonBuilding(chestTile, chestType, factionId, true, 3);
 	    
 	    
 	 // Spawn random chests along the path
@@ -1164,7 +1168,7 @@ public class Game {
 	}
 
 
-	private void clearWallAtBorder(TileLoc pathTile, int size, int startX, int startY) {
+	private Tile clearWallAtBorder(TileLoc pathTile, int size, int startX, int startY) {
 	    int x = pathTile.x();
 	    int y = pathTile.y();
 
@@ -1198,10 +1202,9 @@ public class Game {
 	    if (exitLoc != null) {
 	        // Remove wall if it exists
 	        Tile t = world.get(exitLoc);
-	        if(t.getBuilding() != null) {
-	        	t.getBuilding().setDead(true);
-	        }
+	        return t;
 	    }
+	    return null;
 	}
 	
 	private void generateAbandonedCastle(Tile center, int rings) {
