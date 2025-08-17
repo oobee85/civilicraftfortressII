@@ -692,9 +692,9 @@ public class Game {
 		}
 		int y = world.getHeight() - 18;
 		for (int x = 0; x < 5; x++) {
-			summonBuilding(world.get(new TileLoc(x, y)), Game.buildingTypeMap.get("WALL_WOOD"), cyclops);
+			summonBuilding(world.get(new TileLoc(x, y)), Game.buildingTypeMap.get("WALL_WOOD"), cyclops, true, 0);
 			summonBuilding(world.get(new TileLoc(world.getWidth() - x, y)), Game.buildingTypeMap.get("WALL_WOOD"),
-					cyclops);
+					cyclops, true, 0);
 		}
 
 	}
@@ -811,7 +811,7 @@ public class Game {
 		}
 
 		Thing necropolis = summonBuilding(highestTile, Game.buildingTypeMap.get("NECROPOLIS"),
-				world.getFaction(World.UNDEAD_FACTION_ID));
+				world.getFaction(World.UNDEAD_FACTION_ID), true, 0);
 
 		List<Tile> neighbors = Utils.getTilesInRadius(highestTile, world, 1);
 		Collections.shuffle(neighbors);
@@ -821,7 +821,7 @@ public class Game {
 		}
 		Tile forWindmill = neighbors.remove(0);
 		Thing windmill = summonBuilding(forWindmill, Game.buildingTypeMap.get("WINDMILL"),
-				world.getFaction(World.UNDEAD_FACTION_ID));
+				world.getFaction(World.UNDEAD_FACTION_ID), true, 0);
 		windmill.setInventory(world.getFaction(World.UNDEAD_FACTION_ID).getInventory());
 
 //		for (TileLoc neighbor : neighbors) {
@@ -857,7 +857,7 @@ public class Game {
 			if(t.getTerrain() != Terrain.GRASS) {
 				continue;
 			}else {
-				spawnLabyrinthRuins(t, (5+((int)(Math.random()*5))));
+				spawnLabyrinthRuins(t, (20+((int)(Math.random()*5))));
 				return;
 			}
 		}
@@ -936,17 +936,11 @@ public class Game {
 			Tile wall;
 			if(Math.random() > 0.5) {
 				wall = world.get(new TileLoc(tile.getLocation().x() + 3, tile.getLocation().y() - 2 + i));
-				summonBuilding(wall, type, factionId);
-				if(wall != null) {
-					wall.getBuilding().setImmuneToLiquidDamage(true);
-				}
+				summonBuilding(wall, type, factionId, true, 0);
 			}
 			if(Math.random() > 0.5) {
 				wall = world.get(new TileLoc(tile.getLocation().x() - 3, tile.getLocation().y() - 2 + i));
-				summonBuilding(wall, type, factionId);
-				if(wall != null) {
-					wall.getBuilding().setImmuneToLiquidDamage(true);
-				}
+				summonBuilding(wall, type, factionId, true, 0);
 			}
 		}
 		for (int i = 1; i < (5+((int)(Math.random()+0.5))); i++) {
@@ -961,22 +955,15 @@ public class Game {
 			
 			if(Math.random() > 0.5) {
 				wall = world.get(new TileLoc(tile.getLocation().x() - 3 + i, tile.getLocation().y() - 2 - yoffset));
-				summonBuilding(wall, type, factionId);
-				if(wall != null) {
-					wall.getBuilding().setImmuneToLiquidDamage(true);
-				}
+				summonBuilding(wall, type, factionId, true, 0);
 				
 			}
 			yoffset = yoffset + (tile.getLocation().x() + i) % 2 - 2 - (tile.getLocation().x() % 2);
 			wall = world.get(new TileLoc(tile.getLocation().x() - 3 + i, tile.getLocation().y() + 4 + yoffset));
-			summonBuilding(wall, type, factionId);
-			if(wall != null) {
-				wall.getBuilding().setImmuneToLiquidDamage(true);
-			}
+			summonBuilding(wall, type, factionId, true, 0);
 		}
-		summonBuilding(tile, chest, factionId);
-		addLootItemsToBuilding(tile, 1);
-		tile.getBuilding().setImmuneToLiquidDamage(true);
+		summonBuilding(tile, chest, factionId, true, 1);
+		
 	}
 	
 	private void generateSquareRoom(Tile center, int r) {
@@ -1003,8 +990,7 @@ public class Game {
 	            if (tile != null) {
 	                if (isWall) {
 	                    // Place wall
-	                	summonBuilding(tile, type, factionId);
-	                	tile.getBuilding().setImmuneToLiquidDamage(true);
+	                	summonBuilding(tile, type, factionId, true, 0);
 	                } else {
 
 	                }
@@ -1016,9 +1002,8 @@ public class Game {
 	    	previousTile.getBuilding().setDead(true);
 	    }
 	    
-	    summonBuilding(center, chest, factionId);
-	    center.getBuilding().setImmuneToLiquidDamage(true);
-	    addLootItemsToBuilding(center, 1);
+	    summonBuilding(center, chest, factionId, true, 1);
+	    
 	}
 	
 	private void spawnLabyrinthRuins(Tile origin, int size) {
@@ -1046,8 +1031,8 @@ public class Game {
 	            if (!pathTiles.contains(loc)) {
 	     
 	                Tile wallTile = world.get(loc);
-	                summonBuilding(wallTile, wallType, factionId);
-	                wallTile.getBuilding().setImmuneToLiquidDamage(true);
+	                summonBuilding(wallTile, wallType, factionId, true, 0);
+	                
 	            }
 	        }
 	    }
@@ -1060,51 +1045,50 @@ public class Game {
 	    TileLoc chestTileLoc = findFarthestPathTile(entrance, pathTiles);
 	    //clearWallAtBorder(chestTileLoc, size, startX, startY); // Ensure it's accessible
 	    Tile chestTile = world.get(chestTileLoc);
-	    summonBuilding(chestTile, chestType, factionId);
-	    addLootItemsToBuilding(chestTile, 3);
-	    chestTile.getBuilding().setImmuneToLiquidDamage(true);
+	    Building b = summonBuilding(chestTile, chestType, factionId, true, 3);
+	    
 	    
 	 // Spawn random chests along the path
 	    spawnRandomChests(pathTiles, entrance, chestType, factionId, 0.05); // 5% chance
 	}
 	
-	private void addLootItemsToBuilding(Tile t, int lootLevel) {
-		if(t.getBuilding() == null) {
+	private void addLootItemsToBuilding(Building b, int lootLevel) {
+		if(b == null) {
 			System.out.println("addLootItemsToBuilding() building is null");
 			return;
 		}
-		if(t.getBuilding().getInventory() == null) {
+		if(b.getInventory() == null) {
 			System.out.println("addLootItemsToBuilding() inventory is null");
 			return;
 		}
 		Faction factionId = world.getFaction(World.NO_FACTION_ID);
 		int itemAmount = 10 + (int) (Math.random()*10);
 		if(lootLevel == 1) {
-			t.getBuilding().getInventory().addItem(ItemType.BRONZE_BAR, itemAmount*2);
-			t.getBuilding().getInventory().addItem(ItemType.IRON_BAR, itemAmount);
-			t.getBuilding().getInventory().addItem(ItemType.COAL, itemAmount*5);
-			t.getBuilding().getInventory().addItem(ItemType.WOOD, itemAmount*10);
-			t.getBuilding().getInventory().addItem(ItemType.FOOD, itemAmount*10);
+			b.getInventory().addItem(ItemType.BRONZE_BAR, itemAmount*2);
+			b.getInventory().addItem(ItemType.IRON_BAR, itemAmount);
+			b.getInventory().addItem(ItemType.COAL, itemAmount*5);
+			b.getInventory().addItem(ItemType.WOOD, itemAmount*10);
+			b.getInventory().addItem(ItemType.FOOD, itemAmount*10);
 //			summonUnit(t, Game.unitTypeMap.get("SPEARMAN"), factionId);
 //			summonUnit(t, Game.unitTypeMap.get("WARRIOR"), factionId);
 		}
 		if(lootLevel == 2) {
-			t.getBuilding().getInventory().addItem(ItemType.IRON_BAR, itemAmount*2);
-			t.getBuilding().getInventory().addItem(ItemType.MITHRIL_BAR, itemAmount);
-			t.getBuilding().getInventory().addItem(ItemType.GOLD_BAR, itemAmount*2);
-			t.getBuilding().getInventory().addItem(ItemType.COAL, itemAmount*10);
-			t.getBuilding().getInventory().addItem(ItemType.WOOD, itemAmount*50);
-			t.getBuilding().getInventory().addItem(ItemType.FOOD, itemAmount*50);
+			b.getInventory().addItem(ItemType.IRON_BAR, itemAmount*2);
+			b.getInventory().addItem(ItemType.MITHRIL_BAR, itemAmount);
+			b.getInventory().addItem(ItemType.GOLD_BAR, itemAmount*2);
+			b.getInventory().addItem(ItemType.COAL, itemAmount*10);
+			b.getInventory().addItem(ItemType.WOOD, itemAmount*50);
+			b.getInventory().addItem(ItemType.FOOD, itemAmount*50);
 //			summonUnit(t, Game.unitTypeMap.get("SWORDSMAN"), factionId);
 //			summonUnit(t, Game.unitTypeMap.get("SPEARMAN"), factionId);
 //			summonUnit(t, Game.unitTypeMap.get("HORSEMAN"), factionId);
 		}
 		if(lootLevel == 3) {
-			t.getBuilding().getInventory().addItem(ItemType.BETTER_WEAPONS, itemAmount/2);
-			t.getBuilding().getInventory().addItem(ItemType.IMPROVED_SPARRING, itemAmount/2);
-			t.getBuilding().getInventory().addItem(ItemType.BETTER_FORMATIONS, itemAmount/2);
-			t.getBuilding().getInventory().addItem(ItemType.BRICK, itemAmount*10);
-			t.getBuilding().getInventory().addItem(ItemType.MEDICINE, itemAmount/2);
+			b.getInventory().addItem(ItemType.BETTER_WEAPONS, itemAmount/2);
+			b.getInventory().addItem(ItemType.IMPROVED_SPARRING, itemAmount/2);
+			b.getInventory().addItem(ItemType.BETTER_FORMATIONS, itemAmount/2);
+			b.getInventory().addItem(ItemType.BRICK, itemAmount*10);
+			b.getInventory().addItem(ItemType.MEDICINE, itemAmount/2);
 //			summonUnit(t, Game.unitTypeMap.get("OGRE"), factionId);
 //			summonUnit(t, Game.unitTypeMap.get("SWORDSMAN"), factionId);
 		}
@@ -1116,9 +1100,9 @@ public class Game {
 	        if (!loc.equals(entrance) && Math.random() < chance) {
 	        	Tile t = world.get(loc);
 	        	
-	            summonBuilding(t, chestType, factionId);
-	            addLootItemsToBuilding(t, 1);
-	            t.getBuilding().setImmuneToLiquidDamage(true);
+	            summonBuilding(t, chestType, factionId, true, 1);
+	            
+	            
 	        }
 	    }
 	}
@@ -1249,8 +1233,7 @@ public class Game {
 	                        	// out of bounds
 	                        	continue;
 	                        }
-	                        Building summonedWall = summonBuilding(wallTile, wallType, factionId);
-	                        summonedWall.setImmuneToLiquidDamage(true);
+	                        summonBuilding(wallTile, wallType, factionId, true, 0);
 	                    }
 	                }
 	            }
@@ -1261,9 +1244,8 @@ public class Game {
 	    }
 
 	    // Place chest or throne room at the center
-	    summonBuilding(center, chestType, factionId);
-	    addLootItemsToBuilding(center, 3);
-	    center.getBuilding().setImmuneToLiquidDamage(true);
+	    summonBuilding(center, chestType, factionId, true, 0);
+	    
 	}
 
 
@@ -1278,11 +1260,11 @@ public class Game {
 			Tile wall;
 			if(Math.random() > 0.5) {
 				wall = world.get(new TileLoc(tile.getLocation().x() + 3, tile.getLocation().y() - 2 + i));
-				summonBuilding(wall, type, factionId);
+				summonBuilding(wall, type, factionId, true, 0);
 			}
 			if(Math.random() > 0.5) {
 				wall = world.get(new TileLoc(tile.getLocation().x() - 3, tile.getLocation().y() - 2 + i));
-				summonBuilding(wall, type, factionId);
+				summonBuilding(wall, type, factionId, true, 0);
 			}
 		}
 		for (int i = 1; i < (5+((int)(Math.random()+0.5))); i++) {
@@ -1296,16 +1278,15 @@ public class Game {
 			
 			if(Math.random() > 0.5) {
 				wall = world.get(new TileLoc(tile.getLocation().x() - 3 + i, tile.getLocation().y() - 2 - yoffset));
-				summonBuilding(wall, type, factionId);
+				summonBuilding(wall, type, factionId, true, 0);
 			}
 			yoffset = yoffset + (tile.getLocation().x() + i) % 2 - 2 - (tile.getLocation().x() % 2);
 			wall = world.get(new TileLoc(tile.getLocation().x() - 3 + i, tile.getLocation().y() + 4 + yoffset));
-			summonBuilding(wall, type, factionId);
+			summonBuilding(wall, type, factionId, true, 0);
 		}
 		
-		summonBuilding(tile, chest, factionId);
-		addLootItemsToBuilding(tile, 1);
-		tile.getBuilding().setImmuneToLiquidDamage(true);
+		summonBuilding(tile, chest, factionId, true, 1);
+		
 		
 	}
 	private void generateSpineWithRibs(Tile start, int spineLength, int ribLength) {
@@ -1323,28 +1304,21 @@ public class Game {
 	        
 	        if(i == spineLength) {
 	        	Tile endOfSpine = world.get(new TileLoc(x, startY));
-	        	summonBuilding(endOfSpine, wallType, factionId);
-	        	endOfSpine.getBuilding().setImmuneToLiquidDamage(true);
+	        	summonBuilding(endOfSpine, wallType, factionId, true, 0);
 	        }
 	        
 	        // wall at the end of rib path
 	        if(i % 2 == 1) {
 	        	Tile ribWallAbove = world.get(new TileLoc(x, startY - ribLength));
 		        Tile ribWallBelow = world.get(new TileLoc(x, startY + ribLength));
-	        	summonBuilding(ribWallAbove, wallType, factionId);
-	        	ribWallAbove.getBuilding().setImmuneToLiquidDamage(true);
-	        	summonBuilding(ribWallBelow, wallType, factionId);
-	        	ribWallBelow.getBuilding().setImmuneToLiquidDamage(true);
+	        	summonBuilding(ribWallAbove, wallType, factionId, true, 0);
+	        	summonBuilding(ribWallBelow, wallType, factionId, true, 0);
 	        	
 	        	Tile treasureAbove = world.get(new TileLoc(x, startY - ribLength+1));
 		        Tile treasureBelow = world.get(new TileLoc(x, startY + ribLength-1));
-	        	summonBuilding(treasureAbove, chest, factionId);
-	    		addLootItemsToBuilding(treasureAbove, 1);
-	    		treasureAbove.getBuilding().setImmuneToLiquidDamage(true);
+	        	summonBuilding(treasureAbove, chest, factionId, true, 1);
 	    		
-	    		summonBuilding(treasureBelow, chest, factionId);
-	    		addLootItemsToBuilding(treasureBelow, 1);
-	    		treasureBelow.getBuilding().setImmuneToLiquidDamage(true);
+	    		summonBuilding(treasureBelow, chest, factionId, true, 1);
 	    		
 	        	continue;
 	        }
@@ -1353,13 +1327,11 @@ public class Game {
 		        Tile wallAbove = world.get(new TileLoc(x, startY - y));
 		        Tile wallBelow = world.get(new TileLoc(x, startY + y));
 		        if (wallAbove != null) {
-		            summonBuilding(wallAbove, wallType, factionId);
-		            wallAbove.getBuilding().setImmuneToLiquidDamage(true);
+		            summonBuilding(wallAbove, wallType, factionId, true, 0);
 //		            previousWallTile = wallAbove;
 		        }
 		        if (wallBelow != null) {
-		            summonBuilding(wallBelow, wallType, factionId);
-		            wallBelow.getBuilding().setImmuneToLiquidDamage(true);
+		            summonBuilding(wallBelow, wallType, factionId, true, 0);
 //		            previousWallTile = wallBelow;
 		        }
 	        }
@@ -1422,21 +1394,19 @@ public class Game {
 	private void spawnCyclopsFort(Tile tile) {
 		Faction cyclopsFaction = world.getFaction(World.CYCLOPS_FACTION_ID);
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y())),
-				Game.buildingTypeMap.get("WATCHTOWER"), cyclopsFaction);
+				Game.buildingTypeMap.get("WATCHTOWER"), cyclopsFaction, true, 0);
 		Building building = (Building) summonBuilding(world.get(new TileLoc(tile.getLocation().x(), tile.getLocation().y()+1)), 
-				Game.buildingTypeMap.get("WATCHTOWER"), cyclopsFaction);
+				Game.buildingTypeMap.get("WATCHTOWER"), cyclopsFaction, true, 3);
 		
-		building.setImmuneToLiquidDamage(true);
-	    addLootItemsToBuilding(building.getTile(), 3);
 	    
 		Thing granary = summonBuilding(world.get(new TileLoc(tile.getLocation().x() - 1, tile.getLocation().y() - 1)),
-				Game.buildingTypeMap.get("GRANARY"), cyclopsFaction);
+				Game.buildingTypeMap.get("GRANARY"), cyclopsFaction, true, 0);
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x() + 1, tile.getLocation().y() - 1)),
-				Game.buildingTypeMap.get("BARRACKS"), cyclopsFaction);
+				Game.buildingTypeMap.get("BARRACKS"), cyclopsFaction, true, 0);
 		Thing windmill = summonBuilding(world.get(new TileLoc(tile.getLocation().x() + 1, tile.getLocation().y() + 1)),
-				Game.buildingTypeMap.get("WINDMILL"), cyclopsFaction);
+				Game.buildingTypeMap.get("WINDMILL"), cyclopsFaction, true, 0);
 		summonBuilding(world.get(new TileLoc(tile.getLocation().x() - 1, tile.getLocation().y() + 1)),
-				Game.buildingTypeMap.get("MINE"), cyclopsFaction);
+				Game.buildingTypeMap.get("MINE"), cyclopsFaction, true, 0);
 		windmill.setInventory(cyclopsFaction.getInventory());
 		granary.setInventory(cyclopsFaction.getInventory());
 		// makes the walls
@@ -1447,9 +1417,9 @@ public class Game {
 			}
 			Tile wall;
 			wall = world.get(new TileLoc(tile.getLocation().x() + 3, tile.getLocation().y() - 2 + i));
-			summonBuilding(wall, type, cyclopsFaction);
+			summonBuilding(wall, type, cyclopsFaction, true, 0);
 			wall = world.get(new TileLoc(tile.getLocation().x() - 3, tile.getLocation().y() - 2 + i));
-			summonBuilding(wall, type, cyclopsFaction);
+			summonBuilding(wall, type, cyclopsFaction, true, 0);
 		}
 		for (int i = 1; i < 6; i++) {
 			BuildingType type = Game.buildingTypeMap.get("WALL_STONE");
@@ -1465,11 +1435,11 @@ public class Game {
 			yoffset /= 2;
 
 			wall = world.get(new TileLoc(tile.getLocation().x() - 3 + i, tile.getLocation().y() - 2 - yoffset));
-			summonBuilding(wall, type, cyclopsFaction);
+			summonBuilding(wall, type, cyclopsFaction, true, 0);
 
 			yoffset = yoffset + (tile.getLocation().x() + i) % 2 - 2 - (tile.getLocation().x() % 2);
 			wall = world.get(new TileLoc(tile.getLocation().x() - 3 + i, tile.getLocation().y() + 4 + yoffset));
-			summonBuilding(wall, type, cyclopsFaction);
+			summonBuilding(wall, type, cyclopsFaction, true, 0);
 		}
 
 		for (int i = -1; i < 2; i++) {
@@ -2000,7 +1970,7 @@ public class Game {
 				if (thingType instanceof BuildingType) {
 					BuildingType type = (BuildingType) thingType;
 					if (isValidSpawnTileForBuilding(current, type)) {
-						summonBuilding(current, type, newFaction);
+						summonBuilding(current, type, newFaction, false, 0);
 						thingType = null;
 						if (current.getPlant() != null) {
 							current.getPlant().setRemoved(true);
@@ -2085,8 +2055,18 @@ public class Game {
 		}
 	}
 
-	public Building summonBuilding(Tile tile, BuildingType buildingType, Faction faction) {
-		return world.summonBuilding(tile, buildingType, faction);
+	public Building summonBuilding(Tile tile, BuildingType buildingType, Faction faction, boolean immuneToWater, int lootLevel) {
+		if(tile != null) {
+			Building b = world.summonBuilding(tile, buildingType, faction);
+			if(lootLevel != 0) {
+				addLootItemsToBuilding(b, lootLevel);
+			}
+    		b.setImmuneToLiquidDamage(immuneToWater);
+			return b;
+		}else {
+			return null;
+		}
+		
 	}
 
 	public Thing summonPlant(Tile tile, PlantType plantType, Faction faction) {
@@ -2108,7 +2088,7 @@ public class Game {
 		if (thingType instanceof UnitType) {
 			return summonUnit(tile, (UnitType) thingType, faction);
 		} else if (thingType instanceof BuildingType) {
-			return summonBuilding(tile, (BuildingType) thingType, faction);
+			return summonBuilding(tile, (BuildingType) thingType, faction, false, 0);
 		} else if (thingType instanceof PlantType) {
 			return summonPlant(tile, (PlantType) thingType, faction);
 		} else {
