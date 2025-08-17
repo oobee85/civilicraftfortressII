@@ -1234,6 +1234,33 @@ public class World {
 			}
 		}
 	}
+	
+	public void makeStartingOreVein(Tile t) {
+		boolean spawnedCopper = false;
+		boolean spawnedSivler = false;
+		boolean spawnedIron = false;
+		
+		for(Tile neighbor: t.getNeighbors()) {
+			neighbor.setTerrain(Terrain.ROCK);
+			if(spawnedCopper == false) {
+				neighbor.setResource(ResourceType.COPPER);
+				spawnedCopper = true;
+			}
+			if(spawnedSivler == false) {
+				neighbor.setResource(ResourceType.SILVER);
+				spawnedSivler = true;
+			}
+			if(spawnedIron == false) {
+				neighbor.setResource(ResourceType.IRON);
+				spawnedIron = true;
+			}
+			
+			
+		}
+		
+		
+	}
+	
 	public void makePlantVein(Tile t, PlantType type, int veinSize, Random rand) {
 		HashMap<Tile, Double> visited = new HashMap<>();
 

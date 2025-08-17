@@ -1893,6 +1893,7 @@ public class Game {
 			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
 			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
 			thingsToPlace.add(Game.plantTypeMap.get("TREE"));
+			thingsToPlace.add(Game.plantTypeMap.get("STARTINGOREPLANT"));
 			if (easymode || Settings.SPAWN_EXTRA) {
 				addResources(newFaction);
 				thingsToPlace.add(Game.buildingTypeMap.get("BARRACKS"));
@@ -1972,12 +1973,21 @@ public class Game {
 
 					}
 				} else if (thingType instanceof PlantType) {
+					System.out.println(thingType.toString());
+					if(thingType == Game.plantTypeMap.get("STARTINGOREPLANT")) {
+						Generation.makeOreVein(current, ResourceType.COPPER, 1, rand);
+						Generation.makeOreVein(current, ResourceType.SILVER, 1, rand);
+						Generation.makeOreVein(current, ResourceType.IRON, 1, rand);
+						Generation.makeOreVein(current, ResourceType.COAL, 1, rand);
+						thingType = null;
+					}else
 					if (current.getTerrain().isPlantable(current.getTerrain()) && current.getRoad() == null
 							&& current.liquidAmount < current.liquidType.getMinimumDamageAmount() / 2
 							&& current.hasBuilding() == false) {
 						world.makePlantVein(current, (PlantType) thingType, 2, rand);
 						thingType = null;
 					}
+					
 				} else if (thingType instanceof UnitType) {
 					if (current.liquidAmount < current.liquidType.getMinimumDamageAmount()) {
 						summonUnit(current, (UnitType) thingType, newFaction);

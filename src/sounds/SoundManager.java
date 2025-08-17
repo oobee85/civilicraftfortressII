@@ -19,6 +19,7 @@ public class SoundManager {
 	private static Map<SoundEffect, LinkedList<Clip>> previouslyUsedClips = new HashMap<>();
 	private static ArrayList<SoundEffect> musicQueue = new ArrayList<>();
 	private static int currentMusicIndex = 0;
+	
 	public static void queueSoundEffect(SoundEffect soundEffect) {
 		queueSoundEffect(soundEffect, null);
 	}

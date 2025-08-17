@@ -56,6 +56,12 @@
 		"image":"Images/plants/flower.png",
 		"health":50,
 		"rarity":1
+	},
+	{
+		"name":"STARTINGOREPLANT",
+		"image":"Images/plants/flower.png",
+		"health":50,
+		"rarity":1
 	}
 ]
 }

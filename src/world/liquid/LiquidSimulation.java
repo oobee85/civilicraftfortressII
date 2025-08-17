@@ -9,7 +9,7 @@ import world.*;
 
 public class LiquidSimulation {
 	
-	public static final float WALL_HEIGHT = 20;
+	public static final float WALL_HEIGHT = 50;
 	public static final float MINIMUM_LIQUID_THRESHOLD = 0.001f;
 	
 	private static final float FRICTION_RATIO = 0.99f;
@@ -174,7 +174,7 @@ public class LiquidSimulation {
 			}
 			float myh = tile.getHeight();
 			if(tile.getBuilding() != null && tile.getBuilding().getType().isGate() == true) {
-				myh += 5;
+				myh += WALL_HEIGHT/2;
 			}
 			else if(tile.hasWall() == true) {
 				myh += WALL_HEIGHT;
