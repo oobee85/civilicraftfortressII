@@ -1244,14 +1244,17 @@ public class World {
 			neighbor.setTerrain(Terrain.ROCK);
 			if(spawnedCopper == false) {
 				neighbor.setResource(ResourceType.COPPER);
+				neighbor.getResource().setRemainingAmount(100);
 				spawnedCopper = true;
 			}
 			if(spawnedSivler == false) {
 				neighbor.setResource(ResourceType.SILVER);
+				neighbor.getResource().setRemainingAmount(100);
 				spawnedSivler = true;
 			}
 			if(spawnedIron == false) {
 				neighbor.setResource(ResourceType.IRON);
+				neighbor.getResource().setRemainingAmount(100);
 				spawnedIron = true;
 			}
 			

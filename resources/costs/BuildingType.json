@@ -359,7 +359,7 @@
 		"name":"WALL_WOOD",
 		"info":"Blocks movement",
 		"image":"Images/buildings/wall_wood.png",
-		"tiledImages":"Images/buildings/wallTileset",
+		"tiledImages":"Images/buildings/woodwallTileset",
 		"vision":0,
 		"cost":{"WOOD":50},
 		"culture":0.25,

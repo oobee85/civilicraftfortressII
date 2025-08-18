@@ -42,7 +42,7 @@
 	{
 		"image":"Images/units/warrior.png",
 		"cost":{"WOOD":100,"FOOD":100},
-		"stats":{"movespeed":20,"buildtime":200,"health":100,"healspeed":200},
+		"stats":{"movespeed":20,"buildtime":200,"health":50,"healspeed":200},
 		"name":"WARRIOR",
 		"attackstyles":[
 			{"damage":10, "cooldown":30, "range":1}
@@ -53,7 +53,7 @@
 	},
 	{
 		"image":"Images/units/spearman.png",
-		"cost":{"BRONZE_BAR":2,"WOOD":100,"FOOD":200},
+		"cost":{"BRONZE_BAR":2,"WOOD":100,"FOOD":100},
 		"stats":{"movespeed":20,"buildtime":200,"health":500,"healspeed":200},
 		"name":"SPEARMAN",
 		"attackstyles":[

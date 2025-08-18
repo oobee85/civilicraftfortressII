@@ -745,9 +745,10 @@ public class Game {
 		spawnDesertRuins();
 		spawnLabyrinthRuins();
 		spawnForestRuins(2);
-		spawnAbandonedCastle();
+		spawnAbandonedCastle(2);
 		generateStronghold();
 		spawnSquareRoom(3);
+		spawnRoundRoom(8);
 		spawnUndead();
 		
 		makeDwarves(world);
@@ -857,18 +858,23 @@ public class Game {
 			if(t.getTerrain() != Terrain.GRASS) {
 				continue;
 			}else {
-				spawnLabyrinthRuins(t, (20+((int)(Math.random()*5))));
+				spawnLabyrinthRuins(t, (5+((int)(Math.random()*5))));
 				return;
 			}
 		}
 	}
-	public void spawnAbandonedCastle() {
+	public void spawnAbandonedCastle(int number) {
+		int spawned = 0;
 		for (Tile t : world.getTilesRandomly()) {
 			if(t.getTerrain() != Terrain.GRASS) {
 				continue;
 			}else {
-				generateAbandonedCastle(t, (2+((int)(Math.random()*2))));
-				return;
+				if(spawned < number) {
+					generateAbandonedCastle(t, (2+((int)(Math.random()*2))));
+					spawned ++;
+				}else {
+					return;
+				}
 			}
 		}
 		
@@ -882,6 +888,23 @@ public class Game {
 			}else {
 				if(spawned < number) {
 					generateSquareRoom(t, (2+((int)(Math.random()*2))));
+					spawned ++;
+				}else {
+					return;
+				}
+			}
+		}
+		
+	}
+	
+	public void spawnRoundRoom(int number) {
+		int spawned = 0;
+		for (Tile t : world.getTilesRandomly()) {
+			if(t.getTerrain() != Terrain.GRASS) {
+				continue;
+			}else {
+				if(spawned < number) {
+					generateRoundRoom(t, (2+((int)(Math.random()*2))));
 					spawned ++;
 				}else {
 					return;
@@ -979,7 +1002,7 @@ public class Game {
 	            TileLoc loc = new TileLoc(x, y);
 	            Tile tile = world.get(loc);
 	            previousTile = tile;
-	    	    if(placedEntrance == false && Math.random() > 0.1) {
+	    	    if(placedEntrance == false && Math.random() < 0.1) {
 	        		placedEntrance = true;
 	        		continue;
 	        	}
@@ -1006,6 +1029,47 @@ public class Game {
 	    
 	}
 	
+	private void generateRoundRoom(Tile center, int r) {
+	    int centerX = center.getLocation().x();
+	    int centerY = center.getLocation().y();
+	    Faction factionId = world.getFaction(World.NO_FACTION_ID);
+	    BuildingType wallType = Game.buildingTypeMap.get("WALL_WOOD");
+	    BuildingType chest = Game.buildingTypeMap.get("TREASURE");
+
+	    boolean placedEntrance = false;
+	    Tile previousWallTile = null;
+
+	    for (int y = centerY - r; y <= centerY + r; y++) {
+	        for (int x = centerX - r; x <= centerX + r; x++) {
+	            int dx = x - centerX;
+	            int dy = y - centerY;
+	            double dist = Math.sqrt(dx * dx + dy * dy);
+
+	            // Select tiles where distance is "close enough" to r (within 0.5)
+	            if (Math.abs(dist - r) < 0.7) {
+	                Tile tile = world.get(new TileLoc(x, y));
+	                if (tile != null) {
+	                    // Leave an entrance gap
+	                    if (!placedEntrance && Math.random() > 0.9) {
+	                        placedEntrance = true;
+	                        continue;
+	                    }
+
+	                    summonBuilding(tile, wallType, factionId, true, 0);
+	                    tile.getBuilding().setImmuneToLiquidDamage(true);
+	                    previousWallTile = tile;
+	                }
+	            }
+	        }
+	    }
+
+	    // Ensure there’s at least one entrance
+	    if (!placedEntrance && previousWallTile != null && previousWallTile.getBuilding() != null) {
+	        previousWallTile.getBuilding().setDead(true);
+	    }
+	    summonBuilding(center, chest, factionId, true, 1);
+	}
+	    
 	private void spawnLabyrinthRuins(Tile origin, int size) {
 	    Faction factionId = world.getFaction(World.NO_FACTION_ID);
 	    BuildingType wallType = Game.buildingTypeMap.get("WALL_STONE");

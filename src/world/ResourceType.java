@@ -10,28 +10,28 @@ public enum ResourceType {
 	
 	//		        numVeins  isRare?   maxHeight
 	//        effort     Veinsize   minHeight                      ticksHarvest
-	COPPER (400, 100 , 12, 10, false, 150, 300, ItemType.COPPER_ORE, true, 5, "FARMING",
+	COPPER (400, 100 , 12, 10, false, 150, 300, ItemType.COPPER_ORE, true, 10, "FARMING",
 			new String[] {"Images/resources/copper/ore_copper128.png"}),
-	SILVER (400, 100, 12, 10, false, 150, 300, ItemType.SILVER_ORE, true, 5, "FARMING",
+	SILVER (400, 100, 12, 10, false, 150, 300, ItemType.SILVER_ORE, true, 10, "FARMING",
 			new String[] {"Images/resources/silver/ore_silver128.png"}),
-	GOLD   (400, 100, 8, 8, false, 150, 300, ItemType.GOLD_ORE, true, 10, "FARMING",
+	GOLD   (400, 100, 8, 8, false, 150, 300, ItemType.GOLD_ORE, true, 20, "FARMING",
 			new String[] {"Images/resources/gold/ore_gold128.png"} ),
 	
 	
-	COAL (400, 100 , 10, 5, false, 0, 500, ItemType.COAL, true, 5, "BRONZE_WORKING",
+	COAL (400, 100 , 10, 5, false, 0, 500, ItemType.COAL, true, 10, "BRONZE_WORKING",
 			new String[] {"Images/resources/ore_coal128.png"}),
-	IRON (400, 100, 8, 8, false, 0, 500, ItemType.IRON_ORE, true, 5, "BRONZE_WORKING",
+	IRON (400, 100, 8, 8, false, 0, 500, ItemType.IRON_ORE, true, 20, "BRONZE_WORKING",
 			new String[] {"Images/resources/iron/ore_iron128.png"}),
 	
-	MITHRIL (400, 100, 6, 8, true, 0, 200, ItemType.MITHRIL_ORE, true, 10, "IRON_WORKING",
+	MITHRIL (400, 100, 6, 8, true, 0, 200, ItemType.MITHRIL_ORE, true, 25, "IRON_WORKING",
 			new String[] {"Images/resources/mithril/ore_mithril128.png"} ),
 	
-	ADAMANTITE (400, 100, 2, 5, true, 500, 700, ItemType.ADAMANTITE_ORE, true, 15, "ARMORING",
+	ADAMANTITE (400, 100, 2, 5, true, 500, 700, ItemType.ADAMANTITE_ORE, true, 30, "ARMORING",
 			new String[] {"Images/resources/adamantite/ore_adamant128.png"} ),
 	
-	RUNITE  (400, 100 , 1, 5, true, 700, 1000, ItemType.RUNITE_ORE, true, 15,"CIVILIZATION",
+	RUNITE  (400, 100 , 1, 5, true, 700, 1000, ItemType.RUNITE_ORE, true, 40,"CIVILIZATION",
 			new String[] {"Images/resources/runite/ore_rune128.png"}),
-	TITANIUM (400, 100, 1, 3, true, 700, 1000, ItemType.TITANIUM_ORE, true, 15, "CIVILIZATION",
+	TITANIUM (400, 100, 1, 3, true, 700, 1000, ItemType.TITANIUM_ORE, true, 50, "CIVILIZATION",
 			new String[] {"Images/resources/titanium/ore_titanium128.png"} ),
 	
 	;
@@ -86,6 +86,9 @@ public enum ResourceType {
 	}
 	public void subtractRemainingAmount(int amount) {
 		this.resourceLeft -= 1;
+	}
+	public void setRemainingAmount(int amount) {
+		this.resourceLeft = amount;
 	}
 	public int getRemainingEffort() {
 		return remainingEffort;
