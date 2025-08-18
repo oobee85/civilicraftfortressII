@@ -199,37 +199,37 @@ public class UnitManager {
 		workerToFarm.put(worker, farm);
 	}
 
-	public Building getFarmForWorker(Unit worker, Set<Building> buildings) {
-		if (workerToFarm.containsKey(worker)) {
-			Building farm = workerToFarm.get(worker);
-			if (farm.isDead()) {
-				workerToFarm.remove(worker);
-				farmToWorker.remove(farm);
-			}
-			else {
-				return farm;
-			}
-		}
-		
-		for (Building building : buildings) {
-			if (building.getType() != FARM) {
-				continue;
-			}
-			Building farm = building;
-			if (farmToWorker.containsKey(farm)) {
-				Unit existingWorker = farmToWorker.get(farm);
-				if (!existingWorker.isDead()) {
-					continue;
-				}
-				farmToWorker.remove(farm);
-				workerToFarm.remove(existingWorker);
-			}
-
-			assignWorkerToFarm(worker, farm);
-			return farm;
-		}
-		return null;
-	}
+//	public Building getFarmForWorker(Unit worker, Set<Building> buildings) {
+//		if (workerToFarm.containsKey(worker)) {
+//			Building farm = workerToFarm.get(worker);
+//			if (farm.isDead()) {
+//				workerToFarm.remove(worker);
+//				farmToWorker.remove(farm);
+//			}
+//			else {
+//				return farm;
+//			}
+//		}
+//		
+//		for (Building building : buildings) {
+//			if (building.getType() != FARM) {
+//				continue;
+//			}
+//			Building farm = building;
+//			if (farmToWorker.containsKey(farm)) {
+//				Unit existingWorker = farmToWorker.get(farm);
+//				if (!existingWorker.isDead()) {
+//					continue;
+//				}
+//				farmToWorker.remove(farm);
+//				workerToFarm.remove(existingWorker);
+//			}
+//
+//			assignWorkerToFarm(worker, farm);
+//			return farm;
+//		}
+//		return null;
+//	}
 	
 
 }

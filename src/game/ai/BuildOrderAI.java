@@ -106,11 +106,11 @@ public class BuildOrderAI extends AIInterface {
 				else if (t.getResource() == ResourceType.MITHRIL) {
 					mithrilTiles.add(t);
 				}
-				sortAndRemoveAllBut(silverTiles, 50);
-				sortAndRemoveAllBut(copperTiles, 50);
-				sortAndRemoveAllBut(ironTiles, 50);
-				sortAndRemoveAllBut(coalTiles, 50);
-				sortAndRemoveAllBut(mithrilTiles, 50);
+				sortAndRemoveAllBut(silverTiles, 20);
+				sortAndRemoveAllBut(copperTiles, 20);
+				sortAndRemoveAllBut(ironTiles, 20);
+				sortAndRemoveAllBut(coalTiles, 20);
+				sortAndRemoveAllBut(mithrilTiles, 20);
 
 				tilesToDefend.addAll(silverTiles);
 				tilesToDefend.addAll(copperTiles);
@@ -235,13 +235,6 @@ public class BuildOrderAI extends AIInterface {
 		WorkerTask task = unitManager.getTaskFor(worker.id());
 		boolean result = true;
 		switch (task) {
-		case FARM:
-			if (!handleFarmingWorker(worker)) {
-				if (!handleChoppingWorker(worker)) {
-					collectNearbyDroppedResources(worker);
-				}
-			}
-			break;
 		case CHOP:
 			if (!handleChoppingWorker(worker)) {
 				collectNearbyDroppedResources(worker);
@@ -255,9 +248,6 @@ public class BuildOrderAI extends AIInterface {
 			break;
 		case FORAGE:
 			result = handleForagingWorker(worker, FAR_FORAGE_RADIUS);
-			break;
-		case GATHERSTONE:
-			handleGatherStoneWorker(worker);
 			break;
 		case GATHERSILVER:
 			result = handleGatherMetalWorker(worker, silverTiles);
@@ -295,16 +285,16 @@ public class BuildOrderAI extends AIInterface {
 		return true;
 	}
 	
-	private void handleGatherStoneWorker(Unit worker) {
-		Tile tile = getTargetTile(worker.getTile(), 0, FAR_FORAGE_RADIUS, e -> {
-			return e.getTerrain() == Terrain.ROCK && e.getResource() == null
-					&& (e.getBuilding() == null || !e.getBuilding().getType().isCastle()) ;
-		});
-		if(tile == null) {
-			return;
-		}
-		commands.planAction(worker, PlannedAction.harvestTile(tile), true);
-	}
+//	private void handleGatherStoneWorker(Unit worker) {
+//		Tile tile = getTargetTile(worker.getTile(), 0, FAR_FORAGE_RADIUS, e -> {
+//			return e.getTerrain() == Terrain.ROCK && e.getResource() == null
+//					&& (e.getBuilding() == null || !e.getBuilding().getType().isCastle()) ;
+//		});
+//		if(tile == null) {
+//			return;
+//		}
+//		commands.planAction(worker, PlannedAction.harvestTile(tile), true);
+//	}
 	
 	private Building getRandomCompletedCastle() {
 		if (castles.isEmpty()) {
@@ -494,11 +484,11 @@ public class BuildOrderAI extends AIInterface {
 	
 	
 	private boolean handleFarmingWorker(Unit worker) {
-		Building farmNeedsWorker = unitManager.getFarmForWorker(worker, faction.getBuildings());
-		if(farmNeedsWorker != null) {
-			finishBuildAndHarvest(worker, farmNeedsWorker);
-			return true;
-		}
+//		Building farmNeedsWorker = unitManager.getFarmForWorker(worker, faction.getBuildings());
+//		if(farmNeedsWorker != null) {
+//			finishBuildAndHarvest(worker, farmNeedsWorker);
+//			return true;
+//		}
 		
 		Tile homeTile = getHomeTile(worker);
 		Tile chosenTile = getTargetTile(homeTile, 1, MAX_BUILD_RADIUS, e -> {

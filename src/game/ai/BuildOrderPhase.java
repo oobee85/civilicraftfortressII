@@ -9,7 +9,7 @@ public class BuildOrderPhase {
 	public static List<BuildOrderPhase> phases = new ArrayList<>();
 
 	public enum WorkerTask {
-		CLOSEFORAGE, FORAGE, FARM, CHOP, GATHERSTONE, GATHERSILVER, GATHERCOPPER, GATHERIRON, GATHERCOAL, GATHERMITHRIL
+		CLOSEFORAGE, FORAGE, CHOP, GATHERSILVER, GATHERCOPPER, GATHERIRON, GATHERCOAL, GATHERMITHRIL
 	}
 	
 	public int order;

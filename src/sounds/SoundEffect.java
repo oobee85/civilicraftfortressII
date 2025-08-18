@@ -39,17 +39,17 @@ public enum SoundEffect {
 	BACKGROUND_MUSIC_DIRT ("music/dirt.wav", true),
 	BACKGROUND_MUSIC_ROUGH ("music/rough.wav", true),
 	BACKGROUND_MUSIC_UNDERGROUND ("music/underground.wav", true),
-	explore1 ("music/explore1.wav", true),
-	explore2 ("music/explore2.wav", true),
-	explore3 ("music/explore3.wav", true),
-	explore4 ("music/explore4.wav", true),
+//	explore1 ("music/explore1.wav", true),
+//	explore2 ("music/explore2.wav", true),
+//	explore3 ("music/explore3.wav", true),
+//	explore4 ("music/explore4.wav", true),
 	
-	tense1 ("music/tense1.wav", true),
-	
-	COMBAT1 ("music/combat1.wav", true),
-	COMBAT2 ("music/combat2.wav", true),
-	COMBAT3 ("music/combat3.wav", true),
-	COMBAT4 ("music/combat4.wav", true),
+//	tense1 ("music/tense1.wav", true),
+//	
+//	COMBAT1 ("music/combat1.wav", true),
+//	COMBAT2 ("music/combat2.wav", true),
+//	COMBAT3 ("music/combat3.wav", true),
+//	COMBAT4 ("music/combat4.wav", true),
 
 	mushroomwizard ("music/mushroomwizard.wav", true),
 	

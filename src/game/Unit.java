@@ -5,7 +5,6 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import game.actions.*;
-import game.ai.*;
 import game.components.*;
 import game.pathfinding.*;
 import sounds.SoundEffect;
@@ -28,7 +27,6 @@ public class Unit extends Thing implements Serializable {
 	private transient double timeToHeal;
 	private transient boolean isIdle;
 	private CombatStats combatStats;
-	private AttackStyle attackStyle;
 	
 	private transient LinkedList<Tile> currentPath;
 
@@ -702,7 +700,6 @@ public class Unit extends Thing implements Serializable {
 			return false;
 		}
 		boolean didSomething = false;
-		boolean isBuilder = isBuilder();
 		if(plan.isBuildRoadAction() && isBuilder()) {
 			// when road finishes, worker doesn't die
 			Building tobuild = plan.getTile().getRoad();
