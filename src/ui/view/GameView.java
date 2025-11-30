@@ -613,9 +613,6 @@ public class GameView {
 					else if(targetTile.getResource() != null && unit.getFaction().inRangeColony(unit, targetTile)) {
 						commandInterface.planAction(unit, PlannedAction.harvestTile(targetTile), !shiftDown);
 					}
-					else if(targetTile.getTerrain() == Terrain.ROCK && unit.getFaction().inRangeColony(unit, targetTile)) {
-						commandInterface.planAction(unit, PlannedAction.harvestTile(targetTile), !shiftDown);
-					}
 					else {
 						
 						commandInterface.planAction(unit, PlannedAction.moveTo(targetTile), !shiftDown);
