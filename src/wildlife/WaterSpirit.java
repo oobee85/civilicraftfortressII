@@ -13,10 +13,6 @@ public class WaterSpirit extends Animal {
 		super(Game.unitTypeMap.get("WATER_SPIRIT"), tile, faction);
 	}
 	
-	@Override
-	public boolean wantsToEat() {
-		return false;
-	}
 	
 	@Override
 	public void updateState() {

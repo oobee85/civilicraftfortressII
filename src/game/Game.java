@@ -736,8 +736,9 @@ public class Game {
 		makeRoads(easymode);
 		world.clearDeadAndAddNewThings();
 //		meteorStrike();
-		makeStartingCastleAndUnits(easymode, players, world.worldRNG);
+		
 		spawnStartingEnemies();
+		makeStartingCastleAndUnits(easymode, players, world.worldRNG);
 	}
 
 	public void spawnStartingEnemies() {
@@ -1844,6 +1845,7 @@ public class Game {
 							world.getFaction(World.NO_FACTION_ID));
 					road.setRemainingEffort(0);
 					t.setRoad(road);
+//					road.setImmuneToLiquidDamage(true);
 					world.addBuilding(road);
 					if(t.getPlant() != null) {
 						t.getPlant().setDead(true);
@@ -1882,7 +1884,6 @@ public class Game {
 		int numSafeTiles = 0;
 
 		for (Tile t : tiles) {
-
 			if (isValidSpawnTileForBuilding(t, Game.buildingTypeMap.get("CASTLE"))) {
 				numSafeTiles++;
 			}
@@ -1892,6 +1893,7 @@ public class Game {
 		}
 		return false;
 	}
+	
 
 	private boolean isValidSpawnTileForBuilding(Tile tile, BuildingType type) {
 		return tile.canBuild() == true && !tile.hasBuilding()
@@ -1928,6 +1930,7 @@ public class Game {
 			if (!isValidSpawnLocation(t, 5)) {
 				continue;
 			}
+			
 			validSpawns.add(t);
 		}
 

@@ -76,14 +76,14 @@ public class Parasite extends Animal {
 		}
 	}
 	
-	@Override
-	public void chooseWhereToMove(World world) {
-		if(!transformed) {
-			super.chooseWhereToMove(world);
-		}
-		else {
-			clearPlannedActions();
-			queuePlannedAction(PlannedAction.moveTo(volcano));
-		}
-	}
+//	@Override
+//	public void chooseWhereToMove(World world) {
+//		if(!transformed) {
+//			super.chooseWhereToMove(world);
+//		}
+//		else {
+//			clearPlannedActions();
+//			queuePlannedAction(PlannedAction.moveTo(volcano));
+//		}
+//	}
 }
